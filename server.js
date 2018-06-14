@@ -120,13 +120,13 @@ function leaveGame(game, socket) {
 	
 	socket.broadcast.to(game.id).emit("leave", { gameId: game.id, heroId });
 	socket.leave(game.id);
-	console.log("Game [" + game.id + "]: player " + socket.id + " left");
+	console.log("Game [" + game.id + "]: player " + socket.id + " left after " + game.tick + " ticks");
 }
 
 function finishGame(game) {
 	games.delete(game.id);
 	clearInterval(game.intervalHandle);
-	console.log("Game [" + game.id + "]: finished");
+	console.log("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
 
 function gameTick(game) {
@@ -149,7 +149,7 @@ function gameTick(game) {
 		game.actions.clear();
 
 		if (data.actions.length > 0) {
-			console.log("Game [" + game.id + "]: tick #" + data.tick + ", " + data.actions.length + " actions");
+			// console.log("Game [" + game.id + "]: tick #" + data.tick + ", " + data.actions.length + " actions");
 		}
 
 		io.to(game.id).emit('tick', data);
