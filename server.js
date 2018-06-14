@@ -76,16 +76,36 @@ function initGame() {
 }
 
 function joinGame(game, socket) {
-	var heroId = "hero" + game.numPlayers++;
+	var heroId = null;
+
+	// Take an existing slot, if possible
+	var activeHeroIds = new Set(game.active.values());
+	for (var i = 0; i < game.numPlayers; ++i) {
+		var candidate = formatHeroId(i);
+		if (!activeHeroIds.has(candidate)) {
+			heroId = candidate;
+			break;
+		}
+	}
+
+	// No existing slots, create a new one
+	if (!heroId) {
+		heroId = formatHeroId(game.numPlayers++);
+	}
+
 	game.active.set(socket.id, heroId);
 	socket.join(game.id);
 
 	socket.emit("hero", { gameId: game.id, heroId, numPlayers: game.numPlayers, active: [...game.active.values()] });
-	socket.broadcast.to(game.id).emit("join", { gameId: game.id, numPlayers: game.numPlayers });
+	socket.broadcast.to(game.id).emit("join", { gameId: game.id, heroId, numPlayers: game.numPlayers });
 
 	console.log("Game [" + game.id + "]: player " + socket.id + " joined, now " + game.numPlayers + " players");
 
 	return heroId;
+}
+
+function formatHeroId(index) {
+	return "hero" + index;
 }
 
 function queueAction(game, actionData) {

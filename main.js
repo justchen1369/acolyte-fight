@@ -216,6 +216,8 @@ var Spells = {
 
 var world = {
 	tick: 0,
+	numPlayers: 0,
+	activePlayers: new Set(),
 	objects: new Map(),
 	trails: [],
 	physics: planck.World(),
@@ -316,20 +318,18 @@ function onHeroMsg(data) {
 		}
 	});
 
-	var active = new Set(data.active);
-	heroIds.forEach(heroId => {
-		if (!active.has(heroId)) {
-			deactivateHero(world, heroId);
-		}
-	});
+	data.active.forEach(heroId => world.activePlayers.add(heroId));
 }
 function onJoinMsg(data) {
-	addHeroAtDefaultPosition(world);
+	while (world.numPlayers < data.numPlayers) {
+		addHeroAtDefaultPosition(world);
+	}
+	world.activePlayers.add(data.heroId);
 	console.log("Another player joined, num players now " + data.numPlayers);
 }
 function onLeaveMsg(data) {
 	console.log("Player left game: " + data.heroId);
-	deactivateHero(world, data.heroId);
+	world.activePlayers.delete(data.heroId);
 }
 function onTickMsg(data) {
 	tickQueue.push(data);
@@ -386,6 +386,8 @@ function addHero(world, position) {
 		fillStyle: HeroColors[index % HeroColors.length],
 	};
 	world.objects.set(id, hero);
+
+	++world.numPlayers;
 
 	return hero;
 }
@@ -771,7 +773,7 @@ function renderWorld(ctx, world, rect) {
 
 	world.objects.forEach(obj => {
 		if (obj.type === "hero") {
-			renderHero(ctx, obj);
+			renderHero(ctx, obj, world);
 		} else if (obj.type in Spells) {
 			var spell = Spells[obj.type];
 			spell.render(ctx, obj, world, spell);
@@ -809,7 +811,7 @@ function renderMap(ctx, world) {
 	ctx.restore();
 }
 
-function renderHero(ctx, hero) {
+function renderHero(ctx, hero, world) {
 	var pos = hero.body.getPosition();
 
 	ctx.save();
@@ -819,6 +821,8 @@ function renderHero(ctx, hero) {
 	ctx.fillStyle = hero.fillStyle;
 	if (hero.id === myHeroId) {
 		ctx.fillStyle = MyHeroColor;
+	} else if (!world.activePlayers.has(hero.id)) {
+		ctx.fillStyle = '#666666';
 	}
 	ctx.beginPath();
 	ctx.arc(0, 0, HeroRadius, 0, 2 * Math.PI);
