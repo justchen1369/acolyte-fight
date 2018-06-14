@@ -18,6 +18,7 @@ var server = http.listen(port, function() {
 // Game management
 var TicksPerSecond = 60;
 var JoinPeriod = 5 * TicksPerSecond;
+var MaxHistoryLength = 60 * TicksPerSecond;
 var MaxPlayers = 10;
 var nextGameId = 0;
 var games = new Map();
@@ -67,6 +68,7 @@ function initGame() {
 		started: false,
 		numPlayers: 0,
 		tick: 0,
+		joinLimit: MaxHistoryLength,
 		actions: new Map(),
 		history: [],
 	};
@@ -124,9 +126,15 @@ function queueAction(game, actionData) {
 		game.actions.set(actionData.heroId, actionData);
 	}
 
-	if (shouldStartGame(actionData) && !game.started) {
-		game.started = true;
-		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
+	if (game.started) {
+		if (game.history && isUnjoinable(actionData)) {
+			game.joinLimit = JoinPeriod;
+		}
+	} else {
+		if (shouldStartGame(actionData)) {
+			game.started = true;
+			console.log("Started game " + game.id + " with " + game.numPlayers + " players");
+		}
 	}
 
 	// console.log("Game [" + game.id + "]: action received", actionData);
@@ -150,6 +158,17 @@ function shouldStartGame(actionData) {
 	switch (actionData.actionType) {
 		case "leave":
 		case "join":
+			return false;
+		default:
+			return true;
+	}
+}
+
+function isUnjoinable(actionData) {
+	switch (actionData.actionType) {
+		case "leave":
+		case "join":
+		case "move":
 			return false;
 		default:
 			return true;
@@ -193,7 +212,7 @@ function gameTick(game) {
 
 		if (game.history) {
 			game.history.push(data);
-			if (game.history.length > JoinPeriod) {
+			if (game.history.length >= MaxHistoryLength || game.history.length >= game.joinLimit) {
 				game.history = null; // Make the game unjoinable
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
 			}
