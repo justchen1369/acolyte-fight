@@ -308,6 +308,10 @@ function attachToSocket(socket) {
 			socket.emit('join', {});
 		}
 	});
+	socket.on('disconnect', () => {
+		console.log("Disconnected");
+		onDisconnectMsg();
+	});
 	socket.on('hero', onHeroMsg);
 	socket.on('tick', onTickMsg);
 }
@@ -322,6 +326,9 @@ function onHeroMsg(data) {
 }
 function onTickMsg(data) {
 	tickQueue.push(data);
+}
+function onDisconnectMsg() {
+	world.activePlayers.clear();
 }
 function sendAction(heroId, action) {
 	socket.emit('action', {
@@ -838,10 +845,10 @@ function renderHero(ctx, hero, world) {
 
 	// Fill
 	ctx.fillStyle = hero.fillStyle;
-	if (hero.id === myHeroId) {
-		ctx.fillStyle = MyHeroColor;
-	} else if (!world.activePlayers.has(hero.id)) {
+	if (!world.activePlayers.has(hero.id)) {
 		ctx.fillStyle = '#666666';
+	} else if (hero.id === myHeroId) {
+		ctx.fillStyle = MyHeroColor;
 	}
 	ctx.beginPath();
 	ctx.arc(0, 0, HeroRadius, 0, 2 * Math.PI);
