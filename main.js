@@ -308,6 +308,20 @@ function onHeroMsg(data) {
 	myGameId = data.gameId;
 	myHeroId = data.heroId;
 	console.log("Joined game with " + data.numPlayers + " players as hero id " + myHeroId);
+
+	var heroIds = [];
+	world.objects.forEach(obj => {
+		if (obj.type === "hero") {
+			heroIds.push(obj.id);
+		}
+	});
+
+	var active = new Set(data.active);
+	heroIds.forEach(heroId => {
+		if (!active.has(heroId)) {
+			deactivateHero(world, heroId);
+		}
+	});
 }
 function onJoinMsg(data) {
 	addHeroAtDefaultPosition(world);

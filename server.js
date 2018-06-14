@@ -80,7 +80,7 @@ function joinGame(game, socket) {
 	game.active.set(socket.id, heroId);
 	socket.join(game.id);
 
-	socket.emit("hero", { gameId: game.id, heroId, numPlayers: game.numPlayers });
+	socket.emit("hero", { gameId: game.id, heroId, numPlayers: game.numPlayers, active: [...game.active.values()] });
 	socket.broadcast.to(game.id).emit("join", { gameId: game.id, numPlayers: game.numPlayers });
 
 	console.log("Game [" + game.id + "]: player " + socket.id + " joined, now " + game.numPlayers + " players");
@@ -135,7 +135,7 @@ function gameTick(game) {
 		return;
 	}
 
-	if (!game.started && game.actions.size > 0) {
+	if (!game.started && (game.actions.size > 0 || game.numPlayers >= 10)) {
 		game.started = true;
 		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
 	}
