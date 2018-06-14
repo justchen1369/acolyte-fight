@@ -283,7 +283,8 @@ function canvasMouseMove(e) {
 	var rect = e.target.getBoundingClientRect();
 	var target = pl.Vec2((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
 
-	if (e.buttons != 0) {
+	if (e.buttons || e.button) {
+		console.log(e.button);
 		sendAction(myHeroId, { type: "move", target });
 	}
 
