@@ -994,32 +994,32 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 			var cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
 			ctx.font = 'bold ' + (ButtonSize - 1) + 'px sans-serif';
-
-			ctx.fillStyle = 'black';
-			ctx.fillText(cooldownText, ButtonSize / 2 + 1, ButtonSize / 2 + 1);
-
-			ctx.fillStyle = 'white';
-			ctx.fillText(cooldownText, ButtonSize / 2, ButtonSize / 2);
+			renderTextWithShadow(ctx, cooldownText, ButtonSize / 2, ButtonSize / 2);
 		} else {
 			// Keyboard shortcut
-			{
-				ctx.save();
+			ctx.save();
 
-				ctx.font = 'bold ' + (ButtonSize / 2 - 1) + 'px sans-serif';
+			ctx.font = 'bold ' + (ButtonSize / 2 - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, spell.key.toUpperCase(), ButtonSize / 4, ButtonSize * 3 / 4);
 
-				ctx.fillStyle = 'black';
-				ctx.fillText(spell.key.toUpperCase(), ButtonSize / 4 + 1, ButtonSize * 3 / 4 + 1);
-
-				ctx.fillStyle = 'white';
-				ctx.fillText(spell.key.toUpperCase(), ButtonSize / 4, ButtonSize * 3 / 4);
-
-				ctx.restore();
-			}
+			ctx.restore();
 		}
 
 
 		ctx.restore();
 	}
+
+	ctx.restore();
+}
+
+function renderTextWithShadow(ctx, text, x, y) {
+	ctx.save();
+
+	ctx.fillStyle = 'black';
+	ctx.fillText(text, x + 1, y + 1);
+
+	ctx.fillStyle = 'white';
+	ctx.fillText(text, x, y);
 
 	ctx.restore();
 }
