@@ -36,9 +36,10 @@ var HealthBarHeight = Pixel * 3;
 var HealthBarMargin = Pixel * 2;
 var ChargingIndicatorMargin = Pixel * 5;
 var ChargingIndicatorWidth = Pixel * 2;
-var ButtonSpacing = Pixel * 10;
-var ButtonMargin = Pixel * 5;
-var ButtonSize = Pixel * 50;
+
+var ButtonSpacing = 10;
+var ButtonMargin = 5;
+var ButtonSize = 50;
 
 function loadImage(path) {
 	var img = new Image();
@@ -740,6 +741,15 @@ function render(world, canvas) {
 	var ctx = canvas.getContext('2d');
 
 	ctx.save();
+	renderWorld(ctx, world, rect);
+	renderInterface(ctx, world, rect);
+
+	ctx.restore();
+}
+
+function renderWorld(ctx, world, rect) {
+	ctx.save();
+
 	ctx.scale(rect.width, rect.height);
 	ctx.clearRect(0, 0, 1, 1);
 
@@ -763,11 +773,6 @@ function render(world, canvas) {
 		}
 	});
 	world.trails = newTrails;
-
-	var myHero = world.objects.get(myHeroId);
-	if (myHero) {
-		renderButtons(ctx, ui.buttons, world, myHero, world.actions);
-	}
 
 	ctx.restore();
 }
@@ -923,14 +928,21 @@ function renderTrail(ctx, trail) {
 	return trail.remaining <= 0;
 }
 
-function renderButtons(ctx, buttons, world, hero, actions) {
+function renderInterface(ctx, world, rect) {
+	var myHero = world.objects.get(myHeroId);
+	if (myHero) {
+		renderButtons(ctx, ui.buttons, world, myHero, world.actions, rect);
+	}
+}
+
+function renderButtons(ctx, buttons, world, hero, actions, rect) {
 	var heroAction = actions.get(hero.id);
 	var selectedAction = heroAction && heroAction.type;
 
 	var buttonBarWidth = buttons.length * ButtonSize + (buttons.length - 1) * ButtonSpacing;
 
 	ctx.save();
-	ctx.translate(0.5 - buttonBarWidth / 2.0, 1.0 - ButtonSize - ButtonMargin);
+	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonSize - ButtonMargin);
 
 	for (var i = 0; i < buttons.length; ++i) {
 		var spell = Spells[buttons[i]];
@@ -981,10 +993,10 @@ function renderButtons(ctx, buttons, world, hero, actions) {
 		// Cooldown
 			var cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
-			ctx.font = 'bold ' + (ButtonSize - Pixel) + 'px sans-serif';
+			ctx.font = 'bold ' + (ButtonSize - 1) + 'px sans-serif';
 
 			ctx.fillStyle = 'black';
-			ctx.fillText(cooldownText, ButtonSize / 2 + Pixel, ButtonSize / 2 + Pixel);
+			ctx.fillText(cooldownText, ButtonSize / 2 + 1, ButtonSize / 2 + 1);
 
 			ctx.fillStyle = 'white';
 			ctx.fillText(cooldownText, ButtonSize / 2, ButtonSize / 2);
@@ -993,10 +1005,10 @@ function renderButtons(ctx, buttons, world, hero, actions) {
 			{
 				ctx.save();
 
-				ctx.font = 'bold ' + (ButtonSize / 2 - Pixel) + 'px sans-serif';
+				ctx.font = 'bold ' + (ButtonSize / 2 - 1) + 'px sans-serif';
 
 				ctx.fillStyle = 'black';
-				ctx.fillText(spell.key.toUpperCase(), ButtonSize / 4 + Pixel, ButtonSize * 3 / 4 + Pixel);
+				ctx.fillText(spell.key.toUpperCase(), ButtonSize / 4 + 1, ButtonSize * 3 / 4 + 1);
 
 				ctx.fillStyle = 'white';
 				ctx.fillText(spell.key.toUpperCase(), ButtonSize / 4, ButtonSize * 3 / 4);
