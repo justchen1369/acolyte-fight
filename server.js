@@ -17,6 +17,8 @@ var server = http.listen(port, function() {
 
 // Game management
 var TicksPerSecond = 60;
+var JoinPeriod = 5 * TicksPerSecond;
+var MaxPlayers = 10;
 var nextGameId = 0;
 var games = new Map();
 
@@ -39,7 +41,7 @@ function onConnection(socket) {
 function onJoinGameMsg(socket, data) {
 	var game = null;
 	games.forEach(g => {
-		if (!g.started) {
+		if ((!g.started || g.history) && g.active.size < MaxPlayers) {
 			game = g;
 		}
 	});
@@ -66,6 +68,7 @@ function initGame() {
 		numPlayers: 0,
 		tick: 0,
 		actions: new Map(),
+		history: [],
 	};
 	games.set(game.id, game);
 
@@ -96,8 +99,13 @@ function joinGame(game, socket) {
 	game.active.set(socket.id, heroId);
 	socket.join(game.id);
 
-	socket.emit("hero", { gameId: game.id, heroId, numPlayers: game.numPlayers, active: [...game.active.values()] });
-	socket.broadcast.to(game.id).emit("join", { gameId: game.id, heroId, numPlayers: game.numPlayers });
+	socket.emit("hero", {
+		gameId: game.id, heroId,
+		numPlayers: game.numPlayers,
+		history: game.history,
+	});
+
+	queueAction(game, { heroId, actionType: "join" });
 
 	console.log("Game [" + game.id + "]: player " + socket.id + " joined, now " + game.numPlayers + " players");
 
@@ -115,16 +123,36 @@ function queueAction(game, actionData) {
 	if (newPrecedence >= currentPrecedence) {
 		game.actions.set(actionData.heroId, actionData);
 	}
+
+	if (shouldStartGame(actionData) && !game.started) {
+		game.started = true;
+		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
+	}
+
 	// console.log("Game [" + game.id + "]: action received", actionData);
 }
 
 function actionPrecedence(actionData) {
 	if (!actionData) {
 		return 0;
-	} else if (actionData.actionType === "move") {
-		return 100;
-	} else {
+	} else if (actionData.actionType === "leave") {
+		return 1001;
+	} else if (actionData.actionType === "join") {
 		return 1000;
+	} else if (actionData.actionType === "move") {
+		return 10;
+	} else {
+		return 100;
+	}
+}
+
+function shouldStartGame(actionData) {
+	switch (actionData.actionType) {
+		case "leave":
+		case "join":
+			return false;
+		default:
+			return true;
 	}
 }
 
@@ -132,13 +160,13 @@ function actionPrecedence(actionData) {
 function leaveGame(game, socket) {
 	var heroId = game.active.get(socket.id);
 	if (!heroId) {
-	console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
+		console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
 		return;
 	}
 
+	queueAction(game, { heroId, actionType: "leave" });
+
 	game.active.delete(socket.id);
-	
-	socket.broadcast.to(game.id).emit("leave", { gameId: game.id, heroId });
 	socket.leave(game.id);
 	console.log("Game [" + game.id + "]: player " + socket.id + " left after " + game.tick + " ticks");
 }
@@ -155,12 +183,7 @@ function gameTick(game) {
 		return;
 	}
 
-	if (!game.started && (game.actions.size > 0 || game.numPlayers >= 10)) {
-		game.started = true;
-		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
-	}
-
-	if (game.started) {
+	if (game.started || game.actions.size > 0) {
 		var data = {
 			gameId: game.id,
 			tick: game.tick++,
@@ -168,8 +191,12 @@ function gameTick(game) {
 		};
 		game.actions.clear();
 
-		if (data.actions.length > 0) {
-			// console.log("Game [" + game.id + "]: tick #" + data.tick + ", " + data.actions.length + " actions");
+		if (game.history) {
+			game.history.push(data);
+			if (game.history.length > JoinPeriod) {
+				game.history = null; // Make the game unjoinable
+				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
+			}
 		}
 
 		io.to(game.id).emit('tick', data);

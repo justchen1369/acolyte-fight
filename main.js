@@ -29,7 +29,6 @@ var LavaDamagePerTick = 0.25;
 var ShrinkPerTick = 0.00005;
 
 var Pixel = 0.001;
-var MinTickBuffer = 2;
 var MaxTickBuffer = 5;
 var HealthBarRadius = HeroRadius * 0.9;
 var HealthBarHeight = Pixel * 3;
@@ -216,8 +215,12 @@ var Spells = {
 
 var world = {
 	tick: 0,
+
 	numPlayers: 0,
+	joining: [],
+	leaving: [],
 	activePlayers: new Set(),
+
 	objects: new Map(),
 	trails: [],
 	physics: planck.World(),
@@ -248,6 +251,7 @@ var ui = {
 };
 
 var tickQueue = [];
+var tickFuture = [];
 
 var myGameId = null;
 var myHeroId = null;
@@ -258,9 +262,15 @@ window.requestAnimationFrame(frame);
 // Facade
 function frame() {
 	var canvas = document.getElementById('canvas');
-	if (tickQueue.length >= MinTickBuffer) {
+
+	if (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		do {
-			applyTickActions(tickQueue.shift(), world);
+			var tickData = tickQueue.shift();
+			if (tickData.tick < world.tick) {
+				continue; // Received the same tick multiple times, skip over it
+			}
+
+			applyTickActions(tickData, world);
 			tick(world);
 		} while (tickQueue.length >= MaxTickBuffer);
 	}
@@ -299,37 +309,16 @@ function attachToSocket(socket) {
 		}
 	});
 	socket.on('hero', onHeroMsg);
-	socket.on('join', onJoinMsg);
-	socket.on('leave', onLeaveMsg);
 	socket.on('tick', onTickMsg);
 }
 function onHeroMsg(data) {
-	for (var i = 0; i < data.numPlayers; ++i) {
-		addHeroAtDefaultPosition(world);
-	}
 	myGameId = data.gameId;
 	myHeroId = data.heroId;
 	console.log("Joined game with " + data.numPlayers + " players as hero id " + myHeroId);
 
-	var heroIds = [];
-	world.objects.forEach(obj => {
-		if (obj.type === "hero") {
-			heroIds.push(obj.id);
-		}
-	});
-
-	data.active.forEach(heroId => world.activePlayers.add(heroId));
-}
-function onJoinMsg(data) {
-	while (world.numPlayers < data.numPlayers) {
-		addHeroAtDefaultPosition(world);
+	if (data.history) {
+		tickQueue = [...data.history, ...tickQueue];
 	}
-	world.activePlayers.add(data.heroId);
-	console.log("Another player joined, num players now " + data.numPlayers);
-}
-function onLeaveMsg(data) {
-	console.log("Player left game: " + data.heroId);
-	world.activePlayers.delete(data.heroId);
 }
 function onTickMsg(data) {
 	tickQueue.push(data);
@@ -344,28 +333,31 @@ function sendAction(heroId, action) {
 }
 function applyTickActions(tickData, world) {
 	tickData.actions.forEach(actionData => {
-		world.actions.set(actionData.heroId, { type: actionData.actionType, target: pl.Vec2(actionData.targetX, actionData.targetY) });
+		if (actionData.actionType === "join") {
+			world.joining.push(actionData.heroId);
+		} else if (actionData.actionType === "leave") {
+			world.leaving.push(actionData.heroId);
+		}else {
+			world.actions.set(actionData.heroId, { type: actionData.actionType, target: pl.Vec2(actionData.targetX, actionData.targetY) });
+		}
 	});
 }
 
 // Model
-function addHeroAtDefaultPosition(world) {
-	var nextHeroId = world.nextHeroId;
-	var numHeroes = nextHeroId + 1;
+function nextHeroPosition(world) {
+	var nextHeroIndex = world.numPlayers;
+	var numHeroes = world.numPlayers + 1;
 	var radius = 0.25;
 	var center = new pl.Vec2(0.5, 0.5);
 
-	var angle = 2 * Math.PI * nextHeroId / numHeroes;
+	var angle = 2 * Math.PI * nextHeroIndex / numHeroes;
 	var pos = vectorPlus(vectorMultiply(pl.Vec2(Math.cos(angle), Math.sin(angle)), radius), center);
-	return addHero(world, pos);
+	return pos;
 }
 
-function addHero(world, position) {
-	var index = world.nextHeroId++;
-	var id = "hero" + index;
-
+function addHero(world, position, heroId) {
 	var body = world.physics.createBody({
-		userData: id,
+		userData: heroId,
 		type: 'dynamic',
 		position,
 		linearDamping: HeroMaxDamping,
@@ -376,16 +368,15 @@ function addHero(world, position) {
 	});
 
 	var hero = {
-		id,
-		index,
+		id: heroId,
 		type: "hero",
 		health: HeroMaxHealth,
 		body,
 		charging: {},
 		cooldowns: {},
-		fillStyle: HeroColors[index % HeroColors.length],
+		fillStyle: HeroColors[world.numPlayers % HeroColors.length],
 	};
-	world.objects.set(id, hero);
+	world.objects.set(heroId, hero);
 
 	++world.numPlayers;
 
@@ -449,6 +440,8 @@ function addProjectile(world, hero, target, spell) {
 function tick(world) {
 	++world.tick;
 
+	handlePlayerJoinLeave(world);
+
 	world.physics.step(1.0 / TicksPerSecond);
 
 	var newActions = new Map();
@@ -476,6 +469,28 @@ function tick(world) {
 	reap(world);
 }
 
+function handlePlayerJoinLeave(world) {
+	if (world.joining.length > 0) {
+		world.joining.forEach(heroId => {
+			console.log("Player joined:", heroId);
+			var hero = find(world.objects, x => x.id === heroId);
+			if (!hero) {
+				hero = addHero(world, nextHeroPosition(world), heroId);
+			}
+			world.activePlayers.add(heroId);
+		});
+		world.joining = [];
+	}
+
+	if (world.leaving.length > 0) {
+		world.leaving.forEach(heroId => {
+			console.log("Player left:", heroId);
+			world.activePlayers.delete(heroId);
+		});
+		world.leaving = [];
+	}
+}
+
 function performHeroActions(world, hero, nextAction) {
 	if (hero.charging && hero.charging.action) {
 		var chargingAction = hero.charging.action;
@@ -493,6 +508,10 @@ function performHeroActions(world, hero, nextAction) {
 		return true;
 	} else {
 		var nextSpell = Spells[nextAction.type];
+		if (!nextAction) {
+			return true;
+		}
+
 		if (nextSpell.cooldown) {
 			if (cooldownRemaining(world, hero, nextSpell.id) > 0) {
 				return false; // Cannot perform action, waiting for cooldown
