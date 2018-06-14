@@ -18,7 +18,7 @@ var HeroColors = [
 var MyHeroColor = '#00ccff';
 
 var TicksPerSecond = 60;
-var MoveSpeedPerTick = 0.1 / TicksPerSecond;
+var MoveSpeedPerTick = 0.12 / TicksPerSecond;
 var HeroRadius = 0.01;
 var HeroDensity = 1;
 var HeroMaxDamping = 5;
@@ -70,7 +70,7 @@ var Spells = {
 		speed: 0.4,
 		chargeTicks: 0,
 		maxTicks: 1 * TicksPerSecond,
-		cooldown: 3 * TicksPerSecond,
+		cooldown: 2 * TicksPerSecond,
 		damage: 10,
 		explodesOnImpact: true,
 
@@ -130,7 +130,7 @@ var Spells = {
 		chargeTicks: 0,
 		maxTicks: 6.0 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
-		damage: 10,
+		damage: 20,
 		turnRate: 0.05,
 		explodesOnImpact: true,
 
