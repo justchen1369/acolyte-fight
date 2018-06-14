@@ -107,7 +107,7 @@ var Spells = {
 		density: 3,
 		radius: 0.0025,
 		speed: 3.0,
-		chargeTicks: 5,
+		chargeTicks: 0,
 		maxTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
 		damage: 1,
