@@ -1,0 +1,41 @@
+<html>
+	<head>
+		<style>
+			body {
+				background: #111;
+			}
+
+			canvas {
+				background: black;
+			}
+
+			canvas.center {
+				margin: auto;
+				padding: 0;
+				display: block;
+			}
+		</style>
+		<script src="/socket.io/socket.io.js"></script>
+	</head>
+	<body>
+		<script src="planck.min.js"></script>
+		<script src="main.js"></script>
+		<canvas
+			id="canvas"
+			class="center"
+			width="1000"
+			height="1000">
+		</canvas>
+		<script>
+			var canvas = document.getElementById("canvas");
+
+			canvas.onmousemove = canvasMouseMove;
+			canvas.onmousedown = canvasMouseMove;
+			window.onkeydown = gameKeyDown;
+
+			canvas.oncontextmenu = function (e) {
+					e.preventDefault();
+			};
+		</script>
+	</body>
+</html>
