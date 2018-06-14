@@ -70,7 +70,7 @@ var Spells = {
 		speed: 0.4,
 		chargeTicks: 0,
 		maxTicks: 1 * TicksPerSecond,
-		cooldown: 2 * TicksPerSecond,
+		cooldown: 1 * TicksPerSecond,
 		damage: 10,
 		explodesOnImpact: true,
 
