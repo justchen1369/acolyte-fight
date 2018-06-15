@@ -4,7 +4,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
-const port = 7770;
+const port = process.env.PORT || 7770;
 
 app.use(express.static('./'));
 
