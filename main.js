@@ -25,6 +25,10 @@ var HeroMaxDamping = 5;
 var HeroMinDamping = 0.25;
 var HeroMaxHealth = 100;
 
+var AllCategories = 0xFFFF;
+var HeroCategory = 1;
+var ProjectileCategory = 2;
+
 var LavaDamagePerTick = 0.25;
 var ShrinkPerTick = 0.00005;
 
@@ -375,6 +379,7 @@ function addHero(world, position, heroId) {
 		linearDamping: HeroMaxDamping,
 	});
 	body.createFixture(pl.Circle(HeroRadius), {
+		filterCategoryBits: HeroCategory,
 		density: HeroDensity,
 		restitution: 0.1,
 	});
@@ -428,6 +433,8 @@ function addProjectile(world, hero, target, spell) {
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(spell.radius), {
+		filterCategoryBits: ProjectileCategory,
+		filterMaskBits: AllCategories ^ (spell.passthrough ? ProjectileCategory : 0),
 		density: spell.density,
 		restitution: 1.0,
 	});
