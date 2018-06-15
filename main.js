@@ -282,7 +282,8 @@ function frame() {
 
 function canvasMouseMove(e) {
 	var rect = e.target.getBoundingClientRect();
-	var target = pl.Vec2((e.clientX - rect.left) / rect.width, (e.clientY - rect.top) / rect.height);
+	var worldRect = calculateWorldRect(rect);
+	var target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
 	if (e.buttons || e.button) {
 		console.log(e.button);
@@ -789,8 +790,19 @@ function render(world, canvas) {
 	var ctx = canvas.getContext('2d');
 
 	ctx.save();
+	clearCanvas(ctx, rect);
 	renderWorld(ctx, world, rect);
 	renderInterface(ctx, world, rect);
+	ctx.restore();
+}
+
+function clearCanvas(ctx, rect) {
+	ctx.save();
+
+	ctx.fillStyle = '#000000';
+	ctx.beginPath();
+	ctx.rect(0, 0, rect.width, rect.height);
+	ctx.fill();
 
 	ctx.restore();
 }
@@ -798,8 +810,9 @@ function render(world, canvas) {
 function renderWorld(ctx, world, rect) {
 	ctx.save();
 
-	ctx.scale(rect.width, rect.height);
-	ctx.clearRect(0, 0, 1, 1);
+	var worldRect = calculateWorldRect(rect);
+	ctx.translate(worldRect.left, worldRect.top);
+	ctx.scale(worldRect.width, worldRect.height);
 
 	renderMap(ctx, world);
 
@@ -825,15 +838,20 @@ function renderWorld(ctx, world, rect) {
 	ctx.restore();
 }
 
+function calculateWorldRect(rect) {
+	var size = Math.min(rect.width, rect.height);
+	return {
+		left: (rect.width - size) / 2.0,
+		top: (rect.height - size) / 2.0,
+		width: size,
+		height: size,
+	};
+}
+
 function renderMap(ctx, world) {
 	ctx.save();
 
 	ctx.translate(0.5, 0.5);
-
-	ctx.fillStyle = '#000000';
-	ctx.beginPath();
-	ctx.rect(0, 0, 1, 1);
-	ctx.fill();
 
 	ctx.fillStyle = '#333333';
 	ctx.beginPath();

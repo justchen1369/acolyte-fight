@@ -1,6 +1,12 @@
 <html>
 	<head>
 		<style>
+			html, body {
+				overflow: hidden;
+				padding: 0;
+				margin: 0;
+			}
+
 			body {
 				background: #111;
 			}
@@ -23,19 +29,26 @@
 		<canvas
 			id="canvas"
 			class="center"
-			width="1000"
-			height="1000">
+			width="0"
+			height="0">
 		</canvas>
 		<script>
 			var canvas = document.getElementById("canvas");
+			fullScreenCanvas();
 
 			canvas.onmousemove = canvasMouseMove;
 			canvas.onmousedown = canvasMouseMove;
 			window.onkeydown = gameKeyDown;
+			window.onresize = fullScreenCanvas;
 
 			canvas.oncontextmenu = function (e) {
 					e.preventDefault();
 			};
+
+			function fullScreenCanvas() {
+				canvas.width = document.body.clientWidth;
+				canvas.height = document.body.clientHeight;
+			}
 		</script>
 	</body>
 </html>
