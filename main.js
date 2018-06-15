@@ -203,7 +203,7 @@ var Spells = {
 		id: 'teleport',
 		maxRange: 0.35,
 		chargeTicks: 3,
-		cooldown: 10 * TicksPerSecond,
+		cooldown: 15 * TicksPerSecond,
 
 		key: 'z',
 		icon: Icons.teleport,
