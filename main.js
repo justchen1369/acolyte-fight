@@ -145,7 +145,7 @@ var Spells = {
 	},
 	bouncer: {
 		id: 'bouncer',
-		density: 0.01,
+		density: 2,
 		radius: 0.001,
 		speed: 0.75,
 		chargeTicks: 0,
