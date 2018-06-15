@@ -167,13 +167,13 @@ var Spells = {
 	},
 	scourge: {
 		id: 'scourge',
-		radius: HeroRadius * 3,
+		radius: HeroRadius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
 		maxTicks: 1,
 		cooldown: 10 * TicksPerSecond,
 		damage: 20,
 		selfDamage: 10,
-		impulseMagnitude: 0.0003,
+		impulseMagnitude: 0.0005,
 
 		key: 'f',
 		icon: Icons.deadlyStrike,
