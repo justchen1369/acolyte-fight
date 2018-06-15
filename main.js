@@ -173,7 +173,8 @@ var Spells = {
 		cooldown: 10 * TicksPerSecond,
 		damage: 20,
 		selfDamage: 10,
-		impulseMagnitude: 0.0005,
+		minImpulseMagnitude: 0.0002,
+		maxImpulseMagnitude: 0.0005,
 
 		key: 'f',
 		icon: Icons.deadlyStrike,
@@ -744,13 +745,15 @@ function scourgeAction(world, hero, action, spell) {
 
 		var objPos = obj.body.getPosition();
 		var diff = vectorDiff(objPos, heroPos);
-		if (vectorLength(diff) > spell.radius + HeroRadius) { return; } // +HeroRadius because only need to touch the edge
+		var proportion = 1.0 - (vectorLength(diff) / (spell.radius + HeroRadius)); // +HeroRadius because only need to touch the edge
+		if (proportion <= 0.0) { return; } 
 
 		if (obj.type === "hero") {
 			obj.health -= spell.damage;
 		}
 
-		var impulse = vectorMultiply(vectorUnit(diff), spell.impulseMagnitude);
+		var magnitude = spell.minImpulseMagnitude + proportion * (spell.maxImpulseMagnitude - spell.minImpulseMagnitude);
+		var impulse = vectorMultiply(vectorUnit(diff), magnitude);
 		obj.body.applyLinearImpulse(impulse, vectorZero(), true);
 	});
 
