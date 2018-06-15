@@ -446,7 +446,7 @@ function addProjectile(world, hero, target, spell) {
 		owner: hero.id,
 		type: spell.id,
 		body,
-		uiPreviousPos: vectorClone(position),
+		uiPreviousPos: vectorClone(position), // uiPreviousPos is only used for the UI and not guaranteed to be sync'd across clients!
 		expireTick: world.tick + spell.maxTicks,
 		bullet: true,
 		targetId: enemy ? enemy.id : null,
