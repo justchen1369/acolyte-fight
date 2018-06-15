@@ -223,14 +223,17 @@ var world = {
 	activePlayers: new Set(),
 
 	objects: new Map(),
-	trails: [],
 	physics: planck.World(),
 	actions: new Map(),
-	collisions: [],
 	radius: 0.4,
+
+	collisions: [],
+	destroyed: [],
 
 	nextHeroId: 0,
 	nextBulletId: 0,
+
+	trails: [],
 };
 world.physics.on('post-solve', onCollision);
 
@@ -436,6 +439,7 @@ function addProjectile(world, hero, target, spell) {
 		owner: hero.id,
 		type: spell.id,
 		body,
+		uiPreviousPos: vectorClone(position),
 		expireTick: world.tick + spell.maxTicks,
 		bullet: true,
 		targetId: enemy ? enemy.id : null,
@@ -448,10 +452,9 @@ function addProjectile(world, hero, target, spell) {
 // Simulator
 function tick(world) {
 	++world.tick;
+	world.destroyed = [];
 
 	handlePlayerJoinLeave(world);
-
-	world.physics.step(1.0 / TicksPerSecond);
 
 	var newActions = new Map();
 	world.objects.forEach(hero => {
@@ -463,6 +466,8 @@ function tick(world) {
 		}
 	});
 	world.actions = newActions;
+
+	physicsStep(world);
 
 	if (world.collisions.length > 0) {
 		handleCollisions(world, world.collisions);
@@ -476,6 +481,23 @@ function tick(world) {
 	updateKnockback(world);
 
 	reap(world);
+}
+
+function physicsStep(world) {
+	world.objects.forEach(obj => {
+		if (obj.step) {
+			obj.body.setLinearVelocity(vectorPlus(obj.body.getLinearVelocity(), obj.step));
+		}
+	});
+
+	world.physics.step(1.0 / TicksPerSecond);
+
+	world.objects.forEach(obj => {
+		if (obj.step) {
+			obj.body.setLinearVelocity(vectorDiff(obj.step, obj.body.getLinearVelocity())); // Why is this backwards? I don't know, but it works.
+			obj.step = null;
+		}
+	});
 }
 
 function handlePlayerJoinLeave(world) {
@@ -713,15 +735,15 @@ function reap(world) {
 function destroyObject(world, object) {
 	world.objects.delete(object.id);
 	world.physics.destroyBody(object.body);
+
+	object.destroyed = true;
+	world.destroyed.push(object);
 }
 
 function moveAction(world, hero, action, spell) {
-	var body = hero.body;
-
-	var current = body.getPosition();
+	var current = hero.body.getPosition();
 	var target = action.target;
-	var direction = vectorTruncate(vectorDiff(target, current), MoveSpeedPerTick);
-	body.setPosition(vectorPlus(current, direction));
+	hero.step = vectorMultiply(vectorTruncate(vectorDiff(target, current), MoveSpeedPerTick), TicksPerSecond);
 
 	return vectorDistance(current, target) < Pixel;
 }
@@ -815,14 +837,8 @@ function renderWorld(ctx, world, rect) {
 
 	renderMap(ctx, world);
 
-	world.objects.forEach(obj => {
-		if (obj.type === "hero") {
-			renderHero(ctx, obj, world);
-		} else if (obj.type in Spells) {
-			var spell = Spells[obj.type];
-			spell.render(ctx, obj, world, spell);
-		}
-	});
+	world.objects.forEach(obj => renderObject(ctx, obj, world));
+	world.destroyed.forEach(obj => renderDestroyed(ctx, obj, world));
 
 	var newTrails = [];
 	world.trails.forEach(trail => {
@@ -835,6 +851,20 @@ function renderWorld(ctx, world, rect) {
 	world.trails = newTrails;
 
 	ctx.restore();
+}
+
+function renderObject(ctx, obj, world) {
+	if (obj.type === "hero") {
+		renderHero(ctx, obj, world);
+	} else if (obj.type in Spells) {
+		var spell = Spells[obj.type];
+		spell.render(ctx, obj, world, spell);
+	}
+}
+
+function renderDestroyed(ctx, obj, world) {
+	var spell = Spells[obj.type];
+	spell.render(ctx, obj, world, spell);
 }
 
 function calculateWorldRect(rect) {
@@ -861,6 +891,10 @@ function renderMap(ctx, world) {
 }
 
 function renderHero(ctx, hero, world) {
+	if (hero.destroyed) {
+		return;
+	}
+
 	var pos = hero.body.getPosition();
 
 	ctx.save();
