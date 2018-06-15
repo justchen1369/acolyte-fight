@@ -565,11 +565,13 @@ function handleCollisions(world, collision) {
 				var heroPos = collision.hero.body.getPosition();
 				var currentPos = collision.projectile.body.getPosition();
 				var currentVelocity = collision.projectile.body.getLinearVelocity();
-
 				var speed = spell.speed || vectorLength(currentVelocity); // Return to initial speed because collision will absorb speed
-
 				var newVelocity = vectorMultiply(vectorUnit(vectorDiff(currentPos, heroPos)), speed);
 				collision.projectile.body.setLinearVelocity(newVelocity);
+
+				if (spell.maxTicks) {
+					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
+				}
 
 				if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
 					// Redirect back to owner
