@@ -864,7 +864,9 @@ function renderObject(ctx, obj, world) {
 
 function renderDestroyed(ctx, obj, world) {
 	var spell = Spells[obj.type];
-	spell.render(ctx, obj, world, spell);
+	if (spell) {
+		spell.render(ctx, obj, world, spell);
+	}
 }
 
 function calculateWorldRect(rect) {
