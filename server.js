@@ -53,7 +53,9 @@ function onJoinGameMsg(socket, data) {
 	var heroId = joinGame(game, socket);
 
 	socket.on('action', (actionData) => {
-		if (actionData.heroId == heroId) {
+		if (!isUserInitiated(actionData)) {
+			console.log("Game [" + game.id + "]: user attempted to send disallowed action: " + actionData.type);
+		} else if (actionData.heroId == heroId) {
 			queueAction(game, actionData);
 		} else {
 			console.log("Game [" + game.id + "]: incorrect hero id! " + actionData.heroId + " should be " + heroId);
@@ -126,7 +128,7 @@ function queueAction(game, actionData) {
 		game.actions.set(actionData.heroId, actionData);
 	}
 
-	if (!game.started && shouldStartGame(actionData)) {
+	if (!game.started && isUserInitiated(actionData)) {
 		game.started = true;
 		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
 	}
@@ -148,7 +150,7 @@ function actionPrecedence(actionData) {
 	}
 }
 
-function shouldStartGame(actionData) {
+function isUserInitiated(actionData) {
 	switch (actionData.actionType) {
 		case "leave":
 		case "join":
