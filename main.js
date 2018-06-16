@@ -721,7 +721,9 @@ function applyLavaDamage(world) {
 }
 
 function shrink(world) {
-	world.radius = Math.max(0, world.radius - ShrinkPerTick);
+	if (world.activePlayers.size > 1) {
+		world.radius = Math.max(0, world.radius - ShrinkPerTick);
+	}
 }
 
 function reap(world) {
