@@ -68,7 +68,7 @@ function initGame() {
 		started: false,
 		numPlayers: 0,
 		tick: 0,
-		joinLimit: MaxHistoryLength,
+		joinLimitTick: Infinity,
 		actions: new Map(),
 		history: [],
 	};
@@ -128,7 +128,7 @@ function queueAction(game, actionData) {
 
 	if (game.started) {
 		if (game.history && isUnjoinable(actionData)) {
-			game.joinLimit = JoinPeriod;
+			game.joinLimitTick = game.tick + JoinPeriod;
 		}
 	} else {
 		if (shouldStartGame(actionData)) {
@@ -212,7 +212,7 @@ function gameTick(game) {
 
 		if (game.history) {
 			game.history.push(data);
-			if (game.history.length >= MaxHistoryLength || game.history.length >= game.joinLimit) {
+			if (game.history.length >= MaxHistoryLength || game.tick == game.joinLimitTick) {
 				game.history = null; // Make the game unjoinable
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
 			}
