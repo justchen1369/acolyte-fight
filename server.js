@@ -18,7 +18,7 @@ var server = http.listen(port, function() {
 // Game management
 var TicksPerSecond = 60;
 var JoinPeriod = 5 * TicksPerSecond;
-var MaxHistoryLength = 60 * TicksPerSecond;
+var MaxHistoryLength = 180 * TicksPerSecond;
 var MaxPlayers = 10;
 var nextGameId = 0;
 var games = new Map();
@@ -126,15 +126,9 @@ function queueAction(game, actionData) {
 		game.actions.set(actionData.heroId, actionData);
 	}
 
-	if (game.started) {
-		if (game.history && isUnjoinable(actionData)) {
-			game.joinLimitTick = game.tick + JoinPeriod;
-		}
-	} else {
-		if (shouldStartGame(actionData)) {
-			game.started = true;
-			console.log("Started game " + game.id + " with " + game.numPlayers + " players");
-		}
+	if (!game.started && shouldStartGame(actionData)) {
+		game.started = true;
+		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
 	}
 
 	// console.log("Game [" + game.id + "]: action received", actionData);
@@ -164,7 +158,7 @@ function shouldStartGame(actionData) {
 	}
 }
 
-function isUnjoinable(actionData) {
+function isSpell(actionData) {
 	switch (actionData.actionType) {
 		case "leave":
 		case "join":
@@ -212,6 +206,11 @@ function gameTick(game) {
 
 		if (game.history) {
 			game.history.push(data);
+
+			if (game.active.size > 1 && any(data.actions, action => isSpell(action))) {
+				// Casting any spell closes the game
+				game.joinLimitTick = game.tick + JoinPeriod;
+			}
 			if (game.history.length >= MaxHistoryLength || game.tick == game.joinLimitTick) {
 				game.history = null; // Make the game unjoinable
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
@@ -220,4 +219,13 @@ function gameTick(game) {
 
 		io.to(game.id).emit('tick', data);
 	}
+}
+
+function any(collection, predicate) {
+	for (var value of collection) {
+		if (predicate(value)) {
+			return true;
+		}
+	}
+	return false;
 }
