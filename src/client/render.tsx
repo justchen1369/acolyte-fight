@@ -120,7 +120,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	if (!world.activePlayers.has(hero.id)) {
 		ctx.fillStyle = '#666666';
 	} else if (hero.id === world.ui.myHeroId) {
-		ctx.fillStyle = constants.MyHeroColor;
+		ctx.fillStyle = Hero.MyHeroColor;
 	}
 	ctx.beginPath();
 	ctx.arc(0, 0, Hero.Radius, 0, 2 * Math.PI);
@@ -132,7 +132,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 		let spell = Spells.all[hero.charging.spell];
 		ctx.globalAlpha = hero.charging.proportion;
-		ctx.strokeStyle = spell.fillStyle;
+		ctx.strokeStyle = spell.color;
 		ctx.lineWidth = ChargingIndicator.Width;
 		ctx.beginPath();
 		ctx.arc(0, 0, Hero.Radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
@@ -149,7 +149,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.save();
 
 		ctx.globalAlpha = proportion;
-		ctx.fillStyle = spell.fillStyle;
+		ctx.fillStyle = spell.color;
 		ctx.beginPath();
 		ctx.arc(0, 0, spell.radius, 0, 2 * Math.PI);
 		ctx.fill();
@@ -195,7 +195,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 		max: spell.trailTicks, 
 		from: vector.clone(previous),
 		to: vector.clone(pos),
-		fillStyle: spell.fillStyle,
+		fillStyle: spell.color,
 		width: spell.radius * 2,
 	} as w.LineTrail);
 }
@@ -208,7 +208,7 @@ function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectil
 		remaining: spell.trailTicks,
 		max: spell.trailTicks, 
 		pos: vector.clone(pos),
-		fillStyle: spell.fillStyle,
+		fillStyle: spell.color,
 		radius: spell.radius,
 	} as w.CircleTrail);
 }
@@ -279,7 +279,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: 
 		{
 			ctx.save();
 
-			ctx.fillStyle = spell.fillStyle;
+			ctx.fillStyle = spell.color;
 			if (remainingInSeconds > 0) {
 				ctx.fillStyle = isSelected ? '#cccccc' : '#444444';
 			} else if (isCharging) {

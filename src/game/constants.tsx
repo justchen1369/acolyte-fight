@@ -1,27 +1,13 @@
 import * as c from './constants.model';
 
 export const TicksPerSecond = 60;
+export const Pixel = 0.001;
 
 export namespace Matchmaking {
 	export const JoinPeriod = 5 * TicksPerSecond;
 	export const MaxHistoryLength = 180 * TicksPerSecond;
 	export const MaxPlayers = 10;
 }
-
-export const HeroColors = [
-	"#bfad8f",
-	"#7db37d",
-	"#d0c16b",
-	"#6d89cc",
-	"#cb8fc1",
-	"#56b5bf",
-	"#a69a7c",
-	"#557e6c",
-	"#a18e4c",
-	"#41569e",
-	"#9d6d95",
-	"#2bafca",
-];
 
 export namespace Hero {
 	export const MoveSpeedPerTick = 0.12 / TicksPerSecond;
@@ -30,16 +16,28 @@ export namespace Hero {
 	export const MaxDamping = 5;
 	export const MinDamping = 0.25;
 	export const MaxHealth = 100;
+
+	export const MyHeroColor = '#00ccff';
+	export const Colors = [
+		"#bfad8f",
+		"#7db37d",
+		"#d0c16b",
+		"#6d89cc",
+		"#cb8fc1",
+		"#56b5bf",
+		"#a69a7c",
+		"#557e6c",
+		"#a18e4c",
+		"#41569e",
+		"#9d6d95",
+		"#2bafca",
+	];
 };
 
 export namespace World {
 	export const LavaDamagePerTick = 0.25;
 	export const ShrinkPerTick = 0.00005;
 }
-
-export const Pixel = 0.001;
-
-export const MyHeroColor = '#00ccff';
 
 export namespace HealthBar {
 	export const Radius = Hero.Radius * 0.9;
@@ -90,7 +88,7 @@ export namespace Spells {
 		icon: "thunderball",
 
 		trailTicks: 30,
-		fillStyle: '#ff8800',
+		color: '#ff8800',
 
 		action: "projectile",
 		render: "projectile",
@@ -110,7 +108,7 @@ export namespace Spells {
 		icon: "meteorImpact",
 
 		trailTicks: 15,
-		fillStyle: '#ff0000',
+		color: '#ff0000',
 
 		action: "projectile",
 		render: "projectile",
@@ -131,7 +129,7 @@ export namespace Spells {
 		icon: "lightningHelix",
 
 		trailTicks: 30,
-		fillStyle: '#00ddff',
+		color: '#00ddff',
 
 		action: "projectile",
 		render: "ray",
@@ -153,7 +151,7 @@ export namespace Spells {
 		icon: "boltSaw",
 
 		trailTicks: 30,
-		fillStyle: '#44ffcc',
+		color: '#44ffcc',
 
 		action: "projectile",
 		render: "projectile",
@@ -176,7 +174,7 @@ export namespace Spells {
 		icon: "divert",
 
 		trailTicks: 1.0 * TicksPerSecond,
-		fillStyle: '#88ee22',
+		color: '#88ee22',
 
 		action: "projectile",
 		render: "ray",
@@ -196,7 +194,7 @@ export namespace Spells {
 		icon: "deadlyStrike",
 
 		trailTicks: 30,
-		fillStyle: '#ddbb00',
+		color: '#ddbb00',
 
 		action: "scourge",
 	} as c.ScourgeSpell;
@@ -212,7 +210,7 @@ export namespace Spells {
 		key: 'x',
 		icon: "shield",
 
-		fillStyle: '#3366ff',
+		color: '#3366ff',
 
 		action: "shield",
 	} as c.ShieldSpell;
@@ -226,7 +224,7 @@ export namespace Spells {
 		key: 'z',
 		icon: "teleport",
 
-		fillStyle: '#6666ff',
+		color: '#6666ff',
 
 		action: "teleport",
 	} as c.TeleportSpell;

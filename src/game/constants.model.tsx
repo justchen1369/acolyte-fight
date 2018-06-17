@@ -16,7 +16,7 @@ export interface SpellBase {
     key?: string;
     icon?: string;
 
-    fillStyle?: string;
+    color?: string;
 }
 
 export interface MoveSpell extends SpellBase {

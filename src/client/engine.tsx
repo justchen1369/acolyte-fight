@@ -73,7 +73,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string) {
 		charging: {},
 		cooldowns: {},
 		shieldTicks: 0,
-		fillStyle: constants.HeroColors[world.numPlayers % constants.HeroColors.length],
+		fillStyle: Hero.Colors[world.numPlayers % Hero.Colors.length],
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 
