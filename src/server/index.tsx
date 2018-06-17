@@ -20,9 +20,9 @@ let server = http.listen(port, function() {
 
 
 // Game management
-export interface Game {
+interface Game {
     id: string;
-    active: Map<string, string>; // socketId -> heroId
+    active: Map<string, Player>; // socketId -> Player
     started: boolean;
     numPlayers: number;
     tick: number;
@@ -31,6 +31,11 @@ export interface Game {
 	history: m.TickMsg[];
 
     intervalHandle?: NodeJS.Timer;
+}
+interface Player {
+	socketId: string;
+	heroId: string;
+	name: string;
 }
 
 let nextGameId = 0;
@@ -79,12 +84,12 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 function initGame() {
 	let game = {
 		id: "g" + nextGameId++,
-		active: new Map(),
+		active: new Map<string, Player>(),
 		started: false,
 		numPlayers: 0,
 		tick: 0,
 		joinLimitTick: Infinity,
-		actions: new Map(),
+		actions: new Map<string, m.ActionMsg>(),
 		history: [],
 	} as Game;
 	games.set(game.id, game);
@@ -99,7 +104,7 @@ function joinGame(game: Game, playerName: string, socket: SocketIO.Socket) {
 	let heroId: string = null;
 
 	// Take an existing slot, if possible
-	let activeHeroIds = new Set<string>(game.active.values());
+	let activeHeroIds = new Set<string>(mapMap(game.active, x => x.heroId));
 	for (let i = 0; i < game.numPlayers; ++i) {
 		let candidate = formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {
@@ -113,7 +118,11 @@ function joinGame(game: Game, playerName: string, socket: SocketIO.Socket) {
 		heroId = formatHeroId(game.numPlayers++);
 	}
 
-	game.active.set(socket.id, heroId);
+	game.active.set(socket.id, {
+		socketId: socket.id,
+		heroId,
+		name: playerName,
+	});
 	socket.join(game.id);
 
 	socket.emit("hero", {
@@ -187,17 +196,17 @@ function isSpell(actionData: m.ActionMsg): boolean {
 
 
 function leaveGame(game: Game, socket: SocketIO.Socket) {
-	let heroId = game.active.get(socket.id);
-	if (!heroId) {
+	let player = game.active.get(socket.id);
+	if (!player) {
 		console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
 		return;
 	}
 
-	queueAction(game, { heroId, actionType: "leave" });
+	queueAction(game, { heroId: player.heroId, actionType: "leave" });
 
 	game.active.delete(socket.id);
 	socket.leave(game.id);
-	console.log("Game [" + game.id + "]: player " + socket.id + " left after " + game.tick + " ticks");
+	console.log("Game [" + game.id + "]: player " + player.name + " [" + socket.id + "] left after " + game.tick + " ticks");
 }
 
 function finishGame(game: Game) {
@@ -238,4 +247,10 @@ function gameTick(game: Game) {
 
 		io.to(game.id).emit('tick', data);
 	}
+}
+
+function mapMap<K, V, Out>(map : Map<K, V>, func: (v: V) => Out) {
+	let result = new Array<Out>();
+	map.forEach(value => result.push(func(value)));
+	return result;
 }
