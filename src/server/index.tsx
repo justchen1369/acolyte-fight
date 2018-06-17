@@ -122,7 +122,7 @@ function joinGame(game: Game, playerName: string, socket: SocketIO.Socket) {
 		history: game.history,
 	} as m.HeroMsg);
 
-	queueAction(game, { heroId, actionType: "join" });
+	queueAction(game, { heroId, actionType: "join", playerName });
 
 	console.log("Game [" + game.id + "]: player " + playerName + " [" + socket.id + "] joined, now " + game.numPlayers + " players");
 

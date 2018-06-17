@@ -15,8 +15,7 @@ export function initialWorld(): w.World {
 		tick: 0,
 
 		numPlayers: 0,
-		joining: [],
-		leaving: [],
+		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
 		activePlayers: new Set(),
 
 		objects: new Map(),
@@ -51,7 +50,7 @@ function nextHeroPosition(world: w.World) {
 	return pos;
 }
 
-function addHero(world: w.World, position: pl.Vec2, heroId: string) {
+function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: string) {
 	let body = world.physics.createBody({
 		userData: heroId,
 		type: 'dynamic',
@@ -66,6 +65,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string) {
 
 	let hero = {
 		id: heroId,
+		name: playerName,
 		category: "hero",
 		type: "hero",
 		health: Hero.MaxHealth,
@@ -184,25 +184,22 @@ function physicsStep(world: w.World) {
 }
 
 function handlePlayerJoinLeave(world: w.World) {
-	if (world.joining.length > 0) {
-		world.joining.forEach(heroId => {
-			console.log("Player joined:", heroId);
-			let hero = find(world.objects, x => x.id === heroId);
+	world.joinLeaveEvents.forEach(ev => {
+		if (ev.type === "join") {
+			console.log("Player joined:", ev.heroId);
+			let hero: w.Hero = find(world.objects, x => x.id === ev.heroId);
 			if (!hero) {
-				hero = addHero(world, nextHeroPosition(world), heroId);
+				hero = addHero(world, nextHeroPosition(world), ev.heroId, ev.playerName);
+			} else {
+				hero.name = ev.playerName;
 			}
-			world.activePlayers.add(heroId);
-		});
-		world.joining = [];
-	}
-
-	if (world.leaving.length > 0) {
-		world.leaving.forEach(heroId => {
-			console.log("Player left:", heroId);
-			world.activePlayers.delete(heroId);
-		});
-		world.leaving = [];
-	}
+			world.activePlayers.add(ev.heroId);
+		} else if (ev.type === "leave") {
+			console.log("Player left:", ev.heroId);
+			world.activePlayers.delete(ev.heroId);
+		}
+	});
+	world.joinLeaveEvents = [];
 }
 
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {

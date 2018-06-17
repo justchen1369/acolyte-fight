@@ -5,9 +5,10 @@ import * as engine from './engine';
 import * as m from '../game/messages.model';
 import * as w from './world.model';
 
+export let world = engine.initialWorld();
+
 let socket: SocketIOClient.Socket = null;
 let tickQueue = new Array<m.TickMsg>();
-let world = engine.initialWorld();
 
 let nextTarget: pl.Vec2 = null;
 
@@ -110,12 +111,19 @@ function sendAction(heroId: string, action: w.Action) {
 		targetY: action.target.y,
 	} as m.ActionMsg);
 }
-function applyTickActions(tickData, world) {
+function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	tickData.actions.forEach(actionData => {
 		if (actionData.actionType === "join") {
-			world.joining.push(actionData.heroId);
+			world.joinLeaveEvents.push({
+				type: "join",
+				heroId: actionData.heroId,
+				playerName: actionData.playerName || "Enigma",
+			});
 		} else if (actionData.actionType === "leave") {
-			world.leaving.push(actionData.heroId);
+			world.joinLeaveEvents.push({
+				type: "leave",
+				heroId: actionData.heroId,
+			});
 		} else {
 			world.actions.set(actionData.heroId, { type: actionData.actionType, target: pl.Vec2(actionData.targetX, actionData.targetY) });
 		}

@@ -3,6 +3,7 @@ export interface ActionMsg {
     actionType: string;
     targetX?: number;
     targetY?: number;
+    playerName?: string;
 }
 
 export interface TickMsg {

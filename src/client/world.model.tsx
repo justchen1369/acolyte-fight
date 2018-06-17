@@ -4,9 +4,8 @@ export interface World {
 	tick: number;
 
 	numPlayers: number;
-	joining: string[];
-	leaving: string[];
 	activePlayers: Set<string>;
+	joinLeaveEvents: JoinOrLeaveEvent[];
 
 	objects: Map<string, WorldObject>,
 	physics: pl.World;
@@ -30,6 +29,19 @@ export interface UIState {
 	trails: Trail[];
 }
 
+export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;
+
+export interface JoinEvent {
+	type: "join";
+	heroId: string;
+	playerName: string;
+}
+
+export interface LeaveEvent {
+	type: "leave";
+	heroId: string;
+}
+
 export interface WorldObjectBase {
 	id: string;
 	category: string;
@@ -43,6 +55,8 @@ export interface WorldObjectBase {
 export interface Hero extends WorldObjectBase {
 	category: "hero";
 	type: "hero";
+
+	name: string;
 
 	health: number;
 	body: pl.Body;
