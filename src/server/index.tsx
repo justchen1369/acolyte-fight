@@ -1,5 +1,6 @@
 import { Matchmaking, TicksPerSecond } from '../game/constants';
 import * as _ from 'lodash';
+import * as c from '../game/constants.model';
 import * as m from '../game/messages.model';
 
 const express = require('express');
@@ -62,7 +63,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 		game = initGame();
 	}
 	
-	let heroId = joinGame(game, data.name, socket);
+	let heroId = joinGame(game, c.sanitizeName(data.name), socket);
 
 	socket.on('action', (actionData: m.ActionMsg) => {
 		if (!isUserInitiated(actionData)) {
