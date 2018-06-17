@@ -7,8 +7,6 @@ import { world } from './engine';
 import * as model from './engine';
 const socket = socketLib();
 
-let MaxTickBuffer = 5;
-
 let tickQueue = [];
 let nextTarget = null;
 
@@ -38,16 +36,14 @@ export function attach() {
 function frame() {
 	let canvas = document.getElementById('canvas');
 
-	if (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
-		do {
-			let tickData = tickQueue.shift();
-			if (tickData.tick < world.tick) {
-				continue; // Received the same tick multiple times, skip over it
-			}
+	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
+		let tickData = tickQueue.shift();
+		if (tickData.tick < world.tick) {
+			continue; // Received the same tick multiple times, skip over it
+		}
 
-			applyTickActions(tickData, world);
-			model.tick(world);
-		} while (tickQueue.length >= MaxTickBuffer);
+		applyTickActions(tickData, world);
+		model.tick(world);
 	}
 	render(world, canvas);
 
