@@ -1,7 +1,9 @@
-var socket = io();
-var pl = planck;
+import socketLib from 'socket.io-client';
+import pl from 'planck-js';
 
-var HeroColors = [
+const socket = socketLib();
+
+let HeroColors = [
 	"#bfad8f",
 	"#7db37d",
 	"#d0c16b",
@@ -15,42 +17,42 @@ var HeroColors = [
 	"#9d6d95",
 	"#2bafca",
 ];
-var MyHeroColor = '#00ccff';
+let MyHeroColor = '#00ccff';
 
-var TicksPerSecond = 60;
-var MoveSpeedPerTick = 0.12 / TicksPerSecond;
-var HeroRadius = 0.01;
-var HeroDensity = 1;
-var HeroMaxDamping = 5;
-var HeroMinDamping = 0.25;
-var HeroMaxHealth = 100;
+let TicksPerSecond = 60;
+let MoveSpeedPerTick = 0.12 / TicksPerSecond;
+let HeroRadius = 0.01;
+let HeroDensity = 1;
+let HeroMaxDamping = 5;
+let HeroMinDamping = 0.25;
+let HeroMaxHealth = 100;
 
-var AllCategories = 0xFFFF;
-var HeroCategory = 1;
-var ProjectileCategory = 2;
+let AllCategories = 0xFFFF;
+let HeroCategory = 1;
+let ProjectileCategory = 2;
 
-var LavaDamagePerTick = 0.25;
-var ShrinkPerTick = 0.00005;
+let LavaDamagePerTick = 0.25;
+let ShrinkPerTick = 0.00005;
 
-var Pixel = 0.001;
-var MaxTickBuffer = 5;
-var HealthBarRadius = HeroRadius * 0.9;
-var HealthBarHeight = Pixel * 3;
-var HealthBarMargin = Pixel * 2;
-var ChargingIndicatorMargin = Pixel * 5;
-var ChargingIndicatorWidth = Pixel * 2;
+let Pixel = 0.001;
+let MaxTickBuffer = 5;
+let HealthBarRadius = HeroRadius * 0.9;
+let HealthBarHeight = Pixel * 3;
+let HealthBarMargin = Pixel * 2;
+let ChargingIndicatorMargin = Pixel * 5;
+let ChargingIndicatorWidth = Pixel * 2;
 
-var ButtonSpacing = 10;
-var ButtonMargin = 5;
-var ButtonSize = 50;
+let ButtonSpacing = 10;
+let ButtonMargin = 5;
+let ButtonSize = 50;
 
 function loadImage(path) {
-	var img = new Image();
+	let img = new Image();
 	img.src = path;
 	return img;
 }
 
-var Icons = {
+let Icons = {
 	thunderball: new Path2D("M22.03 16.844l147 158.125 37.75-14.626 6.75 17.437-110.25 42.72 209.564 230.53.187.25c18.074 22.833 46.023 37.5 77.314 37.5 54.318 0 98.562-44.243 98.562-98.56 0-43.636-28.55-80.77-67.937-93.69l-132.095-73.56-56.75 23.968-7.28-17.22 43.31-18.28-.186-.094 102.624-43.28L22.03 16.843zm368.314 293.5c44.218 0 79.875 35.656 79.875 79.875 0 7.866-1.146 15.45-3.25 22.624L446.155 409l4.688-39.656-22.78 54.22 32.467 4.873c-5.74 10.555-13.776 19.644-23.467 26.625l-51-24.75 37.312-44.78-79.594-40.626 53.064 47.25-43.97 36.47 42.72 41.312c-1.736.11-3.486.156-5.25.156-44.22 0-79.875-35.657-79.875-79.875 0-1.48.045-2.95.124-4.408l30.562 11.47-6.5 25.562 27.75-34.938-49.437-17.72c6.807-26.514 26.865-47.622 52.717-55.967l24.5 35.217 51.438-5.218-41.75-8.72-17.688-24.75c2.68-.27 5.404-.406 8.157-.406z"),
 	boltSaw: new Path2D("M118.262 17.338l-.004.002 14.6 33.287L34.74 64.645l46.723 45.552L14.3 183.783l43.804 16.936-9.344 105.706 48.474-8.176 51.393 121.475 26.28-29.786 95.197 94.61 2.335-36.208 112.714 44.967-19.27-43.218 104.538-15.184-42.633-40.883 66.577-72.418-50.224-19.27 8.76-106.876-52.56 8.76L348.946 81.58l-25.695 29.785-89.354-88.77-2.337 39.714-113.298-44.97zm144.8 100.435l52.75 54.9 10.428-26.282 25.125 84.682 19.008-13.43-14.63 63.073 35.02-2.336-50.077 50.225 36.066 17.518.006-.002-.002.005-.004-.002-63.086 14.6 17.443 24.53-79.653-25.698 4.516 32.123-51.422-53.147-11.575 28.618-24.38-82.93-26.116 18.688 17.448-74.754-37.942 2.336 49.354-49.64-35.043-16.938 72.998-16.935-19.215-26.866 76.87 25.113-3.89-27.45zm-23.345 95.846c-14.81 0-18.424 16.9-8.074 37.75 10.35 20.848 30.742 37.747 45.55 37.747 14.81 0 18.424-16.9 8.075-37.748-10.35-20.85-30.742-37.75-45.55-37.75z"),
 	lightningHelix: new Path2D("M20.72 19.344v39.718l130.843 73.813L246.5 87.78l-95.53-68.436H20.72zm196.936.093L313 76.78l-45.5 21.657.03.063-96.03 45.625h-.03l-113.94 54.22 161.532 86.093 59.594-39.25-39.344-34.844 26.375-13.094.094.063 78.94-39.157-.095-.062 136.5-67.72L387.47 19.44H217.655zM361.936 170.5l-76.498 37.906 44.812 25.28-37.03 24.376-.064-.062-55.312 36.438.062.03-68.25 44.938 325.281 154.75L307.47 347l9.31-5.22-.03-.03 43.563-24.313-.032-.03 115.97-65.032L361.937 170.5zm13.19 160.063l-33.97 18.968 139.313 74.22-105.345-93.188z"),
@@ -61,7 +63,7 @@ var Icons = {
 	shield: new Path2D("M256 16c25 24 100 72 150 72v96c0 96-75 240-150 312-75-72-150-216-150-312V88c50 0 125-48 150-72z"),
 }
 
-var Spells = {
+let Spells = {
 	move: {
 		id: 'move',
 		cooldown: 0,
@@ -218,7 +220,7 @@ var Spells = {
 	},
 };
 
-var world = {
+let world = {
 	tick: 0,
 
 	numPlayers: 0,
@@ -227,7 +229,7 @@ var world = {
 	activePlayers: new Set(),
 
 	objects: new Map(),
-	physics: planck.World(),
+	physics: pl.World(),
 	actions: new Map(),
 	radius: 0.4,
 
@@ -241,7 +243,7 @@ var world = {
 };
 world.physics.on('post-solve', onCollision);
 
-var ui = {
+let ui = {
 	buttons: [
 		"teleport",
 		"shield",
@@ -258,22 +260,41 @@ var ui = {
 	target: pl.Vec2(0.5, 0.5),
 };
 
-var tickQueue = [];
-var tickFuture = [];
+let tickQueue = [];
+let tickFuture = [];
 
-var myGameId = null;
-var myHeroId = null;
+let myGameId = null;
+let myHeroId = null;
 
 attachToSocket(socket);
 window.requestAnimationFrame(frame);
 
 // Facade
+function attach() {
+	var canvas = document.getElementById("canvas") as HTMLCanvasElement;
+	fullScreenCanvas();
+
+	canvas.onmousemove = canvasMouseMove;
+	canvas.onmousedown = canvasMouseMove;
+	window.onkeydown = gameKeyDown;
+	window.onresize = fullScreenCanvas;
+
+	canvas.oncontextmenu = function (e) {
+			e.preventDefault();
+	};
+
+	function fullScreenCanvas() {
+		canvas.width = document.body.clientWidth;
+		canvas.height = document.body.clientHeight;
+	}
+}
+
 function frame() {
-	var canvas = document.getElementById('canvas');
+	let canvas = document.getElementById('canvas');
 
 	if (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		do {
-			var tickData = tickQueue.shift();
+			let tickData = tickQueue.shift();
 			if (tickData.tick < world.tick) {
 				continue; // Received the same tick multiple times, skip over it
 			}
@@ -288,9 +309,9 @@ function frame() {
 }
 
 function canvasMouseMove(e) {
-	var rect = e.target.getBoundingClientRect();
-	var worldRect = calculateWorldRect(rect);
-	var target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
+	let rect = e.target.getBoundingClientRect();
+	let worldRect = calculateWorldRect(rect);
+	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
 	if (e.buttons || e.button) {
 		sendAction(myHeroId, { type: "move", target });
@@ -301,8 +322,8 @@ function canvasMouseMove(e) {
 }
 
 function gameKeyDown(e) {
-	for (var id in Spells) {
-		var spell = Spells[id];
+	for (let id in Spells) {
+		let spell = Spells[id];
 		if (spell.key === e.key) {
 			sendAction(myHeroId, { type: spell.id, target: ui.target });
 		}
@@ -361,18 +382,18 @@ function applyTickActions(tickData, world) {
 
 // Model
 function nextHeroPosition(world) {
-	var nextHeroIndex = world.numPlayers;
-	var numHeroes = world.numPlayers + 1;
-	var radius = 0.25;
-	var center = new pl.Vec2(0.5, 0.5);
+	let nextHeroIndex = world.numPlayers;
+	let numHeroes = world.numPlayers + 1;
+	let radius = 0.25;
+	let center = new pl.Vec2(0.5, 0.5);
 
-	var angle = 2 * Math.PI * nextHeroIndex / numHeroes;
-	var pos = vectorPlus(vectorMultiply(pl.Vec2(Math.cos(angle), Math.sin(angle)), radius), center);
+	let angle = 2 * Math.PI * nextHeroIndex / numHeroes;
+	let pos = vectorPlus(vectorMultiply(pl.Vec2(Math.cos(angle), Math.sin(angle)), radius), center);
 	return pos;
 }
 
 function addHero(world, position, heroId) {
-	var body = world.physics.createBody({
+	let body = world.physics.createBody({
 		userData: heroId,
 		type: 'dynamic',
 		position,
@@ -384,7 +405,7 @@ function addHero(world, position, heroId) {
 		restitution: 0.1,
 	});
 
-	var hero = {
+	let hero = {
 		id: heroId,
 		type: "hero",
 		health: HeroMaxHealth,
@@ -409,7 +430,7 @@ function deactivateHero(world, heroId) {
 }
 
 function cooldownRemaining(world, hero, spell) {
-	var next = hero.cooldowns[spell] || 0;
+	let next = hero.cooldowns[spell] || 0;
 	return Math.max(0, next - world.tick);
 }
 
@@ -418,13 +439,13 @@ function setCooldown(world, hero, spell, waitTime) {
 }
 
 function addProjectile(world, hero, target, spell) {
-	var id = spell.id + (world.nextBulletId++);
+	let id = spell.id + (world.nextBulletId++);
 
-	var from = hero.body.getPosition();
-	var position = vectorTowards(from, target, HeroRadius + spell.radius + Pixel);
-	var velocity = vectorDirection(target, from, spell.speed);
+	let from = hero.body.getPosition();
+	let position = vectorTowards(from, target, HeroRadius + spell.radius + Pixel);
+	let velocity = vectorDirection(target, from, spell.speed);
 
-	var body = world.physics.createBody({
+	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
 		position,
@@ -439,9 +460,9 @@ function addProjectile(world, hero, target, spell) {
 		restitution: 1.0,
 	});
 
-	var enemy = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
+	let enemy = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
-	var projectile = {
+	let projectile = {
 		id,
 		owner: hero.id,
 		type: spell.id,
@@ -463,11 +484,11 @@ function tick(world) {
 
 	handlePlayerJoinLeave(world);
 
-	var newActions = new Map();
+	let newActions = new Map();
 	world.objects.forEach(hero => {
 		if (hero.type !== "hero") { return; }
-		var action = world.actions.get(hero.id);
-		var completed = performHeroActions(world, hero, action);
+		let action = world.actions.get(hero.id);
+		let completed = performHeroActions(world, hero, action);
 		if (action && !completed) {
 			newActions.set(hero.id, action);
 		}
@@ -511,7 +532,7 @@ function handlePlayerJoinLeave(world) {
 	if (world.joining.length > 0) {
 		world.joining.forEach(heroId => {
 			console.log("Player joined:", heroId);
-			var hero = find(world.objects, x => x.id === heroId);
+			let hero = find(world.objects, x => x.id === heroId);
 			if (!hero) {
 				hero = addHero(world, nextHeroPosition(world), heroId);
 			}
@@ -531,8 +552,8 @@ function handlePlayerJoinLeave(world) {
 
 function performHeroActions(world, hero, nextAction) {
 	if (hero.charging && hero.charging.action) {
-		var chargingAction = hero.charging.action;
-		var chargingSpell = Spells[chargingAction.type];
+		let chargingAction = hero.charging.action;
+		let chargingSpell = Spells[chargingAction.type];
 		hero.charging.proportion += 1.0 / chargingSpell.chargeTicks;
 		if (hero.charging.proportion < 1.0) {
 			return false; // Blocked charging, cannot perform action
@@ -545,7 +566,7 @@ function performHeroActions(world, hero, nextAction) {
 		// Nothing to do
 		return true;
 	} else {
-		var nextSpell = Spells[nextAction.type];
+		let nextSpell = Spells[nextAction.type];
 		if (!nextAction) {
 			return true;
 		}
@@ -574,8 +595,8 @@ function applyAction(world, hero, action, spell) {
 }
 
 function onCollision(contact) {
-	var objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
-	var objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
+	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
+	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
 	if (objA.type === "hero" && objB.bullet) {
 		world.collisions.push({ hero: objA, projectile: objB });
 	} else if (objA.bullet && objB.type === "hero") {
@@ -589,13 +610,13 @@ function onCollision(contact) {
 function handleCollisions(world, collision) {
 	world.collisions.forEach(collision => {
 		if (collision.projectile) {
-			var spell = Spells[collision.projectile.type];
+			let spell = Spells[collision.projectile.type];
 			if (collision.hero && collision.hero.shieldTicks > 0) {
-				var heroPos = collision.hero.body.getPosition();
-				var currentPos = collision.projectile.body.getPosition();
-				var currentVelocity = collision.projectile.body.getLinearVelocity();
-				var speed = spell.speed || vectorLength(currentVelocity); // Return to initial speed because collision will absorb speed
-				var newVelocity = vectorMultiply(vectorUnit(vectorDiff(currentPos, heroPos)), speed);
+				let heroPos = collision.hero.body.getPosition();
+				let currentPos = collision.projectile.body.getPosition();
+				let currentVelocity = collision.projectile.body.getLinearVelocity();
+				let speed = spell.speed || vectorLength(currentVelocity); // Return to initial speed because collision will absorb speed
+				let newVelocity = vectorMultiply(vectorUnit(vectorDiff(currentPos, heroPos)), speed);
 				collision.projectile.body.setLinearVelocity(newVelocity);
 
 				if (spell.maxTicks) {
@@ -622,7 +643,7 @@ function handleCollisions(world, collision) {
 }
 
 function find(objects, predicate) {
-	var found = null;
+	let found = null;
 	objects.forEach(x => {
 		if (predicate(x)) {
 			found = x;
@@ -632,14 +653,14 @@ function find(objects, predicate) {
 }
 
 function findNearest(objects, target, predicate) {
-	var nearestDistance = Infinity;
-	var nearest = null;
+	let nearestDistance = Infinity;
+	let nearest = null;
 	objects.forEach(obj => {
 		if (!predicate(obj)) {
 			return;
 		}
 
-		var distance = vectorDistance(target, obj.body.getPosition());
+		let distance = vectorDistance(target, obj.body.getPosition());
 		if (distance < nearestDistance) {
 			nearestDistance = distance;
 			nearest = obj;
@@ -649,7 +670,7 @@ function findNearest(objects, target, predicate) {
 }
 
 function bounceToNext(projectile, hit, spell, world) {
-	var nextTarget = findNearest(
+	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
 		x => x.type === "hero" && x.id !== hit.id);
@@ -659,8 +680,8 @@ function bounceToNext(projectile, hit, spell, world) {
 
 	projectile.targetId = nextTarget.id;
 
-	var newDirection = vectorUnit(vectorDiff(nextTarget.body.getPosition(), projectile.body.getPosition()));
-	var newVelocity = vectorMultiply(newDirection, spell.speed);
+	let newDirection = vectorUnit(vectorDiff(nextTarget.body.getPosition(), projectile.body.getPosition()));
+	let newVelocity = vectorMultiply(newDirection, spell.speed);
 	projectile.body.setLinearVelocity(newVelocity);
 
 	projectile.damageMultiplier = (projectile.damageMultiplier || 1.0) * spell.bounceDamage;
@@ -672,18 +693,18 @@ function homingForce(world) {
 			return;
 		}
 
-		var spell = Spells[obj.type];
+		let spell = Spells[obj.type];
 		if (!(spell && spell.turnRate)) {
 			return;
 		}
 
-		var target = find(world.objects, x => x.id === obj.targetId);
+		let target = find(world.objects, x => x.id === obj.targetId);
 		if (target) {
-			var currentSpeed = vectorLength(obj.body.getLinearVelocity());
-			var currentDirection = vectorUnit(obj.body.getLinearVelocity());
-			var idealDirection = vectorUnit(vectorDiff(target.body.getPosition(), obj.body.getPosition()));
-			var newDirection = vectorUnit(vectorPlus(currentDirection, vectorMultiply(idealDirection, spell.turnRate)));
-			var newVelocity = vectorMultiply(newDirection, currentSpeed);
+			let currentSpeed = vectorLength(obj.body.getLinearVelocity());
+			let currentDirection = vectorUnit(obj.body.getLinearVelocity());
+			let idealDirection = vectorUnit(vectorDiff(target.body.getPosition(), obj.body.getPosition()));
+			let newDirection = vectorUnit(vectorPlus(currentDirection, vectorMultiply(idealDirection, spell.turnRate)));
+			let newVelocity = vectorMultiply(newDirection, currentSpeed);
 			obj.body.setLinearVelocity(newVelocity);
 		}
 	});
@@ -703,7 +724,7 @@ function decayShields(world) {
 function updateKnockback(world) {
 	world.objects.forEach(obj => {
 		if (obj.type === "hero") {
-			var damping = HeroMinDamping + (HeroMaxDamping - HeroMinDamping) * obj.health / HeroMaxHealth;
+			let damping = HeroMinDamping + (HeroMaxDamping - HeroMinDamping) * obj.health / HeroMaxHealth;
 			obj.body.setLinearDamping(damping);
 		}
 	});
@@ -712,7 +733,7 @@ function updateKnockback(world) {
 function applyLavaDamage(world) {
 	world.objects.forEach(obj => {
 		if (obj.type === "hero") {
-			var position = obj.body.getPosition();
+			let position = obj.body.getPosition();
 			if (vectorDistance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
 				obj.health -= LavaDamagePerTick;
 			}
@@ -733,7 +754,7 @@ function reap(world) {
 				destroyObject(world, obj);
 			}
 		} else if (obj.bullet) {
-			var pos = obj.body.getPosition();
+			let pos = obj.body.getPosition();
 			if (world.tick >= obj.expireTick || pos.x < 0 || pos.x > 1 || pos.y < 0 || pos.y > 1) {
 				destroyObject(world, obj);
 			}
@@ -750,8 +771,8 @@ function destroyObject(world, object) {
 }
 
 function moveAction(world, hero, action, spell) {
-	var current = hero.body.getPosition();
-	var target = action.target;
+	let current = hero.body.getPosition();
+	let target = action.target;
 	hero.step = vectorMultiply(vectorTruncate(vectorDiff(target, current), MoveSpeedPerTick), TicksPerSecond);
 
 	return vectorDistance(current, target) < Pixel;
@@ -763,8 +784,8 @@ function spawnProjectileAction(world, hero, action, spell) {
 }
 
 function teleportAction(world, hero, action, spell) {
-	var currentPosition = hero.body.getPosition();
-	var newPosition = vectorTowards(currentPosition, action.target, Spells.teleport.maxRange);
+	let currentPosition = hero.body.getPosition();
+	let newPosition = vectorTowards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
 	return true;
 }
@@ -772,21 +793,21 @@ function teleportAction(world, hero, action, spell) {
 function scourgeAction(world, hero, action, spell) {
 	hero.health -= spell.selfDamage;
 
-	var heroPos = hero.body.getPosition();
+	let heroPos = hero.body.getPosition();
 	world.objects.forEach(obj => {
 		if (obj.id === hero.id) { return; }
 
-		var objPos = obj.body.getPosition();
-		var diff = vectorDiff(objPos, heroPos);
-		var proportion = 1.0 - (vectorLength(diff) / (spell.radius + HeroRadius)); // +HeroRadius because only need to touch the edge
+		let objPos = obj.body.getPosition();
+		let diff = vectorDiff(objPos, heroPos);
+		let proportion = 1.0 - (vectorLength(diff) / (spell.radius + HeroRadius)); // +HeroRadius because only need to touch the edge
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.type === "hero") {
 			obj.health -= spell.damage;
 		}
 
-		var magnitude = spell.minImpulseMagnitude + proportion * (spell.maxImpulseMagnitude - spell.minImpulseMagnitude);
-		var impulse = vectorMultiply(vectorUnit(diff), magnitude);
+		let magnitude = spell.minImpulseMagnitude + proportion * (spell.maxImpulseMagnitude - spell.minImpulseMagnitude);
+		let impulse = vectorMultiply(vectorUnit(diff), magnitude);
 		obj.body.applyLinearImpulse(impulse, vectorZero(), true);
 	});
 
@@ -816,8 +837,8 @@ function shieldAction(world, hero, action, spell) {
 
 // Rendering
 function render(world, canvas) {
-	var rect = canvas.getBoundingClientRect();
-	var ctx = canvas.getContext('2d');
+	let rect = canvas.getBoundingClientRect();
+	let ctx = canvas.getContext('2d');
 
 	ctx.save();
 	clearCanvas(ctx, rect);
@@ -840,7 +861,7 @@ function clearCanvas(ctx, rect) {
 function renderWorld(ctx, world, rect) {
 	ctx.save();
 
-	var worldRect = calculateWorldRect(rect);
+	let worldRect = calculateWorldRect(rect);
 	ctx.translate(worldRect.left, worldRect.top);
 	ctx.scale(worldRect.width, worldRect.height);
 
@@ -849,9 +870,9 @@ function renderWorld(ctx, world, rect) {
 	world.objects.forEach(obj => renderObject(ctx, obj, world));
 	world.destroyed.forEach(obj => renderDestroyed(ctx, obj, world));
 
-	var newTrails = [];
+	let newTrails = [];
 	world.trails.forEach(trail => {
-		var complete = true;
+		let complete = true;
 		complete = renderTrail(ctx, trail);
 		if (!complete) {
 			newTrails.push(trail);
@@ -866,20 +887,20 @@ function renderObject(ctx, obj, world) {
 	if (obj.type === "hero") {
 		renderHero(ctx, obj, world);
 	} else if (obj.type in Spells) {
-		var spell = Spells[obj.type];
+		let spell = Spells[obj.type];
 		spell.render(ctx, obj, world, spell);
 	}
 }
 
 function renderDestroyed(ctx, obj, world) {
-	var spell = Spells[obj.type];
+	let spell = Spells[obj.type];
 	if (spell) {
 		spell.render(ctx, obj, world, spell);
 	}
 }
 
 function calculateWorldRect(rect) {
-	var size = Math.min(rect.width, rect.height);
+	let size = Math.min(rect.width, rect.height);
 	return {
 		left: (rect.width - size) / 2.0,
 		top: (rect.height - size) / 2.0,
@@ -906,7 +927,7 @@ function renderHero(ctx, hero, world) {
 		return;
 	}
 
-	var pos = hero.body.getPosition();
+	let pos = hero.body.getPosition();
 
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
@@ -926,7 +947,7 @@ function renderHero(ctx, hero, world) {
 	if (hero.charging && hero.charging.spell && hero.charging.proportion > 0) {
 		ctx.save();
 
-		var spell = Spells[hero.charging.spell];
+		let spell = Spells[hero.charging.spell];
 		ctx.globalAlpha = hero.charging.proportion;
 		ctx.strokeStyle = spell.fillStyle;
 		ctx.lineWidth = ChargingIndicatorWidth;
@@ -939,8 +960,8 @@ function renderHero(ctx, hero, world) {
 
 	// Shield
 	if (hero.shieldTicks) {
-		var spell = Spells.shield;
-		var proportion = 1.0 * hero.shieldTicks / spell.maxTicks;
+		let spell = Spells.shield;
+		let proportion = 1.0 * hero.shieldTicks / spell.maxTicks;
 
 		ctx.save();
 
@@ -960,7 +981,7 @@ function renderHero(ctx, hero, world) {
 	ctx.rect(-HealthBarRadius, -HeroRadius - HealthBarHeight - HealthBarMargin, HealthBarRadius * 2, HealthBarHeight);
 	ctx.fill();
 
-	var healthProportion = hero.health / HeroMaxHealth;
+	let healthProportion = hero.health / HeroMaxHealth;
 	ctx.fillStyle = rgColor(healthProportion);
 	ctx.beginPath();
 	ctx.rect(-HealthBarRadius, -HeroRadius - HealthBarHeight - HealthBarMargin, HealthBarRadius * 2 * healthProportion, HealthBarHeight);
@@ -970,13 +991,13 @@ function renderHero(ctx, hero, world) {
 }
 
 function rgColor(proportion) {
-	var hue = proportion * 120.0;
-	return 'hsl(' + Math.round(hue, 0) + ', 100%, 50%)';
+	let hue = proportion * 120.0;
+	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
 }
 
 function renderRay(ctx, projectile, world, spell) {
-	var pos = projectile.body.getPosition();
-	var previous = projectile.uiPreviousPos;
+	let pos = projectile.body.getPosition();
+	let previous = projectile.uiPreviousPos;
 	projectile.uiPreviousPos = vectorClone(pos);
 
 	if (!previous) {
@@ -997,7 +1018,7 @@ function renderRay(ctx, projectile, world, spell) {
 }
 
 function renderProjectile(ctx, projectile, world, spell) {
-	var pos = projectile.body.getPosition();
+	let pos = projectile.body.getPosition();
 
 	world.trails.push({
 		type: 'circle',
@@ -1010,7 +1031,7 @@ function renderProjectile(ctx, projectile, world, spell) {
 }
 
 function renderTrail(ctx, trail) {
-	var proportion = 1.0 * trail.remaining / trail.max;
+	let proportion = 1.0 * trail.remaining / trail.max;
 	if (proportion <= 0) {
 		return true;
 	}
@@ -1041,30 +1062,30 @@ function renderTrail(ctx, trail) {
 }
 
 function renderInterface(ctx, world, rect) {
-	var myHero = world.objects.get(myHeroId);
+	let myHero = world.objects.get(myHeroId);
 	if (myHero) {
 		renderButtons(ctx, ui.buttons, world, myHero, world.actions, rect);
 	}
 }
 
 function renderButtons(ctx, buttons, world, hero, actions, rect) {
-	var heroAction = actions.get(hero.id);
-	var selectedAction = heroAction && heroAction.type;
+	let heroAction = actions.get(hero.id);
+	let selectedAction = heroAction && heroAction.type;
 
-	var buttonBarWidth = buttons.length * ButtonSize + (buttons.length - 1) * ButtonSpacing;
+	let buttonBarWidth = buttons.length * ButtonSize + (buttons.length - 1) * ButtonSpacing;
 
 	ctx.save();
 	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonSize - ButtonMargin);
 
-	for (var i = 0; i < buttons.length; ++i) {
-		var spell = Spells[buttons[i]];
+	for (let i = 0; i < buttons.length; ++i) {
+		let spell = Spells[buttons[i]];
 		if (!spell) {
 			continue;
 		}
 
-		var isSelected = selectedAction === spell.id;
-		var isCharging = hero.charging && hero.charging.spell === spell.id;
-		var remainingInSeconds = cooldownRemaining(world, hero, spell.id) / TicksPerSecond;
+		let isSelected = selectedAction === spell.id;
+		let isCharging = hero.charging && hero.charging.spell === spell.id;
+		let remainingInSeconds = cooldownRemaining(world, hero, spell.id) / TicksPerSecond;
 
 		ctx.save();
 		ctx.translate((ButtonSize + ButtonSpacing) * i, 0);
@@ -1103,7 +1124,7 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 
 		if (remainingInSeconds > 0) {
 		// Cooldown
-			var cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
+			let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
 			ctx.font = 'bold ' + (ButtonSize - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, ButtonSize / 2, ButtonSize / 2);
@@ -1153,12 +1174,12 @@ function vectorLength(vec) {
 }
 
 function vectorUnit(vec) {
-	var length = vectorLength(vec);
+	let length = vectorLength(vec);
 	return length == 0 ? vec : pl.Vec2(vec.x / length, vec.y / length);
 }
 
 function vectorDirection(to, from, length) {
-	var diff = vectorDiff(to, from);
+	let diff = vectorDiff(to, from);
 	return vectorMultiply(vectorUnit(diff), length);
 }
 
@@ -1167,7 +1188,7 @@ function vectorMultiply(vec, multiplier) {
 }
 
 function vectorTruncate(vec, maxLength) {
-	var length = vectorLength(vec);
+	let length = vectorLength(vec);
 	if (length > maxLength) {
 		return vectorMultiply(vec, maxLength / length);
 	} else {
@@ -1176,8 +1197,8 @@ function vectorTruncate(vec, maxLength) {
 }
 
 function vectorTowards(from, to, distance) {
-	var diff = vectorDiff(to, from);
-	step = vectorTruncate(diff, distance);
+	let diff = vectorDiff(to, from);
+	let step = vectorTruncate(diff, distance);
 	return vectorPlus(from, step);
 }
 
@@ -1192,3 +1213,6 @@ function vectorDistance(a, b) {
 function vectorClone(vec) {
 	return pl.Vec2(vec.x, vec.y);
 }
+
+// Main
+attach();

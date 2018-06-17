@@ -21,34 +21,14 @@
 				display: block;
 			}
 		</style>
-		<script src="/socket.io/socket.io.js"></script>
 	</head>
 	<body>
-		<script src="planck.min.js"></script>
-		<script src="main.js"></script>
 		<canvas
 			id="canvas"
 			class="center"
 			width="0"
 			height="0">
 		</canvas>
-		<script>
-			var canvas = document.getElementById("canvas");
-			fullScreenCanvas();
-
-			canvas.onmousemove = canvasMouseMove;
-			canvas.onmousedown = canvasMouseMove;
-			window.onkeydown = gameKeyDown;
-			window.onresize = fullScreenCanvas;
-
-			canvas.oncontextmenu = function (e) {
-					e.preventDefault();
-			};
-
-			function fullScreenCanvas() {
-				canvas.width = document.body.clientWidth;
-				canvas.height = document.body.clientHeight;
-			}
-		</script>
+		<script src="dist/client.js"></script>
 	</body>
 </html>

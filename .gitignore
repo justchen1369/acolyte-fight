@@ -1,0 +1,6 @@
+.hg
+node_modules
+.DS_Store
+.hgignore
+dist
+js

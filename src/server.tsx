@@ -1,8 +1,7 @@
-'use strict'
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
 
 const port = process.env.PORT || 7770;
 
@@ -10,18 +9,18 @@ app.use(express.static('./'));
 
 io.on('connection', onConnection);
 
-var server = http.listen(port, function() {
+let server = http.listen(port, function() {
 	console.log("Started listening on port " + port);
 });
 
 
 // Game management
-var TicksPerSecond = 60;
-var JoinPeriod = 5 * TicksPerSecond;
-var MaxHistoryLength = 180 * TicksPerSecond;
-var MaxPlayers = 10;
-var nextGameId = 0;
-var games = new Map();
+let TicksPerSecond = 60;
+let JoinPeriod = 5 * TicksPerSecond;
+let MaxHistoryLength = 180 * TicksPerSecond;
+let MaxPlayers = 10;
+let nextGameId = 0;
+let games = new Map();
 
 function onConnection(socket) {
   console.log("user " + socket.id + " connected");
@@ -40,7 +39,7 @@ function onConnection(socket) {
 }
 
 function onJoinGameMsg(socket, data) {
-	var game = null;
+	let game = null;
 	games.forEach(g => {
 		if ((!g.started || g.history) && g.active.size < MaxPlayers) {
 			game = g;
@@ -50,7 +49,7 @@ function onJoinGameMsg(socket, data) {
 		game = initGame();
 	}
 	
-	var heroId = joinGame(game, socket);
+	let heroId = joinGame(game, socket);
 
 	socket.on('action', (actionData) => {
 		if (!isUserInitiated(actionData)) {
@@ -64,7 +63,7 @@ function onJoinGameMsg(socket, data) {
 }
 
 function initGame() {
-	var game = {
+	let game = {
 		id: "g" + nextGameId++,
 		active: new Map(),
 		started: false,
@@ -72,6 +71,7 @@ function initGame() {
 		tick: 0,
 		joinLimitTick: Infinity,
 		actions: new Map(),
+		intervalHandle: null,
 		history: [],
 	};
 	games.set(game.id, game);
@@ -83,12 +83,12 @@ function initGame() {
 }
 
 function joinGame(game, socket) {
-	var heroId = null;
+	let heroId = null;
 
 	// Take an existing slot, if possible
-	var activeHeroIds = new Set(game.active.values());
-	for (var i = 0; i < game.numPlayers; ++i) {
-		var candidate = formatHeroId(i);
+	let activeHeroIds = new Set(game.active.values());
+	for (let i = 0; i < game.numPlayers; ++i) {
+		let candidate = formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {
 			heroId = candidate;
 			break;
@@ -121,8 +121,8 @@ function formatHeroId(index) {
 }
 
 function queueAction(game, actionData) {
-	var currentPrecedence = actionPrecedence(game.actions.get(actionData.heroId));
-	var newPrecedence = actionPrecedence(actionData);
+	let currentPrecedence = actionPrecedence(game.actions.get(actionData.heroId));
+	let newPrecedence = actionPrecedence(actionData);
 
 	if (newPrecedence >= currentPrecedence) {
 		game.actions.set(actionData.heroId, actionData);
@@ -173,7 +173,7 @@ function isSpell(actionData) {
 
 
 function leaveGame(game, socket) {
-	var heroId = game.active.get(socket.id);
+	let heroId = game.active.get(socket.id);
 	if (!heroId) {
 		console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
 		return;
@@ -188,7 +188,10 @@ function leaveGame(game, socket) {
 
 function finishGame(game) {
 	games.delete(game.id);
-	clearInterval(game.intervalHandle);
+	if (game.intervalHandle) {
+		clearInterval(game.intervalHandle);
+	}
+
 	console.log("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
 
@@ -199,7 +202,7 @@ function gameTick(game) {
 	}
 
 	if (game.started || game.actions.size > 0) {
-		var data = {
+		let data = {
 			gameId: game.id,
 			tick: game.tick++,
 			actions: [...game.actions.values()],
@@ -224,10 +227,11 @@ function gameTick(game) {
 }
 
 function any(collection, predicate) {
-	for (var value of collection) {
+	for (let value of collection) {
 		if (predicate(value)) {
 			return true;
 		}
 	}
 	return false;
 }
+
