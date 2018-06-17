@@ -116,7 +116,7 @@ function applyTickActions(tickData, world) {
 			world.joining.push(actionData.heroId);
 		} else if (actionData.actionType === "leave") {
 			world.leaving.push(actionData.heroId);
-		}else {
+		} else {
 			world.actions.set(actionData.heroId, { type: actionData.actionType, target: pl.Vec2(actionData.targetX, actionData.targetY) });
 		}
 	});
