@@ -10,3 +10,14 @@ input {
     font-size: 14pt;
     width: 500px;
 }
+
+a, a:visited {
+    color: #00ccff;
+}
+a:hover, a:active {
+    color: #ff8800;
+}
+
+.controls {
+    text-align: right;
+}
