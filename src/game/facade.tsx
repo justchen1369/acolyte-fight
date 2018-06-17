@@ -1,12 +1,12 @@
 import pl from 'planck-js';
 import { Spells } from './constants';
 import { render, calculateWorldRect } from './render';
-import { world } from './engine';
-import * as model from './engine';
+import * as engine from './engine';
 
 let socket: SocketIOClient.Socket = null;
 let tickQueue = [];
 let nextTarget = null;
+let world = engine.initialWorld();
 
 export function attachToCanvas(canvas: HTMLCanvasElement) {
     fullScreenCanvas();
@@ -41,7 +41,7 @@ export function frame(canvas: HTMLCanvasElement) {
 		}
 
 		applyTickActions(tickData, world);
-		model.tick(world);
+		engine.tick(world);
 	}
 	render(world, canvas);
 }

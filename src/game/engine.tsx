@@ -10,32 +10,35 @@ const AllCategories = 0xFFFF;
 const HeroCategory = 1;
 const ProjectileCategory = 2;
 
-export let world = {
-	tick: 0,
+export function initialWorld(): w.World {
+	let world = {
+		tick: 0,
 
-	numPlayers: 0,
-	joining: [],
-	leaving: [],
-	activePlayers: new Set(),
+		numPlayers: 0,
+		joining: [],
+		leaving: [],
+		activePlayers: new Set(),
 
-	objects: new Map(),
-	physics: pl.World(),
-	actions: new Map(),
-	radius: 0.4,
+		objects: new Map(),
+		physics: pl.World(),
+		actions: new Map(),
+		radius: 0.4,
 
-	collisions: [],
-	destroyed: [],
+		collisions: [],
+		destroyed: [],
 
-	nextHeroId: 0,
-	nextBulletId: 0,
+		nextHeroId: 0,
+		nextBulletId: 0,
 
-	trails: [],
-	ui: {
-		myGameId: null,
-		myHeroId: null,
-	}
-} as w.World;
-world.physics.on('post-solve', onCollision);
+		trails: [],
+		ui: {
+			myGameId: null,
+			myHeroId: null,
+		}
+	} as w.World;
+	world.physics.on('post-solve', (contact) => onCollision(world, contact));
+	return world;
+}
 
 function nextHeroPosition(world: w.World) {
 	let nextHeroIndex = world.numPlayers;
@@ -252,7 +255,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell:
 	}
 }
 
-function onCollision(contact) {
+function onCollision(world, contact) {
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
 	if (objA.category === "hero" && objB.category === "projectile") {
