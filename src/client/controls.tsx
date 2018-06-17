@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as c from '../game/constants';
 import * as w from './world.model';
 
 interface Props {
@@ -7,10 +8,18 @@ interface Props {
     world: w.World;
 }
 interface State {
+    showingPlayerList: boolean;
 }
 
 export class Controls extends React.Component<Props, State> {
     private refreshTimer = null;
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            showingPlayerList: true,
+        };
+    }
 
     componentDidMount() {
         this.refreshTimer = setInterval(() => this.onRefreshInterval(), 1000);
@@ -23,14 +32,16 @@ export class Controls extends React.Component<Props, State> {
     }
 
     render() {
-        let otherHeroes = new Array<w.Hero>();
-
         const world = this.props.world;
+
+        let heroes = new Array<w.Hero>();
         world.objects.forEach(obj => {
-            if (obj.category === "hero" && obj.id != world.ui.myHeroId) {
-                otherHeroes.push(obj);
+            if (obj.category === "hero") {
+                heroes.push(obj);
             }
         });
+
+        let playerListIconClass = this.state.showingPlayerList ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-up";
 
         return (
             <div className="controls">
@@ -42,16 +53,24 @@ export class Controls extends React.Component<Props, State> {
                         </a>
                     </div>
                 </div>
-                <div style={{marginTop: 20}}>
-                    {otherHeroes.map(hero => <div style={{color: hero.fillStyle}}>
-                        {hero.name}
-                    </div>)}
-                </div>
+                {heroes.length > 0 && <div style={{marginTop: 40}}>
+                    <div>{heroes.length} players <i className={playerListIconClass} onClick={() => this.toggleShowPlayers()} /></div>
+                    {this.state.showingPlayerList && heroes.map(hero => {
+                        const color = hero.id === world.ui.myHeroId ? c.Hero.MyHeroColor : hero.fillStyle;
+                        return <div style={{color}}>{hero.name}</div>
+                    })}
+                </div>}
             </div>
         );
     }
 
-    onRefreshInterval() {
+    private toggleShowPlayers() {
+        this.setState({
+            showingPlayerList: !this.state.showingPlayerList,
+        });
+    }
+
+    private onRefreshInterval() {
         this.forceUpdate();
     }
 }
