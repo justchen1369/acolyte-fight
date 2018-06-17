@@ -78,8 +78,25 @@ export interface WorldAction {
 	target?: pl.Vec2;
 }
 
-export interface Trail {
+export type Trail = CircleTrail | LineTrail;
 
+export interface TrailBase {
+	remaining: number;
+	max: number;
+	fillStyle: string;
+}
+
+export interface CircleTrail extends TrailBase {
+	type: "circle";
+	pos: pl.Vec2;
+	radius: number;
+}
+
+export interface LineTrail extends TrailBase {
+	type: "line";
+	from: pl.Vec2;
+	to: pl.Vec2;
+	width: number;
 }
 
 export interface Collision {

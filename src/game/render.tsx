@@ -1,28 +1,14 @@
 import * as constants from './constants';
+import * as c from './constants.model';
 import * as engine from './engine';
 import * as vector from './vector';
+import * as w from './world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from './constants';
 import { Icons } from './icons';
 
-let ui = {
-	buttons: [
-		"teleport",
-		"shield",
-		null,
-		"fireball",
-		"lightning",
-		"homing",
-		"meteor",
-		null,
-		"bouncer",
-		"scourge",
-		// "shield",
-	],
-};
-
 // Rendering
-export function calculateWorldRect(rect) {
+export function calculateWorldRect(rect: ClientRect) {
 	let size = Math.min(rect.width, rect.height);
 	return {
 		left: (rect.width - size) / 2.0,
@@ -32,7 +18,7 @@ export function calculateWorldRect(rect) {
 	};
 }
 
-export function render(world, canvas) {
+export function render(world: w.World, canvas: HTMLCanvasElement) {
 	let rect = canvas.getBoundingClientRect();
 	let ctx = canvas.getContext('2d');
 
@@ -43,7 +29,7 @@ export function render(world, canvas) {
 	ctx.restore();
 }
 
-function clearCanvas(ctx, rect) {
+function clearCanvas(ctx: CanvasRenderingContext2D, rect: ClientRect) {
 	ctx.save();
 
 	ctx.fillStyle = '#000000';
@@ -54,7 +40,7 @@ function clearCanvas(ctx, rect) {
 	ctx.restore();
 }
 
-function renderWorld(ctx, world, rect) {
+function renderWorld(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
 	ctx.save();
 
 	let worldRect = calculateWorldRect(rect);
@@ -79,21 +65,23 @@ function renderWorld(ctx, world, rect) {
 	ctx.restore();
 }
 
-function renderObject(ctx, obj, world) {
-	if (obj.type === "hero") {
+function renderObject(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
+	if (obj.category === "hero") {
 		renderHero(ctx, obj, world);
-	} else if (obj.type in Spells.all) {
-		let spell = Spells.all[obj.type];
+	} else if (obj.category === "projectile") {
+		const spell = Spells.all[obj.type] as c.ProjectileSpell;
 		renderSpell(ctx, obj, world, spell);
 	}
 }
 
-function renderDestroyed(ctx, obj, world) {
-	let spell = Spells.all[obj.type];
-    renderSpell(ctx, obj, world, spell);
+function renderDestroyed(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
+	if (obj.category === "projectile") {
+		const spell = Spells.all[obj.type] as c.ProjectileSpell;
+		renderSpell(ctx, obj, world, spell);
+	}
 }
 
-function renderSpell(ctx, obj, world, spell) {
+function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
     if (!spell) {
         return;
     }
@@ -104,7 +92,7 @@ function renderSpell(ctx, obj, world, spell) {
     }
 }
 
-function renderMap(ctx, world) {
+function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.save();
 
 	ctx.translate(0.5, 0.5);
@@ -117,7 +105,7 @@ function renderMap(ctx, world) {
 	ctx.restore();
 }
 
-function renderHero(ctx, hero, world) {
+function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World) {
 	if (hero.destroyed) {
 		return;
 	}
@@ -185,12 +173,12 @@ function renderHero(ctx, hero, world) {
 	ctx.restore();
 }
 
-function rgColor(proportion) {
+function rgColor(proportion: number) {
 	let hue = proportion * 120.0;
 	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
 }
 
-function renderRay(ctx, projectile, world, spell) {
+function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
 	let pos = projectile.body.getPosition();
 	let previous = projectile.uiPreviousPos;
 	projectile.uiPreviousPos = vector.clone(pos);
@@ -209,10 +197,10 @@ function renderRay(ctx, projectile, world, spell) {
 		to: vector.clone(pos),
 		fillStyle: spell.fillStyle,
 		width: spell.radius * 2,
-	});
+	} as w.LineTrail);
 }
 
-function renderProjectile(ctx, projectile, world, spell) {
+function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
 	let pos = projectile.body.getPosition();
 
 	world.trails.push({
@@ -222,10 +210,10 @@ function renderProjectile(ctx, projectile, world, spell) {
 		pos: vector.clone(pos),
 		fillStyle: spell.fillStyle,
 		radius: spell.radius,
-	});
+	} as w.CircleTrail);
 }
 
-function renderTrail(ctx, trail) {
+function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
 	let proportion = 1.0 * trail.remaining / trail.max;
 	if (proportion <= 0) {
 		return true;
@@ -256,15 +244,15 @@ function renderTrail(ctx, trail) {
 	return trail.remaining <= 0;
 }
 
-function renderInterface(ctx, world, rect) {
-	let myHero = world.objects.get(world.ui.myHeroId);
+function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
+	let myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
-		renderButtons(ctx, ui.buttons, world, myHero, world.actions, rect);
+		const heroAction = world.actions.get(myHero.id);
+		renderButtons(ctx, ButtonBar.List, world, myHero, heroAction, rect);
 	}
 }
 
-function renderButtons(ctx, buttons, world, hero, actions, rect) {
-	let heroAction = actions.get(hero.id);
+function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: w.World, hero: w.Hero, heroAction: w.WorldAction, rect: ClientRect) {
 	let selectedAction = heroAction && heroAction.type;
 
 	let buttonBarWidth = buttons.length * ButtonBar.Size + (buttons.length - 1) * ButtonBar.Spacing;
@@ -340,7 +328,7 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 	ctx.restore();
 }
 
-function renderTextWithShadow(ctx, text, x, y) {
+function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
 	ctx.save();
 
 	ctx.fillStyle = 'black';

@@ -48,6 +48,18 @@ export const ButtonBar = {
 	Spacing: 10,
 	Margin: 5,
 	Size: 50,
+	List: [
+		"teleport",
+		"shield",
+		null,
+		"fireball",
+		"lightning",
+		"homing",
+		"meteor",
+		null,
+		"bouncer",
+		"scourge",
+	],
 }
 
 export namespace Spells {
