@@ -1,5 +1,6 @@
 import socketLib from 'socket.io-client';
 import pl from 'planck-js';
+import * as constants from './constants';
 import { render, calculateWorldRect } from './render';
 import { world } from './model';
 import * as model from './model';
@@ -66,8 +67,8 @@ function canvasMouseMove(e) {
 }
 
 function gameKeyDown(e) {
-	for (let id in model.Spells) {
-		let spell = model.Spells[id];
+	for (let id in constants.Spells) {
+		let spell = constants.Spells[id];
 		if (spell.key === e.key) {
 			sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
 		}

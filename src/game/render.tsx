@@ -1,19 +1,10 @@
 import pl from 'planck-js';
-import { TicksPerSecond } from './constants';
+import * as constants from './constants';
 import * as model from './model';
 import * as vector from './vector';
 
-const MyHeroColor = '#00ccff';
-
-let HealthBarRadius = model.HeroRadius * 0.9;
-let HealthBarHeight = model.Pixel * 3;
-let HealthBarMargin = model.Pixel * 2;
-let ChargingIndicatorMargin = model.Pixel * 5;
-let ChargingIndicatorWidth = model.Pixel * 2;
-
-let ButtonSpacing = 10;
-let ButtonMargin = 5;
-let ButtonSize = 50;
+import { ButtonBar, ChargingIndicator, HealthBar, Hero } from './constants';
+import { Icons } from './icons';
 
 let ui = {
 	buttons: [
@@ -92,14 +83,14 @@ function renderWorld(ctx, world, rect) {
 function renderObject(ctx, obj, world) {
 	if (obj.type === "hero") {
 		renderHero(ctx, obj, world);
-	} else if (obj.type in model.Spells) {
-		let spell = model.Spells[obj.type];
+	} else if (obj.type in constants.Spells) {
+		let spell = constants.Spells[obj.type];
 		renderSpell(ctx, obj, world, spell);
 	}
 }
 
 function renderDestroyed(ctx, obj, world) {
-	let spell = model.Spells[obj.type];
+	let spell = constants.Spells[obj.type];
     renderSpell(ctx, obj, world, spell);
 }
 
@@ -142,22 +133,22 @@ function renderHero(ctx, hero, world) {
 	if (!world.activePlayers.has(hero.id)) {
 		ctx.fillStyle = '#666666';
 	} else if (hero.id === world.ui.myHeroId) {
-		ctx.fillStyle = MyHeroColor;
+		ctx.fillStyle = constants.MyHeroColor;
 	}
 	ctx.beginPath();
-	ctx.arc(0, 0, model.HeroRadius, 0, 2 * Math.PI);
+	ctx.arc(0, 0, Hero.Radius, 0, 2 * Math.PI);
 	ctx.fill();
 
 	// Charging
 	if (hero.charging && hero.charging.spell && hero.charging.proportion > 0) {
 		ctx.save();
 
-		let spell = model.Spells[hero.charging.spell];
+		let spell = constants.Spells[hero.charging.spell];
 		ctx.globalAlpha = hero.charging.proportion;
 		ctx.strokeStyle = spell.fillStyle;
-		ctx.lineWidth = ChargingIndicatorWidth;
+		ctx.lineWidth = ChargingIndicator.Width;
 		ctx.beginPath();
-		ctx.arc(0, 0, model.HeroRadius + ChargingIndicatorMargin, 0, 2 * Math.PI);
+		ctx.arc(0, 0, Hero.Radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
 		ctx.stroke();
 
 		ctx.restore();
@@ -165,7 +156,7 @@ function renderHero(ctx, hero, world) {
 
 	// Shield
 	if (hero.shieldTicks) {
-		let spell = model.Spells.shield;
+		let spell = constants.Spells.shield;
 		let proportion = 1.0 * hero.shieldTicks / spell.maxTicks;
 
 		ctx.save();
@@ -183,13 +174,13 @@ function renderHero(ctx, hero, world) {
 	// Health bar
 	ctx.fillStyle = 'black';
 	ctx.beginPath();
-	ctx.rect(-HealthBarRadius, -model.HeroRadius - HealthBarHeight - HealthBarMargin, HealthBarRadius * 2, HealthBarHeight);
+	ctx.rect(-HealthBar.Radius, -Hero.Radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
 	ctx.fill();
 
-	let healthProportion = hero.health / model.HeroMaxHealth;
+	let healthProportion = hero.health / Hero.MaxHealth;
 	ctx.fillStyle = rgColor(healthProportion);
 	ctx.beginPath();
-	ctx.rect(-HealthBarRadius, -model.HeroRadius - HealthBarHeight - HealthBarMargin, HealthBarRadius * 2 * healthProportion, HealthBarHeight);
+	ctx.rect(-HealthBar.Radius, -Hero.Radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
 	ctx.fill();
 
 	ctx.restore();
@@ -277,23 +268,23 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 	let heroAction = actions.get(hero.id);
 	let selectedAction = heroAction && heroAction.type;
 
-	let buttonBarWidth = buttons.length * ButtonSize + (buttons.length - 1) * ButtonSpacing;
+	let buttonBarWidth = buttons.length * ButtonBar.Size + (buttons.length - 1) * ButtonBar.Spacing;
 
 	ctx.save();
-	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonSize - ButtonMargin);
+	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonBar.Size - ButtonBar.Margin);
 
 	for (let i = 0; i < buttons.length; ++i) {
-		let spell = model.Spells[buttons[i]];
+		let spell = constants.Spells[buttons[i]];
 		if (!spell) {
 			continue;
 		}
 
 		let isSelected = selectedAction === spell.id;
 		let isCharging = hero.charging && hero.charging.spell === spell.id;
-		let remainingInSeconds = model.cooldownRemaining(world, hero, spell.id) / TicksPerSecond;
+		let remainingInSeconds = model.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 		ctx.save();
-		ctx.translate((ButtonSize + ButtonSpacing) * i, 0);
+		ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 
@@ -309,7 +300,7 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 			}
 
 			ctx.beginPath();
-			ctx.rect(0, 0, ButtonSize, ButtonSize);
+			ctx.rect(0, 0, ButtonBar.Size, ButtonBar.Size);
 			ctx.fill();
 
 			ctx.restore();
@@ -321,8 +312,8 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 
 			ctx.globalAlpha = 0.6;
 			ctx.fillStyle = 'white';
-			ctx.scale(ButtonSize / 512, ButtonSize / 512);
-			ctx.fill(spell.icon);
+			ctx.scale(ButtonBar.Size / 512, ButtonBar.Size / 512);
+			ctx.fill(Icons[spell.icon]);
 
 			ctx.restore();
 		}
@@ -331,14 +322,14 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 		// Cooldown
 			let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
-			ctx.font = 'bold ' + (ButtonSize - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, cooldownText, ButtonSize / 2, ButtonSize / 2);
+			ctx.font = 'bold ' + (ButtonBar.Size - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
 		} else {
 			// Keyboard shortcut
 			ctx.save();
 
-			ctx.font = 'bold ' + (ButtonSize / 2 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, spell.key.toUpperCase(), ButtonSize / 4, ButtonSize * 3 / 4);
+			ctx.font = 'bold ' + (ButtonBar.Size / 2 - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, spell.key.toUpperCase(), ButtonBar.Size / 4, ButtonBar.Size * 3 / 4);
 
 			ctx.restore();
 		}

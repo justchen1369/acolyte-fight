@@ -1,196 +1,12 @@
 import pl from 'planck-js';
+import * as constants from './constants';
 import * as vector from './vector';
 
-import * as Icons from './icons';
-import { TicksPerSecond } from './constants';
-
-export const HeroColors = [
-	"#bfad8f",
-	"#7db37d",
-	"#d0c16b",
-	"#6d89cc",
-	"#cb8fc1",
-	"#56b5bf",
-	"#a69a7c",
-	"#557e6c",
-	"#a18e4c",
-	"#41569e",
-	"#9d6d95",
-	"#2bafca",
-];
-
-export const MoveSpeedPerTick = 0.12 / TicksPerSecond;
-export const HeroRadius = 0.01;
-export const HeroDensity = 1;
-export const HeroMaxDamping = 5;
-export const HeroMinDamping = 0.25;
-export const HeroMaxHealth = 100;
+import { Hero, World, TicksPerSecond } from './constants';
 
 export const AllCategories = 0xFFFF;
 export const HeroCategory = 1;
 export const ProjectileCategory = 2;
-
-export const LavaDamagePerTick = 0.25;
-export const ShrinkPerTick = 0.00005;
-
-export const Pixel = 0.001;
-
-export const Spells = {
-	move: {
-		id: 'move',
-		cooldown: 0,
-		action: moveAction,
-	},
-	fireball: {
-		id: 'fireball',
-		density: 25,
-		radius: 0.005,
-		speed: 0.4,
-		chargeTicks: 0,
-		maxTicks: 1 * TicksPerSecond,
-		cooldown: 1 * TicksPerSecond,
-		damage: 10,
-		explodesOnImpact: true,
-
-		key: 'q',
-		icon: Icons.thunderball,
-
-		trailTicks: 30,
-		fillStyle: '#ff8800',
-
-		action: spawnProjectileAction,
-		render: "projectile",
-	},
-	meteor: {
-		id: 'meteor',
-		density: 10000,
-		radius: 0.03,
-		speed: 0.2,
-		chargeTicks: 0.1 * TicksPerSecond,
-		maxTicks: 12 * TicksPerSecond,
-		cooldown: 12 * TicksPerSecond,
-		damage: 1,
-
-		key: 'r',
-		icon: Icons.meteorImpact,
-
-		trailTicks: 15,
-		fillStyle: '#ff0000',
-
-		action: spawnProjectileAction,
-		render: "projectile",
-	},
-	lightning: {
-		id: 'lightning',
-		density: 3,
-		radius: 0.0025,
-		speed: 3.0,
-		chargeTicks: 0,
-		maxTicks: 0.5 * TicksPerSecond,
-		cooldown: 10 * TicksPerSecond,
-		damage: 1,
-		explodesOnImpact: true,
-
-		key: 'w',
-		icon: Icons.lightningHelix,
-
-		trailTicks: 30,
-		fillStyle: '#00ddff',
-
-		action: spawnProjectileAction,
-		render: "ray",
-	},
-	homing: {
-		id: 'homing',
-		density: 25,
-		radius: 0.003,
-		speed: 0.15,
-		chargeTicks: 0,
-		maxTicks: 6.0 * TicksPerSecond,
-		cooldown: 20 * TicksPerSecond,
-		damage: 20,
-		turnRate: 0.05,
-		explodesOnImpact: true,
-
-		key: 'e',
-		icon: Icons.boltSaw,
-
-		trailTicks: 30,
-		fillStyle: '#44ffcc',
-
-		action: spawnProjectileAction,
-		render: "projectile",
-	},
-	bouncer: {
-		id: 'bouncer',
-		density: 2,
-		radius: 0.001,
-		speed: 0.75,
-		chargeTicks: 0,
-		maxTicks: 3.0 * TicksPerSecond,
-		cooldown: 10 * TicksPerSecond,
-		damage: 2,
-		turnRate: 0.025,
-		explodesOnImpact: true,
-		bounceDamage: 0.95,
-
-		key: 'd',
-		icon: Icons.divert,
-
-		trailTicks: 1.0 * TicksPerSecond,
-		fillStyle: '#88ee22',
-
-		action: spawnProjectileAction,
-		render: "ray",
-	},
-	scourge: {
-		id: 'scourge',
-		radius: HeroRadius * 5,
-		chargeTicks: 0.5 * TicksPerSecond,
-		maxTicks: 1,
-		cooldown: 10 * TicksPerSecond,
-		damage: 20,
-		selfDamage: 10,
-		minImpulseMagnitude: 0.0002,
-		maxImpulseMagnitude: 0.0005,
-
-		key: 'f',
-		icon: Icons.deadlyStrike,
-
-		trailTicks: 30,
-		fillStyle: '#ddbb00',
-
-		action: scourgeAction,
-	},
-	shield: {
-		id: 'shield',
-		mass: 100000,
-		chargeTicks: 0,
-		maxTicks: 1 * TicksPerSecond,
-		cooldown: 20 * TicksPerSecond,
-		radius: HeroRadius * 2,
-
-		key: 'x',
-		icon: Icons.shield,
-
-		fillStyle: '#3366ff',
-
-		action: shieldAction,
-	},
-	teleport: {
-		id: 'teleport',
-		maxRange: 0.35,
-		chargeTicks: 3,
-		cooldown: 15 * TicksPerSecond,
-
-		key: 'z',
-		icon: Icons.teleport,
-
-		fillStyle: '#6666ff',
-
-		action: teleportAction,
-	},
-};
 
 export let world = {
 	tick: 0,
@@ -236,22 +52,22 @@ function addHero(world, position, heroId) {
 		userData: heroId,
 		type: 'dynamic',
 		position,
-		linearDamping: HeroMaxDamping,
+		linearDamping: Hero.MaxDamping,
 	});
-	body.createFixture(pl.Circle(HeroRadius), {
+	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: HeroCategory,
-		density: HeroDensity,
+		density: Hero.Density,
 		restitution: 0.1,
 	});
 
 	let hero = {
 		id: heroId,
 		type: "hero",
-		health: HeroMaxHealth,
+		health: Hero.MaxHealth,
 		body,
 		charging: {},
 		cooldowns: {},
-		fillStyle: HeroColors[world.numPlayers % HeroColors.length],
+		fillStyle: constants.HeroColors[world.numPlayers % constants.HeroColors.length],
 	};
 	world.objects.set(heroId, hero);
 
@@ -281,7 +97,7 @@ function addProjectile(world, hero, target, spell) {
 	let id = spell.id + (world.nextBulletId++);
 
 	let from = hero.body.getPosition();
-	let position = vector.towards(from, target, HeroRadius + spell.radius + Pixel);
+	let position = vector.towards(from, target, Hero.Radius + spell.radius + constants.Pixel);
 	let velocity = vector.direction(target, from, spell.speed);
 
 	let body = world.physics.createBody({
@@ -392,7 +208,7 @@ function handlePlayerJoinLeave(world) {
 function performHeroActions(world, hero, nextAction) {
 	if (hero.charging && hero.charging.action) {
 		let chargingAction = hero.charging.action;
-		let chargingSpell = Spells[chargingAction.type];
+		let chargingSpell = constants.Spells[chargingAction.type];
 		hero.charging.proportion += 1.0 / chargingSpell.chargeTicks;
 		if (hero.charging.proportion < 1.0) {
 			return false; // Blocked charging, cannot perform action
@@ -405,7 +221,7 @@ function performHeroActions(world, hero, nextAction) {
 		// Nothing to do
 		return true;
 	} else {
-		let nextSpell = Spells[nextAction.type];
+		let nextSpell = constants.Spells[nextAction.type];
 		if (!nextAction) {
 			return true;
 		}
@@ -430,6 +246,14 @@ function applyAction(world, hero, action, spell) {
 		setCooldown(world, hero, spell.id, spell.cooldown);
 	}
 
+	switch (spell.action) {
+		case "move": return moveAction(world, hero, action, spell);
+		case "projectile": return spawnProjectileAction(world, hero, action, spell);
+		case "scourge": return scourgeAction(world, hero, action, spell);
+		case "teleport": return teleportAction(world, hero, action, spell);
+		case "shield": return shieldAction(world, hero, action, spell);
+		default: throw "Unknown action type: " + spell.action;
+	}
 	return spell.action(world, hero, action, spell);
 }
 
@@ -449,7 +273,7 @@ function onCollision(contact) {
 function handleCollisions(world, collision) {
 	world.collisions.forEach(collision => {
 		if (collision.projectile) {
-			let spell = Spells[collision.projectile.type];
+			let spell = constants.Spells[collision.projectile.type];
 			if (collision.hero && collision.hero.shieldTicks > 0) {
 				let heroPos = collision.hero.body.getPosition();
 				let currentPos = collision.projectile.body.getPosition();
@@ -532,7 +356,7 @@ function homingForce(world) {
 			return;
 		}
 
-		let spell = Spells[obj.type];
+		let spell = constants.Spells[obj.type];
 		if (!(spell && spell.turnRate)) {
 			return;
 		}
@@ -563,7 +387,7 @@ function decayShields(world) {
 function updateKnockback(world) {
 	world.objects.forEach(obj => {
 		if (obj.type === "hero") {
-			let damping = HeroMinDamping + (HeroMaxDamping - HeroMinDamping) * obj.health / HeroMaxHealth;
+			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
 			obj.body.setLinearDamping(damping);
 		}
 	});
@@ -574,7 +398,7 @@ function applyLavaDamage(world) {
 		if (obj.type === "hero") {
 			let position = obj.body.getPosition();
 			if (vector.distance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
-				obj.health -= LavaDamagePerTick;
+				obj.health -= World.LavaDamagePerTick;
 			}
 		}
 	});
@@ -582,7 +406,7 @@ function applyLavaDamage(world) {
 
 function shrink(world) {
 	if (world.activePlayers.size > 1) {
-		world.radius = Math.max(0, world.radius - ShrinkPerTick);
+		world.radius = Math.max(0, world.radius - World.ShrinkPerTick);
 	}
 }
 
@@ -612,9 +436,9 @@ function destroyObject(world, object) {
 function moveAction(world, hero, action, spell) {
 	let current = hero.body.getPosition();
 	let target = action.target;
-	hero.step = vector.multiply(vector.truncate(vector.diff(target, current), MoveSpeedPerTick), TicksPerSecond);
+	hero.step = vector.multiply(vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick), TicksPerSecond);
 
-	return vector.distance(current, target) < Pixel;
+	return vector.distance(current, target) < constants.Pixel;
 }
 
 function spawnProjectileAction(world, hero, action, spell) {
@@ -624,7 +448,7 @@ function spawnProjectileAction(world, hero, action, spell) {
 
 function teleportAction(world, hero, action, spell) {
 	let currentPosition = hero.body.getPosition();
-	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
+	let newPosition = vector.towards(currentPosition, action.target, constants.Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
 	return true;
 }
@@ -638,7 +462,7 @@ function scourgeAction(world, hero, action, spell) {
 
 		let objPos = obj.body.getPosition();
 		let diff = vector.diff(objPos, heroPos);
-		let proportion = 1.0 - (vector.length(diff) / (spell.radius + HeroRadius)); // +HeroRadius because only need to touch the edge
+		let proportion = 1.0 - (vector.length(diff) / (spell.radius + Hero.Radius)); // +HeroRadius because only need to touch the edge
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.type === "hero") {
@@ -665,7 +489,7 @@ function scourgeAction(world, hero, action, spell) {
 function shieldAction(world, hero, action, spell) {
 	hero.shieldTicks = spell.maxTicks;
 	hero.body.setMassData({
-		mass: Spells.shield.mass,
+		mass: constants.Spells.shield.mass,
 		center: vector.zero(),
 		I: 0,
 	});
