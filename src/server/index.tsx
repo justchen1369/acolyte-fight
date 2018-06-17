@@ -1,4 +1,5 @@
 import { Matchmaking, TicksPerSecond } from '../game/constants';
+import * as _ from 'lodash';
 import * as m from '../game/messages.model';
 
 const express = require('express');
@@ -224,7 +225,7 @@ function gameTick(game: Game) {
 		if (game.history) {
 			game.history.push(data);
 
-			if (game.active.size > 1 && any(data.actions, action => isSpell(action))) {
+			if (game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
 				// Casting any spell closes the game
 				game.joinLimitTick = game.tick + Matchmaking.JoinPeriod;
 			}
@@ -237,13 +238,3 @@ function gameTick(game: Game) {
 		io.to(game.id).emit('tick', data);
 	}
 }
-
-function any(collection, predicate) {
-	for (let value of collection) {
-		if (predicate(value)) {
-			return true;
-		}
-	}
-	return false;
-}
-
