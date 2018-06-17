@@ -12,6 +12,7 @@ export interface TickMsg {
 }
 
 export interface JoinMsg {
+    name: string;
 }
 
 export interface HeroMsg {

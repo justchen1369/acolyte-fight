@@ -72,12 +72,12 @@ export function gameKeyDown(e: KeyboardEvent) {
 }
 
 // Sockets
-export function attachToSocket(_socket: SocketIOClient.Socket) {
+export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
 		if (!world.ui.myGameId) {
-			socket.emit('join', {} as m.JoinMsg);
+			socket.emit('join', { name: playerName } as m.JoinMsg);
 		}
 	});
 	socket.on('disconnect', () => {

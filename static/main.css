@@ -1,0 +1,12 @@
+body {
+    background: #111;
+    font-family: sans-serif;
+    font-size: 14pt;
+    color: white;
+}
+
+input {
+    padding: 10px;
+    font-size: 14pt;
+    width: 500px;
+}
