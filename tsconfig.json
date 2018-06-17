@@ -56,6 +56,9 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
 	"include": [
-		"src/**/*.tsx"
-	]
+    "src/**/*.tsx",
+  ],
+  "files": [
+    "src/game/planck-js.d.ts"
+  ]
 }
