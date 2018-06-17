@@ -52,15 +52,15 @@ function renderWorld(ctx: CanvasRenderingContext2D, world: w.World, rect: Client
 	world.objects.forEach(obj => renderObject(ctx, obj, world));
 	world.destroyed.forEach(obj => renderDestroyed(ctx, obj, world));
 
-	let newTrails = [];
-	world.trails.forEach(trail => {
+	let newTrails = new Array<w.Trail>();
+	world.ui.trails.forEach(trail => {
 		let complete = true;
 		complete = renderTrail(ctx, trail);
 		if (!complete) {
 			newTrails.push(trail);
 		}
 	});
-	world.trails = newTrails;
+	world.ui.trails = newTrails;
 
 	ctx.restore();
 }
@@ -188,8 +188,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 		return;
 	}
 
-
-	world.trails.push({
+	world.ui.trails.push({
 		type: 'line',
 		remaining: spell.trailTicks,
 		max: spell.trailTicks, 
@@ -203,7 +202,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
 	let pos = projectile.body.getPosition();
 
-	world.trails.push({
+	world.ui.trails.push({
 		type: 'circle',
 		remaining: spell.trailTicks,
 		max: spell.trailTicks, 
@@ -252,7 +251,7 @@ function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: Cl
 	}
 }
 
-function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: w.World, hero: w.Hero, heroAction: w.WorldAction, rect: ClientRect) {
+function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: w.World, hero: w.Hero, heroAction: w.Action, rect: ClientRect) {
 	let selectedAction = heroAction && heroAction.type;
 
 	let buttonBarWidth = buttons.length * ButtonBar.Size + (buttons.length - 1) * ButtonBar.Spacing;

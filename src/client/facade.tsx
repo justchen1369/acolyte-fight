@@ -102,7 +102,7 @@ function onTickMsg(data: m.TickMsg) {
 function onDisconnectMsg() {
 	world.activePlayers.clear();
 }
-function sendAction(heroId: string, action: w.WorldAction) {
+function sendAction(heroId: string, action: w.Action) {
 	socket.emit('action', {
 		heroId: heroId,
 		actionType: action.type,

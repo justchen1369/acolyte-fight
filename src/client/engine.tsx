@@ -30,10 +30,10 @@ export function initialWorld(): w.World {
 		nextHeroId: 0,
 		nextBulletId: 0,
 
-		trails: [],
 		ui: {
 			myGameId: null,
 			myHeroId: null,
+			trails: [],
 		}
 	} as w.World;
 	world.physics.on('post-solve', (contact) => onCollision(world, contact));
@@ -121,7 +121,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		category: "projectile",
 		type: spell.id,
 		body,
-		uiPreviousPos: vector.clone(position), // uiPreviousPos is only used for the UI and not guaranteed to be sync'd across clients!
+		uiPreviousPos: vector.clone(position),
 		expireTick: world.tick + spell.maxTicks,
 		damageMultiplier: 1.0,
 		bullet: true,
@@ -205,7 +205,7 @@ function handlePlayerJoinLeave(world: w.World) {
 	}
 }
 
-function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.WorldAction) {
+function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
 	if (hero.charging && hero.charging.action) {
 		let chargingAction = hero.charging.action;
 		let chargingSpell = constants.Spells.all[chargingAction.type];
@@ -241,7 +241,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.WorldAct
 	}
 }
 
-function applyAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.Spell) {
+function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Spell) {
 	if (spell.cooldown) {
 		setCooldown(world, hero, spell.id, spell.cooldown);
 	}
@@ -435,7 +435,7 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.destroyed.push(object);
 }
 
-function moveAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.MoveSpell) {
+function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.MoveSpell) {
 	let current = hero.body.getPosition();
 	let target = action.target;
 	hero.step = vector.multiply(vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick), TicksPerSecond);
@@ -443,19 +443,19 @@ function moveAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: 
 	return vector.distance(current, target) < constants.Pixel;
 }
 
-function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.ProjectileSpell) {
+function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ProjectileSpell) {
 	addProjectile(world, hero, action.target, spell);
 	return true;
 }
 
-function teleportAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.TeleportSpell) {
+function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.TeleportSpell) {
 	let currentPosition = hero.body.getPosition();
 	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
 	return true;
 }
 
-function scourgeAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.ScourgeSpell) {
+function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ScourgeSpell) {
 	hero.health -= spell.selfDamage;
 
 	let heroPos = hero.body.getPosition();
@@ -476,7 +476,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.WorldAction, spel
 		obj.body.applyLinearImpulse(impulse, vector.zero(), true);
 	});
 
-	world.trails.push({
+	world.ui.trails.push({
 		type: "circle",
 		remaining: spell.trailTicks,
 		max: spell.trailTicks, 
@@ -488,7 +488,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.WorldAction, spel
 	return true;
 }
 
-function shieldAction(world: w.World, hero: w.Hero, action: w.WorldAction, spell: c.ShieldSpell) {
+function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ShieldSpell) {
 	hero.shieldTicks = spell.maxTicks;
 	hero.body.setMassData({
 		mass: Spells.shield.mass,

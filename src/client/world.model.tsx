@@ -10,21 +10,25 @@ export interface World {
 
 	objects: Map<string, WorldObject>,
 	physics: pl.World;
-	actions: Map<string, WorldAction>,
+	actions: Map<string, Action>,
 	radius: number;
 
 	collisions: Collision[];
 	destroyed: WorldObject[];
 
-	nextHeroId: number,
-	nextBulletId: number,
-
-	trails: Trail[];
-	ui: {
-		myGameId: string | null,
-		myHeroId: string | null,
-	}
+	nextHeroId: number;
+	nextBulletId: number;
+	
+	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };
+
+export interface UIState {
+	myGameId: string;
+	myHeroId: string;
+
+	previousObjectPositions: Map<string, pl.Vec2>;
+	trails: Trail[];
+}
 
 export interface WorldObjectBase {
 	id: string;
@@ -49,12 +53,13 @@ export interface Hero extends WorldObjectBase {
 }
 
 export interface Charging {
-	action?: WorldAction;
+	action?: Action;
 	proportion?: number;
 	spell?: string;
 }
 
 export interface Cooldowns {
+	[spellId: string]: number;
 }
 
 export interface Projectile extends WorldObjectBase {
@@ -68,12 +73,12 @@ export interface Projectile extends WorldObjectBase {
 	damageMultiplier: number;
 	expireTick: number;
 
-	uiPreviousPos: pl.Vec2;
+	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
 }
 
 export type WorldObject = Hero | Projectile;
 
-export interface WorldAction {
+export interface Action {
 	type: string;
 	target?: pl.Vec2;
 }
