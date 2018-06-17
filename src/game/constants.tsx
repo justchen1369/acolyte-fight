@@ -1,3 +1,5 @@
+import * as c from './constants.model';
+
 export const TicksPerSecond = 60;
 
 export const HeroColors = [
@@ -48,13 +50,14 @@ export const ButtonBar = {
 	Size: 50,
 }
 
-export const Spells = {
-	move: {
+export namespace Spells {
+	export const move = {
 		id: 'move',
 		cooldown: 0,
 		action: "move",
-	},
-	fireball: {
+	} as c.MoveSpell;
+
+	export const fireball = {
 		id: 'fireball',
 		density: 25,
 		radius: 0.005,
@@ -73,8 +76,9 @@ export const Spells = {
 
 		action: "projectile",
 		render: "projectile",
-	},
-	meteor: {
+	} as c.ProjectileSpell;
+
+	export const meteor = {
 		id: 'meteor',
 		density: 10000,
 		radius: 0.03,
@@ -92,8 +96,9 @@ export const Spells = {
 
 		action: "projectile",
 		render: "projectile",
-	},
-	lightning: {
+	} as c.ProjectileSpell;
+
+	export const lightning = {
 		id: 'lightning',
 		density: 3,
 		radius: 0.0025,
@@ -112,8 +117,9 @@ export const Spells = {
 
 		action: "projectile",
 		render: "ray",
-	},
-	homing: {
+	} as c.ProjectileSpell;
+
+	export const homing = {
 		id: 'homing',
 		density: 25,
 		radius: 0.003,
@@ -133,8 +139,9 @@ export const Spells = {
 
 		action: "projectile",
 		render: "projectile",
-	},
-	bouncer: {
+	} as c.ProjectileSpell;
+
+	export const bouncer = {
 		id: 'bouncer',
 		density: 2,
 		radius: 0.001,
@@ -155,17 +162,17 @@ export const Spells = {
 
 		action: "projectile",
 		render: "ray",
-	},
-	scourge: {
+	} as c.ProjectileSpell;
+
+	export const scourge = {
 		id: 'scourge',
 		radius: Hero.Radius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
-		maxTicks: 1,
 		cooldown: 10 * TicksPerSecond,
 		damage: 20,
 		selfDamage: 10,
-		minImpulseMagnitude: 0.0002,
-		maxImpulseMagnitude: 0.0005,
+		minImpulse: 0.0002,
+		maxImpulse: 0.0005,
 
 		key: 'f',
 		icon: "deadlyStrike",
@@ -174,8 +181,9 @@ export const Spells = {
 		fillStyle: '#ddbb00',
 
 		action: "scourge",
-	},
-	shield: {
+	} as c.ScourgeSpell;
+
+	export const shield = {
 		id: 'shield',
 		mass: 100000,
 		chargeTicks: 0,
@@ -189,8 +197,9 @@ export const Spells = {
 		fillStyle: '#3366ff',
 
 		action: "shield",
-	},
-	teleport: {
+	} as c.ShieldSpell;
+
+	export const teleport = {
 		id: 'teleport',
 		maxRange: 0.35,
 		chargeTicks: 3,
@@ -202,5 +211,17 @@ export const Spells = {
 		fillStyle: '#6666ff',
 
 		action: "teleport",
-	},
+	} as c.TeleportSpell;
+
+	export const all: c.Spells = {
+		move,
+		fireball,
+		meteor,
+		lightning,
+		homing,
+		bouncer,
+		scourge,
+		shield,
+		teleport,
+	};
 };

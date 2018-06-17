@@ -1,9 +1,8 @@
-import pl from 'planck-js';
 import * as constants from './constants';
-import * as model from './model';
+import * as engine from './engine';
 import * as vector from './vector';
 
-import { ButtonBar, ChargingIndicator, HealthBar, Hero } from './constants';
+import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from './constants';
 import { Icons } from './icons';
 
 let ui = {
@@ -83,14 +82,14 @@ function renderWorld(ctx, world, rect) {
 function renderObject(ctx, obj, world) {
 	if (obj.type === "hero") {
 		renderHero(ctx, obj, world);
-	} else if (obj.type in constants.Spells) {
-		let spell = constants.Spells[obj.type];
+	} else if (obj.type in Spells.all) {
+		let spell = Spells.all[obj.type];
 		renderSpell(ctx, obj, world, spell);
 	}
 }
 
 function renderDestroyed(ctx, obj, world) {
-	let spell = constants.Spells[obj.type];
+	let spell = Spells.all[obj.type];
     renderSpell(ctx, obj, world, spell);
 }
 
@@ -143,7 +142,7 @@ function renderHero(ctx, hero, world) {
 	if (hero.charging && hero.charging.spell && hero.charging.proportion > 0) {
 		ctx.save();
 
-		let spell = constants.Spells[hero.charging.spell];
+		let spell = Spells.all[hero.charging.spell];
 		ctx.globalAlpha = hero.charging.proportion;
 		ctx.strokeStyle = spell.fillStyle;
 		ctx.lineWidth = ChargingIndicator.Width;
@@ -156,7 +155,7 @@ function renderHero(ctx, hero, world) {
 
 	// Shield
 	if (hero.shieldTicks) {
-		let spell = constants.Spells.shield;
+		let spell = Spells.shield;
 		let proportion = 1.0 * hero.shieldTicks / spell.maxTicks;
 
 		ctx.save();
@@ -274,14 +273,14 @@ function renderButtons(ctx, buttons, world, hero, actions, rect) {
 	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonBar.Size - ButtonBar.Margin);
 
 	for (let i = 0; i < buttons.length; ++i) {
-		let spell = constants.Spells[buttons[i]];
+		let spell = Spells.all[buttons[i]];
 		if (!spell) {
 			continue;
 		}
 
 		let isSelected = selectedAction === spell.id;
 		let isCharging = hero.charging && hero.charging.spell === spell.id;
-		let remainingInSeconds = model.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
+		let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 		ctx.save();
 		ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);

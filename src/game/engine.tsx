@@ -2,7 +2,7 @@ import pl from 'planck-js';
 import * as constants from './constants';
 import * as vector from './vector';
 
-import { Hero, World, TicksPerSecond } from './constants';
+import { Hero, World, Spells, TicksPerSecond } from './constants';
 
 export const AllCategories = 0xFFFF;
 export const HeroCategory = 1;
@@ -35,7 +35,6 @@ export let world = {
 };
 world.physics.on('post-solve', onCollision);
 
-// Model
 function nextHeroPosition(world) {
 	let nextHeroIndex = world.numPlayers;
 	let numHeroes = world.numPlayers + 1;
@@ -208,7 +207,7 @@ function handlePlayerJoinLeave(world) {
 function performHeroActions(world, hero, nextAction) {
 	if (hero.charging && hero.charging.action) {
 		let chargingAction = hero.charging.action;
-		let chargingSpell = constants.Spells[chargingAction.type];
+		let chargingSpell = constants.Spells.all[chargingAction.type];
 		hero.charging.proportion += 1.0 / chargingSpell.chargeTicks;
 		if (hero.charging.proportion < 1.0) {
 			return false; // Blocked charging, cannot perform action
@@ -221,7 +220,7 @@ function performHeroActions(world, hero, nextAction) {
 		// Nothing to do
 		return true;
 	} else {
-		let nextSpell = constants.Spells[nextAction.type];
+		let nextSpell = constants.Spells.all[nextAction.type];
 		if (!nextAction) {
 			return true;
 		}
@@ -273,7 +272,11 @@ function onCollision(contact) {
 function handleCollisions(world, collision) {
 	world.collisions.forEach(collision => {
 		if (collision.projectile) {
-			let spell = constants.Spells[collision.projectile.type];
+			let spell = constants.Spells.all[collision.projectile.type];
+			if (spell.action !== "projectile") {
+				return;
+			}
+
 			if (collision.hero && collision.hero.shieldTicks > 0) {
 				let heroPos = collision.hero.body.getPosition();
 				let currentPos = collision.projectile.body.getPosition();
@@ -282,7 +285,7 @@ function handleCollisions(world, collision) {
 				let newVelocity = vector.multiply(vector.unit(vector.diff(currentPos, heroPos)), speed);
 				collision.projectile.body.setLinearVelocity(newVelocity);
 
-				if (spell.maxTicks) {
+				if (spell.action === "projectile" && spell.maxTicks) {
 					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
 				}
 
@@ -356,8 +359,8 @@ function homingForce(world) {
 			return;
 		}
 
-		let spell = constants.Spells[obj.type];
-		if (!(spell && spell.turnRate)) {
+		let spell = constants.Spells.all[obj.type];
+		if (!(spell && spell.action === "projectile" && spell.turnRate)) {
 			return;
 		}
 
@@ -448,7 +451,7 @@ function spawnProjectileAction(world, hero, action, spell) {
 
 function teleportAction(world, hero, action, spell) {
 	let currentPosition = hero.body.getPosition();
-	let newPosition = vector.towards(currentPosition, action.target, constants.Spells.teleport.maxRange);
+	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
 	return true;
 }
@@ -489,7 +492,7 @@ function scourgeAction(world, hero, action, spell) {
 function shieldAction(world, hero, action, spell) {
 	hero.shieldTicks = spell.maxTicks;
 	hero.body.setMassData({
-		mass: constants.Spells.shield.mass,
+		mass: Spells.shield.mass,
 		center: vector.zero(),
 		I: 0,
 	});

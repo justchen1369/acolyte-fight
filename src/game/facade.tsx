@@ -1,9 +1,10 @@
 import socketLib from 'socket.io-client';
 import pl from 'planck-js';
 import * as constants from './constants';
+import { Spells } from './constants';
 import { render, calculateWorldRect } from './render';
-import { world } from './model';
-import * as model from './model';
+import { world } from './engine';
+import * as model from './engine';
 const socket = socketLib();
 
 let MaxTickBuffer = 5;
@@ -67,8 +68,8 @@ function canvasMouseMove(e) {
 }
 
 function gameKeyDown(e) {
-	for (let id in constants.Spells) {
-		let spell = constants.Spells[id];
+	for (let id in Spells.all) {
+		let spell = Spells.all[id];
 		if (spell.key === e.key) {
 			sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
 		}
