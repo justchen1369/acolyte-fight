@@ -1,0 +1,1 @@
+export const TicksPerSecond = 60;

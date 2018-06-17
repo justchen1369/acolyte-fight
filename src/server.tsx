@@ -1,3 +1,5 @@
+import { TicksPerSecond } from './game/constants';
+
 const express = require('express');
 const app = express();
 const http = require('http').Server(app);
@@ -15,7 +17,6 @@ let server = http.listen(port, function() {
 
 
 // Game management
-let TicksPerSecond = 60;
 let JoinPeriod = 5 * TicksPerSecond;
 let MaxHistoryLength = 180 * TicksPerSecond;
 let MaxPlayers = 10;
