@@ -36,7 +36,7 @@ export class Controls extends React.Component<Props, State> {
 
         let heroes = new Array<w.Hero>();
         world.objects.forEach(obj => {
-            if (obj.category === "hero") {
+            if (obj.category === "hero" && world.activePlayers.has(obj.id)) {
                 heroes.push(obj);
             }
         });
