@@ -1,4 +1,4 @@
-import { TicksPerSecond } from './game/constants';
+import { TicksPerSecond } from '../game/constants';
 
 const express = require('express');
 const app = express();

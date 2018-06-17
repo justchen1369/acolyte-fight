@@ -1,10 +1,10 @@
-import * as constants from './constants';
-import * as c from './constants.model';
+import * as constants from '../game/constants';
+import * as c from '../game/constants.model';
 import * as engine from './engine';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from './constants';
+import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from '../game/constants';
 import { Icons } from './icons';
 
 // Rendering

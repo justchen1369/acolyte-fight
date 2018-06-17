@@ -59,6 +59,6 @@
     "src/**/*.tsx",
   ],
   "files": [
-    "src/game/planck-js.d.ts"
+    "src/typings/planck-js.d.ts"
   ]
 }

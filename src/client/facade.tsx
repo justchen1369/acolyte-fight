@@ -1,5 +1,5 @@
 import pl from 'planck-js';
-import { Spells } from './constants';
+import { Spells } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from './engine';
 

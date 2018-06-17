@@ -1,10 +1,10 @@
 import pl from 'planck-js';
-import * as constants from './constants';
-import * as c from './constants.model';
+import * as constants from '../game/constants';
+import * as c from '../game/constants.model';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, TicksPerSecond } from './constants';
+import { Hero, World, Spells, TicksPerSecond } from '../game/constants';
 
 const AllCategories = 0xFFFF;
 const HeroCategory = 1;

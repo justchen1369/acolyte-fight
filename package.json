@@ -7,7 +7,7 @@
     "compile": "tsc",
     "bundle": "webpack",
     "build": "npm run compile && npm run bundle",
-    "start": "node js/server",
+    "start": "node js/server/index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
