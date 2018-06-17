@@ -1,4 +1,8 @@
-import * as facade from './game/facade';
+import socketLib from 'socket.io-client';
+import { attachToCanvas, attachToSocket } from './game/facade';
 
-// Main
-facade.attach();
+const socket = socketLib();
+const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+
+attachToSocket(socket);
+attachToCanvas(canvas);
