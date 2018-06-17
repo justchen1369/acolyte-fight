@@ -2,6 +2,12 @@ import * as c from './constants.model';
 
 export const TicksPerSecond = 60;
 
+export namespace Matchmaking {
+	export const JoinPeriod = 5 * TicksPerSecond;
+	export const MaxHistoryLength = 180 * TicksPerSecond;
+	export const MaxPlayers = 10;
+}
+
 export const HeroColors = [
 	"#bfad8f",
 	"#7db37d",
@@ -17,38 +23,38 @@ export const HeroColors = [
 	"#2bafca",
 ];
 
-export const Hero = {
-	MoveSpeedPerTick: 0.12 / TicksPerSecond,
-	Radius: 0.01,
-	Density: 1,
-	MaxDamping: 5,
-	MinDamping: 0.25,
-	MaxHealth: 100,
+export namespace Hero {
+	export const MoveSpeedPerTick = 0.12 / TicksPerSecond;
+	export const Radius = 0.01;
+	export const Density = 1;
+	export const MaxDamping = 5;
+	export const MinDamping = 0.25;
+	export const MaxHealth = 100;
 };
 
-export const World = {
-	LavaDamagePerTick: 0.25,
-	ShrinkPerTick: 0.00005,
+export namespace World {
+	export const LavaDamagePerTick = 0.25;
+	export const ShrinkPerTick = 0.00005;
 }
 
 export const Pixel = 0.001;
 
 export const MyHeroColor = '#00ccff';
 
-export const HealthBar = {
-	Radius: Hero.Radius * 0.9,
-	Height: Pixel * 3,
-	Margin: Pixel * 2,
+export namespace HealthBar {
+	export const Radius = Hero.Radius * 0.9;
+	export const Height = Pixel * 3;
+	export const Margin = Pixel * 2;
 }
-export const ChargingIndicator = {
-	Margin: Pixel * 5,
-	Width: Pixel * 2,
+export namespace ChargingIndicator {
+	export const Margin = Pixel * 5;
+	export const Width = Pixel * 2;
 }
-export const ButtonBar = {
-	Spacing: 10,
-	Margin: 5,
-	Size: 50,
-	List: [
+export namespace ButtonBar {
+	export const Spacing = 10;
+	export const Margin = 5;
+	export const Size = 50;
+	export const List = [
 		"teleport",
 		"shield",
 		null,
@@ -59,7 +65,7 @@ export const ButtonBar = {
 		null,
 		"bouncer",
 		"scourge",
-	],
+	];
 }
 
 export namespace Spells {

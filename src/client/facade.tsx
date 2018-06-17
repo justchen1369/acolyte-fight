@@ -2,11 +2,14 @@ import pl from 'planck-js';
 import { Spells } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from './engine';
+import * as m from '../game/messages.model';
+import * as w from './world.model';
 
 let socket: SocketIOClient.Socket = null;
-let tickQueue = [];
-let nextTarget = null;
+let tickQueue = new Array<m.TickMsg>();
 let world = engine.initialWorld();
+
+let nextTarget: pl.Vec2 = null;
 
 export function attachToCanvas(canvas: HTMLCanvasElement) {
     fullScreenCanvas();
@@ -74,7 +77,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket) {
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
 		if (!world.ui.myGameId) {
-			socket.emit('join', {});
+			socket.emit('join', {} as m.JoinMsg);
 		}
 	});
 	socket.on('disconnect', () => {
@@ -84,7 +87,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket) {
 	socket.on('hero', onHeroMsg);
 	socket.on('tick', onTickMsg);
 }
-function onHeroMsg(data) {
+function onHeroMsg(data: m.HeroMsg) {
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 	console.log("Joined game with " + data.numPlayers + " players as hero id " + world.ui.myHeroId);
@@ -93,19 +96,19 @@ function onHeroMsg(data) {
 		tickQueue = [...data.history, ...tickQueue];
 	}
 }
-function onTickMsg(data) {
+function onTickMsg(data: m.TickMsg) {
 	tickQueue.push(data);
 }
 function onDisconnectMsg() {
 	world.activePlayers.clear();
 }
-function sendAction(heroId, action) {
+function sendAction(heroId: string, action: w.WorldAction) {
 	socket.emit('action', {
 		heroId: heroId,
 		actionType: action.type,
 		targetX: action.target.x,
 		targetY: action.target.y,
-	});
+	} as m.ActionMsg);
 }
 function applyTickActions(tickData, world) {
 	tickData.actions.forEach(actionData => {

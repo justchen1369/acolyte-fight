@@ -1,4 +1,5 @@
-import { TicksPerSecond } from '../game/constants';
+import { Matchmaking, TicksPerSecond } from '../game/constants';
+import * as m from '../game/messages.model';
 
 const express = require('express');
 const app = express();
@@ -17,13 +18,23 @@ let server = http.listen(port, function() {
 
 
 // Game management
-let JoinPeriod = 5 * TicksPerSecond;
-let MaxHistoryLength = 180 * TicksPerSecond;
-let MaxPlayers = 10;
-let nextGameId = 0;
-let games = new Map();
+export interface Game {
+    id: string;
+    active: Map<string, string>; // socketId -> heroId
+    started: boolean;
+    numPlayers: number;
+    tick: number;
+    joinLimitTick: number;
+	actions: Map<string, m.ActionMsg>; // heroId -> actionData
+	history: m.TickMsg[];
 
-function onConnection(socket) {
+    intervalHandle?: NodeJS.Timer;
+}
+
+let nextGameId = 0;
+let games = new Map<string, Game>(); // id -> game
+
+function onConnection(socket: SocketIO.Socket) {
   console.log("user " + socket.id + " connected");
 
 	socket.on('disconnect', () => {
@@ -39,10 +50,10 @@ function onConnection(socket) {
 	socket.on('join', data => onJoinGameMsg(socket, data));
 }
 
-function onJoinGameMsg(socket, data) {
-	let game = null;
+function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
+	let game: Game = null;
 	games.forEach(g => {
-		if ((!g.started || g.history) && g.active.size < MaxPlayers) {
+		if ((!g.started || g.history) && g.active.size < Matchmaking.MaxPlayers) {
 			game = g;
 		}
 	});
@@ -52,9 +63,9 @@ function onJoinGameMsg(socket, data) {
 	
 	let heroId = joinGame(game, socket);
 
-	socket.on('action', (actionData) => {
+	socket.on('action', (actionData: m.ActionMsg) => {
 		if (!isUserInitiated(actionData)) {
-			console.log("Game [" + game.id + "]: user attempted to send disallowed action: " + actionData.type);
+			console.log("Game [" + game.id + "]: user attempted to send disallowed action: " + actionData.actionType);
 		} else if (actionData.heroId == heroId) {
 			queueAction(game, actionData);
 		} else {
@@ -72,9 +83,8 @@ function initGame() {
 		tick: 0,
 		joinLimitTick: Infinity,
 		actions: new Map(),
-		intervalHandle: null,
 		history: [],
-	};
+	} as Game;
 	games.set(game.id, game);
 
 	game.intervalHandle = setInterval(() => gameTick(game), 1000.0 / TicksPerSecond);
@@ -83,11 +93,11 @@ function initGame() {
 	return game;
 }
 
-function joinGame(game, socket) {
-	let heroId = null;
+function joinGame(game: Game, socket: SocketIO.Socket) {
+	let heroId: string = null;
 
 	// Take an existing slot, if possible
-	let activeHeroIds = new Set(game.active.values());
+	let activeHeroIds = new Set<string>(game.active.values());
 	for (let i = 0; i < game.numPlayers; ++i) {
 		let candidate = formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {
@@ -105,10 +115,11 @@ function joinGame(game, socket) {
 	socket.join(game.id);
 
 	socket.emit("hero", {
-		gameId: game.id, heroId,
+		gameId: game.id,
+		heroId,
 		numPlayers: game.numPlayers,
 		history: game.history,
-	});
+	} as m.HeroMsg);
 
 	queueAction(game, { heroId, actionType: "join" });
 
@@ -117,11 +128,11 @@ function joinGame(game, socket) {
 	return heroId;
 }
 
-function formatHeroId(index) {
+function formatHeroId(index: number): string {
 	return "hero" + index;
 }
 
-function queueAction(game, actionData) {
+function queueAction(game: Game, actionData: m.ActionMsg) {
 	let currentPrecedence = actionPrecedence(game.actions.get(actionData.heroId));
 	let newPrecedence = actionPrecedence(actionData);
 
@@ -137,7 +148,7 @@ function queueAction(game, actionData) {
 	// console.log("Game [" + game.id + "]: action received", actionData);
 }
 
-function actionPrecedence(actionData) {
+function actionPrecedence(actionData: m.ActionMsg): number {
 	if (!actionData) {
 		return 0;
 	} else if (actionData.actionType === "leave") {
@@ -151,7 +162,7 @@ function actionPrecedence(actionData) {
 	}
 }
 
-function isUserInitiated(actionData) {
+function isUserInitiated(actionData: m.ActionMsg): boolean {
 	switch (actionData.actionType) {
 		case "leave":
 		case "join":
@@ -161,7 +172,7 @@ function isUserInitiated(actionData) {
 	}
 }
 
-function isSpell(actionData) {
+function isSpell(actionData: m.ActionMsg): boolean {
 	switch (actionData.actionType) {
 		case "leave":
 		case "join":
@@ -173,7 +184,7 @@ function isSpell(actionData) {
 }
 
 
-function leaveGame(game, socket) {
+function leaveGame(game: Game, socket: SocketIO.Socket) {
 	let heroId = game.active.get(socket.id);
 	if (!heroId) {
 		console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
@@ -187,7 +198,7 @@ function leaveGame(game, socket) {
 	console.log("Game [" + game.id + "]: player " + socket.id + " left after " + game.tick + " ticks");
 }
 
-function finishGame(game) {
+function finishGame(game: Game) {
 	games.delete(game.id);
 	if (game.intervalHandle) {
 		clearInterval(game.intervalHandle);
@@ -196,7 +207,7 @@ function finishGame(game) {
 	console.log("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
 
-function gameTick(game) {
+function gameTick(game: Game) {
 	if (game.active.size === 0) {
 		finishGame(game);
 		return;
@@ -207,7 +218,7 @@ function gameTick(game) {
 			gameId: game.id,
 			tick: game.tick++,
 			actions: [...game.actions.values()],
-		};
+		} as m.TickMsg;
 		game.actions.clear();
 
 		if (game.history) {
@@ -215,9 +226,9 @@ function gameTick(game) {
 
 			if (game.active.size > 1 && any(data.actions, action => isSpell(action))) {
 				// Casting any spell closes the game
-				game.joinLimitTick = game.tick + JoinPeriod;
+				game.joinLimitTick = game.tick + Matchmaking.JoinPeriod;
 			}
-			if (game.history.length >= MaxHistoryLength || game.tick == game.joinLimitTick) {
+			if (game.history.length >= Matchmaking.MaxHistoryLength || game.tick == game.joinLimitTick) {
 				game.history = null; // Make the game unjoinable
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
 			}
