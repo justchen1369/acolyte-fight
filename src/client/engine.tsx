@@ -74,7 +74,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: HeroCategory,
 		density: Hero.Density,
-		restitution: 0.1,
+		restitution: 1.0,
 	});
 
 	let hero = {
