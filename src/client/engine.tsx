@@ -294,30 +294,28 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 				return;
 			}
 
-			if (collision.hero) {
-				if (collision.hero.shieldTicks > 0) {
-					if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
-						// Redirect back to owner
-						collision.projectile.targetId = collision.projectile.owner;
-						collision.projectile.owner = collision.hero.id;
-					}
-
-					if (spell.action === "projectile" && spell.maxTicks) {
-						collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
-					}
-				} else {
-					if (collision.hero.id !== collision.projectile.owner) {
-						const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
-						applyDamage(collision.hero, damage, collision.projectile.owner);
-					}
+			if (collision.hero && collision.hero.shieldTicks > 0) {
+				if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
+					// Redirect back to owner
+					collision.projectile.targetId = collision.projectile.owner;
+					collision.projectile.owner = collision.hero.id;
 				}
-			}
 
-			const other = collision.hero || collision.other;
-			if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
-				bounceToNext(collision.projectile, other, spell, world);
-			} else if (spell.explodeOn & categoryFlags(other.category)) {
-				destroyObject(world, collision.projectile);
+				if (spell.action === "projectile" && spell.maxTicks) {
+					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
+				}
+			} else {
+				if (collision.hero.id !== collision.projectile.owner) {
+					const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
+					applyDamage(collision.hero, damage, collision.projectile.owner);
+				}
+
+				const other = collision.hero || collision.other;
+				if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
+					bounceToNext(collision.projectile, other, spell, world);
+				} else if (spell.explodeOn & categoryFlags(other.category)) {
+					destroyObject(world, collision.projectile);
+				}
 			}
 		}
 	});
