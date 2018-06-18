@@ -125,6 +125,7 @@ export namespace Spells {
 		cooldown: 10 * TicksPerSecond,
 		damage: 1,
 		explodesOnImpact: true,
+		deflector: true,
 
 		key: 'w',
 		icon: "lightningHelix",

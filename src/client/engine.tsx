@@ -293,34 +293,47 @@ function onCollision(world, contact) {
 function handleCollisions(world: w.World, collisions: w.Collision[]) {
 	collisions.forEach(collision => {
 		if (collision.projectile) {
-			let spell = constants.Spells.all[collision.projectile.type];
+			const spell = constants.Spells.all[collision.projectile.type];
 			if (spell.action !== "projectile") {
 				return;
 			}
 
-			if (collision.hero && collision.hero.shieldTicks > 0) {
+			if (collision.hero) {
+				if (collision.hero.shieldTicks > 0) {
+					if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
+						// Redirect back to owner
+						collision.projectile.targetId = collision.projectile.owner;
+						collision.projectile.owner = collision.hero.id;
+					}
+				} else {
+					if (collision.hero.id !== collision.projectile.owner) {
+						const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
+						applyDamage(collision.hero, damage, collision.projectile.owner);
+					}
+				}
+			}
+
+			const other = collision.hero || collision.other;
+			if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
+				bounceToNext(collision.projectile, other, spell, world);
+			} else if (isDeflector(other)) {
 				if (spell.action === "projectile" && spell.maxTicks) {
 					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
 				}
-
-				if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
-					// Redirect back to owner
-					collision.projectile.targetId = collision.projectile.owner;
-					collision.projectile.owner = collision.hero.id;
-				}
-			} else {
-				if (collision.hero && !(collision.hero.id == collision.projectile.owner) && !collision.hero.shieldTicks) {
-					const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
-					applyDamage(collision.hero, damage, collision.projectile.owner);
-				}
-				if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
-					bounceToNext(collision.projectile, collision.hero || collision.other, spell, world);
-				} else if (spell.explodesOnImpact) {
-					destroyObject(world, collision.projectile);
-				}
+			} else if (spell.explodesOnImpact) {
+				destroyObject(world, collision.projectile);
 			}
 		}
 	});
+}
+
+function isDeflector(obj: w.WorldObject) {
+	if (obj.category === "hero") {
+		return obj.shieldTicks > 0;
+	} else if (obj.category === "projectile") {
+		const spell = constants.Spells.all[obj.type];
+		return spell && spell.action === "projectile" && spell.deflector;
+	}
 }
 
 function find(objects, predicate) {
