@@ -305,7 +305,7 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
 				}
 			} else {
-				if (collision.hero.id !== collision.projectile.owner) {
+				if (collision.hero && collision.hero.id !== collision.projectile.owner) {
 					const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
 					applyDamage(collision.hero, damage, collision.projectile.owner);
 				}
