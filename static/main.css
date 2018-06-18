@@ -33,6 +33,10 @@ a:hover, a:active {
     text-align: right;
 }
 
+.player-list {
+    margin-top: 40px;
+}
+
 #messages-panel {
     position: absolute;
     bottom: 80;

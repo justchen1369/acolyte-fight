@@ -33,7 +33,7 @@ export class InfoPanel extends React.Component<Props, State> {
                         </a>
                     </div>
                 </div>
-                {world.activePlayers.size > 0 && <div style={{marginTop: 40}}>
+                {world.activePlayers.size > 0 && <div className="player-list">
                     <div>{world.activePlayers.size} players <i className={playerListIconClass} style={{cursor: "hand"}} onClick={() => this.toggleShowPlayers()} /></div>
                     {this.state.showingPlayerList && this.renderPlayerList(world)}
                 </div>}

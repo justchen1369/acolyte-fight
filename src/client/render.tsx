@@ -313,7 +313,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: 
 		// Cooldown
 			let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
-			ctx.font = 'bold ' + (ButtonBar.Size - 1) + 'px sans-serif';
+			ctx.font = 'bold ' + (ButtonBar.Size * 0.75 - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
 		} else {
 			// Keyboard shortcut
