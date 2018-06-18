@@ -103,8 +103,8 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderKillNotification(notification: w.KillNotification) {
         return <span>
-            {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)} killed</span>}
-            {notification.killer && <span key="killer"> by {this.renderPlayer(notification.killer)}</span>}
+            {notification.killer && <span key="killer">{this.renderPlayer(notification.killer)} killed </span>}
+            {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)}</span>}
             {notification.assist && <span key="assist"> assist {this.renderPlayer(notification.assist)}</span>}
         </span>
     }
