@@ -6,10 +6,6 @@ import * as w from './world.model';
 
 import { Hero, World, Spells, TicksPerSecond } from '../game/constants';
 
-const AllCategories = 0xFFFF;
-const HeroCategory = 1;
-const ProjectileCategory = 2;
-
 // Planck.js considers collisions to be inelastic if below this threshold.
 // We want all thresholds to be elastic.
 (pl as any).internal.Settings.velocityThreshold = 0;
@@ -72,7 +68,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		linearDamping: Hero.MaxDamping,
 	});
 	body.createFixture(pl.Circle(Hero.Radius), {
-		filterCategoryBits: HeroCategory,
+		filterCategoryBits: constants.Categories.Hero,
 		density: Hero.Density,
 		restitution: 1.0,
 	});
@@ -120,8 +116,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(spell.radius), {
-		filterCategoryBits: ProjectileCategory,
-		filterMaskBits: AllCategories ^ (spell.passthrough ? ProjectileCategory : 0),
+		filterCategoryBits: constants.Categories.Projectile,
+		filterMaskBits: constants.Categories.All ^ (spell.passthrough ? constants.Categories.Projectile : 0),
 		density: spell.density,
 		restitution: 1.0,
 	});
@@ -305,6 +301,10 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 						collision.projectile.targetId = collision.projectile.owner;
 						collision.projectile.owner = collision.hero.id;
 					}
+
+					if (spell.action === "projectile" && spell.maxTicks) {
+						collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
+					}
 				} else {
 					if (collision.hero.id !== collision.projectile.owner) {
 						const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
@@ -316,23 +316,18 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 			const other = collision.hero || collision.other;
 			if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
 				bounceToNext(collision.projectile, other, spell, world);
-			} else if (isDeflector(other)) {
-				if (spell.action === "projectile" && spell.maxTicks) {
-					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
-				}
-			} else if (spell.explodesOnImpact) {
+			} else if (spell.explodeOn & categoryFlags(other.category)) {
 				destroyObject(world, collision.projectile);
 			}
 		}
 	});
 }
 
-function isDeflector(obj: w.WorldObject) {
-	if (obj.category === "hero") {
-		return obj.shieldTicks > 0;
-	} else if (obj.category === "projectile") {
-		const spell = constants.Spells.all[obj.type];
-		return spell && spell.action === "projectile" && spell.deflector;
+function categoryFlags(category: string) {
+	switch (category) {
+		case "hero": return constants.Categories.Hero;
+		case "projectile": return constants.Categories.Projectile;
+		default: return 0;
 	}
 }
 

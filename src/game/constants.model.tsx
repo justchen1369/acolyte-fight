@@ -46,9 +46,8 @@ export interface ProjectileSpell extends SpellBase {
     turnRate?: number;
 
     maxTicks: number;
-    explodesOnImpact?: boolean;
+    explodeOn?: number;
     passthrough?: boolean;
-    deflector?: boolean;
 
     trailTicks?: number;
 

@@ -3,6 +3,12 @@ import * as c from './constants.model';
 export const TicksPerSecond = 60;
 export const Pixel = 0.001;
 
+export namespace Categories {
+	export const All = 0xFFFF;
+	export const Hero = 1;
+	export const Projectile = 2;
+}
+
 export namespace Matchmaking {
 	export const JoinPeriod = 5 * TicksPerSecond;
 	export const MaxHistoryLength = 180 * TicksPerSecond;
@@ -83,7 +89,7 @@ export namespace Spells {
 		maxTicks: 1 * TicksPerSecond,
 		cooldown: 1 * TicksPerSecond,
 		damage: 10,
-		explodesOnImpact: true,
+		explodeOn: Categories.Hero,
 
 		key: 'q',
 		icon: "thunderball",
@@ -104,7 +110,6 @@ export namespace Spells {
 		maxTicks: 12 * TicksPerSecond,
 		cooldown: 12 * TicksPerSecond,
 		damage: 1,
-		deflector: true,
 
 		key: 'r',
 		icon: "meteorImpact",
@@ -125,8 +130,7 @@ export namespace Spells {
 		maxTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
 		damage: 1,
-		explodesOnImpact: true,
-		deflector: true,
+		explodeOn: Categories.All,
 
 		key: 'w',
 		icon: "lightningHelix",
@@ -148,7 +152,7 @@ export namespace Spells {
 		cooldown: 20 * TicksPerSecond,
 		damage: 20,
 		turnRate: 0.05,
-		explodesOnImpact: true,
+		explodeOn: Categories.Hero,
 
 		key: 'e',
 		icon: "boltSaw",
@@ -170,7 +174,7 @@ export namespace Spells {
 		cooldown: 10 * TicksPerSecond,
 		damage: 2,
 		turnRate: 0.025,
-		explodesOnImpact: true,
+		explodeOn: Categories.All,
 		bounceDamage: 0.95,
 
 		key: 'd',
