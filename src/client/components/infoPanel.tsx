@@ -24,7 +24,7 @@ export class InfoPanel extends React.Component<Props, State> {
 
         let playerListIconClass = this.state.showingPlayerList ? "fa fa-chevron-circle-down" : "fa fa-chevron-circle-up";
         return (
-            <div className="controls">
+            <div>
                 <div>
                     <div>Welcome {this.props.playerName}!</div>
                     <div style={{ fontSize: "80%" }}>
@@ -41,7 +41,7 @@ export class InfoPanel extends React.Component<Props, State> {
         );
     }
 
-    onNotificationsChanged() {
+    onNotification(notifications: w.Notification[]) {
         this.forceUpdate();
     }
 
@@ -53,7 +53,7 @@ export class InfoPanel extends React.Component<Props, State> {
                 if (player.heroId === world.ui.myHeroId) {
                     color = c.Hero.MyHeroColor;
                 }
-                result.push(<div style={{color}}>{player.name}</div>);
+                result.push(<div key={player.heroId} style={{color}}>{player.name}</div>);
             }
         });
         return result;

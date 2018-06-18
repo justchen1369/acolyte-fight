@@ -10,7 +10,7 @@ interface State {
 export class Root extends React.Component<Props, State> {
     render() {
         return <div>
-            <h1>Welcome to Enigma!</h1>
+            <h1>Welcome to Arcane Enigma!</h1>
             <NameConfig />
         </div>;
     }

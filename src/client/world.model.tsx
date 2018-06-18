@@ -40,7 +40,7 @@ export interface Player {
 	color: string;
 }
 
-export type Notification = JoinNotification | LeaveNotification | KillNotification;
+export type Notification = JoinNotification | LeaveNotification | KillNotification | MyHeroNotification;
 
 export interface JoinNotification {
 	type: "join";
@@ -57,6 +57,12 @@ export interface KillNotification {
 	killer: Player;
 	killed: Player;
 	assist: Player;
+}
+
+export interface MyHeroNotification {
+	type: "myHero";
+	gameId: string;
+	heroId: string;
 }
 
 export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;
@@ -91,6 +97,9 @@ export interface Hero extends WorldObjectBase {
 	charging: Charging;
 	cooldowns: Cooldowns;
 	shieldTicks: number;
+
+	killerHeroId: string;
+	assistHeroId: string;
 }
 
 export interface Charging {

@@ -47,7 +47,6 @@ export function attachToCanvas(canvas: HTMLCanvasElement) {
 }
 
 export function frame(canvas: HTMLCanvasElement) {
-	let notifications = new Array<w.Notification>();
 	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		let tickData = tickQueue.shift();
 		if (tickData.tick < world.tick) {
@@ -55,11 +54,14 @@ export function frame(canvas: HTMLCanvasElement) {
 		}
 
 		applyTickActions(tickData, world);
-		notifications.push(...engine.tick(world));
+		engine.tick(world);
 	}
 	render(world, canvas);
 
-	notificationListeners.forEach(listener => listener(notifications));
+	const notifications = engine.takeNotifications(world);
+	if (notifications.length > 0) {
+		notificationListeners.forEach(listener => listener(notifications));
+	}
 }
 
 export function canvasMouseMove(e: MouseEvent) {
@@ -108,6 +110,12 @@ function onHeroMsg(data: m.HeroMsg) {
 	if (data.history) {
 		tickQueue = [...data.history, ...tickQueue];
 	}
+
+	world.ui.notifications.push({
+		type: "myHero",
+		gameId: world.ui.myGameId,
+		heroId: world.ui.myHeroId,
+	});
 }
 function onTickMsg(data: m.TickMsg) {
 	tickQueue.push(data);

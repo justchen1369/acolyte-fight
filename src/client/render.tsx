@@ -110,7 +110,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		return;
 	}
 
-	let color = '#666666';
+	let color = Hero.InactiveColor;
 	if (world.activePlayers.has(hero.id)) {
 		const player = world.players.get(hero.id);
 		if (hero.id === world.ui.myHeroId) {

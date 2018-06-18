@@ -41,6 +41,14 @@ export function initialWorld(): w.World {
 	return world;
 }
 
+export function takeNotifications(world: w.World): w.Notification[] {
+	const notifications = world.ui.notifications;
+	if (notifications.length > 0) {
+		world.ui.notifications = [];
+	}
+	return notifications;
+}
+
 function nextHeroPosition(world: w.World) {
 	let nextHeroIndex = world.nextPositionId++;
 	let numHeroes = nextHeroIndex + 1;
@@ -75,6 +83,8 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		charging: {},
 		cooldowns: {},
 		shieldTicks: 0,
+		killerHeroId: null,
+		assistHeroId: null,
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 
@@ -132,7 +142,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 }
 
 // Simulator
-export function tick(world: w.World): w.Notification[] {
+export function tick(world: w.World) {
 	++world.tick;
 	world.destroyed = [];
 
@@ -163,10 +173,6 @@ export function tick(world: w.World): w.Notification[] {
 	updateKnockback(world);
 
 	reap(world);
-
-	const notifications = world.ui.notifications;
-	world.ui.notifications = [];
-	return notifications;
 }
 
 function physicsStep(world: w.World) {
@@ -307,7 +313,8 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 				}
 			} else {
 				if (collision.hero && !(collision.hero.id == collision.projectile.owner) && !collision.hero.shieldTicks) {
-					collision.hero.health -= spell.damage * (collision.projectile.damageMultiplier || 1.0);
+					const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
+					applyDamage(collision.hero, damage, collision.projectile.owner);
 				}
 				if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
 					bounceToNext(collision.projectile, collision.hero || collision.other, spell, world);
@@ -412,7 +419,7 @@ function applyLavaDamage(world: w.World) {
 		if (obj.category === "hero") {
 			let position = obj.body.getPosition();
 			if (vector.distance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
-				obj.health -= World.LavaDamagePerTick;
+				applyDamage(obj, World.LavaDamagePerTick, null);
 			}
 		}
 	});
@@ -429,6 +436,7 @@ function reap(world: w.World) {
 		if (obj.category === "hero") {
 			if (obj.health <= 0) {
 				destroyObject(world, obj);
+				createKilledNotification(obj, world);
 			}
 		} else if (obj.category === "projectile") {
 			let pos = obj.body.getPosition();
@@ -437,6 +445,13 @@ function reap(world: w.World) {
 			}
 		}
 	});
+}
+
+function createKilledNotification(hero: w.Hero, world: w.World) {
+	const killed = world.players.get(hero.id);
+	const killer = world.players.get(hero.killerHeroId);
+	const assist = world.players.get(hero.assistHeroId);
+	world.ui.notifications.push({ type: "kill", killed, killer, assist });
 }
 
 function destroyObject(world: w.World, object: w.WorldObject) {
@@ -468,7 +483,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ScourgeSpell) {
-	hero.health -= spell.selfDamage;
+	applyDamage(hero, spell.selfDamage, hero.id);
 
 	let heroPos = hero.body.getPosition();
 	world.objects.forEach(obj => {
@@ -480,7 +495,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.category === "hero") {
-			obj.health -= spell.damage;
+			applyDamage(obj, spell.damage, hero.id);
 		}
 
 		let magnitude = spell.minImpulse + proportion * (spell.maxImpulse - spell.minImpulse);
@@ -511,3 +526,10 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.S
 	return true;
 }
 
+function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string) {
+	toHero.health -= amount;
+	if (fromHeroId && toHero.killerHeroId !== fromHeroId) {
+		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
+		toHero.killerHeroId = fromHeroId;
+	}
+}

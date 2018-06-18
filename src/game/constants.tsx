@@ -18,6 +18,7 @@ export namespace Hero {
 	export const MaxHealth = 100;
 
 	export const MyHeroColor = '#00ccff';
+	export const InactiveColor = '#666666';
 	export const Colors = [
 		"#bfad8f",
 		"#7db37d",

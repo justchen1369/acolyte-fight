@@ -6,6 +6,7 @@ import { attachToCanvas, attachToSocket, attachNotificationListener, world } fro
 import { StorageKeys } from '../game/storage.model';
 
 import { InfoPanel } from './components/infoPanel';
+import { MessagesPanel } from './components/messagesPanel';
 
 const socket = socketLib();
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;
@@ -16,8 +17,10 @@ attachToSocket(socket, playerName);
 attachToCanvas(canvas);
 
 const infoPanel = ReactDOM.render(<InfoPanel playerName={playerName} world={world} />, document.getElementById("info-panel")) as InfoPanel;
+const messagesPanel = ReactDOM.render(<MessagesPanel world={world} />, document.getElementById("messages-panel")) as MessagesPanel;
 attachNotificationListener(notifications => {
-    infoPanel.onNotificationsChanged();
+    infoPanel.onNotification(notifications);
+    messagesPanel.onNotification(notifications);
 });
 
 function retrievePlayerName() {
