@@ -5,12 +5,21 @@ import * as engine from './engine';
 import * as m from '../game/messages.model';
 import * as w from './world.model';
 
+interface NotificationListener {
+	(notifications: w.Notification[]): void;
+}
+
 export let world = engine.initialWorld();
 
 let socket: SocketIOClient.Socket = null;
 let tickQueue = new Array<m.TickMsg>();
+let notificationListeners = new Array<NotificationListener>();
 
 let nextTarget: pl.Vec2 = null;
+
+export function attachNotificationListener(listener: NotificationListener) {
+	notificationListeners.push(listener);
+}
 
 export function attachToCanvas(canvas: HTMLCanvasElement) {
     fullScreenCanvas();
@@ -38,6 +47,7 @@ export function attachToCanvas(canvas: HTMLCanvasElement) {
 }
 
 export function frame(canvas: HTMLCanvasElement) {
+	let notifications = new Array<w.Notification>();
 	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		let tickData = tickQueue.shift();
 		if (tickData.tick < world.tick) {
@@ -45,9 +55,11 @@ export function frame(canvas: HTMLCanvasElement) {
 		}
 
 		applyTickActions(tickData, world);
-		engine.tick(world);
+		notifications.push(...engine.tick(world));
 	}
 	render(world, canvas);
+
+	notificationListeners.forEach(listener => listener(notifications));
 }
 
 export function canvasMouseMove(e: MouseEvent) {

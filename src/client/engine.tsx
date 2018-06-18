@@ -14,9 +14,9 @@ export function initialWorld(): w.World {
 	let world = {
 		tick: 0,
 
-		numPlayers: 0,
 		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
-		activePlayers: new Set(),
+		activePlayers: new Set<string>(),
+		players: new Map<string, w.Player>(),
 
 		objects: new Map(),
 		physics: pl.World(),
@@ -26,13 +26,15 @@ export function initialWorld(): w.World {
 		collisions: [],
 		destroyed: [],
 
-		nextHeroId: 0,
+		nextPositionId: 0,
 		nextBulletId: 0,
+		nextColorId: 0,
 
 		ui: {
 			myGameId: null,
 			myHeroId: null,
 			trails: [],
+			notifications: [],
 		}
 	} as w.World;
 	world.physics.on('post-solve', (contact) => onCollision(world, contact));
@@ -40,8 +42,8 @@ export function initialWorld(): w.World {
 }
 
 function nextHeroPosition(world: w.World) {
-	let nextHeroIndex = world.numPlayers;
-	let numHeroes = world.numPlayers + 1;
+	let nextHeroIndex = world.nextPositionId++;
+	let numHeroes = nextHeroIndex + 1;
 	let radius = 0.25;
 	let center = pl.Vec2(0.5, 0.5);
 
@@ -73,11 +75,8 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		charging: {},
 		cooldowns: {},
 		shieldTicks: 0,
-		fillStyle: Hero.Colors[world.numPlayers % Hero.Colors.length],
 	} as w.Hero;
 	world.objects.set(heroId, hero);
-
-	++world.numPlayers;
 
 	return hero;
 }
@@ -133,7 +132,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 }
 
 // Simulator
-export function tick(world: w.World) {
+export function tick(world: w.World): w.Notification[] {
 	++world.tick;
 	world.destroyed = [];
 
@@ -164,6 +163,10 @@ export function tick(world: w.World) {
 	updateKnockback(world);
 
 	reap(world);
+
+	const notifications = world.ui.notifications;
+	world.ui.notifications = [];
+	return notifications;
 }
 
 function physicsStep(world: w.World) {
@@ -190,13 +193,25 @@ function handlePlayerJoinLeave(world: w.World) {
 			let hero: w.Hero = find(world.objects, x => x.id === ev.heroId);
 			if (!hero) {
 				hero = addHero(world, nextHeroPosition(world), ev.heroId, ev.playerName);
-			} else {
-				hero.name = ev.playerName;
 			}
-			world.activePlayers.add(ev.heroId);
+
+			const player = {
+				heroId: hero.id,
+				name: ev.playerName,
+				color: Hero.Colors[world.nextColorId++ % Hero.Colors.length],
+			} as w.Player;
+			world.players.set(hero.id, player);
+			world.activePlayers.add(hero.id);
+
+			world.ui.notifications.push({ type: "join", player });
 		} else if (ev.type === "leave") {
 			console.log("Player left:", ev.heroId);
+			const player = world.players.get(ev.heroId);
 			world.activePlayers.delete(ev.heroId);
+
+			if (player) {
+				world.ui.notifications.push({ type: "leave", player });
+			}
 		}
 	});
 	world.joinLeaveEvents = [];

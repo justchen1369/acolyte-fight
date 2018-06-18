@@ -110,18 +110,23 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		return;
 	}
 
+	let color = '#666666';
+	if (world.activePlayers.has(hero.id)) {
+		const player = world.players.get(hero.id);
+		if (hero.id === world.ui.myHeroId) {
+			color = Hero.MyHeroColor;
+		} else if (player) {
+			color = player.color;
+		}
+	}
+
 	let pos = hero.body.getPosition();
 
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
 
 	// Fill
-	ctx.fillStyle = hero.fillStyle;
-	if (!world.activePlayers.has(hero.id)) {
-		ctx.fillStyle = '#666666';
-	} else if (hero.id === world.ui.myHeroId) {
-		ctx.fillStyle = Hero.MyHeroColor;
-	}
+	ctx.fillStyle = color;
 	ctx.beginPath();
 	ctx.arc(0, 0, Hero.Radius, 0, 2 * Math.PI);
 	ctx.fill();

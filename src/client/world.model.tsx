@@ -3,20 +3,23 @@ import pl from 'planck-js';
 export interface World {
 	tick: number;
 
-	numPlayers: number;
 	activePlayers: Set<string>;
-	joinLeaveEvents: JoinOrLeaveEvent[];
+	players: Map<string, Player>;
 
 	objects: Map<string, WorldObject>,
-	physics: pl.World;
-	actions: Map<string, Action>,
-	radius: number;
-
-	collisions: Collision[];
 	destroyed: WorldObject[];
 
-	nextHeroId: number;
+	physics: pl.World;
+	collisions: Collision[];
+
+	radius: number;
+
+	joinLeaveEvents: JoinOrLeaveEvent[];
+	actions: Map<string, Action>,
+
+	nextPositionId: number;
 	nextBulletId: number;
+	nextColorId: number;
 	
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };
@@ -27,6 +30,33 @@ export interface UIState {
 
 	previousObjectPositions: Map<string, pl.Vec2>;
 	trails: Trail[];
+
+	notifications: Notification[];
+}
+
+export interface Player {
+	heroId: string;
+	name: string;
+	color: string;
+}
+
+export type Notification = JoinNotification | LeaveNotification | KillNotification;
+
+export interface JoinNotification {
+	type: "join";
+	player: Player;
+}
+
+export interface LeaveNotification {
+	type: "leave";
+	player: Player;
+}
+
+export interface KillNotification {
+	type: "kill";
+	killer: Player;
+	killed: Player;
+	assist: Player;
 }
 
 export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;
@@ -56,14 +86,11 @@ export interface Hero extends WorldObjectBase {
 	category: "hero";
 	type: "hero";
 
-	name: string;
-
 	health: number;
 	body: pl.Body;
 	charging: Charging;
 	cooldowns: Cooldowns;
 	shieldTicks: number;
-	fillStyle: string;
 }
 
 export interface Charging {
