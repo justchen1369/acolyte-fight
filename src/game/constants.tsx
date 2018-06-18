@@ -104,6 +104,7 @@ export namespace Spells {
 		maxTicks: 12 * TicksPerSecond,
 		cooldown: 12 * TicksPerSecond,
 		damage: 1,
+		deflector: true,
 
 		key: 'r',
 		icon: "meteorImpact",
