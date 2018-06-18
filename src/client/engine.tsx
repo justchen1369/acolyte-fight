@@ -10,6 +10,10 @@ const AllCategories = 0xFFFF;
 const HeroCategory = 1;
 const ProjectileCategory = 2;
 
+// Planck.js considers collisions to be inelastic if below this threshold.
+// We want all thresholds to be elastic.
+(pl as any).internal.Settings.velocityThreshold = 0;
+
 export function initialWorld(): w.World {
 	let world = {
 		tick: 0,
@@ -295,13 +299,6 @@ function handleCollisions(world: w.World, collisions: w.Collision[]) {
 			}
 
 			if (collision.hero && collision.hero.shieldTicks > 0) {
-				let heroPos = collision.hero.body.getPosition();
-				let currentPos = collision.projectile.body.getPosition();
-				let currentVelocity = collision.projectile.body.getLinearVelocity();
-				let speed = spell.speed || vector.length(currentVelocity); // Return to initial speed because collision will absorb speed
-				let newVelocity = vector.multiply(vector.unit(vector.diff(currentPos, heroPos)), speed);
-				collision.projectile.body.setLinearVelocity(newVelocity);
-
 				if (spell.action === "projectile" && spell.maxTicks) {
 					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
 				}
