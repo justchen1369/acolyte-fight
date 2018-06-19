@@ -13,7 +13,7 @@ export interface Spells {
     [key: string]: Spell;
 }
 
-export type Spell = MoveSpell | ProjectileSpell | ScourgeSpell | ShieldSpell | TeleportSpell;
+export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | ShieldSpell | TeleportSpell;
 
 export interface SpellBase {
     id: string;
@@ -36,6 +36,17 @@ export interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
     projectile: ProjectileTemplate;
+}
+
+export interface SpraySpell extends SpellBase {
+    action: "spray";
+
+    projectile: ProjectileTemplate;
+
+    intervalTicks: number;
+    lengthTicks: number;
+
+    jitterRatio: number;
 }
 
 export interface ProjectileTemplate {

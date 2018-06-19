@@ -53,3 +53,11 @@ export function distance(a: pl.Vec2, b: pl.Vec2) {
 export function clone(vec: pl.Vec2) {
 	return pl.Vec2(vec.x, vec.y);
 }
+
+export function angle(vec: pl.Vec2) {
+	return Math.atan2(vec.y, vec.x);
+}
+
+export function fromAngle(angle: number) {
+	return pl.Vec2(Math.cos(angle), Math.sin(angle));
+}

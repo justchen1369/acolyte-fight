@@ -301,6 +301,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Sp
 	switch (spell.action) {
 		case "move": return moveAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
+		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
 		case "shield": return shieldAction(world, hero, action, spell);
@@ -510,6 +511,25 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
 	return true;
+}
+
+function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.SpraySpell) {
+	if (!action.target) { return true; }
+
+	const currentLength = world.tick - hero.casting.channellingStartTick;
+	if (currentLength % spell.intervalTicks === 0) {
+		const currentAngle = vector.angle(hero.body.getPosition());
+
+		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
+		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
+		const newAngle = currentAngle + 2 * Math.PI * projectileIndex / numProjectiles;
+
+		const jitterRadius = vector.distance(hero.body.getPosition(), action.target) * spell.jitterRatio;
+		const newTarget = vector.plus(action.target, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
+
+		addProjectile(world, hero, newTarget, spell, spell.projectile);
+	}
+	return currentLength >= spell.lengthTicks;
 }
 
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.TeleportSpell) {

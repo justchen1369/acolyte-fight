@@ -105,6 +105,36 @@ export namespace Spells {
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
+	export const firespray = {
+		id: 'firespray',
+		action: "spray",
+
+		// key: 's',
+		color: '#ffdd00',
+		icon: "thunderball",
+
+		cooldown: 1 * TicksPerSecond,
+
+		intervalTicks: 0.1 * TicksPerSecond,
+		lengthTicks: 1 * TicksPerSecond,
+
+		jitterRatio: 0.05,
+
+		projectile: {
+			color: '#ffdd00',
+
+			density: 0.01,
+			radius: 0.002,
+			speed: 0.5,
+			maxTicks: 0.5 * TicksPerSecond,
+			damage: 2.5,
+			explodeOn: Categories.All,
+
+			render: "ray",
+			trailTicks: 30,
+		} as c.ProjectileTemplate,
+	} as c.SpraySpell;
+
 	export const meteor = {
 		id: 'meteor',
 		action: "projectile",
@@ -267,6 +297,7 @@ export namespace Spells {
 	export const all: c.Spells = {
 		move,
 		fireball,
+		firespray,
 		meteor,
 		lightning,
 		homing,
