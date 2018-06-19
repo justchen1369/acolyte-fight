@@ -11,7 +11,6 @@ export interface World {
 	destroyed: WorldObject[];
 
 	physics: pl.World;
-	collisions: Collision[];
 
 	radius: number;
 
@@ -161,9 +160,4 @@ export interface LineTrail extends TrailBase {
 	from: pl.Vec2;
 	to: pl.Vec2;
 	width: number;
-}
-
-export interface Collision {
-	object: WorldObject;
-	other: WorldObject;
 }

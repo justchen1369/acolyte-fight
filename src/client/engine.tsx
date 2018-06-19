@@ -23,7 +23,6 @@ export function initialWorld(): w.World {
 		actions: new Map(),
 		radius: 0.4,
 
-		collisions: [],
 		destroyed: [],
 
 		nextPositionId: 0,
@@ -37,7 +36,6 @@ export function initialWorld(): w.World {
 			notifications: [],
 		} as w.UIState,
 	} as w.World;
-	world.physics.on('post-solve', (contact: pl.Contact) => onContact(world, contact));
 	return world;
 }
 
@@ -168,11 +166,9 @@ export function tick(world: w.World) {
 	world.actions = newActions;
 
 	physicsStep(world);
-
-	if (world.collisions.length > 0) {
-		handleCollisions(world, world.collisions);
+	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
+		handleContact(world, contact);
 	}
-	world.collisions = [];
 
 	homingForce(world);
 	decayShields(world);
@@ -283,7 +279,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Sp
 	}
 }
 
-function onContact(world: w.World, contact: pl.Contact) {
+function handleContact(world: w.World, contact: pl.Contact) {
 	if (!contact.isTouching()) {
 		return;
 	}
@@ -291,40 +287,37 @@ function onContact(world: w.World, contact: pl.Contact) {
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
 	if (objA && objB) {
-		world.collisions.push({ object: objA, other: objB });
-		world.collisions.push({ object: objB, other: objA });
+		handleCollision(world, objA, objB);
+		handleCollision(world, objB, objA);
 	}
 }
 
-function handleCollisions(world: w.World, collisions: w.Collision[]) {
-	collisions.forEach(collision => {
-		if (collision.object.category !== "projectile") {
-			return;
+function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject) {
+	if (object.category !== "projectile") {
+		return;
+	}
+	const projectile = object;
+
+	if (hit.category === "hero" && hit.shieldTicks > 0) {
+		if (projectile.owner !== hit.id) { // Stop double redirections cancelling out
+			// Redirect back to owner
+			projectile.targetId = projectile.owner;
+			projectile.owner = hit.id;
 		}
-		const projectile = collision.object;
-		const hit = collision.other;
 
-		if (hit.category === "hero" && hit.shieldTicks > 0) {
-			if (projectile.owner !== hit.id) { // Stop double redirections cancelling out
-				// Redirect back to owner
-				projectile.targetId = projectile.owner;
-				projectile.owner = hit.id;
-			}
-
-			projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
-		} else {
-			if (hit.category === "hero" && hit.id !== projectile.owner) {
-				const damage = projectile.damage;
-				applyDamage(hit, damage, projectile.owner);
-			}
-
-			if (projectile.bounce && hit.category === "hero") { // Only bounce off heroes, not projectiles
-				bounceToNext(projectile, hit, world);
-			} else if (projectile.explodeOn & categoryFlags(hit.category)) {
-				destroyObject(world, projectile);
-			}
+		projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
+	} else {
+		if (hit.category === "hero" && hit.id !== projectile.owner) {
+			const damage = projectile.damage;
+			applyDamage(hit, damage, projectile.owner);
 		}
-	});
+
+		if (projectile.bounce && hit.category === "hero") { // Only bounce off heroes, not projectiles
+			bounceToNext(projectile, hit, world);
+		} else if (projectile.explodeOn & categoryFlags(hit.category)) {
+			destroyObject(world, projectile);
+		}
+	}
 }
 
 function categoryFlags(category: string) {

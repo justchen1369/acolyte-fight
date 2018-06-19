@@ -5,6 +5,7 @@ declare module "planck-js" {
             destroyBody(body: Body): void;
             on(eventName: string, callback : any): void;
             step(timeSpan: number): void;
+            getContactList(): Contact;
         }
 
         interface Body {
@@ -48,6 +49,7 @@ declare module "planck-js" {
         }
 
         interface Contact {
+            getNext(): Contact;
             isTouching(): boolean;
             getFixtureA(): Fixture;
             getFixtureB(): Fixture;
