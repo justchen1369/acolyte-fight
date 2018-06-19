@@ -19,8 +19,6 @@ export interface SpellBase {
     id: string;
     action: string;
 
-    damage?: number;
-
     chargeTicks?: number;
     cooldown: number;
 
@@ -37,6 +35,10 @@ export interface MoveSpell extends SpellBase {
 export interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
+    projectile: ProjectileTemplate;
+}
+
+export interface ProjectileTemplate {
     damage: number;
     bounce?: BounceParameters;
 
@@ -50,6 +52,7 @@ export interface ProjectileSpell extends SpellBase {
 
     trailTicks: number;
 
+    color: string;
     render: string;
 }
 

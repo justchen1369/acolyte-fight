@@ -97,12 +97,12 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c.ProjectileSpell) {
+function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c.Spell, projectileTemplate: c.ProjectileTemplate) {
 	let id = spell.id + (world.nextBulletId++);
 
 	let from = hero.body.getPosition();
-	let position = vector.towards(from, target, Hero.Radius + spell.radius + constants.Pixel);
-	let velocity = vector.direction(target, from, spell.speed);
+	let position = vector.towards(from, target, Hero.Radius + projectileTemplate.radius + constants.Pixel);
+	let velocity = vector.direction(target, from, projectileTemplate.speed);
 
 	let body = world.physics.createBody({
 		userData: id,
@@ -112,8 +112,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		linearDamping: 0,
 		bullet: true,
 	});
-	body.createFixture(pl.Circle(spell.radius), {
-		density: spell.density,
+	body.createFixture(pl.Circle(projectileTemplate.radius), {
+		density: projectileTemplate.density,
 		restitution: 1.0,
 	});
 
@@ -127,18 +127,18 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		body,
 
 		targetId: enemy ? enemy.id : null,
-		damage: spell.damage,
-		bounce: spell.bounce,
-		turnRate: spell.turnRate,
+		damage: projectileTemplate.damage,
+		bounce: projectileTemplate.bounce,
+		turnRate: projectileTemplate.turnRate,
 
-		expireTick: world.tick + spell.maxTicks,
-		maxTicks: spell.maxTicks,
-		explodeOn: spell.explodeOn,
+		expireTick: world.tick + projectileTemplate.maxTicks,
+		maxTicks: projectileTemplate.maxTicks,
+		explodeOn: projectileTemplate.explodeOn,
 
-		render: spell.render,
-		color: spell.color,
-		radius: spell.radius,
-		trailTicks: spell.trailTicks,
+		render: projectileTemplate.render,
+		color: projectileTemplate.color,
+		radius: projectileTemplate.radius,
+		trailTicks: projectileTemplate.trailTicks,
 
 		uiPreviousPos: vector.clone(position),
 	} as w.Projectile;
@@ -508,7 +508,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Mov
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ProjectileSpell) {
 	if (!action.target) { return true; }
 
-	addProjectile(world, hero, action.target, spell);
+	addProjectile(world, hero, action.target, spell, spell.projectile);
 	return true;
 }
 

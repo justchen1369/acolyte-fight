@@ -82,111 +82,136 @@ export namespace Spells {
 
 	export const fireball = {
 		id: 'fireball',
-		density: 25,
-		radius: 0.005,
-		speed: 0.4,
-		chargeTicks: 0,
-		maxTicks: 1 * TicksPerSecond,
-		cooldown: 1 * TicksPerSecond,
-		damage: 10,
-		explodeOn: Categories.Hero,
+		action: "projectile",
 
 		key: 'q',
+		color: '#ff8800',
 		icon: "thunderball",
 
-		trailTicks: 30,
-		color: '#ff8800',
+		projectile: {
+			color: '#ff8800',
 
-		action: "projectile",
-		render: "projectile",
+			density: 25,
+			radius: 0.005,
+			speed: 0.4,
+			chargeTicks: 0,
+			maxTicks: 1 * TicksPerSecond,
+			cooldown: 1 * TicksPerSecond,
+			damage: 10,
+			explodeOn: Categories.Hero,
+
+			trailTicks: 30,
+
+			render: "projectile",
+		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
 	export const meteor = {
 		id: 'meteor',
-		density: 10000,
-		radius: 0.03,
-		speed: 0.2,
-		chargeTicks: 0.1 * TicksPerSecond,
-		maxTicks: 12 * TicksPerSecond,
-		cooldown: 12 * TicksPerSecond,
-		damage: 1,
+		action: "projectile",
 
 		key: 'r',
+		color: '#ff0000',
 		icon: "meteorImpact",
 
-		trailTicks: 15,
-		color: '#ff0000',
+		projectile: {
+			color: '#ff0000',
 
-		action: "projectile",
-		render: "projectile",
+			density: 10000,
+			radius: 0.03,
+			speed: 0.2,
+			chargeTicks: 0.1 * TicksPerSecond,
+			maxTicks: 12 * TicksPerSecond,
+			cooldown: 12 * TicksPerSecond,
+			damage: 1,
+			trailTicks: 15,
+			explodeOn: 0,
+
+			render: "projectile",
+		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
 	export const lightning = {
 		id: 'lightning',
-		density: 3,
-		radius: 0.0025,
-		speed: 3.0,
-		chargeTicks: 0,
-		maxTicks: 0.5 * TicksPerSecond,
-		cooldown: 10 * TicksPerSecond,
-		damage: 1,
-		explodeOn: Categories.All,
+		action: "projectile",
 
 		key: 'w',
+		color: '#00ddff',
 		icon: "lightningHelix",
 
-		trailTicks: 30,
-		color: '#00ddff',
+		projectile: {
+			color: '#00ddff',
 
-		action: "projectile",
-		render: "ray",
+			density: 3,
+			radius: 0.0025,
+			speed: 3.0,
+			chargeTicks: 0,
+			maxTicks: 0.5 * TicksPerSecond,
+			cooldown: 10 * TicksPerSecond,
+			damage: 1,
+			explodeOn: Categories.All,
+
+			trailTicks: 30,
+
+			render: "ray",
+		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
 	export const homing = {
 		id: 'homing',
-		density: 25,
-		radius: 0.003,
-		speed: 0.15,
-		chargeTicks: 0,
-		maxTicks: 6.0 * TicksPerSecond,
-		cooldown: 20 * TicksPerSecond,
-		damage: 20,
-		turnRate: 0.05,
-		explodeOn: Categories.Hero,
+		action: "projectile",
 
 		key: 'e',
+		color: '#44ffcc',
 		icon: "boltSaw",
 
-		trailTicks: 30,
-		color: '#44ffcc',
+		projectile: {
+			color: '#44ffcc',
 
-		action: "projectile",
-		render: "projectile",
+			density: 25,
+			radius: 0.003,
+			speed: 0.15,
+			chargeTicks: 0,
+			maxTicks: 6.0 * TicksPerSecond,
+			cooldown: 20 * TicksPerSecond,
+			damage: 20,
+			turnRate: 0.05,
+			explodeOn: Categories.Hero,
+
+			trailTicks: 30,
+
+			render: "projectile",
+		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
 	export const bouncer = {
 		id: 'bouncer',
-		density: 2,
-		radius: 0.001,
-		speed: 0.75,
-		chargeTicks: 0,
-		maxTicks: 3.0 * TicksPerSecond,
-		cooldown: 10 * TicksPerSecond,
-		damage: 2,
-		turnRate: 0.025,
-		explodeOn: Categories.All,
-		bounce: {
-			damageFactor: 0.95,
-		},
+		action: "projectile",
 
 		key: 'd',
+		color: '#88ee22',
 		icon: "divert",
 
-		trailTicks: 1.0 * TicksPerSecond,
-		color: '#88ee22',
+		projectile: {
+			color: '#88ee22',
 
-		action: "projectile",
-		render: "ray",
+			density: 2,
+			radius: 0.001,
+			speed: 0.75,
+			chargeTicks: 0,
+			maxTicks: 3.0 * TicksPerSecond,
+			cooldown: 10 * TicksPerSecond,
+			damage: 2,
+			turnRate: 0.025,
+			explodeOn: Categories.All,
+			bounce: {
+				damageFactor: 0.95,
+			},
+
+			trailTicks: 1.0 * TicksPerSecond,
+
+			render: "ray",
+		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
 	export const scourge = {
