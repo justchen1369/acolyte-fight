@@ -1,6 +1,13 @@
 import pl from 'planck-js';
 import * as c from '../game/constants.model';
 
+export namespace CastStage {
+	export const Cooldown = 1;
+	export const Charging = 2;
+	export const Channelling = 3;
+	export const Complete = 4;
+}
+
 export interface World {
 	tick: number;
 
@@ -93,7 +100,7 @@ export interface Hero extends WorldObjectBase {
 
 	health: number;
 	body: pl.Body;
-	charging: Charging | null;
+	casting: CastState | null;
 	cooldowns: Cooldowns;
 	shieldTicks: number;
 
@@ -101,10 +108,16 @@ export interface Hero extends WorldObjectBase {
 	assistHeroId: string | null;
 }
 
-export interface Charging {
+export interface CastState {
 	action: Action;
-	proportion: number;
-	spell: string;
+	stage: number;
+	uninterruptible?: boolean;
+
+	chargeStartTick?: number;
+	channellingStartTick?: number;
+
+	proportion?: number;
+	color?: string;
 }
 
 export interface Cooldowns {

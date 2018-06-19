@@ -132,12 +132,11 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	ctx.fill();
 
 	// Charging
-	if (hero.charging && hero.charging.spell && hero.charging.proportion > 0) {
+	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		ctx.save();
 
-		let spell = Spells.all[hero.charging.spell];
-		ctx.globalAlpha = hero.charging.proportion;
-		ctx.strokeStyle = spell.color;
+		ctx.globalAlpha = hero.casting.proportion;
+		ctx.strokeStyle = hero.casting.color;
 		ctx.lineWidth = ChargingIndicator.Width;
 		ctx.beginPath();
 		ctx.arc(0, 0, Hero.Radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
@@ -277,7 +276,6 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: C
 		let spell = Spells.all[button];
 
 		let isSelected = selectedAction === spell.id;
-		let isCharging = hero.charging && hero.charging.spell === spell.id;
 		let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 		ctx.save();
@@ -292,8 +290,6 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: C
 			ctx.fillStyle = spell.color;
 			if (remainingInSeconds > 0) {
 				ctx.fillStyle = isSelected ? '#cccccc' : '#444444';
-			} else if (isCharging) {
-				ctx.fillStyle = 'white';
 			}
 
 			ctx.beginPath();

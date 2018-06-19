@@ -77,7 +77,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		type: "hero",
 		health: Hero.MaxHealth,
 		body,
-		charging: null,
+		casting: null,
 		cooldowns: {},
 		shieldTicks: 0,
 		killerHeroId: null,
@@ -229,47 +229,75 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents = [];
 }
 
-function performHeroActions(world: w.World, hero: w.Hero, nextAction?: w.Action) {
-	if (hero.charging && hero.charging.action) {
-		let chargingAction = hero.charging.action;
-		let chargingSpell = constants.Spells.all[chargingAction.type];
-		hero.charging.proportion += 1.0 / (chargingSpell.chargeTicks || 1);
-		if (hero.charging.proportion < 1.0) {
-			return false; // Blocked charging, cannot perform action
-		} else {
-			hero.charging = null;
-			applyAction(world, hero, chargingAction, chargingSpell);
-			return false; // Cannot perform new action, handling charging action
+function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
+	let action = nextAction;
+	if (hero.casting && hero.casting.uninterruptible) {
+		action = hero.casting.action;
+	}
+	if (!action) {
+		return true; // Nothing to do
+	}
+	const spell = constants.Spells.all[action.type];
+
+	// Start casting a new spell
+	if (!hero.casting || action !== hero.casting.action) {
+		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown };
+	}
+
+	if (hero.casting.stage === w.CastStage.Cooldown) {
+		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
+			return false; // Cannot perform action, waiting for cooldown
 		}
-	} else if (!nextAction) {
-		// Nothing to do
-		return true;
-	} else {
-		let nextSpell = constants.Spells.all[nextAction.type];
-		if (!nextAction || !nextSpell) {
-			return true;
+		++hero.casting.stage;
+	}
+
+	if (hero.casting.stage === w.CastStage.Charging) {
+		// Entering charging stage
+		if (!hero.casting.chargeStartTick) {
+			hero.casting.chargeStartTick = world.tick;
+			hero.casting.uninterruptible = true;
 		}
 
-		if (nextSpell.cooldown) {
-			if (cooldownRemaining(world, hero, nextSpell.id) > 0) {
-				return false; // Cannot perform action, waiting for cooldown
+		// Waiting for charging to complete
+		const ticksCharging = world.tick - hero.casting.chargeStartTick;
+		if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
+			hero.casting.proportion = 1.0 * ticksCharging / spell.chargeTicks;
+			return false;
+		}
+
+		// Exiting charging stage
+		hero.casting.uninterruptible = false;
+		hero.casting.proportion = null;
+		++hero.casting.stage;
+	}
+
+	let done = false;
+	if (hero.casting.stage === w.CastStage.Channelling) {
+		// Start channelling
+		if (!hero.casting.channellingStartTick) {
+			hero.casting.channellingStartTick = world.tick;
+
+			if (spell.cooldown) {
+				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
 		}
 
-		if (nextSpell.chargeTicks) {
-			hero.charging = { spell: nextSpell.id, proportion: 0.0, action: nextAction };
-			return true; // Action now charging
-		} else {
-			return applyAction(world, hero, nextAction, nextSpell); // Performed action immediately without charging
+		done = applyAction(world, hero, action, spell);
+
+		if (done) {
+			++hero.casting.stage;
 		}
 	}
-}
 
-function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Spell) {
-	if (spell.cooldown) {
-		setCooldown(world, hero, spell.id, spell.cooldown);
+	if (hero.casting.stage === w.CastStage.Complete) {
+		hero.casting = null;
 	}
 
+	// Only mark nextAction as completed if we actually did it and not the uninterruptible action
+	return action === nextAction && done;
+}
+
+function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Spell): boolean {
 	switch (spell.action) {
 		case "move": return moveAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
