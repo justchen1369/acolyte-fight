@@ -1,4 +1,5 @@
 import pl from 'planck-js';
+import * as c from '../game/constants.model';
 
 export interface World {
 	tick: number;
@@ -25,10 +26,9 @@ export interface World {
 };
 
 export interface UIState {
-	myGameId: string;
-	myHeroId: string;
+	myGameId: string | null;
+	myHeroId: string | null;
 
-	previousObjectPositions: Map<string, pl.Vec2>;
 	trails: Trail[];
 
 	notifications: Notification[];
@@ -54,9 +54,9 @@ export interface LeaveNotification {
 
 export interface KillNotification {
 	type: "kill";
-	killer: Player;
 	killed: Player;
-	assist: Player;
+	killer: Player | null;
+	assist: Player | null;
 }
 
 export interface MyHeroNotification {
@@ -94,18 +94,18 @@ export interface Hero extends WorldObjectBase {
 
 	health: number;
 	body: pl.Body;
-	charging: Charging;
+	charging: Charging | null;
 	cooldowns: Cooldowns;
 	shieldTicks: number;
 
-	killerHeroId: string;
-	assistHeroId: string;
+	killerHeroId: string | null;
+	assistHeroId: string | null;
 }
 
 export interface Charging {
-	action?: Action;
-	proportion?: number;
-	spell?: string;
+	action: Action;
+	proportion: number;
+	spell: string;
 }
 
 export interface Cooldowns {
@@ -114,14 +114,23 @@ export interface Cooldowns {
 
 export interface Projectile extends WorldObjectBase {
 	category: "projectile";
-	bullet: true;
 
 	owner: string;
 	body: pl.Body;
 
 	targetId: string | null;
-	damageMultiplier: number;
+	damage: number;
+	bounce?: c.BounceParameters;
+	turnRate: number;
+
 	expireTick: number;
+	maxTicks: number;
+	explodeOn: number;
+
+	render: string;
+    radius: number;
+    color: string;
+    trailTicks: number;
 
 	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
 }
@@ -155,7 +164,6 @@ export interface LineTrail extends TrailBase {
 }
 
 export interface Collision {
-	hero?: Hero;
-	projectile?: Projectile;
-	other?: WorldObject;
+	object: WorldObject;
+	other: WorldObject;
 }

@@ -2,21 +2,22 @@ declare module "planck-js" {
     namespace PlanckJs {
         interface World {
             createBody(bodyDef: BodyDef): Body;
-            destroyBody(body: Body);
-            on(eventName: string, callback : any);
-            step(timeSpan: number);
+            destroyBody(body: Body): void;
+            on(eventName: string, callback : any): void;
+            step(timeSpan: number): void;
         }
 
         interface Body {
-            createFixture(polygon: Polygon, fixtureDef: FixtureDef);
+            createFixture(polygon: Polygon, fixtureDef: FixtureDef): void;
             getPosition(): Vec2;
-            setPosition(pos: Vec2);
+            setPosition(pos: Vec2): void;
             getLinearVelocity(): Vec2;
-            setLinearVelocity(velocity: Vec2);
-            setLinearDamping(damping: number);
-            applyLinearImpulse(impulse: Vec2, center: Vec2, unknown?: boolean);
-            setMassData(massData: MassData);
-            resetMassData();
+            setLinearVelocity(velocity: Vec2): void;
+            setLinearDamping(damping: number): void;
+            applyLinearImpulse(impulse: Vec2, center: Vec2, unknown?: boolean): void;
+            setMassData(massData: MassData): void;
+            resetMassData(): void;
+            getUserData(): any;
         }
 
         interface BodyDef {
@@ -30,7 +31,7 @@ declare module "planck-js" {
         }
 
         interface Fixture {
-
+            getBody(): Body;
         }
 
         interface FixtureDef {
@@ -44,6 +45,12 @@ declare module "planck-js" {
         interface Vec2 {
             x: number;
             y: number;
+        }
+
+        interface Contact {
+            isTouching(): boolean;
+            getFixtureA(): Fixture;
+            getFixtureB(): Fixture;
         }
 
         function Circle(radius: number): Polygon;

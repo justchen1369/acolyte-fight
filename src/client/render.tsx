@@ -21,6 +21,9 @@ export function calculateWorldRect(rect: ClientRect) {
 export function render(world: w.World, canvas: HTMLCanvasElement) {
 	let rect = canvas.getBoundingClientRect();
 	let ctx = canvas.getContext('2d');
+	if (!ctx) {
+		throw "Error getting context";
+	}
 
 	ctx.save();
 	clearCanvas(ctx, rect);
@@ -69,27 +72,24 @@ function renderObject(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: 
 	if (obj.category === "hero") {
 		renderHero(ctx, obj, world);
 	} else if (obj.category === "projectile") {
-		const spell = Spells.all[obj.type] as c.ProjectileSpell;
-		renderSpell(ctx, obj, world, spell);
+		renderSpell(ctx, obj, world);
 	}
 }
 
 function renderDestroyed(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
 	if (obj.category === "projectile") {
-		const spell = Spells.all[obj.type] as c.ProjectileSpell;
-		renderSpell(ctx, obj, world, spell);
+		renderSpell(ctx, obj, world);
 	}
 }
 
-function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
-    if (!spell) {
-        return;
-    }
-
-    switch (spell.render) {
-        case 'projectile': renderProjectile(ctx, obj, world, spell);
-        case 'ray': renderRay(ctx, obj, world, spell);
-    }
+function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World) {
+	if (obj.render === "projectile") {
+		// Render both to ensure there are no gaps in the trail
+        renderProjectile(ctx, obj, world);
+        renderRay(ctx, obj, world);
+	} else if (obj.render == "ray") {
+        renderRay(ctx, obj, world);
+	}
 }
 
 function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
@@ -183,37 +183,37 @@ function rgColor(proportion: number) {
 	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
 }
 
-function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
+function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
 	let pos = projectile.body.getPosition();
 	let previous = projectile.uiPreviousPos;
 	projectile.uiPreviousPos = vector.clone(pos);
 
 	if (!previous) {
-		renderProjectile(ctx, projectile, world, spell);
+		renderProjectile(ctx, projectile, world);
 		return;
 	}
 
 	world.ui.trails.push({
 		type: 'line',
-		remaining: spell.trailTicks,
-		max: spell.trailTicks, 
+		remaining: projectile.trailTicks,
+		max: projectile.trailTicks, 
 		from: vector.clone(previous),
 		to: vector.clone(pos),
-		fillStyle: spell.color,
-		width: spell.radius * 2,
+		fillStyle: projectile.color,
+		width: projectile.radius * 2,
 	} as w.LineTrail);
 }
 
-function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, spell: c.ProjectileSpell) {
+function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
 	let pos = projectile.body.getPosition();
 
 	world.ui.trails.push({
 		type: 'circle',
-		remaining: spell.trailTicks,
-		max: spell.trailTicks, 
+		remaining: projectile.trailTicks,
+		max: projectile.trailTicks, 
 		pos: vector.clone(pos),
-		fillStyle: spell.color,
-		radius: spell.radius,
+		fillStyle: projectile.color,
+		radius: projectile.radius,
 	} as w.CircleTrail);
 }
 
@@ -249,14 +249,18 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
 }
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
-	let myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
+	if (!world.ui.myHeroId) {
+		return;
+	}
+
+	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
 		const heroAction = world.actions.get(myHero.id);
-		renderButtons(ctx, ButtonBar.List, world, myHero, heroAction, rect);
+		renderButtons(ctx, ButtonBar.List, rect, world, myHero, heroAction);
 	}
 }
 
-function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: w.World, hero: w.Hero, heroAction: w.Action, rect: ClientRect) {
+function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
 
 	let buttonBarWidth = buttons.length * ButtonBar.Size + (buttons.length - 1) * ButtonBar.Spacing;
@@ -265,10 +269,12 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: 
 	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonBar.Size - ButtonBar.Margin);
 
 	for (let i = 0; i < buttons.length; ++i) {
-		let spell = Spells.all[buttons[i]];
-		if (!spell) {
+		const button = buttons[i];
+		if (!button) {
 			continue;
 		}
+
+		let spell = Spells.all[button];
 
 		let isSelected = selectedAction === spell.id;
 		let isCharging = hero.charging && hero.charging.spell === spell.id;
@@ -310,12 +316,12 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], world: 
 		}
 
 		if (remainingInSeconds > 0) {
-		// Cooldown
+			// Cooldown
 			let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 
 			ctx.font = 'bold ' + (ButtonBar.Size * 0.75 - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
-		} else {
+		} else if (spell.key) {
 			// Keyboard shortcut
 			ctx.save();
 

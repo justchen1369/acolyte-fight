@@ -11,7 +11,7 @@ interface Props {
 }
 interface State {
     items: NotificationItem[];
-    myHeroId: string;
+    myHeroId: string | null;
     now: number;
 }
 
@@ -21,7 +21,7 @@ interface NotificationItem {
 }
 
 export class MessagesPanel extends React.Component<Props, State> {
-    private intervalHandle = null;
+    private intervalHandle: NodeJS.Timer | null = null;
     
     constructor(props: Props) {
         super(props);
@@ -37,7 +37,9 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     componentWillUnmount() {
-        clearInterval(this.intervalHandle);
+        if (this.intervalHandle) {
+            clearInterval(this.intervalHandle);
+        }
     }
 
     private onInterval() {
@@ -86,6 +88,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             case "join": return this.renderJoinNotification(notification);
             case "leave": return this.renderLeaveNotification(notification);
             case "kill": return this.renderKillNotification(notification);
+            default: return null; // Ignore this notification
         }
     }
 

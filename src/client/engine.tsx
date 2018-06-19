@@ -35,9 +35,9 @@ export function initialWorld(): w.World {
 			myHeroId: null,
 			trails: [],
 			notifications: [],
-		}
+		} as w.UIState,
 	} as w.World;
-	world.physics.on('post-solve', (contact) => onCollision(world, contact));
+	world.physics.on('post-solve', (contact: pl.Contact) => onContact(world, contact));
 	return world;
 }
 
@@ -68,7 +68,6 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		linearDamping: Hero.MaxDamping,
 	});
 	body.createFixture(pl.Circle(Hero.Radius), {
-		filterCategoryBits: constants.Categories.Hero,
 		density: Hero.Density,
 		restitution: 1.0,
 	});
@@ -80,7 +79,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		type: "hero",
 		health: Hero.MaxHealth,
 		body,
-		charging: {},
+		charging: null,
 		cooldowns: {},
 		shieldTicks: 0,
 		killerHeroId: null,
@@ -116,8 +115,6 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(spell.radius), {
-		filterCategoryBits: constants.Categories.Projectile,
-		filterMaskBits: constants.Categories.All ^ (spell.passthrough ? constants.Categories.Projectile : 0),
 		density: spell.density,
 		restitution: 1.0,
 	});
@@ -130,11 +127,22 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		category: "projectile",
 		type: spell.id,
 		body,
-		uiPreviousPos: vector.clone(position),
-		expireTick: world.tick + spell.maxTicks,
-		damageMultiplier: 1.0,
-		bullet: true,
+
 		targetId: enemy ? enemy.id : null,
+		damage: spell.damage,
+		bounce: spell.bounce,
+		turnRate: spell.turnRate,
+
+		expireTick: world.tick + spell.maxTicks,
+		maxTicks: spell.maxTicks,
+		explodeOn: spell.explodeOn,
+
+		render: spell.render,
+		color: spell.color,
+		radius: spell.radius,
+		trailTicks: spell.trailTicks,
+
+		uiPreviousPos: vector.clone(position),
 	} as w.Projectile;
 	world.objects.set(id, projectile);
 
@@ -196,9 +204,11 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents.forEach(ev => {
 		if (ev.type === "join") {
 			console.log("Player joined:", ev.heroId);
-			let hero: w.Hero = find(world.objects, x => x.id === ev.heroId);
+			let hero = find(world.objects, x => x.id === ev.heroId);
 			if (!hero) {
 				hero = addHero(world, nextHeroPosition(world), ev.heroId, ev.playerName);
+			} else if (hero.category !== "hero") {
+				throw "Player tried to join as non-hero: " + ev.heroId;
 			}
 
 			const player = {
@@ -223,15 +233,15 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents = [];
 }
 
-function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
+function performHeroActions(world: w.World, hero: w.Hero, nextAction?: w.Action) {
 	if (hero.charging && hero.charging.action) {
 		let chargingAction = hero.charging.action;
 		let chargingSpell = constants.Spells.all[chargingAction.type];
-		hero.charging.proportion += 1.0 / chargingSpell.chargeTicks;
+		hero.charging.proportion += 1.0 / (chargingSpell.chargeTicks || 1);
 		if (hero.charging.proportion < 1.0) {
 			return false; // Blocked charging, cannot perform action
 		} else {
-			hero.charging = {};
+			hero.charging = null;
 			applyAction(world, hero, chargingAction, chargingSpell);
 			return false; // Cannot perform new action, handling charging action
 		}
@@ -240,7 +250,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		return true;
 	} else {
 		let nextSpell = constants.Spells.all[nextAction.type];
-		if (!nextAction) {
+		if (!nextAction || !nextSpell) {
 			return true;
 		}
 
@@ -250,7 +260,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			}
 		}
 
-		if (nextSpell.chargeTicks > 0) {
+		if (nextSpell.chargeTicks) {
 			hero.charging = { spell: nextSpell.id, proportion: 0.0, action: nextAction };
 			return true; // Action now charging
 		} else {
@@ -273,49 +283,45 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Sp
 	}
 }
 
-function onCollision(world, contact) {
+function onContact(world: w.World, contact: pl.Contact) {
+	if (!contact.isTouching()) {
+		return;
+	}
+
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
-	if (objA.category === "hero" && objB.category === "projectile") {
-		world.collisions.push({ hero: objA, projectile: objB });
-	} else if (objA.category === "projectile" && objB.category === "hero") {
-		world.collisions.push({ hero: objB, projectile: objA });
-	} else if (objA.category === "projectile" && objB.category === "projectile") {
-		world.collisions.push({ projectile: objA, other: objB });
-		world.collisions.push({ projectile: objB, other: objA });
+	if (objA && objB) {
+		world.collisions.push({ object: objA, other: objB });
+		world.collisions.push({ object: objB, other: objA });
 	}
 }
 
 function handleCollisions(world: w.World, collisions: w.Collision[]) {
 	collisions.forEach(collision => {
-		if (collision.projectile) {
-			const spell = constants.Spells.all[collision.projectile.type];
-			if (spell.action !== "projectile") {
-				return;
+		if (collision.object.category !== "projectile") {
+			return;
+		}
+		const projectile = collision.object;
+		const hit = collision.other;
+
+		if (hit.category === "hero" && hit.shieldTicks > 0) {
+			if (projectile.owner !== hit.id) { // Stop double redirections cancelling out
+				// Redirect back to owner
+				projectile.targetId = projectile.owner;
+				projectile.owner = hit.id;
 			}
 
-			if (collision.hero && collision.hero.shieldTicks > 0) {
-				if (collision.projectile.owner !== collision.hero.id) { // Stop double redirections cancelling out
-					// Redirect back to owner
-					collision.projectile.targetId = collision.projectile.owner;
-					collision.projectile.owner = collision.hero.id;
-				}
+			projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
+		} else {
+			if (hit.category === "hero" && hit.id !== projectile.owner) {
+				const damage = projectile.damage;
+				applyDamage(hit, damage, projectile.owner);
+			}
 
-				if (spell.action === "projectile" && spell.maxTicks) {
-					collision.projectile.expireTick = world.tick + spell.maxTicks; // Make the spell last longer
-				}
-			} else {
-				if (collision.hero && collision.hero.id !== collision.projectile.owner) {
-					const damage = spell.damage * (collision.projectile.damageMultiplier || 1.0);
-					applyDamage(collision.hero, damage, collision.projectile.owner);
-				}
-
-				const other = collision.hero || collision.other;
-				if (spell.bounceDamage && collision.hero) { // Only bounce off heroes, not projectiles
-					bounceToNext(collision.projectile, other, spell, world);
-				} else if (spell.explodeOn & categoryFlags(other.category)) {
-					destroyObject(world, collision.projectile);
-				}
+			if (projectile.bounce && hit.category === "hero") { // Only bounce off heroes, not projectiles
+				bounceToNext(projectile, hit, world);
+			} else if (projectile.explodeOn & categoryFlags(hit.category)) {
+				destroyObject(world, projectile);
 			}
 		}
 	});
@@ -329,8 +335,8 @@ function categoryFlags(category: string) {
 	}
 }
 
-function find(objects, predicate) {
-	let found = null;
+function find(objects: Map<string, w.WorldObject>, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
+	let found: w.WorldObject = null;
 	objects.forEach(x => {
 		if (predicate(x)) {
 			found = x;
@@ -339,9 +345,9 @@ function find(objects, predicate) {
 	return found;
 }
 
-function findNearest(objects, target, predicate) {
+function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
 	let nearestDistance = Infinity;
-	let nearest = null;
+	let nearest: w.WorldObject = null;
 	objects.forEach(obj => {
 		if (!predicate(obj)) {
 			return;
@@ -356,7 +362,11 @@ function findNearest(objects, target, predicate) {
 	return nearest;
 }
 
-function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, spell: c.ProjectileSpell, world: w.World) {
+function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.World) {
+	if (!projectile.bounce) {
+		return;
+	}
+
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
@@ -366,22 +376,17 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, spell: c.Pro
 	}
 
 	projectile.targetId = nextTarget.id;
+	projectile.damage *= projectile.bounce.damageFactor || 1.0;
 
+	let currentSpeed = vector.length(projectile.body.getLinearVelocity());
 	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
-	let newVelocity = vector.multiply(newDirection, spell.speed);
+	let newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
-
-	projectile.damageMultiplier = (projectile.damageMultiplier || 1.0) * spell.bounceDamage;
 }
 
 function homingForce(world: w.World) {
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.targetId)) {
-			return;
-		}
-
-		let spell = constants.Spells.all[obj.type];
-		if (!(spell && spell.action === "projectile" && spell.turnRate)) {
+		if (!(obj.category === "projectile" && obj.targetId && obj.turnRate)) {
 			return;
 		}
 
@@ -390,7 +395,7 @@ function homingForce(world: w.World) {
 			let currentSpeed = vector.length(obj.body.getLinearVelocity());
 			let currentDirection = vector.unit(obj.body.getLinearVelocity());
 			let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-			let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, spell.turnRate)));
+			let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.turnRate)));
 			let newVelocity = vector.multiply(newDirection, currentSpeed);
 			obj.body.setLinearVelocity(newVelocity);
 		}
@@ -452,8 +457,12 @@ function reap(world: w.World) {
 
 function createKilledNotification(hero: w.Hero, world: w.World) {
 	const killed = world.players.get(hero.id);
-	const killer = world.players.get(hero.killerHeroId);
-	const assist = world.players.get(hero.assistHeroId);
+	if (!killed) {
+		return;
+	}
+
+	const killer = hero.killerHeroId && world.players.get(hero.killerHeroId) || null;
+	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
 	world.ui.notifications.push({ type: "kill", killed, killer, assist });
 }
 
@@ -466,6 +475,8 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 }
 
 function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.MoveSpell) {
+	if (!action.target) { return true; }
+
 	let current = hero.body.getPosition();
 	let target = action.target;
 	hero.step = vector.multiply(vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick), TicksPerSecond);
@@ -474,11 +485,15 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Mov
 }
 
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ProjectileSpell) {
+	if (!action.target) { return true; }
+
 	addProjectile(world, hero, action.target, spell);
 	return true;
 }
 
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.TeleportSpell) {
+	if (!action.target) { return true; }
+
 	let currentPosition = hero.body.getPosition();
 	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);

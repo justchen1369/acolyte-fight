@@ -175,7 +175,9 @@ export namespace Spells {
 		damage: 2,
 		turnRate: 0.025,
 		explodeOn: Categories.All,
-		bounceDamage: 0.95,
+		bounce: {
+			damageFactor: 0.95,
+		},
 
 		key: 'd',
 		icon: "divert",

@@ -27,7 +27,7 @@ export interface SpellBase {
     key?: string;
     icon?: string;
 
-    color?: string;
+    color: string;
 }
 
 export interface MoveSpell extends SpellBase {
@@ -38,20 +38,23 @@ export interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
     damage: number;
-    bounceDamage?: number;
+    bounce?: BounceParameters;
 
-    density?: number;
-    radius?: number;
-    speed?: number;
+    density: number;
+    radius: number;
+    speed: number;
     turnRate?: number;
 
     maxTicks: number;
-    explodeOn?: number;
-    passthrough?: boolean;
+    explodeOn: number;
 
-    trailTicks?: number;
+    trailTicks: number;
 
-    render?: string;
+    render: string;
+}
+
+export interface BounceParameters {
+    damageFactor: number;
 }
 
 export interface ScourgeSpell extends SpellBase {
