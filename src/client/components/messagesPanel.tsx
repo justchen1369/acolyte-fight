@@ -11,7 +11,7 @@ interface Props {
 }
 interface State {
     items: NotificationItem[];
-    myHeroId: string | null;
+    myHeroId: string;
     now: number;
 }
 
@@ -21,7 +21,7 @@ interface NotificationItem {
 }
 
 export class MessagesPanel extends React.Component<Props, State> {
-    private intervalHandle: NodeJS.Timer | null = null;
+    private intervalHandle: NodeJS.Timer = null;
     
     constructor(props: Props) {
         super(props);
