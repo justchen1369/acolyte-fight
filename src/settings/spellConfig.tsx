@@ -9,6 +9,7 @@ interface Props {
 
 interface State {
     config: c.KeyBindings;
+    saved: Set<string>;
 }
 
 export class SpellConfig extends React.Component<Props, State> {
@@ -16,12 +17,13 @@ export class SpellConfig extends React.Component<Props, State> {
         super(props);
         this.state = {
             config: Storage.loadKeyBindingConfig() || Choices.Defaults,
+            saved: new Set<string>(),
         };
     }
 
     render() {
         return <div className="spell-config">
-            <h1>Spell Configuration</h1>
+            <h1>Your Spell Configuration</h1>
             {ButtonBar.Keys.map(key => this.renderKey(key))}
         </div>;
     }
@@ -46,6 +48,7 @@ export class SpellConfig extends React.Component<Props, State> {
             <div className="key-detail">
                 <div className="spell-name">{chosenSpell.id}</div>
                 <div className="description">{chosenSpell.description}</div>
+                {this.state.saved.has(key) && <div className="key-saved">Changes saved. Your {key.toUpperCase()} spell is now {this.capitalize(chosen)}.</div>}
             </div>
             <div className="key-name-container">
                 <div className="key-name">{key}</div>
@@ -54,10 +57,13 @@ export class SpellConfig extends React.Component<Props, State> {
     }
     
     private onChoose(key: string, spellId: string) {
-        let config = Object.assign({}, this.state.config, {
-            [key]: spellId,
-        });
-        this.setState({ config });
+        const config = this.state.config;
+        const saved = this.state.saved;
+
+        config[key] = spellId;
+        saved.add(key);
+
+        this.setState({ config, saved });
         Storage.saveKeyBindingConfig(config);
     }
 

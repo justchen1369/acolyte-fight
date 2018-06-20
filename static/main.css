@@ -81,7 +81,7 @@ h1 {
 
 .spell-config .key-name-container {
     min-width: 200px;
-    height: 200px;
+    height: 100%;
     margin-left: 50px;
 
     background:#222;
@@ -103,6 +103,12 @@ h1 {
 .spell-config .key-detail {
     flex-grow: 1;
     margin-left: 50px;
+}
+
+.spell-config .key-saved {
+    color: #88ff00;
+    font-weight: bold;
+    margin-top: 30px;
 }
 
 .spell-config .spell-name {
