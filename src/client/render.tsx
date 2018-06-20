@@ -122,6 +122,11 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	}
 
 	let pos = hero.body.getPosition();
+	let radius = Hero.Radius;
+
+	if (hero.casting && hero.casting.action.type === Spells.thrust.id) {
+		radius = Hero.Radius * 1.25;
+	}
 
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
@@ -129,7 +134,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	// Fill
 	ctx.fillStyle = color;
 	ctx.beginPath();
-	ctx.arc(0, 0, Hero.Radius, 0, 2 * Math.PI);
+	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
 	ctx.fill();
 
 	// Charging
@@ -140,7 +145,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.strokeStyle = hero.casting.color;
 		ctx.lineWidth = ChargingIndicator.Width;
 		ctx.beginPath();
-		ctx.arc(0, 0, Hero.Radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
+		ctx.arc(0, 0, radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
 		ctx.stroke();
 
 		ctx.restore();
@@ -166,13 +171,13 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	// Health bar
 	ctx.fillStyle = 'black';
 	ctx.beginPath();
-	ctx.rect(-HealthBar.Radius, -Hero.Radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
+	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
 	ctx.fill();
 
 	let healthProportion = hero.health / Hero.MaxHealth;
 	ctx.fillStyle = rgColor(healthProportion);
 	ctx.beginPath();
-	ctx.rect(-HealthBar.Radius, -Hero.Radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
+	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
 	ctx.fill();
 
 	ctx.restore();

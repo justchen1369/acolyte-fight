@@ -365,6 +365,20 @@ export namespace Spells {
 		action: "teleport",
 	} as c.TeleportSpell;
 
+	export const thrust = {
+		id: 'thrust',
+		description: "Accelerate quickly, knocking away anything in your path.",
+		cooldown: 12 * TicksPerSecond,
+
+		damage: 10,
+		maxTicks: 0.25 * TicksPerSecond,
+		speed: 1.0,
+
+		icon: "fireDash",
+		color: '#ff00cc',
+		action: "thrust",
+	} as c.ThrustSpell;
+
 	export const all: c.Spells = {
 		move,
 		fireball,
@@ -378,12 +392,13 @@ export namespace Spells {
 		scourge,
 		shield,
 		teleport,
+		thrust,
 	};
 };
 
 export namespace Choices {
 	export const Options = {
-		"a": ["teleport"],
+		"a": ["teleport", "thrust"],
 		"x": ["shield"],
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],

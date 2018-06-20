@@ -16,9 +16,11 @@ declare module "planck-js" {
             setLinearVelocity(velocity: Vec2): void;
             setLinearDamping(damping: number): void;
             applyLinearImpulse(impulse: Vec2, center: Vec2, wake: boolean): void;
+            applyForce(force: Vec2, center: Vec2, wake: boolean): void;
             setMassData(massData: MassData): void;
             resetMassData(): void;
             getWorldPoint(vec: Vec2): Vec2;
+            getWorldVector(vec: Vec2): Vec2;
             getUserData(): any;
         }
 

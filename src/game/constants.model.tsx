@@ -13,7 +13,7 @@ export interface Spells {
     [key: string]: Spell;
 }
 
-export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | ShieldSpell | TeleportSpell;
+export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | ShieldSpell | TeleportSpell | ThrustSpell;
 
 export interface SpellBase {
     id: string;
@@ -107,6 +107,14 @@ export interface TeleportSpell extends SpellBase {
     action: "teleport";
 
     maxRange: number;
+}
+
+export interface ThrustSpell extends SpellBase {
+    action: "thrust";
+
+    damage: number;
+    maxTicks: number;
+    speed: number;
 }
 
 export interface KeyBindingOptions {

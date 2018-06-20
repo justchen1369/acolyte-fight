@@ -66,6 +66,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		position,
 		linearDamping: Hero.MaxDamping,
 		allowSleep: false,
+		bullet: true,
 	});
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
@@ -311,7 +312,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			}
 		}
 
-		const cancelled = hero.hitTick > hero.casting.channellingStartTick;
+		const cancelled = !hero.casting.uninterruptible && hero.hitTick > hero.casting.channellingStartTick;
 		if (!cancelled) {
 			done = applyAction(world, hero, action, spell);
 		} else {
@@ -347,6 +348,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Sp
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
+		case "thrust": return thrustAction(world, hero, action, spell);
 		case "shield": return shieldAction(world, hero, action, spell);
 	}
 }
@@ -379,17 +381,22 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 }
 
 function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
+	// Push back other heroes
 	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
 	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
-	if (repelDistance <= 0) {
-		return;
+	if (repelDistance > 0) {
+		const step = vector.multiply(pushbackDirection, repelDistance);
+		const impulse = vector.multiply(step, Hero.SeparationStrength);
+		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	}
 
-	const step = vector.multiply(pushbackDirection, repelDistance);
-	const impulse = vector.multiply(step, Hero.SeparationStrength);
-	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
-
+	// Mark other hero as hit - cancel any channelling
 	other.hitTick = world.tick;
+
+	// If using thrust, cause damage
+	if (hero.casting && hero.casting.action && hero.casting.action.type === Spells.thrust.id) {
+		applyDamage(other, Spells.thrust.damage, hero.id);
+	}
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
@@ -628,6 +635,22 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c
 	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
 	return true;
+}
+
+function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ThrustSpell) {
+	if (!action.target) { return true; }
+
+	const thrustTicks = world.tick - hero.casting.channellingStartTick;
+	if (thrustTicks >= spell.maxTicks) {
+		hero.body.setLinearVelocity(vector.zero());
+		return true;
+	}
+
+	let currentPosition = hero.body.getPosition();
+	const diff = vector.diff(action.target, currentPosition);
+	const step = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
+	hero.body.setLinearVelocity(step);
+	return false;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ScourgeSpell) {
