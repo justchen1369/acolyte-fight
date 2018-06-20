@@ -292,7 +292,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		} else if (remainingInSeconds > 0) {
 			color = '#444444';
 		}
-		renderIcon(ctx, spell.icon && Icons[spell.icon], color, ButtonBar.Size);
+		renderIcon(ctx, spell.icon && Icons[spell.icon], color, 0.6, ButtonBar.Size);
 
 		if (remainingInSeconds > 0) {
 			// Cooldown

@@ -169,7 +169,7 @@ export namespace Spells {
 		icon: "glowingHands",
 
 		chargeTicks: 2.0 * TicksPerSecond,
-		cooldown: 20 * TicksPerSecond,
+		cooldown: 30 * TicksPerSecond,
 		chargingUninterruptible: false,
 
 		channellingUninterruptible: false,
@@ -318,7 +318,7 @@ export namespace Spells {
 
 	export const scourge = {
 		id: 'scourge',
-		description: "Takes half a second to charge, but will send your enemies flying. Be careful though, each scourge takes 10% off your health!",
+		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
 		radius: Hero.Radius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,

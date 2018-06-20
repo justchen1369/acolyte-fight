@@ -35,7 +35,7 @@ export class SpellIcon extends React.Component<Props, State> {
         const icon = Icons[spell.icon];
         if (icon) {
             const ctx = elem.getContext('2d');
-            renderIcon(ctx, icon, spell.color, ButtonBar.Size);
+            renderIcon(ctx, icon, spell.color, 0.9, ButtonBar.Size);
         }
     }
 }
