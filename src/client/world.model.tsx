@@ -81,6 +81,7 @@ export interface JoinEvent {
 	type: "join";
 	heroId: string;
 	playerName: string;
+	keyBindings: c.KeyBindings;
 }
 
 export interface LeaveEvent {
@@ -110,6 +111,9 @@ export interface Hero extends WorldObjectBase {
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
+
+	keysToSpells: Map<string, string>;
+	spellsToKeys: Map<string, string>;
 }
 
 export interface CastState {

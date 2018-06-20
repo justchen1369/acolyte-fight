@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as c from '../game/constants.model';
-import { StorageKeys } from '../game/storage.model';
+import * as Storage from '../game/storage';
 
 interface Props {
 }
@@ -17,13 +17,13 @@ export class NameConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            name: window.localStorage.getItem(StorageKeys.Name),
+            name: Storage.loadName(),
             saved: true,
         }
     }
     render() {
         return <div>
-            <h2>Your Name</h2>
+            <h1>Your Name</h1>
             <div><input type="text" value={this.state.name} maxLength={c.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
             <div style={{ marginTop: 8 }}>
                 {this.state.saved 
@@ -42,7 +42,7 @@ export class NameConfig extends React.Component<Props, State> {
     }
 
     private saveState() {
-        window.localStorage.setItem(StorageKeys.Name, this.state.name);
+        Storage.saveName(this.state.name);
         this.setState({
             saved: true,
         });

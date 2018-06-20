@@ -1,10 +1,11 @@
+import * as _ from 'lodash';
 import pl from 'planck-js';
 import * as constants from '../game/constants';
 import * as c from '../game/constants.model';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, TicksPerSecond } from '../game/constants';
+import { Hero, World, Spells, Choices, TicksPerSecond } from '../game/constants';
 
 // Planck.js considers collisions to be inelastic if below this threshold.
 // We want all thresholds to be elastic.
@@ -83,6 +84,8 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		shieldTicks: 0,
 		killerHeroId: null,
 		assistHeroId: null,
+		keysToSpells: new Map<string, string>(),
+		spellsToKeys: new Map<string, string>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 
@@ -202,6 +205,8 @@ function handlePlayerJoinLeave(world: w.World) {
 				throw "Player tried to join as non-hero: " + ev.heroId;
 			}
 
+			assignKeyBindingsToHero(hero, ev.keyBindings);
+
 			const player = {
 				heroId: hero.id,
 				name: ev.playerName,
@@ -224,12 +229,30 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents = [];
 }
 
+function assignKeyBindingsToHero(hero: w.Hero, keyBindings: c.KeyBindings) {
+	let keysToSpells = new Map<string, string>();
+	let spellsToKeys = new Map<string, string>();
+	for (var key in keyBindings) {
+		let spellId = keyBindings[key];
+
+		const validOptions = Choices.Options[key];
+		if (!(validOptions.indexOf(spellId) >= 0)) {
+			spellId = Choices.Defaults[key];
+		}
+
+		keysToSpells.set(key, spellId);
+		spellsToKeys.set(spellId, key);
+	}
+	hero.keysToSpells = keysToSpells;
+	hero.spellsToKeys = spellsToKeys;
+}
+
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
 	let action = nextAction;
 	if (hero.casting && hero.casting.uninterruptible) {
 		action = hero.casting.action;
 	}
-	if (!action) {
+	if (!action || !isValidAction(action, hero)) {
 		return true; // Nothing to do
 	}
 	const spell = constants.Spells.all[action.type];
@@ -290,6 +313,14 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 	// Only mark nextAction as completed if we actually did it and not the uninterruptible action
 	return action === nextAction && done;
+}
+
+function isValidAction(action: w.Action, hero: w.Hero) {
+	if (action.type === "move") {
+		return true;
+	} else {
+		return hero.spellsToKeys.has(action.type);
+	}
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Spell): boolean {

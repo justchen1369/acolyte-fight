@@ -60,32 +60,28 @@ export namespace ButtonBar {
 	export const Spacing = 10;
 	export const Margin = 5;
 	export const Size = 50;
-	export const List = [
-		"teleport",
-		"shield",
+	export const Keys = [
+		"a", "x",
 		null,
-		"fireball",
-		"lightning",
-		"homing",
-		"meteor",
+		"q", "w", "e", "r",
 		null,
-		"bouncer",
-		"scourge",
+		"d", "f",
 	];
 }
 
 export namespace Spells {
 	export const move = {
 		id: 'move',
+		description: "",
 		cooldown: 0,
 		action: "move",
 	} as c.MoveSpell;
 
 	export const fireball = {
 		id: 'fireball',
+		description: "Quick cooldown, medium damage, medium range. Good old trusty fireball.",
 		action: "projectile",
 
-		key: 'q',
 		color: '#ff8800',
 		icon: "thunderball",
 
@@ -108,13 +104,13 @@ export namespace Spells {
 
 	export const firespray = {
 		id: 'firespray',
+		description: "Shoot a stream of 10 fire particles at the target. Huge damage if they all hit, but you must stand in one place for the duration of the spell.",
 		action: "spray",
 
-		// key: 's',
-		color: '#ffdd00',
-		icon: "thunderball",
+		color: '#ff0044',
+		icon: "bubblingBeam",
 
-		cooldown: 1 * TicksPerSecond,
+		cooldown: 10 * TicksPerSecond,
 
 		intervalTicks: 0.1 * TicksPerSecond,
 		lengthTicks: 1 * TicksPerSecond,
@@ -122,13 +118,13 @@ export namespace Spells {
 		jitterRatio: 0.05,
 
 		projectile: {
-			color: '#ffdd00',
+			color: '#ff0044',
 
-			density: 0.01,
+			density: 0.1,
 			radius: 0.002,
 			speed: 0.5,
 			maxTicks: 0.5 * TicksPerSecond,
-			damage: 2.5,
+			damage: 3,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -138,9 +134,9 @@ export namespace Spells {
 
 	export const meteor = {
 		id: 'meteor',
+		description: "Send a giant meteor towards your enemies! Nothing stops a meteor.",
 		action: "projectile",
 
-		key: 'r',
 		color: '#ff0000',
 		icon: "meteorImpact",
 
@@ -164,9 +160,9 @@ export namespace Spells {
 
 	export const lightning = {
 		id: 'lightning',
+		description: "Huge knockback, if your aim is good enough.",
 		action: "projectile",
 
-		key: 'w',
 		color: '#00ddff',
 		icon: "lightningHelix",
 
@@ -190,9 +186,9 @@ export namespace Spells {
 
 	export const homing = {
 		id: 'homing',
+		description: "Follows the enemy. High damage, but only if the enemy doesn't know how to dodge.",
 		action: "projectile",
 
-		key: 'e',
 		color: '#44ffcc',
 		icon: "boltSaw",
 
@@ -218,9 +214,9 @@ export namespace Spells {
 
 	export const bouncer = {
 		id: 'bouncer',
+		description: "The more times this bounces, the more damage this does. Stay close to your enemy.",
 		action: "projectile",
 
-		key: 'd',
 		color: '#88ee22',
 		icon: "divert",
 
@@ -248,6 +244,7 @@ export namespace Spells {
 
 	export const scourge = {
 		id: 'scourge',
+		description: "Takes half a second to charge, but will send your enemies flying. Be careful though, each scourge takes 10% off your health!",
 		radius: Hero.Radius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
@@ -256,7 +253,6 @@ export namespace Spells {
 		minImpulse: 0.0002,
 		maxImpulse: 0.0005,
 
-		key: 'f',
 		icon: "deadlyStrike",
 
 		trailTicks: 30,
@@ -267,13 +263,13 @@ export namespace Spells {
 
 	export const shield = {
 		id: 'shield',
+		description: "Deflect any projectiles. Deflected projectiles become your projectiles. Try sending a 'homing' back to where it came from!",
 		mass: 100000,
 		chargeTicks: 0,
 		maxTicks: 1 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
 
-		key: 's',
 		icon: "shield",
 
 		color: '#3366ff',
@@ -283,11 +279,11 @@ export namespace Spells {
 
 	export const teleport = {
 		id: 'teleport',
+		description: "Teleport to a nearby location. Good for both escaping and for aggression.",
 		maxRange: 0.35,
 		chargeTicks: 3,
 		cooldown: 15 * TicksPerSecond,
 
-		key: 'a',
 		icon: "teleport",
 
 		color: '#6666ff',
@@ -308,3 +304,27 @@ export namespace Spells {
 		teleport,
 	};
 };
+
+export namespace Choices {
+	export const Options = {
+		"a": ["teleport"],
+		"x": ["shield"],
+		"q": ["fireball"],
+		"w": ["lightning"],
+		"e": ["homing"],
+		"r": ["meteor"],
+		"d": ["bouncer", "firespray"],
+		"f": ["scourge"],
+	} as c.KeyBindingOptions;
+
+	export const Defaults = {
+		"a": "teleport",
+		"x": "shield",
+		"q": "fireball",
+		"w": "lightning",
+		"e": "homing",
+		"r": "meteor",
+		"d": "bouncer",
+		"f": "scourge",
+	} as c.KeyBindings;
+}

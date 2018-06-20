@@ -17,12 +17,12 @@ export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | Sh
 
 export interface SpellBase {
     id: string;
+    description: string;
     action: string;
 
     chargeTicks?: number;
     cooldown: number;
 
-    key?: string;
     icon?: string;
 
     color: string;
@@ -97,4 +97,12 @@ export interface TeleportSpell extends SpellBase {
     action: "teleport";
 
     maxRange: number;
+}
+
+export interface KeyBindingOptions {
+    [key: string]: string[];
+}
+
+export interface KeyBindings {
+    [key: string]: string;
 }

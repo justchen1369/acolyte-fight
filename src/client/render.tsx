@@ -5,7 +5,8 @@ import * as vector from './vector';
 import * as w from './world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from '../game/constants';
-import { Icons } from './icons';
+import { Icons } from '../game/icons';
+import { renderIcon } from '../game/renderIcon';
 
 // Rendering
 export function calculateWorldRect(rect: ClientRect) {
@@ -255,25 +256,27 @@ function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: Cl
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
 		const heroAction = world.actions.get(myHero.id);
-		renderButtons(ctx, ButtonBar.List, rect, world, myHero, heroAction);
+		renderButtons(ctx, rect, world, myHero, heroAction);
 	}
 }
 
-function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
+function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
 
-	let buttonBarWidth = buttons.length * ButtonBar.Size + (buttons.length - 1) * ButtonBar.Spacing;
+	const keys = ButtonBar.Keys;
+	let buttonBarWidth = keys.length * ButtonBar.Size + (keys.length - 1) * ButtonBar.Spacing;
 
 	ctx.save();
 	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonBar.Size - ButtonBar.Margin);
 
-	for (let i = 0; i < buttons.length; ++i) {
-		const button = buttons[i];
-		if (!button) {
-			continue;
-		}
+	for (let i = 0; i < keys.length; ++i) {
+		const key = keys[i];
+		if (!key) { continue; }
 
-		let spell = Spells.all[button];
+		const spellId = hero.keysToSpells.get(key);
+		if (!spellId) { continue; }
+
+		let spell = Spells.all[spellId];
 
 		let isSelected = selectedAction === spell.id;
 		let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
@@ -282,34 +285,12 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: C
 		ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-
-		// Button
-		{
-			ctx.save();
-
-			ctx.fillStyle = spell.color;
-			if (remainingInSeconds > 0) {
-				ctx.fillStyle = isSelected ? '#cccccc' : '#444444';
-			}
-
-			ctx.beginPath();
-			ctx.rect(0, 0, ButtonBar.Size, ButtonBar.Size);
-			ctx.fill();
-
-			ctx.restore();
-		}
 		
-		// Icon
-		if (spell.icon) {
-			ctx.save();
-
-			ctx.globalAlpha = 0.6;
-			ctx.fillStyle = 'white';
-			ctx.scale(ButtonBar.Size / 512, ButtonBar.Size / 512);
-			ctx.fill(Icons[spell.icon]);
-
-			ctx.restore();
+		let color = spell.color;
+		if (remainingInSeconds > 0) {
+			color = isSelected ? '#cccccc' : '#444444';
 		}
+		renderIcon(ctx, spell.icon && Icons[spell.icon], color, ButtonBar.Size);
 
 		if (remainingInSeconds > 0) {
 			// Cooldown
@@ -317,12 +298,12 @@ function renderButtons(ctx: CanvasRenderingContext2D, buttons: string[], rect: C
 
 			ctx.font = 'bold ' + (ButtonBar.Size * 0.75 - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
-		} else if (spell.key) {
+		} else {
 			// Keyboard shortcut
 			ctx.save();
 
 			ctx.font = 'bold ' + (ButtonBar.Size / 2 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, spell.key.toUpperCase(), ButtonBar.Size / 4, ButtonBar.Size * 3 / 4);
+			renderTextWithShadow(ctx, key.toUpperCase(), ButtonBar.Size / 4, ButtonBar.Size * 3 / 4);
 
 			ctx.restore();
 		}

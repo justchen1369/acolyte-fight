@@ -68,7 +68,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 		game = initGame();
 	}
 	
-	let heroId = joinGame(game, c.sanitizeName(data.name), socket);
+	let heroId = joinGame(game, c.sanitizeName(data.name), data.keyBindings, socket);
 
 	socket.on('action', (actionData: m.ActionMsg) => {
 		if (!isUserInitiated(actionData)) {
@@ -100,7 +100,7 @@ function initGame() {
 	return game;
 }
 
-function joinGame(game: Game, playerName: string, socket: SocketIO.Socket) {
+function joinGame(game: Game, playerName: string, keyBindings: c.KeyBindings, socket: SocketIO.Socket) {
 	let heroId: string = null;
 
 	// Take an existing slot, if possible
@@ -132,7 +132,7 @@ function joinGame(game: Game, playerName: string, socket: SocketIO.Socket) {
 		history: game.history,
 	} as m.HeroMsg);
 
-	queueAction(game, { heroId, actionType: "join", playerName });
+	queueAction(game, { heroId, actionType: "join", playerName, keyBindings });
 
 	console.log("Game [" + game.id + "]: player " + playerName + " [" + socket.id + "] joined, now " + game.numPlayers + " players");
 

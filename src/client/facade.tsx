@@ -1,7 +1,8 @@
 import pl from 'planck-js';
-import { Spells } from '../game/constants';
+import { Choices, Spells } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from './engine';
+import * as c from '../game/constants.model';
 import * as m from '../game/messages.model';
 import * as w from './world.model';
 
@@ -90,21 +91,27 @@ export function gameKeyDown(e: KeyboardEvent) {
 		}
 	}
 
-	for (let id in Spells.all) {
-		let spell = Spells.all[id];
-		if (spell.key === e.key) {
-			sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
-		}
-	}
+	if (!world.ui.myHeroId) { return; }
+
+	const hero = world.objects.get(world.ui.myHeroId);
+	if (hero.category !== "hero") { return; }
+
+	const spellId = hero.keysToSpells.get(e.key);
+	if (!spellId) { return }
+
+	const spell = Spells.all[spellId];
+	if (!spell) { return; }
+
+	sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
 }
 
 // Sockets
-export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string) {
+export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: c.KeyBindings) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
 		if (!world.ui.myGameId) {
-			socket.emit('join', { name: playerName } as m.JoinMsg);
+			socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
 		}
 	});
 	socket.on('disconnect', () => {
@@ -150,6 +157,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				type: "join",
 				heroId: actionData.heroId,
 				playerName: actionData.playerName || "Enigma",
+				keyBindings: actionData.keyBindings,
 			});
 		} else if (actionData.actionType === "leave") {
 			world.joinLeaveEvents.push({
