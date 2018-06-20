@@ -124,7 +124,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	let pos = hero.body.getPosition();
 	let radius = Hero.Radius;
 
-	if (hero.casting && hero.casting.action.type === Spells.thrust.id) {
+	if (hero.casting && hero.casting.stage >= w.CastStage.Channelling && hero.casting.action.type === Spells.thrust.id) {
 		radius = Hero.Radius * 1.25;
 	}
 

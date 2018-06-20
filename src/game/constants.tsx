@@ -368,7 +368,7 @@ export namespace Spells {
 	export const thrust = {
 		id: 'thrust',
 		description: "Accelerate quickly, knocking away anything in your path.",
-		cooldown: 12 * TicksPerSecond,
+		cooldown: 8 * TicksPerSecond,
 
 		damage: 10,
 		maxTicks: 0.25 * TicksPerSecond,
