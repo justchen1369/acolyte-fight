@@ -172,6 +172,7 @@ export namespace Spells {
 		cooldown: 20 * TicksPerSecond,
 		chargingUninterruptible: false,
 
+		knockbackCancel: true,
 		channellingUninterruptible: false,
 		jitterRatio: 0.0,
 
