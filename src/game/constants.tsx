@@ -104,19 +104,20 @@ export namespace Spells {
 
 	export const firespray = {
 		id: 'firespray',
-		description: "Shoot a stream of 10 fire particles at the target. Huge damage if they all hit, but you must stand in one place for the duration of the spell.",
+		description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
 		action: "spray",
 
 		color: '#ff0044',
 		icon: "bubblingBeam",
 
+		chargeTicks: 0.1 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
 		channellingUninterruptible: true,
 
-		intervalTicks: 0.1 * TicksPerSecond,
-		lengthTicks: 1 * TicksPerSecond,
+		intervalTicks: 0.025 * TicksPerSecond,
+		lengthTicks: 0.5 * TicksPerSecond,
 
-		jitterRatio: 0.05,
+		jitterRatio: 0.25,
 
 		projectile: {
 			color: '#ff0044',
@@ -124,7 +125,7 @@ export namespace Spells {
 			density: 0.1,
 			radius: 0.002,
 			speed: 0.5,
-			maxTicks: 0.5 * TicksPerSecond,
+			maxTicks: 0.25 * TicksPerSecond,
 			damage: 5,
 			explodeOn: Categories.All,
 
@@ -265,11 +266,11 @@ export namespace Spells {
 			radius: 0.001,
 			speed: 0.75,
 			maxTicks: 3.0 * TicksPerSecond,
-			damage: 2,
+			damage: 5,
 			turnRate: 0.025,
 			explodeOn: Categories.All,
 			bounce: {
-				damageFactor: 0.95,
+				damageFactor: 0.99,
 			},
 
 			render: "ray",
