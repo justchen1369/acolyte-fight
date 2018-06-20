@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as c from '../../game/constants';
+import { Hero } from '../../game/constants';
 import * as w from '../world.model';
 
 interface Props {
@@ -47,11 +47,21 @@ export class InfoPanel extends React.Component<Props, State> {
 
     private renderPlayerList(world: w.World) {
         let result = new Array<JSX.Element>();
+
+        const aliveHeroIds = new Set<string>();
+        world.objects.forEach(obj => {
+            if (obj.category === "hero") {
+                aliveHeroIds.add(obj.id);
+            }
+        });
+
         world.players.forEach(player => {
             if (world.activePlayers.has(player.heroId)) {
                 let color = player.color;
-                if (player.heroId === world.ui.myHeroId) {
-                    color = c.Hero.MyHeroColor;
+                if (!aliveHeroIds.has(player.heroId)) {
+                    color = Hero.InactiveColor;
+                } else if (player.heroId === world.ui.myHeroId) {
+                    color = Hero.MyHeroColor;
                 }
                 result.push(<div key={player.heroId} style={{color}}>{player.name}</div>);
             }
