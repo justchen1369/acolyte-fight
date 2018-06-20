@@ -165,7 +165,7 @@ export namespace Spells {
 		description: "After a long charge time, unleash a powerful beam to defeat your enemies.",
 		action: "spray",
 
-		color: '#88aacc',
+		color: '#44ddff',
 		icon: "glowingHands",
 
 		chargeTicks: 2.0 * TicksPerSecond,
@@ -347,9 +347,9 @@ export namespace Choices {
 		"a": ["teleport"],
 		"x": ["shield"],
 		"q": ["fireball"],
-		"w": ["lightning"],
+		"w": ["lightning", "kamehameha"],
 		"e": ["homing"],
-		"r": ["meteor", "kamehameha"],
+		"r": ["meteor"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;
