@@ -273,7 +273,7 @@ export namespace Spells {
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
 
-		key: 'x',
+		key: 's',
 		icon: "shield",
 
 		color: '#3366ff',
@@ -287,7 +287,7 @@ export namespace Spells {
 		chargeTicks: 3,
 		cooldown: 15 * TicksPerSecond,
 
-		key: 'z',
+		key: 'a',
 		icon: "teleport",
 
 		color: '#6666ff',
