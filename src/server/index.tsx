@@ -26,7 +26,7 @@ interface Game {
     started: boolean;
     numPlayers: number;
     tick: number;
-    joinLimitTick: number;
+    joinLimitTick: number | null;
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];
 
@@ -88,7 +88,7 @@ function initGame() {
 		started: false,
 		numPlayers: 0,
 		tick: 0,
-		joinLimitTick: Infinity,
+		joinLimitTick: null,
 		actions: new Map<string, m.ActionMsg>(),
 		history: [],
 	} as Game;
@@ -235,11 +235,12 @@ function gameTick(game: Game) {
 		if (game.history) {
 			game.history.push(data);
 
-			if (game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
+			if (!game.joinLimitTick && game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
 				// Casting any spell closes the game
 				game.joinLimitTick = game.tick + Matchmaking.JoinPeriod;
 			}
-			if (game.history.length >= Matchmaking.MaxHistoryLength || game.tick == game.joinLimitTick) {
+			if (game.history.length >= Matchmaking.MaxHistoryLength ||
+				(game.joinLimitTick && game.tick >= game.joinLimitTick)) {
 				game.history = null; // Make the game unjoinable
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
 			}
