@@ -16,7 +16,7 @@ export namespace Matchmaking {
 }
 
 export namespace Hero {
-	export const MoveSpeedPerTick = 0.12 / TicksPerSecond;
+	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.01;
 	export const Density = 1;
 	export const MaxDamping = 5;
@@ -79,7 +79,7 @@ export namespace Spells {
 
 	export const fireball = {
 		id: 'fireball',
-		description: "Quick cooldown, medium damage, medium range. Good old trusty fireball.",
+		description: "Quick cooldown and packs a punch. Good old trusty fireball.",
 		action: "projectile",
 
 		color: '#ff8800',
@@ -90,7 +90,7 @@ export namespace Spells {
 		projectile: {
 			color: '#ff8800',
 
-			density: 25,
+			density: 1,
 			radius: 0.005,
 			speed: 0.4,
 			maxTicks: 1 * TicksPerSecond,
