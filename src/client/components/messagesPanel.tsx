@@ -16,7 +16,7 @@ interface State {
 }
 
 interface NotificationItem {
-    notification: w.Notification;
+    element: JSX.Element;
     expiryTime: number;
 }
 
@@ -58,11 +58,9 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     render() {
-        const world = this.props.world;
-
         return (
             <div>{this.state.items.map(item => (
-                <div style={{ opacity: this.calculateOpacity(item) }}>{this.renderNotification(item.notification)}</div>
+                <div style={{ opacity: this.calculateOpacity(item) }}>{item.element}</div>
             ))}</div>
         );
     }
@@ -76,20 +74,30 @@ export class MessagesPanel extends React.Component<Props, State> {
         });
 
         // Add notifications to list
+        this.addNotifications(...newNotifications.map(n => this.renderNotification(n)));
+    }
+
+    private addNotifications(...notificationElements: JSX.Element[]) {
         const expiryTime = new Date().getTime() + ExpiryMilliseconds;
-        const newItems = newNotifications.map(notification => ({ notification, expiryTime } as NotificationItem));
-        this.setState({
-            items: [ ...this.state.items, ...newItems ],
+        const newItems = [...this.state.items];
+        notificationElements.forEach(element => {
+            newItems.push({ element, expiryTime });
         });
+        this.setState({ items: newItems });
     }
 
     private renderNotification(notification: w.Notification) {
         switch (notification.type) {
+            case "help": return this.renderHelpNotification(notification);
             case "join": return this.renderJoinNotification(notification);
             case "leave": return this.renderLeaveNotification(notification);
             case "kill": return this.renderKillNotification(notification);
             default: return null; // Ignore this notification
         }
+    }
+
+    private renderHelpNotification(notification: w.HelpNotification) {
+        return <span className="help-text">Use the mouse to move!</span>
     }
 
     private renderJoinNotification(notification: w.JoinNotification) {

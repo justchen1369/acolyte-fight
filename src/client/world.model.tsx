@@ -46,7 +46,11 @@ export interface Player {
 	color: string;
 }
 
-export type Notification = JoinNotification | LeaveNotification | KillNotification | MyHeroNotification;
+export type Notification = HelpNotification | JoinNotification | LeaveNotification | KillNotification | MyHeroNotification;
+
+export interface HelpNotification {
+	type: "help";
+}
 
 export interface JoinNotification {
 	type: "join";

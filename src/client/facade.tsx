@@ -16,6 +16,7 @@ let tickQueue = new Array<m.TickMsg>();
 let notificationListeners = new Array<NotificationListener>();
 
 let nextTarget: pl.Vec2 = null;
+let showedHelpText: boolean = false;
 
 export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
@@ -59,6 +60,10 @@ export function frame(canvas: HTMLCanvasElement) {
 	render(world, canvas);
 
 	const notifications = engine.takeNotifications(world);
+	notify(notifications);
+}
+
+function notify(notifications: w.Notification[]) {
 	if (notifications.length > 0) {
 		notificationListeners.forEach(listener => listener(notifications));
 	}
@@ -78,6 +83,13 @@ export function canvasMouseMove(e: MouseEvent) {
 }
 
 export function gameKeyDown(e: KeyboardEvent) {
+	if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
+		if (!showedHelpText) {
+			showedHelpText = true;
+			notify([{ type: "help" }]);
+		}
+	}
+
 	for (let id in Spells.all) {
 		let spell = Spells.all[id];
 		if (spell.key === e.key) {

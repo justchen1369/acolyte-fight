@@ -45,6 +45,10 @@ a:hover, a:active {
     pointer-events: none;
 }
 
+#messages-panel .help-text {
+    font-weight: bold;
+}
+
 .player-name {
     font-weight: bold;
 }
