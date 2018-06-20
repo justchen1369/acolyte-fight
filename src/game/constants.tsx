@@ -125,8 +125,8 @@ export namespace Spells {
 			density: 0.1,
 			radius: 0.002,
 			speed: 0.5,
-			maxTicks: 0.25 * TicksPerSecond,
-			damage: 5,
+			maxTicks: 0.2 * TicksPerSecond,
+			damage: 2.5,
 			explodeOn: Categories.All,
 
 			render: "ray",
