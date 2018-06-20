@@ -125,7 +125,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		restitution: 1.0,
 	} as pl.FixtureDef);
 
-	let enemy = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
+	let targetObj = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
 	let projectile = {
 		id,
@@ -134,10 +134,15 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		type: spell.id,
 		body,
 
-		targetId: enemy ? enemy.id : null,
+		targetId: targetObj ? targetObj.id : null,
 		damage: projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
-		turnRate: projectileTemplate.turnRate,
+
+		homing: projectileTemplate.homing && {
+			turnRate: projectileTemplate.homing.turnRate,
+			homingStartTick: world.tick + (projectileTemplate.homing.ticksBeforeHoming || 0),
+			boomerang: projectileTemplate.homing.boomerang,
+		},
 
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
@@ -471,16 +476,27 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 
 function homingForce(world: w.World) {
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.targetId && obj.turnRate)) {
+		if (!(obj.category === "projectile" && obj.homing && world.tick >= obj.homing.homingStartTick)) {
 			return;
 		}
 
-		let target = find(world.objects, x => x.id === obj.targetId);
+		let target = null;
+		if (obj.homing.boomerang) {
+			target = find(world.objects, x => x.id === obj.owner);
+		} else {
+			target = find(world.objects, x => x.id === obj.targetId);
+		}
+
 		if (target) {
 			let currentSpeed = vector.length(obj.body.getLinearVelocity());
+
 			let currentDirection = vector.unit(obj.body.getLinearVelocity());
 			let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-			let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.turnRate)));
+			if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
+				idealDirection = vector.rotateRight(currentDirection);
+			}
+
+			let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
 			let newVelocity = vector.multiply(newDirection, currentSpeed);
 			obj.body.setLinearVelocity(newVelocity);
 		}

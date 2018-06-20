@@ -65,3 +65,7 @@ export function fromAngle(angle: number) {
 export function negate(vec: pl.Vec2) {
 	return pl.Vec2(-vec.x, -vec.y);
 }
+
+export function rotateRight(vec: pl.Vec2) {
+	return pl.Vec2(vec.y, -vec.x);
+}

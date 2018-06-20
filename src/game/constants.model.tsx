@@ -58,10 +58,11 @@ export interface ProjectileTemplate {
     density: number;
     radius: number;
     speed: number;
-    turnRate?: number;
+
+    homing?: HomingParameters;
 
     maxTicks: number;
-    collideWith: number;
+    collideWith?: number;
     explodeOn: number;
 
     trailTicks: number;
@@ -72,6 +73,12 @@ export interface ProjectileTemplate {
 
 export interface BounceParameters {
     damageFactor: number;
+}
+
+export interface HomingParameters {
+    ticksBeforeHoming: number;
+    turnRate: number;
+    boomerang?: true;
 }
 
 export interface ScourgeSpell extends SpellBase {

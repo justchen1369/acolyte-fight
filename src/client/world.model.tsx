@@ -141,7 +141,7 @@ export interface Projectile extends WorldObjectBase {
 	targetId: string | null;
 	damage: number;
 	bounce?: c.BounceParameters;
-	turnRate: number;
+	homing?: HomingParameters;
 
 	expireTick: number;
 	maxTicks: number;
@@ -153,6 +153,12 @@ export interface Projectile extends WorldObjectBase {
     trailTicks: number;
 
 	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
+}
+
+export interface HomingParameters {
+	turnRate: number;
+	homingStartTick: number;
+	boomerang: boolean;
 }
 
 export type WorldObject = Hero | Projectile;

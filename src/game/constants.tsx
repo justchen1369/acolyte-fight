@@ -170,7 +170,7 @@ export namespace Spells {
 
 		chargeTicks: 2.0 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
-		chargingUninterruptible: true,
+		chargingUninterruptible: false,
 
 		channellingUninterruptible: false,
 		jitterRatio: 0.0,
@@ -239,8 +239,46 @@ export namespace Spells {
 			speed: 0.15,
 			maxTicks: 6.0 * TicksPerSecond,
 			damage: 20,
-			turnRate: 0.05,
 			explodeOn: Categories.All,
+
+			homing: {
+				turnRate: 0.05,
+				ticksBeforeHoming: 0.1 * TicksPerSecond,
+			},
+
+			trailTicks: 30,
+
+			render: "projectile",
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
+	export const boomerang = {
+		id: 'boomerang',
+		description: "To the enemy, then back to you. All in a day's work.",
+		action: "projectile",
+
+		color: '#ff00ff',
+		icon: "boltSaw",
+
+		chargeTicks: 0,
+		cooldown: 20 * TicksPerSecond,
+
+		projectile: {
+			color: '#ff00ff',
+
+			density: 25,
+			radius: 0.005,
+			speed: 0.2,
+			maxTicks: 20.0 * TicksPerSecond,
+			damage: 20,
+			explodeOn: Categories.Hero,
+			boomerang: true,
+
+			homing: {
+				turnRate: 0.05,
+				ticksBeforeHoming: 1 * TicksPerSecond,
+				boomerang: true,
+			},
 
 			trailTicks: 30,
 
@@ -335,6 +373,7 @@ export namespace Spells {
 		kamehameha,
 		lightning,
 		homing,
+		boomerang,
 		bouncer,
 		scourge,
 		shield,
@@ -348,7 +387,7 @@ export namespace Choices {
 		"x": ["shield"],
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
-		"e": ["homing"],
+		"e": ["homing", "boomerang"],
 		"r": ["meteor"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
