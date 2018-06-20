@@ -99,7 +99,7 @@ export namespace Spells {
 			speed: 0.4,
 			maxTicks: 1 * TicksPerSecond,
 			damage: 10,
-			explodeOn: Categories.Hero,
+			explodeOn: Categories.All,
 
 			render: "projectile",
 			trailTicks: 30,
@@ -208,7 +208,7 @@ export namespace Spells {
 			maxTicks: 6.0 * TicksPerSecond,
 			damage: 20,
 			turnRate: 0.05,
-			explodeOn: Categories.Hero,
+			explodeOn: Categories.All,
 
 			trailTicks: 30,
 
