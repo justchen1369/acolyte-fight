@@ -22,6 +22,7 @@ export namespace Hero {
 	export const MaxDamping = 5;
 	export const MinDamping = 0.25;
 	export const MaxHealth = 100;
+	export const SeparationStrength = 0.01;
 
 	export const MyHeroColor = '#00ccff';
 	export const InactiveColor = '#666666';

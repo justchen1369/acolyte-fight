@@ -64,6 +64,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		type: 'dynamic',
 		position,
 		linearDamping: Hero.MaxDamping,
+		allowSleep: false,
 	});
 	body.createFixture(pl.Circle(Hero.Radius), {
 		density: Hero.Density,
@@ -182,18 +183,12 @@ export function tick(world: w.World) {
 function physicsStep(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.step) {
-			obj.body.setLinearVelocity(vector.plus(obj.body.getLinearVelocity(), obj.step));
+			obj.body.setPosition(vector.plus(obj.body.getPosition(), obj.step));
+			obj.step = null;
 		}
 	});
 
 	world.physics.step(1.0 / TicksPerSecond);
-
-	world.objects.forEach(obj => {
-		if (obj.step) {
-			obj.body.setLinearVelocity(vector.diff(obj.step, obj.body.getLinearVelocity())); // Why is this backwards? I don't know, but it works.
-			obj.step = null;
-		}
-	});
 }
 
 function handlePlayerJoinLeave(world: w.World) {
@@ -322,35 +317,66 @@ function handleContact(world: w.World, contact: pl.Contact) {
 }
 
 function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject) {
-	if (object.category !== "projectile") {
+	if (object.category === "projectile") {
+		if (hit.category === "hero") {
+			handleProjectileHitHero(world, object, hit);
+		} else if (hit.category === "projectile") {
+			handleProjectileHitProjectile(world, object, hit);
+		}
+	} else if (object.category === "hero") {
+		if (hit.category === "hero") {
+			handleHeroHitHero(world, object, hit);
+		}
+	}
+}
+
+function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
+	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
+	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
+	if (repelDistance <= 0) {
 		return;
 	}
-	const projectile = object;
 
-	if (hit.category === "hero" && hit.shieldTicks > 0) {
-		if (projectile.owner !== hit.id) { // Stop double redirections cancelling out
+	const step = vector.multiply(pushbackDirection, repelDistance);
+	const impulse = vector.multiply(step, Hero.SeparationStrength);
+	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+}
+
+function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
+	if (projectile.explodeOn & categoryFlags(other)) {
+		destroyObject(world, projectile);
+	}
+}
+
+function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
+	if (hero.shieldTicks > 0) {
+		if (projectile.owner !== hero.id) { // Stop double redirections cancelling out
 			// Redirect back to owner
 			projectile.targetId = projectile.owner;
-			projectile.owner = hit.id;
+			projectile.owner = hero.id;
 		}
 
 		projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
 	} else {
-		if (hit.category === "hero" && hit.id !== projectile.owner) {
+		if (hero.id !== projectile.owner) {
 			const damage = projectile.damage;
-			applyDamage(hit, damage, projectile.owner);
+			applyDamage(hero, damage, projectile.owner);
 		}
 
-		if (projectile.bounce && hit.category === "hero") { // Only bounce off heroes, not projectiles
-			bounceToNext(projectile, hit, world);
-		} else if (projectile.explodeOn & categoryFlags(hit.category)) {
+		if (projectile.bounce) { // Only bounce off heroes, not projectiles
+			bounceToNext(projectile, hero, world);
+		} else if (projectile.explodeOn & categoryFlags(hero)) {
 			destroyObject(world, projectile);
 		}
 	}
 }
 
-function categoryFlags(category: string) {
-	switch (category) {
+function categoryFlags(obj: w.WorldObject) {
+	if (!obj) {
+		return 0;
+	}
+
+	switch (obj.category) {
 		case "hero": return constants.Categories.Hero;
 		case "projectile": return constants.Categories.Projectile;
 		default: return 0;
@@ -501,7 +527,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Mov
 
 	let current = hero.body.getPosition();
 	let target = action.target;
-	hero.step = vector.multiply(vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick), TicksPerSecond);
+	hero.step = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
 
 	return vector.distance(current, target) < constants.Pixel;
 }
@@ -559,7 +585,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.
 
 		let magnitude = spell.minImpulse + proportion * (spell.maxImpulse - spell.minImpulse);
 		let impulse = vector.multiply(vector.unit(diff), magnitude);
-		obj.body.applyLinearImpulse(impulse, vector.zero(), true);
+		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 	});
 
 	world.ui.trails.push({

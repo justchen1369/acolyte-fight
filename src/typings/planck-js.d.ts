@@ -15,9 +15,10 @@ declare module "planck-js" {
             getLinearVelocity(): Vec2;
             setLinearVelocity(velocity: Vec2): void;
             setLinearDamping(damping: number): void;
-            applyLinearImpulse(impulse: Vec2, center: Vec2, unknown?: boolean): void;
+            applyLinearImpulse(impulse: Vec2, center: Vec2, wake: boolean): void;
             setMassData(massData: MassData): void;
             resetMassData(): void;
+            getWorldPoint(vec: Vec2): Vec2;
             getUserData(): any;
         }
 
@@ -46,6 +47,8 @@ declare module "planck-js" {
         interface Vec2 {
             x: number;
             y: number;
+
+            add(vec: Vec2): void;
         }
 
         interface Contact {

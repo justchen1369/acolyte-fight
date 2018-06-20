@@ -61,3 +61,7 @@ export function angle(vec: pl.Vec2) {
 export function fromAngle(angle: number) {
 	return pl.Vec2(Math.cos(angle), Math.sin(angle));
 }
+
+export function negate(vec: pl.Vec2) {
+	return pl.Vec2(-vec.x, -vec.y);
+}
