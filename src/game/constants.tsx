@@ -20,7 +20,7 @@ export namespace Hero {
 	export const Radius = 0.01;
 	export const Density = 1;
 	export const MaxDamping = 5;
-	export const MinDamping = 0.25;
+	export const MinDamping = 1;
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 
