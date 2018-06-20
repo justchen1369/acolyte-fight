@@ -298,11 +298,16 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
+
+			if (spell.channellingUninterruptible) {
+				hero.casting.uninterruptible = true;
+			}
 		}
 
 		done = applyAction(world, hero, action, spell);
 
 		if (done) {
+			hero.casting.uninterruptible = false;
 			++hero.casting.stage;
 		}
 	}

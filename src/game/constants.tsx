@@ -111,6 +111,7 @@ export namespace Spells {
 		icon: "bubblingBeam",
 
 		cooldown: 10 * TicksPerSecond,
+		channellingUninterruptible: true,
 
 		intervalTicks: 0.1 * TicksPerSecond,
 		lengthTicks: 1 * TicksPerSecond,
@@ -124,7 +125,7 @@ export namespace Spells {
 			radius: 0.002,
 			speed: 0.5,
 			maxTicks: 0.5 * TicksPerSecond,
-			damage: 3,
+			damage: 5,
 			explodeOn: Categories.All,
 
 			render: "ray",
