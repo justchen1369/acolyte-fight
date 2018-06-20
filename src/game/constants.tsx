@@ -147,7 +147,7 @@ export namespace Spells {
 		projectile: {
 			color: '#ff0000',
 
-			density: 10000,
+			density: 1000,
 			radius: 0.03,
 			speed: 0.2,
 			maxTicks: 12 * TicksPerSecond,
@@ -158,6 +158,40 @@ export namespace Spells {
 			render: "projectile",
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
+
+	export const kamehameha = {
+		id: 'kamehameha',
+		description: "After a long charge time, unleash a powerful beam to defeat your enemies.",
+		action: "spray",
+
+		color: '#88aacc',
+		icon: "glowingHands",
+
+		chargeTicks: 2.0 * TicksPerSecond,
+		cooldown: 20 * TicksPerSecond,
+		chargingUninterruptible: true,
+
+		channellingUninterruptible: false,
+		jitterRatio: 0.0,
+
+		intervalTicks: 0.1 * TicksPerSecond,
+		lengthTicks: 3 * TicksPerSecond,
+
+		projectile: {
+			color: '#ffffff',
+
+			density: 0.01,
+			radius: 0.005,
+			speed: 10.0,
+			maxTicks: 10 * TicksPerSecond,
+			damage: 10,
+			trailTicks: 1 * TicksPerSecond,
+			collideWith: Categories.Hero,
+			explodeOn: Categories.Hero,
+
+			render: "ray",
+		} as c.ProjectileTemplate,
+	} as c.SpraySpell;
 
 	export const lightning = {
 		id: 'lightning',
@@ -297,6 +331,7 @@ export namespace Spells {
 		fireball,
 		firespray,
 		meteor,
+		kamehameha,
 		lightning,
 		homing,
 		bouncer,
@@ -313,7 +348,7 @@ export namespace Choices {
 		"q": ["fireball"],
 		"w": ["lightning"],
 		"e": ["homing"],
-		"r": ["meteor"],
+		"r": ["meteor", "kamehameha"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;

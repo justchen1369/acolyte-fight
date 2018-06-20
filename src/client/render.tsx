@@ -287,8 +287,10 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		ctx.textBaseline = 'middle';
 		
 		let color = spell.color;
-		if (remainingInSeconds > 0) {
-			color = isSelected ? '#cccccc' : '#444444';
+		if (isSelected) {
+			color = '#f0f0f0';
+		} else if (remainingInSeconds > 0) {
+			color = '#444444';
 		}
 		renderIcon(ctx, spell.icon && Icons[spell.icon], color, ButtonBar.Size);
 

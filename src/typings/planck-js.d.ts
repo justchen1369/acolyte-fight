@@ -37,7 +37,10 @@ declare module "planck-js" {
         }
 
         interface FixtureDef {
-
+            filterCategoryBits?: number;
+            filterMaskBits?: number;
+            density?: number;
+            restitution?: number;
         }
 
         interface Polygon {

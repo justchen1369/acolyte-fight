@@ -22,7 +22,8 @@ export interface SpellBase {
 
     chargeTicks?: number;
     cooldown: number;
-    channellingUninterruptible: boolean;
+    chargingUninterruptible?: boolean;
+    channellingUninterruptible?: boolean;
 
     icon?: string;
 
@@ -60,6 +61,7 @@ export interface ProjectileTemplate {
     turnRate?: number;
 
     maxTicks: number;
+    collideWith: number;
     explodeOn: number;
 
     trailTicks: number;

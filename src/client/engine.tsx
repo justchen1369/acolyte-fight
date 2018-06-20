@@ -5,7 +5,7 @@ import * as c from '../game/constants.model';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, Choices, TicksPerSecond } from '../game/constants';
+import { Hero, World, Spells, Categories, Choices, TicksPerSecond } from '../game/constants';
 
 // Planck.js considers collisions to be inelastic if below this threshold.
 // We want all thresholds to be elastic.
@@ -68,6 +68,8 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		allowSleep: false,
 	});
 	body.createFixture(pl.Circle(Hero.Radius), {
+		filterCategoryBits: Categories.Hero,
+		filterMaskBits: Categories.All,
 		density: Hero.Density,
 		restitution: 1.0,
 	});
@@ -117,9 +119,11 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
+		filterCategoryBits: Categories.Projectile,
+		filterMaskBits: projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All,
 		density: projectileTemplate.density,
 		restitution: 1.0,
-	});
+	} as pl.FixtureDef);
 
 	let enemy = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
@@ -273,9 +277,9 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {
 			hero.casting.chargeStartTick = world.tick;
-			hero.casting.uninterruptible = true;
+			hero.casting.uninterruptible = spell.chargingUninterruptible !== undefined ? spell.chargingUninterruptible : true;
 		}
-
+		
 		// Waiting for charging to complete
 		const ticksCharging = world.tick - hero.casting.chargeStartTick;
 		if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
@@ -294,13 +298,10 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Start channelling
 		if (!hero.casting.channellingStartTick) {
 			hero.casting.channellingStartTick = world.tick;
+			hero.casting.uninterruptible = spell.channellingUninterruptible || false;
 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
-			}
-
-			if (spell.channellingUninterruptible) {
-				hero.casting.uninterruptible = true;
 			}
 		}
 
@@ -532,7 +533,7 @@ function reap(world: w.World) {
 			}
 		} else if (obj.category === "projectile") {
 			let pos = obj.body.getPosition();
-			if (world.tick >= obj.expireTick || pos.x < 0 || pos.x > 1 || pos.y < 0 || pos.y > 1) {
+			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
 			}
 		}
