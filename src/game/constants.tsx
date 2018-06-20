@@ -169,7 +169,7 @@ export namespace Spells {
 		icon: "glowingHands",
 
 		chargeTicks: 2.0 * TicksPerSecond,
-		cooldown: 30 * TicksPerSecond,
+		cooldown: 20 * TicksPerSecond,
 		chargingUninterruptible: false,
 
 		channellingUninterruptible: false,

@@ -109,6 +109,8 @@ export interface Hero extends WorldObjectBase {
 	cooldowns: Cooldowns;
 	shieldTicks: number;
 
+	hitTick: number;
+
 	killerHeroId: string | null;
 	assistHeroId: string | null;
 

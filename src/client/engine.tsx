@@ -84,6 +84,7 @@ function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: 
 		casting: null,
 		cooldowns: {},
 		shieldTicks: 0,
+		hitTick: 0,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -310,7 +311,12 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			}
 		}
 
-		done = applyAction(world, hero, action, spell);
+		const cancelled = !hero.casting.uninterruptible && hero.hitTick > hero.casting.channellingStartTick;
+		if (!cancelled) {
+			done = applyAction(world, hero, action, spell);
+		} else {
+			done = true;
+		}
 
 		if (done) {
 			hero.casting.uninterruptible = false;
@@ -382,6 +388,8 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const step = vector.multiply(pushbackDirection, repelDistance);
 	const impulse = vector.multiply(step, Hero.SeparationStrength);
 	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+
+	other.hitTick = world.tick;
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
@@ -400,6 +408,8 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
 	} else {
+		hero.hitTick = world.tick;
+
 		if (hero.id !== projectile.owner) {
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner);
