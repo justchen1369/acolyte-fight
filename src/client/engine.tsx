@@ -311,7 +311,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			}
 		}
 
-		const cancelled = !hero.casting.uninterruptible && hero.hitTick > hero.casting.channellingStartTick;
+		const cancelled = hero.hitTick > hero.casting.channellingStartTick;
 		if (!cancelled) {
 			done = applyAction(world, hero, action, spell);
 		} else {
