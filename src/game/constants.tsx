@@ -116,9 +116,8 @@ export namespace Spells {
 		color: '#ff0044',
 		icon: "bubblingBeam",
 
-		chargeTicks: 0,
 		cooldown: 10 * TicksPerSecond,
-		channellingUninterruptible: true,
+		uninterruptible: true,
 
 		intervalTicks: 0.025 * TicksPerSecond,
 		lengthTicks: 0.5 * TicksPerSecond,
@@ -178,10 +177,9 @@ export namespace Spells {
 
 		chargeTicks: 2.0 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
-		chargingUninterruptible: false,
 
 		knockbackCancel: true,
-		channellingUninterruptible: false,
+		uninterruptible: false,
 		jitterRatio: 0.0,
 
 		intervalTicks: 0.1 * TicksPerSecond,
@@ -191,7 +189,7 @@ export namespace Spells {
 			color: '#ffffff',
 			glowPixels: 5,
 
-			density: 0.01,
+			density: 0.0001,
 			radius: 0.005,
 			speed: 3.0,
 			maxTicks: 10 * TicksPerSecond,
@@ -212,7 +210,6 @@ export namespace Spells {
 		color: '#00ddff',
 		icon: "lightningHelix",
 
-		chargeTicks: 0,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -239,7 +236,6 @@ export namespace Spells {
 		color: '#44ffcc',
 		icon: "boltSaw",
 
-		chargeTicks: 0,
 		cooldown: 20 * TicksPerSecond,
 
 		projectile: {
@@ -271,7 +267,6 @@ export namespace Spells {
 		color: '#ff00ff',
 		icon: "boltSaw",
 
-		chargeTicks: 0,
 		cooldown: 20 * TicksPerSecond,
 
 		projectile: {
@@ -306,7 +301,6 @@ export namespace Spells {
 		color: '#0000ff',
 		icon: "andromedaChain",
 
-		chargeTicks: 0,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -346,7 +340,6 @@ export namespace Spells {
 		color: '#88ee22',
 		icon: "divert",
 
-		chargeTicks: 0,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -395,7 +388,6 @@ export namespace Spells {
 
 		orientationRequired: false,
 		mass: 100000,
-		chargeTicks: 0,
 		maxTicks: 3 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
@@ -428,7 +420,7 @@ export namespace Spells {
 		description: "Accelerate quickly, knocking away anything in your path.",
 		cooldown: 8 * TicksPerSecond,
 
-		channellingUninterruptible: true,
+		uninterruptible: true,
 
 		damage: 10,
 		maxTicks: 0.25 * TicksPerSecond,

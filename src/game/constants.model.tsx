@@ -24,8 +24,7 @@ export interface SpellBase {
 
     chargeTicks?: number;
     cooldown: number;
-    chargingUninterruptible?: boolean;
-    channellingUninterruptible?: boolean;
+    uninterruptible?: boolean;
     knockbackCancel?: boolean;
 
     icon?: string;

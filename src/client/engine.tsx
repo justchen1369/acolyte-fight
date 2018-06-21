@@ -322,7 +322,6 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {
 			hero.casting.chargeStartTick = world.tick;
-			hero.casting.uninterruptible = spell.chargingUninterruptible !== undefined ? spell.chargingUninterruptible : true;
 		}
 		
 		// Waiting for charging to complete
@@ -333,7 +332,6 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		}
 
 		// Exiting charging stage
-		hero.casting.uninterruptible = false;
 		hero.casting.proportion = null;
 		++hero.casting.stage;
 	}
@@ -343,7 +341,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Start channelling
 		if (!hero.casting.channellingStartTick) {
 			hero.casting.channellingStartTick = world.tick;
-			hero.casting.uninterruptible = spell.channellingUninterruptible || false;
+			hero.casting.uninterruptible = spell.uninterruptible || false;
 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
