@@ -63,10 +63,12 @@ export interface ProjectileTemplate {
     speed: number;
 
     homing?: HomingParameters;
+    link?: LinkParameters;
 
     maxTicks: number;
     collideWith?: number;
     explodeOn: number;
+    shieldTakesOwnership: boolean;
 
     trailTicks: number;
 
@@ -84,6 +86,11 @@ export interface HomingParameters {
     minDistanceToTarget?: number;
     turnRate: number;
     targetSelf?: boolean;
+}
+
+export interface LinkParameters {
+    strength: number;
+    linkTicks: number;
 }
 
 export interface ScourgeSpell extends SpellBase {

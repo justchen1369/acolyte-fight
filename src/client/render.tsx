@@ -84,7 +84,9 @@ function renderDestroyed(ctx: CanvasRenderingContext2D, obj: w.WorldObject, worl
 }
 
 function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World) {
-	if (obj.render === "projectile") {
+	if (obj.render === "link") {
+		renderLink(ctx, obj, world);
+	} else if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctx, obj, world);
         renderRay(ctx, obj, world);
@@ -231,6 +233,42 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 function rgColor(proportion: number) {
 	let hue = proportion * 120.0;
 	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
+}
+
+function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
+	if (!projectile.link) {
+		return;
+	}
+
+	let owner: w.WorldObject = null;
+	let target: w.WorldObject = null;
+	world.objects.forEach(obj => {
+		if (obj.id === projectile.owner) {
+			owner = obj;
+		} else if (obj.id === projectile.link.heroId) {
+			target = obj;
+		}
+	});
+	if (!target) {
+		target = projectile;
+		renderProjectile(ctx, projectile, world);
+	}
+
+	if (!(owner && target)) {
+		return;
+	}
+
+	ctx.lineWidth = Pixel * 2;
+	ctx.strokeStyle = projectile.color;
+	ctx.shadowColor = projectile.color;
+	ctx.shadowBlur = 5;
+
+	const from = owner.body.getPosition();
+	const to = target.body.getPosition();
+	ctx.beginPath();
+	ctx.moveTo(from.x, from.y);
+	ctx.lineTo(to.x, to.y);
+	ctx.stroke();
 }
 
 function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {

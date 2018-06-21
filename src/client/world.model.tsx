@@ -145,6 +145,8 @@ export interface Projectile extends WorldObjectBase {
 	damage: number;
 	bounce?: c.BounceParameters;
 	homing?: HomingParameters;
+	link?: LinkParameters;
+	shieldTakesOwnership: boolean;
 
 	expireTick: number;
 	maxTicks: number;
@@ -164,6 +166,12 @@ export interface HomingParameters {
 	turnRate: number;
     minDistanceToTarget: number;
 	targetSelf: boolean;
+}
+
+export interface LinkParameters {
+	heroId: string | null;
+	strength: number;
+	linkTicks: number;
 }
 
 export type WorldObject = Hero | Projectile;

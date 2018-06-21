@@ -7,6 +7,7 @@ export namespace Categories {
 	export const All = 0xFFFF;
 	export const Hero = 1;
 	export const Projectile = 2;
+	export const None = 0;
 }
 
 export namespace Matchmaking {
@@ -16,7 +17,7 @@ export namespace Matchmaking {
 }
 
 export namespace Hero {
-	export const MoveSpeedPerTick = 0.07 / TicksPerSecond;
+	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.01;
 	export const Density = 1;
 	export const AngularDamping = 10;
@@ -290,11 +291,50 @@ export namespace Spells {
 				minDistanceToTarget: 0.25,
 				targetSelf: true,
 			} as c.HomingParameters,
-			reflectRange: Hero.Radius * 4,
 
 			trailTicks: 1 * TicksPerSecond,
 
 			render: "projectile",
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
+	export const link = {
+		id: 'link',
+		description: "Pull your enemy to you... while they pull you to them.",
+		action: "projectile",
+
+		color: '#0000ff',
+		icon: "andromedaChain",
+
+		chargeTicks: 0,
+		cooldown: 20 * TicksPerSecond,
+
+		projectile: {
+			color: '#4444ff',
+			glowPixels: 5,
+
+			density: 0.001,
+			radius: 0.005,
+			speed: 0.4,
+			maxTicks: 3.0 * TicksPerSecond,
+			damage: 10,
+			explodeOn: Categories.None,
+			shieldTakesOwnership: false,
+
+			link: {
+				strength: 0.001 / TicksPerSecond,
+				linkTicks: 4 * TicksPerSecond,
+			} as c.LinkParameters,
+
+			homing: {
+				turnRate: 0.1,
+				minDistanceToTarget: 0.25,
+				targetSelf: true,
+			} as c.HomingParameters,
+
+			trailTicks: 1,
+
+			render: "link",
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
@@ -404,6 +444,7 @@ export namespace Spells {
 		fireball,
 		firespray,
 		meteor,
+		link,
 		kamehameha,
 		lightning,
 		homing,
@@ -423,7 +464,7 @@ export namespace Choices {
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang"],
-		"r": ["meteor"],
+		"r": ["meteor", "link"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;

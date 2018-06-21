@@ -150,6 +150,12 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetSelf: projectileTemplate.homing.targetSelf || false,
 		} as w.HomingParameters,
+		link: projectileTemplate.link && {
+			strength: projectileTemplate.link.strength,
+			linkTicks: projectileTemplate.link.linkTicks,
+			heroId: null,
+		} as w.LinkParameters,
+		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
@@ -193,6 +199,7 @@ export function tick(world: w.World) {
 	}
 
 	homingForce(world);
+	linkForce(world);
 	decayShields(world);
 	applyLavaDamage(world);
 	shrink(world);
@@ -438,7 +445,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
 	if (hero.shieldTicks > 0) {
-		if (projectile.owner !== hero.id) { // Stop double redirections cancelling out
+		if (projectile.shieldTakesOwnership && projectile.owner !== hero.id) { // Stop double redirections cancelling out
 			// Redirect back to owner
 			projectile.targetId = projectile.owner;
 			projectile.owner = hero.id;
@@ -453,7 +460,9 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			applyDamage(hero, damage, projectile.owner);
 		}
 
-		if (projectile.bounce) { // Only bounce off heroes, not projectiles
+		if (projectile.link) {
+			linkToHero(projectile, hero, world);
+		} else if (projectile.bounce) { // Only bounce off heroes, not projectiles
 			bounceToNext(projectile, hero, world);
 		} else if (projectile.explodeOn & categoryFlags(hero)) {
 			destroyObject(world, projectile);
@@ -498,6 +507,27 @@ function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predi
 		}
 	});
 	return nearest;
+}
+
+
+function linkToHero(projectile: w.Projectile, hero: w.WorldObject, world: w.World) {
+	if (!projectile.link) {
+		return;
+	}
+
+	if (projectile.link.heroId) {
+		return; // Already linked
+	}
+
+	projectile.expireTick = world.tick + projectile.link.linkTicks;
+	projectile.link.heroId = hero.id;
+
+	// Destroy fixtures on this link so it stops colliding with things
+	let fixturesToDestroy = new Array<pl.Fixture>();
+	for (let fixture = projectile.body.getFixtureList(); !!fixture; fixture = fixture.getNext()) {
+		fixturesToDestroy.push(fixture);
+	}
+	fixturesToDestroy.forEach(fixture => projectile.body.destroyFixture(fixture));
 }
 
 function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.World) {
@@ -556,6 +586,33 @@ function homingForce(world: w.World) {
 		let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
 		let newVelocity = vector.multiply(newDirection, currentSpeed);
 		obj.body.setLinearVelocity(newVelocity);
+	});
+}
+
+function linkForce(world: w.World) {
+	const minDistance = Hero.Radius * 3;
+	const maxDistance = 0.25;
+	world.objects.forEach(obj => {
+		if (!(obj.category === "projectile" && obj.link && obj.link.heroId)) {
+			return;
+		}
+
+		const owner = find(world.objects, x => x.id == obj.owner);
+		const target = find(world.objects, x => x.id == obj.link.heroId);
+		if (!(owner && target)) {
+			return;
+		}
+
+		const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
+		const distance = vector.length(diff);
+		const strength = obj.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
+		if (strength <= 0) {
+			return;
+		}
+
+		const toTarget = vector.multiply(vector.unit(diff), strength);
+		owner.body.applyLinearImpulse(toTarget, owner.body.getWorldPoint(vector.zero()), true);
+		target.body.applyLinearImpulse(vector.negate(toTarget), target.body.getWorldPoint(vector.zero()), true);
 	});
 }
 

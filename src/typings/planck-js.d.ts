@@ -10,6 +10,7 @@ declare module "planck-js" {
 
         interface Body {
             createFixture(polygon: Polygon, fixtureDef: FixtureDef): void;
+            destroyFixture(fixture: Fixture): void;
             getPosition(): Vec2;
             setPosition(pos: Vec2): void;
             getAngle(): number;
@@ -24,6 +25,7 @@ declare module "planck-js" {
             getWorldPoint(vec: Vec2): Vec2;
             getWorldVector(vec: Vec2): Vec2;
             getUserData(): any;
+            getFixtureList(): Fixture;
         }
 
         interface BodyDef {
@@ -46,6 +48,9 @@ declare module "planck-js" {
 
         interface Fixture {
             getBody(): Body;
+            getNext(): Fixture;
+            isSensor(): boolean;
+            setSensor(sensor: boolean): void;
         }
 
         interface FixtureDef {
