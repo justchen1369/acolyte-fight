@@ -20,6 +20,8 @@ export interface SpellBase {
     description: string;
     action: string;
 
+    orientationRequired?: boolean;
+
     chargeTicks?: number;
     cooldown: number;
     chargingUninterruptible?: boolean;
@@ -69,6 +71,7 @@ export interface ProjectileTemplate {
     trailTicks: number;
 
     color: string;
+    selfColor: boolean;
     render: string;
 }
 
@@ -79,7 +82,7 @@ export interface BounceParameters {
 export interface HomingParameters {
     ticksBeforeHoming: number;
     turnRate: number;
-    boomerang?: true;
+    boomerangReturnRange?: number;
 }
 
 export interface ScourgeSpell extends SpellBase {

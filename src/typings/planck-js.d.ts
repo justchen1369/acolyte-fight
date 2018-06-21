@@ -12,6 +12,8 @@ declare module "planck-js" {
             createFixture(polygon: Polygon, fixtureDef: FixtureDef): void;
             getPosition(): Vec2;
             setPosition(pos: Vec2): void;
+            getAngle(): number;
+            setAngle(angle: number): void;
             getLinearVelocity(): Vec2;
             setLinearVelocity(velocity: Vec2): void;
             setLinearDamping(damping: number): void;
@@ -25,7 +27,15 @@ declare module "planck-js" {
         }
 
         interface BodyDef {
-
+            userData?: string;
+            type?: string;
+            position?: Vec2;
+            angle?: number;
+            linearVelocity?: Vec2;
+            linearDamping?: number;
+            angularDamping?: number;
+            allowSleep?: boolean;
+            bullet?: boolean;
         }
 
         interface MassData {

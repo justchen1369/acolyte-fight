@@ -5,7 +5,7 @@ import * as c from '../game/constants.model';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, Categories, Choices, TicksPerSecond } from '../game/constants';
+import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
 
 // Planck.js considers collisions to be inelastic if below this threshold.
 // We want all thresholds to be elastic.
@@ -48,26 +48,31 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function nextHeroPosition(world: w.World) {
-	let nextHeroIndex = world.nextPositionId++;
-	let numHeroes = nextHeroIndex + 1;
-	let radius = 0.25;
-	let center = pl.Vec2(0.5, 0.5);
+function addHero(world: w.World, heroId: string, playerName: string) {
+	let position;
+	let angle;
+	{
+		const radius = 0.25;
+		const center = pl.Vec2(0.5, 0.5);
 
-	let angle = 2 * Math.PI * nextHeroIndex / numHeroes;
-	let pos = vector.plus(vector.multiply(pl.Vec2(Math.cos(angle), Math.sin(angle)), radius), center);
-	return pos;
-}
+		const nextHeroIndex = world.nextPositionId++;
 
-function addHero(world: w.World, position: pl.Vec2, heroId: string, playerName: string) {
+		let posAngle = 2 * Math.PI * nextHeroIndex / Matchmaking.MaxPlayers;
+		position = vector.plus(vector.multiply(vector.fromAngle(posAngle), radius), center);
+
+		angle = posAngle + Math.PI; // Face inward
+	}
+
 	let body = world.physics.createBody({
 		userData: heroId,
 		type: 'dynamic',
 		position,
+		angle,
 		linearDamping: Hero.MaxDamping,
+		angularDamping: Hero.AngularDamping,
 		allowSleep: false,
 		bullet: true,
-	});
+	} as pl.BodyDef);
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
 		filterMaskBits: Categories.All,
@@ -143,8 +148,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		homing: projectileTemplate.homing && {
 			turnRate: projectileTemplate.homing.turnRate,
 			homingStartTick: world.tick + (projectileTemplate.homing.ticksBeforeHoming || 0),
-			boomerang: projectileTemplate.homing.boomerang,
-		},
+			boomerangReturnRange: projectileTemplate.homing.boomerangReturnRange,
+		} as w.HomingParameters,
 
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
@@ -152,6 +157,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
+		selfColor: projectileTemplate.selfColor,
 		radius: projectileTemplate.radius,
 		trailTicks: projectileTemplate.trailTicks,
 
@@ -211,7 +217,7 @@ function handlePlayerJoinLeave(world: w.World) {
 			console.log("Player joined:", ev.heroId);
 			let hero = find(world.objects, x => x.id === ev.heroId);
 			if (!hero) {
-				hero = addHero(world, nextHeroPosition(world), ev.heroId, ev.playerName);
+				hero = addHero(world, ev.heroId, ev.playerName);
 			} else if (hero.category !== "hero") {
 				throw "Player tried to join as non-hero: " + ev.heroId;
 			}
@@ -276,6 +282,32 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
 			return false; // Cannot perform action, waiting for cooldown
+		}
+		++hero.casting.stage;
+	}
+
+	if (hero.casting.stage === w.CastStage.Orientating) {
+		const orientationRequired = spell.orientationRequired !== undefined ? spell.orientationRequired : true;
+		if (orientationRequired) {
+			const targetAngle = vector.angle(vector.diff(action.target, hero.body.getPosition()));
+			const currentAngle = hero.body.getAngle();
+
+			let angleDiff = targetAngle - currentAngle;
+			if (angleDiff > Math.PI) {
+				angleDiff -= 2 * Math.PI;
+			}
+			if (angleDiff < -Math.PI) {
+				angleDiff += 2 * Math.PI;
+			}
+
+			console.log(targetAngle, currentAngle, angleDiff);
+
+			if (Math.abs(angleDiff) > Hero.MaxAttackAngleDiff) {
+				const turnDiff = Math.min(Math.abs(angleDiff), Hero.TurnRate) * Math.sign(angleDiff);
+				const newAngle = currentAngle + turnDiff;
+				hero.body.setAngle(newAngle);
+				return false;
+			}
 		}
 		++hero.casting.stage;
 	}
@@ -492,31 +524,50 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 }
 
 function homingForce(world: w.World) {
+	let objectsToDestroy = new Array<w.Projectile>();
 	world.objects.forEach(obj => {
 		if (!(obj.category === "projectile" && obj.homing && world.tick >= obj.homing.homingStartTick)) {
 			return;
 		}
 
 		let target = null;
-		if (obj.homing.boomerang) {
+		if (obj.homing.boomerangReturnRange) {
 			target = find(world.objects, x => x.id === obj.owner);
 		} else {
 			target = find(world.objects, x => x.id === obj.targetId);
 		}
 
 		if (target) {
-			let currentSpeed = vector.length(obj.body.getLinearVelocity());
+			const distanceToTarget = vector.distance(obj.body.getPosition(), target.body.getPosition());
+			if (obj.homing.boomerangReturnRange &&
+				// Return boomerangs
+				distanceToTarget <= obj.homing.boomerangReturnRange) {
 
-			let currentDirection = vector.unit(obj.body.getLinearVelocity());
-			let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-			if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
-				idealDirection = vector.rotateRight(currentDirection);
+				const outwardVector = vector.diff(obj.body.getPosition(), target.body.getPosition());
+				if (vector.dot(obj.body.getLinearVelocity(), outwardVector) < 0) {
+					// Only reflect if not already going outwards
+					obj.body.setLinearVelocity(vector.negate(obj.body.getLinearVelocity()));
+				}
+			} else {
+				// Home to target
+				let currentSpeed = vector.length(obj.body.getLinearVelocity());
+
+				let currentDirection = vector.unit(obj.body.getLinearVelocity());
+				let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
+				if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
+					idealDirection = vector.rotateRight(currentDirection);
+				}
+
+				let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
+				let newVelocity = vector.multiply(newDirection, currentSpeed);
+				obj.body.setLinearVelocity(newVelocity);
 			}
-
-			let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
-			let newVelocity = vector.multiply(newDirection, currentSpeed);
-			obj.body.setLinearVelocity(newVelocity);
 		}
+	});
+
+
+	objectsToDestroy.forEach(boomerang => {
+		destroyObject(world, boomerang);
 	});
 }
 
@@ -640,14 +691,14 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ThrustSpell) {
 	if (!action.target) { return true; }
 
+	const diff = vector.diff(action.target, hero.body.getPosition());
+
 	const thrustTicks = world.tick - hero.casting.channellingStartTick;
-	if (thrustTicks >= spell.maxTicks) {
+	if (thrustTicks >= spell.maxTicks || vector.length(diff) < constants.Pixel) {
 		hero.body.setLinearVelocity(vector.zero());
 		return true;
 	}
 
-	let currentPosition = hero.body.getPosition();
-	const diff = vector.diff(action.target, currentPosition);
 	const step = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
 	hero.body.setLinearVelocity(step);
 	return false;
@@ -699,7 +750,7 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.S
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string) {
 	toHero.health -= amount;
-	if (fromHeroId && toHero.killerHeroId !== fromHeroId) {
+	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
 		toHero.killerHeroId = fromHeroId;
 	}

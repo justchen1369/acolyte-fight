@@ -4,7 +4,7 @@ import * as engine from './engine';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells } from '../game/constants';
+import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
 import { Icons } from '../game/icons';
 import { renderIcon } from '../game/renderIcon';
 
@@ -121,7 +121,8 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		}
 	}
 
-	let pos = hero.body.getPosition();
+	const pos = hero.body.getPosition();
+	const angle = hero.body.getAngle();
 	let radius = Hero.Radius;
 
 	if (hero.casting && hero.casting.stage >= w.CastStage.Channelling && hero.casting.action.type === Spells.thrust.id) {
@@ -132,10 +133,47 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	ctx.translate(pos.x, pos.y);
 
 	// Fill
-	ctx.fillStyle = color;
-	ctx.beginPath();
-	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-	ctx.fill();
+	{
+		ctx.save();
+
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+		ctx.fill();
+
+		ctx.restore();
+	}
+
+	// Orientation
+	{
+		const numTriangles = 3;
+		ctx.save();
+
+		ctx.beginPath();
+		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+		ctx.clip();
+
+		ctx.rotate(angle);
+		ctx.scale(Hero.Radius, Hero.Radius);
+
+		ctx.globalAlpha = 0.5;
+		ctx.fillStyle = "white";
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = Pixel;
+
+		ctx.beginPath();
+		ctx.moveTo(0, 0);
+		ctx.lineTo(-1, 1);
+		ctx.lineTo(0, 1);
+		ctx.lineTo(0.5, 0);
+		ctx.lineTo(0, -1);
+		ctx.lineTo(-1, -1);
+		ctx.lineTo(0, 0);
+		ctx.fill();
+		ctx.stroke();
+
+		ctx.restore();
+	}
 
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
@@ -204,7 +242,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 		max: projectile.trailTicks, 
 		from: vector.clone(previous),
 		to: vector.clone(pos),
-		fillStyle: projectile.color,
+		fillStyle: projectileColor(projectile, world),
 		width: projectile.radius * 2,
 	} as w.LineTrail);
 }
@@ -217,9 +255,17 @@ function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectil
 		remaining: projectile.trailTicks,
 		max: projectile.trailTicks, 
 		pos: vector.clone(pos),
-		fillStyle: projectile.color,
+		fillStyle: projectileColor(projectile, world),
 		radius: projectile.radius,
 	} as w.CircleTrail);
+}
+
+function projectileColor(projectile: w.Projectile, world: w.World) {
+	let color = projectile.color;
+	if (projectile.selfColor && projectile.owner === world.ui.myHeroId) {
+		color = Hero.MyHeroColor;
+	}
+	return color;
 }
 
 function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {

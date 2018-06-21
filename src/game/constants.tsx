@@ -19,10 +19,14 @@ export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.01;
 	export const Density = 1;
+	export const AngularDamping = 10;
 	export const MaxDamping = 5;
 	export const MinDamping = 1;
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
+
+	export const MaxAttackAngleDiff = 0.04 * 2 * Math.PI;
+	export const TurnRate = 0.025 * 2 * Math.PI;
 
 	export const MyHeroColor = '#00ccff';
 	export const InactiveColor = '#666666';
@@ -104,20 +108,20 @@ export namespace Spells {
 
 	export const firespray = {
 		id: 'firespray',
-		description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
+		description: "Shoot a stream of fire in a narrow arc. Get closer to focus all your damage onto one target.",
 		action: "spray",
 
 		color: '#ff0044',
 		icon: "bubblingBeam",
 
-		chargeTicks: 0.1 * TicksPerSecond,
+		chargeTicks: 0,
 		cooldown: 10 * TicksPerSecond,
 		channellingUninterruptible: true,
 
 		intervalTicks: 0.025 * TicksPerSecond,
 		lengthTicks: 0.5 * TicksPerSecond,
 
-		jitterRatio: 0.25,
+		jitterRatio: 0.1,
 
 		projectile: {
 			color: '#ff0044',
@@ -125,8 +129,8 @@ export namespace Spells {
 			density: 0.1,
 			radius: 0.002,
 			speed: 0.5,
-			maxTicks: 0.3 * TicksPerSecond,
-			damage: 2.5,
+			maxTicks: 0.5 * TicksPerSecond,
+			damage: 5,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -188,8 +192,8 @@ export namespace Spells {
 			maxTicks: 10 * TicksPerSecond,
 			damage: 10,
 			trailTicks: 1 * TicksPerSecond,
-			collideWith: Categories.Hero,
-			explodeOn: Categories.Hero,
+			collideWith: Categories.All,
+			explodeOn: Categories.All,
 
 			render: "ray",
 		} as c.ProjectileTemplate,
@@ -234,6 +238,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#44ffcc',
+			selfColor: true,
 
 			density: 25,
 			radius: 0.003,
@@ -266,22 +271,22 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff00ff',
+			selfColor: true,
 
 			density: 25,
 			radius: 0.005,
-			speed: 0.15,
-			maxTicks: 20.0 * TicksPerSecond,
+			speed: 0.4,
+			maxTicks: 8.0 * TicksPerSecond,
 			damage: 20,
 			explodeOn: Categories.Hero,
-			boomerang: true,
 
 			homing: {
 				turnRate: 0.05,
-				ticksBeforeHoming: 1 * TicksPerSecond,
-				boomerang: true,
-			},
+				ticksBeforeHoming: 0.5 * TicksPerSecond,
+				boomerangReturnRange: Hero.Radius * 4,
+			} as c.HomingParameters,
 
-			trailTicks: 30,
+			trailTicks: 1 * TicksPerSecond,
 
 			render: "projectile",
 		} as c.ProjectileTemplate,
@@ -300,13 +305,13 @@ export namespace Spells {
 
 		projectile: {
 			color: '#88ee22',
+			selfColor: true,
 
 			density: 2,
 			radius: 0.001,
 			speed: 0.75,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 5,
-			turnRate: 0.025,
 			explodeOn: Categories.All,
 			bounce: {
 				damageFactor: 0.99,
@@ -320,6 +325,8 @@ export namespace Spells {
 	export const scourge = {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
+
+		orientationRequired: false,
 		radius: Hero.Radius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
@@ -339,9 +346,11 @@ export namespace Spells {
 	export const shield = {
 		id: 'shield',
 		description: "Deflect any projectiles. Deflected projectiles become your projectiles. Try sending a 'homing' back to where it came from!",
+
+		orientationRequired: false,
 		mass: 100000,
 		chargeTicks: 0,
-		maxTicks: 1 * TicksPerSecond,
+		maxTicks: 5 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
 
@@ -355,6 +364,8 @@ export namespace Spells {
 	export const teleport = {
 		id: 'teleport',
 		description: "Teleport to a nearby location. Good for both escaping and for aggression.",
+
+		orientationRequired: false,
 		maxRange: 0.35,
 		chargeTicks: 3,
 		cooldown: 15 * TicksPerSecond,
@@ -370,6 +381,8 @@ export namespace Spells {
 		id: 'thrust',
 		description: "Accelerate quickly, knocking away anything in your path.",
 		cooldown: 8 * TicksPerSecond,
+
+		channellingUninterruptible: true,
 
 		damage: 10,
 		maxTicks: 0.25 * TicksPerSecond,

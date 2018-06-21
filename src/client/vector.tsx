@@ -69,3 +69,7 @@ export function negate(vec: pl.Vec2) {
 export function rotateRight(vec: pl.Vec2) {
 	return pl.Vec2(vec.y, -vec.x);
 }
+
+export function dot(a: pl.Vec2, b: pl.Vec2) {
+	return a.x * b.x + a.y * b.y;
+}

@@ -3,9 +3,10 @@ import * as c from '../game/constants.model';
 
 export namespace CastStage {
 	export const Cooldown = 1;
-	export const Charging = 2;
-	export const Channelling = 3;
-	export const Complete = 4;
+	export const Orientating = 2;
+	export const Charging = 3;
+	export const Channelling = 4;
+	export const Complete = 5;
 }
 
 export interface World {
@@ -151,7 +152,8 @@ export interface Projectile extends WorldObjectBase {
 
 	render: string;
     radius: number;
-    color: string;
+	color: string;
+	selfColor: boolean;
     trailTicks: number;
 
 	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
@@ -160,7 +162,7 @@ export interface Projectile extends WorldObjectBase {
 export interface HomingParameters {
 	turnRate: number;
 	homingStartTick: number;
-	boomerang: boolean;
+	boomerangReturnRange?: number;
 }
 
 export type WorldObject = Hero | Projectile;
