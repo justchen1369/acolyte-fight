@@ -311,7 +311,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#88ee22',
-			selfColor: true,
 			glowPixels: 5,
 
 			density: 2,
