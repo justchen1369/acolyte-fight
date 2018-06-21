@@ -254,7 +254,6 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 0.05,
-				ticksBeforeHoming: 0.1 * TicksPerSecond,
 			},
 
 			trailTicks: 30,
@@ -288,9 +287,10 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 0.05,
-				ticksBeforeHoming: 0.5 * TicksPerSecond,
-				boomerangReturnRange: Hero.Radius * 4,
+				minDistanceToTarget: 0.25,
+				targetSelf: true,
 			} as c.HomingParameters,
+			reflectRange: Hero.Radius * 4,
 
 			trailTicks: 1 * TicksPerSecond,
 

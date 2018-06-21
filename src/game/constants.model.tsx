@@ -81,9 +81,9 @@ export interface BounceParameters {
 }
 
 export interface HomingParameters {
-    ticksBeforeHoming: number;
+    minDistanceToTarget?: number;
     turnRate: number;
-    boomerangReturnRange?: number;
+    targetSelf?: boolean;
 }
 
 export interface ScourgeSpell extends SpellBase {

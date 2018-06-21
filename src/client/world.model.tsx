@@ -162,8 +162,8 @@ export interface Projectile extends WorldObjectBase {
 
 export interface HomingParameters {
 	turnRate: number;
-	homingStartTick: number;
-	boomerangReturnRange?: number;
+    minDistanceToTarget: number;
+	targetSelf: boolean;
 }
 
 export type WorldObject = Hero | Projectile;

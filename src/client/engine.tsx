@@ -147,8 +147,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 
 		homing: projectileTemplate.homing && {
 			turnRate: projectileTemplate.homing.turnRate,
-			homingStartTick: world.tick + (projectileTemplate.homing.ticksBeforeHoming || 0),
-			boomerangReturnRange: projectileTemplate.homing.boomerangReturnRange,
+			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
+			targetSelf: projectileTemplate.homing.targetSelf || false,
 		} as w.HomingParameters,
 
 		expireTick: world.tick + projectileTemplate.maxTicks,
@@ -523,50 +523,39 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 }
 
 function homingForce(world: w.World) {
-	let objectsToDestroy = new Array<w.Projectile>();
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.homing && world.tick >= obj.homing.homingStartTick)) {
+		if (!(obj.category === "projectile" && obj.homing)) {
 			return;
 		}
 
 		let target = null;
-		if (obj.homing.boomerangReturnRange) {
+		if (obj.homing.targetSelf) {
 			target = find(world.objects, x => x.id === obj.owner);
 		} else {
 			target = find(world.objects, x => x.id === obj.targetId);
 		}
 
-		if (target) {
-			const distanceToTarget = vector.distance(obj.body.getPosition(), target.body.getPosition());
-			if (obj.homing.boomerangReturnRange &&
-				// Return boomerangs
-				distanceToTarget <= obj.homing.boomerangReturnRange) {
-
-				const outwardVector = vector.diff(obj.body.getPosition(), target.body.getPosition());
-				if (vector.dot(obj.body.getLinearVelocity(), outwardVector) < 0) {
-					// Only reflect if not already going outwards
-					obj.body.setLinearVelocity(vector.negate(obj.body.getLinearVelocity()));
-				}
-			} else {
-				// Home to target
-				let currentSpeed = vector.length(obj.body.getLinearVelocity());
-
-				let currentDirection = vector.unit(obj.body.getLinearVelocity());
-				let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-				if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
-					idealDirection = vector.rotateRight(currentDirection);
-				}
-
-				let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
-				let newVelocity = vector.multiply(newDirection, currentSpeed);
-				obj.body.setLinearVelocity(newVelocity);
-			}
+		if (!target) {
+			return;
 		}
-	});
 
+		const distanceToTarget = vector.distance(obj.body.getPosition(), target.body.getPosition());
+		if (distanceToTarget < obj.homing.minDistanceToTarget) {
+			return;
+		}
 
-	objectsToDestroy.forEach(boomerang => {
-		destroyObject(world, boomerang);
+		// Home to target
+		let currentSpeed = vector.length(obj.body.getLinearVelocity());
+
+		let currentDirection = vector.unit(obj.body.getLinearVelocity());
+		let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
+		if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
+			idealDirection = vector.rotateRight(currentDirection);
+		}
+
+		let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
+		let newVelocity = vector.multiply(newDirection, currentSpeed);
+		obj.body.setLinearVelocity(newVelocity);
 	});
 }
 
