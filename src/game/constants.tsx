@@ -18,7 +18,7 @@ export namespace Matchmaking {
 
 export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
-	export const Radius = 0.01;
+	export const Radius = 0.015;
 	export const Density = 1;
 	export const AngularDamping = 10;
 	export const MaxDamping = 5;
