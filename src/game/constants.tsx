@@ -16,7 +16,7 @@ export namespace Matchmaking {
 }
 
 export namespace Hero {
-	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
+	export const MoveSpeedPerTick = 0.07 / TicksPerSecond;
 	export const Radius = 0.01;
 	export const Density = 1;
 	export const AngularDamping = 10;
@@ -280,7 +280,7 @@ export namespace Spells {
 			glowPixels: 3,
 
 			density: 25,
-			radius: 0.005,
+			radius: 0.003,
 			speed: 0.4,
 			maxTicks: 8.0 * TicksPerSecond,
 			damage: 20,
