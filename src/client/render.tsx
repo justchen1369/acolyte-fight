@@ -156,10 +156,14 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.rotate(angle);
 		ctx.scale(Hero.Radius, Hero.Radius);
 
-		ctx.globalAlpha = 0.5;
 		ctx.fillStyle = "white";
 		ctx.strokeStyle = "black";
 		ctx.lineWidth = Pixel;
+
+		ctx.globalAlpha = 0.5;
+		if (hero.casting && hero.casting.stage >= w.CastStage.Orientating && hero.casting.action.type !== Spells.move.id) {
+			ctx.globalAlpha = 0.75;
+		}
 
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
