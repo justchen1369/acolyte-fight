@@ -238,7 +238,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#44ffcc',
-			selfColor: true,
 
 			density: 25,
 			radius: 0.003,
