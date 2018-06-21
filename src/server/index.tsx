@@ -1,5 +1,6 @@
 import { Matchmaking, TicksPerSecond } from '../game/constants';
 import * as _ from 'lodash';
+import moment from 'moment';
 import * as c from '../game/constants.model';
 import * as m from '../game/messages.model';
 
@@ -26,7 +27,8 @@ interface Game {
     started: boolean;
     numPlayers: number;
     tick: number;
-    joinLimitTick: number | null;
+	joinable: boolean;
+	joinLimitTick: number | null;
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];
 
@@ -39,7 +41,8 @@ interface Player {
 }
 
 let nextGameId = 0;
-let games = new Map<string, Game>(); // id -> game
+let activeGames = new Map<string, Game>(); // id -> game
+let inactiveGames = new Map<string, Game>(); // id -> game
 
 function onConnection(socket: SocketIO.Socket) {
   console.log("user " + socket.id + " connected");
@@ -47,7 +50,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('disconnect', () => {
 		console.log("user " + socket.id + " disconnected");
 
-		games.forEach(game => {
+		activeGames.forEach(game => {
 			if (game.active.has(socket.id)) {
 				leaveGame(game, socket);
 			}
@@ -55,12 +58,43 @@ function onConnection(socket: SocketIO.Socket) {
 	});
 
 	socket.on('join', data => onJoinGameMsg(socket, data));
+	socket.on('watch', data => onWatchGameMsg(socket, data));
+}
+
+function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
+	if (activeGames.has(data.gameId)) {
+		const game = activeGames.get(data.gameId);
+		console.log("Game [" + game.id + "]: " + data.name + " joined as observer");
+
+		socket.emit("hero", {
+			gameId: game.id,
+			heroId: "_observer",
+			history: game.history,
+		} as m.HeroMsg);
+
+		socket.join(game.id);
+	} else if (inactiveGames.has(data.gameId)) {
+		const game = inactiveGames.get(data.gameId);
+		console.log("Game [" + game.id + "]: going to be watched by " + data.name);
+
+		socket.emit("watch", {
+			gameId: game.id,
+			history: game.history,
+		} as m.WatchResponseMsg);
+	} else {
+		console.log("Game [" + data.gameId + "]: unable to find game for " + data.name);
+
+		socket.emit("watch", {
+			gameId: null,
+			history: null,
+		} as m.WatchResponseMsg);
+	}
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 	let game: Game = null;
-	games.forEach(g => {
-		if ((!g.started || g.history) && g.active.size < Matchmaking.MaxPlayers) {
+	activeGames.forEach(g => {
+		if (g.joinable && g.active.size < Matchmaking.MaxPlayers) {
 			game = g;
 		}
 	});
@@ -83,16 +117,17 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 
 function initGame() {
 	let game = {
-		id: "g" + nextGameId++,
+		id: "g" + nextGameId++ + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		active: new Map<string, Player>(),
 		started: false,
 		numPlayers: 0,
 		tick: 0,
+		joinable: true,
 		joinLimitTick: null,
 		actions: new Map<string, m.ActionMsg>(),
 		history: [],
 	} as Game;
-	games.set(game.id, game);
+	activeGames.set(game.id, game);
 
 	game.intervalHandle = setInterval(() => gameTick(game), 1000.0 / TicksPerSecond);
 
@@ -128,7 +163,6 @@ function joinGame(game: Game, playerName: string, keyBindings: c.KeyBindings, so
 	socket.emit("hero", {
 		gameId: game.id,
 		heroId,
-		numPlayers: game.numPlayers,
 		history: game.history,
 	} as m.HeroMsg);
 
@@ -210,7 +244,8 @@ function leaveGame(game: Game, socket: SocketIO.Socket) {
 }
 
 function finishGame(game: Game) {
-	games.delete(game.id);
+	activeGames.delete(game.id);
+	inactiveGames.set(game.id, game);
 	if (game.intervalHandle) {
 		clearInterval(game.intervalHandle);
 	}
@@ -233,16 +268,22 @@ function gameTick(game: Game) {
 		game.actions.clear();
 
 		if (game.history) {
-			game.history.push(data);
+			if (game.history.length < Matchmaking.MaxHistoryLength) {
+				game.history.push(data);
+			} else {
+				game.joinable = false; // New players cannot join without the full history
+			}
+		}
 
+		if (game.joinable) {
 			if (!game.joinLimitTick && game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
 				// Casting any spell closes the game
 				game.joinLimitTick = game.tick + Matchmaking.JoinPeriod;
 			}
-			if (game.history.length >= Matchmaking.MaxHistoryLength ||
-				(game.joinLimitTick && game.tick >= game.joinLimitTick)) {
-				game.history = null; // Make the game unjoinable
+
+			if (game.joinLimitTick && game.tick >= game.joinLimitTick) {
 				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
+				game.joinable = false;
 			}
 		}
 

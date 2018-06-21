@@ -2,6 +2,8 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import socketLib from 'socket.io-client';
+import queryString from 'query-string';
+
 import { attachToCanvas, attachToSocket, attachNotificationListener, world } from './facade';
 import * as Storage from '../game/storage';
 import { Choices } from '../game/constants';
@@ -24,7 +26,15 @@ function getOrCreatePlayerName(): string {
     return name;
 }
 
-attachToSocket(socket, playerName, keyBindings);
+let observeGameId = null;
+if (window.location.search) {
+    const params = queryString.parse(window.location.search);
+    if (params["g"]) {
+        observeGameId = params["g"];
+    }
+}
+
+attachToSocket(socket, playerName, keyBindings, observeGameId);
 attachToCanvas(canvas);
 
 const infoPanel = ReactDOM.render(<InfoPanel playerName={playerName} world={world} />, document.getElementById("info-panel")) as InfoPanel;

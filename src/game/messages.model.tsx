@@ -23,6 +23,15 @@ export interface JoinMsg {
 export interface HeroMsg {
     gameId: string;
     heroId: string;
-    numPlayers: number;
+    history: TickMsg[];
+}
+
+export interface WatchMsg {
+    gameId: string;
+    name: string;
+}
+
+export interface WatchResponseMsg {
+    gameId: string;
     history: TickMsg[];
 }

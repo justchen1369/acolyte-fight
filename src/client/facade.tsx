@@ -1,5 +1,5 @@
 import pl from 'planck-js';
-import { Choices, Spells } from '../game/constants';
+import { Choices, Spells, TicksPerSecond } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from './engine';
 import * as c from '../game/constants.model';
@@ -122,12 +122,16 @@ function readKey(e: KeyboardEvent) {
 }
 
 // Sockets
-export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: c.KeyBindings) {
+export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: c.KeyBindings, observe?: string) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
 		if (!world.ui.myGameId) {
-			socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
+			if (observe) {
+				socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg);
+			} else {
+				socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
+			}
 		}
 	});
 	socket.on('disconnect', () => {
@@ -136,11 +140,12 @@ export function attachToSocket(_socket: SocketIOClient.Socket, playerName: strin
 	});
 	socket.on('hero', onHeroMsg);
 	socket.on('tick', onTickMsg);
+	socket.on('watch', onWatchMsg);
 }
 function onHeroMsg(data: m.HeroMsg) {
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
-	console.log("Joined game with " + data.numPlayers + " players as hero id " + world.ui.myHeroId);
+	console.log("Joined game as hero id " + world.ui.myHeroId);
 
 	if (data.history) {
 		tickQueue = [...data.history, ...tickQueue];
@@ -154,6 +159,28 @@ function onHeroMsg(data: m.HeroMsg) {
 }
 function onTickMsg(data: m.TickMsg) {
 	tickQueue.push(data);
+}
+function onWatchMsg(data: m.WatchResponseMsg) {
+	if (!(data.gameId && data.history)) {
+		return;
+	}
+	console.log("Watching game " + data.gameId + " with " + data.history.length + " ticks");
+
+	const observerHeroId = "_observer";
+	onHeroMsg({
+		gameId: data.gameId,
+		heroId: observerHeroId,
+		history: [],
+	});
+
+	let replayQueue = [...data.history];
+	const interval = setInterval(() => {
+		if (replayQueue.length > 0) {
+			onTickMsg(replayQueue.shift());
+		} else {
+			clearInterval(interval);
+		}
+	}, 1000.0 / TicksPerSecond);
 }
 function onDisconnectMsg() {
 	world.activePlayers.clear();
