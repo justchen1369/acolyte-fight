@@ -158,6 +158,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
 		selfColor: projectileTemplate.selfColor,
+		glowPixels: projectileTemplate.glowPixels,
 		radius: projectileTemplate.radius,
 		trailTicks: projectileTemplate.trailTicks,
 
@@ -729,6 +730,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.
 		max: spell.trailTicks, 
 		pos: vector.clone(hero.body.getPosition()),
 		fillStyle: 'white',
+		glowPixels: 20,
 		radius: spell.radius,
 	});
 

@@ -71,7 +71,8 @@ export interface ProjectileTemplate {
     trailTicks: number;
 
     color: string;
-    selfColor: boolean;
+    selfColor?: boolean;
+    glowPixels?: number;
     render: string;
 }
 

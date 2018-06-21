@@ -93,8 +93,9 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff8800',
+			glowPixels: 3,
 
-			density: 1,
+			density: 2,
 			radius: 0.005,
 			speed: 0.4,
 			maxTicks: 1 * TicksPerSecond,
@@ -125,6 +126,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff0044',
+			glowPixels: 5,
 
 			density: 0.1,
 			radius: 0.002,
@@ -151,6 +153,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff0000',
+			glowPixels: 10,
 
 			density: 1000,
 			radius: 0.03,
@@ -185,6 +188,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ffffff',
+			glowPixels: 5,
 
 			density: 0.01,
 			radius: 0.005,
@@ -212,6 +216,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#00ddff',
+			glowPixels: 5,
 
 			density: 3,
 			radius: 0.0025,
@@ -238,6 +243,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#44ffcc',
+			glowPixels: 5,
 
 			density: 25,
 			radius: 0.003,
@@ -271,6 +277,7 @@ export namespace Spells {
 		projectile: {
 			color: '#ff00ff',
 			selfColor: true,
+			glowPixels: 3,
 
 			density: 25,
 			radius: 0.005,
@@ -305,6 +312,7 @@ export namespace Spells {
 		projectile: {
 			color: '#88ee22',
 			selfColor: true,
+			glowPixels: 5,
 
 			density: 2,
 			radius: 0.001,
@@ -349,7 +357,7 @@ export namespace Spells {
 		orientationRequired: false,
 		mass: 100000,
 		chargeTicks: 0,
-		maxTicks: 5 * TicksPerSecond,
+		maxTicks: 3 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
 

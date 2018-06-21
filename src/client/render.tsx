@@ -202,6 +202,9 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 		ctx.globalAlpha = proportion;
 		ctx.fillStyle = spell.color;
+		ctx.shadowColor = spell.color;
+		ctx.shadowBlur = 10;
+
 		ctx.beginPath();
 		ctx.arc(0, 0, spell.radius, 0, 2 * Math.PI);
 		ctx.fill();
@@ -247,6 +250,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 		from: vector.clone(previous),
 		to: vector.clone(pos),
 		fillStyle: projectileColor(projectile, world),
+		glowPixels: projectile.glowPixels,
 		width: projectile.radius * 2,
 	} as w.LineTrail);
 }
@@ -260,6 +264,7 @@ function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectil
 		max: projectile.trailTicks, 
 		pos: vector.clone(pos),
 		fillStyle: projectileColor(projectile, world),
+		glowPixels: projectile.glowPixels,
 		radius: projectile.radius,
 	} as w.CircleTrail);
 }
@@ -284,6 +289,9 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
 	ctx.globalAlpha = proportion;
 	ctx.fillStyle = trail.fillStyle;
 	ctx.strokeStyle = trail.fillStyle;
+	
+	ctx.shadowColor = trail.fillStyle;
+	ctx.shadowBlur = trail.glowPixels || 0;
 
 	if (trail.type === "circle") {
 		ctx.beginPath();
