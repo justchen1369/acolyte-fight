@@ -579,7 +579,8 @@ function homingForce(world: w.World) {
 
 		let currentDirection = vector.unit(obj.body.getLinearVelocity());
 		let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-		if (vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
+		if (obj.homing.turnRate <= 0.5 && vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
+			// The projectile is heading perfectly away from the target so needs a tiebreaker to be able to turnaround
 			idealDirection = vector.rotateRight(currentDirection);
 		}
 

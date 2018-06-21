@@ -307,7 +307,7 @@ export namespace Spells {
 		icon: "andromedaChain",
 
 		chargeTicks: 0,
-		cooldown: 20 * TicksPerSecond,
+		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
 			color: '#4444ff',
@@ -327,7 +327,7 @@ export namespace Spells {
 			} as c.LinkParameters,
 
 			homing: {
-				turnRate: 0.1,
+				turnRate: 1.0,
 				minDistanceToTarget: 0.25,
 				targetSelf: true,
 			} as c.HomingParameters,
