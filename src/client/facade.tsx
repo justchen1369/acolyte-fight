@@ -96,13 +96,29 @@ export function gameKeyDown(e: KeyboardEvent) {
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (hero.category !== "hero") { return; }
 
-	const spellId = hero.keysToSpells.get(e.key);
+	const key = readKey(e);
+
+	const spellId = hero.keysToSpells.get(key);
 	if (!spellId) { return }
 
 	const spell = Spells.all[spellId];
 	if (!spell) { return; }
 
 	sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
+}
+
+function readKey(e: KeyboardEvent) {
+	switch (e.code) {
+		case 'KeyQ': return 'q';
+		case 'KeyW': return 'w';
+		case 'KeyE': return 'e';
+		case 'KeyR': return 'r';
+		case 'KeyA': return 'a';
+		case 'KeyS': return 's';
+		case 'KeyD': return 'd';
+		case 'KeyF': return 'f';
+		default: return e.key && e.key.toLowerCase();
+	}
 }
 
 // Sockets

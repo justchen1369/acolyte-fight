@@ -300,8 +300,6 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 				angleDiff += 2 * Math.PI;
 			}
 
-			console.log(targetAngle, currentAngle, angleDiff);
-
 			if (Math.abs(angleDiff) > Hero.MaxAttackAngleDiff) {
 				const turnDiff = Math.min(Math.abs(angleDiff), Hero.TurnRate) * Math.sign(angleDiff);
 				const newAngle = currentAngle + turnDiff;
