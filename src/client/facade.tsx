@@ -145,7 +145,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, playerName: strin
 function onHeroMsg(data: m.HeroMsg) {
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
-	console.log("Joined game as hero id " + world.ui.myHeroId);
+	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
 
 	if (data.history) {
 		tickQueue = [...data.history, ...tickQueue];
