@@ -3,7 +3,7 @@ import { Choices, Spells, TicksPerSecond } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
-import * as w from '../game/model';
+import * as w from '../game/world.model';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;

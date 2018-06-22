@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as w from '../game/model';
+import * as w from '../game/world.model';
 import { Hero } from '../game/constants';
 
 const ExpiryMilliseconds = 15000;

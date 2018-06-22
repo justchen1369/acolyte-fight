@@ -1,5 +1,5 @@
 import pl from 'planck-js';
-import * as c from './model';
+import * as c from './world.model';
 
 export const TicksPerSecond = 60;
 export const Pixel = 0.001;

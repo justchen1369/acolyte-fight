@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import pl from 'planck-js';
 import * as constants from '../game/constants';
 import * as vector from './vector';
-import * as w from './model';
+import * as w from './world.model';
 
 import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
 

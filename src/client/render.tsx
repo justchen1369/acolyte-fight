@@ -1,7 +1,7 @@
 import * as constants from '../game/constants';
 import * as engine from '../game/engine';
 import * as vector from '../game/vector';
-import * as w from '../game/model';
+import * as w from '../game/world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
 import { Icons } from '../ui/icons';
