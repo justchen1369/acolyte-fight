@@ -74,8 +74,9 @@ export interface BounceParameters {
 
 export interface HomingParametersTemplate {
     minDistanceToTarget?: number;
-    turnRate: number;
-    targetSelf?: boolean;
+	turnRate: number;
+	maxTurnProportion?: number;
+    targetType?: string;
 }
 
 export interface LinkParametersTemplate {
@@ -288,10 +289,17 @@ export interface Projectile extends WorldObjectBase {
 	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
 }
 
+export namespace HomingTargets {
+	export const enemy = "enemy";
+	export const self = "self";
+	export const turn = "turn";
+}
+
 export interface HomingParameters {
 	turnRate: number;
-    minDistanceToTarget: number;
-	targetSelf: boolean;
+	maxTurnProportion: number;
+	minDistanceToTarget: number;
+	targetType: string;
 }
 
 export interface LinkParameters {

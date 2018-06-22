@@ -73,3 +73,28 @@ export function rotateRight(vec: pl.Vec2) {
 export function dot(a: pl.Vec2, b: pl.Vec2) {
 	return a.x * b.x + a.y * b.y;
 }
+
+export function angleDelta(currentAngle: number, targetAngle: number) {
+	let delta = targetAngle - currentAngle;
+	if (delta > Math.PI) {
+		delta -= 2 * Math.PI;
+	}
+	if (delta < -Math.PI) {
+		delta += 2 * Math.PI;
+	}
+	return delta;
+}
+
+export function turnTowards(currentAngle: number, targetAngle: number, turnRate: number) {
+	let delta = angleDelta(currentAngle, targetAngle);
+	const turnDelta = Math.min(Math.abs(delta), turnRate) * Math.sign(delta);
+	const newAngle = currentAngle + turnDelta;
+	return newAngle;
+}
+
+export function turnVectorBy(currentVector: pl.Vec2, deltaAngle: number) {
+	const currentAngle = angle(currentVector);
+	const newAngle = currentAngle + deltaAngle;
+
+	return multiply(unit(fromAngle(newAngle)), length(currentVector));
+}

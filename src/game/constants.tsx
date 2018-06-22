@@ -256,8 +256,9 @@ export namespace Spells {
 			explodeOn: Categories.All,
 
 			homing: {
-				turnRate: 0.05,
-			},
+				turnRate: 2 * Math.PI,
+				maxTurnProportion: 0.05,
+			} as c.HomingParametersTemplate,
 
 			trailTicks: 30,
 
@@ -271,7 +272,7 @@ export namespace Spells {
 		action: "projectile",
 
 		color: '#ff00ff',
-		icon: "boltSaw",
+		icon: "boomerangSun",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 20 * TicksPerSecond,
@@ -284,14 +285,15 @@ export namespace Spells {
 			density: 25,
 			radius: 0.003,
 			speed: 0.4,
-			maxTicks: 8.0 * TicksPerSecond,
+			maxTicks: 6.0 * TicksPerSecond,
 			damage: 20,
 			explodeOn: Categories.Hero,
 
 			homing: {
-				turnRate: 0.05,
-				minDistanceToTarget: 0.25,
-				targetSelf: true,
+				turnRate: 0.01 * 2 * Math.PI,
+				maxTurnProportion: 0.1,
+				minDistanceToTarget: 0.1,
+				targetType: c.HomingTargets.self,
 			} as c.HomingParameters,
 
 			trailTicks: 1 * TicksPerSecond,
@@ -317,21 +319,21 @@ export namespace Spells {
 
 			density: 0.001,
 			radius: 0.005,
-			speed: 0.4,
-			maxTicks: 3.0 * TicksPerSecond,
+			speed: 0.3,
+			maxTicks: 2.0 * TicksPerSecond,
 			damage: 10,
 			explodeOn: Categories.None,
 			shieldTakesOwnership: false,
 
 			link: {
-				strength: 0.001 / TicksPerSecond,
+				strength: 0.01 / TicksPerSecond,
 				linkTicks: 4 * TicksPerSecond,
 			} as c.LinkParameters,
 
 			homing: {
-				turnRate: 1.0,
-				minDistanceToTarget: 0.25,
-				targetSelf: true,
+				turnRate: 2 * Math.PI,
+				minDistanceToTarget: 0.3,
+				targetType: c.HomingTargets.self,
 			} as c.HomingParameters,
 
 			trailTicks: 1,

@@ -146,8 +146,9 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 
 		homing: projectileTemplate.homing && {
 			turnRate: projectileTemplate.homing.turnRate,
+			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
-			targetSelf: projectileTemplate.homing.targetSelf || false,
+			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
 		} as w.HomingParameters,
 		link: projectileTemplate.link && {
 			strength: projectileTemplate.link.strength,
@@ -363,20 +364,10 @@ function turnTowards(hero: w.Hero, target: pl.Vec2) {
 	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
 	const currentAngle = hero.body.getAngle();
 
-	let angleDelta = targetAngle - currentAngle;
-	if (angleDelta > Math.PI) {
-		angleDelta -= 2 * Math.PI;
-	}
-	if (angleDelta < -Math.PI) {
-		angleDelta += 2 * Math.PI;
-	}
-
-	const turnDelta = Math.min(Math.abs(angleDelta), Hero.TurnRate) * Math.sign(angleDelta);
-	const newAngle = currentAngle + turnDelta;
+	const newAngle = vector.turnTowards(currentAngle, targetAngle, Hero.TurnRate);
 	hero.body.setAngle(newAngle);
 
-	const angleDiff = Math.abs(angleDelta - turnDelta);
-	return angleDiff;
+	return Math.abs(vector.angleDelta(newAngle, targetAngle));
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
@@ -556,35 +547,37 @@ function homingForce(world: w.World) {
 			return;
 		}
 
-		let target = null;
-		if (obj.homing.targetSelf) {
-			target = world.objects.get(obj.owner);
+		if (obj.homing.targetType === w.HomingTargets.turn) {
+			const newVelocity = vector.turnVectorBy(obj.body.getLinearVelocity(), obj.homing.turnRate);
+			obj.body.setLinearVelocity(newVelocity);
 		} else {
-			target = world.objects.get(obj.targetId);
+			const targetId = obj.homing.targetType === w.HomingTargets.self ? obj.owner : obj.targetId;
+			const target = world.objects.get(targetId);
+			if (!target) {
+				return;
+			}
+
+			const diff = vector.diff(target.body.getPosition(), obj.body.getPosition());
+			const distanceToTarget = vector.length(diff);
+			if (distanceToTarget < obj.homing.minDistanceToTarget) {
+				return;
+			}
+
+			// Home to target
+			const currentVelocity = obj.body.getLinearVelocity();
+
+			const currentAngle = vector.angle(currentVelocity);
+			const idealAngle = vector.angle(diff);
+
+			const maxTurnRate = obj.homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
+			const turnRate = Math.min(obj.homing.turnRate, maxTurnRate);
+			const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
+
+			const currentSpeed = vector.length(currentVelocity);
+			const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
+
+			obj.body.setLinearVelocity(newVelocity);
 		}
-
-		if (!target) {
-			return;
-		}
-
-		const distanceToTarget = vector.distance(obj.body.getPosition(), target.body.getPosition());
-		if (distanceToTarget < obj.homing.minDistanceToTarget) {
-			return;
-		}
-
-		// Home to target
-		let currentSpeed = vector.length(obj.body.getLinearVelocity());
-
-		let currentDirection = vector.unit(obj.body.getLinearVelocity());
-		let idealDirection = vector.unit(vector.diff(target.body.getPosition(), obj.body.getPosition()));
-		if (obj.homing.turnRate <= 0.5 && vector.length(vector.plus(currentDirection, idealDirection)) <= 0.01) {
-			// The projectile is heading perfectly away from the target so needs a tiebreaker to be able to turnaround
-			idealDirection = vector.rotateRight(currentDirection);
-		}
-
-		let newDirection = vector.unit(vector.plus(currentDirection, vector.multiply(idealDirection, obj.homing.turnRate)));
-		let newVelocity = vector.multiply(newDirection, currentSpeed);
-		obj.body.setLinearVelocity(newVelocity);
 	});
 }
 
