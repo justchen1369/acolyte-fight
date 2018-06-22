@@ -414,6 +414,7 @@ export namespace Spells {
 
 		maxRange: 0.35,
 		chargeTicks: 3,
+		uninterruptible: true,
 		cooldown: 15 * TicksPerSecond,
 
 		icon: "teleport",
