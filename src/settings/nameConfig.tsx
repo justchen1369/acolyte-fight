@@ -1,6 +1,6 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as c from '../game/world.model';
+import * as PlayerName from '../game/playerName';
 import * as Storage from '../ui/storage';
 
 interface Props {
@@ -24,7 +24,7 @@ export class NameConfig extends React.Component<Props, State> {
     render() {
         return <div>
             <h1>Your Name</h1>
-            <div><input type="text" value={this.state.name} maxLength={c.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
+            <div><input type="text" value={this.state.name} maxLength={PlayerName.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
             <div style={{ marginTop: 8 }}>
                 {this.state.saved 
                     ? "Your name has been set to " + this.state.name + " (does not apply to any in-progress games)"
@@ -35,7 +35,7 @@ export class NameConfig extends React.Component<Props, State> {
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {
         this.setState({
-            name: c.sanitizeName(ev.target.value),
+            name: PlayerName.sanitizeName(ev.target.value),
             saved: false,
         });
         this.saveStateDebounced();

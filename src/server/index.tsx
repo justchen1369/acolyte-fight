@@ -1,8 +1,8 @@
 import { Matchmaking, TicksPerSecond } from '../game/constants';
 import * as _ from 'lodash';
-import moment from 'moment';
 import * as c from '../game/world.model';
 import * as m from '../game/messages.model';
+import * as PlayerName from '../game/playerName';
 
 const express = require('express');
 const app = express();
@@ -102,7 +102,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 		game = initGame();
 	}
 	
-	let heroId = joinGame(game, c.sanitizeName(data.name), data.keyBindings, socket);
+	let heroId = joinGame(game, PlayerName.sanitizeName(data.name), data.keyBindings, socket);
 
 	socket.on('action', (actionData: m.ActionMsg) => {
 		if (!isUserInitiated(actionData)) {
