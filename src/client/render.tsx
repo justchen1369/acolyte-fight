@@ -267,8 +267,13 @@ function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, wor
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
 	let target: w.WorldObject = world.objects.get(projectile.link.heroId);
 	if (!target) {
-		target = projectile;
-		renderProjectile(ctx, projectile, world);
+		if (projectile.link.heroId) {
+			// Linked to a hero who is now dead, display nothing
+			return;
+		} else {
+			target = projectile;
+			renderProjectile(ctx, projectile, world);
+		}
 	}
 
 	if (!(owner && target)) {
