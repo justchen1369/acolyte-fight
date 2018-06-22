@@ -96,7 +96,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff8800',
-			glowPixels: 3,
+			glowPixels: 10,
 
 			density: 2,
 			radius: 0.005,
@@ -129,7 +129,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff0044',
-			glowPixels: 5,
+			glowPixels: 10,
 
 			density: 0.1,
 			radius: 0.002,
@@ -246,7 +246,7 @@ export namespace Spells {
 
 		projectile: {
 			color: '#44ffcc',
-			glowPixels: 5,
+			glowPixels: 10,
 
 			density: 25,
 			radius: 0.003,
@@ -280,7 +280,7 @@ export namespace Spells {
 		projectile: {
 			color: '#ff00ff',
 			selfColor: true,
-			glowPixels: 3,
+			glowPixels: 10,
 
 			density: 25,
 			radius: 0.003,
