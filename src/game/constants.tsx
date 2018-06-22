@@ -222,7 +222,7 @@ export namespace Spells {
 			color: '#00ddff',
 			glowPixels: 5,
 
-			density: 3,
+			density: 4,
 			radius: 0.0025,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,
