@@ -88,7 +88,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		body,
 		casting: null,
 		cooldowns: {},
-		shieldTicks: 0,
 		hitTick: 0,
 		killerHeroId: null,
 		assistHeroId: null,
@@ -623,6 +622,14 @@ function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
+			if (obj.thrustTicks > 0) {
+				--obj.thrustTicks;
+				if (obj.thrustTicks === 0) {
+					obj.body.setLinearVelocity(vector.zero());
+				} else {
+					damping = 0;
+				}
+			}
 			obj.body.setLinearDamping(damping);
 		}
 	});
@@ -733,16 +740,12 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 	if (!action.target) { return true; }
 
 	const diff = vector.diff(action.target, hero.body.getPosition());
+	const velocity = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
+	hero.body.setLinearVelocity(velocity);
 
-	const thrustTicks = world.tick - hero.casting.channellingStartTick;
-	if (thrustTicks >= spell.maxTicks || vector.length(diff) < constants.Pixel) {
-		hero.body.setLinearVelocity(vector.zero());
-		return true;
-	}
+	hero.thrustTicks = spell.maxTicks;
 
-	const step = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
-	hero.body.setLinearVelocity(step);
-	return false;
+	return true;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {

@@ -235,7 +235,8 @@ export interface Hero extends WorldObjectBase {
 	body: pl.Body;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
-	shieldTicks: number;
+	shieldTicks?: number;
+	thrustTicks?: number;
 
 	hitTick: number;
 
