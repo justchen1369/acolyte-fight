@@ -275,10 +275,10 @@ function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, wor
 		return;
 	}
 
-	ctx.lineWidth = Pixel * 2;
+	ctx.lineWidth = Pixel * 5;
 	ctx.strokeStyle = projectile.color;
 	ctx.shadowColor = projectile.color;
-	ctx.shadowBlur = 5;
+	ctx.shadowBlur = 10;
 
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
