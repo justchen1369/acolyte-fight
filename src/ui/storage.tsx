@@ -1,4 +1,4 @@
-import * as c from './constants.model';
+import * as c from '../game/constants.model';
 
 namespace StorageKeys {
     export const Name = "enigma-name";

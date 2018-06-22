@@ -1,12 +1,12 @@
 import * as constants from '../game/constants';
 import * as c from '../game/constants.model';
-import * as engine from './engine';
-import * as vector from './vector';
-import * as w from './world.model';
+import * as engine from '../game/engine';
+import * as vector from '../game/vector';
+import * as w from '../game/world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
-import { Icons } from '../game/icons';
-import { renderIcon } from '../game/renderIcon';
+import { Icons } from '../ui/icons';
+import { renderIcon } from '../ui/renderIcon';
 
 // Rendering
 export function calculateWorldRect(rect: ClientRect) {

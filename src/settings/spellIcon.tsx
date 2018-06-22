@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { ButtonBar, Spells } from '../game/constants';
-import { Icons } from '../game/icons';
-import { renderIcon } from '../game/renderIcon';
+import { Icons } from '../ui/icons';
+import { renderIcon } from '../ui/renderIcon';
 
 interface Props extends React.HTMLAttributes<HTMLCanvasElement> {
     spellId: string;

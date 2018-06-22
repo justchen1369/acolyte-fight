@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as c from '../../game/constants';
-import * as w from '../world.model';
+import * as c from '../game/constants';
+import * as w from '../game/world.model';
 
 const ExpiryMilliseconds = 15000;
 const FadeoutMilliseconds = 5000;

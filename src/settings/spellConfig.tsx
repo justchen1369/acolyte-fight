@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as c from '../game/constants.model';
 import { ButtonBar, Choices, Spells } from '../game/constants';
 import { SpellIcon } from './spellIcon';
-import * as Storage from '../game/storage';
+import * as Storage from '../ui/storage';
 
 interface Props {
 }

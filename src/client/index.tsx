@@ -5,11 +5,11 @@ import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
 import { attachToCanvas, attachToSocket, attachNotificationListener, world } from './facade';
-import * as Storage from '../game/storage';
+import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
 
-import { InfoPanel } from './components/infoPanel';
-import { MessagesPanel } from './components/messagesPanel';
+import { InfoPanel } from './infoPanel';
+import { MessagesPanel } from './messagesPanel';
 
 const socket = socketLib();
 const canvas = document.getElementById("canvas") as HTMLCanvasElement;

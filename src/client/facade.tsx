@@ -1,10 +1,10 @@
 import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond } from '../game/constants';
 import { render, calculateWorldRect } from './render';
-import * as engine from './engine';
+import * as engine from '../game/engine';
 import * as c from '../game/constants.model';
 import * as m from '../game/messages.model';
-import * as w from './world.model';
+import * as w from '../game/world.model';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
