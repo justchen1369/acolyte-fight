@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as c from '../game/constants.model';
+import * as c from '../game/model';
 import { ButtonBar, Choices, Spells } from '../game/constants';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../ui/storage';

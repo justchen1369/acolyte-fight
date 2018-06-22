@@ -2,9 +2,8 @@ import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond } from '../game/constants';
 import { render, calculateWorldRect } from './render';
 import * as engine from '../game/engine';
-import * as c from '../game/constants.model';
 import * as m from '../game/messages.model';
-import * as w from '../game/world.model';
+import * as w from '../game/model';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
@@ -122,7 +121,7 @@ function readKey(e: KeyboardEvent) {
 }
 
 // Sockets
-export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: c.KeyBindings, observe?: string) {
+export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: w.KeyBindings, observe?: string) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);

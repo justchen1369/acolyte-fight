@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as c from '../game/constants';
-import * as w from '../game/world.model';
+import * as w from '../game/model';
+import { Hero } from '../game/constants';
 
 const ExpiryMilliseconds = 15000;
 const FadeoutMilliseconds = 5000;
@@ -123,7 +123,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     private renderPlayer(player: w.Player) {
         let color = player.color;
         if (player.heroId === this.state.myHeroId) {
-            color = c.Hero.MyHeroColor;
+            color = Hero.MyHeroColor;
         }
         return <span className="player-name" style={{ color }}>{player.name}</span>;
     }

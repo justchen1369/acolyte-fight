@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import { Hero } from '../game/constants';
-import * as w from '../game/world.model';
+import * as w from '../game/model';
 
 interface Props {
     playerName: string;

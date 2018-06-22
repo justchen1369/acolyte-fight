@@ -1,4 +1,4 @@
-import * as c from './constants.model';
+import * as c from './model';
 
 export interface ActionMsg {
     heroId: string;

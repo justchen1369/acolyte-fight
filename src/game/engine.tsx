@@ -1,9 +1,8 @@
 import * as _ from 'lodash';
 import pl from 'planck-js';
 import * as constants from '../game/constants';
-import * as c from '../game/constants.model';
 import * as vector from './vector';
-import * as w from './world.model';
+import * as w from './model';
 
 import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
 
@@ -110,7 +109,7 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: c.Spell, projectileTemplate: c.ProjectileTemplate) {
+function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w.Spell, projectileTemplate: w.ProjectileTemplate) {
 	let id = spell.id + (world.nextBulletId++);
 
 	let from = hero.body.getPosition();
@@ -254,7 +253,7 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents = [];
 }
 
-function assignKeyBindingsToHero(hero: w.Hero, keyBindings: c.KeyBindings) {
+function assignKeyBindingsToHero(hero: w.Hero, keyBindings: w.KeyBindings) {
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
 	for (var key in keyBindings) {
@@ -377,7 +376,7 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 	}
 }
 
-function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Spell): boolean {
+function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Spell): boolean {
 	switch (spell.action) {
 		case "move": return moveAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
@@ -677,7 +676,7 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.destroyed.push(object);
 }
 
-function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.MoveSpell) {
+function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.MoveSpell) {
 	if (!action.target) { return true; }
 
 	let current = hero.body.getPosition();
@@ -687,14 +686,14 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.Mov
 	return vector.distance(current, target) < constants.Pixel;
 }
 
-function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ProjectileSpell) {
+function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ProjectileSpell) {
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
 	return true;
 }
 
-function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.SpraySpell) {
+function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.SpraySpell) {
 	if (!action.target) { return true; }
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
@@ -713,7 +712,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return currentLength >= spell.lengthTicks;
 }
 
-function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.TeleportSpell) {
+function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.TeleportSpell) {
 	if (!action.target) { return true; }
 
 	let currentPosition = hero.body.getPosition();
@@ -722,7 +721,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: c
 	return true;
 }
 
-function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ThrustSpell) {
+function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ThrustSpell) {
 	if (!action.target) { return true; }
 
 	const diff = vector.diff(action.target, hero.body.getPosition());
@@ -738,7 +737,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.T
 	return false;
 }
 
-function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ScourgeSpell) {
+function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
 	applyDamage(hero, spell.selfDamage, hero.id);
 
 	let heroPos = hero.body.getPosition();
@@ -772,7 +771,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.
 	return true;
 }
 
-function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: c.ShieldSpell) {
+function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
 	hero.shieldTicks = spell.maxTicks;
 	hero.body.setMassData({
 		mass: Spells.shield.mass,

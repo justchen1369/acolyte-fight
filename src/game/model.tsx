@@ -1,5 +1,142 @@
-import pl from 'planck-js';
-import * as c from '../game/constants.model';
+import * as pl from 'planck-js';
+
+export const MaxPlayerNameLength = 30;
+
+export function sanitizeName(input: string) {
+    let name = input || "";
+    name = name.replace(/\W/g, '');
+    if (name.length > MaxPlayerNameLength) {
+        name = name.substring(0, MaxPlayerNameLength);
+    }
+    return name;
+}
+
+export interface Spells {
+    [key: string]: Spell;
+}
+
+export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | ShieldSpell | TeleportSpell | ThrustSpell;
+
+export interface SpellBase {
+    id: string;
+    description: string;
+    action: string;
+
+    orientationRequired?: boolean;
+
+    chargeTicks?: number;
+    cooldown: number;
+    uninterruptible?: boolean;
+    knockbackCancel?: boolean;
+
+    icon?: string;
+
+    color: string;
+}
+
+export interface MoveSpell extends SpellBase {
+    action: "move";
+}
+
+export interface ProjectileSpell extends SpellBase {
+    action: "projectile";
+
+    projectile: ProjectileTemplate;
+}
+
+export interface SpraySpell extends SpellBase {
+    action: "spray";
+
+    projectile: ProjectileTemplate;
+
+    intervalTicks: number;
+    lengthTicks: number;
+
+    jitterRatio: number;
+}
+
+export interface ProjectileTemplate {
+    damage: number;
+    bounce?: BounceParameters;
+
+    density: number;
+    radius: number;
+    speed: number;
+
+    homing?: HomingParametersTemplate;
+    link?: LinkParametersTemplate;
+
+    maxTicks: number;
+    collideWith?: number;
+    explodeOn: number;
+    shieldTakesOwnership: boolean;
+
+    trailTicks: number;
+
+    color: string;
+    selfColor?: boolean;
+    glowPixels?: number;
+    render: string;
+}
+
+export interface BounceParameters {
+    damageFactor: number;
+}
+
+export interface HomingParametersTemplate {
+    minDistanceToTarget?: number;
+    turnRate: number;
+    targetSelf?: boolean;
+}
+
+export interface LinkParametersTemplate {
+    strength: number;
+    linkTicks: number;
+}
+
+export interface ScourgeSpell extends SpellBase {
+    action: "scourge";
+
+    damage: number;
+    selfDamage: number;
+
+    radius: number;
+
+    minImpulse: number;
+    maxImpulse: number;
+
+    trailTicks: number;
+}
+
+export interface ShieldSpell extends SpellBase {
+    action: "shield";
+
+    mass: number;
+    maxTicks: number;
+    radius: number;
+}
+
+export interface TeleportSpell extends SpellBase {
+    action: "teleport";
+
+    maxRange: number;
+}
+
+export interface ThrustSpell extends SpellBase {
+    action: "thrust";
+
+    damage: number;
+    maxTicks: number;
+    speed: number;
+}
+
+export interface KeyBindingOptions {
+    [key: string]: string[];
+}
+
+export interface KeyBindings {
+    [key: string]: string;
+}
 
 export namespace CastStage {
 	export const Cooldown = 1;
@@ -82,7 +219,7 @@ export interface JoinEvent {
 	type: "join";
 	heroId: string;
 	playerName: string;
-	keyBindings: c.KeyBindings;
+	keyBindings: KeyBindings;
 }
 
 export interface LeaveEvent {
@@ -143,7 +280,7 @@ export interface Projectile extends WorldObjectBase {
 
 	targetId: string | null;
 	damage: number;
-	bounce?: c.BounceParameters;
+	bounce?: BounceParameters;
 	homing?: HomingParameters;
 	link?: LinkParameters;
 	shieldTakesOwnership: boolean;

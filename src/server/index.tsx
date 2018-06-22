@@ -1,7 +1,7 @@
 import { Matchmaking, TicksPerSecond } from '../game/constants';
 import * as _ from 'lodash';
 import moment from 'moment';
-import * as c from '../game/constants.model';
+import * as c from '../game/model';
 import * as m from '../game/messages.model';
 
 const express = require('express');

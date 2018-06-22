@@ -1,4 +1,5 @@
-import * as c from './constants.model';
+import pl from 'planck-js';
+import * as c from './model';
 
 export const TicksPerSecond = 60;
 export const Pixel = 0.001;
