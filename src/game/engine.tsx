@@ -286,6 +286,8 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown };
 	}
 
+	const angleDiff = turnTowards(hero, action.target);
+
 	if (hero.casting.stage === w.CastStage.Cooldown) {
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
 			return false; // Cannot perform action, waiting for cooldown
@@ -294,25 +296,8 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	}
 
 	if (hero.casting.stage === w.CastStage.Orientating) {
-		const orientationRequired = spell.orientationRequired !== undefined ? spell.orientationRequired : true;
-		if (orientationRequired) {
-			const targetAngle = vector.angle(vector.diff(action.target, hero.body.getPosition()));
-			const currentAngle = hero.body.getAngle();
-
-			let angleDiff = targetAngle - currentAngle;
-			if (angleDiff > Math.PI) {
-				angleDiff -= 2 * Math.PI;
-			}
-			if (angleDiff < -Math.PI) {
-				angleDiff += 2 * Math.PI;
-			}
-
-			if (Math.abs(angleDiff) > Hero.MaxAttackAngleDiff) {
-				const turnDiff = Math.min(Math.abs(angleDiff), Hero.TurnRate) * Math.sign(angleDiff);
-				const newAngle = currentAngle + turnDiff;
-				hero.body.setAngle(newAngle);
-				return false;
-			}
+		if (spell.maxAngleDiff !== undefined && angleDiff > spell.maxAngleDiff) {
+			return false; // Wait until are facing the target
 		}
 		++hero.casting.stage;
 	}
@@ -366,6 +351,26 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 	// Only mark nextAction as completed if we actually did it and not the uninterruptible action
 	return action === nextAction && done;
+}
+
+function turnTowards(hero: w.Hero, target: pl.Vec2) {
+	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
+	const currentAngle = hero.body.getAngle();
+
+	let angleDelta = targetAngle - currentAngle;
+	if (angleDelta > Math.PI) {
+		angleDelta -= 2 * Math.PI;
+	}
+	if (angleDelta < -Math.PI) {
+		angleDelta += 2 * Math.PI;
+	}
+
+	const turnDelta = Math.min(Math.abs(angleDelta), Hero.TurnRate) * Math.sign(angleDelta);
+	const newAngle = currentAngle + turnDelta;
+	hero.body.setAngle(newAngle);
+
+	const angleDiff = Math.abs(angleDelta - turnDelta);
+	return angleDiff;
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
@@ -681,7 +686,11 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Mov
 
 	let current = hero.body.getPosition();
 	let target = action.target;
-	hero.step = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
+
+	const step = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
+	const facing = vector.fromAngle(hero.body.getAngle());
+	hero.step = vector.multiply(vector.unit(step), vector.dot(step, facing)); // Project onto the direction we're facing
+	console.log(step, facing, hero.step);
 
 	return vector.distance(current, target) < constants.Pixel;
 }

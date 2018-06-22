@@ -11,7 +11,7 @@ export interface SpellBase {
     description: string;
     action: string;
 
-    orientationRequired?: boolean;
+    maxAngleDiff?: number;
 
     chargeTicks?: number;
     cooldown: number;

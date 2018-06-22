@@ -27,8 +27,7 @@ export namespace Hero {
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 
-	export const MaxAttackAngleDiff = 0.04 * 2 * Math.PI;
-	export const TurnRate = 1.0 * 2 * Math.PI;
+	export const TurnRate = 0.05 * 2 * Math.PI;
 
 	export const MyHeroColor = '#00ccff';
 	export const InactiveColor = '#666666';
@@ -79,6 +78,7 @@ export namespace Spells {
 	export const move = {
 		id: 'move',
 		description: "",
+		maxAngleDiff: 0.25 * 2 * Math.PI,
 		cooldown: 0,
 		action: "move",
 	} as c.MoveSpell;
@@ -91,6 +91,7 @@ export namespace Spells {
 		color: '#ff8800',
 		icon: "thunderball",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 1 * TicksPerSecond,
 
 		projectile: {
@@ -117,6 +118,7 @@ export namespace Spells {
 		color: '#ff0044',
 		icon: "bubblingBeam",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 		uninterruptible: true,
 
@@ -149,6 +151,7 @@ export namespace Spells {
 		color: '#ff0000',
 		icon: "meteorImpact",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		chargeTicks: 0.1 * TicksPerSecond,
 		cooldown: 12 * TicksPerSecond,
 
@@ -176,6 +179,7 @@ export namespace Spells {
 		color: '#44ddff',
 		icon: "glowingHands",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		chargeTicks: 2.0 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
@@ -211,6 +215,7 @@ export namespace Spells {
 		color: '#00ddff',
 		icon: "lightningHelix",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -268,6 +273,7 @@ export namespace Spells {
 		color: '#ff00ff',
 		icon: "boltSaw",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 20 * TicksPerSecond,
 
 		projectile: {
@@ -302,6 +308,7 @@ export namespace Spells {
 		color: '#0000ff',
 		icon: "andromedaChain",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -341,6 +348,7 @@ export namespace Spells {
 		color: '#88ee22',
 		icon: "divert",
 
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 
 		projectile: {
@@ -366,7 +374,6 @@ export namespace Spells {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
 
-		orientationRequired: false,
 		radius: Hero.Radius * 5,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
@@ -387,7 +394,6 @@ export namespace Spells {
 		id: 'shield',
 		description: "Deflect any projectiles. Deflected projectiles become your projectiles. Try sending a 'homing' back to where it came from!",
 
-		orientationRequired: false,
 		mass: 100000,
 		maxTicks: 3 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
@@ -404,7 +410,6 @@ export namespace Spells {
 		id: 'teleport',
 		description: "Teleport to a nearby location. Good for both escaping and for aggression.",
 
-		orientationRequired: false,
 		maxRange: 0.35,
 		chargeTicks: 3,
 		cooldown: 15 * TicksPerSecond,
@@ -419,6 +424,8 @@ export namespace Spells {
 	export const thrust = {
 		id: 'thrust',
 		description: "Accelerate quickly, knocking away anything in your path.",
+
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 8 * TicksPerSecond,
 
 		uninterruptible: true,
