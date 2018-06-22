@@ -23,6 +23,10 @@ body .settings-page {
     margin-right: auto;
 }
 
+canvas.game {
+    cursor: crosshair;
+}
+
 input {
     padding: 10px;
     font-size: 14pt;
