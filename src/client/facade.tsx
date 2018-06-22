@@ -94,7 +94,7 @@ export function gameKeyDown(e: KeyboardEvent) {
 	if (!world.ui.myHeroId) { return; }
 
 	const hero = world.objects.get(world.ui.myHeroId);
-	if (hero.category !== "hero") { return; }
+	if (!hero || hero.category !== "hero") { return; }
 
 	const key = readKey(e);
 
