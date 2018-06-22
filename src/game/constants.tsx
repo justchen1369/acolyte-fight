@@ -326,7 +326,7 @@ export namespace Spells {
 			shieldTakesOwnership: false,
 
 			link: {
-				strength: 0.01 / TicksPerSecond,
+				strength: 0.001 / TicksPerSecond,
 				linkTicks: 4 * TicksPerSecond,
 			} as c.LinkParameters,
 

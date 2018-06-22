@@ -582,7 +582,7 @@ function homingForce(world: w.World) {
 }
 
 function linkForce(world: w.World) {
-	const minDistance = Hero.Radius * 3;
+	const minDistance = Hero.Radius * 2;
 	const maxDistance = 0.25;
 	world.objects.forEach(obj => {
 		if (!(obj.category === "projectile" && obj.link && obj.link.heroId)) {
