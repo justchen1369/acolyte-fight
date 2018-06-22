@@ -20,7 +20,7 @@ export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.015;
 	export const Density = 0.5;
-	export const AngularDamping = 10;
+	export const AngularDamping = 1;
 	export const MaxDamping = 5;
 	export const MinDamping = 1;
 	export const MaxHealth = 100;
