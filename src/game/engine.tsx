@@ -696,7 +696,6 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Mov
 	const step = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
 	const facing = vector.fromAngle(hero.body.getAngle());
 	hero.step = vector.multiply(vector.unit(step), vector.dot(step, facing)); // Project onto the direction we're facing
-	console.log(step, facing, hero.step);
 
 	return vector.distance(current, target) < constants.Pixel;
 }
@@ -739,13 +738,15 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ThrustSpell) {
 	if (!action.target) { return true; }
 
-	const diff = vector.diff(action.target, hero.body.getPosition());
-	const velocity = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
-	hero.body.setLinearVelocity(velocity);
+	if (world.tick === hero.casting.channellingStartTick) {
+		const diff = vector.diff(action.target, hero.body.getPosition());
+		const velocity = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
+		hero.body.setLinearVelocity(velocity);
 
-	hero.thrustTicks = spell.maxTicks;
+		hero.thrustTicks = spell.maxTicks;
+	}
 
-	return true;
+	return hero.thrustTicks === 0;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
