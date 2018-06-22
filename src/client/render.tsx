@@ -240,15 +240,8 @@ function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, wor
 		return;
 	}
 
-	let owner: w.WorldObject = null;
-	let target: w.WorldObject = null;
-	world.objects.forEach(obj => {
-		if (obj.id === projectile.owner) {
-			owner = obj;
-		} else if (obj.id === projectile.link.heroId) {
-			target = obj;
-		}
-	});
+	let owner: w.WorldObject = world.objects.get(projectile.owner);
+	let target: w.WorldObject = world.objects.get(projectile.link.heroId);
 	if (!target) {
 		target = projectile;
 		renderProjectile(ctx, projectile, world);

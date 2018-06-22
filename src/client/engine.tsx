@@ -223,7 +223,7 @@ function handlePlayerJoinLeave(world: w.World) {
 	world.joinLeaveEvents.forEach(ev => {
 		if (ev.type === "join") {
 			console.log("Player joined:", ev.heroId);
-			let hero = find(world.objects, x => x.id === ev.heroId);
+			let hero = world.objects.get(ev.heroId);
 			if (!hero) {
 				hero = addHero(world, ev.heroId, ev.playerName);
 			} else if (hero.category !== "hero") {
@@ -480,16 +480,6 @@ function categoryFlags(obj: w.WorldObject) {
 	}
 }
 
-function find(objects: Map<string, w.WorldObject>, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
-	let found: w.WorldObject = null;
-	objects.forEach(x => {
-		if (predicate(x)) {
-			found = x;
-		}
-	});
-	return found;
-}
-
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
 	let nearestDistance = Infinity;
 	let nearest: w.WorldObject = null;
@@ -558,9 +548,9 @@ function homingForce(world: w.World) {
 
 		let target = null;
 		if (obj.homing.targetSelf) {
-			target = find(world.objects, x => x.id === obj.owner);
+			target = world.objects.get(obj.owner);
 		} else {
-			target = find(world.objects, x => x.id === obj.targetId);
+			target = world.objects.get(obj.targetId);
 		}
 
 		if (!target) {
@@ -596,8 +586,8 @@ function linkForce(world: w.World) {
 			return;
 		}
 
-		const owner = find(world.objects, x => x.id == obj.owner);
-		const target = find(world.objects, x => x.id == obj.link.heroId);
+		const owner = world.objects.get(obj.owner);
+		const target = world.objects.get(obj.link.heroId);
 		if (!(owner && target)) {
 			return;
 		}
