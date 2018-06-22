@@ -296,9 +296,13 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	}
 
 	if (hero.casting.stage === w.CastStage.Orientating) {
+		hero.casting.uninterruptible = true;
+
 		if (spell.maxAngleDiff !== undefined && angleDiff > spell.maxAngleDiff) {
 			return false; // Wait until are facing the target
 		}
+
+		hero.casting.uninterruptible = false;
 		++hero.casting.stage;
 	}
 
@@ -306,6 +310,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {
 			hero.casting.chargeStartTick = world.tick;
+			hero.casting.uninterruptible = spell.uninterruptible || false;
 		}
 		
 		// Waiting for charging to complete
@@ -317,6 +322,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 		// Exiting charging stage
 		hero.casting.proportion = null;
+		hero.casting.uninterruptible = false;
 		++hero.casting.stage;
 	}
 
