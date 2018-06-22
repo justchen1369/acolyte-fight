@@ -25,6 +25,7 @@ export function attachNotificationListener(listener: NotificationListener) {
 export function attachToCanvas(canvas: HTMLCanvasElement) {
     fullScreenCanvas();
 
+    canvas.onmouseenter = canvasMouseMove;
     canvas.onmousemove = canvasMouseMove;
     canvas.onmousedown = canvasMouseMove;
     window.onkeydown = gameKeyDown;

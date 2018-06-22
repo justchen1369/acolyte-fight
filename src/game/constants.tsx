@@ -410,7 +410,7 @@ export namespace Spells {
 
 	export const teleport = {
 		id: 'teleport',
-		description: "Teleport to a nearby location. Good for both escaping and for aggression.",
+		description: "Teleport to a nearby location. Get close, or get away.",
 
 		maxRange: 0.35,
 		chargeTicks: 3,
