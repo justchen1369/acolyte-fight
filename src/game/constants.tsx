@@ -19,7 +19,7 @@ export namespace Matchmaking {
 export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.015;
-	export const Density = 1;
+	export const Density = 0.5;
 	export const AngularDamping = 10;
 	export const MaxDamping = 5;
 	export const MinDamping = 1;
@@ -27,7 +27,7 @@ export namespace Hero {
 	export const SeparationStrength = 0.01;
 
 	export const MaxAttackAngleDiff = 0.04 * 2 * Math.PI;
-	export const TurnRate = 0.025 * 2 * Math.PI;
+	export const TurnRate = 1.0 * 2 * Math.PI;
 
 	export const MyHeroColor = '#00ccff';
 	export const InactiveColor = '#666666';
@@ -122,7 +122,7 @@ export namespace Spells {
 		intervalTicks: 0.025 * TicksPerSecond,
 		lengthTicks: 0.5 * TicksPerSecond,
 
-		jitterRatio: 0.1,
+		jitterRatio: 0.4,
 
 		projectile: {
 			color: '#ff0044',
@@ -131,7 +131,7 @@ export namespace Spells {
 			density: 0.1,
 			radius: 0.002,
 			speed: 0.5,
-			maxTicks: 0.5 * TicksPerSecond,
+			maxTicks: 0.3 * TicksPerSecond,
 			damage: 5,
 			explodeOn: Categories.All,
 
