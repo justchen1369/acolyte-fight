@@ -57,8 +57,8 @@ export interface ProjectileTemplate {
 
     maxTicks: number;
     collideWith?: number;
-    explodeOn: number;
-    shieldTakesOwnership: boolean;
+	explodeOn: number;
+	shieldTakesOwnership: boolean;
 
     trailTicks: number;
 
@@ -144,6 +144,7 @@ export interface World {
 
 	objects: Map<string, WorldObject>,
 	destroyed: WorldObject[];
+	explosions: Explosion[];
 
 	physics: pl.World;
 
@@ -310,6 +311,16 @@ export interface LinkParameters {
 }
 
 export type WorldObject = Hero | Projectile;
+
+export interface Explosion {
+	pos: pl.Vec2;
+	type: string;
+}
+
+export namespace ExplosionType {
+	export const HeroDeath = "heroDeath";
+	export const Scourge = "scourge";
+} 
 
 export interface Action {
 	type: string;

@@ -76,6 +76,11 @@ declare module "planck-js" {
             isTouching(): boolean;
             getFixtureA(): Fixture;
             getFixtureB(): Fixture;
+            getWorldManifold(): Manifold;
+        }
+
+        interface Manifold {
+            points: Vec2[];
         }
 
         function Circle(radius: number): Polygon;

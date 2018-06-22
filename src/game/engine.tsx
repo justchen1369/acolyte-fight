@@ -24,6 +24,7 @@ export function initialWorld(): w.World {
 		radius: 0.4,
 
 		destroyed: [],
+		explosions: new Array<w.Explosion>(),
 
 		nextPositionId: 0,
 		nextBulletId: 0,
@@ -178,6 +179,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 export function tick(world: w.World) {
 	++world.tick;
 	world.destroyed = [];
+	world.explosions = [];
 
 	handlePlayerJoinLeave(world);
 
@@ -394,29 +396,31 @@ function handleContact(world: w.World, contact: pl.Contact) {
 		return;
 	}
 
+	const collisionPoint = vector.average(contact.getWorldManifold().points);
+
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
 	if (objA && objB) {
-		handleCollision(world, objA, objB);
-		handleCollision(world, objB, objA);
+		handleCollision(world, objA, objB, collisionPoint);
+		handleCollision(world, objB, objA, collisionPoint);
 	}
 }
 
-function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject) {
+function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
 	if (object.category === "projectile") {
 		if (hit.category === "hero") {
-			handleProjectileHitHero(world, object, hit);
+			handleProjectileHitHero(world, object, hit, collisionPoint);
 		} else if (hit.category === "projectile") {
-			handleProjectileHitProjectile(world, object, hit);
+			handleProjectileHitProjectile(world, object, hit, collisionPoint);
 		}
 	} else if (object.category === "hero") {
 		if (hit.category === "hero") {
-			handleHeroHitHero(world, object, hit);
+			handleHeroHitHero(world, object, hit, collisionPoint);
 		}
 	}
 }
 
-function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
+function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero, collisionPoint: pl.Vec2) {
 	// Push back other heroes
 	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
 	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
@@ -435,13 +439,13 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	}
 }
 
-function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
+function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile, collisionPoint: pl.Vec2) {
 	if (projectile.explodeOn & categoryFlags(other)) {
 		destroyObject(world, projectile);
 	}
 }
 
-function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
+function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero, collisionPoint: pl.Vec2) {
 	if (hero.shieldTicks > 0) {
 		if (projectile.shieldTakesOwnership && projectile.owner !== hero.id) { // Stop double redirections cancelling out
 			// Redirect back to owner
@@ -656,6 +660,10 @@ function reap(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (obj.health <= 0) {
+				world.explosions.push({
+					pos: obj.body.getPosition(),
+					type: w.ExplosionType.HeroDeath,
+				});
 				destroyObject(world, obj);
 				createKilledNotification(obj, world);
 			}
@@ -770,14 +778,9 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 	});
 
-	world.ui.trails.push({
-		type: "circle",
-		remaining: spell.trailTicks,
-		max: spell.trailTicks, 
-		pos: vector.clone(hero.body.getPosition()),
-		fillStyle: 'white',
-		glowPixels: 20,
-		radius: spell.radius,
+	world.explosions.push({
+		pos: hero.body.getPosition(),
+		type: w.ExplosionType.Scourge,
 	});
 
 	return true;

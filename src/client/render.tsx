@@ -54,6 +54,7 @@ function renderWorld(ctx: CanvasRenderingContext2D, world: w.World, rect: Client
 
 	world.objects.forEach(obj => renderObject(ctx, obj, world));
 	world.destroyed.forEach(obj => renderDestroyed(ctx, obj, world));
+	world.explosions.forEach(obj => renderExplosion(ctx, obj, world));
 
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
@@ -92,6 +93,30 @@ function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.
 	} else if (obj.render == "ray") {
         renderRay(ctx, obj, world);
 	}
+}
+
+function renderExplosion(ctx: CanvasRenderingContext2D, explosion: w.Explosion, world: w.World) {
+	let ticks;
+	let radius;
+	if (explosion.type === w.ExplosionType.Scourge) {
+		ticks = 30;
+		radius = Spells.scourge.radius;
+	} else if (explosion.type === w.ExplosionType.HeroDeath) {
+		ticks = 15;
+		radius = Hero.Radius * 1.5;
+	} else {
+		return;
+	}
+
+	world.ui.trails.push({
+		type: "circle",
+		max: ticks,
+		remaining: ticks,
+		pos: explosion.pos,
+		fillStyle: 'white',
+		glowPixels: 20,
+		radius,
+	});
 }
 
 function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {

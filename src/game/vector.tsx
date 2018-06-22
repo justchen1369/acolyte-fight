@@ -98,3 +98,16 @@ export function turnVectorBy(currentVector: pl.Vec2, deltaAngle: number) {
 
 	return multiply(unit(fromAngle(newAngle)), length(currentVector));
 }
+
+export function average(points: pl.Vec2[]) {
+	let totalX = 0.0;
+	let totalY = 0.0;
+	let count = 0;
+	points.forEach(point => {
+		totalX += point.x;
+		totalY += point.y;
+		++count;
+	});
+
+	return count ? pl.Vec2(totalX / count, totalY / count) : zero();
+}
