@@ -254,19 +254,19 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.beginPath();
 		healthBarPath(ctx, radius, healthProportion);
 		ctx.fill();
-	}
 
-	let startProportion = Math.min(1.0, ticksUntilStart / constants.Matchmaking.JoinPeriod);
-	if (startProportion > 0 && hero.health === Hero.MaxHealth) {
-		ctx.save();
+		let startProportion = Math.min(1.0, ticksUntilStart / constants.Matchmaking.JoinPeriod);
+		if (startProportion > 0 && hero.health === Hero.MaxHealth) {
+			ctx.save();
 
-		ctx.fillStyle = "#ffffff";
-		ctx.globalAlpha = startProportion;
-		ctx.beginPath();
-		healthBarPath(ctx, radius, 1.0);
-		ctx.fill();
+			ctx.fillStyle = "#ffffff";
+			ctx.globalAlpha = startProportion;
+			ctx.beginPath();
+			healthBarPath(ctx, radius, 1.0);
+			ctx.fill();
 
-		ctx.restore();
+			ctx.restore();
+		}
 	}
 
 	ctx.restore();
