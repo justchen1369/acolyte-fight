@@ -243,33 +243,37 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
-	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod) {
+	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
 		ctx.fillStyle = 'black';
 		ctx.beginPath();
-		ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
+		healthBarPath(ctx, radius, 1.0);
 		ctx.fill();
 
 		let healthProportion = hero.health / Hero.MaxHealth;
 		ctx.fillStyle = rgColor(healthProportion);
 		ctx.beginPath();
-		ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
+		healthBarPath(ctx, radius, healthProportion);
+		ctx.fill();
+	}
+
+	let startProportion = Math.min(1.0, ticksUntilStart / constants.Matchmaking.JoinPeriod);
+	if (startProportion > 0 && hero.health === Hero.MaxHealth) {
+		ctx.save();
+
+		ctx.fillStyle = "#ffffff";
+		ctx.globalAlpha = startProportion;
+		ctx.beginPath();
+		healthBarPath(ctx, radius, 1.0);
 		ctx.fill();
 
-		let startProportion = ticksUntilStart / constants.Matchmaking.JoinPeriod;
-		if (startProportion > 0) {
-			ctx.save();
-
-			ctx.fillStyle = "#ffffff";
-			ctx.globalAlpha = startProportion;
-			ctx.beginPath();
-			ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
-			ctx.fill();
-
-			ctx.restore();
-		}
+		ctx.restore();
 	}
 
 	ctx.restore();
+}
+
+function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number) {
+	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * proportion, HealthBar.Height);
 }
 
 function rgColor(proportion: number) {
