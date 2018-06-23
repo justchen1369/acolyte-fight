@@ -256,13 +256,13 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.fill();
 
 		let startProportion = Math.min(1.0, ticksUntilStart / constants.Matchmaking.JoinPeriod);
-		if (startProportion > 0 && hero.health === Hero.MaxHealth) {
+		if (startProportion > 0) {
 			ctx.save();
 
 			ctx.fillStyle = "#ffffff";
 			ctx.globalAlpha = startProportion;
 			ctx.beginPath();
-			healthBarPath(ctx, radius, 1.0);
+			healthBarPath(ctx, radius, healthProportion);
 			ctx.fill();
 
 			ctx.restore();

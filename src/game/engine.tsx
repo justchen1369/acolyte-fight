@@ -81,10 +81,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		restitution: 1.0,
 	});
 
-	// Don't bother shielding if the hero already has start-of-game invicibility as it is just an unnecessary visual artifact
-	const invincibleTicks = Math.max(0, world.startTick - world.tick);
-	const shieldTicks = invincibleTicks < World.InitialShieldTicks ? World.InitialShieldTicks : 0;
-
 	let hero = {
 		id: heroId,
 		name: playerName,
@@ -95,7 +91,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		casting: null,
 		cooldowns: {},
 		hitTick: 0,
-		shieldTicks,
+		shieldTicks: World.InitialShieldTicks,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -804,11 +800,6 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 }
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
-	if (fromHeroId && world.tick < world.startTick) {
-		// Ignore damage from other heroes before game starts
-		return;
-	}
-
 	toHero.health -= amount;
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
