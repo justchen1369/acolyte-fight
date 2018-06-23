@@ -1,4 +1,4 @@
-import { Matchmaking, TicksPerSecond } from '../game/constants';
+import { Matchmaking, TicksPerSecond, Spells, World } from '../game/constants';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as m from '../game/messages.model';
@@ -28,7 +28,7 @@ interface Game {
     numPlayers: number;
     tick: number;
 	joinable: boolean;
-	joinLimitTick: number | null;
+	closeTick: number;
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];
 
@@ -105,9 +105,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 	let heroId = joinGame(game, PlayerName.sanitizeName(data.name), data.keyBindings, socket);
 
 	socket.on('action', (actionData: m.ActionMsg) => {
-		if (!isUserInitiated(actionData)) {
-			console.log("Game [" + game.id + "]: user attempted to send disallowed action: " + actionData.actionType);
-		} else if (actionData.heroId == heroId) {
+		if (actionData.heroId === heroId && actionData.actionType === "game") {
 			queueAction(game, actionData);
 		} else {
 			console.log("Game [" + game.id + "]: incorrect hero id! " + actionData.heroId + " should be " + heroId);
@@ -123,7 +121,7 @@ function initGame() {
 		numPlayers: 0,
 		tick: 0,
 		joinable: true,
-		joinLimitTick: null,
+		closeTick: Matchmaking.MaxHistoryLength,
 		actions: new Map<string, m.ActionMsg>(),
 		history: [],
 	} as Game;
@@ -200,7 +198,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 1001;
 	} else if (actionData.actionType === "join") {
 		return 1000;
-	} else if (actionData.actionType === "move") {
+	} else if (actionData.actionType === "game" && actionData.spellId === Spells.move.id) {
 		return 10;
 	} else {
 		return 100;
@@ -208,24 +206,11 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isUserInitiated(actionData: m.ActionMsg): boolean {
-	switch (actionData.actionType) {
-		case "leave":
-		case "join":
-			return false;
-		default:
-			return true;
-	}
+	return actionData.actionType === "game";
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	switch (actionData.actionType) {
-		case "leave":
-		case "join":
-		case "move":
-			return false;
-		default:
-			return true;
-	}
+	return actionData.actionType === "game" && actionData.spellId !== Spells.move.id;
 }
 
 
@@ -271,24 +256,51 @@ function gameTick(game: Game) {
 			if (game.history.length < Matchmaking.MaxHistoryLength) {
 				game.history.push(data);
 			} else {
-				game.joinable = false; // New players cannot join without the full history
+				game.closeTick = Math.min(game.closeTick, game.tick); // New players cannot join without the full history
 			}
 		}
 
-		if (game.joinable) {
-			if (!game.joinLimitTick && game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
-				// Casting any spell closes the game
-				game.joinLimitTick = game.tick + Matchmaking.JoinPeriod;
-			}
-
-			if (game.joinLimitTick && game.tick >= game.joinLimitTick) {
-				console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
-				game.joinable = false;
-			}
-		}
-
+		closeGameIfNecessary(game, data);
 		io.to(game.id).emit('tick', data);
 	}
+}
+
+function closeGameIfNecessary(game: Game, data: m.TickMsg) {
+	if (!game.joinable) {
+		return;
+	}
+
+	let statusChanged = false;
+
+	if (game.tick >= World.InitialShieldTicks
+		&& game.active.size > 1
+		&& _.some(data.actions, action => isSpell(action))) {
+
+		// Casting any spell closes the game
+		const newCloseTick = game.tick + Matchmaking.JoinPeriod;
+		if (newCloseTick < game.closeTick) {
+			game.closeTick = newCloseTick;
+			statusChanged = true;
+		}
+	}
+
+	if (game.tick >= game.closeTick) {
+		game.joinable = false;
+		statusChanged = true;
+		console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
+	}
+
+	if (statusChanged) {
+		queueAction(game, {
+			heroId: systemHeroId(m.ActionType.CloseGame),
+			actionType: m.ActionType.CloseGame,
+			closeTick: game.closeTick,
+		});
+	}
+}
+
+function systemHeroId(actionType: string) {
+	return "_" + actionType;
 }
 
 function mapMap<K, V, Out>(map : Map<K, V>, func: (v: V) => Out) {

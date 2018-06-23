@@ -1,12 +1,39 @@
 import * as c from './world.model';
 
-export interface ActionMsg {
-    heroId: string;
+export namespace ActionType {
+    export const Join = "join";
+	export const Leave = "leave";
+	export const GameAction = "game";
+	export const CloseGame = "close";
+}
+
+export type ActionMsg = JoinActionMsg | LeaveActionMsg | CloseGameMsg | GameActionMsg;
+
+export interface ActionMsgBase {
     actionType: string;
-    targetX?: number;
-    targetY?: number;
-    playerName?: string;
-    keyBindings?: c.KeyBindings;
+    heroId: string;
+}
+
+export interface JoinActionMsg extends ActionMsgBase {
+    actionType: "join";
+    playerName: string;
+    keyBindings: c.KeyBindings;
+}
+
+export interface LeaveActionMsg extends ActionMsgBase {
+    actionType: "leave";
+}
+
+export interface CloseGameMsg extends ActionMsgBase {
+    actionType: "close";
+    closeTick: number;
+}
+
+export interface GameActionMsg extends ActionMsgBase {
+    actionType: "game";
+    spellId: string;
+    targetX: number;
+    targetY: number;
 }
 
 export interface TickMsg {

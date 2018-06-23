@@ -12,7 +12,7 @@ export namespace Categories {
 }
 
 export namespace Matchmaking {
-	export const JoinPeriod = 5 * TicksPerSecond;
+	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 3 * 60 * TicksPerSecond;
 	export const MaxPlayers = 5;
 }
@@ -50,6 +50,9 @@ export namespace Hero {
 export namespace World {
 	export const LavaDamagePerTick = 0.25;
 	export const ShrinkPerTick = 0.00005;
+
+	export const InitialShieldTicks = 3.0 * TicksPerSecond;
+	export const JoinShieldTicks = 0.5 * TicksPerSecond;
 }
 
 export namespace HealthBar {

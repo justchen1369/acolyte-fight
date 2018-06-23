@@ -48,8 +48,16 @@ a:hover, a:active {
     text-align: right;
 }
 
+.settings-link {
+    font-size: 80%;
+}
+
 .player-list {
     margin-top: 40px;
+}
+
+.player-list-title {
+    font-size: 80%;
 }
 
 #messages-panel {

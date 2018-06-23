@@ -188,27 +188,37 @@ function onDisconnectMsg() {
 function sendAction(heroId: string, action: w.Action) {
 	socket.emit('action', {
 		heroId: heroId,
-		actionType: action.type,
+		actionType: m.ActionType.GameAction,
+		spellId: action.type,
 		targetX: action.target.x,
 		targetY: action.target.y,
 	} as m.ActionMsg);
 }
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	tickData.actions.forEach(actionData => {
-		if (actionData.actionType === "join") {
+		if (actionData.actionType === m.ActionType.CloseGame) {
+			world.closeTick = actionData.closeTick;
+			world.ui.notifications.push({
+				type: "closing",
+				ticksUntilClose: world.closeTick - world.tick,
+			});
+		} else if (actionData.actionType === m.ActionType.Join) {
 			world.joinLeaveEvents.push({
 				type: "join",
 				heroId: actionData.heroId,
 				playerName: actionData.playerName || "Enigma",
 				keyBindings: actionData.keyBindings,
 			});
-		} else if (actionData.actionType === "leave") {
+		} else if (actionData.actionType === m.ActionType.Leave) {
 			world.joinLeaveEvents.push({
 				type: "leave",
 				heroId: actionData.heroId,
 			});
-		} else {
-			world.actions.set(actionData.heroId, { type: actionData.actionType, target: pl.Vec2(actionData.targetX, actionData.targetY) });
+		} else if (actionData.actionType === m.ActionType.GameAction) {
+			world.actions.set(actionData.heroId, {
+				type: actionData.spellId,
+				target: pl.Vec2(actionData.targetX, actionData.targetY),
+			});
 		}
 	});
 }

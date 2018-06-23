@@ -226,7 +226,9 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 		ctx.save();
 
-		ctx.globalAlpha = proportion;
+		const MaxAlpha = 0.75;
+		const MinAlpha = 0.10;
+		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
 		ctx.fillStyle = spell.color;
 		ctx.shadowColor = spell.color;
 		ctx.shadowBlur = 10;

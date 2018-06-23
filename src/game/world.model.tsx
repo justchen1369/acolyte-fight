@@ -138,6 +138,7 @@ export namespace CastStage {
 
 export interface World {
 	tick: number;
+	closeTick: number;
 
 	activePlayers: Set<string>;
 	players: Map<string, Player>;
@@ -175,7 +176,13 @@ export interface Player {
 	color: string;
 }
 
-export type Notification = HelpNotification | JoinNotification | LeaveNotification | KillNotification | MyHeroNotification;
+export type Notification =
+	HelpNotification 
+	| JoinNotification 
+	| LeaveNotification 
+	| KillNotification 
+	| MyHeroNotification
+	| CloseGameNotification;
 
 export interface HelpNotification {
 	type: "help";
@@ -202,6 +209,11 @@ export interface MyHeroNotification {
 	type: "myHero";
 	gameId: string;
 	heroId: string;
+}
+
+export interface CloseGameNotification {
+	type: "closing";
+	ticksUntilClose: number;
 }
 
 export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;

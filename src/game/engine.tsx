@@ -13,6 +13,7 @@ import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond }
 export function initialWorld(): w.World {
 	let world = {
 		tick: 0,
+		closeTick: constants.Matchmaking.MaxHistoryLength,
 
 		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
 		activePlayers: new Set<string>(),
@@ -90,6 +91,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		casting: null,
 		cooldowns: {},
 		hitTick: 0,
+		shieldTicks: Math.max(World.JoinShieldTicks, World.InitialShieldTicks - world.tick),
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -787,7 +789,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 }
 
 function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
-	hero.shieldTicks = spell.maxTicks;
+	hero.shieldTicks = Math.max(hero.shieldTicks || 0, spell.maxTicks);
 	hero.body.setMassData({
 		mass: Spells.shield.mass,
 		center: vector.zero(),
