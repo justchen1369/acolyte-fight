@@ -639,9 +639,6 @@ function updateKnockback(world: w.World) {
 				} else {
 					damping = 0;
 				}
-			} else if (world.tick < world.startTick) {
-				// Before the game, no knockback
-				damping = Hero.PreGameDamping;
 			}
 			obj.body.setLinearDamping(damping);
 		}
