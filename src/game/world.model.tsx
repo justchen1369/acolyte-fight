@@ -138,7 +138,7 @@ export namespace CastStage {
 
 export interface World {
 	tick: number;
-	closeTick: number;
+	startTick: number;
 
 	activePlayers: Set<string>;
 	players: Map<string, Player>;

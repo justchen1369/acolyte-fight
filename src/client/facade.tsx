@@ -197,10 +197,10 @@ function sendAction(heroId: string, action: w.Action) {
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	tickData.actions.forEach(actionData => {
 		if (actionData.actionType === m.ActionType.CloseGame) {
-			world.closeTick = actionData.closeTick;
+			world.startTick = actionData.closeTick;
 			world.ui.notifications.push({
 				type: "closing",
-				ticksUntilClose: world.closeTick - world.tick,
+				ticksUntilClose: world.startTick - world.tick,
 			});
 		} else if (actionData.actionType === m.ActionType.Join) {
 			world.joinLeaveEvents.push({

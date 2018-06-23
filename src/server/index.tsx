@@ -272,9 +272,8 @@ function closeGameIfNecessary(game: Game, data: m.TickMsg) {
 
 	let statusChanged = false;
 
-	if (game.tick >= World.InitialShieldTicks
-		&& game.active.size > 1
-		&& _.some(data.actions, action => isSpell(action))) {
+	if ((game.active.size > 1 && _.some(data.actions, action => isSpell(action)))
+		|| game.active.size >= Matchmaking.MaxPlayers) {
 
 		// Casting any spell closes the game
 		const newCloseTick = game.tick + Matchmaking.JoinPeriod;

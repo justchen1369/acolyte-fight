@@ -242,16 +242,32 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	}
 
 	// Health bar
-	ctx.fillStyle = 'black';
-	ctx.beginPath();
-	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
-	ctx.fill();
+	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
+	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod) {
+		ctx.fillStyle = 'black';
+		ctx.beginPath();
+		ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
+		ctx.fill();
 
-	let healthProportion = hero.health / Hero.MaxHealth;
-	ctx.fillStyle = rgColor(healthProportion);
-	ctx.beginPath();
-	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
-	ctx.fill();
+		let healthProportion = hero.health / Hero.MaxHealth;
+		ctx.fillStyle = rgColor(healthProportion);
+		ctx.beginPath();
+		ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * healthProportion, HealthBar.Height);
+		ctx.fill();
+
+		let startProportion = ticksUntilStart / constants.Matchmaking.JoinPeriod;
+		if (startProportion > 0) {
+			ctx.save();
+
+			ctx.fillStyle = "#ffffff";
+			ctx.globalAlpha = startProportion;
+			ctx.beginPath();
+			ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2, HealthBar.Height);
+			ctx.fill();
+
+			ctx.restore();
+		}
+	}
 
 	ctx.restore();
 }

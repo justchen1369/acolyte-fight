@@ -32,13 +32,7 @@ export class InfoPanel extends React.Component<Props, State> {
                     </div>
                 </div>
                 {world.activePlayers.size > 0 && <div className="player-list">
-                    <div className="player-list-title">
-                        {
-                            (this.props.world.tick < this.props.world.closeTick)
-                            ? <i className="fa fa-clock" title="Waiting for players to join" />
-                            : null
-                        } {world.activePlayers.size} players
-                    </div>
+                    <div className="player-list-title">{world.activePlayers.size} players</div>
                     {this.renderPlayerList(world)}
                 </div>}
             </div>

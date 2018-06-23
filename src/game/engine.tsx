@@ -13,7 +13,7 @@ import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond }
 export function initialWorld(): w.World {
 	let world = {
 		tick: 0,
-		closeTick: constants.Matchmaking.MaxHistoryLength,
+		startTick: constants.Matchmaking.MaxHistoryLength,
 
 		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
 		activePlayers: new Set<string>(),
@@ -81,6 +81,10 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		restitution: 1.0,
 	});
 
+	// Don't bother shielding if the hero already has start-of-game invicibility as it is just an unnecessary visual artifact
+	const invincibleTicks = Math.max(0, world.startTick - world.tick);
+	const shieldTicks = invincibleTicks < World.InitialShieldTicks ? World.InitialShieldTicks : 0;
+
 	let hero = {
 		id: heroId,
 		name: playerName,
@@ -91,7 +95,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		casting: null,
 		cooldowns: {},
 		hitTick: 0,
-		shieldTicks: Math.max(World.JoinShieldTicks, World.InitialShieldTicks - world.tick),
+		shieldTicks,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -437,7 +441,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero, collisio
 
 	// If using thrust, cause damage
 	if (hero.casting && hero.casting.action && hero.casting.action.type === Spells.thrust.id) {
-		applyDamage(other, Spells.thrust.damage, hero.id);
+		applyDamage(other, Spells.thrust.damage, hero.id, world);
 	}
 }
 
@@ -461,7 +465,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		if (hero.id !== projectile.owner) {
 			const damage = projectile.damage;
-			applyDamage(hero, damage, projectile.owner);
+			applyDamage(hero, damage, projectile.owner, world);
 		}
 
 		if (projectile.link) {
@@ -646,7 +650,7 @@ function applyLavaDamage(world: w.World) {
 		if (obj.category === "hero") {
 			let position = obj.body.getPosition();
 			if (vector.distance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
-				applyDamage(obj, World.LavaDamagePerTick, null);
+				applyDamage(obj, World.LavaDamagePerTick, null, world);
 			}
 		}
 	});
@@ -760,7 +764,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
-	applyDamage(hero, spell.selfDamage, hero.id);
+	applyDamage(hero, spell.selfDamage, hero.id, world);
 
 	let heroPos = hero.body.getPosition();
 	world.objects.forEach(obj => {
@@ -772,7 +776,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.category === "hero") {
-			applyDamage(obj, spell.damage, hero.id);
+			applyDamage(obj, spell.damage, hero.id, world);
 		}
 
 		let magnitude = spell.minImpulse + proportion * (spell.maxImpulse - spell.minImpulse);
@@ -799,7 +803,11 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 	return true;
 }
 
-function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string) {
+function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
+	if (world.tick < world.startTick) {
+		return;
+	}
+
 	toHero.health -= amount;
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
