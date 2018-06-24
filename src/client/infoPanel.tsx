@@ -61,7 +61,10 @@ export class InfoPanel extends React.Component<Props, State> {
                 } else if (player.heroId === world.ui.myHeroId) {
                     color = Hero.MyHeroColor;
                 }
-                result.push(<div key={player.heroId} style={{color}}>{player.name}</div>);
+
+                result.push(<div key={player.heroId} className="player-list-row">
+                    <span style={{color}} className="player-name">{player.name}</span>
+                </div>);
             }
         });
         return result;

@@ -18,6 +18,7 @@ export function initialWorld(): w.World {
 		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
 		activePlayers: new Set<string>(),
 		players: new Map<string, w.Player>(),
+		scores: new Map<string, w.HeroScore>(),
 
 		objects: new Map(),
 		physics: pl.World(),
@@ -471,6 +472,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		if (hero.id !== projectile.owner) {
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner, world);
+			projectile.hit = true;
 		}
 
 		if (projectile.link) {
@@ -718,18 +720,20 @@ function reap(world: w.World) {
 					type: w.ExplosionType.HeroDeath,
 				});
 				destroyObject(world, obj);
-				createKilledNotification(obj, world);
+				notifyKill(obj, world);
 			}
 		} else if (obj.category === "projectile") {
-			let pos = obj.body.getPosition();
 			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
+			}
+			if (obj.hit) {
+				notifyHit(obj, world);
 			}
 		}
 	});
 }
 
-function createKilledNotification(hero: w.Hero, world: w.World) {
+function notifyKill(hero: w.Hero, world: w.World) {
 	const killed = world.players.get(hero.id);
 	if (!killed) {
 		return;
@@ -738,6 +742,24 @@ function createKilledNotification(hero: w.Hero, world: w.World) {
 	const killer = hero.killerHeroId && world.players.get(hero.killerHeroId) || null;
 	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
 	world.ui.notifications.push({ type: "kill", killed, killer, assist });
+
+	if (hero.killerHeroId) {
+		let score = getOrCreateScore(hero.killerHeroId, world);
+		++score.kills;
+	}
+	if (hero.assistHeroId) {
+		let score = getOrCreateScore(hero.assistHeroId, world);
+		++score.assists;
+	}
+}
+
+function notifyHit(obj: w.Projectile, world: w.World) {
+	if (!(obj.hit && obj.owner && obj.type === Spells.fireball.id)) {
+		return;
+	}
+
+	const score = getOrCreateScore(obj.owner, world);
+	++score.numFireballsHit;
 }
 
 function destroyObject(world: w.World, object: w.WorldObject) {
@@ -765,6 +787,12 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
+
+	if (spell.id === Spells.fireball.id) {
+		let score = getOrCreateScore(hero.id, world);
+		++score.numFireballsShot;
+	}
+
 	return true;
 }
 
@@ -851,9 +879,34 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 }
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
+	if (fromHeroId && fromHeroId !== toHero.id) {
+		const score = getOrCreateScore(fromHeroId, world);
+		score.damage += amount;
+	}
+
 	toHero.health -= amount;
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
 		toHero.killerHeroId = fromHeroId;
 	}
+}
+
+export function initScore(heroId: string) {
+	return {
+		heroId,
+		kills: 0,
+		assists: 0,
+		damage: 0,
+		numFireballsShot: 0,
+		numFireballsHit: 0,
+	};
+}
+
+function getOrCreateScore(heroId: string, world: w.World) {
+	let score = world.scores.get(heroId);
+	if (!score) {
+		score = initScore(heroId);
+		world.scores.set(heroId, score);
+	}
+	return score;
 }

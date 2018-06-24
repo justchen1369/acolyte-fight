@@ -151,6 +151,7 @@ export interface World {
 
 	activePlayers: Set<string>;
 	players: Map<string, Player>;
+	scores: Map<string, HeroScore>;
 
 	objects: Map<string, WorldObject>,
 	destroyed: WorldObject[];
@@ -169,6 +170,16 @@ export interface World {
 	
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };
+
+export interface HeroScore {
+	heroId: string;
+	kills: number;
+	assists: number;
+	damage: number;
+
+	numFireballsShot: number;
+	numFireballsHit: number;
+}
 
 export interface UIState {
 	myGameId: string | null;
@@ -290,6 +301,7 @@ export interface Projectile extends WorldObjectBase {
 
 	owner: string;
 	body: pl.Body;
+	hit?: boolean;
 
 	targetId: string | null;
 	damage: number;
