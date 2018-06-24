@@ -150,7 +150,7 @@ export namespace Spells {
 		action: "projectile",
 
 		color: '#ff0000',
-		icon: "meteorImpact",
+		icon: "cometSpark",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		chargeTicks: 0.1 * TicksPerSecond,
