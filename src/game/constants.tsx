@@ -244,6 +244,7 @@ export namespace Spells {
 		icon: "boltSaw",
 
 		cooldown: 20 * TicksPerSecond,
+		fireTowardsCurrentHeading: true,
 
 		projectile: {
 			color: '#44ffcc',

@@ -30,7 +30,8 @@ export interface MoveSpell extends SpellBase {
 export interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
-    projectile: ProjectileTemplate;
+	projectile: ProjectileTemplate;
+	fireTowardsCurrentHeading?: boolean;
 }
 
 export interface SpraySpell extends SpellBase {

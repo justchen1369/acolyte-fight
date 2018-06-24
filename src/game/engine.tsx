@@ -115,8 +115,15 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 	let id = spell.id + (world.nextBulletId++);
 
 	let from = hero.body.getPosition();
-	let position = vector.towards(from, target, Hero.Radius + projectileTemplate.radius + constants.Pixel);
-	let velocity = vector.direction(target, from, projectileTemplate.speed);
+
+	let direction = vector.unit(vector.diff(target, from));
+	if (spell.action === "projectile" && spell.fireTowardsCurrentHeading) {
+		direction = vector.fromAngle(hero.body.getAngle());
+	}
+
+	const offset = Hero.Radius + projectileTemplate.radius + constants.Pixel;
+	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
+	const velocity = vector.multiply(direction, projectileTemplate.speed);
 
 	let body = world.physics.createBody({
 		userData: id,
