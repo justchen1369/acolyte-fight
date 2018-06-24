@@ -12,7 +12,7 @@ export namespace Categories {
 }
 
 export namespace Matchmaking {
-	export const JoinPeriod = 5 * TicksPerSecond;
+	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 3 * 60 * TicksPerSecond;
 	export const MaxPlayers = 5;
 }

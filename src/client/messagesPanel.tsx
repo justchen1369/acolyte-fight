@@ -89,6 +89,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     private renderNotification(notification: w.Notification) {
         switch (notification.type) {
             case "help": return this.renderHelpNotification(notification);
+            case "closing": return this.renderClosingNotification(notification);
             case "join": return this.renderJoinNotification(notification);
             case "leave": return this.renderLeaveNotification(notification);
             case "kill": return this.renderKillNotification(notification);
@@ -98,6 +99,14 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderHelpNotification(notification: w.HelpNotification) {
         return <span className="help-text">Use the mouse to move!</span>
+    }
+
+    private renderClosingNotification(notification: w.CloseGameNotification) {
+        if (notification.ticksUntilClose <= 0) {
+            return <span className="game-started">Game started</span>
+        } else {
+            return null;
+        }
     }
 
     private renderJoinNotification(notification: w.JoinNotification) {
@@ -113,11 +122,19 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderKillNotification(notification: w.KillNotification) {
-        return <span>
-            {notification.killer && <span key="killer">{this.renderPlayer(notification.killer)} killed </span>}
-            {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)} </span>}
-            {notification.assist && <span key="assist">assist {this.renderPlayer(notification.assist)} </span>}
-        </span>
+        if (!notification.killed) {
+            return null;
+        }
+
+        if (notification.killer) {
+            return <span>
+                {notification.killer && <span key="killer">{this.renderPlayer(notification.killer)} killed </span>}
+                {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)} </span>}
+                {notification.assist && <span key="assist">assist {this.renderPlayer(notification.assist)} </span>}
+            </span>
+        } else {
+            return <span key="killed">{this.renderPlayer(notification.killed)} died</span>
+        }
     }
 
     private renderPlayer(player: w.Player) {

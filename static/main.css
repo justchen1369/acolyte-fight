@@ -60,7 +60,7 @@ a:hover, a:active {
     font-size: 80%;
 }
 
-.player-list .player-icons {
+.player-list .waiting-for-players {
     margin-right: 4px;
 }
 
@@ -73,6 +73,10 @@ a:hover, a:active {
 }
 
 #messages-panel .help-text {
+    font-weight: bold;
+}
+
+#messages-panel .game-started {
     font-weight: bold;
 }
 

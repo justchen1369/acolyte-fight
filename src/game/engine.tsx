@@ -879,6 +879,11 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 }
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
+	if (world.tick < world.startTick) {
+		// No damage until game started
+		return;
+	}
+
 	if (fromHeroId && fromHeroId !== toHero.id) {
 		const score = getOrCreateScore(fromHeroId, world);
 		score.damage += amount;
