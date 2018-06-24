@@ -59,7 +59,7 @@ function renderWorld(ctx: CanvasRenderingContext2D, world: w.World, rect: Client
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
 		let complete = true;
-		complete = renderTrail(ctx, trail);
+		complete = renderTrail(ctx, trail, world);
 		if (!complete) {
 			newTrails.push(trail);
 		}
@@ -113,7 +113,7 @@ function renderExplosion(ctx: CanvasRenderingContext2D, explosion: w.Explosion, 
 	world.ui.trails.push({
 		type: "circle",
 		max: ticks,
-		remaining: ticks,
+		initialTick: world.tick,
 		pos: explosion.pos,
 		fillStyle: 'white',
 		glowPixels: 20,
@@ -298,7 +298,7 @@ function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, 
 			type: "circle",
 			pos: vector.plus(projectile.body.getPosition(), vector.multiply(vector.fromAngle(angle), projectile.radius)),
 			radius: projectile.radius / numParticles,
-			remaining: projectile.trailTicks,
+			initialTick: world.tick,
 			max: projectile.trailTicks, 
 			fillStyle: projectileColor(projectile, world),
 			glowPixels: projectile.glowPixels,
@@ -352,7 +352,7 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 
 	world.ui.trails.push({
 		type: 'line',
-		remaining: projectile.trailTicks,
+		initialTick: world.tick,
 		max: projectile.trailTicks, 
 		from: vector.clone(previous),
 		to: vector.clone(pos),
@@ -367,7 +367,7 @@ function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectil
 
 	world.ui.trails.push({
 		type: 'circle',
-		remaining: projectile.trailTicks,
+		initialTick: world.tick,
 		max: projectile.trailTicks, 
 		pos: vector.clone(pos),
 		fillStyle: projectileColor(projectile, world),
@@ -384,12 +384,14 @@ function projectileColor(projectile: w.Projectile, world: w.World) {
 	return color;
 }
 
-function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
-	let proportion = 1.0 * trail.remaining / trail.max;
-	if (proportion <= 0) {
+function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail, world: w.World) {
+	const expireTick = trail.initialTick + trail.max;
+	const remaining = expireTick - world.tick;
+	if (remaining <= 0) {
 		return true;
 	}
 
+	const proportion = 1.0 * remaining / trail.max;
 
 	ctx.save(); 
 
@@ -415,8 +417,7 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
 
 	ctx.restore();
 
-	--trail.remaining;
-	return trail.remaining <= 0;
+	return false;
 }
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {

@@ -351,7 +351,7 @@ export interface Action {
 export type Trail = CircleTrail | LineTrail;
 
 export interface TrailBase {
-	remaining: number;
+	initialTick: number;
 	max: number;
 	fillStyle: string;
 	glowPixels?: number;
