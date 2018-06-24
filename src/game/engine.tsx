@@ -145,6 +145,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		targetId: targetObj ? targetObj.id : null,
 		damage: projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
+		gravity: projectileTemplate.gravity,
 
 		homing: projectileTemplate.homing && {
 			turnRate: projectileTemplate.homing.turnRate,
@@ -203,6 +204,7 @@ export function tick(world: w.World) {
 
 	homingForce(world);
 	linkForce(world);
+	gravityForce(world);
 	decayShields(world);
 	applyLavaDamage(world);
 	shrink(world);
@@ -544,6 +546,43 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
 	let newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
+}
+
+function gravityForce(world: w.World) {
+	world.objects.forEach(orb => {
+		if (!(orb.category === "projectile" && orb.gravity)) {
+			return;
+		}
+
+		world.objects.forEach(other => {
+			if (other.id === orb.id || other.id === orb.owner) {
+				return;
+			}
+
+			const towardsOrb = vector.diff(orb.body.getPosition(), other.body.getPosition());
+			const distanceTo = vector.length(towardsOrb);
+			if (distanceTo >= orb.gravity.radius) {
+				return;
+			}
+
+			const proportion = Math.pow(1.0 - distanceTo / orb.gravity.radius, orb.gravity.power);
+
+			if (other.category === "hero") {
+				const strength = orb.gravity.strength * proportion;
+				const impulse = vector.multiply(vector.unit(towardsOrb), strength);
+				other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
+
+				applyDamage(other, orb.damage * proportion, orb.owner, world);
+			} else if (other.category === "projectile") {
+				const currentVelocity = other.body.getLinearVelocity();
+				const currentAngle = vector.angle(currentVelocity);
+				const targetAngle = vector.angle(towardsOrb);
+				const newAngle = vector.turnTowards(currentAngle, targetAngle, orb.gravity.turnRate * proportion);
+				const newVelocity = vector.redirect(currentVelocity, vector.fromAngle(newAngle));
+				other.body.setLinearVelocity(newVelocity);
+			}
+		});
+	});
 }
 
 function homingForce(world: w.World) {

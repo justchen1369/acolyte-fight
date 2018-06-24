@@ -84,14 +84,16 @@ function renderDestroyed(ctx: CanvasRenderingContext2D, obj: w.WorldObject, worl
 }
 
 function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World) {
-	if (obj.render === "link") {
-		renderLink(ctx, obj, world);
-	} else if (obj.render === "projectile") {
+	if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctx, obj, world);
         renderRay(ctx, obj, world);
 	} else if (obj.render == "ray") {
         renderRay(ctx, obj, world);
+	} else if (obj.render === "link") {
+		renderLink(ctx, obj, world);
+	} else if (obj.render === "gravity") {
+		renderGravity(ctx, obj, world);
 	}
 }
 
@@ -281,6 +283,29 @@ function rgColor(proportion: number) {
 	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
 }
 
+function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
+	if (!projectile.gravity) {
+		return;
+	}
+
+	const animationLength = 0.33 * constants.TicksPerSecond;
+	const numParticles = 3;
+
+	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
+	for (let i = 0; i < numParticles; ++i) {
+		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
+		world.ui.trails.push({
+			type: "circle",
+			pos: vector.plus(projectile.body.getPosition(), vector.multiply(vector.fromAngle(angle), projectile.radius)),
+			radius: projectile.radius / numParticles,
+			remaining: projectile.trailTicks,
+			max: projectile.trailTicks, 
+			fillStyle: projectileColor(projectile, world),
+			glowPixels: projectile.glowPixels,
+		});
+	}
+}
+
 function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
 	if (!projectile.link) {
 		return;
@@ -368,6 +393,7 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail) {
 
 	ctx.save(); 
 
+	ctx.globalCompositeOperation = "lighten";
 	ctx.globalAlpha = proportion;
 	ctx.fillStyle = trail.fillStyle;
 	ctx.strokeStyle = trail.fillStyle;

@@ -53,7 +53,8 @@ export interface ProjectileTemplate {
     speed: number;
 
     homing?: HomingParametersTemplate;
-    link?: LinkParametersTemplate;
+	link?: LinkParametersTemplate;
+	gravity?: GravityParameters;
 
     maxTicks: number;
     collideWith?: number;
@@ -66,6 +67,13 @@ export interface ProjectileTemplate {
     selfColor?: boolean;
     glowPixels?: number;
     render: string;
+}
+
+export interface GravityParameters {
+	strength: number;
+	turnRate: number;
+	radius: number;
+	power: number;
 }
 
 export interface BounceParameters {
@@ -285,6 +293,7 @@ export interface Projectile extends WorldObjectBase {
 	targetId: string | null;
 	damage: number;
 	bounce?: BounceParameters;
+	gravity?: GravityParameters;
 	homing?: HomingParameters;
 	link?: LinkParameters;
 	shieldTakesOwnership: boolean;

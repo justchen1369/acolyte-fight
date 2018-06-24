@@ -132,7 +132,7 @@ export namespace Spells {
 			color: '#ff0044',
 			glowPixels: 10,
 
-			density: 0.1,
+			density: 1.0,
 			radius: 0.002,
 			speed: 0.5,
 			maxTicks: 0.3 * TicksPerSecond,
@@ -198,7 +198,7 @@ export namespace Spells {
 			density: 0.0001,
 			radius: 0.005,
 			speed: 3.0,
-			maxTicks: 10 * TicksPerSecond,
+			maxTicks: 1 * TicksPerSecond,
 			damage: 10,
 			trailTicks: 1 * TicksPerSecond,
 			collideWith: Categories.All,
@@ -373,6 +373,41 @@ export namespace Spells {
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
+	export const gravity = {
+		id: 'gravity',
+		description: "Fire an orb that pulls everything in",
+		action: "projectile",
+
+		color: '#0ace00',
+		icon: "atomicSlashes",
+
+		maxAngleDiff: 0.01 * 2 * Math.PI,
+		cooldown: 12 * TicksPerSecond,
+
+		projectile: {
+			color: '#0ace00',
+			glowPixels: 10,
+
+			density: 2,
+			radius: 0.02,
+			speed: 0.2,
+			maxTicks: 5.0 * TicksPerSecond,
+			damage: 10 / TicksPerSecond,
+			collideWith: 0,
+			explodeOn: Categories.All,
+
+			gravity: {
+				strength: 0.001 / TicksPerSecond,
+				turnRate: 4.0 / TicksPerSecond,
+				radius: 0.25,
+				power: 4,
+			} as c.GravityParameters,
+
+			render: "gravity",
+			trailTicks: 0.5 * TicksPerSecond,
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
 	export const scourge = {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
@@ -448,6 +483,7 @@ export namespace Spells {
 		fireball,
 		firespray,
 		meteor,
+		gravity,
 		link,
 		kamehameha,
 		lightning,
@@ -468,7 +504,7 @@ export namespace Choices {
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang"],
-		"r": ["meteor", "link"],
+		"r": ["meteor", "link", "gravity"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;

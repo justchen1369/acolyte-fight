@@ -42,6 +42,11 @@ export function towards(from: pl.Vec2, to: pl.Vec2, distance: number) {
 	return plus(from, step);
 }
 
+// Keep length, but use new direction
+export function redirect(oldDirection: pl.Vec2, newDirection: pl.Vec2) {
+	return multiply(unit(newDirection), length(oldDirection));
+}
+
 export function plus(a: pl.Vec2, b: pl.Vec2) {
 	return pl.Vec2(a.x + b.x, a.y + b.y);
 }
