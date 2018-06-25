@@ -10,6 +10,10 @@ import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond }
 // We want all thresholds to be elastic.
 (pl as any).internal.Settings.velocityThreshold = 0;
 
+// We need to adjust this because our scale is not a normal scale and the defaults let some small projectiles tunnel through others
+(pl as any).internal.Settings.linearSlop = 0.0005;
+(pl as any).internal.Settings.linearSlopSquared = Math.pow((pl as any).internal.Settings.linearSlop, 2.0);
+
 export function initialWorld(): w.World {
 	let world = {
 		tick: 0,
@@ -73,7 +77,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		linearDamping: Hero.MaxDamping,
 		angularDamping: Hero.AngularDamping,
 		allowSleep: false,
-		bullet: true,
 	} as pl.BodyDef);
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,

@@ -11,6 +11,8 @@ declare module "planck-js" {
         interface Body {
             createFixture(polygon: Polygon, fixtureDef: FixtureDef): void;
             destroyFixture(fixture: Fixture): void;
+            isBullet(): boolean;
+            setBullet(bullet: boolean): void;
             getPosition(): Vec2;
             setPosition(pos: Vec2): void;
             getAngle(): number;
