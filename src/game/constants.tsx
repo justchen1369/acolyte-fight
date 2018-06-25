@@ -177,7 +177,7 @@ export namespace Spells {
 		icon: "glowingHands",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		chargeTicks: 2.0 * TicksPerSecond,
+		chargeTicks: 1.5 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
 		knockbackCancel: true,
@@ -320,7 +320,7 @@ export namespace Spells {
 
 			link: {
 				strength: 0.001 / TicksPerSecond,
-				linkTicks: 4 * TicksPerSecond,
+				linkTicks: 2 * TicksPerSecond,
 			} as c.LinkParameters,
 
 			homing: {
@@ -524,8 +524,8 @@ export namespace Choices {
 		"a": ["teleport", "thrust"],
 		"x": ["shield", "drain"],
 		"q": ["fireball"],
-		"w": ["lightning", "link", "kamehameha"],
-		"e": ["homing", "boomerang"],
+		"w": ["lightning", "kamehameha"],
+		"e": ["homing", "boomerang", "link"],
 		"r": ["meteor", "gravity"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
