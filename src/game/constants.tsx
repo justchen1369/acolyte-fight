@@ -418,7 +418,7 @@ export namespace Spells {
 			explodeOn: Categories.All,
 
 			gravity: {
-				strength: 0.00025 / TicksPerSecond,
+				strength: 0.0001 / TicksPerSecond,
 				turnRate: 10.0 / TicksPerSecond,
 				radius: 0.5,
 				power: 4,
@@ -426,6 +426,8 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 2 * Math.PI,
+				minDistanceToTarget: Hero.Radius / 2,
+				speedWhenClose: 0.1,
 			} as c.HomingParametersTemplate,
 
 			render: "gravity",
