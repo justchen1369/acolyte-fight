@@ -413,7 +413,7 @@ export namespace Spells {
 			radius: 0.02,
 			speed: 0.1,
 			maxTicks: 3.0 * TicksPerSecond,
-			damage: 10.0 / TicksPerSecond,
+			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
 
