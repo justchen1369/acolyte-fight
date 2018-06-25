@@ -20,7 +20,7 @@ export function calculateWorldRect(rect: ClientRect) {
 
 export function render(world: w.World, canvas: HTMLCanvasElement) {
 	let rect = canvas.getBoundingClientRect();
-	let ctx = canvas.getContext('2d');
+	let ctx = canvas.getContext('2d', { alpha: false });
 	if (!ctx) {
 		throw "Error getting context";
 	}
