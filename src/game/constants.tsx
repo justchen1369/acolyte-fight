@@ -356,7 +356,7 @@ export namespace Spells {
 			damage: 5,
 			explodeOn: Categories.All,
 			bounce: {
-				damageFactor: 0.99,
+				damageFactor: 0.9,
 			},
 
 			render: "ray",
