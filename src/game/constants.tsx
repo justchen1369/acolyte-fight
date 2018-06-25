@@ -373,7 +373,7 @@ export namespace Spells {
 		icon: "energyBreath",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 5 * TicksPerSecond,
+		cooldown: 7 * TicksPerSecond,
 
 		projectile: {
 			color: '#22ee88',
@@ -381,7 +381,7 @@ export namespace Spells {
 			density: 2,
 			radius: 0.002,
 			speed: 0.2,
-			maxTicks: 1.0 * TicksPerSecond,
+			maxTicks: 2.0 * TicksPerSecond,
 			damage: 10,
 			lifeSteal: 1.0,
 			explodeOn: Categories.All,
