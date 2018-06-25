@@ -258,7 +258,6 @@ export interface WorldObjectBase {
 	bullet?: boolean;
 	body: pl.Body;
 	destroyed?: boolean;
-	step?: pl.Vec2;
 }
 
 export interface Hero extends WorldObjectBase {

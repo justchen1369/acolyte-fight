@@ -230,13 +230,6 @@ export function tick(world: w.World) {
 }
 
 function physicsStep(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.step) {
-			obj.body.setPosition(vector.plus(obj.body.getPosition(), obj.step));
-			obj.step = null;
-		}
-	});
-
 	world.physics.step(1.0 / TicksPerSecond);
 }
 
@@ -596,7 +589,11 @@ function gravityForce(world: w.World) {
 			if (other.category === "hero") {
 
 				const strength = orb.gravity.strength * proportion;
-				const impulse = vector.multiply(vector.unit(towardsOrb), strength);
+
+				const idealImpulse = vector.multiply(vector.unit(towardsOrb), strength);
+				const outwardDirection = vector.unit(orb.body.getLinearVelocity());
+				const impulse = vector.multiply(outwardDirection, Math.max(0, vector.dot(idealImpulse, outwardDirection)));
+
 				other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
 
 				if (!(other.shieldTicks > 0)) {
@@ -812,9 +809,11 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Mov
 	let current = hero.body.getPosition();
 	let target = action.target;
 
-	const step = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
+	const idealStep = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
 	const facing = vector.fromAngle(hero.body.getAngle());
-	hero.step = vector.multiply(vector.unit(step), vector.dot(step, facing)); // Project onto the direction we're facing
+	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
+
+	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
 
 	return vector.distance(current, target) < constants.Pixel;
 }

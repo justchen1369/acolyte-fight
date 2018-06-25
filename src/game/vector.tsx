@@ -47,6 +47,11 @@ export function redirect(oldDirection: pl.Vec2, newDirection: pl.Vec2) {
 	return multiply(unit(newDirection), length(oldDirection));
 }
 
+// Keep direction, but use new length
+export function relengthen(oldDirection: pl.Vec2, newLength: number) {
+	return multiply(unit(oldDirection), newLength);
+}
+
 export function plus(a: pl.Vec2, b: pl.Vec2) {
 	return pl.Vec2(a.x + b.x, a.y + b.y);
 }
