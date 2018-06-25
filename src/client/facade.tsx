@@ -1,9 +1,11 @@
 import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond } from '../game/constants';
-import { render, calculateWorldRect } from './render';
+import { render, calculateWorldRect, CanvasStack } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
+
+export { CanvasStack } from './render';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
@@ -22,33 +24,37 @@ export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
 }
 
-export function attachToCanvas(canvas: HTMLCanvasElement) {
+export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
-    canvas.onmouseenter = canvasMouseMove;
-    canvas.onmousemove = canvasMouseMove;
-    canvas.onmousedown = canvasMouseMove;
+    canvasStack.canvas.onmouseenter = canvasMouseMove;
+    canvasStack.canvas.onmousemove = canvasMouseMove;
+    canvasStack.canvas.onmousedown = canvasMouseMove;
     window.onkeydown = gameKeyDown;
     window.onresize = fullScreenCanvas;
 
-    canvas.oncontextmenu = function (e) {
+    canvasStack.canvas.oncontextmenu = function (e) {
             e.preventDefault();
     };
 
     window.requestAnimationFrame(frameLoop);
 
     function fullScreenCanvas() {
-        canvas.width = document.body.clientWidth;
-        canvas.height = document.body.clientHeight;
+        canvasStack.background.width = document.body.clientWidth;
+        canvasStack.background.height = document.body.clientHeight;
+        canvasStack.glows.width = document.body.clientWidth;
+        canvasStack.glows.height = document.body.clientHeight;
+        canvasStack.canvas.width = document.body.clientWidth;
+        canvasStack.canvas.height = document.body.clientHeight;
     }
 
     function frameLoop() {
-        frame(canvas);
+        frame(canvasStack);
         window.requestAnimationFrame(frameLoop);
     }
 }
 
-export function frame(canvas: HTMLCanvasElement) {
+export function frame(canvasStack: CanvasStack) {
 	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		let tickData = tickQueue.shift();
 		if (tickData.tick < world.tick) {
@@ -58,7 +64,7 @@ export function frame(canvas: HTMLCanvasElement) {
 		applyTickActions(tickData, world);
 		engine.tick(world);
 	}
-	render(world, canvas);
+	render(world, canvasStack);
 
 	const notifications = engine.takeNotifications(world);
 	notify(notifications);

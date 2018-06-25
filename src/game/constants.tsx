@@ -97,7 +97,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff8800',
-			glowPixels: 10,
 
 			density: 2,
 			radius: 0.005,
@@ -130,7 +129,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff0044',
-			glowPixels: 10,
 
 			density: 1.0,
 			radius: 0.002,
@@ -158,7 +156,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ff0000',
-			glowPixels: 10,
 
 			density: 1000,
 			radius: 0.03,
@@ -193,14 +190,13 @@ export namespace Spells {
 
 		projectile: {
 			color: '#ffffff',
-			glowPixels: 5,
 
 			density: 0.0001,
 			radius: 0.005,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,
 			damage: 10,
-			trailTicks: 0.75 * TicksPerSecond,
+			trailTicks: 1.0 * TicksPerSecond,
 			collideWith: Categories.All,
 			explodeOn: Categories.All,
 
@@ -221,7 +217,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#00ddff',
-			glowPixels: 5,
 
 			density: 4,
 			radius: 0.0025,
@@ -248,7 +243,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#44ffcc',
-			glowPixels: 10,
 
 			density: 25,
 			radius: 0.003,
@@ -282,7 +276,6 @@ export namespace Spells {
 		projectile: {
 			color: '#ff00ff',
 			selfColor: true,
-			glowPixels: 10,
 
 			density: 25,
 			radius: 0.003,
@@ -317,7 +310,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#4444ff',
-			glowPixels: 5,
 
 			density: 0.001,
 			radius: 0.005,
@@ -357,7 +349,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#88ee22',
-			glowPixels: 5,
 
 			density: 2,
 			radius: 0.001,
@@ -387,7 +378,6 @@ export namespace Spells {
 
 		projectile: {
 			color: '#0ace00',
-			glowPixels: 10,
 
 			density: 2,
 			radius: 0.02,

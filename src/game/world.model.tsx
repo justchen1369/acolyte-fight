@@ -66,7 +66,6 @@ export interface ProjectileTemplate {
 
     color: string;
     selfColor?: boolean;
-    glowPixels?: number;
     render: string;
 }
 
@@ -319,7 +318,6 @@ export interface Projectile extends WorldObjectBase {
     radius: number;
 	color: string;
 	selfColor: boolean;
-	glowPixels?: number;
     trailTicks: number;
 
 	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
@@ -367,7 +365,6 @@ export interface TrailBase {
 	initialTick: number;
 	max: number;
 	fillStyle: string;
-	glowPixels?: number;
 }
 
 export interface CircleTrail extends TrailBase {

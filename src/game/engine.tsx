@@ -175,7 +175,6 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
 		selfColor: projectileTemplate.selfColor,
-		glowPixels: projectileTemplate.glowPixels,
 		radius: projectileTemplate.radius,
 		trailTicks: projectileTemplate.trailTicks,
 

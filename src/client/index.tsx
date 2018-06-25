@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { attachToCanvas, attachToSocket, attachNotificationListener, world } from './facade';
+import { attachToCanvas, attachToSocket, attachNotificationListener, world, CanvasStack } from './facade';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
 
@@ -12,7 +12,6 @@ import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
 
 const socket = socketLib();
-const canvas = document.getElementById("canvas") as HTMLCanvasElement;
 
 const playerName = getOrCreatePlayerName();
 const keyBindings = Storage.loadKeyBindingConfig() || Choices.Defaults;
@@ -35,7 +34,11 @@ if (window.location.search) {
 }
 
 attachToSocket(socket, playerName, keyBindings, observeGameId);
-attachToCanvas(canvas);
+attachToCanvas({
+    background: document.getElementById("background") as HTMLCanvasElement,
+    glows: document.getElementById("glows") as HTMLCanvasElement,
+    canvas: document.getElementById("canvas") as HTMLCanvasElement,
+});
 
 const infoPanel = ReactDOM.render(<InfoPanel playerName={playerName} world={world} />, document.getElementById("info-panel")) as InfoPanel;
 const messagesPanel = ReactDOM.render(<MessagesPanel world={world} />, document.getElementById("messages-panel")) as MessagesPanel;

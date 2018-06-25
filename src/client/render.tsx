@@ -7,6 +7,18 @@ import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '..
 import { Icons } from '../ui/icons';
 import { renderIcon } from '../ui/renderIcon';
 
+export interface CanvasStack {
+	background: HTMLCanvasElement;
+	glows: HTMLCanvasElement;
+	canvas: HTMLCanvasElement;
+}
+
+export interface CanvasCtxStack {
+	background: CanvasRenderingContext2D;
+	glows: CanvasRenderingContext2D;
+	canvas: CanvasRenderingContext2D;
+}
+
 // Rendering
 export function calculateWorldRect(rect: ClientRect) {
 	let size = Math.min(rect.width, rect.height);
@@ -18,55 +30,66 @@ export function calculateWorldRect(rect: ClientRect) {
 	};
 }
 
-export function render(world: w.World, canvas: HTMLCanvasElement) {
-	let rect = canvas.getBoundingClientRect();
-	let ctx = canvas.getContext('2d', { alpha: false });
-	if (!ctx) {
+export function render(world: w.World, canvasStack: CanvasStack) {
+	let ctxStack = {
+		background: canvasStack.background.getContext('2d', { alpha: false }),
+		glows: canvasStack.glows.getContext('2d', { alpha: true }),
+		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
+	} as CanvasCtxStack;
+
+	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas)) {
 		throw "Error getting context";
 	}
 
-	ctx.save();
-	clearCanvas(ctx, rect);
-	renderWorld(ctx, world, rect);
-	renderInterface(ctx, world, rect);
-	ctx.restore();
+	let rect = canvasStack.canvas.getBoundingClientRect();
+
+	all(ctxStack, ctx => ctx.save());
+	clearCanvas(ctxStack, rect);
+	renderWorld(ctxStack, world, rect);
+	renderInterface(ctxStack.canvas, world, rect);
+	all(ctxStack, ctx => ctx.restore());
 }
 
-function clearCanvas(ctx: CanvasRenderingContext2D, rect: ClientRect) {
-	ctx.save();
-
-	ctx.fillStyle = '#000000';
-	ctx.beginPath();
-	ctx.rect(0, 0, rect.width, rect.height);
-	ctx.fill();
-
-	ctx.restore();
+function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
+	func(contextStack.background);
+	func(contextStack.glows);
+	func(contextStack.canvas);
 }
 
-function renderWorld(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
-	ctx.save();
+function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
+	ctxStack.background.fillStyle = 'black';
+	ctxStack.background.fillRect(0, 0, rect.width, rect.height);
+
+	ctxStack.glows.clearRect(0, 0, rect.width, rect.height);
+	ctxStack.canvas.clearRect(0, 0, rect.width, rect.height);
+}
+
+function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
+	all(ctxStack, ctx => ctx.save());
 
 	let worldRect = calculateWorldRect(rect);
-	ctx.translate(worldRect.left, worldRect.top);
-	ctx.scale(worldRect.width, worldRect.height);
+	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
+	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
-	renderMap(ctx, world);
+	renderMap(ctxStack.background, world);
 
-	world.objects.forEach(obj => renderObject(ctx, obj, world));
-	world.destroyed.forEach(obj => renderDestroyed(ctx, obj, world));
-	world.explosions.forEach(obj => renderExplosion(ctx, obj, world));
+	world.objects.forEach(obj => renderObject(ctxStack.canvas, obj, world));
+	world.destroyed.forEach(obj => renderDestroyed(ctxStack.canvas, obj, world));
+	world.explosions.forEach(obj => renderExplosion(ctxStack.canvas, obj, world));
 
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
-		let complete = true;
-		complete = renderTrail(ctx, trail, world);
-		if (!complete) {
+		renderTrail(ctxStack.glows, trail, world);
+		renderTrail(ctxStack.canvas, trail, world);
+
+		const expireTick = trail.initialTick + trail.max;
+		if (world.tick < expireTick) {
 			newTrails.push(trail);
 		}
 	});
 	world.ui.trails = newTrails;
 
-	ctx.restore();
+	all(ctxStack, ctx => ctx.restore());
 }
 
 function renderObject(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
@@ -116,7 +139,6 @@ function renderExplosion(ctx: CanvasRenderingContext2D, explosion: w.Explosion, 
 		initialTick: world.tick,
 		pos: explosion.pos,
 		fillStyle: 'white',
-		glowPixels: 20,
 		radius,
 	});
 }
@@ -301,7 +323,6 @@ function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, 
 			initialTick: world.tick,
 			max: projectile.trailTicks, 
 			fillStyle: projectileColor(projectile, world),
-			glowPixels: projectile.glowPixels,
 		});
 	}
 }
@@ -357,7 +378,6 @@ function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, worl
 		from: vector.clone(previous),
 		to: vector.clone(pos),
 		fillStyle: projectileColor(projectile, world),
-		glowPixels: projectile.glowPixels,
 		width: projectile.radius * 2,
 	} as w.LineTrail);
 }
@@ -371,7 +391,6 @@ function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectil
 		max: projectile.trailTicks, 
 		pos: vector.clone(pos),
 		fillStyle: projectileColor(projectile, world),
-		glowPixels: projectile.glowPixels,
 		radius: projectile.radius,
 	} as w.CircleTrail);
 }
@@ -399,9 +418,6 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail, world: w.Wor
 	ctx.globalAlpha = proportion;
 	ctx.fillStyle = trail.fillStyle;
 	ctx.strokeStyle = trail.fillStyle;
-	
-	ctx.shadowColor = trail.fillStyle;
-	ctx.shadowBlur = trail.glowPixels || 0;
 
 	if (trail.type === "circle") {
 		ctx.beginPath();
