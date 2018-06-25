@@ -196,7 +196,6 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 	// Orientation
 	{
-		const numTriangles = 3;
 		ctx.save();
 
 		ctx.beginPath();
@@ -204,7 +203,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.clip();
 
 		ctx.rotate(angle);
-		ctx.scale(Hero.Radius, Hero.Radius);
+		ctx.scale(radius, radius);
 
 		ctx.fillStyle = "white";
 		ctx.strokeStyle = "black";
