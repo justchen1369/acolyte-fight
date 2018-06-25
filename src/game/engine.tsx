@@ -682,7 +682,7 @@ function updateKnockback(world: w.World) {
 			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
 			if (obj.thrustTicks > 0) {
 				--obj.thrustTicks;
-				if (obj.thrustTicks === 0) {
+				if (obj.thrustTicks <= 0) {
 					obj.body.setLinearVelocity(vector.zero());
 				} else {
 					damping = 0;
@@ -828,13 +828,15 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 
 	if (world.tick === hero.casting.channellingStartTick) {
 		const diff = vector.diff(action.target, hero.body.getPosition());
-		const velocity = vector.multiply(vector.truncate(diff, spell.speed / TicksPerSecond), TicksPerSecond);
+		const velocity = vector.multiply(vector.unit(diff), spell.speed);
 		hero.body.setLinearVelocity(velocity);
 
-		hero.thrustTicks = spell.maxTicks;
+		const distancePerTick = spell.speed / TicksPerSecond;
+		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
+		hero.thrustTicks = Math.min(spell.maxTicks, ticksToTarget);
 	}
 
-	return hero.thrustTicks === 0;
+	return hero.thrustTicks <= 0;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
