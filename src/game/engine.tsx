@@ -676,7 +676,7 @@ function linkForce(world: w.World) {
 			return;
 		}
 
-		if (target.shieldTicks > 0) {
+		if (owner.shieldTicks > 0 || target.shieldTicks > 0) {
 			obj.expireTick = world.tick;
 			return;
 		}
