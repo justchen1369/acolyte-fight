@@ -404,15 +404,15 @@ export namespace Spells {
 		icon: "atomicSlashes",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 12 * TicksPerSecond,
+		cooldown: 20 * TicksPerSecond,
 
 		projectile: {
 			color: '#0ace00',
 
 			density: 2,
 			radius: 0.02,
-			speed: 0.1,
-			maxTicks: 3.0 * TicksPerSecond,
+			speed: 0.3,
+			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
