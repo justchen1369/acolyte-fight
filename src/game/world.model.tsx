@@ -56,11 +56,12 @@ export interface ProjectileTemplate {
     homing?: HomingParametersTemplate;
 	link?: LinkParametersTemplate;
 	gravity?: GravityParameters;
+	lifeSteal?: number;
 
     maxTicks: number;
     collideWith?: number;
 	explodeOn: number;
-	shieldTakesOwnership: boolean;
+	shieldTakesOwnership?: boolean;
 
     trailTicks: number;
 
@@ -85,6 +86,7 @@ export interface HomingParametersTemplate {
 	turnRate: number;
 	maxTurnProportion?: number;
     targetType?: string;
+	redirect?: boolean;
 }
 
 export interface LinkParametersTemplate {
@@ -308,6 +310,7 @@ export interface Projectile extends WorldObjectBase {
 	gravity?: GravityParameters;
 	homing?: HomingParameters;
 	link?: LinkParameters;
+	lifeSteal: number;
 	shieldTakesOwnership: boolean;
 
 	expireTick: number;
@@ -326,7 +329,6 @@ export interface Projectile extends WorldObjectBase {
 export namespace HomingTargets {
 	export const enemy = "enemy";
 	export const self = "self";
-	export const turn = "turn";
 }
 
 export interface HomingParameters {
@@ -334,6 +336,7 @@ export interface HomingParameters {
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
 	targetType: string;
+	redirectionTick: number | null;
 }
 
 export interface LinkParameters {

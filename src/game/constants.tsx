@@ -364,9 +364,40 @@ export namespace Spells {
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
+	export const drain = {
+		id: 'drain',
+		description: "Steal some life from another player. They probably didn't need it anyway.",
+		action: "projectile",
+
+		color: '#22ee88',
+		icon: "energyBreath",
+
+		maxAngleDiff: 0.01 * 2 * Math.PI,
+		cooldown: 5 * TicksPerSecond,
+
+		projectile: {
+			color: '#22ee88',
+
+			density: 2,
+			radius: 0.002,
+			speed: 0.2,
+			maxTicks: 1.0 * TicksPerSecond,
+			damage: 10,
+			lifeSteal: 1.0,
+			explodeOn: Categories.All,
+			homing: {
+				turnRate: 0,
+				redirect: true,
+			},
+
+			render: "ray",
+			trailTicks: 0.5 * TicksPerSecond,
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
 	export const gravity = {
 		id: 'gravity',
-		description: "Fire an orb that pulls everything in",
+		description: "Fire an orb that pulls everything in.",
 		action: "projectile",
 
 		color: '#0ace00',
@@ -480,6 +511,7 @@ export namespace Spells {
 		homing,
 		boomerang,
 		bouncer,
+		drain,
 		scourge,
 		shield,
 		teleport,
@@ -490,7 +522,7 @@ export namespace Spells {
 export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
-		"x": ["shield"],
+		"x": ["shield", "drain"],
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang"],

@@ -125,6 +125,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 	const offset = Hero.Radius + projectileTemplate.radius + constants.Pixel;
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
+	const diff = vector.diff(target, position);
 
 	let body = world.physics.createBody({
 		userData: id,
@@ -160,12 +161,14 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
+			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
 		} as w.HomingParameters,
 		link: projectileTemplate.link && {
 			strength: projectileTemplate.link.strength,
 			linkTicks: projectileTemplate.link.linkTicks,
 			heroId: null,
 		} as w.LinkParameters,
+		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
 		expireTick: world.tick + projectileTemplate.maxTicks,
@@ -409,31 +412,29 @@ function handleContact(world: w.World, contact: pl.Contact) {
 		return;
 	}
 
-	const collisionPoint = vector.average(contact.getWorldManifold().points);
-
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
 	if (objA && objB) {
-		handleCollision(world, objA, objB, collisionPoint);
-		handleCollision(world, objB, objA, collisionPoint);
+		handleCollision(world, objA, objB);
+		handleCollision(world, objB, objA);
 	}
 }
 
-function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
+function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject) {
 	if (object.category === "projectile") {
 		if (hit.category === "hero") {
-			handleProjectileHitHero(world, object, hit, collisionPoint);
+			handleProjectileHitHero(world, object, hit);
 		} else if (hit.category === "projectile") {
-			handleProjectileHitProjectile(world, object, hit, collisionPoint);
+			handleProjectileHitProjectile(world, object, hit);
 		}
 	} else if (object.category === "hero") {
 		if (hit.category === "hero") {
-			handleHeroHitHero(world, object, hit, collisionPoint);
+			handleHeroHitHero(world, object, hit);
 		}
 	}
 }
 
-function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero, collisionPoint: pl.Vec2) {
+function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	// Push back other heroes
 	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
 	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
@@ -452,13 +453,13 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero, collisio
 	}
 }
 
-function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile, collisionPoint: pl.Vec2) {
+function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
 	if (projectile.explodeOn & categoryFlags(other)) {
 		destroyObject(world, projectile);
 	}
 }
 
-function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero, collisionPoint: pl.Vec2) {
+function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
 	if (hero.shieldTicks > 0) {
 		if (projectile.shieldTakesOwnership && projectile.owner !== hero.id) { // Stop double redirections cancelling out
 			// Redirect back to owner
@@ -473,6 +474,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		if (hero.id !== projectile.owner) {
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner, world);
+			lifeSteal(damage, projectile, world);
 			projectile.hit = true;
 		}
 
@@ -483,6 +485,17 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		} else if (projectile.explodeOn & categoryFlags(hero)) {
 			destroyObject(world, projectile);
 		}
+	}
+}
+
+function lifeSteal(damage: number, projectile: w.Projectile, world: w.World) {
+	if (!projectile.lifeSteal) {
+		return;
+	}
+
+	const owner = world.objects.get(projectile.owner);
+	if (owner && owner.category === "hero") {
+		owner.health = Math.min(Hero.MaxHealth, owner.health + damage * projectile.lifeSteal);
 	}
 }
 
@@ -608,22 +621,25 @@ function homingForce(world: w.World) {
 			return;
 		}
 
-		if (obj.homing.targetType === w.HomingTargets.turn) {
-			const newVelocity = vector.turnVectorBy(obj.body.getLinearVelocity(), obj.homing.turnRate);
-			obj.body.setLinearVelocity(newVelocity);
+		const targetId = obj.homing.targetType === w.HomingTargets.self ? obj.owner : obj.targetId;
+		const target = world.objects.get(targetId);
+		if (!target) {
+			return;
+		}
+
+		const diff = vector.diff(target.body.getPosition(), obj.body.getPosition());
+		const distanceToTarget = vector.length(diff);
+		if (distanceToTarget < obj.homing.minDistanceToTarget) {
+			return;
+		}
+
+		if (obj.homing.redirectionTick && world.tick >= obj.homing.redirectionTick) {
+			obj.homing.redirectionTick = null;
+
+			// Redirect directly towards target
+			const currentVelocity = obj.body.getLinearVelocity();
+			obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
 		} else {
-			const targetId = obj.homing.targetType === w.HomingTargets.self ? obj.owner : obj.targetId;
-			const target = world.objects.get(targetId);
-			if (!target) {
-				return;
-			}
-
-			const diff = vector.diff(target.body.getPosition(), obj.body.getPosition());
-			const distanceToTarget = vector.length(diff);
-			if (distanceToTarget < obj.homing.minDistanceToTarget) {
-				return;
-			}
-
 			// Home to target
 			const currentVelocity = obj.body.getLinearVelocity();
 
