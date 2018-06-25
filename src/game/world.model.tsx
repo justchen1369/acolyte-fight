@@ -273,6 +273,7 @@ export interface Hero extends WorldObjectBase {
 	thrustTicks?: number;
 
 	hitTick: number;
+	teleportTick: number;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
@@ -313,6 +314,7 @@ export interface Projectile extends WorldObjectBase {
 	lifeSteal: number;
 	shieldTakesOwnership: boolean;
 
+	createTick: number;
 	expireTick: number;
 	maxTicks: number;
 	explodeOn: number;

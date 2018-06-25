@@ -95,6 +95,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		casting: null,
 		cooldowns: {},
 		hitTick: 0,
+		teleportTick: 0,
 		shieldTicks: World.InitialShieldTicks,
 		killerHeroId: null,
 		assistHeroId: null,
@@ -174,6 +175,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
+		createTick: world.tick,
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
 		explodeOn: projectileTemplate.explodeOn,
@@ -671,7 +673,12 @@ function linkForce(world: w.World) {
 
 		const owner = world.objects.get(obj.owner);
 		const target = world.objects.get(obj.link.heroId);
-		if (!(owner && target)) {
+		if (!(owner && target && owner.category === "hero" && target.category === "hero")) {
+			return;
+		}
+
+		if (target.teleportTick >= obj.createTick || target.shieldTicks > 0) {
+			obj.expireTick = world.tick;
 			return;
 		}
 
@@ -851,6 +858,9 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w
 	let currentPosition = hero.body.getPosition();
 	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
+
+	hero.teleportTick = world.tick;
+
 	return true;
 }
 
