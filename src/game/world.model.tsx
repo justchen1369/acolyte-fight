@@ -82,7 +82,8 @@ export interface BounceParameters {
 }
 
 export interface HomingParametersTemplate {
-    minDistanceToTarget?: number;
+	minDistanceToTarget?: number;
+	speedDecayWhenClose?: number;
 	turnRate: number;
 	maxTurnProportion?: number;
     targetType?: string;
@@ -337,6 +338,7 @@ export interface HomingParameters {
 	minDistanceToTarget: number;
 	targetType: string;
 	redirectionTick: number | null;
+	speedDecayWhenClose: number;
 }
 
 export interface LinkParameters {

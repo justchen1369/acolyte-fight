@@ -165,6 +165,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
 			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
+			speedDecayWhenClose: projectileTemplate.homing.speedDecayWhenClose,
 		} as w.HomingParameters,
 		link: projectileTemplate.link && {
 			strength: projectileTemplate.link.strength,
@@ -575,7 +576,7 @@ function gravityForce(world: w.World) {
 		}
 
 		world.objects.forEach(other => {
-			if (other.id === orb.id || other.id === orb.owner) {
+			if (other.id === orb.id || other.id === orb.owner || other.type === "gravity") {
 				return;
 			}
 
@@ -630,7 +631,10 @@ function homingForce(world: w.World) {
 
 		const diff = vector.diff(target.body.getPosition(), obj.body.getPosition());
 		const distanceToTarget = vector.length(diff);
-		if (distanceToTarget < obj.homing.minDistanceToTarget) {
+		if (distanceToTarget <= obj.homing.minDistanceToTarget) {
+			if (obj.homing.speedDecayWhenClose !== undefined) {
+				obj.body.setLinearVelocity(vector.multiply(obj.body.getLinearVelocity(), obj.homing.speedDecayWhenClose));
+			}
 			return;
 		}
 
