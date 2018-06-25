@@ -215,6 +215,7 @@ export function tick(world: w.World) {
 	}
 
 	decayShields(world);
+	decayThrust(world);
 	applyLavaDamage(world);
 	shrink(world);
 
@@ -679,17 +680,25 @@ function decayShields(world: w.World) {
 	});
 }
 
+function decayThrust(world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.category === "hero") {
+			if (obj.thrustTicks > 0) {
+				--obj.thrustTicks;
+				if (obj.thrustTicks <= 0) {
+					obj.body.setLinearVelocity(vector.zero());
+				}
+			}
+		}
+	});
+}
+
 function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
 			if (obj.thrustTicks > 0) {
-				--obj.thrustTicks;
-				if (obj.thrustTicks <= 0) {
-					obj.body.setLinearVelocity(vector.zero());
-				} else {
-					damping = 0;
-				}
+				damping = 0;
 			}
 			obj.body.setLinearDamping(damping);
 		}
