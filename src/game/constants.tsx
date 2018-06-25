@@ -151,7 +151,6 @@ export namespace Spells {
 		icon: "cometSpark",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		chargeTicks: 0.1 * TicksPerSecond,
 		cooldown: 12 * TicksPerSecond,
 
 		projectile: {
