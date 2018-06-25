@@ -412,15 +412,15 @@ export namespace Spells {
 			density: 2,
 			radius: 0.02,
 			speed: 0.2,
-			maxTicks: 1.0 * TicksPerSecond,
+			maxTicks: 2.0 * TicksPerSecond,
 			damage: 10.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
 
 			gravity: {
-				strength: 0.001 / TicksPerSecond,
-				turnRate: 4.0 / TicksPerSecond,
-				radius: 0.25,
+				strength: 0.00025 / TicksPerSecond,
+				turnRate: 10.0 / TicksPerSecond,
+				radius: 0.5,
 				power: 4,
 			} as c.GravityParameters,
 
