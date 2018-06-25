@@ -426,8 +426,6 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 2 * Math.PI,
-				minDistanceToTarget: 0.001,
-				speedDecayWhenClose: 0.9,
 			} as c.HomingParametersTemplate,
 
 			render: "gravity",
