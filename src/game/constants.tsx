@@ -413,7 +413,7 @@ export namespace Spells {
 			radius: 0.02,
 			speed: 0.2,
 			maxTicks: 1.0 * TicksPerSecond,
-			damage: 2.5 / TicksPerSecond,
+			damage: 0,
 			collideWith: 0,
 			explodeOn: Categories.All,
 
@@ -524,9 +524,9 @@ export namespace Choices {
 		"a": ["teleport", "thrust"],
 		"x": ["shield", "drain"],
 		"q": ["fireball"],
-		"w": ["lightning", "kamehameha"],
+		"w": ["lightning", "link", "kamehameha"],
 		"e": ["homing", "boomerang"],
-		"r": ["meteor", "link", "gravity"],
+		"r": ["meteor", "gravity"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;
