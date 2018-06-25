@@ -95,7 +95,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		casting: null,
 		cooldowns: {},
 		hitTick: 0,
-		teleportTick: 0,
 		shieldTicks: World.InitialShieldTicks,
 		killerHeroId: null,
 		assistHeroId: null,
@@ -677,7 +676,7 @@ function linkForce(world: w.World) {
 			return;
 		}
 
-		if (target.teleportTick >= obj.createTick || target.shieldTicks > 0) {
+		if (target.shieldTicks > 0) {
 			obj.expireTick = world.tick;
 			return;
 		}
@@ -858,8 +857,6 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w
 	let currentPosition = hero.body.getPosition();
 	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
 	hero.body.setPosition(newPosition);
-
-	hero.teleportTick = world.tick;
 
 	return true;
 }

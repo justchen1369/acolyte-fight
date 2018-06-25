@@ -273,7 +273,6 @@ export interface Hero extends WorldObjectBase {
 	thrustTicks?: number;
 
 	hitTick: number;
-	teleportTick: number;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
