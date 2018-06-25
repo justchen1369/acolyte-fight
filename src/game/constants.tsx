@@ -404,7 +404,7 @@ export namespace Spells {
 		icon: "atomicSlashes",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 20 * TicksPerSecond,
+		cooldown: 12 * TicksPerSecond,
 
 		projectile: {
 			color: '#0ace00',
