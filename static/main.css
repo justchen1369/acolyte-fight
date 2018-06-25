@@ -72,6 +72,10 @@ a:hover, a:active {
     margin-right: 4px;
 }
 
+.player-list .player-icons {
+    margin-right: 4px;
+}
+
 #messages-panel {
     position: absolute;
     bottom: 80;

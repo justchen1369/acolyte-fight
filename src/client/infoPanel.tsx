@@ -59,18 +59,28 @@ export class InfoPanel extends React.Component<Props, State> {
         });
 
         world.players.forEach(player => {
-            if (world.activePlayers.has(player.heroId)) {
-                let color = player.color;
-                if (!aliveHeroIds.has(player.heroId)) {
-                    color = Hero.InactiveColor;
-                } else if (player.heroId === world.ui.myHeroId) {
-                    color = Hero.MyHeroColor;
-                }
+            const isAlive = aliveHeroIds.has(player.heroId);
+            const isActive = world.activePlayers.has(player.heroId);
 
-                result.push(<div key={player.heroId} className="player-list-row">
-                    <span style={{color}} className="player-name">{player.name}</span>
-                </div>);
+            let color = player.color;
+            if (!(isAlive && isActive)) {
+                color = Hero.InactiveColor;
+            } else if (player.heroId === world.ui.myHeroId) {
+                color = Hero.MyHeroColor;
             }
+            
+            let numKills = 0;
+            {
+                let scores = world.scores.get(player.heroId);
+                if (scores) {
+                    numKills = scores.kills;
+                }
+            }
+
+            result.push(<div key={player.heroId} className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
+                <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
+                <span style={{color}} className="player-name">{player.name}</span>
+            </div>);
         });
         return result;
     }
