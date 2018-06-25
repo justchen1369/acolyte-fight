@@ -204,18 +204,19 @@ export function tick(world: w.World) {
 	});
 	world.actions = newActions;
 
+	homingForce(world);
+	linkForce(world);
+	gravityForce(world);
+	updateKnockback(world);
+
 	physicsStep(world);
 	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
 		handleContact(world, contact);
 	}
 
-	homingForce(world);
-	linkForce(world);
-	gravityForce(world);
 	decayShields(world);
 	applyLavaDamage(world);
 	shrink(world);
-	updateKnockback(world);
 
 	reap(world);
 }
@@ -574,8 +575,8 @@ function gravityForce(world: w.World) {
 			}
 
 			const proportion = Math.pow(1.0 - distanceTo / orb.gravity.radius, orb.gravity.power);
-
 			if (other.category === "hero") {
+
 				const strength = orb.gravity.strength * proportion;
 				const impulse = vector.multiply(vector.unit(towardsOrb), strength);
 				other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
