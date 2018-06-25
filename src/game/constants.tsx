@@ -470,9 +470,8 @@ export namespace Spells {
 		description: "Teleport to a nearby location. Get close, or get away.",
 
 		maxRange: 0.35,
-		chargeTicks: 3,
 		uninterruptible: true,
-		cooldown: 15 * TicksPerSecond,
+		cooldown: 8 * TicksPerSecond,
 
 		icon: "teleport",
 
@@ -486,7 +485,7 @@ export namespace Spells {
 		description: "Accelerate quickly, knocking away anything in your path.",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 8 * TicksPerSecond,
+		cooldown: 10 * TicksPerSecond,
 
 		uninterruptible: true,
 
