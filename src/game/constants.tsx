@@ -469,9 +469,9 @@ export namespace Spells {
 		id: 'teleport',
 		description: "Teleport to a nearby location. Get close, or get away.",
 
-		maxRange: 0.35,
+		maxRange: 0.5,
 		uninterruptible: true,
-		cooldown: 8 * TicksPerSecond,
+		cooldown: 10 * TicksPerSecond,
 
 		icon: "teleport",
 
