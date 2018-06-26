@@ -204,15 +204,23 @@ export interface Player {
 
 export type Notification =
 	HelpNotification 
+	| ServerStatsNotification
 	| JoinNotification 
 	| LeaveNotification 
 	| KillNotification 
 	| MyHeroNotification
 	| CloseGameNotification
-	| WinNotification;
+	| WinNotification
+	| DisconnectedNotification;
 
 export interface HelpNotification {
 	type: "help";
+}
+
+export interface ServerStatsNotification {
+	type: "serverStats";
+	numGames: number;
+	numPlayers: number;
 }
 
 export interface JoinNotification {
@@ -247,6 +255,10 @@ export interface WinNotification {
 	type: "win";
 	winner: Player;
 	mostDamage: Player;
+}
+
+export interface DisconnectedNotification {
+	type: "disconnected";
 }
 
 export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;

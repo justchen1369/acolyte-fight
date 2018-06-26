@@ -87,6 +87,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     private calculateExpiryMilliseconds(notification: w.Notification): number {
         switch (notification.type) {
             case "win": return 1e9;
+            case "disconnected": return 1e9;
             default: return ExpiryMilliseconds;
         }
     }
@@ -94,6 +95,8 @@ export class MessagesPanel extends React.Component<Props, State> {
     private renderNotification(notification: w.Notification) {
         switch (notification.type) {
             case "help": return this.renderHelpNotification(notification);
+            case "disconnected": return this.renderDisconnectedNotification(notification);
+            case "serverStats": return this.renderServerStatsNotification(notification);
             case "closing": return this.renderClosingNotification(notification);
             case "join": return this.renderJoinNotification(notification);
             case "leave": return this.renderLeaveNotification(notification);
@@ -105,6 +108,16 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderHelpNotification(notification: w.HelpNotification) {
         return <span className="help-text">Use the mouse to move!</span>
+    }
+
+    private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
+        return <span className="disconnected-notification">Disconnected from server. Game cannot continue.</span>
+    }
+
+    private renderServerStatsNotification(notification: w.ServerStatsNotification) {
+        return <span className="server-stats-notification">
+            {notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
+        </span>
     }
 
     private renderClosingNotification(notification: w.CloseGameNotification) {

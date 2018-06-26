@@ -44,6 +44,16 @@ let nextGameId = 0;
 let activeGames = new Map<string, Game>(); // id -> game
 let inactiveGames = new Map<string, Game>(); // id -> game
 
+function getServerStats(): m.ServerStats {
+	let numGames = 0;
+	let numPlayers = 0;
+	activeGames.forEach(game => {
+		++numGames;
+		numPlayers += game.active.size;
+	});
+	return { numGames, numPlayers };
+}
+
 function onConnection(socket: SocketIO.Socket) {
   console.log("user " + socket.id + " connected");
 
@@ -80,6 +90,7 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.emit("watch", {
 			gameId: game.id,
 			history: game.history,
+			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);
 	} else {
 		console.log("Game [" + data.gameId + "]: unable to find game for " + data.name);
@@ -87,6 +98,7 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.emit("watch", {
 			gameId: null,
 			history: null,
+			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);
 	}
 }
@@ -162,6 +174,7 @@ function joinGame(game: Game, playerName: string, keyBindings: c.KeyBindings, so
 		gameId: game.id,
 		heroId,
 		history: game.history,
+		serverStats: getServerStats(),
 	} as m.HeroMsg);
 
 	queueAction(game, { heroId, actionType: "join", playerName, keyBindings });

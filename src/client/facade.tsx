@@ -67,10 +67,10 @@ export function frame(canvasStack: CanvasStack) {
 	render(world, canvasStack);
 
 	const notifications = engine.takeNotifications(world);
-	notify(notifications);
+	notify(...notifications);
 }
 
-function notify(notifications: w.Notification[]) {
+function notify(...notifications: w.Notification[]) {
 	if (notifications.length > 0) {
 		notificationListeners.forEach(listener => listener(notifications));
 	}
@@ -93,7 +93,7 @@ export function gameKeyDown(e: KeyboardEvent) {
 	if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
 		if (!showedHelpText) {
 			showedHelpText = true;
-			notify([{ type: "help" }]);
+			notify({ type: "help" });
 		}
 	}
 
@@ -148,6 +148,13 @@ export function attachToSocket(_socket: SocketIOClient.Socket, playerName: strin
 	socket.on('tick', onTickMsg);
 	socket.on('watch', onWatchMsg);
 }
+function onServerStatsMsg(serverStats: m.ServerStats) {
+	notify({
+		type: "serverStats",
+		numGames: serverStats.numGames,
+		numPlayers: serverStats.numPlayers,
+	});
+}
 function onHeroMsg(data: m.HeroMsg) {
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
@@ -162,6 +169,8 @@ function onHeroMsg(data: m.HeroMsg) {
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
 	});
+
+	onServerStatsMsg(data.serverStats);
 }
 function onTickMsg(data: m.TickMsg) {
 	tickQueue.push(data);
@@ -177,6 +186,7 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 		gameId: data.gameId,
 		heroId: observerHeroId,
 		history: [],
+		serverStats: data.serverStats,
 	});
 
 	let replayQueue = [...data.history];
@@ -190,6 +200,7 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 }
 function onDisconnectMsg() {
 	world.activePlayers.clear();
+	notify({ type: "disconnected" });
 }
 function sendAction(heroId: string, action: w.Action) {
 	socket.emit('action', {
