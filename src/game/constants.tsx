@@ -177,7 +177,7 @@ export namespace Spells {
 		icon: "glowingHands",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		chargeTicks: 1.5 * TicksPerSecond,
+		chargeTicks: 1 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
 		knockbackCancel: true,
