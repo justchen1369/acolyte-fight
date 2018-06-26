@@ -407,14 +407,15 @@ export namespace Spells {
 		icon: "atomicSlashes",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 20 * TicksPerSecond,
+		cooldown: 12 * TicksPerSecond,
+		chargeTicks: 0.25 * TicksPerSecond,
 
 		projectile: {
 			color: '#0ace00',
 
 			density: 2,
 			radius: 0.02,
-			speed: 0.1,
+			speed: 0.3,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
@@ -424,7 +425,7 @@ export namespace Spells {
 				strength: 0.001 / TicksPerSecond,
 				turnRate: 10.0 / TicksPerSecond,
 				radius: 0.05,
-				power: 4,
+				power: 2,
 			} as c.GravityParameters,
 
 			homing: {
@@ -432,7 +433,7 @@ export namespace Spells {
 				targetType: c.HomingTargets.cursor,
 				minDistanceToTarget: Hero.Radius / 2,
 				speedWhenClose: 0,
-			},
+			} as c.HomingParameters,
 
 			render: "gravity",
 			trailTicks: 0.25 * TicksPerSecond,

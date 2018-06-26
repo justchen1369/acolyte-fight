@@ -589,9 +589,7 @@ function gravityForce(world: w.World) {
 				const impulse = vector.multiply(vector.unit(towardsOrb), strength);
 				other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
 
-				if (!(other.shieldTicks > 0)) {
-					applyDamage(other, orb.damage * proportion, orb.owner, world);
-				}
+				applyDamage(other, orb.damage * proportion, orb.owner, world);
 
 				if (distanceTo <= orb.radius) {
 					// If you get hit by the projectile itself, that counts as knockback
