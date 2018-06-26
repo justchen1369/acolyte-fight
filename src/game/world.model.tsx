@@ -155,6 +155,7 @@ export interface World {
 	activePlayers: Set<string>;
 	players: Map<string, Player>;
 	scores: Map<string, HeroScore>;
+	winner: string | null;
 
 	objects: Map<string, WorldObject>,
 	destroyed: WorldObject[];
@@ -182,6 +183,8 @@ export interface HeroScore {
 
 	numFireballsShot: number;
 	numFireballsHit: number;
+	
+	deathTick: number | null;
 }
 
 export interface UIState {
@@ -205,7 +208,8 @@ export type Notification =
 	| LeaveNotification 
 	| KillNotification 
 	| MyHeroNotification
-	| CloseGameNotification;
+	| CloseGameNotification
+	| WinNotification;
 
 export interface HelpNotification {
 	type: "help";
@@ -237,6 +241,12 @@ export interface MyHeroNotification {
 export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
+}
+
+export interface WinNotification {
+	type: "win";
+	winner: Player;
+	mostDamage: Player;
 }
 
 export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;

@@ -74,16 +74,21 @@ export class MessagesPanel extends React.Component<Props, State> {
         });
 
         // Add notifications to list
-        this.addNotifications(...newNotifications.map(n => this.renderNotification(n)));
-    }
-
-    private addNotifications(...notificationElements: JSX.Element[]) {
-        const expiryTime = new Date().getTime() + ExpiryMilliseconds;
+        const now = new Date().getTime();
         const newItems = [...this.state.items];
-        notificationElements.forEach(element => {
+        newNotifications.forEach(notification => {
+            const element = this.renderNotification(notification);
+            const expiryTime = now + this.calculateExpiryMilliseconds(notification);
             newItems.push({ element, expiryTime });
         });
         this.setState({ items: newItems });
+    }
+
+    private calculateExpiryMilliseconds(notification: w.Notification): number {
+        switch (notification.type) {
+            case "win": return 1e9;
+            default: return ExpiryMilliseconds;
+        }
     }
 
     private renderNotification(notification: w.Notification) {
@@ -93,6 +98,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             case "join": return this.renderJoinNotification(notification);
             case "leave": return this.renderLeaveNotification(notification);
             case "kill": return this.renderKillNotification(notification);
+            case "win": return this.renderWinNotification(notification);
             default: return null; // Ignore this notification
         }
     }
@@ -135,6 +141,11 @@ export class MessagesPanel extends React.Component<Props, State> {
         } else {
             return <span key="killed">{this.renderPlayer(notification.killed)} died</span>
         }
+    }
+
+    private renderWinNotification(notification: w.WinNotification) {
+        const mostDamageScore = this.props.world.scores.get(notification.mostDamage.heroId);
+        return <span className="winner">{this.renderPlayer(notification.winner)} is the winner! Most damage: {this.renderPlayer(notification.mostDamage)} ({mostDamageScore.damage.toFixed(0)}%)</span>;
     }
 
     private renderPlayer(player: w.Player) {

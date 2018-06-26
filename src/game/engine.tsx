@@ -23,6 +23,7 @@ export function initialWorld(): w.World {
 		activePlayers: new Set<string>(),
 		players: new Map<string, w.Player>(),
 		scores: new Map<string, w.HeroScore>(),
+		winner: null,
 
 		objects: new Map(),
 		physics: pl.World(),
@@ -752,6 +753,7 @@ function shrink(world: w.World) {
 }
 
 function reap(world: w.World) {
+	let heroKilled = false;
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (obj.health <= 0) {
@@ -761,6 +763,7 @@ function reap(world: w.World) {
 				});
 				destroyObject(world, obj);
 				notifyKill(obj, world);
+				heroKilled = true;
 			}
 		} else if (obj.category === "projectile") {
 			if (world.tick >= obj.expireTick) {
@@ -770,6 +773,68 @@ function reap(world: w.World) {
 				notifyHit(obj, world);
 			}
 		}
+	});
+
+	if (heroKilled) {
+		notifyWin(world);
+	}
+}
+
+function notifyWin(world: w.World) {
+	if (world.winner) {
+		return;
+	}
+
+	let numAlive = 0;
+	world.objects.forEach(hero => {
+		if (hero.category === "hero") {
+			++numAlive;
+		}
+	});
+	if (numAlive > 1) {
+		return;
+	}
+
+	let bestScore: w.HeroScore = null;
+	world.scores.forEach(score => {
+		if (!(score.deathTick >= 0)) {
+			++numAlive;
+		}
+		if (!bestScore) {
+			bestScore = score;
+			return;
+		}
+
+		const myDeathTick = score.deathTick || Infinity;
+		const bestDeathTick = bestScore.deathTick || Infinity;
+		if (myDeathTick > bestDeathTick) {
+			bestScore = score;
+		}
+	});
+	if (!bestScore) {
+		return;
+	}
+
+	let mostDamage: w.HeroScore = null;
+	world.scores.forEach(score => {
+		if (!mostDamage) {
+			mostDamage = score;
+			return;
+		}
+
+		if (score.damage > mostDamage.damage) {
+			mostDamage = score;
+		}
+	});
+	if (!mostDamage) {
+		return;
+	}
+
+	world.winner = bestScore.heroId;
+	world.ui.notifications.push({
+		type: "win",
+		winner: world.players.get(bestScore.heroId),
+		mostDamage: world.players.get(mostDamage.heroId),
 	});
 }
 
@@ -783,6 +848,10 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
 	world.ui.notifications.push({ type: "kill", killed, killer, assist });
 
+	if (hero) {
+		let score = getOrCreateScore(hero.id, world);
+		score.deathTick = world.tick;
+	}
 	if (hero.killerHeroId) {
 		let score = getOrCreateScore(hero.killerHeroId, world);
 		++score.kills;
@@ -941,7 +1010,7 @@ function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: 
 	}
 }
 
-export function initScore(heroId: string) {
+export function initScore(heroId: string): w.HeroScore {
 	return {
 		heroId,
 		kills: 0,
@@ -949,6 +1018,7 @@ export function initScore(heroId: string) {
 		damage: 0,
 		numFireballsShot: 0,
 		numFireballsHit: 0,
+		deathTick: null,
 	};
 }
 
