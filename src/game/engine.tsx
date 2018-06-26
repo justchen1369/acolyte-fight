@@ -835,6 +835,7 @@ function notifyWin(world: w.World) {
 		type: "win",
 		winner: world.players.get(bestScore.heroId),
 		mostDamage: world.players.get(mostDamage.heroId),
+		mostDamageAmount: mostDamage.damage,
 	});
 }
 

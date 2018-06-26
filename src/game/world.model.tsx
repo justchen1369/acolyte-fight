@@ -255,6 +255,7 @@ export interface WinNotification {
 	type: "win";
 	winner: Player;
 	mostDamage: Player;
+	mostDamageAmount: number;
 }
 
 export interface DisconnectedNotification {

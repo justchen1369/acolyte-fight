@@ -111,7 +111,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
-        return <span className="disconnected-notification">Disconnected from server. Game cannot continue.</span>
+        return <span className="disconnected-notification">Disconnected from server.</span>
     }
 
     private renderServerStatsNotification(notification: w.ServerStatsNotification) {
@@ -157,8 +157,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderWinNotification(notification: w.WinNotification) {
-        const mostDamageScore = this.props.world.scores.get(notification.mostDamage.heroId);
-        return <span className="winner">{this.renderPlayer(notification.winner)} is the winner! Most damage: {this.renderPlayer(notification.mostDamage)} ({mostDamageScore.damage.toFixed(0)}%)</span>;
+        return <span className="winner">{this.renderPlayer(notification.winner)} is the winner! Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</span>;
     }
 
     private renderPlayer(player: w.Player) {
