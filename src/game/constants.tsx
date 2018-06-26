@@ -397,7 +397,7 @@ export namespace Spells {
 
 	export const gravity = {
 		id: 'gravity',
-		description: "Fire an orb that pulls everything in.",
+		description: "Fire an orb that redirects towards the target enemy.",
 		action: "projectile",
 
 		color: '#0ace00',
@@ -420,8 +420,8 @@ export namespace Spells {
 			gravity: {
 				strength: 0.0001 / TicksPerSecond,
 				turnRate: 10.0 / TicksPerSecond,
-				radius: 0.1,
-				power: 2,
+				radius: 0.2,
+				power: 4,
 			} as c.GravityParameters,
 
 			/*
