@@ -603,9 +603,10 @@ function gravityForce(world: w.World) {
 					other.hitTick = world.tick;
 				}
 			} else if (other.category === "projectile") {
+				const towardsTarget = vector.diff(target.body.getPosition(), other.body.getPosition());
 				const currentVelocity = other.body.getLinearVelocity();
 				const currentAngle = vector.angle(currentVelocity);
-				const targetAngle = vector.angle(towardsOrb);
+				const targetAngle = vector.angle(towardsTarget);
 				const newAngle = vector.turnTowards(currentAngle, targetAngle, orb.gravity.turnRate * proportion);
 				const newVelocity = vector.redirect(currentVelocity, vector.fromAngle(newAngle));
 				other.body.setLinearVelocity(newVelocity);

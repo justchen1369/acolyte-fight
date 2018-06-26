@@ -411,8 +411,8 @@ export namespace Spells {
 
 			density: 2,
 			radius: 0.02,
-			speed: 0.3,
-			maxTicks: 3.0 * TicksPerSecond,
+			speed: 0.1,
+			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
@@ -421,15 +421,15 @@ export namespace Spells {
 				strength: 0.001 / TicksPerSecond,
 				turnRate: 10.0 / TicksPerSecond,
 				radius: 0.05,
-				power: 1,
+				power: 4,
 			} as c.GravityParameters,
 
 			homing: {
 				turnRate: 2 * Math.PI,
-				speedWhenClose: 0,
-				minDistanceToTarget: Hero.Radius / 2,
 				targetType: c.HomingTargets.cursor,
-			} as c.HomingParametersTemplate,
+				minDistanceToTarget: Hero.Radius / 2,
+				speedWhenClose: 0,
+			},
 
 			render: "gravity",
 			trailTicks: 0.25 * TicksPerSecond,
