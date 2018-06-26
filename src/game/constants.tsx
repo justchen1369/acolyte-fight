@@ -68,7 +68,7 @@ export namespace ButtonBar {
 	export const Margin = 5;
 	export const Size = 50;
 	export const Keys = [
-		"a", "x",
+		"a", "s",
 		null,
 		"q", "w", "e", "r",
 		null,
@@ -113,7 +113,7 @@ export namespace Spells {
 
 	export const firespray = {
 		id: 'firespray',
-		description: "Shoot a stream of fire in a narrow arc. Get closer to focus all your damage onto one target.",
+		description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
 		action: "spray",
 
 		color: '#ff0044',
@@ -121,6 +121,7 @@ export namespace Spells {
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
+		chargeTicks: 0.1 * TicksPerSecond,
 		uninterruptible: true,
 
 		intervalTicks: 0.025 * TicksPerSecond,
@@ -134,7 +135,7 @@ export namespace Spells {
 			density: 1.0,
 			radius: 0.002,
 			speed: 0.5,
-			maxTicks: 0.3 * TicksPerSecond,
+			maxTicks: 0.25 * TicksPerSecond,
 			damage: 5,
 			explodeOn: Categories.All,
 
@@ -215,6 +216,7 @@ export namespace Spells {
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
+		chargeTicks: 0.1 * TicksPerSecond,
 
 		projectile: {
 			color: '#00ddff',
@@ -416,7 +418,7 @@ export namespace Spells {
 			density: 2,
 			radius: 0.02,
 			speed: 0.3,
-			maxTicks: 2.0 * TicksPerSecond,
+			maxTicks: 3.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
@@ -532,7 +534,7 @@ export namespace Spells {
 export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
-		"x": ["shield", "drain"],
+		"s": ["shield", "drain"],
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang", "link"],
@@ -543,7 +545,7 @@ export namespace Choices {
 
 	export const Defaults = {
 		"a": "teleport",
-		"x": "shield",
+		"s": "shield",
 		"q": "fireball",
 		"w": "lightning",
 		"e": "homing",

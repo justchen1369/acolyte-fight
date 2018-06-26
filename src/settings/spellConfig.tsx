@@ -34,7 +34,7 @@ export class SpellConfig extends React.Component<Props, State> {
         }
 
         const options = Choices.Options[key];
-        const chosen = this.state.config[key];
+        const chosen = this.state.config[key] || Choices.Defaults[key];
         const chosenSpell = Spells.all[chosen];
         return <div className="key">
             <div className="key-options">

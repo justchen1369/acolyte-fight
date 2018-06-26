@@ -280,7 +280,7 @@ function handlePlayerJoinLeave(world: w.World) {
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: w.KeyBindings) {
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
-	for (var key in keyBindings) {
+	for (var key in Choices.Options) {
 		let spellId = keyBindings[key];
 
 		const validOptions = Choices.Options[key];
@@ -550,7 +550,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
-		x => (x.categories & projectile.collideWith) && x.id !== hit.id);
+		x => x.category === "hero" && x.id !== hit.id);
 	if (!nextTarget) {
 		return;
 	}
