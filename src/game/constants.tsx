@@ -411,18 +411,25 @@ export namespace Spells {
 
 			density: 2,
 			radius: 0.02,
-			speed: 0.1,
+			speed: 0.3,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
 
 			gravity: {
-				strength: 0.0001 / TicksPerSecond,
+				strength: 0.001 / TicksPerSecond,
 				turnRate: 10.0 / TicksPerSecond,
-				radius: 0.2,
-				power: 4,
+				radius: 0.05,
+				power: 1,
 			} as c.GravityParameters,
+
+			homing: {
+				turnRate: 2 * Math.PI,
+				speedWhenClose: 0,
+				minDistanceToTarget: Hero.Radius / 2,
+				targetType: c.HomingTargets.cursor,
+			} as c.HomingParametersTemplate,
 
 			render: "gravity",
 			trailTicks: 0.25 * TicksPerSecond,
@@ -521,11 +528,11 @@ export namespace Spells {
 export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
-		"x": ["shield", "gravity", "drain"],
+		"x": ["shield", "drain"],
 		"q": ["fireball"],
 		"w": ["lightning", "kamehameha"],
-		"e": ["homing", "boomerang"],
-		"r": ["meteor", "link"],
+		"e": ["homing", "boomerang", "link"],
+		"r": ["meteor", "gravity"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;

@@ -154,6 +154,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		type: spell.id,
 		body,
 
+		target,
 		targetId: targetObj ? targetObj.id : null,
 		damage: projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
@@ -602,11 +603,9 @@ function gravityForce(world: w.World) {
 					other.hitTick = world.tick;
 				}
 			} else if (other.category === "projectile") {
-				const towardsTarget = vector.diff(target.body.getPosition(), other.body.getPosition());
-
 				const currentVelocity = other.body.getLinearVelocity();
 				const currentAngle = vector.angle(currentVelocity);
-				const targetAngle = vector.angle(towardsTarget);
+				const targetAngle = vector.angle(towardsOrb);
 				const newAngle = vector.turnTowards(currentAngle, targetAngle, orb.gravity.turnRate * proportion);
 				const newVelocity = vector.redirect(currentVelocity, vector.fromAngle(newAngle));
 				other.body.setLinearVelocity(newVelocity);
@@ -621,13 +620,25 @@ function homingForce(world: w.World) {
 			return;
 		}
 
-		const targetId = obj.homing.targetType === w.HomingTargets.self ? obj.owner : obj.targetId;
-		const target = world.objects.get(targetId);
+		let target: pl.Vec2 = null;
+		if (obj.homing.targetType === w.HomingTargets.self) {
+			const targetObj = world.objects.get(obj.owner);
+			if (targetObj) {
+				target = targetObj.body.getPosition();
+			}
+		} else if (obj.homing.targetType === w.HomingTargets.enemy) {
+			const targetObj = world.objects.get(obj.targetId);
+			if (targetObj) {
+				target = targetObj.body.getPosition();
+			}
+		} else if (obj.homing.targetType === w.HomingTargets.cursor) {
+			target = obj.target;
+		}
 		if (!target) {
 			return;
 		}
 
-		const diff = vector.diff(target.body.getPosition(), obj.body.getPosition());
+		const diff = vector.diff(target, obj.body.getPosition());
 		const distanceToTarget = vector.length(diff);
 		if (distanceToTarget <= obj.homing.minDistanceToTarget) {
 			if (obj.homing.speedWhenClose !== undefined) {

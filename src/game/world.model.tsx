@@ -304,6 +304,7 @@ export interface Projectile extends WorldObjectBase {
 	body: pl.Body;
 	hit?: boolean;
 
+	target: pl.Vec2;
 	targetId: string | null;
 	damage: number;
 	bounce?: BounceParameters;
@@ -330,6 +331,7 @@ export interface Projectile extends WorldObjectBase {
 export namespace HomingTargets {
 	export const enemy = "enemy";
 	export const self = "self";
+	export const cursor = "cursor";
 }
 
 export interface HomingParameters {
