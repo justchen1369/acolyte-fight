@@ -217,6 +217,7 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
+		uninterruptible: true,
 
 		projectile: {
 			color: '#00ddff',
@@ -411,6 +412,7 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
 		chargeTicks: 0.25 * TicksPerSecond,
+		uninterruptible: true,
 
 		projectile: {
 			color: '#0ace00',
