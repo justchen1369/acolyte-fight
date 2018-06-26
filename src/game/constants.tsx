@@ -425,7 +425,7 @@ export namespace Spells {
 
 			gravity: {
 				strength: 0.001 / TicksPerSecond,
-				turnRate: 10.0 / TicksPerSecond,
+				turnRate: 2 * Math.PI / TicksPerSecond,
 				radius: 0.05,
 				power: 2,
 			} as c.GravityParameters,
