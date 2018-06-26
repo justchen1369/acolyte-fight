@@ -473,12 +473,11 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner, world);
 			lifeSteal(damage, projectile, world);
+			linkToHero(projectile, hero, world);
 			projectile.hit = true;
 		}
 
-		if (projectile.link) {
-			linkToHero(projectile, hero, world);
-		} else if (projectile.bounce) { // Only bounce off heroes, not projectiles
+		if (projectile.bounce) { // Only bounce off heroes, not projectiles
 			bounceToNext(projectile, hero, world);
 		} else if (projectile.explodeOn & categoryFlags(hero)) {
 			destroyObject(world, projectile);
