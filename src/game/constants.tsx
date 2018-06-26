@@ -373,7 +373,7 @@ export namespace Spells {
 		icon: "energyBreath",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 7 * TicksPerSecond,
+		cooldown: 5 * TicksPerSecond,
 
 		projectile: {
 			color: '#22ee88',
