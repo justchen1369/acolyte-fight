@@ -90,6 +90,8 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		name: playerName,
 		category: "hero",
 		type: "hero",
+		categories: Categories.Hero,
+		collideWith: Categories.All,
 		health: Hero.MaxHealth,
 		body,
 		casting: null,
@@ -130,6 +132,9 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
+	const categories = projectileTemplate.categories === undefined ? Categories.Projectile : projectileTemplate.categories;
+	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
+
 	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
@@ -139,8 +144,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
-		filterCategoryBits: Categories.Projectile,
-		filterMaskBits: projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All,
+		filterCategoryBits: categories,
+		filterMaskBits: collideWith,
 		density: projectileTemplate.density,
 		restitution: 1.0,
 	} as pl.FixtureDef);
@@ -151,6 +156,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		id,
 		owner: hero.id,
 		category: "projectile",
+		categories,
 		type: spell.id,
 		body,
 
@@ -179,6 +185,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		createTick: world.tick,
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
+		collideWith,
 		explodeOn: projectileTemplate.explodeOn,
 
 		render: projectileTemplate.render,
@@ -453,7 +460,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
-	if (projectile.explodeOn & categoryFlags(other)) {
+	if (projectile.explodeOn & other.categories) {
 		destroyObject(world, projectile);
 	}
 }
@@ -480,7 +487,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		if (projectile.bounce) { // Only bounce off heroes, not projectiles
 			bounceToNext(projectile, hero, world);
-		} else if (projectile.explodeOn & categoryFlags(hero)) {
+		} else if (projectile.explodeOn & hero.categories) {
 			destroyObject(world, projectile);
 		}
 	}
@@ -494,18 +501,6 @@ function lifeSteal(damage: number, projectile: w.Projectile, world: w.World) {
 	const owner = world.objects.get(projectile.owner);
 	if (owner && owner.category === "hero") {
 		owner.health = Math.min(Hero.MaxHealth, owner.health + damage * projectile.lifeSteal);
-	}
-}
-
-function categoryFlags(obj: w.WorldObject) {
-	if (!obj) {
-		return 0;
-	}
-
-	switch (obj.category) {
-		case "hero": return constants.Categories.Hero;
-		case "projectile": return constants.Categories.Projectile;
-		default: return 0;
 	}
 }
 
@@ -555,7 +550,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
-		x => x.type === "hero" && x.id !== hit.id);
+		x => (x.categories & projectile.collideWith) && x.id !== hit.id);
 	if (!nextTarget) {
 		return;
 	}

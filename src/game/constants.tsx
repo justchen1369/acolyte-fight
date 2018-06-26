@@ -8,6 +8,7 @@ export namespace Categories {
 	export const All = 0xFFFF;
 	export const Hero = 1;
 	export const Projectile = 2;
+	export const Massive = 4;
 	export const None = 0;
 }
 
@@ -162,7 +163,8 @@ export namespace Spells {
 			maxTicks: 12 * TicksPerSecond,
 			damage: 1,
 			trailTicks: 15,
-			explodeOn: 0,
+			categories: Categories.Projectile | Categories.Massive,
+			explodeOn: Categories.None,
 
 			render: "projectile",
 		} as c.ProjectileTemplate,
@@ -354,6 +356,7 @@ export namespace Spells {
 			speed: 0.75,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 5,
+			collideWith: Categories.Hero | Categories.Massive,
 			explodeOn: Categories.All,
 			bounce: {
 				damageFactor: 0.9,

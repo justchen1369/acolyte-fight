@@ -58,7 +58,8 @@ export interface ProjectileTemplate {
 	gravity?: GravityParameters;
 	lifeSteal?: number;
 
-    maxTicks: number;
+	maxTicks: number;
+	categories?: number;
     collideWith?: number;
 	explodeOn: number;
 	shieldTakesOwnership?: boolean;
@@ -255,6 +256,8 @@ export interface LeaveEvent {
 export interface WorldObjectBase {
 	id: string;
 	category: string;
+	categories: number;
+	collideWith: number;
 	type: string;
 	bullet?: boolean;
 	body: pl.Body;
