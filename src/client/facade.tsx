@@ -20,6 +20,9 @@ let notificationListeners = new Array<NotificationListener>();
 let nextTarget: pl.Vec2 = null;
 let showedHelpText: boolean = false;
 
+
+const isEdge = (navigator.appName == "Netscape" && navigator.appVersion.indexOf('Edge') > -1);
+
 export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
 }
@@ -27,9 +30,10 @@ export function attachNotificationListener(listener: NotificationListener) {
 export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
-    canvasStack.canvas.onmouseenter = (ev) => canvasMouseMove(ev, false);
-    canvasStack.canvas.onmousemove = (ev) => canvasMouseMove(ev, false);
-    canvasStack.canvas.onmousedown = (ev) => canvasMouseMove(ev, true);
+    canvasStack.canvas.onmouseenter = canvasMouseMove;
+    canvasStack.canvas.onmousemove = canvasMouseMove;
+    canvasStack.canvas.onmousedown = canvasMouseMove;
+
     window.onkeydown = gameKeyDown;
     window.onresize = fullScreenCanvas;
 
@@ -76,12 +80,12 @@ function notify(...notifications: w.Notification[]) {
 	}
 }
 
-export function canvasMouseMove(e: MouseEvent, mouseDown: boolean) {
+export function canvasMouseMove(e: MouseEvent) {
 	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
 	let worldRect = calculateWorldRect(rect);
 	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
-	if (mouseDown) { // e.buttons || e.button || e.which - edge gets e.which wrong on mousemove
+	if (e.buttons || e.button || (!isEdge && e.which)) {
 		sendAction(world.ui.myHeroId, { type: "move", target });
 	}
 
