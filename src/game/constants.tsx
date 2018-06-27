@@ -386,7 +386,7 @@ export namespace Spells {
 
 			density: 2,
 			radius: 0.002,
-			speed: 0.4,
+			speed: 0.2,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 10,
 			lifeSteal: 1.0,
@@ -427,7 +427,7 @@ export namespace Spells {
 
 			gravity: {
 				strength: 0.001 / TicksPerSecond,
-				turnRate: 2 * Math.PI / TicksPerSecond,
+				turnRate: 0,
 				radius: 0.05,
 				power: 2,
 			} as c.GravityParameters,
