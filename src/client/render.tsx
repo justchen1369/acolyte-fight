@@ -146,10 +146,10 @@ function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, w
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
-		max: 0.5 * constants.TicksPerSecond,
+		max: 0.25 * constants.TicksPerSecond,
 		pos: vector.clone(pos),
 		fillStyle: projectile.color,
-		radius: Hero.Radius * 1.1,
+		radius: Hero.Radius * 1.5,
 	} as w.CircleTrail);
 }
 
