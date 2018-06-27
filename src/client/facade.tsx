@@ -21,7 +21,7 @@ let nextTarget: pl.Vec2 = null;
 let showedHelpText: boolean = false;
 
 
-const isEdge = (navigator.appName == "Netscape" && navigator.appVersion.indexOf('Edge') > -1);
+const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
 
 export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
@@ -85,7 +85,7 @@ export function canvasMouseMove(e: MouseEvent) {
 	let worldRect = calculateWorldRect(rect);
 	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
-	if (e.buttons || e.button || (!isEdge && e.which)) {
+	if (e.buttons || e.button || (isSafari && e.which)) {
 		sendAction(world.ui.myHeroId, { type: "move", target });
 	}
 
