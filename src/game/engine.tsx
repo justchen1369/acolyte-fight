@@ -160,6 +160,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		categories,
 		type: spell.id,
 		body,
+		maxSpeed: projectileTemplate.maxSpeed || null,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -766,7 +767,8 @@ function reap(world: w.World) {
 				heroKilled = true;
 			}
 		} else if (obj.category === "projectile") {
-			if (world.tick >= obj.expireTick) {
+			if (world.tick >= obj.expireTick
+				|| (obj.maxSpeed && vector.length(obj.body.getLinearVelocity()) >= obj.maxSpeed)) {
 				destroyObject(world, obj);
 			}
 			if (obj.hit) {

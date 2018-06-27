@@ -51,7 +51,8 @@ export interface ProjectileTemplate {
 
     density: number;
     radius: number;
-    speed: number;
+	speed: number;
+	maxSpeed?: number;
 
     homing?: HomingParametersTemplate;
 	link?: LinkParametersTemplate;
@@ -329,6 +330,7 @@ export interface Projectile extends WorldObjectBase {
 	owner: string;
 	body: pl.Body;
 	hit?: boolean;
+	maxSpeed: number | null;
 
 	target: pl.Vec2;
 	targetId: string | null;
