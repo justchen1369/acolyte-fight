@@ -27,14 +27,14 @@ export function attachNotificationListener(listener: NotificationListener) {
 export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
-    canvasStack.canvas.onmouseenter = canvasMouseMove;
-    canvasStack.canvas.onmousemove = canvasMouseMove;
-    canvasStack.canvas.onmousedown = canvasMouseMove;
+    canvasStack.canvas.onmouseenter = (ev) => canvasMouseMove(ev, false);
+    canvasStack.canvas.onmousemove = (ev) => canvasMouseMove(ev, false);
+    canvasStack.canvas.onmousedown = (ev) => canvasMouseMove(ev, true);
     window.onkeydown = gameKeyDown;
     window.onresize = fullScreenCanvas;
 
-    canvasStack.canvas.oncontextmenu = function (e) {
-            e.preventDefault();
+    canvasStack.canvas.oncontextmenu = (ev) => {
+            ev.preventDefault();
     };
 
     window.requestAnimationFrame(frameLoop);
@@ -76,12 +76,12 @@ function notify(...notifications: w.Notification[]) {
 	}
 }
 
-export function canvasMouseMove(e: MouseEvent) {
+export function canvasMouseMove(e: MouseEvent, mouseDown: boolean) {
 	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
 	let worldRect = calculateWorldRect(rect);
 	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
-	if (e.buttons || e.button || e.which) {
+	if (mouseDown) { // e.buttons || e.button || e.which - edge gets e.which wrong on mousemove
 		sendAction(world.ui.myHeroId, { type: "move", target });
 	}
 
