@@ -111,7 +111,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
-        return <span className="disconnected-notification">Disconnected from server.</span>
+        return <span className="disconnected-notification">Disconnected from server</span>
     }
 
     private renderServerStatsNotification(notification: w.ServerStatsNotification) {

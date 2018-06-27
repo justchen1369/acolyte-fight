@@ -269,7 +269,7 @@ export namespace Spells {
 
 	export const boomerang = {
 		id: 'boomerang',
-		description: "To the enemy, then back to you. All in a day's work.",
+		description: "Around and around you. Keep your enemies at a safe distance.",
 		action: "projectile",
 
 		color: '#ff00ff',
@@ -406,7 +406,7 @@ export namespace Spells {
 
 	export const gravity = {
 		id: 'gravity',
-		description: "Fire an orb that redirects towards the target enemy.",
+		description: "Hold an enemy in place while you unleash your volleys upon them.",
 		action: "projectile",
 
 		color: '#0ace00',
