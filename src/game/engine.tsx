@@ -965,7 +965,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 		const velocity = vector.multiply(vector.unit(diff), spell.speed);
 		hero.thrust = {
 			velocity,
-			ticks: ticksToTarget,
+			ticks: Math.min(spell.maxTicks, ticksToTarget),
 			nullified: false,
 		};
 	}
