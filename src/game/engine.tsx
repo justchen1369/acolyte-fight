@@ -232,6 +232,7 @@ export function tick(world: w.World) {
 		handleContact(world, contact);
 	}
 
+	applySpeedLimit(world);
 	decayShields(world);
 	decayThrust(world);
 	applyLavaDamage(world);
@@ -242,6 +243,17 @@ export function tick(world: w.World) {
 
 function physicsStep(world: w.World) {
 	world.physics.step(1.0 / TicksPerSecond);
+}
+
+function applySpeedLimit(world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.category === "projectile" && obj.maxSpeed) {
+			const currentVelocity = obj.body.getLinearVelocity();
+			if (vector.length(currentVelocity) > obj.maxSpeed) {
+				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, obj.maxSpeed));
+			}
+		}
+	});
 }
 
 function handlePlayerJoinLeave(world: w.World) {
@@ -783,8 +795,7 @@ function reap(world: w.World) {
 				heroKilled = true;
 			}
 		} else if (obj.category === "projectile") {
-			if (world.tick >= obj.expireTick
-				|| (obj.maxSpeed && vector.length(obj.body.getLinearVelocity()) >= obj.maxSpeed)) {
+			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
 			}
 			if (obj.hit) {
