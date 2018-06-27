@@ -574,7 +574,7 @@ function gravityForce(world: w.World) {
 
 		const target = world.objects.get(orb.targetId) || orb;
 		world.objects.forEach(other => {
-			if (other.id === orb.id || other.id === orb.owner || other.type === "gravity") {
+			if (other.id === orb.id || other.type === "gravity") {
 				return;
 			}
 
