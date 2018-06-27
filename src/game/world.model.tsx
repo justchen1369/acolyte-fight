@@ -297,7 +297,7 @@ export interface Hero extends WorldObjectBase {
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	shieldTicks?: number;
-	thrustTicks?: number;
+	thrust?: ThrustState;
 
 	hitTick: number;
 
@@ -318,6 +318,12 @@ export interface CastState {
 
 	proportion?: number;
 	color?: string;
+}
+
+export interface ThrustState {
+	velocity: pl.Vec2;
+	ticks: number;
+	nullified: boolean;
 }
 
 export interface Cooldowns {

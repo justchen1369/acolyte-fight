@@ -438,6 +438,8 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 	} else if (object.category === "hero") {
 		if (hit.category === "hero") {
 			handleHeroHitHero(world, object, hit);
+		} else if (hit.category === "projectile") {
+			handleHeroHitProjectile(world, object, hit);
 		}
 	}
 }
@@ -453,11 +455,26 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	}
 
 	// Mark other hero as hit - cancel any channelling
-	other.hitTick = world.tick;
+	if (!other.shieldTicks) {
+		other.hitTick = world.tick;
+	}
 
 	// If using thrust, cause damage
-	if (hero.casting && hero.casting.action && hero.casting.action.type === Spells.thrust.id) {
-		applyDamage(other, Spells.thrust.damage, hero.id, world);
+	if (hero.thrust) {
+		if (other.shieldTicks) {
+			// Thrust into shield means the hero bounces off
+			hero.thrust.nullified = true;
+		} else {
+			applyDamage(other, Spells.thrust.damage, hero.id, world);
+		}
+	}
+}
+
+function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Projectile) {
+	if (hero.thrust) {
+		if (projectile.categories & Categories.Massive) {
+			hero.thrust.nullified = true;
+		}
 	}
 }
 
@@ -713,12 +730,11 @@ function decayShields(world: w.World) {
 
 function decayThrust(world: w.World) {
 	world.objects.forEach(obj => {
-		if (obj.category === "hero") {
-			if (obj.thrustTicks > 0) {
-				--obj.thrustTicks;
-				if (obj.thrustTicks <= 0) {
-					obj.body.setLinearVelocity(vector.zero());
-				}
+		if (obj.category === "hero" && obj.thrust) {
+			--obj.thrust.ticks;
+			if (obj.thrust.ticks <= 0) {
+				obj.body.setLinearVelocity(vector.zero());
+				obj.thrust = null;
 			}
 		}
 	});
@@ -728,7 +744,7 @@ function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
-			if (obj.thrustTicks > 0) {
+			if (obj.thrust) {
 				damping = 0;
 			}
 			obj.body.setLinearDamping(damping);
@@ -942,17 +958,23 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ThrustSpell) {
 	if (!action.target) { return true; }
 
-	if (world.tick === hero.casting.channellingStartTick) {
+	if (world.tick == hero.casting.channellingStartTick) {
 		const diff = vector.diff(action.target, hero.body.getPosition());
-		const velocity = vector.multiply(vector.unit(diff), spell.speed);
-		hero.body.setLinearVelocity(velocity);
-
 		const distancePerTick = spell.speed / TicksPerSecond;
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
-		hero.thrustTicks = Math.min(spell.maxTicks, ticksToTarget);
+		const velocity = vector.multiply(vector.unit(diff), spell.speed);
+		hero.thrust = {
+			velocity,
+			ticks: ticksToTarget,
+			nullified: false,
+		};
 	}
 
-	return hero.thrustTicks <= 0;
+	if (hero.thrust && !hero.thrust.nullified) {
+		hero.body.setLinearVelocity(hero.thrust.velocity);
+	}
+
+	return !hero.thrust;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
