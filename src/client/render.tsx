@@ -108,6 +108,10 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
 	if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
+
+		if (obj.type === Spells.drain.id) {
+			renderDrainReturn(ctxStack, obj, world);
+		}
 	}
 }
 
@@ -125,6 +129,28 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	} else if (obj.render === "gravity") {
 		renderGravity(ctx, obj, world);
 	}
+}
+
+function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+	if (!projectile.hit) {
+		return;
+	}
+
+	let owner = world.objects.get(projectile.owner);
+	if (!owner) {
+		return;
+	}
+
+	const pos = owner.body.getPosition();
+
+	world.ui.trails.push({
+		type: 'circle',
+		initialTick: world.tick,
+		max: 0.5 * constants.TicksPerSecond,
+		pos: vector.clone(pos),
+		fillStyle: projectile.color,
+		radius: Hero.Radius * 1.1,
+	} as w.CircleTrail);
 }
 
 function renderExplosion(ctxStack: CanvasCtxStack, explosion: w.Explosion, world: w.World) {
