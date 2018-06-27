@@ -56,6 +56,11 @@ function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D)
 	func(contextStack.canvas);
 }
 
+function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
+	func(contextStack.glows);
+	func(contextStack.canvas);
+}
+
 function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
 	ctxStack.background.fillStyle = 'black';
 	ctxStack.background.fillRect(0, 0, rect.width, rect.height);
@@ -73,14 +78,13 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 
 	renderMap(ctxStack.background, world);
 
-	world.objects.forEach(obj => renderObject(ctxStack.canvas, obj, world));
-	world.destroyed.forEach(obj => renderDestroyed(ctxStack.canvas, obj, world));
-	world.explosions.forEach(obj => renderExplosion(ctxStack.canvas, obj, world));
+	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
+	world.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
+	world.explosions.forEach(obj => renderExplosion(ctxStack, obj, world));
 
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
-		renderTrail(ctxStack.glows, trail, world);
-		renderTrail(ctxStack.canvas, trail, world);
+		renderTrail(ctxStack, trail, world);
 
 		const expireTick = trail.initialTick + trail.max;
 		if (world.tick < expireTick) {
@@ -92,21 +96,24 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 	all(ctxStack, ctx => ctx.restore());
 }
 
-function renderObject(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
+function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
+	const ctx = ctxStack.canvas;
 	if (obj.category === "hero") {
 		renderHero(ctx, obj, world);
 	} else if (obj.category === "projectile") {
-		renderSpell(ctx, obj, world);
+		renderSpell(ctxStack, obj, world);
 	}
 }
 
-function renderDestroyed(ctx: CanvasRenderingContext2D, obj: w.WorldObject, world: w.World) {
+function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
 	if (obj.category === "projectile") {
-		renderSpell(ctx, obj, world);
+		renderSpell(ctxStack, obj, world);
 	}
 }
 
-function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.World) {
+function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
+	const ctx = ctxStack.canvas;
+
 	if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctx, obj, world);
@@ -114,13 +121,13 @@ function renderSpell(ctx: CanvasRenderingContext2D, obj: w.Projectile, world: w.
 	} else if (obj.render == "ray") {
         renderRay(ctx, obj, world);
 	} else if (obj.render === "link") {
-		renderLink(ctx, obj, world);
+		renderLink(ctxStack, obj, world);
 	} else if (obj.render === "gravity") {
 		renderGravity(ctx, obj, world);
 	}
 }
 
-function renderExplosion(ctx: CanvasRenderingContext2D, explosion: w.Explosion, world: w.World) {
+function renderExplosion(ctxStack: CanvasCtxStack, explosion: w.Explosion, world: w.World) {
 	let ticks;
 	let radius;
 	if (explosion.type === w.ExplosionType.Scourge) {
@@ -326,7 +333,7 @@ function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, 
 	}
 }
 
-function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
+function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
 	if (!projectile.link) {
 		return;
 	}
@@ -339,7 +346,7 @@ function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, wor
 			return;
 		} else {
 			target = projectile;
-			renderProjectile(ctx, projectile, world);
+			renderProjectile(ctxStack.canvas, projectile, world);
 		}
 	}
 
@@ -347,17 +354,17 @@ function renderLink(ctx: CanvasRenderingContext2D, projectile: w.Projectile, wor
 		return;
 	}
 
-	ctx.lineWidth = Pixel * 5;
-	ctx.strokeStyle = projectile.color;
-	ctx.shadowColor = projectile.color;
-	ctx.shadowBlur = 10;
+	foreground(ctxStack, ctx => {
+		ctx.lineWidth = Pixel * 5;
+		ctx.strokeStyle = projectile.color;
 
-	const from = owner.body.getPosition();
-	const to = target.body.getPosition();
-	ctx.beginPath();
-	ctx.moveTo(from.x, from.y);
-	ctx.lineTo(to.x, to.y);
-	ctx.stroke();
+		const from = owner.body.getPosition();
+		const to = target.body.getPosition();
+		ctx.beginPath();
+		ctx.moveTo(from.x, from.y);
+		ctx.lineTo(to.x, to.y);
+		ctx.stroke();
+	});
 }
 
 function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
@@ -402,7 +409,7 @@ function projectileColor(projectile: w.Projectile, world: w.World) {
 	return color;
 }
 
-function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail, world: w.World) {
+function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	const expireTick = trail.initialTick + trail.max;
 	const remaining = expireTick - world.tick;
 	if (remaining <= 0) {
@@ -411,26 +418,28 @@ function renderTrail(ctx: CanvasRenderingContext2D, trail: w.Trail, world: w.Wor
 
 	const proportion = 1.0 * remaining / trail.max;
 
-	ctx.save(); 
+	foreground(ctxStack, ctx => {
+		ctx.save(); 
 
-	ctx.globalCompositeOperation = "lighten";
-	ctx.globalAlpha = proportion;
-	ctx.fillStyle = trail.fillStyle;
-	ctx.strokeStyle = trail.fillStyle;
+		ctx.globalCompositeOperation = "lighten";
+		ctx.globalAlpha = proportion;
+		ctx.fillStyle = trail.fillStyle;
+		ctx.strokeStyle = trail.fillStyle;
 
-	if (trail.type === "circle") {
-		ctx.beginPath();
-		ctx.arc(trail.pos.x, trail.pos.y, proportion * trail.radius, 0, 2 * Math.PI);
-		ctx.fill();
-	} else if (trail.type === "line") {
-		ctx.lineWidth = proportion * trail.width;
-		ctx.beginPath();
-		ctx.moveTo(trail.from.x, trail.from.y);
-		ctx.lineTo(trail.to.x, trail.to.y);
-		ctx.stroke();
-	}
+		if (trail.type === "circle") {
+			ctx.beginPath();
+			ctx.arc(trail.pos.x, trail.pos.y, proportion * trail.radius, 0, 2 * Math.PI);
+			ctx.fill();
+		} else if (trail.type === "line") {
+			ctx.lineWidth = proportion * trail.width;
+			ctx.beginPath();
+			ctx.moveTo(trail.from.x, trail.from.y);
+			ctx.lineTo(trail.to.x, trail.to.y);
+			ctx.stroke();
+		}
 
-	ctx.restore();
+		ctx.restore();
+	});
 
 	return false;
 }

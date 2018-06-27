@@ -322,7 +322,8 @@ export namespace Spells {
 			speed: 0.3,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 10,
-			explodeOn: Categories.None,
+			collideWith: Categories.Hero | Categories.Massive,
+			explodeOn: Categories.Massive,
 			shieldTakesOwnership: false,
 
 			link: {
