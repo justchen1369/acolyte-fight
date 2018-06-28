@@ -513,7 +513,7 @@ export namespace Spells {
 		uninterruptible: true,
 
 		damage: 10,
-		maxTicks: 0.25 * TicksPerSecond,
+		maxTicks: 0.33 * TicksPerSecond,
 		speed: 0.75,
 
 		icon: "fireDash",
