@@ -99,9 +99,9 @@ export namespace Spells {
 		projectile: {
 			color: '#ff8800',
 
-			density: 2,
-			radius: 0.005,
-			speed: 0.3,
+			density: 5,
+			radius: 0.002,
+			speed: 0.4,
 			maxSpeed: 1.0,
 			maxTicks: 1 * TicksPerSecond,
 			damage: 10,
