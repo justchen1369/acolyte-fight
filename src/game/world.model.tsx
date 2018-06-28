@@ -324,6 +324,7 @@ export interface ThrustState {
 	velocity: pl.Vec2;
 	ticks: number;
 	nullified: boolean;
+	alreadyHit: Set<string>;
 }
 
 export interface Cooldowns {
@@ -340,6 +341,8 @@ export interface Projectile extends WorldObjectBase {
 
 	target: pl.Vec2;
 	targetId: string | null;
+	alreadyHit: Set<string>;
+
 	damage: number;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;

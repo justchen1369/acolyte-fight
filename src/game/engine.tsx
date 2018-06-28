@@ -164,6 +164,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
+		alreadyHit: new Set<string>(),
+
 		damage: projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
@@ -477,7 +479,10 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			// Thrust into shield means the hero bounces off
 			hero.thrust.nullified = true;
 		} else {
-			applyDamage(other, Spells.thrust.damage, hero.id, world);
+			if (!hero.thrust.alreadyHit.has(other.id)) {
+				hero.thrust.alreadyHit.add(other.id);
+				applyDamage(other, Spells.thrust.damage, hero.id, world);
+			}
 		}
 	}
 }
@@ -508,7 +513,9 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	} else {
 		hero.hitTick = world.tick;
 
-		if (hero.id !== projectile.owner) {
+		if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
+			projectile.alreadyHit.add(hero.id);
+
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner, world);
 			lifeSteal(damage, projectile, world);
@@ -593,6 +600,8 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
 	let newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
+
+	projectile.alreadyHit.clear();
 }
 
 function gravityForce(world: w.World) {
@@ -978,6 +987,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 			velocity,
 			ticks: Math.min(spell.maxTicks, ticksToTarget),
 			nullified: false,
+			alreadyHit: new Set<string>(),
 		};
 	}
 
