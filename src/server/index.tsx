@@ -1,5 +1,6 @@
 import { Matchmaking, TicksPerSecond, Spells, World } from '../game/constants';
 import * as _ from 'lodash';
+import * as winston from 'winston';
 import * as c from '../game/world.model';
 import * as m from '../game/messages.model';
 import * as PlayerName from '../game/playerName';
@@ -12,12 +13,22 @@ const NanoTimer = require('nanotimer');
 
 const port = process.env.PORT || 7770;
 
+const logger = winston.createLogger({
+	level: 'info',
+	format: winston.format.combine(
+		winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+		winston.format.printf(info => `${info.timestamp} - ${info.message}`),
+	),
+	transports: [
+		new winston.transports.File({ filename: 'logs/server.log' }),
+		new winston.transports.Console(),
+	],
+});
+
 app.use(express.static('./'));
-
 io.on('connection', onConnection);
-
-let server = http.listen(port, function() {
-	console.log("Started listening on port " + port);
+http.listen(port, function() {
+	logger.info("Started listening on port " + port);
 });
 
 // Game management
@@ -60,10 +71,10 @@ function tickAllGames() {
 }
 
 function onConnection(socket: SocketIO.Socket) {
-  console.log("user " + socket.id + " connected");
+  logger.info("user " + socket.id + " connected");
 
 	socket.on('disconnect', () => {
-		console.log("user " + socket.id + " disconnected");
+		logger.info("user " + socket.id + " disconnected");
 
 		activeGames.forEach(game => {
 			if (game.active.has(socket.id)) {
@@ -79,7 +90,7 @@ function onConnection(socket: SocketIO.Socket) {
 function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 	if (activeGames.has(data.gameId)) {
 		const game = activeGames.get(data.gameId);
-		console.log("Game [" + game.id + "]: " + data.name + " joined as observer");
+		logger.info("Game [" + game.id + "]: " + data.name + " joined as observer");
 
 		socket.emit("hero", {
 			gameId: game.id,
@@ -90,7 +101,7 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.join(game.id);
 	} else if (inactiveGames.has(data.gameId)) {
 		const game = inactiveGames.get(data.gameId);
-		console.log("Game [" + game.id + "]: going to be watched by " + data.name);
+		logger.info("Game [" + game.id + "]: going to be watched by " + data.name);
 
 		socket.emit("watch", {
 			gameId: game.id,
@@ -98,7 +109,7 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);
 	} else {
-		console.log("Game [" + data.gameId + "]: unable to find game for " + data.name);
+		logger.info("Game [" + data.gameId + "]: unable to find game for " + data.name);
 
 		socket.emit("watch", {
 			gameId: null,
@@ -125,7 +136,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 		if (actionData.heroId === heroId && actionData.actionType === "game") {
 			queueAction(game, actionData);
 		} else {
-			console.log("Game [" + game.id + "]: incorrect hero id! " + actionData.heroId + " should be " + heroId);
+			logger.info("Game [" + game.id + "]: incorrect hero id! " + actionData.heroId + " should be " + heroId);
 		}
 	});
 }
@@ -144,7 +155,7 @@ function initGame() {
 	} as Game;
 	activeGames.set(game.id, game);
 
-	console.log("Game [" + game.id + "]: started");
+	logger.info("Game [" + game.id + "]: started");
 	return game;
 }
 
@@ -182,7 +193,7 @@ function joinGame(game: Game, playerName: string, keyBindings: c.KeyBindings, so
 
 	queueAction(game, { heroId, actionType: "join", playerName, keyBindings });
 
-	console.log("Game [" + game.id + "]: player " + playerName + " [" + socket.id + "] joined, now " + game.numPlayers + " players");
+	logger.info("Game [" + game.id + "]: player " + playerName + " [" + socket.id + "] joined, now " + game.numPlayers + " players");
 
 	return heroId;
 }
@@ -201,10 +212,10 @@ function queueAction(game: Game, actionData: m.ActionMsg) {
 
 	if (!game.started && isUserInitiated(actionData)) {
 		game.started = true;
-		console.log("Started game " + game.id + " with " + game.numPlayers + " players");
+		logger.info("Started game " + game.id + " with " + game.numPlayers + " players");
 	}
 
-	// console.log("Game [" + game.id + "]: action received", actionData);
+	// logger.info("Game [" + game.id + "]: action received", actionData);
 }
 
 function actionPrecedence(actionData: m.ActionMsg): number {
@@ -233,7 +244,7 @@ function isSpell(actionData: m.ActionMsg): boolean {
 function leaveGame(game: Game, socket: SocketIO.Socket) {
 	let player = game.active.get(socket.id);
 	if (!player) {
-		console.log("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
+		logger.info("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
 		return;
 	}
 
@@ -241,14 +252,14 @@ function leaveGame(game: Game, socket: SocketIO.Socket) {
 
 	game.active.delete(socket.id);
 	socket.leave(game.id);
-	console.log("Game [" + game.id + "]: player " + player.name + " [" + socket.id + "] left after " + game.tick + " ticks");
+	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socket.id + "] left after " + game.tick + " ticks");
 }
 
 function finishGame(game: Game) {
 	activeGames.delete(game.id);
 	inactiveGames.set(game.id, game);
 
-	console.log("Game [" + game.id + "]: finished after " + game.tick + " ticks");
+	logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
 
 function gameTick(game: Game) {
@@ -299,7 +310,7 @@ function closeGameIfNecessary(game: Game, data: m.TickMsg) {
 	if (game.tick >= game.closeTick) {
 		game.joinable = false;
 		statusChanged = true;
-		console.log("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
 	}
 
 	if (statusChanged) {
