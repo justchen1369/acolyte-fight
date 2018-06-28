@@ -508,13 +508,13 @@ export namespace Spells {
 		description: "Accelerate quickly, knocking away anything in your path.",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 10 * TicksPerSecond,
+		cooldown: 12 * TicksPerSecond,
 
 		uninterruptible: true,
 
 		damage: 10,
 		maxTicks: 0.25 * TicksPerSecond,
-		speed: 1.0,
+		speed: 0.75,
 
 		icon: "fireDash",
 		color: '#ff00cc',
