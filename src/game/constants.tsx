@@ -23,7 +23,7 @@ export namespace Hero {
 	export const Radius = 0.015;
 	export const Density = 0.5;
 	export const AngularDamping = 1;
-	export const MaxDamping = 5;
+	export const MaxDamping = 10;
 	export const MinDamping = 1;
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
@@ -99,8 +99,8 @@ export namespace Spells {
 		projectile: {
 			color: '#ff8800',
 
-			density: 12,
-			radius: 0.002,
+			density: 10,
+			radius: 0.003,
 			speed: 0.3,
 			maxSpeed: 1.0,
 			maxTicks: 1 * TicksPerSecond,
