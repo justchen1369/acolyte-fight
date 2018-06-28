@@ -11,7 +11,11 @@ const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const NanoTimer = require('nanotimer');
 
-const port = process.env.PORT || 7770;
+const program = require('commander');
+program.option('--port <port>', 'Port number');
+program.parse(process.argv);
+
+const port = program.port || process.env.PORT || 7770;
 
 const logger = winston.createLogger({
 	level: 'info',
