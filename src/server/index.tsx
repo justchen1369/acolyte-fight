@@ -8,6 +8,7 @@ const express = require('express');
 const app = express();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+const NanoTimer = require('nanotimer');
 
 const port = process.env.PORT || 7770;
 
@@ -18,7 +19,6 @@ io.on('connection', onConnection);
 let server = http.listen(port, function() {
 	console.log("Started listening on port " + port);
 });
-
 
 // Game management
 interface Game {
@@ -31,8 +31,6 @@ interface Game {
 	closeTick: number;
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];
-
-    intervalHandle?: NodeJS.Timer;
 }
 interface Player {
 	socketId: string;
@@ -44,6 +42,9 @@ let nextGameId = 0;
 let activeGames = new Map<string, Game>(); // id -> game
 let inactiveGames = new Map<string, Game>(); // id -> game
 
+const tickTimer = new NanoTimer();
+tickTimer.setInterval(tickAllGames, '', Math.floor(1e9 / TicksPerSecond) + 'n');
+
 function getServerStats(): m.ServerStats {
 	let numGames = 0;
 	let numPlayers = 0;
@@ -52,6 +53,10 @@ function getServerStats(): m.ServerStats {
 		numPlayers += game.active.size;
 	});
 	return { numGames, numPlayers };
+}
+
+function tickAllGames() {
+	activeGames.forEach(game => gameTick(game));
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -138,8 +143,6 @@ function initGame() {
 		history: [],
 	} as Game;
 	activeGames.set(game.id, game);
-
-	game.intervalHandle = setInterval(() => gameTick(game), 1000.0 / TicksPerSecond);
 
 	console.log("Game [" + game.id + "]: started");
 	return game;
@@ -244,9 +247,6 @@ function leaveGame(game: Game, socket: SocketIO.Socket) {
 function finishGame(game: Game) {
 	activeGames.delete(game.id);
 	inactiveGames.set(game.id, game);
-	if (game.intervalHandle) {
-		clearInterval(game.intervalHandle);
-	}
 
 	console.log("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
