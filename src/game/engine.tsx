@@ -1038,8 +1038,8 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 }
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
-	if (world.tick < world.startTick) {
-		// No damage until game started
+	if (world.tick < world.startTick && fromHeroId) {
+		// No damage from other heroes until game started
 		return;
 	}
 
