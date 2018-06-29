@@ -246,7 +246,7 @@ export namespace Spells {
 		icon: "boltSaw",
 
 		cooldown: 20 * TicksPerSecond,
-		fireTowardsCurrentHeading: true,
+		maxAngleDiff: 0.01 * 2 * Math.PI,
 
 		projectile: {
 			color: '#44ffcc',
@@ -365,7 +365,7 @@ export namespace Spells {
 			speed: 0.75,
 			maxSpeed: 1.0,
 			maxTicks: 3.0 * TicksPerSecond,
-			damage: 5,
+			damage: 8,
 			collideWith: Categories.Hero | Categories.Massive,
 			explodeOn: Categories.All,
 			bounce: {
