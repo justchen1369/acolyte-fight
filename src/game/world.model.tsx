@@ -128,7 +128,7 @@ export interface TeleportSpell extends SpellBase {
 export interface ThrustSpell extends SpellBase {
     action: "thrust";
 
-    damage: number;
+	damage: number;
     maxTicks: number;
     speed: number;
 }
@@ -294,6 +294,7 @@ export interface Hero extends WorldObjectBase {
 
 	health: number;
 	body: pl.Body;
+	massOverride?: number;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	shieldTicks?: number;

@@ -742,9 +742,6 @@ function decayShields(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero" && obj.shieldTicks > 0) {
 			--obj.shieldTicks;
-			if (obj.shieldTicks === 0) {
-				obj.body.resetMassData();
-			}
 		}
 	});
 }
@@ -764,11 +761,27 @@ function decayThrust(world: w.World) {
 function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
+			// Damping
 			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
 			if (obj.thrust) {
 				damping = 0;
 			}
 			obj.body.setLinearDamping(damping);
+
+			// Mass
+			let mass = null;
+			if (obj.shieldTicks) {
+				mass = Spells.shield.mass;
+			}
+
+			if (mass !== obj.massOverride) {
+				obj.massOverride = mass;
+				if (mass) {
+					obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
+				} else {
+					obj.body.resetMassData();
+				}
+			}
 		}
 	});
 }
@@ -1029,11 +1042,6 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 
 function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
 	hero.shieldTicks = Math.max(hero.shieldTicks || 0, spell.maxTicks);
-	hero.body.setMassData({
-		mass: Spells.shield.mass,
-		center: vector.zero(),
-		I: 0,
-	});
 	return true;
 }
 
