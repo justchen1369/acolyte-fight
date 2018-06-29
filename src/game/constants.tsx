@@ -95,13 +95,13 @@ export namespace Spells {
 		icon: "thunderball",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 2 * TicksPerSecond,
+		cooldown: 1 * TicksPerSecond,
 
 		projectile: {
 			color: '#ff8800',
 
-			density: 3,
-			radius: 0.005,
+			density: 4,
+			radius: 0.004,
 			speed: 0.4,
 			maxSpeed: 1.0,
 			maxTicks: 1 * TicksPerSecond,
