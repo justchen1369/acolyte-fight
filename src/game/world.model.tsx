@@ -281,11 +281,14 @@ export interface WorldObjectBase {
 	id: string;
 	category: string;
 	categories: number;
-	collideWith: number;
 	type: string;
-	bullet?: boolean;
 	body: pl.Body;
 	destroyed?: boolean;
+}
+
+export interface Obstacle extends WorldObjectBase {
+	category: "obstacle";
+	points: pl.Vec2[];
 }
 
 export interface Hero extends WorldObjectBase {
@@ -337,6 +340,7 @@ export interface Projectile extends WorldObjectBase {
 
 	owner: string;
 	body: pl.Body;
+	collideWith: number;
 	hit?: boolean;
 	maxSpeed: number | null;
 
@@ -387,7 +391,7 @@ export interface LinkParameters {
 	linkTicks: number;
 }
 
-export type WorldObject = Hero | Projectile;
+export type WorldObject = Hero | Projectile | Obstacle;
 
 export interface Explosion {
 	pos: pl.Vec2;

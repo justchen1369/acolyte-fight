@@ -1,3 +1,4 @@
+import * as pl from 'planck-js';
 import * as constants from '../game/constants';
 import * as engine from '../game/engine';
 import * as vector from '../game/vector';
@@ -102,6 +103,8 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		renderHero(ctx, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
+	} else if (obj.category === "obstacle") {
+		renderObstacle(ctxStack, obj, world);
 	}
 }
 
@@ -187,6 +190,37 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.fill();
 
 	ctx.restore();
+}
+
+function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World) {
+	if (obstacle.destroyed) {
+		return;
+	}
+
+	const body = obstacle.body;
+	const pos = body.getPosition();
+
+	foreground(ctxStack, ctx => {
+		ctx.save();
+		
+		ctx.translate(pos.x, pos.y);
+		ctx.rotate(body.getAngle());
+
+		ctx.fillStyle = 'white';
+		ctx.beginPath();
+
+		const points = obstacle.points;
+		for (let i = 0; i <= points.length; ++i) { // <= to because we need to return to the start point and close the shape
+			const point = points[i % points.length];
+			if (i === 0) {
+				ctx.moveTo(point.x, point.y);
+			}
+			ctx.lineTo(point.x, point.y);
+		}
+		ctx.fill();
+
+		ctx.restore();
+	});
 }
 
 function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World) {

@@ -9,7 +9,7 @@ declare module "planck-js" {
         }
 
         interface Body {
-            createFixture(polygon: Polygon, fixtureDef: FixtureDef): void;
+            createFixture(shape: Shape, fixtureDef: FixtureDef): void;
             destroyFixture(fixture: Fixture): void;
             isBullet(): boolean;
             setBullet(bullet: boolean): void;
@@ -51,6 +51,7 @@ declare module "planck-js" {
         interface Fixture {
             getBody(): Body;
             getNext(): Fixture;
+            getShape(): Shape;
             isSensor(): boolean;
             setSensor(sensor: boolean): void;
         }
@@ -62,8 +63,14 @@ declare module "planck-js" {
             restitution?: number;
         }
 
-        interface Polygon {
+        type Shape = Circle | Polygon;
 
+        interface Circle {
+            m_type: "circle";
+        }
+
+        interface Polygon {
+            m_type: "polygon";
         }
 
         interface Vec2 {
@@ -85,7 +92,8 @@ declare module "planck-js" {
             points: Vec2[];
         }
 
-        function Circle(radius: number): Polygon;
+        function Circle(radius: number): Circle;
+        function Polygon(points: Vec2[]): Polygon;
         function Vec2(x: number, y: number): Vec2;
         function World(): World;
     }

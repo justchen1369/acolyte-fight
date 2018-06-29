@@ -4,15 +4,21 @@ import * as constants from '../game/constants';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
+import { Hero, World, Spells, Obstacle, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
 
-// Planck.js considers collisions to be inelastic if below this threshold.
-// We want all thresholds to be elastic.
-(pl as any).internal.Settings.velocityThreshold = 0;
+// Reset planck.js constants
+{
+	const settings = (pl as any).internal.Settings;
 
-// We need to adjust this because our scale is not a normal scale and the defaults let some small projectiles tunnel through others
-(pl as any).internal.Settings.linearSlop = 0.0005;
-(pl as any).internal.Settings.linearSlopSquared = Math.pow((pl as any).internal.Settings.linearSlop, 2.0);
+	// Planck.js considers collisions to be inelastic if below this threshold.
+	// We want all thresholds to be elastic.
+	settings.velocityThreshold = 0;
+
+	// We need to adjust this because our scale is not a normal scale and the defaults let some small projectiles tunnel through others
+	settings.linearSlop = 0.0005;
+	settings.linearSlopSquared = Math.pow(settings.linearSlop, 2.0);
+	settings.polygonRadius = (2.0 * settings.linearSlop);
+}
 
 export function initialWorld(): w.World {
 	let world = {
@@ -44,6 +50,9 @@ export function initialWorld(): w.World {
 			notifications: [],
 		} as w.UIState,
 	} as w.World;
+
+	addObstacle(world, "obstacle1", pl.Vec2(0.5, 0.5), 0, Obstacle.Extent, Obstacle.Points);
+
 	return world;
 }
 
@@ -53,6 +62,42 @@ export function takeNotifications(world: w.World): w.Notification[] {
 		world.ui.notifications = [];
 	}
 	return notifications;
+}
+
+function addObstacle(world: w.World, obstacleId: string, position: pl.Vec2, angle: number, extent: number, numPoints: number) {
+	const body = world.physics.createBody({
+		userData: obstacleId,
+		type: 'static',
+		position,
+		angle,
+		linearDamping: Obstacle.LinearDamping,
+		angularDamping: Obstacle.AngularDamping,
+	});
+
+	let points = new Array<pl.Vec2>();
+	for (let i = 0; i < numPoints; ++i) {
+		const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
+		points.push(point);
+	}
+
+	body.createFixture(pl.Polygon(points), {
+		filterCategoryBits: Categories.Obstacle,
+		filterMaskBits: Categories.All,
+		density: Obstacle.Density,
+		restitution: 0.0,
+	});
+
+	const obstacle: w.Obstacle = {
+		id: obstacleId,
+		category: "obstacle",
+		categories: Categories.Obstacle,
+		type: "polygon",
+		body,
+		points,
+	};
+
+	world.objects.set(obstacle.id, obstacle);
+	return obstacle;
 }
 
 function addHero(world: w.World, heroId: string, playerName: string) {
@@ -448,6 +493,8 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 			handleProjectileHitHero(world, object, hit);
 		} else if (hit.category === "projectile") {
 			handleProjectileHitProjectile(world, object, hit);
+		} else if (hit.category === "obstacle") {
+			handleProjectileHitObstacle(world, object, hit);
 		}
 	} else if (object.category === "hero") {
 		if (hit.category === "hero") {
@@ -492,6 +539,14 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 		if (projectile.categories & Categories.Massive) {
 			hero.thrust.nullified = true;
 		}
+	}
+}
+
+function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
+	if (projectile.bounce) { // Only bounce off heroes, not projectiles
+		bounceToNext(projectile, obstacle, world);
+	} else if (projectile.explodeOn & obstacle.categories) {
+		destroyObject(world, projectile);
 	}
 }
 
@@ -588,7 +643,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
-		x => x.category === "hero" && x.id !== hit.id);
+		x => !!(x.categories & projectile.collideWith) && x.id !== hit.id);
 	if (!nextTarget) {
 		return;
 	}

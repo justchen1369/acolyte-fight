@@ -9,6 +9,7 @@ export namespace Categories {
 	export const Hero = 1;
 	export const Projectile = 2;
 	export const Massive = 4;
+	export const Obstacle = 8;
 	export const None = 0;
 }
 
@@ -53,6 +54,14 @@ export namespace World {
 	export const LavaDamagePerTick = 0.25;
 	export const ShrinkPerTick = 0.00005;
 	export const InitialShieldTicks = 1.0 * TicksPerSecond;
+}
+
+export namespace Obstacle {
+	export const Density = 10000.0;
+	export const Extent = 0.02;
+	export const Points = 6;
+	export const AngularDamping = 1;
+	export const LinearDamping = 10;
 }
 
 export namespace HealthBar {
@@ -204,7 +213,7 @@ export namespace Spells {
 			damage: 10,
 			trailTicks: 1.0 * TicksPerSecond,
 			collideWith: Categories.All,
-			explodeOn: Categories.All,
+			explodeOn: Categories.All ^ Categories.Obstacle,
 
 			render: "ray",
 		} as c.ProjectileTemplate,
@@ -367,8 +376,8 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 8,
-			collideWith: Categories.Hero | Categories.Massive,
-			explodeOn: Categories.All,
+			collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
+			explodeOn: Categories.All ^ Categories.Obstacle,
 			bounce: {
 				damageFactor: 0.9,
 			},
