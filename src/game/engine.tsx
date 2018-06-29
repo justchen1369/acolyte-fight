@@ -1029,6 +1029,11 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 
 function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
 	hero.shieldTicks = Math.max(hero.shieldTicks || 0, spell.maxTicks);
+	hero.body.setMassData({
+		mass: Spells.shield.mass,
+		center: vector.zero(),
+		I: 0,
+	});
 	return true;
 }
 
