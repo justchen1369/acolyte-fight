@@ -59,7 +59,7 @@ export namespace World {
 export namespace Obstacle {
 	export const Density = 10000.0;
 	export const Extent = 0.02;
-	export const Points = 6;
+	export const Points = 5;
 	export const AngularDamping = 1;
 	export const LinearDamping = 10;
 }
