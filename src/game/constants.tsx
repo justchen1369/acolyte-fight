@@ -325,7 +325,7 @@ export namespace Spells {
 			speed: 0.3,
 			maxSpeed: 0.35,
 			maxTicks: 1.75 * TicksPerSecond,
-			damage: 25,
+			damage: 10,
 			explodeOn: Categories.None,
 			shieldTakesOwnership: false,
 
