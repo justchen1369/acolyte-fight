@@ -49,6 +49,7 @@ export namespace Hero {
 };
 
 export namespace World {
+	export const PreGameLavaDamagePerTick = 0.05;
 	export const LavaDamagePerTick = 0.25;
 	export const ShrinkPerTick = 0.00005;
 	export const InitialShieldTicks = 1.0 * TicksPerSecond;

@@ -300,7 +300,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
 	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
-		ctx.fillStyle = 'black';
+		ctx.fillStyle = '#111';
 		ctx.beginPath();
 		healthBarPath(ctx, radius, 1.0);
 		ctx.fill();
@@ -311,7 +311,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		healthBarPath(ctx, radius, healthProportion);
 		ctx.fill();
 
-		let startProportion = Math.min(1.0, ticksUntilStart / constants.Matchmaking.JoinPeriod);
+		let startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
 		if (startProportion > 0) {
 			ctx.save();
 

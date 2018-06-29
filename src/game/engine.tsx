@@ -791,7 +791,8 @@ function applyLavaDamage(world: w.World) {
 		if (obj.category === "hero") {
 			let position = obj.body.getPosition();
 			if (vector.distance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
-				applyDamage(obj, World.LavaDamagePerTick, null, world);
+				const damage = world.tick < world.startTick ? World.PreGameLavaDamagePerTick : World.LavaDamagePerTick;
+				applyDamage(obj, damage, null, world);
 			}
 		}
 	});
