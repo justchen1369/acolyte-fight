@@ -246,7 +246,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		radius: projectileTemplate.radius,
 		trailTicks: projectileTemplate.trailTicks,
 
-		uiPreviousPos: vector.clone(position),
+		uiPath: [vector.clone(position)],
 	} as w.Projectile;
 	world.objects.set(id, projectile);
 
@@ -519,14 +519,17 @@ function handleContact(world: w.World, contact: pl.Contact) {
 
 	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
 	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
+	const collisionPoint = vector.average(contact.getWorldManifold().points);
 	if (objA && objB) {
-		handleCollision(world, objA, objB);
-		handleCollision(world, objB, objA);
+		handleCollision(world, objA, objB, collisionPoint);
+		handleCollision(world, objB, objA, collisionPoint);
 	}
 }
 
-function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject) {
+function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
 	if (object.category === "projectile") {
+		object.uiPath.push(collisionPoint);
+
 		if (hit.category === "hero") {
 			handleProjectileHitHero(world, object, hit);
 		} else if (hit.category === "projectile") {

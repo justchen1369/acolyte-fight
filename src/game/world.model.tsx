@@ -393,7 +393,7 @@ export interface Projectile extends WorldObjectBase {
 	selfColor: boolean;
     trailTicks: number;
 
-	uiPreviousPos: pl.Vec2; // is only used for the UI and not guaranteed to be sync'd across clients!
+	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
 }
 
 export namespace HomingTargets {

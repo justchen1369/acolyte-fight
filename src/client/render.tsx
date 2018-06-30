@@ -149,6 +149,10 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	const ctx = ctxStack.canvas;
 
+	if (!obj.destroyed) {
+		obj.uiPath.push(vector.clone(obj.body.getPosition()));
+	}
+
 	if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctx, obj, world);
@@ -159,6 +163,10 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 		renderLink(ctxStack, obj, world);
 	} else if (obj.render === "gravity") {
 		renderGravity(ctx, obj, world);
+	}
+
+	while (obj.uiPath.length > 1) {
+		obj.uiPath.shift();
 	}
 }
 
@@ -475,37 +483,33 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
-	let pos = projectile.body.getPosition();
-	let previous = projectile.uiPreviousPos;
-	projectile.uiPreviousPos = vector.clone(pos);
+	for (let i = 0; i < projectile.uiPath.length - 1; ++i) {
+		const previous = projectile.uiPath[i];
+		const pos = projectile.uiPath[i + 1];
 
-	if (!previous) {
-		renderProjectile(ctx, projectile, world);
-		return;
+		world.ui.trails.push({
+			type: 'line',
+			initialTick: world.tick,
+			max: projectile.trailTicks, 
+			from: previous,
+			to: pos,
+			fillStyle: projectileColor(projectile, world),
+			width: projectile.radius * 2,
+		} as w.LineTrail);
 	}
-
-	world.ui.trails.push({
-		type: 'line',
-		initialTick: world.tick,
-		max: projectile.trailTicks, 
-		from: vector.clone(previous),
-		to: vector.clone(pos),
-		fillStyle: projectileColor(projectile, world),
-		width: projectile.radius * 2,
-	} as w.LineTrail);
 }
 
 function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
-	let pos = projectile.body.getPosition();
-
-	world.ui.trails.push({
-		type: 'circle',
-		initialTick: world.tick,
-		max: projectile.trailTicks, 
-		pos: vector.clone(pos),
-		fillStyle: projectileColor(projectile, world),
-		radius: projectile.radius,
-	} as w.CircleTrail);
+	projectile.uiPath.forEach(pos => {
+		world.ui.trails.push({
+			type: 'circle',
+			initialTick: world.tick,
+			max: projectile.trailTicks, 
+			pos: vector.clone(pos),
+			fillStyle: projectileColor(projectile, world),
+			radius: projectile.radius,
+		} as w.CircleTrail);
+	});
 }
 
 function projectileColor(projectile: w.Projectile, world: w.World) {
