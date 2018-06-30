@@ -38,7 +38,7 @@ export function initialWorld(): w.World {
 		radius: World.InitialRadius,
 
 		destroyed: [],
-		explosions: new Array<w.Explosion>(),
+		events: new Array<w.WorldEvent>(),
 
 		nextObstacleId: 0,
 		nextPositionId: 0,
@@ -257,7 +257,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 export function tick(world: w.World) {
 	++world.tick;
 	world.destroyed = [];
-	world.explosions = [];
+	world.events = [];
 
 	handleOccurences(world);
 	handleActions(world);
@@ -913,10 +913,6 @@ function reap(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (obj.health <= 0) {
-				world.explosions.push({
-					pos: obj.body.getPosition(),
-					type: w.ExplosionType.HeroDeath,
-				});
 				destroyObject(world, obj);
 				notifyKill(obj, world);
 				heroKilled = true;
@@ -1141,9 +1137,10 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 	});
 
-	world.explosions.push({
+	world.events.push({
+		heroId: hero.id,
 		pos: hero.body.getPosition(),
-		type: w.ExplosionType.Scourge,
+		type: w.WorldEventType.Scourge,
 	});
 
 	return true;

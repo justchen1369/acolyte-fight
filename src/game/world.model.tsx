@@ -177,7 +177,7 @@ export interface World {
 
 	objects: Map<string, WorldObject>,
 	destroyed: WorldObject[];
-	explosions: Explosion[];
+	events: WorldEvent[];
 
 	physics: pl.World;
 
@@ -419,12 +419,19 @@ export interface LinkParameters {
 
 export type WorldObject = Hero | Projectile | Obstacle;
 
-export interface Explosion {
-	pos: pl.Vec2;
+export type WorldEvent = ScourgeEvent;
+
+export interface WorldEventBase {
 	type: string;
 }
 
-export namespace ExplosionType {
+export interface ScourgeEvent extends WorldEventBase {
+	type: "scourge";
+	pos: pl.Vec2;
+	heroId: string;
+}
+
+export namespace WorldEventType {
 	export const HeroDeath = "heroDeath";
 	export const Scourge = "scourge";
 } 

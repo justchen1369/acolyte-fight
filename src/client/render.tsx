@@ -81,7 +81,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 
 	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
 	world.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
-	world.explosions.forEach(obj => renderExplosion(ctxStack, obj, world));
+	world.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
@@ -109,13 +109,41 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 }
 
 function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
-	if (obj.category === "projectile") {
+	if (obj.category === "hero") {
+		renderHeroDeath(ctxStack, obj, world);
+	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
 
 		if (obj.type === Spells.drain.id) {
 			renderDrainReturn(ctxStack, obj, world);
 		}
+	} else if (obj.category === "obstacle") {
+		renderObstacleDestroyed(ctxStack, obj, world);
 	}
+}
+
+function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const ticks = 15;
+	world.ui.trails.push({
+		type: "circle",
+		max: ticks,
+		initialTick: world.tick,
+		pos: hero.body.getPosition(),
+		fillStyle: 'white',
+		radius: Hero.Radius * 1.5,
+	});
+}
+
+function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World) {
+	const ticks = 15;
+	world.ui.trails.push({
+		type: "circle",
+		max: ticks,
+		initialTick: world.tick,
+		pos: obstacle.body.getPosition(),
+		fillStyle: 'white',
+		radius: obstacle.extent,
+	});
 }
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
@@ -156,13 +184,13 @@ function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, w
 	} as w.CircleTrail);
 }
 
-function renderExplosion(ctxStack: CanvasCtxStack, explosion: w.Explosion, world: w.World) {
+function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
 	let ticks;
 	let radius;
-	if (explosion.type === w.ExplosionType.Scourge) {
+	if (ev.type === w.WorldEventType.Scourge) {
 		ticks = 30;
 		radius = Spells.scourge.radius;
-	} else if (explosion.type === w.ExplosionType.HeroDeath) {
+	} else if (ev.type === w.WorldEventType.HeroDeath) {
 		ticks = 15;
 		radius = Hero.Radius * 1.5;
 	} else {
@@ -173,7 +201,7 @@ function renderExplosion(ctxStack: CanvasCtxStack, explosion: w.Explosion, world
 		type: "circle",
 		max: ticks,
 		initialTick: world.tick,
-		pos: explosion.pos,
+		pos: ev.pos,
 		fillStyle: 'white',
 		radius,
 	});
