@@ -547,8 +547,9 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	foreground(ctxStack, ctx => {
 		ctx.save(); 
 
-		ctx.globalCompositeOperation = "lighten";
-		ctx.globalAlpha = proportion;
+		if (ctx === ctxStack.glows) {
+			ctx.globalAlpha = proportion;
+		}
 		ctx.fillStyle = trail.fillStyle;
 		ctx.strokeStyle = trail.fillStyle;
 
