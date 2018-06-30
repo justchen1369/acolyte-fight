@@ -87,7 +87,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
-        return <div className="disconnected-notification">Disconnected from server</div>
+        return <div className="disconnected-notification">Disconnected from server. Refresh the page to reconnect.</div>
     }
 
     private renderServerStatsNotification(notification: w.ServerStatsNotification) {
@@ -137,7 +137,10 @@ export class MessagesPanel extends React.Component<Props, State> {
             <div className="winner-row">{this.renderPlayer(notification.winner)} is the winner!</div>
             <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
-            <div className="action-row"><span className="new-game-btn" onClick={() => this.onNewGameClick()}>New Game</span></div>
+            <div className="action-row">
+                <span className="new-game-btn" onClick={() => this.props.newGameCallback()}>New Game</span>
+                <a className="rewatch-game-link" href={"?g=" + this.props.store.world.ui.myGameId}>Watch Replay</a>
+            </div>
         </div>;
     }
 
@@ -159,9 +162,5 @@ export class MessagesPanel extends React.Component<Props, State> {
         } else {
             return 1;
         }
-    }
-
-    private onNewGameClick() {
-        this.props.newGameCallback();
     }
 }

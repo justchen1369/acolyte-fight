@@ -108,6 +108,7 @@ a:hover, a:active {
 #messages-panel .action-row {
     margin-top: 30px;
     display: flex;
+    align-items: center;
 }
 
 #messages-panel .new-game-btn {
@@ -128,6 +129,12 @@ a:hover, a:active {
 
 #messages-panel .new-game-btn:active {
     box-shadow: none;
+}
+
+#messages-panel .rewatch-game-link {
+    pointer-events: all;
+    margin-left: 20px;
+    font-size: 80%;
 }
 
 .player-name {

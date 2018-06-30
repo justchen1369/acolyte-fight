@@ -98,10 +98,10 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		const game = activeGames.get(data.gameId);
 		logger.info("Game [" + game.id + "]: " + data.name + " joined as observer");
 
-		socket.emit("hero", {
+		socket.emit("watch", {
 			gameId: game.id,
-			heroId: "_observer",
 			history: game.history,
+			serverStats: getServerStats(),
 		} as m.HeroMsg);
 
 		socket.join(game.id);
@@ -118,7 +118,7 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + data.name);
 
 		socket.emit("watch", {
-			gameId: null,
+			gameId: data.gameId,
 			history: null,
 			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);

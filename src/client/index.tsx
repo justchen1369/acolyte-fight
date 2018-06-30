@@ -8,11 +8,10 @@ import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
+import * as w from '../game/world.model';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
-
-import * as s from './store.model';
 
 const socket = socketLib();
 
@@ -28,6 +27,7 @@ function getOrCreatePlayerName(): string {
     return name;
 }
 
+let joinedInitialGame = false;
 let observeGameId: string = null;
 if (window.location.search) {
     const params = queryString.parse(window.location.search);
@@ -37,8 +37,11 @@ if (window.location.search) {
 }
 
 attachToSocket(socket, () => {
-    joinNewGame(playerName, keyBindings, observeGameId);
-    observeGameId = null;
+    if (!joinedInitialGame) {
+        joinedInitialGame = true;
+        joinNewGame(playerName, keyBindings, observeGameId);
+        observeGameId = null;
+    }
 });
 attachToCanvas({
     background: document.getElementById("background") as HTMLCanvasElement,
@@ -54,9 +57,18 @@ rerender();
 
 function onNewGameClicked() {
     joinNewGame(playerName, keyBindings);
+    window.history.pushState(null, null, "?");
 }
 
 function rerender() {
-    ReactDOM.render(<InfoPanel playerName={playerName} store={getStore()} />, document.getElementById("info-panel"));
-    ReactDOM.render(<MessagesPanel store={getStore()} newGameCallback={onNewGameClicked} />, document.getElementById("messages-panel"));
+    ReactDOM.render(
+        <InfoPanel
+            playerName={playerName}
+            store={getStore()} />,
+        document.getElementById("info-panel"));
+    ReactDOM.render(
+        <MessagesPanel
+            store={getStore()}
+            newGameCallback={onNewGameClicked} />,
+            document.getElementById("messages-panel"));
 }

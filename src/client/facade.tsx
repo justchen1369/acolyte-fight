@@ -15,6 +15,7 @@ let world = engine.initialWorld();
 
 let socket: SocketIOClient.Socket = null;
 let tickQueue = new Array<m.TickMsg>();
+let replayQueue = new Array<m.TickMsg>();
 let notificationListeners = new Array<NotificationListener>();
 
 let nextTarget: pl.Vec2 = null;
@@ -182,6 +183,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('watch', onWatchMsg);
 }
 function onServerStatsMsg(serverStats: m.ServerStats) {
+	if (!serverStats) { return; }
 	notify({
 		type: "serverStats",
 		numGames: serverStats.numGames,
@@ -191,6 +193,7 @@ function onServerStatsMsg(serverStats: m.ServerStats) {
 function onHeroMsg(data: m.HeroMsg) {
 	world = engine.initialWorld();
 	tickQueue = [];
+	replayQueue = [];
 
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
@@ -210,7 +213,11 @@ function onHeroMsg(data: m.HeroMsg) {
 }
 function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
-		tickQueue.push(data);
+		if (replayQueue.length > 0) {
+			replayQueue.push(data);
+		} else {
+			tickQueue.push(data);
+		}
 	}
 }
 function onWatchMsg(data: m.WatchResponseMsg) {
@@ -227,10 +234,11 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 		serverStats: data.serverStats,
 	});
 
-	let replayQueue = [...data.history];
+	replayQueue = [...data.history];
 	const interval = setInterval(() => {
 		if (replayQueue.length > 0) {
-			onTickMsg(replayQueue.shift());
+			const next = replayQueue.shift();
+			tickQueue.push(next);
 		} else {
 			clearInterval(interval);
 		}
