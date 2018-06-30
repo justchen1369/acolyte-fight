@@ -85,6 +85,18 @@ a:hover, a:active {
     pointer-events: none;
 }
 
+#messages-panel .row {
+    animation-name: fade-out;
+    animation-duration: 15s;
+    animation-fill-mode: both;
+}
+
+@keyframes fade-out {
+    from { opacity: 1.0 }
+    75% { opacity: 1.0 }
+    to { opacity: 0.0 }
+}
+
 #messages-panel .help-text {
     font-weight: bold;
 }

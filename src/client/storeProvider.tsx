@@ -12,7 +12,7 @@ let store: s.Store = {
     disconnected: false,
 };
 
-setInterval(notificationCleanup, 1000);
+setInterval(notificationCleanup, ExpiryMilliseconds);
 
 export function getStore() {
     return store;
