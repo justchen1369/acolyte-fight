@@ -218,7 +218,7 @@ export interface UIState {
 export interface Player {
 	heroId: string;
 	name: string;
-	color: string;
+	uiColor: string; // Not synced across clients
 }
 
 export type Notification =
@@ -297,6 +297,7 @@ export interface Joining {
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;
+	preferredColor: string | null;
 }
 
 export interface Leaving {

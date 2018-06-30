@@ -1,24 +1,17 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as s from './store.model';
 import * as w from '../game/world.model';
 import { Hero, TicksPerSecond } from '../game/constants';
 
-const ExpiryMilliseconds = 15000;
 const FadeoutMilliseconds = 5000;
 
 interface Props {
-    world: w.World;
+    store: s.Store;
     newGameCallback: () => void;
 }
 interface State {
-    items: NotificationItem[];
-    myHeroId: string;
     now: number;
-}
-
-interface NotificationItem {
-    element: JSX.Element;
-    expiryTime: number;
 }
 
 export class MessagesPanel extends React.Component<Props, State> {
@@ -27,8 +20,6 @@ export class MessagesPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            items: [],
-            myHeroId: null,
             now: new Date().getTime(),
         };
     }
@@ -44,56 +35,37 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private onInterval() {
-        if (this.state.items.length === 0) {
-            return;
-        }
-
         const now = new Date().getTime();
-        let items = new Array<NotificationItem>();
-        this.state.items.forEach(item => {
-            if (item.expiryTime > now) {
-                items.push(item);
-            }
-        });
-        this.setState({ now, items });
+        this.setState({ now });
     }
 
     render() {
-        return (
-            <div>{this.state.items.map(item => (
-                <div style={{ opacity: this.calculateOpacity(item) }}>{item.element}</div>
-            ))}</div>
-        );
-    }
+        let rows = new Array<JSX.Element>();
+        let winRow = null;
+        const now = new Date().getTime();
+        this.props.store.items.forEach(item => {
+            if (now >= item.expiryTime) {
+                return;
+            }
 
-    onNotification(newNotifications: w.Notification[]) {
-        // Detect if entered a new game
-        newNotifications.forEach(n => {
-            if (n.type === "new") {
-                this.setState({
-                    items: [],
-                    myHeroId: n.heroId
-                });
+            const rendered = this.renderNotification(item.notification);
+            if (!rendered) {
+                return;
+            }
+
+            const row = <div key={item.key} style={{ opacity: this.calculateOpacity(item) }}>{rendered}</div>;
+            if (item.notification.type === "win") {
+                winRow = row;
+            } else {
+                rows.push(row);
             }
         });
 
-        // Add notifications to list
-        const now = new Date().getTime();
-        const newItems = [...this.state.items];
-        newNotifications.forEach(notification => {
-            const element = this.renderNotification(notification);
-            const expiryTime = now + this.calculateExpiryMilliseconds(notification);
-            newItems.push({ element, expiryTime });
-        });
-        this.setState({ items: newItems });
-    }
-
-    private calculateExpiryMilliseconds(notification: w.Notification): number {
-        switch (notification.type) {
-            case "win": return 1e9;
-            case "disconnected": return 1e9;
-            default: return ExpiryMilliseconds;
+        if (winRow) {
+            rows.push(winRow);
         }
+
+        return <div>{rows}</div>;
     }
 
     private renderNotification(notification: w.Notification) {
@@ -170,14 +142,14 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderPlayer(player: w.Player) {
-        let color = player.color;
-        if (player.heroId === this.state.myHeroId) {
+        let color = player.uiColor;
+        if (player.heroId === this.props.store.world.ui.myHeroId) {
             color = Hero.MyHeroColor;
         }
         return <span className="player-name" style={{ color }}>{player.name}</span>;
     }
 
-    private calculateOpacity(item: NotificationItem): number {
+    private calculateOpacity(item: s.NotificationItem): number {
         const millisecondsToExpiry = item.expiryTime - this.state.now;
         if (millisecondsToExpiry <= 0) {
             return 0;

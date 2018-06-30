@@ -4,12 +4,15 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, world, CanvasStack } from './facade';
+import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, getCurrentWorld, CanvasStack } from './facade';
+import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
+
+import * as s from './store.model';
 
 const socket = socketLib();
 
@@ -42,14 +45,18 @@ attachToCanvas({
     glows: document.getElementById("glows") as HTMLCanvasElement,
     canvas: document.getElementById("canvas") as HTMLCanvasElement,
 } as CanvasStack);
-
-const infoPanel = ReactDOM.render(<InfoPanel playerName={playerName} world={world} />, document.getElementById("info-panel")) as InfoPanel;
-const messagesPanel = ReactDOM.render(<MessagesPanel world={world} newGameCallback={onNewGameClicked} />, document.getElementById("messages-panel")) as MessagesPanel;
 attachNotificationListener(notifications => {
-    infoPanel.onNotification(notifications);
-    messagesPanel.onNotification(notifications);
+    applyNotificationsToStore(notifications);
+    rerender();
 });
+
+rerender();
 
 function onNewGameClicked() {
     joinNewGame(playerName, keyBindings);
+}
+
+function rerender() {
+    ReactDOM.render(<InfoPanel playerName={playerName} store={getStore()} />, document.getElementById("info-panel"));
+    ReactDOM.render(<MessagesPanel store={getStore()} newGameCallback={onNewGameClicked} />, document.getElementById("messages-panel"));
 }

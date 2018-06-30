@@ -11,7 +11,7 @@ interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
 
-export let world = engine.initialWorld();
+let world = engine.initialWorld();
 
 let socket: SocketIOClient.Socket = null;
 let tickQueue = new Array<m.TickMsg>();
@@ -20,8 +20,14 @@ let notificationListeners = new Array<NotificationListener>();
 let nextTarget: pl.Vec2 = null;
 let showedHelpText: boolean = false;
 
+let preferredColors = new Map<string, string>(); // player name -> color
+
 
 const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
+
+export function getCurrentWorld(): w.World {
+	return world;
+}
 
 export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, observe?: string) {
 	leaveCurrentGame();
@@ -36,6 +42,10 @@ export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, obse
 }
 
 export function leaveCurrentGame() {
+	world.players.forEach(player => {
+		preferredColors.set(player.name, player.uiColor);
+	});
+
 	if (world.ui.myGameId) {
 		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
 		socket.emit('leave', leaveMsg);
@@ -266,6 +276,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				heroId: actionData.heroId,
 				playerName: actionData.playerName || "Enigma",
 				keyBindings: actionData.keyBindings,
+				preferredColor: preferredColors.get(actionData.playerName) || null,
 			});
 		} else if (actionData.actionType === m.ActionType.Leave) {
 			world.occurrences.push({

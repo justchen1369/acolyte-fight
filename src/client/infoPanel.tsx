@@ -2,11 +2,12 @@ import _ from 'lodash';
 import * as React from 'react';
 import { Hero } from '../game/constants';
 import * as m from '../game/messages.model';
+import * as s from './store.model';
 import * as w from '../game/world.model';
 
 interface Props {
     playerName: string;
-    world: w.World;
+    store: s.Store;
 }
 interface State {
 }
@@ -19,7 +20,7 @@ export class InfoPanel extends React.Component<Props, State> {
     }
 
     render() {
-        const world = this.props.world;
+        const world = this.props.store.world;
 
         return (
             <div>
@@ -62,7 +63,7 @@ export class InfoPanel extends React.Component<Props, State> {
             const isAlive = aliveHeroIds.has(player.heroId);
             const isActive = world.activePlayers.has(player.heroId);
 
-            let color = player.color;
+            let color = player.uiColor;
             if (!(isAlive && isActive)) {
                 color = Hero.InactiveColor;
             } else if (player.heroId === world.ui.myHeroId) {

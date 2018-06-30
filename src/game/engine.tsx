@@ -27,9 +27,9 @@ export function initialWorld(): w.World {
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
 		occurrences: new Array<w.Occurrence>(),
-		activePlayers: new Set<string>(),
-		players: new Map<string, w.Player>(),
-		scores: new Map<string, w.HeroScore>(),
+		activePlayers: new Set<string>(), // hero IDs
+		players: new Map<string, w.Player>(), // hero ID -> player
+		scores: new Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
 
 		objects: new Map(),
@@ -344,13 +344,37 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	const player = {
 		heroId: hero.id,
 		name: ev.playerName,
-		color: Hero.Colors[world.nextColorId++ % Hero.Colors.length],
+		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
 	} as w.Player;
 	world.players.set(hero.id, player);
 	world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
 
+}
+
+function chooseNewPlayerColor(preferredColor: string, world: w.World) {
+	let alreadyUsedColors = new Set<string>();
+	world.players.forEach(player => {
+		if (world.activePlayers.has(player.heroId)) {
+			alreadyUsedColors.add(player.uiColor);
+		}
+	});
+
+	let uiColor = Hero.Colors[0];
+	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
+		uiColor = preferredColor;
+	} else {
+		for (let i = 0; i < Hero.Colors.length; ++i) {
+			let candidate = Hero.Colors[i];
+			if (!alreadyUsedColors.has(candidate)) {
+				uiColor = candidate;
+				break;
+			}
+		}
+	}
+
+	return uiColor;
 }
 
 function handleLeaving(ev: w.Leaving, world: w.World) {

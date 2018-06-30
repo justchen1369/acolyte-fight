@@ -423,7 +423,7 @@ function heroColor(heroId: string, world: w.World) {
 	if (heroId === world.ui.myHeroId) {
 		return Hero.MyHeroColor;
 	} else if (player) {
-		return player.color;
+		return player.uiColor;
 	} else {
 		return Hero.InactiveColor;
 	}
