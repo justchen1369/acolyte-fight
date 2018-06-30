@@ -901,12 +901,15 @@ function updateKnockback(world: w.World) {
 }
 
 function applyLavaDamage(world: w.World) {
+	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			let position = obj.body.getPosition();
-			if (vector.distance(position, pl.Vec2(0.5, 0.5)) > world.radius) {
-				const damage = world.tick < world.startTick ? World.PreGameLavaDamagePerTick : World.LavaDamagePerTick;
-				applyDamage(obj, damage, null, world);
+			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
+				applyDamage(obj, World.LavaDamagePerTick, null, world);
+			}
+		} else if (obj.category === "obstacle") {
+			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
+				applyDamageToObstacle(obj, World.LavaDamagePerTick, world);
 			}
 		}
 	});
@@ -1179,8 +1182,8 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 }
 
 function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
-	if (world.tick < world.startTick && fromHeroId) {
-		// No damage from other heroes until game started
+	if (world.tick < world.startTick) {
+		// No damage until game started
 		return;
 	}
 
