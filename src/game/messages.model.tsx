@@ -1,17 +1,28 @@
 import * as c from './world.model';
 
 export namespace ActionType {
+    export const Environment = "environment";
     export const Join = "join";
 	export const Leave = "leave";
 	export const GameAction = "game";
 	export const CloseGame = "close";
 }
 
-export type ActionMsg = JoinActionMsg | LeaveActionMsg | CloseGameMsg | GameActionMsg;
+export type ActionMsg =
+    EnvironmentMsg
+    | JoinActionMsg
+    | LeaveActionMsg
+    | CloseGameMsg
+    | GameActionMsg;
 
 export interface ActionMsgBase {
     actionType: string;
     heroId: string;
+}
+
+export interface EnvironmentMsg extends ActionMsgBase {
+    actionType: "environment";
+    seed: number;
 }
 
 export interface JoinActionMsg extends ActionMsgBase {

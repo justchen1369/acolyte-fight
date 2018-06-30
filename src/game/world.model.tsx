@@ -133,6 +133,22 @@ export interface ThrustSpell extends SpellBase {
     speed: number;
 }
 
+export interface Layout {
+	obstacles: ObstacleTemplate[];
+}
+
+export interface ObstacleTemplate {
+	// Where to place the obstacles
+	numObstacles: number;
+	layoutRadius: number;
+	layoutAngleOffset: number;
+
+	// Properties of an individual obstacle
+	numPoints: number;
+	extent: number;
+	orientationAngleOffset: number;
+}
+
 export interface KeyBindingOptions {
     [key: string]: string[];
 }
@@ -150,6 +166,7 @@ export namespace CastStage {
 }
 
 export interface World {
+	seed: number | null;
 	tick: number;
 	startTick: number;
 
@@ -166,9 +183,10 @@ export interface World {
 
 	radius: number;
 
-	joinLeaveEvents: JoinOrLeaveEvent[];
+	occurrences: Occurrence[];
 	actions: Map<string, Action>,
 
+	nextObstacleId: number;
 	nextPositionId: number;
 	nextBulletId: number;
 	nextColorId: number;
@@ -263,16 +281,21 @@ export interface DisconnectedNotification {
 	type: "disconnected";
 }
 
-export type JoinOrLeaveEvent = JoinEvent | LeaveEvent;
+export type Occurrence = Joining | Leaving | EnvironmentSeed;
 
-export interface JoinEvent {
+export interface EnvironmentSeed {
+	type: "environment";
+	seed: number;
+}
+
+export interface Joining {
 	type: "join";
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;
 }
 
-export interface LeaveEvent {
+export interface Leaving {
 	type: "leave";
 	heroId: string;
 }
@@ -288,6 +311,7 @@ export interface WorldObjectBase {
 
 export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
+	extent: number;
 	points: pl.Vec2[];
 }
 

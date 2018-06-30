@@ -206,7 +206,16 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.translate(pos.x, pos.y);
 		ctx.rotate(body.getAngle());
 
-		ctx.fillStyle = 'white';
+		ctx.lineWidth = Pixel * 3;
+		ctx.strokeStyle = 'white';
+		if (ctx === ctxStack.canvas) {
+			const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
+			gradient.addColorStop(0, '#888');
+			gradient.addColorStop(1, '#555');
+			ctx.fillStyle = gradient;
+		} else {
+			ctx.fillStyle = 'white';
+		}
 		ctx.beginPath();
 
 		const points = obstacle.points;
@@ -218,6 +227,10 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 			ctx.lineTo(point.x, point.y);
 		}
 		ctx.fill();
+
+		if (ctx === ctxStack.canvas) {
+			ctx.stroke();
+		}
 
 		ctx.restore();
 	});

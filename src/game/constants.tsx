@@ -16,7 +16,7 @@ export namespace Categories {
 export namespace Matchmaking {
 	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 3 * 60 * TicksPerSecond;
-	export const MaxPlayers = 5;
+	export const MaxPlayers = 6;
 }
 
 export namespace Hero {
@@ -50,10 +50,67 @@ export namespace Hero {
 };
 
 export namespace World {
+	export const InitialRadius = 0.4;
+	export const HeroLayoutRadius = 0.25;
+
 	export const PreGameLavaDamagePerTick = 0.05;
 	export const LavaDamagePerTick = 0.25;
 	export const ShrinkPerTick = 0.00005;
 	export const InitialShieldTicks = 1.0 * TicksPerSecond;
+
+	export const Layouts: c.Layout[] = [
+		{
+			obstacles: [],
+		},
+		{
+			obstacles: [
+				{
+					numObstacles: 6,
+					layoutRadius: 0.15,
+					layoutAngleOffset: (1 / 6) * 2 * Math.PI,
+					numPoints: 3,
+					extent: 0.03,
+					orientationAngleOffset: Math.PI,
+				},
+			],
+		},
+		{
+			obstacles: [
+				{
+					numObstacles: 1,
+					layoutRadius: 0,
+					layoutAngleOffset: 0,
+					numPoints: 12,
+					extent: 0.04,
+					orientationAngleOffset: 0,
+				},
+			],
+		},
+		{
+			obstacles: [
+				{
+					numObstacles: 6,
+					layoutRadius: 0.32,
+					layoutAngleOffset: 0,
+					numPoints: 4,
+					extent: 0.03,
+					orientationAngleOffset: (1 / 4) * Math.PI,
+				},
+			],
+		},
+		{
+			obstacles: [
+				{
+					numObstacles: 12,
+					layoutRadius: 0.4,
+					layoutAngleOffset: 0,
+					numPoints: 4,
+					extent: 0.03,
+					orientationAngleOffset: (1 / 4) * Math.PI,
+				},
+			],
+		},
+	];
 }
 
 export namespace Obstacle {
@@ -178,7 +235,7 @@ export namespace Spells {
 			damage: 1,
 			trailTicks: 15,
 			categories: Categories.Projectile | Categories.Massive,
-			explodeOn: Categories.None,
+			explodeOn: Categories.Obstacle,
 
 			render: "projectile",
 		} as c.ProjectileTemplate,

@@ -22,10 +22,11 @@ import { Hero, World, Spells, Obstacle, Categories, Choices, Matchmaking, TicksP
 
 export function initialWorld(): w.World {
 	let world = {
+		seed: null,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
-		joinLeaveEvents: new Array<w.JoinOrLeaveEvent>(),
+		occurrences: new Array<w.Occurrence>(),
 		activePlayers: new Set<string>(),
 		players: new Map<string, w.Player>(),
 		scores: new Map<string, w.HeroScore>(),
@@ -34,11 +35,12 @@ export function initialWorld(): w.World {
 		objects: new Map(),
 		physics: pl.World(),
 		actions: new Map(),
-		radius: 0.4,
+		radius: World.InitialRadius,
 
 		destroyed: [],
 		explosions: new Array<w.Explosion>(),
 
+		nextObstacleId: 0,
 		nextPositionId: 0,
 		nextBulletId: 0,
 		nextColorId: 0,
@@ -51,8 +53,6 @@ export function initialWorld(): w.World {
 		} as w.UIState,
 	} as w.World;
 
-	addObstacle(world, "obstacle1", pl.Vec2(0.5, 0.5), 0, Obstacle.Extent, Obstacle.Points);
-
 	return world;
 }
 
@@ -64,7 +64,8 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function addObstacle(world: w.World, obstacleId: string, position: pl.Vec2, angle: number, extent: number, numPoints: number) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, extent: number, numPoints: number) {
+	const obstacleId = "obstacle" + (world.nextObstacleId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
 		type: 'static',
@@ -93,6 +94,7 @@ function addObstacle(world: w.World, obstacleId: string, position: pl.Vec2, angl
 		categories: Categories.Obstacle,
 		type: "polygon",
 		body,
+		extent,
 		points,
 	};
 
@@ -104,7 +106,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 	let position;
 	let angle;
 	{
-		const radius = 0.25;
+		const radius = World.HeroLayoutRadius;
 		const center = pl.Vec2(0.5, 0.5);
 
 		const nextHeroIndex = world.nextPositionId++;
@@ -256,18 +258,8 @@ export function tick(world: w.World) {
 	world.destroyed = [];
 	world.explosions = [];
 
-	handlePlayerJoinLeave(world);
-
-	let newActions = new Map();
-	world.objects.forEach(hero => {
-		if (hero.category !== "hero") { return; }
-		let action = world.actions.get(hero.id);
-		let completed = performHeroActions(world, hero, action);
-		if (action && !completed) {
-			newActions.set(hero.id, action);
-		}
-	});
-	world.actions = newActions;
+	handleOccurences(world);
+	handleActions(world);
 
 	homingForce(world);
 	linkForce(world);
@@ -303,39 +295,84 @@ function applySpeedLimit(world: w.World) {
 	});
 }
 
-function handlePlayerJoinLeave(world: w.World) {
-	world.joinLeaveEvents.forEach(ev => {
+function handleOccurences(world: w.World) {
+	world.occurrences.forEach(ev => {
 		if (ev.type === "join") {
-			console.log("Player joined:", ev.heroId);
-			let hero = world.objects.get(ev.heroId);
-			if (!hero) {
-				hero = addHero(world, ev.heroId, ev.playerName);
-			} else if (hero.category !== "hero") {
-				throw "Player tried to join as non-hero: " + ev.heroId;
-			}
-
-			assignKeyBindingsToHero(hero, ev.keyBindings);
-
-			const player = {
-				heroId: hero.id,
-				name: ev.playerName,
-				color: Hero.Colors[world.nextColorId++ % Hero.Colors.length],
-			} as w.Player;
-			world.players.set(hero.id, player);
-			world.activePlayers.add(hero.id);
-
-			world.ui.notifications.push({ type: "join", player });
+			handleJoining(ev, world);
 		} else if (ev.type === "leave") {
-			console.log("Player left:", ev.heroId);
-			const player = world.players.get(ev.heroId);
-			world.activePlayers.delete(ev.heroId);
-
-			if (player) {
-				world.ui.notifications.push({ type: "leave", player });
-			}
+			handleLeaving(ev, world);
+		} else if (ev.type === "environment") {
+			seedEnvironment(ev, world);
 		}
 	});
-	world.joinLeaveEvents = [];
+	world.occurrences = [];
+}
+
+function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
+	if (world.seed !== null) {
+		return;
+	}
+	world.seed = ev.seed;
+	console.log("Environment seed " + world.seed);
+
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	const layout = World.Layouts[world.seed % World.Layouts.length];
+	layout.obstacles.forEach(obstacleTemplate => {
+		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
+			const proportion = i / obstacleTemplate.numObstacles;
+			const baseAngle = proportion * (2 * Math.PI);
+			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + obstacleTemplate.layoutAngleOffset), obstacleTemplate.layoutRadius));
+
+			const orientationAngle = baseAngle + obstacleTemplate.layoutAngleOffset + obstacleTemplate.orientationAngleOffset;
+			addObstacle(world, position, orientationAngle, obstacleTemplate.extent, obstacleTemplate.numPoints);
+		}
+	});
+}
+
+function handleJoining(ev: w.Joining, world: w.World) {
+	console.log("Player joined:", ev.heroId);
+	let hero = world.objects.get(ev.heroId);
+	if (!hero) {
+		hero = addHero(world, ev.heroId, ev.playerName);
+	} else if (hero.category !== "hero") {
+		throw "Player tried to join as non-hero: " + ev.heroId;
+	}
+
+	assignKeyBindingsToHero(hero, ev.keyBindings);
+
+	const player = {
+		heroId: hero.id,
+		name: ev.playerName,
+		color: Hero.Colors[world.nextColorId++ % Hero.Colors.length],
+	} as w.Player;
+	world.players.set(hero.id, player);
+	world.activePlayers.add(hero.id);
+
+	world.ui.notifications.push({ type: "join", player });
+
+}
+
+function handleLeaving(ev: w.Leaving, world: w.World) {
+	console.log("Player left:", ev.heroId);
+	const player = world.players.get(ev.heroId);
+	world.activePlayers.delete(ev.heroId);
+
+	if (player) {
+		world.ui.notifications.push({ type: "leave", player });
+	}
+}
+
+function handleActions(world: w.World) {
+	let newActions = new Map();
+	world.objects.forEach(hero => {
+		if (hero.category !== "hero") { return; }
+		let action = world.actions.get(hero.id);
+		let completed = performHeroActions(world, hero, action);
+		if (action && !completed) {
+			newActions.set(hero.id, action);
+		}
+	});
+	world.actions = newActions;
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: w.KeyBindings) {
@@ -501,6 +538,8 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 			handleHeroHitHero(world, object, hit);
 		} else if (hit.category === "projectile") {
 			handleHeroHitProjectile(world, object, hit);
+		} else if (hit.category === "obstacle") {
+			handleHeroHitObstacle(world, object, hit);
 		}
 	}
 }
@@ -539,6 +578,12 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 		if (projectile.categories & Categories.Massive) {
 			hero.thrust.nullified = true;
 		}
+	}
+}
+
+function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
+	if (hero.thrust) {
+		hero.thrust.nullified = true;
 	}
 }
 

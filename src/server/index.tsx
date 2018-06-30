@@ -146,8 +146,9 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 }
 
 function initGame() {
+	const gameIndex = nextGameId++;
 	let game = {
-		id: "g" + nextGameId++ + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		active: new Map<string, Player>(),
 		started: false,
 		numPlayers: 0,
@@ -158,6 +159,13 @@ function initGame() {
 		history: [],
 	} as Game;
 	activeGames.set(game.id, game);
+
+	const heroId = systemHeroId(m.ActionType.Environment);
+	game.actions.set(heroId, {
+		heroId,
+		actionType: m.ActionType.Environment,
+		seed: gameIndex,
+	});
 
 	logger.info("Game [" + game.id + "]: started");
 	return game;

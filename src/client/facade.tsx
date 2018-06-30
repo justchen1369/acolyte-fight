@@ -217,28 +217,33 @@ function sendAction(heroId: string, action: w.Action) {
 }
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	tickData.actions.forEach(actionData => {
-		if (actionData.actionType === m.ActionType.CloseGame) {
+		if (actionData.actionType === m.ActionType.GameAction) {
+			world.actions.set(actionData.heroId, {
+				type: actionData.spellId,
+				target: pl.Vec2(actionData.targetX, actionData.targetY),
+			});
+		} else if (actionData.actionType === m.ActionType.CloseGame) {
 			world.startTick = actionData.closeTick;
 			world.ui.notifications.push({
 				type: "closing",
 				ticksUntilClose: world.startTick - world.tick,
 			});
 		} else if (actionData.actionType === m.ActionType.Join) {
-			world.joinLeaveEvents.push({
+			world.occurrences.push({
 				type: "join",
 				heroId: actionData.heroId,
 				playerName: actionData.playerName || "Enigma",
 				keyBindings: actionData.keyBindings,
 			});
 		} else if (actionData.actionType === m.ActionType.Leave) {
-			world.joinLeaveEvents.push({
+			world.occurrences.push({
 				type: "leave",
 				heroId: actionData.heroId,
 			});
-		} else if (actionData.actionType === m.ActionType.GameAction) {
-			world.actions.set(actionData.heroId, {
-				type: actionData.spellId,
-				target: pl.Vec2(actionData.targetX, actionData.targetY),
+		} else if (actionData.actionType === m.ActionType.Environment) {
+			world.occurrences.push({
+				type: "environment",
+				seed: actionData.seed,
 			});
 		}
 	});
