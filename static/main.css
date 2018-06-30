@@ -80,7 +80,7 @@ a:hover, a:active {
     position: absolute;
     bottom: 80;
     left: 8;
-    width: 30%;
+    min-width: 30%;
 
     pointer-events: none;
 }
