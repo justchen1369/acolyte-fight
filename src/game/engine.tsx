@@ -996,12 +996,29 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
+	let mostKills: w.HeroScore = null;
+	world.scores.forEach(score => {
+		if (!mostKills) {
+			mostKills = score;
+			return;
+		}
+
+		if (score.kills > mostKills.kills) {
+			mostKills = score;
+		}
+	});
+	if (!mostKills) {
+		return;
+	}
+
 	world.winner = bestScore.heroId;
 	world.ui.notifications.push({
 		type: "win",
 		winner: world.players.get(bestScore.heroId),
 		mostDamage: world.players.get(mostDamage.heroId),
 		mostDamageAmount: mostDamage.damage,
+		mostKills: world.players.get(mostKills.heroId),
+		mostKillsCount: mostKills.kills,
 	});
 }
 

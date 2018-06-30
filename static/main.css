@@ -80,6 +80,7 @@ a:hover, a:active {
     position: absolute;
     bottom: 80;
     left: 8;
+    width: 30%;
 
     pointer-events: none;
 }
@@ -90,6 +91,43 @@ a:hover, a:active {
 
 #messages-panel .game-started {
     font-weight: bold;
+}
+
+#messages-panel .winner {
+    margin: 30px 0;
+    padding: 20px;
+    background: linear-gradient(to right, #111, rgba(0,0,0,0));
+}
+
+#messages-panel .winner-row {
+    font-weight: bold;
+    font-size: 150%;
+    margin-bottom: 20px;
+}
+
+#messages-panel .action-row {
+    margin-top: 30px;
+    display: flex;
+}
+
+#messages-panel .new-game-btn {
+    pointer-events: all;
+    font-weight: bold;
+    cursor: hand;
+    text-align: center;
+    box-shadow: 3px 3px 3px #0c0c0c;
+    text-shadow: 1px 1px 1px black;
+    background: #00ccff;
+    padding: 10px 40px;
+    font-size: 150%;
+}
+
+#messages-panel .new-game-btn:hover {
+    background: #ff8800;
+}
+
+#messages-panel .new-game-btn:active {
+    box-shadow: none;
 }
 
 .player-name {

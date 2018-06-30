@@ -107,37 +107,37 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderHelpNotification(notification: w.HelpNotification) {
-        return <span className="help-text">Use the mouse to move!</span>
+        return <div className="help-text">Use the mouse to move!</div>
     }
 
     private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
-        return <span className="disconnected-notification">Disconnected from server</span>
+        return <div className="disconnected-notification">Disconnected from server</div>
     }
 
     private renderServerStatsNotification(notification: w.ServerStatsNotification) {
-        return <span className="server-stats-notification">
+        return <div className="server-stats-notification">
             {notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
-        </span>
+        </div>
     }
 
     private renderClosingNotification(notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
-            return <span className="game-started">Game started</span>
+            return <div className="game-started">Game started</div>
         } else {
             return null;
         }
     }
 
     private renderJoinNotification(notification: w.JoinNotification) {
-        return <span>
+        return <div>
             {this.renderPlayer(notification.player)} joined
-        </span>
+        </div>
     }
 
     private renderLeaveNotification(notification: w.LeaveNotification) {
-        return <span>
+        return <div>
             {this.renderPlayer(notification.player)} left
-        </span>
+        </div>
     }
 
     private renderKillNotification(notification: w.KillNotification) {
@@ -146,18 +146,23 @@ export class MessagesPanel extends React.Component<Props, State> {
         }
 
         if (notification.killer) {
-            return <span>
+            return <div>
                 {notification.killer && <span key="killer">{this.renderPlayer(notification.killer)} killed </span>}
                 {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)} </span>}
                 {notification.assist && <span key="assist">assist {this.renderPlayer(notification.assist)} </span>}
-            </span>
+            </div>
         } else {
-            return <span key="killed">{this.renderPlayer(notification.killed)} died</span>
+            return <div key="killed">{this.renderPlayer(notification.killed)} died</div>
         }
     }
 
     private renderWinNotification(notification: w.WinNotification) {
-        return <span className="winner">{this.renderPlayer(notification.winner)} is the winner! Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</span>;
+        return <div className="winner">
+            <div className="winner-row">{this.renderPlayer(notification.winner)} is the winner!</div>
+            <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
+            <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
+            <div className="action-row"><span className="new-game-btn" onClick={() => this.onNewGameClick()}>New Game</span></div>
+        </div>;
     }
 
     private renderPlayer(player: w.Player) {
@@ -178,5 +183,9 @@ export class MessagesPanel extends React.Component<Props, State> {
         } else {
             return 1;
         }
+    }
+
+    private onNewGameClick() {
+        window.location.reload();
     }
 }

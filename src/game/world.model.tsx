@@ -273,8 +273,12 @@ export interface CloseGameNotification {
 export interface WinNotification {
 	type: "win";
 	winner: Player;
+
 	mostDamage: Player;
 	mostDamageAmount: number;
+
+	mostKills: Player;
+	mostKillsCount: number;
 }
 
 export interface DisconnectedNotification {
