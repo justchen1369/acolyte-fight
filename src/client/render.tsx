@@ -253,7 +253,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		if (ctx === ctxStack.canvas) {
 			const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
 			gradient.addColorStop(0, hsl(red, saturation, 0.5));
-			gradient.addColorStop(1, hsl(red, saturation, 0.3));
+			gradient.addColorStop(1, hsl(red, saturation, 0.4));
 			ctx.fillStyle = gradient;
 		} else {
 			ctx.fillStyle = 'white';
