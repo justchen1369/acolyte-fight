@@ -361,10 +361,6 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 	if (player) {
 		world.ui.notifications.push({ type: "leave", player });
 	}
-
-	if (ev.heroId === world.ui.myHeroId) {
-		world.ui.myHeroId = null;
-	}
 }
 
 function handleActions(world: w.World) {
