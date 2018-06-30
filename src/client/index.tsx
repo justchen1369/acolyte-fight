@@ -61,7 +61,7 @@ function onNewGameClicked() {
         window.location.reload();
     } else {
         joinNewGame(playerName, keyBindings);
-        window.history.pushState(null, null, "#");
+        window.history.pushState(null, null, "?");
     }
 }
 
