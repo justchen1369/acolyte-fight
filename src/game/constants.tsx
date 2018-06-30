@@ -36,10 +36,10 @@ export namespace Hero {
 	export const Colors = [
 		"#bfad8f",
 		"#7db37d",
-		"#d0c16b",
 		"#6d89cc",
-		"#56b5bf",
 		"#cb8fc1",
+		"#56b5bf",
+		"#d0c16b",
 		"#a69a7c",
 		"#557e6c",
 		"#a18e4c",
