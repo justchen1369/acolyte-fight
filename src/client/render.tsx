@@ -200,6 +200,8 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const body = obstacle.body;
 	const pos = body.getPosition();
 
+	const proportion = obstacle.health / obstacle.maxHealth;
+
 	foreground(ctxStack, ctx => {
 		ctx.save();
 		
@@ -207,11 +209,15 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.rotate(body.getAngle());
 
 		ctx.lineWidth = Pixel * 3;
-		ctx.strokeStyle = 'white';
+
+		const red = 0;
+		const saturation = 1.0 - proportion;
+		ctx.strokeStyle = 'white'; // hsl(red, saturation, (0.5 + 0.5 * proportion));
+
 		if (ctx === ctxStack.canvas) {
 			const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
-			gradient.addColorStop(0, '#888');
-			gradient.addColorStop(1, '#555');
+			gradient.addColorStop(0, hsl(red, saturation, 0.5));
+			gradient.addColorStop(1, hsl(red, saturation, 0.3));
 			ctx.fillStyle = gradient;
 		} else {
 			ctx.fillStyle = 'white';
@@ -381,7 +387,7 @@ function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion
 
 function rgColor(proportion: number) {
 	let hue = proportion * 120.0;
-	return 'hsl(' + Math.round(hue) + ', 100%, 50%)';
+	return hsl(hue, 1.0, 0.5);
 }
 
 function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
@@ -598,5 +604,6 @@ function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: nu
 	ctx.restore();
 }
 
-
-
+function hsl(h: number, sProportion: number, lProportion: number): string {
+	return 'hsl(' + h + ', ' + (100 * sProportion).toFixed(2) + '%, ' + (100 * lProportion).toFixed(2) + '%)';
+}

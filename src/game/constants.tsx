@@ -114,9 +114,7 @@ export namespace World {
 }
 
 export namespace Obstacle {
-	export const Density = 10000.0;
-	export const Extent = 0.02;
-	export const Points = 5;
+	export const Health = 100;
 	export const AngularDamping = 1;
 	export const LinearDamping = 10;
 }
@@ -270,7 +268,7 @@ export namespace Spells {
 			damage: 10,
 			trailTicks: 1.0 * TicksPerSecond,
 			collideWith: Categories.All,
-			explodeOn: Categories.All ^ Categories.Obstacle,
+			explodeOn: Categories.All,
 
 			render: "ray",
 		} as c.ProjectileTemplate,

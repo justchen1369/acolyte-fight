@@ -311,6 +311,8 @@ export interface WorldObjectBase {
 
 export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
+	maxHealth: number;
+	health: number;
 	extent: number;
 	points: pl.Vec2[];
 }

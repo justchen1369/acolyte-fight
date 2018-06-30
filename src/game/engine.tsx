@@ -64,7 +64,7 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, extent: number, numPoints: number) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, obstacleTemplate: w.ObstacleTemplate) {
 	const obstacleId = "obstacle" + (world.nextObstacleId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
@@ -76,16 +76,14 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, extent: n
 	});
 
 	let points = new Array<pl.Vec2>();
-	for (let i = 0; i < numPoints; ++i) {
-		const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
+	for (let i = 0; i < obstacleTemplate.numPoints; ++i) {
+		const point = vector.multiply(vector.fromAngle((i / obstacleTemplate.numPoints) * (2 * Math.PI)), obstacleTemplate.extent);
 		points.push(point);
 	}
 
 	body.createFixture(pl.Polygon(points), {
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: Categories.All,
-		density: Obstacle.Density,
-		restitution: 0.0,
 	});
 
 	const obstacle: w.Obstacle = {
@@ -94,8 +92,10 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, extent: n
 		categories: Categories.Obstacle,
 		type: "polygon",
 		body,
-		extent,
+		extent: obstacleTemplate.extent,
 		points,
+		health: Obstacle.Health,
+		maxHealth: Obstacle.Health,
 	};
 
 	world.objects.set(obstacle.id, obstacle);
@@ -325,7 +325,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + obstacleTemplate.layoutAngleOffset), obstacleTemplate.layoutRadius));
 
 			const orientationAngle = baseAngle + obstacleTemplate.layoutAngleOffset + obstacleTemplate.orientationAngleOffset;
-			addObstacle(world, position, orientationAngle, obstacleTemplate.extent, obstacleTemplate.numPoints);
+			addObstacle(world, position, orientationAngle, obstacleTemplate);
 		}
 	});
 }
@@ -584,11 +584,14 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (hero.thrust) {
+		applyDamageToObstacle(obstacle, Spells.thrust.damage, world);
 		hero.thrust.nullified = true;
 	}
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
+	applyDamageToObstacle(obstacle, projectile.damage, world);
+
 	if (projectile.bounce) { // Only bounce off heroes, not projectiles
 		bounceToNext(projectile, obstacle, world);
 	} else if (projectile.explodeOn & obstacle.categories) {
@@ -925,6 +928,10 @@ function reap(world: w.World) {
 			if (obj.hit) {
 				notifyHit(obj, world);
 			}
+		} else if (obj.category === "obstacle") {
+			if (obj.health <= 0) {
+				destroyObject(world, obj);
+			}
 		}
 	});
 
@@ -1163,6 +1170,14 @@ function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: 
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
 		toHero.killerHeroId = fromHeroId;
 	}
+}
+
+function applyDamageToObstacle(obstacle: w.Obstacle, damage: number, world: w.World) {
+	if (world.tick < world.startTick) {
+		// No damage until game started
+		return;
+	}
+	obstacle.health = Math.max(0, obstacle.health - damage);
 }
 
 export function initScore(heroId: string): w.HeroScore {
