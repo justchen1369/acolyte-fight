@@ -34,12 +34,12 @@ export namespace Hero {
 	export const MyHeroColor = '#00ccff';
 	export const InactiveColor = '#666666';
 	export const Colors = [
-		"#bfad8f",
-		"#7db37d",
-		"#6d89cc",
 		"#cb8fc1",
-		"#56b5bf",
 		"#d0c16b",
+		"#6d89cc",
+		"#56b5bf",
+		"#7db37d",
+		"#bfad8f",
 		"#a69a7c",
 		"#557e6c",
 		"#a18e4c",

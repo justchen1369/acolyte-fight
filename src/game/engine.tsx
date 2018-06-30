@@ -916,7 +916,7 @@ function applyLavaDamage(world: w.World) {
 }
 
 function shrink(world: w.World) {
-	if (world.activePlayers.size > 1) {
+	if (world.tick >= world.startTick && !world.winner) {
 		world.radius = Math.max(0, world.radius - World.ShrinkPerTick);
 	}
 }

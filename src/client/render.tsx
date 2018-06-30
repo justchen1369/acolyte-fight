@@ -222,7 +222,8 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 
 	ctx.fillStyle = '#333333';
 	if (world.winner) {
-		ctx.fillStyle = heroColor(world.winner, world);
+		const color = heroColor(world.winner, world);
+		ctx.fillStyle = color;
 		ctx.globalAlpha = 0.5;
 	}
 
