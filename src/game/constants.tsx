@@ -67,7 +67,7 @@ export namespace World {
 				{
 					numObstacles: 6,
 					layoutRadius: 0.15,
-					layoutAngleOffset: (1 / 6) * 2 * Math.PI,
+					layoutAngleOffset: (1 / 6) * Math.PI,
 					numPoints: 3,
 					extent: 0.03,
 					orientationAngleOffset: Math.PI,
@@ -101,9 +101,9 @@ export namespace World {
 		{
 			obstacles: [
 				{
-					numObstacles: 12,
+					numObstacles: 6,
 					layoutRadius: 0.4,
-					layoutAngleOffset: 0,
+					layoutAngleOffset: (1 / 6) * Math.PI,
 					numPoints: 4,
 					extent: 0.03,
 					orientationAngleOffset: (1 / 4) * Math.PI,
