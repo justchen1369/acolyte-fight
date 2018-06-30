@@ -1,6 +1,7 @@
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import { getCurrentWorld } from './facade';
+import { World } from 'planck-js';
 
 const ExpiryMilliseconds = 15000;
 

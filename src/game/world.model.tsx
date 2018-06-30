@@ -230,7 +230,8 @@ export type Notification =
 	| NewGameNotification
 	| CloseGameNotification
 	| WinNotification
-	| DisconnectedNotification;
+	| DisconnectedNotification
+	| ReplayNotFoundNotification;
 
 export interface HelpNotification {
 	type: "help";
@@ -283,6 +284,10 @@ export interface WinNotification {
 
 export interface DisconnectedNotification {
 	type: "disconnected";
+}
+
+export interface ReplayNotFoundNotification {
+	type: "replayNotFound";
 }
 
 export type Occurrence = Joining | Leaving | EnvironmentSeed;

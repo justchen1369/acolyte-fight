@@ -73,6 +73,7 @@ export class MessagesPanel extends React.Component<Props, State> {
         switch (notification.type) {
             case "help": return this.renderHelpNotification(notification);
             case "disconnected": return this.renderDisconnectedNotification(notification);
+            case "replayNotFound": return this.renderReplayNotFoundNotification(notification);
             case "serverStats": return this.renderServerStatsNotification(notification);
             case "closing": return this.renderClosingNotification(notification);
             case "join": return this.renderJoinNotification(notification);
@@ -89,6 +90,10 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderDisconnectedNotification(notification: w.DisconnectedNotification) {
         return <div className="disconnected-notification">Disconnected from server. Refresh the page to reconnect.</div>
+    }
+
+    private renderReplayNotFoundNotification(notification: w.ReplayNotFoundNotification) {
+        return <div className="replay-not-found-notification">Replay not found.</div>
     }
 
     private renderServerStatsNotification(notification: w.ServerStatsNotification) {

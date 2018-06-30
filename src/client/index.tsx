@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, getCurrentWorld, CanvasStack } from './facade';
+import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';

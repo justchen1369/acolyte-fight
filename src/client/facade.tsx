@@ -221,6 +221,7 @@ function onTickMsg(data: m.TickMsg) {
 }
 function onWatchMsg(data: m.WatchResponseMsg) {
 	if (!(data.gameId && data.history)) {
+		notify({ type: "replayNotFound" });
 		return;
 	}
 	console.log("Watching game " + data.gameId + " with " + data.history.length + " ticks");
