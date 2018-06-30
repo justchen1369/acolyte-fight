@@ -56,8 +56,23 @@ attachNotificationListener(notifications => {
 rerender();
 
 function onNewGameClicked() {
-    joinNewGame(playerName, keyBindings);
-    window.history.pushState(null, null, "?");
+    if (getStore().disconnected) {
+        // New server? Reload the client, just in case the version has changed.
+        window.location.reload();
+    } else {
+        joinNewGame(playerName, keyBindings);
+        window.history.pushState(null, null, "#");
+    }
+}
+
+function onRewatchGameClicked() {
+    const gameId = getStore().world.ui.myGameId;
+    if (gameId) {
+        joinNewGame(playerName, keyBindings, gameId);
+        window.history.pushState(null, null, "?g=" + gameId);
+    } else {
+        console.error("Unable to rewatch game as gameId not set");
+    }
 }
 
 function rerender() {
@@ -69,6 +84,7 @@ function rerender() {
     ReactDOM.render(
         <MessagesPanel
             store={getStore()}
-            newGameCallback={onNewGameClicked} />,
+            newGameCallback={onNewGameClicked}
+            rewatchGameCallback={onRewatchGameClicked} />,
             document.getElementById("messages-panel"));
 }

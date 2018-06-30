@@ -3,6 +3,7 @@ import * as w from '../game/world.model';
 export interface Store {
     world: w.World;
     items: NotificationItem[];
+    disconnected: boolean;
 }
 
 export interface NotificationItem {

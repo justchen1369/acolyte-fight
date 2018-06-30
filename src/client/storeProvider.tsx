@@ -8,6 +8,7 @@ let nextNotificationId = 0;
 let store: s.Store = {
     world: getCurrentWorld(),
     items: [],
+    disconnected: false,
 };
 
 setInterval(notificationCleanup, 1000);
@@ -22,6 +23,8 @@ export function applyNotificationsToStore(newNotifications: w.Notification[]) {
         if (n.type === "new") {
             store.world = getCurrentWorld();
             store.items = [];
+        } else if (n.type === "disconnected") {
+            store.disconnected = true;
         }
     });
 

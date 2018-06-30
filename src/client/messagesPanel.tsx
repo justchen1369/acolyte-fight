@@ -9,6 +9,7 @@ const FadeoutMilliseconds = 5000;
 interface Props {
     store: s.Store;
     newGameCallback: () => void;
+    rewatchGameCallback: () => void;
 }
 interface State {
     now: number;
@@ -139,7 +140,9 @@ export class MessagesPanel extends React.Component<Props, State> {
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 <span className="new-game-btn" onClick={() => this.props.newGameCallback()}>New Game</span>
-                <a className="rewatch-game-link" href={"?g=" + this.props.store.world.ui.myGameId}>Watch Replay</a>
+                <a className="watch-replay-link" href={"?g=" + this.props.store.world.ui.myGameId} title="Watch replay of this game" onClick={this.props.rewatchGameCallback}>
+                    <i className="fa fa-tv" />
+                </a>
             </div>
         </div>;
     }

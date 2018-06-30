@@ -182,14 +182,6 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', onTickMsg);
 	socket.on('watch', onWatchMsg);
 }
-function onServerStatsMsg(serverStats: m.ServerStats) {
-	if (!serverStats) { return; }
-	notify({
-		type: "serverStats",
-		numGames: serverStats.numGames,
-		numPlayers: serverStats.numPlayers,
-	});
-}
 function onHeroMsg(data: m.HeroMsg) {
 	world = engine.initialWorld();
 	tickQueue = [];
@@ -209,7 +201,14 @@ function onHeroMsg(data: m.HeroMsg) {
 		heroId: world.ui.myHeroId,
 	});
 
-	onServerStatsMsg(data.serverStats);
+	const serverStats = data.serverStats;
+	if (serverStats) {
+		world.ui.notifications.push({
+			type: "serverStats",
+			numGames: serverStats.numGames,
+			numPlayers: serverStats.numPlayers,
+		});
+	}
 }
 function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
