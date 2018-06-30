@@ -454,9 +454,9 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 	}
 
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
-	let target: w.WorldObject = world.objects.get(projectile.link.heroId);
+	let target: w.WorldObject = world.objects.get(projectile.link.targetId);
 	if (!target) {
-		if (projectile.link.heroId) {
+		if (projectile.link.targetId) {
 			// Linked to a hero who is now dead, display nothing
 			return;
 		} else {

@@ -412,7 +412,7 @@ export interface HomingParameters {
 }
 
 export interface LinkParameters {
-	heroId: string | null;
+	targetId: string | null;
 	strength: number;
 	linkTicks: number;
 }

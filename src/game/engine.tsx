@@ -229,7 +229,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		link: projectileTemplate.link && {
 			strength: projectileTemplate.link.strength,
 			linkTicks: projectileTemplate.link.linkTicks,
-			heroId: null,
+			targetId: null,
 		} as w.LinkParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
@@ -595,6 +595,10 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	applyDamageToObstacle(obstacle, projectile.damage, world);
 
+	if (projectile.link) {
+		linkTo(projectile, obstacle, world);
+	}
+
 	if (projectile.bounce) { // Only bounce off heroes, not projectiles
 		bounceToNext(projectile, obstacle, world);
 	} else if (projectile.explodeOn & obstacle.categories) {
@@ -626,7 +630,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			const damage = projectile.damage;
 			applyDamage(hero, damage, projectile.owner, world);
 			lifeSteal(damage, projectile, world);
-			linkToHero(projectile, hero, world);
+			linkTo(projectile, hero, world);
 			projectile.hit = true;
 		}
 
@@ -667,17 +671,17 @@ function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predi
 }
 
 
-function linkToHero(projectile: w.Projectile, hero: w.WorldObject, world: w.World) {
+function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	if (!projectile.link) {
 		return;
 	}
 
-	if (projectile.link.heroId) {
+	if (projectile.link.targetId) {
 		return; // Already linked
 	}
 
 	projectile.expireTick = world.tick + projectile.link.linkTicks;
-	projectile.link.heroId = hero.id;
+	projectile.link.targetId = target.id;
 
 	// Destroy fixtures on this link so it stops colliding with things
 	let fixturesToDestroy = new Array<pl.Fixture>();
@@ -817,17 +821,17 @@ function linkForce(world: w.World) {
 	const minDistance = Hero.Radius * 2;
 	const maxDistance = 0.25;
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.link && obj.link.heroId)) {
+		if (!(obj.category === "projectile" && obj.link && obj.link.targetId)) {
 			return;
 		}
 
 		const owner = world.objects.get(obj.owner);
-		const target = world.objects.get(obj.link.heroId);
-		if (!(owner && target && owner.category === "hero" && target.category === "hero")) {
+		const target = world.objects.get(obj.link.targetId);
+		if (!(owner && target && owner.category === "hero")) {
 			return;
 		}
 
-		if (owner.shieldTicks > 0 || target.shieldTicks > 0) {
+		if (target.category === "hero" && target.shieldTicks > 0) {
 			obj.expireTick = world.tick;
 			return;
 		}
@@ -841,7 +845,10 @@ function linkForce(world: w.World) {
 
 		const toTarget = vector.multiply(vector.unit(diff), strength);
 		owner.body.applyLinearImpulse(toTarget, owner.body.getWorldPoint(vector.zero()), true);
-		target.body.applyLinearImpulse(vector.negate(toTarget), target.body.getWorldPoint(vector.zero()), true);
+
+		if (target.category === "hero") {
+			target.body.applyLinearImpulse(vector.negate(toTarget), target.body.getWorldPoint(vector.zero()), true);
+		}
 	});
 }
 
