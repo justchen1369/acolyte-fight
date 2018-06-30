@@ -145,9 +145,7 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 		return;
 	}
 
-	if (game.active.has(socket.id)) {
-		leaveGame(game, socket);
-	}
+	leaveGame(game, socket);
 }
 
 function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {

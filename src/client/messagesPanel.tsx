@@ -144,7 +144,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
-                <span className="new-game-btn" onClick={() => this.props.newGameCallback()}>New Game</span>
+                <span className="new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</span>
                 <a className="watch-replay-link" href={"?g=" + this.props.store.world.ui.myGameId} title="Watch replay of this game" onClick={this.props.rewatchGameCallback}>
                     <i className="fa fa-tv" />
                 </a>
