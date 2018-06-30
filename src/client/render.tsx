@@ -149,16 +149,16 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	const ctx = ctxStack.canvas;
 
-	if (!obj.destroyed) {
-		obj.uiPath.push(vector.clone(obj.body.getPosition()));
-	}
+	obj.uiPath.push(vector.clone(obj.body.getPosition()));
 
 	if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctx, obj, world);
         renderRay(ctx, obj, world);
 	} else if (obj.render == "ray") {
-        renderRay(ctx, obj, world);
+		// A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
+		const intermediatePoints = true;
+        renderRay(ctx, obj, world, intermediatePoints);
 	} else if (obj.render === "link") {
 		renderLink(ctxStack, obj, world);
 	} else if (obj.render === "gravity") {
@@ -482,34 +482,49 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 	});
 }
 
-function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
-	for (let i = 0; i < projectile.uiPath.length - 1; ++i) {
-		const previous = projectile.uiPath[i];
-		const pos = projectile.uiPath[i + 1];
+function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, intermediatePoints: boolean = false) {
+	let previous: pl.Vec2 = null;
+	for (let pos of getRenderPoints(projectile.uiPath, intermediatePoints)) {
+		if (previous) {
+			world.ui.trails.push({
+				type: 'line',
+				initialTick: world.tick,
+				max: projectile.trailTicks, 
+				from: previous,
+				to: pos,
+				fillStyle: projectileColor(projectile, world),
+				width: projectile.radius * 2,
+			} as w.LineTrail);
+		}
 
-		world.ui.trails.push({
-			type: 'line',
-			initialTick: world.tick,
-			max: projectile.trailTicks, 
-			from: previous,
-			to: pos,
-			fillStyle: projectileColor(projectile, world),
-			width: projectile.radius * 2,
-		} as w.LineTrail);
+		previous = pos;
+	}
+}
+
+function* getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
+	if (intermediatePoints) {
+		for (let i = 0; i < path.length; ++i) {
+			yield path[i];
+		}
+	} else {
+		if (path.length > 0) {
+			yield path[0];
+		}
+		if (path.length > 1) {
+			yield path[path.length - 1];
+		}
 	}
 }
 
 function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
-	projectile.uiPath.forEach(pos => {
-		world.ui.trails.push({
-			type: 'circle',
-			initialTick: world.tick,
-			max: projectile.trailTicks, 
-			pos: vector.clone(pos),
-			fillStyle: projectileColor(projectile, world),
-			radius: projectile.radius,
-		} as w.CircleTrail);
-	});
+	world.ui.trails.push({
+		type: 'circle',
+		initialTick: world.tick,
+		max: projectile.trailTicks, 
+		pos: vector.clone(projectile.body.getPosition()),
+		fillStyle: projectileColor(projectile, world),
+		radius: projectile.radius,
+	} as w.CircleTrail);
 }
 
 function projectileColor(projectile: w.Projectile, world: w.World) {
