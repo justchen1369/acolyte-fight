@@ -23,6 +23,25 @@ let showedHelpText: boolean = false;
 
 const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
 
+export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, observe?: string) {
+	leaveCurrentGame();
+
+	world = engine.initialWorld();
+
+	if (observe) {
+		socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg);
+	} else {
+		socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
+	}
+}
+
+export function leaveCurrentGame() {
+	if (world.ui.myGameId) {
+		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
+		socket.emit('leave', leaveMsg);
+	}
+}
+
 export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
 }
@@ -58,7 +77,10 @@ export function attachToCanvas(canvasStack: CanvasStack) {
     }
 }
 
-export function frame(canvasStack: CanvasStack) {
+function frame(canvasStack: CanvasStack) {
+	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
+		tickQueue.shift(); // Get rid of any leftover ticks from other games
+	}
 	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
 		let tickData = tickQueue.shift();
 		if (tickData.tick < world.tick) {
@@ -81,16 +103,19 @@ function notify(...notifications: w.Notification[]) {
 }
 
 export function canvasMouseMove(e: MouseEvent) {
+	if (!world.ui.myGameId || !world.ui.myHeroId){
+		return;
+	}
+
 	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
 	let worldRect = calculateWorldRect(rect);
 	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
 
 	if (e.buttons || e.button || (isSafari && e.which)) {
-		sendAction(world.ui.myHeroId, { type: "move", target });
+		sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "move", target });
 	}
 
 	nextTarget = target; // Set for next keyboard event
-	return true;
 }
 
 export function gameKeyDown(e: KeyboardEvent) {
@@ -101,7 +126,7 @@ export function gameKeyDown(e: KeyboardEvent) {
 		}
 	}
 
-	if (!world.ui.myHeroId) { return; }
+	if (!world.ui.myGameId || !world.ui.myHeroId) { return; }
 
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (!hero || hero.category !== "hero") { return; }
@@ -114,7 +139,7 @@ export function gameKeyDown(e: KeyboardEvent) {
 	const spell = Spells.all[spellId];
 	if (!spell) { return; }
 
-	sendAction(world.ui.myHeroId, { type: spell.id, target: nextTarget });
+	sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: nextTarget });
 }
 
 function readKey(e: KeyboardEvent) {
@@ -132,17 +157,11 @@ function readKey(e: KeyboardEvent) {
 }
 
 // Sockets
-export function attachToSocket(_socket: SocketIOClient.Socket, playerName: string, keyBindings: w.KeyBindings, observe?: string) {
+export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
-		if (!world.ui.myGameId) {
-			if (observe) {
-				socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg);
-			} else {
-				socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
-			}
-		}
+		onConnect();
 	});
 	socket.on('disconnect', () => {
 		console.log("Disconnected");
@@ -160,6 +179,9 @@ function onServerStatsMsg(serverStats: m.ServerStats) {
 	});
 }
 function onHeroMsg(data: m.HeroMsg) {
+	world = engine.initialWorld();
+	tickQueue = [];
+
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
@@ -169,7 +191,7 @@ function onHeroMsg(data: m.HeroMsg) {
 	}
 
 	world.ui.notifications.push({
-		type: "myHero",
+		type: "new",
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
 	});
@@ -177,7 +199,9 @@ function onHeroMsg(data: m.HeroMsg) {
 	onServerStatsMsg(data.serverStats);
 }
 function onTickMsg(data: m.TickMsg) {
-	tickQueue.push(data);
+	if (data.gameId === world.ui.myGameId) {
+		tickQueue.push(data);
+	}
 }
 function onWatchMsg(data: m.WatchResponseMsg) {
 	if (!(data.gameId && data.history)) {
@@ -206,18 +230,26 @@ function onDisconnectMsg() {
 	world.activePlayers.clear();
 	notify({ type: "disconnected" });
 }
-function sendAction(heroId: string, action: w.Action) {
-	socket.emit('action', {
-		heroId: heroId,
+function sendAction(gameId: string, heroId: string, action: w.Action) {
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
 		actionType: m.ActionType.GameAction,
 		spellId: action.type,
 		targetX: action.target.x,
 		targetY: action.target.y,
-	} as m.ActionMsg);
+	}
+	socket.emit('action', actionMsg);
 }
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
+	if (tickData.gameId !== world.ui.myGameId) {
+		return;
+	}
+
 	tickData.actions.forEach(actionData => {
-		if (actionData.actionType === m.ActionType.GameAction) {
+		if (actionData.gameId !== world.ui.myGameId) {
+			// Skip this action
+		} else if (actionData.actionType === m.ActionType.GameAction) {
 			world.actions.set(actionData.heroId, {
 				type: actionData.spellId,
 				target: pl.Vec2(actionData.targetX, actionData.targetY),

@@ -227,7 +227,7 @@ export type Notification =
 	| JoinNotification 
 	| LeaveNotification 
 	| KillNotification 
-	| MyHeroNotification
+	| NewGameNotification
 	| CloseGameNotification
 	| WinNotification
 	| DisconnectedNotification;
@@ -259,8 +259,8 @@ export interface KillNotification {
 	assist: Player | null;
 }
 
-export interface MyHeroNotification {
-	type: "myHero";
+export interface NewGameNotification {
+	type: "new";
 	gameId: string;
 	heroId: string;
 }

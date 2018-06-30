@@ -17,6 +17,7 @@ export type ActionMsg =
 
 export interface ActionMsgBase {
     actionType: string;
+    gameId: string;
     heroId: string;
 }
 
@@ -56,6 +57,10 @@ export interface TickMsg {
 export interface JoinMsg {
     name: string;
     keyBindings: c.KeyBindings;
+}
+
+export interface LeaveMsg {
+    gameId: string;
 }
 
 export interface HeroMsg {

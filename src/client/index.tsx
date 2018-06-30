@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { attachToCanvas, attachToSocket, attachNotificationListener, world, CanvasStack } from './facade';
+import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, world, CanvasStack } from './facade';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
 
@@ -25,7 +25,7 @@ function getOrCreatePlayerName(): string {
     return name;
 }
 
-let observeGameId = null;
+let observeGameId: string = null;
 if (window.location.search) {
     const params = queryString.parse(window.location.search);
     if (params["g"]) {
@@ -33,16 +33,23 @@ if (window.location.search) {
     }
 }
 
-attachToSocket(socket, playerName, keyBindings, observeGameId);
+attachToSocket(socket, () => {
+    joinNewGame(playerName, keyBindings, observeGameId);
+    observeGameId = null;
+});
 attachToCanvas({
     background: document.getElementById("background") as HTMLCanvasElement,
     glows: document.getElementById("glows") as HTMLCanvasElement,
     canvas: document.getElementById("canvas") as HTMLCanvasElement,
-});
+} as CanvasStack);
 
 const infoPanel = ReactDOM.render(<InfoPanel playerName={playerName} world={world} />, document.getElementById("info-panel")) as InfoPanel;
-const messagesPanel = ReactDOM.render(<MessagesPanel world={world} />, document.getElementById("messages-panel")) as MessagesPanel;
+const messagesPanel = ReactDOM.render(<MessagesPanel world={world} newGameCallback={onNewGameClicked} />, document.getElementById("messages-panel")) as MessagesPanel;
 attachNotificationListener(notifications => {
     infoPanel.onNotification(notifications);
     messagesPanel.onNotification(notifications);
 });
+
+function onNewGameClicked() {
+    joinNewGame(playerName, keyBindings);
+}

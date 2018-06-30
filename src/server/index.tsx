@@ -88,7 +88,9 @@ function onConnection(socket: SocketIO.Socket) {
 	});
 
 	socket.on('join', data => onJoinGameMsg(socket, data));
+	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('watch', data => onWatchGameMsg(socket, data));
+	socket.on('action', data => onActionMsg(socket, data));
 }
 
 function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
@@ -134,15 +136,42 @@ function onJoinGameMsg(socket: SocketIO.Socket, data: m.JoinMsg) {
 		game = initGame();
 	}
 	
-	let heroId = joinGame(game, PlayerName.sanitizeName(data.name), data.keyBindings, socket);
+	joinGame(game, PlayerName.sanitizeName(data.name), data.keyBindings, socket);
+}
 
-	socket.on('action', (actionData: m.ActionMsg) => {
-		if (actionData.heroId === heroId && actionData.actionType === "game") {
-			queueAction(game, actionData);
-		} else {
-			logger.info("Game [" + game.id + "]: incorrect hero id! " + actionData.heroId + " should be " + heroId);
-		}
-	});
+function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
+	const game = activeGames.get(data.gameId);
+	if (!game) {
+		return;
+	}
+
+	if (game.active.has(socket.id)) {
+		leaveGame(game, socket);
+	}
+}
+
+function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
+	const game = activeGames.get(data.gameId);
+	if (!game) {
+		return;
+	}
+
+	if (data.actionType !== "game") {
+		logger.info("Game [" + game.id + "]: action message received from socket " + socket.id + " with wrong action type: " + data.actionType);
+		return;
+	}
+
+	const player = game.active.get(socket.id);
+	if (!player) {
+		return;
+	}
+
+	if (data.heroId !== player.heroId) {
+		logger.info("Game [" + game.id + "]: incorrect hero id from socket " + socket.id + " - received " + data.heroId + " should be " + player.heroId);
+		return;
+	}
+
+	queueAction(game, data);
 }
 
 function initGame() {
@@ -162,6 +191,7 @@ function initGame() {
 
 	const heroId = systemHeroId(m.ActionType.Environment);
 	game.actions.set(heroId, {
+		gameId: game.id,
 		heroId,
 		actionType: m.ActionType.Environment,
 		seed: gameIndex,
@@ -203,7 +233,7 @@ function joinGame(game: Game, playerName: string, keyBindings: c.KeyBindings, so
 		serverStats: getServerStats(),
 	} as m.HeroMsg);
 
-	queueAction(game, { heroId, actionType: "join", playerName, keyBindings });
+	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings });
 
 	logger.info("Game [" + game.id + "]: player " + playerName + " [" + socket.id + "] joined, now " + game.numPlayers + " players");
 
@@ -260,7 +290,7 @@ function leaveGame(game: Game, socket: SocketIO.Socket) {
 		return;
 	}
 
-	queueAction(game, { heroId: player.heroId, actionType: "leave" });
+	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
 	game.active.delete(socket.id);
 	socket.leave(game.id);
@@ -327,6 +357,7 @@ function closeGameIfNecessary(game: Game, data: m.TickMsg) {
 
 	if (statusChanged) {
 		queueAction(game, {
+			gameId: game.id,
 			heroId: systemHeroId(m.ActionType.CloseGame),
 			actionType: m.ActionType.CloseGame,
 			closeTick: game.closeTick,

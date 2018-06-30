@@ -8,6 +8,7 @@ const FadeoutMilliseconds = 5000;
 
 interface Props {
     world: w.World;
+    newGameCallback: () => void;
 }
 interface State {
     items: NotificationItem[];
@@ -66,10 +67,13 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     onNotification(newNotifications: w.Notification[]) {
-        // Detect if my hero ID has changed
+        // Detect if entered a new game
         newNotifications.forEach(n => {
-            if (n.type === "myHero") {
-                this.setState({ myHeroId: n.heroId });
+            if (n.type === "new") {
+                this.setState({
+                    items: [],
+                    myHeroId: n.heroId
+                });
             }
         });
 
@@ -186,6 +190,6 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private onNewGameClick() {
-        window.location.reload();
+        this.props.newGameCallback();
     }
 }
