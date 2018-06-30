@@ -221,6 +221,11 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.translate(0.5, 0.5);
 
 	ctx.fillStyle = '#333333';
+	if (world.winner) {
+		ctx.fillStyle = heroColor(world.winner, world);
+		ctx.globalAlpha = 0.5;
+	}
+
 	ctx.beginPath();
 	ctx.arc(0, 0, world.radius, 0, 2 * Math.PI);
 	ctx.fill();
@@ -285,12 +290,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 
 	let color = Hero.InactiveColor;
 	if (world.activePlayers.has(hero.id)) {
-		const player = world.players.get(hero.id);
-		if (hero.id === world.ui.myHeroId) {
-			color = Hero.MyHeroColor;
-		} else if (player) {
-			color = player.color;
-		}
+		color = heroColor(hero.id, world);
 	}
 
 	const pos = hero.body.getPosition();
@@ -415,6 +415,17 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 	}
 
 	ctx.restore();
+}
+
+function heroColor(heroId: string, world: w.World) {
+	const player = world.players.get(heroId);
+	if (heroId === world.ui.myHeroId) {
+		return Hero.MyHeroColor;
+	} else if (player) {
+		return player.color;
+	} else {
+		return Hero.InactiveColor;
+	}
 }
 
 function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number) {
