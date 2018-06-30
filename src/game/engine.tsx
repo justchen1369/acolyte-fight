@@ -152,6 +152,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		spellsToKeys: new Map<string, string>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
+	world.scores.set(heroId, initScore(heroId));
 
 	return hero;
 }
@@ -1002,15 +1003,15 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	world.ui.notifications.push({ type: "kill", killed, killer, assist });
 
 	if (hero) {
-		let score = getOrCreateScore(hero.id, world);
+		const score = world.scores.get(hero.id);
 		score.deathTick = world.tick;
 	}
 	if (hero.killerHeroId) {
-		let score = getOrCreateScore(hero.killerHeroId, world);
+		const score = world.scores.get(hero.killerHeroId);
 		++score.kills;
 	}
 	if (hero.assistHeroId) {
-		let score = getOrCreateScore(hero.assistHeroId, world);
+		const score = world.scores.get(hero.assistHeroId);
 		++score.assists;
 	}
 }
@@ -1020,7 +1021,7 @@ function notifyHit(obj: w.Projectile, world: w.World) {
 		return;
 	}
 
-	const score = getOrCreateScore(obj.owner, world);
+	const score = world.scores.get(obj.owner);
 	++score.numFireballsHit;
 }
 
@@ -1053,7 +1054,7 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	addProjectile(world, hero, action.target, spell, spell.projectile);
 
 	if (spell.id === Spells.fireball.id) {
-		let score = getOrCreateScore(hero.id, world);
+		let score = world.scores.get(hero.id);
 		++score.numFireballsShot;
 	}
 
@@ -1153,7 +1154,7 @@ function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: 
 	}
 
 	if (fromHeroId && fromHeroId !== toHero.id) {
-		const score = getOrCreateScore(fromHeroId, world);
+		const score = world.scores.get(fromHeroId);
 		score.damage += amount;
 	}
 
@@ -1174,13 +1175,4 @@ export function initScore(heroId: string): w.HeroScore {
 		numFireballsHit: 0,
 		deathTick: null,
 	};
-}
-
-function getOrCreateScore(heroId: string, world: w.World) {
-	let score = world.scores.get(heroId);
-	if (!score) {
-		score = initScore(heroId);
-		world.scores.set(heroId, score);
-	}
-	return score;
 }
