@@ -8,7 +8,8 @@
     "bundle": "webpack",
     "build": "npm run compile && npm run bundle",
     "server": "node js/server/index",
-    "start": "npm run build && npm run server",
+    "postinstall": "npm run build",
+    "start": "npm run server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
