@@ -10,7 +10,7 @@ let games = new Array<Game>();
 
 rerender();
 
-fetch('games')
+fetch('games', { credentials: "same-origin" })
     .then(res => res.json())
     .then((data: m.GameListMsg) => {
         data.games.forEach(gameMsg => {
@@ -28,10 +28,12 @@ function rerender() {
 }
 
 function msgToGame(msg: m.GameMsg): Game {
+    let playerNames = msg.playerNames;
+    playerNames = playerNames.sort();
     return {
         id: msg.id,
         createdTimestamp: moment(msg.createdTimestamp),
-        playerNames: msg.playerNames,
+        playerNames,
         numActivePlayers: msg.numActivePlayers,
         joinable: msg.joinable,
         numTicks: msg.numTicks,

@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as m from '../game/messages.model';
 import { Game } from './watch.model';
 
 interface Props {
@@ -12,11 +11,24 @@ interface State {
 export class WatchPage extends React.Component<Props, State> {
     render() {
         return <div className="watch-page">
-            <h1 className="title">Watch previous games</h1>
+            <h1 className="title">Your recent games</h1>
             <div className="game-list">
-                {this.props.games.map(game => <div className="game">
-                    <a href={"/?g=" + game.id} target="_blank">{game.playerNames.join(", ") + " at " + game.createdTimestamp.format("YYYY-MM-DD HH:mm")} ({game.numActivePlayers > 0 ? "live" : "done"})</a>
-                </div>)}
+                <table style={{width: "100%"}}>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Players</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {this.props.games.map(game => <tr>
+                            <td>{game.createdTimestamp.fromNow()}</td>
+                            <td>{game.playerNames.join(", ")}</td>
+                            <td><a href={"/?g=" + game.id} target="_blank">Watch</a></td>
+                        </tr>)}
+                    </tbody>
+                </table>
             </div>
         </div>;
     }

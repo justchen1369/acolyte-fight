@@ -1,6 +1,7 @@
 import httpLib from 'http';
 import socketLib from 'socket.io';
 import express from 'express';
+import { authMiddleware } from './auth';
 import { attachToSocket } from './connector';
 import { attachApi } from './api';
 import { logger } from './logging';
@@ -16,6 +17,8 @@ program.parse(process.argv);
 const port = program.port || process.env.PORT || 7770;
 
 app.use(express.json());
+app.use(authMiddleware);
+
 attachToSocket(io);
 attachApi(app);
 app.use(express.static('./'));

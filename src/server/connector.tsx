@@ -5,6 +5,7 @@ import * as c from '../game/world.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as PlayerName from '../game/playerName';
+import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './games';
 import { logger } from './logging';
 
@@ -35,7 +36,7 @@ function tickAllGames() {
 }
 
 function onConnection(socket: SocketIO.Socket) {
-  logger.info("user " + socket.id + " connected");
+	logger.info(`socket ${socket.id} connected - user ${getAuthTokenFromSocket(socket)}`);
 
 	socket.on('disconnect', () => {
 		logger.info("user " + socket.id + " disconnected");
@@ -140,6 +141,7 @@ function initGame() {
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
+		accessTokens: new Set<string>(),
 		started: false,
 		numPlayers: 0,
 		tick: 0,
@@ -277,6 +279,11 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 	});
 	game.playerNames.push(playerName);
 	socket.join(game.id);
+
+	const authToken = getAuthTokenFromSocket(socket);
+	if (authToken) {
+		game.accessTokens.add(authToken);
+	}
 
 	socket.emit("hero", {
 		gameId: game.id,

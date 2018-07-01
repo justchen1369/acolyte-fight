@@ -233,3 +233,22 @@ h1 {
     border: 3px white solid;
     opacity: 1.0;
 }
+
+body .watch-page {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+body .watch-page table {
+    border-collapse: collapse;
+}
+
+body .watch-page tr:hover {
+    background: #333;
+}
+
+body .watch-page th, body .watch-page td {
+    padding: 10px;
+    text-align: left;
+}

@@ -2,21 +2,29 @@ import moment from 'moment';
 import express from 'express';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import { getAuthToken } from './auth';
 import { getStore } from './games';
+import { logger } from './logging';
 
 export function attachApi(app: express.Application) {
     app.get('/games', onGamesList);
 }
 
 function onGamesList(req: express.Request, res: express.Response) {
+    const authToken = getAuthToken(req);
+    logger.info("Retrieving games list for user " + authToken);
+
     let gameMsgs = new Array<m.GameMsg>();
     getStore().activeGames.forEach(game => {
-        gameMsgs.push(gameToMsg(game));
+        if (!game.joinable && game.accessTokens.has(authToken)) {
+            gameMsgs.push(gameToMsg(game));
+        }
     });
     getStore().inactiveGames.forEach(game => {
-        gameMsgs.push(gameToMsg(game));
+        if (!game.joinable && game.accessTokens.has(authToken)) {
+            gameMsgs.push(gameToMsg(game));
+        }
     });
-    gameMsgs = gameMsgs.filter(msg => !msg.joinable);
 
     const result: m.GameListMsg = {
         games: gameMsgs,

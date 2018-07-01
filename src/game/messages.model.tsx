@@ -1,5 +1,7 @@
 import * as c from './world.model';
 
+export const AuthCookieName = "enigma-auth";
+
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";

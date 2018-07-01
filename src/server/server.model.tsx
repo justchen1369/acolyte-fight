@@ -12,6 +12,7 @@ export interface Game {
     created: moment.Moment;
     active: Map<string, Player>; // socketId -> Player
     playerNames: string[];
+    accessTokens: Set<string>;
     started: boolean;
     numPlayers: number;
     tick: number;
