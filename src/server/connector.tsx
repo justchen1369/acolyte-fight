@@ -8,11 +8,11 @@ import * as PlayerName from '../game/playerName';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './games';
 import { logger } from './logging';
+import { startTimer } from 'winston';
 
 const NanoTimer = require('nanotimer');
 
 const tickTimer = new NanoTimer();
-tickTimer.setInterval(tickAllGames, '', Math.floor(1e9 / TicksPerSecond) + 'n');
 
 let io: SocketIO.Server = null;
 
@@ -29,6 +29,17 @@ function getServerStats(): m.ServerStats {
 		numPlayers += game.active.size;
 	});
 	return { numGames, numPlayers };
+}
+
+function startTickProcessing() {
+	tickTimer.setInterval(tickAllGames, '', Math.floor(1e9 / TicksPerSecond) + 'n');
+}
+
+function stopTickProcessingIfPossible() {
+	if (getStore().activeGames.size === 0) {
+		tickTimer.clearInterval();
+		logger.info("Stopped processing ticks");
+	}
 }
 
 function tickAllGames() {
@@ -159,6 +170,7 @@ function initGame() {
 		actionType: m.ActionType.Environment,
 		seed: gameIndex,
 	});
+	startTickProcessing();
 
 	logger.info("Game [" + game.id + "]: started");
 	return game;
@@ -223,6 +235,7 @@ function leaveGame(game: g.Game, socket: SocketIO.Socket) {
 function finishGame(game: g.Game) {
 	getStore().activeGames.delete(game.id);
 	getStore().inactiveGames.set(game.id, game);
+	stopTickProcessingIfPossible();
 
 	logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
