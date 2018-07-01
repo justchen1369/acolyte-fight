@@ -50,6 +50,7 @@ export function initialWorld(): w.World {
 			myHeroId: null,
 			trails: [],
 			notifications: [],
+			buttons: new Map<string, w.ButtonRenderState>(),
 		} as w.UIState,
 	} as w.World;
 

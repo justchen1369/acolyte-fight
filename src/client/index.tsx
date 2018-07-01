@@ -47,6 +47,7 @@ attachToCanvas({
     background: document.getElementById("background") as HTMLCanvasElement,
     glows: document.getElementById("glows") as HTMLCanvasElement,
     canvas: document.getElementById("canvas") as HTMLCanvasElement,
+    ui: document.getElementById("ui") as HTMLCanvasElement,
 } as CanvasStack);
 attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);

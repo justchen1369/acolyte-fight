@@ -60,14 +60,14 @@ export function attachNotificationListener(listener: NotificationListener) {
 export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
-    canvasStack.canvas.onmouseenter = canvasMouseMove;
-    canvasStack.canvas.onmousemove = canvasMouseMove;
-    canvasStack.canvas.onmousedown = canvasMouseMove;
+    canvasStack.ui.onmouseenter = canvasMouseMove;
+    canvasStack.ui.onmousemove = canvasMouseMove;
+    canvasStack.ui.onmousedown = canvasMouseMove;
 
     window.onkeydown = gameKeyDown;
     window.onresize = fullScreenCanvas;
 
-    canvasStack.canvas.oncontextmenu = (ev) => {
+    canvasStack.ui.oncontextmenu = (ev) => {
             ev.preventDefault();
     };
 
@@ -80,6 +80,8 @@ export function attachToCanvas(canvasStack: CanvasStack) {
         canvasStack.glows.height = document.body.clientHeight;
         canvasStack.canvas.width = document.body.clientWidth;
         canvasStack.canvas.height = document.body.clientHeight;
+        canvasStack.ui.width = document.body.clientWidth;
+        canvasStack.ui.height = document.body.clientHeight;
     }
 
     function frameLoop() {

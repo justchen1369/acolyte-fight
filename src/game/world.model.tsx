@@ -211,14 +211,21 @@ export interface UIState {
 	myHeroId: string | null;
 
 	trails: Trail[];
-
 	notifications: Notification[];
+	buttons: Map<string, ButtonRenderState>;
 }
 
 export interface Player {
 	heroId: string;
 	name: string;
 	uiColor: string; // Not synced across clients
+}
+
+export interface ButtonRenderState {
+	key: string;
+	color: string;
+	icon: string;
+	cooldownText: string;
 }
 
 export type Notification =

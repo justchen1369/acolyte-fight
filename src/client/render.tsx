@@ -12,12 +12,14 @@ export interface CanvasStack {
 	background: HTMLCanvasElement;
 	glows: HTMLCanvasElement;
 	canvas: HTMLCanvasElement;
+	ui: HTMLCanvasElement;
 }
 
 export interface CanvasCtxStack {
 	background: CanvasRenderingContext2D;
 	glows: CanvasRenderingContext2D;
 	canvas: CanvasRenderingContext2D;
+	ui: CanvasRenderingContext2D;
 }
 
 // Rendering
@@ -36,6 +38,7 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 		background: canvasStack.background.getContext('2d', { alpha: false }),
 		glows: canvasStack.glows.getContext('2d', { alpha: true }),
 		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
+		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 	} as CanvasCtxStack;
 
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas)) {
@@ -47,7 +50,7 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
 	renderWorld(ctxStack, world, rect);
-	renderInterface(ctxStack.canvas, world, rect);
+	renderInterface(ctxStack.ui, world, rect);
 	all(ctxStack, ctx => ctx.restore());
 }
 
@@ -55,6 +58,7 @@ function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D)
 	func(contextStack.background);
 	func(contextStack.glows);
 	func(contextStack.canvas);
+	func(contextStack.ui);
 }
 
 function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
@@ -584,14 +588,12 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 }
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
-	if (!world.ui.myHeroId) {
-		return;
-	}
-
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
 		const heroAction = world.actions.get(myHero.id);
 		renderButtons(ctx, rect, world, myHero, heroAction);
+	} else {
+		ctx.clearRect(0, 0, rect.width, rect.height);
 	}
 }
 
@@ -606,32 +608,83 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
-		if (!key) { continue; }
+		const newState = calculateButtonState(key, hero, selectedAction, world);
+		const currentState = world.ui.buttons.get(key);
 
-		const spellId = hero.keysToSpells.get(key);
-		if (!spellId) { continue; }
+		if (buttonStateChanged(currentState, newState)) {
+			world.ui.buttons.set(key, newState);
 
-		let spell = Spells.all[spellId];
+			ctx.save();
+			ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);
+			renderButton(ctx, newState);
+			ctx.restore();
+		}
+	}
 
-		let isSelected = selectedAction === spell.id;
-		let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
+	ctx.restore();
+}
+
+function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRenderState) {
+	if (!previous && !current) {
+		return false;
+	} else if (!previous && current || previous && !current) {
+		return true;
+	} else {
+		return previous.key !== current.key
+			|| previous.color !== current.color
+			|| previous.icon !== current.icon
+			|| previous.cooldownText !== current.cooldownText;
+	}
+}
+
+function calculateButtonState(key: string, hero: w.Hero, selectedAction: string, world: w.World): w.ButtonRenderState {
+	if (!key) { return null; }
+
+	const spellId = hero.keysToSpells.get(key);
+	if (!spellId) { return null; }
+
+	const spell = Spells.all[spellId];
+	if (!spell) { return null; }
+
+	let button: w.ButtonRenderState = {
+		key,
+		color: spell.color,
+		icon: spell.icon,
+		cooldownText: null,
+	};
+
+	let isSelected = selectedAction === spell.id;
+	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
+
+	if (isSelected) {
+		button.color = '#f0f0f0';
+	} else if (remainingInSeconds > 0) {
+		button.color = '#444444';
+	}
+
+	if (remainingInSeconds > 0) {
+		// Cooldown
+		let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
+		button.cooldownText = cooldownText;
+	}
+
+	return button;
+}
+
+function renderButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRenderState) {
+	if (buttonState) {
+		const key = buttonState.key || "";
 
 		ctx.save();
-		ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
 		
-		let color = spell.color;
-		if (isSelected) {
-			color = '#f0f0f0';
-		} else if (remainingInSeconds > 0) {
-			color = '#444444';
-		}
-		renderIcon(ctx, spell.icon && Icons[spell.icon], color, 0.6, ButtonBar.Size);
+		let color = buttonState.color;
+		renderIcon(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, ButtonBar.Size);
 
-		if (remainingInSeconds > 0) {
+		if (buttonState.cooldownText) {
 			// Cooldown
-			let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
+			let cooldownText = buttonState.cooldownText
 
 			ctx.font = 'bold ' + (ButtonBar.Size * 0.75 - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
@@ -647,9 +700,9 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 
 
 		ctx.restore();
+	} else {
+		ctx.clearRect(0, 0, ButtonBar.Size, ButtonBar.Size);
 	}
-
-	ctx.restore();
 }
 
 function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
