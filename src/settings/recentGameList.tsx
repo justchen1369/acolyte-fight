@@ -3,6 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import * as m from '../game/messages.model';
+import { TicksPerSecond } from '../game/constants';
 
 export interface Game {
     id: string;
@@ -66,7 +67,7 @@ export class RecentGameList extends React.Component<Props, State> {
 
     render() {
         return <div className="recent-game-list-section">
-            <h1>Your recent games</h1>
+            <h1>Your Recent Games</h1>
             {this.state.error && <div className="error">Error loading recent games: {this.state.error}</div>}
             {!this.state.games && <div className="loading-text">Loading...</div>}
             {this.state.games && this.state.games.length === 0 && <div>No recent games</div>}
@@ -74,11 +75,13 @@ export class RecentGameList extends React.Component<Props, State> {
                 <table style={{width: "100%"}}>
                     <col className="timestamp" />
                     <col className="player-names" />
+                    <col className="game-length" />
                     <col className="actions" />
                     <thead>
                         <tr>
                             <th>Time</th>
                             <th>Players</th>
+                            <th>Length</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -86,6 +89,7 @@ export class RecentGameList extends React.Component<Props, State> {
                         {this.state.games.map(game => <tr>
                             <td>{game.createdTimestamp.fromNow()}</td>
                             <td>{game.playerNames.join(", ")}</td>
+                            <td>{game.numActivePlayers > 0 ? "Live" : `${(game.numTicks / TicksPerSecond).toFixed(0)} s`}</td>
                             <td><a href={"/?g=" + game.id} target="_blank">Watch <i className="fa fa-external-link-square-alt" /></a></td>
                         </tr>)}
                     </tbody>
