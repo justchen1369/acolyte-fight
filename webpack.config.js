@@ -18,14 +18,5 @@ const settingsConfig = {
   },
   mode: 'production',
 };
-const watchConfig = {
-	entry: './js/watch/index.js',
-  target: 'web', // <=== can be omitted as default is 'web'
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'watch.js'
-  },
-  mode: 'production',
-};
 
-module.exports = [ clientConfig, settingsConfig, watchConfig ];
+module.exports = [ clientConfig, settingsConfig ];
