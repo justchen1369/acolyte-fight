@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -15,6 +16,7 @@ fetch('games')
         data.games.forEach(gameMsg => {
             games.push(msgToGame(gameMsg));
         });
+        games = _.sortBy(games, (game: Game) => -game.createdTimestamp.unix());
     })
     .then(() => rerender());
 

@@ -15,7 +15,7 @@ export class WatchPage extends React.Component<Props, State> {
             <h1 className="title">Watch previous games</h1>
             <div className="game-list">
                 {this.props.games.map(game => <div className="game">
-                    <a href={"/?g=" + game.id} target="_blank">{game.playerNames.join(", ") + " at " + game.createdTimestamp.format("YYYY-MM-DD HH:mm")}</a>
+                    <a href={"/?g=" + game.id} target="_blank">{game.playerNames.join(", ") + " at " + game.createdTimestamp.format("YYYY-MM-DD HH:mm")} ({game.numActivePlayers > 0 ? "live" : "done"})</a>
                 </div>)}
             </div>
         </div>;
