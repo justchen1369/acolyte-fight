@@ -23,6 +23,10 @@ export interface CanvasCtxStack {
 }
 
 // Rendering
+export function fullRerender(world: w.World) {
+	world.ui.buttons.clear();
+}
+
 export function calculateWorldRect(rect: ClientRect) {
 	let size = Math.min(rect.width, rect.height);
 	return {
