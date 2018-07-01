@@ -85,3 +85,16 @@ export interface ServerStats {
     numGames: number;
     numPlayers: number;
 }
+
+export interface GameListMsg {
+    games: GameMsg[];
+}
+
+export interface GameMsg {
+    id: string;
+    createdTimestamp: string;
+    playerNames: string[];
+    numActivePlayers: number;
+    joinable: boolean;
+    numTicks: number;
+}

@@ -15,6 +15,7 @@ program.parse(process.argv);
 
 const port = program.port || process.env.PORT || 7770;
 
+app.use(express.json());
 attachToSocket(io);
 attachApi(app);
 app.use(express.static('./'));

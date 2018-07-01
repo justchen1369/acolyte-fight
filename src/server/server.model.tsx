@@ -1,3 +1,4 @@
+import * as moment from 'moment';
 import * as m from '../game/messages.model';
 
 export interface ServerStore {
@@ -8,7 +9,9 @@ export interface ServerStore {
 
 export interface Game {
     id: string;
+    created: moment.Moment;
     active: Map<string, Player>; // socketId -> Player
+    playerNames: string[];
     started: boolean;
     numPlayers: number;
     tick: number;

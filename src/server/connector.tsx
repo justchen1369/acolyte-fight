@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Matchmaking, TicksPerSecond, Spells, World } from '../game/constants';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
@@ -134,9 +135,11 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 
 function initGame() {
 	const gameIndex = getStore().nextGameId++;
-	let game = {
+	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		created: moment(),
 		active: new Map<string, g.Player>(),
+		playerNames: new Array<string>(),
 		started: false,
 		numPlayers: 0,
 		tick: 0,
@@ -144,7 +147,7 @@ function initGame() {
 		closeTick: Matchmaking.MaxHistoryLength,
 		actions: new Map<string, m.ActionMsg>(),
 		history: [],
-	} as g.Game;
+	};
 	getStore().activeGames.set(game.id, game);
 
 	const heroId = systemHeroId(m.ActionType.Environment);
@@ -272,6 +275,7 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 		heroId,
 		name: playerName,
 	});
+	game.playerNames.push(playerName);
 	socket.join(game.id);
 
 	socket.emit("hero", {
