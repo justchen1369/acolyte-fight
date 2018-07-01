@@ -32,18 +32,14 @@ function getServerStats(): m.ServerStats {
 }
 
 function startTickProcessing() {
-	tickTimer.setInterval(tickAllGames, '', Math.floor(1e9 / TicksPerSecond) + 'n');
-}
-
-function stopTickProcessingIfPossible() {
-	if (getStore().activeGames.size === 0) {
-		tickTimer.clearInterval();
-		logger.info("Stopped processing ticks");
-	}
-}
-
-function tickAllGames() {
-	getStore().activeGames.forEach(game => gameTick(game));
+	tickTimer.setInterval(() => {
+		if (getStore().activeGames.size > 0) {
+			getStore().activeGames.forEach(game => gameTick(game));
+		} else {
+			tickTimer.clearInterval();
+			logger.info("Stopped processing ticks");
+		}
+	}, '', Math.floor(1e9 / TicksPerSecond) + 'n');
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -235,7 +231,6 @@ function leaveGame(game: g.Game, socket: SocketIO.Socket) {
 function finishGame(game: g.Game) {
 	getStore().activeGames.delete(game.id);
 	getStore().inactiveGames.set(game.id, game);
-	stopTickProcessingIfPossible();
 
 	logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
