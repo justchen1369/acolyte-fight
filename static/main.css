@@ -21,6 +21,7 @@ body .settings-page {
     max-width: 1000px;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 300px;
 }
 
 canvas.game {
@@ -46,6 +47,15 @@ a, a:visited {
 }
 a:hover, a:active {
     color: #ff8800;
+}
+
+.loading-text {
+    animation: loading-text-animation alternate 4s infinite;
+}
+
+@keyframes loading-text-animation {
+    from { color: white; }
+    to { color: #888; }
 }
 
 #info-panel {
@@ -234,21 +244,15 @@ h1 {
     opacity: 1.0;
 }
 
-body .watch-page {
-    max-width: 1000px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-body .watch-page table {
+.game-list table {
     border-collapse: collapse;
 }
 
-body .watch-page tr:hover {
+.game-list tr:hover {
     background: #333;
 }
 
-body .watch-page th, body .watch-page td {
+.game-list th, .game-list td {
     padding: 10px;
     text-align: left;
 }

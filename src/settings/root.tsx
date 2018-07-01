@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { NameConfig } from './nameConfig';
 import { SpellConfig } from './spellConfig';
+import { RecentGameList } from './recentGameList';
 
 interface Props {
 }
@@ -17,6 +18,7 @@ export class Root extends React.Component<Props, State> {
                 Move using the mouse, cast spells with the keyboard.
             </div>
             <NameConfig />
+            <RecentGameList />
             <SpellConfig />
         </div>;
     }
