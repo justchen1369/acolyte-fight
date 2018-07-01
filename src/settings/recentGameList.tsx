@@ -69,9 +69,12 @@ export class RecentGameList extends React.Component<Props, State> {
             <h1>Your recent games</h1>
             {this.state.error && <div className="error">Error loading recent games: {this.state.error}</div>}
             {!this.state.games && <div className="loading-text">Loading...</div>}
-            {this.state.games && this.state.games.length === 0 && <div>No recent games.</div>}
+            {this.state.games && this.state.games.length === 0 && <div>No recent games</div>}
             {this.state.games && this.state.games.length > 0 && <div className="game-list">
                 <table style={{width: "100%"}}>
+                    <col className="timestamp" />
+                    <col className="player-names" />
+                    <col className="actions" />
                     <thead>
                         <tr>
                             <th>Time</th>
@@ -83,7 +86,7 @@ export class RecentGameList extends React.Component<Props, State> {
                         {this.state.games.map(game => <tr>
                             <td>{game.createdTimestamp.fromNow()}</td>
                             <td>{game.playerNames.join(", ")}</td>
-                            <td><a href={"/?g=" + game.id} target="_blank">Watch</a></td>
+                            <td><a href={"/?g=" + game.id} target="_blank">Watch <i className="fa fa-external-link-square-alt" /></a></td>
                         </tr>)}
                     </tbody>
                 </table>

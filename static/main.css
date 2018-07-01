@@ -107,6 +107,11 @@ a:hover, a:active {
     to { opacity: 0.0 }
 }
 
+#messages-panel .error {
+    color: red;
+    font-weight: bold;
+}
+
 #messages-panel .help-text {
     font-weight: bold;
 }
@@ -244,15 +249,32 @@ h1 {
     opacity: 1.0;
 }
 
+.game-list {
+    background: #333;
+    box-shadow: 5px 5px 5px black;
+}
+
 .game-list table {
     border-collapse: collapse;
 }
 
+.game-list col.timestamp {
+    width: 200px;
+}
+
+.game-list col.actions {
+    width: 200px;
+}
+
+.game-list table thead {
+    background: #222;
+}
+
 .game-list tr:hover {
-    background: #333;
+    background: #555;
 }
 
 .game-list th, .game-list td {
-    padding: 10px;
+    padding: 20px;
     text-align: left;
 }
