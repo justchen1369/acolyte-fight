@@ -7,7 +7,6 @@ import { Hero, TicksPerSecond } from '../game/constants';
 interface Props {
     store: s.Store;
     newGameCallback: () => void;
-    rewatchGameCallback: () => void;
 }
 interface State {
 }

@@ -16,7 +16,6 @@ import { MessagesPanel } from './messagesPanel';
 const socket = socketLib();
 
 const playerName = getOrCreatePlayerName();
-const keyBindings = Storage.loadKeyBindingConfig() || Choices.Defaults;
 
 function getOrCreatePlayerName(): string {
     let name = Storage.loadName();
@@ -39,7 +38,7 @@ if (window.location.search) {
 attachToSocket(socket, () => {
     if (!joinedInitialGame) {
         joinedInitialGame = true;
-        joinNewGame(playerName, keyBindings, observeGameId);
+        joinNewGame(playerName, retrieveKeyBindings(), observeGameId);
         observeGameId = null;
     }
 });
@@ -61,18 +60,8 @@ function onNewGameClicked() {
         // New server? Reload the client, just in case the version has changed.
         window.location.reload();
     } else {
-        joinNewGame(playerName, keyBindings);
+        joinNewGame(playerName, retrieveKeyBindings());
         window.history.pushState(null, null, "?");
-    }
-}
-
-function onRewatchGameClicked() {
-    const gameId = getStore().world.ui.myGameId;
-    if (gameId) {
-        joinNewGame(playerName, keyBindings, gameId);
-        window.history.pushState(null, null, "?g=" + gameId);
-    } else {
-        console.error("Unable to rewatch game as gameId not set");
     }
 }
 
@@ -85,7 +74,10 @@ function rerender() {
     ReactDOM.render(
         <MessagesPanel
             store={getStore()}
-            newGameCallback={onNewGameClicked}
-            rewatchGameCallback={onRewatchGameClicked} />,
+            newGameCallback={onNewGameClicked} />,
             document.getElementById("messages-panel"));
+}
+
+function retrieveKeyBindings() {
+    return Storage.loadKeyBindingConfig() || Choices.Defaults;
 }
