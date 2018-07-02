@@ -187,21 +187,21 @@ export namespace Spells {
 
 	export const flamestrike = {
 		id: 'flamestrike',
-		description: "It's slower than fireball, harder to aim, but has half the cooldown and does area-of-effect damage.",
+		description: "It's slower than fireball, harder to aim, but has a lower cooldown and does area-of-effect damage.",
 		action: "projectile",
 
 		color: '#ff4400',
 		icon: "burningDot",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 1 * TicksPerSecond,
+		cooldown: 1.5 * TicksPerSecond,
 
 		projectile: {
 			color: '#ff4400',
 
 			density: 5,
 			radius: 0.005,
-			speed: 0.15,
+			speed: 0.2,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
 			damage: 10,
