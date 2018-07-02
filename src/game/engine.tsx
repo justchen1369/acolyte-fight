@@ -232,6 +232,10 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 			linkTicks: projectileTemplate.link.linkTicks,
 			targetId: null,
 		} as w.LinkParameters,
+		detonate: projectileTemplate.detonate && {
+			radius: projectileTemplate.detonate.radius,
+			detonateTick: world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity)),
+		} as w.DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
@@ -276,6 +280,7 @@ export function tick(world: w.World) {
 	applySpeedLimit(world);
 	decayShields(world);
 	decayThrust(world);
+	detonate(world);
 	applyLavaDamage(world);
 	shrink(world);
 
@@ -919,6 +924,36 @@ function updateKnockback(world: w.World) {
 					obj.body.resetMassData();
 				}
 			}
+		}
+	});
+}
+
+function detonate(world: w.World) {
+	world.objects.forEach(obj => {
+		if (!(obj.category === "projectile" && obj.detonate)) {
+			return;
+		}
+
+		if (world.tick === obj.detonate.detonateTick) {
+			// Apply damage
+			world.objects.forEach(other => {
+				if (other.category === "hero") {
+					if (!other.shieldTicks && vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + Hero.Radius) {
+						applyDamage(other, obj.damage, obj.owner, world);
+					}
+				} else if (other.category === "obstacle") {
+					if (vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + other.extent) {
+						applyDamageToObstacle(other, obj.damage, world);
+					}
+				}
+			});
+
+			world.events.push({
+				type: w.WorldEventType.Detonate,
+				pos: vector.clone(obj.body.getPosition()),
+				radius: obj.detonate.radius,
+			});
+			destroyObject(world, obj);
 		}
 	});
 }

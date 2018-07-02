@@ -185,6 +185,37 @@ export namespace Spells {
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
+	export const flamestrike = {
+		id: 'flamestrike',
+		description: "It's slower than fireball, harder to aim, but has half the cooldown and does area-of-effect damage.",
+		action: "projectile",
+
+		color: '#ff4400',
+		icon: "burningDot",
+
+		maxAngleDiff: 0.01 * 2 * Math.PI,
+		cooldown: 1 * TicksPerSecond,
+
+		projectile: {
+			color: '#ff4400',
+
+			density: 5,
+			radius: 0.005,
+			speed: 0.15,
+			maxSpeed: 1.0,
+			maxTicks: 2 * TicksPerSecond,
+			damage: 10,
+			explodeOn: Categories.All,
+
+			detonate: {
+				radius: 0.025,
+			},
+
+			render: "projectile",
+			trailTicks: 30,
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
 	export const firespray = {
 		id: 'firespray',
 		description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
@@ -597,6 +628,7 @@ export namespace Spells {
 	export const all: c.Spells = {
 		move,
 		fireball,
+		flamestrike,
 		firespray,
 		meteor,
 		gravity,
@@ -618,7 +650,7 @@ export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
 		"s": ["shield", "drain"],
-		"q": ["fireball"],
+		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang", "link"],
 		"r": ["meteor", "gravity"],

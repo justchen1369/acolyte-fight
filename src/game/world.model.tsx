@@ -57,6 +57,7 @@ export interface ProjectileTemplate {
     homing?: HomingParametersTemplate;
 	link?: LinkParametersTemplate;
 	gravity?: GravityParameters;
+	detonate?: DetonateParametersTemplate;
 	lifeSteal?: number;
 
 	maxTicks: number;
@@ -95,6 +96,10 @@ export interface HomingParametersTemplate {
 export interface LinkParametersTemplate {
     strength: number;
     linkTicks: number;
+}
+
+export interface DetonateParametersTemplate {
+	radius: number;
 }
 
 export interface ScourgeSpell extends SpellBase {
@@ -396,6 +401,7 @@ export interface Projectile extends WorldObjectBase {
 	gravity?: GravityParameters;
 	homing?: HomingParameters;
 	link?: LinkParameters;
+	detonate?: DetonateParameters;
 	lifeSteal: number;
 	shieldTakesOwnership: boolean;
 
@@ -411,6 +417,11 @@ export interface Projectile extends WorldObjectBase {
     trailTicks: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
+}
+
+export interface DetonateParameters {
+	radius: number;
+	detonateTick: number;
 }
 
 export namespace HomingTargets {
@@ -434,12 +445,23 @@ export interface LinkParameters {
 	linkTicks: number;
 }
 
-export type WorldObject = Hero | Projectile | Obstacle;
+export type WorldObject =
+	Hero
+	| Projectile
+	| Obstacle;
 
-export type WorldEvent = ScourgeEvent;
+export type WorldEvent =
+	DetonateEvent
+	| ScourgeEvent;
 
 export interface WorldEventBase {
 	type: string;
+}
+
+export interface DetonateEvent extends WorldEventBase {
+	type: "detonate";
+	pos: pl.Vec2;
+	radius: number;
 }
 
 export interface ScourgeEvent extends WorldEventBase {
@@ -449,7 +471,7 @@ export interface ScourgeEvent extends WorldEventBase {
 }
 
 export namespace WorldEventType {
-	export const HeroDeath = "heroDeath";
+	export const Detonate = "detonate";
 	export const Scourge = "scourge";
 } 
 

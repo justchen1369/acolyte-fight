@@ -201,25 +201,34 @@ function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, w
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
-	let ticks;
-	let radius;
 	if (ev.type === w.WorldEventType.Scourge) {
-		ticks = 30;
-		radius = Spells.scourge.radius;
-	} else if (ev.type === w.WorldEventType.HeroDeath) {
-		ticks = 15;
-		radius = Hero.Radius * 1.5;
+		renderScourge(ctxStack, ev, world);
+	} else if (ev.type === w.WorldEventType.Detonate) {
+		renderDetonate(ctxStack, ev, world);
 	} else {
 		return;
 	}
+}
 
+function renderScourge(ctxStack: CanvasCtxStack, ev: w.ScourgeEvent, world: w.World) {
 	world.ui.trails.push({
 		type: "circle",
-		max: ticks,
+		max: 30,
 		initialTick: world.tick,
 		pos: ev.pos,
 		fillStyle: 'white',
-		radius,
+		radius: Spells.scourge.radius,
+	});
+}
+
+function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.World) {
+	world.ui.trails.push({
+		type: "circle",
+		max: 10,
+		initialTick: world.tick,
+		pos: ev.pos,
+		fillStyle: 'white',
+		radius: ev.radius,
 	});
 }
 
