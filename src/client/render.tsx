@@ -275,13 +275,15 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.beginPath();
 
 		const points = obstacle.points;
-		for (let i = 0; i <= points.length; ++i) { // <= to because we need to return to the start point and close the shape
+		for (let i = 0; i < points.length; ++i) {
 			const point = points[i % points.length];
 			if (i === 0) {
 				ctx.moveTo(point.x, point.y);
 			}
 			ctx.lineTo(point.x, point.y);
 		}
+
+		ctx.closePath();
 		ctx.fill();
 
 		if (ctx === ctxStack.canvas) {
@@ -352,7 +354,7 @@ function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World)
 		ctx.lineTo(0.5, 0);
 		ctx.lineTo(0, -1);
 		ctx.lineTo(-1, -1);
-		ctx.lineTo(0, 0);
+		ctx.closePath();
 		ctx.fill();
 		ctx.stroke();
 
