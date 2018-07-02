@@ -167,7 +167,7 @@ export namespace Spells {
 		icon: "thunderball",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 2 * TicksPerSecond,
+		cooldown: 1 * TicksPerSecond,
 
 		projectile: {
 			color: '#ff8800',
@@ -187,14 +187,14 @@ export namespace Spells {
 
 	export const flamestrike = {
 		id: 'flamestrike',
-		description: "It's slower than fireball, harder to aim, but has a lower cooldown and does area-of-effect damage.",
+		description: "It's slower than fireball - harder to aim, but does more damage.",
 		action: "projectile",
 
 		color: '#ff4400',
 		icon: "burningDot",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 1.5 * TicksPerSecond,
+		cooldown: 1 * TicksPerSecond,
 
 		projectile: {
 			color: '#ff4400',
@@ -204,7 +204,7 @@ export namespace Spells {
 			speed: 0.2,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
-			damage: 10,
+			damage: 20,
 			explodeOn: Categories.All,
 
 			detonate: {
