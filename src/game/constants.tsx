@@ -439,8 +439,8 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 8,
-			collideWith: Categories.Hero,
-			explodeOn: Categories.All,
+			collideWith: Categories.Hero | Categories.Obstacle,
+			explodeOn: Categories.All ^ Categories.Obstacle,
 			bounce: {
 				damageFactor: 0.9,
 			},

@@ -724,7 +724,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
-		x => !!(x.categories & projectile.collideWith) && x.id !== hit.id);
+		x => x.category === "hero" && x.id !== hit.id);
 	if (!nextTarget) {
 		return;
 	}
