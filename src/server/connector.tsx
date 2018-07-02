@@ -15,6 +15,7 @@ const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
 let io: SocketIO.Server = null;
+let ticksProcessing = false;
 
 export function attachToSocket(_io: SocketIO.Server ) {
     io = _io;
@@ -32,10 +33,16 @@ function getServerStats(): m.ServerStats {
 }
 
 function startTickProcessing() {
+	if (ticksProcessing) {
+		return;
+	}
+	ticksProcessing = true;
+
 	tickTimer.setInterval(() => {
 		if (getStore().activeGames.size > 0) {
 			getStore().activeGames.forEach(game => gameTick(game));
 		} else {
+			ticksProcessing = false;
 			tickTimer.clearInterval();
 			logger.info("Stopped processing ticks");
 		}
