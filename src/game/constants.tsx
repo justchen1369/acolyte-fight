@@ -522,7 +522,7 @@ export namespace Spells {
 		icon: "atomicSlashes",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 10 * TicksPerSecond,
+		cooldown: 8 * TicksPerSecond,
 		chargeTicks: 0.25 * TicksPerSecond,
 		uninterruptible: true,
 
