@@ -209,6 +209,7 @@ export namespace Spells {
 
 			detonate: {
 				radius: 0.025,
+				impulse: 0.00005,
 			},
 
 			render: "projectile",

@@ -100,6 +100,7 @@ export interface LinkParametersTemplate {
 
 export interface DetonateParametersTemplate {
 	radius: number;
+	impulse: number;
 }
 
 export interface ScourgeSpell extends SpellBase {
@@ -421,6 +422,7 @@ export interface Projectile extends WorldObjectBase {
 
 export interface DetonateParameters {
 	radius: number;
+	impulse: number;
 	detonateTick: number;
 }
 

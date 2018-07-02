@@ -234,6 +234,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		} as w.LinkParameters,
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
+			impulse: projectileTemplate.detonate.impulse,
 			detonateTick: world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity)),
 		} as w.DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
@@ -938,8 +939,13 @@ function detonate(world: w.World) {
 			// Apply damage
 			world.objects.forEach(other => {
 				if (other.category === "hero") {
-					if (!other.shieldTicks && vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + Hero.Radius) {
+					if (other.id !== obj.owner && !other.shieldTicks && vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + Hero.Radius) {
 						applyDamage(other, obj.damage, obj.owner, world);
+
+						other.body.applyLinearImpulse(
+							vector.relengthen(vector.diff(other.body.getPosition(), obj.body.getPosition()), obj.detonate.impulse),
+							other.body.getWorldPoint(vector.zero()),
+							true);
 					}
 				} else if (other.category === "obstacle") {
 					if (vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + other.extent) {
