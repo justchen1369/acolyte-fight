@@ -361,7 +361,7 @@ export namespace Spells {
 			density: 25,
 			radius: 0.003,
 			maxSpeed: 0.6,
-			speed: 0.4,
+			speed: 0.2,
 			maxTicks: 6.0 * TicksPerSecond,
 			damage: 20,
 			explodeOn: Categories.Hero,
