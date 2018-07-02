@@ -624,9 +624,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		linkTo(projectile, obstacle, world);
 	}
 
-	if (projectile.bounce) { // Only bounce off heroes, not projectiles
-		bounceToNext(projectile, obstacle, world);
-	} else if (projectile.explodeOn & obstacle.categories) {
+	if (projectile.explodeOn & obstacle.categories) {
 		destroyObject(world, projectile);
 	}
 }
