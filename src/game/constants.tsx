@@ -167,7 +167,7 @@ export namespace Spells {
 		icon: "thunderball",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 1 * TicksPerSecond,
+		cooldown: 2 * TicksPerSecond,
 
 		projectile: {
 			color: '#ff8800',
