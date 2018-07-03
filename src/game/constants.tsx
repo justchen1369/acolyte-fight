@@ -201,7 +201,7 @@ export namespace Spells {
 
 			density: 5,
 			radius: 0.005,
-			speed: 0.15,
+			speed: 0.2,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
 			damage: 20,
@@ -390,16 +390,16 @@ export namespace Spells {
 			color: '#ff00ff',
 			selfColor: true,
 
-			density: 25,
+			density: 10,
 			radius: 0.003,
 			maxSpeed: 0.6,
-			speed: 0.2,
+			speed: 0.4,
 			maxTicks: 6.0 * TicksPerSecond,
 			damage: 20,
 			explodeOn: Categories.Hero,
 
 			homing: {
-				turnRate: 0.01 * 2 * Math.PI,
+				turnRate: 0.02 * 2 * Math.PI,
 				maxTurnProportion: 0.1,
 				minDistanceToTarget: 0.1,
 				targetType: c.HomingTargets.self,
