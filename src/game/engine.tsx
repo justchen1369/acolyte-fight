@@ -873,10 +873,14 @@ function linkForce(world: w.World) {
 		}
 
 		const toTarget = vector.multiply(vector.unit(diff), strength);
-		owner.body.applyLinearImpulse(toTarget, owner.body.getWorldPoint(vector.zero()), true);
+		owner.body.applyLinearImpulse(
+			vector.relengthen(diff, strength * owner.body.getMass()),
+			owner.body.getWorldPoint(vector.zero()), true);
 
 		if (target.category === "hero") {
-			target.body.applyLinearImpulse(vector.negate(toTarget), target.body.getWorldPoint(vector.zero()), true);
+			target.body.applyLinearImpulse(
+				vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
+				target.body.getWorldPoint(vector.zero()), true);
 		}
 	});
 }
@@ -904,27 +908,24 @@ function decayThrust(world: w.World) {
 function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
+			const proportion = obj.health / Hero.MaxHealth;
+
 			// Damping
-			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * obj.health / Hero.MaxHealth;
+			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * proportion;
 			if (obj.thrust) {
 				damping = 0;
 			}
 			obj.body.setLinearDamping(damping);
 
 			// Mass
-			let mass = null;
+			let mass = Hero.MinMass + (Hero.MaxMass - Hero.MinMass) * proportion;
 			if (obj.shieldTicks) {
 				mass = Spells.shield.mass;
+			} else if (obj.thrust) {
+				mass = Hero.MaxMass;
 			}
 
-			if (mass !== obj.massOverride) {
-				obj.massOverride = mass;
-				if (mass) {
-					obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
-				} else {
-					obj.body.resetMassData();
-				}
-			}
+			obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
 		}
 	});
 }
