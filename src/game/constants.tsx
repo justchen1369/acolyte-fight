@@ -201,7 +201,7 @@ export namespace Spells {
 
 			density: 5,
 			radius: 0.005,
-			speed: 0.2,
+			speed: 0.18,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
 			damage: 20,
