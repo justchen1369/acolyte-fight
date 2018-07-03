@@ -618,8 +618,8 @@ export namespace Spells {
 		uninterruptible: true,
 
 		damage: 10,
-		maxTicks: 0.33 * TicksPerSecond,
-		speed: 0.75,
+		maxTicks: 0.3 * TicksPerSecond,
+		speed: 0.85,
 
 		icon: "fireDash",
 		color: '#ff00cc',
