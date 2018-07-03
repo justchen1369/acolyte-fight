@@ -22,8 +22,8 @@ export namespace Matchmaking {
 export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.015;
-	export const MinMass = 0.0001;
-	export const MaxMass = 0.00035;
+	export const MinMass = 0.0002;
+	export const MaxMass = 0.0007;
 	export const Density = 0.5;
 	export const AngularDamping = 1;
 	export const MaxDamping = 5;
@@ -56,7 +56,7 @@ export namespace World {
 	export const HeroLayoutRadius = 0.25;
 
 	export const PreGameLavaDamagePerTick = 0.05;
-	export const LavaDamagePerTick = 0.25;
+	export const LavaDamagePerTick = 0.5;
 	export const ShrinkPerTick = 0.00005;
 	export const InitialShieldTicks = 1.0 * TicksPerSecond;
 
@@ -437,7 +437,7 @@ export namespace Spells {
 			shieldTakesOwnership: false,
 
 			link: {
-				strength: 0.9 / TicksPerSecond,
+				strength: 1.0 / TicksPerSecond,
 				linkTicks: 2 * TicksPerSecond,
 			} as c.LinkParameters,
 
