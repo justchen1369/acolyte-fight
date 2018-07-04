@@ -64,7 +64,16 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, obstacleTemplate: w.ObstacleTemplate) {
+function polygon(numPoints: number, extent: number) {
+	let points = new Array<pl.Vec2>();
+	for (let i = 0; i < numPoints; ++i) {
+		const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
+		points.push(point);
+	}
+	return points;
+}
+
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
 	const obstacleId = "obstacle" + (world.nextObstacleId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
@@ -74,12 +83,6 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, obstacleT
 		linearDamping: Obstacle.LinearDamping,
 		angularDamping: Obstacle.AngularDamping,
 	});
-
-	let points = new Array<pl.Vec2>();
-	for (let i = 0; i < obstacleTemplate.numPoints; ++i) {
-		const point = vector.multiply(vector.fromAngle((i / obstacleTemplate.numPoints) * (2 * Math.PI)), obstacleTemplate.extent);
-		points.push(point);
-	}
 
 	body.createFixture(pl.Polygon(points), {
 		filterCategoryBits: Categories.Obstacle,
@@ -92,10 +95,13 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, obstacleT
 		categories: Categories.Obstacle,
 		type: "polygon",
 		body,
-		extent: obstacleTemplate.extent,
+		extent,
 		points,
 		health: Obstacle.Health,
 		maxHealth: Obstacle.Health,
+		createTick: world.tick,
+		growthTicks: 0,
+		damagePerTick: 0,
 	};
 
 	world.objects.set(obstacle.id, obstacle);
@@ -283,6 +289,7 @@ export function tick(world: w.World) {
 	applySpeedLimit(world);
 	decayShields(world);
 	decayThrust(world);
+	decayObstacles(world);
 	detonate(world);
 	applyLavaDamage(world);
 	shrink(world);
@@ -328,13 +335,14 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	const layout = World.Layouts[world.seed % World.Layouts.length];
 	layout.obstacles.forEach(obstacleTemplate => {
+		const points = polygon(obstacleTemplate.numPoints, obstacleTemplate.extent);
 		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
 			const proportion = i / obstacleTemplate.numObstacles;
 			const baseAngle = proportion * (2 * Math.PI);
 			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + obstacleTemplate.layoutAngleOffset), obstacleTemplate.layoutRadius));
 
 			const orientationAngle = baseAngle + obstacleTemplate.layoutAngleOffset + obstacleTemplate.orientationAngleOffset;
-			addObstacle(world, position, orientationAngle, obstacleTemplate);
+			addObstacle(world, position, orientationAngle, points, obstacleTemplate.extent);
 		}
 	});
 }
@@ -541,6 +549,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Sp
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
 		case "thrust": return thrustAction(world, hero, action, spell);
+		case "wall": return wallAction(world, hero, action, spell);
 		case "shield": return shieldAction(world, hero, action, spell);
 	}
 }
@@ -906,6 +915,14 @@ function decayThrust(world: w.World) {
 	});
 }
 
+function decayObstacles(world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.category === "obstacle" && obj.damagePerTick) {
+			obj.health -= obj.damagePerTick;
+		}
+	});
+}
+
 function updateKnockback(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
@@ -1241,6 +1258,29 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		pos: hero.body.getPosition(),
 		type: w.WorldEventType.Scourge,
 	});
+
+	return true;
+}
+
+function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.WallSpell) {
+	const halfWidth = spell.width / 2;
+	const halfLength = spell.length / 2;
+	let points = [
+		pl.Vec2(-halfWidth, -halfLength),
+		pl.Vec2(halfWidth, -halfLength),
+		pl.Vec2(halfWidth, halfLength),
+		pl.Vec2(-halfWidth, halfLength),
+	];
+
+	const diff = vector.truncate(vector.diff(action.target, hero.body.getPosition()), spell.maxRange);
+	const angle = 0.5 * Math.PI + vector.angle(diff);
+
+	const position = vector.plus(hero.body.getPosition(), diff);
+	let obstacle = addObstacle(world, position, angle, points, Math.min(halfWidth, halfLength));
+	obstacle.health = spell.health;
+	obstacle.maxHealth = spell.health;
+	obstacle.damagePerTick = obstacle.maxHealth / spell.maxTicks;
+	obstacle.growthTicks = 5;
 
 	return true;
 }

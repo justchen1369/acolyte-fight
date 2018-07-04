@@ -4,7 +4,15 @@ export interface Spells {
     [key: string]: Spell;
 }
 
-export type Spell = MoveSpell | ProjectileSpell | SpraySpell | ScourgeSpell | ShieldSpell | TeleportSpell | ThrustSpell;
+export type Spell =
+	MoveSpell
+	| ProjectileSpell
+	| SpraySpell
+	| ScourgeSpell
+	| ShieldSpell
+	| TeleportSpell
+	| ThrustSpell
+	| WallSpell;
 
 export interface SpellBase {
     id: string;
@@ -43,6 +51,18 @@ export interface SpraySpell extends SpellBase {
     lengthTicks: number;
 
     jitterRatio: number;
+}
+
+export interface WallSpell extends SpellBase {
+	action: "wall";
+
+	maxRange: number;
+
+	length: number;
+	width: number;
+
+	health: number;
+	maxTicks: number;
 }
 
 export interface ProjectileTemplate {
@@ -338,6 +358,9 @@ export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
 	maxHealth: number;
 	health: number;
+	createTick: number;
+	growthTicks: number;
+	damagePerTick: number;
 	extent: number;
 	points: pl.Vec2[];
 }

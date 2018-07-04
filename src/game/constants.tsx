@@ -630,6 +630,26 @@ export namespace Spells {
 		action: "shield",
 	} as c.ShieldSpell;
 
+	export const icewall = {
+		id: 'icewall',
+		description: "Create a wall of ice to block projectiles or stop enemies getting away.",
+
+		chargeTicks: 0.1 * TicksPerSecond,
+		health: 50,
+		maxRange: 0.15,
+		maxTicks: 5 * TicksPerSecond,
+		cooldown: 20 * TicksPerSecond,
+
+		length: 0.005,
+		width: 0.15,
+
+		icon: "woodenFence",
+
+		color: '#4488ff',
+
+		action: "wall",
+	} as c.WallSpell;
+
 	export const teleport = {
 		id: 'teleport',
 		description: "Teleport to a nearby location. Get close, or get away.",
@@ -677,6 +697,7 @@ export namespace Spells {
 		boomerang,
 		bouncer,
 		drain,
+		icewall,
 		scourge,
 		shield,
 		supernova,
@@ -688,7 +709,7 @@ export namespace Spells {
 export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
-		"s": ["shield", "drain"],
+		"s": ["shield", "drain", "icewall"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang", "link"],

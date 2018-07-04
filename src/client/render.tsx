@@ -270,6 +270,11 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.translate(pos.x, pos.y);
 		ctx.rotate(body.getAngle());
 
+		if (world.tick - obstacle.createTick < obstacle.growthTicks) {
+			const growthProportion = (world.tick - obstacle.createTick) / obstacle.growthTicks;
+			ctx.scale(growthProportion, growthProportion);
+		}
+
 		ctx.lineWidth = Pixel * 3;
 
 		const red = 0;
