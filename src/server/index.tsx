@@ -4,8 +4,10 @@ import express from 'express';
 import { authMiddleware } from './auth';
 import { attachToSocket } from './connector';
 import { attachApi } from './api';
+import { getStore } from './serverStore';
+import { getLoadAverage } from './loadMetrics';
 import { logger } from './logging';
-import { cleanupOldInactiveGames } from './games';
+import { cleanupOldInactiveGames } from './serverStore';
 
 const app = express();
 const http = new httpLib.Server(app);
@@ -30,3 +32,9 @@ http.listen(port, function() {
 });
 
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
+
+setInterval(() => {
+	if (getStore().activeGames.size > 0) {
+		logger.info(`Current load: ${(getLoadAverage() * 100).toFixed(1)}%`);
+	}
+}, 60 * 1000);

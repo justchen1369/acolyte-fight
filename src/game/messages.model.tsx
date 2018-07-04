@@ -100,3 +100,7 @@ export interface GameMsg {
     joinable: boolean;
     numTicks: number;
 }
+
+export interface ServerStatusMsg {
+    serverLoad: number;
+}

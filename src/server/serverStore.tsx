@@ -6,6 +6,7 @@ let store: g.ServerStore = {
     nextGameId: 0,
     activeGames: new Map<string, g.Game>(),
     inactiveGames: new Map<string, g.Game>(),
+    recentTickMilliseconds: [],
 };
 
 export function getStore() {

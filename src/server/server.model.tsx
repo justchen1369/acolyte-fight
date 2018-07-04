@@ -5,6 +5,7 @@ export interface ServerStore {
     nextGameId: 0;
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
+    recentTickMilliseconds: number[];
 }
 
 export interface Game {

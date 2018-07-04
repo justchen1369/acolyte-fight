@@ -1,13 +1,16 @@
+import _ from 'lodash';
 import moment from 'moment';
 import express from 'express';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import { getAuthToken } from './auth';
-import { getStore } from './games';
+import { getStore } from './serverStore';
+import { getLoadAverage } from './loadMetrics';
 import { logger } from './logging';
 
 export function attachApi(app: express.Application) {
     app.get('/games', onGamesList);
+    app.get('/status', onStatus);
 }
 
 function onGamesList(req: express.Request, res: express.Response) {
@@ -28,6 +31,13 @@ function onGamesList(req: express.Request, res: express.Response) {
 
     const result: m.GameListMsg = {
         games: gameMsgs,
+    };
+    res.send(result);
+}
+
+function onStatus(req: express.Request, res: express.Response) {
+    const result: m.ServerStatusMsg = {
+        serverLoad: getLoadAverage(),
     };
     res.send(result);
 }

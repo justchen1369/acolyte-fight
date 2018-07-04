@@ -6,9 +6,9 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as PlayerName from '../game/playerName';
 import { getAuthTokenFromSocket } from './auth';
-import { getStore } from './games';
+import { getStore } from './serverStore';
+import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
-import { startTimer } from 'winston';
 
 const NanoTimer = require('nanotimer');
 
@@ -40,7 +40,10 @@ function startTickProcessing() {
 
 	tickTimer.setInterval(() => {
 		if (getStore().activeGames.size > 0) {
-			getStore().activeGames.forEach(game => gameTick(game));
+			const milliseconds = tickTimer.time(() => {
+				getStore().activeGames.forEach(game => gameTick(game));
+			}, '', 'm');
+			addTickMilliseconds(milliseconds);
 		} else {
 			ticksProcessing = false;
 			tickTimer.clearInterval();
