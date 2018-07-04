@@ -326,7 +326,6 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 	return heroId;
 }
 
-
 function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (!game.joinable) {
 		return;
