@@ -14,10 +14,10 @@ export interface Game {
     active: Map<string, Player>; // socketId -> Player
     playerNames: string[];
     accessTokens: Set<string>;
-    started: boolean;
     numPlayers: number;
     tick: number;
-	joinable: boolean;
+    joinable: boolean;
+    activeTick: number;
 	closeTick: number;
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];

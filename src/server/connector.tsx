@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Matchmaking, TicksPerSecond, Spells, World } from '../game/constants';
+import { Matchmaking, TicksPerSecond, MaxIdleTicks, Spells, World } from '../game/constants';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
@@ -11,7 +11,6 @@ import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
 
 const NanoTimer = require('nanotimer');
-
 const tickTimer = new NanoTimer();
 
 let io: SocketIO.Server = null;
@@ -39,16 +38,21 @@ function startTickProcessing() {
 	ticksProcessing = true;
 
 	tickTimer.setInterval(() => {
-		if (getStore().activeGames.size > 0) {
-			const milliseconds = tickTimer.time(() => {
-				getStore().activeGames.forEach(game => gameTick(game));
-			}, '', 'm');
-			addTickMilliseconds(milliseconds);
-		} else {
-			ticksProcessing = false;
-			tickTimer.clearInterval();
-			logger.info("Stopped processing ticks");
-		}
+		const milliseconds = tickTimer.time(() => {
+			let anyGameRunning = false;
+
+			getStore().activeGames.forEach(game => {
+				const isGameRunning = gameTick(game);
+				anyGameRunning = anyGameRunning || isGameRunning;
+			});
+
+			if (!anyGameRunning) {
+				ticksProcessing = false;
+				tickTimer.clearInterval();
+				logger.info("Stopped processing ticks");
+			}
+		}, '', 'm');
+		addTickMilliseconds(milliseconds);
 	}, '', Math.floor(1e9 / TicksPerSecond) + 'n');
 }
 
@@ -159,9 +163,9 @@ function initGame() {
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
 		accessTokens: new Set<string>(),
-		started: false,
 		numPlayers: 0,
 		tick: 0,
+		activeTick: 0,
 		joinable: true,
 		closeTick: Matchmaking.MaxHistoryLength,
 		actions: new Map<string, m.ActionMsg>(),
@@ -194,12 +198,7 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 		game.actions.set(actionData.heroId, actionData);
 	}
 
-	if (!game.started && isUserInitiated(actionData)) {
-		game.started = true;
-		logger.info("Started game " + game.id + " with " + game.numPlayers + " players");
-	}
-
-	// logger.info("Game [" + game.id + "]: action received", actionData);
+	startTickProcessing();
 }
 
 function actionPrecedence(actionData: m.ActionMsg): number {
@@ -225,17 +224,20 @@ function isSpell(actionData: m.ActionMsg): boolean {
 }
 
 function leaveGame(game: g.Game, socket: SocketIO.Socket) {
-	let player = game.active.get(socket.id);
+	removeFromGame(game, socket.id);
+	socket.leave(game.id);
+}
+
+function removeFromGame(game: g.Game, socketId: string) {
+	let player = game.active.get(socketId);
 	if (!player) {
-		logger.info("Game [" + game.id + "]: player " + socket.id + " tried to leave but was not in the game");
 		return;
 	}
 
 	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
-	game.active.delete(socket.id);
-	socket.leave(game.id);
-	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socket.id + "] left after " + game.tick + " ticks");
+	game.active.delete(socketId);
+	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
 
 function finishGame(game: g.Game) {
@@ -245,18 +247,21 @@ function finishGame(game: g.Game) {
 	logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 }
 
-function gameTick(game: g.Game) {
+function gameTick(game: g.Game): boolean {
 	if (game.active.size === 0) {
 		finishGame(game);
-		return;
+		return false;
 	}
 
-	if (game.started || game.actions.size > 0) {
+	if (isGameRunning(game) || game.actions.size > 0) {
 		let data = {
 			gameId: game.id,
 			tick: game.tick++,
 			actions: [...game.actions.values()],
 		} as m.TickMsg;
+		if (game.actions.size > 0) {
+			game.activeTick = game.tick;
+		}
 		game.actions.clear();
 
 		if (game.history) {
@@ -269,7 +274,15 @@ function gameTick(game: g.Game) {
 
 		closeGameIfNecessary(game, data);
 		io.to(game.id).emit('tick', data);
+
+		return true;
+	} else {
+		return false;
 	}
+}
+
+function isGameRunning(game: g.Game) {
+	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
 function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, socket: SocketIO.Socket) {

@@ -2,6 +2,7 @@ import pl from 'planck-js';
 import * as c from './world.model';
 
 export const TicksPerSecond = 60;
+export const MaxIdleTicks = 60 * TicksPerSecond;
 export const Pixel = 0.001;
 
 export namespace Categories {
