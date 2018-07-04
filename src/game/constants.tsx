@@ -598,7 +598,7 @@ export namespace Spells {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
 
-		radius: Hero.Radius * 5,
+		radius: Hero.Radius * 4,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
 		damage: 20,
