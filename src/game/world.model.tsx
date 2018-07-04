@@ -182,8 +182,6 @@ export interface World {
 	winner: string | null;
 
 	objects: Map<string, WorldObject>,
-	destroyed: WorldObject[];
-	events: WorldEvent[];
 
 	physics: pl.World;
 
@@ -215,6 +213,9 @@ export interface HeroScore {
 export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
+
+	destroyed: WorldObject[];
+	events: WorldEvent[];
 
 	trails: Trail[];
 	notifications: Notification[];

@@ -37,9 +37,6 @@ export function initialWorld(): w.World {
 		actions: new Map(),
 		radius: World.InitialRadius,
 
-		destroyed: [],
-		events: new Array<w.WorldEvent>(),
-
 		nextObstacleId: 0,
 		nextPositionId: 0,
 		nextBulletId: 0,
@@ -48,6 +45,8 @@ export function initialWorld(): w.World {
 		ui: {
 			myGameId: null,
 			myHeroId: null,
+			destroyed: [],
+			events: new Array<w.WorldEvent>(),
 			trails: [],
 			notifications: [],
 			buttons: new Map<string, w.ButtonRenderState>(),
@@ -266,8 +265,6 @@ function attackDamage(damage: number, hero: w.Hero) {
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
-	world.destroyed = [];
-	world.events = [];
 
 	handleOccurences(world);
 	handleActions(world);
@@ -956,7 +953,7 @@ function detonate(world: w.World) {
 				}
 			});
 
-			world.events.push({
+			world.ui.events.push({
 				type: w.WorldEventType.Detonate,
 				pos: vector.clone(obj.body.getPosition()),
 				radius: obj.detonate.radius,
@@ -1129,7 +1126,7 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.physics.destroyBody(object.body);
 
 	object.destroyed = true;
-	world.destroyed.push(object);
+	world.ui.destroyed.push(object);
 }
 
 function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.MoveSpell) {
@@ -1234,7 +1231,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 	});
 
-	world.events.push({
+	world.ui.events.push({
 		heroId: hero.id,
 		pos: hero.body.getPosition(),
 		type: w.WorldEventType.Scourge,

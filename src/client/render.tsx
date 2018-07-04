@@ -56,6 +56,9 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 	renderWorld(ctxStack, world, rect);
 	renderInterface(ctxStack.ui, world, rect);
 	all(ctxStack, ctx => ctx.restore());
+
+	world.ui.destroyed = [];
+	world.ui.events = [];
 }
 
 function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
@@ -88,8 +91,8 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 	renderMap(ctxStack.background, world);
 
 	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
-	world.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
-	world.events.forEach(obj => renderEvent(ctxStack, obj, world));
+	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
+	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
 	let newTrails = new Array<w.Trail>();
 	world.ui.trails.forEach(trail => {
