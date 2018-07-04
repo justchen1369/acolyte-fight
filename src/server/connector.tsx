@@ -215,10 +215,6 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 	}
 }
 
-function isUserInitiated(actionData: m.ActionMsg): boolean {
-	return actionData.actionType === "game";
-}
-
 function isSpell(actionData: m.ActionMsg): boolean {
 	return actionData.actionType === "game" && actionData.spellId !== Spells.move.id;
 }
