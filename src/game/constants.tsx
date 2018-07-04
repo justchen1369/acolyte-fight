@@ -22,12 +22,15 @@ export namespace Matchmaking {
 export namespace Hero {
 	export const MoveSpeedPerTick = 0.1 / TicksPerSecond;
 	export const Radius = 0.015;
-	export const MinMass = 0.0002;
-	export const MaxMass = 0.0007;
 	export const Density = 0.5;
+
+	export const MinMass = 0.0001;
+	export const MaxMass = 0.0007;
+	export const MassPower = 2.0;
+
 	export const AngularDamping = 1;
-	export const MaxDamping = 5;
-	export const MinDamping = 1;
+	export const Damping = 2.5;
+
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 
@@ -332,7 +335,7 @@ export namespace Spells {
 		projectile: {
 			color: '#00ddff',
 
-			density: 3,
+			density: 4,
 			radius: 0.0025,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,

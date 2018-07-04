@@ -123,7 +123,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		type: 'dynamic',
 		position,
 		angle,
-		linearDamping: Hero.MaxDamping,
+		linearDamping: Hero.Damping,
 		angularDamping: Hero.AngularDamping,
 		allowSleep: false,
 	} as pl.BodyDef);
@@ -910,15 +910,8 @@ function updateKnockback(world: w.World) {
 		if (obj.category === "hero") {
 			const proportion = obj.health / Hero.MaxHealth;
 
-			// Damping
-			let damping = Hero.MinDamping + (Hero.MaxDamping - Hero.MinDamping) * proportion;
-			if (obj.thrust) {
-				damping = 0;
-			}
-			obj.body.setLinearDamping(damping);
-
 			// Mass
-			let mass = Hero.MinMass + (Hero.MaxMass - Hero.MinMass) * proportion;
+			let mass = Hero.MinMass + (Hero.MaxMass - Hero.MinMass) * Math.pow(proportion, Hero.MassPower);
 			if (obj.shieldTicks) {
 				mass = Spells.shield.mass;
 			} else if (obj.thrust) {
