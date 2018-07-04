@@ -235,6 +235,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 			radius: projectileTemplate.detonate.radius,
 			impulse: projectileTemplate.detonate.impulse,
 			detonateTick: world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity)),
+			waitTicks: projectileTemplate.detonate.waitTicks || 0,
 		} as w.DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
@@ -935,6 +936,10 @@ function detonate(world: w.World) {
 		}
 
 		if (world.tick === obj.detonate.detonateTick) {
+			obj.body.setLinearVelocity(vector.zero());
+		}
+
+		if (world.tick === obj.detonate.detonateTick + obj.detonate.waitTicks) {
 			// Apply damage
 			world.objects.forEach(other => {
 				if (other.category === "hero") {

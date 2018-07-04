@@ -101,6 +101,7 @@ export interface LinkParametersTemplate {
 export interface DetonateParametersTemplate {
 	radius: number;
 	impulse: number;
+	waitTicks?: number;
 }
 
 export interface ScourgeSpell extends SpellBase {
@@ -426,6 +427,7 @@ export interface DetonateParameters {
 	radius: number;
 	impulse: number;
 	detonateTick: number;
+	waitTicks: number;
 }
 
 export namespace HomingTargets {

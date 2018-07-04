@@ -158,22 +158,22 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 }
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
-	const ctx = ctxStack.canvas;
-
 	obj.uiPath.push(vector.clone(obj.body.getPosition()));
 
 	if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
-        renderProjectile(ctx, obj, world);
-        renderRay(ctx, obj, world);
+        renderProjectile(ctxStack, obj, world);
+        renderRay(ctxStack, obj, world);
 	} else if (obj.render == "ray") {
 		// A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 		const intermediatePoints = true;
-        renderRay(ctx, obj, world, intermediatePoints);
+        renderRay(ctxStack, obj, world, intermediatePoints);
 	} else if (obj.render === "link") {
 		renderLink(ctxStack, obj, world);
 	} else if (obj.render === "gravity") {
-		renderGravity(ctx, obj, world);
+		renderGravity(ctxStack, obj, world);
+	} else if (obj.render === "supernova") {
+		renderSupernova(ctxStack, obj, world);
 	}
 
 	while (obj.uiPath.length > 1) {
@@ -460,7 +460,7 @@ function rgColor(proportion: number) {
 	return hsl(hue, 1.0, 0.5);
 }
 
-function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
+function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
 	if (!projectile.gravity) {
 		return;
 	}
@@ -482,6 +482,53 @@ function renderGravity(ctx: CanvasRenderingContext2D, projectile: w.Projectile, 
 	}
 }
 
+function renderSupernova(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+	if (!projectile.detonate) {
+		return;
+	}
+
+	if (projectile.destroyed) {
+		world.ui.trails.push({
+			type: "circle",
+			max: 30,
+			initialTick: world.tick,
+			pos: vector.clone(projectile.body.getPosition()),
+			fillStyle: 'white',
+			radius: projectile.detonate.radius,
+		});
+	} else if (world.tick < projectile.detonate.detonateTick) {
+		renderRay(ctxStack, projectile, world, false);
+	} else {
+		const pos = projectile.body.getPosition();
+		const proportion = 1.0 - (world.tick - projectile.detonate.detonateTick) / projectile.detonate.waitTicks;
+
+		const animationLength = 11;
+		const numSegments = 5;
+		const arcFraction = 0.5;
+
+		const angleOffset = ((world.tick % animationLength) / animationLength) * 2 * Math.PI;
+		const arcAngle = arcFraction * 2 * Math.PI / numSegments;
+
+		foreground(ctxStack, ctx => {
+			ctx.save();
+
+			ctx.strokeStyle = projectile.color;
+			ctx.lineWidth = 3 * Pixel;
+
+			const perSegment = 2 * Math.PI / numSegments;
+			for (let i = 0; i < numSegments; ++i) {
+				const startAngle = angleOffset + i * perSegment;
+				const endAngle = startAngle + arcAngle;
+				ctx.beginPath();
+				ctx.arc(pos.x, pos.y, projectile.detonate.radius * proportion, startAngle, endAngle);
+				ctx.stroke();
+			}
+
+			ctx.restore();
+		});
+	}
+}
+
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
 	if (!projectile.link) {
 		return;
@@ -495,7 +542,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 			return;
 		} else {
 			target = projectile;
-			renderProjectile(ctxStack.canvas, projectile, world);
+			renderProjectile(ctxStack, projectile, world);
 		}
 	}
 
@@ -516,7 +563,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 	});
 }
 
-function renderRay(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World, intermediatePoints: boolean = false) {
+function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, intermediatePoints: boolean = false) {
 	let previous: pl.Vec2 = null;
 	for (let pos of getRenderPoints(projectile.uiPath, intermediatePoints)) {
 		if (previous) {
@@ -550,7 +597,7 @@ function* getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 	}
 }
 
-function renderProjectile(ctx: CanvasRenderingContext2D, projectile: w.Projectile, world: w.World) {
+function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,

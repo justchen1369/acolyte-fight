@@ -560,6 +560,40 @@ export namespace Spells {
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 
+	export const supernova = {
+		id: 'supernova',
+		description: "A massive explosion with huge knockback",
+		action: "projectile",
+
+		color: '#ff00cc',
+		icon: "crownedExplosion",
+
+		maxAngleDiff: 0.01 * 2 * Math.PI,
+		cooldown: 12 * TicksPerSecond,
+
+		projectile: {
+			color: '#ff00cc',
+
+			density: 5,
+			radius: 0.001,
+			speed: 0.3,
+			maxSpeed: 1.0,
+			maxTicks: 2 * TicksPerSecond,
+			damage: 20,
+			collideWith: Categories.None,
+			explodeOn: Categories.None,
+
+			detonate: {
+				waitTicks: 1.0 * TicksPerSecond,
+				radius: 0.05,
+				impulse: 0.0002,
+			},
+
+			render: "supernova",
+			trailTicks: 30,
+		} as c.ProjectileTemplate,
+	} as c.ProjectileSpell;
+
 	export const scourge = {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
@@ -645,6 +679,7 @@ export namespace Spells {
 		drain,
 		scourge,
 		shield,
+		supernova,
 		teleport,
 		thrust,
 	};
@@ -656,8 +691,8 @@ export namespace Choices {
 		"s": ["shield", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "kamehameha"],
-		"e": ["homing", "boomerang"],
-		"r": ["meteor", "gravity", "link"],
+		"e": ["homing", "boomerang", "link"],
+		"r": ["meteor", "gravity", "supernova"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;
