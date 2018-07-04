@@ -202,8 +202,6 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 
 	let targetObj = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
-	const damage = projectileTemplate.damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
-
 	let projectile = {
 		id,
 		owner: hero.id,
@@ -217,7 +215,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage,
+		damage: attackDamage(projectileTemplate.damage, hero),
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 
@@ -259,6 +257,10 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 	world.objects.set(id, projectile);
 
 	return projectile;
+}
+
+function attackDamage(damage: number, hero: w.Hero) {
+	return damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
 }
 
 // Simulator
@@ -604,7 +606,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		} else {
 			if (!hero.thrust.alreadyHit.has(other.id)) {
 				hero.thrust.alreadyHit.add(other.id);
-				applyDamage(other, Spells.thrust.damage, hero.id, world);
+				applyDamage(other, hero.thrust.damage, hero.id, world);
 			}
 		}
 	}
@@ -620,7 +622,7 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (hero.thrust) {
-		applyDamageToObstacle(obstacle, Spells.thrust.damage, world);
+		applyDamageToObstacle(obstacle, hero.thrust.damage, world);
 		hero.thrust.nullified = true;
 	}
 }
@@ -1196,6 +1198,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
 		const velocity = vector.multiply(vector.unit(diff), spell.speed);
 		hero.thrust = {
+			damage: attackDamage(spell.damage, hero),
 			velocity,
 			ticks: Math.min(spell.maxTicks, ticksToTarget),
 			nullified: false,

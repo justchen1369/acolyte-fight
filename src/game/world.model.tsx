@@ -374,6 +374,7 @@ export interface CastState {
 }
 
 export interface ThrustState {
+	damage: number;
 	velocity: pl.Vec2;
 	ticks: number;
 	nullified: boolean;
