@@ -346,6 +346,7 @@ export interface Hero extends WorldObjectBase {
 
 	health: number;
 	body: pl.Body;
+	massOverride?: number;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	shieldTicks?: number;

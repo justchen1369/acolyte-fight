@@ -24,12 +24,8 @@ export namespace Hero {
 	export const Radius = 0.015;
 	export const Density = 0.5;
 
-	export const MinMass = 0.0001;
-	export const MaxMass = 0.0007;
-	export const MassPower = 2.0;
-
 	export const AngularDamping = 1;
-	export const Damping = 2.5;
+	export const Damping = 3;
 
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
@@ -182,7 +178,7 @@ export namespace Spells {
 			speed: 0.4,
 			maxSpeed: 1.0,
 			maxTicks: 1 * TicksPerSecond,
-			damage: 5,
+			damage: 10,
 			explodeOn: Categories.All,
 
 			render: "projectile",
@@ -209,7 +205,7 @@ export namespace Spells {
 			speed: 0.18,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
-			damage: 10,
+			damage: 20,
 			explodeOn: Categories.All,
 
 			detonate: {
@@ -248,7 +244,7 @@ export namespace Spells {
 			speed: 0.5,
 			maxSpeed: 1.0,
 			maxTicks: 0.25 * TicksPerSecond,
-			damage: 2.5,
+			damage: 5,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -335,7 +331,7 @@ export namespace Spells {
 		projectile: {
 			color: '#00ddff',
 
-			density: 4,
+			density: 3,
 			radius: 0.0025,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,
@@ -366,7 +362,7 @@ export namespace Spells {
 			maxSpeed: 0.3,
 			speed: 0.15,
 			maxTicks: 6.0 * TicksPerSecond,
-			damage: 10,
+			damage: 25,
 			explodeOn: Categories.All,
 
 			homing: {
@@ -400,7 +396,7 @@ export namespace Spells {
 			maxSpeed: 0.6,
 			speed: 0.4,
 			maxTicks: 6.0 * TicksPerSecond,
-			damage: 10,
+			damage: 25,
 			explodeOn: Categories.Hero,
 
 			homing: {
@@ -435,7 +431,7 @@ export namespace Spells {
 			speed: 0.5,
 			maxSpeed: 1.0,
 			maxTicks: 1.0 * TicksPerSecond,
-			damage: 5,
+			damage: 10,
 			explodeOn: Categories.None,
 			shieldTakesOwnership: false,
 
@@ -475,7 +471,7 @@ export namespace Spells {
 			speed: 0.75,
 			maxSpeed: 1.0,
 			maxTicks: 3.0 * TicksPerSecond,
-			damage: 4,
+			damage: 8,
 			collideWith: Categories.Hero | Categories.Obstacle,
 			explodeOn: Categories.All ^ Categories.Obstacle,
 			bounce: {
@@ -506,7 +502,7 @@ export namespace Spells {
 			speed: 0.2,
 			maxSpeed: 0.4,
 			maxTicks: 2.0 * TicksPerSecond,
-			damage: 5,
+			damage: 10,
 			lifeSteal: 1.0,
 			explodeOn: Categories.All,
 			homing: {
@@ -622,7 +618,7 @@ export namespace Spells {
 
 		uninterruptible: true,
 
-		damage: 5,
+		damage: 10,
 		maxTicks: 0.33 * TicksPerSecond,
 		speed: 0.75,
 

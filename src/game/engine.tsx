@@ -911,14 +911,19 @@ function updateKnockback(world: w.World) {
 			const proportion = obj.health / Hero.MaxHealth;
 
 			// Mass
-			let mass = Hero.MinMass + (Hero.MaxMass - Hero.MinMass) * Math.pow(proportion, Hero.MassPower);
+			let mass = null;
 			if (obj.shieldTicks) {
 				mass = Spells.shield.mass;
-			} else if (obj.thrust) {
-				mass = Hero.MaxMass;
 			}
 
-			obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
+			if (obj.massOverride !== mass) {
+				obj.massOverride = mass;
+				if (mass) {
+					obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
+				} else {
+					obj.body.resetMassData();
+				}
+			}
 		}
 	});
 }
