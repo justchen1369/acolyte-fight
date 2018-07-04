@@ -872,7 +872,6 @@ function linkForce(world: w.World) {
 			return;
 		}
 
-		const toTarget = vector.multiply(vector.unit(diff), strength);
 		owner.body.applyLinearImpulse(
 			vector.relengthen(diff, strength * owner.body.getMass()),
 			owner.body.getWorldPoint(vector.zero()), true);
