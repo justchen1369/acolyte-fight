@@ -403,7 +403,7 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 0.02 * 2 * Math.PI,
-				maxTurnProportion: 0.1,
+				maxTurnProportion: 0.05,
 				minDistanceToTarget: 0.1,
 				targetType: c.HomingTargets.self,
 			} as c.HomingParameters,
