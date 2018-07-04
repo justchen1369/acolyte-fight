@@ -1277,8 +1277,10 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Wal
 
 	const position = vector.plus(hero.body.getPosition(), diff);
 	let obstacle = addObstacle(world, position, angle, points, Math.min(halfWidth, halfLength));
-	obstacle.health = spell.health;
-	obstacle.maxHealth = spell.health;
+
+	const health = attackDamage(spell.health, hero);
+	obstacle.health = health;
+	obstacle.maxHealth = health;
 	obstacle.damagePerTick = obstacle.maxHealth / spell.maxTicks;
 	obstacle.growthTicks = 5;
 

@@ -562,29 +562,29 @@ export namespace Spells {
 
 	export const supernova = {
 		id: 'supernova',
-		description: "A massive explosion with huge knockback",
+		description: "A delayed explosion to knock back your enemies",
 		action: "projectile",
 
-		color: '#ff00cc',
+		color: '#ffaa00',
 		icon: "crownedExplosion",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
 
 		projectile: {
-			color: '#ff00cc',
+			color: '#ffaa00',
 
 			density: 5,
 			radius: 0.001,
 			speed: 0.3,
 			maxSpeed: 1.0,
 			maxTicks: 2 * TicksPerSecond,
-			damage: 20,
+			damage: 10,
 			collideWith: Categories.None,
 			explodeOn: Categories.None,
 
 			detonate: {
-				waitTicks: 1.0 * TicksPerSecond,
+				waitTicks: 0.5 * TicksPerSecond,
 				radius: 0.05,
 				impulse: 0.0002,
 			},
@@ -609,7 +609,7 @@ export namespace Spells {
 		icon: "deadlyStrike",
 
 		trailTicks: 30,
-		color: '#ddbb00',
+		color: '#ffcc00',
 
 		action: "scourge",
 	} as c.ScourgeSpell;
@@ -645,7 +645,7 @@ export namespace Spells {
 
 		icon: "woodenFence",
 
-		color: '#4488ff',
+		color: '#0088ff',
 
 		action: "wall",
 	} as c.WallSpell;
@@ -709,7 +709,7 @@ export namespace Spells {
 export namespace Choices {
 	export const Options = {
 		"a": ["teleport", "thrust"],
-		"s": ["shield", "drain", "icewall"],
+		"s": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "kamehameha"],
 		"e": ["homing", "boomerang", "link"],
