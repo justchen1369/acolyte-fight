@@ -229,15 +229,22 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 	}
 	console.log("Watching game " + data.gameId + " with " + data.history.length + " ticks");
 
+	let history = new Array<m.TickMsg>();
+	let newReplayQueue = [...data.history];
+
+	while (newReplayQueue.length > 0 && !isStartGameTick(newReplayQueue[0])) {
+		history.push(newReplayQueue.shift());
+	}
+
 	const observerHeroId = "_observer";
 	onHeroMsg({
 		gameId: data.gameId,
 		heroId: observerHeroId,
-		history: [],
+		history,
 		serverStats: data.serverStats,
 	});
 
-	replayQueue = [...data.history];
+	replayQueue = newReplayQueue;
 	const interval = setInterval(() => {
 		if (replayQueue.length > 0) {
 			const next = replayQueue.shift();
@@ -301,4 +308,14 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 			});
 		}
 	});
+}
+
+function isStartGameTick(tickData: m.TickMsg) {
+	let result = false;
+	tickData.actions.forEach(actionData => {
+		if (actionData.actionType === m.ActionType.CloseGame) {
+			result = true;
+		}
+	});
+	return result;
 }
