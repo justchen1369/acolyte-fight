@@ -656,8 +656,8 @@ export namespace Choices {
 		"s": ["shield", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "kamehameha"],
-		"e": ["homing", "boomerang", "link"],
-		"r": ["meteor", "gravity"],
+		"e": ["homing", "boomerang"],
+		"r": ["meteor", "gravity", "link"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;
