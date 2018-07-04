@@ -27,6 +27,8 @@ export namespace Hero {
 	export const AngularDamping = 1;
 	export const Damping = 3;
 
+	export const AdditionalDamageMultiplier = 1.0;
+
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 

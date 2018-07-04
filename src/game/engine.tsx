@@ -202,6 +202,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 
 	let targetObj = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
+	const damage = projectileTemplate.damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
+
 	let projectile = {
 		id,
 		owner: hero.id,
@@ -215,7 +217,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage: projectileTemplate.damage,
+		damage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 
