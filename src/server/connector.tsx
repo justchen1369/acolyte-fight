@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Matchmaking, TicksPerSecond, MaxIdleTicks, Spells, World } from '../game/constants';
+import { Matchmaking, TicksPerSecond, MaxIdleTicks, Spells, World, TicksPerTurn } from '../game/constants';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
@@ -53,7 +53,7 @@ function startTickProcessing() {
 			}
 		}, '', 'm');
 		addTickMilliseconds(milliseconds);
-	}, '', Math.floor(1e9 / TicksPerSecond) + 'n');
+	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -250,31 +250,37 @@ function gameTick(game: g.Game): boolean {
 	}
 
 	if (isGameRunning(game) || game.actions.size > 0) {
-		let data = {
-			gameId: game.id,
-			tick: game.tick++,
-			actions: [...game.actions.values()],
-		} as m.TickMsg;
-		if (game.actions.size > 0) {
-			game.activeTick = game.tick;
+		for (let i = 0; i < TicksPerTurn; ++i) {
+			gameTurn(game);
 		}
-		game.actions.clear();
-
-		if (game.history) {
-			if (game.history.length < Matchmaking.MaxHistoryLength) {
-				game.history.push(data);
-			} else {
-				game.closeTick = Math.min(game.closeTick, game.tick); // New players cannot join without the full history
-			}
-		}
-
-		closeGameIfNecessary(game, data);
-		io.to(game.id).emit('tick', data);
 
 		return true;
 	} else {
 		return false;
 	}
+}
+
+function gameTurn(game: g.Game) {
+	let data = {
+		gameId: game.id,
+		tick: game.tick++,
+		actions: [...game.actions.values()],
+	} as m.TickMsg;
+	if (game.actions.size > 0) {
+		game.activeTick = game.tick;
+	}
+	game.actions.clear();
+
+	if (game.history) {
+		if (game.history.length < Matchmaking.MaxHistoryLength) {
+			game.history.push(data);
+		} else {
+			game.closeTick = Math.min(game.closeTick, game.tick); // New players cannot join without the full history
+		}
+	}
+
+	closeGameIfNecessary(game, data);
+	io.to(game.id).emit('tick', data);
 }
 
 function isGameRunning(game: g.Game) {

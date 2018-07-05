@@ -1,5 +1,5 @@
 import pl from 'planck-js';
-import { Choices, Spells, TicksPerSecond } from '../game/constants';
+import { Choices, Spells, TicksPerSecond, TicksPerTurn } from '../game/constants';
 import { fullRerender, render, calculateWorldRect, CanvasStack } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
@@ -14,8 +14,10 @@ interface NotificationListener {
 let world = engine.initialWorld();
 
 let socket: SocketIOClient.Socket = null;
+
 let tickQueue = new Array<m.TickMsg>();
-let replayQueue = new Array<m.TickMsg>();
+let incomingQueue = new Array<m.TickMsg>();
+
 let notificationListeners = new Array<NotificationListener>();
 
 let nextTarget: pl.Vec2 = null;
@@ -71,7 +73,9 @@ export function attachToCanvas(canvasStack: CanvasStack) {
             ev.preventDefault();
     };
 
-    window.requestAnimationFrame(frameLoop);
+	window.requestAnimationFrame(frameLoop);
+	
+	setInterval(incomingLoop, Math.floor(1000 / TicksPerSecond));
 
     function fullScreenCanvas() {
         canvasStack.background.width = document.body.clientWidth;
@@ -88,7 +92,28 @@ export function attachToCanvas(canvasStack: CanvasStack) {
     function frameLoop() {
         frame(canvasStack);
         window.requestAnimationFrame(frameLoop);
-    }
+	}
+	
+	function incomingLoop() {
+		let numFramesToProcess = 1;
+
+		if (incomingQueue.length === 0) {
+			numFramesToProcess = 0;
+		} else if (world.ui.isReplay) {
+			numFramesToProcess = 1; // Don't catch up to live when watching a replay
+		} else if (incomingQueue.length <= TicksPerTurn) {
+			numFramesToProcess = 1; // We're on time, process at normal rate
+		} else if (incomingQueue.length <= TicksPerTurn * 3) {
+			numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
+		} else {
+			// We're very behind, skip ahead
+			numFramesToProcess = incomingQueue.length;
+		}
+
+		for (let i = 0; i < numFramesToProcess; ++i) {
+			tickQueue.push(incomingQueue.shift());
+		}
+	}
 }
 
 function frame(canvasStack: CanvasStack) {
@@ -185,13 +210,14 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', onTickMsg);
 	socket.on('watch', onWatchMsg);
 }
-function onHeroMsg(data: m.HeroMsg) {
+function onHeroMsg(data: m.HeroMsg, isReplay: boolean = false) {
 	world = engine.initialWorld();
 	tickQueue = [];
-	replayQueue = [];
+	incomingQueue = [];
 
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
+	world.ui.isReplay = isReplay;
 	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
 
 	if (data.history) {
@@ -215,11 +241,7 @@ function onHeroMsg(data: m.HeroMsg) {
 }
 function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
-		if (replayQueue.length > 0) {
-			replayQueue.push(data);
-		} else {
-			tickQueue.push(data);
-		}
+		incomingQueue.push(data);
 	}
 }
 function onWatchMsg(data: m.WatchResponseMsg) {
@@ -237,22 +259,15 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 	}
 
 	const observerHeroId = "_observer";
+	const isReplay = true;
 	onHeroMsg({
 		gameId: data.gameId,
 		heroId: observerHeroId,
 		history,
 		serverStats: data.serverStats,
-	});
+	}, isReplay);
 
-	replayQueue = newReplayQueue;
-	const interval = setInterval(() => {
-		if (replayQueue.length > 0) {
-			const next = replayQueue.shift();
-			tickQueue.push(next);
-		} else {
-			clearInterval(interval);
-		}
-	}, 1000.0 / TicksPerSecond);
+	incomingQueue = newReplayQueue;
 }
 function onDisconnectMsg() {
 	world.activePlayers.clear();

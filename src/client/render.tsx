@@ -24,6 +24,7 @@ export interface CanvasCtxStack {
 
 // Rendering
 export function fullRerender(world: w.World) {
+	world.ui.renderedTick = null;
 	world.ui.buttons.clear();
 }
 
@@ -38,6 +39,11 @@ export function calculateWorldRect(rect: ClientRect) {
 }
 
 export function render(world: w.World, canvasStack: CanvasStack) {
+	if (world.ui.renderedTick === world.tick) {
+		return;
+	}
+	world.ui.renderedTick = world.tick;
+
 	let ctxStack = {
 		background: canvasStack.background.getContext('2d', { alpha: false }),
 		glows: canvasStack.glows.getContext('2d', { alpha: true }),
