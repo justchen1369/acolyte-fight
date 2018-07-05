@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { getStore } from './serverStore';
-import { TicksPerSecond } from '../game/constants';
+import { TicksPerTurn, TicksPerSecond } from '../game/constants';
 
 export function addTickMilliseconds(milliseconds: number) {
     getStore().recentTickMilliseconds.push(milliseconds);
@@ -16,7 +16,7 @@ export function getLoadAverage() {
     }
 
     const averageMilliseconds = _.mean(recentTickMilliseconds);
-    const maxMilliseconds = 1000 / TicksPerSecond;
+    const maxMilliseconds = TicksPerTurn * 1000 / TicksPerSecond;
     const load = averageMilliseconds / maxMilliseconds;
     return load;
 }
