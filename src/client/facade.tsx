@@ -20,6 +20,7 @@ let incomingQueue = new Array<m.TickMsg>();
 
 let notificationListeners = new Array<NotificationListener>();
 
+let isMouseDown = false;
 let nextTarget: pl.Vec2 = null;
 let showedHelpText: boolean = false;
 
@@ -62,11 +63,19 @@ export function attachNotificationListener(listener: NotificationListener) {
 export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
-    canvasStack.ui.onmouseenter = canvasMouseMove;
-    canvasStack.ui.onmousemove = canvasMouseMove;
-    canvasStack.ui.onmousedown = canvasMouseMove;
+	canvasStack.ui.onmousemove = (ev) => canvasMouseMove(ev);
 
-    window.onkeydown = gameKeyDown;
+	canvasStack.ui.onmouseenter = (ev) => canvasMouseMove(ev);
+	canvasStack.ui.onmouseleave = (ev) => { isMouseDown = false; };
+	
+    canvasStack.ui.onmousedown = (ev) => {
+		isMouseDown = true;
+		canvasMouseMove(ev);
+	};
+    canvasStack.ui.onmouseup = (ev) => { isMouseDown = false; };
+
+    window.onkeyup = (ev) => gameKeyUp(ev);
+    window.onkeydown = (ev) => gameKeyDown(ev);
     window.onresize = fullScreenCanvas;
 
     canvasStack.ui.oncontextmenu = (ev) => {
@@ -179,6 +188,15 @@ export function gameKeyDown(e: KeyboardEvent) {
 	if (!spell) { return; }
 
 	sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: nextTarget });
+}
+
+export function gameKeyUp(e: KeyboardEvent) {
+	if (!world.ui.myGameId || !world.ui.myHeroId) { return; }
+	if (!nextTarget) { return; }
+
+	if (isMouseDown) {
+		sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "move", target: nextTarget });
+	}
 }
 
 function readKey(e: KeyboardEvent) {
