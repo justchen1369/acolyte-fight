@@ -424,7 +424,7 @@ export namespace Spells {
 		icon: "andromedaChain",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 5 * TicksPerSecond,
+		cooldown: 7 * TicksPerSecond,
 
 		projectile: {
 			color: '#4444ff',
