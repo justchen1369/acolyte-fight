@@ -247,7 +247,7 @@ export namespace Spells {
 			speed: 0.5,
 			maxSpeed: 1.0,
 			maxTicks: 0.25 * TicksPerSecond,
-			damage: 2.5,
+			damage: 3,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -424,7 +424,7 @@ export namespace Spells {
 		icon: "andromedaChain",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 10 * TicksPerSecond,
+		cooldown: 5 * TicksPerSecond,
 
 		projectile: {
 			color: '#4444ff',
