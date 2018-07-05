@@ -104,13 +104,15 @@ export function attachToCanvas(canvasStack: CanvasStack) {
 	}
 	
 	function incomingLoop() {
+		const AllowedDelayInTicks = 1;
+
 		let numFramesToProcess = 1;
 
 		if (incomingQueue.length === 0) {
 			numFramesToProcess = 0;
 		} else if (world.ui.isReplay) {
 			numFramesToProcess = 1; // Don't catch up to live when watching a replay
-		} else if (incomingQueue.length <= TicksPerTurn) {
+		} else if (incomingQueue.length <= TicksPerTurn + AllowedDelayInTicks) {
 			numFramesToProcess = 1; // We're on time, process at normal rate
 		} else if (incomingQueue.length <= TicksPerTurn * 3) {
 			numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
