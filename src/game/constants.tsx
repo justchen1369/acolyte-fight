@@ -634,7 +634,6 @@ export namespace Spells {
 		id: 'icewall',
 		description: "Create a wall of ice to block projectiles or stop enemies getting away.",
 
-		chargeTicks: 0.1 * TicksPerSecond,
 		health: 25,
 		maxRange: 0.15,
 		maxTicks: 5 * TicksPerSecond,
