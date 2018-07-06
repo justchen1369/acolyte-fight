@@ -38,3 +38,7 @@ setInterval(() => {
 		logger.info(`Current load: ${(getLoadAverage() * 100).toFixed(1)}%`);
 	}
 }, 60 * 1000);
+
+process.on('SIGTERM', function () {
+  process.exit(0);
+});
