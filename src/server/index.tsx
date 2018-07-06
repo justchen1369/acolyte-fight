@@ -39,6 +39,10 @@ setInterval(() => {
 	}
 }, 60 * 1000);
 
-process.on('SIGTERM', function () {
-  process.exit(0);
-});
+process.on('SIGHUP', shutdown);
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
+
+function shutdown() {
+	http.close();
+}
