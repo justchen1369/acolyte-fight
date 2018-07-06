@@ -1240,6 +1240,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 	let heroPos = hero.body.getPosition();
 	world.objects.forEach(obj => {
 		if (obj.id === hero.id) { return; }
+		if (!(collidable(hero, obj) && collidable(obj, hero))) { return; }
 
 		let objPos = obj.body.getPosition();
 		let diff = vector.diff(objPos, heroPos);
@@ -1262,6 +1263,14 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 	});
 
 	return true;
+}
+
+function collidable(a: w.WorldObject, b: w.WorldObject) {
+	if (a.category === "projectile") {
+		return a.collideWith & b.categories;
+	} else {
+		return true;
+	}
 }
 
 function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.WallSpell) {
