@@ -528,7 +528,7 @@ export namespace Spells {
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 8 * TicksPerSecond,
-		chargeTicks: 0.25 * TicksPerSecond,
+		chargeTicks: 0.1 * TicksPerSecond,
 		uninterruptible: true,
 
 		projectile: {
