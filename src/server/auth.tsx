@@ -31,7 +31,6 @@ export function getAuthTokenFromSocket(socket: SocketIO.Socket) {
 function parseAuthTokenFromRequest(req: express.Request) {
     req.rawHeaders;
     if (!(req && req.headers && req.headers.cookie && typeof req.headers.cookie === "string")) {
-        console.log("Unable to find cookie header", req.headers);
         return null;
     }
     const cookies = cookie.parse(req.headers.cookie);

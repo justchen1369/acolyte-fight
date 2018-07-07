@@ -17,8 +17,10 @@ const io = socketLib(http);
 
 const program = require('commander');
 program.option('--port <port>', 'Port number');
+program.option('--mirrored', 'Redirect to closest mirror, where mirrors are comma separated');
 program.parse(process.argv);
 
+const isMirrored = !!program.mirrored;
 const port = program.port || process.env.PORT || 7770;
 const cleanupHours = 24;
 
@@ -35,7 +37,13 @@ app.use('/dist', express.static('./dist'));
 app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
 
-app.get('/', (req, res) => res.redirect('play'));
+app.get('/', (req, res) => {
+	if (isMirrored) {
+		res.sendFile(rootDir + '/index.html');
+	} else {
+		res.redirect('play');
+	}
+});
 
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
 

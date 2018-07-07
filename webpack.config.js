@@ -18,5 +18,14 @@ const settingsConfig = {
   },
   mode: 'production',
 };
+const mirrorsConfig = {
+	entry: './js/mirrors/index.js',
+  target: 'web', // <=== can be omitted as default is 'web'
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'mirrors.js'
+  },
+  mode: 'production',
+};
 
-module.exports = [ clientConfig, settingsConfig ];
+module.exports = [ clientConfig, settingsConfig, mirrorsConfig ];

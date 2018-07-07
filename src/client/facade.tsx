@@ -34,7 +34,7 @@ export function getCurrentWorld(): w.World {
 }
 
 export function displayPlayersOnline() {
-	fetch('/status').then(res => res.json()).then((serverStats: m.ServerStats) => {
+	return fetch('/status').then(res => res.json()).then((serverStats: m.ServerStats) => {
 		world.ui.notifications.push({
 			type: "serverStats",
 			numGames: serverStats.numGames,
