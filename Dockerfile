@@ -7,7 +7,7 @@ RUN apt-get update \
     && npm install -g npm@6.1
 
 ENV PORT 80
-ENTRYPOINT ["node", "js/server/index"]
+CMD node js/server/index
 WORKDIR /app
 
 ADD . /app

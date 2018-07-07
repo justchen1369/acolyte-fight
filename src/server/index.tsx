@@ -27,10 +27,6 @@ attachToSocket(io);
 attachApi(app);
 app.use(express.static('./'));
 
-http.listen(port, function() {
-	logger.info("Started listening on port " + port);
-});
-
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
 
 setInterval(() => {
@@ -39,10 +35,16 @@ setInterval(() => {
 	}
 }, 60 * 1000);
 
-process.on('SIGHUP', shutdown);
-process.on('SIGINT', shutdown);
-process.on('SIGTERM', shutdown);
+http.on('close', () => {
+	logger.info("HTTP server closed, shutting down");
+	process.exit();
+});
 
-function shutdown() {
+process.on('SIGTERM', () => {
+	logger.info("Received shutdown command");
 	http.close();
-}
+});
+
+http.listen(port, function() {
+	logger.info("Started listening on port " + port);
+});
