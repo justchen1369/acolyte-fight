@@ -36,6 +36,7 @@ attachApi(app);
 app.get('/static/rpg-awesome.min.css', (req, res) => res.sendFile(rootDir + '/node_modules/rpg-awesome/css/rpg-awesome.min.css'));
 app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));
+app.use('/logs', express.static('./logs'));
 
 app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
