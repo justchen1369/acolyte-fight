@@ -11,6 +11,7 @@ import { logger } from './logging';
 export function attachApi(app: express.Application) {
     app.get('/games', onGamesList);
     app.get('/status', onStatus);
+    app.get('/ping', onPing);
 }
 
 function onGamesList(req: express.Request, res: express.Response) {
@@ -37,6 +38,12 @@ function onGamesList(req: express.Request, res: express.Response) {
 
 function onStatus(req: express.Request, res: express.Response) {
     res.send(getServerStats());
+}
+
+function onPing(req: express.Request, res: express.Response) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "X-Requested-With");
+  res.sendStatus(200).send("OK");
 }
 
 function gameToMsg(game: g.Game): m.GameMsg {

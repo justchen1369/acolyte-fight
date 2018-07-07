@@ -18,11 +18,14 @@ const io = socketLib(http);
 const program = require('commander');
 program.option('--port <port>', 'Port number');
 program.option('--mirrored', 'Redirect to closest mirror, where mirrors are comma separated');
+program.option('--cleanupHours <hours>', 'The number of hours to keep replays for');
 program.parse(process.argv);
 
 const isMirrored = !!program.mirrored;
 const port = program.port || process.env.PORT || 7770;
-const cleanupHours = 24;
+const cleanupHours = parseInt(program.cleanupHours) || 24;
+
+logger.info(`Settings: port=${port} isMirrored=${isMirrored} cleanupHours=${cleanupHours}`);
 
 app.use(express.json());
 app.use(authMiddleware);

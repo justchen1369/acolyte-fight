@@ -7,11 +7,15 @@ let serverList = [
 ];
 
 findClosestServer(serverList).then(url => {
+    let newHref: string = null;
+    
     if (url) {
         console.log("Redirecting to closest server " + url);
-        window.location.href = url + "/play";
+        newHref = url + "/play";
     } else {
         console.error("Unable to find another server, using this one");
-        window.location.href = "play";
+        newHref = "play";
     }
+
+    window.location.href = newHref;
 });

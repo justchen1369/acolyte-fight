@@ -4,10 +4,14 @@ const each = require('promise-each');
 
 function calculatePing(url: string) {
     const startMilliseconds = new Date().getTime();
-	return fetch(url + '/status').then(res => res.json()).then((serverStats: m.ServerStats) => {
+	return fetch(url + '/ping', { mode: 'cors' }).then((res) => {
         const ping = new Date().getTime() - startMilliseconds;
-        console.log("Ping (ms)", url, startMilliseconds);
-        return ping;
+        console.log(`Ping ${url} - ${ping} ms. Status ${res.status}.`);
+        if (res.status === 200) {
+            return ping;
+        } else {
+            return null;
+        }
     }).catch(error => {
         console.error("Unable to ping server", url, error);
         return null;
@@ -20,7 +24,7 @@ export function findClosestServer(serverList: string[]) {
 
     return Promise.resolve(serverList)
         .then(each((url: string) => {
-            calculatePing(url).then(pingMilliseconds => {
+            return calculatePing(url).then(pingMilliseconds => {
                 if (pingMilliseconds && pingMilliseconds < bestPingMilliseconds) {
                     bestUrl = url;
                     bestPingMilliseconds = pingMilliseconds;
