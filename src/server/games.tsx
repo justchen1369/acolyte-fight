@@ -289,7 +289,6 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 		name: playerName,
 	});
 	game.playerNames.push(playerName);
-	// TODO: socket.join(game.id);
 
 	if (authToken) {
 		game.accessTokens.add(authToken);

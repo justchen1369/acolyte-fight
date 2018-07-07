@@ -1,4 +1,4 @@
-import * as games from './connector';
+import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
 import { logger } from './logging';
