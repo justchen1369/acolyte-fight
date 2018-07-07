@@ -48,7 +48,7 @@ export class SpellConfig extends React.Component<Props, State> {
             <div className="key-detail">
                 <div className="spell-name">{chosenSpell.id}</div>
                 <div className="description">{chosenSpell.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Changes saved. Your {key.toUpperCase()} spell is now {this.capitalize(chosen)}.</div>}
+                {this.state.saved.has(key) && <div className="key-saved">Your {key.toUpperCase()} spell will be {this.capitalize(chosen)} in your next game.</div>}
             </div>
             <div className="key-name-container">
                 <div className="key-name">{key}</div>

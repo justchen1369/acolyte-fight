@@ -11,12 +11,17 @@ interface State {
 
 export class Root extends React.Component<Props, State> {
     render() {
-        return <div className="settings-page">
+        return <div className="page settings-page">
             <h1 className="title">Welcome to Arcane Enigma!</h1>
-            <div>
-                To win, be the last one standing. The lower your health, the more the knockback.
-                Move using the mouse, cast spells with the keyboard.
-            </div>
+            <p>
+                To win, be the last one standing. 
+                You deal more damage as your health gets lower,
+                so don't give up, you can always win!
+                This game is all about skillshots - those with the best aiming and dodging will prevail.
+            </p>
+            <p>
+                See the <a href="About">About page</a>.
+            </p>
             <NameConfig />
             <RecentGameList />
             <SpellConfig />

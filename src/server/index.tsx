@@ -40,6 +40,7 @@ app.use('/logs', express.static('./logs'));
 
 app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
+app.get('/about', (req, res) => res.sendFile(rootDir + '/about.html'));
 
 app.get('/', (req, res) => {
 	if (isMirrored) {
