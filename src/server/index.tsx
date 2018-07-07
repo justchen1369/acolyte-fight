@@ -21,9 +21,9 @@ program.option('--mirrored', 'Redirect to closest mirror, where mirrors are comm
 program.option('--cleanupHours <hours>', 'The number of hours to keep replays for');
 program.parse(process.argv);
 
-const isMirrored = !!program.mirrored;
+const isMirrored = !!program.mirrored || !!process.env.MIRRORED;
 const port = program.port || process.env.PORT || 7770;
-const cleanupHours = parseInt(program.cleanupHours) || 24;
+const cleanupHours = parseInt(program.cleanupHours) || parseInt(process.env.CLEANUP_HOURS) || 24;
 
 logger.info(`Settings: port=${port} isMirrored=${isMirrored} cleanupHours=${cleanupHours}`);
 
