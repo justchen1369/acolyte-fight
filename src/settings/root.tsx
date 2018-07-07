@@ -20,7 +20,7 @@ export class Root extends React.Component<Props, State> {
                 This game is all about skillshots - those with the best aiming and dodging will prevail.
             </p>
             <p>
-                See the <a href="About">About page</a>.
+                See the <a href="about">About page</a>.
             </p>
             <NameConfig />
             <RecentGameList />
