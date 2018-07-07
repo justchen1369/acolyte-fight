@@ -5,7 +5,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import { getAuthToken } from './auth';
 import { getStore } from './serverStore';
-import { getLoadAverage } from './loadMetrics';
+import { getServerStats } from './loadMetrics';
 import { logger } from './logging';
 
 export function attachApi(app: express.Application) {
@@ -36,10 +36,7 @@ function onGamesList(req: express.Request, res: express.Response) {
 }
 
 function onStatus(req: express.Request, res: express.Response) {
-    const result: m.ServerStatusMsg = {
-        serverLoad: getLoadAverage(),
-    };
-    res.send(result);
+    res.send(getServerStats());
 }
 
 function gameToMsg(game: g.Game): m.GameMsg {

@@ -1,14 +1,14 @@
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack, displayPlayersOnline } from './facade';
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
-import * as w from '../game/world.model';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
@@ -49,6 +49,9 @@ attachToCanvas({
     ui: document.getElementById("ui") as HTMLCanvasElement,
 } as CanvasStack);
 attachNotificationListener(notifications => {
+    if (_.some(notifications, n => n.type === "new")) {
+        displayPlayersOnline();
+    }
     applyNotificationsToStore(notifications);
     rerender();
 });

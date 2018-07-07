@@ -69,7 +69,6 @@ export interface HeroMsg {
     gameId: string;
     heroId: string;
     history: TickMsg[];
-    serverStats: ServerStats;
 }
 
 export interface WatchMsg {
@@ -80,12 +79,12 @@ export interface WatchMsg {
 export interface WatchResponseMsg {
     gameId: string;
     history: TickMsg[];
-    serverStats: ServerStats;
 }
 
 export interface ServerStats {
     numGames: number;
     numPlayers: number;
+    serverLoad: number;
 }
 
 export interface GameListMsg {
@@ -99,8 +98,4 @@ export interface GameMsg {
     numActivePlayers: number;
     joinable: boolean;
     numTicks: number;
-}
-
-export interface ServerStatusMsg {
-    serverLoad: number;
 }

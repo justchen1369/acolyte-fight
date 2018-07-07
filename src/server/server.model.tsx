@@ -3,6 +3,7 @@ import * as m from '../game/messages.model';
 
 export interface ServerStore {
     nextGameId: 0;
+    numConnections: number;
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
     recentTickMilliseconds: number[];

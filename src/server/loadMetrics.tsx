@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { getStore } from './serverStore';
 import { TicksPerTurn, TicksPerSecond } from '../game/constants';
+import * as m from '../game/messages.model';
 
 export function addTickMilliseconds(milliseconds: number) {
     getStore().recentTickMilliseconds.push(milliseconds);
@@ -9,7 +10,7 @@ export function addTickMilliseconds(milliseconds: number) {
     }
 }
 
-export function getLoadAverage() {
+function getLoadAverage() {
     const recentTickMilliseconds = getStore().recentTickMilliseconds;
     if (recentTickMilliseconds.length === 0) {
         return 0;
@@ -19,4 +20,13 @@ export function getLoadAverage() {
     const maxMilliseconds = TicksPerTurn * 1000 / TicksPerSecond;
     const load = averageMilliseconds / maxMilliseconds;
     return load;
+}
+
+export function getServerStats(): m.ServerStats {
+    const store = getStore();
+	return {
+        numGames: store.activeGames.size,
+        numPlayers: store.numConnections,
+        serverLoad: getLoadAverage(),
+    };
 }

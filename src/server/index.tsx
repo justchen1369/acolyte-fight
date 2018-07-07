@@ -4,8 +4,7 @@ import express from 'express';
 import { authMiddleware } from './auth';
 import { attachToSocket } from './connector';
 import { attachApi } from './api';
-import { getStore } from './serverStore';
-import { getLoadAverage } from './loadMetrics';
+import { getServerStats } from './loadMetrics';
 import { logger } from './logging';
 import { cleanupOldInactiveGames } from './serverStore';
 
@@ -30,8 +29,9 @@ app.use(express.static('./'));
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
 
 setInterval(() => {
-	if (getStore().activeGames.size > 0) {
-		logger.info(`Current load: ${(getLoadAverage() * 100).toFixed(1)}%`);
+	const stats = getServerStats();
+	if (stats.numGames > 0) {
+		logger.info(`Current status: ${(stats.serverLoad * 100).toFixed(1)}% load, ${stats.numGames} games, ${stats.numPlayers} players`);
 	}
 }, 60 * 1000);
 

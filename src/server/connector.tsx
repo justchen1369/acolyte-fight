@@ -21,16 +21,6 @@ export function attachToSocket(_io: SocketIO.Server ) {
     io.on('connection', onConnection);
 }
 
-function getServerStats(): m.ServerStats {
-	let numGames = 0;
-	let numPlayers = 0;
-	getStore().activeGames.forEach(game => {
-		++numGames;
-		numPlayers += game.active.size;
-	});
-	return { numGames, numPlayers };
-}
-
 function startTickProcessing() {
 	if (ticksProcessing) {
 		return;
@@ -58,8 +48,10 @@ function startTickProcessing() {
 
 function onConnection(socket: SocketIO.Socket) {
 	logger.info(`socket ${socket.id} connected - user ${getAuthTokenFromSocket(socket)}`);
+	++getStore().numConnections;
 
 	socket.on('disconnect', () => {
+		--getStore().numConnections;
 		logger.info("user " + socket.id + " disconnected");
 
 		getStore().activeGames.forEach(game => {
@@ -84,7 +76,6 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.emit("watch", {
 			gameId: game.id,
 			history: game.history,
-			serverStats: getServerStats(),
 		} as m.HeroMsg);
 
 		socket.join(game.id);
@@ -95,7 +86,6 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.emit("watch", {
 			gameId: game.id,
 			history: game.history,
-			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + data.name);
@@ -103,7 +93,6 @@ function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg) {
 		socket.emit("watch", {
 			gameId: data.gameId,
 			history: null,
-			serverStats: getServerStats(),
 		} as m.WatchResponseMsg);
 	}
 }
@@ -322,7 +311,6 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 		gameId: game.id,
 		heroId,
 		history: game.history,
-		serverStats: getServerStats(),
 	} as m.HeroMsg);
 
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings });

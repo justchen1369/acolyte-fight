@@ -33,6 +33,16 @@ export function getCurrentWorld(): w.World {
 	return world;
 }
 
+export function displayPlayersOnline() {
+	fetch('/status').then(res => res.json()).then((serverStats: m.ServerStats) => {
+		world.ui.notifications.push({
+			type: "serverStats",
+			numGames: serverStats.numGames,
+			numPlayers: serverStats.numPlayers,
+		});
+	});
+}
+
 export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, observe?: string) {
 	leaveCurrentGame();
 
@@ -249,15 +259,6 @@ function onHeroMsg(data: m.HeroMsg, isReplay: boolean = false) {
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
 	});
-
-	const serverStats = data.serverStats;
-	if (serverStats) {
-		world.ui.notifications.push({
-			type: "serverStats",
-			numGames: serverStats.numGames,
-			numPlayers: serverStats.numPlayers,
-		});
-	}
 }
 function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
@@ -284,7 +285,6 @@ function onWatchMsg(data: m.WatchResponseMsg) {
 		gameId: data.gameId,
 		heroId: observerHeroId,
 		history,
-		serverStats: data.serverStats,
 	}, isReplay);
 
 	incomingQueue = newReplayQueue;
