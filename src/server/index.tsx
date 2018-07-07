@@ -44,13 +44,7 @@ app.get('/:region?/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/:region?/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
 app.get('/:region?/about', (req, res) => res.sendFile(rootDir + '/about.html'));
 
-app.get('/', (req, res) => {
-	if (isMirrored) {
-		res.sendFile(rootDir + '/index.html');
-	} else {
-		res.redirect('/play');
-	}
-});
+app.get('/', (req, res) => res.redirect('/play'));
 
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
 
