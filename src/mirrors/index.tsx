@@ -1,9 +1,9 @@
 import { findClosestServer } from './closestServerFinder';
 
 let serverList = [
-    "http://us.enigma.rayhidayat.com",
-    "http://eu.enigma.rayhidayat.com",
-    "http://au.enigma.rayhidayat.com",
+    "http://enigma.rayhidayat.com/us",
+    "http://enigma.rayhidayat.com/eu",
+    "http://enigma.rayhidayat.com/au",
 ];
 
 findClosestServer(serverList).then(url => {
