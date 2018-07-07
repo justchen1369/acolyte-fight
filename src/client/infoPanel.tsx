@@ -27,7 +27,7 @@ export class InfoPanel extends React.Component<Props, State> {
                 <div>
                     <div className="welcome-name-label">Welcome {this.props.playerName}!</div>
                     <div className="settings-link">
-                        <a href="settings.html" target="_blank">
+                        <a href="settings" target="_blank">
                             Edit Settings <i className="fa fa-external-link-square-alt" />
                         </a>
                     </div>

@@ -1,3 +1,4 @@
+import path from 'path';
 import httpLib from 'http';
 import socketLib from 'socket.io';
 import express from 'express';
@@ -7,6 +8,8 @@ import { attachApi } from './api';
 import { getServerStats } from './loadMetrics';
 import { logger } from './logging';
 import { cleanupOldInactiveGames } from './serverStore';
+
+const rootDir = path.resolve('.');
 
 const app = express();
 const http = new httpLib.Server(app);
@@ -24,7 +27,15 @@ app.use(authMiddleware);
 
 attachToSocket(io);
 attachApi(app);
-app.use(express.static('./'));
+
+app.get('/static/rpg-awesome.min.css', (req, res) => res.sendFile(rootDir + '/node_modules/rpg-awesome/css/rpg-awesome.min.css'));
+app.use('/static', express.static('./static'));
+app.use('/dist', express.static('./dist'));
+
+app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
+app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
+
+app.get('/', (req, res) => res.redirect('play'));
 
 setInterval(() => cleanupOldInactiveGames(cleanupHours), 60 * 60 * 1000);
 
