@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import * as g from './server.model';
 import { logger } from './logging';
@@ -14,18 +15,21 @@ export function getStore() {
     return store;
 }
 
-export function cleanupOldInactiveGames(expiryHours: number) {
-    const now = moment();
+export function cleanupOldInactiveGames(maxInactiveGames: number) {
+    const numToCleanup = Math.max(0, store.inactiveGames.size - maxInactiveGames);
+    if (numToCleanup <= 0) {
+        return;
+    }
 
-    let idsToCleanup = new Array<string>();
-    store.inactiveGames.forEach(game => {
-        const hoursSinceCreated = now.diff(game.created, "hours", true);
-        if (hoursSinceCreated > expiryHours) {
-            idsToCleanup.push(game.id);
-        }
-    });
-    logger.info(`Cleaning up ${idsToCleanup.length} inactive games`);
+    const inactiveGames = [...store.inactiveGames.values()];
+    const idsToCleanup =
+        _.chain(inactiveGames)
+        .orderBy(x => x.created.unix())
+        .map(x => x.id)
+        .take(numToCleanup)
+        .value();
 
+    logger.info(`Cleaning up ${idsToCleanup.length} inactive games`); 
     idsToCleanup.forEach(id => {
         store.inactiveGames.delete(id);
     });
