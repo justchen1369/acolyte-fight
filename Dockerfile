@@ -9,6 +9,7 @@ RUN apt-get update \
 ENV PORT 80
 CMD node js/server/index
 WORKDIR /app
+RUN mkdir /app/logs
 
 ADD . /app
 RUN npm install && npm run build
