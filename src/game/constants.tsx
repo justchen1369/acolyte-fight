@@ -654,7 +654,7 @@ export namespace Spells {
 		id: 'teleport',
 		description: "Teleport to a nearby location. Get close, or get away.",
 
-		maxRange: 0.25,
+		maxRange: 0.4,
 		uninterruptible: true,
 		cooldown: 10 * TicksPerSecond,
 
@@ -675,7 +675,7 @@ export namespace Spells {
 		uninterruptible: true,
 
 		damage: 5,
-		maxTicks: 0.33 * TicksPerSecond,
+		maxTicks: 0.4 * TicksPerSecond,
 		speed: 0.75,
 
 		icon: "fireDash",
