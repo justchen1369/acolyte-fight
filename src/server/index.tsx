@@ -3,7 +3,7 @@ import httpLib from 'http';
 import socketLib from 'socket.io';
 import express from 'express';
 import { authMiddleware } from './auth';
-import { attachToSocket } from './connector';
+import { attachToSocket } from './emitter';
 import { attachApi } from './api';
 import { getServerStats } from './loadMetrics';
 import { logger } from './logging';

@@ -29,3 +29,7 @@ export interface Player {
 	heroId: string;
 	name: string;
 }
+
+export interface Emit {
+    (room: string, event: string, data: any): void;
+}
