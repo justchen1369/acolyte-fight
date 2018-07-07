@@ -5,12 +5,11 @@ const LoggingWinston = require('@google-cloud/logging-winston').LoggingWinston;
 
 let transports: Array<Transport> = [
 	new winston.transports.Console(),
+	new winston.transports.File({ filename: 'logs/server.log' }),
 ];
 
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 	transports.push(new LoggingWinston());
-} else {
-	transports.push(new winston.transports.File({ filename: 'logs/server.log' }));
 }
 
 export const logger = winston.createLogger({
