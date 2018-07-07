@@ -242,7 +242,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
 			impulse: projectileTemplate.detonate.impulse,
-			detonateTick: world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity)),
+			detonateTick: world.tick + ticksToDetonate(projectileTemplate, vector.length(diff), vector.length(velocity)),
 			waitTicks: projectileTemplate.detonate.waitTicks || 0,
 		} as w.DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
@@ -265,6 +265,16 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 	world.objects.set(id, projectile);
 
 	return projectile;
+}
+
+function ticksToDetonate(projectileTemplate: w.ProjectileTemplate, distance: number, speed: number) {
+	if (!projectileTemplate.detonate) {
+		return 0;
+	}
+
+	let ticks = Math.floor(TicksPerSecond * distance / speed);
+	ticks = Math.min(ticks, projectileTemplate.maxTicks - (projectileTemplate.detonate.waitTicks || 0));
+	return ticks;
 }
 
 function attackDamage(damage: number, hero: w.Hero) {
