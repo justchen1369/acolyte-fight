@@ -9,8 +9,8 @@ import { getServerStats } from './loadMetrics';
 import { logger } from './logging';
 
 export function attachApi(app: express.Application) {
-    app.get('/:region/games', onGamesList);
-    app.get('/:region/status', onStatus);
+    app.get('/:region?/games', onGamesList);
+    app.get('/:region?/status', onStatus);
 }
 
 function onGamesList(req: express.Request, res: express.Response) {

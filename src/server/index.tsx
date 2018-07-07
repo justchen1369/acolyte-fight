@@ -33,22 +33,22 @@ app.use(authMiddleware);
 attachToSocket(io);
 attachApi(app);
 
-app.get('/:region/ping', (req, res) => res.send("OK"));
+app.get('/:region?/ping', (req, res) => res.send("OK"));
 
-app.use('/:region/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
-app.use('/:region/static', express.static('./static'));
-app.use('/:region/dist', express.static('./dist'));
-app.use('/:region/logs', express.static('./logs'));
+app.use('/:region?/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
+app.use('/:region?/static', express.static('./static'));
+app.use('/:region?/dist', express.static('./dist'));
+app.use('/:region?/logs', express.static('./logs'));
 
-app.get('/:region/play', (req, res) => res.sendFile(rootDir + '/play.html'));
-app.get('/:region/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
-app.get('/:region/about', (req, res) => res.sendFile(rootDir + '/about.html'));
+app.get('/:region?/play', (req, res) => res.sendFile(rootDir + '/play.html'));
+app.get('/:region?/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
+app.get('/:region?/about', (req, res) => res.sendFile(rootDir + '/about.html'));
 
 app.get('/', (req, res) => {
 	if (isMirrored) {
 		res.sendFile(rootDir + '/index.html');
 	} else {
-		res.redirect('/live/play');
+		res.redirect('/play');
 	}
 });
 
