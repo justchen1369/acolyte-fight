@@ -14,7 +14,7 @@ findClosestServer(serverList).then(url => {
         newHref = url + "/play";
     } else {
         console.error("Unable to find another server, using this one");
-        newHref = "play";
+        newHref = "live/play";
     }
 
     window.location.href = newHref;
