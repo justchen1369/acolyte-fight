@@ -43,17 +43,17 @@ export function displayPlayersOnline() {
 	});
 }
 
-export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, observe?: string) {
+export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 
 	world = engine.initialWorld();
 
 	const msg: m.JoinMsg = {
-		gameId: observe || null,
+		gameId: observeGameId || null,
 		name: playerName,
-		keyBindings: keyBindings,
-		room: null,
-		observe: !!observe,
+		keyBindings,
+		room,
+		observe: !!observeGameId,
 	};
 	socket.emit('join', msg, (hero: m.HeroMsg) => {
 		if (hero) {

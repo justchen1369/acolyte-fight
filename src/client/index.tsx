@@ -28,17 +28,21 @@ function getOrCreatePlayerName(): string {
 
 let joinedInitialGame = false;
 let observeGameId: string = null;
+let room: string = null;
 if (window.location.search) {
     const params = queryString.parse(window.location.search);
     if (params["g"]) {
         observeGameId = params["g"];
+    }
+    if (params["room"]) {
+        room = params["room"];
     }
 }
 
 attachToSocket(socket, () => {
     if (!joinedInitialGame) {
         joinedInitialGame = true;
-        joinNewGame(playerName, retrieveKeyBindings(), observeGameId);
+        joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
         observeGameId = null;
     }
 });
@@ -63,8 +67,13 @@ function onNewGameClicked() {
         // New server? Reload the client, just in case the version has changed.
         window.location.reload();
     } else {
-        joinNewGame(playerName, retrieveKeyBindings());
-        window.history.pushState(null, null, "?");
+        joinNewGame(playerName, retrieveKeyBindings(), room);
+
+        let search = "?";
+        if (room) {
+            search += "room=" + room;
+        }
+        window.history.pushState(null, null, search);
     }
 }
 
