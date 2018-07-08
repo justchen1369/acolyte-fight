@@ -1,11 +1,18 @@
 import * as React from 'react';
+import * as m from '../game/messages.model';
 
 interface Props {
 }
 
 interface State {
-    room: string;
+    roomUrl: string;
     more: boolean;
+}
+
+function retrieveLocationAsync() {
+    return fetch('location', { credentials: "same-origin" })
+        .then(res => res.json())
+        .then((msg: m.LocationMsg) => msg);
 }
 
 export class TitleSection extends React.Component<Props, State> {
@@ -13,8 +20,27 @@ export class TitleSection extends React.Component<Props, State> {
         super(props);
         this.state = {
             more: false,
-            room: Math.floor(Math.random() * 1e9).toString(36),
+            roomUrl: null,
         };
+    }
+
+    componentDidMount() {
+        retrieveLocationAsync().then(locationMsg => {
+            const room = Math.floor(Math.random() * 1e9).toString(36);
+            const region = locationMsg.currentRegion;
+            const server = locationMsg.currentServer;
+
+            let roomUrl = `play?room=${room}`;
+            if (locationMsg.currentRegion) {
+                roomUrl = `/${region}/${roomUrl}`;
+            }
+            if (locationMsg.currentServer) {
+                roomUrl = `${roomUrl}&server=${encodeURIComponent(server)}`;
+            }
+            this.setState({ roomUrl });
+        }).catch((error) => {
+            console.error("Unable to generate room URL", error);
+        });
     }
 
     render() {
@@ -28,7 +54,12 @@ export class TitleSection extends React.Component<Props, State> {
             </p>
             {this.state.more && this.renderMore()}
             <h2>Share this game</h2>
-            <p><a href={"play?room=" + this.state.room} target="_blank">Click here to create a private room.</a> Share this link with your friends to play against them!</p>
+            <p>
+                {this.state.roomUrl
+                ? <a href={this.state.roomUrl} target="_blank">Click here to create a private room.</a>
+                : <span>Generating private room URL...</span>}
+                {' '}
+                Share this link with your friends to play against them!</p>
         </div>;
     }
 

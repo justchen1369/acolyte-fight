@@ -5,15 +5,9 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import { getAuthToken } from './auth';
 import { getStore } from './serverStore';
-import { getServerStats } from './loadMetrics';
 import { logger } from './logging';
 
-export function attachApi(app: express.Application) {
-    app.get('/:region?/games', onGamesList);
-    app.get('/:region?/status', onStatus);
-}
-
-function onGamesList(req: express.Request, res: express.Response) {
+export function onGamesList(req: express.Request, res: express.Response) {
     const authToken = getAuthToken(req);
     logger.info("Retrieving games list for user " + authToken);
 
@@ -33,10 +27,6 @@ function onGamesList(req: express.Request, res: express.Response) {
         games: gameMsgs,
     };
     res.send(result);
-}
-
-function onStatus(req: express.Request, res: express.Response) {
-    res.send(getServerStats());
 }
 
 function gameToMsg(game: g.Game): m.GameMsg {

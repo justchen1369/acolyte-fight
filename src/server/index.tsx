@@ -2,10 +2,12 @@ import path from 'path';
 import httpLib from 'http';
 import socketLib from 'socket.io';
 import express from 'express';
+import * as os from 'os';
+import * as api from './api';
 import { authMiddleware } from './auth';
 import { attachToSocket } from './emitter';
-import { attachApi } from './api';
 import { getServerStats } from './loadMetrics';
+import { onLocation, setLocation } from './mirroring';
 import { logger } from './logging';
 import { cleanupOldInactiveGames } from './serverStore';
 
@@ -21,11 +23,12 @@ const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) ||
 
 logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes}`);
 
+setLocation(process.env.REGION, os.hostname());
+
 app.use(express.json());
 app.use(authMiddleware);
 
 attachToSocket(io);
-attachApi(app);
 
 app.get('/:region?/ping', (req, res) => res.send("OK"));
 
@@ -34,6 +37,9 @@ app.use('/:region?/static', express.static('./static'));
 app.use('/:region?/dist', express.static('./dist'));
 app.use('/:region?/logs', express.static('./logs'));
 
+app.get('/:region?/games', (req, res) => api.onGamesList(req, res));
+app.get('/:region?/location', (req, res) => onLocation(req, res));
+app.get('/:region?/status', (req, res) => res.send(getServerStats()));
 app.get('/:region?/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/:region?/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
 

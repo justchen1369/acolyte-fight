@@ -95,3 +95,11 @@ export interface GameMsg {
     joinable: boolean;
     numTicks: number;
 }
+
+export interface LocationMsg {
+    currentRegion: string;
+    targetRegion: string;
+
+    targetServer: string;
+    currentServer: string;
+}

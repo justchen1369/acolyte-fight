@@ -9,6 +9,8 @@ let store: g.ServerStore = {
     activeGames: new Map<string, g.Game>(),
     inactiveGames: new Map<string, g.Game>(),
     recentTickMilliseconds: [],
+    region: null,
+    server: null,
 };
 
 export function getStore() {
