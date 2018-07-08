@@ -10,7 +10,6 @@ export interface ServerStore {
 }
 
 export interface LocationStore {
-    region: string;
     server: string;
     upstreamSuffix: string;
 }

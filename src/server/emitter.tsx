@@ -1,7 +1,7 @@
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
-import { getLocation } from './mirroring';
+import { getLocation, sanitizeHostname } from './mirroring';
 import { logger } from './logging';
 import * as PlayerName from '../game/playerName';
 import * as m from '../game/messages.model';
@@ -66,10 +66,12 @@ function onConnection(socket: SocketIO.Socket) {
 
 function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
 	const location = getLocation();
-	if (!location.region || location.server === data.server) {
+	if (!location.server || !data.server || location.server === data.server) {
+		// Already connected to the correct server
 		callback({});
 	} else {
-		const upstream = socketClient(`http://${data.server}${location.upstreamSuffix}`, {
+		const server = sanitizeHostname(data.server);
+		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
 			forceNew: true,
 			transportOptions: {
 				polling: {

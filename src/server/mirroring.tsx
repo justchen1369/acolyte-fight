@@ -4,7 +4,6 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 
 let location: g.LocationStore = {
-    region: null,
     server: null,
     upstreamSuffix: "",
 };
@@ -28,7 +27,7 @@ export function onLocation(req: express.Request, res: express.Response) {
     res.send(locationMsg);
 }
 
-function sanitizeHostname(hostname: string): string {
+export function sanitizeHostname(hostname: string): string {
     let server = hostname;
 	if (server.indexOf('.') !== -1) {
 		// Don't use the FQDN, assume that all other servers have the same suffix and can find each other easily
