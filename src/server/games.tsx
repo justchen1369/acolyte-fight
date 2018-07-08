@@ -4,7 +4,6 @@ import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
-import * as PlayerName from '../game/playerName';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
@@ -12,10 +11,14 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
-let emit: g.Emit = null;
+let emit: TickEmitter = null;
 let ticksProcessing = false;
 
-export function attachToEmitter(_emit: g.Emit) {
+export interface TickEmitter {
+	(data: m.TickMsg): void;
+}
+
+export function attachToEmitter(_emit: TickEmitter) {
 	emit = _emit;
 }
 
@@ -55,69 +58,20 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function onWatchGameMsg(socketId: string, data: m.WatchMsg) {
-    const store = getStore();
-	if (store.activeGames.has(data.gameId)) {
-		const game = store.activeGames.get(data.gameId);
-		logger.info("Game [" + game.id + "]: " + data.name + " joined as observer");
-
-		emit(socketId, "watch", {
-			gameId: game.id,
-			history: game.history,
-		} as m.HeroMsg);
-
-		game.active.set(socketId, {
-			socketId,
-			heroId: systemHeroId(socketId),
-			name: data.name,
-		});
-	} else if (store.inactiveGames.has(data.gameId)) {
-		const game = store.inactiveGames.get(data.gameId);
-		logger.info("Game [" + game.id + "]: going to be watched by " + data.name);
-
-		emit(socketId, "watch", {
-			gameId: game.id,
-			history: game.history,
-		} as m.WatchResponseMsg);
-	} else {
-		logger.info("Game [" + data.gameId + "]: unable to find game for " + data.name);
-
-		emit(socketId, "watch", {
-			gameId: data.gameId,
-			history: null,
-		} as m.WatchResponseMsg);
-	}
-}
-
-export function onJoinGameMsg(socketId: string, authToken: string, data: m.JoinMsg) {
+export function findNewGame(room: string = null): g.Game {
 	let game: g.Game = null;
 	getStore().activeGames.forEach(g => {
-		if (g.joinable && g.active.size < Matchmaking.MaxPlayers) {
+		if (g.joinable && g.active.size < Matchmaking.MaxPlayers && g.room === room) {
 			game = g;
 		}
 	});
 	if (!game) {
 		game = initGame();
 	}
-	
-	joinGame(game, PlayerName.sanitizeName(data.name), data.keyBindings, authToken, socketId);
+	return game;
 }
 
-export function onLeaveGameMsg(socketId: string, data: m.LeaveMsg) {
-	const game = getStore().activeGames.get(data.gameId);
-	if (!game) {
-		return;
-	}
-
-	leaveGame(game, socketId);
-}
-
-export function onActionMsg(socketId: string, data: m.ActionMsg) {
-	const game = getStore().activeGames.get(data.gameId);
-	if (!game) {
-		return;
-	}
-
+export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
 	if (data.actionType !== "game") {
 		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
 		return;
@@ -140,6 +94,7 @@ function initGame() {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		room: null,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
@@ -200,7 +155,7 @@ function isSpell(actionData: m.ActionMsg): boolean {
 	return actionData.actionType === "game" && actionData.spellId !== Spells.move.id;
 }
 
-function leaveGame(game: g.Game, socketId: string) {
+export function leaveGame(game: g.Game, socketId: string) {
 	let player = game.active.get(socketId);
 	if (!player) {
 		return;
@@ -256,16 +211,14 @@ function gameTurn(game: g.Game) {
 	}
 
 	closeGameIfNecessary(game, data);
-	for (let socketId of game.active.keys()) {
-		emit(socketId, 'tick', data);
-	}
+	emit(data);
 }
 
 function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, authToken: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, authToken: string, socketId: string) {
 	let heroId: string = null;
 
 	// Take an existing slot, if possible
@@ -293,12 +246,6 @@ function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, 
 	if (authToken) {
 		game.accessTokens.add(authToken);
 	}
-
-	emit(socketId, "hero", {
-		gameId: game.id,
-		heroId,
-		history: game.history,
-	} as m.HeroMsg);
 
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings });
 

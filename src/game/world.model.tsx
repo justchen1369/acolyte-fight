@@ -234,7 +234,7 @@ export interface HeroScore {
 export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
-	isReplay: boolean;
+	observer: boolean;
 	renderedTick: number | null;
 
 	destroyed: WorldObject[];

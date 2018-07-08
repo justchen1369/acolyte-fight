@@ -11,6 +11,7 @@ export interface ServerStore {
 
 export interface Game {
     id: string;
+    room: string | null;
     created: moment.Moment;
     active: Map<string, Player>; // socketId -> Player
     playerNames: string[];
@@ -28,8 +29,4 @@ export interface Player {
 	socketId: string;
 	heroId: string;
 	name: string;
-}
-
-export interface Emit {
-    (room: string, event: string, data: any): void;
 }

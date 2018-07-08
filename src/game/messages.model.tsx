@@ -69,16 +69,12 @@ export interface HeroMsg {
     gameId: string;
     heroId: string;
     history: TickMsg[];
+    observer: boolean;
 }
 
 export interface WatchMsg {
     gameId: string;
     name: string;
-}
-
-export interface WatchResponseMsg {
-    gameId: string;
-    history: TickMsg[];
 }
 
 export interface ServerStats {

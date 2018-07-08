@@ -49,9 +49,15 @@ export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, obse
 	world = engine.initialWorld();
 
 	if (observe) {
-		socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg);
+		socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg, (hero: m.HeroMsg) => {
+			if (hero) {
+				onHeroMsg(hero);
+			} else {
+				notify({ type: "replayNotFound" });
+			}
+		});
 	} else {
-		socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg);
+		socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg, onHeroMsg);
 	}
 }
 
@@ -120,7 +126,7 @@ export function attachToCanvas(canvasStack: CanvasStack) {
 
 		if (incomingQueue.length === 0) {
 			numFramesToProcess = 0;
-		} else if (world.ui.isReplay) {
+		} else if (world.ui.observer) {
 			numFramesToProcess = 1; // Don't catch up to live when watching a replay
 		} else if (incomingQueue.length <= TicksPerTurn + AllowedDelayInTicks) {
 			numFramesToProcess = 1; // We're on time, process at normal rate
@@ -236,23 +242,23 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 		console.log("Disconnected");
 		onDisconnectMsg();
 	});
-	socket.on('hero', onHeroMsg);
 	socket.on('tick', onTickMsg);
-	socket.on('watch', onWatchMsg);
 }
-function onHeroMsg(data: m.HeroMsg, isReplay: boolean = false) {
+function onHeroMsg(data: m.HeroMsg) {
 	world = engine.initialWorld();
 	tickQueue = [];
-	incomingQueue = [];
+	incomingQueue = [...data.history];
 
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
-	world.ui.isReplay = isReplay;
-	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
+	world.ui.observer = data.observer;
 
-	if (data.history) {
-		tickQueue = [...data.history, ...tickQueue];
+	// Skip to start of game
+	while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
+		tickQueue.push(incomingQueue.shift());
 	}
+
+	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
 
 	world.ui.notifications.push({
 		type: "new",
@@ -264,30 +270,6 @@ function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
 	}
-}
-function onWatchMsg(data: m.WatchResponseMsg) {
-	if (!(data.gameId && data.history)) {
-		notify({ type: "replayNotFound" });
-		return;
-	}
-	console.log("Watching game " + data.gameId + " with " + data.history.length + " ticks");
-
-	let history = new Array<m.TickMsg>();
-	let newReplayQueue = [...data.history];
-
-	while (newReplayQueue.length > 0 && !isStartGameTick(newReplayQueue[0])) {
-		history.push(newReplayQueue.shift());
-	}
-
-	const observerHeroId = "_observer";
-	const isReplay = true;
-	onHeroMsg({
-		gameId: data.gameId,
-		heroId: observerHeroId,
-		history,
-	}, isReplay);
-
-	incomingQueue = newReplayQueue;
 }
 function onDisconnectMsg() {
 	world.activePlayers.clear();
