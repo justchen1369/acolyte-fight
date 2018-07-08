@@ -25,7 +25,7 @@ const mirrored = !!process.env.MIRRORED;
 logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes} mirrored=${mirrored}`);
 
 if (mirrored) {
-	setLocation(process.env.REGION || null, os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
+	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
 }
 
 app.use(express.json());
@@ -33,18 +33,18 @@ app.use(authMiddleware);
 
 attachToSocket(io);
 
-app.get('/:region?/ping', (req, res) => res.send("OK"));
+app.get('/ping', (req, res) => res.send("OK"));
 
-app.use('/:region?/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
-app.use('/:region?/static', express.static('./static'));
-app.use('/:region?/dist', express.static('./dist'));
-app.use('/:region?/logs', express.static('./logs'));
+app.use('/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
+app.use('/static', express.static('./static'));
+app.use('/dist', express.static('./dist'));
+app.use('/logs', express.static('./logs'));
 
-app.get('/:region?/games', (req, res) => api.onGamesList(req, res));
-app.get('/:region?/location', (req, res) => onLocation(req, res));
-app.get('/:region?/status', (req, res) => res.send(getServerStats()));
-app.get('/:region?/play', (req, res) => res.sendFile(rootDir + '/play.html'));
-app.get('/:region?/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
+app.get('/games', (req, res) => api.onGamesList(req, res));
+app.get('/location', (req, res) => onLocation(req, res));
+app.get('/status', (req, res) => res.send(getServerStats()));
+app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
+app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
 
 app.get('/', (req, res) => res.redirect('/play'));
 

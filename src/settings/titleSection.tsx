@@ -27,13 +27,9 @@ export class TitleSection extends React.Component<Props, State> {
     componentDidMount() {
         retrieveLocationAsync().then(locationMsg => {
             const room = Math.floor(Math.random() * 1e9).toString(36);
-            const region = locationMsg.currentRegion;
             const server = locationMsg.currentServer;
 
             let roomUrl = `play?room=${room}`;
-            if (locationMsg.currentRegion) {
-                roomUrl = `/${region}/${roomUrl}`;
-            }
             if (locationMsg.currentServer) {
                 roomUrl = `${roomUrl}&server=${encodeURIComponent(server)}`;
             }

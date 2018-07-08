@@ -105,9 +105,6 @@ export interface GameMsg {
 }
 
 export interface LocationMsg {
-    currentRegion: string;
-    targetRegion: string;
-
     targetServer: string;
     currentServer: string;
 }

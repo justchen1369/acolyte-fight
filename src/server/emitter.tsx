@@ -50,33 +50,18 @@ function onConnection(socket: SocketIO.Socket) {
 			onProxyMsg(socket, authToken, data, callback);
 		}
 	});
+	socket.use((packet: SocketIO.Packet, next) => {
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			(upstream as any).emit(...packet);
+		} else {
+			next();
+		}
+	});
 
-	socket.on('join', (data, callback) => {
-		const upstream = upstreams.get(socket.id);
-		if (upstream) {
-			logger.info(`socket ${socket.id} join passed upstream`);
-			upstream.emit('join', data, callback);
-		} else {
-			onJoinGameMsg(socket, authToken, data, callback);
-		}
-	});
-	socket.on('leave', data => {
-		const upstream = upstreams.get(socket.id);
-		if (upstream) {
-			logger.info(`socket ${socket.id} leave passed upstream`);
-			upstream.emit('leave', data);
-		} else {
-			onLeaveGameMsg(socket, data)
-		}
-	});
-	socket.on('action', data => {
-		const upstream = upstreams.get(socket.id);
-		if (upstream) {
-			upstream.emit('action', data);
-		} else {
-			onActionMsg(socket, data);
-		}
-	});
+	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
+	socket.on('leave', data => onLeaveGameMsg(socket, data));
+	socket.on('action', data => onActionMsg(socket, data));
 }
 
 function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
@@ -113,7 +98,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 				callback({ error: "Timed out connecting to upstream server" });
 			}
 		});
-		upstream.on('tick', (msg: m.TickMsg) => socket.emit('tick', msg));
+		upstream.on('tick', (data: any) => socket.emit('tick', data));
 		upstream.on('disconnect', () => {
 			// Only disconnect if we've actually connected before
 			if (!attached) { return; }

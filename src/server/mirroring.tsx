@@ -13,18 +13,15 @@ export function getLocation() {
     return location;
 }
 
-export function setLocation(region: string, hostname: string, upstreamSuffix: string) {
-    location.region = region || defaultRegion(hostname);
+export function setLocation(hostname: string, upstreamSuffix: string) {
     location.server = sanitizeHostname(hostname);
     location.upstreamSuffix = upstreamSuffix;
 
-    logger.info(`Location: region=${location.region} server=${location.server} fqdnSuffix=${location.upstreamSuffix}`);
+    logger.info(`Location: server=${location.server} fqdnSuffix=${location.upstreamSuffix}`);
 }
 
 export function onLocation(req: express.Request, res: express.Response) {
     let locationMsg: m.LocationMsg = {
-        currentRegion: location.region,
-        targetRegion: req.params["region"] || location.region,
         currentServer: location.server,
         targetServer: req.query["server"] || location.server,
     };
@@ -41,14 +38,4 @@ function sanitizeHostname(hostname: string): string {
     server = server.replace(/[^A-Za-z0-9_-]/g, '');
 
     return server;
-}
-
-function defaultRegion(hostname: string): string {
-    // Google Cloud Platform hostnames follow a standard naming convention which lets us extract the region from them
-    const match = hostname.match(/^([A-Za-z0-9]+)-/);
-    if (match) {
-        return match[1];
-    } else {
-        return "live";
-    }
 }
