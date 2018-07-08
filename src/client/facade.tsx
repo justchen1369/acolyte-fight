@@ -33,16 +33,6 @@ export function getCurrentWorld(): w.World {
 	return world;
 }
 
-export function displayPlayersOnline() {
-	return fetch('/status').then(res => res.json()).then((serverStats: m.ServerStats) => {
-		world.ui.notifications.push({
-			type: "serverStats",
-			numGames: serverStats.numGames,
-			numPlayers: serverStats.numPlayers,
-		});
-	});
-}
-
 export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 
@@ -266,6 +256,9 @@ function onHeroMsg(data: m.HeroMsg) {
 		type: "new",
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
+		room: data.room,
+		numGames: data.numGames,
+		numPlayers: data.numPlayers,
 	});
 }
 function onTickMsg(data: m.TickMsg) {

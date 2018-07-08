@@ -71,7 +71,10 @@ export interface LeaveMsg {
 export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
+    room: string | null;
     history: TickMsg[];
+    numGames: number;
+    numPlayers: number;
 }
 
 export interface ServerStats {

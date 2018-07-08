@@ -52,7 +52,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             case "help": return this.renderHelpNotification(key, notification);
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "replayNotFound": return this.renderReplayNotFoundNotification(key, notification);
-            case "serverStats": return this.renderServerStatsNotification(key, notification);
+            case "new": return this.renderNewGameNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
             case "leave": return this.renderLeaveNotification(key, notification);
@@ -74,9 +74,9 @@ export class MessagesPanel extends React.Component<Props, State> {
         return <div key={key} className="row error">Replay not found.</div>
     }
 
-    private renderServerStatsNotification(key: string, notification: w.ServerStatsNotification) {
+    private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
         return <div key={key} className="row info">
-            {notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
+            {notification.room && <span>Room <span className="room-name">{notification.room}</span>: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
         </div>
     }
 

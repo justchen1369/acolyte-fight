@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack, displayPlayersOnline } from './facade';
+import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
@@ -53,9 +53,6 @@ attachToCanvas({
     ui: document.getElementById("ui") as HTMLCanvasElement,
 } as CanvasStack);
 attachNotificationListener(notifications => {
-    if (_.some(notifications, n => n.type === "new")) {
-        displayPlayersOnline();
-    }
     applyNotificationsToStore(notifications);
     rerender();
 });

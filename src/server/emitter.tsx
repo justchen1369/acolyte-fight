@@ -5,6 +5,11 @@ import { logger } from './logging';
 import * as PlayerName from '../game/playerName';
 import * as m from '../game/messages.model';
 
+interface RoomStats {
+	numGames: number;
+	numPlayers: number;
+}
+
 export function attachToSocket(io: SocketIO.Server) {
     io.on('connection', onConnection);
 
@@ -35,7 +40,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
-	const room = data.room || null;
+	const room = data.room ? PlayerName.sanitizeName(data.room) : null;
 
 	let game = null;
 	if (data.gameId) {
@@ -50,8 +55,18 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		if (!data.observe) {
 			heroId = games.joinGame(game, playerName, data.keyBindings, authToken, socket.id);
 		}
+
+		const roomStats = calculateRoomStats(room);
+
 		socket.join(game.id);
-		callback({ gameId: game.id, heroId, history: game.history });
+		callback({
+			gameId: game.id,
+			heroId,
+			room: game.room,
+			history: game.history,
+			numGames: roomStats.numGames,
+			numPlayers: roomStats.numPlayers,
+		});
 
 		if (heroId) {
 			logger.info("Game [" + game.id + "]: player " + playerName + " [" + socket.id  + "] joined, now " + game.numPlayers + " players");
@@ -77,4 +92,16 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	if (game) {
 		games.receiveAction(game, data, socket.id);
 	}
+}
+
+function calculateRoomStats(room: string): RoomStats {
+	let numGames = 0;
+	let numPlayers = 0;
+	getStore().activeGames.forEach(game => {
+		if (game.room === room) {
+			numGames += 1;
+			numPlayers += game.active.size;
+		}
+	});
+	return { numGames, numPlayers };
 }

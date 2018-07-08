@@ -259,7 +259,6 @@ export interface ButtonRenderState {
 
 export type Notification =
 	HelpNotification 
-	| ServerStatsNotification
 	| JoinNotification 
 	| LeaveNotification 
 	| KillNotification 
@@ -271,12 +270,6 @@ export type Notification =
 
 export interface HelpNotification {
 	type: "help";
-}
-
-export interface ServerStatsNotification {
-	type: "serverStats";
-	numGames: number;
-	numPlayers: number;
 }
 
 export interface JoinNotification {
@@ -300,6 +293,9 @@ export interface NewGameNotification {
 	type: "new";
 	gameId: string;
 	heroId: string;
+	room: string | null;
+	numGames: number;
+	numPlayers: number;
 }
 
 export interface CloseGameNotification {
