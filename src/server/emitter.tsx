@@ -28,18 +28,39 @@ function onConnection(socket: SocketIO.Socket) {
 
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
-	socket.on('watch', (data, callback) => onWatchGameMsg(socket, data, callback));
 	socket.on('action', data => onActionMsg(socket, data));
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.HeroMsg) => void) {
-	const game = games.findNewGame();
+	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
-	if (game) {
-		const heroId = games.joinGame(game, playerName, data.keyBindings, authToken, socket.id);
 
+	const room = data.room || null;
+
+	let game = null;
+	if (data.gameId) {
+		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
+	}
+	if (!game) {
+		game = games.findNewGame(room);
+	}
+
+	if (game) {
+		let heroId = null;
+		if (!data.observe) {
+			heroId = games.joinGame(game, playerName, data.keyBindings, authToken, socket.id);
+		}
 		socket.join(game.id);
-		callback({ gameId: game.id, heroId, history: game.history, observer: false });
+		callback({ gameId: game.id, heroId, history: game.history });
+
+		if (heroId) {
+			logger.info("Game [" + game.id + "]: player " + playerName + " [" + socket.id  + "] joined, now " + game.numPlayers + " players");
+		} else {
+			logger.info("Game [" + game.id + "]: " + playerName + " joined as observer");
+		}
+	} else {
+		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
+		callback(null);
 	}
 }
 
@@ -48,21 +69,6 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	if (game) {
 		games.leaveGame(game, socket.id);
 		socket.leave(game.id);
-	}
-}
-
-function onWatchGameMsg(socket: SocketIO.Socket, data: m.WatchMsg, callback: (hero: m.HeroMsg) => void) {
-	const store = getStore();
-	const game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
-	const playerName = PlayerName.sanitizeName(data.name);
-
-	if (game) {
-		logger.info("Game [" + game.id + "]: " + playerName + " joined as observer");
-		socket.join(game.id);
-		callback({ gameId: game.id, heroId: "_observer", history: game.history, observer: true });
-	} else {
-		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
-		callback(null);
 	}
 }
 

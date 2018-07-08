@@ -57,8 +57,11 @@ export interface TickMsg {
 }
 
 export interface JoinMsg {
+    gameId: string | null;
+    room: string | null;
     name: string;
     keyBindings: c.KeyBindings;
+    observe: boolean;
 }
 
 export interface LeaveMsg {
@@ -67,14 +70,8 @@ export interface LeaveMsg {
 
 export interface HeroMsg {
     gameId: string;
-    heroId: string;
+    heroId: string | null; // null means observer
     history: TickMsg[];
-    observer: boolean;
-}
-
-export interface WatchMsg {
-    gameId: string;
-    name: string;
 }
 
 export interface ServerStats {

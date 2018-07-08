@@ -66,7 +66,7 @@ export function findNewGame(room: string = null): g.Game {
 		}
 	});
 	if (!game) {
-		game = initGame();
+		game = initGame(room);
 	}
 	return game;
 }
@@ -90,11 +90,11 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	queueAction(game, data);
 }
 
-function initGame() {
+export function initGame(room: string = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		room: null,
+		room,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
@@ -219,6 +219,10 @@ function isGameRunning(game: g.Game) {
 }
 
 export function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, authToken: string, socketId: string) {
+	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers) {
+		return null;
+	}
+
 	let heroId: string = null;
 
 	// Take an existing slot, if possible
@@ -248,8 +252,6 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBin
 	}
 
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings });
-
-	logger.info("Game [" + game.id + "]: player " + playerName + " [" + socketId  + "] joined, now " + game.numPlayers + " players");
 
 	return heroId;
 }

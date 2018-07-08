@@ -45,7 +45,6 @@ export function initialWorld(): w.World {
 		ui: {
 			myGameId: null,
 			myHeroId: null,
-			observer: false,
 			renderedTick: null,
 			destroyed: [],
 			events: new Array<w.WorldEvent>(),

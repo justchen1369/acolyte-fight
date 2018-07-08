@@ -48,17 +48,20 @@ export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, obse
 
 	world = engine.initialWorld();
 
-	if (observe) {
-		socket.emit('watch', { gameId: observe, name: playerName } as m.WatchMsg, (hero: m.HeroMsg) => {
-			if (hero) {
-				onHeroMsg(hero);
-			} else {
-				notify({ type: "replayNotFound" });
-			}
-		});
-	} else {
-		socket.emit('join', { name: playerName, keyBindings } as m.JoinMsg, onHeroMsg);
-	}
+	const msg: m.JoinMsg = {
+		gameId: observe || null,
+		name: playerName,
+		keyBindings: keyBindings,
+		room: null,
+		observe: !!observe,
+	};
+	socket.emit('join', msg, (hero: m.HeroMsg) => {
+		if (hero) {
+			onHeroMsg(hero);
+		} else {
+			notify({ type: "replayNotFound" });
+		}
+	});
 }
 
 export function leaveCurrentGame() {
@@ -126,7 +129,7 @@ export function attachToCanvas(canvasStack: CanvasStack) {
 
 		if (incomingQueue.length === 0) {
 			numFramesToProcess = 0;
-		} else if (world.ui.observer) {
+		} else if (!world.ui.myHeroId) {
 			numFramesToProcess = 1; // Don't catch up to live when watching a replay
 		} else if (incomingQueue.length <= TicksPerTurn + AllowedDelayInTicks) {
 			numFramesToProcess = 1; // We're on time, process at normal rate
@@ -251,7 +254,6 @@ function onHeroMsg(data: m.HeroMsg) {
 
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
-	world.ui.observer = data.observer;
 
 	// Skip to start of game
 	while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
