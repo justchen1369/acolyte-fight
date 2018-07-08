@@ -81,7 +81,7 @@ function onConnection(socket: SocketIO.Socket) {
 
 function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
 	const location = getLocation();
-	if (location.server === data.server) {
+	if (!location.region || location.server === data.server) {
 		callback({});
 	} else {
 		const upstream = socketClient(`http://${data.server}${location.fqdnSuffix}`, {
