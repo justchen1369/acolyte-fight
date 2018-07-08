@@ -86,18 +86,21 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 				attached = true;
 				upstreams.set(socket.id, upstream);
 				callback({});
+				logger.error(`Socket ${socket.id} connected to upstream ${server}`);
 			}
 		});
 		upstream.on('connect_error', (error: any) => {
 			if (!attached) {
 				attached = true;
 				callback({ error: `${error}` });
+				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: ${error}`);
 			}
 		});
 		upstream.on('connect_timeout', () => {
 			if (!attached) {
 				attached = true;
 				callback({ error: "Timed out connecting to upstream server" });
+				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: timeout`);
 			}
 		});
 		upstream.on('tick', (data: any) => socket.emit('tick', data));
