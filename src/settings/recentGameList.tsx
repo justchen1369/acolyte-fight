@@ -40,7 +40,7 @@ function msgToGame(msg: m.GameMsg): Game {
     playerNames = playerNames.sort();
     return {
         id: msg.id,
-        createdTimestamp: moment(msg.createdTimestamp),
+        createdTimestamp: moment.utc(msg.createdTimestamp),
         playerNames,
         numActivePlayers: msg.numActivePlayers,
         joinable: msg.joinable,
