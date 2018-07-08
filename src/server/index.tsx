@@ -20,10 +20,13 @@ const io = socketLib(http);
 const port = process.env.PORT || 7770;
 const maxReplays = parseInt(process.env.MAX_REPLAYS) || 1000;
 const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) || 60;
+const mirrored = !!process.env.MIRRORED;
 
-logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes}`);
+logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes} mirrored=${mirrored}`);
 
-setLocation(process.env.REGION, os.hostname(), process.env.FQDN_SUFFIX || "");
+if (mirrored) {
+	setLocation(process.env.REGION || null, os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
+}
 
 app.use(express.json());
 app.use(authMiddleware);

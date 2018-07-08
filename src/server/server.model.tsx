@@ -12,7 +12,7 @@ export interface ServerStore {
 export interface LocationStore {
     region: string;
     server: string;
-    fqdnSuffix: string;
+    upstreamSuffix: string;
 }
 
 export interface Game {
