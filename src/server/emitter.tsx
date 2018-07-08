@@ -68,10 +68,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			numPlayers: roomStats.numPlayers,
 		});
 
+		let gameName = game.id;
+		if (room) {
+			gameName = room + "/" + gameName;
+		}
 		if (heroId) {
-			logger.info("Game [" + game.id + "]: player " + playerName + " [" + socket.id  + "] joined, now " + game.numPlayers + " players");
+			logger.info("Game [" + gameName + "]: player " + playerName + " [" + socket.id  + "] joined, now " + game.numPlayers + " players");
 		} else {
-			logger.info("Game [" + game.id + "]: " + playerName + " joined as observer");
+			logger.info("Game [" + gameName + "]: " + playerName + " joined as observer");
 		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
