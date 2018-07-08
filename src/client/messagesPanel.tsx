@@ -76,7 +76,7 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
         return <div key={key} className="row info">
-            {notification.room && <span>Room <span className="room-name">{notification.room}</span>: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
+            {notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
         </div>
     }
 

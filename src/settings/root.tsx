@@ -15,8 +15,8 @@ export class Root extends React.Component<Props, State> {
         return <div className="page settings-page">
             <TitleSection />
             <NameConfig />
-            <RecentGameList />
             <SpellConfig />
+            <RecentGameList />
         </div>;
     }
 }

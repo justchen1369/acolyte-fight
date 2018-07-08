@@ -171,9 +171,19 @@ a:hover, a:active {
     font-weight: bold;
 }
 
+.private-room {
+    font-weight: bold;
+}
+
 h1 {
     margin-top: 100px;
     font-size: 36pt;
+}
+
+h2 {
+    margin-top: 36px;
+    margin-bottom: 0px;
+    font-size: 24pt;
 }
 
 .spell-config .key {

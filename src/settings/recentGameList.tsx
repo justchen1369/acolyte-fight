@@ -68,10 +68,10 @@ export class RecentGameList extends React.Component<Props, State> {
     render() {
         return <div className="recent-game-list-section">
             <h1>Your Recent Games</h1>
-                {this.state.error && <div className="error">Error loading recent games: {this.state.error}</div>}
-                {!this.state.games && <div className="loading-text">Loading...</div>}
-                {this.state.games && this.state.games.length === 0 && <div>No recent games</div>}
-                {this.state.games && this.state.games.length > 0 && <div className="game-list">
+            {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
+            {!this.state.games && <p className="loading-text">Loading...</p>}
+            {this.state.games && this.state.games.length === 0 && <p>No recent games</p>}
+            {this.state.games && this.state.games.length > 0 && <div className="game-list">
                 <table style={{width: "100%"}}>
                     <col className="timestamp" />
                     <col className="player-names" />
