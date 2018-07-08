@@ -23,7 +23,7 @@ const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) ||
 
 logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes}`);
 
-setLocation(process.env.REGION, os.hostname());
+setLocation(process.env.REGION, os.hostname(), process.env.FQDN_SUFFIX || "");
 
 app.use(express.json());
 app.use(authMiddleware);

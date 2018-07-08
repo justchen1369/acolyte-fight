@@ -7,8 +7,12 @@ export interface ServerStore {
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
     recentTickMilliseconds: number[];
+}
+
+export interface LocationStore {
     region: string;
     server: string;
+    fqdnSuffix: string;
 }
 
 export interface Game {

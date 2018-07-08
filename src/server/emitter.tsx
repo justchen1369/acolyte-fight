@@ -1,14 +1,18 @@
 import * as games from './games';
-import { getAuthTokenFromSocket } from './auth';
+import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
+import { getLocation } from './mirroring';
 import { logger } from './logging';
 import * as PlayerName from '../game/playerName';
 import * as m from '../game/messages.model';
+import socketClient from 'socket.io-client';
 
 interface RoomStats {
 	numGames: number;
 	numPlayers: number;
 }
+
+let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
 export function attachToSocket(io: SocketIO.Server) {
     io.on('connection', onConnection);
@@ -25,15 +29,97 @@ function onConnection(socket: SocketIO.Socket) {
     games.onConnect(socket.id, authToken);
 
 	socket.on('disconnect', () => {
-		--getStore().numConnections;
-		logger.info("socket " + socket.id + " disconnected");
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			upstream.disconnect();
+			upstreams.delete(socket.id);
+		}
 
-        games.onDisconnect(socket.id, authToken);
+		--getStore().numConnections;
+		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
+
+		games.onDisconnect(socket.id, authToken);
 	});
 
-	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
-	socket.on('leave', data => onLeaveGameMsg(socket, data));
-	socket.on('action', data => onActionMsg(socket, data));
+	socket.on('proxy', (data, callback) => {
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			logger.error(`Error: socket ${socket.id} attempted to proxy multiple times`);
+			callback({ error: "Cannot connect to new server - already connected to an existing server" });
+		} else {
+			onProxyMsg(socket, authToken, data, callback);
+		}
+	});
+
+	socket.on('join', (data, callback) => {
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			logger.info(`socket ${socket.id} join passed upstream`);
+			upstream.emit('join', data, callback);
+		} else {
+			onJoinGameMsg(socket, authToken, data, callback);
+		}
+	});
+	socket.on('leave', data => {
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			logger.info(`socket ${socket.id} leave passed upstream`);
+			upstream.emit('leave', data);
+		} else {
+			onLeaveGameMsg(socket, data)
+		}
+	});
+	socket.on('action', data => {
+		const upstream = upstreams.get(socket.id);
+		if (upstream) {
+			upstream.emit('action', data);
+		} else {
+			onActionMsg(socket, data);
+		}
+	});
+}
+
+function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
+	const location = getLocation();
+	if (location.server === data.server) {
+		callback({});
+	} else {
+		const upstream = socketClient(`http://${data.server}${location.fqdnSuffix}`, {
+			forceNew: true,
+			transportOptions: {
+				polling: {
+					extraHeaders: { [AuthHeader]: authToken }
+				}
+			},
+		});
+
+		let attached = false;
+		upstream.on('connect', () => {
+			if (!attached) {
+				attached = true;
+				upstreams.set(socket.id, upstream);
+				callback({});
+			}
+		});
+		upstream.on('connect_error', (error: any) => {
+			if (!attached) {
+				attached = true;
+				callback({ error: `${error}` });
+			}
+		});
+		upstream.on('connect_timeout', () => {
+			if (!attached) {
+				attached = true;
+				callback({ error: "Timed out connecting to upstream server" });
+			}
+		});
+		upstream.on('tick', (msg: m.TickMsg) => socket.emit('tick', msg));
+		upstream.on('disconnect', () => {
+			// Only disconnect if we've actually connected before
+			if (!attached) { return; }
+			socket.disconnect();
+		});
+	}
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.HeroMsg) => void) {

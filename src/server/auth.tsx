@@ -3,6 +3,8 @@ import express from 'express';
 import * as uuid from 'uuid';
 import * as m from '../game/messages.model';
 
+export const AuthHeader = "x-enigma-auth";
+
 export function authMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
     let authToken = parseAuthTokenFromRequest(req);
     if (!authToken) {
@@ -28,11 +30,20 @@ export function getAuthTokenFromSocket(socket: SocketIO.Socket) {
     }
 }
 
-function parseAuthTokenFromRequest(req: express.Request) {
-    req.rawHeaders;
-    if (!(req && req.headers && req.headers.cookie && typeof req.headers.cookie === "string")) {
+function parseAuthTokenFromRequest(req: express.Request): string | null {
+    if (!(req && req.headers)) {
         return null;
+    } 
+
+    let headerValue = req.headers[AuthHeader];
+    if (headerValue && typeof headerValue === "string") {
+        return headerValue
+    } 
+
+    if (req.headers.cookie && typeof req.headers.cookie === "string") {
+        const cookies = cookie.parse(req.headers.cookie);
+        return cookies && cookies[m.AuthCookieName];
     }
-    const cookies = cookie.parse(req.headers.cookie);
-    return cookies && cookies[m.AuthCookieName];
+
+    return null;
 }

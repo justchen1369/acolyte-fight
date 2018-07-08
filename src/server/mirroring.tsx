@@ -1,25 +1,34 @@
 import express from 'express';
-import { getStore } from './serverStore';
 import { logger } from './logging';
+import * as g from './server.model';
 import * as m from '../game/messages.model';
 
-export function setLocation(region: string, hostname: string) {
-    const store = getStore();
-    if (region && hostname) {
-        store.region = region;
-        store.server = sanitizeHostname(hostname);
+let location: g.LocationStore = {
+    region: null,
+    server: null,
+    fqdnSuffix: "",
+};
 
-        logger.info(`Location: region=${store.region} server=${store.server}`);
+export function getLocation() {
+    return location;
+}
+
+export function setLocation(region: string, hostname: string, fqdnSuffix: string) {
+    if (region && hostname && fqdnSuffix) {
+        location.region = region;
+        location.server = sanitizeHostname(hostname);
+        location.fqdnSuffix = fqdnSuffix;
+
+        logger.info(`Location: region=${location.region} server=${location.server} fqdnSuffix=${location.fqdnSuffix}`);
     }
 }
 
 export function onLocation(req: express.Request, res: express.Response) {
-    const store = getStore();
     let locationMsg: m.LocationMsg = {
-        currentRegion: store.region,
-        targetRegion: req.params["region"] || store.region,
-        currentServer: store.server,
-        targetServer: req.query["server"] || store.server,
+        currentRegion: location.region,
+        targetRegion: req.params["region"] || location.region,
+        currentServer: location.server,
+        targetServer: req.query["server"] || location.server,
     };
     res.send(locationMsg);
 }

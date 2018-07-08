@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { connectToServer, joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
@@ -29,6 +29,7 @@ function getOrCreatePlayerName(): string {
 let joinedInitialGame = false;
 let observeGameId: string = null;
 let room: string = null;
+let server: string = null;
 if (window.location.search) {
     const params = queryString.parse(window.location.search);
     if (params["g"]) {
@@ -37,13 +38,21 @@ if (window.location.search) {
     if (params["room"]) {
         room = params["room"];
     }
+    if (params["server"]) {
+        server = params["server"];
+    }
 }
 
 attachToSocket(socket, () => {
     if (!joinedInitialGame) {
         joinedInitialGame = true;
-        joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
-        observeGameId = null;
+        connectToServer(server).then(() => {
+            joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
+            observeGameId = null;
+        }).catch(error => {
+            console.error(error)
+            socket.disconnect();
+        });
     }
 });
 attachToCanvas({
@@ -66,11 +75,14 @@ function onNewGameClicked() {
     } else {
         joinNewGame(playerName, retrieveKeyBindings(), room);
 
-        let search = "?";
+        let params = [];
         if (room) {
-            search += "room=" + room;
+            params.push("room=" + room);
         }
-        window.history.pushState(null, null, search);
+        if (server) {
+            params.push("server=" + server);
+        }
+        window.history.pushState(null, null, "?" + params.join("&"));
     }
 }
 

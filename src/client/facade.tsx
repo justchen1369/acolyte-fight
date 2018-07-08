@@ -33,6 +33,23 @@ export function getCurrentWorld(): w.World {
 	return world;
 }
 
+export function connectToServer(server: string): Promise<void> {
+	if (server) {
+		return new Promise<void>((resolve, reject) => {
+			let msg: m.ProxyRequestMsg = { server };
+			socket.emit('proxy', msg, (response: m.ProxyResponseMsg) => {
+				if (response.error) {
+					reject(response.error);
+				} else {
+					resolve();
+				}
+			});
+		});
+	} else {
+		return Promise.resolve();
+	}
+}
+
 export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 

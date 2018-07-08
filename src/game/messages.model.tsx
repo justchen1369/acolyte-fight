@@ -68,6 +68,14 @@ export interface LeaveMsg {
     gameId: string;
 }
 
+export interface ProxyRequestMsg {
+    server: string;
+}
+
+export interface ProxyResponseMsg {
+    error?: string;
+}
+
 export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
