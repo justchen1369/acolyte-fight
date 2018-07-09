@@ -140,9 +140,9 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 function actionPrecedence(actionData: m.ActionMsg): number {
 	if (!actionData) {
 		return 0;
-	} else if (actionData.actionType === "leave") {
-		return 1001;
 	} else if (actionData.actionType === "join") {
+		return 1000;
+	} else if (actionData.actionType === "leave") {
 		return 1000;
 	} else if (actionData.actionType === "game" && actionData.spellId === Spells.move.id) {
 		return 10;
