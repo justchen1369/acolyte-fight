@@ -149,9 +149,9 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			gameName = room + "/" + gameName;
 		}
 		if (heroId) {
-			logger.info("Game [" + gameName + "]: player " + playerName + " [" + socket.id  + "] joined, now " + game.numPlayers + " players");
+			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
 		} else {
-			logger.info("Game [" + gameName + "]: " + playerName + " joined as observer");
+			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
