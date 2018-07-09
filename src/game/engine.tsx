@@ -773,8 +773,9 @@ function gravityForce(world: w.World) {
 		}
 
 		const target = world.objects.get(orb.targetId) || orb;
+		let touched = false;
 		world.objects.forEach(other => {
-			if (other.id === orb.id || other.type === "gravity") {
+			if (other.id === orb.id || other.category !== "hero") {
 				return;
 			}
 
@@ -785,26 +786,19 @@ function gravityForce(world: w.World) {
 			}
 
 			const proportion = Math.pow(1.0 - distanceTo / orb.gravity.radius, orb.gravity.power);
-			if (other.category === "hero") {
-				const strength = orb.gravity.strength * proportion;
+			const strength = orb.gravity.strength * proportion;
 
-				const impulse = vector.multiply(vector.unit(towardsOrb), strength);
-				other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
+			const impulse = vector.multiply(vector.unit(towardsOrb), strength);
+			other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
 
-				applyDamage(other, orb.damage * proportion, orb.owner, world);
+			applyDamage(other, orb.damage * proportion, orb.owner, world);
 
-				if (distanceTo <= orb.radius) {
-					// If you get hit by the projectile itself, that counts as knockback
-					other.hitTick = world.tick;
-				}
-			} else if (other.category === "projectile") {
-				const towardsTarget = vector.diff(target.body.getPosition(), other.body.getPosition());
-				const currentVelocity = other.body.getLinearVelocity();
-				const currentAngle = vector.angle(currentVelocity);
-				const targetAngle = vector.angle(towardsTarget);
-				const newAngle = vector.turnTowards(currentAngle, targetAngle, orb.gravity.turnRate * proportion);
-				const newVelocity = vector.redirect(currentVelocity, vector.fromAngle(newAngle));
-				other.body.setLinearVelocity(newVelocity);
+			if (distanceTo <= orb.radius) {
+				// If you get hit by the projectile itself, that counts as knockback
+				other.hitTick = world.tick;
+
+				// Orb is active - start expiring
+				orb.expireTick = Math.min(orb.expireTick, world.tick + orb.gravity.ticks);
 			}
 		});
 	});

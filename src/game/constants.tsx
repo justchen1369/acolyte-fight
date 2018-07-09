@@ -527,7 +527,7 @@ export namespace Spells {
 		icon: "atomicSlashes",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		cooldown: 8 * TicksPerSecond,
+		cooldown: 12 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
 		uninterruptible: true,
 
@@ -537,13 +537,14 @@ export namespace Spells {
 			density: 2,
 			radius: 0.02,
 			speed: 0.3,
-			maxTicks: 3.0 * TicksPerSecond,
+			maxTicks: 8.0 * TicksPerSecond,
 			damage: 1.0 / TicksPerSecond,
 			collideWith: 0,
 			explodeOn: Categories.All,
 
 			gravity: {
 				strength: 0.001 / TicksPerSecond,
+				ticks: 2.0 * TicksPerSecond,
 				turnRate: 0,
 				radius: 0.05,
 				power: 2,

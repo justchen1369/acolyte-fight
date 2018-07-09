@@ -96,6 +96,7 @@ export interface ProjectileTemplate {
 export interface GravityParameters {
 	strength: number;
 	turnRate: number;
+	ticks: number;
 	radius: number;
 	power: number;
 }
