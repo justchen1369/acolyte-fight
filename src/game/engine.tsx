@@ -208,6 +208,8 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 
 	let targetObj = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
 
+	const damageScaling = projectileTemplate.damageScaling === undefined ? true : projectileTemplate.damageScaling;
+
 	let projectile = {
 		id,
 		owner: hero.id,
@@ -221,7 +223,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage: attackDamage(projectileTemplate.damage, hero),
+		damage: damageScaling ? attackDamage(projectileTemplate.damage, hero) : projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 

@@ -79,6 +79,7 @@ export interface ProjectileTemplate {
 	gravity?: GravityParameters;
 	detonate?: DetonateParametersTemplate;
 	lifeSteal?: number;
+	damageScaling?: boolean;
 
 	maxTicks: number;
 	categories?: number;
