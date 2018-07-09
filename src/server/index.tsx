@@ -17,7 +17,11 @@ const app = express();
 const http = new httpLib.Server(app);
 const io = socketLib(http);
 
-const port = process.env.PORT || 80;
+const program = require('commander');
+program.option('--port <port>', 'Port number');
+program.parse(process.argv);
+
+const port = program.port || process.env.PORT || 7770;
 const maxReplays = parseInt(process.env.MAX_REPLAYS) || 1000;
 const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) || 60;
 const mirrored = !!process.env.MIRRORED;
