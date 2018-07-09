@@ -713,9 +713,9 @@ export namespace Choices {
 		"a": ["teleport", "thrust"],
 		"s": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike"],
-		"w": ["lightning", "kamehameha"],
-		"e": ["homing", "boomerang", "link"],
-		"r": ["meteor", "gravity", "supernova"],
+		"w": ["lightning", "link"],
+		"e": ["homing", "boomerang", "gravity"],
+		"r": ["meteor", "kamehameha", "supernova"],
 		"d": ["bouncer", "firespray"],
 		"f": ["scourge"],
 	} as c.KeyBindingOptions;
