@@ -216,7 +216,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage: attackDamage(projectileTemplate.damage, hero, projectileTemplate.damageScaling),
+		damage: projectileTemplate.damage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 
@@ -256,6 +256,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 
 		uiPath: [vector.clone(position)],
 	} as w.Projectile;
+	scaleDamagePacket(projectile, hero, projectileTemplate.damageScaling);
 	world.objects.set(id, projectile);
 
 	return projectile;
@@ -269,18 +270,6 @@ function ticksToDetonate(projectileTemplate: w.ProjectileTemplate, distance: num
 	let ticks = Math.floor(TicksPerSecond * distance / speed);
 	ticks = Math.min(ticks, projectileTemplate.maxTicks - (projectileTemplate.detonate.waitTicks || 0));
 	return ticks;
-}
-
-function attackDamage(damage: number, hero: w.Hero, damageScaling?: boolean) {
-	if (damageScaling === undefined) {
-		damageScaling = true;
-	}
-
-	if (damageScaling) {
-		return damage * (1.0 + Math.pow(1.0 - hero.health / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier);
-	} else {
-		return damage;
-	}
 }
 
 // Simulator
@@ -630,7 +619,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		} else {
 			if (!hero.thrust.alreadyHit.has(other.id)) {
 				hero.thrust.alreadyHit.add(other.id);
-				applyDamage(other, hero.thrust.damage, hero.id, world);
+				applyDamage(other, hero.thrust, hero.id, world);
 			}
 		}
 	}
@@ -682,9 +671,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
 			projectile.alreadyHit.add(hero.id);
 
-			const damage = projectile.damage;
-			applyDamage(hero, damage, projectile.owner, world);
-			lifeSteal(damage, projectile, world);
+			applyDamage(hero, projectile, projectile.owner, world);
 			linkTo(projectile, hero, world);
 			projectile.hit = true;
 		}
@@ -694,17 +681,6 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		} else if (projectile.explodeOn & hero.categories) {
 			destroyObject(world, projectile);
 		}
-	}
-}
-
-function lifeSteal(damage: number, projectile: w.Projectile, world: w.World) {
-	if (!projectile.lifeSteal) {
-		return;
-	}
-
-	const owner = world.objects.get(projectile.owner);
-	if (owner && owner.category === "hero") {
-		owner.health = Math.min(Hero.MaxHealth, owner.health + damage * projectile.lifeSteal);
 	}
 }
 
@@ -730,20 +706,18 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	if (!projectile.link) {
 		return;
 	}
+	projectile.expireTick = world.tick;
 
-	if (projectile.link.targetId) {
-		return; // Already linked
+	const owner = world.objects.get(projectile.owner);
+	if (!(target && owner && owner.category === "hero")) {
+		return;
 	}
 
-	projectile.expireTick = world.tick + projectile.link.linkTicks;
-	projectile.link.targetId = target.id;
-
-	// Destroy fixtures on this link so it stops colliding with things
-	let fixturesToDestroy = new Array<pl.Fixture>();
-	for (let fixture = projectile.body.getFixtureList(); !!fixture; fixture = fixture.getNext()) {
-		fixturesToDestroy.push(fixture);
-	}
-	fixturesToDestroy.forEach(fixture => projectile.body.destroyFixture(fixture));
+	owner.link = {
+		targetId: target.id,
+		strength: projectile.link.strength,
+		expireTick: world.tick + projectile.link.linkTicks,
+	};
 }
 
 function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.World) {
@@ -793,7 +767,7 @@ function gravityForce(world: w.World) {
 			const impulse = vector.multiply(vector.unit(towardsOrb), strength);
 			other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
 
-			applyDamage(other, orb.damage, orb.owner, world);
+			applyDamage(other, orb, orb.owner, world);
 
 			if (distanceTo <= orb.radius) {
 				// Orb is active - start expiring
@@ -864,26 +838,24 @@ function homingForce(world: w.World) {
 function linkForce(world: w.World) {
 	const minDistance = Hero.Radius * 2;
 	const maxDistance = 0.25;
-	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.link && obj.link.targetId)) {
+	world.objects.forEach(owner => {
+		if (!(owner.category === "hero" && owner.link)) {
 			return;
 		}
 
-		const owner = world.objects.get(obj.owner);
-		const target = world.objects.get(obj.link.targetId);
-		if (!(owner && target && owner.category === "hero")) {
+		if (world.tick >= owner.link.expireTick) {
+			owner.link = null;
 			return;
 		}
 
-		if (target.category === "hero" && target.shieldTicks > 0) {
-			// Shield causes the link to disintegrate
-			obj.expireTick = world.tick;
+		const target = world.objects.get(owner.link.targetId);
+		if (!(owner && target)) {
 			return;
 		}
 
 		const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
 		const distance = vector.length(diff);
-		const strength = obj.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
+		const strength = owner.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
 		if (strength <= 0) {
 			return;
 		}
@@ -966,7 +938,7 @@ function detonate(world: w.World) {
 			world.objects.forEach(other => {
 				if (other.category === "hero") {
 					if (other.id !== obj.owner && !other.shieldTicks && vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + Hero.Radius) {
-						applyDamage(other, obj.damage, obj.owner, world);
+						applyDamage(other, obj, obj.owner, world);
 
 						other.body.applyLinearImpulse(
 							vector.relengthen(vector.diff(other.body.getPosition(), obj.body.getPosition()), obj.detonate.impulse),
@@ -995,7 +967,7 @@ function applyLavaDamage(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
-				applyDamage(obj, World.LavaDamagePerTick, null, world);
+				applyDamage(obj, { damage: World.LavaDamagePerTick }, null, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
@@ -1221,13 +1193,17 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 		const distancePerTick = spell.speed / TicksPerSecond;
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
 		const velocity = vector.multiply(vector.unit(diff), spell.speed);
-		hero.thrust = {
-			damage: attackDamage(spell.damage, hero),
+
+		let thrust: w.ThrustState = {
+			damage: spell.damage,
 			velocity,
 			ticks: Math.min(spell.maxTicks, ticksToTarget),
 			nullified: false,
 			alreadyHit: new Set<string>(),
-		};
+		} as w.ThrustState;
+		scaleDamagePacket(thrust, hero, spell.damageScaling);
+
+		hero.thrust = thrust;
 	}
 
 	if (hero.thrust && !hero.thrust.nullified) {
@@ -1238,7 +1214,11 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
-	applyDamage(hero, spell.selfDamage, hero.id, world);
+	const selfPacket: w.DamagePacket = { damage: spell.selfDamage };
+	const damagePacket: w.DamagePacket = { damage: spell.damage };
+	scaleDamagePacket(damagePacket, hero, spell.damageScaling)
+
+	applyDamage(hero, selfPacket, hero.id, world);
 
 	let heroPos = hero.body.getPosition();
 	world.objects.forEach(obj => {
@@ -1251,7 +1231,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.category === "hero") {
-			applyDamage(obj, spell.damage, hero.id, world);
+			applyDamage(obj, damagePacket, hero.id, world);
 		}
 
 		let magnitude = spell.minImpulse + proportion * (spell.maxImpulse - spell.minImpulse);
@@ -1292,7 +1272,7 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Wal
 	const position = vector.plus(hero.body.getPosition(), diff);
 	let obstacle = addObstacle(world, position, angle, points, Math.min(halfWidth, halfLength));
 
-	const health = attackDamage(spell.health, hero);
+	const health = spell.health;
 	obstacle.health = health;
 	obstacle.maxHealth = health;
 	obstacle.damagePerTick = obstacle.maxHealth / spell.maxTicks;
@@ -1306,18 +1286,46 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 	return true;
 }
 
-function applyDamage(toHero: w.Hero, amount: number, fromHeroId: string, world: w.World) {
+function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
+	let scaleFactor = 1.0;
+	let extraLifeSteal = 0.0;
+	if (fromHero && damageScaling) {
+		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
+		scaleFactor += Math.pow(1.0 - fromHeroHealth / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
+	}
+	if (fromHero && fromHero.link) {
+		extraLifeSteal += Hero.LinkLifeSteal;
+	}
+
+	packet.damage *= scaleFactor;
+	packet.lifeSteal = Math.min(1.0, (packet.lifeSteal || 0.0) + extraLifeSteal);
+}
+
+function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string, world: w.World) {
+	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
+	if (!toHero) { return; }
+
 	if (world.tick < world.startTick) {
 		// No damage until game started
 		return;
 	}
 
-	if (fromHeroId && fromHeroId !== toHero.id) {
-		const score = world.scores.get(fromHeroId);
-		score.damage += amount;
+	let fromHero = world.objects.get(fromHeroId) as w.Hero;
+
+	// Apply damage
+	let amount = Math.min(toHero.health, packet.damage);
+	toHero.health -= amount;
+
+	// Apply lifesteal
+	if (fromHero && packet.lifeSteal) {
+		fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
 	}
 
-	toHero.health -= amount;
+	// Update scores
+	if (fromHeroId && fromHeroId !== toHero.id) {
+		const score = world.scores.get(fromHero.id);
+		score.damage += amount;
+	}
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
 		toHero.killerHeroId = fromHeroId;

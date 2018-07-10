@@ -64,7 +64,7 @@ export interface WallSpell extends SpellBase {
 	maxTicks: number;
 }
 
-export interface ProjectileTemplate {
+export interface ProjectileTemplate extends DamagePacket {
 	damage: number;
 	damageScaling?: boolean;
     bounce?: BounceParameters;
@@ -75,7 +75,7 @@ export interface ProjectileTemplate {
 	maxSpeed?: number;
 
     homing?: HomingParametersTemplate;
-	link?: LinkParametersTemplate;
+	link?: LinkParameters;
 	gravity?: GravityParameters;
 	detonate?: DetonateParametersTemplate;
 	lifeSteal?: number;
@@ -114,11 +114,6 @@ export interface HomingParametersTemplate {
 	redirect?: boolean;
 }
 
-export interface LinkParametersTemplate {
-    strength: number;
-    linkTicks: number;
-}
-
 export interface DetonateParametersTemplate {
 	radius: number;
 	impulse: number;
@@ -129,7 +124,8 @@ export interface ScourgeSpell extends SpellBase {
     action: "scourge";
 
     damage: number;
-    selfDamage: number;
+	selfDamage: number;
+	damageScaling?: boolean;
 
     radius: number;
 
@@ -157,6 +153,7 @@ export interface ThrustSpell extends SpellBase {
     action: "thrust";
 
 	damage: number;
+	damageScaling?: boolean;
     maxTicks: number;
     speed: number;
 }
@@ -373,6 +370,7 @@ export interface Hero extends WorldObjectBase {
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	shieldTicks?: number;
+	link?: LinkState;
 	thrust?: ThrustState;
 
 	killerHeroId: string | null;
@@ -396,7 +394,13 @@ export interface CastState {
 	color?: string;
 }
 
-export interface ThrustState {
+export interface LinkState {
+	targetId: string | null;
+	strength: number;
+	expireTick: number;
+}
+
+export interface ThrustState extends DamagePacket {
 	damage: number;
 	velocity: pl.Vec2;
 	ticks: number;
@@ -408,7 +412,7 @@ export interface Cooldowns {
 	[spellId: string]: number;
 }
 
-export interface Projectile extends WorldObjectBase {
+export interface Projectile extends WorldObjectBase, DamagePacket {
 	category: "projectile";
 
 	owner: string;
@@ -467,9 +471,13 @@ export interface HomingParameters {
 }
 
 export interface LinkParameters {
-	targetId: string | null;
 	strength: number;
 	linkTicks: number;
+}
+
+export interface DamagePacket {
+	damage: number;
+	lifeSteal?: number;
 }
 
 export type WorldObject =

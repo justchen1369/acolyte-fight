@@ -115,9 +115,14 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 }
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
-	const ctx = ctxStack.canvas;
 	if (obj.category === "hero") {
-		renderHero(ctx, obj, world);
+		renderHero(ctxStack, obj, world);
+		if (obj.link) {
+			const target = world.objects.get(obj.link.targetId);
+			if (target) {
+				renderLinkBetween(ctxStack, obj, target);
+			}
+		}
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
 	} else if (obj.category === "obstacle") {
@@ -317,7 +322,9 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	});
 }
 
-function renderHero(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World) {
+function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const ctx = ctxStack.canvas;
+
 	if (hero.destroyed) {
 		return;
 	}
@@ -546,24 +553,17 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 	}
 
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
-	let target: w.WorldObject = world.objects.get(projectile.link.targetId);
-	if (!target) {
-		if (projectile.link.targetId) {
-			// Linked to a hero who is now dead, display nothing
-			return;
-		} else {
-			target = projectile;
-			renderProjectile(ctxStack, projectile, world);
-		}
-	}
+	renderProjectile(ctxStack, projectile, world);
 
-	if (!(owner && target)) {
-		return;
+	if (owner && owner.category == "hero") {
+		renderLinkBetween(ctxStack, owner, projectile);
 	}
+}
 
+function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject) {
 	foreground(ctxStack, ctx => {
 		ctx.lineWidth = Pixel * 5;
-		ctx.strokeStyle = projectile.color;
+		ctx.strokeStyle = Spells.link.projectile.color;
 
 		const from = owner.body.getPosition();
 		const to = target.body.getPosition();

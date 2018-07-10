@@ -32,6 +32,8 @@ export namespace Hero {
 	export const AdditionalDamageMultiplier = 2.0;
 	export const AdditionalDamagePower = 2.0;
 
+	export const LinkLifeSteal = 1.0;
+
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 
@@ -418,7 +420,7 @@ export namespace Spells {
 
 	export const link = {
 		id: 'link',
-		description: "Pull your enemy to you, while also stealing a bit of their health in the process.",
+		description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
 		action: "projectile",
 
 		color: '#0000ff',
@@ -432,12 +434,10 @@ export namespace Spells {
 
 			density: 0.001,
 			radius: 0.005,
-			speed: 0.3,
+			speed: 0.25,
 			maxSpeed: 1.0,
-			maxTicks: 1.75 * TicksPerSecond,
-			damage: 7,
-			damageScaling: false,
-			lifeSteal: 1.0,
+			maxTicks: 2.0 * TicksPerSecond,
+			damage: 1,
 			explodeOn: Categories.None,
 			shieldTakesOwnership: false,
 
@@ -607,6 +607,7 @@ export namespace Spells {
 		cooldown: 10 * TicksPerSecond,
 		damage: 20,
 		selfDamage: 10,
+		damageScaling: false,
 		minImpulse: 0.0002,
 		maxImpulse: 0.0005,
 
@@ -638,7 +639,7 @@ export namespace Spells {
 		id: 'icewall',
 		description: "Create a wall of ice to block projectiles or stop enemies getting away.",
 
-		health: 25,
+		health: 50,
 		maxRange: 0.15,
 		maxTicks: 5 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
