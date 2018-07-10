@@ -776,8 +776,6 @@ function gravityForce(world: w.World) {
 			return;
 		}
 
-		const target = world.objects.get(orb.targetId) || orb;
-		let touched = false;
 		world.objects.forEach(other => {
 			if (other.id === orb.id || other.category !== "hero") {
 				return;
@@ -795,7 +793,7 @@ function gravityForce(world: w.World) {
 			const impulse = vector.multiply(vector.unit(towardsOrb), strength);
 			other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
 
-			applyDamage(other, orb.damage * proportion, orb.owner, world);
+			applyDamage(other, orb.damage, orb.owner, world);
 
 			if (distanceTo <= orb.radius) {
 				// Orb is active - start expiring
