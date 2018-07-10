@@ -397,6 +397,7 @@ export interface CastState {
 export interface LinkState {
 	targetId: string | null;
 	strength: number;
+	lifeSteal: number;
 	expireTick: number;
 }
 
@@ -472,6 +473,7 @@ export interface HomingParameters {
 
 export interface LinkParameters {
 	strength: number;
+	lifeSteal: number;
 	linkTicks: number;
 }
 

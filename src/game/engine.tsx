@@ -228,11 +228,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
 			speedWhenClose: projectileTemplate.homing.speedWhenClose,
 		} as w.HomingParameters,
-		link: projectileTemplate.link && {
-			strength: projectileTemplate.link.strength,
-			linkTicks: projectileTemplate.link.linkTicks,
-			targetId: null,
-		} as w.LinkParameters,
+		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
 			impulse: projectileTemplate.detonate.impulse,
@@ -643,10 +639,6 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	applyDamageToObstacle(obstacle, projectile.damage, world);
 
-	if (projectile.link) {
-		linkTo(projectile, obstacle, world);
-	}
-
 	if (projectile.explodeOn & obstacle.categories) {
 		destroyObject(world, projectile);
 	}
@@ -716,6 +708,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	owner.link = {
 		targetId: target.id,
 		strength: projectile.link.strength,
+		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
 	};
 }
@@ -1294,7 +1287,7 @@ function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScali
 		scaleFactor += Math.pow(1.0 - fromHeroHealth / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
 	}
 	if (fromHero && fromHero.link) {
-		extraLifeSteal += Hero.LinkLifeSteal;
+		extraLifeSteal += fromHero.link.lifeSteal;
 	}
 
 	packet.damage *= scaleFactor;

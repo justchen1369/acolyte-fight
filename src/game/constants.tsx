@@ -32,8 +32,6 @@ export namespace Hero {
 	export const AdditionalDamageMultiplier = 2.0;
 	export const AdditionalDamagePower = 2.0;
 
-	export const LinkLifeSteal = 1.0;
-
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
 
@@ -403,7 +401,7 @@ export namespace Spells {
 			speed: 0.4,
 			maxTicks: 6.0 * TicksPerSecond,
 			damage: 10,
-			explodeOn: Categories.Hero,
+			explodeOn: Categories.Hero | Categories.Massive,
 
 			homing: {
 				turnRate: 0.02 * 2 * Math.PI,
@@ -438,12 +436,13 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1,
-			explodeOn: Categories.None,
+			explodeOn: Categories.Obstacle & Categories.Massive,
 			shieldTakesOwnership: false,
 
 			link: {
 				strength: 1.0 / TicksPerSecond,
 				linkTicks: 2 * TicksPerSecond,
+				lifeSteal: 0.5,
 			} as c.LinkParameters,
 
 			homing: {
