@@ -282,7 +282,7 @@ function attackDamage(damage: number, hero: w.Hero, damageScaling?: boolean) {
 	}
 
 	if (damageScaling) {
-		return damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
+		return damage * (1.0 + Math.pow(1.0 - hero.health / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier);
 	} else {
 		return damage;
 	}

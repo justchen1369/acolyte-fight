@@ -30,6 +30,7 @@ export namespace Hero {
 	export const Damping = 3;
 
 	export const AdditionalDamageMultiplier = 2.0;
+	export const AdditionalDamagePower = 2.0;
 
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
