@@ -419,7 +419,7 @@ export namespace Spells {
 
 	export const link = {
 		id: 'link',
-		description: "Pull your enemy to you... while they pull you to them.",
+		description: "Pull your enemy to you, while also stealing a bit of their health in the process.",
 		action: "projectile",
 
 		color: '#0000ff',
