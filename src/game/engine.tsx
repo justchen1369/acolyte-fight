@@ -221,7 +221,7 @@ function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage: attackDamage(projectileTemplate.damage, hero),
+		damage: attackDamage(projectileTemplate.damage, hero, projectileTemplate.damageScaling),
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 
@@ -276,8 +276,16 @@ function ticksToDetonate(projectileTemplate: w.ProjectileTemplate, distance: num
 	return ticks;
 }
 
-function attackDamage(damage: number, hero: w.Hero) {
-	return damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
+function attackDamage(damage: number, hero: w.Hero, damageScaling?: boolean) {
+	if (damageScaling === undefined) {
+		damageScaling = true;
+	}
+
+	if (damageScaling) {
+		return damage * (1.0 + (1.0 - hero.health / Hero.MaxHealth) * Hero.AdditionalDamageMultiplier);
+	} else {
+		return damage;
+	}
 }
 
 // Simulator

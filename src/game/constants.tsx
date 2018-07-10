@@ -292,7 +292,7 @@ export namespace Spells {
 		icon: "glowingHands",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
-		chargeTicks: 0.5 * TicksPerSecond,
+		chargeTicks: 1.0 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
 		knockbackCancel: true,
@@ -309,7 +309,8 @@ export namespace Spells {
 			radius: 0.005,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,
-			damage: 10,
+			damage: 5,
+			damageScaling: false,
 			trailTicks: 1.0 * TicksPerSecond,
 			collideWith: Categories.All,
 			explodeOn: Categories.All,
@@ -435,6 +436,7 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 1.75 * TicksPerSecond,
 			damage: 7,
+			damageScaling: false,
 			lifeSteal: 1.0,
 			explodeOn: Categories.None,
 			shieldTakesOwnership: false,

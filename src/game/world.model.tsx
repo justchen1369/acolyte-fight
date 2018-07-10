@@ -66,7 +66,8 @@ export interface WallSpell extends SpellBase {
 }
 
 export interface ProjectileTemplate {
-    damage: number;
+	damage: number;
+	damageScaling?: boolean;
     bounce?: BounceParameters;
 
     density: number;
