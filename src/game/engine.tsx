@@ -885,6 +885,7 @@ function linkForce(world: w.World) {
 		}
 
 		if (target.category === "hero" && target.shieldTicks > 0) {
+			// Shield causes the link to disintegrate
 			obj.expireTick = world.tick;
 			return;
 		}
@@ -896,11 +897,13 @@ function linkForce(world: w.World) {
 			return;
 		}
 
+		owner.hitTick = world.tick;
 		owner.body.applyLinearImpulse(
 			vector.relengthen(diff, strength * owner.body.getMass()),
 			owner.body.getWorldPoint(vector.zero()), true);
 
 		if (target.category === "hero") {
+			target.hitTick = world.tick;
 			target.body.applyLinearImpulse(
 				vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
 				target.body.getWorldPoint(vector.zero()), true);
