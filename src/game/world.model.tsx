@@ -23,7 +23,7 @@ export interface SpellBase {
 
     chargeTicks?: number;
     cooldown: number;
-    uninterruptible?: boolean;
+    interruptible?: boolean;
     knockbackCancel?: boolean;
 
     icon?: string;
@@ -39,7 +39,6 @@ export interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
 	projectile: ProjectileTemplate;
-	fireTowardsCurrentHeading?: boolean;
 }
 
 export interface SpraySpell extends SpellBase {
@@ -376,8 +375,6 @@ export interface Hero extends WorldObjectBase {
 	shieldTicks?: number;
 	thrust?: ThrustState;
 
-	hitTick: number;
-
 	killerHeroId: string | null;
 	assistHeroId: string | null;
 
@@ -392,6 +389,8 @@ export interface CastState {
 
 	chargeStartTick?: number;
 	channellingStartTick?: number;
+	initialPosition?: pl.Vec2;
+	initialAngle?: number;
 
 	proportion?: number;
 	color?: string;

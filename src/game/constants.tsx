@@ -159,6 +159,7 @@ export namespace Spells {
 		id: 'move',
 		description: "",
 		maxAngleDiff: 0.25 * 2 * Math.PI,
+		interruptible: true,
 		cooldown: 0,
 		action: "move",
 	} as c.MoveSpell;
@@ -233,7 +234,6 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
-		uninterruptible: true,
 
 		intervalTicks: 0.025 * TicksPerSecond,
 		lengthTicks: 0.5 * TicksPerSecond,
@@ -297,7 +297,7 @@ export namespace Spells {
 		cooldown: 20 * TicksPerSecond,
 
 		knockbackCancel: true,
-		uninterruptible: false,
+		interruptible: true,
 		jitterRatio: 0.0,
 
 		intervalTicks: 0.1 * TicksPerSecond,
@@ -331,7 +331,6 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
-		uninterruptible: true,
 
 		projectile: {
 			color: '#00ddff',
@@ -533,7 +532,6 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
-		uninterruptible: true,
 
 		projectile: {
 			color: '#0ace00',
@@ -660,7 +658,6 @@ export namespace Spells {
 		description: "Teleport to a nearby location. Get close, or get away.",
 
 		maxRange: 0.4,
-		uninterruptible: true,
 		cooldown: 10 * TicksPerSecond,
 
 		icon: "teleport",
@@ -676,8 +673,6 @@ export namespace Spells {
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
-
-		uninterruptible: true,
 
 		damage: 5,
 		maxTicks: 0.4 * TicksPerSecond,

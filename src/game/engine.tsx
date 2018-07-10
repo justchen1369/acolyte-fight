@@ -151,7 +151,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		body,
 		casting: null,
 		cooldowns: {},
-		hitTick: 0,
 		shieldTicks: World.InitialShieldTicks,
 		killerHeroId: null,
 		assistHeroId: null,
@@ -173,15 +172,11 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addProjectile(world : w.World, hero : w.Hero, target: pl.Vec2, spell: w.Spell, projectileTemplate: w.ProjectileTemplate) {
+function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.Spell, projectileTemplate: w.ProjectileTemplate) {
 	let id = spell.id + (world.nextBulletId++);
 
-	let from = hero.body.getPosition();
-
-	let direction = vector.unit(vector.diff(target, from));
-	if (spell.action === "projectile" && spell.fireTowardsCurrentHeading) {
-		direction = vector.fromAngle(hero.body.getAngle());
-	}
+	const from = hero.body.getPosition();
+	const direction = vector.unit(vector.diff(target, from));
 
 	const offset = Hero.Radius + projectileTemplate.radius + constants.Pixel;
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
@@ -463,6 +458,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		return true; // Nothing to do
 	}
 	const spell = constants.Spells.all[action.type];
+	const uninterruptible = !spell.interruptible;
 
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
@@ -479,7 +475,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	}
 
 	if (hero.casting.stage === w.CastStage.Orientating) {
-		hero.casting.uninterruptible = true;
+		hero.casting.uninterruptible = uninterruptible;
 
 		if (spell.maxAngleDiff !== undefined && angleDiff > spell.maxAngleDiff) {
 			return false; // Wait until are facing the target
@@ -493,7 +489,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {
 			hero.casting.chargeStartTick = world.tick;
-			hero.casting.uninterruptible = spell.uninterruptible || false;
+			hero.casting.uninterruptible = uninterruptible;
 		}
 		
 		// Waiting for charging to complete
@@ -514,14 +510,21 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Start channelling
 		if (!hero.casting.channellingStartTick) {
 			hero.casting.channellingStartTick = world.tick;
-			hero.casting.uninterruptible = spell.uninterruptible || false;
+			hero.casting.uninterruptible = uninterruptible;
+			hero.casting.initialPosition = vector.clone(hero.body.getPosition());
+			hero.casting.initialAngle = hero.body.getAngle();
 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
 		}
 
-		const cancelled = spell.knockbackCancel && hero.hitTick > hero.casting.channellingStartTick;
+		let cancelled = false;
+		if (!cancelled && spell.knockbackCancel) {
+			cancelled = 
+				Math.abs(vector.angleDelta(hero.casting.initialAngle, hero.body.getAngle())) > spell.maxAngleDiff
+				|| vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel;
+		}
 		if (!cancelled) {
 			done = applyAction(world, hero, action, spell);
 		} else {
@@ -619,11 +622,6 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	}
 
-	// Mark other hero as hit - cancel any channelling
-	if (!other.shieldTicks) {
-		other.hitTick = world.tick;
-	}
-
 	// If using thrust, cause damage
 	if (hero.thrust) {
 		if (other.shieldTicks) {
@@ -681,8 +679,6 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
 	} else {
-		hero.hitTick = world.tick;
-
 		if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
 			projectile.alreadyHit.add(hero.id);
 
@@ -802,9 +798,6 @@ function gravityForce(world: w.World) {
 			applyDamage(other, orb.damage * proportion, orb.owner, world);
 
 			if (distanceTo <= orb.radius) {
-				// If you get hit by the projectile itself, that counts as knockback
-				other.hitTick = world.tick;
-
 				// Orb is active - start expiring
 				orb.expireTick = Math.min(orb.expireTick, world.tick + orb.gravity.ticks);
 			}
@@ -897,13 +890,11 @@ function linkForce(world: w.World) {
 			return;
 		}
 
-		owner.hitTick = world.tick;
 		owner.body.applyLinearImpulse(
 			vector.relengthen(diff, strength * owner.body.getMass()),
 			owner.body.getWorldPoint(vector.zero()), true);
 
 		if (target.category === "hero") {
-			target.hitTick = world.tick;
 			target.body.applyLinearImpulse(
 				vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
 				target.body.getWorldPoint(vector.zero()), true);
