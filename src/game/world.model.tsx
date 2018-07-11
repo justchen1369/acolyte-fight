@@ -115,7 +115,8 @@ export interface HomingParametersTemplate {
 
 export interface DetonateParametersTemplate {
 	radius: number;
-	impulse: number;
+	minImpulse: number;
+	maxImpulse: number;
 	waitTicks?: number;
 }
 
@@ -459,7 +460,8 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 
 export interface DetonateParameters {
 	radius: number;
-	impulse: number;
+	minImpulse: number;
+	maxImpulse: number;
 	detonateTick: number;
 	waitTicks: number;
 }

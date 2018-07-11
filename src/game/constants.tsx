@@ -244,7 +244,8 @@ export namespace Spells {
 
 			detonate: {
 				radius: 0.025,
-				impulse: 0.00005,
+				minImpulse: 0.00005,
+				maxImpulse: 0.00005,
 			},
 
 			render: "projectile",
@@ -617,7 +618,8 @@ export namespace Spells {
 			detonate: {
 				waitTicks: 0.5 * TicksPerSecond,
 				radius: 0.05,
-				impulse: 0.0002,
+				minImpulse: 0.0002,
+				maxImpulse: 0.0005,
 			},
 
 			render: "supernova",

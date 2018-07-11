@@ -231,7 +231,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
-			impulse: projectileTemplate.detonate.impulse,
+			minImpulse: projectileTemplate.detonate.minImpulse,
+			maxImpulse: projectileTemplate.detonate.maxImpulse,
 			detonateTick: world.tick + ticksToDetonate(projectileTemplate, vector.length(diff), vector.length(velocity)),
 			waitTicks: projectileTemplate.detonate.waitTicks || 0,
 		} as w.DetonateParameters,
@@ -937,11 +938,15 @@ function detonate(world: w.World) {
 			// Apply damage
 			world.objects.forEach(other => {
 				if (other.category === "hero") {
-					if (other.id !== obj.owner && !other.shieldTicks && vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + Hero.Radius) {
+					const diff = vector.diff(other.body.getPosition(), obj.body.getPosition());
+					const distance = vector.length(diff);
+					if (other.id !== obj.owner && !other.shieldTicks && distance <= obj.detonate.radius + Hero.Radius) {
 						applyDamage(other, obj, obj.owner, world);
 
+						const proportion = 1.0 - (distance / (obj.detonate.radius + Hero.Radius)); // +HeroRadius because only need to touch the edge
+						const magnitude = obj.detonate.minImpulse + proportion * (obj.detonate.maxImpulse - obj.detonate.minImpulse);
 						other.body.applyLinearImpulse(
-							vector.relengthen(vector.diff(other.body.getPosition(), obj.body.getPosition()), obj.detonate.impulse),
+							vector.relengthen(diff, magnitude),
 							other.body.getWorldPoint(vector.zero()),
 							true);
 					}
