@@ -1296,7 +1296,6 @@ function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScali
 
 	if (fromHero && fromHero.link && !packet.lifeSteal) {
 		packet.lifeSteal = fromHero.link.lifeSteal;
-		packet.lifeStealTargetId = fromHero.link.targetId;
 	}
 }
 
@@ -1314,7 +1313,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string,
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHeroId && packet.lifeSteal && (!packet.lifeStealTargetId || toHero.id === packet.lifeStealTargetId)) {
+	if (fromHeroId && packet.lifeSteal) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
