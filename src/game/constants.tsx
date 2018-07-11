@@ -568,7 +568,7 @@ export namespace Spells {
 			radius: 0.02,
 			speed: 0.3,
 			maxTicks: 8.0 * TicksPerSecond,
-			damage: 1,
+			damage: 0,
 			collideWith: Categories.Hero | Categories.Massive,
 			explodeOn: Categories.All,
 
