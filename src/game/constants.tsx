@@ -632,6 +632,7 @@ export namespace Spells {
 		radius: Hero.Radius * 4,
 		chargeTicks: 0.5 * TicksPerSecond,
 		cooldown: 10 * TicksPerSecond,
+		interruptible: true,
 		damage: 20,
 		selfDamage: 10,
 		damageScaling: false,
@@ -702,9 +703,9 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
 
-		damage: 5,
+		damage: 0,
 		maxTicks: 0.4 * TicksPerSecond,
-		speed: 0.75,
+		speed: 1.0,
 
 		icon: "fireDash",
 		color: '#ff00cc',
