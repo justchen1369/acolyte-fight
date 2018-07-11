@@ -1288,17 +1288,16 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.S
 
 function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
 	let scaleFactor = 1.0;
-	let extraLifeSteal = 0.0;
 	if (fromHero && damageScaling) {
 		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
 		scaleFactor += Math.pow(1.0 - fromHeroHealth / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
 	}
-	if (fromHero && fromHero.link) {
-		extraLifeSteal += fromHero.link.lifeSteal;
-	}
-
 	packet.damage *= scaleFactor;
-	packet.lifeSteal = Math.min(1.0, (packet.lifeSteal || 0.0) + extraLifeSteal);
+
+	if (fromHero && fromHero.link && !packet.lifeSteal) {
+		packet.lifeSteal = fromHero.link.lifeSteal;
+		packet.lifeStealTargetId = fromHero.link.targetId;
+	}
 }
 
 function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string, world: w.World) {
@@ -1315,7 +1314,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string,
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHeroId && packet.lifeSteal) {
+	if (fromHeroId && packet.lifeSteal && (!packet.lifeStealTargetId || toHero.id === packet.lifeStealTargetId)) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);

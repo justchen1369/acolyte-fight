@@ -488,6 +488,7 @@ export interface LinkParameters {
 export interface DamagePacket {
 	damage: number;
 	lifeSteal?: number;
+	lifeStealTargetId?: string;
 }
 
 export type WorldObject =
