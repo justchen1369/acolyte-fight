@@ -665,6 +665,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 			applyDamage(hero, projectile, projectile.owner, world);
 			linkTo(projectile, hero, world);
+			applyGravity(projectile, hero, world);
 			projectile.hit = true;
 		}
 
@@ -693,6 +694,20 @@ function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predi
 	return nearest;
 }
 
+function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
+	if (!projectile.gravity || target.category !== "hero") {
+		return;
+	}
+	projectile.expireTick = world.tick;
+
+	target.gravity = {
+		expireTick: world.tick + projectile.gravity.ticks,
+		location: projectile.body.getPosition(),
+		strength: projectile.gravity.strength,
+		radius: projectile.gravity.radius,
+		power: projectile.gravity.power,
+	};
+}
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	if (!projectile.link) {
@@ -738,35 +753,27 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 }
 
 function gravityForce(world: w.World) {
-	world.objects.forEach(orb => {
-		if (!(orb.category === "projectile" && orb.gravity)) {
+	world.objects.forEach(hero => {
+		if (!(hero.category === "hero" && hero.gravity)) {
+			return;
+		}
+		if (world.tick >= hero.gravity.expireTick) {
+			hero.gravity = null;
 			return;
 		}
 
-		world.objects.forEach(other => {
-			if (other.id === orb.id || other.category !== "hero") {
-				return;
-			}
+		const towardsOrb = vector.diff(hero.gravity.location, hero.body.getPosition());
+		const distanceTo = vector.length(towardsOrb);
+		if (distanceTo >= hero.gravity.radius) {
+			hero.gravity = null;
+			return;
+		}
 
-			const towardsOrb = vector.diff(orb.body.getPosition(), other.body.getPosition());
-			const distanceTo = vector.length(towardsOrb);
-			if (distanceTo >= orb.gravity.radius) {
-				return;
-			}
+		const proportion = Math.pow(1.0 - distanceTo / hero.gravity.radius, hero.gravity.power);
+		const strength = hero.gravity.strength * proportion;
 
-			const proportion = Math.pow(1.0 - distanceTo / orb.gravity.radius, orb.gravity.power);
-			const strength = orb.gravity.strength * proportion;
-
-			const impulse = vector.multiply(vector.unit(towardsOrb), strength);
-			other.body.applyLinearImpulse(impulse, other.body.getWorldPoint(vector.zero()), true);
-
-			applyDamage(other, orb, orb.owner, world);
-
-			if (distanceTo <= orb.radius) {
-				// Orb is active - start expiring
-				orb.expireTick = Math.min(orb.expireTick, world.tick + orb.gravity.ticks);
-			}
-		});
+		const impulse = vector.multiply(vector.unit(towardsOrb), strength);
+		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	});
 }
 

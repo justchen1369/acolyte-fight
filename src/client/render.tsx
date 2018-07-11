@@ -117,6 +117,9 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
 	if (obj.category === "hero") {
 		renderHero(ctxStack, obj, world);
+		if (obj.gravity) {
+			renderGravityWell(ctxStack, obj, world);
+		}
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
 			if (target) {
@@ -483,6 +486,19 @@ function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		return;
 	}
 
+	renderGravityAt(ctxStack, projectile.body.getPosition(), world);
+}
+
+function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	if (!hero.gravity) {
+		return;
+	}
+
+	renderGravityAt(ctxStack, hero.gravity.location, world);
+}
+
+function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World) {
+	const spell = Spells.gravity;
 	const animationLength = 0.33 * constants.TicksPerSecond;
 	const numParticles = 3;
 
@@ -491,11 +507,11 @@ function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		world.ui.trails.push({
 			type: "circle",
-			pos: vector.plus(projectile.body.getPosition(), vector.multiply(vector.fromAngle(angle), projectile.radius)),
-			radius: projectile.radius / numParticles,
+			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), spell.projectile.radius)),
+			radius: spell.projectile.radius / numParticles,
 			initialTick: world.tick,
-			max: projectile.trailTicks, 
-			fillStyle: projectileColor(projectile, world),
+			max: spell.projectile.trailTicks, 
+			fillStyle: spell.projectile.color,
 		});
 	}
 }

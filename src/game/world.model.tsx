@@ -95,7 +95,6 @@ export interface ProjectileTemplate extends DamagePacket {
 
 export interface GravityParameters {
 	strength: number;
-	turnRate: number;
 	ticks: number;
 	radius: number;
 	power: number;
@@ -372,6 +371,7 @@ export interface Hero extends WorldObjectBase {
 	shieldTicks?: number;
 	link?: LinkState;
 	thrust?: ThrustState;
+	gravity?: GravityState;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
@@ -407,6 +407,14 @@ export interface ThrustState extends DamagePacket {
 	ticks: number;
 	nullified: boolean;
 	alreadyHit: Set<string>;
+}
+
+export interface GravityState {
+	expireTick: number;
+	location: pl.Vec2;
+	strength: number;
+	radius: number;
+	power: number;
 }
 
 export interface Cooldowns {

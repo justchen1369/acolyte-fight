@@ -535,20 +535,19 @@ export namespace Spells {
 		projectile: {
 			color: '#0ace00',
 
-			density: 2,
+			density: 0.0001,
 			radius: 0.02,
 			speed: 0.3,
 			maxTicks: 8.0 * TicksPerSecond,
-			damage: 1.0 / TicksPerSecond,
-			collideWith: 0,
+			damage: 1,
+			collideWith: Categories.Hero | Categories.Massive,
 			explodeOn: Categories.All,
 
 			gravity: {
 				strength: 0.001 / TicksPerSecond,
 				ticks: 2.0 * TicksPerSecond,
-				turnRate: 0,
 				radius: 0.05,
-				power: 2,
+				power: 1,
 			} as c.GravityParameters,
 
 			homing: {
