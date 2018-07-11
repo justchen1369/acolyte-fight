@@ -1303,20 +1303,21 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string,
 		return;
 	}
 
-	let fromHero = world.objects.get(fromHeroId) as w.Hero;
-
 	// Apply damage
 	let amount = Math.min(toHero.health, packet.damage);
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHero && packet.lifeSteal) {
-		fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
+	if (fromHeroId && packet.lifeSteal) {
+		const fromHero = world.objects.get(fromHeroId);
+		if (fromHero && fromHero.category === "hero") {
+			fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
+		}
 	}
 
 	// Update scores
 	if (fromHeroId && fromHeroId !== toHero.id) {
-		const score = world.scores.get(fromHero.id);
+		const score = world.scores.get(fromHeroId);
 		score.damage += amount;
 	}
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
