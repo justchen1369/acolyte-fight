@@ -441,8 +441,8 @@ export namespace Spells {
 
 			link: {
 				strength: 1.0 / TicksPerSecond,
-				linkTicks: 2 * TicksPerSecond,
-				lifeSteal: 0.25,
+				linkTicks: 1.5 * TicksPerSecond,
+				lifeSteal: 0.5,
 			} as c.LinkParameters,
 
 			homing: {
