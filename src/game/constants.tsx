@@ -30,7 +30,7 @@ export namespace Hero {
 	export const Damping = 3;
 
 	export const AdditionalDamageMultiplier = 2.0;
-	export const AdditionalDamagePower = 2.0;
+	export const AdditionalDamagePower = 1.0;
 
 	export const MaxHealth = 100;
 	export const SeparationStrength = 0.01;
@@ -441,8 +441,8 @@ export namespace Spells {
 
 			link: {
 				strength: 1.0 / TicksPerSecond,
-				linkTicks: 2 * TicksPerSecond,
-				lifeSteal: 0.25,
+				linkTicks: 2.0 * TicksPerSecond,
+				lifeSteal: 0.5,
 			} as c.LinkParameters,
 
 			homing: {
@@ -639,7 +639,7 @@ export namespace Spells {
 		description: "Create a wall of ice to block projectiles or stop enemies getting away.",
 
 		health: 50,
-		maxRange: 0.15,
+		maxRange: 0.25,
 		maxTicks: 5 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
