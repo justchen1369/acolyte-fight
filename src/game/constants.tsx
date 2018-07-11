@@ -68,11 +68,19 @@ export namespace World {
 			obstacles: [
 				{
 					numObstacles: 2,
-					layoutRadius: 0.09,
-					layoutAngleOffset: 0.125 * Math.PI,
-					numPoints: 12,
+					layoutRadius: 0.07,
+					layoutAngleOffset: 0.25 * Math.PI,
+					numPoints: 4,
+					extent: Hero.Radius * 1.5,
+					orientationAngleOffset: 0.25 * Math.PI,
+				},
+				{
+					numObstacles: 4,
+					layoutRadius: 0.33,
+					layoutAngleOffset: 0,
+					numPoints: 4,
 					extent: Hero.Radius * 1,
-					orientationAngleOffset: Math.PI,
+					orientationAngleOffset: 0.0 * Math.PI,
 				},
 			],
 		},
