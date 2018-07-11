@@ -304,7 +304,7 @@ export namespace Spells {
 			speed: 0.2,
 			maxSpeed: 0.4,
 			maxTicks: 12 * TicksPerSecond,
-			damage: 0,
+			damage: 1,
 			trailTicks: 15,
 			categories: Categories.Projectile | Categories.Massive,
 			explodeOn: Categories.Obstacle,
@@ -368,7 +368,7 @@ export namespace Spells {
 			radius: 0.0025,
 			speed: 3.0,
 			maxTicks: 0.5 * TicksPerSecond,
-			damage: 0,
+			damage: 1,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -610,7 +610,7 @@ export namespace Spells {
 			speed: 0.3,
 			maxSpeed: 1.0,
 			maxTicks: 1.25 * TicksPerSecond,
-			damage: 0,
+			damage: 2,
 			collideWith: Categories.None,
 			explodeOn: Categories.None,
 
@@ -703,7 +703,7 @@ export namespace Spells {
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 12 * TicksPerSecond,
 
-		damage: 0,
+		damage: 1,
 		maxTicks: 0.4 * TicksPerSecond,
 		speed: 1.0,
 
