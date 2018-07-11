@@ -62,7 +62,7 @@ export class TitleSection extends React.Component<Props, State> {
     private renderMore() {
         return <div>
             <h2>Credits</h2>
-            <p><b>Arcane Enigma</b> was created by <b>Ray Hidayat</b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Adynathos</b> and <b>Zymoran</b>.</p>
+            <p><b>Arcane Enigma</b> was created by <b>Ray Hidayat</b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
             <p>
                 <ul>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
