@@ -441,7 +441,7 @@ export namespace Spells {
 
 			link: {
 				strength: 1.0 / TicksPerSecond,
-				linkTicks: 1.5 * TicksPerSecond,
+				linkTicks: 2.0 * TicksPerSecond,
 				lifeSteal: 0.5,
 			} as c.LinkParameters,
 
@@ -639,7 +639,7 @@ export namespace Spells {
 		description: "Create a wall of ice to block projectiles or stop enemies getting away.",
 
 		health: 50,
-		maxRange: 0.15,
+		maxRange: 0.25,
 		maxTicks: 5 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 
