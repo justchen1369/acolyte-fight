@@ -219,7 +219,7 @@ function isGameRunning(game: g.Game) {
 }
 
 export function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, authToken: string, socketId: string) {
-	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers) {
+	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
 
@@ -263,8 +263,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 
 	let statusChanged = false;
 
-	if ((game.active.size > 1 && _.some(data.actions, action => isSpell(action)))
-		|| game.active.size >= Matchmaking.MaxPlayers) {
+	if (game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
 
 		// Casting any spell closes the game
 		const newCloseTick = game.tick + Matchmaking.JoinPeriod;
