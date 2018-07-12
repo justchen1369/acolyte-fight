@@ -672,7 +672,7 @@ export namespace Spells {
 		health: 50,
 		maxRange: 0.25,
 		maxTicks: 5 * TicksPerSecond,
-		cooldown: 15 * TicksPerSecond,
+		cooldown: 20 * TicksPerSecond,
 
 		length: 0.005,
 		width: 0.15,
