@@ -60,7 +60,7 @@ export namespace World {
 	export const HeroLayoutRadius = 0.25;
 
 	export const LavaDamagePerTick = 0.25;
-	export const ShrinkPerTick = 0.00005;
+	export const ShrinkPerTick = 0.000075;
 	export const InitialShieldTicks = 1.0 * TicksPerSecond;
 
 	export const Layouts: c.Layout[] = [
