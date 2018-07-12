@@ -18,7 +18,7 @@ export namespace Categories {
 export namespace Matchmaking {
 	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 3 * 60 * TicksPerSecond;
-	export const MaxPlayers = 6;
+	export const MaxPlayers = 5;
 }
 
 export namespace Hero {
@@ -87,9 +87,9 @@ export namespace World {
 		{
 			obstacles: [
 				{
-					numObstacles: 6,
+					numObstacles: 5,
 					layoutRadius: 0.15,
-					layoutAngleOffset: (1 / 6) * Math.PI,
+					layoutAngleOffset: (1 / 5) * Math.PI,
 					numPoints: 3,
 					extent: Hero.Radius,
 					orientationAngleOffset: Math.PI,
@@ -102,7 +102,7 @@ export namespace World {
 					numObstacles: 1,
 					layoutRadius: 0,
 					layoutAngleOffset: 0,
-					numPoints: 9,
+					numPoints: 12,
 					extent: Hero.Radius * 2,
 					orientationAngleOffset: 0,
 				},
@@ -111,7 +111,7 @@ export namespace World {
 		{
 			obstacles: [
 				{
-					numObstacles: 6,
+					numObstacles: 5,
 					layoutRadius: 0.32,
 					layoutAngleOffset: 0,
 					numPoints: 4,
@@ -119,9 +119,9 @@ export namespace World {
 					orientationAngleOffset: (1 / 4) * Math.PI,
 				},
 				{
-					numObstacles: 6,
+					numObstacles: 5,
 					layoutRadius: 0.15,
-					layoutAngleOffset: (1 / 6) * Math.PI,
+					layoutAngleOffset: (1 / 5) * Math.PI,
 					numPoints: 4,
 					extent: Hero.Radius,
 					orientationAngleOffset: (1 / 4) * Math.PI,
@@ -145,7 +145,7 @@ export namespace World {
 				{
 					numObstacles: 15,
 					layoutRadius: 0.35,
-					layoutAngleOffset: (1 / 6) * Math.PI,
+					layoutAngleOffset: (1 / 5) * Math.PI,
 					numPoints: 3,
 					extent: Hero.Radius,
 					orientationAngleOffset: Math.PI,
