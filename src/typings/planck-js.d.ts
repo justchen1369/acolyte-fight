@@ -55,6 +55,10 @@ declare module "planck-js" {
             getShape(): Shape;
             isSensor(): boolean;
             setSensor(sensor: boolean): void;
+            getFilterGroupIndex(): number;
+            getFilterCategoryBits(): number;
+            getFilterMaskBits(): number;
+            setFilterData(filter: Filter): void;
         }
 
         interface FixtureDef {
@@ -63,6 +67,12 @@ declare module "planck-js" {
             filterGroupIndex?: number;
             density?: number;
             restitution?: number;
+        }
+
+        interface Filter {
+            categoryBits: number;
+            maskBits: number;
+            groupIndex: number;
         }
 
         type Shape = Circle | Polygon;

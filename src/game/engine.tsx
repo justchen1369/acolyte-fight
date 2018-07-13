@@ -164,7 +164,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 	} as pl.BodyDef);
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
-		filterMaskBits: Categories.All,
+		filterMaskBits: Categories.All ^ Categories.Shield,
 		filterGroupIndex,
 		density: Hero.Density,
 		restitution: 1.0,
@@ -311,9 +311,9 @@ export function tick(world: w.World) {
 	homingForce(world);
 	linkForce(world);
 	gravityForce(world);
+	updateKnockback(world);
 
 	shields(world);
-
 	physicsStep(world);
 	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
 		handleContact(world, contact);
@@ -924,13 +924,35 @@ function shields(world: w.World) {
 	});
 }
 
+function updateKnockback(world: w.World) {
+	world.objects.forEach(hero => {
+		if (hero.category === "hero") {
+			if (hero.thrust) {
+				updateMaskBits(hero.body.getFixtureList(), Categories.All);
+			} else {
+				updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
+			}
+		}
+	});
+}
+
+function updateMaskBits(fixture: pl.Fixture, newMaskBits: number) {
+	if (fixture.getFilterMaskBits() !== newMaskBits) {
+		fixture.setFilterData({
+			groupIndex: fixture.getFilterGroupIndex(),
+			categoryBits: fixture.getFilterCategoryBits(),
+			maskBits: newMaskBits,
+		});
+	}
+}
+
 function decayThrust(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.category === "hero" && obj.thrust) {
-			--obj.thrust.ticks;
-			if (obj.thrust.ticks <= 0) {
-				obj.body.setLinearVelocity(vector.zero());
-				obj.thrust = null;
+	world.objects.forEach(hero => {
+		if (hero.category === "hero" && hero.thrust) {
+			--hero.thrust.ticks;
+			if (hero.thrust.ticks <= 0) {
+				hero.body.setLinearVelocity(vector.zero());
+				hero.thrust = null;
 			}
 		}
 	});
