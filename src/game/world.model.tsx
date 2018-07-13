@@ -112,6 +112,7 @@ export interface HomingParametersTemplate {
 	maxTurnProportion?: number;
     targetType?: string;
 	redirect?: boolean;
+	afterTicks?: number;
 }
 
 export interface DetonateParametersTemplate {
@@ -484,6 +485,7 @@ export interface HomingParameters {
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
 	targetType: string;
+	afterTick: number;
 	redirectionTick: number | null;
 	speedWhenClose: number;
 }

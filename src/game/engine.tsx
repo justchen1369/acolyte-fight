@@ -256,6 +256,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
+			afterTick: world.tick + (projectileTemplate.homing.afterTicks || 0),
 			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
 			speedWhenClose: projectileTemplate.homing.speedWhenClose,
 		} as w.HomingParameters,
@@ -817,7 +818,7 @@ function gravityForce(world: w.World) {
 
 function homingForce(world: w.World) {
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.homing)) {
+		if (!(obj.category === "projectile" && obj.homing && world.tick >= obj.homing.afterTick)) {
 			return;
 		}
 

@@ -466,7 +466,7 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1,
-			explodeOn: Categories.None,
+			explodeOn: Categories.Hero,
 			shieldTakesOwnership: false,
 
 			link: {
@@ -477,9 +477,9 @@ export namespace Spells {
 
 			homing: {
 				turnRate: 2 * Math.PI,
-				minDistanceToTarget: 0.3,
+				afterTicks: 1.0 * TicksPerSecond,
 				targetType: c.HomingTargets.self,
-			} as c.HomingParameters,
+			} as c.HomingParametersTemplate,
 
 			trailTicks: 1,
 
