@@ -60,6 +60,7 @@ declare module "planck-js" {
         interface FixtureDef {
             filterCategoryBits?: number;
             filterMaskBits?: number;
+            filterGroupIndex?: number;
             density?: number;
             restitution?: number;
         }

@@ -39,7 +39,7 @@ export function initialWorld(): w.World {
 
 		nextObstacleId: 0,
 		nextPositionId: 0,
-		nextBulletId: 0,
+		nextObjectId: 0,
 		nextColorId: 0,
 
 		ui: {
@@ -75,7 +75,7 @@ function polygon(numPoints: number, extent: number) {
 }
 
 function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
-	const obstacleId = "obstacle" + (world.nextObstacleId++);
+	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
 		type: 'static',
@@ -109,16 +109,45 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
+function addShield(world: w.World, hero: w.Hero, spell: w.ShieldSpell) {
+	const shieldId = "shield" + (world.nextObjectId++);
+
+	const body = world.physics.createBody({
+		userData: shieldId,
+		type: 'static',
+		position: vector.clone(hero.body.getPosition()),
+	});
+
+	body.createFixture(pl.Circle(spell.radius), {
+		filterCategoryBits: Categories.Shield,
+		filterMaskBits: Categories.Hero | Categories.Projectile,
+		filterGroupIndex: hero.filterGroupIndex,
+	});
+
+	const shield: w.Shield = {
+		id: shieldId,
+		category: "shield",
+		categories: Categories.Shield,
+		body,
+		expireTick: world.tick + spell.maxTicks,
+		owner: hero.id,
+	};
+
+	world.objects.set(shield.id, shield);
+	return shield;
+}
+
 function addHero(world: w.World, heroId: string, playerName: string) {
+	const heroIndex = world.nextPositionId++;
+	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
+
 	let position;
 	let angle;
 	{
 		const radius = World.HeroLayoutRadius;
 		const center = pl.Vec2(0.5, 0.5);
 
-		const nextHeroIndex = world.nextPositionId++;
-
-		let posAngle = 2 * Math.PI * nextHeroIndex / Matchmaking.MaxPlayers;
+		let posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
 		position = vector.plus(vector.multiply(vector.fromAngle(posAngle), radius), center);
 
 		angle = posAngle + Math.PI; // Face inward
@@ -136,6 +165,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
 		filterMaskBits: Categories.All,
+		filterGroupIndex,
 		density: Hero.Density,
 		restitution: 1.0,
 	});
@@ -145,6 +175,7 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		name: playerName,
 		category: "hero",
 		type: "hero",
+		filterGroupIndex,
 		categories: Categories.Hero,
 		collideWith: Categories.All,
 		health: Hero.MaxHealth,
@@ -173,7 +204,7 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 }
 
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.Spell, projectileTemplate: w.ProjectileTemplate) {
-	let id = spell.id + (world.nextBulletId++);
+	let id = spell.id + (world.nextObjectId++);
 
 	const from = hero.body.getPosition();
 	const direction = vector.unit(vector.diff(target, from));
@@ -201,7 +232,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 		restitution: 1.0,
 	} as pl.FixtureDef);
 
-	let targetObj = findNearest(world.objects, target, x => x.type === "hero" && x.id !== hero.id);
+	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && x.id !== hero.id);
 
 	let projectile = {
 		id,
@@ -279,7 +310,8 @@ export function tick(world: w.World) {
 	homingForce(world);
 	linkForce(world);
 	gravityForce(world);
-	updateKnockback(world);
+
+	shields(world);
 
 	physicsStep(world);
 	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
@@ -287,7 +319,6 @@ export function tick(world: w.World) {
 	}
 
 	applySpeedLimit(world);
-	decayShields(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -586,6 +617,8 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 			handleProjectileHitProjectile(world, object, hit);
 		} else if (hit.category === "obstacle") {
 			handleProjectileHitObstacle(world, object, hit);
+		} else if (hit.category === "shield") {
+			handleProjectileHitShield(world, object, hit);
 		}
 	} else if (object.category === "hero") {
 		if (hit.category === "hero") {
@@ -594,7 +627,16 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 			handleHeroHitProjectile(world, object, hit);
 		} else if (hit.category === "obstacle") {
 			handleHeroHitObstacle(world, object, hit);
+		} else if (hit.category === "shield") {
+			handleHeroHitShield(world, object, hit);
 		}
+	}
+}
+
+function handleHeroHitShield(world: w.World, hero: w.Hero, other: w.Shield) {
+	if (hero.thrust) {
+		// Thrust into shield means the hero bounces off
+		hero.thrust.nullified = true;
 	}
 }
 
@@ -610,14 +652,9 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 
 	// If using thrust, cause damage
 	if (hero.thrust) {
-		if (other.shieldTicks) {
-			// Thrust into shield means the hero bounces off
-			hero.thrust.nullified = true;
-		} else {
-			if (!hero.thrust.alreadyHit.has(other.id)) {
-				hero.thrust.alreadyHit.add(other.id);
-				applyDamage(other, hero.thrust, hero.id, world);
-			}
+		if (!hero.thrust.alreadyHit.has(other.id)) {
+			hero.thrust.alreadyHit.add(other.id);
+			applyDamage(other, hero.thrust, hero.id, world);
 		}
 	}
 }
@@ -651,30 +688,30 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 	}
 }
 
+function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
+	if (projectile.shieldTakesOwnership && projectile.owner !== shield.owner) { // Stop double redirections cancelling out
+		// Redirect back to owner
+		projectile.targetId = projectile.owner;
+		projectile.owner = shield.owner;
+	}
+
+	projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
+}
+
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
-	if (hero.shieldTicks > 0) {
-		if (projectile.shieldTakesOwnership && projectile.owner !== hero.id) { // Stop double redirections cancelling out
-			// Redirect back to owner
-			projectile.targetId = projectile.owner;
-			projectile.owner = hero.id;
-		}
+	if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
+		projectile.alreadyHit.add(hero.id);
 
-		projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
-	} else {
-		if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
-			projectile.alreadyHit.add(hero.id);
+		applyDamage(hero, projectile, projectile.owner, world);
+		linkTo(projectile, hero, world);
+		applyGravity(projectile, hero, world);
+		projectile.hit = true;
+	}
 
-			applyDamage(hero, projectile, projectile.owner, world);
-			linkTo(projectile, hero, world);
-			applyGravity(projectile, hero, world);
-			projectile.hit = true;
-		}
-
-		if (projectile.bounce) { // Only bounce off heroes, not projectiles
-			bounceToNext(projectile, hero, world);
-		} else if (projectile.explodeOn & hero.categories) {
-			destroyObject(world, projectile);
-		}
+	if (projectile.bounce) { // Only bounce off heroes, not projectiles
+		bounceToNext(projectile, hero, world);
+	} else if (projectile.explodeOn & hero.categories) {
+		destroyObject(world, projectile);
 	}
 }
 
@@ -703,7 +740,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 
 	target.gravity = {
 		expireTick: world.tick + projectile.gravity.ticks,
-		location: projectile.body.getPosition(),
+		location: vector.clone(projectile.body.getPosition()),
 		strength: projectile.gravity.strength,
 		radius: projectile.gravity.radius,
 		power: projectile.gravity.power,
@@ -873,10 +910,15 @@ function linkForce(world: w.World) {
 	});
 }
 
-function decayShields(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.category === "hero" && obj.shieldTicks > 0) {
-			--obj.shieldTicks;
+function shields(world: w.World) {
+	world.objects.forEach(shield => {
+		if (shield.category === "shield" && world.tick < shield.expireTick) {
+			const hero = world.objects.get(shield.owner);
+			if (hero) {
+				shield.body.setPosition(vector.clone(hero.body.getPosition()));
+			} else {
+				shield.expireTick = world.tick;
+			}
 		}
 	});
 }
@@ -901,29 +943,6 @@ function decayObstacles(world: w.World) {
 	});
 }
 
-function updateKnockback(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.category === "hero") {
-			const proportion = obj.health / Hero.MaxHealth;
-
-			// Mass
-			let mass = null;
-			if (obj.shieldTicks) {
-				mass = Spells.shield.mass;
-			}
-
-			if (obj.massOverride !== mass) {
-				obj.massOverride = mass;
-				if (mass) {
-					obj.body.setMassData({ mass, center: vector.zero(), I: 0 });
-				} else {
-					obj.body.resetMassData();
-				}
-			}
-		}
-	});
-}
-
 function detonate(world: w.World) {
 	world.objects.forEach(obj => {
 		if (!(obj.category === "projectile" && obj.detonate)) {
@@ -940,7 +959,7 @@ function detonate(world: w.World) {
 				if (other.category === "hero") {
 					const diff = vector.diff(other.body.getPosition(), obj.body.getPosition());
 					const distance = vector.length(diff);
-					if (other.id !== obj.owner && !other.shieldTicks && distance <= obj.detonate.radius + Hero.Radius) {
+					if (other.id !== obj.owner && distance <= obj.detonate.radius + Hero.Radius) {
 						applyDamage(other, obj, obj.owner, world);
 
 						const proportion = 1.0 - (distance / (obj.detonate.radius + Hero.Radius)); // +HeroRadius because only need to touch the edge
@@ -1006,6 +1025,10 @@ function reap(world: w.World) {
 			}
 		} else if (obj.category === "obstacle") {
 			if (obj.health <= 0) {
+				destroyObject(world, obj);
+			}
+		} else if (obj.category === "shield") {
+			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
 			}
 		}
@@ -1287,7 +1310,7 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Wal
 }
 
 function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
-	hero.shieldTicks = Math.max(hero.shieldTicks || 0, spell.maxTicks);
+	addShield(world, hero, spell);
 	return true;
 }
 

@@ -209,9 +209,8 @@ export interface World {
 	occurrences: Occurrence[];
 	actions: Map<string, Action>,
 
-	nextObstacleId: number;
 	nextPositionId: number;
-	nextBulletId: number;
+	nextObjectId: number;
 	nextColorId: number;
 	
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
@@ -344,13 +343,14 @@ export interface WorldObjectBase {
 	id: string;
 	category: string;
 	categories: number;
-	type: string;
 	body: pl.Body;
 	destroyed?: boolean;
 }
 
 export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
+	type: string;
+
 	maxHealth: number;
 	health: number;
 	createTick: number;
@@ -362,14 +362,13 @@ export interface Obstacle extends WorldObjectBase {
 
 export interface Hero extends WorldObjectBase {
 	category: "hero";
-	type: "hero";
+	filterGroupIndex: number;
 
 	health: number;
 	body: pl.Body;
 	massOverride?: number;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
-	shieldTicks?: number;
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
@@ -379,6 +378,12 @@ export interface Hero extends WorldObjectBase {
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
+}
+
+export interface Shield extends WorldObjectBase {
+	category: "shield";
+	expireTick: number;
+	owner: string;
 }
 
 export interface CastState {
@@ -424,6 +429,7 @@ export interface Cooldowns {
 
 export interface Projectile extends WorldObjectBase, DamagePacket {
 	category: "projectile";
+	type: string;
 
 	owner: string;
 	body: pl.Body;
@@ -494,6 +500,7 @@ export interface DamagePacket {
 
 export type WorldObject =
 	Hero
+	| Shield
 	| Projectile
 	| Obstacle;
 

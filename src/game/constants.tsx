@@ -8,10 +8,11 @@ export const Pixel = 0.001;
 
 export namespace Categories {
 	export const All = 0xFFFF;
-	export const Hero = 1;
-	export const Projectile = 2;
-	export const Massive = 4;
-	export const Obstacle = 8;
+	export const Hero = 0x1;
+	export const Projectile = 0x2;
+	export const Massive = 0x4;
+	export const Obstacle = 0x8;
+	export const Shield = 0x10;
 	export const None = 0;
 }
 
@@ -343,7 +344,6 @@ export namespace Spells {
 			damage: 5,
 			damageScaling: false,
 			trailTicks: 1.0 * TicksPerSecond,
-			collideWith: Categories.All,
 			explodeOn: Categories.All,
 
 			render: "ray",
@@ -507,8 +507,8 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 3.0 * TicksPerSecond,
 			damage: 4,
-			collideWith: Categories.Hero | Categories.Obstacle,
-			explodeOn: Categories.All ^ Categories.Obstacle,
+			collideWith: Categories.All ^ Categories.Projectile,
+			explodeOn: Categories.None,
 			bounce: {
 				damageFactor: 0.9,
 			},
@@ -570,7 +570,7 @@ export namespace Spells {
 			speed: 0.3,
 			maxTicks: 8.0 * TicksPerSecond,
 			damage: 0,
-			collideWith: Categories.Hero | Categories.Massive,
+			collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
 			explodeOn: Categories.All,
 
 			gravity: {

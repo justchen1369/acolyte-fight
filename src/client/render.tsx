@@ -126,6 +126,8 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 				renderLinkBetween(ctxStack, obj, target);
 			}
 		}
+	} else if (obj.category === "shield") {
+		renderShield(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
 	} else if (obj.category === "obstacle") {
@@ -408,28 +410,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		ctx.restore();
 	}
 
-	// Shield
-	if (hero.shieldTicks) {
-		let spell = Spells.shield;
-		let proportion = 1.0 * hero.shieldTicks / spell.maxTicks;
-
-		ctx.save();
-
-		const MaxAlpha = 0.75;
-		const MinAlpha = 0.10;
-		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
-		ctx.fillStyle = spell.color;
-		ctx.shadowColor = spell.color;
-		ctx.shadowBlur = 10;
-
-		ctx.beginPath();
-		ctx.arc(0, 0, spell.radius, 0, 2 * Math.PI);
-		ctx.fill();
-
-
-		ctx.restore();
-	}
-
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
 	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
@@ -457,6 +437,39 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			ctx.restore();
 		}
 	}
+
+	ctx.restore();
+}
+
+function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
+	const MaxAlpha = 0.75;
+	const MinAlpha = 0.10;
+	const ctx = ctxStack.canvas;
+
+	const hero = world.objects.get(shield.owner);
+	if (!hero) {
+		return;
+	}
+	const pos = hero.body.getPosition();
+
+	const ticksRemaining = shield.expireTick - world.tick;
+
+	let spell = Spells.shield;
+	let proportion = 1.0 * ticksRemaining / spell.maxTicks;
+
+	ctx.save();
+
+	ctx.translate(pos.x, pos.y);
+
+	ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
+	ctx.fillStyle = spell.color;
+	ctx.shadowColor = spell.color;
+	ctx.shadowBlur = 10;
+
+	ctx.beginPath();
+	ctx.arc(0, 0, spell.radius, 0, 2 * Math.PI);
+	ctx.fill();
+
 
 	ctx.restore();
 }
