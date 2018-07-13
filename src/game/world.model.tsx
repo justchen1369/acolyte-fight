@@ -15,7 +15,8 @@ export type Spell =
 	| WallSpell;
 
 export interface SpellBase {
-    id: string;
+	id: string;
+	name?: string;
     description: string;
     action: string;
 

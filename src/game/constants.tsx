@@ -466,7 +466,7 @@ export namespace Spells {
 			maxSpeed: 1.0,
 			maxTicks: 2.0 * TicksPerSecond,
 			damage: 1,
-			explodeOn: Categories.Obstacle & Categories.Massive,
+			explodeOn: Categories.None,
 			shieldTakesOwnership: false,
 
 			link: {
@@ -570,7 +570,7 @@ export namespace Spells {
 			speed: 0.3,
 			maxTicks: 8.0 * TicksPerSecond,
 			damage: 0,
-			collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
+			collideWith: Categories.Hero | Categories.Massive,
 			explodeOn: Categories.All,
 
 			gravity: {
@@ -651,14 +651,15 @@ export namespace Spells {
 
 	export const shield = {
 		id: 'shield',
-		description: "Deflect any projectiles. Deflected projectiles become your projectiles. Try sending a 'homing' back to where it came from!",
+		name: 'Reflect',
+		description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
 
 		mass: 100000,
 		maxTicks: 3 * TicksPerSecond,
 		cooldown: 20 * TicksPerSecond,
 		radius: Hero.Radius * 2,
 
-		icon: "shield",
+		icon: "shieldReflect",
 
 		color: '#3366ff',
 
