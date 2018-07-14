@@ -18,7 +18,8 @@ export interface SpellBase {
 	id: string;
 	name?: string;
     description: string;
-    action: string;
+	action: string;
+	untargeted?: boolean;
 
     maxAngleDiff?: number;
 
@@ -233,6 +234,7 @@ export interface HeroScore {
 export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
+	nextSpellId?: string;
 	renderedTick: number | null;
 
 	destroyed: WorldObject[];

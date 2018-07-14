@@ -702,14 +702,31 @@ function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: Cl
 	}
 }
 
+export function whichKeyClicked(pos: pl.Vec2, rect: ClientRect) {
+	const region = buttonBarRegion(rect);
+	if (!(region.left <= pos.x && pos.x < region.right && region.top <= pos.y && pos.y < region.bottom)) {
+		return null;
+	}
+
+	const buttonRegionWidth = ButtonBar.Size + ButtonBar.Spacing;
+	const buttonIndex = Math.trunc((pos.x - region.left) / buttonRegionWidth);
+	const buttonLeft = region.left + buttonRegionWidth * buttonIndex;
+	const buttonRight = buttonLeft + ButtonBar.Size;
+	if (!(buttonLeft <= pos.x && pos.x < buttonRight)) {
+		return null;
+	}
+
+	return ButtonBar.Keys[buttonIndex];
+}
+
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
 
 	const keys = ButtonBar.Keys;
-	let buttonBarWidth = keys.length * ButtonBar.Size + (keys.length - 1) * ButtonBar.Spacing;
+	const region = buttonBarRegion(rect);
 
 	ctx.save();
-	ctx.translate(rect.width / 2.0 - buttonBarWidth / 2.0, rect.height - ButtonBar.Size - ButtonBar.Margin);
+	ctx.translate(region.left, region.top);
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
@@ -727,6 +744,21 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 	}
 
 	ctx.restore();
+}
+
+function buttonBarRegion(rect: ClientRect): ClientRect {
+	const keys = ButtonBar.Keys;
+
+	const height = ButtonBar.Size;
+	const width = keys.length * ButtonBar.Size + (keys.length - 1) * ButtonBar.Spacing;
+
+	const left = rect.width / 2.0 - width / 2.0;
+	const top = rect.height - ButtonBar.Size - ButtonBar.Margin;
+
+	const right = left + width;
+	const bottom = top + height;
+
+	return { left, top, right, bottom, width, height };
 }
 
 function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRenderState) {
@@ -758,7 +790,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 		cooldownText: null,
 	};
 
-	let isSelected = selectedAction === spell.id;
+	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 	if (isSelected) {

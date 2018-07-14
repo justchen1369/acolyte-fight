@@ -630,6 +630,7 @@ export namespace Spells {
 	export const scourge = {
 		id: 'scourge',
 		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
+		untargeted: true,
 
 		radius: Hero.Radius * 4,
 		chargeTicks: 0.5 * TicksPerSecond,
@@ -653,6 +654,7 @@ export namespace Spells {
 		id: 'shield',
 		name: 'Reflect',
 		description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
+		untargeted: true,
 
 		mass: 100000,
 		maxTicks: 3 * TicksPerSecond,

@@ -483,7 +483,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown };
 	}
 
-	const angleDiff = turnTowards(hero, action.target);
+	const angleDiff = spell.untargeted ? 0 : turnTowards(hero, action.target);
 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {

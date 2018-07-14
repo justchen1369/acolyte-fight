@@ -1,6 +1,6 @@
 import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond, TicksPerTurn } from '../game/constants';
-import { fullRerender, render, calculateWorldRect, CanvasStack } from './render';
+import { whichKeyClicked, fullRerender, render, calculateWorldRect, CanvasStack } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
@@ -90,15 +90,22 @@ export function attachToCanvas(canvasStack: CanvasStack) {
     fullScreenCanvas();
 
 	canvasStack.ui.onmousemove = (ev) => canvasMouseMove(ev);
-
 	canvasStack.ui.onmouseenter = (ev) => canvasMouseMove(ev);
-	canvasStack.ui.onmouseleave = (ev) => { isMouseDown = false; };
+	canvasStack.ui.ontouchmove = (ev) => canvasTouch(ev);
 	
     canvasStack.ui.onmousedown = (ev) => {
 		isMouseDown = true;
 		canvasMouseMove(ev);
 	};
-    canvasStack.ui.onmouseup = (ev) => { isMouseDown = false; };
+	canvasStack.ui.ontouchstart = (ev) => {
+		isMouseDown = true;
+		canvasTouch(ev);
+	}
+
+	canvasStack.ui.onmouseleave = (ev) => { isMouseDown = false; };
+	canvasStack.ui.onmouseup = (ev) => { isMouseDown = false; };
+	canvasStack.ui.ontouchcancel = (ev) => { isMouseDown = false; };
+	canvasStack.ui.ontouchend = (ev) => { isMouseDown = false; };
 
     window.onkeyup = (ev) => gameKeyUp(ev);
     window.onkeydown = (ev) => gameKeyDown(ev);
@@ -179,16 +186,68 @@ function notify(...notifications: w.Notification[]) {
 }
 
 export function canvasMouseMove(e: MouseEvent) {
+	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+	let interfacePoint = pl.Vec2((e.clientX - rect.left), (e.clientY - rect.top));
+	const mouseDown = !!(e.buttons || e.button || (isSafari && e.which));
+
+	canvasTouchHandler(interfacePoint, rect, mouseDown);
+}
+
+function canvasTouch(e: TouchEvent) {
+	e.preventDefault();
+
+	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
+
+	const handled = new Set<number>();
+	for (let i = 0; i < e.changedTouches.length; ++i) { // Handled changed first - forces spells to go to current target
+		const touch = e.changedTouches.item(i);
+		if (!handled.has(touch.identifier)) {
+			handled.add(touch.identifier);
+			canvasSingleTouch(touch, rect);
+		}
+	}
+
+	for (let i = 0; i < e.touches.length; ++i) {
+		const touch = e.touches.item(i);
+		if (!handled.has(touch.identifier)) {
+			handled.add(touch.identifier);
+			canvasSingleTouch(touch, rect);
+		}
+	}
+}
+
+function canvasSingleTouch(touch: Touch, rect: ClientRect) {
+	let interfacePoint = pl.Vec2((touch.clientX - rect.left), (touch.clientY - rect.top));
+
+	const mouseDown = true;
+	canvasTouchHandler(interfacePoint, rect, mouseDown);
+}
+
+function canvasTouchHandler(interfacePoint: pl.Vec2, rect: ClientRect, mouseDown: boolean) {
 	if (!world.ui.myGameId || !world.ui.myHeroId){
 		return;
 	}
 
-	let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
 	let worldRect = calculateWorldRect(rect);
-	let target = pl.Vec2((e.clientX - rect.left - worldRect.left) / worldRect.width, (e.clientY - rect.top - worldRect.top) / worldRect.height);
+	let target = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
 
-	if (e.buttons || e.button || (isSafari && e.which)) {
-		sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "move", target });
+	if (mouseDown) {
+		const key = whichKeyClicked(interfacePoint, rect);
+		if (key) {
+			const spellId = keyToSpellId(key);
+			const spell = Spells.all[spellId];
+			if (spell) {
+				if (spell.untargeted) {
+					sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: nextTarget });
+				} else {
+					world.ui.nextSpellId = spellId;
+				}
+			}
+		} else {
+			const spellId = world.ui.nextSpellId || "move";
+			sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
+			world.ui.nextSpellId = null;
+		}
 	}
 
 	nextTarget = target; // Set for next keyboard event
@@ -204,18 +263,26 @@ export function gameKeyDown(e: KeyboardEvent) {
 
 	if (!world.ui.myGameId || !world.ui.myHeroId) { return; }
 
-	const hero = world.objects.get(world.ui.myHeroId);
-	if (!hero || hero.category !== "hero") { return; }
-
 	const key = readKey(e);
+	const spellType = keyToSpellId(key);
+	if (spellType) {
+		sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: nextTarget });
+	}
+}
+
+function keyToSpellId(key: string): string {
+	if (!key) { return null; }
+
+	const hero = world.objects.get(world.ui.myHeroId);
+	if (!hero || hero.category !== "hero") { return null; }
 
 	const spellId = hero.keysToSpells.get(key);
-	if (!spellId) { return }
+	if (!spellId) { return null; }
 
 	const spell = Spells.all[spellId];
-	if (!spell) { return; }
+	if (!spell) { return null; }
 
-	sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: nextTarget });
+	return spell.id;
 }
 
 export function gameKeyUp(e: KeyboardEvent) {
