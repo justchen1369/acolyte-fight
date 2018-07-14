@@ -15,7 +15,7 @@ import { MessagesPanel } from './messagesPanel';
 
 const socket = socketLib();
 
-const playerName = getOrCreatePlayerName();
+let playerName = getOrCreatePlayerName();
 
 function getOrCreatePlayerName(): string {
     let name = Storage.loadName();
@@ -73,6 +73,7 @@ function onNewGameClicked() {
         // New server? Reload the client, just in case the version has changed.
         window.location.reload();
     } else {
+        playerName = getOrCreatePlayerName(); // Reload name
         joinNewGame(playerName, retrieveKeyBindings(), room);
 
         let params = [];
