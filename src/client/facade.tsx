@@ -1,6 +1,6 @@
 import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond, TicksPerTurn } from '../game/constants';
-import { whichKeyClicked, fullRerender, render, calculateWorldRect, CanvasStack } from './render';
+import { whichKeyClicked, clearRenderCache, render, calculateWorldRect, CanvasStack } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
@@ -112,7 +112,7 @@ export function attachToCanvas(canvasStack: CanvasStack) {
     window.onresize = fullScreenCanvas;
 
     canvasStack.ui.oncontextmenu = (ev) => {
-            ev.preventDefault();
+		ev.preventDefault();
     };
 
 	window.requestAnimationFrame(frameLoop);
@@ -128,7 +128,8 @@ export function attachToCanvas(canvasStack: CanvasStack) {
         canvasStack.canvas.height = document.body.clientHeight;
         canvasStack.ui.width = document.body.clientWidth;
 		canvasStack.ui.height = document.body.clientHeight;
-		fullRerender(world);
+
+		clearRenderCache(world);
     }
 
     function frameLoop() {

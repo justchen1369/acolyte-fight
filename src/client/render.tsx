@@ -23,7 +23,7 @@ export interface CanvasCtxStack {
 }
 
 // Rendering
-export function fullRerender(world: w.World) {
+export function clearRenderCache(world: w.World) {
 	world.ui.renderedTick = null;
 	world.ui.buttons.clear();
 }
