@@ -262,11 +262,15 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 
 	ctx.translate(0.5, 0.5);
 
-	ctx.fillStyle = '#333333';
 	if (world.winner) {
 		const color = heroColor(world.winner, world);
 		ctx.fillStyle = color;
 		ctx.globalAlpha = 0.5;
+	} else {
+		const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, world.radius);
+		gradient.addColorStop(0, "#222222");
+		gradient.addColorStop(1, "#333333");
+		ctx.fillStyle = gradient;
 	}
 
 	ctx.beginPath();
