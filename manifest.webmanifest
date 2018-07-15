@@ -3,11 +3,25 @@
   "start_url": ".",
   "display": "fullscreen",
   "orientation": "landscape",
-  "background_color": "#ffcc00",
+  "background_color": "#000000",
   "theme_color": "#00ccff",
   "description": "A 2d multiplayer arcade game",
-  "icons": [{
-    "src": "static/svg/deadly-strike.svg",
-    "sizes": "32x32 64x64 72x72 96x96 128x128"
-  }]
+  "icons": [
+    {
+      "src": "static/icons/favicon-32.png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "static/icons/favicon-128.png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "static/icons/favicon-192.png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "static/icons/favicon-512.png",
+      "sizes": "512x512"
+    }
+  ]
 }
