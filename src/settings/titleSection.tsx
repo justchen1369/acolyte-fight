@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Hero } from '../game/constants';
 import * as m from '../game/messages.model';
 
 interface Props {
@@ -43,26 +44,37 @@ export class TitleSection extends React.Component<Props, State> {
         return <div>
             <h1 className="title">Acolyte Fight!</h1>
             <p>
-                To win, be the last one standing. 
-                You deal more damage as your health gets lower,
-                so don't give up, you can always win!
-                This game is all about skillshots - those with the best aiming and dodging will prevail. {!this.state.more && <a href="#" onClick={() => this.showMore()}>Show more...</a>}
+                Welcome Acolyte! Time to practice your skills.
+                In this arena, you'll find others just like you. Will you be the last one standing?
             </p>
+            <p>{!this.state.more && <a href="#" onClick={() => this.showMore()}>Show more...</a>}</p>
             {this.state.more && this.renderMore()}
             <h2>Share this game</h2>
             <p>
-                {this.state.roomUrl
-                ? <a href={this.state.roomUrl} target="_blank">Click here to create a private room.</a>
-                : <span>Generating private room URL...</span>}
-                {' '}
-                Share this link with your friends to play against them!</p>
+                <ul>
+                    <li>
+                        {this.state.roomUrl
+                        ? <a href={this.state.roomUrl} target="_blank">Click here to create a private room.</a>
+                        : <span>Generating private room URL...</span>}
+                        {' '}
+                        Share this link with your friends to play against them!
+                    </li>
+                    <li><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></li>
+                </ul>
+            </p>
         </div>;
     }
 
     private renderMore() {
         return <div>
+            <p>
+                This is a game of skillshots. To land spells, you've got to successfully predict how your enemy will move.
+                This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
+                Acolytes become more dangerous as they lose health - dealing up to {1 + Hero.AdditionalDamageMultiplier}x more damage!
+                This means you can always make a comeback, just keep dodging and aim carefully!
+            </p>
             <h2>Credits</h2>
-            <p><b>Acolyte Fight</b> was created by <b><a href="https://twitter.com/raysplacenspace">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
+            <p><b>Acolyte Fight</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
             <p>
                 <ul>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
