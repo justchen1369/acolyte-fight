@@ -1,0 +1,13 @@
+{
+  "name": "Arcane Enigma",
+  "start_url": ".",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#ffcc00",
+  "theme_color": "#00ccff",
+  "description": "A 2d multiplayer arcade game",
+  "icons": [{
+    "src": "static/svg/deadly-strike.svg",
+    "sizes": "32x32 64x64 72x72 96x96 128x128"
+  }]
+}

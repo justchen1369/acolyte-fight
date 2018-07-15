@@ -49,6 +49,7 @@ app.get('/location', (req, res) => onLocation(req, res));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/play', (req, res) => res.sendFile(rootDir + '/play.html'));
 app.get('/settings', (req, res) => res.sendFile(rootDir + '/settings.html'));
+app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest.webmanifest'));
 
 app.get('/', (req, res) => res.redirect('/play'));
 
