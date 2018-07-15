@@ -43,7 +43,8 @@ export class SpellConfig extends React.Component<Props, State> {
                         className={spellId === chosen ? "spell-icon-chosen" : "spell-icon-not-chosen"}
                         spellId={spellId}
                         title={this.capitalize(spellId)}
-                        onClick={() => this.onChoose(key, spellId)} />)}
+                        onClick={() => this.onChoose(key, spellId)}
+                        size={48} />)}
             </div>
             <div className="key-detail">
                 <div className="spell-name">{chosenSpell.name || chosenSpell.id}</div>

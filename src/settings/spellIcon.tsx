@@ -5,6 +5,7 @@ import { renderIcon } from '../ui/renderIcon';
 
 interface Props extends React.HTMLAttributes<HTMLCanvasElement> {
     spellId: string;
+    size: number;
 }
 
 interface State {
@@ -21,8 +22,8 @@ export class SpellIcon extends React.Component<Props, State> {
             Object.assign({}, this.props, {
                 className,
                 ref: (elem: HTMLCanvasElement) => this.onCanvasElem(elem),
-                width: ButtonBar.Size,
-                height: ButtonBar.Size,
+                width: this.props.size,
+                height: this.props.size,
             }));
     }
 
@@ -35,7 +36,7 @@ export class SpellIcon extends React.Component<Props, State> {
         const icon = Icons[spell.icon];
         if (icon) {
             const ctx = elem.getContext('2d');
-            renderIcon(ctx, icon, spell.color, 0.9, ButtonBar.Size);
+            renderIcon(ctx, icon, spell.color, 0.9, this.props.size);
         }
     }
 }
