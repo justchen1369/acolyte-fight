@@ -242,7 +242,16 @@ export interface UIState {
 
 	trails: Trail[];
 	notifications: Notification[];
+
+	buttonBar?: ButtonConfig;
+}
+
+export interface ButtonConfig {
 	buttons: Map<string, ButtonRenderState>;
+	hitBoxes: Map<string, ClientRect>;
+	region: ClientRect;
+	scaleFactor: number;
+	vertical: boolean;
 }
 
 export interface Player {

@@ -172,9 +172,10 @@ export namespace ChargingIndicator {
 	export const Width = Pixel * 2;
 }
 export namespace ButtonBar {
-	export const Spacing = 10;
+	export const Spacing = 8;
 	export const Margin = 5;
-	export const Size = 50;
+	export const Size = 64;
+	export const Gap = 32;
 	export const Keys = [
 		"a", "s",
 		null,

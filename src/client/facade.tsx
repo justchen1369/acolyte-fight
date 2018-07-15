@@ -1,11 +1,11 @@
 import pl from 'planck-js';
 import { Choices, Spells, TicksPerSecond, TicksPerTurn } from '../game/constants';
-import { whichKeyClicked, clearRenderCache, render, calculateWorldRect, CanvasStack } from './render';
+import { whichKeyClicked, resetRenderState, render, calculateWorldRect, CanvasStack } from './render';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
-export { CanvasStack } from './render';
+export { setMobile, CanvasStack } from './render';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
@@ -107,9 +107,9 @@ export function attachToCanvas(canvasStack: CanvasStack) {
 	canvasStack.ui.ontouchcancel = (ev) => { isMouseDown = false; };
 	canvasStack.ui.ontouchend = (ev) => { isMouseDown = false; };
 
-    window.onkeyup = (ev) => gameKeyUp(ev);
-    window.onkeydown = (ev) => gameKeyDown(ev);
-    window.onresize = fullScreenCanvas;
+	window.addEventListener('keyup', gameKeyUp);
+	window.addEventListener('keydown', gameKeyDown);
+	window.addEventListener('resize', fullScreenCanvas);
 
     canvasStack.ui.oncontextmenu = (ev) => {
 		ev.preventDefault();
@@ -129,8 +129,8 @@ export function attachToCanvas(canvasStack: CanvasStack) {
         canvasStack.ui.width = document.body.clientWidth;
 		canvasStack.ui.height = document.body.clientHeight;
 
-		clearRenderCache(world);
-    }
+		resetRenderState(world);
+	}
 
     function frameLoop() {
         frame(canvasStack);
@@ -233,7 +233,7 @@ function canvasTouchHandler(interfacePoint: pl.Vec2, rect: ClientRect, mouseDown
 	let target = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
 
 	if (mouseDown) {
-		const key = whichKeyClicked(interfacePoint, rect);
+		const key = whichKeyClicked(interfacePoint, world.ui.buttonBar);
 		if (key) {
 			const spellId = keyToSpellId(key);
 			const spell = Spells.all[spellId];

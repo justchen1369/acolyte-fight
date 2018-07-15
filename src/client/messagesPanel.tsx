@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
-import { Hero, TicksPerSecond } from '../game/constants';
+import { ButtonBar, Hero, TicksPerSecond } from '../game/constants';
 
 interface Props {
     store: s.Store;
@@ -44,7 +44,19 @@ export class MessagesPanel extends React.Component<Props, State> {
             rows.push(winRow);
         }
 
-        return <div>{rows}</div>;
+        // Offset the messages from the button bar
+        let marginBottom = 0;
+        let marginLeft = 0;
+        const world = this.props.store.world;
+        const buttonBar = world.ui.buttonBar;
+        if (world.ui.buttonBar) {
+            if (buttonBar.vertical) {
+                marginLeft = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+            } else {
+                marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+            }
+        }
+        return <div style={{ marginLeft, marginBottom }}>{rows}</div>;
     }
 
     private renderNotification(key: string, notification: w.Notification) {

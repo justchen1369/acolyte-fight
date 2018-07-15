@@ -8,6 +8,8 @@ import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '..
 import { Icons } from '../ui/icons';
 import { renderIcon } from '../ui/renderIcon';
 
+let isMobile: boolean = false;
+
 export interface CanvasStack {
 	background: HTMLCanvasElement;
 	glows: HTMLCanvasElement;
@@ -23,9 +25,13 @@ export interface CanvasCtxStack {
 }
 
 // Rendering
-export function clearRenderCache(world: w.World) {
+export function setMobile(_isMobile: boolean) {
+	isMobile = _isMobile;
+}
+
+export function resetRenderState(world: w.World) {
 	world.ui.renderedTick = null;
-	world.ui.buttons.clear();
+	world.ui.buttonBar = null;
 }
 
 export function calculateWorldRect(rect: ClientRect) {
@@ -55,7 +61,7 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 		throw "Error getting context";
 	}
 
-	let rect = canvasStack.canvas.getBoundingClientRect();
+	const rect = canvasStack.canvas.getBoundingClientRect();
 
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
@@ -702,63 +708,137 @@ function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: Cl
 	}
 }
 
-export function whichKeyClicked(pos: pl.Vec2, rect: ClientRect) {
-	const region = buttonBarRegion(rect);
+export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
+	if (!config) {
+		// Buttons not drawn yet
+		return null;
+	}
+
+	const region = config.region;
 	if (!(region.left <= pos.x && pos.x < region.right && region.top <= pos.y && pos.y < region.bottom)) {
 		return null;
 	}
 
-	const buttonRegionWidth = ButtonBar.Size + ButtonBar.Spacing;
-	const buttonIndex = Math.trunc((pos.x - region.left) / buttonRegionWidth);
-	const buttonLeft = region.left + buttonRegionWidth * buttonIndex;
-	const buttonRight = buttonLeft + ButtonBar.Size;
-	if (!(buttonLeft <= pos.x && pos.x < buttonRight)) {
-		return null;
-	}
+	const offset = pl.Vec2((pos.x - region.left) / config.scaleFactor, (pos.y - region.top) / config.scaleFactor);
+	let key: string = null;
+	config.hitBoxes.forEach((hitBox, candidateKey) => {
+		if (hitBox.left <= offset.x && offset.x < hitBox.right && hitBox.top <= offset.y && offset.y < hitBox.bottom) {
+			key = candidateKey;
+		}
+	});
 
-	return ButtonBar.Keys[buttonIndex];
+	return key;
 }
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
-
 	const keys = ButtonBar.Keys;
-	const region = buttonBarRegion(rect);
+
+	if (!world.ui.buttonBar) {
+		world.ui.buttonBar = calculateButtonLayout(keys, rect);
+	}
+	const config = world.ui.buttonBar;
 
 	ctx.save();
-	ctx.translate(region.left, region.top);
+	ctx.translate(config.region.left, config.region.top);
+	ctx.scale(config.scaleFactor, config.scaleFactor);
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
 		const newState = calculateButtonState(key, hero, selectedAction, world);
-		const currentState = world.ui.buttons.get(key);
+		const currentState = config.buttons.get(key);
+		const buttonRegion = config.hitBoxes.get(key);
 
-		if (buttonStateChanged(currentState, newState)) {
-			world.ui.buttons.set(key, newState);
+		if (buttonStateChanged(currentState, newState) && buttonRegion) {
+			config.buttons.set(key, newState);
 
 			ctx.save();
-			ctx.translate((ButtonBar.Size + ButtonBar.Spacing) * i, 0);
+			ctx.translate(buttonRegion.left, buttonRegion.top);
 			renderButton(ctx, newState);
 			ctx.restore();
 		}
 	}
-
 	ctx.restore();
 }
 
-function buttonBarRegion(rect: ClientRect): ClientRect {
-	const keys = ButtonBar.Keys;
+function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig {
+	const vertical = chooseButtonsVertical();
 
-	const height = ButtonBar.Size;
-	const width = keys.length * ButtonBar.Size + (keys.length - 1) * ButtonBar.Spacing;
+	const hitBoxes = new Map<string, ClientRect>();
+	let nextOffset = 0;
+	keys.forEach(key => {
+		if (nextOffset > 0) {
+			nextOffset += ButtonBar.Spacing;
+		}
 
-	const left = rect.width / 2.0 - width / 2.0;
-	const top = rect.height - ButtonBar.Size - ButtonBar.Margin;
+		if (key) {
+			const offset = nextOffset;
 
-	const right = left + width;
-	const bottom = top + height;
+			const left = vertical ? 0 : offset;
+			const top = vertical ? offset : 0;
+			const width = ButtonBar.Size;
+			const height = ButtonBar.Size;
+			const right = left + width;
+			const bottom = top + height;
+			hitBoxes.set(key, { left, top, right, bottom, width, height });
 
-	return { left, top, right, bottom, width, height };
+			nextOffset += ButtonBar.Size;
+		} else {
+			nextOffset += ButtonBar.Gap;
+		}
+	});
+
+	const scaleFactor = calculateButtonScaleFactor(rect, vertical, nextOffset);
+	const region = calculateButtonBarRegion(rect, vertical, nextOffset, scaleFactor);
+
+	return {
+		vertical,
+		hitBoxes,
+		region,
+		scaleFactor,
+		buttons: new Map<string, w.ButtonRenderState>(),
+	};
+}
+
+function chooseButtonsVertical() {
+	return isMobile;
+}
+
+function calculateButtonScaleFactor(rect: ClientRect, vertical: boolean, totalSize: number): number {
+	const availableSize = vertical ? rect.height : rect.width;
+	if (availableSize <= 0) {
+		return 1.0; // Stop division by zero errors
+	} else if (totalSize <= availableSize) {
+		return 1.0;
+	} else {
+		return availableSize / totalSize;
+	}
+}
+
+function calculateButtonBarRegion(rect: ClientRect, vertical: boolean, totalSize: number, scaleFactor: number): ClientRect {
+	const axisSize = totalSize * scaleFactor;
+	const crossSize = ButtonBar.Size * scaleFactor;
+	if (vertical) {
+		const width = crossSize;
+		const height = axisSize;
+
+		const left = ButtonBar.Margin;
+		const top = rect.height / 2.0 - height / 2.0;
+
+		const right = left + width;
+		const bottom = top + height;
+		return { left, top, right, bottom, width, height };
+	} else {
+		const height = crossSize;
+		const width = axisSize;
+
+		const left = rect.width / 2.0 - width / 2.0;
+		const top = rect.height - crossSize - ButtonBar.Margin;
+
+		const right = left + width;
+		const bottom = top + height;
+		return { left, top, right, bottom, width, height };
+	}
 }
 
 function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRenderState) {

@@ -92,7 +92,7 @@ a:hover, a:active {
 
 #messages-panel {
     position: absolute;
-    bottom: 80;
+    bottom: 8;
     left: 8;
     min-width: 30%;
 
