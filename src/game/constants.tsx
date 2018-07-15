@@ -653,7 +653,6 @@ export namespace Spells {
 
 	export const shield = {
 		id: 'shield',
-		name: 'Reflect',
 		description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
 		untargeted: true,
 
