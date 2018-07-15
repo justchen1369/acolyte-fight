@@ -20,7 +20,7 @@ let playerName = getOrCreatePlayerName();
 function getOrCreatePlayerName(): string {
     let name = Storage.loadName();
     if (!name) {
-        name = "Enigma" + (Math.random() * 10000).toFixed(0);
+        name = "Acolyte" + (Math.random() * 10000).toFixed(0);
         Storage.saveName(name);
     }
     return name;
