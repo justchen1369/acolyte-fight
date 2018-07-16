@@ -274,8 +274,14 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 		ctx.fillStyle = gradient;
 	}
 
+	let radius = world.radius;
+	if (isEdge) {
+		// Edge has a weird oscillation of Y-axis scaling for certain fractions of radius.
+		// Force it to draw perfect circles by snapping to a minimum precision.
+		radius = Math.floor(world.radius / Pixel) * Pixel;
+	}
 	ctx.beginPath();
-	ctx.arc(0, 0, world.radius, 0, 2 * Math.PI);
+	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
 	ctx.fill();
 
 	ctx.restore();
