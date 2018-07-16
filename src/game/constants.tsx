@@ -312,7 +312,7 @@ export namespace Spells {
 			categories: Categories.Projectile | Categories.Massive,
 			explodeOn: Categories.Obstacle,
 
-			render: "projectile",
+			render: "ball",
 		} as c.ProjectileTemplate,
 	} as c.ProjectileSpell;
 

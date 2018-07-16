@@ -183,7 +183,9 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	obj.uiPath.push(vector.clone(obj.body.getPosition()));
 
-	if (obj.render === "projectile") {
+	if (obj.render === "ball") {
+        renderProjectile(ctxStack, obj, world);
+	} else if (obj.render === "projectile") {
 		// Render both to ensure there are no gaps in the trail
         renderProjectile(ctxStack, obj, world);
         renderRay(ctxStack, obj, world);
