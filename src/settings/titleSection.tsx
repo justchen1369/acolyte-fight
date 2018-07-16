@@ -44,7 +44,7 @@ export class TitleSection extends React.Component<Props, State> {
         return <div>
             <h1 className="title">Acolyte Fight!</h1>
             <p>
-                Welcome Acolyte! Time to practice your skills.
+                Welcome <b>Acolyte</b>! Time to practice your skills.
                 In this arena, you'll find others just like you. Will you be the last one standing?
             </p>
             <p>{!this.state.more && <a href="#" onClick={() => this.showMore()}>Show more...</a>}</p>
@@ -74,7 +74,7 @@ export class TitleSection extends React.Component<Props, State> {
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
             <h2>Credits</h2>
-            <p><b>Acolyte Fight</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
+            <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
             <p>
                 <ul>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
