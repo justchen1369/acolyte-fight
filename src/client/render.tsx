@@ -632,17 +632,14 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 	}
 }
 
-function* getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
+function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 	if (intermediatePoints) {
-		for (let i = 0; i < path.length; ++i) {
-			yield path[i];
-		}
+		return path;
 	} else {
-		if (path.length > 0) {
-			yield path[0];
-		}
-		if (path.length > 1) {
-			yield path[path.length - 1];
+		if (path.length <= 2) {
+			return path;
+		} else {
+			return [path[0], path[path.length - 1]];
 		}
 	}
 }
