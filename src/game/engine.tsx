@@ -675,7 +675,10 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
-	applyDamageToObstacle(obstacle, projectile.damage, world);
+	if (!projectile.alreadyHit.has(obstacle.id)) {
+		projectile.alreadyHit.add(obstacle.id);
+		applyDamageToObstacle(obstacle, projectile.damage, world);
+	}
 
 	if (projectile.explodeOn & obstacle.categories) {
 		destroyObject(world, projectile);
@@ -1189,6 +1192,13 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Mov
 	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
 
 	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
+
+	world.objects.forEach(link => {
+		// Move link with the hero
+		if (link.category === "projectile" && link.type === Spells.link.id && link.owner === hero.id) {
+			link.body.setPosition(vector.plus(link.body.getPosition(), step));
+		}
+	});
 
 	return vector.distance(current, target) < constants.Pixel;
 }
