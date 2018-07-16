@@ -8,6 +8,7 @@ import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '..
 import { Icons } from '../ui/icons';
 import { renderIcon } from '../ui/renderIcon';
 
+const isEdge = window.navigator.userAgent.indexOf("Edge") > -1;
 let isMobile: boolean = false;
 
 export interface CanvasStack {
@@ -686,11 +687,25 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			ctx.arc(trail.pos.x, trail.pos.y, proportion * trail.radius, 0, 2 * Math.PI);
 			ctx.fill();
 		} else if (trail.type === "line") {
-			ctx.lineWidth = proportion * trail.width;
-			ctx.beginPath();
-			ctx.moveTo(trail.from.x, trail.from.y);
-			ctx.lineTo(trail.to.x, trail.to.y);
-			ctx.stroke();
+			if (isEdge) {
+				// Edge doesn't render lines if they are shorter than the line width, so render them ourselves.
+				const axis = vector.diff(trail.to, trail.from);
+				const cross = vector.relengthen(vector.rotateRight(axis), proportion * trail.width / 2);
+
+				ctx.beginPath();
+				ctx.moveTo(trail.from.x + cross.x, trail.from.y + cross.y);
+				ctx.lineTo(trail.to.x + cross.x, trail.to.y + cross.y);
+				ctx.lineTo(trail.to.x - cross.x, trail.to.y - cross.y);
+				ctx.lineTo(trail.from.x - cross.x, trail.from.y - cross.y);
+				ctx.closePath();
+				ctx.fill();
+			} else {
+				ctx.lineWidth = proportion * trail.width;
+				ctx.beginPath();
+				ctx.moveTo(trail.from.x, trail.from.y);
+				ctx.lineTo(trail.to.x, trail.to.y);
+				ctx.stroke();
+			}
 		}
 
 		ctx.restore();
