@@ -36,6 +36,7 @@ export class SpellConfig extends React.Component<Props, State> {
         const options = Choices.Options[key];
         const chosen = this.state.config[key] || Choices.Defaults[key];
         const chosenSpell = Spells.all[chosen];
+        const name = chosenSpell.name || chosenSpell.id;
         return <div className="key">
             <div className="key-options">
                 {options.map(spellId =>
@@ -47,9 +48,9 @@ export class SpellConfig extends React.Component<Props, State> {
                         size={48} />)}
             </div>
             <div className="key-detail">
-                <div className="spell-name">{chosenSpell.name || chosenSpell.id}</div>
+                <div className="spell-name">{name}</div>
                 <div className="description">{chosenSpell.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Your {key.toUpperCase()} spell will be {this.capitalize(chosen)} in your next game.</div>}
+                {this.state.saved.has(key) && <div className="key-saved">Your {key.toUpperCase()} spell will be {this.capitalize(name)} in your next game.</div>}
             </div>
             <div className="key-name-container">
                 <div className="key-name">{key}</div>

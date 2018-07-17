@@ -224,6 +224,7 @@ export namespace Spells {
 
 	export const flamestrike = {
 		id: 'flamestrike',
+		name: 'Boom',
 		description: "It's slower than fireball - harder to aim, but does more damage.",
 		action: "projectile",
 
@@ -318,7 +319,8 @@ export namespace Spells {
 
 	export const kamehameha = {
 		id: 'kamehameha',
-		description: "After a long charge time, unleash a powerful beam to defeat your enemies.",
+		name: 'Acolyte Beam',
+		description: "After a long charge time, unleash a beam so powerful it can wipe out a full-health enemy in seconds.",
 		action: "spray",
 
 		color: '#44ddff',
@@ -353,6 +355,7 @@ export namespace Spells {
 
 	export const lightning = {
 		id: 'lightning',
+		name: 'Zap',
 		description: "Huge knockback, if your aim is good enough.",
 		action: "projectile",
 
@@ -380,6 +383,7 @@ export namespace Spells {
 
 	export const homing = {
 		id: 'homing',
+		name: 'Seeker',
 		description: "Follows the enemy. High damage, but only if the enemy doesn't know how to dodge.",
 		action: "projectile",
 
@@ -413,6 +417,7 @@ export namespace Spells {
 
 	export const boomerang = {
 		id: 'boomerang',
+		name: 'Orbiter',
 		description: "Around and around you. Keep your enemies at a safe distance.",
 		action: "projectile",
 
@@ -449,6 +454,7 @@ export namespace Spells {
 
 	export const link = {
 		id: 'link',
+		name: 'Grab',
 		description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
 		action: "projectile",
 
@@ -521,6 +527,7 @@ export namespace Spells {
 
 	export const drain = {
 		id: 'drain',
+		name: 'Siphon',
 		description: "Steal some life from another player. They probably didn't need it anyway.",
 		action: "projectile",
 
@@ -553,6 +560,7 @@ export namespace Spells {
 
 	export const gravity = {
 		id: 'gravity',
+		name: 'Trap',
 		description: "Hold an enemy in place while you unleash your volleys upon them.",
 		action: "projectile",
 
@@ -630,7 +638,8 @@ export namespace Spells {
 
 	export const scourge = {
 		id: 'scourge',
-		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each scourge takes 10% off your health!",
+		name: 'Overload',
+		description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each blast takes 10% off your health!",
 		untargeted: true,
 
 		radius: Hero.Radius * 4,
@@ -653,6 +662,7 @@ export namespace Spells {
 
 	export const shield = {
 		id: 'shield',
+		name: 'Reflect',
 		description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
 		untargeted: true,
 
@@ -689,6 +699,7 @@ export namespace Spells {
 
 	export const teleport = {
 		id: 'teleport',
+		name: 'Blink',
 		description: "Teleport to a nearby location. Get close, or get away.",
 
 		maxRange: 0.4,
@@ -703,6 +714,7 @@ export namespace Spells {
 
 	export const thrust = {
 		id: 'thrust',
+		name: 'Charge',
 		description: "Accelerate quickly, knocking away anything in your path.",
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
