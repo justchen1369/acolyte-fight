@@ -270,7 +270,7 @@ export namespace Spells {
 		intervalTicks: 0.025 * TicksPerSecond,
 		lengthTicks: 0.5 * TicksPerSecond,
 
-		jitterRatio: 0.4,
+		jitterRatio: 0.25,
 
 		projectile: {
 			color: '#ff0044',
