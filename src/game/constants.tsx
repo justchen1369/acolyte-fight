@@ -559,7 +559,7 @@ export namespace Spells {
 
 	export const gravity = {
 		id: 'gravity',
-		name: 'Trap',
+		name: 'Ensnare',
 		description: "Hold an enemy in place while you unleash your volleys upon them.",
 		action: "projectile",
 
