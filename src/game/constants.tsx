@@ -266,12 +266,11 @@ export namespace Spells {
 
 		maxAngleDiff: 0.01 * 2 * Math.PI,
 		cooldown: 10 * TicksPerSecond,
-		chargeTicks: 0.1 * TicksPerSecond,
 
 		intervalTicks: 2,
 		lengthTicks: 20,
 
-		jitterRatio: 0.3,
+		jitterRatio: 0.4,
 
 		projectile: {
 			color: '#ff0044',
