@@ -268,10 +268,10 @@ export namespace Spells {
 		cooldown: 10 * TicksPerSecond,
 		chargeTicks: 0.1 * TicksPerSecond,
 
-		intervalTicks: 0.025 * TicksPerSecond,
-		lengthTicks: 0.5 * TicksPerSecond,
+		intervalTicks: 2,
+		lengthTicks: 20,
 
-		jitterRatio: 0.25,
+		jitterRatio: 0.3,
 
 		projectile: {
 			color: '#ff0044',
