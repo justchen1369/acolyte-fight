@@ -5,6 +5,8 @@ import * as w from '../game/world.model';
 import { Spells, TicksPerSecond } from '../game/constants';
 import { CanvasStack, sendAction, calculateWorldRect, whichKeyClicked, resetRenderState, notify, frame } from './facade';
 
+const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
+
 interface Props {
     world: w.World;
 }
@@ -119,7 +121,7 @@ export class CanvasPanel extends React.Component<Props, State> {
     private canvasMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
         let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
         let interfacePoint = pl.Vec2((e.clientX - rect.left), (e.clientY - rect.top));
-        const mouseDown = !!(e.buttons || e.button);
+        const mouseDown = !!(e.buttons || e.button || (isSafari && e.nativeEvent.which));
 
         this.canvasTouchHandler(interfacePoint, rect, mouseDown);
     }
