@@ -332,11 +332,16 @@ export interface ReplayNotFoundNotification {
 	type: "replayNotFound";
 }
 
-export type Occurrence = Joining | Leaving | EnvironmentSeed;
+export type Occurrence = Closing | Joining | Leaving | EnvironmentSeed;
 
 export interface EnvironmentSeed {
 	type: "environment";
 	seed: number;
+}
+
+export interface Closing {
+	type: "closing";
+	startTick: number;
 }
 
 export interface Joining {

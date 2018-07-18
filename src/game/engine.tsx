@@ -105,6 +105,13 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		damagePerTick: 0,
 	};
 
+	// Obstacles start immovable
+	body.setMassData({
+		mass: 1e6,
+		I: 0,
+		center: vector.zero(),
+	});
+
 	world.objects.set(obstacle.id, obstacle);
 	return obstacle;
 }
@@ -346,7 +353,9 @@ function applySpeedLimit(world: w.World) {
 
 function handleOccurences(world: w.World) {
 	world.occurrences.forEach(ev => {
-		if (ev.type === "join") {
+		if (ev.type === "closing") {
+			handleClosing(ev, world);
+		} else if (ev.type === "join") {
 			handleJoining(ev, world);
 		} else if (ev.type === "leave") {
 			handleLeaving(ev, world);
@@ -375,6 +384,16 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 
 			const orientationAngle = baseAngle + obstacleTemplate.layoutAngleOffset + obstacleTemplate.orientationAngleOffset;
 			addObstacle(world, position, orientationAngle, points, obstacleTemplate.extent);
+		}
+	});
+}
+
+function handleClosing(ev: w.Closing, world: w.World) {
+	world.startTick = ev.startTick;
+
+	world.objects.forEach(obstacle => { // Obstacles movable now
+		if (obstacle.category === "obstacle") {
+			obstacle.body.resetMassData();
 		}
 	});
 }

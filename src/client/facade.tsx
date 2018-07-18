@@ -380,7 +380,10 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				target: pl.Vec2(actionData.targetX, actionData.targetY),
 			});
 		} else if (actionData.actionType === m.ActionType.CloseGame) {
-			world.startTick = actionData.closeTick;
+			world.occurrences.push({
+				type: "closing",
+				startTick: actionData.closeTick,
+			});
 			world.ui.notifications.push({
 				type: "closing",
 				ticksUntilClose: world.startTick - world.tick,
