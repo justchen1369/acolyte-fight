@@ -711,7 +711,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		projectile.hit = true;
 	}
 
-	if (projectile.bounce) { // Only bounce off heroes, not projectiles
+	if (projectile.bounce) {
 		bounceToNext(projectile, hero, world);
 	} else if (projectile.explodeOn & hero.categories) {
 		destroyObject(world, projectile);
@@ -790,7 +790,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
 
-	projectile.alreadyHit.clear();
+	projectile.alreadyHit.delete(nextTarget.id);
 }
 
 function gravityForce(world: w.World) {
