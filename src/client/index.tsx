@@ -8,7 +8,7 @@ import queryString from 'query-string';
 import { connectToServer, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, setMobile, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../ui/storage';
-import { Choices } from '../game/constants';
+import { Choices, World } from '../game/constants';
 
 import { Root } from './root';
 
@@ -35,7 +35,7 @@ if (window.location.search) {
         observeGameId = params["g"];
     }
     if (params["p"]) {
-        page = params["page"];
+        page = params["p"];
     }
     if (params["room"]) {
         room = params["room"];
@@ -62,6 +62,10 @@ attachToSocket(socket, () => {
 attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
     rerender();
+
+    if (_.some(notifications, n => n.type === "new" || n.type === "quit")) {
+        updateUrl();
+    }
 });
 
 rerender();
@@ -88,10 +92,14 @@ function changePage(newPage: string) {
 }
 
 function updateUrl() {
+    const gameId = getStore().world.ui.myGameId;
     let params = [];
-    if (page) {
+    if (gameId) {
+        params.push("g=" + gameId);
+    } else if (page) {
         params.push("p=" + page);
     }
+
     if (room) {
         params.push("room=" + room);
     }
