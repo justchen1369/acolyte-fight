@@ -28,6 +28,11 @@ body .page {
     margin-bottom: 300px;
 }
 
+#game-panel {
+    width: 100%;
+    height: 100%;
+}
+
 canvas.game {
     background: transparent;
     cursor: crosshair;

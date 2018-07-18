@@ -56,7 +56,7 @@ export class MessagesPanel extends React.Component<Props, State> {
                 marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
             }
         }
-        return <div style={{ marginLeft, marginBottom }}>{rows}</div>;
+        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>{rows}</div>;
     }
 
     private renderNotification(key: string, notification: w.Notification) {

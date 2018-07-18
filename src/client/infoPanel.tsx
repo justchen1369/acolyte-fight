@@ -23,7 +23,7 @@ export class InfoPanel extends React.Component<Props, State> {
         const world = this.props.store.world;
 
         return (
-            <div>
+            <div id="info-panel">
                 <div>
                     <div className="welcome-name-label">Welcome {this.props.playerName}!</div>
                     <div className="settings-link">

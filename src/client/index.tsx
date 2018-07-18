@@ -5,13 +5,12 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { connectToServer, joinNewGame, attachToCanvas, attachToSocket, attachNotificationListener, setMobile, CanvasStack } from './facade';
+import { connectToServer, joinNewGame, attachToSocket, attachNotificationListener, setMobile, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore } from './storeProvider';
 import * as Storage from '../ui/storage';
 import { Choices } from '../game/constants';
 
-import { InfoPanel } from './infoPanel';
-import { MessagesPanel } from './messagesPanel';
+import { GamePanel } from './gamePanel';
 
 const socket = socketLib();
 
@@ -57,12 +56,6 @@ attachToSocket(socket, () => {
         });
     }
 });
-attachToCanvas({
-    background: document.getElementById("background") as HTMLCanvasElement,
-    glows: document.getElementById("glows") as HTMLCanvasElement,
-    canvas: document.getElementById("canvas") as HTMLCanvasElement,
-    ui: document.getElementById("ui") as HTMLCanvasElement,
-} as CanvasStack);
 attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
     rerender();
@@ -91,15 +84,11 @@ function onNewGameClicked() {
 
 function rerender() {
     ReactDOM.render(
-        <InfoPanel
+        <GamePanel
             playerName={playerName}
-            store={getStore()} />,
-        document.getElementById("info-panel"));
-    ReactDOM.render(
-        <MessagesPanel
             store={getStore()}
-            newGameCallback={onNewGameClicked} />,
-            document.getElementById("messages-panel"));
+            newGameCallback={() => onNewGameClicked()} />,
+        document.getElementById("root"));
 }
 
 function retrieveKeyBindings() {
