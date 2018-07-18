@@ -68,7 +68,7 @@ export class CanvasPanel extends React.Component<Props, State> {
 
     componentWillMount() {
         window.addEventListener('keydown', this.keyDownListener);
-        window.addEventListener('keydown', this.keyUpListener);
+        window.addEventListener('keyup', this.keyUpListener);
         window.addEventListener('resize', this.resizeListener);
 
         this.animationLoop.start();
@@ -82,12 +82,12 @@ export class CanvasPanel extends React.Component<Props, State> {
 
         window.removeEventListener('resize', this.resizeListener);
         window.removeEventListener('keydown', this.keyDownListener);
-        window.removeEventListener('keydown', this.keyUpListener);
+        window.removeEventListener('keyup', this.keyUpListener);
     }
 
     render() {
         return (
-            <div id="game-panel">
+            <div id="canvas-container">
                 <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
