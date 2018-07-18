@@ -259,6 +259,7 @@ export namespace Spells {
 
 	export const firespray = {
 		id: 'firespray',
+		name: 'Splatter',
 		description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
 		action: "spray",
 
