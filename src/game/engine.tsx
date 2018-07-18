@@ -77,7 +77,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
-		type: 'static',
+		type: 'dynamic',
 		position,
 		angle,
 		linearDamping: Obstacle.LinearDamping,
@@ -85,6 +85,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	});
 
 	body.createFixture(pl.Polygon(points), {
+		density: Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: Categories.All,
 	});
