@@ -93,7 +93,13 @@ export class CanvasPanel extends React.Component<Props, State> {
                 <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="ui" ref={c => this.canvasStack.ui = c} className="game" width={this.state.width} height={this.state.height} 
+                <canvas id="ui" ref={c => {
+                    this.canvasStack.ui = c;
+                    if (c) { // Why do I have to do this to prevent pinch zooming? Why isn't the normal event handlers enough?
+                        c.addEventListener("touchstart", ev => ev.preventDefault());
+                        c.addEventListener("touchmove", ev => ev.preventDefault());
+                    }
+                }} className="game" width={this.state.width} height={this.state.height} 
                     onMouseMove={(ev) => this.canvasMouseMove(ev)}
                     onMouseEnter={(ev) => this.canvasMouseMove(ev)}
                     onTouchMove={(ev) => this.canvasTouch(ev)}
