@@ -25,7 +25,7 @@ export class GamePanel extends React.Component<Props, State> {
 
     render() {
         const world = this.props.world;
-        const allowExit = world.activePlayers.size <= 1 || !!world.winner;
+        const allowExit = world.activePlayers.size <= 1 || !!world.winner || !world.ui.myHeroId;
         return (
             <div id="game-panel">
                 <CanvasPanel world={this.props.world} />

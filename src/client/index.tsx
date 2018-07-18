@@ -51,8 +51,8 @@ attachToSocket(socket, () => {
     connectToServer(server).then(() => {
         setConnected();
         if (observeGameId) {
-            observeGameId = null;
             joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
+            observeGameId = null;
         }
     }).catch(error => {
         console.error(error)
