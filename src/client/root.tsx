@@ -17,6 +17,7 @@ interface Props {
     changePage: (newPage: string) => void;
     newGameCallback: () => void;
     exitGameCallback: () => void;
+    watchGameCallback: (gameId: string) => void;
 }
 interface State {
 }
@@ -107,7 +108,7 @@ export class Root extends React.Component<Props, State> {
     private renderReplays() {
         return <div className="content-container">
             <div className="page">
-                <RecentGameList />
+                <RecentGameList watchGameCallback={(gameId) => this.props.watchGameCallback(gameId)} />
             </div>
         </div>;
     }

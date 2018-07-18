@@ -51,7 +51,7 @@ attachToSocket(socket, () => {
     connectToServer(server).then(() => {
         setConnected();
         if (observeGameId) {
-            joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
+            onWatchGameClicked(observeGameId);
             observeGameId = null;
         }
     }).catch(error => {
@@ -83,6 +83,10 @@ function onNewGameClicked() {
 
 function onExitGameClicked() {
     leaveCurrentGame();
+}
+
+function onWatchGameClicked(gameId: string) {
+    joinNewGame(playerName, retrieveKeyBindings(), room, gameId);
 }
 
 function changePage(newPage: string) {
@@ -120,7 +124,9 @@ function rerender() {
             items={store.items}
             changePage={newPage => changePage(newPage)}
             newGameCallback={() => onNewGameClicked()}
-            exitGameCallback={() => onExitGameClicked()}/>,
+            exitGameCallback={() => onExitGameClicked()}
+            watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
+        />,
         document.getElementById("root"));
 }
 
