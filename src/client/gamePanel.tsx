@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import * as React from 'react';
 import * as s from './store.model';
+import * as w from '../game/world.model';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
@@ -8,7 +9,8 @@ import { CanvasPanel } from './canvasPanel';
 
 interface Props {
     playerName: string;
-    store: s.Store;
+    world: w.World;
+    items: s.NotificationItem[];
     newGameCallback: () => void;
 }
 interface State {
@@ -24,9 +26,9 @@ export class GamePanel extends React.Component<Props, State> {
     render() {
         return (
             <div id="game-panel">
-                <CanvasPanel world={this.props.store.world} />
-                <InfoPanel playerName={this.props.playerName} store={this.props.store} />
-                <MessagesPanel store={this.props.store} newGameCallback={this.props.newGameCallback} />
+                <CanvasPanel world={this.props.world} />
+                <InfoPanel playerName={this.props.playerName} world={this.props.world} />
+                <MessagesPanel world={this.props.world} items={this.props.items} newGameCallback={this.props.newGameCallback} />
             </div>
         );
     }

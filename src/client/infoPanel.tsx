@@ -1,13 +1,11 @@
 import _ from 'lodash';
 import * as React from 'react';
 import { Hero } from '../game/constants';
-import * as m from '../game/messages.model';
-import * as s from './store.model';
 import * as w from '../game/world.model';
 
 interface Props {
     playerName: string;
-    store: s.Store;
+    world: w.World;
 }
 interface State {
 }
@@ -20,7 +18,7 @@ export class InfoPanel extends React.Component<Props, State> {
     }
 
     render() {
-        const world = this.props.store.world;
+        const world = this.props.world;
 
         return (
             <div id="info-panel">

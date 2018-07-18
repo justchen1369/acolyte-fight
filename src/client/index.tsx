@@ -83,10 +83,12 @@ function onNewGameClicked() {
 }
 
 function rerender() {
+    const store = getStore();
     ReactDOM.render(
         <GamePanel
             playerName={playerName}
-            store={getStore()}
+            world={store.world}
+            items={store.items}
             newGameCallback={() => onNewGameClicked()} />,
         document.getElementById("root"));
 }

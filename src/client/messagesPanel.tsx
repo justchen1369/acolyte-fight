@@ -5,7 +5,8 @@ import * as w from '../game/world.model';
 import { ButtonBar, Hero, TicksPerSecond } from '../game/constants';
 
 interface Props {
-    store: s.Store;
+    world: w.World;
+    items: s.NotificationItem[];
     newGameCallback: () => void;
 }
 interface State {
@@ -23,7 +24,7 @@ export class MessagesPanel extends React.Component<Props, State> {
         let rows = new Array<JSX.Element>();
         let winRow = null;
         const now = new Date().getTime();
-        this.props.store.items.forEach(item => {
+        this.props.items.forEach(item => {
             if (now >= item.expiryTime) {
                 return;
             }
@@ -47,7 +48,7 @@ export class MessagesPanel extends React.Component<Props, State> {
         // Offset the messages from the button bar
         let marginBottom = 0;
         let marginLeft = 0;
-        const world = this.props.store.world;
+        const world = this.props.world;
         const buttonBar = world.ui.buttonBar;
         if (world.ui.buttonBar) {
             if (buttonBar.vertical) {
@@ -135,7 +136,7 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderPlayer(player: w.Player) {
         let color = player.uiColor;
-        if (player.heroId === this.props.store.world.ui.myHeroId) {
+        if (player.heroId === this.props.world.ui.myHeroId) {
             color = Hero.MyHeroColor;
         }
         return <span className="player-name" style={{ color }}>{player.name}</span>;
