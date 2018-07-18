@@ -6,9 +6,11 @@ import { NameConfig } from '../settings/nameConfig';
 import { SpellConfig } from '../settings/spellConfig';
 import { RecentGameList } from '../settings/recentGameList';
 import { TitleSection } from '../settings/titleSection';
+import { PrivateRoomPanel } from './privateRoomPanel';
 
 interface Props {
     playerName: string;
+    room: string;
     world: w.World;
     items: s.NotificationItem[];
     page: string;
@@ -50,12 +52,13 @@ export class Root extends React.Component<Props, State> {
                 <div className="navbar">
                     {this.renderNavBarItem(null, "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
+                    {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
                 </div>
                 {page === null && this.renderHome()}
-                {page === "customize" && this.renderSettings()}
                 {page === "replays" && this.renderReplays()}
+                {page === "share" && this.renderShare()}
                 {page === "about" && this.renderAbout()}
             </div>
         );
@@ -74,6 +77,7 @@ export class Root extends React.Component<Props, State> {
                 <div className="button-row">
                     <span className="btn primary" onClick={() => this.props.newGameCallback()}>Play</span>
                 </div>
+                {this.props.room && <div className="private-room-indicator">In private room: <b>{this.props.room}</b> (<a href="?">exit room</a>)</div>}
                 <div className="spacer" />
                 <div className="fold-indicator"><i className="fa fa-chevron-down" /></div>
                 <div className="spacer" />
@@ -90,8 +94,13 @@ export class Root extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderSettings() {
+    private renderShare() {
         return <div className="content-container">
+            <div className="page">
+                <PrivateRoomPanel />
+                <h1>Discord</h1>
+                <p><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></p>
+            </div>
         </div>;
     }
 

@@ -51,20 +51,7 @@ export class TitleSection extends React.Component<Props, State> {
                 Acolytes become more dangerous as they lose health - dealing up to {1 + Hero.AdditionalDamageMultiplier}x more damage!
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
-            <h2>Share this game</h2>
-            <p>
-                <ul>
-                    <li>
-                        {this.state.roomUrl
-                        ? <a href={this.state.roomUrl} target="_blank">Click here to create a private room.</a>
-                        : <span>Generating private room URL...</span>}
-                        {' '}
-                        Share this link with your friends to play against them!
-                    </li>
-                    <li><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></li>
-                </ul>
-            </p>
-            <h2>Credits</h2>
+            <h1>Credits</h1>
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
             <p>
                 <ul>
@@ -74,7 +61,7 @@ export class TitleSection extends React.Component<Props, State> {
                     <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
                 </ul>
             </p>
-            <h2>Privacy Policy</h2>
+            <h1>Privacy Policy</h1>
             <p>
                 Replays and game stats are collected are collected for the purpose of balancing the game and making it better.
                 Your user profile is stored via cookies and browser local storage.

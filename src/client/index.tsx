@@ -106,6 +106,7 @@ function rerender() {
     ReactDOM.render(
         <Root
             page={page}
+            room={room}
             playerName={playerName}
             world={store.world}
             items={store.items}
