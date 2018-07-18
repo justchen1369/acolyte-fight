@@ -9,7 +9,7 @@ let nextNotificationId = 0;
 let store: s.Store = {
     world: getCurrentWorld(),
     items: [],
-    disconnected: false,
+    connected: false,
 };
 
 setInterval(notificationCleanup, ExpiryMilliseconds);
@@ -18,14 +18,18 @@ export function getStore() {
     return store;
 }
 
+export function setConnected() {
+    store.connected = true;
+}
+
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {
     // Detect if entered a new game
     newNotifications.forEach(n => {
-        if (n.type === "new") {
+        if (n.type === "new" || n.type === "quit") {
             store.world = getCurrentWorld();
             store.items = [];
         } else if (n.type === "disconnected") {
-            store.disconnected = true;
+            store.connected = false;
         }
     });
 

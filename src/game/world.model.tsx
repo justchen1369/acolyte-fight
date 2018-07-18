@@ -271,6 +271,7 @@ export type Notification =
 	HelpNotification 
 	| JoinNotification 
 	| LeaveNotification 
+	| QuitNotification
 	| KillNotification 
 	| NewGameNotification
 	| CloseGameNotification
@@ -322,6 +323,10 @@ export interface WinNotification {
 
 	mostKills: Player;
 	mostKillsCount: number;
+}
+
+export interface QuitNotification {
+	type: "quit";
 }
 
 export interface DisconnectedNotification {

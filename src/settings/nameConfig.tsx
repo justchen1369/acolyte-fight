@@ -27,7 +27,7 @@ export class NameConfig extends React.Component<Props, State> {
             <div><input type="text" value={this.state.name} maxLength={PlayerName.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
             <div style={{ marginTop: 8 }}>
                 {this.state.saved 
-                    ? "Your name has been set to " + this.state.name + " (does not apply to any in-progress games)"
+                    ? "Your name has been set to " + this.state.name
                     : "Unsaved changes"}
             </div>
         </div>;

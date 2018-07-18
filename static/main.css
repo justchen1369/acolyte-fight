@@ -33,6 +33,13 @@ body .page {
     height: 100%;
 }
 
+#game-panel .exit-link {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    font-size: 20px;
+}
+
 canvas.game {
     background: transparent;
     cursor: crosshair;
@@ -67,6 +74,95 @@ a:hover, a:active {
     to { color: #888; }
 }
 
+.btn {
+    pointer-events: all;
+    font-weight: bold;
+    cursor: hand;
+    text-align: center;
+    box-shadow: 3px 3px 3px #0c0c0c;
+    text-shadow: 1px 1px 1px black;
+    background: #00ccff;
+    padding: 10px 40px;
+}
+
+.btn:hover {
+    background: #ff8800;
+}
+
+.btn:active {
+    box-shadow: none;
+}
+
+.root-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    min-height: 50px;
+    display: flex;
+}
+
+.navbar .nav-item {
+    font-size: 20px;
+    padding: 15px 20px;
+    cursor: hand;
+    font-weight: bold;
+}
+
+.navbar .nav-item:hover {
+    color: #ff8800;
+}
+
+.navbar .nav-item-selected {
+    color: #00ccff;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.content-container {
+    flex-grow: 1;
+    max-height: 100%;
+    overflow-y: auto;
+}
+
+.home {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+}
+
+.home .title {
+    font-size: 100px;
+    font-weight: bold;
+    margin-bottom: 40px;
+}
+
+.home .button-row {
+    display: flex;
+    margin: 20px auto;
+}
+
+.home .btn {
+    width: 250px;
+    font-size: 40px;
+    margin: 0px 50px;
+}
+
+.home .fold-indicator {
+    font-size: 50px;
+    font-weight: bold;
+    animation: fold-animation alternate 1s infinite;
+}
+
+@keyframes fold-animation {
+    from { color: #888; }
+    to { color: white; }
+}
+
 #info-panel {
     position: absolute;
     top: 8;
@@ -77,10 +173,6 @@ a:hover, a:active {
 
 .settings-link {
     font-size: 80%;
-}
-
-.player-list {
-    margin-top: 40px;
 }
 
 .player-list-title {
@@ -148,28 +240,7 @@ a:hover, a:active {
 }
 
 #messages-panel .new-game-btn {
-    pointer-events: all;
-    font-weight: bold;
-    cursor: hand;
-    text-align: center;
-    box-shadow: 3px 3px 3px #0c0c0c;
-    text-shadow: 1px 1px 1px black;
-    background: #00ccff;
-    padding: 10px 40px;
     font-size: 150%;
-}
-
-#messages-panel .new-game-btn:hover {
-    background: #ff8800;
-}
-
-#messages-panel .new-game-btn:active {
-    box-shadow: none;
-}
-
-#messages-panel .watch-replay-link {
-    pointer-events: all;
-    margin-left: 20px;
 }
 
 .player-name {

@@ -396,6 +396,11 @@ function handleClosing(ev: w.Closing, world: w.World) {
 			obstacle.body.resetMassData();
 		}
 	});
+
+	world.ui.notifications.push({
+		type: "closing",
+		ticksUntilClose: world.startTick - world.tick,
+	});
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {

@@ -22,14 +22,6 @@ export class InfoPanel extends React.Component<Props, State> {
 
         return (
             <div id="info-panel">
-                <div>
-                    <div className="welcome-name-label">Welcome {this.props.playerName}!</div>
-                    <div className="settings-link">
-                        <a href="settings" target="_blank">
-                            Edit Settings <i className="fa fa-external-link-square-alt" />
-                        </a>
-                    </div>
-                </div>
                 {world.activePlayers.size > 0 && <div className="player-list">
                     {world.tick < world.startTick 
                     ? (

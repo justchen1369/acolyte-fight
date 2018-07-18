@@ -71,8 +71,6 @@ export function connectToServer(server: string): Promise<void> {
 export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 
-	world = engine.initialWorld();
-
 	const msg: m.JoinMsg = {
 		gameId: observeGameId || null,
 		name: playerName,
@@ -98,6 +96,10 @@ export function leaveCurrentGame() {
 		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
 		socket.emit('leave', leaveMsg);
 	}
+
+	world = engine.initialWorld();
+
+	notify({ type: "quit" });
 }
 
 export function attachNotificationListener(listener: NotificationListener) {
@@ -157,7 +159,7 @@ function onHeroMsg(data: m.HeroMsg) {
 
 	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
 
-	world.ui.notifications.push({
+	notify({
 		type: "new",
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
@@ -203,10 +205,6 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 			world.occurrences.push({
 				type: "closing",
 				startTick: actionData.closeTick,
-			});
-			world.ui.notifications.push({
-				type: "closing",
-				ticksUntilClose: world.startTick - world.tick,
 			});
 		} else if (actionData.actionType === m.ActionType.Join) {
 			world.occurrences.push({
