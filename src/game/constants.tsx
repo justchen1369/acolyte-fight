@@ -158,9 +158,9 @@ export namespace World {
 
 export namespace Obstacle {
 	export const Health = 100;
-	export const AngularDamping = 1;
-	export const LinearDamping = 3;
-	export const Density = 10.0;
+	export const AngularDamping = 10;
+	export const LinearDamping = 2;
+	export const Density = 100.0;
 }
 
 export namespace HealthBar {
@@ -432,7 +432,7 @@ export namespace Spells {
 			color: '#ff00ff',
 			selfColor: true,
 
-			density: 10,
+			density: 1,
 			radius: 0.003,
 			maxSpeed: 0.6,
 			speed: 0.4,
