@@ -103,7 +103,7 @@ export namespace World {
 					numObstacles: 1,
 					layoutRadius: 0,
 					layoutAngleOffset: 0,
-					numPoints: 12,
+					numPoints: 10,
 					extent: Hero.Radius * 2,
 					orientationAngleOffset: 0,
 				},
