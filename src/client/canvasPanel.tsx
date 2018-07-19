@@ -195,7 +195,7 @@ export class CanvasPanel extends React.Component<Props, State> {
     private processCurrentTouch() {
         const world = this.props.world;
         if (this.currentTouchId !== null && this.nextTarget) {
-            const spellId = world.ui.nextSpellId || "move";
+            const spellId = world.ui.nextSpellId || Spells.move.id;
             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: this.nextTarget });
             world.ui.nextSpellId = null;
         }

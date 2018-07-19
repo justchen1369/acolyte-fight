@@ -214,7 +214,10 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 	let id = spell.id + (world.nextObjectId++);
 
 	const from = hero.body.getPosition();
-	const direction = vector.unit(vector.diff(target, from));
+	let direction = vector.unit(vector.diff(target, from));
+	if (direction.x === 0 && direction.y === 0) {
+		direction = vector.fromAngle(hero.body.getAngle());
+	}
 
 	const offset = Hero.Radius + projectileTemplate.radius + constants.Pixel;
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
