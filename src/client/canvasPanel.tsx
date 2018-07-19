@@ -102,21 +102,21 @@ export class CanvasPanel extends React.Component<Props, State> {
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="ui" ref={c => {
                     this.canvasStack.ui = c;
-                    if (c) { // Why do I have to do this to prevent pinch zooming? Why isn't the normal event handlers enough?
-                        c.addEventListener("touchstart", ev => ev.preventDefault());
-                        c.addEventListener("touchmove", ev => ev.preventDefault());
+                    if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
+                        c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
+                        c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
                     }
                 }} className="game" width={this.state.width} height={this.state.height} 
-                    onMouseDown={(ev) => this.touchStartHandler(this.mousePoint(ev))}
-                    onMouseEnter={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
-                    onMouseMove={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
-                    onMouseLeave={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
-                    onMouseUp={(ev) => this.touchEndHandler(this.mousePoint(ev))}
+                    onMouseDown={(ev) => this.touchStartHandler(this.takeMousePoint(ev))}
+                    onMouseEnter={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
+                    onMouseMove={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
+                    onMouseLeave={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
+                    onMouseUp={(ev) => this.touchEndHandler(this.takeMousePoint(ev))}
 
-                    onTouchStart={(ev) => this.touchStartHandler(...this.touchPoints(ev))}
-                    onTouchMove={(ev) => this.touchMoveHandler(...this.touchPoints(ev))}
-                    onTouchEnd={(ev) => this.touchEndHandler(...this.touchPoints(ev))}
-                    onTouchCancel={(ev) => this.touchEndHandler(...this.touchPoints(ev))}
+                    onTouchStart={(ev) => this.touchStartHandler(...this.takeTouchPoint(ev))}
+                    onTouchMove={(ev) => this.touchMoveHandler(...this.takeTouchPoint(ev))}
+                    onTouchEnd={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
+                    onTouchCancel={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
 
                     onContextMenu={(ev) => { ev.preventDefault() }}
                 />
@@ -124,15 +124,15 @@ export class CanvasPanel extends React.Component<Props, State> {
         );
     }
 
-    private mousePoint(e: React.MouseEvent<HTMLCanvasElement>): PointInfo {
+    private takeMousePoint(e: React.MouseEvent<HTMLCanvasElement>): PointInfo {
         return this.pointInfo(MouseId, e.target as HTMLCanvasElement, e.clientX, e.clientY);
     }
 
-    private touchPoints(e: React.TouchEvent<HTMLCanvasElement>): PointInfo[] {
+    private takeTouchPoint(e: React.TouchEvent<HTMLCanvasElement>): PointInfo[] {
         let points = new Array<PointInfo>();
         for (let i = 0; i < e.changedTouches.length; ++i) {
             const touch = e.changedTouches.item(i);
-            this.pointInfo(touch.identifier, e.target as HTMLCanvasElement, touch.clientX, touch.clientY);
+            points.push(this.pointInfo(touch.identifier, e.target as HTMLCanvasElement, touch.clientX, touch.clientY));
         }
         return points;
     }
