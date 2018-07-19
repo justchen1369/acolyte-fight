@@ -100,7 +100,6 @@ function updateUrl() {
     let pathElements = new Array<string>();
     let params = [];
     if (gameId) {
-        pathElements = ["game"];
         params.push("g=" + gameId);
     } else if (page) {
         pathElements = [page];

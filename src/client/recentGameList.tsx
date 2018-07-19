@@ -90,7 +90,7 @@ export class RecentGameList extends React.Component<Props, State> {
                             <td>{game.createdTimestamp.fromNow()}</td>
                             <td>{game.playerNames.join(", ")}</td>
                             <td>{game.numActivePlayers > 0 ? "Live" : `${(game.numTicks / TicksPerSecond).toFixed(0)} s`}</td>
-                            <td><a href={"game?g=" + game.id} onClick={ev=>this.onWatchClicked(ev, game.id)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
+                            <td><a href={"?g=" + game.id} onClick={ev=>this.onWatchClicked(ev, game.id)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
                         </tr>)}
                     </tbody>
                 </table>
