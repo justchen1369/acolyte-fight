@@ -2,8 +2,7 @@ import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import { GamePanel } from './gamePanel';
-import { NameConfig } from '../settings/nameConfig';
-import { SpellConfig } from '../settings/spellConfig';
+import { HomePanel } from './homePanel';
 import { RecentGameList } from '../settings/recentGameList';
 import { TitleSection } from '../settings/titleSection';
 import { PrivateRoomPanel } from './privateRoomPanel';
@@ -71,28 +70,9 @@ export class Root extends React.Component<Props, State> {
     }
 
     private renderHome() {
-        return <div className="content-container">
-            <div className="home">
-                <div className="spacer" />
-                <div className="title">Acolyte Fight!</div>
-                <div className="button-row">
-                    <span className="btn primary" onClick={() => this.props.newGameCallback()}>Play</span>
-                </div>
-                {this.props.room && <div className="private-room-indicator">In private room: <b>{this.props.room}</b> (<a href="?">exit room</a>)</div>}
-                <div className="spacer" />
-                <div className="fold-indicator"><i className="fa fa-chevron-down" /></div>
-                <div className="spacer" />
-            </div>
-            <div className="page">
-                <h1>Welcome Acolyte!</h1>
-                <p>
-                    Time to practice your skills.
-                    In this arena, you'll find others just like you. Will you be the last one standing?
-                </p>
-                <NameConfig />
-                <SpellConfig />
-            </div>
-        </div>;
+        return <HomePanel
+            room={this.props.room}
+            newGameCallback={this.props.newGameCallback} />
     }
 
     private renderShare() {

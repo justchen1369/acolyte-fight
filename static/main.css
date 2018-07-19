@@ -96,7 +96,7 @@ a:hover, a:active {
 .btn {
     pointer-events: all;
     font-weight: bold;
-    cursor: hand;
+    cursor: pointer;
     text-align: center;
     box-shadow: 3px 3px 3px #0c0c0c;
     text-shadow: 1px 1px 1px black;
@@ -125,7 +125,7 @@ a:hover, a:active {
 .navbar .nav-item {
     font-size: 20px;
     padding: 15px 20px;
-    cursor: hand;
+    cursor: pointer;
     font-weight: bold;
 }
 
@@ -176,6 +176,12 @@ a:hover, a:active {
     font-size: 50px;
     font-weight: bold;
     animation: fold-animation alternate 1s infinite;
+    cursor: pointer;
+}
+
+.home .fold-indicator:hover {
+    color: white;
+    animation: none;
 }
 
 @keyframes fold-animation {
@@ -344,7 +350,7 @@ h2 {
 
 .spell-config .spell-icon {
     margin: 4px;
-    cursor: hand;
+    cursor: pointer;
     border: 3px transparent solid;
     box-shadow: 2px 2px 3px #222;
 }
