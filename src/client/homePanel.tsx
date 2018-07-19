@@ -13,6 +13,7 @@ interface Props {
     newGameCallback: () => void;
 }
 interface State {
+    joining: boolean;
 }
 
 export class HomePanel extends React.Component<Props, State> {
@@ -21,6 +22,7 @@ export class HomePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            joining: false,
         };
     }
 
@@ -31,7 +33,8 @@ export class HomePanel extends React.Component<Props, State> {
                 <div className="title">Acolyte Fight!</div>
                 <div className="spacer" />
                 <div className="button-row">
-                    <span className="btn primary" onClick={() => this.props.newGameCallback()}>Play</span>
+                    {!this.state.joining && <span className="btn" onClick={() => this.props.newGameCallback()}>Play</span>}
+                    {this.state.joining && <span className="btn disabled">Play</span>}
                 </div>
                 {this.props.room && <div className="private-room-indicator">In private room: <b>{this.props.room}</b> (<a href="?">exit room</a>)</div>}
                 <div className="spacer" />

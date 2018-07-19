@@ -170,6 +170,9 @@ a:hover, a:active {
     font-size: 40px;
     margin: 0px 50px;
 }
+.home .btn.disabled {
+    background-color: #ccc;
+}
 
 .home .fold-indicator {
     font-size: 50px;
