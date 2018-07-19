@@ -26,7 +26,7 @@ export class PrivateRoomPanel extends React.Component<Props, State> {
             const room = Math.floor(Math.random() * 1e9).toString(36);
             const server = locationMsg.currentServer;
 
-            let roomUrl = `?room=${room}`;
+            let roomUrl = `/?room=${room}`;
             if (locationMsg.currentServer) {
                 roomUrl = `${roomUrl}&server=${encodeURIComponent(server)}`;
             }
@@ -40,11 +40,8 @@ export class PrivateRoomPanel extends React.Component<Props, State> {
         return <div>
             <h1>Private room</h1>
             <p>
-                {this.state.roomUrl
-                ? <a href={this.state.roomUrl}>Click here to create a private room.</a>
-                : <span>Generating private room URL...</span>}
-                {' '}
-                Share this link with your friends to play against them!
+                {this.state.roomUrl && <span><a href={this.state.roomUrl}>Click here to create a private room.</a> Share this link with your friends to play against them!</span>}
+                {!this.state.roomUrl && <span className="loading-text">Generating private room URL...</span>}
             </p>
         </div>;
     }
