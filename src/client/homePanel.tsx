@@ -5,6 +5,8 @@ import * as w from '../game/world.model';
 import { NameConfig } from '../settings/nameConfig';
 import { SpellConfig } from '../settings/spellConfig';
 
+const scrollIntoView = require('scroll-into-view');
+
 interface Props {
     room: string;
     newGameCallback: () => void;
@@ -48,9 +50,9 @@ export class HomePanel extends React.Component<Props, State> {
 
     private scrollBelowFold() {
         if (this.belowFoldElem) {
-            this.belowFoldElem.scrollIntoView({
-                behavior: "smooth",
-                block: "start",
+            scrollIntoView(this.belowFoldElem, {
+                time: 500,
+                align: { top: 0 },
             });
         }
     }
