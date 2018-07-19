@@ -7,6 +7,7 @@ import { ButtonBar, Hero, TicksPerSecond } from '../game/constants';
 interface Props {
     world: w.World;
     items: s.NotificationItem[];
+    style: any;
     newGameCallback: () => void;
     exitGameCallback: () => void;
 }
@@ -46,19 +47,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             rows.push(winRow);
         }
 
-        // Offset the messages from the button bar
-        let marginBottom = 0;
-        let marginLeft = 0;
-        const world = this.props.world;
-        const buttonBar = world.ui.buttonBar;
-        if (world.ui.buttonBar) {
-            if (buttonBar.vertical) {
-                marginLeft = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
-            } else {
-                marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
-            }
-        }
-        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>{rows}</div>;
+        return <div id="messages-panel" style={this.props.style}>{rows}</div>;
     }
 
     private renderNotification(key: string, notification: w.Notification) {
