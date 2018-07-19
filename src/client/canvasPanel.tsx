@@ -6,7 +6,6 @@ import { Spells, TicksPerSecond } from '../game/constants';
 import { CanvasStack, sendAction, calculateWorldRect, whichKeyClicked, resetRenderState, notify, frame } from './facade';
 
 const MouseId = -999;
-const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
 
 interface Props {
     world: w.World;
@@ -52,7 +51,6 @@ class AnimationLoop {
 export class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: number = null;
     private nextTarget: pl.Vec2 = null;
-    private showedHelpText: boolean = false;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
@@ -203,16 +201,6 @@ export class CanvasPanel extends React.Component<Props, State> {
 
     private gameKeyDown(e: KeyboardEvent) {
         const world = this.props.world;
-
-        if (e.key === "ArrowRight" || e.key === "ArrowLeft" || e.key === "ArrowUp" || e.key === "ArrowDown") {
-            if (!this.showedHelpText) {
-                this.showedHelpText = true;
-                notify({ type: "help" });
-            }
-        }
-
-        if (!world.ui.myGameId || !world.ui.myHeroId) { return; }
-
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
         if (spellType && this.nextTarget) {

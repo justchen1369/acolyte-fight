@@ -5,7 +5,7 @@ import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
-export { calculateWorldRect, whichKeyClicked, resetRenderState, setMobile, CanvasStack } from './render';
+export { calculateWorldRect, whichKeyClicked, resetRenderState, CanvasStack } from './render';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;

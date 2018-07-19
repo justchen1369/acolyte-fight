@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import { ButtonBar, Hero, TicksPerSecond } from '../game/constants';
+import { isMobile } from './userAgent';
 
 interface Props {
     world: w.World;
@@ -52,7 +53,6 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderNotification(key: string, notification: w.Notification) {
         switch (notification.type) {
-            case "help": return this.renderHelpNotification(key, notification);
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "replayNotFound": return this.renderReplayNotFoundNotification(key, notification);
             case "new": return this.renderNewGameNotification(key, notification);
@@ -65,10 +65,6 @@ export class MessagesPanel extends React.Component<Props, State> {
         }
     }
 
-    private renderHelpNotification(key: string, notification: w.HelpNotification) {
-        return <div key={key} className="row help-text">Use the mouse to move!</div>
-    }
-
     private renderDisconnectedNotification(key: string, notification: w.DisconnectedNotification) {
         return <div key={key} className="row error">Disconnected from server. Refresh the page to reconnect.</div>
     }
@@ -78,8 +74,15 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        return <div key={key} className="row info">
-            {notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}
+        return <div key={key} className="row">
+            <div className="help-box">
+                <div className="help-title">How to play:</div>
+                {!isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>}
+                {!isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>}
+                {isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-hand-point-right" /></span> Tap to move</div>}
+                {isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-hand-point-left" /></span> Use buttons to cast spells</div>}
+            </div>
+            <div>{notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}</div>
         </div>
     }
 

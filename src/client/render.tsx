@@ -7,9 +7,7 @@ import * as w from '../game/world.model';
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
 import { Icons } from './icons';
 import { renderIcon } from '../client/renderIcon';
-
-const isEdge = window.navigator.userAgent.indexOf("Edge") > -1;
-let isMobile: boolean = false;
+import { isMobile, isEdge } from './userAgent';
 
 export interface CanvasStack {
 	background: HTMLCanvasElement;
@@ -26,10 +24,6 @@ export interface CanvasCtxStack {
 }
 
 // Rendering
-export function setMobile(_isMobile: boolean) {
-	isMobile = _isMobile;
-}
-
 export function resetRenderState(world: w.World) {
 	world.ui.renderedTick = null;
 	world.ui.buttonBar = null;

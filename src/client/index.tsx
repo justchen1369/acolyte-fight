@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { connectToServer, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, setMobile, CanvasStack } from './facade';
+import { connectToServer, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
 import { Choices, World } from '../game/constants';
@@ -44,8 +44,6 @@ if (window.location.search) {
         server = params["server"];
     }
 }
-
-setMobile(window.navigator.userAgent.toLowerCase().indexOf("mobi") !== -1);
 
 attachToSocket(socket, () => {
     connectToServer(server).then(() => {
