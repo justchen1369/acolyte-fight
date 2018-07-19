@@ -75,13 +75,11 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
         return <div key={key} className="row">
-            <div className="help-box">
+            {!isMobile && <div className="help-box">
                 <div className="help-title">How to play:</div>
-                {!isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>}
-                {!isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>}
-                {isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-hand-point-right" /></span> Tap to move</div>}
-                {isMobile && <div className="help-row"><span className="icon-container"><i className="fa fa-hand-point-left" /></span> Use buttons to cast spells</div>}
-            </div>
+                <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
+                <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
+            </div>}
             <div>{notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}</div>
         </div>
     }

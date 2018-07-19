@@ -4,6 +4,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
+import { isMobile } from './userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -28,6 +29,7 @@ export class HomePanel extends React.Component<Props, State> {
             <div className="home">
                 <div className="spacer" />
                 <div className="title">Acolyte Fight!</div>
+                <div className="spacer" />
                 <div className="button-row">
                     <span className="btn primary" onClick={() => this.props.newGameCallback()}>Play</span>
                 </div>
