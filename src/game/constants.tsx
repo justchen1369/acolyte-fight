@@ -304,7 +304,7 @@ export namespace Spells {
 		projectile: {
 			color: '#ff0000',
 
-			density: 1000,
+			density: 100,
 			radius: 0.03,
 			speed: 0.2,
 			maxSpeed: 0.4,
