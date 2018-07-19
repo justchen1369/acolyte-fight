@@ -50,7 +50,6 @@ class AnimationLoop {
 
 export class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: number = null;
-    private nextTarget: pl.Vec2 = null;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
@@ -148,15 +147,15 @@ export class CanvasPanel extends React.Component<Props, State> {
     }
 
     private touchStartHandler(...points: PointInfo[]) {
+        const world = this.props.world;
         points.forEach(p => {
-            const world = this.props.world;
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
                 const spellId = this.keyToSpellId(key);
                 const spell = Spells.all[spellId];
                 if (spell) {
                     if (spell.untargeted) {
-                        sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: this.nextTarget });
+                        sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
                     } else {
                         world.ui.nextSpellId = spellId;
                     }
@@ -164,7 +163,7 @@ export class CanvasPanel extends React.Component<Props, State> {
             } else {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                     this.currentTouchId = p.touchId;
-                    this.nextTarget = p.worldPoint;
+                    world.ui.nextTarget = p.worldPoint;
                 }
             }
         });
@@ -172,9 +171,10 @@ export class CanvasPanel extends React.Component<Props, State> {
     }
 
     private touchMoveHandler(...points: PointInfo[]) {
+        const world = this.props.world;
         points.forEach(p => {
             if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
-                this.nextTarget = p.worldPoint;
+                world.ui.nextTarget = p.worldPoint;
             }
         });
         this.processCurrentTouch();
@@ -191,9 +191,9 @@ export class CanvasPanel extends React.Component<Props, State> {
 
     private processCurrentTouch() {
         const world = this.props.world;
-        if (this.currentTouchId !== null && this.nextTarget) {
+        if (this.currentTouchId !== null && world.ui.nextTarget) {
             const spellId = world.ui.nextSpellId || Spells.move.id;
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: this.nextTarget });
+            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             world.ui.nextSpellId = null;
         }
     }
@@ -202,8 +202,8 @@ export class CanvasPanel extends React.Component<Props, State> {
         const world = this.props.world;
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
-        if (spellType && this.nextTarget) {
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: this.nextTarget });
+        if (spellType && world.ui.nextTarget) {
+            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
         }
     }
 

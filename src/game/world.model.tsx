@@ -234,6 +234,7 @@ export interface HeroScore {
 export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
+	nextTarget?: pl.Vec2;
 	nextSpellId?: string;
 	renderedTick: number | null;
 

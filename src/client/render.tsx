@@ -165,6 +165,10 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 				}
 			});
 			world.ui.trails = newTrails;
+
+			if (viewRects.length > 1) {
+				renderTarget(ctxStack, world.ui.nextTarget);
+			}
 		} else {
 			// Secondary view
 			const primary = false;
@@ -173,6 +177,29 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 
 		all(ctxStack, ctx => ctx.restore());
 	}
+}
+
+function renderTarget(ctxStack: CanvasCtxStack, target: pl.Vec2) {
+	const CrossHairSize = Hero.Radius;
+	if (!target) {
+		return;
+	}
+
+	const ctx = ctxStack.canvas;
+	ctx.save();
+	ctx.translate(target.x, target.y);
+
+	ctx.strokeStyle = "white";
+	ctx.lineWidth = Pixel * 3;
+
+	ctx.beginPath();
+	ctx.moveTo(0, -CrossHairSize);
+	ctx.lineTo(0, CrossHairSize);
+	ctx.moveTo(-CrossHairSize, 0);
+	ctx.lineTo(CrossHairSize, 0);
+	ctx.stroke();
+
+	ctx.restore();
 }
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
