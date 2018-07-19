@@ -7,7 +7,7 @@ import queryString from 'query-string';
 
 import { connectToServer, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, setMobile, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
-import * as Storage from '../ui/storage';
+import * as Storage from '../client/storage';
 import { Choices, World } from '../game/constants';
 
 import { Root } from './root';

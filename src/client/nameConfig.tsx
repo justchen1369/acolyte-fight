@@ -1,7 +1,7 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as PlayerName from '../game/playerName';
-import * as Storage from '../ui/storage';
+import * as Storage from '../client/storage';
 
 interface Props {
 }

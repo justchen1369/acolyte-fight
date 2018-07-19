@@ -5,8 +5,8 @@ import * as vector from '../game/vector';
 import * as w from '../game/world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
-import { Icons } from '../ui/icons';
-import { renderIcon } from '../ui/renderIcon';
+import { Icons } from './icons';
+import { renderIcon } from '../client/renderIcon';
 
 const isEdge = window.navigator.userAgent.indexOf("Edge") > -1;
 let isMobile: boolean = false;

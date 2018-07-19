@@ -2,8 +2,8 @@
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
-import { NameConfig } from '../settings/nameConfig';
-import { SpellConfig } from '../settings/spellConfig';
+import { NameConfig } from '../client/nameConfig';
+import { SpellConfig } from '../client/spellConfig';
 
 const scrollIntoView = require('scroll-into-view');
 

@@ -3,8 +3,8 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
-import { RecentGameList } from '../settings/recentGameList';
-import { TitleSection } from '../settings/titleSection';
+import { RecentGameList } from '../client/recentGameList';
+import { TitleSection } from '../client/titleSection';
 import { PrivateRoomPanel } from './privateRoomPanel';
 
 interface Props {
