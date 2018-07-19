@@ -29,11 +29,62 @@ export function resetRenderState(world: w.World) {
 	world.ui.buttonBar = null;
 }
 
-export function calculateWorldRect(rect: ClientRect) {
-	let size = Math.min(rect.width, rect.height);
+export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, rect: ClientRect) {
+	const viewRects = calculateViewRects(rect);
+
+	let worldPoint: pl.Vec2 = worldPointFromViewRect(interfacePoint, viewRects[0]);
+	for (let i = 1; i < viewRects.length; ++i) {
+		const viewRect = viewRects[i];
+		if (viewRect.left <= interfacePoint.x && interfacePoint.x < viewRect.right && viewRect.top <= interfacePoint.y && interfacePoint.y < viewRect.bottom) {
+			worldPoint = worldPointFromViewRect(interfacePoint, viewRect);
+		}
+	}
+	return worldPoint;
+}
+
+export function worldPointFromViewRect(interfacePoint: pl.Vec2, viewRect: ClientRect) {
+	const worldRect = calculateWorldRect(viewRect);
+	const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
+	return worldPoint;
+}
+
+function calculateViewRects(rect: ClientRect): ClientRect[] {
+	if (isMobile && rect.width > rect.height * 1.5) {
+		const split = rect.width / 2;
+		const primary: ClientRect = {
+			left: 0,
+			right: split,
+			width: split,
+			top: rect.top,
+			bottom: rect.height,
+			height: rect.height,
+		};
+		const secondary: ClientRect = {
+			left: split,
+			right: rect.width,
+			width: rect.width - split,
+			top: rect.top,
+			bottom: rect.height,
+			height: rect.height,
+		};
+		return [primary, secondary];
+	} else {
+		return [{
+			left: 0,
+			right: rect.width,
+			width: rect.width,
+			top: 0,
+			bottom: rect.height,
+			height: rect.height,
+		}];
+	}
+}
+
+function calculateWorldRect(viewRect: ClientRect) {
+	let size = Math.min(viewRect.width, viewRect.height);
 	return {
-		left: (rect.width - size) / 2.0,
-		top: (rect.height - size) / 2.0,
+		left: viewRect.left + (viewRect.width - size) / 2.0,
+		top: viewRect.top + (viewRect.height - size) / 2.0,
 		width: size,
 		height: size,
 	};
@@ -89,30 +140,39 @@ function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
 }
 
 function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
-	all(ctxStack, ctx => ctx.save());
+	const viewRects = calculateViewRects(rect);
+	for (let i = 0; i < viewRects.length; ++i) {
+		const worldRect = calculateWorldRect(viewRects[i]);
+		all(ctxStack, ctx => ctx.save());
+		all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
+		all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
-	let worldRect = calculateWorldRect(rect);
-	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
-	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
+		if (i == 0) {
+			// Primary view
+			renderMap(ctxStack.background, world);
 
-	renderMap(ctxStack.background, world);
+			world.objects.forEach(obj => renderObject(ctxStack, obj, world));
+			world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
+			world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
-	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
-	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
-	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
+			let newTrails = new Array<w.Trail>();
+			world.ui.trails.forEach(trail => {
+				renderTrail(ctxStack, trail, world);
 
-	let newTrails = new Array<w.Trail>();
-	world.ui.trails.forEach(trail => {
-		renderTrail(ctxStack, trail, world);
-
-		const expireTick = trail.initialTick + trail.max;
-		if (world.tick < expireTick) {
-			newTrails.push(trail);
+				const expireTick = trail.initialTick + trail.max;
+				if (world.tick < expireTick) {
+					newTrails.push(trail);
+				}
+			});
+			world.ui.trails = newTrails;
+		} else {
+			// Secondary view
+			const primary = false;
+			renderMap(ctxStack.background, world, primary);
 		}
-	});
-	world.ui.trails = newTrails;
 
-	all(ctxStack, ctx => ctx.restore());
+		all(ctxStack, ctx => ctx.restore());
+	}
 }
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
@@ -254,11 +314,13 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 	});
 }
 
-function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
+function renderMap(ctx: CanvasRenderingContext2D, world: w.World, primary: boolean = true) {
 	ctx.save();
 
 	ctx.translate(0.5, 0.5);
 
+	ctx.lineWidth = Pixel * 5;
+	ctx.strokeStyle = "#333333";
 	if (world.winner) {
 		const color = heroColor(world.winner, world);
 		ctx.fillStyle = color;
@@ -275,7 +337,12 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	}
 	ctx.beginPath();
 	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-	ctx.fill();
+
+	if (primary) {
+		ctx.fill();
+	} else {
+		ctx.stroke();
+	}
 
 	ctx.restore();
 }

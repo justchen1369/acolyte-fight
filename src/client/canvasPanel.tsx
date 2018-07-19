@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as w from '../game/world.model';
 
 import { Spells, TicksPerSecond } from '../game/constants';
-import { CanvasStack, sendAction, calculateWorldRect, whichKeyClicked, resetRenderState, notify, frame } from './facade';
+import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, resetRenderState, notify, frame } from './facade';
 
 const MouseId = -999;
 
@@ -138,8 +138,7 @@ export class CanvasPanel extends React.Component<Props, State> {
     private pointInfo(touchId: number, elem: HTMLCanvasElement, clientX: number, clientY: number) {
         const rect = elem.getBoundingClientRect();
         const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
-        const worldRect = calculateWorldRect(rect);
-        const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
+        const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect);
 
         return {
             touchId,
