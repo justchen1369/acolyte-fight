@@ -5,6 +5,7 @@ import * as w from '../game/world.model';
 import { Spells, TicksPerSecond } from '../game/constants';
 import { CanvasStack, sendAction, calculateWorldRect, whichKeyClicked, resetRenderState, notify, frame } from './facade';
 
+const MouseId = -999;
 const isSafari = navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1;
 
 interface Props {
@@ -13,6 +14,12 @@ interface Props {
 interface State {
     width: number;
     height: number;
+}
+
+interface PointInfo {
+    touchId: number;
+    interfacePoint: pl.Vec2;
+    worldPoint: pl.Vec2;
 }
 
 class AnimationLoop {
@@ -43,7 +50,7 @@ class AnimationLoop {
 }
 
 export class CanvasPanel extends React.Component<Props, State> {
-    private isMouseDown = false;
+    private currentTouchId: number = null;
     private nextTarget: pl.Vec2 = null;
     private showedHelpText: boolean = false;
 
@@ -100,23 +107,16 @@ export class CanvasPanel extends React.Component<Props, State> {
                         c.addEventListener("touchmove", ev => ev.preventDefault());
                     }
                 }} className="game" width={this.state.width} height={this.state.height} 
-                    onMouseMove={(ev) => this.canvasMouseMove(ev)}
-                    onMouseEnter={(ev) => this.canvasMouseMove(ev)}
-                    onTouchMove={(ev) => this.canvasTouch(ev)}
-                    
-                    onMouseDown={(ev) => {
-                        this.isMouseDown = true;
-                        this.canvasMouseMove(ev);
-                    }}
-                    onTouchStart={(ev) => {
-                        this.isMouseDown = true;
-                        this.canvasTouch(ev);
-                    }}
+                    onMouseDown={(ev) => this.touchStartHandler(this.mousePoint(ev))}
+                    onMouseEnter={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
+                    onMouseMove={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
+                    onMouseLeave={(ev) => this.touchMoveHandler(this.mousePoint(ev))}
+                    onMouseUp={(ev) => this.touchEndHandler(this.mousePoint(ev))}
 
-                    onMouseLeave={(ev) => { this.isMouseDown = false; }}
-                    onMouseUp={(ev) => { this.isMouseDown = false; }}
-                    onTouchCancel={(ev) => { this.isMouseDown = false; }}
-                    onTouchEnd={(ev) => { this.isMouseDown = false; }}
+                    onTouchStart={(ev) => this.touchStartHandler(...this.touchPoints(ev))}
+                    onTouchMove={(ev) => this.touchMoveHandler(...this.touchPoints(ev))}
+                    onTouchEnd={(ev) => this.touchEndHandler(...this.touchPoints(ev))}
+                    onTouchCancel={(ev) => this.touchEndHandler(...this.touchPoints(ev))}
 
                     onContextMenu={(ev) => { ev.preventDefault() }}
                 />
@@ -124,56 +124,36 @@ export class CanvasPanel extends React.Component<Props, State> {
         );
     }
 
-    private canvasMouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
-        let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-        let interfacePoint = pl.Vec2((e.clientX - rect.left), (e.clientY - rect.top));
-        const mouseDown = !!(e.buttons || e.button || (isSafari && e.nativeEvent.which));
-
-        this.canvasTouchHandler(interfacePoint, rect, mouseDown);
+    private mousePoint(e: React.MouseEvent<HTMLCanvasElement>): PointInfo {
+        return this.pointInfo(MouseId, e.target as HTMLCanvasElement, e.clientX, e.clientY);
     }
 
-    private canvasTouch(e: React.TouchEvent<HTMLCanvasElement>) {
-        e.preventDefault();
-
-        let rect = (e.target as HTMLCanvasElement).getBoundingClientRect();
-
-        const handled = new Set<number>();
-        for (let i = 0; i < e.changedTouches.length; ++i) { // Handled changed first - forces spells to go to current target
+    private touchPoints(e: React.TouchEvent<HTMLCanvasElement>): PointInfo[] {
+        let points = new Array<PointInfo>();
+        for (let i = 0; i < e.changedTouches.length; ++i) {
             const touch = e.changedTouches.item(i);
-            if (!handled.has(touch.identifier)) {
-                handled.add(touch.identifier);
-                this.canvasSingleTouch(touch, rect);
-            }
+            this.pointInfo(touch.identifier, e.target as HTMLCanvasElement, touch.clientX, touch.clientY);
         }
-
-        for (let i = 0; i < e.touches.length; ++i) {
-            const touch = e.touches.item(i);
-            if (!handled.has(touch.identifier)) {
-                handled.add(touch.identifier);
-                this.canvasSingleTouch(touch, rect);
-            }
-        }
+        return points;
     }
 
-    private canvasSingleTouch(touch: Touch, rect: ClientRect) {
-        let interfacePoint = pl.Vec2((touch.clientX - rect.left), (touch.clientY - rect.top));
+    private pointInfo(touchId: number, elem: HTMLCanvasElement, clientX: number, clientY: number) {
+        const rect = elem.getBoundingClientRect();
+        const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
+        const worldRect = calculateWorldRect(rect);
+        const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
 
-        const mouseDown = true;
-        this.canvasTouchHandler(interfacePoint, rect, mouseDown);
+        return {
+            touchId,
+            interfacePoint,
+            worldPoint,
+        };
     }
 
-    private canvasTouchHandler(interfacePoint: pl.Vec2, rect: ClientRect, mouseDown: boolean) {
-        const world = this.props.world;
-
-        if (!world.ui.myGameId || !world.ui.myHeroId){
-            return;
-        }
-
-        let worldRect = calculateWorldRect(rect);
-        let target = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
-
-        if (mouseDown) {
-            const key = whichKeyClicked(interfacePoint, world.ui.buttonBar);
+    private touchStartHandler(...points: PointInfo[]) {
+        points.forEach(p => {
+            const world = this.props.world;
+            const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
                 const spellId = this.keyToSpellId(key);
                 const spell = Spells.all[spellId];
@@ -185,13 +165,40 @@ export class CanvasPanel extends React.Component<Props, State> {
                     }
                 }
             } else {
-                const spellId = world.ui.nextSpellId || "move";
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
-                world.ui.nextSpellId = null;
+                if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
+                    this.currentTouchId = p.touchId;
+                    this.nextTarget = p.worldPoint;
+                }
             }
-        }
+        });
+        this.processCurrentTouch();
+    }
 
-        this.nextTarget = target; // Set for next keyboard event
+    private touchMoveHandler(...points: PointInfo[]) {
+        points.forEach(p => {
+            if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
+                this.nextTarget = p.worldPoint;
+            }
+        });
+        this.processCurrentTouch();
+    }
+
+    private touchEndHandler(...points: PointInfo[]) {
+        points.forEach(p => {
+            if (this.currentTouchId === p.touchId) {
+                this.currentTouchId = null;
+            }
+        });
+        this.processCurrentTouch();
+    }
+
+    private processCurrentTouch() {
+        const world = this.props.world;
+        if (this.currentTouchId !== null && this.nextTarget) {
+            const spellId = world.ui.nextSpellId || "move";
+            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: this.nextTarget });
+            world.ui.nextSpellId = null;
+        }
     }
 
     private gameKeyDown(e: KeyboardEvent) {
@@ -208,7 +215,7 @@ export class CanvasPanel extends React.Component<Props, State> {
 
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
-        if (spellType) {
+        if (spellType && this.nextTarget) {
             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: this.nextTarget });
         }
     }
@@ -231,14 +238,7 @@ export class CanvasPanel extends React.Component<Props, State> {
     }
 
     private gameKeyUp(e: KeyboardEvent) {
-        const world = this.props.world;
-
-        if (!world.ui.myGameId || !world.ui.myHeroId) { return; }
-        if (!this.nextTarget) { return; }
-
-        if (this.isMouseDown) {
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "move", target: this.nextTarget });
-        }
+        this.processCurrentTouch();
     }
 
     private readKey(e: KeyboardEvent) {

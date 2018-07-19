@@ -178,6 +178,10 @@ function onDisconnectMsg() {
 	notify({ type: "disconnected" });
 }
 export function sendAction(gameId: string, heroId: string, action: w.Action) {
+	if (!(gameId && heroId)) {
+		return;
+	}
+
 	const actionMsg: m.ActionMsg = {
 		gameId,
 		heroId,
