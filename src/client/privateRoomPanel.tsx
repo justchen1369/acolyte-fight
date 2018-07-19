@@ -8,7 +8,7 @@ interface State {
 }
 
 function retrieveLocationAsync() {
-    return fetch('location', { credentials: "same-origin" })
+    return fetch('api/location', { credentials: "same-origin" })
         .then(res => res.json())
         .then((msg: m.LocationMsg) => msg);
 }

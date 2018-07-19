@@ -50,13 +50,13 @@ export class Root extends React.Component<Props, State> {
         return (
             <div className="root-panel">
                 <div className="navbar">
-                    {this.renderNavBarItem(null, "Home")}
+                    {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
                     {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
                 </div>
-                {page === null && this.renderHome()}
+                {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
                 {page === "share" && this.renderShare()}
                 {page === "about" && this.renderAbout()}

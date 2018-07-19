@@ -44,12 +44,14 @@ app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));
 app.use('/logs', express.static('./logs'));
 
-app.get('/games', (req, res) => api.onGamesList(req, res));
-app.get('/location', (req, res) => onLocation(req, res));
+app.get('/api/games', (req, res) => api.onGamesList(req, res));
+app.get('/api/location', (req, res) => onLocation(req, res));
+app.get('/api/status', (req, res) => res.send(getServerStats()));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
 app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest.webmanifest'));
-app.get('/', (req, res) => res.sendFile(rootDir + '/index.html'));
+
+app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(() => cleanupOldInactiveGames(maxReplays), cleanupIntervalMinutes * 60 * 1000);
 

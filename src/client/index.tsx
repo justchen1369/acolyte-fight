@@ -28,14 +28,15 @@ function getOrCreatePlayerName(): string {
 let observeGameId: string = null;
 let room: string = null;
 let server: string = null;
-let page: string = null;
+let page: string = "";
+if (window.location.pathname) {
+    const elems = window.location.pathname.split("/");
+    page = elems[1] || "";
+}
 if (window.location.search) {
     const params = queryString.parse(window.location.search);
     if (params["g"]) {
         observeGameId = params["g"];
-    }
-    if (params["p"]) {
-        page = params["p"];
     }
     if (params["room"]) {
         room = params["room"];
@@ -95,11 +96,14 @@ function changePage(newPage: string) {
 
 function updateUrl() {
     const gameId = getStore().world.ui.myGameId;
+
+    let pathElements = new Array<string>();
     let params = [];
     if (gameId) {
+        pathElements = ["game"];
         params.push("g=" + gameId);
     } else if (page) {
-        params.push("p=" + page);
+        pathElements = [page];
     }
 
     if (room) {
@@ -108,7 +112,12 @@ function updateUrl() {
     if (server) {
         params.push("server=" + server);
     }
-    window.history.pushState(null, null, "?" + params.join("&"));
+
+    let path = "/" + pathElements.join("/");
+    if (params.length > 0) {
+        path += "?" + params.join("&");
+    }
+    window.history.pushState(null, null, path);
 }
 
 function rerender() {
