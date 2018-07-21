@@ -178,7 +178,7 @@ function calculateRoomStats(room: string): RoomStats {
 	let numGames = 0;
 	let numPlayers = 0;
 	getStore().activeGames.forEach(game => {
-		if (game.room === room) {
+		if (game.room === room && games.isGameRunning(game)) {
 			numGames += 1;
 			numPlayers += game.active.size;
 		}

@@ -214,7 +214,7 @@ function gameTurn(game: g.Game) {
 	emit(data);
 }
 
-function isGameRunning(game: g.Game) {
+export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
