@@ -60,9 +60,7 @@ export class CustomGamesPanel extends React.Component<Props, State> {
                     : <span>No mod is active in this room.</span>}
                 </p>
             </div>}
-            <h1>Custom Games</h1>
-            <p>Want to play private games with your friends? Want to modify the rules of the game? See below.</p>
-            <h2>Private room</h2>
+            <h1>Private room</h1>
             <p>Create a private room to play with friends!</p>
             {this.renderForm()}
             <h1>Modding (EXPERIMENTAL)</h1>

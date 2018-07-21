@@ -47,6 +47,13 @@ attachToSocket(socket, () => {
         }).catch(error => {
             console.error(error)
             socket.disconnect();
+
+            if (current.room || current.server) {
+                // Failed to join room/server, try without server
+                current.room = null;
+                current.server = null;
+                updateUrl();
+            }
         });
 });
 attachNotificationListener(notifications => {
