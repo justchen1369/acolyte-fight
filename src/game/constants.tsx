@@ -157,7 +157,7 @@ export namespace World {
 }
 
 export namespace Obstacle {
-	export const Health = 100;
+	export const Health = 50;
 	export const AngularDamping = 10;
 	export const LinearDamping = 2;
 	export const Density = 100.0;
