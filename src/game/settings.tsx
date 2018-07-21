@@ -64,8 +64,8 @@ export const Choices: ChoiceSettings = {
 	},
 }
 
-export const Layouts: Layout[] = [
-    {
+export const Layouts: Layouts = {
+    "double": {
         obstacles: [
             {
                 numObstacles: 2,
@@ -85,7 +85,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-    {
+    "inside5": {
         obstacles: [
             {
                 numObstacles: 5,
@@ -97,7 +97,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-    {
+    "single": {
         obstacles: [
             {
                 numObstacles: 1,
@@ -109,7 +109,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-    {
+    "pepper": {
         obstacles: [
             {
                 numObstacles: 5,
@@ -129,7 +129,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-    {
+    "triplet": {
         obstacles: [
             {
                 numObstacles: 3,
@@ -141,7 +141,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-    {
+    "surrounded": {
         obstacles: [
             {
                 numObstacles: 15,
@@ -153,7 +153,7 @@ export const Layouts: Layout[] = [
             },
         ],
     },
-];
+};
 
 export const move: Spell = {
     id: 'move',

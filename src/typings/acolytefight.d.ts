@@ -1,5 +1,5 @@
 declare interface AcolyteFightSettings {
-    Layouts: Layout[];
+    Layouts: Layouts;
     Hero: HeroSettings;
     World: WorldSettings;
     Obstacle: ObstacleSettings;
@@ -31,6 +31,10 @@ declare interface WorldSettings {
 	LavaDamagePerSecond: number;
 	ShrinkPerSecond: number;
     InitialShieldSeconds: number;
+}
+
+declare interface Layouts {
+    [name: string]: Layout;
 }
 
 declare interface Layout {

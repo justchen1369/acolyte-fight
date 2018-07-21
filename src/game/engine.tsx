@@ -378,7 +378,8 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	console.log("Environment seed " + world.seed);
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const layout = Settings.Layouts[world.seed % Settings.Layouts.length];
+	const layouts = Object.keys(Settings.Layouts).map(key => Settings.Layouts[key]).filter(x => !!x);
+	const layout = layouts[world.seed % layouts.length];
 	layout.obstacles.forEach(obstacleTemplate => {
 		const points = polygon(obstacleTemplate.numPoints, obstacleTemplate.extent);
 		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
