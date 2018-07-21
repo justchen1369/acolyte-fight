@@ -192,9 +192,14 @@ export class CanvasPanel extends React.Component<Props, State> {
     private processCurrentTouch() {
         const world = this.props.world;
         if (this.currentTouchId !== null && world.ui.nextTarget) {
-            const spellId = world.ui.nextSpellId || Spells.move.id;
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+            const spell = Spells.all[world.ui.nextSpellId] || Spells.move;
+            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
             world.ui.nextSpellId = null;
+
+            if (spell.id !== Spells.move.id && spell.interruptible) {
+                // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick
+                this.currentTouchId = null;
+            }
         }
     }
 
