@@ -90,7 +90,7 @@ export class Root extends React.Component<Props, State> {
     private renderCustom() {
         return <div className="content-container">
             <div className="page">
-                <CustomGamesPanel />
+                <CustomGamesPanel room={this.props.room} />
             </div>
         </div>;
     }

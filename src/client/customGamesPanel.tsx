@@ -1,10 +1,11 @@
+import fileSaver from 'file-saver';
 import * as React from 'react';
 import * as m from '../game/messages.model';
 import * as url from './url';
 import { Mod } from '../game/settings';
-import 'file-saver';
 
 interface Props {
+    room: string;
 }
 interface State {
     error: string;
@@ -49,6 +50,16 @@ export class CustomGamesPanel extends React.Component<Props, State> {
 
     render() {
         return <div>
+            {this.props.room && <div>
+                <h1>Current room</h1>
+                <p>
+                    You are currently in room <b>{this.props.room}</b>.
+                    {' '}
+                    {Object.keys(Mod).length > 0
+                    ? <span>Current mod: <a href="#" onClick={() => this.downloadCurrentMod()}>{this.roomModFilename()}</a>.</span>
+                    : <span>No mod is active in this room.</span>}
+                </p>
+            </div>}
             <h1>Custom Games</h1>
             <p>Want to play private games with your friends? Want to modify the rules of the game? See below.</p>
             <h2>Private room</h2>
@@ -67,7 +78,6 @@ export class CustomGamesPanel extends React.Component<Props, State> {
                 <ul>
                     <li><a href="/static/fireballMod.acolytefight.json">fireballMod.acolytefight.json</a> - this is an example mod which increases fireball damage.</li>
                     <li><a href="/api/default.acolytefight.json">default.acolytefight.json</a> - this JSON file represents all the current default settings.</li>
-                    {Object.keys(Mod).length > 0 && <li><a href="#" onClick={() => this.downloadCurrentMod()}>room.acolytefight.json</a> - this JSON file is the current mod that has been applied to this room.</li>}
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings</li>
                 </ul>
             </p>
@@ -108,7 +118,12 @@ export class CustomGamesPanel extends React.Component<Props, State> {
     }
 
     private downloadCurrentMod() {
-        const file = new File([JSON.stringify(Mod)], "room.acolytefight.json", {type: "application/json;charset=utf-8"});
-        (window as any).saveAs(file);
+        const filename = this.roomModFilename();
+        const file = new File([JSON.stringify(Mod)], filename, {type: "application/json;charset=utf-8"});
+        fileSaver.saveAs(file, filename);
+    }
+
+    private roomModFilename() {
+        return `${this.props.room}.acolytefight.json`;
     }
 }
