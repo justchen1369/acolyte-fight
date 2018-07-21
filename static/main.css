@@ -94,7 +94,7 @@ a:hover, a:active {
 }
 
 .btn {
-    pointer-events: all;
+    display: inline-block;
     font-weight: bold;
     cursor: pointer;
     text-align: center;
@@ -282,8 +282,8 @@ a:hover, a:active {
 
 #messages-panel .action-row {
     margin-top: 30px;
-    display: flex;
     align-items: center;
+    pointer-events: all;
 }
 
 #messages-panel .new-game-btn {

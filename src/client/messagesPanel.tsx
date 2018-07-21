@@ -13,19 +13,22 @@ interface Props {
     exitGameCallback: () => void;
 }
 interface State {
+    spectatingGameId: string;
 }
 
 export class MessagesPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            now: new Date().getTime(),
+            spectatingGameId: null,
         };
     }
 
     render() {
+        const world = this.props.world;
+
         let rows = new Array<JSX.Element>();
-        let winRow = null;
+        let actionRow: JSX.Element = null;
         const now = new Date().getTime();
         this.props.items.forEach(item => {
             if (now >= item.expiryTime) {
@@ -38,14 +41,18 @@ export class MessagesPanel extends React.Component<Props, State> {
             }
 
             if (item.notification.type === "win") {
-                winRow = row;
+                actionRow = row;
             } else {
                 rows.push(row);
             }
         });
 
-        if (winRow) {
-            rows.push(winRow);
+        if (!actionRow && world.ui.myGameId !== this.state.spectatingGameId && world.ui.myHeroId && !world.objects.has(world.ui.myHeroId)) {
+            actionRow = this.renderDead("dead", world.ui.myGameId);
+        }
+
+        if (actionRow) {
+            rows.push(actionRow);
         }
 
         return <div id="messages-panel" style={this.props.style}>{rows}</div>;
@@ -123,6 +130,18 @@ export class MessagesPanel extends React.Component<Props, State> {
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 <span className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</span>
+            </div>
+        </div>;
+    }
+    
+    private renderDead(key: string, spectatingGameId: string) {
+        return <div key={key} className="winner">
+            <div className="winner-row">You died.</div>
+            <div className="action-row">
+                <div style={{ marginBottom: 12 }}>
+                    <b><a href="#" onClick={() => this.setState({ spectatingGameId })}>Continue Watching</a></b> or
+                </div>
+                <div className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</div>
             </div>
         </div>;
     }

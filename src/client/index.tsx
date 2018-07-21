@@ -25,6 +25,8 @@ function getOrCreatePlayerName(): string {
     return name;
 }
 
+let alreadyConnected = false;
+
 let observeGameId: string = null;
 let room: string = null;
 let server: string = null;
@@ -48,7 +50,10 @@ if (window.location.search) {
 
 attachToSocket(socket, () => {
     connectToServer(server).then(() => {
-        setConnected();
+        if (!alreadyConnected) {
+            alreadyConnected = true;
+            setConnected();
+        }
         if (observeGameId) {
             onWatchGameClicked(observeGameId);
             observeGameId = null;
