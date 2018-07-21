@@ -121,7 +121,7 @@ function updateUrl() {
     if (params.length > 0) {
         path += "?" + params.join("&");
     }
-    window.history.pushState(null, null, path);
+    window.history.replaceState(null, null, path);
 }
 
 function rerender() {
