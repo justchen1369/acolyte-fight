@@ -2,6 +2,7 @@
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import * as url from './url';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
 import { isMobile } from './userAgent';
@@ -10,6 +11,7 @@ const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     room: string;
+    server: string;
     newGameCallback: () => void;
 }
 interface State {
@@ -36,7 +38,9 @@ export class HomePanel extends React.Component<Props, State> {
                     {!this.state.joining && <span className="btn" onClick={() => this.props.newGameCallback()}>Play</span>}
                     {this.state.joining && <span className="btn disabled">Play</span>}
                 </div>
-                {this.props.room && <div className="private-room-indicator">In private room: <b>{this.props.room}</b> (<a href="?">exit room</a>)</div>}
+                {this.props.room && <div className="private-room-indicator">
+                    In private room: <b><a href={this.createRoomUrl()}>{this.props.room}</a></b> (<a href="?">exit room</a>)
+                </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}><i className="fa fa-chevron-down" /></div>
                 <div className="spacer" />
@@ -51,6 +55,10 @@ export class HomePanel extends React.Component<Props, State> {
                 <SpellConfig />
             </div>
         </div>;
+    }
+
+    private createRoomUrl() {
+        return url.getPath({ room: this.props.room, server: this.props.server });
     }
 
     private scrollBelowFold() {

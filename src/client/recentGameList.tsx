@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import * as m from '../game/messages.model';
+import * as url from './url';
 import { TicksPerSecond } from '../game/constants';
 
 export interface Game {
@@ -102,13 +103,11 @@ export class RecentGameList extends React.Component<Props, State> {
     }
 
     private gameUrl(game: Game): string {
-        let params = [`g=${game.id}`];
-        if (game.room) {
-            params.push(`room=${game.room}`);
-        }
-        if (game.server) {
-            params.push(`server=${game.server}`);
-        }
-        return "?" + params.join("&");
+        return url.getPath({
+            gameId: game.id,
+            room: game.room,
+            server: game.server,
+            page: null,
+        });
     }
 }

@@ -10,6 +10,7 @@ import { CustomGamesPanel } from './customGamesPanel';
 interface Props {
     playerName: string;
     room: string;
+    server: string;
     world: w.World;
     items: s.NotificationItem[];
     page: string;
@@ -73,6 +74,7 @@ export class Root extends React.Component<Props, State> {
     private renderHome() {
         return <HomePanel
             room={this.props.room}
+            server={this.props.server}
             newGameCallback={this.props.newGameCallback} />
     }
 

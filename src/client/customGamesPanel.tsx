@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as m from '../game/messages.model';
+import * as url from './url';
 import { Mod } from '../game/settings';
 import 'file-saver';
 
@@ -7,7 +8,6 @@ interface Props {
 }
 interface State {
     error: string;
-    roomUrl: string;
     selectedFile: File;
 }
 
@@ -40,7 +40,6 @@ export class CustomGamesPanel extends React.Component<Props, State> {
         super(props);
         this.state = {
             error: null,
-            roomUrl: null,
             selectedFile: null,
         };
     }
@@ -86,11 +85,13 @@ export class CustomGamesPanel extends React.Component<Props, State> {
             })
             .then(mod => createRoomAsync(mod))
             .then(msg => {
-                let roomUrl = `/?room=${msg.roomId}`;
-                if (msg.server) {
-                    roomUrl = `${roomUrl}&server=${encodeURIComponent(msg.server)}`;
-                }
-                this.setState({ roomUrl });
+                const path = url.getPath({
+                    gameId: null,
+                    room: msg.roomId,
+                    server: msg.server,
+                    page: null,
+                });
+                window.location.href = path;
             })
             .catch(error => {
                 console.error(error);
@@ -100,11 +101,8 @@ export class CustomGamesPanel extends React.Component<Props, State> {
 
     private renderForm(modding: boolean = false) {
         return <div>
-            {this.state.roomUrl && <p><a href={this.state.roomUrl}>Click here to enter your private room.</a> Share this link with friends to play against them!</p>}
-            {!this.state.roomUrl && <div>
-                {modding && <p>Choose a mod file (optional): <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>}
-                <p><div className="btn" onClick={() => this.onSubmit()}>Create Room</div></p>
-            </div>}
+            {modding && <p>Choose a mod file (optional): <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>}
+            <p><div className="btn" onClick={() => this.onSubmit()}>Create Room</div></p>
             {this.state.error && <p className="error">{this.state.error}</p>}
         </div>
     }

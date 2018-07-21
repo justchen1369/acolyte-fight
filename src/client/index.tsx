@@ -5,6 +5,8 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
+import * as url from './url';
+
 import { connectToServer, joinRoom, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
@@ -27,38 +29,20 @@ function getOrCreatePlayerName(): string {
 
 let alreadyConnected = false;
 
-let observeGameId: string = null;
-let room: string = null;
-let server: string = null;
-let page: string = "";
-if (window.location.pathname) {
-    const elems = window.location.pathname.split("/");
-    page = elems[1] || "";
-}
-if (window.location.search) {
-    const params = queryString.parse(window.location.search);
-    if (params["g"]) {
-        observeGameId = params["g"];
-    }
-    if (params["room"]) {
-        room = params["room"];
-    }
-    if (params["server"]) {
-        server = params["server"];
-    }
-}
+let current = url.parseLocation(window.location);
 
 attachToSocket(socket, () => {
-    connectToServer(server)
-        .then(() => joinRoom(room))
+    connectToServer(current.server)
+        .then(() => joinRoom(current.room))
         .then(() => {
             if (!alreadyConnected) {
                 alreadyConnected = true;
                 setConnected();
-            }
-            if (observeGameId) {
-                joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
-                observeGameId = null;
+
+                if (current.gameId) {
+                    // Join as observer
+                    joinNewGame(playerName, retrieveKeyBindings(), current.room, current.gameId);
+                }
             }
         }).catch(error => {
             console.error(error)
@@ -82,7 +66,7 @@ function onNewGameClicked() {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), room);
+        joinNewGame(playerName, retrieveKeyBindings(), current.room);
         updateUrl();
     }
 }
@@ -92,33 +76,14 @@ function onExitGameClicked() {
 }
 
 function changePage(newPage: string) {
-    page = newPage;
+    current.page = newPage;
     updateUrl();
     rerender();
 }
 
 function updateUrl() {
-    const gameId = getStore().world.ui.myGameId;
-
-    let pathElements = new Array<string>();
-    let params = [];
-    if (gameId) {
-        params.push("g=" + gameId);
-    } else if (page) {
-        pathElements = [page];
-    }
-
-    if (room) {
-        params.push("room=" + room);
-    }
-    if (server) {
-        params.push("server=" + server);
-    }
-
-    let path = "/" + pathElements.join("/");
-    if (params.length > 0) {
-        path += "?" + params.join("&");
-    }
+    current.gameId = getStore().world.ui.myGameId;
+    const path = url.getPath(current);
     window.history.replaceState(null, null, path);
 }
 
@@ -126,8 +91,9 @@ function rerender() {
     const store = getStore();
     ReactDOM.render(
         <Root
-            page={page}
-            room={room}
+            page={current.page}
+            room={current.room}
+            server={current.server}
             playerName={playerName}
             world={store.world}
             items={store.items}
