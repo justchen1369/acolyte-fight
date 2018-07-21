@@ -621,7 +621,6 @@ export const shield: Spell = {
     description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
     untargeted: true,
 
-    mass: 100000,
     maxTicks: 3 * TicksPerSecond,
     cooldown: 20 * TicksPerSecond,
     radius: Hero.Radius * 2,

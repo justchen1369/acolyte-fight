@@ -203,7 +203,6 @@ declare interface ScourgeSpell extends SpellBase {
 declare interface ShieldSpell extends SpellBase {
     action: "shield";
 
-    mass: number;
     maxTicks: number;
     radius: number;
 }
