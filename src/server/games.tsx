@@ -67,8 +67,7 @@ export function findNewGame(roomId: string = null): g.Game {
 		}
 	});
 	if (!game) {
-		const room: g.Room = getStore().rooms.get(roomId);
-		game = initGame(room);
+		game = initGame(roomId);
 	}
 	return game;
 }
@@ -103,11 +102,11 @@ export function initRoom(mod: Object = {}): g.Room {
 	return room;
 }
 
-export function initGame(room: g.Room = null) {
+export function initGame(room: string = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		room: room ? room.id : null,
+		room,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
