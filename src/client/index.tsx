@@ -5,7 +5,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import { connectToServer, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { connectToServer, joinRoom, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
 import { Choices } from '../game/settings';
@@ -49,19 +49,21 @@ if (window.location.search) {
 }
 
 attachToSocket(socket, () => {
-    connectToServer(server).then(() => {
-        if (!alreadyConnected) {
-            alreadyConnected = true;
-            setConnected();
-        }
-        if (observeGameId) {
-            onWatchGameClicked(observeGameId);
-            observeGameId = null;
-        }
-    }).catch(error => {
-        console.error(error)
-        socket.disconnect();
-    });
+    connectToServer(server)
+        .then(() => joinRoom(room))
+        .then(() => {
+            if (!alreadyConnected) {
+                alreadyConnected = true;
+                setConnected();
+            }
+            if (observeGameId) {
+                joinNewGame(playerName, retrieveKeyBindings(), room, observeGameId);
+                observeGameId = null;
+            }
+        }).catch(error => {
+            console.error(error)
+            socket.disconnect();
+        });
 });
 attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
@@ -87,10 +89,6 @@ function onNewGameClicked() {
 
 function onExitGameClicked() {
     leaveCurrentGame();
-}
-
-function onWatchGameClicked(gameId: string) {
-    joinNewGame(playerName, retrieveKeyBindings(), room, gameId);
 }
 
 function changePage(newPage: string) {
@@ -136,7 +134,6 @@ function rerender() {
             changePage={newPage => changePage(newPage)}
             newGameCallback={() => onNewGameClicked()}
             exitGameCallback={() => onExitGameClicked()}
-            watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
         />,
         document.getElementById("root"));
 }

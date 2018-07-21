@@ -77,6 +77,8 @@ input {
     width: 100%;
 }
 
+input.file-selector { width: 300px }
+
 a, a:visited {
     color: #00ccff;
 }
@@ -110,6 +112,11 @@ a:hover, a:active {
 
 .btn:active {
     box-shadow: none;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
 }
 
 .root-panel {
@@ -234,11 +241,6 @@ a:hover, a:active {
     from { opacity: 1.0 }
     75% { opacity: 1.0 }
     to { opacity: 0.0 }
-}
-
-#messages-panel .error {
-    color: red;
-    font-weight: bold;
 }
 
 #messages-panel .help-box {

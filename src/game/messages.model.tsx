@@ -68,15 +68,34 @@ export interface LeaveMsg {
     gameId: string;
 }
 
+export interface ErrorResponseMsg {
+    success: false;
+    error: string;
+}
+
 export interface ProxyRequestMsg {
     server: string;
 }
 
-export interface ProxyResponseMsg {
-    error?: string;
+export interface ProxyResponse {
+    success: true;
 }
 
-export interface HeroMsg {
+export type ProxyResponseMsg = ProxyResponse | ErrorResponseMsg;
+
+export interface JoinRoomRequest {
+    roomId: string;
+}
+
+export interface JoinRoomResponse {
+    success: true;
+    roomId: string;
+    mod: Object;
+}
+
+export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
+
+export interface JoinResponseMsg {
     gameId: string;
     heroId: string | null; // null means observer
     room: string | null;
@@ -102,9 +121,20 @@ export interface GameMsg {
     numActivePlayers: number;
     joinable: boolean;
     numTicks: number;
+    roomId: string;
+    server: string;
 }
 
 export interface LocationMsg {
     targetServer: string;
     currentServer: string;
+}
+
+export interface CreateRoomRequest {
+    mod: Object;
+}
+
+export interface CreateRoomResponse {
+    roomId: string;
+    server: string;
 }

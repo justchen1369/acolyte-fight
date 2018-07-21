@@ -19,14 +19,6 @@ export function setLocation(hostname: string, upstreamSuffix: string) {
     logger.info(`Location: server=${location.server} fqdnSuffix=${location.upstreamSuffix}`);
 }
 
-export function onLocation(req: express.Request, res: express.Response) {
-    let locationMsg: m.LocationMsg = {
-        currentServer: location.server,
-        targetServer: req.query["server"] || location.server,
-    };
-    res.send(locationMsg);
-}
-
 export function sanitizeHostname(hostname: string): string {
     let server = hostname;
 	if (server.indexOf('.') !== -1) {

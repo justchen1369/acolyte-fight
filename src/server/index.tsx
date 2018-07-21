@@ -7,7 +7,7 @@ import * as api from './api';
 import { authMiddleware } from './auth';
 import { attachToSocket } from './emitter';
 import { getServerStats } from './loadMetrics';
-import { onLocation, setLocation } from './mirroring';
+import { setLocation } from './mirroring';
 import { logger } from './logging';
 import { cleanupOldInactiveGames } from './serverStore';
 
@@ -44,8 +44,11 @@ app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));
 app.use('/logs', express.static('./logs'));
 
+app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typings/acolytefight.d.ts'));
+app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
 app.get('/api/games', (req, res) => api.onGamesList(req, res));
-app.get('/api/location', (req, res) => onLocation(req, res));
+app.get('/api/location', (req, res) => api.onLocation(req, res));
+app.post('/api/room', (req, res) => api.onCreateRoom(req, res));
 app.get('/api/status', (req, res) => res.send(getServerStats()));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));

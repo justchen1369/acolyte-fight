@@ -3,7 +3,9 @@ import * as m from '../game/messages.model';
 
 export interface ServerStore {
     nextGameId: 0;
+    nextRoomId: 0;
     numConnections: number;
+    rooms: Map<string, Room>; // id -> room
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
     recentTickMilliseconds: number[];
@@ -34,4 +36,10 @@ export interface Player {
 	socketId: string;
 	heroId: string;
 	name: string;
+}
+
+export interface Room {
+    id: string;
+    created: moment.Moment;
+    mod: Object;
 }

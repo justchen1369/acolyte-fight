@@ -11,10 +11,11 @@ export interface Game {
     numActivePlayers: number;
     joinable: boolean;
     numTicks: number;
+    room: string;
+    server: string;
 }
 
 interface Props {
-    watchGameCallback: (gameId: string) => void;
 }
 
 interface State {
@@ -45,6 +46,8 @@ function msgToGame(msg: m.GameMsg): Game {
         numActivePlayers: msg.numActivePlayers,
         joinable: msg.joinable,
         numTicks: msg.numTicks,
+        room: msg.roomId,
+        server: msg.server,
     };
 }
 
@@ -90,7 +93,7 @@ export class RecentGameList extends React.Component<Props, State> {
                             <td>{game.createdTimestamp.fromNow()}</td>
                             <td>{game.playerNames.join(", ")}</td>
                             <td>{game.numActivePlayers > 0 ? "Live" : `${(game.numTicks / TicksPerSecond).toFixed(0)} s`}</td>
-                            <td><a href={"?g=" + game.id} onClick={ev=>this.onWatchClicked(ev, game.id)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
+                            <td><a href={this.gameUrl(game)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
                         </tr>)}
                     </tbody>
                 </table>
@@ -98,8 +101,14 @@ export class RecentGameList extends React.Component<Props, State> {
         </div>;
     }
 
-    private onWatchClicked(ev: React.MouseEvent, gameId: string) {
-        ev.preventDefault();
-        this.props.watchGameCallback(gameId);
+    private gameUrl(game: Game): string {
+        let params = [`g=${game.id}`];
+        if (game.room) {
+            params.push(`room=${game.room}`);
+        }
+        if (game.server) {
+            params.push(`server=${game.server}`);
+        }
+        return "?" + params.join("&");
     }
 }

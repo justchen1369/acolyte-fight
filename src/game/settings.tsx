@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import { TicksPerSecond, Categories } from './constants';
 import { HomingTargets } from './world.model';
 
@@ -710,3 +712,10 @@ export const Settings: AcolyteFightSettings = {
     Spells,
     Choices,
 };
+
+export const Mod = {};
+
+export function applyMod(mod: Object) {
+    _.merge(Settings, mod);
+    _.merge(Mod, mod);
+}

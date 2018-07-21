@@ -59,14 +59,15 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: string = null): g.Game {
+export function findNewGame(roomId: string = null): g.Game {
 	let game: g.Game = null;
 	getStore().activeGames.forEach(g => {
-		if (g.joinable && g.active.size < Matchmaking.MaxPlayers && g.room === room) {
+		if (g.joinable && g.active.size < Matchmaking.MaxPlayers && g.room === roomId) {
 			game = g;
 		}
 	});
 	if (!game) {
+		const room: g.Room = getStore().rooms.get(roomId);
 		game = initGame(room);
 	}
 	return game;
@@ -91,11 +92,22 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	queueAction(game, data);
 }
 
-export function initGame(room: string = null) {
+export function initRoom(mod: Object = {}): g.Room {
+	const roomIndex = getStore().nextRoomId++;
+	const room: g.Room = {
+		id: "r" + roomIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		created: moment(),
+		mod,
+	};
+	getStore().rooms.set(room.id, room);
+	return room;
+}
+
+export function initGame(room: g.Room = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		room,
+		room: room ? room.id : null,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),

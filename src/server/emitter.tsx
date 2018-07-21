@@ -4,6 +4,7 @@ import { getStore } from './serverStore';
 import { getLocation, sanitizeHostname } from './mirroring';
 import { logger } from './logging';
 import * as PlayerName from '../game/playerName';
+import * as g from './server.model';
 import * as m from '../game/messages.model';
 import socketClient from 'socket.io-client';
 
@@ -59,6 +60,7 @@ function onConnection(socket: SocketIO.Socket) {
 		}
 	});
 
+	socket.on('room', (data, callback) => onRoomMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
@@ -68,7 +70,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 	const location = getLocation();
 	if (!location.server || !data.server || location.server === data.server) {
 		// Already connected to the correct server
-		callback({});
+		callback({ success: true });
 	} else {
 		const server = sanitizeHostname(data.server);
 		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
@@ -85,21 +87,21 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			if (!attached) {
 				attached = true;
 				upstreams.set(socket.id, upstream);
-				callback({});
+				callback({ success: true });
 				logger.error(`Socket ${socket.id} connected to upstream ${server}`);
 			}
 		});
 		upstream.on('connect_error', (error: any) => {
 			if (!attached) {
 				attached = true;
-				callback({ error: `${error}` });
+				callback({ success: false, error: `${error}` });
 				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: ${error}`);
 			}
 		});
 		upstream.on('connect_timeout', () => {
 			if (!attached) {
 				attached = true;
-				callback({ error: "Timed out connecting to upstream server" });
+				callback({ success: false, error: "Timed out connecting to upstream server" });
 				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: timeout`);
 			}
 		});
@@ -112,13 +114,23 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 	}
 }
 
-function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.HeroMsg) => void) {
+function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomRequest, callback: (output: m.JoinRoomResponseMsg) => void) {
+	const store = getStore();
+	const room = store.rooms.get(data.roomId);
+	if (room) {
+		callback({ success: true, roomId: room.id, mod: room.mod });
+	} else {
+		callback({ success: false, error: `Unable to find room ${data.roomId}` });
+	}
+}
+
+function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
 	const room = data.room ? PlayerName.sanitizeName(data.room) : null;
 
-	let game = null;
+	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}

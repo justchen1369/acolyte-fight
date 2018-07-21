@@ -4,8 +4,10 @@ import * as g from './server.model';
 import { logger } from './logging';
 
 let store: g.ServerStore = {
+    nextRoomId: 0,
     nextGameId: 0,
     numConnections: 0,
+    rooms: new Map<string, g.Room>(),
     activeGames: new Map<string, g.Game>(),
     inactiveGames: new Map<string, g.Game>(),
     recentTickMilliseconds: [],

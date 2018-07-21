@@ -5,7 +5,7 @@ import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
 import { TitleSection } from '../client/titleSection';
-import { PrivateRoomPanel } from './privateRoomPanel';
+import { CustomGamesPanel } from './customGamesPanel';
 
 interface Props {
     playerName: string;
@@ -16,7 +16,6 @@ interface Props {
     changePage: (newPage: string) => void;
     newGameCallback: () => void;
     exitGameCallback: () => void;
-    watchGameCallback: (gameId: string) => void;
 }
 interface State {
 }
@@ -52,6 +51,7 @@ export class Root extends React.Component<Props, State> {
                 <div className="navbar">
                     {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
+                    {this.renderNavBarItem("custom", "Custom Games")}
                     {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
@@ -59,6 +59,7 @@ export class Root extends React.Component<Props, State> {
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
                 {page === "share" && this.renderShare()}
+                {page === "custom" && this.renderCustom()}
                 {page === "about" && this.renderAbout()}
             </div>
         );
@@ -78,9 +79,16 @@ export class Root extends React.Component<Props, State> {
     private renderShare() {
         return <div className="content-container">
             <div className="page">
-                <PrivateRoomPanel />
                 <h1>Discord</h1>
                 <p><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></p>
+            </div>
+        </div>;
+    }
+
+    private renderCustom() {
+        return <div className="content-container">
+            <div className="page">
+                <CustomGamesPanel />
             </div>
         </div>;
     }
@@ -88,7 +96,7 @@ export class Root extends React.Component<Props, State> {
     private renderReplays() {
         return <div className="content-container">
             <div className="page">
-                <RecentGameList watchGameCallback={(gameId) => this.props.watchGameCallback(gameId)} />
+                <RecentGameList />
             </div>
         </div>;
     }

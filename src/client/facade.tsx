@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import { TicksPerTurn, TicksPerSecond } from '../game/constants';
 import { render, CanvasStack } from './render';
+import { applyMod } from '../game/settings';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
@@ -56,9 +57,31 @@ export function connectToServer(server: string): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.ProxyRequestMsg = { server };
 			socket.emit('proxy', msg, (response: m.ProxyResponseMsg) => {
-				if (response.error) {
+				if (response.success === false) {
 					reject(response.error);
 				} else {
+					resolve();
+				}
+			});
+		});
+	} else {
+		return Promise.resolve();
+	}
+}
+
+export function joinRoom(roomId: string): Promise<void> {
+	if (roomId) {
+		return new Promise<void>((resolve, reject) => {
+			let msg: m.JoinRoomRequest = { roomId };
+			socket.emit('room', msg, (response: m.JoinRoomResponseMsg) => {
+				if (response.success === false) {
+					reject(response.error);
+				} else {
+					const mod = response.mod;
+					if (mod) {
+						console.log("Mod", mod);
+						applyMod(mod);
+					}
 					resolve();
 				}
 			});
@@ -78,7 +101,7 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: 
 		room,
 		observe: !!observeGameId,
 	};
-	socket.emit('join', msg, (hero: m.HeroMsg) => {
+	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
 		if (hero) {
 			onHeroMsg(hero);
 		} else {
@@ -144,7 +167,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	});
 	socket.on('tick', onTickMsg);
 }
-function onHeroMsg(data: m.HeroMsg) {
+function onHeroMsg(data: m.JoinResponseMsg) {
 	world = engine.initialWorld();
 	tickQueue = [];
 	incomingQueue = [...data.history];

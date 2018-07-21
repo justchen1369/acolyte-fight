@@ -1,0 +1,9 @@
+{
+    "Spells": {
+        "fireball": {
+            "projectile": {
+                "damage": 50
+            }
+        }
+    }
+}
