@@ -356,7 +356,7 @@ export namespace Spells {
 
 	export const lightning = {
 		id: 'lightning',
-		name: 'Zap',
+		name: 'Repulsor',
 		description: "Huge knockback, if your aim is good enough.",
 		action: "projectile",
 
