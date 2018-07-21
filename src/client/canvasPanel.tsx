@@ -5,7 +5,7 @@ import * as w from '../game/world.model';
 import { Spells, TicksPerSecond } from '../game/constants';
 import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, resetRenderState, notify, frame } from './facade';
 
-const MouseId = -999;
+const MouseId = "mouse";
 
 interface Props {
     world: w.World;
@@ -16,7 +16,7 @@ interface State {
 }
 
 interface PointInfo {
-    touchId: number;
+    touchId: string;
     interfacePoint: pl.Vec2;
     worldPoint: pl.Vec2;
 }
@@ -49,7 +49,7 @@ class AnimationLoop {
 }
 
 export class CanvasPanel extends React.Component<Props, State> {
-    private currentTouchId: number = null;
+    private currentTouchId: string = null;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
@@ -129,12 +129,12 @@ export class CanvasPanel extends React.Component<Props, State> {
         let points = new Array<PointInfo>();
         for (let i = 0; i < e.changedTouches.length; ++i) {
             const touch = e.changedTouches.item(i);
-            points.push(this.pointInfo(touch.identifier, e.target as HTMLCanvasElement, touch.clientX, touch.clientY));
+            points.push(this.pointInfo("touch" + touch.identifier, e.target as HTMLCanvasElement, touch.clientX, touch.clientY));
         }
         return points;
     }
 
-    private pointInfo(touchId: number, elem: HTMLCanvasElement, clientX: number, clientY: number) {
+    private pointInfo(touchId: string, elem: HTMLCanvasElement, clientX: number, clientY: number) {
         const rect = elem.getBoundingClientRect();
         const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
         const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect);
