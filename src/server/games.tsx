@@ -1,5 +1,6 @@
 import moment from 'moment';
-import { Matchmaking, TicksPerSecond, MaxIdleTicks, Spells, World, TicksPerTurn } from '../game/constants';
+import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
+import { Spells } from '../game/settings';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
@@ -218,7 +219,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: c.KeyBindings, authToken: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, authToken: string, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}

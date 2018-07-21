@@ -59,6 +59,10 @@
     "src/**/*.tsx",
   ],
   "files": [
+    "src/typings/acolytefight.d.ts",
     "src/typings/planck-js.d.ts"
+  ],
+  "types": [
+    "src/typings/acolytefight.d.ts",
   ]
 }

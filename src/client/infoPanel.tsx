@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as React from 'react';
-import { Hero } from '../game/constants';
+import { HeroColors } from '../game/constants';
 import * as w from '../game/world.model';
 
 interface Props {
@@ -59,9 +59,9 @@ export class InfoPanel extends React.Component<Props, State> {
 
             let color = player.uiColor;
             if (!(isAlive && isActive)) {
-                color = Hero.InactiveColor;
+                color = HeroColors.InactiveColor;
             } else if (player.heroId === world.ui.myHeroId) {
-                color = Hero.MyHeroColor;
+                color = HeroColors.MyHeroColor;
             }
             
             let numKills = 0;

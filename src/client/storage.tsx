@@ -13,7 +13,7 @@ export function saveName(name: string) {
     window.localStorage.setItem(StorageKeys.Name, name);
 }
 
-export function loadKeyBindingConfig(): c.KeyBindings {
+export function loadKeyBindingConfig(): KeyBindings {
     const json = window.localStorage.getItem(StorageKeys.Buttons);
     if (json) {
         return JSON.parse(json);
@@ -22,6 +22,6 @@ export function loadKeyBindingConfig(): c.KeyBindings {
     }
 }
 
-export function saveKeyBindingConfig(config: c.KeyBindings) {
+export function saveKeyBindingConfig(config: KeyBindings) {
     window.localStorage.setItem(StorageKeys.Buttons, JSON.stringify(config));
 }

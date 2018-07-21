@@ -68,7 +68,7 @@ export function connectToServer(server: string): Promise<void> {
 	}
 }
 
-export function joinNewGame(playerName: string, keyBindings: w.KeyBindings, room: string, observeGameId?: string) {
+export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 
 	const msg: m.JoinMsg = {

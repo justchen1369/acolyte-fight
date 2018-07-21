@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ButtonBar, Spells } from '../game/constants';
+import { Spells } from '../game/settings';
 import { Icons } from './icons';
 import { renderIcon } from '../client/renderIcon';
 
@@ -32,7 +32,7 @@ export class SpellIcon extends React.Component<Props, State> {
             return;
         }
 
-        const spell = Spells.all[this.props.spellId];
+        const spell = (Spells as Spells)[this.props.spellId];
         const icon = Icons[spell.icon];
         if (icon) {
             const ctx = elem.getContext('2d');

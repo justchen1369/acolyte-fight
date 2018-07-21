@@ -4,7 +4,8 @@ import * as engine from '../game/engine';
 import * as vector from '../game/vector';
 import * as w from '../game/world.model';
 
-import { ButtonBar, ChargingIndicator, HealthBar, Hero, Spells, Pixel } from '../game/constants';
+import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../game/constants';
+import { Hero, Choices, Spells } from '../game/settings';
 import { Icons } from './icons';
 import { renderIcon } from '../client/renderIcon';
 import { isMobile, isEdge } from './userAgent';
@@ -438,7 +439,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	let color = Hero.InactiveColor;
+	let color = HeroColors.InactiveColor;
 	if (world.activePlayers.has(hero.id)) {
 		color = heroColor(hero.id, world);
 	}
@@ -581,16 +582,17 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
 	if (heroId === world.ui.myHeroId) {
-		return Hero.MyHeroColor;
+		return HeroColors.MyHeroColor;
 	} else if (player) {
 		return player.uiColor;
 	} else {
-		return Hero.InactiveColor;
+		return HeroColors.InactiveColor;
 	}
 }
 
 function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number) {
-	ctx.rect(-HealthBar.Radius, -radius - HealthBar.Height - HealthBar.Margin, HealthBar.Radius * 2 * proportion, HealthBar.Height);
+	const healthBarRadius = HealthBar.HeroRadiusFraction * Hero.Radius;
+	ctx.rect(-healthBarRadius, -radius - HealthBar.Height - HealthBar.Margin, healthBarRadius * 2 * proportion, HealthBar.Height);
 }
 
 function rgColor(proportion: number) {
@@ -752,7 +754,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 function projectileColor(projectile: w.Projectile, world: w.World) {
 	let color = projectile.color;
 	if (projectile.selfColor && projectile.owner === world.ui.myHeroId) {
-		color = Hero.MyHeroColor;
+		color = HeroColors.MyHeroColor;
 	}
 	return color;
 }
@@ -841,7 +843,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
-	const keys = ButtonBar.Keys;
+	const keys = Choices.Keys;
 
 	if (!world.ui.buttonBar) {
 		world.ui.buttonBar = calculateButtonLayout(keys, rect);
@@ -969,7 +971,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const spellId = hero.keysToSpells.get(key);
 	if (!spellId) { return null; }
 
-	const spell = Spells.all[spellId];
+	const spell = (Spells as Spells)[spellId];
 	if (!spell) { return null; }
 
 	let button: w.ButtonRenderState = {

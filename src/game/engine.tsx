@@ -4,7 +4,8 @@ import * as constants from '../game/constants';
 import * as vector from './vector';
 import * as w from './world.model';
 
-import { Hero, World, Spells, Obstacle, Categories, Choices, Matchmaking, TicksPerSecond } from '../game/constants';
+import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/constants';
+import { Settings, World, Hero, Obstacle, Choices, Spells } from '../game/settings';
 
 // Reset planck.js constants
 {
@@ -116,7 +117,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
-function addShield(world: w.World, hero: w.Hero, spell: w.ShieldSpell) {
+function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 	const shieldId = "shield" + (world.nextObjectId++);
 
 	const body = world.physics.createBody({
@@ -165,15 +166,15 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		type: 'dynamic',
 		position,
 		angle,
-		linearDamping: Hero.Damping,
-		angularDamping: Hero.AngularDamping,
+		linearDamping: Settings.Hero.Damping,
+		angularDamping: Settings.Hero.AngularDamping,
 		allowSleep: false,
 	} as pl.BodyDef);
-	body.createFixture(pl.Circle(Hero.Radius), {
+	body.createFixture(pl.Circle(Settings.Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
 		filterMaskBits: Categories.All ^ Categories.Shield,
 		filterGroupIndex,
-		density: Hero.Density,
+		density: Settings.Hero.Density,
 		restitution: 1.0,
 	});
 
@@ -185,11 +186,11 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		filterGroupIndex,
 		categories: Categories.Hero,
 		collideWith: Categories.All,
-		health: Hero.MaxHealth,
+		health: Settings.Hero.MaxHealth,
 		body,
 		casting: null,
 		cooldowns: {},
-		shieldTicks: World.InitialShieldTicks,
+		shieldTicks: World.InitialShieldSeconds * TicksPerSecond,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -210,7 +211,7 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.Spell, projectileTemplate: w.ProjectileTemplate) {
+function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate) {
 	let id = spell.id + (world.nextObjectId++);
 
 	const from = hero.body.getPosition();
@@ -219,7 +220,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
 
-	const offset = Hero.Radius + projectileTemplate.radius + constants.Pixel;
+	const offset = Settings.Hero.Radius + projectileTemplate.radius + constants.Pixel;
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
@@ -269,7 +270,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 			afterTick: world.tick + (projectileTemplate.homing.afterTicks || 0),
 			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
 			speedWhenClose: projectileTemplate.homing.speedWhenClose,
-		} as w.HomingParameters,
+		} as HomingParameters,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
@@ -277,7 +278,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 			maxImpulse: projectileTemplate.detonate.maxImpulse,
 			detonateTick: world.tick + ticksToDetonate(projectileTemplate, vector.length(diff), vector.length(velocity)),
 			waitTicks: projectileTemplate.detonate.waitTicks || 0,
-		} as w.DetonateParameters,
+		} as DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
@@ -301,7 +302,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: w.S
 	return projectile;
 }
 
-function ticksToDetonate(projectileTemplate: w.ProjectileTemplate, distance: number, speed: number) {
+function ticksToDetonate(projectileTemplate: ProjectileTemplate, distance: number, speed: number) {
 	if (!projectileTemplate.detonate) {
 		return 0;
 	}
@@ -377,7 +378,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	console.log("Environment seed " + world.seed);
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const layout = World.Layouts[world.seed % World.Layouts.length];
+	const layout = Settings.Layouts[world.seed % Settings.Layouts.length];
 	layout.obstacles.forEach(obstacleTemplate => {
 		const points = polygon(obstacleTemplate.numPoints, obstacleTemplate.extent);
 		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
@@ -437,12 +438,12 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 		}
 	});
 
-	let uiColor = Hero.Colors[0];
+	let uiColor = HeroColors.Colors[0];
 	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
 		uiColor = preferredColor;
 	} else {
-		for (let i = 0; i < Hero.Colors.length; ++i) {
-			let candidate = Hero.Colors[i];
+		for (let i = 0; i < HeroColors.Colors.length; ++i) {
+			let candidate = HeroColors.Colors[i];
 			if (!alreadyUsedColors.has(candidate)) {
 				uiColor = candidate;
 				break;
@@ -476,7 +477,7 @@ function handleActions(world: w.World) {
 	world.actions = newActions;
 }
 
-function assignKeyBindingsToHero(hero: w.Hero, keyBindings: w.KeyBindings) {
+function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings) {
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
 	for (var key in Choices.Options) {
@@ -502,7 +503,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (!action || !isValidAction(action, hero)) {
 		return true; // Nothing to do
 	}
-	const spell = constants.Spells.all[action.type];
+	const spell = (Spells as Spells)[action.type];
 	const uninterruptible = !spell.interruptible;
 
 	// Start casting a new spell
@@ -594,7 +595,7 @@ function turnTowards(hero: w.Hero, target: pl.Vec2) {
 	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
 	const currentAngle = hero.body.getAngle();
 
-	const newAngle = vector.turnTowards(currentAngle, targetAngle, Hero.TurnRate);
+	const newAngle = vector.turnTowards(currentAngle, targetAngle, Settings.Hero.TurnFractionPerTick * 2 * Math.PI);
 	hero.body.setAngle(newAngle);
 
 	return Math.abs(vector.angleDelta(newAngle, targetAngle));
@@ -608,7 +609,7 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 	}
 }
 
-function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Spell): boolean {
+function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
 		case "move": return moveAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
@@ -671,10 +672,10 @@ function handleHeroHitShield(world: w.World, hero: w.Hero, other: w.Shield) {
 function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	// Push back other heroes
 	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
-	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
+	const repelDistance = Settings.Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
 	if (repelDistance > 0) {
 		const step = vector.multiply(pushbackDirection, repelDistance);
-		const impulse = vector.multiply(step, Hero.SeparationStrength);
+		const impulse = vector.multiply(step, Settings.Hero.SeparationStrength);
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	}
 
@@ -905,7 +906,7 @@ function homingForce(world: w.World) {
 }
 
 function linkForce(world: w.World) {
-	const minDistance = Hero.Radius * 2;
+	const minDistance = Settings.Hero.Radius * 2;
 	const maxDistance = 0.25;
 	world.objects.forEach(owner => {
 		if (!(owner.category === "hero" && owner.link)) {
@@ -1012,10 +1013,10 @@ function detonate(world: w.World) {
 				if (other.category === "hero") {
 					const diff = vector.diff(other.body.getPosition(), obj.body.getPosition());
 					const distance = vector.length(diff);
-					if (other.id !== obj.owner && distance <= obj.detonate.radius + Hero.Radius) {
+					if (other.id !== obj.owner && distance <= obj.detonate.radius + Settings.Hero.Radius) {
 						applyDamage(other, obj, obj.owner, world);
 
-						const proportion = 1.0 - (distance / (obj.detonate.radius + Hero.Radius)); // +HeroRadius because only need to touch the edge
+						const proportion = 1.0 - (distance / (obj.detonate.radius + Settings.Hero.Radius)); // +HeroRadius because only need to touch the edge
 						const magnitude = obj.detonate.minImpulse + proportion * (obj.detonate.maxImpulse - obj.detonate.minImpulse);
 						other.body.applyLinearImpulse(
 							vector.relengthen(diff, magnitude),
@@ -1040,15 +1041,16 @@ function detonate(world: w.World) {
 }
 
 function applyLavaDamage(world: w.World) {
+	const lavaDamagePerTick = World.LavaDamagePerSecond / TicksPerSecond;
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
-				applyDamage(obj, { damage: World.LavaDamagePerTick }, null, world);
+				applyDamage(obj, { damage: lavaDamagePerTick }, null, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
-				applyDamageToObstacle(obj, World.LavaDamagePerTick, world);
+				applyDamageToObstacle(obj, lavaDamagePerTick, world);
 			}
 		}
 	});
@@ -1056,7 +1058,7 @@ function applyLavaDamage(world: w.World) {
 
 function shrink(world: w.World) {
 	if (world.tick >= world.startTick && !world.winner) {
-		world.radius = Math.max(0, world.radius - World.ShrinkPerTick);
+		world.radius = Math.max(0, world.radius - World.ShrinkPerSecond / TicksPerSecond);
 	}
 }
 
@@ -1209,13 +1211,13 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.ui.destroyed.push(object);
 }
 
-function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.MoveSpell) {
+function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
 	if (!action.target) { return true; }
 
 	let current = hero.body.getPosition();
 	let target = action.target;
 
-	const idealStep = vector.truncate(vector.diff(target, current), Hero.MoveSpeedPerTick);
+	const idealStep = vector.truncate(vector.diff(target, current), Settings.Hero.MoveSpeedPerSecond / TicksPerSecond);
 	const facing = vector.fromAngle(hero.body.getAngle());
 	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
 
@@ -1231,7 +1233,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Mov
 	return vector.distance(current, target) < constants.Pixel;
 }
 
-function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ProjectileSpell) {
+function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ProjectileSpell) {
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
@@ -1244,7 +1246,7 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return true;
 }
 
-function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.SpraySpell) {
+function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: SpraySpell) {
 	if (!action.target) { return true; }
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
@@ -1263,7 +1265,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return currentLength >= spell.lengthTicks;
 }
 
-function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.TeleportSpell) {
+function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
 	if (!action.target) { return true; }
 
 	let currentPosition = hero.body.getPosition();
@@ -1273,7 +1275,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: w
 	return true;
 }
 
-function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ThrustSpell) {
+function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
@@ -1301,9 +1303,9 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.T
 	return !hero.thrust;
 }
 
-function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ScourgeSpell) {
-	const selfPacket: w.DamagePacket = { damage: spell.selfDamage };
-	const damagePacket: w.DamagePacket = { damage: spell.damage };
+function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
+	const selfPacket: DamagePacket = { damage: spell.selfDamage };
+	const damagePacket: DamagePacket = { damage: spell.damage };
 	scaleDamagePacket(damagePacket, hero, spell.damageScaling)
 
 	applyDamage(hero, selfPacket, hero.id, world);
@@ -1314,7 +1316,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 
 		let objPos = obj.body.getPosition();
 		let diff = vector.diff(objPos, heroPos);
-		let proportion = 1.0 - (vector.length(diff) / (spell.radius + Hero.Radius)); // +HeroRadius because only need to touch the edge
+		let proportion = 1.0 - (vector.length(diff) / (spell.radius + Settings.Hero.Radius)); // +HeroRadius because only need to touch the edge
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.category === "hero") {
@@ -1335,7 +1337,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.
 	return true;
 }
 
-function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.WallSpell) {
+function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: WallSpell) {
 	const halfWidth = spell.width / 2;
 	const halfLength = spell.length / 2;
 	let points = [
@@ -1360,16 +1362,16 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.Wal
 	return true;
 }
 
-function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: w.ShieldSpell) {
+function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: ShieldSpell) {
 	addShield(world, hero, spell);
 	return true;
 }
 
-function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
+function scaleDamagePacket(packet: DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
 	let scaleFactor = 1.0;
 	if (fromHero && damageScaling) {
 		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
-		scaleFactor += Math.pow(1.0 - fromHeroHealth / Hero.MaxHealth, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
+		scaleFactor += Math.pow(1.0 - fromHeroHealth / Settings.Hero.MaxHealth, Settings.Hero.AdditionalDamagePower) * Settings.Hero.AdditionalDamageMultiplier;
 	}
 	packet.damage *= scaleFactor;
 
@@ -1378,7 +1380,7 @@ function scaleDamagePacket(packet: w.DamagePacket, fromHero: w.Hero, damageScali
 	}
 }
 
-function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string, world: w.World) {
+function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, world: w.World) {
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
 	if (!toHero) { return; }
 
@@ -1395,7 +1397,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, fromHeroId: string,
 	if (fromHeroId && packet.lifeSteal) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
-			fromHero.health = Math.min(Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
+			fromHero.health = Math.min(Settings.Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
 		}
 	}
 

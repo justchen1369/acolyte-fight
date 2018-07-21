@@ -31,7 +31,7 @@ export interface EnvironmentMsg extends ActionMsgBase {
 export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
     playerName: string;
-    keyBindings: c.KeyBindings;
+    keyBindings: KeyBindings;
 }
 
 export interface LeaveActionMsg extends ActionMsgBase {
@@ -60,7 +60,7 @@ export interface JoinMsg {
     gameId: string | null;
     room: string | null;
     name: string;
-    keyBindings: c.KeyBindings;
+    keyBindings: KeyBindings;
     observe: boolean;
 }
 

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as c from '../game/world.model';
-import { ButtonBar, Choices, Spells } from '../game/constants';
+import { Choices, Spells } from '../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../client/storage';
 
@@ -8,7 +8,7 @@ interface Props {
 }
 
 interface State {
-    config: c.KeyBindings;
+    config: KeyBindings;
     saved: Set<string>;
 }
 
@@ -24,7 +24,7 @@ export class SpellConfig extends React.Component<Props, State> {
     render() {
         return <div className="spell-config">
             <h1>Your Spell Configuration</h1>
-            {ButtonBar.Keys.map(key => this.renderKey(key))}
+            {Choices.Keys.map(key => this.renderKey(key))}
         </div>;
     }
 
@@ -35,7 +35,7 @@ export class SpellConfig extends React.Component<Props, State> {
 
         const options = Choices.Options[key];
         const chosen = this.state.config[key] || Choices.Defaults[key];
-        const chosenSpell = Spells.all[chosen];
+        const chosenSpell = (Spells as Spells)[chosen];
         const name = chosenSpell.name || chosenSpell.id;
         return <div className="key">
             <div className="key-options">

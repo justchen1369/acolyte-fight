@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Hero } from '../game/constants';
+import { Hero } from '../game/settings';
 import * as m from '../game/messages.model';
 
 interface Props {

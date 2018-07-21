@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
-import { ButtonBar, Hero, TicksPerSecond } from '../game/constants';
+import { HeroColors } from '../game/constants';
 import { isMobile } from './userAgent';
 
 interface Props {
@@ -149,7 +149,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     private renderPlayer(player: w.Player) {
         let color = player.uiColor;
         if (player.heroId === this.props.world.ui.myHeroId) {
-            color = Hero.MyHeroColor;
+            color = HeroColors.MyHeroColor;
         }
         return <span className="player-name" style={{ color }}>{player.name}</span>;
     }
