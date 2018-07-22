@@ -10,7 +10,7 @@ Units - general conventions:
 * Lifesteal: Fraction of damage translated into lifesteal. e.g. 1.0 for drain, 0.5 for link.
 * Densities, forces, impulses: These are a bit arbitrary and don't really have units. Heroes have a density of 0.5 and everything has been set relative to that.
 
-Collision category flags (categories, explodeOn and collideWith):
+Collision category flags (categories, expireOn and collideWith):
 * All = 0xFFFF
 * Hero = 0x1
 * Projectile = 0x2
@@ -174,7 +174,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	maxTicks: number;
 	categories?: number;
     collideWith?: number;
-	explodeOn: number;
+	expireOn: number;
 	shieldTakesOwnership?: boolean;
 
     trailTicks: number;

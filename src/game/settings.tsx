@@ -186,7 +186,7 @@ export const fireball: Spell = {
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
         damage: 5,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         render: "projectile",
         trailTicks: 30,
@@ -213,7 +213,7 @@ export const flamestrike: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2 * TicksPerSecond,
         damage: 10,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         detonate: {
             radius: 0.025,
@@ -251,7 +251,7 @@ export const firespray: Spell = {
         maxSpeed: 1.0,
         maxTicks: 0.25 * TicksPerSecond,
         damage: 2.5,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         render: "ray",
         trailTicks: 30,
@@ -279,7 +279,7 @@ export const meteor: Spell = {
         damage: 0,
         trailTicks: 15,
         categories: Categories.Projectile | Categories.Massive,
-        explodeOn: Categories.Obstacle,
+        expireOn: Categories.Obstacle,
 
         render: "ball",
     },
@@ -314,7 +314,7 @@ export const kamehameha: Spell = {
         damage: 5,
         damageScaling: false,
         trailTicks: 1.0 * TicksPerSecond,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         render: "ray",
     },
@@ -340,7 +340,7 @@ export const lightning: Spell = {
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         damage: 0,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         render: "ray",
         trailTicks: 30,
@@ -367,7 +367,7 @@ export const homing: Spell = {
         speed: 0.15,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         homing: {
             revolutionsPerSecond: 1,
@@ -401,7 +401,7 @@ export const boomerang: Spell = {
         speed: 0.4,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
-        explodeOn: Categories.Hero | Categories.Massive,
+        expireOn: Categories.Hero | Categories.Massive,
 
         homing: {
             revolutionsPerSecond: 0.02,
@@ -436,7 +436,7 @@ export const link: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
-        explodeOn: Categories.Hero,
+        expireOn: Categories.Hero,
         shieldTakesOwnership: false,
 
         link: {
@@ -477,7 +477,7 @@ export const bouncer: Spell = {
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
-        explodeOn: Categories.None,
+        expireOn: Categories.None,
         bounce: {
             damageFactor: 0.9,
         },
@@ -508,7 +508,7 @@ export const drain: Spell = {
         maxTicks: 2.0 * TicksPerSecond,
         damage: 5,
         lifeSteal: 1.0,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
         homing: {
             revolutionsPerSecond: 0,
             redirect: true,
@@ -540,7 +540,7 @@ export const gravity: Spell = {
         maxTicks: 8.0 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Massive,
-        explodeOn: Categories.All,
+        expireOn: Categories.All,
 
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
@@ -581,7 +581,7 @@ export const supernova: Spell = {
         maxTicks: 1.25 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.None,
-        explodeOn: Categories.None,
+        expireOn: Categories.None,
 
         detonate: {
             waitTicks: 0.5 * TicksPerSecond,

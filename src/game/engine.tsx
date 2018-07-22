@@ -286,7 +286,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
-		explodeOn: projectileTemplate.explodeOn,
+		expireOn: projectileTemplate.expireOn,
 
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
@@ -712,13 +712,13 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		applyDamageToObstacle(obstacle, projectile.damage, world);
 	}
 
-	if (projectile.explodeOn & obstacle.categories) {
+	if (projectile.expireOn & obstacle.categories) {
 		destroyObject(world, projectile);
 	}
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
-	if (projectile.explodeOn & other.categories) {
+	if (projectile.expireOn & other.categories) {
 		destroyObject(world, projectile);
 	}
 }
@@ -746,7 +746,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (projectile.bounce) {
 		bounceToNext(projectile, hero, world);
 	}
-	if (projectile.explodeOn & hero.categories) {
+	if (projectile.expireOn & hero.categories) {
 		destroyObject(world, projectile);
 	}
 }
