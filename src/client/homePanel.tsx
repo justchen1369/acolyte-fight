@@ -61,12 +61,12 @@ export class HomePanel extends React.Component<Props, State> {
     }
 
     private getRoomDetailsUrl() {
-        return url.getPath(Object.assign({}, this.props.current, { page: "custom" }));
+        return url.getPath(Object.assign({}, this.props.current, { page: "share" }));
     }
 
     private onRoomDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
         ev.preventDefault();
-        return this.props.changePage("custom");
+        return this.props.changePage("share");
     }
 
     private scrollBelowFold() {

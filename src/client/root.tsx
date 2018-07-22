@@ -6,8 +6,9 @@ import * as url from './url';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
+import { SharePanel } from '../client/sharePanel';
 import { TitleSection } from '../client/titleSection';
-import { CustomGamesPanel } from './customGamesPanel';
+import { ModdingPanel } from './moddingPanel';
 
 interface Props {
     playerName: string;
@@ -54,7 +55,7 @@ export class Root extends React.Component<Props, State> {
                 <div className="navbar">
                     {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
-                    {this.renderNavBarItem("custom", "Custom Games")}
+                    {this.renderNavBarItem("modding", "Modding")}
                     {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
@@ -62,7 +63,7 @@ export class Root extends React.Component<Props, State> {
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
                 {page === "share" && this.renderShare()}
-                {page === "custom" && this.renderCustom()}
+                {page === "modding" && this.renderModding()}
                 {page === "about" && this.renderAbout()}
             </div>
         );
@@ -89,26 +90,15 @@ export class Root extends React.Component<Props, State> {
     private renderShare() {
         return <div className="content-container">
             <div className="page">
-                <h1>Chat</h1>
-                <p><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></p>
-                <h1>Social Media</h1>
-                <p>
-                    <ul>
-                        <li><a href="http://twitter.com/acolytefight" target="_blank">Twitter</a></li>
-                        <li><a href="http://twitch.com/acolytefight" target="_blank">Twitch</a></li>
-                        <li><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank">YouTube</a></li>
-                        <li><a href="http://instagram.com/acolytefight" target="_blank">Instagram</a></li>
-                        <li><a href="http://facebook.com/acolytefight" target="_blank">Facebook</a></li>
-                    </ul>
-                </p>
+                <SharePanel current={this.props.current} />
             </div>
         </div>;
     }
 
-    private renderCustom() {
+    private renderModding() {
         return <div className="content-container">
             <div className="page">
-                <CustomGamesPanel current={this.props.current} />
+                <ModdingPanel current={this.props.current} />
             </div>
         </div>;
     }
@@ -138,6 +128,6 @@ export class Root extends React.Component<Props, State> {
     private onDrop(ev: React.DragEvent) {
         ev.stopPropagation();
         ev.preventDefault();
-        rooms.createAndJoinRoomAsync(ev.dataTransfer.files.item(0), this.props.current);
+        rooms.createRoomFromFile(ev.dataTransfer.files.item(0), this.props.current);
     }
 }

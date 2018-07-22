@@ -1,21 +1,13 @@
 import * as m from '../game/messages.model';
 import * as url from './url';
 
-export function createAndJoinRoomAsync(file: File, current: url.PathElements) {
+export function createRoomFromFile(file: File, current: url.PathElements) {
     return readFileAsync(file)
         .then(json => json ? JSON.parse(json) : {})
-        .then(mod => createRoomAsync(mod))
-        .then(msg => {
-            const path = url.getPath(Object.assign({}, current, {
-                gameId: null,
-                room: msg.roomId,
-                server: msg.server,
-            }));
-            window.location.href = path;
-        })
+        .then(mod => createRoomFromMod(mod, current))
 }
 
-function createRoomAsync(mod: Object) {
+export function createRoomFromMod(mod: Object, current: url.PathElements) {
     console.log("Creating room with mod", mod);
     return fetch('api/room', {
         credentials: "same-origin",
@@ -24,7 +16,16 @@ function createRoomAsync(mod: Object) {
         },
         method: 'POST',
         body: JSON.stringify({ mod } as m.CreateRoomRequest),
-    }).then(res => res.json()).then((msg: m.CreateRoomResponse) => msg);
+    }).then(res => res.json()).then((msg: m.CreateRoomResponse) => msg)
+    .then(msg => {
+        const path = url.getPath(Object.assign({}, current, {
+            gameId: null,
+            page: "share",
+            room: msg.roomId,
+            server: msg.server,
+        }));
+        window.location.href = path;
+    })
 }
 
 function readFileAsync(file: File): Promise<string> {
