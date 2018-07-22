@@ -34,14 +34,18 @@ export class SpellConfig extends React.Component<Props, State> {
         }
 
         const options = Choices.Options[key];
-        const chosen = this.state.config[key] || Choices.Defaults[key];
-        const chosenSpell = (Spells as Spells)[chosen];
-        const name = chosenSpell.name || chosenSpell.id;
+        let chosenId = this.state.config[key];
+		if (!(options.indexOf(chosenId) >= 0)) {
+			chosenId = Choices.Defaults[key];
+		}
+        const chosen = (Spells as Spells)[chosenId];
+
+        const name = chosen.name || chosen.id;
         return <div className="key">
             <div className="key-options">
                 {options.map(spellId =>
                     <SpellIcon
-                        className={spellId === chosen ? "spell-icon-chosen" : "spell-icon-not-chosen"}
+                        className={spellId === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
                         spellId={spellId}
                         title={this.capitalize(spellId)}
                         onClick={() => this.onChoose(key, spellId)}
@@ -49,7 +53,7 @@ export class SpellConfig extends React.Component<Props, State> {
             </div>
             <div className="key-detail">
                 <div className="spell-name">{name}</div>
-                <div className="description">{chosenSpell.description}</div>
+                <div className="description">{chosen.description}</div>
                 {this.state.saved.has(key) && <div className="key-saved">Your {key.toUpperCase()} spell is now {this.capitalize(name)}.</div>}
             </div>
             <div className="key-name-container">
