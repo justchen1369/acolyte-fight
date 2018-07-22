@@ -1,3 +1,26 @@
+/*
+
+Units - general conventions:
+* Distance: If you're on a horizontal monitor, the distance from the top of the screen to the bottom is 1.0.
+* Time: Either ticks or seconds. There are 60 ticks per second.
+* Speed: Distance per second.
+* Angles: Revolutions. e.g. maxAngleDiff: 0.25 means the spell can be cast when the acolyte is one quarter-turn away from facing the target directly.
+* Angular speeds: Revolutions per second.
+* Health: Percentages. Heroes start with 100.
+* Lifesteal: Fraction of damage translated into lifesteal. e.g. 1.0 for drain, 0.5 for link.
+* Densities, forces, impulses: These are a bit arbitrary and don't really have units. Heroes have a density of 0.5 and everything has been set relative to that.
+
+Collision category flags (categories, explodeOn and collideWith):
+* All = 0xFFFF
+* Hero = 0x1
+* Projectile = 0x2
+* Massive = 0x4
+* Obstacle = 0x8
+* Shield = 0x10
+* None = 0
+
+*/
+
 declare interface AcolyteFightSettings {
     Layouts: Layouts;
     Hero: HeroSettings;
@@ -19,9 +42,9 @@ declare interface HeroSettings {
     AdditionalDamagePower: number;
 
     MaxHealth: number;
-    SeparationStrength: number;
+    SeparationImpulsePerTick: number;
 
-    TurnFractionPerTick: number;
+    RevolutionsPerTick: number;
 }
 
 declare interface WorldSettings {
@@ -162,7 +185,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 }
 
 declare interface GravityParameters {
-	strength: number;
+	impulsePerTick: number;
 	ticks: number;
 	radius: number;
 	power: number;
@@ -235,7 +258,7 @@ declare interface KeyBindings {
 }
 
 declare interface LinkParameters {
-	strength: number;
+	impulsePerTick: number;
 	lifeSteal: number;
 	linkTicks: number;
 }

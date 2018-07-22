@@ -15,9 +15,9 @@ export const Hero: HeroSettings = {
     AdditionalDamagePower: 1.0,
 
     MaxHealth: 100,
-    SeparationStrength: 0.01,
+    SeparationImpulsePerTick: 0.01,
 
-    TurnFractionPerTick: 0.05,
+    RevolutionsPerTick: 0.05,
 }
 
 export const World: WorldSettings = {
@@ -440,7 +440,7 @@ export const link: Spell = {
         shieldTakesOwnership: false,
 
         link: {
-            strength: 1.0 / TicksPerSecond,
+            impulsePerTick: 1.0 / TicksPerSecond,
             linkTicks: 2.0 * TicksPerSecond,
             lifeSteal: 0.5,
         },
@@ -543,7 +543,7 @@ export const gravity: Spell = {
         explodeOn: Categories.All,
 
         gravity: {
-            strength: 0.001 / TicksPerSecond,
+            impulsePerTick: 0.001 / TicksPerSecond,
             ticks: 2.0 * TicksPerSecond,
             radius: 0.05,
             power: 1,

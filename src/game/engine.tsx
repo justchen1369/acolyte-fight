@@ -598,7 +598,7 @@ function turnTowards(hero: w.Hero, target: pl.Vec2) {
 	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
 	const currentAngle = hero.body.getAngle();
 
-	const newAngle = vector.turnTowards(currentAngle, targetAngle, Settings.Hero.TurnFractionPerTick * 2 * Math.PI);
+	const newAngle = vector.turnTowards(currentAngle, targetAngle, Settings.Hero.RevolutionsPerTick * 2 * Math.PI);
 	hero.body.setAngle(newAngle);
 
 	return Math.abs(vector.angleDelta(newAngle, targetAngle));
@@ -678,7 +678,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const repelDistance = Settings.Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
 	if (repelDistance > 0) {
 		const step = vector.multiply(pushbackDirection, repelDistance);
-		const impulse = vector.multiply(step, Settings.Hero.SeparationStrength);
+		const impulse = vector.multiply(step, Settings.Hero.SeparationImpulsePerTick);
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	}
 
@@ -776,7 +776,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 	target.gravity = {
 		expireTick: world.tick + projectile.gravity.ticks,
 		location: vector.clone(projectile.body.getPosition()),
-		strength: projectile.gravity.strength,
+		strength: projectile.gravity.impulsePerTick,
 		radius: projectile.gravity.radius,
 		power: projectile.gravity.power,
 	};
@@ -795,7 +795,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 
 	owner.link = {
 		targetId: target.id,
-		strength: projectile.link.strength,
+		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
 	};
