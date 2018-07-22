@@ -36,24 +36,24 @@ declare interface HeroSettings {
     Density: number;
 
     AngularDamping: number;
-    Damping: number;
+    Damping: number; // How quickly knockback decayed. Higher number, faster decay.
 
-    AdditionalDamageMultiplier: number;
+    AdditionalDamageMultiplier: number; // Damage scaling
     AdditionalDamagePower: number;
 
     MaxHealth: number;
-    SeparationImpulsePerTick: number;
+    SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
 
-    RevolutionsPerTick: number;
+    RevolutionsPerTick: number; // Hero turn rate
 }
 
 declare interface WorldSettings {
-	InitialRadius: number;
-	HeroLayoutRadius: number;
+	InitialRadius: number; // Initial radius of the world
+	HeroLayoutRadius: number; // The radius at which to place heroes
 
 	LavaDamagePerSecond: number;
 	ShrinkPerSecond: number;
-    InitialShieldSeconds: number;
+    InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
 }
 
 declare interface Layouts {
@@ -72,7 +72,7 @@ declare interface ObstacleTemplate {
 
 	// Properties of an individual obstacle
 	numPoints: number;
-	extent: number;
+	extent: number; // aka radius but for a polygon
 	orientationAngleOffsetInRevs: number;
 }
 
@@ -107,19 +107,19 @@ declare interface SpellBase {
 	id: string;
 	name?: string;
     description: string;
-	action: string;
-	untargeted?: boolean;
+	action: string; // Which action function to use
+	untargeted?: boolean; // No target required. i.e. cast instantly when you click the button
 
-	maxAngleDiffInRevs?: number;
+	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
-    chargeTicks?: number;
+    chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
     cooldown: number;
-    interruptible?: boolean;
-    knockbackCancel?: boolean;
+    interruptible?: boolean; // Whether this spell can be interrupted by moving.
+    knockbackCancel?: boolean; // If this spell is being channelled, whether knockback cancels it.
 
     icon?: string;
 
-    color: string;
+    color: string; // The colour of the button for this spell (not the projectile)
 }
 
 declare interface MoveSpell extends SpellBase {
@@ -137,10 +137,10 @@ declare interface SpraySpell extends SpellBase {
 
     projectile: ProjectileTemplate;
 
-    intervalTicks: number;
-    lengthTicks: number;
+    intervalTicks: number; // Spray shoots a new projectile every intervalTicks
+    lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 
-    jitterRatio: number;
+    jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
 }
 
 declare interface WallSpell extends SpellBase {
@@ -157,59 +157,64 @@ declare interface WallSpell extends SpellBase {
 
 declare interface ProjectileTemplate extends DamagePacket {
 	damage: number;
-	damageScaling?: boolean;
+	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
     bounce?: BounceParameters;
 
     density: number;
     radius: number;
 	speed: number;
-	maxSpeed?: number;
+	maxSpeed?: number; // Projectile will expire if it is accelerated above this speed (e.g. by a thrust).
 
     homing?: HomingParametersTemplate;
 	link?: LinkParameters;
-	gravity?: GravityParameters;
-	detonate?: DetonateParametersTemplate;
-	lifeSteal?: number;
+	gravity?: GravityParameters; // Trap a hero
+	detonate?: DetonateParametersTemplate; // Explode at target
+	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
 	maxTicks: number;
-	categories?: number;
-    collideWith?: number;
-	expireOn: number;
-	shieldTakesOwnership?: boolean;
+	categories?: number; // Collision flags: What flags this object has
+    collideWith?: number; // Collision flags: Which other objects to collide with
+	expireOn: number; // Collision flags: The projectile will expire if it hits any of these objects
+	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
-    trailTicks: number;
+    trailTicks: number; // How long is the trail? (Visual effect only)
 
-    color: string;
-    selfColor?: boolean;
-    render: string;
+    color: string; // Color of the projectile
+    selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
+    render: string; // Which render function to use
 }
 
 declare interface GravityParameters {
-	impulsePerTick: number;
-	ticks: number;
-	radius: number;
-	power: number;
+	ticks: number; // How long the trap lasts for
+	impulsePerTick: number; // Force to apply each tick to a trapped hero (pre-scaling)
+	radius: number; // Scale factor: The force scales to zero at this radius
+	power: number; // Scale factor: The power curve to apply to the scaling
 }
 
 declare interface BounceParameters {
-    damageFactor: number;
+    damageFactor: number; // Used to decay the bouncer from repeated hits. 0.9 means it loses 10% damage each time.
 }
 
 declare interface HomingParametersTemplate {
-	minDistanceToTarget?: number;
-	speedWhenClose?: number;
-	revolutionsPerSecond: number;
-	maxTurnProportion?: number;
-    targetType?: string;
-	redirect?: boolean;
-	afterTicks?: number;
+	targetType?: string; // Whether to home towards "self", "enemy" or "cursor"
+
+	revolutionsPerSecond: number; // The maximum turn rate of the homing projectile
+	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
+
+	afterTicks?: number; // Only apply homing after this many ticks
+	redirect?: boolean; // Redirect after a certain number of ticks
+
+	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
+	speedWhenClose?: number; // When the projectile is within minDistanceToTarget, change the speed to this. Used to stop projectiles when they reach targets.
 }
 
 declare interface DetonateParametersTemplate {
-	radius: number;
-	minImpulse: number;
-	maxImpulse: number;
-	waitTicks?: number;
+	radius: number; // The radius of the explosion
+	
+	minImpulse: number; // The outer rim of the explosion will cause this much knockback
+	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
+
+	waitTicks?: number; // Don't explode straight away
 }
 
 declare interface ScourgeSpell extends SpellBase {
