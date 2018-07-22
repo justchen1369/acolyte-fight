@@ -89,8 +89,18 @@ export class Root extends React.Component<Props, State> {
     private renderShare() {
         return <div className="content-container">
             <div className="page">
-                <h1>Discord</h1>
+                <h1>Chat</h1>
                 <p><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></p>
+                <h1>Social Media</h1>
+                <p>
+                    <ul>
+                        <li><a href="http://twitter.com/acolytefight" target="_blank">Twitter</a></li>
+                        <li><a href="http://twitch.com/acolytefight" target="_blank">Twitch</a></li>
+                        <li><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank">YouTube</a></li>
+                        <li><a href="http://instagram.com/acolytefight" target="_blank">Instagram</a></li>
+                        <li><a href="http://facebook.com/acolytefight" target="_blank">Facebook</a></li>
+                    </ul>
+                </p>
             </div>
         </div>;
     }
