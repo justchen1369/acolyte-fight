@@ -705,12 +705,12 @@ export const Spells = {
 };
 
 export const Settings: AcolyteFightSettings = {
-    Layouts,
-    Hero,
     World,
+    Hero,
     Obstacle,
-    Spells,
     Choices,
+    Spells,
+    Layouts,
 };
 
 export const Mod = {};
