@@ -73,7 +73,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderDisconnectedNotification(key: string, notification: w.DisconnectedNotification) {
-        return <div key={key} className="row error">Disconnected from server. Refresh the page to reconnect.</div>
+        return <div key={key} className="row error">Disconnected from server. Exit the game and try again.</div>
     }
 
     private renderReplayNotFoundNotification(key: string, notification: w.ReplayNotFoundNotification) {

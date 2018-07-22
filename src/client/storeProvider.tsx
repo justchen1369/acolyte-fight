@@ -18,8 +18,8 @@ export function getStore() {
     return store;
 }
 
-export function setConnected() {
-    store.connected = true;
+export function setConnected(connected: boolean) {
+    store.connected = connected;
 }
 
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {

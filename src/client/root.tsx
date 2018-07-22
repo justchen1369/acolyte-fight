@@ -11,6 +11,7 @@ interface Props {
     playerName: string;
     room: string;
     server: string;
+    connected: boolean;
     world: w.World;
     items: s.NotificationItem[];
     page: string;
@@ -40,6 +41,7 @@ export class Root extends React.Component<Props, State> {
         return <GamePanel
             world={this.props.world} 
             items={this.props.items} 
+            connected={this.props.connected}
             playerName={this.props.playerName}
             newGameCallback={this.props.newGameCallback}
             exitGameCallback={this.props.exitGameCallback} />;

@@ -12,6 +12,7 @@ interface Props {
     playerName: string;
     world: w.World;
     items: s.NotificationItem[];
+    connected: boolean;
     newGameCallback: () => void;
     exitGameCallback: () => void;
 }
@@ -45,6 +46,7 @@ export class GamePanel extends React.Component<Props, State> {
             || !!world.winner
             || !world.ui.myHeroId
             || !world.objects.has(world.ui.myHeroId)
+            || !this.props.connected
         return (
             <div id="game-panel">
                 <CanvasPanel world={this.props.world} />

@@ -36,8 +36,8 @@ attachToSocket(socket, () => {
         .then(() => joinRoom(current.room))
         .then(() => {
             if (!alreadyConnected) {
-                alreadyConnected = true;
-                setConnected();
+                alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
+                setConnected(true);
 
                 if (current.gameId) {
                     // Join as observer
@@ -47,6 +47,7 @@ attachToSocket(socket, () => {
         }).catch(error => {
             console.error(error)
             socket.disconnect();
+            setConnected(false);
 
             if (current.room || current.server) {
                 // Failed to join room/server, try without server
@@ -101,6 +102,7 @@ function rerender() {
             page={current.page}
             room={current.room}
             server={current.server}
+            connected={store.connected}
             playerName={playerName}
             world={store.world}
             items={store.items}
