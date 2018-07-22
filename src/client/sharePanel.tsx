@@ -18,9 +18,6 @@ export class SharePanel extends React.Component<Props, State> {
         };
     }
 
-    componentDidMount() {
-    }
-
     render() {
         return <div>
             {this.props.current.room ? this.renderCurrentRoom() : this.renderNewRoom()}
@@ -34,6 +31,8 @@ export class SharePanel extends React.Component<Props, State> {
                     <li><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank">YouTube</a></li>
                     <li><a href="http://instagram.com/acolytefight" target="_blank">Instagram</a></li>
                     <li><a href="http://facebook.com/acolytefight" target="_blank">Facebook</a></li>
+                    <li><a href="https://medium.com/acolytefight" target="_blank">Medium</a></li>
+                    <li><a href="https://acolytefight.tumblr.com" target="_blank">Tumblr</a></li>
                 </ul>
             </p>
         </div>
