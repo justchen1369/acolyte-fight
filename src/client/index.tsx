@@ -42,6 +42,8 @@ attachToSocket(socket, () => {
                 if (current.gameId) {
                     // Join as observer
                     joinNewGame(playerName, retrieveKeyBindings(), current.room, current.gameId);
+                } else {
+                    rerender(); // Room settings might have changed the page
                 }
             }
         }).catch(error => {

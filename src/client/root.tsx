@@ -80,8 +80,8 @@ export class Root extends React.Component<Props, State> {
 
     private renderHome() {
         return <HomePanel
-            room={this.props.current.room}
-            server={this.props.current.server}
+            current={this.props.current}
+            changePage={this.props.changePage}
             newGameCallback={this.props.newGameCallback} />
     }
 

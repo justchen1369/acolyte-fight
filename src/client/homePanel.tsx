@@ -5,13 +5,12 @@ import * as w from '../game/world.model';
 import * as url from './url';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
-import { isMobile } from './userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
-    room: string;
-    server: string;
+    current: url.PathElements;
+    changePage: (newPage: string) => void;
     newGameCallback: () => void;
 }
 interface State {
@@ -38,8 +37,8 @@ export class HomePanel extends React.Component<Props, State> {
                     {!this.state.joining && <span className="btn" onClick={() => this.props.newGameCallback()}>Play</span>}
                     {this.state.joining && <span className="btn disabled">Play</span>}
                 </div>
-                {this.props.room && <div className="private-room-indicator">
-                    In private room: <b><a href={this.createRoomUrl()}>{this.props.room}</a></b> (<a href="?">exit room</a>)
+                {this.props.current.room && <div className="private-room-indicator">
+                    In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={() => this.viewRoomDetails()}>details</a>)
                 </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}><i className="fa fa-chevron-down" /></div>
@@ -57,8 +56,16 @@ export class HomePanel extends React.Component<Props, State> {
         </div>;
     }
 
-    private createRoomUrl() {
-        return url.getPath({ room: this.props.room, server: this.props.server });
+    private getCurrentRoomUrl() {
+        return url.getPath(Object.assign({}, this.props.current, { page: null, gameId: null }));
+    }
+
+    private getRoomDetailsUrl() {
+        return url.getPath(Object.assign({}, this.props.current, { page: "custom" }));
+    }
+
+    private viewRoomDetails() {
+        return this.props.changePage("custom");
     }
 
     private scrollBelowFold() {
