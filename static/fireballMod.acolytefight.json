@@ -1,9 +1,10 @@
 {
     "Spells": {
         "fireball": {
-            "projectile": {
-                "damage": 50
-            }
+            "cooldown": 120
+        },
+        "flamestrike": {
+            "cooldown": 120
         }
     }
 }

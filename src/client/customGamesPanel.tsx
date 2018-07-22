@@ -70,7 +70,7 @@ export class CustomGamesPanel extends React.Component<Props, State> {
             <p>
                 Getting started:
                 <ul>
-                    <li><a href="/static/fireballMod.acolytefight.json">fireballMod.acolytefight.json</a> - this is an example mod which increases fireball damage.</li>
+                    <li><a href="/static/fireballMod.acolytefight.json">fireballMod.acolytefight.json</a> - this is an example mod which increases fireball cooldown.</li>
                     <li><a href="/api/default.acolytefight.json">default.acolytefight.json</a> - this JSON file represents all the current default settings.</li>
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings</li>
                 </ul>
