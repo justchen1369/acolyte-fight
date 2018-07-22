@@ -65,12 +65,19 @@ export class CustomGamesPanel extends React.Component<Props, State> {
                 This feature is experimental and will be subject to a lot of change!
                 Forward compatibility is not guaranteed - functional mods in the current version may be broken by future releases.
                 Mods are represented as JSON overrides to the default settings file.
-                To maximise the likelihood of forward-compatibility, the mod should only contain as few overrides as necessary.
+                To maximise the likelihood of forward-compatibility, your mod should only contain as few overrides as necessary.
             </p>
             <p>
-                Getting started:
+                Examples:
                 <ul>
-                    <li><a href="/static/fireballMod.acolytefight.json">fireballMod.acolytefight.json</a> - this is an example mod which increases fireball cooldown.</li>
+                    <li><a href="/static/fireballMod.acolytefight.json">fireballMod.acolytefight.json</a> - this is example mod increases fireball cooldown.</li>
+                    <li><a href="/static/homingClusterMod.acolytefight.json">homingClusterMod.acolytefight.json</a> - this is an example of creating a new spell - a slow cluster of homing missiles.</li>
+                    <li><a href="/static/noMove.acolytefight.json">noMove.acolytefight.json</a> - this example mod disables normal movement but reduces the speed of teleport.</li>
+                </ul>
+            </p>
+            <p>
+                Reference:
+                <ul>
                     <li><a href="/api/default.acolytefight.json">default.acolytefight.json</a> - this JSON file represents all the current default settings.</li>
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings</li>
                 </ul>
