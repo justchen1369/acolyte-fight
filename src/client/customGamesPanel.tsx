@@ -1,6 +1,6 @@
 import fileSaver from 'file-saver';
 import * as React from 'react';
-import * as m from '../game/messages.model';
+import * as rooms from './rooms';
 import * as url from './url';
 import { Mod } from '../game/settings';
 
@@ -10,30 +10,6 @@ interface Props {
 interface State {
     error: string;
     selectedFile: File;
-}
-
-function createRoomAsync(mod: Object) {
-    return fetch('api/room', {
-        credentials: "same-origin",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({ mod } as m.CreateRoomRequest),
-    }).then(res => res.json()).then((msg: m.CreateRoomResponse) => msg);
-}
-
-function readFileAsync(file: File): Promise<string> {
-    if (file) {
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => resolve(reader.result)
-            reader.onerror = (ev) => reject(reader.error)
-            reader.readAsText(file);
-        });
-    } else {
-        return Promise.resolve<string>(null);
-    }
 }
 
 export class CustomGamesPanel extends React.Component<Props, State> {
@@ -57,12 +33,13 @@ export class CustomGamesPanel extends React.Component<Props, State> {
     }
 
     private renderCurrentRoom() {
+        const currentRoomPath = url.getRoomHomePath(this.props.current);
         return <div>
             <h1>Current room</h1>
             <p>
-                You are currently in room <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b>.
+                You are currently in room <b><a href={currentRoomPath}>{this.props.current.room}</a></b>.
                 Invite friends to this room by sending the following URL:
-                <input className="share-url" type="text" value={window.location.origin + this.getCurrentRoomUrl()} readOnly onFocus={ev => ev.target.select()} />
+                <input className="share-url" type="text" value={window.location.origin + currentRoomPath} readOnly onFocus={ev => ev.target.select()} />
             </p>
             <p><div className="btn" onClick={() => this.exitRoom()}>Exit room</div></p>
             <h2>Room modifications</h2>
@@ -100,34 +77,16 @@ export class CustomGamesPanel extends React.Component<Props, State> {
             </p>
             <h2>Create modded room</h2>
             {this.renderForm(true)}
+            <p><b>Tip: </b>you can drag-and-drop a mod file onto this window to quickly create a modded room</p>
         </div>;
     }
 
-    private getCurrentRoomUrl() {
-        return url.getPath(Object.assign({}, this.props.current, { page: null }));
-    }
-
     private exitRoom() {
-        window.location.href = url.getPath(Object.assign({}, this.props.current, { room: null, server: null }));
+        window.location.href = url.exitRoomPath(this.props.current);
     }
 
     private onSubmit() {
-        readFileAsync(this.state.selectedFile)
-            .then(json => json ? JSON.parse(json) : {})
-            .then(mod => {
-                console.log("Creating room with mod", mod);
-                return mod;
-            })
-            .then(mod => createRoomAsync(mod))
-            .then(msg => {
-                const path = url.getPath({
-                    gameId: null,
-                    room: msg.roomId,
-                    server: msg.server,
-                    page: "custom",
-                });
-                window.location.href = path;
-            })
+        rooms.createAndJoinRoomAsync(this.state.selectedFile, this.props.current)
             .catch(error => {
                 console.error(error);
                 this.setState({ error: `${error}` });

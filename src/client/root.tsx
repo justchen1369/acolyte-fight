@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import * as rooms from './rooms';
 import * as url from './url';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
@@ -49,7 +50,7 @@ export class Root extends React.Component<Props, State> {
     private renderPage() {
         const page = this.props.current.page;
         return (
-            <div className="root-panel">
+            <div className="root-panel" onDragOver={ev => this.onDragOver(ev)} onDrop={ev => this.onDrop(ev)}>
                 <div className="navbar">
                     {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
@@ -116,5 +117,17 @@ export class Root extends React.Component<Props, State> {
                 <TitleSection />
             </div>
         </div>;
+    }
+
+    private onDragOver(ev: React.DragEvent) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        ev.dataTransfer.dropEffect = "copy";
+    }
+
+    private onDrop(ev: React.DragEvent) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        rooms.createAndJoinRoomAsync(ev.dataTransfer.files.item(0), this.props.current);
     }
 }

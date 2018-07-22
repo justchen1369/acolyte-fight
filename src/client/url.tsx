@@ -56,3 +56,11 @@ export function getPath(elems: PathElements) {
 
     return path;
 }
+
+export function getRoomHomePath(current: PathElements) {
+    return getPath(Object.assign({}, current, { page: null }));
+}
+
+export function exitRoomPath(current: PathElements) {
+    return getPath(Object.assign({}, current, { room: null, server: null }));
+}

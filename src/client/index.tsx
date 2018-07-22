@@ -63,7 +63,7 @@ attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
     rerender();
 
-    if (_.some(notifications, n => n.type === "new" || n.type === "quit")) {
+    if (_.some(notifications, n => n.type === "new" || n.type === "quit" || n.type === "disconnected")) {
         updateUrl();
     }
 });
