@@ -263,14 +263,14 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		gravity: projectileTemplate.gravity,
 
 		homing: projectileTemplate.homing && {
-			turnRate: projectileTemplate.homing.turnRate,
+			turnRate: projectileTemplate.homing.revolutionsPerSecond * 2 * Math.PI,
 			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
 			afterTick: world.tick + (projectileTemplate.homing.afterTicks || 0),
 			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
 			speedWhenClose: projectileTemplate.homing.speedWhenClose,
-		} as HomingParameters,
+		} as w.HomingParameters,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			radius: projectileTemplate.detonate.radius,
@@ -278,7 +278,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 			maxImpulse: projectileTemplate.detonate.maxImpulse,
 			detonateTick: world.tick + ticksToDetonate(projectileTemplate, vector.length(diff), vector.length(velocity)),
 			waitTicks: projectileTemplate.detonate.waitTicks || 0,
-		} as DetonateParameters,
+		} as w.DetonateParameters,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
@@ -385,9 +385,11 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
 			const proportion = i / obstacleTemplate.numObstacles;
 			const baseAngle = proportion * (2 * Math.PI);
-			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + obstacleTemplate.layoutAngleOffset), obstacleTemplate.layoutRadius));
+			const layoutAngleOffset = obstacleTemplate.layoutAngleOffsetInRevs * 2 * Math.PI;
+			const orientationAngleOffset = obstacleTemplate.orientationAngleOffsetInRevs * 2 * Math.PI;
+			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), obstacleTemplate.layoutRadius));
 
-			const orientationAngle = baseAngle + obstacleTemplate.layoutAngleOffset + obstacleTemplate.orientationAngleOffset;
+			const orientationAngle = baseAngle + layoutAngleOffset + orientationAngleOffset;
 			addObstacle(world, position, orientationAngle, points, obstacleTemplate.extent);
 		}
 	});

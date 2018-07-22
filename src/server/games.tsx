@@ -123,7 +123,9 @@ export function initGame(room: g.Room = null) {
 		history: [],
 	};
 	getStore().activeGames.set(game.id, game);
-	++room.numGamesCumulative;
+	if (room) {
+		++room.numGamesCumulative;
+	}
 
 	const heroId = systemHeroId(m.ActionType.Environment);
 	game.actions.set(heroId, {

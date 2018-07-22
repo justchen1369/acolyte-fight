@@ -72,18 +72,18 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 2,
                 layoutRadius: 0.07,
-                layoutAngleOffset: 0.25 * Math.PI,
+                layoutAngleOffsetInRevs: 0.125,
                 numPoints: 4,
                 extent: Hero.Radius * 1.5,
-                orientationAngleOffset: 0.25 * Math.PI,
+                orientationAngleOffsetInRevs: 0.125,
             },
             {
                 numObstacles: 4,
                 layoutRadius: 0.33,
-                layoutAngleOffset: 0,
+                layoutAngleOffsetInRevs: 0,
                 numPoints: 4,
                 extent: Hero.Radius * 1,
-                orientationAngleOffset: 0.0 * Math.PI,
+                orientationAngleOffsetInRevs: 0,
             },
         ],
     },
@@ -92,10 +92,10 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 5,
                 layoutRadius: 0.15,
-                layoutAngleOffset: (1 / 5) * Math.PI,
+                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
                 numPoints: 3,
                 extent: Hero.Radius,
-                orientationAngleOffset: Math.PI,
+                orientationAngleOffsetInRevs: 0.5,
             },
         ],
     },
@@ -104,10 +104,10 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 1,
                 layoutRadius: 0,
-                layoutAngleOffset: 0,
+                layoutAngleOffsetInRevs: 0,
                 numPoints: 10,
                 extent: Hero.Radius * 2,
-                orientationAngleOffset: 0,
+                orientationAngleOffsetInRevs: 0,
             },
         ],
     },
@@ -116,18 +116,18 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 5,
                 layoutRadius: 0.32,
-                layoutAngleOffset: 0,
+                layoutAngleOffsetInRevs: 0,
                 numPoints: 4,
                 extent: Hero.Radius,
-                orientationAngleOffset: (1 / 4) * Math.PI,
+                orientationAngleOffsetInRevs: 0.5 * (1 / 4),
             },
             {
                 numObstacles: 5,
                 layoutRadius: 0.15,
-                layoutAngleOffset: (1 / 5) * Math.PI,
+                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
                 numPoints: 4,
                 extent: Hero.Radius,
-                orientationAngleOffset: (1 / 4) * Math.PI,
+                orientationAngleOffsetInRevs: 0.5 * (1 / 4),
             },
         ],
     },
@@ -136,10 +136,10 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 3,
                 layoutRadius: 0.28,
-                layoutAngleOffset: Math.PI,
+                layoutAngleOffsetInRevs: 0.5,
                 numPoints: 3,
                 extent: Hero.Radius * 1.5,
-                orientationAngleOffset: Math.PI,
+                orientationAngleOffsetInRevs: 0.5,
             },
         ],
     },
@@ -148,10 +148,10 @@ export const Layouts: Layouts = {
             {
                 numObstacles: 15,
                 layoutRadius: 0.35,
-                layoutAngleOffset: (1 / 5) * Math.PI,
+                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
                 numPoints: 3,
                 extent: Hero.Radius,
-                orientationAngleOffset: Math.PI,
+                orientationAngleOffsetInRevs: 0.5,
             },
         ],
     },
@@ -370,7 +370,7 @@ export const homing: Spell = {
         explodeOn: Categories.All,
 
         homing: {
-            turnRate: 2 * Math.PI,
+            revolutionsPerSecond: 1,
             maxTurnProportion: 0.05,
         },
 
@@ -404,7 +404,7 @@ export const boomerang: Spell = {
         explodeOn: Categories.Hero | Categories.Massive,
 
         homing: {
-            turnRate: 0.02 * 2 * Math.PI,
+            revolutionsPerSecond: 0.02,
             maxTurnProportion: 0.05,
             minDistanceToTarget: 0.075,
             targetType: HomingTargets.self,
@@ -446,7 +446,7 @@ export const link: Spell = {
         },
 
         homing: {
-            turnRate: 2 * Math.PI,
+            revolutionsPerSecond: 1,
             afterTicks: 1.0 * TicksPerSecond,
             targetType: HomingTargets.self,
         },
@@ -510,7 +510,7 @@ export const drain: Spell = {
         lifeSteal: 1.0,
         explodeOn: Categories.All,
         homing: {
-            turnRate: 0,
+            revolutionsPerSecond: 0,
             redirect: true,
         },
 
@@ -550,7 +550,7 @@ export const gravity: Spell = {
         },
 
         homing: {
-            turnRate: 2 * Math.PI,
+            revolutionsPerSecond: 1,
             targetType: HomingTargets.cursor,
             minDistanceToTarget: Hero.Radius / 2,
             speedWhenClose: 0,

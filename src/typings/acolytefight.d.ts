@@ -45,12 +45,12 @@ declare interface ObstacleTemplate {
 	// Where to place the obstacles
 	numObstacles: number;
 	layoutRadius: number;
-	layoutAngleOffset: number;
+	layoutAngleOffsetInRevs: number;
 
 	// Properties of an individual obstacle
 	numPoints: number;
 	extent: number;
-	orientationAngleOffset: number;
+	orientationAngleOffsetInRevs: number;
 }
 
 declare interface ObstacleSettings {
@@ -175,7 +175,7 @@ declare interface BounceParameters {
 declare interface HomingParametersTemplate {
 	minDistanceToTarget?: number;
 	speedWhenClose?: number;
-	turnRate: number;
+	revolutionsPerSecond: number;
 	maxTurnProportion?: number;
     targetType?: string;
 	redirect?: boolean;
@@ -234,28 +234,10 @@ declare interface KeyBindings {
     [key: string]: string;
 }
 
-declare interface HomingParameters {
-	turnRate: number;
-	maxTurnProportion: number;
-	minDistanceToTarget: number;
-	targetType: string;
-	afterTick: number;
-	redirectionTick: number | null;
-	speedWhenClose: number;
-}
-
 declare interface LinkParameters {
 	strength: number;
 	lifeSteal: number;
 	linkTicks: number;
-}
-
-declare interface DetonateParameters {
-	radius: number;
-	minImpulse: number;
-	maxImpulse: number;
-	detonateTick: number;
-	waitTicks: number;
 }
 
 declare interface DamagePacket {

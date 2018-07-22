@@ -308,6 +308,24 @@ export namespace HomingTargets {
 	export const cursor = "cursor";
 }
 
+export interface HomingParameters {
+	turnRate: number;
+	maxTurnProportion: number;
+	minDistanceToTarget: number;
+	targetType: string;
+	afterTick: number;
+	redirectionTick: number | null;
+	speedWhenClose: number;
+}
+
+export interface DetonateParameters {
+	radius: number;
+	minImpulse: number;
+	maxImpulse: number;
+	detonateTick: number;
+	waitTicks: number;
+}
+
 export type WorldObject =
 	Hero
 	| Shield
