@@ -59,7 +59,9 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(roomId: string = null): g.Game {
+export function findNewGame(room: g.Room = null): g.Game {
+	const roomId = room ? room.id : null;
+
 	let game: g.Game = null;
 	getStore().activeGames.forEach(g => {
 		if (g.joinable && g.active.size < Matchmaking.MaxPlayers && g.room === roomId) {
@@ -67,7 +69,7 @@ export function findNewGame(roomId: string = null): g.Game {
 		}
 	});
 	if (!game) {
-		game = initGame(roomId);
+		game = initGame(room);
 	}
 	return game;
 }
@@ -97,16 +99,17 @@ export function initRoom(mod: Object = {}): g.Room {
 		id: "r" + roomIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		created: moment(),
 		mod,
+		numGamesCumulative: 0,
 	};
 	getStore().rooms.set(room.id, room);
 	return room;
 }
 
-export function initGame(room: string = null) {
+export function initGame(room: g.Room = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		room,
+		room: room ? room.id : null,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		playerNames: new Array<string>(),
@@ -120,6 +123,7 @@ export function initGame(room: string = null) {
 		history: [],
 	};
 	getStore().activeGames.set(game.id, game);
+	++room.numGamesCumulative;
 
 	const heroId = systemHeroId(m.ActionType.Environment);
 	game.actions.set(heroId, {

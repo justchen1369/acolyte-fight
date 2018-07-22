@@ -9,7 +9,7 @@ import { attachToSocket } from './emitter';
 import { getServerStats } from './loadMetrics';
 import { setLocation } from './mirroring';
 import { logger } from './logging';
-import { cleanupOldInactiveGames } from './serverStore';
+import * as serverStore from './serverStore';
 
 const rootDir = path.resolve('.');
 
@@ -56,7 +56,10 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
-setInterval(() => cleanupOldInactiveGames(maxReplays), cleanupIntervalMinutes * 60 * 1000);
+setInterval(() => {
+	serverStore.cleanupOldInactiveGames(maxReplays);
+	serverStore.cleanupOldRooms(24, 1);
+}, cleanupIntervalMinutes * 60 * 1000);
 
 setInterval(() => {
 	const stats = getServerStats();

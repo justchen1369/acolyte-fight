@@ -128,13 +128,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
-	const room = data.room ? PlayerName.sanitizeName(data.room) : null;
+	const roomId = data.room ? PlayerName.sanitizeName(data.room) : null;
 
 	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
+		const room = store.rooms.get(roomId);
 		game = games.findNewGame(room);
 	}
 
@@ -144,7 +145,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			heroId = games.joinGame(game, playerName, data.keyBindings, authToken, socket.id);
 		}
 
-		const roomStats = calculateRoomStats(room);
+		const roomStats = calculateRoomStats(roomId);
 
 		socket.join(game.id);
 		callback({
@@ -157,8 +158,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		});
 
 		let gameName = game.id;
-		if (room) {
-			gameName = room + "/" + gameName;
+		if (roomId) {
+			gameName = roomId + "/" + gameName;
 		}
 		if (heroId) {
 			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);

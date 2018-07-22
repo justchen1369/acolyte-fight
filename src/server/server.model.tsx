@@ -41,5 +41,6 @@ export interface Player {
 export interface Room {
     id: string;
     created: moment.Moment;
+    numGamesCumulative: number;
     mod: Object;
 }
