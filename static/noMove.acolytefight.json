@@ -1,0 +1,13 @@
+{
+	"Hero": {
+		"MoveSpeedPerSecond": 0
+	},
+	"Spells": {
+		"teleport": {
+			"cooldown": 180
+		},
+		"thrust": {
+			"cooldown": 180
+		}
+	}
+}
