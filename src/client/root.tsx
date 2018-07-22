@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import * as url from './url';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
@@ -9,12 +10,10 @@ import { CustomGamesPanel } from './customGamesPanel';
 
 interface Props {
     playerName: string;
-    room: string;
-    server: string;
+    current: url.PathElements;
     connected: boolean;
     world: w.World;
     items: s.NotificationItem[];
-    page: string;
     changePage: (newPage: string) => void;
     newGameCallback: () => void;
     exitGameCallback: () => void;
@@ -48,7 +47,7 @@ export class Root extends React.Component<Props, State> {
     }
 
     private renderPage() {
-        const page = this.props.page;
+        const page = this.props.current.page;
         return (
             <div className="root-panel">
                 <div className="navbar">
@@ -69,14 +68,20 @@ export class Root extends React.Component<Props, State> {
     }
 
     private renderNavBarItem(page: string, label: string) {
-        const className = this.props.page === page ? "nav-item nav-item-selected" : "nav-item";
-        return <span className={className} onClick={() => this.props.changePage(page)}>{label}</span>
+        const className = this.props.current.page === page ? "nav-item nav-item-selected" : "nav-item";
+        const newPath = url.getPath(Object.assign({}, this.props.current, { page }));
+        return <a className={className} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>{label}</a>
+    }
+
+    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
+        ev.preventDefault();
+        this.props.changePage(newPage);
     }
 
     private renderHome() {
         return <HomePanel
-            room={this.props.room}
-            server={this.props.server}
+            room={this.props.current.room}
+            server={this.props.current.server}
             newGameCallback={this.props.newGameCallback} />
     }
 
@@ -92,7 +97,7 @@ export class Root extends React.Component<Props, State> {
     private renderCustom() {
         return <div className="content-container">
             <div className="page">
-                <CustomGamesPanel room={this.props.room} />
+                <CustomGamesPanel room={this.props.current.room} />
             </div>
         </div>;
     }

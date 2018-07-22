@@ -130,10 +130,12 @@ a:hover, a:active {
 }
 
 .navbar .nav-item {
+    color: white;
     font-size: 20px;
     padding: 15px 20px;
     cursor: pointer;
     font-weight: bold;
+    text-decoration: none;
 }
 
 .navbar .nav-item:hover {

@@ -84,9 +84,14 @@ function onExitGameClicked() {
 }
 
 function changePage(newPage: string) {
-    current.page = newPage;
-    updateUrl();
-    rerender();
+    if (!getStore().connected) {
+        const newTarget: url.PathElements = Object.assign({}, current, { page: newPage });
+        window.location.href = url.getPath(newTarget);
+    } else {
+        current.page = newPage;
+        updateUrl();
+        rerender();
+    }
 }
 
 function updateUrl() {
@@ -99,9 +104,7 @@ function rerender() {
     const store = getStore();
     ReactDOM.render(
         <Root
-            page={current.page}
-            room={current.room}
-            server={current.server}
+            current={current}
             connected={store.connected}
             playerName={playerName}
             world={store.world}
