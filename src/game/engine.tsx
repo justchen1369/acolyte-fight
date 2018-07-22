@@ -524,7 +524,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (hero.casting.stage === w.CastStage.Orientating) {
 		hero.casting.uninterruptible = uninterruptible;
 
-		if (spell.maxAngleDiff !== undefined && angleDiff > spell.maxAngleDiff) {
+		if (spell.maxAngleDiffInRevs !== undefined && angleDiff > spell.maxAngleDiffInRevs * 2 * Math.PI) {
 			return false; // Wait until are facing the target
 		}
 
@@ -569,7 +569,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		let cancelled = false;
 		if (!cancelled && spell.knockbackCancel) {
 			cancelled = 
-				Math.abs(vector.angleDelta(hero.casting.initialAngle, hero.body.getAngle())) > spell.maxAngleDiff
+				Math.abs(vector.angleDelta(hero.casting.initialAngle, hero.body.getAngle())) > spell.maxAngleDiffInRevs * 2 * Math.PI
 				|| vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel;
 		}
 		if (!cancelled) {

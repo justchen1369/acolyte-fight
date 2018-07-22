@@ -161,7 +161,7 @@ export const move: Spell = {
     id: 'move',
     description: "",
     color: 'white',
-    maxAngleDiff: 0.25 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.25,
     interruptible: true,
     cooldown: 0,
     action: "move",
@@ -174,7 +174,7 @@ export const fireball: Spell = {
     color: '#ff8800',
     icon: "thunderball",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 1 * TicksPerSecond,
 
     projectile: {
@@ -201,7 +201,7 @@ export const flamestrike: Spell = {
     color: '#ff4400',
     icon: "burningDot",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 1 * TicksPerSecond,
 
     projectile: {
@@ -234,7 +234,7 @@ export const firespray: Spell = {
     color: '#ff0044',
     icon: "bubblingBeam",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
 
     intervalTicks: 2,
@@ -265,7 +265,7 @@ export const meteor: Spell = {
     color: '#ff0000',
     icon: "cometSpark",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 12 * TicksPerSecond,
 
     projectile: {
@@ -293,7 +293,7 @@ export const kamehameha: Spell = {
     color: '#44ddff',
     icon: "glowingHands",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     chargeTicks: 0.75 * TicksPerSecond,
     cooldown: 20 * TicksPerSecond,
 
@@ -328,7 +328,7 @@ export const lightning: Spell = {
     color: '#00ddff',
     icon: "lightningHelix",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     chargeTicks: 0.1 * TicksPerSecond,
 
@@ -356,7 +356,7 @@ export const homing: Spell = {
     icon: "boltSaw",
 
     cooldown: 20 * TicksPerSecond,
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
 
     projectile: {
         color: '#44ffcc',
@@ -388,7 +388,7 @@ export const boomerang: Spell = {
     color: '#ff00ff',
     icon: "boomerangSun",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 20 * TicksPerSecond,
 
     projectile: {
@@ -424,7 +424,7 @@ export const link: Spell = {
     color: '#0000ff',
     icon: "andromedaChain",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 12 * TicksPerSecond,
 
     projectile: {
@@ -464,7 +464,7 @@ export const bouncer: Spell = {
     color: '#88ee22',
     icon: "divert",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
 
     projectile: {
@@ -495,7 +495,7 @@ export const drain: Spell = {
     color: '#22ee88',
     icon: "energyBreath",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
 
     projectile: {
@@ -527,7 +527,7 @@ export const gravity: Spell = {
     color: '#0ace00',
     icon: "atomicSlashes",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 8 * TicksPerSecond,
     chargeTicks: 0.1 * TicksPerSecond,
 
@@ -568,7 +568,7 @@ export const supernova: Spell = {
     color: '#ffaa00',
     icon: "crownedExplosion",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 12 * TicksPerSecond,
 
     projectile: {
@@ -670,7 +670,7 @@ export const thrust: Spell = {
     name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
 
-    maxAngleDiff: 0.01 * 2 * Math.PI,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 12 * TicksPerSecond,
 
     damage: 1,

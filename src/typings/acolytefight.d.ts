@@ -87,7 +87,7 @@ declare interface SpellBase {
 	action: string;
 	untargeted?: boolean;
 
-    maxAngleDiff?: number;
+	maxAngleDiffInRevs?: number;
 
     chargeTicks?: number;
     cooldown: number;
