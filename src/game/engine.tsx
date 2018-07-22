@@ -745,7 +745,8 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 	if (projectile.bounce) {
 		bounceToNext(projectile, hero, world);
-	} else if (projectile.explodeOn & hero.categories) {
+	}
+	if (projectile.explodeOn & hero.categories) {
 		destroyObject(world, projectile);
 	}
 }
