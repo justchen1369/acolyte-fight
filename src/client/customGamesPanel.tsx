@@ -49,24 +49,38 @@ export class CustomGamesPanel extends React.Component<Props, State> {
     }
 
     render() {
+        if (this.props.current.room) {
+            return this.renderCurrentRoom();
+        } else {
+            return this.renderNewRoom();
+        }
+    }
+
+    private renderCurrentRoom() {
         return <div>
-            {this.props.current.room
-                ? <div>
-                    <h1>Current room</h1>
-                    <p>You are currently in room <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b>.</p>
-                    <p><div className="btn" onClick={() => this.exitRoom()}>Exit room</div></p>
-                    <h2>Room modifications</h2>
-                    {Object.keys(Mod).length > 0
-                        ? <p>
-                            The following modifications are active in this room:
-                            <textarea className="mod-json">{JSON.stringify(Mod, null, 2)}</textarea>
-                        </p>
-                        : <p>No modifications are in effect in this room.</p>}
-                </div>
-                : <div>
-                    <h1>Private room</h1>
-                    <p>Create a private room to play with friends!</p>
-                </div>}
+            <h1>Current room</h1>
+            <p>
+                You are currently in room <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b>.
+                Invite friends to this room by sending the following URL:
+                <input className="share-url" type="text" value={window.location.origin + this.getCurrentRoomUrl()} readOnly onFocus={ev => ev.target.select()} />
+            </p>
+            <p><div className="btn" onClick={() => this.exitRoom()}>Exit room</div></p>
+            <h2>Room modifications</h2>
+            {Object.keys(Mod).length > 0
+                ? <p>
+                    The following modifications are active in this room:
+                    <textarea className="mod-json">{JSON.stringify(Mod, null, 2)}</textarea>
+                </p>
+                : <p>No modifications are in effect in this room.</p>}
+        </div>
+    }
+
+    private renderNewRoom() {
+        return <div>
+            <div>
+                <h1>Private room</h1>
+                <p>Create a private room to play with friends!</p>
+            </div>
             {this.renderForm()}
             <h1>Modding (EXPERIMENTAL)</h1>
             <p>
@@ -110,7 +124,7 @@ export class CustomGamesPanel extends React.Component<Props, State> {
                     gameId: null,
                     room: msg.roomId,
                     server: msg.server,
-                    page: null,
+                    page: "custom",
                 });
                 window.location.href = path;
             })

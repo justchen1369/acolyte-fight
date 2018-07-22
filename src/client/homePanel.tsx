@@ -38,7 +38,7 @@ export class HomePanel extends React.Component<Props, State> {
                     {this.state.joining && <span className="btn disabled">Play</span>}
                 </div>
                 {this.props.current.room && <div className="private-room-indicator">
-                    In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={() => this.viewRoomDetails()}>details</a>)
+                    In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>details</a>)
                 </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}><i className="fa fa-chevron-down" /></div>
@@ -64,7 +64,8 @@ export class HomePanel extends React.Component<Props, State> {
         return url.getPath(Object.assign({}, this.props.current, { page: "custom" }));
     }
 
-    private viewRoomDetails() {
+    private onRoomDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
+        ev.preventDefault();
         return this.props.changePage("custom");
     }
 
