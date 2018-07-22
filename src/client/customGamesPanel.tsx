@@ -5,7 +5,7 @@ import * as url from './url';
 import { Mod } from '../game/settings';
 
 interface Props {
-    room: string;
+    current: url.PathElements;
 }
 interface State {
     error: string;
@@ -50,10 +50,10 @@ export class CustomGamesPanel extends React.Component<Props, State> {
 
     render() {
         return <div>
-            {this.props.room && <div>
+            {this.props.current.room && <div>
                 <h1>Current room</h1>
                 <p>
-                    You are currently in room <b>{this.props.room}</b>.
+                    You are currently in room <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b>.
                     {' '}
                     {Object.keys(Mod).length > 0
                     ? <span>Current mod: <a href="#" onClick={() => this.downloadCurrentMod()}>{this.roomModFilename()}</a>.</span>
@@ -82,6 +82,10 @@ export class CustomGamesPanel extends React.Component<Props, State> {
             <h2>Create modded room</h2>
             {this.renderForm(true)}
         </div>;
+    }
+
+    private getCurrentRoomUrl() {
+        return url.getPath(Object.assign({}, this.props.current, { page: null }));
     }
 
     private onSubmit() {
@@ -122,6 +126,6 @@ export class CustomGamesPanel extends React.Component<Props, State> {
     }
 
     private roomModFilename() {
-        return `${this.props.room}.acolytefight.json`;
+        return `${this.props.current.room}.acolytefight.json`;
     }
 }
