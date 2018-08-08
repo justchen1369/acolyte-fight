@@ -1062,7 +1062,9 @@ function applyLavaDamage(world: w.World) {
 
 function shrink(world: w.World) {
 	if (world.tick >= world.startTick && !world.winner) {
-		world.radius = Math.max(0, world.radius - World.ShrinkPerSecond / TicksPerSecond);
+		const seconds = (world.tick - world.startTick) / TicksPerSecond;
+		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
+		world.radius = World.InitialRadius * Math.pow(proportion, World.ShrinkPower);
 	}
 }
 

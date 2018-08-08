@@ -52,7 +52,8 @@ declare interface WorldSettings {
 	HeroLayoutRadius: number; // The radius at which to place heroes
 
 	LavaDamagePerSecond: number;
-	ShrinkPerSecond: number;
+	SecondsToShrink: number;
+	ShrinkPower: number;
     InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
 }
 
