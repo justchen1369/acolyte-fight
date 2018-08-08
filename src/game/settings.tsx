@@ -26,7 +26,7 @@ export const World: WorldSettings = {
 
     LavaDamagePerSecond: 15,
     SecondsToShrink: 90,
-    ShrinkPower: 2.0,
+    ShrinkPower: 1.25,
     InitialShieldSeconds: 1.0,
 }
 
