@@ -62,12 +62,31 @@ function startTickProcessing() {
 export function findNewGame(room: g.Room = null): g.Game {
 	const roomId = room ? room.id : null;
 
-	let game: g.Game = null;
+	let numPlayers = 1; // +1 player because the current player calling this method is a new player
+	let openGames = new Array<g.Game>();
 	getStore().activeGames.forEach(g => {
-		if (g.joinable && g.active.size < Matchmaking.MaxPlayers && g.room === roomId) {
-			game = g;
+		if (g.room === roomId) {
+			if (isGameRunning(g)) {
+				numPlayers += g.active.size;
+			}
+			if (g.joinable && g.active.size < Matchmaking.MaxPlayers) {
+				openGames.push(g);
+			}
 		}
 	});
+
+	const maxGames = Math.ceil(numPlayers / Matchmaking.MaxPlayers);
+	const targetPlayersPerGame = numPlayers > Matchmaking.MaxPlayers ? Math.ceil(numPlayers / maxGames) : Matchmaking.MaxPlayers;
+
+	let game: g.Game = null;
+	if (openGames.length > 0) {
+		game = _.minBy(openGames, g => g.active.size);
+	}
+	if (game && game.active.size >= targetPlayersPerGame && openGames.length <= 1) {
+		// Start a new game early to stop a single player ending up in the same game
+		game = null;
+	}
+
 	if (!game) {
 		game = initGame(room);
 	}
