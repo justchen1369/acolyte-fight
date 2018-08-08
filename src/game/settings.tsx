@@ -25,8 +25,8 @@ export const World: WorldSettings = {
     HeroLayoutRadius: 0.25,
 
     LavaDamagePerSecond: 15,
-    SecondsToShrink: 120,
-    ShrinkPower: 2,
+    SecondsToShrink: 90,
+    ShrinkPower: 1.25,
     InitialShieldSeconds: 1.0,
 }
 
