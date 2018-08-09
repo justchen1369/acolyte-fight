@@ -81,6 +81,7 @@ input.file-selector { width: 300px }
 
 a, a:visited {
     color: #00ccff;
+    text-decoration: none;
 }
 a:hover, a:active {
     color: #ff8800;
@@ -429,4 +430,14 @@ textarea.mod-json {
     width: 100%;
     height: 20em;
     font-family: monospace;
+}
+
+.share a {
+    display: flex;
+    align-items: center;
+}
+
+.share a i {
+    font-size: 175%;
+    margin-right: 10px;
 }

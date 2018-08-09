@@ -21,20 +21,10 @@ export class SharePanel extends React.Component<Props, State> {
     render() {
         return <div>
             {this.props.current.room ? this.renderCurrentRoom() : this.renderNewRoom()}
-            <h1>Chat</h1>
-            <p><a href="https://discord.gg/sZvgpZk" target="_blank">Join the chat on Discord!</a></p>
-            <h1>Social Media</h1>
-            <p>
-                <ul>
-                    <li><a href="http://twitter.com/acolytefight" target="_blank">Twitter</a></li>
-                    <li><a href="http://twitch.com/acolytefight" target="_blank">Twitch</a></li>
-                    <li><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank">YouTube</a></li>
-                    <li><a href="http://instagram.com/acolytefight" target="_blank">Instagram</a></li>
-                    <li><a href="http://facebook.com/acolytefight" target="_blank">Facebook</a></li>
-                    <li><a href="https://medium.com/acolytefight" target="_blank">Medium</a></li>
-                    <li><a href="https://acolytefight.tumblr.com" target="_blank">Tumblr</a></li>
-                </ul>
-            </p>
+            <h1>Community</h1>
+            <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
+            <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>Twitter</span></a></p>
+            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>Facebook</span></a></p>
         </div>
     }
 
