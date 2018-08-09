@@ -186,7 +186,7 @@ export const fireball: Spell = {
         speed: 0.4,
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
-        damage: 7.5,
+        damage: 5,
         expireOn: Categories.All,
 
         render: "projectile",
@@ -213,7 +213,7 @@ export const flamestrike: Spell = {
         speed: 0.18,
         maxSpeed: 1.0,
         maxTicks: 2 * TicksPerSecond,
-        damage: 15,
+        damage: 10,
         expireOn: Categories.All,
 
         detonate: {
