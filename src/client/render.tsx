@@ -819,14 +819,13 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 	return key;
 }
 
-export function withinTargetSurface(pos: pl.Vec2, config: w.ButtonConfig): boolean {
+export function touchControls(config: w.ButtonConfig): boolean {
 	if (!config) {
 		// Buttons not drawn yet
 		return false;
 	}
 
 	if (config.view === "wheel") {
-		// return vector.distance(pos, config.targetSurfaceCenter) <= config.outerRadius;
 		return true;
 	} else {
 		return false;

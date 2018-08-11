@@ -5,7 +5,7 @@ import * as w from '../game/world.model';
 
 import { TicksPerSecond } from '../game/constants';
 import { Spells } from '../game/settings';
-import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, withinTargetSurface, resetRenderState, frame } from './facade';
+import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, frame } from './facade';
 
 const MouseId = "mouse";
 
@@ -166,7 +166,7 @@ export class CanvasPanel extends React.Component<Props, State> {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                     this.currentTouchId = p.touchId;
 
-                    if (withinTargetSurface(p.interfacePoint, world.ui.buttonBar)) {
+                    if (touchControls(world.ui.buttonBar)) {
                         world.ui.nextTarget = world.ui.nextTarget || pl.Vec2(0.5, 0.5);
 
                         this.targetSurface = {
@@ -186,7 +186,7 @@ export class CanvasPanel extends React.Component<Props, State> {
         const spellId = this.keyToSpellId(key);
         const spell = (Spells as Spells)[spellId];
         if (spell) {
-            if (spell.untargeted) {
+            if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             } else {
                 world.ui.nextSpellId = spellId;
