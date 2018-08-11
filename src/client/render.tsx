@@ -846,7 +846,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		renderButtonBar(ctx, config, keys, hero, selectedAction, world);
 	} else if (config.view === "wheel") {
 		renderButtonWheel(ctx, config, keys, hero, selectedAction, world);
-		renderTargetSurface(ctx, config);
+		renderTargetSurface(ctx, config, selectedAction, world);
 	}
 }
 
@@ -906,12 +906,12 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	ctx.restore();
 }
 
-function renderTargetSurface(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig) {
+function renderTargetSurface(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, selectedAction: string, world: w.World) {
 	ctx.save();
 	ctx.translate(config.targetSurfaceCenter.x, config.targetSurfaceCenter.y);
 
 	ctx.lineWidth = 3;
-	ctx.strokeStyle = "#888888";
+	ctx.strokeStyle = world.ui.nextSpellId ? "#cccccc" : "#888888";
 
 	ctx.beginPath();
 	ctx.arc(0, 0, config.outerRadius, 0, 2 * Math.PI);
