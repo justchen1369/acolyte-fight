@@ -195,7 +195,7 @@ export const fireball: Spell = {
 };
 export const flamestrike: Spell = {
     id: 'flamestrike',
-    name: 'Boom',
+    name: 'Fireboom',
     description: "It's slower than fireball - harder to aim, but does more damage.",
     action: "projectile",
 
@@ -349,7 +349,6 @@ export const lightning: Spell = {
 };
 export const homing: Spell = {
     id: 'homing',
-    name: 'Seeker',
     description: "Follows the enemy. High damage, but only if the enemy doesn't know how to dodge.",
     action: "projectile",
 
@@ -418,7 +417,6 @@ export const boomerang: Spell = {
 };
 export const link: Spell = {
     id: 'link',
-    name: 'Grab',
     description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
     action: "projectile",
 
@@ -489,7 +487,6 @@ export const bouncer: Spell = {
 };
 export const drain: Spell = {
     id: 'drain',
-    name: 'Siphon',
     description: "Steal some life from another player. They probably didn't need it anyway.",
     action: "projectile",
 
@@ -668,7 +665,7 @@ export const teleport: Spell = {
 };
 export const thrust: Spell = {
     id: 'thrust',
-    name: 'Charge',
+    name: 'Dash',
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
