@@ -46,13 +46,15 @@ export class TitleSection extends React.Component<Props, State> {
                 In this arena, you'll find others just like you. Will you be the last one standing?
             </p>
             <p>
-                This is a game of skillshots. To land spells, you've got to successfully predict how your enemy will move.
+                This game is a 2D skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
                 This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
                 Acolytes become more dangerous as they lose health - dealing up to {1 + Hero.AdditionalDamageMultiplier}x more damage!
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
             <h1>Credits</h1>
-            <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and was inspired by <a href="http://www.warlockbrawl.com/" target="_blank">Warlocks</a>, originally created by <b>Zymoran</b> and <b>Adynathos</b>.</p>
+            <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
+            was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
+            originally created by <b>Zymoran</b>, <b>Adynathos</b>, <b>Toraxxx</b> and <b>sides</b>.</p>
             <p>
                 <ul>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
