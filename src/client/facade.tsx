@@ -40,7 +40,7 @@ function incomingLoop() {
 		numFramesToProcess = 1; // Don't catch up to live when watching a replay
 	} else if (incomingQueue.length <= TicksPerTurn + AllowedDelayInTicks) {
 		numFramesToProcess = 1; // We're on time, process at normal rate
-	} else if (incomingQueue.length <= TicksPerTurn * 3) {
+	} else if (incomingQueue.length <= TicksPerTurn * 10) {
 		numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
 	} else {
 		// We're very behind, skip ahead
