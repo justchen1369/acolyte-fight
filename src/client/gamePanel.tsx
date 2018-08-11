@@ -1,8 +1,10 @@
+import * as screenfull from 'screenfull';
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
 import { ButtonBar } from '../game/constants';
+import { isMobile } from './userAgent';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
@@ -61,10 +63,17 @@ export class GamePanel extends React.Component<Props, State> {
                     items={this.props.items}
                     newGameCallback={this.props.newGameCallback}
                     exitGameCallback={this.props.exitGameCallback} />
-                {allowExit && <a className="exit-link" href="#" onClick={() => this.props.exitGameCallback()}>
+                {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-times-circle" /> Exit Game
                 </a>}
             </div>
         );
+    }
+
+    private onExitClicked(ev: React.MouseEvent) {
+        if (isMobile) {
+            screenfull.exit();
+        }
+        this.props.exitGameCallback();
     }
 }

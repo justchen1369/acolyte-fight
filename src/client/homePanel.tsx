@@ -1,10 +1,9 @@
-
+import * as screenfull from 'screenfull';
 import * as React from 'react';
-import * as s from './store.model';
-import * as w from '../game/world.model';
 import * as url from './url';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
+import { isMobile } from './userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -34,8 +33,7 @@ export class HomePanel extends React.Component<Props, State> {
                 <div className="title">Acolyte Fight!</div>
                 <div className="spacer" />
                 <div className="button-row">
-                    {!this.state.joining && <span className="btn" onClick={() => this.props.newGameCallback()}>Play</span>}
-                    {this.state.joining && <span className="btn disabled">Play</span>}
+                    <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>Play</span>
                 </div>
                 {this.props.current.room && <div className="private-room-indicator">
                     In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>details</a>)
@@ -54,6 +52,18 @@ export class HomePanel extends React.Component<Props, State> {
                 <SpellConfig />
             </div>
         </div>;
+    }
+
+    private onPlayClicked(ev: React.MouseEvent) {
+        if (this.state.joining) {
+            return;
+        }
+        this.setState({ joining: true });
+
+        if (isMobile) {
+            screenfull.request();
+        }
+        this.props.newGameCallback();
     }
 
     private getCurrentRoomUrl() {
