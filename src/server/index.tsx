@@ -53,6 +53,8 @@ app.get('/api/status', (req, res) => res.send(getServerStats()));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
 app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest.webmanifest'));
+app.get('/google71aeed5bfbf1589d.html', (req, res) => res.sendFile(rootDir + '/google71aeed5bfbf1589d.html'));
+
 
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
