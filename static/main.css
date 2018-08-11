@@ -269,6 +269,10 @@ a:hover, a:active {
     margin-right: 8px;
 }
 
+#messages-panel .help-box .close-help-link {
+    pointer-events: all;
+}
+
 #messages-panel .game-started {
     font-weight: bold;
 }

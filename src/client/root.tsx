@@ -11,6 +11,7 @@ import { TitleSection } from '../client/titleSection';
 import { ModdingPanel } from './moddingPanel';
 
 interface Props {
+    isNewPlayer: boolean;
     playerName: string;
     current: url.PathElements;
     connected: boolean;
@@ -40,6 +41,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderGame() {
         return <GamePanel
+            isNewPlayer={this.props.isNewPlayer}
             world={this.props.world} 
             items={this.props.items} 
             connected={this.props.connected}

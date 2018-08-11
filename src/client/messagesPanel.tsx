@@ -6,6 +6,7 @@ import { HeroColors } from '../game/constants';
 import { isMobile } from './userAgent';
 
 interface Props {
+    isNewPlayer: boolean;
     world: w.World;
     items: s.NotificationItem[];
     style: any;
@@ -14,13 +15,17 @@ interface Props {
 }
 interface State {
     spectatingGameId: string;
+    helped: boolean;
 }
+
+let helpedThisSession = false; // Store across games so the user only has to dismiss the help once
 
 export class MessagesPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
             spectatingGameId: null,
+            helped: helpedThisSession,
         };
     }
 
@@ -81,14 +86,39 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
+        if (!notification.heroId) {
+            return null; // Observer doesn't need instructions
+        }
+
+        let help = null;
+        if (!this.state.helped && this.props.isNewPlayer) {
+            help =
+                isMobile
+                ? (
+                    <div className="help-box">
+                        <div className="help-title">How to play (<a className="close-help-link" href="#" onClick={(e) => this.onCloseHelpClicked(e)}>hide this</a>):</div>
+                        <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> Cast spells with left circle</div>
+                        <div className="help-row"><span className="icon-container"><i className="fas fa-circle" /></span> Move/aim with right circle</div>
+                    </div>
+                )
+                : (
+                    <div className="help-box">
+                        <div className="help-title">How to play:</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
+                    </div>
+                );
+        }
         return <div key={key} className="row">
-            {notification.heroId && !isMobile && <div className="help-box">
-                <div className="help-title">How to play:</div>
-                <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
-                <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
-            </div>}
+            {help}
             <div>{notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}</div>
         </div>
+    }
+
+    private onCloseHelpClicked(e: React.MouseEvent<HTMLAnchorElement>) {
+        e.preventDefault();
+        helpedThisSession = true;
+        this.setState({ helped: true });
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {

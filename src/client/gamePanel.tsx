@@ -9,6 +9,7 @@ import { MessagesPanel } from './messagesPanel';
 import { CanvasPanel } from './canvasPanel';
 
 interface Props {
+    isNewPlayer: boolean;
     playerName: string;
     world: w.World;
     items: s.NotificationItem[];
@@ -55,6 +56,7 @@ export class GamePanel extends React.Component<Props, State> {
                     world={this.props.world} />
                 <MessagesPanel
                     style={{ marginLeft, marginBottom }}
+                    isNewPlayer={this.props.isNewPlayer}
                     world={this.props.world}
                     items={this.props.items}
                     newGameCallback={this.props.newGameCallback}

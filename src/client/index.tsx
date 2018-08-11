@@ -16,6 +16,7 @@ import { Root } from './root';
 
 const socket = socketLib();
 
+let isNewPlayer = !Storage.loadName();
 let playerName = getOrCreatePlayerName();
 
 function getOrCreatePlayerName(): string {
@@ -108,6 +109,7 @@ function rerender() {
         <Root
             current={current}
             connected={store.connected}
+            isNewPlayer={isNewPlayer}
             playerName={playerName}
             world={store.world}
             items={store.items}
