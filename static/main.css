@@ -250,7 +250,12 @@ a:hover, a:active {
     margin: 30px 0px;
     padding: 20px;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
-    font-size: 150%;
+}
+
+@media (min-width: 1000px) {
+    #messages-panel .help-box {
+        font-size: 150%;
+    }
 }
 
 #messages-panel .help-box .help-title {
