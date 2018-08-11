@@ -160,17 +160,8 @@ export class CanvasPanel extends React.Component<Props, State> {
         points.forEach(p => {
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
-                const spellId = this.keyToSpellId(key);
-                const spell = (Spells as Spells)[spellId];
-                if (spell) {
-                    if (spell.untargeted) {
-                        sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
-                    } else {
-                        world.ui.nextSpellId = spellId;
-                    }
-                }
-
                 this.actionTouchId = p.touchId;
+                this.handleButtonClick(key, world);
             } else {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                     this.currentTouchId = p.touchId;
@@ -191,11 +182,27 @@ export class CanvasPanel extends React.Component<Props, State> {
         this.processCurrentTouch();
     }
 
+    private handleButtonClick(key: string, world: w.World) {
+        const spellId = this.keyToSpellId(key);
+        const spell = (Spells as Spells)[spellId];
+        if (spell) {
+            if (spell.untargeted) {
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+            } else {
+                world.ui.nextSpellId = spellId;
+            }
+        }
+    }
+
     private touchMoveHandler(...points: PointInfo[]) {
         const world = this.props.world;
         points.forEach(p => {
             if (this.actionTouchId === p.touchId) {
-                // Do nothing
+                const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
+                if (key) {
+                    this.actionTouchId = p.touchId;
+                    this.handleButtonClick(key, world);
+                }
             } else if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                 if (this.targetSurface) {
                     world.ui.nextTarget = vector.plus(this.targetSurface.startWorldPoint, vector.diff(p.worldPoint, this.targetSurface.startTargetPoint));
