@@ -1,9 +1,8 @@
-import * as screenfull from 'screenfull';
 import * as React from 'react';
 import * as url from './url';
+import * as screenLifecycle from './screenLifecycle';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
-import { isMobile } from './userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -59,10 +58,7 @@ export class HomePanel extends React.Component<Props, State> {
             return;
         }
         this.setState({ joining: true });
-
-        if (isMobile) {
-            screenfull.request();
-        }
+        screenLifecycle.enterGame();
         this.props.newGameCallback();
     }
 

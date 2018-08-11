@@ -1,10 +1,9 @@
-import * as screenfull from 'screenfull';
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import * as screenLifecycle from './screenLifecycle';
 
 import { ButtonBar } from '../game/constants';
-import { isMobile } from './userAgent';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';
@@ -71,9 +70,7 @@ export class GamePanel extends React.Component<Props, State> {
     }
 
     private onExitClicked(ev: React.MouseEvent) {
-        if (isMobile) {
-            screenfull.exit();
-        }
+        screenLifecycle.exitGame();
         this.props.exitGameCallback();
     }
 }
