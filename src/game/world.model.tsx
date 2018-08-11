@@ -83,6 +83,8 @@ export interface ButtonWheelConfig {
 	innerRadius: number;
 	outerRadius: number;
 
+	targetSurfaceCenter: pl.Vec2;
+
 	buttons: Map<string, ButtonRenderState>;
 }
 

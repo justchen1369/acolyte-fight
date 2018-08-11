@@ -31,15 +31,8 @@ export function resetRenderState(world: w.World) {
 }
 
 export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, rect: ClientRect) {
-	const viewRects = calculateViewRects(rect);
-
-	let worldPoint: pl.Vec2 = worldPointFromViewRect(interfacePoint, viewRects[0]);
-	for (let i = 1; i < viewRects.length; ++i) {
-		const viewRect = viewRects[i];
-		if (viewRect.left <= interfacePoint.x && interfacePoint.x < viewRect.right && viewRect.top <= interfacePoint.y && interfacePoint.y < viewRect.bottom) {
-			worldPoint = worldPointFromViewRect(interfacePoint, viewRect);
-		}
-	}
+	const viewRect = calculateViewRects(rect);
+	const worldPoint = worldPointFromViewRect(interfacePoint, viewRect);
 	return worldPoint;
 }
 
@@ -49,15 +42,15 @@ export function worldPointFromViewRect(interfacePoint: pl.Vec2, viewRect: Client
 	return worldPoint;
 }
 
-function calculateViewRects(rect: ClientRect): ClientRect[] {
-	return [{
+function calculateViewRects(rect: ClientRect): ClientRect {
+	return {
 		left: 0,
 		right: rect.width,
 		width: rect.width,
 		top: 0,
 		bottom: rect.height,
 		height: rect.height,
-	}];
+	};
 }
 
 function calculateWorldRect(viewRect: ClientRect) {
@@ -120,43 +113,35 @@ function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
 }
 
 function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
-	const viewRects = calculateViewRects(rect);
-	for (let i = 0; i < viewRects.length; ++i) {
-		const worldRect = calculateWorldRect(viewRects[i]);
-		all(ctxStack, ctx => ctx.save());
-		all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
-		all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
+	const viewRect = calculateViewRects(rect);
 
-		if (i == 0) {
-			// Primary view
-			renderMap(ctxStack.background, world);
+	const worldRect = calculateWorldRect(viewRect);
+	all(ctxStack, ctx => ctx.save());
+	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
+	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
-			world.objects.forEach(obj => renderObject(ctxStack, obj, world));
-			world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
-			world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
+	renderMap(ctxStack.background, world);
 
-			let newTrails = new Array<w.Trail>();
-			world.ui.trails.forEach(trail => {
-				renderTrail(ctxStack, trail, world);
+	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
+	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
+	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
-				const expireTick = trail.initialTick + trail.max;
-				if (world.tick < expireTick) {
-					newTrails.push(trail);
-				}
-			});
-			world.ui.trails = newTrails;
+	let newTrails = new Array<w.Trail>();
+	world.ui.trails.forEach(trail => {
+		renderTrail(ctxStack, trail, world);
 
-			if (viewRects.length > 1) {
-				renderTarget(ctxStack, world.ui.nextTarget);
-			}
-		} else {
-			// Secondary view
-			const primary = false;
-			renderMap(ctxStack.background, world, primary);
+		const expireTick = trail.initialTick + trail.max;
+		if (world.tick < expireTick) {
+			newTrails.push(trail);
 		}
+	});
+	world.ui.trails = newTrails;
 
-		all(ctxStack, ctx => ctx.restore());
+	if (isMobile) {
+		renderTarget(ctxStack, world.ui.nextTarget);
 	}
+
+	all(ctxStack, ctx => ctx.restore());
 }
 
 function renderTarget(ctxStack: CanvasCtxStack, target: pl.Vec2) {
@@ -321,7 +306,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 	});
 }
 
-function renderMap(ctx: CanvasRenderingContext2D, world: w.World, primary: boolean = true) {
+function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.save();
 
 	ctx.translate(0.5, 0.5);
@@ -345,11 +330,7 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World, primary: boole
 	ctx.beginPath();
 	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
 
-	if (primary) {
-		ctx.fill();
-	} else {
-		ctx.stroke();
-	}
+	ctx.fill();
 
 	ctx.restore();
 }
@@ -821,7 +802,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 		const offset = pl.Vec2(pos.x - config.center.x, pos.y - config.center.y);
 		const radius = vector.length(offset);
 
-		if (config.innerRadius <= radius && radius <= config.outerRadius) {
+		if (config.innerRadius <= radius && radius < config.outerRadius) {
 			const angle = vector.angle(offset);
 			config.hitSectors.forEach((hitSector, candidateKey) => {
 				const arcWidth = hitSector.endAngle - hitSector.startAngle;
@@ -830,10 +811,26 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 					key = candidateKey;
 				}
 			});
+		} else if (radius <= config.innerRadius) {
+			key = " ";
 		}
 	}
 
 	return key;
+}
+
+export function withinTargetSurface(pos: pl.Vec2, config: w.ButtonConfig): boolean {
+	if (!config) {
+		// Buttons not drawn yet
+		return false;
+	}
+
+	if (config.view === "wheel") {
+		// return vector.distance(pos, config.targetSurfaceCenter) <= config.outerRadius;
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
@@ -849,6 +846,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		renderButtonBar(ctx, config, keys, hero, selectedAction, world);
 	} else if (config.view === "wheel") {
 		renderButtonWheel(ctx, config, keys, hero, selectedAction, world);
+		// renderTargetSurface(ctx, config);
 	}
 }
 
@@ -905,6 +903,20 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 			}
 		}
 	}
+	ctx.restore();
+}
+
+function renderTargetSurface(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig) {
+	ctx.save();
+	ctx.translate(config.targetSurfaceCenter.x, config.targetSurfaceCenter.y);
+
+	ctx.lineWidth = 3;
+	ctx.strokeStyle = "#888888";
+
+	ctx.beginPath();
+	ctx.arc(0, 0, config.outerRadius, 0, 2 * Math.PI);
+	ctx.stroke();
+
 	ctx.restore();
 }
 
@@ -994,6 +1006,8 @@ function calculateButtonWheelLayout(keys: string[], rect: ClientRect): w.ButtonW
 	const innerRadius = outerRadius / 2.0;
 	const center = pl.Vec2((region.left + region.right) / 2, (region.top + region.bottom) / 2);
 
+	const targetSurfaceCenter = pl.Vec2(rect.right - (center.x - rect.left), center.y); // Mirror the wheel on the right
+
 	return {
 		view: "wheel",
 		hitSectors,
@@ -1001,6 +1015,7 @@ function calculateButtonWheelLayout(keys: string[], rect: ClientRect): w.ButtonW
 		center,
 		outerRadius,
 		innerRadius,
+		targetSurfaceCenter,
 		buttons: new Map<string, w.ButtonRenderState>(),
 	};
 }

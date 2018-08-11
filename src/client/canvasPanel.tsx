@@ -1,10 +1,11 @@
 import pl from 'planck-js';
 import * as React from 'react';
+import * as vector from '../game/vector';
 import * as w from '../game/world.model';
 
 import { TicksPerSecond } from '../game/constants';
 import { Spells } from '../game/settings';
-import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, resetRenderState, notify, frame } from './facade';
+import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, withinTargetSurface, resetRenderState, frame } from './facade';
 
 const MouseId = "mouse";
 
@@ -20,6 +21,11 @@ interface PointInfo {
     touchId: string;
     interfacePoint: pl.Vec2;
     worldPoint: pl.Vec2;
+}
+
+interface TargetTouchState {
+    startWorldPoint: pl.Vec2;
+    startTargetPoint: pl.Vec2;
 }
 
 class AnimationLoop {
@@ -51,6 +57,8 @@ class AnimationLoop {
 
 export class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: string = null;
+    private actionTouchId: string = null;
+    private targetSurface: TargetTouchState = null;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
@@ -161,10 +169,22 @@ export class CanvasPanel extends React.Component<Props, State> {
                         world.ui.nextSpellId = spellId;
                     }
                 }
+
+                this.actionTouchId = p.touchId;
             } else {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                     this.currentTouchId = p.touchId;
-                    world.ui.nextTarget = p.worldPoint;
+
+                    if (withinTargetSurface(p.interfacePoint, world.ui.buttonBar)) {
+                        world.ui.nextTarget = world.ui.nextTarget || pl.Vec2(0.5, 0.5);
+
+                        this.targetSurface = {
+                            startWorldPoint: world.ui.nextTarget,
+                            startTargetPoint: p.worldPoint,
+                        };
+                    } else {
+                        world.ui.nextTarget = p.worldPoint;
+                    }
                 }
             }
         });
@@ -174,8 +194,14 @@ export class CanvasPanel extends React.Component<Props, State> {
     private touchMoveHandler(...points: PointInfo[]) {
         const world = this.props.world;
         points.forEach(p => {
-            if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
-                world.ui.nextTarget = p.worldPoint;
+            if (this.actionTouchId === p.touchId) {
+                // Do nothing
+            } else if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
+                if (this.targetSurface) {
+                    world.ui.nextTarget = vector.plus(this.targetSurface.startWorldPoint, vector.diff(p.worldPoint, this.targetSurface.startTargetPoint));
+                } else {
+                    world.ui.nextTarget = p.worldPoint;
+                }
             }
         });
         this.processCurrentTouch();
@@ -183,9 +209,12 @@ export class CanvasPanel extends React.Component<Props, State> {
 
     private touchEndHandler(...points: PointInfo[]) {
         points.forEach(p => {
-            if (this.currentTouchId === p.touchId) {
+            if (this.actionTouchId === p.touchId) {
+                this.actionTouchId = null;
+            } else if (this.currentTouchId === p.touchId) {
                 this.currentTouchId = null;
-            }
+                this.targetSurface = null;
+            } 
         });
         this.processCurrentTouch();
     }
@@ -193,13 +222,18 @@ export class CanvasPanel extends React.Component<Props, State> {
     private processCurrentTouch() {
         const world = this.props.world;
         if (this.currentTouchId !== null && world.ui.nextTarget) {
-            const spell = (Spells as Spells)[world.ui.nextSpellId] || Spells.move;
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
-            world.ui.nextSpellId = null;
+            let spell = (Spells as Spells)[world.ui.nextSpellId] || Spells.move;
+            if (spell) {
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
 
-            if (spell.id !== Spells.move.id && spell.interruptible) {
-                // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick
-                this.currentTouchId = null;
+                if (spell.id !== Spells.move.id) {
+                    world.ui.nextSpellId = null;
+
+                    if (spell.interruptible) {
+                        // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick
+                        this.currentTouchId = null;
+                    }
+                }
             }
         }
     }

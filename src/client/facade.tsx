@@ -6,7 +6,7 @@ import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
-export { worldPointFromInterfacePoint, whichKeyClicked, resetRenderState, CanvasStack } from './render';
+export { worldPointFromInterfacePoint, whichKeyClicked, withinTargetSurface, resetRenderState, CanvasStack } from './render';
 
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
