@@ -7,7 +7,7 @@ import * as w from '../game/world.model';
 import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../game/constants';
 import { Hero, Choices, Spells } from '../game/settings';
 import { Icons } from './icons';
-import { renderIcon } from '../client/renderIcon';
+import { renderIconButton, renderIconOnly } from '../client/renderIcon';
 import { isMobile, isEdge } from './userAgent';
 
 export interface CanvasStack {
@@ -50,35 +50,14 @@ export function worldPointFromViewRect(interfacePoint: pl.Vec2, viewRect: Client
 }
 
 function calculateViewRects(rect: ClientRect): ClientRect[] {
-	if (isMobile && rect.width > rect.height * 1.5) {
-		const split = rect.width / 2;
-		const primary: ClientRect = {
-			left: 0,
-			right: split,
-			width: split,
-			top: rect.top,
-			bottom: rect.height,
-			height: rect.height,
-		};
-		const secondary: ClientRect = {
-			left: split,
-			right: rect.width,
-			width: rect.width - split,
-			top: rect.top,
-			bottom: rect.height,
-			height: rect.height,
-		};
-		return [primary, secondary];
-	} else {
-		return [{
-			left: 0,
-			right: rect.width,
-			width: rect.width,
-			top: 0,
-			bottom: rect.height,
-			height: rect.height,
-		}];
-	}
+	return [{
+		left: 0,
+		right: rect.width,
+		width: rect.width,
+		top: 0,
+		bottom: rect.height,
+		height: rect.height,
+	}];
 }
 
 function calculateWorldRect(viewRect: ClientRect) {
@@ -830,13 +809,29 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 		return null;
 	}
 
-	const offset = pl.Vec2((pos.x - region.left) / config.scaleFactor, (pos.y - region.top) / config.scaleFactor);
 	let key: string = null;
-	config.hitBoxes.forEach((hitBox, candidateKey) => {
-		if (hitBox.left <= offset.x && offset.x < hitBox.right && hitBox.top <= offset.y && offset.y < hitBox.bottom) {
-			key = candidateKey;
+	if (config.view === "bar") {
+		const offset = pl.Vec2((pos.x - region.left) / config.scaleFactor, (pos.y - region.top) / config.scaleFactor);
+		config.hitBoxes.forEach((hitBox, candidateKey) => {
+			if (hitBox.left <= offset.x && offset.x < hitBox.right && hitBox.top <= offset.y && offset.y < hitBox.bottom) {
+				key = candidateKey;
+			}
+		});
+	} else if (config.view === "wheel") {
+		const offset = pl.Vec2(pos.x - config.center.x, pos.y - config.center.y);
+		const radius = vector.length(offset);
+
+		if (config.innerRadius <= radius && radius <= config.outerRadius) {
+			const angle = vector.angle(offset);
+			config.hitSectors.forEach((hitSector, candidateKey) => {
+				const arcWidth = hitSector.endAngle - hitSector.startAngle;
+				const delta = vector.angleDelta(hitSector.startAngle, angle);
+				if (0 <= delta && delta < arcWidth) {
+					key = candidateKey;
+				}
+			});
 		}
-	});
+	}
 
 	return key;
 }
@@ -848,8 +843,24 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 	if (!world.ui.buttonBar) {
 		world.ui.buttonBar = calculateButtonLayout(keys, rect);
 	}
-	const config = world.ui.buttonBar;
 
+	const config = world.ui.buttonBar;
+	if (config.view === "bar") {
+		renderButtonBar(ctx, config, keys, hero, selectedAction, world);
+	} else if (config.view === "wheel") {
+		renderButtonWheel(ctx, config, keys, hero, selectedAction, world);
+	}
+}
+
+function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig {
+	if (isMobile) {
+		return calculateButtonWheelLayout(keys, rect);
+	} else {
+		return calculateButtonBarLayout(keys, rect);
+	}
+}
+
+function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: string[], hero: w.Hero, selectedAction: string, world: w.World) {
 	ctx.save();
 	ctx.translate(config.region.left, config.region.top);
 	ctx.scale(config.scaleFactor, config.scaleFactor);
@@ -858,23 +869,46 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		const key = keys[i];
 		const newState = calculateButtonState(key, hero, selectedAction, world);
 		const currentState = config.buttons.get(key);
-		const buttonRegion = config.hitBoxes.get(key);
 
-		if (buttonStateChanged(currentState, newState) && buttonRegion) {
-			config.buttons.set(key, newState);
+		if (buttonStateChanged(currentState, newState)) {
+			const buttonRegion = config.hitBoxes.get(key);
+			if (buttonRegion) {
+				config.buttons.set(key, newState);
 
-			ctx.save();
-			ctx.translate(buttonRegion.left, buttonRegion.top);
-			renderButton(ctx, newState);
-			ctx.restore();
+				ctx.save();
+				ctx.translate(buttonRegion.left, buttonRegion.top);
+				renderBarButton(ctx, newState);
+				ctx.restore();
+			}
 		}
 	}
 	ctx.restore();
 }
 
-function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig {
-	const vertical = chooseButtonsVertical();
+function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: string[], hero: w.Hero, selectedAction: string, world: w.World) {
+	ctx.save();
+	ctx.translate(config.center.x, config.center.y);
 
+	for (let i = 0; i < keys.length; ++i) {
+		const key = keys[i];
+		const newState = calculateButtonState(key, hero, selectedAction, world);
+		const currentState = config.buttons.get(key);
+
+		if (buttonStateChanged(currentState, newState)) {
+			const buttonSector = config.hitSectors.get(key);
+			if (buttonSector) {
+				config.buttons.set(key, newState);
+
+				ctx.save();
+				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState);
+				ctx.restore();
+			}
+		}
+	}
+	ctx.restore();
+}
+
+function calculateButtonBarLayout(keys: string[], rect: ClientRect): w.ButtonBarConfig {
 	const hitBoxes = new Map<string, ClientRect>();
 	let nextOffset = 0;
 	keys.forEach(key => {
@@ -885,8 +919,8 @@ function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig
 		if (key) {
 			const offset = nextOffset;
 
-			const left = vertical ? 0 : offset;
-			const top = vertical ? offset : 0;
+			const left = offset;
+			const top = 0;
 			const width = ButtonBar.Size;
 			const height = ButtonBar.Size;
 			const right = left + width;
@@ -899,11 +933,11 @@ function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig
 		}
 	});
 
-	const scaleFactor = calculateButtonScaleFactor(rect, vertical, nextOffset);
-	const region = calculateButtonBarRegion(rect, vertical, nextOffset, scaleFactor);
+	const scaleFactor = calculateButtonScaleFactor(rect, nextOffset);
+	const region = calculateButtonBarRegion(rect, nextOffset, scaleFactor);
 
 	return {
-		vertical,
+		view: "bar",
 		hitBoxes,
 		region,
 		scaleFactor,
@@ -911,12 +945,8 @@ function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig
 	};
 }
 
-function chooseButtonsVertical() {
-	return isMobile;
-}
-
-function calculateButtonScaleFactor(rect: ClientRect, vertical: boolean, totalSize: number): number {
-	const availableSize = vertical ? rect.height : rect.width;
+function calculateButtonScaleFactor(rect: ClientRect, totalSize: number): number {
+	const availableSize = rect.width;
 	if (availableSize <= 0) {
 		return 1.0; // Stop division by zero errors
 	} else if (totalSize <= availableSize) {
@@ -926,30 +956,71 @@ function calculateButtonScaleFactor(rect: ClientRect, vertical: boolean, totalSi
 	}
 }
 
-function calculateButtonBarRegion(rect: ClientRect, vertical: boolean, totalSize: number, scaleFactor: number): ClientRect {
+function calculateButtonBarRegion(rect: ClientRect, totalSize: number, scaleFactor: number): ClientRect {
 	const axisSize = totalSize * scaleFactor;
 	const crossSize = ButtonBar.Size * scaleFactor;
-	if (vertical) {
-		const width = crossSize;
-		const height = axisSize;
 
-		const left = ButtonBar.Margin;
-		const top = rect.height / 2.0 - height / 2.0;
+	const height = crossSize;
+	const width = axisSize;
 
-		const right = left + width;
-		const bottom = top + height;
-		return { left, top, right, bottom, width, height };
-	} else {
-		const height = crossSize;
-		const width = axisSize;
+	const left = rect.width / 2.0 - width / 2.0;
+	const top = rect.height - crossSize - ButtonBar.Margin;
 
-		const left = rect.width / 2.0 - width / 2.0;
-		const top = rect.height - crossSize - ButtonBar.Margin;
+	const right = left + width;
+	const bottom = top + height;
+	return { left, top, right, bottom, width, height };
+}
 
-		const right = left + width;
-		const bottom = top + height;
-		return { left, top, right, bottom, width, height };
-	}
+function calculateButtonWheelLayout(keys: string[], rect: ClientRect): w.ButtonWheelConfig {
+	const WheelAngleOffset = Math.PI / 2;
+
+	const hitSectors = new Map<string, w.HitSector>();
+
+	const arcWidth = 2 * Math.PI / keys.filter(k => !!k).length;
+	let nextAngle = WheelAngleOffset + arcWidth / 2;
+	keys.forEach(key => {
+		if (key) {
+			const startAngle = nextAngle;
+			const endAngle = startAngle + arcWidth;
+
+			hitSectors.set(key, { startAngle, endAngle });
+
+			nextAngle += arcWidth;
+		}
+	});
+
+	const region = calculateButtonWheelRegion(rect);
+	const outerRadius = Math.min(region.width, region.height) / 2.0;
+	const innerRadius = outerRadius / 2.0;
+	const center = pl.Vec2((region.left + region.right) / 2, (region.top + region.bottom) / 2);
+
+	return {
+		view: "wheel",
+		hitSectors,
+		region,
+		center,
+		outerRadius,
+		innerRadius,
+		buttons: new Map<string, w.ButtonRenderState>(),
+	};
+}
+
+function calculateButtonWheelRegion(rect: ClientRect): ClientRect {
+	const maxSize = ButtonBar.Size * 3;
+
+	let size = Math.min(
+		(rect.width - ButtonBar.Margin) / 2, // Half width
+		(rect.height - ButtonBar.Margin * 2)); // Or whole height
+	size = Math.max(0, Math.min(maxSize, size));
+
+	const left = ButtonBar.Margin;
+	const bottom = rect.bottom - ButtonBar.Margin;
+	const right = left + size;
+	const top = bottom - size;
+	const width = size;
+	const height = size;
+
+	return { left, top, right, bottom, width, height };
 }
 
 function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRenderState) {
@@ -999,7 +1070,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	return button;
 }
 
-function renderButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRenderState) {
+function renderBarButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRenderState) {
 	if (buttonState) {
 		const key = buttonState.key || "";
 
@@ -1008,7 +1079,7 @@ function renderButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRender
 		ctx.textBaseline = 'middle';
 		
 		let color = buttonState.color;
-		renderIcon(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, ButtonBar.Size);
+		renderIconButton(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, ButtonBar.Size);
 
 		if (buttonState.cooldownText) {
 			// Cooldown
@@ -1031,6 +1102,60 @@ function renderButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRender
 	} else {
 		ctx.clearRect(0, 0, ButtonBar.Size, ButtonBar.Size);
 	}
+}
+
+function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState) {
+	ctx.save();
+
+	// Render button
+	ctx.fillStyle = buttonState.color;
+
+	ctx.beginPath();
+	ctx.arc(0, 0, outerRadius, sector.startAngle, sector.endAngle, false);
+	ctx.arc(0, 0, innerRadius, sector.endAngle, sector.startAngle, true);
+	ctx.closePath();
+	ctx.fill();
+
+	ctx.clip(); // Clip icon inside button
+
+	{
+		ctx.save();
+
+		// Translate to center of button
+		const midVector = vector.multiply(
+			vector.fromAngle((sector.startAngle + sector.endAngle) / 2),
+			(innerRadius + outerRadius) / 2);
+		ctx.translate(midVector.x, midVector.y);
+
+		const size = outerRadius - innerRadius;
+
+		// Render icon
+		{
+			ctx.save();
+
+			ctx.translate(-size / 2, -size / 2); // Translate to top-left of button
+			renderIconOnly(ctx, buttonState.icon && Icons[buttonState.icon], 0.6, size);
+			
+			ctx.restore();
+		}
+
+		// Cooldown
+		let cooldownText = buttonState.cooldownText
+		if (cooldownText) {
+			ctx.save();
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, cooldownText, 0, 0);
+
+			ctx.restore();
+		}
+
+		ctx.restore();
+	}
+
+	ctx.restore();
 }
 
 function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {

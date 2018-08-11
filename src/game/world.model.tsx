@@ -62,12 +62,33 @@ export interface UIState {
 	buttonBar?: ButtonConfig;
 }
 
-export interface ButtonConfig {
-	buttons: Map<string, ButtonRenderState>;
-	hitBoxes: Map<string, ClientRect>;
+export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;
+
+export interface ButtonBarConfig {
+	view: "bar";
 	region: ClientRect;
 	scaleFactor: number;
-	vertical: boolean;
+
+	hitBoxes: Map<string, ClientRect>;
+
+	buttons: Map<string, ButtonRenderState>;
+}
+
+export interface ButtonWheelConfig {
+	view: "wheel";
+	region: ClientRect;
+
+	center: pl.Vec2;
+	hitSectors: Map<string, HitSector>;
+	innerRadius: number;
+	outerRadius: number;
+
+	buttons: Map<string, ButtonRenderState>;
+}
+
+export interface HitSector {
+	startAngle: number;
+	endAngle: number;
 }
 
 export interface Player {

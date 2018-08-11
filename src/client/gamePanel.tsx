@@ -33,11 +33,11 @@ export class GamePanel extends React.Component<Props, State> {
         let marginBottom = 0;
         let marginLeft = 0;
         const buttonBar = world.ui.buttonBar;
-        if (world.ui.buttonBar) {
-            if (buttonBar.vertical) {
-                marginLeft = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
-            } else {
+        if (buttonBar) {
+            if (buttonBar.view === "bar") {
                 marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+            } else if (buttonBar.view === "wheel") {
+                marginLeft = buttonBar.region.right;
             }
         }
 

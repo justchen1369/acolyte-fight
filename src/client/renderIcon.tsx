@@ -1,4 +1,4 @@
-export function renderIcon(ctx: CanvasRenderingContext2D, icon: Path2D, color: string, alpha: number, size: number) {
+export function renderIconButton(ctx: CanvasRenderingContext2D, icon: Path2D, color: string, alpha: number, size: number) {
     // Button
     {
         ctx.save();
@@ -13,6 +13,10 @@ export function renderIcon(ctx: CanvasRenderingContext2D, icon: Path2D, color: s
     }
     
     // Icon
+    renderIconOnly(ctx, icon, alpha, size);
+}
+
+export function renderIconOnly(ctx: CanvasRenderingContext2D, icon: Path2D, alpha: number, size: number) {
     if (icon) {
         ctx.save();
 
