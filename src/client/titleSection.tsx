@@ -51,6 +51,18 @@ export class TitleSection extends React.Component<Props, State> {
                 Acolytes become more dangerous as they lose health - dealing up to {1 + Hero.AdditionalDamageMultiplier}x more damage!
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
+            <h1>FAQ</h1>
+            <h2>Is there a Mobile App?</h2>
+            <p>
+                Add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
+                On iPhone - tap the Share button, click Add to Home Screen.
+                On Android - tap the triple dot menu button, click Add to Home Screen.
+            </p>
+            <h2>When does the game start?</h2>
+            <p>
+                The game starts whenever you want it to - just start casting some spells.
+                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
+            </p>
             <h1>Credits</h1>
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
             was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
