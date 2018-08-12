@@ -29,7 +29,12 @@ export class HomePanel extends React.Component<Props, State> {
         return <div className="content-container">
             <div className="home">
                 <div className="spacer" />
-                <div className="title">Acolyte Fight!</div>
+                <div className="title-row">
+                    <video autoPlay muted loop>
+                        <source src="static/video/AcolyteFight1.mp4" type="video/mp4" />
+                    </video>
+                    <div className="title">Acolyte Fight!</div>
+                </div>
                 <div className="spacer" />
                 <div className="button-row">
                     <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>Play</span>

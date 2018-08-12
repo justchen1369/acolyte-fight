@@ -167,9 +167,32 @@ a:hover, a:active {
     text-align: center;
 }
 
+.home .title-row {
+    overflow: hidden;
+    background: black;
+    position: relative;
+    z-index: -100;
+    padding: 25px 0;
+}
+
 .home .title {
     font-size: 100px;
     font-weight: bold;
+    text-shadow: 2px 2px black;
+}
+
+.home .title-row video {
+    position: absolute;
+    width: 854px;
+
+    /* Center video */
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+
+    z-index: -1;
 }
 
 .home .button-row {
