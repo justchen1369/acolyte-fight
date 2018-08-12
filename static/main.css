@@ -184,14 +184,10 @@ a:hover, a:active {
 .home .title-row video {
     position: absolute;
     width: 854px;
-
-    /* Center video */
-    bottom: 0;
+    margin: auto;
     top: 0;
     left: 0;
     right: 0;
-    margin: auto;
-
     z-index: -1;
 }
 
