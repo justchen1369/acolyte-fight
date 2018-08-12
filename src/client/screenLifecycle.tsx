@@ -3,7 +3,9 @@ import { isMobile } from './userAgent';
 
 export function enterGame() {
     if (isMobile) {
-        screenfull.request();
+        if (screenfull && screenfull.request) {
+            screenfull.request();
+        }
         lockLandscape();
     }
 }
@@ -11,7 +13,9 @@ export function enterGame() {
 export function exitGame() {
     if (isMobile) {
         unlockLandscape();
-        screenfull.exit();
+        if (screenfull && screenfull.exit) {
+            screenfull.exit();
+        }
     }
 }
 
