@@ -3,6 +3,7 @@ import * as c from '../game/world.model';
 import { Choices, Spells } from '../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../client/storage';
+import { isMobile } from './userAgent';
 
 interface Props {
 }
@@ -56,9 +57,9 @@ export class SpellConfig extends React.Component<Props, State> {
                 <div className="description">{chosen.description}</div>
                 {this.state.saved.has(key) && <div className="key-saved">Your {key.toUpperCase()} spell is now {this.capitalize(name)}.</div>}
             </div>
-            <div className="key-name-container">
+            {!isMobile && <div className="key-name-container">
                 <div className="key-name">{key}</div>
-            </div>
+            </div>}
         </div>;
     }
     
