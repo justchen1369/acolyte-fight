@@ -739,10 +739,12 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		applyDamage(hero, projectile, projectile.owner, world);
 		linkTo(projectile, hero, world);
-		applyGravity(projectile, hero, world);
 		projectile.hit = true;
 	}
 
+	if (projectile.gravity) {
+		applyGravity(projectile, hero, world);
+	}
 	if (projectile.bounce) {
 		bounceToNext(projectile, hero, world);
 	}
