@@ -34,6 +34,7 @@ export class HomePanel extends React.Component<Props, State> {
                         <source src="static/video/AcolyteFight1.mp4" type="video/mp4" />
                     </video>
                     <div className="title">Acolyte Fight!</div>
+                    <div className="mask"></div>
                 </div>
                 <div className="spacer" />
                 <div className="button-row">
