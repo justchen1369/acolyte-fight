@@ -23,9 +23,14 @@ interface PointInfo {
     worldPoint: pl.Vec2;
 }
 
-interface TargetTouchState {
+interface TargetSurfaceState {
     startWorldPoint: pl.Vec2;
     startTargetPoint: pl.Vec2;
+}
+
+interface ActionSurfaceState {
+    touchId: string;
+    activeKey: string;
 }
 
 class AnimationLoop {
@@ -57,8 +62,8 @@ class AnimationLoop {
 
 export class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: string = null;
-    private actionTouchId: string = null;
-    private targetSurface: TargetTouchState = null;
+    private actionSurface: ActionSurfaceState = null;
+    private targetSurface: TargetSurfaceState = null;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
@@ -160,7 +165,10 @@ export class CanvasPanel extends React.Component<Props, State> {
         points.forEach(p => {
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
-                this.actionTouchId = p.touchId;
+                this.actionSurface = {
+                    touchId: p.touchId,
+                    activeKey: key,
+                };
                 this.handleButtonClick(key, world);
             } else {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
@@ -197,11 +205,13 @@ export class CanvasPanel extends React.Component<Props, State> {
     private touchMoveHandler(...points: PointInfo[]) {
         const world = this.props.world;
         points.forEach(p => {
-            if (this.actionTouchId === p.touchId) {
+            if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
                 const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
-                if (key) {
-                    this.actionTouchId = p.touchId;
-                    this.handleButtonClick(key, world);
+                if (this.actionSurface.activeKey !== key) {
+                    this.actionSurface.activeKey = key; // Ignore dragging on the same key
+                    if (key) {
+                        this.handleButtonClick(key, world);
+                    }
                 }
             } else if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                 if (this.targetSurface) {
@@ -216,8 +226,8 @@ export class CanvasPanel extends React.Component<Props, State> {
 
     private touchEndHandler(...points: PointInfo[]) {
         points.forEach(p => {
-            if (this.actionTouchId === p.touchId) {
-                this.actionTouchId = null;
+            if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
+                this.actionSurface = null;
             } else if (this.currentTouchId === p.touchId) {
                 this.currentTouchId = null;
                 this.targetSurface = null;
@@ -229,7 +239,10 @@ export class CanvasPanel extends React.Component<Props, State> {
     private processCurrentTouch() {
         const world = this.props.world;
         if (this.currentTouchId !== null && world.ui.nextTarget) {
-            let spell = (Spells as Spells)[world.ui.nextSpellId] || Spells.move;
+            let spell = (Spells as Spells)[world.ui.nextSpellId];
+            if (!spell && (!this.actionSurface || this.actionSurface.activeKey === " ")) {
+                spell = Spells.move;
+            }
             if (spell) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
 
