@@ -33,7 +33,7 @@ export class MessagesPanel extends React.Component<Props, State> {
         const world = this.props.world;
 
         let rows = new Array<JSX.Element>();
-        let actionRow: JSX.Element = null;
+        let actionRow: JSX.Element = this.renderHelp("help");
         const now = new Date().getTime();
         this.props.items.forEach(item => {
             if (now >= item.expiryTime) {
@@ -86,19 +86,31 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        if (!notification.heroId) {
+        return <div key={key} className="row">
+            <div>{notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}</div>
+        </div>
+    }
+
+    private renderHelp(key: string) {
+        const world = this.props.world;
+        if (!world.ui.myHeroId) {
             return null; // Observer doesn't need instructions
         }
 
-        let help = null;
         if (!this.state.helped && this.props.isNewPlayer) {
-            help =
+            const closeLink =
+                <div className="action-row">
+                    <span className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</span>
+                </div>;
+
+            const help =
                 isMobile
                 ? (
                     <div className="help-box">
-                        <div className="help-title">How to play (<a className="close-help-link" href="#" onClick={(e) => this.onCloseHelpClicked(e)}>hide this</a>):</div>
+                        <div className="help-title">How to play:</div>
                         <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> Move/aim by dragging</div>
                         <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> Cast spells with button wheel</div>
+                        {closeLink}
                     </div>
                 )
                 : (
@@ -106,17 +118,16 @@ export class MessagesPanel extends React.Component<Props, State> {
                         <div className="help-title">How to play:</div>
                         <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
                         <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
+                        {closeLink}
                     </div>
                 );
+            return help;
+        } else {
+            return null;
         }
-        return <div key={key} className="row">
-            {help}
-            <div>{notification.room && <span className="private-room">In this private room: </span>}{notification.numPlayers} {notification.numPlayers === 1 ? "player" : "players"} online in {notification.numGames} {notification.numGames === 1 ? "game" : "games"}</div>
-        </div>
     }
 
-    private onCloseHelpClicked(e: React.MouseEvent<HTMLAnchorElement>) {
-        e.preventDefault();
+    private onCloseHelpClicked(e: React.MouseEvent) {
         helpedThisSession = true;
         this.setState({ helped: true });
     }
