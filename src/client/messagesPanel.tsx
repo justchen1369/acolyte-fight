@@ -97,8 +97,8 @@ export class MessagesPanel extends React.Component<Props, State> {
                 ? (
                     <div className="help-box">
                         <div className="help-title">How to play (<a className="close-help-link" href="#" onClick={(e) => this.onCloseHelpClicked(e)}>hide this</a>):</div>
-                        <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> Cast spells with left circle</div>
-                        <div className="help-row"><span className="icon-container"><i className="fas fa-circle" /></span> Move/aim with right circle</div>
+                        <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> Move/aim by dragging</div>
+                        <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> Cast spells with button wheel</div>
                     </div>
                 )
                 : (

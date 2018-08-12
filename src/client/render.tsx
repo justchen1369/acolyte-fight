@@ -845,7 +845,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		renderButtonBar(ctx, config, keys, hero, selectedAction, world);
 	} else if (config.view === "wheel") {
 		renderButtonWheel(ctx, config, keys, hero, selectedAction, world);
-		renderTargetSurface(ctx, config, selectedAction, world);
+		// renderTargetSurface(ctx, config, selectedAction, world);
 	}
 }
 
