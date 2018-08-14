@@ -32,7 +32,7 @@ export const World: WorldSettings = {
 
 export const Obstacle: ObstacleSettings = {
 	Health: 50,
-	AngularDamping: 10,
+	AngularDamping: 5,
 	LinearDamping: 2,
 	Density: 100.0,
 }
