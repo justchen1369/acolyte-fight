@@ -40,8 +40,13 @@ attachToSocket(socket, () => {
                 alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
                 setConnected(true);
 
-                if (current.gameId) {
-                    // Join as observer
+                if (current.gameId || current.page === "join") {
+                    // Decide which page to return to after game is finished
+                    if (current.gameId) {
+                        current.page = "replays";
+                    } else {
+                        current.page = "";
+                    }
                     joinNewGame(playerName, retrieveKeyBindings(), current.room, current.gameId);
                 } else {
                     rerender(); // Room settings might have changed the page
@@ -74,6 +79,8 @@ rerender();
 function onNewGameClicked() {
     if (!getStore().connected) {
         // New server? Reload the client, just in case the version has changed.
+        current.page = "join";
+        updateUrl();
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
