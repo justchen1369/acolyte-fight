@@ -165,12 +165,15 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
+        const observing = !this.props.world.ui.myHeroId;
         return <div key={key} className="winner">
             <div className="winner-row">{this.renderPlayer(notification.winner)} is the winner!</div>
             <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
-                <span className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</span>
+                {observing
+                    ? <span className="btn new-game-btn" onClick={() => this.props.exitGameCallback()}>Exit Replay</span>
+                    : <span className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</span>}
             </div>
         </div>;
     }
