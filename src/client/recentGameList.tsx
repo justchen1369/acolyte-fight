@@ -107,7 +107,7 @@ export class RecentGameList extends React.Component<Props, State> {
             gameId: game.id,
             room: game.room,
             server: game.server,
-            page: "replays",
+            page: null,
         });
     }
 }
