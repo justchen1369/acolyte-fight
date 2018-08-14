@@ -107,11 +107,13 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	};
 
 	// Obstacles start immovable
-	body.setMassData({
-		mass: 1e6,
-		I: 0,
-		center: vector.zero(),
-	});
+	if (world.tick < world.startTick) {
+		body.setMassData({
+			mass: 1e6,
+			I: 0,
+			center: vector.zero(),
+		});
+	}
 
 	world.objects.set(obstacle.id, obstacle);
 	return obstacle;
@@ -714,6 +716,13 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 
 	if (projectile.expireOn & obstacle.categories) {
 		destroyObject(world, projectile);
+
+		if (projectile.createTick === world.tick) {
+			// Sometimes projectiles propel obstacles backwards on creation because they are created in front of the hero,
+			// but perhaps behind the projectile. Ensure the obstacles are always propelled forward.
+			const impulse = vector.multiply(projectile.body.getLinearVelocity(), projectile.body.getMass());
+			obstacle.body.applyLinearImpulse(impulse, obstacle.body.getWorldPoint(vector.zero()), true);
+		}
 	}
 }
 
