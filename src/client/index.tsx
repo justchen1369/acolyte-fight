@@ -41,10 +41,8 @@ attachToSocket(socket, () => {
                 setConnected(true);
 
                 if (current.gameId || current.page === "join") {
-                    // Decide which page to return to after game is finished
-                    if (current.gameId) {
-                        current.page = "replays";
-                    } else {
+                    if (current.page === "join") {
+                        // Return to the home page when we exit
                         current.page = "";
                     }
                     joinNewGame(playerName, retrieveKeyBindings(), current.room, current.gameId);

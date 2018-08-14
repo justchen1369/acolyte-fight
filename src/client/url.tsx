@@ -38,7 +38,8 @@ export function getPath(elems: PathElements) {
     let params = [];
     if (elems.gameId) {
         params.push("g=" + elems.gameId);
-    } else if (elems.page) {
+    }
+    if (elems.page) {
         pathElements = [elems.page];
     }
 
