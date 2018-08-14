@@ -468,6 +468,7 @@ export const bouncer: Spell = {
 
     projectile: {
         color: '#88ee22',
+        selfColor: true,
 
         density: 2,
         radius: 0.001,
