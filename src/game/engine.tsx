@@ -733,6 +733,10 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	}
 
 	projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
+
+	if (projectile.bounce) {
+		bounceToNext(projectile, shield.owner, world);
+	}
 }
 
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
@@ -748,7 +752,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		applyGravity(projectile, hero, world);
 	}
 	if (projectile.bounce) {
-		bounceToNext(projectile, hero, world);
+		bounceToNext(projectile, hero.id, world);
 	}
 	if (projectile.expireOn & hero.categories) {
 		destroyObject(world, projectile);
@@ -806,7 +810,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	};
 }
 
-function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.World) {
+function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	if (!projectile.bounce) {
 		return;
 	}
@@ -814,7 +818,7 @@ function bounceToNext(projectile: w.Projectile, hit: w.WorldObject, world: w.Wor
 	let nextTarget = findNearest(
 		world.objects,
 		projectile.body.getPosition(),
-		x => x.category === "hero" && x.id !== hit.id);
+		x => x.category === "hero" && x.id !== hitId);
 	if (!nextTarget) {
 		return;
 	}
