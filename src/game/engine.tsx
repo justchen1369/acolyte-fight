@@ -721,7 +721,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 			// Sometimes projectiles propel obstacles backwards on creation because they are created in front of the hero,
 			// but perhaps behind the projectile. Ensure the obstacles are always propelled forward.
 			const impulse = vector.multiply(projectile.body.getLinearVelocity(), projectile.body.getMass());
-			obstacle.body.applyLinearImpulse(impulse, obstacle.body.getWorldPoint(vector.zero()), true);
+			obstacle.body.applyForce(impulse, obstacle.body.getWorldPoint(vector.zero()), true);
 		}
 	}
 }
