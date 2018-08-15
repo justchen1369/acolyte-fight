@@ -186,7 +186,7 @@ export const fireball: Spell = {
         speed: 0.4,
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
-        damage: 5,
+        damage: 8,
         expireOn: Categories.All,
 
         render: "projectile",
