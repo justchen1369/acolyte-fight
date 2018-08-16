@@ -288,7 +288,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		expireTick: world.tick + projectileTemplate.maxTicks,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
-		expireOn: projectileTemplate.expireOn,
+		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
@@ -736,6 +736,9 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 
 	if (projectile.bounce) {
 		bounceToNext(projectile, shield.owner, world);
+	}
+	if (projectile.expireOn & shield.categories) {
+		destroyObject(world, projectile);
 	}
 }
 

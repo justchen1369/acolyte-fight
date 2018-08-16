@@ -187,7 +187,6 @@ export const fireball: Spell = {
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
         damage: 5,
-        expireOn: Categories.All,
 
         render: "projectile",
         trailTicks: 30,
@@ -214,7 +213,6 @@ export const flamestrike: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2 * TicksPerSecond,
         damage: 10,
-        expireOn: Categories.All,
 
         detonate: {
             radius: 0.025,
@@ -252,7 +250,6 @@ export const firespray: Spell = {
         maxSpeed: 1.0,
         maxTicks: 0.25 * TicksPerSecond,
         damage: 2.5,
-        expireOn: Categories.All,
 
         render: "ray",
         trailTicks: 30,
@@ -341,7 +338,6 @@ export const lightning: Spell = {
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         damage: 0,
-        expireOn: Categories.All,
 
         render: "ray",
         trailTicks: 30,
@@ -367,7 +363,6 @@ export const homing: Spell = {
         speed: 0.15,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
-        expireOn: Categories.All,
 
         homing: {
             revolutionsPerSecond: 1,
@@ -477,7 +472,7 @@ export const bouncer: Spell = {
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
-        expireOn: Categories.None,
+        expireOn: Categories.Massive,
         bounce: {
             damageFactor: 0.9,
         },
@@ -507,7 +502,6 @@ export const drain: Spell = {
         maxTicks: 2.0 * TicksPerSecond,
         damage: 5,
         lifeSteal: 1.0,
-        expireOn: Categories.All,
         homing: {
             revolutionsPerSecond: 0,
             redirect: true,

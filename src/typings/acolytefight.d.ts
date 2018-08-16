@@ -175,7 +175,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	maxTicks: number;
 	categories?: number; // Collision flags: What flags this object has
     collideWith?: number; // Collision flags: Which other objects to collide with
-	expireOn: number; // Collision flags: The projectile will expire if it hits any of these objects
+	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
     trailTicks: number; // How long is the trail? (Visual effect only)
