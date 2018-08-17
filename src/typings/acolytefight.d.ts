@@ -273,3 +273,63 @@ declare interface DamagePacket {
 	damage: number;
 	lifeSteal?: number;
 }
+
+declare interface Vec2 {
+	x: number;
+	y: number;
+}
+
+declare interface WorldContract {
+	tick: number;
+	started: boolean;
+	winner: string | null;
+
+	heroes: HeroContract[];
+	projectiles: ProjectileContract[];
+	obstacles: ObstacleContract[];
+
+	radius: number;
+
+	actions: Map<string, ActionContract>;
+}
+
+declare interface WorldObjectContract {
+	id: string;
+	pos: Vec2;
+	velocity: Vec2;
+}
+
+declare interface HeroContract extends WorldObjectContract {
+	health: number;
+	heading: Vec2;
+	casting?: CastingContract;
+}
+
+declare interface ProjectileContract extends WorldObjectContract {
+	ownerId: string;
+	spellId: string;
+
+	radius: number;
+
+	damage: number;
+	lifeSteal: number;
+}
+
+declare interface CastingContract {
+	spellId: string;
+	target: Vec2;
+}
+
+declare interface CooldownsContract {
+	[spellId: string]: number;
+}
+
+declare interface ObstacleContract extends WorldObjectContract {
+	extent: number;
+	numPoints: number;
+}
+
+declare interface ActionContract {
+	spellId: string;
+	target?: Vec2;
+}

@@ -3,6 +3,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as rooms from './rooms';
 import * as url from './url';
+import { AiPanel } from './aiPanel';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
@@ -58,6 +59,7 @@ export class Root extends React.Component<Props, State> {
                     {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
                     {this.renderNavBarItem("modding", "Modding")}
+                    {this.renderNavBarItem("ai", "AI")}
                     {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
@@ -66,6 +68,7 @@ export class Root extends React.Component<Props, State> {
                 {page === "replays" && this.renderReplays()}
                 {page === "share" && this.renderShare()}
                 {page === "modding" && this.renderModding()}
+                {page === "ai" && this.renderAi()}
                 {page === "about" && this.renderAbout()}
             </div>
         );
@@ -101,6 +104,14 @@ export class Root extends React.Component<Props, State> {
         return <div className="content-container">
             <div className="page">
                 <ModdingPanel current={this.props.current} />
+            </div>
+        </div>;
+    }
+
+    private renderAi() {
+        return <div className="content-container">
+            <div className="page">
+                <AiPanel current={this.props.current} />
             </div>
         </div>;
     }

@@ -1,5 +1,6 @@
 import * as m from '../game/messages.model';
 import * as url from './url';
+import { readFileAsync } from './fileUtils';
 
 export function createRoomFromFile(file: File, current: url.PathElements) {
     return readFileAsync(file)
@@ -26,17 +27,4 @@ export function createRoomFromMod(mod: Object, current: url.PathElements) {
         }));
         window.location.href = path;
     })
-}
-
-function readFileAsync(file: File): Promise<string> {
-    if (file) {
-        return new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (ev) => resolve(reader.result)
-            reader.onerror = (ev) => reject(reader.error)
-            reader.readAsText(file);
-        });
-    } else {
-        return Promise.resolve<string>(null);
-    }
 }
