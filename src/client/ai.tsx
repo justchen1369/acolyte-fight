@@ -139,7 +139,7 @@ function worldToState(world: w.World): WorldContract {
     });
     world.objects.forEach(shield => {
         if (shield.category === "shield") {
-            const hero = contract.heroes.get(shield.id);
+            const hero = contract.heroes.get(shield.owner);
             if (hero) {
                 hero.shieldTicksRemaining = Math.max(0, shield.expireTick - world.tick);
             }
