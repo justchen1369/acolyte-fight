@@ -192,7 +192,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 		body,
 		casting: null,
 		cooldowns: {},
-		shieldTicks: World.InitialShieldSeconds * TicksPerSecond,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),

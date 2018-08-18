@@ -1,4 +1,5 @@
 var settings = null;
+var center = { x: 0.5, y: 0.5 };
 
 onmessage = function (e) {
     var msg = e.data;
@@ -14,7 +15,7 @@ onmessage = function (e) {
 }
 
 function handleInput(gameId, heroId, state, cooldowns) {
-    var hero = findWorldObject(state.heroes, heroId);
+    var hero = state.heroes.get(heroId);
     var opponent = findOpponent(state.heroes, heroId);
     if (!opponent) {
         return;
@@ -24,6 +25,7 @@ function handleInput(gameId, heroId, state, cooldowns) {
     if (state.started) {
         action =
             recovery(state, hero, cooldowns)
+            || deflect(state, hero, cooldowns)
             || castSpell(state, hero, opponent, cooldowns)
             || move(state, opponent);
     } else {
@@ -45,16 +47,15 @@ function findWorldObject(objects, targetId) {
 }
 
 function findOpponent(heroes, myHeroId) {
-    for (var i = 0; i < heroes.length; ++i) {
-        if (heroes[i].id !== myHeroId) {
-            return heroes[i];
+    for (var hero of heroes.values()) {
+        if (hero.id !== myHeroId) {
+            return hero;
         }
     }
     return null;
 }
 
 function recovery(state, hero, cooldowns) {
-    var center = { x: 0.5, y: 0.5 };
     var offset = vectorDiff(hero.pos, center);
     var length = vectorLength(offset);
     if (length < state.radius || state.radius <= 0) {
@@ -74,7 +75,19 @@ function recovery(state, hero, cooldowns) {
     }
 }
 
+function deflect(state, hero, cooldowns) {
+    if (cooldowns["shield"] === 0) {
+        return { spellId: "shield", target: center };
+    } else {
+        return null;
+    }
+}
+
 function castSpell(state, hero, opponent, cooldowns) {
+    if (opponent.shieldTicksRemaining) {
+        return null;
+    }
+
     for (var spellId in cooldowns) {
         var readyToCast = !cooldowns[spellId];
         var spell = settings.Spells[spellId];
@@ -92,7 +105,6 @@ function castSpell(state, hero, opponent, cooldowns) {
 
 function move(state, opponent) {
     // Move to the opposite side of the arena
-    var center = { x: 0.5, y: 0.5 };
     var offset = vectorDiff(opponent.pos, center);
     var target = { x: center.x - offset.x, y: center.y - offset.y };
 

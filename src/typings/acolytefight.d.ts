@@ -284,9 +284,9 @@ declare interface WorldContract {
 	started: boolean;
 	winner: string | null;
 
-	heroes: HeroContract[];
-	projectiles: ProjectileContract[];
-	obstacles: ObstacleContract[];
+	heroes: Map<string, HeroContract>;
+	projectiles: Map<string, ProjectileContract>;
+	obstacles: Map<string, ObstacleContract>;
 
 	radius: number;
 
@@ -303,6 +303,7 @@ declare interface HeroContract extends WorldObjectContract {
 	health: number;
 	heading: Vec2;
 	casting?: CastingContract;
+	shieldTicksRemaining: number;
 }
 
 declare interface ProjectileContract extends WorldObjectContract {

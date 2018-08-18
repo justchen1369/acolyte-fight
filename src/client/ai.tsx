@@ -100,23 +100,24 @@ function worldToState(world: w.World): WorldContract {
         tick: world.tick,
         started: world.tick >= world.startTick,
         winner: world.winner,
-        heroes: [],
-        projectiles: [],
-        obstacles: [],
+        heroes: new Map<string, HeroContract>(),
+        projectiles: new Map<string, ProjectileContract>(),
+        obstacles: new Map<string, ObstacleContract>(),
         radius: world.radius,
         actions: new Map<string, ActionContract>(),
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
-            contract.heroes.push({
+            contract.heroes.set(obj.id, {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
                 health: obj.health,
+                shieldTicksRemaining: 0,
             });
         } else if (obj.category === "projectile") {
-            contract.projectiles.push({
+            contract.projectiles.set(obj.id, {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
@@ -127,13 +128,21 @@ function worldToState(world: w.World): WorldContract {
                 lifeSteal: obj.lifeSteal
             });
         } else if (obj.category === "obstacle") {
-            contract.obstacles.push({
+            contract.obstacles.set(obj.id, {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 extent: obj.extent,
                 numPoints: obj.points.length,
             });
+        }
+    });
+    world.objects.forEach(shield => {
+        if (shield.category === "shield") {
+            const hero = contract.heroes.get(shield.id);
+            if (hero) {
+                hero.shieldTicksRemaining = Math.max(0, shield.expireTick - world.tick);
+            }
         }
     });
     world.actions.forEach((action: w.Action, heroId: string) => {
