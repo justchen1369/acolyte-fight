@@ -88,8 +88,6 @@ declare module "planck-js" {
         interface Vec2 {
             x: number;
             y: number;
-
-            add(vec: Vec2): void;
         }
 
         interface Contact {

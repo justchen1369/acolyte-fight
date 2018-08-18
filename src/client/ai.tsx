@@ -1,9 +1,8 @@
-import * as a from './ai.model';
 import * as w from '../game/world.model';
 import * as facade from './facade';
 import * as vector from '../game/vector';
 import { TicksPerSecond, TicksPerTurn } from '../game/constants';
-import { ActionType } from '../game/messages.model';
+import { Settings } from '../game/settings';
 
 let handler: AiHandler = null;
 
@@ -38,7 +37,10 @@ class AiHandler {
         worker.onmessage = this.onWorkerMessage;
         this.worker = worker;
 
-        this.intervalHandle = setInterval(() => this.onInterval(), TicksPerSecond * TicksPerTurn);
+        this.intervalHandle = setInterval(() => this.onInterval(), (1000 / TicksPerSecond) * TicksPerTurn);
+
+        const initMsg: InitMsgContract = { type: "init", settings: Settings };
+        worker.postMessage(initMsg);
     }
 
     getCode() {
@@ -61,25 +63,33 @@ class AiHandler {
             return;
         }
 
-        const message: a.WorldMessage = {
-            type: "world",
+        let cooldowns: CooldownsRemainingContract = {};
+        hero.keysToSpells.forEach(spellId => {
+            const next = hero.cooldowns[spellId] || 0;
+            cooldowns[spellId] = Math.max(0, next - world.tick);
+        });
+        const stateMsg: StateMsgContract = {
+            type: "state",
             gameId: world.ui.myGameId,
             heroId: world.ui.myHeroId,
             state: worldToState(world),
-            cooldowns: hero.cooldowns,
+            cooldowns,
         };
-        this.worker.postMessage(message);
+        this.worker.postMessage(stateMsg);
     }
 
     private onWorkerMessage(ev: MessageEvent) {
-        const message: a.Message = ev.data;
+        const message: MsgContract = ev.data;
         if (message.type === "action") {
             const world = facade.getCurrentWorld();
             if (world.ui.myGameId === message.gameId
                 && world.ui.myHeroId === message.heroId
-                && (world.tick >= world.startTick || message.action.type === "move")) {
+                && (world.tick >= world.startTick || message.action.spellId === "move")) {
 
-                facade.sendAction(message.gameId, message.heroId, message.action);
+                facade.sendAction(message.gameId, message.heroId, {
+                    type: message.action.spellId,
+                    target: message.action.target,
+                });
             }
         }
     }

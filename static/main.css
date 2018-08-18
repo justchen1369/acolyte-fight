@@ -473,6 +473,12 @@ textarea.mod-json {
     font-family: monospace;
 }
 
+textarea.ai-js {
+    width: 100%;
+    height: 20em;
+    font-family: monospace;
+}
+
 .share a {
     display: flex;
     align-items: center;

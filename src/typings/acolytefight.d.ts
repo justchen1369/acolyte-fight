@@ -320,7 +320,7 @@ declare interface CastingContract {
 	target: Vec2;
 }
 
-declare interface CooldownsContract {
+declare interface CooldownsRemainingContract {
 	[spellId: string]: number;
 }
 
@@ -331,5 +331,30 @@ declare interface ObstacleContract extends WorldObjectContract {
 
 declare interface ActionContract {
 	spellId: string;
-	target?: Vec2;
+	target: Vec2;
+}
+
+declare type MsgContract =
+	InitMsgContract
+    | StateMsgContract
+	| ActionMsgContract
+
+declare interface InitMsgContract {
+	type: "init";
+	settings: AcolyteFightSettings;
+}
+
+declare interface StateMsgContract {
+    type: "state";
+    gameId: string;
+	heroId: string;
+    state: WorldContract;
+    cooldowns: CooldownsRemainingContract;
+}
+
+declare interface ActionMsgContract {
+    type: "action";
+    gameId: string;
+    heroId: string;
+    action: ActionContract;
 }
