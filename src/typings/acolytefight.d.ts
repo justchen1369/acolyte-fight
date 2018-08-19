@@ -17,6 +17,7 @@ Collision category flags (categories, expireOn and collideWith):
 * Massive = 0x4
 * Obstacle = 0x8
 * Shield = 0x10
+* Solid = 0x20 // all projectiles except Fireball are solid
 * None = 0
 
 */
