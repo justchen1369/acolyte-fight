@@ -366,7 +366,7 @@ export const homing: Spell = {
         speed: 0.15,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
-        expireOn: Categories.Hero | Categories.Massive,
+        expireOn: Categories.All ^ Categories.Projectile,
 
         homing: {
             revolutionsPerSecond: 1,
@@ -434,7 +434,7 @@ export const link: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
-        expireOn: Categories.Hero,
+        expireOn: Categories.Hero | Categories.Massive,
         shieldTakesOwnership: false,
 
         link: {
