@@ -366,7 +366,7 @@ export const homing: Spell = {
         speed: 0.15,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
-        expireOn: Categories.All ^ Categories.Projectile,
+        expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         homing: {
             revolutionsPerSecond: 1,
@@ -537,7 +537,6 @@ export const gravity: Spell = {
         maxTicks: 8.0 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Massive,
-        expireOn: Categories.All,
 
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
