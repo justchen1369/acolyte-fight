@@ -337,6 +337,7 @@ export const lightning: Spell = {
         radius: 0.0025,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
+        collideWith: Categories.All ^ Categories.Projectile,
         damage: 0,
 
         render: "ray",
@@ -363,6 +364,7 @@ export const homing: Spell = {
         speed: 0.15,
         maxTicks: 6.0 * TicksPerSecond,
         damage: 10,
+        expireOn: Categories.Hero | Categories.Massive,
 
         homing: {
             revolutionsPerSecond: 1,
