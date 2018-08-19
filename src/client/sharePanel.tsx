@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ai from './ai';
 import * as rooms from './rooms';
 import * as url from './url';
 import { Mod } from '../game/settings';
@@ -45,6 +46,10 @@ export class SharePanel extends React.Component<Props, State> {
                     <textarea className="mod-json">{JSON.stringify(Mod, null, 2)}</textarea>
                 </p>
                 : <p>No modifications are in effect in this room.</p>}
+            <h2>Room bots</h2>
+            {ai.getBotsEnabled()
+                ? <p>Bots are allowed in this room.</p>
+                : <p>Bots are not allowed in this room.</p>}
         </div>
     }
 

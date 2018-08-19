@@ -62,7 +62,7 @@ export class AiPanel extends React.Component<Props, State> {
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings and contracts (see MsgContract).</li>
                 </ul>
             </p>
-            {ai.getAutopilotEnabled() ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
+            {ai.getBotsEnabled() ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
         </div>;
     }
     

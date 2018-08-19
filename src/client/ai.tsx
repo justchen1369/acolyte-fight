@@ -12,7 +12,7 @@ const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
-let autopilotEnabled = false;
+let botsEnabled = false;
 let code: string = null;
 let sendAction: SendActionFunc = () => {};
 
@@ -20,12 +20,12 @@ export function attach(sendActionFunc: SendActionFunc) {
     sendAction = sendActionFunc;
 }
 
-export function getAutopilotEnabled() {
-    return autopilotEnabled;
+export function getBotsEnabled() {
+    return botsEnabled;
 }
 
-export function setAutopilotEnabled(enabled: boolean) {
-    autopilotEnabled = enabled;
+export function setBotsEnabled(enabled: boolean) {
+    botsEnabled = enabled;
 }
 
 export function getCode() {
@@ -33,7 +33,7 @@ export function getCode() {
 }
 
 export function playingAsAI() {
-    return autopilotEnabled && !!code;
+    return botsEnabled && !!code;
 }
 
 export function overwriteAI(_code: string) {

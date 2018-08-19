@@ -87,7 +87,7 @@ export function joinRoom(roomId: string): Promise<void> {
 						applyMod(mod);
 					}
 					if (response.allowBots) {
-						ai.setAutopilotEnabled(true);
+						ai.setBotsEnabled(true);
 					}
 					resolve();
 				}
