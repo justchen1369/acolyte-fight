@@ -3,6 +3,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as rooms from './rooms';
 import * as url from './url';
+import { isMobile } from './userAgent';
 import { AiPanel } from './aiPanel';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
@@ -60,8 +61,8 @@ export class Root extends React.Component<Props, State> {
                 <div className="navbar">
                     {this.renderNavBarItem("", "Home")}
                     {this.renderNavBarItem("replays", "Replays")}
-                    {this.renderNavBarItem("modding", "Modding")}
-                    {this.renderNavBarItem("ai", "AI")}
+                    {this.renderNavBarItem("modding", "Modding", true)}
+                    {this.renderNavBarItem("ai", "AI", true)}
                     {this.renderNavBarItem("share", "Share")}
                     {this.renderNavBarItem("about", "About")}
                     <div className="spacer" />
@@ -76,10 +77,17 @@ export class Root extends React.Component<Props, State> {
         );
     }
 
-    private renderNavBarItem(page: string, label: string) {
-        const className = this.props.current.page === page ? "nav-item nav-item-selected" : "nav-item";
+    private renderNavBarItem(page: string, label: string, hideOnMobile: boolean = false) {
+        const classNames = ["nav-item"];
+        if (this.props.current.page === page) {
+            classNames.push("nav-item-selected");
+        }
+        if (hideOnMobile) {
+            classNames.push("nav-optional");
+        }
+
         const newPath = url.getPath(Object.assign({}, this.props.current, { page }));
-        return <a className={className} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>{label}</a>
+        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>{label}</a>
     }
 
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
