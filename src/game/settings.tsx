@@ -434,6 +434,7 @@ export const link: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
+        collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Massive,
         shieldTakesOwnership: false,
 
