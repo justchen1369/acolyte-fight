@@ -17,7 +17,8 @@ onmessage = function (e) {
 function handleInput(gameId, heroId, state, cooldowns) {
     var hero = state.heroes[heroId];
     var opponent = findOpponent(state.heroes, heroId);
-    if (!opponent) {
+    if (!hero || !opponent) {
+        // Either we're dead, or everyone else is, nothing to do
         return;
     }
     
@@ -100,6 +101,11 @@ function castSpell(state, hero, opponent, cooldowns) {
         return null;
     }
 
+    if (alreadyHasProjectile(state.projectiles, hero.id)) {
+        // Only shoot one thing at a time
+        return null;
+    }
+
     for (var spellId in cooldowns) {
         var readyToCast = !cooldowns[spellId];
         var spell = settings.Spells[spellId];
@@ -113,6 +119,15 @@ function castSpell(state, hero, opponent, cooldowns) {
         }
     }
     return null;
+}
+
+function alreadyHasProjectile(projectiles, heroId) {
+    for (var projectileId in projectiles) {
+        if (projectiles[projectileId].ownerId === heroId) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function move(state, opponent) {
