@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as React from 'react';
-import { HeroColors } from '../game/constants';
+import { HeroColors, Matchmaking } from '../game/constants';
 import * as w from '../game/world.model';
 
 interface Props {
@@ -97,7 +97,7 @@ export class InfoPanel extends React.Component<Props, State> {
         world.bots.forEach(heroId => {
             items.push({
                 heroId,
-                name: "Bot",
+                name: Matchmaking.BotName,
                 color: HeroColors.BotColor,
                 isBot: true,
             });

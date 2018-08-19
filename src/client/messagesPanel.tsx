@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
-import { HeroColors } from '../game/constants';
+import { HeroColors, Matchmaking } from '../game/constants';
 import { isMobile } from './userAgent';
 
 interface Props {
@@ -198,7 +198,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             }
             return <span className="player-name" style={{ color }}>{player.name}</span>;
         } else {
-            return <span className="player-name" style={{ color: HeroColors.BotColor }}>Bot<i className="fas fa-microchip bot" /></span>;
+            return <span className="player-name" style={{ color: HeroColors.BotColor }}>{Matchmaking.BotName}<i className="fas fa-microchip bot" /></span>;
         }
     }
 }
