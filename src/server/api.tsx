@@ -48,7 +48,7 @@ export function onCreateRoom(req: express.Request, res: express.Response) {
 
     const input = req.body as m.CreateRoomRequest;
     if (input && input.mod && typeof input.mod === "object") {
-        const room = games.initRoom(input.mod);
+        const room = games.initRoom(input.mod, !!input.allowBots);
         const result: m.CreateRoomResponse = {
             roomId: room.id,
             server: getLocation().server,

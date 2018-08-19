@@ -91,7 +91,7 @@ export class InfoPanel extends React.Component<Props, State> {
                 heroId: player.heroId,
                 name: player.name,
                 color,
-                isBot: false,
+                isBot: player.isBot,
             });
         });
         world.bots.forEach(heroId => {

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ai from './ai';
+import * as rooms from './rooms';
 import * as url from './url';
 import { readFileAsync } from './fileUtils';
 
@@ -33,11 +34,11 @@ export class AiPanel extends React.Component<Props, State> {
 
     private renderAttached() {
         return <div>
-            <p>Currently, bots will be controlled by the AI code below:</p>
-            <textarea className="ai-js" onChange={ev => this.setState({ code: ev.target.value })}>
+            <p>Currently, your Acolyte will be controlled by the AI code below:</p>
+            <textarea className="ai-js" readOnly>
                 {this.state.code}
             </textarea>
-            <p><div className="btn" onClick={() => this.onDetach()}>Reset to Default AI</div></p>
+            <p><div className="btn" onClick={() => this.onDetach()}>Deactivate Autopilot</div></p>
         </div>;
     }
 
@@ -49,13 +50,7 @@ export class AiPanel extends React.Component<Props, State> {
             </p>
             <p>
                 The AI runs in a Web Worker in your browser. It receives the world state through messages, and then it must post messages back to perform actions.
-                You can override the default AI with your own AI with the form at the bottom of this page.
-                This override will only last until you close this browser tab.
-            </p>
-            <p>
-                Current limitations:
-                <li>You can only play against your AI locally. An AI league is on the list for future development.</li>
-                <li>Your AI cannot choose any spells - it just gets the default set. This is also on the list for future development.</li>
+                The code of your AI is never sent to the server, and is never sent to or run on anyone else's machine except yours.
             </p>
             <h2>Reference files</h2>
             <p>
@@ -67,11 +62,30 @@ export class AiPanel extends React.Component<Props, State> {
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings and contracts (see MsgContract).</li>
                 </ul>
             </p>
-            <h2>Use your AI</h2>
-            <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
-            <p><div className={(this.state.loading || !this.state.selectedFile) ? "btn btn-disabled" : "btn"} onClick={() => this.onAttach()}>Override AI</div></p>
+            {ai.getAutopilotEnabled() ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
+        </div>;
+    }
+    
+    private renderCreateRoom() {
+        return <div>
+            <h2>Create AI room</h2>
+            <p>
+                AI programming is only allowed within certain private rooms.
+                Click the button below to create a room that allows bots.
+                You can join the room from another browser tab to play against your AI.</p>
+            <p><div className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => this.onCreateAIRoom()}>Create AI room</div></p>
             {this.state.error && <p className="error">{this.state.error}</p>}
         </div>;
+    }
+
+    private renderStartAutopilotForm() {
+        return <div>
+            <h2>Use your AI</h2>
+            <p>Autopilot your Acolyte with an AI. This override will only last until you close this browser tab.</p>
+            <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
+            <p><div className={(this.state.loading || !this.state.selectedFile) ? "btn btn-disabled" : "btn"} onClick={() => this.onAttach()}>Activate Autopilot</div></p>
+            {this.state.error && <p className="error">{this.state.error}</p>}
+        </div>
     }
 
     private onAttach() {
@@ -87,5 +101,10 @@ export class AiPanel extends React.Component<Props, State> {
     private onDetach() {
         ai.resetAI();
         this.setState({ loading: false, code: null });
+    }
+
+    private onCreateAIRoom() {
+        this.setState({ loading: true });
+        rooms.createRoom({}, true, this.props.current, this.props.current.page); // Return to this page
     }
 }

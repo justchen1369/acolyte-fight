@@ -9,19 +9,23 @@ export function createRoomFromFile(file: File, current: url.PathElements) {
 }
 
 export function createRoomFromMod(mod: Object, current: url.PathElements) {
-    console.log("Creating room with mod", mod);
+    return createRoom(mod, false, current);
+}
+
+export function createRoom(mod: Object, allowBots: boolean, current: url.PathElements, nextPage: string = "share") {
+    console.log("Creating room", mod, allowBots);
     return fetch('api/room', {
         credentials: "same-origin",
         headers: {
             'Content-Type': 'application/json',
         },
         method: 'POST',
-        body: JSON.stringify({ mod } as m.CreateRoomRequest),
+        body: JSON.stringify({ mod, allowBots } as m.CreateRoomRequest),
     }).then(res => res.json()).then((msg: m.CreateRoomResponse) => msg)
     .then(msg => {
         const path = url.getPath(Object.assign({}, current, {
             gameId: null,
-            page: "share",
+            page: nextPage,
             room: msg.roomId,
             server: msg.server,
         }));

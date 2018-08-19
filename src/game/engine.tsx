@@ -444,6 +444,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		heroId: hero.id,
 		name: ev.playerName,
 		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
+		isBot: ev.isBot,
 	} as w.Player;
 	world.players.set(hero.id, player);
 	world.activePlayers.add(hero.id);

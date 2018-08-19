@@ -118,7 +118,7 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 	const store = getStore();
 	const room = store.rooms.get(data.roomId);
 	if (room) {
-		callback({ success: true, roomId: room.id, mod: room.mod });
+		callback({ success: true, roomId: room.id, mod: room.mod, allowBots: room.allowBots });
 	} else {
 		callback({ success: false, error: `Unable to find room ${data.roomId}` });
 	}
@@ -129,20 +129,20 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const playerName = PlayerName.sanitizeName(data.name);
 
 	const roomId = data.room ? PlayerName.sanitizeName(data.room) : null;
+	const room = roomId ? store.rooms.get(roomId) : null;
 
 	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		const room = store.rooms.get(roomId);
 		game = games.findNewGame(room);
 	}
 
 	if (game) {
 		let heroId = null;
 		if (!data.observe) {
-			heroId = games.joinGame(game, playerName, data.keyBindings, authToken, socket.id);
+			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, authToken, socket.id);
 		}
 
 		const roomStats = calculateRoomStats(roomId);
@@ -169,7 +169,10 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 
 		if (!data.observe && game.active.size === 1 && game.bots.size === 0) {
 			// Always start all games with a bot
-			games.addBot(game, {});
+			if (!(room && room.allowBots)) {
+				// ...unless it is a botting room, then assume the bots will join themselves
+				games.addBot(game, {});
+			}
 		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);

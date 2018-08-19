@@ -109,12 +109,13 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	}
 }
 
-export function initRoom(mod: Object = {}): g.Room {
+export function initRoom(mod: Object, allowBots: boolean): g.Room {
 	const roomIndex = getStore().nextRoomId++;
 	const room: g.Room = {
 		id: "r" + roomIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		created: moment(),
 		mod,
+		allowBots,
 		numGamesCumulative: 0,
 	};
 	getStore().rooms.set(room.id, room);
@@ -280,7 +281,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, authToken: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, authToken: string, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -314,7 +315,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		game.accessTokens.add(authToken);
 	}
 
-	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings });
+	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings, isBot });
 
 	return heroId;
 }

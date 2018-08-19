@@ -86,6 +86,9 @@ export function joinRoom(roomId: string): Promise<void> {
 						console.log("Mod", mod);
 						applyMod(mod);
 					}
+					if (response.allowBots) {
+						ai.setAutopilotEnabled(true);
+					}
 					resolve();
 				}
 			});
@@ -103,6 +106,7 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: 
 		name: playerName,
 		keyBindings,
 		room,
+		isBot: ai.playingAsAI() && !observeGameId,
 		observe: !!observeGameId,
 	};
 	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
@@ -244,6 +248,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
 				preferredColor: preferredColors.get(actionData.playerName) || null,
+				isBot: actionData.isBot,
 			});
 		} else if (actionData.actionType === m.ActionType.Bot) {
 			world.occurrences.push({

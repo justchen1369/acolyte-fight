@@ -98,6 +98,7 @@ export interface Player {
 	heroId: string;
 	name: string;
 	uiColor: string; // Not synced across clients
+	isBot: boolean;
 }
 
 export interface ButtonRenderState {
@@ -200,6 +201,7 @@ export interface Joining {
 	playerName: string;
 	keyBindings: KeyBindings;
 	preferredColor: string | null;
+	isBot: boolean;
 }
 
 export interface Botting {

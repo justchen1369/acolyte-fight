@@ -34,6 +34,7 @@ export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
     playerName: string;
     keyBindings: KeyBindings;
+    isBot: boolean;
 }
 
 export interface BotActionMsg extends ActionMsgBase {
@@ -68,6 +69,7 @@ export interface JoinMsg {
     room: string | null;
     name: string;
     keyBindings: KeyBindings;
+    isBot: boolean;
     observe: boolean;
 }
 
@@ -98,6 +100,7 @@ export interface JoinRoomResponse {
     success: true;
     roomId: string;
     mod: Object;
+    allowBots: boolean;
 }
 
 export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
@@ -139,6 +142,7 @@ export interface LocationMsg {
 
 export interface CreateRoomRequest {
     mod: Object;
+    allowBots: boolean;
 }
 
 export interface CreateRoomResponse {

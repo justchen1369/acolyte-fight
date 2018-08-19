@@ -44,4 +44,5 @@ export interface Room {
     created: moment.Moment;
     numGamesCumulative: number;
     mod: Object;
+    allowBots: boolean;
 }

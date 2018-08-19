@@ -1,5 +1,6 @@
 import * as w from '../game/world.model';
 import * as vector from '../game/vector';
+import * as StoreProvider from './storeProvider';
 import { TicksPerSecond, TicksPerTurn } from '../game/constants';
 import { Settings } from '../game/settings';
 
@@ -11,6 +12,7 @@ const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
+let autopilotEnabled = false;
 let code: string = null;
 let sendAction: SendActionFunc = () => {};
 
@@ -18,8 +20,20 @@ export function attach(sendActionFunc: SendActionFunc) {
     sendAction = sendActionFunc;
 }
 
+export function getAutopilotEnabled() {
+    return autopilotEnabled;
+}
+
+export function setAutopilotEnabled(enabled: boolean) {
+    autopilotEnabled = enabled;
+}
+
 export function getCode() {
     return code;
+}
+
+export function playingAsAI() {
+    return autopilotEnabled && !!code;
 }
 
 export function overwriteAI(_code: string) {
@@ -37,12 +51,8 @@ export function onTick(world: w.World) {
 
     // Start any new bots
     if (world.ui.myHeroId) { // If not a replay
-        world.bots.forEach(heroId => {
-            const key = workerKey(world.ui.myGameId, heroId);
-            if (!workers.has(key)) {
-                workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl()));
-            }
-        });
+        startBotIfNecessary(world, world.ui.myHeroId);
+        world.bots.forEach(heroId => startBotIfNecessary(world, heroId));
     }
 
     // Process all bots
@@ -60,6 +70,15 @@ export function onTick(world: w.World) {
     });
 }
 
+function startBotIfNecessary(world: w.World, heroId: string) {
+    if (isMyBot(world, heroId)) {
+        const key = workerKey(world.ui.myGameId, heroId);
+        if (!workers.has(key)) {
+            workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl()));
+        }
+    }
+}
+
 function createCodeUrl() {
     if (code) {
         return `data:text/javascript;base64,${btoa(code)}`;
@@ -70,6 +89,19 @@ function createCodeUrl() {
 
 function workerKey(gameId: string, heroId: string) {
     return `${gameId}/${heroId}`;
+}
+
+function isMyBot(world: w.World, heroId: string) {
+    if (!world.ui.myGameId) {
+        return false;
+    }
+
+    const player = world.players.get(heroId);
+    if (player) {
+        return heroId === world.ui.myHeroId && player.isBot;
+    } else {
+        return world.bots.has(heroId);
+    }
 }
 
 class AiWorker {
@@ -98,7 +130,7 @@ class AiWorker {
             return false;
         }
 
-        if (!world.ui.myGameId || !world.bots.has(this.heroId)) {
+        if (!isMyBot(world, this.heroId)) {
             this.terminate();
             return false;
         }

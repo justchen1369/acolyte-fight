@@ -191,14 +191,18 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderPlayer(player: w.Player) {
+        let name = Matchmaking.BotName;
+        let color = HeroColors.BotColor;
+        let isBot = true;
         if (player) {
-            let color = player.uiColor;
             if (player.heroId === this.props.world.ui.myHeroId) {
                 color = HeroColors.MyHeroColor;
+            } else {
+                color = player.uiColor;
             }
-            return <span className="player-name" style={{ color }}>{player.name}</span>;
-        } else {
-            return <span className="player-name" style={{ color: HeroColors.BotColor }}>{Matchmaking.BotName}<i className="fas fa-microchip bot" /></span>;
+            name = player.name;
+            isBot = player.isBot;
         }
+        return <span className="player-name" style={{ color }}>{player.name}{isBot && <i className="fas fa-microchip bot" />}</span>;
     }
 }

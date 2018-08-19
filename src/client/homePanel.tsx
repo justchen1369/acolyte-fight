@@ -1,4 +1,5 @@
 import * as React from 'react';
+import * as ai from './ai';
 import * as url from './url';
 import * as screenLifecycle from './screenLifecycle';
 import { NameConfig } from '../client/nameConfig';
@@ -12,6 +13,7 @@ interface Props {
     newGameCallback: () => void;
 }
 interface State {
+    playingAsAI: boolean;
     joining: boolean;
 }
 
@@ -21,6 +23,7 @@ export class HomePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            playingAsAI: ai.playingAsAI(),
             joining: false,
         };
     }
@@ -38,7 +41,7 @@ export class HomePanel extends React.Component<Props, State> {
                 </div>
                 <div className="spacer" />
                 <div className="button-row">
-                    <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>Play</span>
+                    <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{this.state.playingAsAI ? "Play as AI" : "Play"}</span>
                 </div>
                 {this.props.current.room && <div className="private-room-indicator">
                     In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>details</a>)
