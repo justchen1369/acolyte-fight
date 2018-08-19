@@ -70,6 +70,7 @@ export class MessagesPanel extends React.Component<Props, State> {
             case "new": return this.renderNewGameNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
+            case "bot": return this.renderBotNotification(key, notification);
             case "leave": return this.renderLeaveNotification(key, notification);
             case "kill": return this.renderKillNotification(key, notification);
             case "win": return this.renderWinNotification(key, notification);
@@ -142,6 +143,11 @@ export class MessagesPanel extends React.Component<Props, State> {
 
     private renderJoinNotification(key: string, notification: w.JoinNotification) {
         return <div key={key} className="row">{this.renderPlayer(notification.player)} joined</div>
+    }
+
+    private renderBotNotification(key: string, notification: w.BotNotification) {
+        const botPlayer: w.Player = null; // the bot player is represented by null
+        return <div key={key} className="row">{this.renderPlayer(botPlayer)} joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
