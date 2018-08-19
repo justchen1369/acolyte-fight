@@ -284,13 +284,13 @@ declare interface WorldContract {
 	started: boolean;
 	winner: string | null;
 
-	heroes: Map<string, HeroContract>;
-	projectiles: Map<string, ProjectileContract>;
-	obstacles: Map<string, ObstacleContract>;
+	heroes: { [id: string]: HeroContract };
+	projectiles: { [id: string]: ProjectileContract };
+	obstacles: { [id: string]: ObstacleContract };
 
 	radius: number;
 
-	actions: Map<string, ActionContract>;
+	actions: { [id: string]: ActionContract };
 }
 
 declare interface WorldObjectContract {

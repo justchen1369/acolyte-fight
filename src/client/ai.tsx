@@ -37,10 +37,10 @@ class AiHandler {
         worker.onmessage = this.onWorkerMessage;
         this.worker = worker;
 
-        this.intervalHandle = setInterval(() => this.onInterval(), (1000 / TicksPerSecond) * TicksPerTurn);
+        this.intervalHandle = setInterval(() => this.onInterval(), 200);
 
         const initMsg: InitMsgContract = { type: "init", settings: Settings };
-        worker.postMessage(initMsg);
+        worker.postMessage(JSON.stringify(initMsg));
     }
 
     getCode() {
@@ -75,11 +75,11 @@ class AiHandler {
             state: worldToState(world),
             cooldowns,
         };
-        this.worker.postMessage(stateMsg);
+        this.worker.postMessage(JSON.stringify(stateMsg));
     }
 
     private onWorkerMessage(ev: MessageEvent) {
-        const message: MsgContract = ev.data;
+        const message: MsgContract = JSON.parse(ev.data);
         if (message.type === "action") {
             const world = facade.getCurrentWorld();
             if (world.ui.myGameId === message.gameId
@@ -100,24 +100,24 @@ function worldToState(world: w.World): WorldContract {
         tick: world.tick,
         started: world.tick >= world.startTick,
         winner: world.winner,
-        heroes: new Map<string, HeroContract>(),
-        projectiles: new Map<string, ProjectileContract>(),
-        obstacles: new Map<string, ObstacleContract>(),
+        heroes: {},
+        projectiles: {},
+        obstacles: {},
         radius: world.radius,
-        actions: new Map<string, ActionContract>(),
+        actions: {},
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
-            contract.heroes.set(obj.id, {
+            contract.heroes[obj.id] = {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
                 health: obj.health,
                 shieldTicksRemaining: 0,
-            });
+            };
         } else if (obj.category === "projectile") {
-            contract.projectiles.set(obj.id, {
+            contract.projectiles[obj.id] = {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
@@ -126,30 +126,30 @@ function worldToState(world: w.World): WorldContract {
                 radius: obj.radius,
                 damage: obj.damage,
                 lifeSteal: obj.lifeSteal
-            });
+            };
         } else if (obj.category === "obstacle") {
-            contract.obstacles.set(obj.id, {
+            contract.obstacles[obj.id] = {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 extent: obj.extent,
                 numPoints: obj.points.length,
-            });
+            };
         }
     });
     world.objects.forEach(shield => {
         if (shield.category === "shield") {
-            const hero = contract.heroes.get(shield.owner);
+            const hero = contract.heroes[shield.owner];
             if (hero) {
                 hero.shieldTicksRemaining = Math.max(0, shield.expireTick - world.tick);
             }
         }
     });
     world.actions.forEach((action: w.Action, heroId: string) => {
-        contract.actions.set(heroId, {
+        contract.actions[heroId] = {
             spellId: action.type,
             target: action.target,
-        });
+        };
     });
     return contract;
 }

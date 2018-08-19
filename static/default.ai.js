@@ -2,7 +2,7 @@ var settings = null;
 var center = { x: 0.5, y: 0.5 };
 
 onmessage = function (e) {
-    var msg = e.data;
+    var msg = JSON.parse(e.data);
     if (msg.type === "init") {
         settings = msg.settings;
     } else if (msg.type === "state") {
@@ -15,7 +15,7 @@ onmessage = function (e) {
 }
 
 function handleInput(gameId, heroId, state, cooldowns) {
-    var hero = state.heroes.get(heroId);
+    var hero = state.heroes[heroId];
     var opponent = findOpponent(state.heroes, heroId);
     if (!opponent) {
         return;
@@ -33,7 +33,7 @@ function handleInput(gameId, heroId, state, cooldowns) {
     }
 
     if (action) {
-        postMessage({ type: "action", gameId, heroId, action });
+        postMessage(JSON.stringify({ type: "action", gameId, heroId, action }));
     }
 }
 
@@ -47,12 +47,24 @@ function findWorldObject(objects, targetId) {
 }
 
 function findOpponent(heroes, myHeroId) {
-    for (var hero of heroes.values()) {
+    var myHero = heroes[myHeroId];
+    if (!myHero) {
+        return null;
+    }
+
+    var closest = null;
+    var closestDistance = Infinity;
+    for (var heroId in heroes) {
+        var hero = heroes[heroId];
         if (hero.id !== myHeroId) {
-            return hero;
+            var distance = vectorLength(vectorDiff(hero.pos, myHero.pos));
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closest = hero;
+            }
         }
     }
-    return null;
+    return closest;
 }
 
 function recovery(state, hero, cooldowns) {
