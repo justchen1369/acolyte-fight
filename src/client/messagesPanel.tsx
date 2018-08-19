@@ -203,6 +203,6 @@ export class MessagesPanel extends React.Component<Props, State> {
             name = player.name;
             isBot = player.isBot;
         }
-        return <span className="player-name" style={{ color }}>{player.name}{isBot && <i className="fas fa-microchip bot" />}</span>;
+        return <span className="player-name" style={{ color }}>{name}{isBot && <i className="fas fa-microchip bot" />}</span>;
     }
 }
