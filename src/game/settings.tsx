@@ -653,7 +653,10 @@ export const teleport: Spell = {
     description: "Teleport to a nearby location. Get close, or get away.",
 
     maxRange: 0.4,
+    maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
+    chargeTicks: 6,
+    interruptible: false,
 
     icon: "teleport",
 
