@@ -74,13 +74,14 @@ function startBotIfNecessary(world: w.World, heroId: string) {
     if (isMyBot(world, heroId)) {
         const key = workerKey(world.ui.myGameId, heroId);
         if (!workers.has(key)) {
-            workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl()));
+            const allowCustomCode = heroId === world.ui.myHeroId;
+            workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl(allowCustomCode)));
         }
     }
 }
 
-function createCodeUrl() {
-    if (code) {
+function createCodeUrl(allowCustomCode: boolean) {
+    if (code && allowCustomCode) {
         return `data:text/javascript;base64,${btoa(code)}`;
     } else {
         return DefaultCodeUrl;
