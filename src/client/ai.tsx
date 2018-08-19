@@ -7,15 +7,27 @@ interface SendActionFunc {
     (gameId: string, heroId: string, action: w.Action): void;
 }
 
-const DefaultCodeUrl = "static/acolytefight.ai.js";
+const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
-let codeUrl = DefaultCodeUrl;
+let code: string = null;
 let sendAction: SendActionFunc = () => {};
 
 export function attach(sendActionFunc: SendActionFunc) {
     sendAction = sendActionFunc;
+}
+
+export function getCode() {
+    return code;
+}
+
+export function overwriteAI(_code: string) {
+    code = _code;
+}
+
+export function resetAI() {
+    code = null;
 }
 
 export function onTick(world: w.World) {
@@ -28,7 +40,7 @@ export function onTick(world: w.World) {
         world.bots.forEach(heroId => {
             const key = workerKey(world.ui.myGameId, heroId);
             if (!workers.has(key)) {
-                workers.set(key, new AiWorker(world.ui.myGameId, heroId, codeUrl));
+                workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl()));
             }
         });
     }
@@ -46,6 +58,14 @@ export function onTick(world: w.World) {
     keysToDelete.forEach(key => {
         workers.delete(key);
     });
+}
+
+function createCodeUrl() {
+    if (code) {
+        return `data:text/javascript;base64,${btoa(code)}`;
+    } else {
+        return DefaultCodeUrl;
+    }
 }
 
 function workerKey(gameId: string, heroId: string) {

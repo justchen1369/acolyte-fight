@@ -307,6 +307,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		heroId,
 		name: playerName,
 	});
+	game.bots.delete(heroId);
 	game.playerNames.push(playerName);
 
 	if (authToken) {
