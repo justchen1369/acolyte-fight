@@ -187,6 +187,7 @@ export const fireball: Spell = {
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
         damage: 10,
+        categories: Categories.Projectile,
 
         render: "projectile",
         trailTicks: 30,
@@ -213,6 +214,7 @@ export const flamestrike: Spell = {
         maxSpeed: 1.0,
         maxTicks: 2 * TicksPerSecond,
         damage: 15,
+        categories: Categories.Projectile,
 
         detonate: {
             radius: 0.025,

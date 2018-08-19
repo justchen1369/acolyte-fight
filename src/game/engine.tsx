@@ -226,7 +226,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
-	const categories = projectileTemplate.categories === undefined ? Categories.Projectile : projectileTemplate.categories;
+	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Solid) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
 	let body = world.physics.createBody({
