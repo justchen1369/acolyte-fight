@@ -118,6 +118,13 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: 
 	});
 }
 
+export function addBotToCurrentGame() {
+	if (world.ui.myGameId && world.ui.myHeroId) {
+		const botMsg: m.BotMsg = { gameId: world.ui.myGameId };
+		socket.emit('bot', botMsg);
+	}
+}
+
 export function leaveCurrentGame() {
 	world.players.forEach(player => {
 		preferredColors.set(player.name, player.uiColor);

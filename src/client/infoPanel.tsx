@@ -4,6 +4,7 @@ import { HeroColors, Matchmaking } from '../game/constants';
 import * as w from '../game/world.model';
 
 interface Props {
+    playVsAiCallback: () => void;
     playerName: string;
     world: w.World;
 }
@@ -42,12 +43,21 @@ export class InfoPanel extends React.Component<Props, State> {
                     )}
                     {this.renderPlayerList(world)}
                 </div>}
+                {(world.ui.myHeroId && world.players.size === 1 && world.bots.size === 0) && this.renderPlayVsAiBtn()}
             </div>
         );
     }
 
     onNotification(notifications: w.Notification[]) {
         this.forceUpdate();
+    }
+
+    private renderPlayVsAiBtn() {
+        return <div className="btn play-vs-ai-btn" onClick={() => this.onPlayVsAiClick()}>Play vs AI</div>;
+    }
+
+    private onPlayVsAiClick() {
+        this.props.playVsAiCallback();
     }
 
     private renderPlayerList(world: w.World) {

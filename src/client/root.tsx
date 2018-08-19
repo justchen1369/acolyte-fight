@@ -19,6 +19,7 @@ interface Props {
     world: w.World;
     items: s.NotificationItem[];
     changePage: (newPage: string) => void;
+    playVsAiCallback: () => void;
     newGameCallback: () => void;
     exitGameCallback: () => void;
 }
@@ -47,6 +48,7 @@ export class Root extends React.Component<Props, State> {
             items={this.props.items} 
             connected={this.props.connected}
             playerName={this.props.playerName}
+            playVsAiCallback={this.props.playVsAiCallback}
             newGameCallback={this.props.newGameCallback}
             exitGameCallback={this.props.exitGameCallback} />;
     }

@@ -62,6 +62,7 @@ function onConnection(socket: SocketIO.Socket) {
 
 	socket.on('room', (data, callback) => onRoomMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
+	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 }
@@ -166,17 +167,16 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		} else {
 			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 		}
-
-		if (!data.observe && game.active.size === 1 && game.bots.size === 0) {
-			// Always start all games with a bot
-			if (!(room && room.allowBots)) {
-				// ...unless it is a botting room, then assume the bots will join themselves
-				games.addBot(game, {});
-			}
-		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
 		callback(null);
+	}
+}
+
+function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
+	const game = getStore().activeGames.get(data.gameId);
+	if (game && game.active.has(socket.id) && game.active.size <= 1 && game.bots.size === 0) { // Only allow adding one bot
+		games.addBot(game, {});
 	}
 }
 

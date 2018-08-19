@@ -7,7 +7,7 @@ import queryString from 'query-string';
 
 import * as url from './url';
 
-import { connectToServer, joinRoom, joinNewGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { connectToServer, joinRoom, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
 import { Choices } from '../game/settings';
@@ -119,6 +119,7 @@ function rerender() {
             world={store.world}
             items={store.items}
             changePage={newPage => changePage(newPage)}
+            playVsAiCallback={() => addBotToCurrentGame()}
             newGameCallback={() => onNewGameClicked()}
             exitGameCallback={() => onExitGameClicked()}
         />,

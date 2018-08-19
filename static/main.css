@@ -262,6 +262,10 @@ a:hover, a:active {
     margin-right: 4px;
 }
 
+#info-panel .play-vs-ai-btn {
+    margin-top: 10px;
+}
+
 #messages-panel {
     position: absolute;
     bottom: 8;

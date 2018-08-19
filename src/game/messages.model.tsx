@@ -73,6 +73,10 @@ export interface JoinMsg {
     observe: boolean;
 }
 
+export interface BotMsg {
+    gameId: string;
+}
+
 export interface LeaveMsg {
     gameId: string;
 }
