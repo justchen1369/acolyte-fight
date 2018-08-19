@@ -5,6 +5,7 @@ export const AuthCookieName = "enigma-auth";
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";
+    export const Bot = "bot";
 	export const Leave = "leave";
 	export const GameAction = "game";
 	export const CloseGame = "close";
@@ -13,6 +14,7 @@ export namespace ActionType {
 export type ActionMsg =
     EnvironmentMsg
     | JoinActionMsg
+    | BotActionMsg
     | LeaveActionMsg
     | CloseGameMsg
     | GameActionMsg;
@@ -31,6 +33,11 @@ export interface EnvironmentMsg extends ActionMsgBase {
 export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
     playerName: string;
+    keyBindings: KeyBindings;
+}
+
+export interface BotActionMsg extends ActionMsgBase {
+    actionType: "bot";
     keyBindings: KeyBindings;
 }
 

@@ -6,15 +6,14 @@ onmessage = function (e) {
     if (msg.type === "init") {
         settings = msg.settings;
     } else if (msg.type === "state") {
-        var gameId = msg.gameId;
-        var heroId = msg.heroId;
         var state = msg.state;
+        var heroId = msg.heroId;
         var cooldowns = msg.cooldowns;
-        handleInput(gameId, heroId, state, cooldowns);
+        handleInput(state, heroId, cooldowns);
     }
 }
 
-function handleInput(gameId, heroId, state, cooldowns) {
+function handleInput(state, heroId, cooldowns) {
     var hero = state.heroes[heroId];
     var opponent = findOpponent(state.heroes, heroId);
     if (!hero || !opponent) {
@@ -28,13 +27,13 @@ function handleInput(gameId, heroId, state, cooldowns) {
             recovery(state, hero, cooldowns)
             || deflect(state, hero, cooldowns)
             || castSpell(state, hero, opponent, cooldowns)
-            || move(state, opponent);
+            || move(state, hero, opponent);
     } else {
-        action = move(state, opponent);
+        action = move(state, hero, opponent);
     }
 
     if (action) {
-        postMessage(JSON.stringify({ type: "action", gameId, heroId, action }));
+        postMessage(JSON.stringify({ type: "action", action }));
     }
 }
 
@@ -58,7 +57,7 @@ function findOpponent(heroes, myHeroId) {
     for (var heroId in heroes) {
         var hero = heroes[heroId];
         if (hero.id !== myHeroId) {
-            var distance = vectorLength(vectorDiff(hero.pos, myHero.pos));
+            var distance = vectorDistance(hero.pos, myHero.pos);
             if (distance < closestDistance) {
                 closestDistance = distance;
                 closest = hero;
@@ -101,7 +100,7 @@ function castSpell(state, hero, opponent, cooldowns) {
         return null;
     }
 
-    if (alreadyHasProjectile(state.projectiles, hero.id)) {
+    if (alreadyHasProjectile(state, hero.id)) {
         // Only shoot one thing at a time
         return null;
     }
@@ -121,19 +120,27 @@ function castSpell(state, hero, opponent, cooldowns) {
     return null;
 }
 
-function alreadyHasProjectile(projectiles, heroId) {
-    for (var projectileId in projectiles) {
-        if (projectiles[projectileId].ownerId === heroId) {
+function alreadyHasProjectile(state, heroId) {
+    for (var projectileId in state.projectiles) {
+        var projectile = state.projectiles[projectileId];
+        if (projectile.ownerId === heroId && vectorDistance(projectile.pos, center) <= state.radius) {
+            // Projectiles stay alive a long time off the screen, so don't get blocked by those
             return true;
         }
     }
     return false;
 }
 
-function move(state, opponent) {
+function move(state, hero, opponent) {
     // Move to the opposite side of the arena
     var offset = vectorDiff(opponent.pos, center);
     var target = { x: center.x - offset.x, y: center.y - offset.y };
+
+    var distanceToTarget = vectorDistance(hero.pos, target);
+    if (distanceToTarget <= 0.001) {
+        // Close enough - don't send any action so the game can sleep while waiting for players
+        return null;
+    }
 
     return { spellId: "move", target };
 }
@@ -144,4 +151,8 @@ function vectorDiff(to, from) {
 
 function vectorLength(vector) {
     return Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+}
+
+function vectorDistance(from, to) {
+    return vectorLength(vectorDiff(from, to));
 }

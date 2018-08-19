@@ -346,8 +346,7 @@ declare interface InitMsgContract {
 }
 
 declare interface StateMsgContract {
-    type: "state";
-    gameId: string;
+	type: "state";
 	heroId: string;
     state: WorldContract;
     cooldowns: CooldownsRemainingContract;
@@ -355,7 +354,5 @@ declare interface StateMsgContract {
 
 declare interface ActionMsgContract {
     type: "action";
-    gameId: string;
-    heroId: string;
     action: ActionContract;
 }

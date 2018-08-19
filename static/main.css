@@ -340,6 +340,10 @@ a:hover, a:active {
     font-weight: bold;
 }
 
+i.bot {
+    margin-left: 5px;
+}
+
 .room-name {
     font-weight: bold;
 }

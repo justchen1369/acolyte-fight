@@ -13,9 +13,10 @@ export interface World {
 	tick: number;
 	startTick: number;
 
-	activePlayers: Set<string>;
-	players: Map<string, Player>;
-	scores: Map<string, HeroScore>;
+	activePlayers: Set<string>; // Set<heroId: string>
+	bots: Set<string>; // Set<heroId: string>
+	players: Map<string, Player>; // heroId -> Player
+	scores: Map<string, HeroScore>; // heroId -> HeroScore
 	winner: string | null;
 
 	objects: Map<string, WorldObject>,
@@ -109,6 +110,7 @@ export interface ButtonRenderState {
 export type Notification =
 	HelpNotification 
 	| JoinNotification 
+	| BotNotification 
 	| LeaveNotification 
 	| QuitNotification
 	| KillNotification 
@@ -125,6 +127,10 @@ export interface HelpNotification {
 export interface JoinNotification {
 	type: "join";
 	player: Player;
+}
+
+export interface BotNotification {
+	type: "bot";
 }
 
 export interface LeaveNotification {
@@ -176,7 +182,7 @@ export interface ReplayNotFoundNotification {
 	type: "replayNotFound";
 }
 
-export type Occurrence = Closing | Joining | Leaving | EnvironmentSeed;
+export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed;
 
 export interface EnvironmentSeed {
 	type: "environment";
@@ -194,6 +200,12 @@ export interface Joining {
 	playerName: string;
 	keyBindings: KeyBindings;
 	preferredColor: string | null;
+}
+
+export interface Botting {
+	type: "botting";
+	heroId: string;
+	keyBindings: KeyBindings;
 }
 
 export interface Leaving {

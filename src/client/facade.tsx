@@ -2,6 +2,7 @@ import pl from 'planck-js';
 import { TicksPerTurn, TicksPerSecond } from '../game/constants';
 import { render, CanvasStack } from './render';
 import { applyMod } from '../game/settings';
+import * as ai from './ai';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
@@ -22,8 +23,11 @@ let incomingQueue = new Array<m.TickMsg>();
 let notificationListeners = new Array<NotificationListener>();
 
 let preferredColors = new Map<string, string>(); // player name -> color
+
+ai.attach(sendAction);
         
 setInterval(incomingLoop, Math.floor(1000 / TicksPerSecond));
+setInterval(() => ai.onTick(world), 200);
 
 export function getCurrentWorld(): w.World {
 	return world;
@@ -237,9 +241,15 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 			world.occurrences.push({
 				type: "join",
 				heroId: actionData.heroId,
-				playerName: actionData.playerName || "Enigma",
+				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
 				preferredColor: preferredColors.get(actionData.playerName) || null,
+			});
+		} else if (actionData.actionType === m.ActionType.Bot) {
+			world.occurrences.push({
+				type: "botting",
+				heroId: actionData.heroId,
+				keyBindings: actionData.keyBindings,
 			});
 		} else if (actionData.actionType === m.ActionType.Leave) {
 			world.occurrences.push({

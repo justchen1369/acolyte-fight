@@ -166,6 +166,11 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		} else {
 			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 		}
+
+		if (!data.observe && game.active.size === 1 && game.bots.size === 0) {
+			// Always start all games with a bot
+			games.addBot(game, {});
+		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
 		callback(null);

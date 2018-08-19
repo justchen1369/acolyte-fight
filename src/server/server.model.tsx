@@ -21,6 +21,7 @@ export interface Game {
     room: string | null;
     created: moment.Moment;
     active: Map<string, Player>; // socketId -> Player
+    bots: Map<string, string>; // heroId -> socketId
     playerNames: string[];
     accessTokens: Set<string>;
     numPlayers: number;

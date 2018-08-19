@@ -29,6 +29,7 @@ export function initialWorld(): w.World {
 
 		occurrences: new Array<w.Occurrence>(),
 		activePlayers: new Set<string>(), // hero IDs
+		bots: new Set<string>(),
 		players: new Map<string, w.Player>(), // hero ID -> player
 		scores: new Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
@@ -147,7 +148,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 	return shield;
 }
 
-function addHero(world: w.World, heroId: string, playerName: string) {
+function addHero(world: w.World, heroId: string) {
 	const heroIndex = world.nextPositionId++;
 	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
 
@@ -182,7 +183,6 @@ function addHero(world: w.World, heroId: string, playerName: string) {
 
 	let hero = {
 		id: heroId,
-		name: playerName,
 		category: "hero",
 		type: "hero",
 		filterGroupIndex,
@@ -360,6 +360,8 @@ function handleOccurences(world: w.World) {
 	world.occurrences.forEach(ev => {
 		if (ev.type === "closing") {
 			handleClosing(ev, world);
+		} else if (ev.type === "botting") {
+			handleBotting(ev, world);
 		} else if (ev.type === "join") {
 			handleJoining(ev, world);
 		} else if (ev.type === "leave") {
@@ -411,11 +413,27 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	});
 }
 
+function handleBotting(ev: w.Botting, world: w.World) {
+	console.log("Bot joined:", ev.heroId);
+	let hero = world.objects.get(ev.heroId);
+	if (!hero) {
+		hero = addHero(world, ev.heroId);
+	} else if (hero.category !== "hero") {
+		throw "Player tried to join as non-hero: " + ev.heroId;
+	}
+
+	assignKeyBindingsToHero(hero, ev.keyBindings);
+
+	world.bots.add(hero.id);
+
+	world.ui.notifications.push({ type: "bot" });
+}
+
 function handleJoining(ev: w.Joining, world: w.World) {
 	console.log("Player joined:", ev.heroId);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
-		hero = addHero(world, ev.heroId, ev.playerName);
+		hero = addHero(world, ev.heroId);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
@@ -429,9 +447,9 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	} as w.Player;
 	world.players.set(hero.id, player);
 	world.activePlayers.add(hero.id);
+	world.bots.delete(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
-
 }
 
 function chooseNewPlayerColor(preferredColor: string, world: w.World) {

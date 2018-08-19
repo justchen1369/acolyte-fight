@@ -1,66 +1,93 @@
 import * as w from '../game/world.model';
-import * as facade from './facade';
 import * as vector from '../game/vector';
 import { TicksPerSecond, TicksPerTurn } from '../game/constants';
 import { Settings } from '../game/settings';
 
-let handler: AiHandler = null;
+interface SendActionFunc {
+    (gameId: string, heroId: string, action: w.Action): void;
+}
 
-export function getCode(): string | null {
-    if (handler) {
-        return handler.getCode();
-    } else {
-        return null;
+const DefaultCodeUrl = "static/acolytefight.ai.js";
+
+const workers = new Map<string, AiWorker>();
+
+let codeUrl = DefaultCodeUrl;
+let sendAction: SendActionFunc = () => {};
+
+export function attach(sendActionFunc: SendActionFunc) {
+    sendAction = sendActionFunc;
+}
+
+export function onTick(world: w.World) {
+    if (!world.ui.myGameId) {
+        return;
     }
+
+    // Start any new bots
+    if (world.ui.myHeroId) { // If not a replay
+        world.bots.forEach(heroId => {
+            const key = workerKey(world.ui.myGameId, heroId);
+            if (!workers.has(key)) {
+                workers.set(key, new AiWorker(world.ui.myGameId, heroId, codeUrl));
+            }
+        });
+    }
+
+    // Process all bots
+    const keysToDelete = new Array<string>();
+    workers.forEach((worker, key) => {
+        const keep = worker.tick(world);
+        if (!keep) {
+            keysToDelete.push(key);
+        }
+    });
+
+    // Delete any finished bots
+    keysToDelete.forEach(key => {
+        workers.delete(key);
+    });
 }
 
-export function attach(code: string) {
-    detach();
-    handler = new AiHandler(code);
+function workerKey(gameId: string, heroId: string) {
+    return `${gameId}/${heroId}`;
 }
 
-export function detach() {
-    if (!handler) { return; }
-    handler.terminate();
-    handler = null;
-}
-
-class AiHandler {
+class AiWorker {
+    private gameId: string;
+    private heroId: string;
     private worker: Worker;
-    private intervalHandle: NodeJS.Timer;
-    private code: string;
+    private isTerminated = false;
 
-    constructor(code: string) {
-        this.code = code;
+    constructor(gameId: string, heroId: string, codeUrl: string) {
+        this.gameId = gameId;
+        this.heroId = heroId;
 
-        const worker = new Worker(`data:text/javascript;base64,${btoa(code)}`);
-        worker.onmessage = this.onWorkerMessage;
+        const worker = new Worker(codeUrl);
+        worker.onmessage = (ev) => this.onWorkerMessage(ev);
         this.worker = worker;
-
-        this.intervalHandle = setInterval(() => this.onInterval(), 200);
 
         const initMsg: InitMsgContract = { type: "init", settings: Settings };
         worker.postMessage(JSON.stringify(initMsg));
     }
 
-    getCode() {
-        return this.code;
-    }
-
-    terminate() {
-        this.worker.terminate();
-        clearInterval(this.intervalHandle);
-    }
-
-    private onInterval() {
-        const world = facade.getCurrentWorld();
-        if (!(world.ui.myGameId && world.ui.myHeroId)) {
-            return;
+    /**
+     * @returns whether to keep this worker or delete it
+     */
+    tick(world: w.World): boolean {
+        if (this.isTerminated) {
+            return false;
         }
 
-        const hero = world.objects.get(world.ui.myHeroId);
+        if (!world.ui.myGameId || !world.bots.has(this.heroId)) {
+            this.terminate();
+            return false;
+        }
+
+        const hero = world.objects.get(this.heroId);
         if (!(hero && hero.category === "hero")) {
-            return;
+            // Hero is dead
+            this.terminate();
+            return false;
         }
 
         let cooldowns: CooldownsRemainingContract = {};
@@ -70,27 +97,27 @@ class AiHandler {
         });
         const stateMsg: StateMsgContract = {
             type: "state",
-            gameId: world.ui.myGameId,
-            heroId: world.ui.myHeroId,
+            heroId: this.heroId,
             state: worldToState(world),
             cooldowns,
         };
         this.worker.postMessage(JSON.stringify(stateMsg));
+
+        return true;
+    }
+
+    terminate() {
+        this.isTerminated = true;
+        this.worker.terminate();
     }
 
     private onWorkerMessage(ev: MessageEvent) {
         const message: MsgContract = JSON.parse(ev.data);
         if (message.type === "action") {
-            const world = facade.getCurrentWorld();
-            if (world.ui.myGameId === message.gameId
-                && world.ui.myHeroId === message.heroId
-                && (world.tick >= world.startTick || message.action.spellId === "move")) {
-
-                facade.sendAction(message.gameId, message.heroId, {
-                    type: message.action.spellId,
-                    target: message.action.target,
-                });
-            }
+            sendAction(this.gameId, this.heroId, {
+                type: message.action.spellId,
+                target: message.action.target,
+            });
         }
     }
 }

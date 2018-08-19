@@ -191,10 +191,14 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderPlayer(player: w.Player) {
-        let color = player.uiColor;
-        if (player.heroId === this.props.world.ui.myHeroId) {
-            color = HeroColors.MyHeroColor;
+        if (player) {
+            let color = player.uiColor;
+            if (player.heroId === this.props.world.ui.myHeroId) {
+                color = HeroColors.MyHeroColor;
+            }
+            return <span className="player-name" style={{ color }}>{player.name}</span>;
+        } else {
+            return <span className="player-name" style={{ color: HeroColors.BotColor }}>Bot<i className="fas fa-microchip bot" /></span>;
         }
-        return <span className="player-name" style={{ color }}>{player.name}</span>;
     }
 }

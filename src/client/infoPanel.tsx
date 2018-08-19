@@ -10,6 +10,13 @@ interface Props {
 interface State {
 }
 
+interface PlayerListItem {
+    heroId: string;
+    name: string;
+    isBot: boolean;
+    color: string;
+}
+
 export class InfoPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -46,15 +53,31 @@ export class InfoPanel extends React.Component<Props, State> {
     private renderPlayerList(world: w.World) {
         let result = new Array<JSX.Element>();
 
-        const aliveHeroIds = new Set<string>();
-        world.objects.forEach(obj => {
-            if (obj.category === "hero") {
-                aliveHeroIds.add(obj.id);
+        this.playerListItems(world).forEach(item => {
+            let numKills = 0;
+            {
+                let scores = world.scores.get(item.heroId);
+                if (scores) {
+                    numKills = scores.kills;
+                }
             }
+
+            const isAlive = world.objects.has(item.heroId);
+
+            result.push(<div key={item.heroId} className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
+                <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
+                <span style={{ color: item.color }} className="player-name">{item.name}{item.isBot && <i className="fas fa-microchip bot" />}</span>
+            </div>);
         });
 
+        return result;
+    }
+
+    private playerListItems(world: w.World): PlayerListItem[] {
+        const items = new Array<PlayerListItem>();
+
         world.players.forEach(player => {
-            const isAlive = aliveHeroIds.has(player.heroId);
+            const isAlive = world.objects.has(player.heroId);
             const isActive = world.activePlayers.has(player.heroId);
 
             let color = player.uiColor;
@@ -63,20 +86,22 @@ export class InfoPanel extends React.Component<Props, State> {
             } else if (player.heroId === world.ui.myHeroId) {
                 color = HeroColors.MyHeroColor;
             }
-            
-            let numKills = 0;
-            {
-                let scores = world.scores.get(player.heroId);
-                if (scores) {
-                    numKills = scores.kills;
-                }
-            }
 
-            result.push(<div key={player.heroId} className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
-                <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
-                <span style={{color}} className="player-name">{player.name}</span>
-            </div>);
+            items.push({
+                heroId: player.heroId,
+                name: player.name,
+                color,
+                isBot: false,
+            });
         });
-        return result;
+        world.bots.forEach(heroId => {
+            items.push({
+                heroId,
+                name: "Bot",
+                color: HeroColors.BotColor,
+                isBot: true,
+            });
+        });
+        return items;
     }
 }

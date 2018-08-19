@@ -104,12 +104,9 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		return;
 	}
 
-	if (data.heroId !== player.heroId) {
-		logger.info("Game [" + game.id + "]: incorrect hero id from socket " + socketId + " - received " + data.heroId + " should be " + player.heroId);
-		return;
+	if (data.heroId === player.heroId || game.bots.get(data.heroId) === socketId) {
+		queueAction(game, data);
 	}
-
-	queueAction(game, data);
 }
 
 export function initRoom(mod: Object = {}): g.Room {
@@ -131,6 +128,7 @@ export function initGame(room: g.Room = null) {
 		room: room ? room.id : null,
 		created: moment(),
 		active: new Map<string, g.Player>(),
+		bots: new Map<string, string>(),
 		playerNames: new Array<string>(),
 		accessTokens: new Set<string>(),
 		numPlayers: 0,
@@ -201,10 +199,37 @@ export function leaveGame(game: g.Game, socketId: string) {
 	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
 	game.active.delete(socketId);
+	reassignBots(game, socketId);
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
 
+function reassignBots(game: g.Game, leftSocketId: string) {
+	if (game.active.size === 0) {
+		// No one to simulate the bots
+		game.bots.clear();
+		return;
+	}
+
+	const botsToReassign = new Array<string>();
+	game.bots.forEach((socketId, heroId) => {
+		if (socketId === leftSocketId) {
+			botsToReassign.push(heroId);
+		}
+	});
+	if (botsToReassign.length === 0) {
+		// Nothing to do
+		return;
+	}
+
+	// Assign to first active player
+	const newPlayer = [...game.active.values()][0];
+	botsToReassign.forEach(heroId => {
+		game.bots.set(heroId, newPlayer.socketId);
+	});
+}
+
 function finishGame(game: g.Game) {
+	game.bots.clear();
 	getStore().activeGames.delete(game.id);
 	getStore().inactiveGames.set(game.id, game);
 
@@ -293,6 +318,21 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	return heroId;
 }
 
+export function addBot(game: g.Game, keyBindings: KeyBindings) {
+	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers) {
+		return null;
+	}
+
+	const heroId = formatHeroId(game.numPlayers);
+	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
+
+	// Nominate first player as simulator
+	const player = [...game.active.values()][0];
+	game.bots.set(heroId, player.socketId);
+
+	return heroId;
+}
+
 function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (!game.joinable) {
 		return;
@@ -300,8 +340,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 
 	let statusChanged = false;
 
-	if (game.active.size > 1 && _.some(data.actions, action => isSpell(action))) {
-
+	if ((game.active.size + game.bots.size) > 1 && _.some(data.actions, action => isSpell(action))) {
 		// Casting any spell closes the game
 		const newCloseTick = game.tick + Matchmaking.JoinPeriod;
 		if (newCloseTick < game.closeTick) {

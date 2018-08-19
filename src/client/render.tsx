@@ -399,10 +399,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	let color = HeroColors.InactiveColor;
-	if (world.activePlayers.has(hero.id)) {
-		color = heroColor(hero.id, world);
-	}
+	let color = heroColor(hero.id, world);
 
 	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
@@ -545,6 +542,8 @@ function heroColor(heroId: string, world: w.World) {
 		return HeroColors.MyHeroColor;
 	} else if (player) {
 		return player.uiColor;
+	} else if (world.bots.has(heroId)) {
+		return HeroColors.BotColor;
 	} else {
 		return HeroColors.InactiveColor;
 	}

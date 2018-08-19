@@ -13,12 +13,14 @@ interface State {
     selectedFile: File;
 }
 
+// TODO: codeUrl = `data:text/javascript;base64,${btoa(code)}`
+
 export class AiPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
             loading: false,
-            code: ai.getCode(),
+            code: null, // TODO
             error: null,
             selectedFile: null,
         };
@@ -46,7 +48,7 @@ export class AiPanel extends React.Component<Props, State> {
             <p>
                 Program a bot for this game!
                 <ul>
-                    <li><a href="static/default.ai.js" target="_blank">default.ai.js</a></li>
+                    <li><a href="static/acolytefight.ai.js" target="_blank">acolytefight.ai.js</a></li>
                 </ul>
             </p>
             <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
@@ -59,14 +61,14 @@ export class AiPanel extends React.Component<Props, State> {
         this.setState({ loading: true });
         readFileAsync(this.state.selectedFile)
             .then(code => {
-                ai.attach(code)
+                // ai.attach(code) // TODO
                 this.setState({ code, loading: false });
             });
         ;
     }
 
     private onDetach() {
-        ai.detach();
+        // ai.detach(); // TODO
         this.setState({ loading: false, code: null });
     }
 }

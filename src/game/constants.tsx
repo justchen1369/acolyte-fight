@@ -21,6 +21,7 @@ export namespace Matchmaking {
 
 export namespace HeroColors {
 	export const MyHeroColor = '#00ccff';
+	export const BotColor = '#cccccc';
 	export const InactiveColor = '#666666';
 	export const Colors = [
 		"#6d89cc",
