@@ -37,15 +37,6 @@ function handleInput(state, heroId, cooldowns) {
     }
 }
 
-function findWorldObject(objects, targetId) {
-    for (var i = 0; i < objects.length; ++i) {
-        if (objects[i].id === targetId) {
-            return objects[i];
-        }
-    }
-    return null;
-}
-
 function findOpponent(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
