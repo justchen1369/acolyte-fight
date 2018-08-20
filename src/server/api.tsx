@@ -47,13 +47,13 @@ export function onCreateRoom(req: express.Request, res: express.Response) {
     const authToken = getAuthToken(req);
 
     const input = req.body as m.CreateRoomRequest;
-    if (input && input.mod && typeof input.mod === "object") {
-        const room = games.initRoom(input.mod, !!input.allowBots);
+    if (input && input.mod && typeof input.mod === "object" && typeof input.allowBots === "boolean") {
+        const room = games.initRoom(input.mod, input.allowBots);
         const result: m.CreateRoomResponse = {
             roomId: room.id,
             server: getLocation().server,
         };
-        logger.info(`Room ${room.id} created by user ${authToken} with mod ${JSON.stringify(input.mod).substr(0, 1000)}`);
+        logger.info(`Room ${room.id} created by user ${authToken} with bots=${input.allowBots} and mod ${JSON.stringify(input.mod).substr(0, 1000)}`);
         res.send(result);
     } else {
         res.sendStatus(400).send("Bad request");
