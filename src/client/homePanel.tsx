@@ -44,7 +44,7 @@ export class HomePanel extends React.Component<Props, State> {
                     <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{this.state.playingAsAI ? "Play as AI" : "Play"}</span>
                 </div>
                 {this.props.current.room && <div className="private-room-indicator">
-                    In private room: <b><a href={this.getCurrentRoomUrl()}>{this.props.current.room}</a></b> (<a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>details</a>)
+                    In private room: <b><a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>{this.props.current.room}</a></b>
                 </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}><i className="fa fa-chevron-down" /></div>
@@ -69,10 +69,6 @@ export class HomePanel extends React.Component<Props, State> {
         this.setState({ joining: true });
         screenLifecycle.enterGame();
         this.props.newGameCallback();
-    }
-
-    private getCurrentRoomUrl() {
-        return url.getPath(Object.assign({}, this.props.current, { page: null, gameId: null }));
     }
 
     private getRoomDetailsUrl() {

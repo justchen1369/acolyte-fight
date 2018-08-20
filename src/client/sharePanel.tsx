@@ -6,6 +6,7 @@ import { Mod } from '../game/settings';
 
 interface Props {
     current: url.PathElements;
+    changePage: (newPage: string) => void;
 }
 interface State {
     error: string;
@@ -45,11 +46,9 @@ export class SharePanel extends React.Component<Props, State> {
                     The following modifications are active in this room:
                     <textarea className="mod-json">{JSON.stringify(Mod, null, 2)}</textarea>
                 </p>
-                : <p>No modifications are in effect in this room.</p>}
+                : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this room.</p>}
             <h2>Room bots</h2>
-            {ai.getBotsEnabled()
-                ? <p>Bots are allowed in this room.</p>
-                : <p>Bots are not allowed in this room.</p>}
+            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {ai.getBotsEnabled() ? "allowed" : "not allowed"} in this room.</p>
         </div>
     }
 
@@ -60,6 +59,11 @@ export class SharePanel extends React.Component<Props, State> {
             <p><div className="btn" onClick={() => this.onSubmit()}>Create Room</div></p>
             {this.state.error && <p className="error">{this.state.error}</p>}
         </div>;
+    }
+
+    private anchorClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
+        ev.preventDefault();
+        this.props.changePage(newPage);
     }
 
     private exitRoom() {

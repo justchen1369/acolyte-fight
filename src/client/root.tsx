@@ -105,7 +105,7 @@ export class Root extends React.Component<Props, State> {
     private renderShare() {
         return <div className="content-container">
             <div className="page">
-                <SharePanel current={this.props.current} />
+                <SharePanel current={this.props.current} changePage={this.props.changePage} />
             </div>
         </div>;
     }
