@@ -542,8 +542,6 @@ function heroColor(heroId: string, world: w.World) {
 		return HeroColors.MyHeroColor;
 	} else if (player) {
 		return player.uiColor;
-	} else if (world.bots.has(heroId)) {
-		return HeroColors.BotColor;
 	} else {
 		return HeroColors.InactiveColor;
 	}

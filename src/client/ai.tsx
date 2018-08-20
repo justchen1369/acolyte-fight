@@ -51,8 +51,7 @@ export function onTick(world: w.World) {
 
     // Start any new bots
     if (world.ui.myHeroId) { // If not a replay
-        startBotIfNecessary(world, world.ui.myHeroId);
-        world.bots.forEach(heroId => startBotIfNecessary(world, heroId));
+        world.players.forEach(player => startBotIfNecessary(world, player.heroId));
     }
 
     // Process all bots
@@ -98,10 +97,10 @@ function isMyBot(world: w.World, heroId: string) {
     }
 
     const player = world.players.get(heroId);
-    if (player) {
-        return heroId === world.ui.myHeroId && player.isBot;
+    if (player && player.isBot) {
+        return player.heroId === world.ui.myHeroId || player.isSharedBot;
     } else {
-        return world.bots.has(heroId);
+        return false;
     }
 }
 

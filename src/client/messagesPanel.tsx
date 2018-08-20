@@ -146,8 +146,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification) {
-        const botPlayer: w.Player = null; // the bot player is represented by null
-        return <div key={key} className="row">{this.renderPlayer(botPlayer)} joined</div>
+        return <div key={key} className="row">{this.renderPlayer(notification.player)} joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
@@ -197,18 +196,12 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderPlayer(player: w.Player) {
-        let name = Matchmaking.BotName;
-        let color = HeroColors.BotColor;
-        let isBot = true;
-        if (player) {
-            if (player.heroId === this.props.world.ui.myHeroId) {
-                color = HeroColors.MyHeroColor;
-            } else {
-                color = player.uiColor;
-            }
-            name = player.name;
-            isBot = player.isBot;
+        let color;
+        if (player.heroId === this.props.world.ui.myHeroId) {
+            color = HeroColors.MyHeroColor;
+        } else {
+            color = player.uiColor;
         }
-        return <span className="player-name" style={{ color }}>{name}{isBot && <i className="fas fa-microchip bot" />}</span>;
+        return <span className="player-name" style={{ color }}>{player.name}{player.isBot && <i className="fas fa-microchip bot" />}</span>;
     }
 }

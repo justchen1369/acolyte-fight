@@ -424,9 +424,16 @@ function handleBotting(ev: w.Botting, world: w.World) {
 
 	assignKeyBindingsToHero(hero, ev.keyBindings);
 
-	world.bots.add(hero.id);
+	const player = {
+		heroId: hero.id,
+		name: Matchmaking.BotName,
+		uiColor: HeroColors.BotColor,
+		isBot: true,
+		isSharedBot: true,
+	} as w.Player;
+	world.players.set(hero.id, player);
 
-	world.ui.notifications.push({ type: "bot" });
+	world.ui.notifications.push({ type: "bot", player });
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {
@@ -445,10 +452,10 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		name: ev.playerName,
 		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
 		isBot: ev.isBot,
+		isSharedBot: false,
 	} as w.Player;
 	world.players.set(hero.id, player);
 	world.activePlayers.add(hero.id);
-	world.bots.delete(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
 }

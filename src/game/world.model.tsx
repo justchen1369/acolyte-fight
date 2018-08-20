@@ -14,7 +14,6 @@ export interface World {
 	startTick: number;
 
 	activePlayers: Set<string>; // Set<heroId: string>
-	bots: Set<string>; // Set<heroId: string>
 	players: Map<string, Player>; // heroId -> Player
 	scores: Map<string, HeroScore>; // heroId -> HeroScore
 	winner: string | null;
@@ -98,6 +97,7 @@ export interface Player {
 	heroId: string;
 	name: string;
 	uiColor: string; // Not synced across clients
+	isSharedBot: boolean; // Not synced across clients
 	isBot: boolean;
 }
 
@@ -132,6 +132,7 @@ export interface JoinNotification {
 
 export interface BotNotification {
 	type: "bot";
+	player: Player;
 }
 
 export interface LeaveNotification {
