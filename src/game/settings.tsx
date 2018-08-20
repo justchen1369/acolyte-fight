@@ -398,7 +398,7 @@ export const boomerang: Spell = {
         radius: 0.003,
         maxSpeed: 0.6,
         speed: 0.4,
-        maxTicks: 6.0 * TicksPerSecond,
+        maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
 
