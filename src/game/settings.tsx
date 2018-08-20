@@ -176,17 +176,17 @@ export const fireball: Spell = {
     icon: "thunderball",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 2 * TicksPerSecond,
+    cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
         color: '#ff8800',
 
         density: 10,
         radius: 0.003,
-        speed: 0.4,
+        speed: 0.5,
         maxSpeed: 1.0,
         maxTicks: 1 * TicksPerSecond,
-        damage: 5,
+        damage: 7.5,
         categories: Categories.Projectile,
 
         render: "projectile",
@@ -203,7 +203,7 @@ export const flamestrike: Spell = {
     icon: "burningDot",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 2 * TicksPerSecond,
+    cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
         color: '#ff4400',
@@ -213,7 +213,7 @@ export const flamestrike: Spell = {
         speed: 0.18,
         maxSpeed: 1.0,
         maxTicks: 2 * TicksPerSecond,
-        damage: 10,
+        damage: 15,
         categories: Categories.Projectile,
 
         detonate: {
