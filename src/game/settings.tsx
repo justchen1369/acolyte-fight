@@ -360,7 +360,7 @@ export const homing: Spell = {
     projectile: {
         color: '#44ffcc',
 
-        density: 25,
+        density: 100,
         radius: 0.003,
         maxSpeed: 0.3,
         speed: 0.15,
