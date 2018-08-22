@@ -1,7 +1,7 @@
 import pl from 'planck-js';
 import { TicksPerTurn, TicksPerSecond } from '../game/constants';
 import { render, CanvasStack } from './render';
-import { Settings, applyMod } from '../game/settings';
+import { DefaultSettings, calculateMod } from '../game/settings';
 import * as ai from './ai';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
@@ -13,7 +13,9 @@ interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
 
-let world = engine.initialWorld(Settings);
+let mod = {};
+let allowBots = false;
+let world = engine.initialWorld(mod, allowBots);
 
 let socket: SocketIOClient.Socket = null;
 
@@ -81,14 +83,10 @@ export function joinRoom(roomId: string): Promise<void> {
 				if (response.success === false) {
 					reject(response.error);
 				} else {
-					const mod = response.mod;
-					if (mod) {
-						console.log("Mod", mod);
-						applyMod(mod);
-					}
-					if (response.allowBots) {
-						ai.setBotsEnabled(true);
-					}
+					mod = response.mod || {};
+					allowBots = response.allowBots || false;
+					world = engine.initialWorld(mod, allowBots);
+					notify({ type: "room", roomId: response.roomId });
 					resolve();
 				}
 			});
@@ -106,7 +104,7 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: 
 		name: playerName,
 		keyBindings,
 		room,
-		isBot: ai.playingAsAI() && !observeGameId,
+		isBot: ai.playingAsAI(allowBots) && !observeGameId,
 		observe: !!observeGameId,
 	};
 	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
@@ -135,7 +133,7 @@ export function leaveCurrentGame() {
 		socket.emit('leave', leaveMsg);
 	}
 
-	world = engine.initialWorld(Settings);
+	world = engine.initialWorld(mod, allowBots);
 
 	notify({ type: "quit" });
 }
@@ -183,7 +181,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', onTickMsg);
 }
 function onHeroMsg(data: m.JoinResponseMsg) {
-	world = engine.initialWorld(Settings);
+	world = engine.initialWorld(mod, allowBots);
 	tickQueue = [];
 	incomingQueue = [...data.history];
 

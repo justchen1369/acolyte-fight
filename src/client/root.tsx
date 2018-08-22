@@ -98,7 +98,7 @@ export class Root extends React.Component<Props, State> {
     private renderHome() {
         return <HomePanel
             current={this.props.current}
-            settings={this.props.world.settings}
+            world={this.props.world}
             changePage={this.props.changePage}
             newGameCallback={this.props.newGameCallback} />
     }
@@ -106,7 +106,11 @@ export class Root extends React.Component<Props, State> {
     private renderShare() {
         return <div className="content-container">
             <div className="page">
-                <SharePanel current={this.props.current} changePage={this.props.changePage} />
+                <SharePanel
+                    current={this.props.current}
+                    mod={this.props.world.mod}
+                    allowBots={this.props.world.allowBots}
+                    changePage={this.props.changePage} />
             </div>
         </div>;
     }
@@ -122,7 +126,9 @@ export class Root extends React.Component<Props, State> {
     private renderAi() {
         return <div className="content-container">
             <div className="page">
-                <AiPanel current={this.props.current} />
+                <AiPanel
+                    current={this.props.current}
+                    allowBots={this.props.world.allowBots} />
             </div>
         </div>;
     }

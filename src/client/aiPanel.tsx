@@ -6,6 +6,7 @@ import { readFileAsync } from './fileUtils';
 
 interface Props {
     current: url.PathElements;
+    allowBots: boolean;
 }
 interface State {
     loading: boolean;
@@ -62,7 +63,7 @@ export class AiPanel extends React.Component<Props, State> {
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings and contracts (see MsgContract).</li>
                 </ul>
             </p>
-            {ai.getBotsEnabled() ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
+            {this.props.allowBots ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
         </div>;
     }
     

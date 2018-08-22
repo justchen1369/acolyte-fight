@@ -708,11 +708,6 @@ export const DefaultSettings: AcolyteFightSettings = {
     Layouts,
 };
 
-export const Settings = DefaultSettings;
-
-export const Mod = {};
-
-export function applyMod(mod: Object) {
-    _.merge(Settings, mod);
-    _.merge(Mod, mod);
+export function calculateMod(mod: Object): AcolyteFightSettings {
+    return _.merge(_.cloneDeep(DefaultSettings), mod);
 }

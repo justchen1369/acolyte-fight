@@ -1,11 +1,12 @@
 import * as React from 'react';
-import * as ai from './ai';
 import * as rooms from './rooms';
+import * as w from '../game/world.model';
 import * as url from './url';
-import { Mod } from '../game/settings';
 
 interface Props {
     current: url.PathElements;
+    mod: Object;
+    allowBots: boolean;
     changePage: (newPage: string) => void;
 }
 interface State {
@@ -41,14 +42,14 @@ export class SharePanel extends React.Component<Props, State> {
             </p>
             <p><div className="btn" onClick={() => this.exitRoom()}>Exit room</div></p>
             <h2>Room modifications</h2>
-            {Object.keys(Mod).length > 0
+            {Object.keys(this.props.mod).length > 0
                 ? <p>
                     The following modifications are active in this room:
-                    <textarea className="mod-json">{JSON.stringify(Mod, null, 2)}</textarea>
+                    <textarea className="mod-json">{JSON.stringify(this.props.mod, null, 2)}</textarea>
                 </p>
                 : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this room.</p>}
             <h2>Room bots</h2>
-            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {ai.getBotsEnabled() ? "allowed" : "not allowed"} in this room.</p>
+            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {this.props.allowBots ? "allowed" : "not allowed"} in this room.</p>
         </div>
     }
 

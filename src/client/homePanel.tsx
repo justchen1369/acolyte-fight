@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ai from './ai';
+import * as w from '../game/world.model';
 import * as url from './url';
 import * as screenLifecycle from './screenLifecycle';
 import { NameConfig } from '../client/nameConfig';
@@ -9,7 +10,7 @@ const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     current: url.PathElements;
-    settings: AcolyteFightSettings;
+    world: w.World;
     changePage: (newPage: string) => void;
     newGameCallback: () => void;
 }
@@ -24,7 +25,7 @@ export class HomePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            playingAsAI: ai.playingAsAI(),
+            playingAsAI: ai.playingAsAI(this.props.world.allowBots),
             joining: false,
         };
     }
@@ -58,7 +59,7 @@ export class HomePanel extends React.Component<Props, State> {
                     In this arena, you'll find others just like you. Will you be the last one standing?
                 </p>
                 <NameConfig />
-                <SpellConfig settings={this.props.settings} />
+                <SpellConfig settings={this.props.world.settings} />
             </div>
         </div>;
     }

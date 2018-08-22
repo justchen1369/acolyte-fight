@@ -9,7 +9,6 @@ const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
-let botsEnabled = false;
 let code: string = null;
 let sendAction: SendActionFunc = () => {};
 
@@ -17,20 +16,12 @@ export function attach(sendActionFunc: SendActionFunc) {
     sendAction = sendActionFunc;
 }
 
-export function getBotsEnabled() {
-    return botsEnabled;
-}
-
-export function setBotsEnabled(enabled: boolean) {
-    botsEnabled = enabled;
-}
-
 export function getCode() {
     return code;
 }
 
-export function playingAsAI() {
-    return botsEnabled && !!code;
+export function playingAsAI(allowBots: boolean) {
+    return allowBots && !!code;
 }
 
 export function overwriteAI(_code: string) {

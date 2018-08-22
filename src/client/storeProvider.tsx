@@ -1,7 +1,6 @@
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import { getCurrentWorld } from './facade';
-import { World } from 'planck-js';
 
 const ExpiryMilliseconds = 15000;
 
@@ -25,7 +24,7 @@ export function setConnected(connected: boolean) {
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {
     // Detect if entered a new game
     newNotifications.forEach(n => {
-        if (n.type === "new" || n.type === "quit") {
+        if (n.type === "room" || n.type === "new" || n.type === "quit") {
             store.world = getCurrentWorld();
             store.items = [];
         } else if (n.type === "disconnected") {

@@ -3,6 +3,7 @@ import pl from 'planck-js';
 import * as constants from '../game/constants';
 import * as vector from './vector';
 import * as w from './world.model';
+import { calculateMod } from '../game/settings';
 
 import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/constants';
 
@@ -20,7 +21,9 @@ import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/con
 	settings.polygonRadius = (2.0 * settings.linearSlop);
 }
 
-export function initialWorld(settings: AcolyteFightSettings): w.World {
+export function initialWorld(mod: Object, allowBots: boolean): w.World {
+	const settings = calculateMod(mod);
+
 	let world = {
 		seed: null,
 		tick: 0,
@@ -44,6 +47,9 @@ export function initialWorld(settings: AcolyteFightSettings): w.World {
 		nextColorId: 0,
 
 		settings,
+		mod,
+		allowBots,
+
 		ui: {
 			myGameId: null,
 			myHeroId: null,
