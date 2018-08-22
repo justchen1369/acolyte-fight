@@ -1,8 +1,5 @@
 import * as w from '../game/world.model';
 import * as vector from '../game/vector';
-import * as StoreProvider from './storeProvider';
-import { TicksPerSecond, TicksPerTurn } from '../game/constants';
-import { Settings } from '../game/settings';
 
 interface SendActionFunc {
     (gameId: string, heroId: string, action: w.Action): void;
@@ -74,7 +71,7 @@ function startBotIfNecessary(world: w.World, heroId: string) {
         const key = workerKey(world.ui.myGameId, heroId);
         if (!workers.has(key)) {
             const allowCustomCode = heroId === world.ui.myHeroId;
-            workers.set(key, new AiWorker(world.ui.myGameId, heroId, createCodeUrl(allowCustomCode)));
+            workers.set(key, new AiWorker(world, heroId, createCodeUrl(allowCustomCode)));
         }
     }
 }
@@ -110,15 +107,15 @@ class AiWorker {
     private worker: Worker;
     private isTerminated = false;
 
-    constructor(gameId: string, heroId: string, codeUrl: string) {
-        this.gameId = gameId;
+    constructor(world: w.World, heroId: string, codeUrl: string) {
+        this.gameId = world.ui.myGameId;
         this.heroId = heroId;
 
         const worker = new Worker(codeUrl);
         worker.onmessage = (ev) => this.onWorkerMessage(ev);
         this.worker = worker;
 
-        const initMsg: InitMsgContract = { type: "init", settings: Settings };
+        const initMsg: InitMsgContract = { type: "init", settings: world.settings };
         worker.postMessage(JSON.stringify(initMsg));
     }
 
