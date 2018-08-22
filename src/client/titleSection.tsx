@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { Settings } from '../game/settings';
 import * as m from '../game/messages.model';
 
 interface Props {
+    settings: AcolyteFightSettings;
 }
 
 interface State {
@@ -48,7 +48,7 @@ export class TitleSection extends React.Component<Props, State> {
             <p>
                 This game is a 2D skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
                 This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
-                Acolytes become more dangerous as they lose health - dealing up to {1 + Settings.Hero.AdditionalDamageMultiplier}x more damage!
+                Acolytes become more dangerous as they lose health - dealing up to {1 + this.props.settings.Hero.AdditionalDamageMultiplier}x more damage!
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
             <h1>FAQ</h1>

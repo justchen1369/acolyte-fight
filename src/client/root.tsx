@@ -98,6 +98,7 @@ export class Root extends React.Component<Props, State> {
     private renderHome() {
         return <HomePanel
             current={this.props.current}
+            settings={this.props.world.settings}
             changePage={this.props.changePage}
             newGameCallback={this.props.newGameCallback} />
     }
@@ -137,7 +138,7 @@ export class Root extends React.Component<Props, State> {
     private renderAbout() {
         return <div className="content-container">
             <div className="page">
-                <TitleSection />
+                <TitleSection settings={this.props.world.settings} />
             </div>
         </div>;
     }

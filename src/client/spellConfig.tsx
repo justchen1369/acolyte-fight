@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as c from '../game/world.model';
-import { Settings } from '../game/settings';
+import { DefaultSettings } from '../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../client/storage';
 import { isMobile } from './userAgent';
 
 interface Props {
+    settings: AcolyteFightSettings;
 }
 
 interface State {
@@ -17,7 +18,7 @@ export class SpellConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            config: Storage.loadKeyBindingConfig() || Settings.Choices.Defaults,
+            config: Storage.loadKeyBindingConfig() || DefaultSettings.Choices.Defaults,
             saved: new Set<string>(),
         };
     }
@@ -25,7 +26,7 @@ export class SpellConfig extends React.Component<Props, State> {
     render() {
         return <div className="spell-config">
             <h1>Your Spell Configuration</h1>
-            {Settings.Choices.Keys.map(key => this.renderKey(key))}
+            {this.props.settings.Choices.Keys.map(key => this.renderKey(key))}
         </div>;
     }
 
@@ -34,8 +35,8 @@ export class SpellConfig extends React.Component<Props, State> {
             return null;
         }
 
-        const Choices = Settings.Choices;
-        const Spells = Settings.Spells;
+        const Choices = this.props.settings.Choices;
+        const Spells = this.props.settings.Spells;
 
         const options = Choices.Options[key];
         let chosenId = this.state.config[key];
