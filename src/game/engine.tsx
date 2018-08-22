@@ -253,7 +253,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		categories,
 		type: spell.id,
 		body,
-		maxSpeed: projectileTemplate.maxSpeed || null,
+		speed: projectileTemplate.speed,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -331,7 +331,7 @@ export function tick(world: w.World) {
 		handleContact(world, contact);
 	}
 
-	applySpeedLimit(world);
+	fixProjectileSpeeds(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -345,13 +345,11 @@ function physicsStep(world: w.World) {
 	world.physics.step(1.0 / TicksPerSecond);
 }
 
-function applySpeedLimit(world: w.World) {
+function fixProjectileSpeeds(world: w.World) {
 	world.objects.forEach(obj => {
-		if (obj.category === "projectile" && obj.maxSpeed) {
+		if (obj.category === "projectile") {
 			const currentVelocity = obj.body.getLinearVelocity();
-			if (vector.length(currentVelocity) > obj.maxSpeed) {
-				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, obj.maxSpeed));
-			}
+			obj.body.setLinearVelocity(vector.relengthen(currentVelocity, obj.speed));
 		}
 	});
 }

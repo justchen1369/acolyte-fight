@@ -165,7 +165,6 @@ declare interface ProjectileTemplate extends DamagePacket {
     density: number;
     radius: number;
 	speed: number;
-	maxSpeed?: number; // Projectile will expire if it is accelerated above this speed (e.g. by a thrust).
 
     homing?: HomingParametersTemplate;
 	link?: LinkParameters;

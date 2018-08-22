@@ -311,7 +311,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	body: pl.Body;
 	collideWith: number;
 	hit?: boolean;
-	maxSpeed: number | null;
+	speed: number;
 
 	target: pl.Vec2;
 	targetId: string | null;
