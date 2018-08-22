@@ -17,6 +17,7 @@ export interface Game {
 }
 
 interface Props {
+    watchGameCallback: (gameId: string) => void;
 }
 
 interface State {
@@ -94,7 +95,7 @@ export class RecentGameList extends React.Component<Props, State> {
                             <td>{game.createdTimestamp.fromNow()}</td>
                             <td>{game.playerNames.join(", ")}</td>
                             <td>{game.numActivePlayers > 0 ? "Live" : `${(game.numTicks / TicksPerSecond).toFixed(0)} s`}</td>
-                            <td><a href={this.gameUrl(game)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
+                            <td><a href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}>Watch <i className="fa fa-external-link-square-alt" /></a></td>
                         </tr>)}
                     </tbody>
                 </table>
@@ -109,5 +110,11 @@ export class RecentGameList extends React.Component<Props, State> {
             server: game.server,
             page: null,
         });
+    }
+
+    private onWatchGameClicked(ev: React.MouseEvent, game: Game) {
+        ev.preventDefault();
+
+        this.props.watchGameCallback(game.id);
     }
 }

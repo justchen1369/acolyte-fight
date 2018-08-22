@@ -126,6 +126,8 @@ export function initGame(room: g.Room = null) {
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		room: room ? room.id : null,
+		mod: room ? room.mod : {},
+		allowBots: room ? room.allowBots : false,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),

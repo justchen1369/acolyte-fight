@@ -20,6 +20,10 @@ export interface Game {
     id: string;
     room: string | null;
     created: moment.Moment;
+
+    mod: Object;
+    allowBots: boolean;
+
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
     playerNames: string[];

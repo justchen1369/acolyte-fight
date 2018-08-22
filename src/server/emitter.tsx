@@ -153,6 +153,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			gameId: game.id,
 			heroId,
 			room: game.room,
+			mod: game.mod,
+			allowBots: game.allowBots,
 			history: game.history,
 			numGames: roomStats.numGames,
 			numPlayers: roomStats.numPlayers,

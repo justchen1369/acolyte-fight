@@ -181,7 +181,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', onTickMsg);
 }
 function onHeroMsg(data: m.JoinResponseMsg) {
-	world = engine.initialWorld(mod, allowBots);
+	world = engine.initialWorld(data.mod, data.allowBots);
 	tickQueue = [];
 	incomingQueue = [...data.history];
 

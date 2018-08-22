@@ -87,6 +87,20 @@ function onNewGameClicked() {
     }
 }
 
+function onWatchGameClicked(gameId: string) {
+    if (!getStore().connected) {
+        // New server? Reload the client, just in case the version has changed.
+        current.gameId = gameId;
+        current.page = null;
+        updateUrl();
+        window.location.reload();
+    } else {
+        playerName = getOrCreatePlayerName(); // Reload name
+        joinNewGame(playerName, retrieveKeyBindings(), current.room, gameId);
+        updateUrl();
+    }
+}
+
 function onExitGameClicked() {
     leaveCurrentGame();
 }
@@ -121,6 +135,7 @@ function rerender() {
             changePage={newPage => changePage(newPage)}
             playVsAiCallback={() => addBotToCurrentGame()}
             newGameCallback={() => onNewGameClicked()}
+            watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
             exitGameCallback={() => onExitGameClicked()}
         />,
         document.getElementById("root"));

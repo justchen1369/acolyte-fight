@@ -113,6 +113,10 @@ export interface JoinResponseMsg {
     gameId: string;
     heroId: string | null; // null means observer
     room: string | null;
+
+    mod: Object;
+    allowBots: boolean;
+
     history: TickMsg[];
     numGames: number;
     numPlayers: number;
