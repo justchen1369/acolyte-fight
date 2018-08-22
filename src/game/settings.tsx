@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { TicksPerSecond, Categories } from './constants';
 import { HomingTargets } from './world.model';
 
-export const Hero: HeroSettings = {
+const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
     Radius: 0.015,
     Density: 0.5,
@@ -20,7 +20,7 @@ export const Hero: HeroSettings = {
     RevolutionsPerTick: 0.05,
 }
 
-export const World: WorldSettings = {
+const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutRadius: 0.25,
 
@@ -32,14 +32,14 @@ export const World: WorldSettings = {
     ProjectileSpeedDecayFactorPerTick: 0.05,
 }
 
-export const Obstacle: ObstacleSettings = {
+const Obstacle: ObstacleSettings = {
 	Health: 50,
 	AngularDamping: 5,
 	LinearDamping: 2,
 	Density: 100.0,
 }
 
-export const Choices: ChoiceSettings = {
+const Choices: ChoiceSettings = {
 	Keys: [
 		"a", "s",
 		null,
@@ -69,7 +69,7 @@ export const Choices: ChoiceSettings = {
 	},
 }
 
-export const Layouts: Layouts = {
+const Layouts: Layouts = {
     "double": {
         obstacles: [
             {
@@ -160,7 +160,7 @@ export const Layouts: Layouts = {
     },
 };
 
-export const move: Spell = {
+const move: Spell = {
     id: 'move',
     description: "",
     color: 'white',
@@ -169,7 +169,7 @@ export const move: Spell = {
     cooldown: 0,
     action: "move",
 };
-export const fireball: Spell = {
+const fireball: Spell = {
     id: 'fireball',
     description: "Quick cooldown and packs a punch. Good old trusty fireball.",
     action: "projectile",
@@ -194,7 +194,7 @@ export const fireball: Spell = {
         trailTicks: 30,
     },
 };
-export const flamestrike: Spell = {
+const flamestrike: Spell = {
     id: 'flamestrike',
     name: 'Fireboom',
     description: "It's slower than fireball - harder to aim, but does more damage.",
@@ -226,7 +226,7 @@ export const flamestrike: Spell = {
         trailTicks: 30,
     },
 };
-export const firespray: Spell = {
+const firespray: Spell = {
     id: 'firespray',
     name: 'Splatter',
     description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
@@ -256,7 +256,7 @@ export const firespray: Spell = {
         trailTicks: 30,
     },
 };
-export const meteor: Spell = {
+const meteor: Spell = {
     id: 'meteor',
     description: "Send a giant meteor towards your enemies! Nothing stops a meteor.",
     action: "projectile",
@@ -282,7 +282,7 @@ export const meteor: Spell = {
         render: "ball",
     },
 };
-export const kamehameha: Spell = {
+const kamehameha: Spell = {
     id: 'kamehameha',
     name: 'Acolyte Beam',
     description: "After a long charge time, unleash a beam so powerful it can wipe out a full-health enemy in seconds.",
@@ -317,7 +317,7 @@ export const kamehameha: Spell = {
         render: "ray",
     },
 };
-export const lightning: Spell = {
+const lightning: Spell = {
     id: 'lightning',
     name: 'Repulsor',
     description: "Huge knockback, if your aim is good enough.",
@@ -344,7 +344,7 @@ export const lightning: Spell = {
         trailTicks: 30,
     },
 };
-export const homing: Spell = {
+const homing: Spell = {
     id: 'homing',
     description: "Follows the enemy. High damage, but only if the enemy doesn't know how to dodge.",
     action: "projectile",
@@ -375,7 +375,7 @@ export const homing: Spell = {
         render: "projectile",
     },
 };
-export const boomerang: Spell = {
+const boomerang: Spell = {
     id: 'boomerang',
     name: 'Orbiter',
     description: "Around and around you. Keep your enemies at a safe distance.",
@@ -410,7 +410,7 @@ export const boomerang: Spell = {
         render: "projectile",
     },
 };
-export const link: Spell = {
+const link: Spell = {
     id: 'link',
     description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
     action: "projectile",
@@ -453,7 +453,7 @@ export const link: Spell = {
         render: "link",
     },
 };
-export const bouncer: Spell = {
+const bouncer: Spell = {
     id: 'bouncer',
     description: "The more times this bounces, the more damage this does. Stay close to your enemy.",
     action: "projectile",
@@ -483,7 +483,7 @@ export const bouncer: Spell = {
         trailTicks: 1.0 * TicksPerSecond,
     },
 };
-export const drain: Spell = {
+const drain: Spell = {
     id: 'drain',
     description: "Steal some life from another player. They probably didn't need it anyway.",
     action: "projectile",
@@ -512,7 +512,7 @@ export const drain: Spell = {
         trailTicks: 0.5 * TicksPerSecond,
     },
 };
-export const gravity: Spell = {
+const gravity: Spell = {
     id: 'gravity',
     name: 'Ensnare',
     description: "Hold an enemy in place while you unleash your volleys upon them.",
@@ -553,7 +553,7 @@ export const gravity: Spell = {
         trailTicks: 0.25 * TicksPerSecond,
     },
 };
-export const supernova: Spell = {
+const supernova: Spell = {
     id: 'supernova',
     description: "A delayed explosion to knock back your enemies",
     action: "projectile",
@@ -586,7 +586,7 @@ export const supernova: Spell = {
         trailTicks: 30,
     },
 };
-export const scourge: Spell = {
+const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
     description: "Takes time to charge, but will send nearby enemies flying. Be careful though, each blast takes 10% off your health!",
@@ -609,7 +609,7 @@ export const scourge: Spell = {
 
     action: "scourge",
 };
-export const shield: Spell = {
+const shield: Spell = {
     id: 'shield',
     name: 'Reflect',
     description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
@@ -625,7 +625,7 @@ export const shield: Spell = {
 
     action: "shield",
 };
-export const icewall: Spell = {
+const icewall: Spell = {
     id: 'icewall',
     description: "Create a wall of ice to block projectiles or stop enemies getting away.",
 
@@ -643,7 +643,7 @@ export const icewall: Spell = {
 
     action: "wall",
 };
-export const teleport: Spell = {
+const teleport: Spell = {
     id: 'teleport',
     name: 'Blink',
     description: "Teleport to a nearby location. Get close, or get away.",
@@ -660,7 +660,7 @@ export const teleport: Spell = {
 
     action: "teleport",
 };
-export const thrust: Spell = {
+const thrust: Spell = {
     id: 'thrust',
     name: 'Dash',
     description: "Accelerate quickly, knocking away anything in your path.",
@@ -677,7 +677,7 @@ export const thrust: Spell = {
     action: "thrust",
 };
 
-export const Spells = {
+const Spells = {
     move,
     fireball,
     flamestrike,
@@ -699,7 +699,7 @@ export const Spells = {
     thrust,
 };
 
-export const Settings: AcolyteFightSettings = {
+export const DefaultSettings: AcolyteFightSettings = {
     World,
     Hero,
     Obstacle,
@@ -707,6 +707,8 @@ export const Settings: AcolyteFightSettings = {
     Spells,
     Layouts,
 };
+
+export const Settings = DefaultSettings;
 
 export const Mod = {};
 

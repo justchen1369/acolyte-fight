@@ -10,7 +10,7 @@ import * as url from './url';
 import { connectToServer, joinRoom, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
-import { Settings } from '../game/settings';
+import { DefaultSettings } from '../game/settings';
 
 import { Root } from './root';
 
@@ -127,5 +127,5 @@ function rerender() {
 }
 
 function retrieveKeyBindings() {
-    return Storage.loadKeyBindingConfig() || Settings.Choices.Defaults;
+    return Storage.loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
 }
