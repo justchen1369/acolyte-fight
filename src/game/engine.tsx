@@ -5,7 +5,6 @@ import * as vector from './vector';
 import * as w from './world.model';
 
 import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/constants';
-import { Settings } from '../game/settings';
 
 // Reset planck.js constants
 {
@@ -21,7 +20,7 @@ import { Settings } from '../game/settings';
 	settings.polygonRadius = (2.0 * settings.linearSlop);
 }
 
-export function initialWorld(): w.World {
+export function initialWorld(settings: AcolyteFightSettings): w.World {
 	let world = {
 		seed: null,
 		tick: 0,
@@ -37,13 +36,14 @@ export function initialWorld(): w.World {
 		objects: new Map(),
 		physics: pl.World(),
 		actions: new Map(),
-		radius: Settings.World.InitialRadius,
+		radius: settings.World.InitialRadius,
 
 		nextObstacleId: 0,
 		nextPositionId: 0,
 		nextObjectId: 0,
 		nextColorId: 0,
 
+		settings,
 		ui: {
 			myGameId: null,
 			myHeroId: null,
@@ -76,7 +76,7 @@ function polygon(numPoints: number, extent: number) {
 }
 
 function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
-	const Obstacle = Settings.Obstacle;
+	const Obstacle = world.settings.Obstacle;
 
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
@@ -154,13 +154,15 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 }
 
 function addHero(world: w.World, heroId: string) {
+	const Hero = world.settings.Hero;
+
 	const heroIndex = world.nextPositionId++;
 	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
 
 	let position;
 	let angle;
 	{
-		const radius = Settings.World.HeroLayoutRadius;
+		const radius = world.settings.World.HeroLayoutRadius;
 		const center = pl.Vec2(0.5, 0.5);
 
 		let posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
@@ -174,15 +176,15 @@ function addHero(world: w.World, heroId: string) {
 		type: 'dynamic',
 		position,
 		angle,
-		linearDamping: Settings.Hero.Damping,
-		angularDamping: Settings.Hero.AngularDamping,
+		linearDamping: Hero.Damping,
+		angularDamping: Hero.AngularDamping,
 		allowSleep: false,
 	} as pl.BodyDef);
-	body.createFixture(pl.Circle(Settings.Hero.Radius), {
+	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
 		filterMaskBits: Categories.All ^ Categories.Shield,
 		filterGroupIndex,
-		density: Settings.Hero.Density,
+		density: Hero.Density,
 		restitution: 1.0,
 	});
 
@@ -193,8 +195,14 @@ function addHero(world: w.World, heroId: string) {
 		filterGroupIndex,
 		categories: Categories.Hero,
 		collideWith: Categories.All,
-		health: Settings.Hero.MaxHealth,
+		health: Hero.MaxHealth,
+		maxHealth: Hero.MaxHealth,
 		body,
+		radius: Hero.Radius,
+		additionalDamageMultiplier: Hero.AdditionalDamageMultiplier,
+		additionalDamagePower: Hero.AdditionalDamagePower,
+		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
+		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
 		killerHeroId: null,
@@ -226,7 +234,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
 
-	const offset = Settings.Hero.Radius + projectileTemplate.radius + constants.Pixel;
+	const offset = world.settings.Hero.Radius + projectileTemplate.radius + constants.Pixel;
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
@@ -384,8 +392,10 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
 
+	const Layouts = world.settings.Layouts;
+
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const layouts = Object.keys(Settings.Layouts).map(key => Settings.Layouts[key]).filter(x => !!x);
+	const layouts = Object.keys(Layouts).map(key => Layouts[key]).filter(x => !!x);
 	const layout = layouts[world.seed % layouts.length];
 	layout.obstacles.forEach(obstacleTemplate => {
 		const points = polygon(obstacleTemplate.numPoints, obstacleTemplate.extent);
@@ -426,7 +436,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	assignKeyBindingsToHero(hero, ev.keyBindings);
+	assignKeyBindingsToHero(hero, ev.keyBindings, world);
 
 	const player = {
 		heroId: hero.id,
@@ -449,7 +459,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	assignKeyBindingsToHero(hero, ev.keyBindings);
+	assignKeyBindingsToHero(hero, ev.keyBindings, world);
 
 	const player = {
 		heroId: hero.id,
@@ -511,8 +521,8 @@ function handleActions(world: w.World) {
 	world.actions = newActions;
 }
 
-function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings) {
-	const Choices = Settings.Choices;
+function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
+	const Choices = world.settings.Choices;
 
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
@@ -539,7 +549,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (!action || !isValidAction(action, hero)) {
 		return true; // Nothing to do
 	}
-	const spell = Settings.Spells[action.type];
+	const spell = world.settings.Spells[action.type];
 	const uninterruptible = !spell.interruptible;
 
 	// Start casting a new spell
@@ -631,7 +641,7 @@ function turnTowards(hero: w.Hero, target: pl.Vec2) {
 	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
 	const currentAngle = hero.body.getAngle();
 
-	const newAngle = vector.turnTowards(currentAngle, targetAngle, Settings.Hero.RevolutionsPerTick * 2 * Math.PI);
+	const newAngle = vector.turnTowards(currentAngle, targetAngle, hero.revolutionsPerTick * 2 * Math.PI);
 	hero.body.setAngle(newAngle);
 
 	return Math.abs(vector.angleDelta(newAngle, targetAngle));
@@ -706,12 +716,14 @@ function handleHeroHitShield(world: w.World, hero: w.Hero, other: w.Shield) {
 }
 
 function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
+	const Hero = world.settings.Hero;
+
 	// Push back other heroes
 	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
-	const repelDistance = Settings.Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
+	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
 	if (repelDistance > 0) {
 		const step = vector.multiply(pushbackDirection, repelDistance);
-		const impulse = vector.multiply(step, Settings.Hero.SeparationImpulsePerTick);
+		const impulse = vector.multiply(step, Hero.SeparationImpulsePerTick);
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
 	}
 
@@ -839,6 +851,8 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 
 	owner.link = {
 		targetId: target.id,
+		minDistance: projectile.link.minDistance,
+		maxDistance: projectile.link.maxDistance,
 		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
@@ -954,8 +968,6 @@ function homingForce(world: w.World) {
 }
 
 function linkForce(world: w.World) {
-	const minDistance = Settings.Hero.Radius * 2;
-	const maxDistance = 0.25;
 	world.objects.forEach(owner => {
 		if (!(owner.category === "hero" && owner.link)) {
 			return;
@@ -970,6 +982,9 @@ function linkForce(world: w.World) {
 		if (!(owner && target)) {
 			return;
 		}
+
+		const minDistance = owner.link.minDistance;
+		const maxDistance = owner.link.maxDistance;
 
 		const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
 		const distance = vector.length(diff);
@@ -1046,6 +1061,8 @@ function decayObstacles(world: w.World) {
 }
 
 function detonate(world: w.World) {
+	const Hero = world.settings.Hero;
+
 	world.objects.forEach(obj => {
 		if (!(obj.category === "projectile" && obj.detonate)) {
 			return;
@@ -1061,10 +1078,10 @@ function detonate(world: w.World) {
 				if (other.category === "hero") {
 					const diff = vector.diff(other.body.getPosition(), obj.body.getPosition());
 					const distance = vector.length(diff);
-					if (other.id !== obj.owner && distance <= obj.detonate.radius + Settings.Hero.Radius) {
+					if (other.id !== obj.owner && distance <= obj.detonate.radius + other.radius) {
 						applyDamage(other, obj, obj.owner, world);
 
-						const proportion = 1.0 - (distance / (obj.detonate.radius + Settings.Hero.Radius)); // +HeroRadius because only need to touch the edge
+						const proportion = 1.0 - (distance / (obj.detonate.radius + other.radius)); // +HeroRadius because only need to touch the edge
 						const magnitude = obj.detonate.minImpulse + proportion * (obj.detonate.maxImpulse - obj.detonate.minImpulse);
 						other.body.applyLinearImpulse(
 							vector.relengthen(diff, magnitude),
@@ -1089,7 +1106,7 @@ function detonate(world: w.World) {
 }
 
 function applyLavaDamage(world: w.World) {
-	const lavaDamagePerTick = Settings.World.LavaDamagePerSecond / TicksPerSecond;
+	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
@@ -1105,7 +1122,7 @@ function applyLavaDamage(world: w.World) {
 }
 
 function shrink(world: w.World) {
-	const World = Settings.World;
+	const World = world.settings.World;
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;
 		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
@@ -1256,7 +1273,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 	let current = hero.body.getPosition();
 	let target = action.target;
 
-	const idealStep = vector.truncate(vector.diff(target, current), Settings.Hero.MoveSpeedPerSecond / TicksPerSecond);
+	const idealStep = vector.truncate(vector.diff(target, current), hero.moveSpeedPerSecond / TicksPerSecond);
 	const facing = vector.fromAngle(hero.body.getAngle());
 	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
 
@@ -1350,7 +1367,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 
 		let objPos = obj.body.getPosition();
 		let diff = vector.diff(objPos, heroPos);
-		let proportion = 1.0 - (vector.length(diff) / (spell.radius + Settings.Hero.Radius)); // +HeroRadius because only need to touch the edge
+		let proportion = 1.0 - (vector.length(diff) / (spell.radius + obj.radius)); // +HeroRadius because only need to touch the edge
 		if (proportion <= 0.0) { return; } 
 
 		if (obj.category === "hero") {
@@ -1406,7 +1423,7 @@ function scaleDamagePacket(packet: DamagePacket, fromHero: w.Hero, damageScaling
 	let scaleFactor = 1.0;
 	if (fromHero && damageScaling) {
 		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
-		scaleFactor += Math.pow(1.0 - fromHeroHealth / Settings.Hero.MaxHealth, Settings.Hero.AdditionalDamagePower) * Settings.Hero.AdditionalDamageMultiplier;
+		scaleFactor += Math.pow(1.0 - fromHeroHealth / fromHero.maxHealth, fromHero.additionalDamagePower) * fromHero.additionalDamageMultiplier;
 	}
 	packet.damage *= scaleFactor;
 
@@ -1432,7 +1449,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	if (fromHeroId && packet.lifeSteal) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
-			fromHero.health = Math.min(Settings.Hero.MaxHealth, fromHero.health + amount * packet.lifeSteal);
+			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
 		}
 	}
 

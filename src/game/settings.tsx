@@ -434,6 +434,8 @@ export const link: Spell = {
 
         link: {
             impulsePerTick: 1.0 / TicksPerSecond,
+            minDistance: Hero.Radius * 2,
+            maxDistance: 0.25,
             linkTicks: 2.0 * TicksPerSecond,
             lifeSteal: 0.5,
         },

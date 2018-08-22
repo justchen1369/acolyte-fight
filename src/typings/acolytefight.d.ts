@@ -268,6 +268,8 @@ declare interface LinkParameters {
 	impulsePerTick: number;
 	lifeSteal: number;
 	linkTicks: number;
+	minDistance: number;
+	maxDistance: number;
 }
 
 declare interface DamagePacket {

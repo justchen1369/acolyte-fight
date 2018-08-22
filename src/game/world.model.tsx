@@ -31,6 +31,7 @@ export interface World {
 	nextObjectId: number;
 	nextColorId: number;
 	
+	settings: AcolyteFightSettings;
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };
 
@@ -239,9 +240,18 @@ export interface Hero extends WorldObjectBase {
 	filterGroupIndex: number;
 
 	health: number;
+	maxHealth: number;
 	body: pl.Body;
+	radius: number;
+	moveSpeedPerSecond: number;
+	revolutionsPerTick: number;
+
+	additionalDamagePower: number;
+	additionalDamageMultiplier: number;
+
 	casting: CastState | null;
 	cooldowns: Cooldowns;
+
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
@@ -280,7 +290,11 @@ export interface CastState {
 
 export interface LinkState {
 	targetId: string | null;
+
 	strength: number;
+	minDistance: number;
+	maxDistance: number;
+
 	lifeSteal: number;
 	expireTick: number;
 	color: string;

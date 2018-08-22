@@ -1,7 +1,7 @@
 import pl from 'planck-js';
 import { TicksPerTurn, TicksPerSecond } from '../game/constants';
 import { render, CanvasStack } from './render';
-import { applyMod } from '../game/settings';
+import { Settings, applyMod } from '../game/settings';
 import * as ai from './ai';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
@@ -13,7 +13,7 @@ interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
 
-let world = engine.initialWorld();
+let world = engine.initialWorld(Settings);
 
 let socket: SocketIOClient.Socket = null;
 
@@ -135,7 +135,7 @@ export function leaveCurrentGame() {
 		socket.emit('leave', leaveMsg);
 	}
 
-	world = engine.initialWorld();
+	world = engine.initialWorld(Settings);
 
 	notify({ type: "quit" });
 }
@@ -183,7 +183,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', onTickMsg);
 }
 function onHeroMsg(data: m.JoinResponseMsg) {
-	world = engine.initialWorld();
+	world = engine.initialWorld(Settings);
 	tickQueue = [];
 	incomingQueue = [...data.history];
 
