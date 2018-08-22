@@ -28,6 +28,8 @@ export const World: WorldSettings = {
     SecondsToShrink: 90,
     ShrinkPower: 1.4,
     InitialShieldSeconds: 1.0,
+
+    ProjectileSpeedDecayFactorPerTick: 0.05,
 }
 
 export const Obstacle: ObstacleSettings = {

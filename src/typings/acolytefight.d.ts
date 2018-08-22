@@ -55,7 +55,9 @@ declare interface WorldSettings {
 	LavaDamagePerSecond: number;
 	SecondsToShrink: number;
 	ShrinkPower: number;
-    InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
+	InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
+	
+	ProjectileSpeedDecayFactorPerTick: number;
 }
 
 declare interface Layouts {

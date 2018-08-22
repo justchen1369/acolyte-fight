@@ -345,7 +345,7 @@ export function tick(world: w.World) {
 		handleContact(world, contact);
 	}
 
-	fixProjectileSpeeds(world);
+	applySpeedLimit(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -359,11 +359,17 @@ function physicsStep(world: w.World) {
 	world.physics.step(1.0 / TicksPerSecond);
 }
 
-function fixProjectileSpeeds(world: w.World) {
+function applySpeedLimit(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "projectile") {
 			const currentVelocity = obj.body.getLinearVelocity();
-			obj.body.setLinearVelocity(vector.relengthen(currentVelocity, obj.speed));
+			const currentSpeed = vector.length(currentVelocity);
+
+			const diff = obj.speed - currentSpeed;
+			if (Math.abs(diff) > 0.001) {
+				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
+				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, newSpeed));
+			}
 		}
 	});
 }
