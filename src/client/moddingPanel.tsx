@@ -46,7 +46,7 @@ export class ModdingPanel extends React.Component<Props, State> {
             </p>
             <h2>Create modded room</h2>
             <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
-            <p><div className="btn" onClick={() => this.onSubmit()}>Create Room</div></p>
+            <p><div className={this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onSubmit()}>Create Room</div></p>
             {this.state.error && <p className="error">{this.state.error}</p>}
             <p><b>Tip: </b>you can drag-and-drop a mod file onto this window to quickly create a modded room</p>
         </div>;
