@@ -165,6 +165,7 @@ declare interface ProjectileTemplate extends DamagePacket {
     density: number;
     radius: number;
 	speed: number;
+	strafe?: boolean;
 
     homing?: HomingParametersTemplate;
 	link?: LinkParameters;

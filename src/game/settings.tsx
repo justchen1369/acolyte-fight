@@ -425,6 +425,7 @@ export const link: Spell = {
         density: 0.001,
         radius: 0.005,
         speed: 0.25,
+        strafe: true,
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,

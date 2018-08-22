@@ -40,9 +40,6 @@ export interface HeroScore {
 	assists: number;
 	damage: number;
 
-	numFireballsShot: number;
-	numFireballsHit: number;
-	
 	deathTick: number | null;
 }
 
@@ -258,8 +255,11 @@ export interface Hero extends WorldObjectBase {
 
 export interface Shield extends WorldObjectBase {
 	category: "shield";
+	radius: number;
+	createTick: number;
 	expireTick: number;
 	owner: string;
+	color: string;
 }
 
 export interface CastState {
@@ -274,6 +274,8 @@ export interface CastState {
 
 	proportion?: number;
 	color?: string;
+
+	uiScale?: number;
 }
 
 export interface LinkState {
@@ -281,6 +283,7 @@ export interface LinkState {
 	strength: number;
 	lifeSteal: number;
 	expireTick: number;
+	color: string;
 }
 
 export interface ThrustState extends DamagePacket {
@@ -292,6 +295,7 @@ export interface ThrustState extends DamagePacket {
 }
 
 export interface GravityState {
+	spellId: string;
 	expireTick: number;
 	location: pl.Vec2;
 	strength: number;
@@ -312,6 +316,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	collideWith: number;
 	hit?: boolean;
 	speed: number;
+	strafe?: boolean;
 
 	target: pl.Vec2;
 	targetId: string | null;
@@ -388,6 +393,7 @@ export interface ScourgeEvent extends WorldEventBase {
 	type: "scourge";
 	pos: pl.Vec2;
 	heroId: string;
+	radius: number;
 }
 
 export namespace WorldEventType {

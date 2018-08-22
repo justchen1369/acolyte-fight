@@ -5,7 +5,7 @@ import * as vector from './vector';
 import * as w from './world.model';
 
 import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/constants';
-import { Settings, World, Hero, Obstacle, Choices, Spells } from '../game/settings';
+import { Settings } from '../game/settings';
 
 // Reset planck.js constants
 {
@@ -37,7 +37,7 @@ export function initialWorld(): w.World {
 		objects: new Map(),
 		physics: pl.World(),
 		actions: new Map(),
-		radius: World.InitialRadius,
+		radius: Settings.World.InitialRadius,
 
 		nextObstacleId: 0,
 		nextPositionId: 0,
@@ -76,6 +76,8 @@ function polygon(numPoints: number, extent: number) {
 }
 
 function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
+	const Obstacle = Settings.Obstacle;
+
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
@@ -140,8 +142,11 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 		category: "shield",
 		categories: Categories.Shield,
 		body,
+		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		owner: hero.id,
+		radius: spell.radius,
+		color: spell.color,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -155,7 +160,7 @@ function addHero(world: w.World, heroId: string) {
 	let position;
 	let angle;
 	{
-		const radius = World.HeroLayoutRadius;
+		const radius = Settings.World.HeroLayoutRadius;
 		const center = pl.Vec2(0.5, 0.5);
 
 		let posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
@@ -254,6 +259,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		type: spell.id,
 		body,
 		speed: projectileTemplate.speed,
+		strafe: projectileTemplate.strafe,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -506,6 +512,8 @@ function handleActions(world: w.World) {
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings) {
+	const Choices = Settings.Choices;
+
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
 	for (var key in Choices.Options) {
@@ -531,7 +539,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (!action || !isValidAction(action, hero)) {
 		return true; // Nothing to do
 	}
-	const spell = (Spells as Spells)[action.type];
+	const spell = Settings.Spells[action.type];
 	const uninterruptible = !spell.interruptible;
 
 	// Start casting a new spell
@@ -809,6 +817,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 	projectile.expireTick = world.tick;
 
 	target.gravity = {
+		spellId: projectile.type,
 		expireTick: world.tick + projectile.gravity.ticks,
 		location: vector.clone(projectile.body.getPosition()),
 		strength: projectile.gravity.impulsePerTick,
@@ -833,6 +842,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
+		color: projectile.color,
 	};
 }
 
@@ -1079,7 +1089,7 @@ function detonate(world: w.World) {
 }
 
 function applyLavaDamage(world: w.World) {
-	const lavaDamagePerTick = World.LavaDamagePerSecond / TicksPerSecond;
+	const lavaDamagePerTick = Settings.World.LavaDamagePerSecond / TicksPerSecond;
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
@@ -1095,6 +1105,7 @@ function applyLavaDamage(world: w.World) {
 }
 
 function shrink(world: w.World) {
+	const World = Settings.World;
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;
 		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
@@ -1114,9 +1125,6 @@ function reap(world: w.World) {
 		} else if (obj.category === "projectile") {
 			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
-			}
-			if (obj.hit) {
-				notifyHit(obj, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (obj.health <= 0) {
@@ -1234,15 +1242,6 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	}
 }
 
-function notifyHit(obj: w.Projectile, world: w.World) {
-	if (!(obj.hit && obj.owner && obj.type === Spells.fireball.id)) {
-		return;
-	}
-
-	const score = world.scores.get(obj.owner);
-	++score.numFireballsHit;
-}
-
 function destroyObject(world: w.World, object: w.WorldObject) {
 	world.objects.delete(object.id);
 	world.physics.destroyBody(object.body);
@@ -1263,10 +1262,10 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 
 	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
 
-	world.objects.forEach(link => {
+	world.objects.forEach(projectile => {
 		// Move link with the hero
-		if (link.category === "projectile" && link.type === Spells.link.id && link.owner === hero.id) {
-			link.body.setPosition(vector.plus(link.body.getPosition(), step));
+		if (projectile.category === "projectile" && projectile.strafe && projectile.owner === hero.id) {
+			projectile.body.setPosition(vector.plus(projectile.body.getPosition(), step));
 		}
 	});
 
@@ -1277,11 +1276,6 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
-
-	if (spell.id === Spells.fireball.id) {
-		let score = world.scores.get(hero.id);
-		++score.numFireballsShot;
-	}
 
 	return true;
 }
@@ -1309,7 +1303,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	if (!action.target) { return true; }
 
 	let currentPosition = hero.body.getPosition();
-	let newPosition = vector.towards(currentPosition, action.target, Spells.teleport.maxRange);
+	let newPosition = vector.towards(currentPosition, action.target, spell.maxRange);
 	hero.body.setPosition(newPosition);
 
 	return true;
@@ -1372,6 +1366,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 		heroId: hero.id,
 		pos: hero.body.getPosition(),
 		type: w.WorldEventType.Scourge,
+		radius: spell.radius,
 	});
 
 	return true;
@@ -1466,8 +1461,6 @@ export function initScore(heroId: string): w.HeroScore {
 		kills: 0,
 		assists: 0,
 		damage: 0,
-		numFireballsShot: 0,
-		numFireballsHit: 0,
 		deathTick: null,
 	};
 }

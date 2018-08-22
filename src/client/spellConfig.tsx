@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as c from '../game/world.model';
-import { Choices, Spells } from '../game/settings';
+import { Settings } from '../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../client/storage';
 import { isMobile } from './userAgent';
@@ -17,7 +17,7 @@ export class SpellConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            config: Storage.loadKeyBindingConfig() || Choices.Defaults,
+            config: Storage.loadKeyBindingConfig() || Settings.Choices.Defaults,
             saved: new Set<string>(),
         };
     }
@@ -25,7 +25,7 @@ export class SpellConfig extends React.Component<Props, State> {
     render() {
         return <div className="spell-config">
             <h1>Your Spell Configuration</h1>
-            {Choices.Keys.map(key => this.renderKey(key))}
+            {Settings.Choices.Keys.map(key => this.renderKey(key))}
         </div>;
     }
 
@@ -34,22 +34,26 @@ export class SpellConfig extends React.Component<Props, State> {
             return null;
         }
 
+        const Choices = Settings.Choices;
+        const Spells = Settings.Spells;
+
         const options = Choices.Options[key];
         let chosenId = this.state.config[key];
 		if (!(options.indexOf(chosenId) >= 0)) {
 			chosenId = Choices.Defaults[key];
 		}
-        const chosen = (Spells as Spells)[chosenId];
+        const chosen = Spells[chosenId];
 
         const name = chosen.name || chosen.id;
         return <div className="key">
             <div className="key-options">
-                {options.map(spellId =>
+                {options.map(spellId => Spells[spellId]).map(spell =>
                     <SpellIcon
-                        className={spellId === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
-                        spellId={spellId}
-                        title={((Spells as Spells)[spellId]).name || this.capitalize(spellId)}
-                        onClick={() => this.onChoose(key, spellId)}
+                        className={spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
+                        icon={spell.icon}
+                        color={spell.color}
+                        title={spell.name || this.capitalize(spell.id)}
+                        onClick={() => this.onChoose(key, spell.id)}
                         size={48} />)}
             </div>
             <div className="key-detail">

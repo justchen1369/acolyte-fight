@@ -5,7 +5,7 @@ import * as vector from '../game/vector';
 import * as w from '../game/world.model';
 
 import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../game/constants';
-import { Hero, Choices, Spells } from '../game/settings';
+import { Settings } from '../game/settings';
 import { Icons } from './icons';
 import { renderIconButton, renderIconOnly } from '../client/renderIcon';
 import { isMobile, isEdge } from './userAgent';
@@ -145,7 +145,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 }
 
 function renderTarget(ctxStack: CanvasCtxStack, target: pl.Vec2) {
-	const CrossHairSize = Hero.Radius;
+	const CrossHairSize = Settings.Hero.Radius;
 	if (!target) {
 		return;
 	}
@@ -176,7 +176,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
 			if (target) {
-				renderLinkBetween(ctxStack, obj, target);
+				renderLinkBetween(ctxStack, obj, target, obj.link.color);
 			}
 		}
 	} else if (obj.category === "shield") {
@@ -194,8 +194,8 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
 
-		if (obj.type === Spells.drain.id) {
-			renderDrainReturn(ctxStack, obj, world);
+		if (obj.lifeSteal > 0) {
+			renderLifeStealReturn(ctxStack, obj, world);
 		}
 	} else if (obj.category === "obstacle") {
 		renderObstacleDestroyed(ctxStack, obj, world);
@@ -210,7 +210,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 		initialTick: world.tick,
 		pos: hero.body.getPosition(),
 		fillStyle: 'white',
-		radius: Hero.Radius * 1.5,
+		radius: Settings.Hero.Radius * 1.5,
 	});
 }
 
@@ -252,7 +252,7 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	}
 }
 
-function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+function renderLifeStealReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
 	if (!projectile.hit) {
 		return;
 	}
@@ -270,7 +270,7 @@ function renderDrainReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, w
 		max: 0.25 * constants.TicksPerSecond,
 		pos: vector.clone(pos),
 		fillStyle: projectile.color,
-		radius: Hero.Radius * 1.5,
+		radius: Settings.Hero.Radius * 1.5,
 	} as w.CircleTrail);
 }
 
@@ -291,7 +291,7 @@ function renderScourge(ctxStack: CanvasCtxStack, ev: w.ScourgeEvent, world: w.Wo
 		initialTick: world.tick,
 		pos: ev.pos,
 		fillStyle: 'white',
-		radius: Spells.scourge.radius,
+		radius: ev.radius,
 	});
 }
 
@@ -403,10 +403,10 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
-	let radius = Hero.Radius;
+	let radius = Settings.Hero.Radius;
 
-	if (hero.casting && hero.casting.stage >= w.CastStage.Channelling && hero.casting.action.type === Spells.thrust.id) {
-		radius = Hero.Radius * 1.25;
+	if (hero.thrust && !hero.thrust.nullified) {
+		radius = Settings.Hero.Radius * 1.25;
 	}
 
 	ctx.save();
@@ -440,7 +440,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		ctx.lineWidth = Pixel;
 
 		ctx.globalAlpha = 0.5;
-		if (hero.casting && hero.casting.stage >= w.CastStage.Orientating && hero.casting.action.type !== Spells.move.id) {
+		if (hero.casting && hero.casting.stage >= w.CastStage.Orientating && hero.casting.action.type !== "move") {
 			ctx.globalAlpha = 0.75;
 		}
 
@@ -474,13 +474,13 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
-	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
+	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Settings.Hero.MaxHealth) {
 		ctx.fillStyle = '#111';
 		ctx.beginPath();
 		healthBarPath(ctx, radius, 1.0);
 		ctx.fill();
 
-		let healthProportion = hero.health / Hero.MaxHealth;
+		let healthProportion = hero.health / Settings.Hero.MaxHealth;
 		ctx.fillStyle = rgColor(healthProportion);
 		ctx.beginPath();
 		healthBarPath(ctx, radius, healthProportion);
@@ -515,21 +515,20 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const pos = hero.body.getPosition();
 
 	const ticksRemaining = shield.expireTick - world.tick;
-
-	let spell = Spells.shield;
-	let proportion = 1.0 * ticksRemaining / spell.maxTicks;
+	const maxTicks = shield.expireTick - shield.createTick;
+	let proportion = 1.0 * ticksRemaining / maxTicks;
 
 	ctx.save();
 
 	ctx.translate(pos.x, pos.y);
 
 	ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
-	ctx.fillStyle = spell.color;
-	ctx.shadowColor = spell.color;
+	ctx.fillStyle = shield.color;
+	ctx.shadowColor = shield.color;
 	ctx.shadowBlur = 10;
 
 	ctx.beginPath();
-	ctx.arc(0, 0, spell.radius, 0, 2 * Math.PI);
+	ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
 	ctx.fill();
 
 
@@ -548,7 +547,7 @@ function heroColor(heroId: string, world: w.World) {
 }
 
 function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number) {
-	const healthBarRadius = HealthBar.HeroRadiusFraction * Hero.Radius;
+	const healthBarRadius = HealthBar.HeroRadiusFraction * Settings.Hero.Radius;
 	ctx.rect(-healthBarRadius, -radius - HealthBar.Height - HealthBar.Margin, healthBarRadius * 2 * proportion, HealthBar.Height);
 }
 
@@ -562,7 +561,7 @@ function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		return;
 	}
 
-	renderGravityAt(ctxStack, projectile.body.getPosition(), world);
+	renderGravityAt(ctxStack, projectile.body.getPosition(), Settings.Spells[projectile.type] as ProjectileSpell, world);
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -570,11 +569,10 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 		return;
 	}
 
-	renderGravityAt(ctxStack, hero.gravity.location, world);
+	renderGravityAt(ctxStack, hero.gravity.location, Settings.Spells[hero.gravity.spellId] as ProjectileSpell, world);
 }
 
-function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World) {
-	const spell = Spells.gravity;
+function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: ProjectileSpell, world: w.World) {
 	const animationLength = 0.33 * constants.TicksPerSecond;
 	const numParticles = 3;
 
@@ -648,14 +646,14 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 	renderProjectile(ctxStack, projectile, world);
 
 	if (owner && owner.category == "hero") {
-		renderLinkBetween(ctxStack, owner, projectile);
+		renderLinkBetween(ctxStack, owner, projectile, projectile.color);
 	}
 }
 
-function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject) {
+function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, color: string) {
 	foreground(ctxStack, ctx => {
 		ctx.lineWidth = Pixel * 5;
-		ctx.strokeStyle = Spells.link.projectile.color;
+		ctx.strokeStyle = color;
 
 		const from = owner.body.getPosition();
 		const to = target.body.getPosition();
@@ -831,7 +829,7 @@ export function touchControls(config: w.ButtonConfig): boolean {
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
 	let selectedAction = heroAction && heroAction.type;
-	const keys = Choices.Keys;
+	const keys = Settings.Choices.Keys;
 
 	if (!world.ui.buttonBar) {
 		world.ui.buttonBar = calculateButtonLayout(keys, rect);
@@ -1053,7 +1051,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const spellId = hero.keysToSpells.get(key);
 	if (!spellId) { return null; }
 
-	const spell = (Spells as Spells)[spellId];
+	const spell = (Settings.Spells as Spells)[spellId];
 	if (!spell) { return null; }
 
 	let button: w.ButtonRenderState = {

@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
-import { Spells } from '../game/settings';
 import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
@@ -180,7 +179,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 1000;
 	} else if (actionData.actionType === "leave") {
 		return 1000;
-	} else if (actionData.actionType === "game" && actionData.spellId === Spells.move.id) {
+	} else if (actionData.actionType === "game" && actionData.spellId === "move") {
 		return 10;
 	} else {
 		return 100;
@@ -188,7 +187,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.actionType === "game" && actionData.spellId !== Spells.move.id;
+	return actionData.actionType === "game" && actionData.spellId !== "move";
 }
 
 export function leaveGame(game: g.Game, socketId: string) {

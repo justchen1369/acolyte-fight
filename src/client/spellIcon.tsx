@@ -1,10 +1,10 @@
 import * as React from 'react';
-import { Spells } from '../game/settings';
 import { Icons } from './icons';
 import { renderIconButton } from '../client/renderIcon';
 
 interface Props extends React.HTMLAttributes<HTMLCanvasElement> {
-    spellId: string;
+    icon: string;
+    color: string;
     size: number;
 }
 
@@ -32,11 +32,10 @@ export class SpellIcon extends React.Component<Props, State> {
             return;
         }
 
-        const spell = (Spells as Spells)[this.props.spellId];
-        const icon = Icons[spell.icon];
+        const icon = Icons[this.props.icon];
         if (icon) {
             const ctx = elem.getContext('2d');
-            renderIconButton(ctx, icon, spell.color, 0.9, this.props.size);
+            renderIconButton(ctx, icon, this.props.color, 0.9, this.props.size);
         }
     }
 }
