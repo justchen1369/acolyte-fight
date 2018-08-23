@@ -339,6 +339,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	collideWith: number;
 	hit?: boolean;
 	speed: number;
+	fixedSpeed: boolean;
 	strafe?: boolean;
 
 	target: pl.Vec2;

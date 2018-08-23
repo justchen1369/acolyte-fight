@@ -273,6 +273,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		type: spell.id,
 		body,
 		speed: projectileTemplate.speed,
+		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		strafe: projectileTemplate.strafe,
 
 		target,
@@ -367,12 +368,12 @@ function physicsStep(world: w.World) {
 
 function applySpeedLimit(world: w.World) {
 	world.objects.forEach(obj => {
-		if (obj.category === "projectile") {
+		if (obj.category === "projectile" && obj.fixedSpeed) {
 			const currentVelocity = obj.body.getLinearVelocity();
 			const currentSpeed = vector.length(currentVelocity);
 
 			const diff = obj.speed - currentSpeed;
-			if (Math.abs(diff) > 0.001) {
+			if (Math.abs(diff) > world.settings.World.ProjectileSpeedMaxError) {
 				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
 				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, newSpeed));
 			}

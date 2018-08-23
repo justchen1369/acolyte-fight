@@ -30,6 +30,7 @@ const World: WorldSettings = {
     InitialShieldSeconds: 1.0,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
+    ProjectileSpeedMaxError: 0.001,
 }
 
 const Obstacle: ObstacleSettings = {
@@ -470,7 +471,8 @@ const bouncer: Spell = {
 
         density: 2,
         radius: 0.001,
-        speed: 0.7,
+        speed: 0.75,
+        fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
