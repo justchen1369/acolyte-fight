@@ -792,7 +792,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	if (projectile.bounce) {
 		bounceToNext(projectile, shield.owner, world);
 	}
-	if (projectile.expireOn & shield.categories) {
+	if ((projectile.expireOn & shield.categories) && projectile.owner !== shield.owner) {
 		destroyObject(world, projectile);
 	}
 }
