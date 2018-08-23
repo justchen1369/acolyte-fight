@@ -470,7 +470,7 @@ const bouncer: Spell = {
 
         density: 2,
         radius: 0.001,
-        speed: 0.75,
+        speed: 0.7,
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
