@@ -306,6 +306,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		createTick: world.tick,
 		expireTick: world.tick + projectileTemplate.maxTicks,
+		minTicks: projectileTemplate.minTicks || 0,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
@@ -770,13 +771,13 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		applyDamageToObstacle(obstacle, projectile.damage, world);
 	}
 
-	if (projectile.expireOn & obstacle.categories) {
+	if (expireOn(world, projectile, obstacle)) {
 		destroyObject(world, projectile);
 	}
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
-	if (projectile.expireOn & other.categories) {
+	if (expireOn(world, projectile, other)) {
 		destroyObject(world, projectile);
 	}
 }
@@ -793,7 +794,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	if (projectile.bounce) {
 		bounceToNext(projectile, shield.owner, world);
 	}
-	if ((projectile.expireOn & shield.categories) && projectile.owner !== shield.owner) {
+	if (expireOn(world, projectile, shield) && projectile.owner !== shield.owner) {
 		destroyObject(world, projectile);
 	}
 }
@@ -813,8 +814,21 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (projectile.bounce) {
 		bounceToNext(projectile, hero.id, world);
 	}
-	if (projectile.expireOn & hero.categories) {
+	if (expireOn(world, projectile, hero)) {
 		destroyObject(world, projectile);
+	}
+}
+
+function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
+	if ((projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks)) {
+		if (other.category === "shield" && projectile.owner === other.owner) {
+			// Every projectile is going to hit its owner's shield on the way out
+			return false;
+		}  else {
+			return true;
+		}
+	} else {
+		return false;
 	}
 }
 

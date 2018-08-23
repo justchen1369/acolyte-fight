@@ -274,6 +274,7 @@ const meteor: Spell = {
         density: 100,
         radius: 0.03,
         speed: 0.2,
+        minTicks: 1,
         maxTicks: 12 * TicksPerSecond,
         damage: 0,
         trailTicks: 15,

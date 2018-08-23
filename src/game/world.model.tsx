@@ -357,6 +357,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 
 	createTick: number;
 	expireTick: number;
+	minTicks: number;
 	maxTicks: number;
 	expireOn: number;
 

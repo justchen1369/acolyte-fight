@@ -177,6 +177,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	detonate?: DetonateParametersTemplate; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
+	minTicks?: number;
 	maxTicks: number;
 	categories?: number; // Collision flags: What flags this object has
     collideWith?: number; // Collision flags: Which other objects to collide with
