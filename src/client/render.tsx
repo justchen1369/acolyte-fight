@@ -268,7 +268,7 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, projectile: w.Projectil
 		initialTick: world.tick,
 		max: 0.25 * constants.TicksPerSecond,
 		pos: vector.clone(pos),
-		fillStyle: projectile.color,
+		fillStyle: HeroColors.HealColor,
 		radius: world.settings.Hero.Radius * 1.5,
 	} as w.CircleTrail);
 }
