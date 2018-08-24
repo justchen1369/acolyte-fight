@@ -539,7 +539,7 @@ function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
 	if (heroId === world.ui.myHeroId) {
 		return HeroColors.MyHeroColor;
-	} else if (player) {
+	} else if (player && (player.isSharedBot || world.activePlayers.has(player.heroId))) {
 		return player.uiColor;
 	} else {
 		return HeroColors.InactiveColor;

@@ -73,7 +73,7 @@ export class InfoPanel extends React.Component<Props, State> {
             }
 
             const isAlive = world.objects.has(player.heroId);
-            const isActive = world.activePlayers.has(player.heroId);
+            const isActive = world.activePlayers.has(player.heroId) || player.isSharedBot;
 
             let color = player.uiColor;
             if (!(isAlive && isActive)) {
