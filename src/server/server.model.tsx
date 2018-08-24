@@ -40,7 +40,7 @@ export interface Game {
 export interface Player {
 	socketId: string;
 	heroId: string;
-	name: string;
+    name: string;
 }
 
 export interface Room {

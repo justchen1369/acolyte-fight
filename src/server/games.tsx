@@ -177,9 +177,7 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 function actionPrecedence(actionData: m.ActionMsg): number {
 	if (!actionData) {
 		return 0;
-	} else if (actionData.actionType === "join") {
-		return 1000;
-	} else if (actionData.actionType === "leave") {
+	} else if (actionData.actionType === "join" || actionData.actionType === "leave" || actionData.actionType === "bot") {
 		return 1000;
 	} else if (actionData.actionType === "game" && actionData.spellId === "move") {
 		return 10;
@@ -198,10 +196,13 @@ export function leaveGame(game: g.Game, socketId: string) {
 		return;
 	}
 
-	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
+	// queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" }); // This is emitted as a "bot" action below
 
 	game.active.delete(socketId);
 	reassignBots(game, socketId);
+
+	activateBot(game, player.heroId); // Replace player with bot
+
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
 
@@ -287,17 +288,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		return null;
 	}
 
-	let heroId: string = null;
-
-	// Take an existing slot, if possible
-	let activeHeroIds = new Set<string>(mapMap(game.active, x => x.heroId));
-	for (let i = 0; i < game.numPlayers; ++i) {
-		let candidate = formatHeroId(i);
-		if (!activeHeroIds.has(candidate)) {
-			heroId = candidate;
-			break;
-		}
-	}
+	let heroId: string = findExistingSlot(game);
 
 	// No existing slots, create a new one
 	if (!heroId) {
@@ -326,14 +317,34 @@ export function addBot(game: g.Game, keyBindings: KeyBindings) {
 		return null;
 	}
 
-	const heroId = formatHeroId(game.numPlayers);
+	const heroId = findExistingSlot(game) || formatHeroId(game.numPlayers); // Bot doesn't count as a player, so don't increment numPlayers
+	activateBot(game, heroId, keyBindings);
+	return heroId;
+}
+
+function activateBot(game: g.Game, heroId: string, keyBindings: KeyBindings = {}) {
+	if (game.active.size === 0) {
+		// Don't bother making a bot for no one
+		return;
+	}
+
 	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
 
 	// Nominate first player as simulator
 	const player = [...game.active.values()][0];
 	game.bots.set(heroId, player.socketId);
+}
 
-	return heroId;
+function findExistingSlot(game: g.Game): string {
+	// Take an existing slot, if possible
+	let activeHeroIds = new Set<string>(mapMap(game.active, x => x.heroId));
+	for (let i = 0; i < game.numPlayers; ++i) {
+		let candidate = formatHeroId(i);
+		if (!activeHeroIds.has(candidate)) {
+			return candidate;
+		}
+	}
+	return null;
 }
 
 function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {

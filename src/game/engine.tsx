@@ -443,6 +443,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 
 function handleBotting(ev: w.Botting, world: w.World) {
 	console.log("Bot joined:", ev.heroId);
+
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
 		hero = addHero(world, ev.heroId);
@@ -450,18 +451,33 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	assignKeyBindingsToHero(hero, ev.keyBindings, world);
+	const existingPlayer = world.players.get(ev.heroId);
+	if (existingPlayer) {
+		const player = {
+			...existingPlayer,
+			isBot: true,
+			isSharedBot: true,
+			uiColor: HeroColors.BotColor,
+		};
+		world.players.set(hero.id, player);
+		world.activePlayers.delete(hero.id);
 
-	const player = {
-		heroId: hero.id,
-		name: Matchmaking.BotName,
-		uiColor: HeroColors.BotColor,
-		isBot: true,
-		isSharedBot: true,
-	} as w.Player;
-	world.players.set(hero.id, player);
+		world.ui.notifications.push({ type: "leave", player: existingPlayer });
+	} else {
+		assignKeyBindingsToHero(hero, ev.keyBindings, world); 
 
-	world.ui.notifications.push({ type: "bot", player });
+		const player = {
+			heroId: hero.id,
+			name: Matchmaking.BotName,
+			uiColor: HeroColors.BotColor,
+			isBot: true,
+			isSharedBot: true,
+		} as w.Player;
+		world.players.set(hero.id, player);
+		world.activePlayers.delete(hero.id);
+
+		world.ui.notifications.push({ type: "bot", player });
+	}
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {
