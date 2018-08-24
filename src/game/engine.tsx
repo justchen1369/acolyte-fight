@@ -783,7 +783,9 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 }
 
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
-	if (projectile.shieldTakesOwnership && projectile.owner !== shield.owner) { // Stop double redirections cancelling out
+	const myProjectile = shield.owner === projectile.owner;
+
+	if (!myProjectile && projectile.shieldTakesOwnership) { // Stop double redirections cancelling out
 		// Redirect back to owner
 		projectile.targetId = projectile.owner;
 		projectile.owner = shield.owner;
@@ -794,7 +796,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	if (projectile.bounce) {
 		bounceToNext(projectile, shield.owner, world);
 	}
-	if (expireOn(world, projectile, shield) && projectile.owner !== shield.owner) {
+	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
 		destroyObject(world, projectile);
 	}
 }
@@ -820,16 +822,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 }
 
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
-	if ((projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks)) {
-		if (other.category === "shield" && projectile.owner === other.owner) {
-			// Every projectile is going to hit its owner's shield on the way out
-			return false;
-		}  else {
-			return true;
-		}
-	} else {
-		return false;
-	}
+	return (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
 }
 
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
