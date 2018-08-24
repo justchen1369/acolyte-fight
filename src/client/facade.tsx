@@ -9,6 +9,8 @@ import * as w from '../game/world.model';
 
 export { worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, CanvasStack } from './render';
 
+const BufferDecayPerTick = 0.999;
+
 interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
@@ -21,6 +23,7 @@ let socket: SocketIOClient.Socket = null;
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
+let allowedDelay = 1;
 
 let notificationListeners = new Array<NotificationListener>();
 
@@ -36,21 +39,28 @@ export function getCurrentWorld(): w.World {
 }
         
 function incomingLoop() {
-	const AllowedDelayInTicks = 1;
+	let numFramesToProcess;
+	if (world.ui.myHeroId) {
+		if (incomingQueue.length === 0) {
+			numFramesToProcess = 0;
+			allowedDelay = Math.min(TicksPerSecond, allowedDelay + 1);
+		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
+			numFramesToProcess = 1; // We're on time, process at normal rate
+		} else if (incomingQueue.length <= TicksPerSecond) {
+			numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
+			allowedDelay = Math.max(1, allowedDelay - 1);
+		} else {
+			// We're very behind, skip ahead
+			numFramesToProcess = incomingQueue.length;
+			allowedDelay = 0;
+		}
 
-	let numFramesToProcess = 1;
-
-	if (incomingQueue.length === 0) {
-		numFramesToProcess = 0;
-	} else if (!world.ui.myHeroId) {
-		numFramesToProcess = 1; // Don't catch up to live when watching a replay
-	} else if (incomingQueue.length <= TicksPerTurn + AllowedDelayInTicks) {
-		numFramesToProcess = 1; // We're on time, process at normal rate
-	} else if (incomingQueue.length <= TicksPerSecond) {
-		numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
+		if (allowedDelay > 1) {
+			allowedDelay = Math.max(1, allowedDelay * BufferDecayPerTick);
+		}
 	} else {
-		// We're very behind, skip ahead
-		numFramesToProcess = incomingQueue.length;
+		// Don't catch up to live when watching a replay
+		numFramesToProcess = incomingQueue.length > 0 ? 1 : 0;
 	}
 
 	for (let i = 0; i < numFramesToProcess; ++i) {
