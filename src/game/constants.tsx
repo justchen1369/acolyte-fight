@@ -28,17 +28,11 @@ export namespace HeroColors {
 	export const HealColor = '#22ee88';
 	export const Colors = [
 		"#6d89cc",
-		"#d0c16b",
 		"#cb8fc1",
-		"#56b5bf",
 		"#7db37d",
-		"#bfad8f",
-		"#a69a7c",
-		"#557e6c",
-		"#a18e4c",
-		"#41569e",
-		"#9d6d95",
-		"#2bafca",
+		"#56b5bf",
+		"#917ccc",
+		"#cc7c88",
 	];
 };
 
