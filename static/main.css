@@ -228,12 +228,12 @@ a:hover, a:active {
 }
 
 .home .fold-indicator {
-    animation: fold-animation alternate 1s infinite;
+    animation: fold-animation alternate 2s infinite;
     cursor: pointer;
 }
 
 .home .fold-indicator .fold-info {
-    font-size: 75%;
+    font-size: 80%;
 }
 
 .home .fold-arrow {

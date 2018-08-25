@@ -50,7 +50,7 @@ export class HomePanel extends React.Component<Props, State> {
                 </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
-                    <div className="fold-info">spell selection &amp; more</div>
+                    <div className="fold-info">spell selection</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
                 <div className="spacer" />
