@@ -55,6 +55,7 @@ export class HomePanel extends React.Component<Props, State> {
                     <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
+                <div style={{ flexGrow: 0.1 }} />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>
