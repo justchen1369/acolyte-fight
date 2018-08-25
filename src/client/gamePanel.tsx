@@ -65,7 +65,7 @@ export class GamePanel extends React.Component<Props, State> {
                     newGameCallback={this.props.newGameCallback}
                     exitGameCallback={this.props.exitGameCallback} />
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
-                    <i className="fa fa-times-circle" /> Exit Game
+                    <i className="fa fa-chevron-left" /> Back to Home
                 </a>}
             </div>
         );
