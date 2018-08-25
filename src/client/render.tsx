@@ -491,7 +491,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			ctx.save();
 
 			ctx.fillStyle = "#ffffff";
-			ctx.globalAlpha = startProportion;
+			ctx.globalAlpha = 0.75 + 0.25 * startProportion;
 			ctx.beginPath();
 			healthBarPath(ctx, radius, healthProportion, world);
 			ctx.fill();
