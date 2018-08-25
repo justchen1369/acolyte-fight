@@ -11,6 +11,7 @@ import { RecentGameList } from '../client/recentGameList';
 import { SharePanel } from '../client/sharePanel';
 import { TitleSection } from '../client/titleSection';
 import { ModdingPanel } from './moddingPanel';
+import { NavBar } from './navbar';
 
 interface Props {
     isNewPlayer: boolean;
@@ -59,15 +60,6 @@ export class Root extends React.Component<Props, State> {
         const page = this.props.current.page;
         return (
             <div className="root-panel" onDragOver={ev => this.onDragOver(ev)} onDrop={ev => this.onDrop(ev)}>
-                <div className="navbar">
-                    {this.renderNavBarItem("", "Home")}
-                    {this.renderNavBarItem("replays", "Replays")}
-                    {this.renderNavBarItem("modding", "Modding", true)}
-                    {this.renderNavBarItem("ai", "AI", true)}
-                    {this.renderNavBarItem("share", "Share")}
-                    {this.renderNavBarItem("about", "About")}
-                    <div className="spacer" />
-                </div>
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
                 {page === "share" && this.renderShare()}
@@ -76,24 +68,6 @@ export class Root extends React.Component<Props, State> {
                 {page === "about" && this.renderAbout()}
             </div>
         );
-    }
-
-    private renderNavBarItem(page: string, label: string, hideOnMobile: boolean = false) {
-        const classNames = ["nav-item"];
-        if (this.props.current.page === page) {
-            classNames.push("nav-item-selected");
-        }
-        if (hideOnMobile) {
-            classNames.push("nav-optional");
-        }
-
-        const newPath = url.getPath(Object.assign({}, this.props.current, { page }));
-        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>{label}</a>
-    }
-
-    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
-        ev.preventDefault();
-        this.props.changePage(newPage);
     }
 
     private renderHome() {
@@ -106,6 +80,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderShare() {
         return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
                 <SharePanel
                     current={this.props.current}
@@ -118,6 +93,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderModding() {
         return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
                 <ModdingPanel current={this.props.current} />
             </div>
@@ -126,6 +102,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderAi() {
         return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
                 <AiPanel
                     current={this.props.current}
@@ -136,6 +113,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderReplays() {
         return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
                 <RecentGameList watchGameCallback={this.props.watchGameCallback} />
             </div>
@@ -144,6 +122,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderAbout() {
         return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
                 <TitleSection settings={this.props.world.settings} />
             </div>

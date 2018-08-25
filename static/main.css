@@ -134,10 +134,6 @@ a:hover, a:active {
 }
 
 .navbar {
-    position: absolute;
-    top: 0;
-    background: #111;
-
     min-height: 50px;
     width: 100%;
     display: flex;
@@ -189,7 +185,7 @@ a:hover, a:active {
     background: black;
     position: relative;
     z-index: -100;
-    padding: 25px 0;
+    padding: 0;
     flex-grow: 1;
 
     display: flex;
@@ -228,7 +224,7 @@ a:hover, a:active {
 
 .home .button-row {
     display: flex;
-    margin: 20px auto;
+    margin: 0px auto;
 }
 
 .home .btn {
@@ -250,7 +246,7 @@ a:hover, a:active {
 }
 
 .home .fold-arrow {
-    font-size: 30px;
+    font-size: 25px;
     font-weight: bold;
 }
 

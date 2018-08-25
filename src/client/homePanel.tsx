@@ -5,6 +5,7 @@ import * as url from './url';
 import * as screenLifecycle from './screenLifecycle';
 import { NameConfig } from '../client/nameConfig';
 import { SpellConfig } from '../client/spellConfig';
+import { NavBar } from './navbar';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -33,6 +34,7 @@ export class HomePanel extends React.Component<Props, State> {
     render() {
         return <div className="content-container">
             <div className="home">
+                <NavBar current={this.props.current} changePage={this.props.changePage} />
                 <div className="spacer" />
                 <div className="title-row">
                     <video autoPlay muted loop>
@@ -53,7 +55,6 @@ export class HomePanel extends React.Component<Props, State> {
                     <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
-                <div className="spacer" />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>
