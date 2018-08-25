@@ -42,11 +42,16 @@ const Obstacle: ObstacleSettings = {
 
 const Choices: ChoiceSettings = {
 	Keys: [
-		"a", "s",
+        { btn: "a", primary: false },
+        { btn: "s", primary: false },
 		null,
-		"q", "w", "e", "r",
+        { btn: "q", primary: true },
+        { btn: "w", primary: true },
+        { btn: "e", primary: true },
+        { btn: "r", primary: true },
 		null,
-		"d", "f",
+        { btn: "d", primary: false },
+        { btn: "f", primary: false },
     ],
 	Options: {
 		"a": ["teleport", "thrust"],
@@ -55,7 +60,7 @@ const Choices: ChoiceSettings = {
 		"w": ["lightning", "link"],
 		"e": ["homing", "boomerang", "gravity"],
 		"r": ["meteor", "kamehameha", "supernova"],
-		"d": ["bouncer", "firespray"],
+		"d": ["firespray", "bouncer"],
 		"f": ["scourge"],
 	},
 	Defaults: {
@@ -65,7 +70,7 @@ const Choices: ChoiceSettings = {
 		"w": "lightning",
 		"e": "homing",
 		"r": "meteor",
-		"d": "bouncer",
+		"d": "firespray",
 		"f": "scourge",
 	},
 }

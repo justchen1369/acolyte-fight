@@ -846,7 +846,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 	}
 }
 
-function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig {
+function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect): w.ButtonConfig {
 	if (isMobile) {
 		return calculateButtonWheelLayout(keys, rect);
 	} else {
@@ -854,24 +854,28 @@ function calculateButtonLayout(keys: string[], rect: ClientRect): w.ButtonConfig
 	}
 }
 
-function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: string[], hero: w.Hero, selectedAction: string, world: w.World) {
+function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World) {
 	ctx.save();
 	ctx.translate(config.region.left, config.region.top);
 	ctx.scale(config.scaleFactor, config.scaleFactor);
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
-		const newState = calculateButtonState(key, hero, selectedAction, world);
-		const currentState = config.buttons.get(key);
+		if (!key) {
+			continue;
+		}
+
+		const newState = calculateButtonState(key.btn, hero, selectedAction, world);
+		const currentState = config.buttons.get(key.btn);
 
 		if (buttonStateChanged(currentState, newState)) {
-			const buttonRegion = config.hitBoxes.get(key);
+			const buttonRegion = config.hitBoxes.get(key.btn);
 			if (buttonRegion) {
-				config.buttons.set(key, newState);
+				config.buttons.set(key.btn, newState);
 
 				ctx.save();
 				ctx.translate(buttonRegion.left, buttonRegion.top);
-				renderBarButton(ctx, newState);
+				renderBarButton(ctx, buttonRegion, newState);
 				ctx.restore();
 			}
 		}
@@ -879,19 +883,23 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 	ctx.restore();
 }
 
-function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: string[], hero: w.Hero, selectedAction: string, world: w.World) {
+function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World) {
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
-		const newState = calculateButtonState(key, hero, selectedAction, world);
-		const currentState = config.buttons.get(key);
+		if (!key) {
+			continue;
+		}
+
+		const newState = calculateButtonState(key.btn, hero, selectedAction, world);
+		const currentState = config.buttons.get(key.btn);
 
 		if (buttonStateChanged(currentState, newState)) {
-			const buttonSector = config.hitSectors.get(key);
+			const buttonSector = config.hitSectors.get(key.btn);
 			if (buttonSector) {
-				config.buttons.set(key, newState);
+				config.buttons.set(key.btn, newState);
 
 				ctx.save();
 				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState);
@@ -916,7 +924,7 @@ function renderTargetSurface(ctx: CanvasRenderingContext2D, config: w.ButtonWhee
 	ctx.restore();
 }
 
-function calculateButtonBarLayout(keys: string[], rect: ClientRect): w.ButtonBarConfig {
+function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.ButtonBarConfig {
 	const hitBoxes = new Map<string, ClientRect>();
 	let nextOffset = 0;
 	keys.forEach(key => {
@@ -926,16 +934,17 @@ function calculateButtonBarLayout(keys: string[], rect: ClientRect): w.ButtonBar
 
 		if (key) {
 			const offset = nextOffset;
+			const size = key.primary ? ButtonBar.Size : ButtonBar.SecondaryButtonSize;
 
 			const left = offset;
-			const top = 0;
-			const width = ButtonBar.Size;
-			const height = ButtonBar.Size;
+			const top = ButtonBar.Size - size;
+			const width = size;
+			const height = size;
 			const right = left + width;
 			const bottom = top + height;
-			hitBoxes.set(key, { left, top, right, bottom, width, height });
+			hitBoxes.set(key.btn, { left, top, right, bottom, width, height });
 
-			nextOffset += ButtonBar.Size;
+			nextOffset += size;
 		} else {
 			nextOffset += ButtonBar.Gap;
 		}
@@ -979,7 +988,7 @@ function calculateButtonBarRegion(rect: ClientRect, totalSize: number, scaleFact
 	return { left, top, right, bottom, width, height };
 }
 
-function calculateButtonWheelLayout(keys: string[], rect: ClientRect): w.ButtonWheelConfig {
+function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.ButtonWheelConfig {
 	const WheelAngleOffset = Math.PI / 2;
 
 	const hitSectors = new Map<string, w.HitSector>();
@@ -991,7 +1000,7 @@ function calculateButtonWheelLayout(keys: string[], rect: ClientRect): w.ButtonW
 			const startAngle = nextAngle;
 			const endAngle = startAngle + arcWidth;
 
-			hitSectors.set(key, { startAngle, endAngle });
+			hitSectors.set(key.btn, { startAngle, endAngle });
 
 			nextAngle += arcWidth;
 		}
@@ -1081,7 +1090,8 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	return button;
 }
 
-function renderBarButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRenderState) {
+function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect, buttonState: w.ButtonRenderState) {
+	const size = buttonRegion.width; // assume square
 	if (buttonState) {
 		const key = buttonState.key || "";
 
@@ -1090,20 +1100,20 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRen
 		ctx.textBaseline = 'middle';
 		
 		let color = buttonState.color;
-		renderIconButton(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, ButtonBar.Size);
+		renderIconButton(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, size);
 
 		if (buttonState.cooldownText) {
 			// Cooldown
 			let cooldownText = buttonState.cooldownText
 
-			ctx.font = 'bold ' + (ButtonBar.Size * 0.75 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, cooldownText, ButtonBar.Size / 2, ButtonBar.Size / 2);
+			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2);
 		} else {
 			// Keyboard shortcut
 			ctx.save();
 
-			ctx.font = 'bold ' + (ButtonBar.Size / 2 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, key.toUpperCase(), ButtonBar.Size / 4, ButtonBar.Size * 3 / 4);
+			ctx.font = 'bold ' + (size / 2 - 1) + 'px sans-serif';
+			renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4);
 
 			ctx.restore();
 		}
@@ -1111,7 +1121,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonState: w.ButtonRen
 
 		ctx.restore();
 	} else {
-		ctx.clearRect(0, 0, ButtonBar.Size, ButtonBar.Size);
+		ctx.clearRect(0, 0, size, size);
 	}
 }
 

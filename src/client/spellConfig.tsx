@@ -29,10 +29,12 @@ export class SpellConfig extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderKey(key: string) {
-        if (!key) {
+    private renderKey(keyConfig: KeyConfig) {
+        if (!keyConfig) {
             return null;
         }
+
+        const key = keyConfig.btn;
 
         const Choices = this.props.settings.Choices;
         const Spells = this.props.settings.Spells;

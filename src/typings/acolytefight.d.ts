@@ -89,9 +89,14 @@ declare interface ObstacleSettings {
 }
 
 declare interface ChoiceSettings {
-	Keys: string[];
+	Keys: KeyConfig[];
 	Options: KeyBindingOptions;
 	Defaults: KeyBindings;
+}
+
+declare interface KeyConfig {
+	btn: string;
+	primary?: boolean;
 }
 
 declare interface Spells {
