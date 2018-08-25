@@ -199,11 +199,13 @@ export function leaveGame(game: g.Game, socketId: string) {
 	// queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" }); // This is emitted as a "bot" action below
 
 	game.active.delete(socketId);
-	reassignBots(game, socketId);
 
+	reassignBots(game, socketId);
 	activateBot(game, player.heroId); // Replace player with bot
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
+
+	finishGameIfNecessary(game);
 }
 
 function reassignBots(game: g.Game, leftSocketId: string) {
@@ -231,17 +233,21 @@ function reassignBots(game: g.Game, leftSocketId: string) {
 	});
 }
 
-function finishGame(game: g.Game) {
-	game.bots.clear();
-	getStore().activeGames.delete(game.id);
-	getStore().inactiveGames.set(game.id, game);
+function finishGameIfNecessary(game: g.Game) {
+	if (game.active.size === 0) {
+		game.bots.clear();
+		getStore().activeGames.delete(game.id);
+		getStore().inactiveGames.set(game.id, game);
 
-	logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function gameTick(game: g.Game): boolean {
-	if (game.active.size === 0) {
-		finishGame(game);
+	if (finishGameIfNecessary(game)) {
 		return false;
 	}
 
