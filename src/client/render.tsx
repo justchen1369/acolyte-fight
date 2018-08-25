@@ -399,7 +399,11 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
+	const player = world.players.get(hero.id);
 	let color = heroColor(hero.id, world);
+	if (!(world.activePlayers.has(hero.id) || (player && player.isSharedBot))) {
+		color = HeroColors.InactiveColor;
+	}
 
 	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
@@ -539,10 +543,8 @@ function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
 	if (heroId === world.ui.myHeroId) {
 		return HeroColors.MyHeroColor;
-	} else if (player && (player.isSharedBot || world.activePlayers.has(player.heroId))) {
-		return player.uiColor;
 	} else {
-		return HeroColors.InactiveColor;
+		return player.uiColor;
 	}
 }
 

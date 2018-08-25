@@ -442,6 +442,12 @@ function handleClosing(ev: w.Closing, world: w.World) {
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {
+	if (world.winner) {
+		// if the game is finished, don't add a bot, just make the player leave
+		handleLeavingHero(ev.heroId, world);
+		return;
+	}
+
 	console.log("Bot joined:", ev.heroId);
 
 	let hero = world.objects.get(ev.heroId);
@@ -529,9 +535,13 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 }
 
 function handleLeaving(ev: w.Leaving, world: w.World) {
-	console.log("Player left:", ev.heroId);
-	const player = world.players.get(ev.heroId);
-	world.activePlayers.delete(ev.heroId);
+	handleLeavingHero(ev.heroId, world);
+}
+
+function handleLeavingHero(heroId: string, world: w.World) {
+	console.log("Player left:", heroId);
+	const player = world.players.get(heroId);
+	world.activePlayers.delete(heroId);
 
 	if (player) {
 		world.ui.notifications.push({ type: "leave", player });
