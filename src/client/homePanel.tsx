@@ -49,7 +49,10 @@ export class HomePanel extends React.Component<Props, State> {
                     In private room: <b><a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>{this.props.current.room}</a></b>
                 </div>}
                 <div className="spacer" />
-                <div className="fold-indicator" onClick={() => this.scrollBelowFold()}><i className="fa fa-chevron-down" /></div>
+                <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
+                    <div className="fold-info">spell selection &amp; more</div>
+                    <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
+                </div>
                 <div className="spacer" />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>

@@ -228,10 +228,17 @@ a:hover, a:active {
 }
 
 .home .fold-indicator {
-    font-size: 50px;
-    font-weight: bold;
     animation: fold-animation alternate 1s infinite;
     cursor: pointer;
+}
+
+.home .fold-indicator .fold-info {
+    font-size: 75%;
+}
+
+.home .fold-arrow {
+    font-size: 50px;
+    font-weight: bold;
 }
 
 .home .fold-indicator:hover {
