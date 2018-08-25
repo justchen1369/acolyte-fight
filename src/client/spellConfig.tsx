@@ -25,7 +25,6 @@ export class SpellConfig extends React.Component<Props, State> {
 
     render() {
         return <div className="spell-config">
-            <h1>Your Spell Configuration</h1>
             {this.props.settings.Choices.Keys.map(key => this.renderKey(key))}
         </div>;
     }

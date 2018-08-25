@@ -24,15 +24,14 @@ export class NameConfig extends React.Component<Props, State> {
         }
     }
     render() {
-        return <div>
-            <h1>Your Name</h1>
+        return <p>
             <div><input type="text" value={this.state.name} maxLength={PlayerName.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
             {this.state.changed && <div style={{ marginTop: 8 }}>
                 {this.state.saved 
                     ? "Your name has been set to " + this.state.name
                     : "Unsaved changes"}
             </div>}
-        </div>;
+        </p>;
     }
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {

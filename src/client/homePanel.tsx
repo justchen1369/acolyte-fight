@@ -50,7 +50,7 @@ export class HomePanel extends React.Component<Props, State> {
                 </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
-                    <div className="fold-info">spell selection</div>
+                    <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
                 <div className="spacer" />
@@ -61,7 +61,9 @@ export class HomePanel extends React.Component<Props, State> {
                     Time to practice your skills.
                     In this arena, you'll find others just like you. Will you be the last one standing?
                 </p>
+                <h2>Your Name</h2>
                 <NameConfig />
+                <h1>Your Spell Configuration</h1>
                 <SpellConfig settings={this.props.world.settings} />
             </div>
         </div>;
