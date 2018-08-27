@@ -25,3 +25,12 @@ export function loadKeyBindingConfig(): KeyBindings {
 export function saveKeyBindingConfig(config: KeyBindings) {
     window.localStorage.setItem(StorageKeys.Buttons, JSON.stringify(config));
 }
+
+export function getOrCreatePlayerName(): string {
+    let name = loadName();
+    if (!name) {
+        name = "Acolyte" + (Math.random() * 10000).toFixed(0);
+        saveName(name);
+    }
+    return name;
+}

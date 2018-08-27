@@ -60,6 +60,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 setInterval(() => {
 	serverStore.cleanupOldInactiveGames(maxReplays);
 	serverStore.cleanupOldRooms(24, 1);
+	serverStore.cleanupOldParties(1);
 }, cleanupIntervalMinutes * 60 * 1000);
 
 setInterval(() => {

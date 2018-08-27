@@ -1,9 +1,10 @@
 import * as React from 'react';
-import * as ai from './ai';
+import * as s from './store.model';
 import * as w from '../game/world.model';
+import * as ai from './ai';
 import * as url from './url';
-import * as screenLifecycle from './screenLifecycle';
 import { NameConfig } from '../client/nameConfig';
+import { PlayButton } from './playButton';
 import { SpellConfig } from '../client/spellConfig';
 import { NavBar } from './navbar';
 
@@ -11,13 +12,14 @@ const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     current: url.PathElements;
+    party: s.PartyState;
     world: w.World;
     changePage: (newPage: string) => void;
     newGameCallback: () => void;
+    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
     playingAsAI: boolean;
-    joining: boolean;
 }
 
 export class HomePanel extends React.Component<Props, State> {
@@ -27,7 +29,6 @@ export class HomePanel extends React.Component<Props, State> {
         super(props);
         this.state = {
             playingAsAI: ai.playingAsAI(this.props.world.allowBots),
-            joining: false,
         };
     }
 
@@ -45,7 +46,12 @@ export class HomePanel extends React.Component<Props, State> {
                 </div>
                 <div className="spacer" />
                 <div className="button-row">
-                    <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{this.state.playingAsAI ? "Play as AI" : "Play"}</span>
+                    <PlayButton
+                        label={this.state.playingAsAI ? "Play as AI" : "Play"}
+                        party={this.props.party}
+                        newGameCallback={this.props.newGameCallback}
+                        partyReadyCallback={this.props.partyReadyCallback}
+                    />
                 </div>
                 {this.props.current.room && <div className="private-room-indicator">
                     In private room: <b><a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>{this.props.current.room}</a></b>
@@ -69,15 +75,6 @@ export class HomePanel extends React.Component<Props, State> {
                 <SpellConfig settings={this.props.world.settings} />
             </div>
         </div>;
-    }
-
-    private onPlayClicked(ev: React.MouseEvent) {
-        if (this.state.joining) {
-            return;
-        }
-        this.setState({ joining: true });
-        screenLifecycle.enterGame();
-        this.props.newGameCallback();
     }
 
     private getRoomDetailsUrl() {

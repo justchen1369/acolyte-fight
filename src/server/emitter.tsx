@@ -1,3 +1,4 @@
+import moment from 'moment';
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -18,7 +19,8 @@ let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstrea
 export function attachToSocket(io: SocketIO.Server) {
     io.on('connection', onConnection);
 
-    games.attachToEmitter(data => io.to(data.gameId).emit("tick", data));
+    games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
+    games.attachToPartyEmitter(data => io.to(data.partyId).emit("party", data));
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -61,6 +63,7 @@ function onConnection(socket: SocketIO.Socket) {
 	});
 
 	socket.on('room', (data, callback) => onRoomMsg(socket, authToken, data, callback));
+	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
@@ -107,6 +110,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			}
 		});
 		upstream.on('tick', (data: any) => socket.emit('tick', data));
+		upstream.on('party', (data: any) => socket.emit('party', data));
 		upstream.on('disconnect', () => {
 			// Only disconnect if we've actually connected before
 			if (!attached) { return; }
@@ -123,6 +127,42 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 	} else {
 		callback({ success: false, error: `Unable to find room ${data.roomId}` });
 	}
+}
+
+function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
+	const store = getStore();
+
+	let party;
+	if (data.partyId) {
+		party = store.parties.get(data.partyId);
+	} else {
+		party = games.initParty();
+		logger.info(`Party ${party.id} created by user ${authToken}`);
+	}
+
+	if (!party) {
+		logger.info(`Party ${data.partyId} not found for user ${authToken}`);
+		callback({ success: false, error: `Party ${data.partyId} not found` });
+		return;
+	}
+
+	if (data.playerName) {
+		const joining = !party.active.has(socket.id);
+		if (joining) {
+			socket.join(party.id);
+		}
+		games.updatePartyMember(party, socket.id, authToken, data.playerName, data.ready);
+	} else {
+		games.removePartyMember(party, socket.id);
+		socket.leave(party.id);
+	}
+
+	const result: m.PartyResponse = {
+		success: true,
+		partyId: party.id,
+		server: getLocation().server,
+	};
+	callback(result);
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {

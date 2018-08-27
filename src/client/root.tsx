@@ -8,6 +8,7 @@ import { AiPanel } from './aiPanel';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
+import { PartyPanel } from './partyPanel';
 import { SharePanel } from '../client/sharePanel';
 import { TitleSection } from '../client/titleSection';
 import { ModdingPanel } from './moddingPanel';
@@ -16,6 +17,7 @@ import { NavBar } from './navbar';
 interface Props {
     isNewPlayer: boolean;
     playerName: string;
+    party: s.PartyState;
     current: url.PathElements;
     connected: boolean;
     world: w.World;
@@ -25,6 +27,9 @@ interface Props {
     newGameCallback: () => void;
     watchGameCallback: (gameId: string) => void;
     exitGameCallback: () => void;
+    createPartyCallback: () => void;
+    leavePartyCallback: (partyId: string) => void;
+    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
 }
@@ -46,6 +51,7 @@ export class Root extends React.Component<Props, State> {
 
     private renderGame() {
         return <GamePanel
+            party={this.props.party}
             isNewPlayer={this.props.isNewPlayer}
             world={this.props.world} 
             items={this.props.items} 
@@ -53,7 +59,9 @@ export class Root extends React.Component<Props, State> {
             playerName={this.props.playerName}
             playVsAiCallback={this.props.playVsAiCallback}
             newGameCallback={this.props.newGameCallback}
-            exitGameCallback={this.props.exitGameCallback} />;
+            exitGameCallback={this.props.exitGameCallback}
+            partyReadyCallback={this.props.partyReadyCallback}
+        />;
     }
 
     private renderPage() {
@@ -62,6 +70,7 @@ export class Root extends React.Component<Props, State> {
             <div className="root-panel" onDragOver={ev => this.onDragOver(ev)} onDrop={ev => this.onDrop(ev)}>
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
+                {page === "party" && this.renderParty()}
                 {page === "share" && this.renderShare()}
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
@@ -73,9 +82,26 @@ export class Root extends React.Component<Props, State> {
     private renderHome() {
         return <HomePanel
             current={this.props.current}
+            party={this.props.party}
             world={this.props.world}
             changePage={this.props.changePage}
-            newGameCallback={this.props.newGameCallback} />
+            newGameCallback={this.props.newGameCallback}
+            partyReadyCallback={this.props.partyReadyCallback}
+        />
+    }
+
+    private renderParty() {
+        return <div className="content-container">
+            <NavBar current={this.props.current} changePage={this.props.changePage} />
+            <div className="page">
+                <PartyPanel
+                    current={this.props.current}
+                    party={this.props.party}
+                    createPartyCallback={this.props.createPartyCallback}
+                    leavePartyCallback={this.props.leavePartyCallback}
+                />
+            </div>
+        </div>
     }
 
     private renderShare() {

@@ -106,6 +106,85 @@ export function joinRoom(roomId: string): Promise<void> {
 	}
 }
 
+export function createParty(playerName: string): Promise<void> {
+	return new Promise<void>((resolve, reject) => {
+		let msg: m.PartyRequest = {
+			partyId: null,
+			playerName,
+			ready: false,
+		};
+		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				notify({ type: "joinParty", partyId: response.partyId, server: response.server });
+				resolve();
+			}
+		});
+	});
+}
+
+export function joinParty(partyId: string, playerName: string): Promise<void> {
+	if (partyId) {
+		return new Promise<void>((resolve, reject) => {
+			let msg: m.PartyRequest = {
+				partyId,
+				playerName,
+				ready: false,
+			};
+			socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+				if (response.success === false) {
+					reject(response.error);
+				} else {
+					notify({ type: "joinParty", partyId: response.partyId, server: response.server });
+					resolve();
+				}
+			});
+		});
+	} else {
+		return Promise.resolve();
+	}
+}
+
+export function updateParty(partyId: string, playerName: string, ready: boolean): Promise<void> {
+	return new Promise<void>((resolve, reject) => {
+		let msg: m.PartyRequest = {
+			partyId,
+			playerName,
+			ready,
+		};
+		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
+export function leaveParty(partyId: string): Promise<void> {
+	if (partyId) {
+		return new Promise<void>((resolve, reject) => {
+			let msg: m.PartyRequest = {
+				partyId,
+				playerName: null,
+				ready: false,
+			};
+			socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+				if (response.success === false) {
+					reject(response.error);
+				} else {
+					notify({ type: "leaveParty", partyId: response.partyId });
+					resolve();
+				}
+			});
+		});
+	} else {
+		return Promise.resolve();
+	}
+}
+
 export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: string, observeGameId?: string) {
 	leaveCurrentGame();
 
@@ -189,6 +268,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 		onDisconnectMsg();
 	});
 	socket.on('tick', onTickMsg);
+	socket.on('party', onPartyMsg);
 }
 function onHeroMsg(data: m.JoinResponseMsg) {
 	world = engine.initialWorld(data.mod, data.allowBots);
@@ -293,4 +373,36 @@ function isStartGameTick(tickData: m.TickMsg) {
 		}
 	});
 	return result;
+}
+
+function onPartyMsg(msg: m.PartyMsg) {
+	notify({
+		type: "updateParty",
+		partyId: msg.partyId,
+		members: msg.members,
+	});
+
+	let meReady = false;
+	let allReady = true;
+	msg.members.forEach(member => {
+		if (!member.ready) {
+			allReady = false;
+		}
+		if (member.socketId === socket.id) {
+			meReady = member.ready;
+		}
+	});
+	if (msg.members.length > 0 && allReady && meReady && worldInterruptible(world)) {
+		notify({
+			type: "startParty",
+			partyId: msg.partyId,
+		});
+	}
+}
+
+export function worldInterruptible(world: w.World) {
+	return world.activePlayers.size <= 1
+		|| !!world.winner
+		|| !world.ui.myHeroId
+		|| !world.objects.has(world.ui.myHeroId);
 }

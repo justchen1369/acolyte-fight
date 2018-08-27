@@ -107,6 +107,7 @@ export class RecentGameList extends React.Component<Props, State> {
         return url.getPath({
             gameId: game.id,
             room: null,
+            party: null,
             server: game.server,
             page: null,
         });

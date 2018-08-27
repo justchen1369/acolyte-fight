@@ -229,7 +229,7 @@ a:hover, a:active {
 }
 
 .home .btn {
-    width: 250px;
+    min-width: 250px;
     font-size: 40px;
     margin: 0px 50px;
 }
@@ -359,7 +359,7 @@ a:hover, a:active {
     align-items: center;
 }
 
-#messages-panel .new-game-btn {
+#messages-panel .winner .action-row .btn {
     font-size: 150%;
 }
 
@@ -518,4 +518,48 @@ textarea.ai-js {
 .share a i {
     font-size: 175%;
     margin-right: 10px;
+}
+
+.btn.waiting-for-party {
+    position: relative;
+    background: #555;
+}
+
+.waiting-for-party-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #888;
+}
+
+.waiting-for-party-label {
+    position: relative; /* So it can appear above the absolute-positioned progress bar */
+}
+
+.party-list .party-member {
+    position: relative;
+    margin: 15px 30px;
+    font-size: 32px;
+}
+
+.party-member .party-member-name {
+    margin-left: 38px;
+}
+
+.party-member .party-member-ready {
+    position: absolute;
+    top: auto;
+    bottom: auto;
+    left: 0px;
+    color: #22ee88;
+}
+
+.party-member .party-member-details {
+    opacity: 0;
+    color: #ccc;
+}
+
+.party-member:hover .party-member-details {
+    opacity: 1;
 }

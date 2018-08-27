@@ -5,6 +5,7 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
+import * as facade from './facade';
 import * as url from './url';
 
 import { connectToServer, joinRoom, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
@@ -35,10 +36,11 @@ let current = url.parseLocation(window.location);
 attachToSocket(socket, () => {
     connectToServer(current.server)
         .then(() => joinRoom(current.room))
+        .then(() => facade.joinParty(current.party, getOrCreatePlayerName()))
         .then(() => {
             if (!alreadyConnected) {
                 alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
-                setConnected(true);
+                setConnected(socket.id);
 
                 if (current.gameId || current.page === "join") {
                     if (current.page === "join") {
@@ -53,7 +55,7 @@ attachToSocket(socket, () => {
         }).catch(error => {
             console.error(error)
             socket.disconnect();
-            setConnected(false);
+            setConnected(null);
 
             if (current.room || current.server) {
                 // Failed to join room/server, try without server
@@ -67,7 +69,15 @@ attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
     rerender();
 
-    if (_.some(notifications, n => n.type === "new" || n.type === "quit" || n.type === "disconnected")) {
+    let urlUpdated = false;
+    notifications.forEach(n => {
+        if (n.type === "new" || n.type === "quit" || n.type === "disconnected" || n.type === "joinParty" || n.type === "leaveParty") {
+            urlUpdated = true;
+        } else if (n.type === "startParty") {
+            onStartParty(n.partyId);
+        }
+    });
+    if (urlUpdated) {
         updateUrl();
     }
 });
@@ -75,7 +85,7 @@ attachNotificationListener(notifications => {
 rerender();
 
 function onNewGameClicked() {
-    if (!getStore().connected) {
+    if (!getStore().socketId) {
         // New server? Reload the client, just in case the version has changed.
         current.page = "join";
         updateUrl();
@@ -88,7 +98,7 @@ function onNewGameClicked() {
 }
 
 function onWatchGameClicked(gameId: string) {
-    if (!getStore().connected) {
+    if (!getStore().socketId) {
         // New server? Reload the client, just in case the version has changed.
         current.gameId = gameId;
         current.page = null;
@@ -105,8 +115,35 @@ function onExitGameClicked() {
     leaveCurrentGame();
 }
 
+function onCreatePartyClicked() {
+    const party = getStore().party;
+    if (!party) {
+        const ready = false;
+        facade.createParty(getOrCreatePlayerName());
+    }
+}
+
+function onLeavePartyClicked(partyId: string) {
+    const party = getStore().party;
+    if (party && party.id === partyId) {
+        facade.leaveParty(party.id);
+    }
+}
+
+function onPartyReadyClicked(partyId: string, ready: boolean) {
+    facade.updateParty(partyId, getOrCreatePlayerName(), ready);
+}
+
+function onStartParty(partyId: string) {
+    const party = getStore().party;
+    if (party && party.id === partyId) {
+        facade.updateParty(partyId, getOrCreatePlayerName(), false);
+        setTimeout(() => onNewGameClicked(), 1);
+    }
+}
+
 function changePage(newPage: string) {
-    if (!getStore().connected) {
+    if (!getStore().socketId) {
         const newTarget: url.PathElements = Object.assign({}, current, { page: newPage });
         window.location.href = url.getPath(newTarget);
     } else {
@@ -117,7 +154,11 @@ function changePage(newPage: string) {
 }
 
 function updateUrl() {
-    current.gameId = getStore().world.ui.myGameId;
+    const store = getStore();
+
+    current.gameId = store.world.ui.myGameId;
+    current.party = store.party ? store.party.id : null;
+
     const path = url.getPath(current);
     window.history.replaceState(null, null, path);
 }
@@ -127,9 +168,10 @@ function rerender() {
     ReactDOM.render(
         <Root
             current={current}
-            connected={store.connected}
+            connected={!!store.socketId}
             isNewPlayer={isNewPlayer}
             playerName={playerName}
+            party={store.party}
             world={store.world}
             items={store.items}
             changePage={newPage => changePage(newPage)}
@@ -137,6 +179,9 @@ function rerender() {
             newGameCallback={() => onNewGameClicked()}
             watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
             exitGameCallback={() => onExitGameClicked()}
+            createPartyCallback={() => onCreatePartyClicked()}
+            leavePartyCallback={(partyId) => onLeavePartyClicked(partyId)}
+            partyReadyCallback={(partyId, ready) => onPartyReadyClicked(partyId, ready)}
         />,
         document.getElementById("root"));
 }

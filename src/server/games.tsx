@@ -11,15 +11,20 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
-let emit: TickEmitter = null;
+let emitParty: Emitter<m.PartyMsg> = null;
+let emitTick: Emitter<m.TickMsg> = null;
 let ticksProcessing = false;
 
-export interface TickEmitter {
-	(data: m.TickMsg): void;
+export interface Emitter<T> {
+	(data: T): void;
 }
 
-export function attachToEmitter(_emit: TickEmitter) {
-	emit = _emit;
+export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
+	emitTick = _emit;
+}
+
+export function attachToPartyEmitter(_emit: Emitter<m.PartyMsg>) {
+	emitParty = _emit;
 }
 
 export function onConnect(socketId: string, authToken: string) {
@@ -29,6 +34,11 @@ export function onDisconnect(socketId: string, authToken: string) {
 	getStore().activeGames.forEach(game => {
 		if (game.active.has(socketId)) {
 			leaveGame(game, socketId);
+		}
+	});
+	getStore().parties.forEach(party => {
+		if (party.active.has(socketId)) {
+			removePartyMember(party, socketId);
 		}
 	});
 }
@@ -121,6 +131,18 @@ export function initRoom(mod: Object, allowBots: boolean): g.Room {
 	return room;
 }
 
+export function initParty(): g.Party {
+	const partyIndex = getStore().nextPartyId++;
+	const party: g.Party = {
+		id: "p" + partyIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		created: moment(),
+		modified: moment(),
+		active: new Map<string, g.PartyMember>(),
+	};
+	getStore().parties.set(party.id, party);
+	return party;
+}
+
 export function initGame(room: g.Room = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
@@ -157,6 +179,44 @@ export function initGame(room: g.Room = null) {
 
 	logger.info("Game [" + game.id + "]: started");
 	return game;
+}
+
+export function updatePartyMember(party: g.Party, socketId: string, authToken: string, name: string, ready: boolean) {
+	const joined = !party.active.has(socketId);
+	party.active.set(socketId, { socketId, name, ready });
+	logger.info(`Party ${party.id} ${joined ? "joined" : "updated"} by user ${name} [${authToken}]]: ready=${ready}`);
+	party.modified = moment();
+
+	setTimeout(() => reprocessParty(party), 1);
+}
+
+export function removePartyMember(party: g.Party, socketId: string) {
+	const member = party.active.get(socketId);
+	if (!member) {
+		return;
+	}
+
+	party.active.delete(socketId);
+	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
+
+	setTimeout(() => reprocessParty(party), 1);
+}
+
+export function reprocessParty(party: g.Party) {
+	if (party.active.size === 0) {
+		return;
+	}
+
+	let members = new Array<g.PartyMember>();
+	party.active.forEach(member => {
+		members.push({
+			socketId: member.socketId,
+			name: member.name,
+			ready: member.ready,
+		});
+	});
+
+	emitParty({ partyId: party.id, members });
 }
 
 function formatHeroId(index: number): string {
@@ -282,7 +342,7 @@ function gameTurn(game: g.Game) {
 	}
 
 	closeGameIfNecessary(game, data);
-	emit(data);
+	emitTick(data);
 }
 
 export function isGameRunning(game: g.Game) {

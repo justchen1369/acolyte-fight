@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as screenLifecycle from './screenLifecycle';
+import { worldInterruptible } from './facade';
 
 import { ButtonBar } from '../game/constants';
 
@@ -10,6 +11,7 @@ import { MessagesPanel } from './messagesPanel';
 import { CanvasPanel } from './canvasPanel';
 
 interface Props {
+    party: s.PartyState;
     isNewPlayer: boolean;
     playerName: string;
     world: w.World;
@@ -18,6 +20,7 @@ interface Props {
     playVsAiCallback: () => void;
     newGameCallback: () => void;
     exitGameCallback: () => void;
+    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
 }
@@ -44,26 +47,25 @@ export class GamePanel extends React.Component<Props, State> {
             }
         }
 
-        const allowExit =
-            world.activePlayers.size <= 1
-            || !!world.winner
-            || !world.ui.myHeroId
-            || !world.objects.has(world.ui.myHeroId)
-            || !this.props.connected
+        const allowExit = worldInterruptible(world) || !this.props.connected
         return (
             <div id="game-panel">
                 <CanvasPanel world={this.props.world} />
                 <InfoPanel
                     playVsAiCallback={this.props.playVsAiCallback}
                     playerName={this.props.playerName}
-                    world={this.props.world} />
+                    world={this.props.world}
+                />
                 <MessagesPanel
                     style={{ marginLeft, marginBottom }}
+                    party={this.props.party}
                     isNewPlayer={this.props.isNewPlayer}
                     world={this.props.world}
                     items={this.props.items}
                     newGameCallback={this.props.newGameCallback}
-                    exitGameCallback={this.props.exitGameCallback} />
+                    exitGameCallback={this.props.exitGameCallback}
+                    partyReadyCallback={this.props.partyReadyCallback}
+                />
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home
                 </a>}

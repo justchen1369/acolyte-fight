@@ -6,9 +6,10 @@ const ExpiryMilliseconds = 15000;
 
 let nextNotificationId = 0;
 let store: s.Store = {
+    socketId: null,
+    party: null,
     world: getCurrentWorld(),
     items: [],
-    connected: false,
 };
 
 setInterval(notificationCleanup, ExpiryMilliseconds);
@@ -17,8 +18,8 @@ export function getStore() {
     return store;
 }
 
-export function setConnected(connected: boolean) {
-    store.connected = connected;
+export function setConnected(socketId: string) {
+    store.socketId = socketId;
 }
 
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {
@@ -28,7 +29,26 @@ export function applyNotificationsToStore(newNotifications: w.Notification[]) {
             store.world = getCurrentWorld();
             store.items = [];
         } else if (n.type === "disconnected") {
-            store.connected = false;
+            store.socketId = null;
+        } else if (n.type === "joinParty") {
+            if (!(store.party && store.party.id === n.partyId)) {
+                store.party = {
+                    id: n.partyId,
+                    members: new Array<w.PartyMemberState>(),
+                    ready: false,
+                };
+            }
+        } else if (n.type === "updateParty") {
+            if (store.party && n.partyId === store.party.id) {
+                store.party.members = n.members;
+                n.members.forEach(member => {
+                    if (member.socketId === store.socketId) {
+                        store.party.ready = member.ready;
+                    }
+                });
+            }
+        } else if (n.type === "leaveParty") {
+            store.party = null;
         }
     });
 

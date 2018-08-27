@@ -122,6 +122,33 @@ export interface JoinResponseMsg {
     numPlayers: number;
 }
 
+
+export interface PartyRequest {
+    partyId: string;
+    playerName: string;
+    ready: boolean;
+}
+export interface PartyResponse {
+    success: true;
+    partyId: string;
+    server: string;
+}
+
+export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
+
+
+export interface PartyMsg {
+    partyId: string;
+    members: PartyMemberMsg[];
+}
+
+export interface PartyMemberMsg {
+    socketId: string;
+    name: string;
+    ready: boolean;
+}
+
+
 export interface ServerStats {
     numGames: number;
     numPlayers: number;

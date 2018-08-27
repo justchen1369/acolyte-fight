@@ -3,15 +3,18 @@ import * as React from 'react';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import { HeroColors, Matchmaking } from '../game/constants';
+import { PlayButton } from './playButton';
 import { isMobile } from './userAgent';
 
 interface Props {
+    party: s.PartyState;
     isNewPlayer: boolean;
     world: w.World;
     items: s.NotificationItem[];
     style: any;
     newGameCallback: () => void;
     exitGameCallback: () => void;
+    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
     spectatingGameId: string;
@@ -170,17 +173,28 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
-        const observing = !this.props.world.ui.myHeroId;
         return <div key={key} className="winner">
             <div className="winner-row">{this.renderPlayer(notification.winner)} is the winner!</div>
             <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
             <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
-                {observing
-                    ? <span className="btn new-game-btn" onClick={() => this.props.exitGameCallback()}>Exit Replay</span>
-                    : <span className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</span>}
+                {this.renderWinAction()}
             </div>
         </div>;
+    }
+
+    private renderWinAction() {
+        const observing = !this.props.world.ui.myHeroId;
+        if (observing) {
+            return <span className="btn new-game-btn" onClick={() => this.props.exitGameCallback()}>Exit Replay</span>;
+        } else {
+            return <PlayButton
+                label="Play Again"
+                party={this.props.party}
+                newGameCallback={this.props.newGameCallback}
+                partyReadyCallback={this.props.partyReadyCallback}
+            />;
+        }
     }
     
     private renderDead(key: string, spectatingGameId: string) {

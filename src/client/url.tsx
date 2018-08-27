@@ -4,6 +4,7 @@ export interface PathElements {
     page?: string;
     gameId?: string;
     room: string;
+    party: string;
     server: string;
 }
 
@@ -11,6 +12,7 @@ export function parseLocation(location: Location): PathElements {
     let page: string = null;
     let gameId: string = null;
     let room: string = null;
+    let party: string = null;
     let server: string = null;
 
     if (location.pathname) {
@@ -25,12 +27,15 @@ export function parseLocation(location: Location): PathElements {
         if (params["room"]) {
             room = params["room"];
         }
+        if (params["party"]) {
+            party = params["party"];
+        }
         if (params["server"]) {
             server = params["server"];
         }
     }
 
-    return { page, gameId, room, server };
+    return { page, gameId, room, party, server };
 }
 
 export function getPath(elems: PathElements) {
@@ -45,6 +50,9 @@ export function getPath(elems: PathElements) {
 
     if (elems.room) {
         params.push("room=" + elems.room);
+    }
+    if (elems.party) {
+        params.push("party=" + elems.party);
     }
     if (elems.server) {
         params.push("server=" + elems.server);
@@ -64,4 +72,8 @@ export function getRoomHomePath(current: PathElements) {
 
 export function exitRoomPath(current: PathElements) {
     return getPath(Object.assign({}, current, { room: null, server: null }));
+}
+
+export function getPartyHomePath(current: PathElements) {
+    return getPath(Object.assign({}, current, { page: null }));
 }

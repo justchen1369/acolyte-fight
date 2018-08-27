@@ -4,8 +4,10 @@ import * as m from '../game/messages.model';
 export interface ServerStore {
     nextGameId: 0;
     nextRoomId: 0;
+    nextPartyId: 0;
     numConnections: number;
     rooms: Map<string, Room>; // id -> room
+    parties: Map<string, Party>; // id -> party
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
     recentTickMilliseconds: number[];
@@ -49,4 +51,17 @@ export interface Room {
     numGamesCumulative: number;
     mod: Object;
     allowBots: boolean;
+}
+
+export interface Party {
+    id: string;
+    created: moment.Moment;
+    modified: moment.Moment;
+    active: Map<string, PartyMember>; // socketId -> party member
+}
+
+export interface PartyMember {
+    socketId: string;
+    name: string;
+    ready: boolean;
 }
