@@ -442,12 +442,6 @@ function handleClosing(ev: w.Closing, world: w.World) {
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {
-	if (world.winner) {
-		// if the game is finished, don't add a bot, just make the player leave
-		handleLeavingHero(ev.heroId, world);
-		return;
-	}
-
 	console.log("Bot joined:", ev.heroId);
 
 	let hero = world.objects.get(ev.heroId);
@@ -457,33 +451,19 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	const existingPlayer = world.players.get(ev.heroId);
-	if (existingPlayer) {
-		const player = {
-			...existingPlayer,
-			isBot: true,
-			isSharedBot: true,
-			uiColor: HeroColors.BotColor,
-		};
-		world.players.set(hero.id, player);
-		world.activePlayers.delete(hero.id);
+	assignKeyBindingsToHero(hero, ev.keyBindings, world); 
 
-		world.ui.notifications.push({ type: "leave", player: existingPlayer });
-	} else {
-		assignKeyBindingsToHero(hero, ev.keyBindings, world); 
+	const player = {
+		heroId: hero.id,
+		name: Matchmaking.BotName,
+		uiColor: HeroColors.BotColor,
+		isBot: true,
+		isSharedBot: true,
+	} as w.Player;
+	world.players.set(hero.id, player);
+	world.activePlayers.delete(hero.id);
 
-		const player = {
-			heroId: hero.id,
-			name: Matchmaking.BotName,
-			uiColor: HeroColors.BotColor,
-			isBot: true,
-			isSharedBot: true,
-		} as w.Player;
-		world.players.set(hero.id, player);
-		world.activePlayers.delete(hero.id);
-
-		world.ui.notifications.push({ type: "bot", player });
-	}
+	world.ui.notifications.push({ type: "bot", player });
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {
@@ -535,16 +515,24 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 }
 
 function handleLeaving(ev: w.Leaving, world: w.World) {
-	handleLeavingHero(ev.heroId, world);
-}
+	console.log("Player left:", ev.heroId);
+	const player = world.players.get(ev.heroId);
+	if (!player) {
+		return;
+	}
 
-function handleLeavingHero(heroId: string, world: w.World) {
-	console.log("Player left:", heroId);
-	const player = world.players.get(heroId);
-	world.activePlayers.delete(heroId);
+	world.activePlayers.delete(ev.heroId);
+	world.ui.notifications.push({ type: "leave", player });
 
-	if (player) {
-		world.ui.notifications.push({ type: "leave", player });
+	const hero = world.objects.get(ev.heroId);
+	if (hero) {
+		// Replace leaving hero with bot
+		const newPlayer = {
+			...player,
+			isBot: true,
+			isSharedBot: true,
+		};
+		world.players.set(ev.heroId, newPlayer);
 	}
 }
 

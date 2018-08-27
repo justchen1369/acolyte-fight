@@ -61,6 +61,7 @@ function startBotIfNecessary(world: w.World, heroId: string) {
     if (isMyBot(world, heroId)) {
         const key = workerKey(world.ui.myGameId, heroId);
         if (!workers.has(key)) {
+            console.log("Starting bot", heroId);
             const allowCustomCode = heroId === world.ui.myHeroId;
             workers.set(key, new AiWorker(world, heroId, createCodeUrl(allowCustomCode)));
         }

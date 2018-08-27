@@ -256,26 +256,24 @@ export function leaveGame(game: g.Game, socketId: string) {
 		return;
 	}
 
-	// queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" }); // This is emitted as a "bot" action below
-
 	game.active.delete(socketId);
+	reassignBots(game, player.heroId, socketId);
 
-	reassignBots(game, socketId);
-	activateBot(game, player.heroId); // Replace player with bot
+	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 
 	finishGameIfNecessary(game);
 }
 
-function reassignBots(game: g.Game, leftSocketId: string) {
+function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string) {
 	if (game.active.size === 0) {
 		// No one to simulate the bots
 		game.bots.clear();
 		return;
 	}
 
-	const botsToReassign = new Array<string>();
+	const botsToReassign = [leavingHeroId];
 	game.bots.forEach((socketId, heroId) => {
 		if (socketId === leftSocketId) {
 			botsToReassign.push(heroId);
@@ -379,26 +377,19 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 }
 
 export function addBot(game: g.Game, keyBindings: KeyBindings) {
-	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers) {
+	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0) {
 		return null;
 	}
 
 	const heroId = findExistingSlot(game) || formatHeroId(game.numPlayers); // Bot doesn't count as a player, so don't increment numPlayers
-	activateBot(game, heroId, keyBindings);
-	return heroId;
-}
-
-function activateBot(game: g.Game, heroId: string, keyBindings: KeyBindings = {}) {
-	if (game.active.size === 0) {
-		// Don't bother making a bot for no one
-		return;
-	}
-
-	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
 
 	// Nominate first player as simulator
 	const player = [...game.active.values()][0];
 	game.bots.set(heroId, player.socketId);
+
+	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
+
+	return heroId;
 }
 
 function findExistingSlot(game: g.Game): string {
