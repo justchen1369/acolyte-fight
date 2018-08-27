@@ -18,3 +18,9 @@ export interface PartyState {
     members: w.PartyMemberState[];
     ready: boolean;
 }
+
+export interface RoomState {
+    id: string;
+    mod: Object;
+    allowBots: boolean;
+}

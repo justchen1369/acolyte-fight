@@ -53,9 +53,6 @@ export class HomePanel extends React.Component<Props, State> {
                         partyReadyCallback={this.props.partyReadyCallback}
                     />
                 </div>
-                {this.props.current.room && <div className="private-room-indicator">
-                    In private room: <b><a href={this.getRoomDetailsUrl()} onClick={(ev) => this.onRoomDetailsClick(ev)}>{this.props.current.room}</a></b>
-                </div>}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>

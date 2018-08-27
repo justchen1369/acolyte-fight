@@ -8,7 +8,7 @@ import queryString from 'query-string';
 import * as facade from './facade';
 import * as url from './url';
 
-import { connectToServer, joinRoom, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { connectToServer, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
 import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
 import * as Storage from '../client/storage';
 import { DefaultSettings } from '../game/settings';
@@ -35,7 +35,6 @@ let current = url.parseLocation(window.location);
 
 attachToSocket(socket, () => {
     connectToServer(current.server)
-        .then(() => joinRoom(current.room))
         .then(() => facade.joinParty(current.party, getOrCreatePlayerName()))
         .then(() => {
             if (!alreadyConnected) {
@@ -47,7 +46,7 @@ attachToSocket(socket, () => {
                         // Return to the home page when we exit
                         current.page = "";
                     }
-                    joinNewGame(playerName, retrieveKeyBindings(), current.room, current.gameId);
+                    joinNewGame(playerName, retrieveKeyBindings(), current.gameId);
                 } else {
                     rerender(); // Room settings might have changed the page
                 }
@@ -57,9 +56,9 @@ attachToSocket(socket, () => {
             socket.disconnect();
             setConnected(null);
 
-            if (current.room || current.server) {
-                // Failed to join room/server, try without server
-                current.room = null;
+            if (current.party || current.server) {
+                // Failed to join party/server, try without server
+                current.party = null;
                 current.server = null;
                 updateUrl();
             }
@@ -92,7 +91,7 @@ function onNewGameClicked() {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), current.room);
+        joinNewGame(playerName, retrieveKeyBindings());
         updateUrl();
     }
 }
@@ -106,7 +105,7 @@ function onWatchGameClicked(gameId: string) {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), current.room, gameId);
+        joinNewGame(playerName, retrieveKeyBindings(), gameId);
         updateUrl();
     }
 }

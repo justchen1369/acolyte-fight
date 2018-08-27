@@ -188,6 +188,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 	const result: m.PartyResponse = {
 		success: true,
 		partyId: party.id,
+		roomId: party.roomId,
 		server: getLocation().server,
 	};
 	callback(result);

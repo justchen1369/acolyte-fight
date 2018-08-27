@@ -5,6 +5,7 @@ import { DefaultSettings, calculateMod } from '../game/settings';
 import * as ai from './ai';
 import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
+import * as s from './store.model';
 import * as w from '../game/world.model';
 
 export { worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, CanvasStack } from './render';
@@ -15,9 +16,12 @@ interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
 
-let mod = {};
-let allowBots = false;
-let world = engine.initialWorld(mod, allowBots);
+let room: s.RoomState = {
+	id: null,
+	mod: {},
+	allowBots: false,
+};
+let world = engine.initialWorld(room.mod, room.allowBots);
 
 let socket: SocketIOClient.Socket = null;
 
@@ -106,9 +110,12 @@ export function joinRoom(roomId: string): Promise<void> {
 				if (response.success === false) {
 					reject(response.error);
 				} else {
-					mod = response.mod || {};
-					allowBots = response.allowBots || false;
-					world = engine.initialWorld(mod, allowBots);
+					room = {
+						id: roomId,
+						mod: response.mod || {},
+						allowBots: response.allowBots || false,
+					};
+					world = engine.initialWorld(room.mod, room.allowBots);
 					notify({ type: "room", roomId: response.roomId });
 					resolve();
 				}
@@ -119,7 +126,16 @@ export function joinRoom(roomId: string): Promise<void> {
 	}
 }
 
-export function createParty(roomId: string, playerName: string): Promise<void> {
+export function leaveRoom(): Promise<void> {
+	room = {
+		id: null,
+		mod: {},
+		allowBots: false,
+	};
+	return Promise.resolve();
+}
+
+export function createParty(roomId: string, playerName: string): Promise<m.PartyResponse> {
 	return new Promise<string>((resolve, reject) => {
 		let msg: m.CreatePartyRequest = {
 			roomId,
@@ -134,25 +150,28 @@ export function createParty(roomId: string, playerName: string): Promise<void> {
 	}).then(partyId => joinParty(partyId, playerName));
 }
 
-export function joinParty(partyId: string, playerName: string): Promise<void> {
+export function joinParty(partyId: string, playerName: string): Promise<m.PartyResponse> {
 	if (partyId) {
+		let response: m.PartyResponse;
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.PartyRequest = {
 				partyId,
 				playerName,
 				ready: false,
 			};
-			socket.emit('party', msg, (response: m.PartyResponseMsg) => {
-				if (response.success === false) {
-					reject(response.error);
+			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
+				if (_response.success === false) {
+					reject(_response.error);
 				} else {
-					notify({ type: "joinParty", partyId: response.partyId, server: response.server });
+					response = _response;
 					resolve();
 				}
 			});
-		});
+		}).then(() => joinRoom(response.roomId))
+		.then(() => notify({ type: "joinParty", partyId: response.partyId, server: response.server }))
+		.then(() => response)
 	} else {
-		return Promise.resolve();
+		return Promise.resolve<m.PartyResponse>(null);
 	}
 }
 
@@ -189,21 +208,21 @@ export function leaveParty(partyId: string): Promise<void> {
 					resolve();
 				}
 			});
-		});
+		}).then(() => leaveRoom());
 	} else {
 		return Promise.resolve();
 	}
 }
 
-export function joinNewGame(playerName: string, keyBindings: KeyBindings, room: string, observeGameId?: string) {
+export function joinNewGame(playerName: string, keyBindings: KeyBindings, observeGameId?: string) {
 	leaveCurrentGame();
 
 	const msg: m.JoinMsg = {
 		gameId: observeGameId || null,
 		name: playerName,
 		keyBindings,
-		room,
-		isBot: ai.playingAsAI(allowBots) && !observeGameId,
+		room: room.id,
+		isBot: ai.playingAsAI(room.allowBots) && !observeGameId,
 		observe: !!observeGameId,
 	};
 	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
@@ -232,7 +251,7 @@ export function leaveCurrentGame() {
 		socket.emit('leave', leaveMsg);
 	}
 
-	world = engine.initialWorld(mod, allowBots);
+	world = engine.initialWorld(room.mod, room.allowBots);
 
 	notify({ type: "quit" });
 }

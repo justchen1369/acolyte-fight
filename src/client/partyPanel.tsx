@@ -6,6 +6,11 @@ import * as url from './url';
 
 interface Props {
     current: url.PathElements;
+    changePage: (newPage: string) => void;
+
+    mod: Object;
+    allowBots: boolean;
+
     party: s.PartyState;
     createPartyCallback: () => void;
     leavePartyCallback: (partyId: string) => void;
@@ -49,6 +54,15 @@ export class PartyPanel extends React.Component<Props, State> {
                     {this.props.party.members.map(member => this.renderMember(member))}
                 </div>
             </p>
+            <h2>Party modifications</h2>
+            {Object.keys(this.props.mod).length > 0
+                ? <p>
+                    The following modifications are active in this room:
+                    <textarea className="mod-json">{JSON.stringify(this.props.mod, null, 2)}</textarea>
+                </p>
+                : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this party.</p>}
+            <h2>Bots</h2>
+            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {this.props.allowBots ? "allowed" : "not allowed"} in this party.</p>
         </div>
     }
 
@@ -72,5 +86,10 @@ export class PartyPanel extends React.Component<Props, State> {
         if (party) {
             this.props.leavePartyCallback(party.id);
         }
+    }
+
+    private anchorClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
+        ev.preventDefault();
+        this.props.changePage(newPage);
     }
 }

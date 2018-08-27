@@ -1,13 +1,18 @@
 import * as React from 'react';
 import * as rooms from './rooms';
+import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as url from './url';
+import { PartyPanel } from './partyPanel';
 
 interface Props {
     current: url.PathElements;
+    party: s.PartyState;
     mod: Object;
     allowBots: boolean;
     changePage: (newPage: string) => void;
+    createPartyCallback: () => void;
+    leavePartyCallback: (partyId: string) => void;
 }
 interface State {
     error: string;
@@ -23,59 +28,19 @@ export class SharePanel extends React.Component<Props, State> {
 
     render() {
         return <div>
-            {this.props.current.room ? this.renderCurrentRoom() : this.renderNewRoom()}
+            <PartyPanel
+                current={this.props.current}
+                changePage={this.props.changePage}
+                mod={this.props.mod}
+                allowBots={this.props.allowBots}
+                party={this.props.party}
+                createPartyCallback={this.props.createPartyCallback}
+                leavePartyCallback={this.props.leavePartyCallback}
+            />
             <h1>Community</h1>
             <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
             <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
             <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
         </div>
-    }
-
-    private renderCurrentRoom() {
-        const currentRoomPath = url.getRoomHomePath(this.props.current);
-        return <div>
-            <h1>Current room</h1>
-            <p>
-                You are currently in room <b><a href={currentRoomPath}>{this.props.current.room}</a></b>.
-                Invite friends to this room by sending the following URL:
-                <input className="share-url" type="text" value={window.location.origin + currentRoomPath} readOnly onFocus={ev => ev.target.select()} />
-            </p>
-            <p><div className="btn" onClick={() => this.exitRoom()}>Exit room</div></p>
-            <h2>Room modifications</h2>
-            {Object.keys(this.props.mod).length > 0
-                ? <p>
-                    The following modifications are active in this room:
-                    <textarea className="mod-json">{JSON.stringify(this.props.mod, null, 2)}</textarea>
-                </p>
-                : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this room.</p>}
-            <h2>Room bots</h2>
-            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {this.props.allowBots ? "allowed" : "not allowed"} in this room.</p>
-        </div>
-    }
-
-    private renderNewRoom() {
-        return <div>
-            <h1>Private room</h1>
-            <p>Create a private room to play with friends!</p>
-            <p><div className="btn" onClick={() => this.onSubmit()}>Create Room</div></p>
-            {this.state.error && <p className="error">{this.state.error}</p>}
-        </div>;
-    }
-
-    private anchorClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
-        ev.preventDefault();
-        this.props.changePage(newPage);
-    }
-
-    private exitRoom() {
-        window.location.href = url.exitRoomPath(this.props.current);
-    }
-
-    private onSubmit() {
-        rooms.createRoomFromMod({}, this.props.current)
-            .catch(error => {
-                console.error(error);
-                this.setState({ error: `${error}` });
-            });
     }
 }

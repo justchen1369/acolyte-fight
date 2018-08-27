@@ -67,10 +67,9 @@ export class Root extends React.Component<Props, State> {
     private renderPage() {
         const page = this.props.current.page;
         return (
-            <div className="root-panel" onDragOver={ev => this.onDragOver(ev)} onDrop={ev => this.onDrop(ev)}>
+            <div className="root-panel">
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
-                {page === "party" && this.renderParty()}
                 {page === "share" && this.renderShare()}
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
@@ -90,20 +89,6 @@ export class Root extends React.Component<Props, State> {
         />
     }
 
-    private renderParty() {
-        return <div className="content-container">
-            <NavBar current={this.props.current} changePage={this.props.changePage} />
-            <div className="page">
-                <PartyPanel
-                    current={this.props.current}
-                    party={this.props.party}
-                    createPartyCallback={this.props.createPartyCallback}
-                    leavePartyCallback={this.props.leavePartyCallback}
-                />
-            </div>
-        </div>
-    }
-
     private renderShare() {
         return <div className="content-container">
             <NavBar current={this.props.current} changePage={this.props.changePage} />
@@ -112,7 +97,11 @@ export class Root extends React.Component<Props, State> {
                     current={this.props.current}
                     mod={this.props.world.mod}
                     allowBots={this.props.world.allowBots}
-                    changePage={this.props.changePage} />
+                    changePage={this.props.changePage}
+                    party={this.props.party}
+                    createPartyCallback={this.props.createPartyCallback}
+                    leavePartyCallback={this.props.leavePartyCallback}
+                />
             </div>
         </div>;
     }
@@ -153,17 +142,5 @@ export class Root extends React.Component<Props, State> {
                 <TitleSection settings={this.props.world.settings} />
             </div>
         </div>;
-    }
-
-    private onDragOver(ev: React.DragEvent) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        ev.dataTransfer.dropEffect = "copy";
-    }
-
-    private onDrop(ev: React.DragEvent) {
-        ev.stopPropagation();
-        ev.preventDefault();
-        rooms.createRoomFromFile(ev.dataTransfer.files.item(0), this.props.current);
     }
 }
