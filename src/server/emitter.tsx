@@ -192,7 +192,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		callback({
 			gameId: game.id,
 			heroId,
-			room: game.room,
+			room: game.roomId,
 			mod: game.mod,
 			allowBots: game.allowBots,
 			history: game.history,
@@ -243,7 +243,7 @@ function calculateRoomStats(room: string): RoomStats {
 	let numGames = 0;
 	let numPlayers = 0;
 	getStore().activeGames.forEach(game => {
-		if (game.room === room && games.isGameRunning(game)) {
+		if (game.roomId === room && games.isGameRunning(game)) {
 			numGames += 1;
 			numPlayers += game.active.size;
 		}

@@ -20,7 +20,7 @@ export interface LocationStore {
 
 export interface Game {
     id: string;
-    room: string | null;
+    roomId: string | null;
     created: moment.Moment;
 
     mod: Object;

@@ -73,7 +73,7 @@ function gameToMsg(game: g.Game): m.GameMsg {
         numActivePlayers: game.active.size,
         joinable: game.joinable,
         numTicks: game.history.length,
-        roomId: game.room,
+        roomId: game.roomId,
         server: getLocation().server,
     };
 }

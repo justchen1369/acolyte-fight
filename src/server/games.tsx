@@ -74,7 +74,7 @@ export function findNewGame(room: g.Room = null): g.Game {
 	let numPlayers = 1; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
 	getStore().activeGames.forEach(g => {
-		if (g.room === roomId) {
+		if (g.roomId === roomId) {
 			if (isGameRunning(g)) {
 				numPlayers += g.active.size;
 			}
@@ -147,7 +147,7 @@ export function initGame(room: g.Room = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		room: room ? room.id : null,
+		roomId: room ? room.id : null,
 		mod: room ? room.mod : {},
 		allowBots: room ? room.allowBots : false,
 		created: moment(),
