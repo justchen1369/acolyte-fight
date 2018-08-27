@@ -211,6 +211,11 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	party.active.delete(socketId);
 	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
 
+	// All members become unready when someone leaves
+	party.active.forEach(member => {
+		member.ready = false;
+	});
+
 	setTimeout(() => reprocessParty(party), 1);
 }
 

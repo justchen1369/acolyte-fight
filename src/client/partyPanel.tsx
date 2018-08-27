@@ -32,13 +32,13 @@ export class PartyPanel extends React.Component<Props, State> {
     render() {
         return <div>
             <h1>Party</h1>
-            <p>Play together with friends by creating a party.</p>
             {this.props.party ? this.renderCurrentParty() : this.renderNoParty()}
         </div>
     }
 
     private renderNoParty() {
         return <div>
+            <p>Play together with friends as a party.</p>
             <p><span className={this.state.creating ? "btn btn-disabled" : "btn"} onClick={() => this.onCreatePartyClick()}>Create Party</span></p>
         </div>
     }
@@ -46,10 +46,10 @@ export class PartyPanel extends React.Component<Props, State> {
     private renderCurrentParty() {
         const currentPartyPath = url.getPartyHomePath(this.props.current);
         return <div>
+            <p><b>Currently in party:</b> <span>{this.props.party.members.map(m => m.name).join(", ")}</span></p>
+            <p>Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => this.onLeavePartyClick()}>Leave Party</span></p>
-            <h2>Party members</h2>
-            <p><b>Currently in party:</b> <span>{this.props.party.members.map(m => m.name).join(", ")}</span></p>
             <h2>Party modifications</h2>
             {Object.keys(this.props.mod).length > 0
                 ? <p>
