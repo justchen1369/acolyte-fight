@@ -118,8 +118,8 @@ function onExitGameClicked() {
 function onCreatePartyClicked() {
     const party = getStore().party;
     if (!party) {
-        const ready = false;
-        facade.createParty(getOrCreatePlayerName());
+        const roomId: string = null;
+        facade.createParty(roomId, getOrCreatePlayerName());
     }
 }
 

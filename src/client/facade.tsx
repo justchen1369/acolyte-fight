@@ -119,22 +119,19 @@ export function joinRoom(roomId: string): Promise<void> {
 	}
 }
 
-export function createParty(playerName: string): Promise<void> {
-	return new Promise<void>((resolve, reject) => {
-		let msg: m.PartyRequest = {
-			partyId: null,
-			playerName,
-			ready: false,
+export function createParty(roomId: string, playerName: string): Promise<void> {
+	return new Promise<string>((resolve, reject) => {
+		let msg: m.CreatePartyRequest = {
+			roomId,
 		};
-		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+		socket.emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
-				notify({ type: "joinParty", partyId: response.partyId, server: response.server });
-				resolve();
+				resolve(response.partyId);
 			}
 		});
-	});
+	}).then(partyId => joinParty(partyId, playerName));
 }
 
 export function joinParty(partyId: string, playerName: string): Promise<void> {
