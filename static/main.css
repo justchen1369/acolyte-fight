@@ -530,36 +530,35 @@ textarea.ai-js {
     top: 0;
     left: 0;
     height: 100%;
-    background: #888;
+    background: #22ee88;
+}
+
+.btn.waiting-for-party:hover .waiting-for-party-progress {
+    background: #ff0044;
 }
 
 .waiting-for-party-label {
     position: relative; /* So it can appear above the absolute-positioned progress bar */
 }
 
+.party-list {
+    margin-top: 10px;
+}
+
 .party-list .party-member {
-    position: relative;
-    margin: 15px 30px;
-    font-size: 32px;
-}
-
-.party-member .party-member-name {
-    margin-left: 38px;
-}
-
-.party-member .party-member-ready {
-    position: absolute;
-    top: auto;
-    bottom: auto;
-    left: 0px;
-    color: #22ee88;
-}
-
-.party-member .party-member-details {
-    opacity: 0;
+    display: inline-block;
+    background: #444;
     color: #ccc;
+    padding: 3px 15px;
+    border-radius: 15px;
+    margin-right: 5px;
 }
 
-.party-member:hover .party-member-details {
-    opacity: 1;
+.party-list .party-member-ready {
+    background: #22ee88;
+    color: #444;
+}
+
+.party-member i {
+    margin-right: 5px;
 }

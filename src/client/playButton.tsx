@@ -28,12 +28,12 @@ export class PlayButton extends React.Component<Props, State> {
             if (party.ready) {
                 let readyCount = party.members.filter(m => m.ready).length;
                 const partySize = party.members.length;
-                return <span className="btn btn-disabled waiting-for-party">
+                return <span className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)}>
                     <div className="waiting-for-party-progress" style={{ width: `${100 * readyCount / partySize}%` }}></div>
                     <div className="waiting-for-party-label">Waiting for Party...</div>
                 </span>
             } else {
-                return <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPartyReadyClicked(ev, !this.props.party.ready)}>
+                return <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPartyReadyClicked(true)}>
                     {this.props.label}
                 </span>
             }
@@ -51,13 +51,11 @@ export class PlayButton extends React.Component<Props, State> {
         this.props.newGameCallback();
     }
 
-    private onPartyReadyClicked(ev: React.MouseEvent, ready: boolean) {
+    private onPartyReadyClicked(ready: boolean) {
         const party = this.props.party;
         if (party) {
             if (ready) {
                 screenLifecycle.enterGame();
-            } else {
-                screenLifecycle.exitGame();
             }
             this.props.partyReadyCallback(party.id, ready);
         }

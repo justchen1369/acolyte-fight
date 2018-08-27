@@ -53,6 +53,7 @@ export class HomePanel extends React.Component<Props, State> {
                         partyReadyCallback={this.props.partyReadyCallback}
                     />
                 </div>
+                {this.props.party && this.renderParty()}
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
@@ -74,11 +75,26 @@ export class HomePanel extends React.Component<Props, State> {
         </div>;
     }
 
-    private getRoomDetailsUrl() {
+    private renderParty() {
+        return <div className="party-list">
+            <b>In party (<a href={this.getPartyDetailsUrl()} onClick={(ev) => this.onPartyDetailsClick(ev)}>details</a>): </b>
+            {" "}
+            {this.props.party.members.map(member => this.renderMember(member))}
+        </div>
+    }
+
+    private renderMember(member: w.PartyMemberState) {
+        return <div className={member.ready ? "party-member party-member-ready" : "party-member party-member-not-ready"} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
+            {member.ready ? <i className="fas fa-check-square" /> : <i className="fas fa-square" />} 
+            <span className="party-member-name">{member.name}</span>
+        </div>
+    }
+
+    private getPartyDetailsUrl() {
         return url.getPath(Object.assign({}, this.props.current, { page: "share" }));
     }
 
-    private onRoomDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
+    private onPartyDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
         ev.preventDefault();
         return this.props.changePage("share");
     }

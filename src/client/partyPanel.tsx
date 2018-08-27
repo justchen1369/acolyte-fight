@@ -32,7 +32,7 @@ export class PartyPanel extends React.Component<Props, State> {
     render() {
         return <div>
             <h1>Party</h1>
-            <p>Play with friends by creating a party.</p>
+            <p>Play together with friends by creating a party.</p>
             {this.props.party ? this.renderCurrentParty() : this.renderNoParty()}
         </div>
     }
@@ -48,12 +48,8 @@ export class PartyPanel extends React.Component<Props, State> {
         return <div>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => this.onLeavePartyClick()}>Leave Party</span></p>
-            <h2>Party Members</h2>
-            <p>
-                <div className="party-list">
-                    {this.props.party.members.map(member => this.renderMember(member))}
-                </div>
-            </p>
+            <h2>Party members</h2>
+            <p><b>Currently in party:</b> <span>{this.props.party.members.map(m => m.name).join(", ")}</span></p>
             <h2>Party modifications</h2>
             {Object.keys(this.props.mod).length > 0
                 ? <p>
@@ -63,14 +59,6 @@ export class PartyPanel extends React.Component<Props, State> {
                 : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this party.</p>}
             <h2>Bots</h2>
             <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {this.props.allowBots ? "allowed" : "not allowed"} in this party.</p>
-        </div>
-    }
-
-    private renderMember(member: w.PartyMemberState) {
-        return <div className="party-member">
-            {member.ready && <i className="fas fa-check-square party-member-ready" title="Ready" />} 
-            <span className="party-member-name">{member.name}</span>
-            <span className="party-member-details"> - {member.ready ? "ready" : "not ready"}</span>
         </div>
     }
 
