@@ -1,4 +1,5 @@
 import * as m from '../game/messages.model';
+import * as facade from './facade';
 import * as url from './url';
 import { readFileAsync } from './fileUtils';
 
@@ -14,21 +15,14 @@ export function createRoomFromMod(mod: Object, current: url.PathElements) {
 
 export function createRoom(mod: Object, allowBots: boolean, current: url.PathElements, nextPage: string = "share") {
     console.log("Creating room", mod, allowBots);
-    return fetch('api/room', {
-        credentials: "same-origin",
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        method: 'POST',
-        body: JSON.stringify({ mod, allowBots } as m.CreateRoomRequest),
-    }).then(res => res.json()).then((msg: m.CreateRoomResponse) => msg)
-    .then(msg => {
-        const path = url.getPath(Object.assign({}, current, {
-            gameId: null,
-            page: nextPage,
-            room: msg.roomId,
-            server: msg.server,
-        }));
-        window.location.href = path;
-    })
+    return facade.createRoom(mod, allowBots)
+        .then(msg => {
+            const path = url.getPath(Object.assign({}, current, {
+                gameId: null,
+                page: nextPage,
+                room: msg.roomId,
+                server: msg.server,
+            }));
+            window.location.href = path;
+        })
 }

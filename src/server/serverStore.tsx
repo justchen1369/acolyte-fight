@@ -4,7 +4,6 @@ import * as g from './server.model';
 import { logger } from './logging';
 
 let store: g.ServerStore = {
-    nextRoomId: 0,
     nextPartyId: 0,
     nextGameId: 0,
     numConnections: 0,
@@ -39,20 +38,14 @@ export function cleanupOldInactiveGames(maxInactiveGames: number) {
     });
 }
 
-export function cleanupOldRooms(maxAgeHours: number, maxAgeUnusedHours: number) {
+export function cleanupOldRooms(maxAgeUnusedHours: number) {
     const now = moment();
 
     const idsToCleanup = new Array<string>();
     store.rooms.forEach(room => {
-        const ageInHours = moment(now).diff(room.created, 'hours', true);
-        if (room.numGamesCumulative > 0) {
-            if (ageInHours > maxAgeHours) {
-                idsToCleanup.push(room.id);
-            }
-        } else {
-            if (ageInHours > maxAgeUnusedHours) {
-                idsToCleanup.push(room.id);
-            }
+        const ageInHours = moment(now).diff(room.accessed, 'hours', true);
+        if (ageInHours > maxAgeUnusedHours) {
+            idsToCleanup.push(room.id);
         }
     });
 

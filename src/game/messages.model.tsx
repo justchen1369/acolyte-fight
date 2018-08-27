@@ -122,6 +122,17 @@ export interface JoinResponseMsg {
     numPlayers: number;
 }
 
+export interface CreatePartyRequest {
+    roomId: string;
+}
+export interface CreatePartyResponse {
+    success: true;
+    partyId: string;
+    roomId: string;
+    server: string;
+}
+export type CreatePartyResponseMsg = CreatePartyResponse | ErrorResponseMsg;
+
 
 export interface PartyRequest {
     partyId: string;
@@ -133,7 +144,6 @@ export interface PartyResponse {
     partyId: string;
     server: string;
 }
-
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
 
 
@@ -179,8 +189,9 @@ export interface CreateRoomRequest {
     mod: Object;
     allowBots: boolean;
 }
-
 export interface CreateRoomResponse {
+    success: true;
     roomId: string;
     server: string;
 }
+export type CreateRoomResponseMsg = CreateRoomResponse | ErrorResponseMsg;

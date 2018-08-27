@@ -63,7 +63,9 @@ function onConnection(socket: SocketIO.Socket) {
 	});
 
 	socket.on('room', (data, callback) => onRoomMsg(socket, authToken, data, callback));
+	socket.on('room.create', (data, callback) => onRoomCreateMsg(socket, authToken, data, callback));
 	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
+	socket.on('party.create', (data, callback) => onPartyCreateMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
@@ -129,17 +131,43 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 	}
 }
 
-function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
-	const store = getStore();
+function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreateRoomRequest, callback: (output: m.CreateRoomResponseMsg) => void) {
+    if (data && data.mod && typeof data.mod === "object" && typeof data.allowBots === "boolean") {
+        const room = games.initRoom(data.mod, data.allowBots);
+        const result: m.CreateRoomResponse = {
+			success: true,
+            roomId: room.id,
+            server: getLocation().server,
+        };
+        logger.info(`Room ${room.id} created by user ${authToken} with bots=${data.allowBots} and mod ${JSON.stringify(data.mod).substr(0, 1000)}`);
+        callback(result);
+    } else {
+        callback({ success: false, error: `Bad request` });
+    }
+}
 
-	let party;
-	if (data.partyId) {
-		party = store.parties.get(data.partyId);
-	} else {
-		party = games.initParty();
-		logger.info(`Party ${party.id} created by user ${authToken}`);
+function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreatePartyRequest, callback: (output: m.CreatePartyResponseMsg) => void) {
+	const party = games.initParty(data.roomId);
+	logger.info(`Party ${party.id} created by user ${authToken}`);
+
+	const result: m.CreatePartyResponse = {
+		success: true,
+		partyId: party.id,
+		roomId: party.roomId,
+		server: getLocation().server,
+	};
+	callback(result);
+}
+
+function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
+	if (!data.partyId) {
+		callback({ success: false, error: `Party field required` });
+		return;
 	}
 
+	const store = getStore();
+
+	let party = store.parties.get(data.partyId);
 	if (!party) {
 		logger.info(`Party ${data.partyId} not found for user ${authToken}`);
 		callback({ success: false, error: `Party ${data.partyId} not found` });
@@ -169,7 +197,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
-	const roomId = data.room ? PlayerName.sanitizeName(data.room) : null;
+	const roomId = data.room;
 	const room = roomId ? store.rooms.get(roomId) : null;
 
 	let game: g.Game = null;
@@ -200,15 +228,11 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			numPlayers: roomStats.numPlayers,
 		});
 
-		let gameName = game.id;
-		if (roomId) {
-			gameName = roomId + "/" + gameName;
-		}
 		if (heroId) {
 			const botLog = data.isBot ? " (bot)" : "";
-			logger.info(`Game [${gameName}]: player ${playerName}${botLog} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+			logger.info(`Game [${game.id}]: player ${playerName}${botLog} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
 		} else {
-			logger.info(`Game [${gameName}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);

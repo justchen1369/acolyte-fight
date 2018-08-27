@@ -48,7 +48,6 @@ app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typ
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
 app.get('/api/games', (req, res) => api.onGamesList(req, res));
 app.get('/api/location', (req, res) => api.onLocation(req, res));
-app.post('/api/room', (req, res) => api.onCreateRoom(req, res));
 app.get('/api/status', (req, res) => res.send(getServerStats()));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
@@ -59,7 +58,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(() => {
 	serverStore.cleanupOldInactiveGames(maxReplays);
-	serverStore.cleanupOldRooms(24, 1);
+	serverStore.cleanupOldRooms(1);
 	serverStore.cleanupOldParties(1);
 }, cleanupIntervalMinutes * 60 * 1000);
 

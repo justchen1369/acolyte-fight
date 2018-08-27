@@ -85,6 +85,19 @@ export function connectToServer(server: string): Promise<void> {
 	}
 }
 
+export function createRoom(mod: Object, allowBots: boolean): Promise<m.CreateRoomResponse> {
+	return new Promise<m.CreateRoomResponse>((resolve, reject) => {
+		let msg: m.CreateRoomRequest = { mod, allowBots };
+		socket.emit('room.create', msg, (response: m.CreateRoomResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				resolve(response);
+			}
+		});
+	});
+}
+
 export function joinRoom(roomId: string): Promise<void> {
 	if (roomId) {
 		return new Promise<void>((resolve, reject) => {
@@ -283,7 +296,7 @@ function onHeroMsg(data: m.JoinResponseMsg) {
 		tickQueue.push(incomingQueue.shift());
 	}
 
-	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId);
+	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod, data.allowBots);
 
 	notify({
 		type: "new",

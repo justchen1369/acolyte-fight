@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import moment from 'moment';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
 import * as _ from 'lodash';
@@ -119,24 +120,31 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 }
 
 export function initRoom(mod: Object, allowBots: boolean): g.Room {
-	const roomIndex = getStore().nextRoomId++;
-	const room: g.Room = {
-		id: "r" + roomIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		created: moment(),
-		mod,
-		allowBots,
-		numGamesCumulative: 0,
-	};
-	getStore().rooms.set(room.id, room);
+	const store = getStore();
+
+	// Same settings -> same room
+	const id = crypto.createHash('md5').update(JSON.stringify({mod, allowBots})).digest('hex');
+	let room = store.rooms.get(id);
+	if (!room) {
+		room = {
+			id,
+			created: moment(),
+			accessed: moment(),
+			mod,
+			allowBots,
+		};
+		store.rooms.set(room.id, room);
+	}
 	return room;
 }
 
-export function initParty(): g.Party {
+export function initParty(roomId: string = null): g.Party {
 	const partyIndex = getStore().nextPartyId++;
 	const party: g.Party = {
 		id: "p" + partyIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		created: moment(),
 		modified: moment(),
+		roomId,
 		active: new Map<string, g.PartyMember>(),
 	};
 	getStore().parties.set(party.id, party);
@@ -165,7 +173,7 @@ export function initGame(room: g.Room = null) {
 	};
 	getStore().activeGames.set(game.id, game);
 	if (room) {
-		++room.numGamesCumulative;
+		room.accessed = moment();
 	}
 
 	const heroId = systemHeroId(m.ActionType.Environment);
@@ -177,7 +185,11 @@ export function initGame(room: g.Room = null) {
 	});
 	startTickProcessing();
 
-	logger.info("Game [" + game.id + "]: started");
+	let gameName = game.id;
+	if (room) {
+		gameName = room.id + "/" + gameName;
+	}
+	logger.info("Game [" + gameName + "]: started");
 	return game;
 }
 
