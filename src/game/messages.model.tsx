@@ -142,6 +142,7 @@ export interface PartyRequest {
 export interface PartyResponse {
     success: true;
     partyId: string;
+    members: PartyMemberMsg[];
     roomId: string;
     server: string;
 }

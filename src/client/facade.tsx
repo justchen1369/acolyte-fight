@@ -168,7 +168,7 @@ export function joinParty(partyId: string, playerName: string): Promise<m.PartyR
 				}
 			});
 		}).then(() => joinRoom(response.roomId))
-		.then(() => notify({ type: "joinParty", partyId: response.partyId, server: response.server }))
+		.then(() => notify({ type: "joinParty", partyId: response.partyId, server: response.server, members: response.members }))
 		.then(() => response)
 	} else {
 		return Promise.resolve<m.PartyResponse>(null);

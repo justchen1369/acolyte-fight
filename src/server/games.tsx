@@ -12,7 +12,7 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
-let emitParty: Emitter<m.PartyMsg> = null;
+let emitParty: Emitter<g.Party> = null;
 let emitTick: Emitter<m.TickMsg> = null;
 let ticksProcessing = false;
 
@@ -24,7 +24,7 @@ export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
 	emitTick = _emit;
 }
 
-export function attachToPartyEmitter(_emit: Emitter<m.PartyMsg>) {
+export function attachToPartyEmitter(_emit: Emitter<g.Party>) {
 	emitParty = _emit;
 }
 
@@ -219,16 +219,7 @@ export function reprocessParty(party: g.Party) {
 		return;
 	}
 
-	let members = new Array<g.PartyMember>();
-	party.active.forEach(member => {
-		members.push({
-			socketId: member.socketId,
-			name: member.name,
-			ready: member.ready,
-		});
-	});
-
-	emitParty({ partyId: party.id, members });
+	emitParty(party);
 }
 
 function formatHeroId(index: number): string {

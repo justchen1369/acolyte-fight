@@ -34,7 +34,7 @@ export function applyNotificationsToStore(newNotifications: w.Notification[]) {
             if (!(store.party && store.party.id === n.partyId)) {
                 store.party = {
                     id: n.partyId,
-                    members: new Array<w.PartyMemberState>(),
+                    members: n.members,
                     ready: false,
                 };
             }

@@ -140,6 +140,7 @@ export interface JoinPartyNotification {
 	type: "joinParty";
 	partyId: string;
 	server: string;
+	members: PartyMemberState[];
 }
 
 export interface UpdatePartyNotification {

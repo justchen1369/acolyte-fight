@@ -28,7 +28,7 @@ export class PlayButton extends React.Component<Props, State> {
             if (party.ready) {
                 let readyCount = party.members.filter(m => m.ready).length;
                 const partySize = party.members.length;
-                return <span className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)}>
+                return <span className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)} title="Click to cancel">
                     <div className="waiting-for-party-progress" style={{ width: `${100 * readyCount / partySize}%` }}></div>
                     <div className="waiting-for-party-label">Waiting for Party...</div>
                 </span>

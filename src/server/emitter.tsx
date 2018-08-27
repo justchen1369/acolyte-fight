@@ -20,7 +20,10 @@ export function attachToSocket(io: SocketIO.Server) {
     io.on('connection', onConnection);
 
     games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
-    games.attachToPartyEmitter(data => io.to(data.partyId).emit("party", data));
+    games.attachToPartyEmitter(party => io.to(party.id).emit("party", {
+		partyId: party.id,
+		members: partyMembersToContract(party),
+	} as m.PartyMsg));
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -188,6 +191,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 	const result: m.PartyResponse = {
 		success: true,
 		partyId: party.id,
+		members: partyMembersToContract(party),
 		roomId: party.roomId,
 		server: getLocation().server,
 	};
@@ -274,4 +278,16 @@ function calculateRoomStats(room: string): RoomStats {
 		}
 	});
 	return { numGames, numPlayers };
+}
+
+function partyMembersToContract(party: g.Party) {
+	let members = new Array<m.PartyMemberMsg>();
+	party.active.forEach(member => {
+		members.push({
+			socketId: member.socketId,
+			name: member.name,
+			ready: member.ready,
+		});
+	});
+	return members;
 }
