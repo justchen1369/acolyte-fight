@@ -132,6 +132,8 @@ export function leaveRoom(): Promise<void> {
 		mod: {},
 		allowBots: false,
 	};
+	world = engine.initialWorld(room.mod, room.allowBots);
+	notify({ type: "room", roomId: null });
 	return Promise.resolve();
 }
 
