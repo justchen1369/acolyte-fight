@@ -33,12 +33,16 @@ export class PartyPanel extends React.Component<Props, State> {
         return <div>
             <h1>Party</h1>
             {this.props.party ? this.renderCurrentParty() : this.renderNoParty()}
+            <h1>Community</h1>
+            <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
+            <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
+            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
         </div>
     }
 
     private renderNoParty() {
         return <div>
-            <p>Play together with friends as a party.</p>
+            <p>Play together with friends as a party. Forming a party ensures that you and your friends are matched to the same game.</p>
             <p><span className={this.state.creating ? "btn btn-disabled" : "btn"} onClick={() => this.onCreatePartyClick()}>Create Party</span></p>
         </div>
     }

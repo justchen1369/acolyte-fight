@@ -9,7 +9,6 @@ import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
 import { RecentGameList } from '../client/recentGameList';
 import { PartyPanel } from './partyPanel';
-import { SharePanel } from '../client/sharePanel';
 import { TitleSection } from '../client/titleSection';
 import { ModdingPanel } from './moddingPanel';
 import { NavBar } from './navbar';
