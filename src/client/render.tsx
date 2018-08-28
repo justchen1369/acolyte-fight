@@ -14,6 +14,7 @@ export interface CanvasStack {
 	glows: HTMLCanvasElement;
 	canvas: HTMLCanvasElement;
 	ui: HTMLCanvasElement;
+	cursor: HTMLCanvasElement;
 }
 
 export interface CanvasCtxStack {
@@ -52,17 +53,33 @@ function calculateViewRects(rect: ClientRect): ClientRect {
 	};
 }
 
-function calculateWorldRect(viewRect: ClientRect) {
-	let size = Math.min(viewRect.width, viewRect.height);
-	return {
-		left: viewRect.left + (viewRect.width - size) / 2.0,
-		top: viewRect.top + (viewRect.height - size) / 2.0,
-		width: size,
-		height: size,
-	};
+function calculateWorldRect(viewRect: ClientRect): ClientRect {
+	const size = Math.min(viewRect.width, viewRect.height);
+
+	const width = size;
+	const height = size;
+
+	const left = viewRect.left + (viewRect.width - size) / 2.0;
+	const top = viewRect.top + (viewRect.height - size) / 2.0;
+
+	const right = left + width;
+	const bottom = top + height;
+
+	return { left, top, right, bottom, width, height };
 }
 
 export function render(world: w.World, canvasStack: CanvasStack) {
+	const rect = canvasStack.canvas.getBoundingClientRect();
+	const viewRect = calculateViewRects(rect);
+	const worldRect = calculateWorldRect(viewRect);
+
+	// Cursor always gets rerendered
+	{
+		const cursorCtx = canvasStack.cursor.getContext('2d', { alpha: true });
+		renderCursor(cursorCtx, world, rect, worldRect);
+	}
+
+	// Other items only get rerendered if changed
 	if (world.ui.renderedTick === world.tick) {
 		return;
 	}
@@ -74,16 +91,13 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 	} as CanvasCtxStack;
-
-	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas)) {
+	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
 		throw "Error getting context";
 	}
 
-	const rect = canvasStack.canvas.getBoundingClientRect();
-
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
-	renderWorld(ctxStack, world, rect);
+	renderWorld(ctxStack, world, worldRect);
 	renderInterface(ctxStack.ui, world, rect);
 	all(ctxStack, ctx => ctx.restore());
 
@@ -111,10 +125,7 @@ function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
 	ctxStack.canvas.clearRect(0, 0, rect.width, rect.height);
 }
 
-function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
-	const viewRect = calculateViewRects(rect);
-
-	const worldRect = calculateWorldRect(viewRect);
+function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: ClientRect) {
 	all(ctxStack, ctx => ctx.save());
 	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
 	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
@@ -136,20 +147,31 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect)
 	});
 	world.ui.trails = newTrails;
 
-	if (isMobile) {
-		renderTarget(ctxStack, world.ui.nextTarget, world);
-	}
-
 	all(ctxStack, ctx => ctx.restore());
 }
 
-function renderTarget(ctxStack: CanvasCtxStack, target: pl.Vec2, world: w.World) {
+function renderCursor(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, worldRect: ClientRect) {
+	if (!isMobile) {
+		return;
+	}
+
+	ctx.clearRect(0, 0, rect.width, rect.height);
+
+	ctx.save();
+	ctx.translate(worldRect.left, worldRect.top);
+	ctx.scale(worldRect.width, worldRect.height);
+
+	renderTarget(ctx, world.ui.nextTarget, world);
+
+	ctx.restore();
+}
+
+function renderTarget(ctx: CanvasRenderingContext2D, target: pl.Vec2, world: w.World) {
 	const CrossHairSize = world.settings.Hero.Radius;
 	if (!target) {
 		return;
 	}
 
-	const ctx = ctxStack.canvas;
 	ctx.save();
 	ctx.translate(target.x, target.y);
 
