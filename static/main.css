@@ -561,8 +561,9 @@ textarea.ai-js {
     position: relative; /* So it can appear above the absolute-positioned progress bar */
 }
 
-.party-list {
-    margin-top: 10px;
+.party-invite {
+    color: #ccc;
+    font-size: 75%;
 }
 
 .party-list .party-member {

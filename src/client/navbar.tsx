@@ -21,7 +21,7 @@ export class NavBar extends React.Component<Props, State> {
             {this.renderNavBarItem("replays", "Replays")}
             {this.renderNavBarItem("modding", "Modding", true)}
             {this.renderNavBarItem("ai", "AI", true)}
-            {this.renderNavBarItem("share", "Share")}
+            {this.renderNavBarItem("party", "Party")}
             {this.renderNavBarItem("about", "About")}
             <div className="spacer" />
         </div>

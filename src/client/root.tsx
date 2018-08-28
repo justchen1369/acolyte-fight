@@ -70,7 +70,7 @@ export class Root extends React.Component<Props, State> {
             <div className="root-panel">
                 {page === "" && this.renderHome()}
                 {page === "replays" && this.renderReplays()}
-                {page === "share" && this.renderShare()}
+                {page === "party" && this.renderParty()}
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
                 {page === "about" && this.renderAbout()}
@@ -89,15 +89,15 @@ export class Root extends React.Component<Props, State> {
         />
     }
 
-    private renderShare() {
+    private renderParty() {
         return <div className="content-container">
             <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
-                <SharePanel
+                <PartyPanel
                     current={this.props.current}
+                    changePage={this.props.changePage}
                     mod={this.props.world.mod}
                     allowBots={this.props.world.allowBots}
-                    changePage={this.props.changePage}
                     party={this.props.party}
                     createPartyCallback={this.props.createPartyCallback}
                     leavePartyCallback={this.props.leavePartyCallback}
