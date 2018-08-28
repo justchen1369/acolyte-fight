@@ -216,7 +216,7 @@ export function leaveParty(partyId: string): Promise<void> {
 	}
 }
 
-export function joinNewGame(playerName: string, keyBindings: KeyBindings, observeGameId?: string) {
+export function joinNewGame(playerName: string, keyBindings: KeyBindings, partyId: string, observeGameId?: string) {
 	leaveCurrentGame();
 
 	const msg: m.JoinMsg = {
@@ -224,6 +224,7 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, observ
 		name: playerName,
 		keyBindings,
 		room: room.id,
+		party: partyId,
 		isBot: ai.playingAsAI(room.allowBots) && !observeGameId,
 		observe: !!observeGameId,
 	};

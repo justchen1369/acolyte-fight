@@ -39,7 +39,8 @@ export interface Game {
 }
 
 export interface Player {
-	socketId: string;
+    socketId: string;
+    partyId: string;
 	heroId: string;
     name: string;
 }

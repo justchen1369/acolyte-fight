@@ -205,18 +205,20 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const roomId = data.room;
 	const room = roomId ? store.rooms.get(roomId) : null;
 
+	const partyId = data.party;
+
 	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		game = games.findNewGame(room);
+		game = games.findNewGame(room, partyId);
 	}
 
 	if (game) {
 		let heroId = null;
 		if (!data.observe) {
-			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, authToken, socket.id);
+			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, authToken, partyId, socket.id);
 		}
 
 		const roomStats = calculateRoomStats(roomId);

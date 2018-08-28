@@ -46,7 +46,7 @@ attachToSocket(socket, () => {
                         // Return to the home page when we exit
                         current.page = "";
                     }
-                    joinNewGame(playerName, retrieveKeyBindings(), current.gameId);
+                    joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
                 } else {
                     rerender(); // Room settings might have changed the page
                 }
@@ -91,7 +91,7 @@ function onNewGameClicked() {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings());
+        joinNewGame(playerName, retrieveKeyBindings(), current.party);
         updateUrl();
     }
 }
@@ -105,7 +105,7 @@ function onWatchGameClicked(gameId: string) {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), gameId);
+        joinNewGame(playerName, retrieveKeyBindings(), current.party, gameId);
         updateUrl();
     }
 }

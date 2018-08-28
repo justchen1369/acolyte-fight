@@ -67,6 +67,7 @@ export interface TickMsg {
 export interface JoinMsg {
     gameId: string | null;
     room: string | null;
+    party: string | null;
     name: string;
     keyBindings: KeyBindings;
     isBot: boolean;

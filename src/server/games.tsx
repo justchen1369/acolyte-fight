@@ -1,7 +1,7 @@
+import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
-import * as _ from 'lodash';
 import * as c from '../game/world.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -69,12 +69,13 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room = null): g.Game {
+export function findNewGame(room: g.Room, myPartyId: string): g.Game {
 	const roomId = room ? room.id : null;
+	const store = getStore();
 
 	let numPlayers = 1; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
-	getStore().activeGames.forEach(g => {
+	store.activeGames.forEach(g => {
 		if (g.roomId === roomId) {
 			if (isGameRunning(g)) {
 				numPlayers += g.active.size;
@@ -85,12 +86,11 @@ export function findNewGame(room: g.Room = null): g.Game {
 		}
 	});
 
-	const maxGames = Math.ceil(numPlayers / Matchmaking.MaxPlayers);
-	const targetPlayersPerGame = numPlayers > Matchmaking.MaxPlayers ? Math.ceil(numPlayers / maxGames) : Matchmaking.MaxPlayers;
+	const targetPlayersPerGame = apportionPerGame(numPlayers);
 
 	let game: g.Game = null;
 	if (openGames.length > 0) {
-		game = _.minBy(openGames, g => g.active.size);
+		game = _.minBy(openGames, g => getActiveAndReservedSize(g, myPartyId, store.parties));
 	}
 	if (game && game.active.size >= targetPlayersPerGame && openGames.length <= 1) {
 		// Start a new game early to stop a single player ending up in the same game
@@ -101,6 +101,29 @@ export function findNewGame(room: g.Room = null): g.Game {
 		game = initGame(room);
 	}
 	return game;
+}
+
+function getActiveAndReservedSize(game: g.Game, myPartyId: string, parties: Map<string, g.Party>): number {
+	let numActive = 0;
+	const reservedPerParty = new Map<string, number>();
+	game.active.forEach(player => {
+		const party = player.partyId ? parties.get(player.partyId) : null;
+		if (party && party.id !== myPartyId) { // Not allowed to use reservations belonging to other parties
+			if (!reservedPerParty.has(party.id)) {
+				reservedPerParty.set(party.id, apportionPerGame(party.active.size));
+			}
+		} else {
+			++numActive;
+		}
+	});
+
+	return numActive + _.sum([...reservedPerParty.values()]);
+}
+
+function apportionPerGame(totalPlayers: number) {
+	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
+	const targetPlayersPerGame = totalPlayers > Matchmaking.MaxPlayers ? Math.ceil(totalPlayers / maxGames) : Matchmaking.MaxPlayers;
+	return targetPlayersPerGame;
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
@@ -355,7 +378,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, authToken: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, authToken: string, partyId: string, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -370,6 +393,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	game.active.set(socketId, {
 		socketId,
 		heroId,
+		partyId,
 		name: playerName,
 	});
 	game.bots.delete(heroId);
