@@ -206,13 +206,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const room = roomId ? store.rooms.get(roomId) : null;
 
 	const partyId = data.party;
+	const party = partyId ? store.parties.get(partyId) : null;
 
 	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		game = games.findNewGame(room, partyId);
+		game = games.findNewGame(room, party);
 	}
 
 	if (game) {

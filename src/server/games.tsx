@@ -69,7 +69,7 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room, myPartyId: string): g.Game {
+export function findNewGame(room: g.Room | null, myParty: g.Party | null): g.Game {
 	const roomId = room ? room.id : null;
 	const store = getStore();
 
@@ -86,21 +86,39 @@ export function findNewGame(room: g.Room, myPartyId: string): g.Game {
 		}
 	});
 
-	const targetPlayersPerGame = apportionPerGame(numPlayers);
+	const targetPlayersPerGame = numPlayers > Matchmaking.MaxPlayers ? apportionPerGame(numPlayers) : Matchmaking.MaxPlayers;
 
 	let game: g.Game = null;
 	if (openGames.length > 0) {
-		game = _.minBy(openGames, g => getActiveAndReservedSize(g, myPartyId, store.parties));
+		let minSize = Infinity;
+		openGames.forEach(g => {
+			const size = getActiveAndReservedSize(g, myParty ? myParty.id : null, store.parties);
+			if (size < Matchmaking.MaxPlayers && size < minSize) {
+				minSize = size;
+				game = g;
+			}
+		});
 	}
 	if (game && game.active.size >= targetPlayersPerGame && openGames.length <= 1) {
 		// Start a new game early to stop a single player ending up in the same game
 		game = null;
+	}
+	if (game && myParty && !canFitParty(game, myParty)) {
+		game = null;
+
 	}
 
 	if (!game) {
 		game = initGame(room);
 	}
 	return game;
+}
+
+function canFitParty(game: g.Game, party: g.Party) {
+	const numOutsideParty = [...game.active.values()].filter(p => p.partyId !== party.id).length;
+	const numInsideParty = apportionPerGame(party.active.size);
+	const numPlayers = numOutsideParty + numInsideParty;
+	return numPlayers <= Matchmaking.MaxPlayers;
 }
 
 function getActiveAndReservedSize(game: g.Game, myPartyId: string, parties: Map<string, g.Party>): number {
@@ -122,8 +140,7 @@ function getActiveAndReservedSize(game: g.Game, myPartyId: string, parties: Map<
 
 function apportionPerGame(totalPlayers: number) {
 	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
-	const targetPlayersPerGame = totalPlayers > Matchmaking.MaxPlayers ? Math.ceil(totalPlayers / maxGames) : Matchmaking.MaxPlayers;
-	return targetPlayersPerGame;
+	return Math.ceil(totalPlayers / maxGames);
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
