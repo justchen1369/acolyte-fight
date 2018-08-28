@@ -72,6 +72,9 @@ attachNotificationListener(notifications => {
     notifications.forEach(n => {
         if (n.type === "new" || n.type === "quit" || n.type === "disconnected" || n.type === "joinParty" || n.type === "leaveParty") {
             urlUpdated = true;
+            if (n.type === "joinParty") {
+                current.server = n.server;
+            }
         } else if (n.type === "startParty") {
             onStartParty(n.partyId);
         }
