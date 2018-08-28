@@ -431,7 +431,7 @@ const link: Spell = {
     projectile: {
         color: '#4444ff',
 
-        density: 0.001,
+        density: 1,
         radius: 0.005,
         speed: 0.25,
         strafe: true,
