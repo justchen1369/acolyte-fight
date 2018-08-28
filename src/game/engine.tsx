@@ -483,6 +483,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
 		isBot: ev.isBot,
 		isSharedBot: false,
+		isMobile: ev.isMobile,
 	} as w.Player;
 	world.players.set(hero.id, player);
 	world.activePlayers.add(hero.id);
@@ -525,12 +526,13 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 	world.ui.notifications.push({ type: "leave", player });
 
 	const hero = world.objects.get(ev.heroId);
-	if (hero) {
+	if (hero && !world.winner) {
 		// Replace leaving hero with bot
 		const newPlayer = {
 			...player,
 			isBot: true,
 			isSharedBot: true,
+			isMobile: false,
 		};
 		world.players.set(ev.heroId, newPlayer);
 	}

@@ -218,7 +218,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	if (game) {
 		let heroId = null;
 		if (!data.observe) {
-			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, authToken, partyId, socket.id);
+			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, partyId, socket.id);
 		}
 
 		const roomStats = calculateRoomStats(roomId);

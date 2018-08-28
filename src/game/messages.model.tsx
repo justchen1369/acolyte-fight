@@ -35,6 +35,7 @@ export interface JoinActionMsg extends ActionMsgBase {
     playerName: string;
     keyBindings: KeyBindings;
     isBot: boolean;
+    isMobile: boolean;
 }
 
 export interface BotActionMsg extends ActionMsgBase {
@@ -71,6 +72,7 @@ export interface JoinMsg {
     name: string;
     keyBindings: KeyBindings;
     isBot: boolean;
+    isMobile: boolean;
     observe: boolean;
 }
 

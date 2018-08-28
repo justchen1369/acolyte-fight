@@ -3,6 +3,7 @@ import * as React from 'react';
 import { HeroColors, Matchmaking } from '../game/constants';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import { PlayerName } from './playerNameComponent';
 
 interface Props {
     playVsAiCallback: () => void;
@@ -85,7 +86,7 @@ export class InfoPanel extends React.Component<Props, State> {
 
             result.push(<div key={player.heroId} className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
                 <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
-                <span style={{ color }} className="player-name">{player.name}{player.isBot && <i className="fas fa-microchip bot" />}</span>
+                <PlayerName player={player} world={world} />
             </div>);
         });
 

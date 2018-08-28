@@ -378,7 +378,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, authToken: string, partyId: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string, partyId: string, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -403,7 +403,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		game.accessTokens.add(authToken);
 	}
 
-	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings, isBot });
+	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings, isBot, isMobile });
 
 	return heroId;
 }

@@ -7,6 +7,7 @@ import * as engine from '../game/engine';
 import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
+import { isMobile } from './userAgent';
 
 export { worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, CanvasStack } from './render';
 
@@ -226,6 +227,7 @@ export function joinNewGame(playerName: string, keyBindings: KeyBindings, partyI
 		room: room.id,
 		party: partyId,
 		isBot: ai.playingAsAI(room.allowBots) && !observeGameId,
+		isMobile,
 		observe: !!observeGameId,
 	};
 	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
@@ -376,6 +378,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				keyBindings: actionData.keyBindings,
 				preferredColor: preferredColors.get(actionData.playerName) || null,
 				isBot: actionData.isBot,
+				isMobile: actionData.isMobile,
 			});
 		} else if (actionData.actionType === m.ActionType.Bot) {
 			world.occurrences.push({

@@ -5,6 +5,7 @@ import * as w from '../game/world.model';
 import { HeroColors, Matchmaking } from '../game/constants';
 import { PlayButton } from './playButton';
 import { isMobile } from './userAgent';
+import { PlayerName } from './playerNameComponent';
 
 interface Props {
     party: s.PartyState;
@@ -145,15 +146,15 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderJoinNotification(key: string, notification: w.JoinNotification) {
-        return <div key={key} className="row">{this.renderPlayer(notification.player)} joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> joined</div>
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification) {
-        return <div key={key} className="row">{this.renderPlayer(notification.player)} joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
-        return <div key={key} className="row">{this.renderPlayer(notification.player)} left</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> left</div>
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
@@ -163,20 +164,20 @@ export class MessagesPanel extends React.Component<Props, State> {
 
         if (notification.killer) {
             return <div key={key} className="row">
-                {notification.killer && <span key="killer">{this.renderPlayer(notification.killer)} killed </span>}
-                {notification.killed && <span key="killed">{this.renderPlayer(notification.killed)} </span>}
-                {notification.assist && <span key="assist">assist {this.renderPlayer(notification.assist)} </span>}
+                {notification.killer && <span key="killer"><PlayerName player={notification.killer} world={this.props.world} /> killed </span>}
+                {notification.killed && <span key="killed"><PlayerName player={notification.killed} world={this.props.world} /> </span>}
+                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} world={this.props.world} /> </span>}
             </div>
         } else {
-            return <div key={key} className="row">{this.renderPlayer(notification.killed)} died</div>
+            return <div key={key} className="row"><PlayerName player={notification.killed} world={this.props.world} /> died</div>
         }
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
         return <div key={key} className="winner">
-            <div className="winner-row">{this.renderPlayer(notification.winner)} is the winner!</div>
-            <div className="award-row">Most damage: {this.renderPlayer(notification.mostDamage)} ({notification.mostDamageAmount.toFixed(0)}%)</div>
-            <div className="award-row">Most kills: {this.renderPlayer(notification.mostKills)} ({notification.mostKillsCount} kills)</div>
+            <div className="winner-row"><PlayerName player={notification.winner} world={this.props.world} /> is the winner!</div>
+            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} world={this.props.world} /> ({notification.mostDamageAmount.toFixed(0)}%)</div>
+            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} world={this.props.world} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 {this.renderWinAction()}
             </div>
@@ -207,15 +208,5 @@ export class MessagesPanel extends React.Component<Props, State> {
                 <div className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</div>
             </div>
         </div>;
-    }
-
-    private renderPlayer(player: w.Player) {
-        let color;
-        if (player.heroId === this.props.world.ui.myHeroId) {
-            color = HeroColors.MyHeroColor;
-        } else {
-            color = player.uiColor;
-        }
-        return <span className="player-name" style={{ color }}>{player.name}{player.isBot && <i className="fas fa-microchip bot" />}</span>;
     }
 }

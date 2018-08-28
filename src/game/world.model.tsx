@@ -100,6 +100,7 @@ export interface Player {
 	uiColor: string; // Not synced across clients
 	isSharedBot: boolean; // Not synced across clients
 	isBot: boolean;
+	isMobile: boolean;
 }
 
 export interface ButtonRenderState {
@@ -243,6 +244,7 @@ export interface Joining {
 	keyBindings: KeyBindings;
 	preferredColor: string | null;
 	isBot: boolean;
+	isMobile: boolean;
 }
 
 export interface Botting {

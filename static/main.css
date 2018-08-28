@@ -387,7 +387,7 @@ a:hover, a:active {
     font-weight: bold;
 }
 
-i.bot {
+.player-name i {
     margin-left: 5px;
 }
 
