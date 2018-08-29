@@ -113,7 +113,6 @@ export interface ButtonRenderState {
 
 export type Notification =
 	HelpNotification 
-	| RoomNotification
 	| JoinNotification 
 	| BotNotification 
 	| LeaveNotification 
@@ -126,11 +125,6 @@ export type Notification =
 
 export interface HelpNotification {
 	type: "help";
-}
-
-export interface RoomNotification {
-	type: "room";
-	roomId: string;
 }
 
 export interface JoinNotification {

@@ -70,6 +70,12 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }
+    } else if (action.type === "updateRoom") {
+        return {
+            ...state,
+            room: action.room,
+            world: engine.initialWorld(action.room.mod, action.room.allowBots),
+        };
     } else if (action.type === "joinParty") {
         if (!(state.party && state.party.id === action.party.id)) {
             return {

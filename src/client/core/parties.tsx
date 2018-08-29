@@ -27,7 +27,7 @@ function createRoomFromMod(mod: Object) {
     return createRoom(mod, false);
 }
 
-export function createRoom(mod: Object, allowBots: boolean, nextPage: string = "share") {
+export function createRoom(mod: Object, allowBots: boolean, nextPage: string = "party") {
     console.log("Creating room", mod, allowBots);
     return createRoomCall(mod, allowBots).then(response => createParty(response.roomId))
         .then(msg => {
@@ -63,13 +63,14 @@ export function joinRoom(roomId: string): Promise<void> {
 				if (response.success === false) {
 					reject(response.error);
 				} else {
-					const room: s.RoomState = store.room = {
-						id: roomId,
-						mod: response.mod || {},
-						allowBots: response.allowBots || false,
-					};
-					store.world = engine.initialWorld(room.mod, room.allowBots);
-					notify({ type: "room", roomId: response.roomId });
+					StoreProvider.dispatch({
+						type: "updateRoom",
+						room: {
+							id: roomId,
+							mod: response.mod || {},
+							allowBots: response.allowBots || false,
+						}
+					});
 					resolve();
 				}
 			});
@@ -87,8 +88,7 @@ export function leaveRoom(): Promise<void> {
 		mod: {},
 		allowBots: false,
 	};
-	store.world = engine.initialWorld(room.mod, room.allowBots);
-	notify({ type: "room", roomId: null });
+	StoreProvider.dispatch({ type: "updateRoom", room });
 	return Promise.resolve();
 }
 

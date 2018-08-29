@@ -48,6 +48,7 @@ export type Action =
     | JoinMatchAction
     | LeaveMatchAction
     | UpdateNotificationsAction
+    | UpdateRoomAction
     | JoinPartyAction
     | UpdatePartyAction
     | LeavePartyAction
@@ -88,6 +89,11 @@ export interface UpdatePageAction {
 export interface UpdateNotificationsAction {
     type: "updateNotifications";
     items: NotificationItem[];
+}
+
+export interface UpdateRoomAction {
+    type: "updateRoom";
+    room: RoomState;
 }
 
 export interface JoinPartyAction {
