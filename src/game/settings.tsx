@@ -670,7 +670,7 @@ const teleport: Spell = {
 };
 const thrust: Spell = {
     id: 'thrust',
-    name: 'Dash',
+    name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
