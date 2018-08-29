@@ -156,6 +156,8 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 	};
 
 	world.objects.set(shield.id, shield);
+	hero.shieldIds.add(shield.id);
+
 	return shield;
 }
 
@@ -215,6 +217,8 @@ function addHero(world: w.World, heroId: string) {
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
 		spellsToKeys: new Map<string, string>(),
+		shieldIds: new Set<string>(),
+		strafeIds: new Set<string>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 	world.scores.set(heroId, initScore(heroId));
@@ -319,8 +323,13 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		uiPath: [vector.clone(position)],
 	} as w.Projectile;
+
 	scaleDamagePacket(projectile, hero, projectileTemplate.damageScaling);
+
 	world.objects.set(id, projectile);
+	if (projectile.strafe) {
+		hero.strafeIds.add(projectile.id);
+	}
 
 	return projectile;
 }
@@ -818,6 +827,10 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 }
 
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
+	if ((projectile.collideWith & Categories.Shield) && isHeroShielded(hero, world)) {
+		return;
+	}
+
 	if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
 		projectile.alreadyHit.add(hero.id);
 
@@ -835,6 +848,15 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (expireOn(world, projectile, hero)) {
 		destroyObject(world, projectile);
 	}
+}
+
+function isHeroShielded(hero: w.Hero, world: w.World) {
+	for (const shieldId of hero.shieldIds) {
+		if (world.objects.has(shieldId)) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
@@ -1315,10 +1337,14 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 
 	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
 
-	world.objects.forEach(projectile => {
-		// Move link with the hero
-		if (projectile.category === "projectile" && projectile.strafe && projectile.owner === hero.id) {
-			projectile.body.setPosition(vector.plus(projectile.body.getPosition(), step));
+	hero.strafeIds.forEach(projectileId => {
+		const projectile = world.objects.get(projectileId);
+		if (projectile) {
+			if (projectile.category === "projectile" && projectile.strafe && projectile.owner === hero.id) {
+				projectile.body.setPosition(vector.plus(projectile.body.getPosition(), step));
+			}
+		} else {
+			hero.strafeIds.delete(projectileId); // Yes you can delete from a set while iterating in ES6
 		}
 	});
 
