@@ -114,10 +114,6 @@ export interface ButtonRenderState {
 export type Notification =
 	HelpNotification 
 	| RoomNotification
-	| JoinPartyNotification
-	| UpdatePartyNotification
-	| StartPartyNotification
-	| LeavePartyNotification
 	| JoinNotification 
 	| BotNotification 
 	| LeaveNotification 
@@ -136,29 +132,6 @@ export interface HelpNotification {
 export interface RoomNotification {
 	type: "room";
 	roomId: string;
-}
-
-export interface JoinPartyNotification {
-	type: "joinParty";
-	partyId: string;
-	server: string;
-	members: PartyMemberState[];
-}
-
-export interface UpdatePartyNotification {
-	type: "updateParty";
-	partyId: string;
-	members: PartyMemberState[];
-}
-
-export interface StartPartyNotification {
-	type: "startParty";
-	partyId: string;
-}
-
-export interface LeavePartyNotification {
-	type: "leaveParty";
-	partyId: string;
 }
 
 export interface JoinNotification {

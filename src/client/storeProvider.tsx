@@ -30,7 +30,16 @@ function initialState(): s.State {
 function reducer(state: s.State, action: s.Action): s.State {
     if (action.type === "updateSocket") {
         return { ...state, socketId: action.socketId };
-    } else if (action.type === "updatePlayerName") {
+    } else if (action.type === "disconnected") {
+	    return {
+            ...state,
+            socketId: null,
+            world: {
+                ...state.world,
+                activePlayers: state.world.activePlayers.clear(),
+            },
+        };
+     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateUrl") {
         return { ...state, current: action.current };
@@ -52,6 +61,45 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }
+    } else if (action.type === "joinParty") {
+        if (!(state.party && state.party.id === action.party.id)) {
+            return {
+                ...state,
+                party: action.party,
+                current: {
+                    ...state.current,
+                    party: action.party.id,
+                },
+            };
+        } else {
+            return state;
+        }
+    } else if (action.type === "updateParty") {
+        if (state.party && state.party.id == action.partyId) {
+            return {
+                ...state,
+                party: {
+                    ...state.party,
+                    members: action.members,
+                    ready: action.members.some(m => m.socketId === state.socketId && m.ready),
+                },
+            };
+        } else {
+            return state;
+        }
+    } else if (action.type === "leaveParty") {
+        if (state.party && state.party.id === action.partyId) {
+            return {
+                ...state,
+                party: null,
+                current: {
+                    ...state.current,
+                    party: null,
+                },
+            };
+        } else {
+            return state;
+        }
     } else {
         console.log(action);
         return state;

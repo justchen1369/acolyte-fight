@@ -126,8 +126,17 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 				}
 			});
 		}).then(() => joinRoom(response.roomId))
-		.then(() => StoreProvider.dispatch({ type: "updateServer", server: response.server }))
-		.then(() => notify({ type: "joinParty", partyId: response.partyId, server: response.server, members: response.members }))
+		.then(() => {
+			StoreProvider.dispatch({ type: "updateServer", server: response.server });
+			StoreProvider.dispatch({
+				type: "joinParty",
+				party: {
+					id: response.partyId,
+					members: response.members,
+					ready: false,
+				},
+			});
+		})
 		.then(() => response)
 	} else {
 		return Promise.resolve<m.PartyResponse>(null);
@@ -172,7 +181,7 @@ export function leaveParty(): Promise<void> {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
-				notify({ type: "leaveParty", partyId: response.partyId });
+				StoreProvider.dispatch({ type: "leaveParty", partyId: response.partyId });
 				resolve();
 			}
 		});
@@ -180,13 +189,14 @@ export function leaveParty(): Promise<void> {
 }
 
 function onPartyMsg(msg: m.PartyMsg) {
-    const world = StoreProvider.getState().world;
+	const store = StoreProvider.getState();
+	if (!(store.party && store.party.id === msg.partyId)) {
+		return;
+	}
 
-	notify({
-		type: "updateParty",
-		partyId: msg.partyId,
-		members: msg.members,
-	});
+    const world = store.world;
+
+	StoreProvider.dispatch({ type: "updateParty", partyId: msg.partyId, members: msg.members });
 
 	let meReady = false;
 	let allReady = true;
@@ -199,10 +209,6 @@ function onPartyMsg(msg: m.PartyMsg) {
 		}
 	});
 	if (msg.members.length > 0 && allReady && meReady && matches.worldInterruptible(world)) {
-		notify({
-				type: "startParty",
-				partyId: msg.partyId,
-		});
         setTimeout(() => {
 			matches.joinNewGame();
 			updateParty(false);

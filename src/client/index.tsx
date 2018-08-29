@@ -9,7 +9,6 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 
 import * as matches from './core/matches';
-import * as notifications from './core/notifications';
 import * as parties from './core/parties';
 import * as sockets from './core/sockets';
 import * as StoreProvider from './storeProvider';
@@ -24,7 +23,6 @@ const socket = socketLib();
 
 let alreadyConnected = false;
 
-notifications.attachNotificationListener((notifs) => onNotification(notifs));
 initialize();
 rerender();
 
@@ -46,8 +44,6 @@ function initialize() {
                             StoreProvider.dispatch({ type: "updatePage", page: "" });
                         }
                         matches.joinNewGame(current.gameId);
-                    } else {
-                        rerender(); // Room settings might have changed the page
                     }
                 }
             }).catch(error => {
@@ -61,10 +57,6 @@ function initialize() {
                 }
             });
     });
-}
-
-function onNotification(notifs: w.Notification[]) {
-    rerender();
 }
 
 function rerender() {

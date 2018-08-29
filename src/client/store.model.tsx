@@ -23,7 +23,7 @@ export interface NotificationItem {
 export interface PartyState {
     id: string;
     members: w.PartyMemberState[];
-    ready: boolean;
+    ready: boolean; // TODO: Reselect this out of members[].ready
 }
 
 export interface RoomState {
@@ -41,12 +41,16 @@ export interface PathElements {
 
 export type Action =
     UpdateSocketAction
+    | DisconnectedAction
     | UpdatePlayerNameAction
     | UpdateUrlAction
     | UpdatePageAction
     | UpdateServerAction
     | UpdateWorldAction
     | UpdateNotificationsAction
+    | JoinPartyAction
+    | UpdatePartyAction
+    | LeavePartyAction
 
 export interface UpdateWorldAction {
     type: "updateWorld";
@@ -56,6 +60,10 @@ export interface UpdateWorldAction {
 export interface UpdateSocketAction {
     type: "updateSocket";
     socketId: string;
+}
+
+export interface DisconnectedAction {
+    type: "disconnected";
 }
 
 export interface UpdatePlayerNameAction {
@@ -81,4 +89,20 @@ export interface UpdateServerAction {
 export interface UpdateNotificationsAction {
     type: "updateNotifications";
     items: NotificationItem[];
+}
+
+export interface JoinPartyAction {
+    type: "joinParty";
+    party: PartyState;
+}
+
+export interface UpdatePartyAction {
+    type: "updateParty";
+    partyId: string;
+    members: w.PartyMemberState[];
+}
+
+export interface LeavePartyAction {
+    type: "leaveParty";
+    partyId: string;
 }
