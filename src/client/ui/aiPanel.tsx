@@ -1,11 +1,11 @@
 import * as React from 'react';
 import * as ai from '../core/ai';
 import * as parties from '../core/parties';
-import * as url from '../core/url';
+import * as s from '../store.model';
 import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
-    current: url.PathElements;
+    current: s.PathElements;
     allowBots: boolean;
 }
 interface State {

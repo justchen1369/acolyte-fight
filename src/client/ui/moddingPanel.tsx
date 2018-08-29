@@ -1,9 +1,10 @@
 import * as React from 'react';
+import * as s from '../store.model';
 import * as parties from '../core/parties';
 import * as url from '../core/url';
 
 interface Props {
-    current: url.PathElements;
+    current: s.PathElements;
 }
 interface State {
     error: string;

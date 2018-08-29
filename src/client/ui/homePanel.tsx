@@ -11,7 +11,7 @@ import { NavBar } from './navbar';
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
-    current: url.PathElements;
+    current: s.PathElements;
     party: s.PartyState;
     world: w.World;
     changePage: (newPage: string) => void;

@@ -1,13 +1,7 @@
 import queryString from 'query-string';
+import * as s from '../store.model';
 
-export interface PathElements {
-    page?: string;
-    gameId?: string;
-    party: string;
-    server: string;
-}
-
-export function parseLocation(location: Location): PathElements {
+export function parseLocation(location: Location): s.PathElements {
     let page: string = null;
     let gameId: string = null;
     let party: string = null;
@@ -33,7 +27,7 @@ export function parseLocation(location: Location): PathElements {
     return { page, gameId, party, server };
 }
 
-export function getPath(elems: PathElements) {
+export function getPath(elems: s.PathElements) {
     let pathElements = new Array<string>();
     let params = [];
     if (elems.gameId) {
@@ -58,6 +52,6 @@ export function getPath(elems: PathElements) {
     return path;
 }
 
-export function getPartyHomePath(current: PathElements) {
+export function getPartyHomePath(current: s.PathElements) {
     return getPath(Object.assign({}, current, { page: null }));
 }

@@ -11,6 +11,7 @@ function initialWorld(): s.State {
         allowBots: false,
     };
     return {
+        current: {},
         socketId: null,
         preferredColors: new Map<string, string>(),
         room,
@@ -26,4 +27,8 @@ export function getStore(): s.State {
 
 export function setConnected(socketId: string) {
     store.socketId = socketId;
+}
+
+export function setUrl(current: s.PathElements) {
+    store.current = current;
 }

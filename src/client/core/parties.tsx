@@ -13,17 +13,17 @@ import { socket } from './sockets';
 
 sockets.listeners.onPartyMsg = onPartyMsg;
 
-export function createRoomFromFile(file: File, current: url.PathElements) {
+export function createRoomFromFile(file: File, current: s.PathElements) {
     return readFileAsync(file)
         .then(json => json ? JSON.parse(json) : {})
         .then(mod => createRoomFromMod(mod, current))
 }
 
-function createRoomFromMod(mod: Object, current: url.PathElements) {
+function createRoomFromMod(mod: Object, current: s.PathElements) {
     return createRoom(mod, false, current);
 }
 
-export function createRoom(mod: Object, allowBots: boolean, current: url.PathElements, nextPage: string = "share") {
+export function createRoom(mod: Object, allowBots: boolean, current: s.PathElements, nextPage: string = "share") {
     console.log("Creating room", mod, allowBots);
     return createRoomCall(mod, allowBots).then(response => createParty(response.roomId, Storage.getOrCreatePlayerName()))
         .then(msg => {

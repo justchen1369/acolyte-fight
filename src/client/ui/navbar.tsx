@@ -1,8 +1,9 @@
 import * as React from 'react';
+import * as s from '../store.model';
 import * as url from '../core/url';
 
 interface Props {
-    current: url.PathElements;
+    current: s.PathElements;
     changePage: (newPage: string) => void;
 }
 

@@ -4,7 +4,7 @@ import * as w from '../../game/world.model';
 import * as url from '../core/url';
 
 interface Props {
-    current: url.PathElements;
+    current: s.PathElements;
     changePage: (newPage: string) => void;
 
     mod: Object;

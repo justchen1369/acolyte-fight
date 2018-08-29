@@ -1,6 +1,7 @@
 import * as w from '../game/world.model';
 
 export interface State {
+    current: PathElements;
     socketId: string;
     preferredColors: Map<string, string>; // player name -> color
     party: PartyState;
@@ -25,4 +26,11 @@ export interface RoomState {
     id: string;
     mod: Object;
     allowBots: boolean;
+}
+
+export interface PathElements {
+    page?: string;
+    gameId?: string;
+    party?: string;
+    server?: string;
 }

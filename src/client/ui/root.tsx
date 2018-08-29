@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as url from '../core/url';
-import { isMobile } from '../core/userAgent';
 import { AiPanel } from './aiPanel';
 import { GamePanel } from './gamePanel';
 import { HomePanel } from './homePanel';
@@ -16,7 +14,7 @@ interface Props {
     isNewPlayer: boolean;
     playerName: string;
     party: s.PartyState;
-    current: url.PathElements;
+    current: s.PathElements;
     connected: boolean;
     world: w.World;
     items: s.NotificationItem[];

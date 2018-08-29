@@ -1,17 +1,20 @@
 import _ from 'lodash';
+import socketLib from 'socket.io-client';
+
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import socketLib from 'socket.io-client';
-import queryString from 'query-string';
+import * as s from './store.model';
+import * as w from '../game/world.model';
 
 import * as matches from './core/matches';
 import * as notifications from './core/notifications';
+import * as parties from './core/parties';
+import * as sockets from './core/sockets';
+import * as StoreProvider from './storeProvider';
 import * as url from './core/url';
 
-import * as sockets from './core/sockets';
-import * as parties from './core/parties';
-import { getStore, setConnected } from './storeProvider';
+import { getStore, setConnected, setUrl } from './storeProvider';
 import { applyNotificationsToStore } from './core/notifications';
 import * as Storage from './core/storage';
 import { DefaultSettings } from '../game/settings';
@@ -34,49 +37,62 @@ function getOrCreatePlayerName(): string {
 
 let alreadyConnected = false;
 
-let current = url.parseLocation(window.location);
+notifications.attachNotificationListener((notifs) => onNotification(notifs));
 
-sockets.attachToSocket(socket, () => {
-    sockets.connectToServer(current.server)
-        .then(() => parties.joinParty(current.party, getOrCreatePlayerName()))
-        .then(() => {
-            if (!alreadyConnected) {
-                alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
-                setConnected(socket.id);
+setUrl(url.parseLocation(window.location));
 
-                if (current.gameId || current.page === "join") {
-                    if (current.page === "join") {
-                        // Return to the home page when we exit
-                        current.page = "";
+initialize();
+
+function initialize() {
+    const current = getStore().current;
+
+    sockets.attachToSocket(socket, () => {
+        sockets.connectToServer(current.server)
+            .then(() => parties.joinParty(current.party, getOrCreatePlayerName()))
+            .then(() => {
+                if (!alreadyConnected) {
+                    alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
+                    setConnected(socket.id);
+
+                    if (current.gameId || current.page === "join") {
+                        if (current.page === "join") {
+                            // Return to the home page when we exit
+                            current.page = "";
+                        }
+                        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
+                    } else {
+                        rerender(); // Room settings might have changed the page
                     }
-                    matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
-                } else {
-                    rerender(); // Room settings might have changed the page
                 }
-            }
-        }).catch(error => {
-            console.error(error)
-            socket.disconnect();
-            setConnected(null);
+            }).catch(error => {
+                console.error(error)
+                socket.disconnect();
+                setConnected(null);
 
-            if (current.party || current.server) {
-                // Failed to join party/server, try without server
-                current.party = null;
-                current.server = null;
-                updateUrl();
-            }
-        });
-});
-notifications.attachNotificationListener(notifications => {
-    applyNotificationsToStore(notifications);
+                if (current.party || current.server) {
+                    // Failed to join party/server, try without server
+                    current.party = null;
+                    current.server = null;
+                    updateUrl();
+                }
+            });
+    });
+}
+
+rerender();
+
+function onNotification(notifs: w.Notification[]) {
+    const store = getStore();
+
+    applyNotificationsToStore(notifs);
     rerender();
 
     let urlUpdated = false;
-    notifications.forEach(n => {
+    notifs.forEach(n => {
         if (n.type === "new" || n.type === "quit" || n.type === "disconnected" || n.type === "joinParty" || n.type === "leaveParty") {
             urlUpdated = true;
             if (n.type === "joinParty") {
-                current.server = n.server;
+                store.current.server = n.server;
             }
         } else if (n.type === "startParty") {
             onStartParty(n.partyId);
@@ -85,11 +101,11 @@ notifications.attachNotificationListener(notifications => {
     if (urlUpdated) {
         updateUrl();
     }
-});
 
-rerender();
+}
 
 function onNewGameClicked() {
+    const current = getStore().current;
     if (!getStore().socketId) {
         // New server? Reload the client, just in case the version has changed.
         current.page = "join";
@@ -103,6 +119,7 @@ function onNewGameClicked() {
 }
 
 function onWatchGameClicked(gameId: string) {
+    const current = getStore().current;
     if (!getStore().socketId) {
         // New server? Reload the client, just in case the version has changed.
         current.gameId = gameId;
@@ -148,8 +165,9 @@ function onStartParty(partyId: string) {
 }
 
 function changePage(newPage: string) {
+    const current = getStore().current;
     if (!getStore().socketId) {
-        const newTarget: url.PathElements = Object.assign({}, current, { page: newPage });
+        const newTarget: s.PathElements = Object.assign({}, current, { page: newPage });
         window.location.href = url.getPath(newTarget);
     } else {
         current.page = newPage;
@@ -160,6 +178,7 @@ function changePage(newPage: string) {
 
 function updateUrl() {
     const store = getStore();
+    const current = store.current;
 
     current.gameId = store.world.ui.myGameId;
     current.party = store.party ? store.party.id : null;
@@ -172,7 +191,7 @@ function rerender() {
     const store = getStore();
     ReactDOM.render(
         <Root
-            current={current}
+            current={store.current}
             connected={!!store.socketId}
             isNewPlayer={isNewPlayer}
             playerName={playerName}
