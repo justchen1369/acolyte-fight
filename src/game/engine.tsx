@@ -1,5 +1,6 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import pl from 'planck-js';
+import * as Immutable from 'immutable';
 import * as constants from './constants';
 import * as vector from './vector';
 import * as w from './world.model';
@@ -30,10 +31,9 @@ export function initialWorld(mod: Object, allowBots: boolean): w.World {
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
 		occurrences: new Array<w.Occurrence>(),
-		activePlayers: new Set<string>(), // hero IDs
-		bots: new Set<string>(),
-		players: new Map<string, w.Player>(), // hero ID -> player
-		scores: new Map<string, w.HeroScore>(), // hero ID -> score
+		activePlayers: Immutable.Set<string>(), // hero IDs
+		players: Immutable.Map<string, w.Player>(), // hero ID -> player
+		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
 
 		objects: new Map(),
@@ -221,7 +221,7 @@ function addHero(world: w.World, heroId: string) {
 		strafeIds: new Set<string>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
-	world.scores.set(heroId, initScore(heroId));
+	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	return hero;
 }
@@ -470,13 +470,8 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		isSharedBot: true,
 	} as w.Player;
 
-	let players = new Map<string, w.Player>(world.players);
-	players.set(hero.id, player);
-	world.players = players;
-
-	let activePlayers = new Set<string>(world.activePlayers);
-	activePlayers.delete(hero.id);
-	world.activePlayers = activePlayers;
+	world.players = world.players.set(hero.id, player);
+	world.activePlayers = world.activePlayers.delete(hero.id);
 
 	world.ui.notifications.push({ type: "bot", player });
 }
@@ -501,13 +496,8 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		isMobile: ev.isMobile,
 	} as w.Player;
 
-	let players = new Map<string, w.Player>(world.players);
-	players.set(hero.id, player);
-	world.players = players;
-
-	let activePlayers = new Set<string>(world.activePlayers);
-	activePlayers.add(hero.id);
-	world.activePlayers = activePlayers;
+	world.players = world.players.set(hero.id, player);
+	world.activePlayers = world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
 }
@@ -543,9 +533,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 		return;
 	}
 
-	const activePlayers = new Set<string>(world.activePlayers);
-	activePlayers.delete(ev.heroId);
-	world.activePlayers = activePlayers;
+	world.activePlayers = world.activePlayers.delete(ev.heroId);
 
 	world.ui.notifications.push({ type: "leave", player });
 
@@ -559,9 +547,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 			isMobile: false,
 		};
 
-		const players = new Map<string, w.Player>(world.players);
-		players.set(ev.heroId, newPlayer);
-		world.players = players;
+		world.players = world.players.set(ev.heroId, newPlayer);
 	}
 }
 
@@ -1325,15 +1311,15 @@ function notifyKill(hero: w.Hero, world: w.World) {
 
 	if (hero) {
 		const score = world.scores.get(hero.id);
-		score.deathTick = world.tick;
+		world.scores = world.scores.set(hero.id, { ...score, deathTick: world.tick });
 	}
 	if (hero.killerHeroId) {
 		const score = world.scores.get(hero.killerHeroId);
-		++score.kills;
+		world.scores = world.scores.set(hero.killerHeroId, { ...score, kills: score.kills + 1 });
 	}
 	if (hero.assistHeroId) {
 		const score = world.scores.get(hero.assistHeroId);
-		++score.assists;
+		world.scores = world.scores.set(hero.assistHeroId, { ...score, assists: score.assists + 1 });
 	}
 }
 
@@ -1538,7 +1524,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	// Update scores
 	if (fromHeroId && fromHeroId !== toHero.id) {
 		const score = world.scores.get(fromHeroId);
-		score.damage += amount;
+		world.scores = world.scores.set(fromHeroId, { ...score, damage: score.damage + amount });
 	}
 	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
 		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;

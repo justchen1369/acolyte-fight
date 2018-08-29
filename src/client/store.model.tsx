@@ -8,7 +8,6 @@ export interface State {
     keyBindings: KeyBindings;
 
     socketId: string;
-    preferredColors: Map<string, string>; // player name -> color
     party: PartyState;
     room: RoomState;
     world: w.World;

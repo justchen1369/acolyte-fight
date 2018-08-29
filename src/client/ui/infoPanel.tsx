@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import { HeroColors, Matchmaking } from '../../game/constants';
@@ -9,8 +10,8 @@ import InfoPanelPlayer from './infoPanelPlayer';
 
 interface Props {
     myHeroId: string;
-    activePlayers: Set<string>;
-    players: Map<string, w.Player>;
+    activePlayers: Immutable.Set<string>;
+    players: Immutable.Map<string, w.Player>;
     waitingForPlayers: boolean;
 }
 interface State {

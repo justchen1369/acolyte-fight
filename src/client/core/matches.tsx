@@ -56,7 +56,7 @@ export function leaveCurrentGame() {
 	const world = store.world;
 
 	world.players.forEach(player => {
-		store.preferredColors.set(player.name, player.uiColor);
+		ticker.setPreferredColor(player.name, player.uiColor);
 	});
 
 	if (world.ui.myGameId) {

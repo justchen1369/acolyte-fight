@@ -10,6 +10,8 @@ import { notify } from './notifications';
 
 const BufferDecayPerTick = 0.999;
 
+const preferredColors = new Map<string, string>(); // player name -> color
+
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
@@ -25,6 +27,10 @@ export function reset(history: m.TickMsg[]) {
 	while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
 		tickQueue.push(incomingQueue.shift());
 	}
+}
+
+export function setPreferredColor(heroId: string, color: string) {
+	preferredColors.set(heroId, color);
 }
 
 function isStartGameTick(tickData: m.TickMsg) {
@@ -83,7 +89,7 @@ export function frame(canvasStack: CanvasStack) {
 			continue; // Received the same tick multiple times, skip over it
 		}
 
-		applyTickActions(tickData, world, store.preferredColors);
+		applyTickActions(tickData, world, preferredColors);
 		engine.tick(world);
 	}
 	render(world, canvasStack);

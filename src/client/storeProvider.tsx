@@ -20,7 +20,6 @@ function initialState(): s.State {
         keyBindings: storage.getKeyBindingsOrDefaults(),
         current: {},
         socketId: null,
-        preferredColors: new Map<string, string>(),
         room,
         party: null,
         world: engine.initialWorld(room.mod, room.allowBots),
@@ -46,7 +45,11 @@ function reducer(state: s.State, action: s.Action): s.State {
             current: { ...state.current, server: action.server },
         };
     } else if (action.type === "updateWorld") {
-        return { ...state, world: action.world };
+        return {
+            ...state,
+            world: action.world,
+            items: [],
+        };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }
     } else {

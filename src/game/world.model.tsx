@@ -1,4 +1,5 @@
 import * as pl from 'planck-js';
+import * as Immutable from 'immutable';
 
 export namespace CastStage {
 	export const Cooldown = 1;
@@ -13,9 +14,9 @@ export interface World {
 	tick: number;
 	startTick: number;
 
-	activePlayers: Set<string>; // Set<heroId: string>
-	players: Map<string, Player>; // heroId -> Player
-	scores: Map<string, HeroScore>; // heroId -> HeroScore
+	activePlayers: Immutable.Set<string>; // Set<heroId: string>
+	players: Immutable.Map<string, Player>; // heroId -> Player
+	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
 	winner: string | null;
 
 	objects: Map<string, WorldObject>,
