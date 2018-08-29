@@ -7,23 +7,7 @@ const ExpiryMilliseconds = 15000;
 let nextNotificationId = 0;
 setInterval(notificationCleanup, ExpiryMilliseconds);
 
-interface NotificationListener {
-	(notifications: w.Notification[]): void;
-}
-
-let notificationListeners: NotificationListener[] = [applyNotificationsToStore];
-
-export function notify(...notifications: w.Notification[]) {
-	if (notifications.length > 0) {
-		notificationListeners.forEach(listener => listener(notifications));
-	}
-}
-
-export function attachNotificationListener(listener: NotificationListener) {
-	notificationListeners.push(listener);
-}
-
-function applyNotificationsToStore(newNotifications: w.Notification[]) {
+export function notify(...newNotifications: w.Notification[]) {
     const store = StoreProvider.getState();
 
     // Add notifications to list
@@ -48,7 +32,6 @@ function calculateExpiryMilliseconds(notification: w.Notification): number {
         default: return ExpiryMilliseconds;
     }
 }
-
 
 function notificationCleanup() {
     const store = StoreProvider.getState();
