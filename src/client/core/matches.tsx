@@ -8,17 +8,17 @@ import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
 
-export function joinNewGame(playerName: string, keyBindings: KeyBindings, partyId: string, observeGameId?: string) {
+export function joinNewGame(observeGameId?: string) {
 	const store = StoreProvider.getStore();
 
 	leaveCurrentGame();
 
 	const msg: m.JoinMsg = {
 		gameId: observeGameId || null,
-		name: playerName,
-		keyBindings,
+		name: store.playerName,
+		keyBindings: store.keyBindings,
 		room: store.room.id,
-		party: partyId,
+		party: store.party ? store.party.id : null,
 		isBot: ai.playingAsAI(store.room.allowBots) && !observeGameId,
 		isMobile,
 		observe: !!observeGameId,

@@ -4,7 +4,7 @@ import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
 import { getLocation, sanitizeHostname } from './mirroring';
 import { logger } from './logging';
-import * as PlayerName from '../game/playerName';
+import * as PlayerName from '../game/sanitize';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import socketClient from 'socket.io-client';

@@ -1,4 +1,4 @@
-import * as c from '../../game/world.model';
+import { DefaultSettings } from '../game/settings';
 
 namespace StorageKeys {
     export const Name = "enigma-name";
@@ -33,4 +33,8 @@ export function getOrCreatePlayerName(): string {
         saveName(name);
     }
     return name;
+}
+
+export function getKeyBindingsOrDefaults() {
+    return loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
 }

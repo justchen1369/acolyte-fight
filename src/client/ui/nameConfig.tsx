@@ -1,7 +1,8 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as PlayerName from '../../game/playerName';
-import * as Storage from '../core/storage';
+import * as PlayerName from '../../game/sanitize';
+import * as Storage from '../storage';
+import * as StoreProvider from '../storeProvider';
 
 interface Props {
 }
@@ -44,7 +45,9 @@ export class NameConfig extends React.Component<Props, State> {
     }
 
     private saveState() {
+        StoreProvider.setPlayerName(this.state.name);
         Storage.saveName(this.state.name);
+
         this.setState({
             saved: true,
         });

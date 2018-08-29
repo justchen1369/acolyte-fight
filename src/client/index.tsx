@@ -16,39 +16,25 @@ import * as url from './core/url';
 
 import { getStore, setConnected, setUrl } from './storeProvider';
 import { applyNotificationsToStore } from './core/notifications';
-import * as Storage from './core/storage';
-import { DefaultSettings } from '../game/settings';
+import * as Storage from './storage';
 
 import { Root } from './ui/root';
 
 const socket = socketLib();
 
-let isNewPlayer = !Storage.loadName();
-let playerName = getOrCreatePlayerName();
-
-function getOrCreatePlayerName(): string {
-    let name = Storage.loadName();
-    if (!name) {
-        name = "Acolyte" + (Math.random() * 10000).toFixed(0);
-        Storage.saveName(name);
-    }
-    return name;
-}
-
 let alreadyConnected = false;
 
 notifications.attachNotificationListener((notifs) => onNotification(notifs));
-
 setUrl(url.parseLocation(window.location));
-
 initialize();
+rerender();
 
 function initialize() {
     const current = getStore().current;
 
     sockets.attachToSocket(socket, () => {
         sockets.connectToServer(current.server)
-            .then(() => parties.joinParty(current.party, getOrCreatePlayerName()))
+            .then(() => parties.joinParty(current.party))
             .then(() => {
                 if (!alreadyConnected) {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
@@ -59,7 +45,7 @@ function initialize() {
                             // Return to the home page when we exit
                             current.page = "";
                         }
-                        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
+                        matches.joinNewGame(current.gameId);
                     } else {
                         rerender(); // Room settings might have changed the page
                     }
@@ -78,8 +64,6 @@ function initialize() {
             });
     });
 }
-
-rerender();
 
 function onNotification(notifs: w.Notification[]) {
     const store = getStore();
@@ -112,8 +96,7 @@ function onNewGameClicked() {
         updateUrl();
         window.location.reload();
     } else {
-        playerName = getOrCreatePlayerName(); // Reload name
-        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party);
+        matches.joinNewGame();
         updateUrl();
     }
 }
@@ -127,8 +110,7 @@ function onWatchGameClicked(gameId: string) {
         updateUrl();
         window.location.reload();
     } else {
-        playerName = getOrCreatePlayerName(); // Reload name
-        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, gameId);
+        matches.joinNewGame(gameId);
         updateUrl();
     }
 }
@@ -141,7 +123,7 @@ function onCreatePartyClicked() {
     const party = getStore().party;
     if (!party) {
         const roomId: string = null;
-        parties.createParty(roomId, getOrCreatePlayerName());
+        parties.createParty(roomId);
     }
 }
 
@@ -153,13 +135,13 @@ function onLeavePartyClicked(partyId: string) {
 }
 
 function onPartyReadyClicked(partyId: string, ready: boolean) {
-    parties.updateParty(partyId, getOrCreatePlayerName(), ready);
+    parties.updateParty(partyId, ready);
 }
 
 function onStartParty(partyId: string) {
     const party = getStore().party;
     if (party && party.id === partyId) {
-        parties.updateParty(partyId, getOrCreatePlayerName(), false);
+        parties.updateParty(partyId, false);
         setTimeout(() => onNewGameClicked(), 1);
     }
 }
@@ -193,8 +175,8 @@ function rerender() {
         <Root
             current={store.current}
             connected={!!store.socketId}
-            isNewPlayer={isNewPlayer}
-            playerName={playerName}
+            isNewPlayer={store.isNewPlayer}
+            playerName={store.playerName}
             party={store.party}
             world={store.world}
             items={store.items}
@@ -208,8 +190,4 @@ function rerender() {
             partyReadyCallback={(partyId, ready) => onPartyReadyClicked(partyId, ready)}
         />,
         document.getElementById("root"));
-}
-
-function retrieveKeyBindings() {
-    return Storage.loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
 }

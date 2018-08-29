@@ -4,7 +4,7 @@ import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as matches from './matches';
 import * as sockets from './sockets';
-import * as Storage from './storage';
+import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from './url';
 import { notify } from './notifications';
@@ -25,7 +25,7 @@ function createRoomFromMod(mod: Object, current: s.PathElements) {
 
 export function createRoom(mod: Object, allowBots: boolean, current: s.PathElements, nextPage: string = "share") {
     console.log("Creating room", mod, allowBots);
-    return createRoomCall(mod, allowBots).then(response => createParty(response.roomId, Storage.getOrCreatePlayerName()))
+    return createRoomCall(mod, allowBots).then(response => createParty(response.roomId))
         .then(msg => {
             const path = url.getPath(Object.assign({}, current, {
                 gameId: null,
@@ -88,7 +88,7 @@ export function leaveRoom(): Promise<void> {
 	return Promise.resolve();
 }
 
-export function createParty(roomId: string, playerName: string): Promise<m.PartyResponse> {
+export function createParty(roomId: string): Promise<m.PartyResponse> {
 	return new Promise<string>((resolve, reject) => {
 		let msg: m.CreatePartyRequest = {
 			roomId,
@@ -100,16 +100,17 @@ export function createParty(roomId: string, playerName: string): Promise<m.Party
 				resolve(response.partyId);
 			}
 		});
-	}).then(partyId => joinParty(partyId, playerName));
+	}).then(partyId => joinParty(partyId));
 }
 
-export function joinParty(partyId: string, playerName: string): Promise<m.PartyResponse> {
+export function joinParty(partyId: string): Promise<m.PartyResponse> {
+	const store = StoreProvider.getStore();
 	if (partyId) {
 		let response: m.PartyResponse;
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.PartyRequest = {
 				partyId,
-				playerName,
+				playerName: store.playerName,
 				ready: false,
 			};
 			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
@@ -128,7 +129,9 @@ export function joinParty(partyId: string, playerName: string): Promise<m.PartyR
 	}
 }
 
-export function updateParty(partyId: string, playerName: string, ready: boolean): Promise<void> {
+export function updateParty(partyId: string, ready: boolean): Promise<void> {
+	const playerName = StoreProvider.getStore().playerName;
+
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyRequest = {
 			partyId,

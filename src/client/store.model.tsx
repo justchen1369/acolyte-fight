@@ -2,6 +2,11 @@ import * as w from '../game/world.model';
 
 export interface State {
     current: PathElements;
+
+    isNewPlayer: boolean;
+    playerName: string;
+    keyBindings: KeyBindings;
+
     socketId: string;
     preferredColors: Map<string, string>; // player name -> color
     party: PartyState;
