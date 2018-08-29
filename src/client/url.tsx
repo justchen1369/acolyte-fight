@@ -1,5 +1,5 @@
 import queryString from 'query-string';
-import * as s from '../store.model';
+import * as s from './store.model';
 
 export function parseLocation(location: Location): s.PathElements {
     let page: string = null;
@@ -50,8 +50,4 @@ export function getPath(elems: s.PathElements) {
     }
 
     return path;
-}
-
-export function getPartyHomePath(current: s.PathElements) {
-    return getPath(Object.assign({}, current, { page: null }));
 }

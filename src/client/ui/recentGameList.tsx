@@ -3,7 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import * as m from '../../game/messages.model';
 import * as matches from '../core/matches';
-import * as url from '../core/url';
+import * as url from '../url';
 import { TicksPerSecond } from '../../game/constants';
 
 export interface Game {
@@ -53,7 +53,7 @@ function msgToGame(msg: m.GameMsg): Game {
     };
 }
 
-export class RecentGameList extends React.Component<Props, State> {
+class RecentGameList extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -118,3 +118,5 @@ export class RecentGameList extends React.Component<Props, State> {
         matches.joinNewGame(game.id);
     }
 }
+
+export default RecentGameList;

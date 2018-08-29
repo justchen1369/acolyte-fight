@@ -48,7 +48,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 }
 function onDisconnectMsg() {
 	const world = StoreProvider.getState().world;
-	world.activePlayers.clear();
+	world.activePlayers = new Set<string>();
 	notify({ type: "disconnected" });
 }
 

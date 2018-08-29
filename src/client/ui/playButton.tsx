@@ -4,7 +4,7 @@ import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
 import * as parties from '../core/parties';
 import * as screenLifecycle from './screenLifecycle';
-import * as url from '../core/url';
+import * as url from '../url';
 
 interface Props {
     party: s.PartyState;

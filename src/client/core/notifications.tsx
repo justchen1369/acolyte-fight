@@ -11,7 +11,7 @@ interface NotificationListener {
 	(notifications: w.Notification[]): void;
 }
 
-let notificationListeners = new Array<NotificationListener>();
+let notificationListeners: NotificationListener[] = [applyNotificationsToStore];
 
 export function notify(...notifications: w.Notification[]) {
 	if (notifications.length > 0) {
@@ -23,7 +23,7 @@ export function attachNotificationListener(listener: NotificationListener) {
 	notificationListeners.push(listener);
 }
 
-export function applyNotificationsToStore(newNotifications: w.Notification[]) {
+function applyNotificationsToStore(newNotifications: w.Notification[]) {
     const store = StoreProvider.getState();
 
     // Detect if entered a new game
@@ -65,7 +65,8 @@ export function applyNotificationsToStore(newNotifications: w.Notification[]) {
             expiryTime,
          });
     });
-    store.items = newItems;
+
+    StoreProvider.dispatch({ type: "updateNotifications", items: newItems });
 }
 
 function calculateExpiryMilliseconds(notification: w.Notification): number {
@@ -91,5 +92,5 @@ function notificationCleanup() {
             items.push(item);
         }
     });
-    store.items = items;
+    StoreProvider.dispatch({ type: "updateNotifications", items });
 }

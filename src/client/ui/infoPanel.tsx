@@ -1,26 +1,32 @@
 import _ from 'lodash';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import { HeroColors, Matchmaking } from '../../game/constants';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
-import { PlayerName } from './playerNameComponent';
+import InfoPanelPlayer from './infoPanelPlayer';
 
 interface Props {
-    playerName: string;
-    world: w.World;
+    myHeroId: string;
+    activePlayers: Set<string>;
+    players: Map<string, w.Player>;
+    waitingForPlayers: boolean;
 }
 interface State {
 }
 
-interface PlayerListItem {
-    heroId: string;
-    name: string;
-    isBot: boolean;
-    color: string;
+function stateToProps(state: s.State): Props {
+    const world = state.world;
+    return {
+        myHeroId: world.ui.myHeroId,
+        activePlayers: world.activePlayers,
+        players: world.players,
+        waitingForPlayers: world.tick < world.startTick,
+    };
 }
 
-export class InfoPanel extends React.Component<Props, State> {
+class InfoPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -28,30 +34,24 @@ export class InfoPanel extends React.Component<Props, State> {
     }
 
     render() {
-        const world = this.props.world;
-
         return (
             <div id="info-panel">
-                {world.activePlayers.size > 0 && <div className="player-list">
-                    {world.tick < world.startTick 
+                {this.props.activePlayers.size > 0 && <div className="player-list">
+                    {this.props.waitingForPlayers
                     ? (
                         <div className="player-list-title">
                             <span className="waiting-for-players"><i className="fa fa-clock" /> Waiting for players</span>
                         </div>
                     ) : (
                         <div className="player-list-title">
-                            <span className="player-list-num-players">{world.activePlayers.size} players</span>
+                            <span className="player-list-num-players">{this.props.activePlayers.size} players</span>
                         </div>
                     )}
-                    {this.renderPlayerList(world)}
+                    {this.renderPlayerList()}
                 </div>}
-                {(world.ui.myHeroId && world.players.size === 1) && this.renderPlayVsAiBtn()}
+                {(this.props.myHeroId && this.props.players.size === 1) && this.renderPlayVsAiBtn()}
             </div>
         );
-    }
-
-    onNotification(notifications: w.Notification[]) {
-        this.forceUpdate();
     }
 
     private renderPlayVsAiBtn() {
@@ -62,34 +62,15 @@ export class InfoPanel extends React.Component<Props, State> {
         matches.addBotToCurrentGame();
     }
 
-    private renderPlayerList(world: w.World) {
+    private renderPlayerList() {
         let result = new Array<JSX.Element>();
 
-        world.players.forEach(player => {
-            let numKills = 0;
-            {
-                let scores = world.scores.get(player.heroId);
-                if (scores) {
-                    numKills = scores.kills;
-                }
-            }
-
-            const isAlive = world.objects.has(player.heroId);
-            const isActive = world.activePlayers.has(player.heroId) || player.isSharedBot;
-
-            let color = player.uiColor;
-            if (!(isAlive && isActive)) {
-                color = HeroColors.InactiveColor;
-            } else if (player.heroId === world.ui.myHeroId) {
-                color = HeroColors.MyHeroColor;
-            }
-
-            result.push(<div key={player.heroId} className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
-                <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
-                <PlayerName player={player} world={world} />
-            </div>);
+        this.props.players.forEach(player => {
+            result.push(<InfoPanelPlayer key={player.heroId} myHeroId={player.heroId} />);
         });
 
         return result;
     }
 }
+
+export default ReactRedux.connect(stateToProps)(InfoPanel);

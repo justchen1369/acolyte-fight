@@ -1,16 +1,23 @@
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
-import * as url from '../core/url';
+import * as pages from '../core/pages';
+import * as url from '../url';
 
 interface Props {
     current: s.PathElements;
-    changePage: (newPage: string) => void;
 }
 
 interface State {
 }
 
-export class NavBar extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        current: state.current,
+    };
+}
+
+class NavBar extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -43,6 +50,8 @@ export class NavBar extends React.Component<Props, State> {
 
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
         ev.preventDefault();
-        this.props.changePage(newPage);
+        pages.changePage(newPage);
     }
 }
+
+export default ReactRedux.connect(stateToProps)(NavBar);

@@ -1,6 +1,8 @@
 import pl from 'planck-js';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as vector from '../../game/vector';
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond } from '../../game/constants';
@@ -61,7 +63,13 @@ class AnimationLoop {
     }
 }
 
-export class CanvasPanel extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        world: state.world,
+    };
+}
+
+class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: string = null;
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
@@ -359,3 +367,5 @@ export class CanvasPanel extends React.Component<Props, State> {
         }
     }
 }
+
+export default ReactRedux.connect(stateToProps)(CanvasPanel);

@@ -1,17 +1,16 @@
 import * as React from 'react';
 import * as s from '../store.model';
 import * as parties from '../core/parties';
-import * as url from '../core/url';
+import * as url from '../url';
 
 interface Props {
-    current: s.PathElements;
 }
 interface State {
     error: string;
     selectedFile: File;
 }
 
-export class ModdingPanel extends React.Component<Props, State> {
+class ModdingPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -53,10 +52,12 @@ export class ModdingPanel extends React.Component<Props, State> {
     }
 
     private onSubmit() {
-        parties.createRoomFromFile(this.state.selectedFile, this.props.current)
+        parties.createRoomFromFile(this.state.selectedFile)
             .catch(error => {
                 console.error(error);
                 this.setState({ error: `${error}` });
             });
     }
 }
+
+export default ModdingPanel;

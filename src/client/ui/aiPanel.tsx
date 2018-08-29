@@ -1,11 +1,11 @@
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as ai from '../core/ai';
 import * as parties from '../core/parties';
 import * as s from '../store.model';
 import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
-    current: s.PathElements;
     allowBots: boolean;
 }
 interface State {
@@ -15,7 +15,13 @@ interface State {
     selectedFile: File;
 }
 
-export class AiPanel extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        allowBots: state.world.allowBots,
+    };
+}
+
+class AiPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -106,6 +112,8 @@ export class AiPanel extends React.Component<Props, State> {
 
     private onCreateAIRoom() {
         this.setState({ loading: true });
-        parties.createRoom({}, true, this.props.current, this.props.current.page); // Return to this page
+        parties.createRoom({}, true, "ai"); // Return to this page
     }
 }
+
+export default ReactRedux.connect(stateToProps)(AiPanel);

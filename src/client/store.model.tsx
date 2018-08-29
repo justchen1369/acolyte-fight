@@ -47,6 +47,7 @@ export type Action =
     | UpdatePageAction
     | UpdateServerAction
     | UpdateWorldAction
+    | UpdateNotificationsAction
 
 export interface UpdateWorldAction {
     type: "updateWorld";
@@ -76,4 +77,9 @@ export interface UpdatePageAction {
 export interface UpdateServerAction {
     type: "updateServer";
     server: string;
+}
+
+export interface UpdateNotificationsAction {
+    type: "updateNotifications";
+    items: NotificationItem[];
 }

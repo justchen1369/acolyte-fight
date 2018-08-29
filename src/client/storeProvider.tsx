@@ -47,7 +47,10 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateWorld") {
         return { ...state, world: action.world };
+    } else if (action.type === "updateNotifications") {
+        return { ...state, items: action.items }
     } else {
+        console.log(action);
         return state;
     }
 }
@@ -58,4 +61,8 @@ export function dispatch(action: s.Action) {
 
 export function getState(): s.State {
     return store.getState();
+}
+
+export function getStore() {
+    return store;
 }

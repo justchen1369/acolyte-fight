@@ -6,33 +6,37 @@ import * as matches from './matches';
 import * as sockets from './sockets';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
-import * as url from './url';
+import * as url from '../url';
 import { notify } from './notifications';
 import { readFileAsync } from './fileUtils';
 import { socket } from './sockets';
 
 sockets.listeners.onPartyMsg = onPartyMsg;
 
-export function createRoomFromFile(file: File, current: s.PathElements) {
+export function getPartyHomePath(current: s.PathElements) {
+    return url.getPath({ ...current, page: null });
+}
+
+export function createRoomFromFile(file: File) {
     return readFileAsync(file)
         .then(json => json ? JSON.parse(json) : {})
-        .then(mod => createRoomFromMod(mod, current))
+        .then(mod => createRoomFromMod(mod))
 }
 
-function createRoomFromMod(mod: Object, current: s.PathElements) {
-    return createRoom(mod, false, current);
+function createRoomFromMod(mod: Object) {
+    return createRoom(mod, false);
 }
 
-export function createRoom(mod: Object, allowBots: boolean, current: s.PathElements, nextPage: string = "share") {
+export function createRoom(mod: Object, allowBots: boolean, nextPage: string = "share") {
     console.log("Creating room", mod, allowBots);
     return createRoomCall(mod, allowBots).then(response => createParty(response.roomId))
         .then(msg => {
-            const path = url.getPath(Object.assign({}, current, {
+            const path = url.getPath({
                 gameId: null,
                 page: nextPage,
                 party: msg.partyId,
                 server: msg.server,
-            }));
+            });
             window.location.href = path;
         })
 }
@@ -122,6 +126,7 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 				}
 			});
 		}).then(() => joinRoom(response.roomId))
+		.then(() => StoreProvider.dispatch({ type: "updateServer", server: response.server }))
 		.then(() => notify({ type: "joinParty", partyId: response.partyId, server: response.server, members: response.members }))
 		.then(() => response)
 	} else {

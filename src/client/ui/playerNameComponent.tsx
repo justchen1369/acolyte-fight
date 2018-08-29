@@ -2,22 +2,19 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import { HeroColors, Matchmaking } from '../../game/constants';
-import { PlayButton } from './playButton';
-import { isMobile } from '../core/userAgent';
+import { HeroColors } from '../../game/constants';
 
 interface Props {
     player: w.Player;
-    world: w.World;
+    myHeroId: string;
 }
 
-export class PlayerName extends React.Component<Props> {
+export class PlayerName extends React.PureComponent<Props> {
     render() {
         const player = this.props.player;
-        const world = this.props.world;
         
         let color;
-        if (player.heroId === world.ui.myHeroId) {
+        if (player.heroId === this.props.myHeroId) {
             color = HeroColors.MyHeroColor;
         } else {
             color = player.uiColor;

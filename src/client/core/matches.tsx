@@ -4,7 +4,7 @@ import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
-import * as url from './url';
+import * as url from '../url';
 import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';

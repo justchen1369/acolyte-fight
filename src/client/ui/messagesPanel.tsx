@@ -1,19 +1,24 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
-import { HeroColors, Matchmaking } from '../../game/constants';
+import { ButtonBar } from '../../game/constants';
 import { PlayButton } from './playButton';
 import { isMobile } from '../core/userAgent';
 import { PlayerName } from './playerNameComponent';
+import { worldInterruptible } from '../core/matches';
 
 interface Props {
     party: s.PartyState;
     isNewPlayer: boolean;
-    world: w.World;
+    myGameId: string;
+    myHeroId: string;
+    isDead: boolean;
+    buttonBar: w.ButtonConfig;
+    exitable: boolean;
     items: s.NotificationItem[];
-    style: Object;
 }
 interface State {
     spectatingGameId: string;
@@ -22,7 +27,20 @@ interface State {
 
 let helpedThisSession = false; // Store across games so the user only has to dismiss the help once
 
-export class MessagesPanel extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        party: state.party,
+        isNewPlayer: state.isNewPlayer,
+        myGameId: state.world.ui.myGameId,
+        myHeroId: state.world.ui.myHeroId,
+        isDead: !state.world.objects.has(state.world.ui.myHeroId),
+        buttonBar: state.world.ui.buttonBar,
+        exitable: worldInterruptible(state.world),
+        items: state.items,
+    };
+}
+
+class MessagesPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -32,7 +50,17 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     render() {
-        const world = this.props.world;
+        // Offset the messages from the button bar
+        let marginBottom = 0;
+        let marginLeft = 0;
+        const buttonBar = this.props.buttonBar;
+        if (buttonBar) {
+            if (buttonBar.view === "bar") {
+                marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+            } else if (buttonBar.view === "wheel") {
+                marginLeft = buttonBar.region.right;
+            }
+        }
 
         let rows = new Array<JSX.Element>();
         let actionRow: JSX.Element = this.renderHelp("help");
@@ -54,15 +82,15 @@ export class MessagesPanel extends React.Component<Props, State> {
             }
         });
 
-        if (!actionRow && world.ui.myGameId !== this.state.spectatingGameId && world.ui.myHeroId && !world.objects.has(world.ui.myHeroId)) {
-            actionRow = this.renderDead("dead", world.ui.myGameId);
+        if (!actionRow && this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
+            actionRow = this.renderDead("dead", this.props.myGameId);
         }
 
         if (actionRow) {
             rows.push(actionRow);
         }
 
-        return <div id="messages-panel" style={this.props.style}>{rows}</div>;
+        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>{rows}</div>;
     }
 
     private renderNotification(key: string, notification: w.Notification) {
@@ -95,8 +123,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderHelp(key: string) {
-        const world = this.props.world;
-        if (!world.ui.myHeroId) {
+        if (!this.props.myHeroId) {
             return null; // Observer doesn't need instructions
         }
 
@@ -144,15 +171,15 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderJoinNotification(key: string, notification: w.JoinNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} world={this.props.world} /> left</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> left</div>
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
@@ -162,20 +189,20 @@ export class MessagesPanel extends React.Component<Props, State> {
 
         if (notification.killer) {
             return <div key={key} className="row">
-                {notification.killer && <span key="killer"><PlayerName player={notification.killer} world={this.props.world} /> killed </span>}
-                {notification.killed && <span key="killed"><PlayerName player={notification.killed} world={this.props.world} /> </span>}
-                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} world={this.props.world} /> </span>}
+                {notification.killer && <span key="killer"><PlayerName player={notification.killer} myHeroId={this.props.myHeroId} /> killed </span>}
+                {notification.killed && <span key="killed"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> </span>}
+                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} myHeroId={this.props.myHeroId} /> </span>}
             </div>
         } else {
-            return <div key={key} className="row"><PlayerName player={notification.killed} world={this.props.world} /> died</div>
+            return <div key={key} className="row"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> died</div>
         }
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
         return <div key={key} className="winner">
-            <div className="winner-row"><PlayerName player={notification.winner} world={this.props.world} /> is the winner!</div>
-            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} world={this.props.world} /> ({notification.mostDamageAmount.toFixed(0)}%)</div>
-            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} world={this.props.world} /> ({notification.mostKillsCount} kills)</div>
+            <div className="winner-row"><PlayerName player={notification.winner} myHeroId={this.props.myHeroId} /> is the winner!</div>
+            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)}%)</div>
+            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} myHeroId={this.props.myHeroId} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 {this.renderWinAction()}
             </div>
@@ -183,7 +210,7 @@ export class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderWinAction() {
-        const observing = !this.props.world.ui.myHeroId;
+        const observing = !this.props.myHeroId;
         if (observing) {
             return <span className="btn new-game-btn" onClick={() => matches.leaveCurrentGame()}>Exit Replay</span>;
         } else {
@@ -206,3 +233,5 @@ export class MessagesPanel extends React.Component<Props, State> {
         </div>;
     }
 }
+
+export default ReactRedux.connect(stateToProps)(MessagesPanel);

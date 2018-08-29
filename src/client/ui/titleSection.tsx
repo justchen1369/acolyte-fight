@@ -1,5 +1,7 @@
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
+import * as s from '../store.model';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -13,6 +15,12 @@ function retrieveLocationAsync() {
     return fetch('location', { credentials: "same-origin" })
         .then(res => res.json())
         .then((msg: m.LocationMsg) => msg);
+}
+
+function stateToProps(state: s.State): Props {
+    return {
+        settings: state.world.settings,
+    };
 }
 
 export class TitleSection extends React.Component<Props, State> {
@@ -84,3 +92,5 @@ export class TitleSection extends React.Component<Props, State> {
         </div>;
     }
 }
+
+export default ReactRedux.connect(stateToProps)(TitleSection);

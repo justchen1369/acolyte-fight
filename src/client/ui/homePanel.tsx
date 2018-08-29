@@ -1,39 +1,50 @@
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as ai from '../core/ai';
-import * as url from '../core/url';
+import * as pages from '../core/pages';
+import * as url from '../url';
 import { NameConfig } from './nameConfig';
 import { PlayButton } from './playButton';
 import { SpellConfig } from './spellConfig';
-import { NavBar } from './navbar';
+import NavBar from './navbar';
 
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     current: s.PathElements;
     party: s.PartyState;
-    world: w.World;
-    changePage: (newPage: string) => void;
+    settings: AcolyteFightSettings;
+    allowBots: boolean;
 }
 interface State {
     playingAsAI: boolean;
 }
 
-export class HomePanel extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        current: state.current,
+        party: state.party,
+        settings: state.world.settings,
+        allowBots: state.world.allowBots,
+    };
+}
+
+class HomePanel extends React.Component<Props, State> {
     private belowFoldElem: HTMLElement = null;
 
     constructor(props: Props) {
         super(props);
         this.state = {
-            playingAsAI: ai.playingAsAI(this.props.world.allowBots),
+            playingAsAI: ai.playingAsAI(this.props.allowBots),
         };
     }
 
     render() {
         return <div className="content-container">
             <div className="home">
-                <NavBar current={this.props.current} changePage={this.props.changePage} />
+                <NavBar />
                 <div className="spacer" />
                 <div className="title-row">
                     <video autoPlay muted loop>
@@ -72,7 +83,7 @@ export class HomePanel extends React.Component<Props, State> {
                 <h2>Your Name</h2>
                 <NameConfig />
                 <h1>Your Spell Configuration</h1>
-                <SpellConfig settings={this.props.world.settings} />
+                <SpellConfig settings={this.props.settings} />
             </div>
         </div>;
     }
@@ -102,7 +113,7 @@ export class HomePanel extends React.Component<Props, State> {
 
     private onPartyDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
         ev.preventDefault();
-        return this.props.changePage("party");
+        pages.changePage("party");
     }
 
     private scrollBelowFold() {
@@ -114,3 +125,5 @@ export class HomePanel extends React.Component<Props, State> {
         }
     }
 }
+
+export default ReactRedux.connect(stateToProps)(HomePanel);

@@ -1,12 +1,13 @@
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as pages from '../core/pages';
 import * as parties from '../core/parties';
-import * as url from '../core/url';
+import * as url from '../url';
 
 interface Props {
     current: s.PathElements;
-    changePage: (newPage: string) => void;
 
     mod: Object;
     allowBots: boolean;
@@ -16,6 +17,15 @@ interface Props {
 interface State {
     creating: boolean;
     error: string;
+}
+
+function stateToProps(state: s.State): Props {
+    return {
+        current: state.current,
+        mod: state.world.mod,
+        allowBots: state.world.allowBots,
+        party: state.party,
+    };
 }
 
 export class PartyPanel extends React.Component<Props, State> {
@@ -46,7 +56,7 @@ export class PartyPanel extends React.Component<Props, State> {
     }
 
     private renderCurrentParty() {
-        const currentPartyPath = url.getPartyHomePath(this.props.current);
+        const currentPartyPath = parties.getPartyHomePath(this.props.current);
         return <div>
             <p><b>Currently in party:</b> <span>{this.props.party.members.map(m => m.name).join(", ")}</span></p>
             <p>Invite friends to join your party by sending them this link:</p>
@@ -80,6 +90,8 @@ export class PartyPanel extends React.Component<Props, State> {
 
     private anchorClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
         ev.preventDefault();
-        this.props.changePage(newPage);
+        pages.changePage(newPage);
     }
 }
+
+export default ReactRedux.connect(stateToProps)(PartyPanel);

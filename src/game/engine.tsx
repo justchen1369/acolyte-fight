@@ -469,8 +469,14 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		isBot: true,
 		isSharedBot: true,
 	} as w.Player;
-	world.players.set(hero.id, player);
-	world.activePlayers.delete(hero.id);
+
+	let players = new Map<string, w.Player>(world.players);
+	players.set(hero.id, player);
+	world.players = players;
+
+	let activePlayers = new Set<string>(world.activePlayers);
+	activePlayers.delete(hero.id);
+	world.activePlayers = activePlayers;
 
 	world.ui.notifications.push({ type: "bot", player });
 }
@@ -494,8 +500,14 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		isSharedBot: false,
 		isMobile: ev.isMobile,
 	} as w.Player;
-	world.players.set(hero.id, player);
-	world.activePlayers.add(hero.id);
+
+	let players = new Map<string, w.Player>(world.players);
+	players.set(hero.id, player);
+	world.players = players;
+
+	let activePlayers = new Set<string>(world.activePlayers);
+	activePlayers.add(hero.id);
+	world.activePlayers = activePlayers;
 
 	world.ui.notifications.push({ type: "join", player });
 }
@@ -531,7 +543,10 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 		return;
 	}
 
-	world.activePlayers.delete(ev.heroId);
+	const activePlayers = new Set<string>(world.activePlayers);
+	activePlayers.delete(ev.heroId);
+	world.activePlayers = activePlayers;
+
 	world.ui.notifications.push({ type: "leave", player });
 
 	const hero = world.objects.get(ev.heroId);
@@ -543,7 +558,10 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 			isSharedBot: true,
 			isMobile: false,
 		};
-		world.players.set(ev.heroId, newPlayer);
+
+		const players = new Map<string, w.Player>(world.players);
+		players.set(ev.heroId, newPlayer);
+		world.players = players;
 	}
 }
 
