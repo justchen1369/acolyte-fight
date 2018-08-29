@@ -4,36 +4,45 @@ import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
+import * as url from './url';
 import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
 
 export function joinNewGame(observeGameId?: string) {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
+	if (store.socketId) {
+		leaveCurrentGame();
 
-	leaveCurrentGame();
-
-	const msg: m.JoinMsg = {
-		gameId: observeGameId || null,
-		name: store.playerName,
-		keyBindings: store.keyBindings,
-		room: store.room.id,
-		party: store.party ? store.party.id : null,
-		isBot: ai.playingAsAI(store.room.allowBots) && !observeGameId,
-		isMobile,
-		observe: !!observeGameId,
-	};
-	socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
-		if (hero) {
-			onHeroMsg(hero);
+		const msg: m.JoinMsg = {
+			gameId: observeGameId || null,
+			name: store.playerName,
+			keyBindings: store.keyBindings,
+			room: store.room.id,
+			party: store.party ? store.party.id : null,
+			isBot: ai.playingAsAI(store.room.allowBots) && !observeGameId,
+			isMobile,
+			observe: !!observeGameId,
+		};
+		socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
+			if (hero) {
+				onHeroMsg(hero);
+			} else {
+				notify({ type: "replayNotFound" });
+			}
+		});
+	} else {
+		// New server? Reload the client, just in case the version has changed.
+		if (observeGameId) {
+			window.location.href = url.getPath({ ...store.current, gameId: observeGameId });
 		} else {
-			notify({ type: "replayNotFound" });
+			window.location.href = url.getPath({ ...store.current, page: "join", gameId: null });
 		}
-	});
+	}
 }
 
 export function addBotToCurrentGame() {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 	const world = store.world;
 
 	if (world.ui.myGameId && world.ui.myHeroId) {
@@ -43,7 +52,7 @@ export function addBotToCurrentGame() {
 }
 
 export function leaveCurrentGame() {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 	const world = store.world;
 
 	world.players.forEach(player => {
@@ -61,7 +70,7 @@ export function leaveCurrentGame() {
 }
 
 function onHeroMsg(data: m.JoinResponseMsg) {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 
 	const world = engine.initialWorld(data.mod, data.allowBots);
 	store.world = world;

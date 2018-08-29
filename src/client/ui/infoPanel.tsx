@@ -3,10 +3,10 @@ import * as React from 'react';
 import { HeroColors, Matchmaking } from '../../game/constants';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as matches from '../core/matches';
 import { PlayerName } from './playerNameComponent';
 
 interface Props {
-    playVsAiCallback: () => void;
     playerName: string;
     world: w.World;
 }
@@ -59,7 +59,7 @@ export class InfoPanel extends React.Component<Props, State> {
     }
 
     private onPlayVsAiClick() {
-        this.props.playVsAiCallback();
+        matches.addBotToCurrentGame();
     }
 
     private renderPlayerList(world: w.World) {

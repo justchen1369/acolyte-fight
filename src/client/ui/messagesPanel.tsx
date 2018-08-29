@@ -2,6 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as matches from '../core/matches';
 import { HeroColors, Matchmaking } from '../../game/constants';
 import { PlayButton } from './playButton';
 import { isMobile } from '../core/userAgent';
@@ -12,10 +13,7 @@ interface Props {
     isNewPlayer: boolean;
     world: w.World;
     items: s.NotificationItem[];
-    style: any;
-    newGameCallback: () => void;
-    exitGameCallback: () => void;
-    partyReadyCallback: (partyId: string, ready: boolean) => void;
+    style: Object;
 }
 interface State {
     spectatingGameId: string;
@@ -187,13 +185,11 @@ export class MessagesPanel extends React.Component<Props, State> {
     private renderWinAction() {
         const observing = !this.props.world.ui.myHeroId;
         if (observing) {
-            return <span className="btn new-game-btn" onClick={() => this.props.exitGameCallback()}>Exit Replay</span>;
+            return <span className="btn new-game-btn" onClick={() => matches.leaveCurrentGame()}>Exit Replay</span>;
         } else {
             return <PlayButton
                 label="Play Again"
                 party={this.props.party}
-                newGameCallback={this.props.newGameCallback}
-                partyReadyCallback={this.props.partyReadyCallback}
             />;
         }
     }
@@ -205,7 +201,7 @@ export class MessagesPanel extends React.Component<Props, State> {
                 <div style={{ marginBottom: 12 }}>
                     <b><a href="#" onClick={() => this.setState({ spectatingGameId })}>Continue Watching</a></b> or
                 </div>
-                <div className="btn new-game-btn" onClick={() => this.props.newGameCallback()}>Play Again</div>
+                <div className="btn new-game-btn" onClick={() => matches.joinNewGame()}>Play Again</div>
             </div>
         </div>;
     }

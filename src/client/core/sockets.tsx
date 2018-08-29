@@ -47,7 +47,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 }
 function onDisconnectMsg() {
-	const world = StoreProvider.getStore().world;
+	const world = StoreProvider.getState().world;
 	world.activePlayers.clear();
 	notify({ type: "disconnected" });
 }

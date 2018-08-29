@@ -39,7 +39,7 @@ function isStartGameTick(tickData: m.TickMsg) {
 
 
 function incomingLoop() {
-	const world = StoreProvider.getStore().world;
+	const world = StoreProvider.getState().world;
 
 	let numFramesToProcess;
 	if (world.ui.myHeroId) {
@@ -71,7 +71,7 @@ function incomingLoop() {
 }
 
 export function frame(canvasStack: CanvasStack) {
-    const store = StoreProvider.getStore();
+    const store = StoreProvider.getState();
     const world = store.world;
 
 	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
@@ -93,7 +93,7 @@ export function frame(canvasStack: CanvasStack) {
 }
 
 function onTickMsg(data: m.TickMsg) {
-	const world = StoreProvider.getStore().world;
+	const world = StoreProvider.getState().world;
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
 	}

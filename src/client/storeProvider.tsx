@@ -1,9 +1,10 @@
+import * as Redux from 'redux';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';
 import * as engine from '../game/engine';
 
-const store: s.State = initialState();
+const store = Redux.createStore(reducer, initialState());
 
 function initialState(): s.State {
     const isNewPlayer = !storage.loadName();
@@ -27,18 +28,34 @@ function initialState(): s.State {
     };
 }
 
-export function getStore(): s.State {
-    return store;
+function reducer(state: s.State, action: s.Action): s.State {
+    if (action.type === "updateSocket") {
+        return { ...state, socketId: action.socketId };
+    } else if (action.type === "updatePlayerName") {
+        return { ...state, playerName: action.playerName };
+    } else if (action.type === "updateUrl") {
+        return { ...state, current: action.current };
+    } else if (action.type === "updatePage") {
+        return {
+             ...state,
+            current: { ...state.current, page: action.page },
+        };
+    } else if (action.type === "updateServer") {
+        return {
+             ...state,
+            current: { ...state.current, server: action.server },
+        };
+    } else if (action.type === "updateWorld") {
+        return { ...state, world: action.world };
+    } else {
+        return state;
+    }
 }
 
-export function setConnected(socketId: string) {
-    store.socketId = socketId;
+export function dispatch(action: s.Action) {
+    store.dispatch(action);
 }
 
-export function setPlayerName(name: string) {
-    store.playerName = name;
-}
-
-export function setUrl(current: s.PathElements) {
-    store.current = current;
+export function getState(): s.State {
+    return store.getState();
 }

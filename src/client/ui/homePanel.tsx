@@ -15,8 +15,6 @@ interface Props {
     party: s.PartyState;
     world: w.World;
     changePage: (newPage: string) => void;
-    newGameCallback: () => void;
-    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
     playingAsAI: boolean;
@@ -49,8 +47,6 @@ export class HomePanel extends React.Component<Props, State> {
                     <PlayButton
                         label={this.state.playingAsAI ? "Play as AI" : "Play"}
                         party={this.props.party}
-                        newGameCallback={this.props.newGameCallback}
-                        partyReadyCallback={this.props.partyReadyCallback}
                     />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />

@@ -1,14 +1,14 @@
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as matches from '../core/matches';
+import * as parties from '../core/parties';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../core/url';
 
 interface Props {
     party: s.PartyState;
     label: string;
-    newGameCallback: () => void;
-    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
     joining: boolean;
@@ -48,7 +48,7 @@ export class PlayButton extends React.Component<Props, State> {
         }
         this.setState({ joining: true });
         screenLifecycle.enterGame();
-        this.props.newGameCallback();
+        matches.joinNewGame();
     }
 
     private onPartyReadyClicked(ready: boolean) {
@@ -57,7 +57,7 @@ export class PlayButton extends React.Component<Props, State> {
             if (ready) {
                 screenLifecycle.enterGame();
             }
-            this.props.partyReadyCallback(party.id, ready);
+            parties.updateParty(ready);
         }
     }
 

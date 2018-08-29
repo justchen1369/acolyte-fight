@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as parties from '../core/parties';
 import * as url from '../core/url';
 
 interface Props {
@@ -11,8 +12,6 @@ interface Props {
     allowBots: boolean;
 
     party: s.PartyState;
-    createPartyCallback: () => void;
-    leavePartyCallback: (partyId: string) => void;
 }
 interface State {
     creating: boolean;
@@ -68,14 +67,14 @@ export class PartyPanel extends React.Component<Props, State> {
     private onCreatePartyClick() {
         const party = this.props.party;
         if (!party) {
-            this.props.createPartyCallback();
+            parties.createParty(null);
         }
     }
 
     private onLeavePartyClick() {
         const party = this.props.party;
         if (party) {
-            this.props.leavePartyCallback(party.id);
+            parties.leaveParty();
         }
     }
 

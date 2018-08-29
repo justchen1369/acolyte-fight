@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import * as m from '../../game/messages.model';
+import * as matches from '../core/matches';
 import * as url from '../core/url';
 import { TicksPerSecond } from '../../game/constants';
 
@@ -17,7 +18,6 @@ export interface Game {
 }
 
 interface Props {
-    watchGameCallback: (gameId: string) => void;
 }
 
 interface State {
@@ -115,6 +115,6 @@ export class RecentGameList extends React.Component<Props, State> {
     private onWatchGameClicked(ev: React.MouseEvent, game: Game) {
         ev.preventDefault();
 
-        this.props.watchGameCallback(game.id);
+        matches.joinNewGame(game.id);
     }
 }

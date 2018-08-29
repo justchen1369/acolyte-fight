@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as matches from '../core/matches';
 import * as screenLifecycle from './screenLifecycle';
 import { worldInterruptible } from '../core/matches';
 
@@ -17,10 +18,6 @@ interface Props {
     world: w.World;
     items: s.NotificationItem[];
     connected: boolean;
-    playVsAiCallback: () => void;
-    newGameCallback: () => void;
-    exitGameCallback: () => void;
-    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
 }
@@ -52,7 +49,6 @@ export class GamePanel extends React.Component<Props, State> {
             <div id="game-panel">
                 <CanvasPanel world={this.props.world} />
                 <InfoPanel
-                    playVsAiCallback={this.props.playVsAiCallback}
                     playerName={this.props.playerName}
                     world={this.props.world}
                 />
@@ -62,9 +58,6 @@ export class GamePanel extends React.Component<Props, State> {
                     isNewPlayer={this.props.isNewPlayer}
                     world={this.props.world}
                     items={this.props.items}
-                    newGameCallback={this.props.newGameCallback}
-                    exitGameCallback={this.props.exitGameCallback}
-                    partyReadyCallback={this.props.partyReadyCallback}
                 />
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home
@@ -75,6 +68,6 @@ export class GamePanel extends React.Component<Props, State> {
 
     private onExitClicked(ev: React.MouseEvent) {
         screenLifecycle.exitGame();
-        this.props.exitGameCallback();
+        matches.leaveCurrentGame();
     }
 }

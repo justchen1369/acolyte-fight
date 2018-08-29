@@ -19,13 +19,6 @@ interface Props {
     world: w.World;
     items: s.NotificationItem[];
     changePage: (newPage: string) => void;
-    playVsAiCallback: () => void;
-    newGameCallback: () => void;
-    watchGameCallback: (gameId: string) => void;
-    exitGameCallback: () => void;
-    createPartyCallback: () => void;
-    leavePartyCallback: (partyId: string) => void;
-    partyReadyCallback: (partyId: string, ready: boolean) => void;
 }
 interface State {
 }
@@ -53,10 +46,6 @@ export class Root extends React.Component<Props, State> {
             items={this.props.items} 
             connected={this.props.connected}
             playerName={this.props.playerName}
-            playVsAiCallback={this.props.playVsAiCallback}
-            newGameCallback={this.props.newGameCallback}
-            exitGameCallback={this.props.exitGameCallback}
-            partyReadyCallback={this.props.partyReadyCallback}
         />;
     }
 
@@ -80,8 +69,6 @@ export class Root extends React.Component<Props, State> {
             party={this.props.party}
             world={this.props.world}
             changePage={this.props.changePage}
-            newGameCallback={this.props.newGameCallback}
-            partyReadyCallback={this.props.partyReadyCallback}
         />
     }
 
@@ -95,8 +82,6 @@ export class Root extends React.Component<Props, State> {
                     mod={this.props.world.mod}
                     allowBots={this.props.world.allowBots}
                     party={this.props.party}
-                    createPartyCallback={this.props.createPartyCallback}
-                    leavePartyCallback={this.props.leavePartyCallback}
                 />
             </div>
         </div>;
@@ -126,7 +111,7 @@ export class Root extends React.Component<Props, State> {
         return <div className="content-container">
             <NavBar current={this.props.current} changePage={this.props.changePage} />
             <div className="page">
-                <RecentGameList watchGameCallback={this.props.watchGameCallback} />
+                <RecentGameList />
             </div>
         </div>;
     }

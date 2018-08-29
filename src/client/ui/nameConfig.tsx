@@ -45,7 +45,7 @@ export class NameConfig extends React.Component<Props, State> {
     }
 
     private saveState() {
-        StoreProvider.setPlayerName(this.state.name);
+        StoreProvider.dispatch({ type: "updatePlayerName", playerName: this.state.name });
         Storage.saveName(this.state.name);
 
         this.setState({

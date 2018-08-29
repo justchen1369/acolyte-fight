@@ -9,7 +9,7 @@ const workers = new Map<string, AiWorker>();
 
 let code: string = null;
 
-setInterval(() => onTick(StoreProvider.getStore().world), 200);
+setInterval(() => onTick(StoreProvider.getState().world), 200);
 
 export function getCode() {
     return code;

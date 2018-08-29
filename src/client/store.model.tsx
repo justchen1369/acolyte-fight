@@ -39,3 +39,41 @@ export interface PathElements {
     party?: string;
     server?: string;
 }
+
+export type Action =
+    UpdateSocketAction
+    | UpdatePlayerNameAction
+    | UpdateUrlAction
+    | UpdatePageAction
+    | UpdateServerAction
+    | UpdateWorldAction
+
+export interface UpdateWorldAction {
+    type: "updateWorld";
+    world: w.World;
+}
+
+export interface UpdateSocketAction {
+    type: "updateSocket";
+    socketId: string;
+}
+
+export interface UpdatePlayerNameAction {
+    type: "updatePlayerName";
+    playerName: string;
+}
+
+export interface UpdateUrlAction {
+    type: "updateUrl";
+    current: PathElements;
+}
+
+export interface UpdatePageAction {
+    type: "updatePage";
+    page: string;
+}
+
+export interface UpdateServerAction {
+    type: "updateServer";
+    server: string;
+}

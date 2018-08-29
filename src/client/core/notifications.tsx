@@ -24,7 +24,7 @@ export function attachNotificationListener(listener: NotificationListener) {
 }
 
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {
-    const store = StoreProvider.getStore();
+    const store = StoreProvider.getState();
 
     // Detect if entered a new game
     newNotifications.forEach(n => {
@@ -78,7 +78,7 @@ function calculateExpiryMilliseconds(notification: w.Notification): number {
 
 
 function notificationCleanup() {
-    const store = StoreProvider.getStore();
+    const store = StoreProvider.getState();
 
     if (store.items.length === 0) {
         return;

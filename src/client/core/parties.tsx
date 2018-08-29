@@ -51,7 +51,7 @@ function createRoomCall(mod: Object, allowBots: boolean): Promise<m.CreateRoomRe
 }
 
 export function joinRoom(roomId: string): Promise<void> {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 	if (roomId) {
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.JoinRoomRequest = { roomId };
@@ -76,7 +76,7 @@ export function joinRoom(roomId: string): Promise<void> {
 }
 
 export function leaveRoom(): Promise<void> {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 
 	const room: s.RoomState = store.room = {
 		id: null,
@@ -104,7 +104,7 @@ export function createParty(roomId: string): Promise<m.PartyResponse> {
 }
 
 export function joinParty(partyId: string): Promise<m.PartyResponse> {
-	const store = StoreProvider.getStore();
+	const store = StoreProvider.getState();
 	if (partyId) {
 		let response: m.PartyResponse;
 		return new Promise<void>((resolve, reject) => {
@@ -129,13 +129,16 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 	}
 }
 
-export function updateParty(partyId: string, ready: boolean): Promise<void> {
-	const playerName = StoreProvider.getStore().playerName;
+export function updateParty(ready: boolean): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return Promise.resolve();
+	}
 
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyRequest = {
-			partyId,
-			playerName,
+			partyId: store.party.id,
+			playerName: store.playerName,
 			ready,
 		};
 		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
@@ -148,30 +151,31 @@ export function updateParty(partyId: string, ready: boolean): Promise<void> {
 	});
 }
 
-export function leaveParty(partyId: string): Promise<void> {
-	if (partyId) {
-		return new Promise<void>((resolve, reject) => {
-			let msg: m.PartyRequest = {
-				partyId,
-				playerName: null,
-				ready: false,
-			};
-			socket.emit('party', msg, (response: m.PartyResponseMsg) => {
-				if (response.success === false) {
-					reject(response.error);
-				} else {
-					notify({ type: "leaveParty", partyId: response.partyId });
-					resolve();
-				}
-			});
-		}).then(() => leaveRoom());
-	} else {
+export function leaveParty(): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
 		return Promise.resolve();
 	}
+
+	return new Promise<void>((resolve, reject) => {
+		let msg: m.PartyRequest = {
+			partyId: store.party.id,
+			playerName: null,
+			ready: false,
+		};
+		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				notify({ type: "leaveParty", partyId: response.partyId });
+				resolve();
+			}
+		});
+	}).then(() => leaveRoom());
 }
 
 function onPartyMsg(msg: m.PartyMsg) {
-    const world = StoreProvider.getStore().world;
+    const world = StoreProvider.getState().world;
 
 	notify({
 		type: "updateParty",
@@ -191,8 +195,12 @@ function onPartyMsg(msg: m.PartyMsg) {
 	});
 	if (msg.members.length > 0 && allReady && meReady && matches.worldInterruptible(world)) {
 		notify({
-			type: "startParty",
-			partyId: msg.partyId,
+				type: "startParty",
+				partyId: msg.partyId,
 		});
+        setTimeout(() => {
+			matches.joinNewGame();
+			updateParty(false);
+		}, 1);
 	}
 }

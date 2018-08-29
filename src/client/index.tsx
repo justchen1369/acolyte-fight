@@ -14,7 +14,7 @@ import * as sockets from './core/sockets';
 import * as StoreProvider from './storeProvider';
 import * as url from './core/url';
 
-import { getStore, setConnected, setUrl } from './storeProvider';
+import { getState } from './storeProvider';
 import { applyNotificationsToStore } from './core/notifications';
 import * as Storage from './storage';
 
@@ -25,12 +25,12 @@ const socket = socketLib();
 let alreadyConnected = false;
 
 notifications.attachNotificationListener((notifs) => onNotification(notifs));
-setUrl(url.parseLocation(window.location));
 initialize();
 rerender();
 
 function initialize() {
-    const current = getStore().current;
+    const current = url.parseLocation(window.location);
+    StoreProvider.dispatch({ type: "updateUrl", current });
 
     sockets.attachToSocket(socket, () => {
         sockets.connectToServer(current.server)
@@ -38,12 +38,12 @@ function initialize() {
             .then(() => {
                 if (!alreadyConnected) {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
-                    setConnected(socket.id);
+                    StoreProvider.dispatch({ type: "updateSocket", socketId: socket.id });
 
                     if (current.gameId || current.page === "join") {
                         if (current.page === "join") {
                             // Return to the home page when we exit
-                            current.page = "";
+                            StoreProvider.dispatch({ type: "updatePage", page: "" });
                         }
                         matches.joinNewGame(current.gameId);
                     } else {
@@ -53,20 +53,18 @@ function initialize() {
             }).catch(error => {
                 console.error(error)
                 socket.disconnect();
-                setConnected(null);
+                StoreProvider.dispatch({ type: "updateSocket", socketId: null });
 
                 if (current.party || current.server) {
                     // Failed to join party/server, try without server
-                    current.party = null;
-                    current.server = null;
-                    updateUrl();
+                    window.location.href = url.getPath({ ...current, party: null, server: null });
                 }
             });
     });
 }
 
 function onNotification(notifs: w.Notification[]) {
-    const store = getStore();
+    const store = getState();
 
     applyNotificationsToStore(notifs);
     rerender();
@@ -76,10 +74,8 @@ function onNotification(notifs: w.Notification[]) {
         if (n.type === "new" || n.type === "quit" || n.type === "disconnected" || n.type === "joinParty" || n.type === "leaveParty") {
             urlUpdated = true;
             if (n.type === "joinParty") {
-                store.current.server = n.server;
+                StoreProvider.dispatch({ type: "updateServer", server: n.server });
             }
-        } else if (n.type === "startParty") {
-            onStartParty(n.partyId);
         }
     });
     if (urlUpdated) {
@@ -88,67 +84,9 @@ function onNotification(notifs: w.Notification[]) {
 
 }
 
-function onNewGameClicked() {
-    const current = getStore().current;
-    if (!getStore().socketId) {
-        // New server? Reload the client, just in case the version has changed.
-        current.page = "join";
-        updateUrl();
-        window.location.reload();
-    } else {
-        matches.joinNewGame();
-        updateUrl();
-    }
-}
-
-function onWatchGameClicked(gameId: string) {
-    const current = getStore().current;
-    if (!getStore().socketId) {
-        // New server? Reload the client, just in case the version has changed.
-        current.gameId = gameId;
-        current.page = null;
-        updateUrl();
-        window.location.reload();
-    } else {
-        matches.joinNewGame(gameId);
-        updateUrl();
-    }
-}
-
-function onExitGameClicked() {
-    matches.leaveCurrentGame();
-}
-
-function onCreatePartyClicked() {
-    const party = getStore().party;
-    if (!party) {
-        const roomId: string = null;
-        parties.createParty(roomId);
-    }
-}
-
-function onLeavePartyClicked(partyId: string) {
-    const party = getStore().party;
-    if (party && party.id === partyId) {
-        parties.leaveParty(party.id);
-    }
-}
-
-function onPartyReadyClicked(partyId: string, ready: boolean) {
-    parties.updateParty(partyId, ready);
-}
-
-function onStartParty(partyId: string) {
-    const party = getStore().party;
-    if (party && party.id === partyId) {
-        parties.updateParty(partyId, false);
-        setTimeout(() => onNewGameClicked(), 1);
-    }
-}
-
 function changePage(newPage: string) {
-    const current = getStore().current;
-    if (!getStore().socketId) {
+    const current = getState().current;
+    if (!getState().socketId) {
         const newTarget: s.PathElements = Object.assign({}, current, { page: newPage });
         window.location.href = url.getPath(newTarget);
     } else {
@@ -159,7 +97,7 @@ function changePage(newPage: string) {
 }
 
 function updateUrl() {
-    const store = getStore();
+    const store = getState();
     const current = store.current;
 
     current.gameId = store.world.ui.myGameId;
@@ -170,7 +108,7 @@ function updateUrl() {
 }
 
 function rerender() {
-    const store = getStore();
+    const store = getState();
     ReactDOM.render(
         <Root
             current={store.current}
@@ -181,13 +119,6 @@ function rerender() {
             world={store.world}
             items={store.items}
             changePage={newPage => changePage(newPage)}
-            playVsAiCallback={() => matches.addBotToCurrentGame()}
-            newGameCallback={() => onNewGameClicked()}
-            watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
-            exitGameCallback={() => onExitGameClicked()}
-            createPartyCallback={() => onCreatePartyClicked()}
-            leavePartyCallback={(partyId) => onLeavePartyClicked(partyId)}
-            partyReadyCallback={(partyId, ready) => onPartyReadyClicked(partyId, ready)}
         />,
         document.getElementById("root"));
 }
