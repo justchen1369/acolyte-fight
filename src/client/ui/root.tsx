@@ -10,6 +10,7 @@ import PartyPanel from './partyPanel';
 import TitleSection from './titleSection';
 import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
+import UrlListener from './urlListener';
 
 interface Props {
     myGameId: string;
@@ -62,6 +63,7 @@ class Root extends React.Component<Props> {
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
                 {page === "about" && this.renderAbout()}
+                <UrlListener />
             </div>
         );
     }

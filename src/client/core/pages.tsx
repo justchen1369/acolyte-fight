@@ -28,9 +28,6 @@ function updateUrl() {
             party: store.party ? store.party.id : null,
         },
     });
-
-    const path = url.getPath(current);
-    window.history.replaceState(null, null, path);
 }
 
 function onNotification(notifs: w.Notification[]) {

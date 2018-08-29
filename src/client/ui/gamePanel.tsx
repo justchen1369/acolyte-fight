@@ -8,6 +8,7 @@ import * as screenLifecycle from './screenLifecycle';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
+import UrlListener from './urlListener';
 
 interface Props {
     party: s.PartyState;
@@ -48,6 +49,7 @@ class GamePanel extends React.Component<Props, State> {
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home
                 </a>}
+                <UrlListener />
             </div>
         );
     }
