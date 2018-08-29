@@ -3,6 +3,7 @@ import * as c from '../../game/world.model';
 import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../storage';
+import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 
 interface Props {
@@ -76,8 +77,10 @@ export class SpellConfig extends React.Component<Props, State> {
         config[key] = spellId;
         saved.add(key);
 
-        this.setState({ config, saved });
+        StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
         Storage.saveKeyBindingConfig(config);
+
+        this.setState({ config, saved });
     }
 
     private capitalize(str: string) {

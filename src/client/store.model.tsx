@@ -43,6 +43,7 @@ export type Action =
     UpdateSocketAction
     | DisconnectedAction
     | UpdatePlayerNameAction
+    | UpdateKeyBindingsAction
     | UpdateUrlAction
     | UpdatePageAction
     | JoinMatchAction
@@ -74,6 +75,11 @@ export interface DisconnectedAction {
 export interface UpdatePlayerNameAction {
     type: "updatePlayerName";
     playerName: string;
+}
+
+export interface UpdateKeyBindingsAction {
+    type: "updateKeyBindings";
+    keyBindings: KeyBindings;
 }
 
 export interface UpdateUrlAction {
