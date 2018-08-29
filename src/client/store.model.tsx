@@ -45,7 +45,6 @@ export type Action =
     | UpdatePlayerNameAction
     | UpdateUrlAction
     | UpdatePageAction
-    | UpdateServerAction
     | UpdateWorldAction
     | UpdateNotificationsAction
     | JoinPartyAction
@@ -81,11 +80,6 @@ export interface UpdatePageAction {
     page: string;
 }
 
-export interface UpdateServerAction {
-    type: "updateServer";
-    server: string;
-}
-
 export interface UpdateNotificationsAction {
     type: "updateNotifications";
     items: NotificationItem[];
@@ -94,6 +88,7 @@ export interface UpdateNotificationsAction {
 export interface JoinPartyAction {
     type: "joinParty";
     party: PartyState;
+    server: string;
 }
 
 export interface UpdatePartyAction {

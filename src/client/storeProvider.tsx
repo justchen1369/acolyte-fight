@@ -48,11 +48,6 @@ function reducer(state: s.State, action: s.Action): s.State {
              ...state,
             current: { ...state.current, page: action.page },
         };
-    } else if (action.type === "updateServer") {
-        return {
-             ...state,
-            current: { ...state.current, server: action.server },
-        };
     } else if (action.type === "updateWorld") {
         return {
             ...state,
@@ -69,6 +64,7 @@ function reducer(state: s.State, action: s.Action): s.State {
                 current: {
                     ...state.current,
                     party: action.party.id,
+                    server: action.server,
                 },
             };
         } else {

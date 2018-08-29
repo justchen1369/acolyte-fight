@@ -127,7 +127,6 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 			});
 		}).then(() => joinRoom(response.roomId))
 		.then(() => {
-			StoreProvider.dispatch({ type: "updateServer", server: response.server });
 			StoreProvider.dispatch({
 				type: "joinParty",
 				party: {
@@ -135,6 +134,7 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 					members: response.members,
 					ready: false,
 				},
+				server: response.server,
 			});
 		})
 		.then(() => response)
