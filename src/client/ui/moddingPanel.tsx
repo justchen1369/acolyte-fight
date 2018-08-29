@@ -1,6 +1,6 @@
 import * as React from 'react';
-import * as rooms from './rooms';
-import * as url from './url';
+import * as rooms from '../core/rooms';
+import * as url from '../core/url';
 
 interface Props {
     current: url.PathElements;

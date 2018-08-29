@@ -1,10 +1,10 @@
 import * as _ from 'lodash';
 import * as React from 'react';
-import * as s from './store.model';
-import * as w from '../game/world.model';
-import { HeroColors, Matchmaking } from '../game/constants';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
+import { HeroColors, Matchmaking } from '../../game/constants';
 import { PlayButton } from './playButton';
-import { isMobile } from './userAgent';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     player: w.Player;

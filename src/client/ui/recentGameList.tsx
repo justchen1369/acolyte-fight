@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
-import * as m from '../game/messages.model';
-import * as url from './url';
-import { TicksPerSecond } from '../game/constants';
+import * as m from '../../game/messages.model';
+import * as url from '../core/url';
+import { TicksPerSecond } from '../../game/constants';
 
 export interface Game {
     id: string;

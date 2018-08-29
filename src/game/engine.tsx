@@ -1,11 +1,11 @@
 import * as _ from 'lodash';
 import pl from 'planck-js';
-import * as constants from '../game/constants';
+import * as constants from './constants';
 import * as vector from './vector';
 import * as w from './world.model';
-import { calculateMod } from '../game/settings';
+import { calculateMod } from './settings';
 
-import { Categories, Matchmaking, HeroColors, TicksPerSecond } from '../game/constants';
+import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
 // Reset planck.js constants
 {

@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import * as React from 'react';
-import { HeroColors, Matchmaking } from '../game/constants';
-import * as s from './store.model';
-import * as w from '../game/world.model';
+import { HeroColors, Matchmaking } from '../../game/constants';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
 import { PlayerName } from './playerNameComponent';
 
 interface Props {

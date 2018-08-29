@@ -1,7 +1,7 @@
-import * as s from './store.model';
+import * as s from '../store.model';
 import { getCurrentWorld } from './facade';
-import * as w from '../game/world.model';
-import * as StoreProvider from './storeProvider';
+import * as w from '../../game/world.model';
+import * as StoreProvider from '../storeProvider';
 
 const ExpiryMilliseconds = 15000;
 

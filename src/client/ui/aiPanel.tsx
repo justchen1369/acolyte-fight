@@ -1,8 +1,8 @@
 import * as React from 'react';
-import * as ai from './ai';
-import * as rooms from './rooms';
-import * as url from './url';
-import { readFileAsync } from './fileUtils';
+import * as ai from '../core/ai';
+import * as rooms from '../core/rooms';
+import * as url from '../core/url';
+import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
     current: url.PathElements;

@@ -1,13 +1,13 @@
 import * as pl from 'planck-js';
-import * as constants from '../game/constants';
-import * as engine from '../game/engine';
-import * as vector from '../game/vector';
-import * as w from '../game/world.model';
+import * as constants from '../../game/constants';
+import * as engine from '../../game/engine';
+import * as vector from '../../game/vector';
+import * as w from '../../game/world.model';
 
-import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../game/constants';
+import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
 import { Icons } from './icons';
-import { renderIconButton, renderIconOnly } from '../client/renderIcon';
-import { isMobile, isEdge } from './userAgent';
+import { renderIconButton, renderIconOnly } from './renderIcon';
+import { isMobile, isEdge } from '../core/userAgent';
 
 export interface CanvasStack {
 	background: HTMLCanvasElement;

@@ -1,15 +1,15 @@
 import pl from 'planck-js';
-import { TicksPerTurn, TicksPerSecond } from '../game/constants';
-import { render, CanvasStack } from './render';
-import { DefaultSettings, calculateMod } from '../game/settings';
+import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
+import { render, CanvasStack } from '../ui/render';
+import { DefaultSettings, calculateMod } from '../../game/settings';
 import * as ai from './ai';
-import * as engine from '../game/engine';
-import * as m from '../game/messages.model';
-import * as s from './store.model';
-import * as w from '../game/world.model';
+import * as engine from '../../game/engine';
+import * as m from '../../game/messages.model';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
 import { isMobile } from './userAgent';
 
-export { worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, CanvasStack } from './render';
+export { worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, CanvasStack } from '../ui/render';
 
 const BufferDecayPerTick = 0.999;
 

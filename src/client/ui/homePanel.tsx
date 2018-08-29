@@ -1,11 +1,11 @@
 import * as React from 'react';
-import * as s from './store.model';
-import * as w from '../game/world.model';
-import * as ai from './ai';
-import * as url from './url';
-import { NameConfig } from '../client/nameConfig';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
+import * as ai from '../core/ai';
+import * as url from '../core/url';
+import { NameConfig } from './nameConfig';
 import { PlayButton } from './playButton';
-import { SpellConfig } from '../client/spellConfig';
+import { SpellConfig } from './spellConfig';
 import { NavBar } from './navbar';
 
 const scrollIntoView = require('scroll-into-view');

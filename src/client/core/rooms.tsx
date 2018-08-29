@@ -1,4 +1,4 @@
-import * as m from '../game/messages.model';
+import * as m from '../../game/messages.model';
 import * as facade from './facade';
 import * as Storage from './storage';
 import * as url from './url';

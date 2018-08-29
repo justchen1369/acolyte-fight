@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as url from './url';
+import * as url from '../core/url';
 
 interface Props {
     current: url.PathElements;

@@ -1,9 +1,9 @@
 import * as React from 'react';
-import * as c from '../game/world.model';
-import { DefaultSettings } from '../game/settings';
+import * as c from '../../game/world.model';
+import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
-import * as Storage from '../client/storage';
-import { isMobile } from './userAgent';
+import * as Storage from '../core/storage';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     settings: AcolyteFightSettings;

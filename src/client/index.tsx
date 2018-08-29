@@ -5,16 +5,16 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import * as facade from './facade';
-import * as url from './url';
+import * as facade from './core/facade';
+import * as url from './core/url';
 
-import { connectToServer, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
+import { connectToServer, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './core/facade';
 import { getStore, setConnected } from './storeProvider';
-import { applyNotificationsToStore } from './notifications';
-import * as Storage from '../client/storage';
+import { applyNotificationsToStore } from './core/notifications';
+import * as Storage from './core/storage';
 import { DefaultSettings } from '../game/settings';
 
-import { Root } from './root';
+import { Root } from './ui/root';
 
 const socket = socketLib();
 

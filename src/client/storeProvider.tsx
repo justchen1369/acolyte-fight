@@ -1,6 +1,6 @@
 import * as s from './store.model';
 import * as w from '../game/world.model';
-import { getCurrentWorld } from './facade';
+import { getCurrentWorld } from './core/facade';
 
 const store: s.State = {
     socketId: null,

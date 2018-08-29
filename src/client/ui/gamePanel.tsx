@@ -1,10 +1,10 @@
 import * as React from 'react';
-import * as s from './store.model';
-import * as w from '../game/world.model';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
 import * as screenLifecycle from './screenLifecycle';
-import { worldInterruptible } from './facade';
+import { worldInterruptible } from '../core/facade';
 
-import { ButtonBar } from '../game/constants';
+import { ButtonBar } from '../../game/constants';
 
 import { InfoPanel } from './infoPanel';
 import { MessagesPanel } from './messagesPanel';

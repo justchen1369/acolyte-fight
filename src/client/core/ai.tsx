@@ -1,5 +1,5 @@
-import * as w from '../game/world.model';
-import * as vector from '../game/vector';
+import * as w from '../../game/world.model';
+import * as vector from '../../game/vector';
 
 interface SendActionFunc {
     (gameId: string, heroId: string, action: w.Action): void;

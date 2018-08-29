@@ -1,8 +1,8 @@
 import * as React from 'react';
-import * as s from './store.model';
-import * as w from '../game/world.model';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
 import * as screenLifecycle from './screenLifecycle';
-import * as url from './url';
+import * as url from '../core/url';
 
 interface Props {
     party: s.PartyState;

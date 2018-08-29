@@ -1,8 +1,8 @@
 import * as React from 'react';
-import * as facade from './facade';
-import * as s from './store.model';
-import * as w from '../game/world.model';
-import * as url from './url';
+import * as facade from '../core/facade';
+import * as s from '../store.model';
+import * as w from '../../game/world.model';
+import * as url from '../core/url';
 
 interface Props {
     current: url.PathElements;

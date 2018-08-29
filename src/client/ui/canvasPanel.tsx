@@ -1,10 +1,10 @@
 import pl from 'planck-js';
 import * as React from 'react';
-import * as vector from '../game/vector';
-import * as w from '../game/world.model';
+import * as vector from '../../game/vector';
+import * as w from '../../game/world.model';
 
-import { TicksPerSecond } from '../game/constants';
-import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, frame } from './facade';
+import { TicksPerSecond } from '../../game/constants';
+import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, frame } from '../core/facade';
 
 const MouseId = "mouse";
 
