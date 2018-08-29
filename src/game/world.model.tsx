@@ -403,7 +403,8 @@ export type WorldObject =
 
 export type WorldEvent =
 	DetonateEvent
-	| ScourgeEvent;
+	| ScourgeEvent
+	| LifeStealEvent;
 
 export interface WorldEventBase {
 	type: string;
@@ -422,10 +423,10 @@ export interface ScourgeEvent extends WorldEventBase {
 	radius: number;
 }
 
-export namespace WorldEventType {
-	export const Detonate = "detonate";
-	export const Scourge = "scourge";
-} 
+export interface LifeStealEvent extends WorldEventBase {
+	type: "lifeSteal";
+	owner: string;
+}
 
 export interface Action {
 	type: string;

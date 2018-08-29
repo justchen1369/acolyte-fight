@@ -1160,7 +1160,7 @@ function detonate(world: w.World) {
 			});
 
 			world.ui.events.push({
-				type: w.WorldEventType.Detonate,
+				type: "detonate",
 				pos: vector.clone(obj.body.getPosition()),
 				radius: obj.detonate.radius,
 			});
@@ -1450,7 +1450,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	world.ui.events.push({
 		heroId: hero.id,
 		pos: hero.body.getPosition(),
-		type: w.WorldEventType.Scourge,
+		type: "scourge",
 		radius: spell.radius,
 	});
 
@@ -1518,6 +1518,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
+			world.ui.events.push({ type: "lifeSteal", owner: fromHero.id });
 		}
 	}
 

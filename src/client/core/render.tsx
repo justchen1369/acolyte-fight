@@ -214,10 +214,6 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 		renderHeroDeath(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
-
-		if (obj.lifeSteal > 0) {
-			renderLifeStealReturn(ctxStack, obj, world);
-		}
 	} else if (obj.category === "obstacle") {
 		renderObstacleDestroyed(ctxStack, obj, world);
 	}
@@ -273,12 +269,8 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	}
 }
 
-function renderLifeStealReturn(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
-	if (!projectile.hit) {
-		return;
-	}
-
-	let owner = world.objects.get(projectile.owner);
+function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, world: w.World) {
+	let owner = world.objects.get(ev.owner);
 	if (!owner) {
 		return;
 	}
@@ -296,10 +288,12 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, projectile: w.Projectil
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
-	if (ev.type === w.WorldEventType.Scourge) {
+	if (ev.type === "scourge") {
 		renderScourge(ctxStack, ev, world);
-	} else if (ev.type === w.WorldEventType.Detonate) {
+	} else if (ev.type === "detonate") {
 		renderDetonate(ctxStack, ev, world);
+	} else if (ev.type === "lifeSteal") {
+		renderLifeStealReturn(ctxStack, ev, world);
 	} else {
 		return;
 	}
