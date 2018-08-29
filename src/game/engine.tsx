@@ -854,6 +854,8 @@ function isHeroShielded(hero: w.Hero, world: w.World) {
 	for (const shieldId of hero.shieldIds) {
 		if (world.objects.has(shieldId)) {
 			return true;
+		} else {
+			hero.shieldIds.delete(shieldId);
 		}
 	}
 	return false;
