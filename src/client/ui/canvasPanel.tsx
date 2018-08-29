@@ -4,7 +4,9 @@ import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond } from '../../game/constants';
-import { CanvasStack, sendAction, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState, frame } from '../core/facade';
+import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../core/render';
+import { sendAction } from '../core/sockets';
+import { frame } from '../core/ticker';
 
 const MouseId = "mouse";
 

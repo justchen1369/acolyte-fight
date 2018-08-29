@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as rooms from '../core/rooms';
+import * as parties from '../core/parties';
 import * as url from '../core/url';
 
 interface Props {
@@ -52,7 +52,7 @@ export class ModdingPanel extends React.Component<Props, State> {
     }
 
     private onSubmit() {
-        rooms.createRoomFromFile(this.state.selectedFile, this.props.current)
+        parties.createRoomFromFile(this.state.selectedFile, this.props.current)
             .catch(error => {
                 console.error(error);
                 this.setState({ error: `${error}` });

@@ -2,7 +2,9 @@ import * as w from '../game/world.model';
 
 export interface State {
     socketId: string;
+    preferredColors: Map<string, string>; // player name -> color
     party: PartyState;
+    room: RoomState;
     world: w.World;
     items: NotificationItem[];
 }

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ai from '../core/ai';
-import * as rooms from '../core/rooms';
+import * as parties from '../core/parties';
 import * as url from '../core/url';
 import { readFileAsync } from '../core/fileUtils';
 
@@ -106,6 +106,6 @@ export class AiPanel extends React.Component<Props, State> {
 
     private onCreateAIRoom() {
         this.setState({ loading: true });
-        rooms.createRoom({}, true, this.props.current, this.props.current.page); // Return to this page
+        parties.createRoom({}, true, this.props.current, this.props.current.page); // Return to this page
     }
 }

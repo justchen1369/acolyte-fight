@@ -5,10 +5,12 @@ import * as ReactDOM from 'react-dom';
 import socketLib from 'socket.io-client';
 import queryString from 'query-string';
 
-import * as facade from './core/facade';
+import * as matches from './core/matches';
+import * as notifications from './core/notifications';
 import * as url from './core/url';
 
-import { connectToServer, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './core/facade';
+import * as sockets from './core/sockets';
+import * as parties from './core/parties';
 import { getStore, setConnected } from './storeProvider';
 import { applyNotificationsToStore } from './core/notifications';
 import * as Storage from './core/storage';
@@ -34,9 +36,9 @@ let alreadyConnected = false;
 
 let current = url.parseLocation(window.location);
 
-attachToSocket(socket, () => {
-    connectToServer(current.server)
-        .then(() => facade.joinParty(current.party, getOrCreatePlayerName()))
+sockets.attachToSocket(socket, () => {
+    sockets.connectToServer(current.server)
+        .then(() => parties.joinParty(current.party, getOrCreatePlayerName()))
         .then(() => {
             if (!alreadyConnected) {
                 alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
@@ -47,7 +49,7 @@ attachToSocket(socket, () => {
                         // Return to the home page when we exit
                         current.page = "";
                     }
-                    joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
+                    matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, current.gameId);
                 } else {
                     rerender(); // Room settings might have changed the page
                 }
@@ -65,7 +67,7 @@ attachToSocket(socket, () => {
             }
         });
 });
-attachNotificationListener(notifications => {
+notifications.attachNotificationListener(notifications => {
     applyNotificationsToStore(notifications);
     rerender();
 
@@ -95,7 +97,7 @@ function onNewGameClicked() {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), current.party);
+        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party);
         updateUrl();
     }
 }
@@ -109,38 +111,38 @@ function onWatchGameClicked(gameId: string) {
         window.location.reload();
     } else {
         playerName = getOrCreatePlayerName(); // Reload name
-        joinNewGame(playerName, retrieveKeyBindings(), current.party, gameId);
+        matches.joinNewGame(playerName, retrieveKeyBindings(), current.party, gameId);
         updateUrl();
     }
 }
 
 function onExitGameClicked() {
-    leaveCurrentGame();
+    matches.leaveCurrentGame();
 }
 
 function onCreatePartyClicked() {
     const party = getStore().party;
     if (!party) {
         const roomId: string = null;
-        facade.createParty(roomId, getOrCreatePlayerName());
+        parties.createParty(roomId, getOrCreatePlayerName());
     }
 }
 
 function onLeavePartyClicked(partyId: string) {
     const party = getStore().party;
     if (party && party.id === partyId) {
-        facade.leaveParty(party.id);
+        parties.leaveParty(party.id);
     }
 }
 
 function onPartyReadyClicked(partyId: string, ready: boolean) {
-    facade.updateParty(partyId, getOrCreatePlayerName(), ready);
+    parties.updateParty(partyId, getOrCreatePlayerName(), ready);
 }
 
 function onStartParty(partyId: string) {
     const party = getStore().party;
     if (party && party.id === partyId) {
-        facade.updateParty(partyId, getOrCreatePlayerName(), false);
+        parties.updateParty(partyId, getOrCreatePlayerName(), false);
         setTimeout(() => onNewGameClicked(), 1);
     }
 }
@@ -178,7 +180,7 @@ function rerender() {
             world={store.world}
             items={store.items}
             changePage={newPage => changePage(newPage)}
-            playVsAiCallback={() => addBotToCurrentGame()}
+            playVsAiCallback={() => matches.addBotToCurrentGame()}
             newGameCallback={() => onNewGameClicked()}
             watchGameCallback={(gameId) => onWatchGameClicked(gameId)}
             exitGameCallback={() => onExitGameClicked()}

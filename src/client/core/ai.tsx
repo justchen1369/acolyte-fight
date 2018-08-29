@@ -1,20 +1,15 @@
 import * as w from '../../game/world.model';
 import * as vector from '../../game/vector';
-
-interface SendActionFunc {
-    (gameId: string, heroId: string, action: w.Action): void;
-}
+import * as StoreProvider from '../storeProvider';
+import { sendAction } from './sockets';
 
 const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
 let code: string = null;
-let sendAction: SendActionFunc = () => {};
 
-export function attach(sendActionFunc: SendActionFunc) {
-    sendAction = sendActionFunc;
-}
+setInterval(() => onTick(StoreProvider.getStore().world), 200);
 
 export function getCode() {
     return code;

@@ -1,5 +1,4 @@
 import * as s from '../store.model';
-import { getCurrentWorld } from './facade';
 import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
 
@@ -8,13 +7,28 @@ const ExpiryMilliseconds = 15000;
 let nextNotificationId = 0;
 setInterval(notificationCleanup, ExpiryMilliseconds);
 
+interface NotificationListener {
+	(notifications: w.Notification[]): void;
+}
+
+let notificationListeners = new Array<NotificationListener>();
+
+export function notify(...notifications: w.Notification[]) {
+	if (notifications.length > 0) {
+		notificationListeners.forEach(listener => listener(notifications));
+	}
+}
+
+export function attachNotificationListener(listener: NotificationListener) {
+	notificationListeners.push(listener);
+}
+
 export function applyNotificationsToStore(newNotifications: w.Notification[]) {
     const store = StoreProvider.getStore();
 
     // Detect if entered a new game
     newNotifications.forEach(n => {
         if (n.type === "room" || n.type === "new" || n.type === "quit") {
-            store.world = getCurrentWorld();
             store.items = [];
         } else if (n.type === "disconnected") {
             store.socketId = null;

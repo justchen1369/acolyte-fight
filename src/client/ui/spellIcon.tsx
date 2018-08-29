@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { Icons } from './icons';
-import { renderIconButton } from './renderIcon';
+import { Icons } from '../core/icons';
+import { renderIconButton } from '../core/renderIcon';
 
 interface Props extends React.HTMLAttributes<HTMLCanvasElement> {
     icon: string;
