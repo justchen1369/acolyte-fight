@@ -1,6 +1,6 @@
 import * as w from '../game/world.model';
 
-export interface Store {
+export interface State {
     socketId: string;
     party: PartyState;
     world: w.World;

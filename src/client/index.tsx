@@ -9,7 +9,8 @@ import * as facade from './facade';
 import * as url from './url';
 
 import { connectToServer, joinNewGame, addBotToCurrentGame, leaveCurrentGame, attachToSocket, attachNotificationListener, CanvasStack } from './facade';
-import { getStore, applyNotificationsToStore, setConnected } from './storeProvider';
+import { getStore, setConnected } from './storeProvider';
+import { applyNotificationsToStore } from './notifications';
 import * as Storage from '../client/storage';
 import { DefaultSettings } from '../game/settings';
 
