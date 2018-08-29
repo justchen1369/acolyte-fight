@@ -47,7 +47,6 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 }
 function onDisconnectMsg() {
-	const world = StoreProvider.getState().world;
 	StoreProvider.dispatch({ type: "disconnected" });
 	notify({ type: "disconnected" });
 }

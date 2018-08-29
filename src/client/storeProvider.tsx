@@ -48,11 +48,25 @@ function reducer(state: s.State, action: s.Action): s.State {
              ...state,
             current: { ...state.current, page: action.page },
         };
-    } else if (action.type === "updateWorld") {
+    } else if (action.type === "joinMatch") {
         return {
             ...state,
             world: action.world,
             items: [],
+            current: {
+                ...state.current,
+                gameId: action.world.ui.myGameId,
+            },
+        };
+    } else if (action.type === "leaveMatch") {
+        return {
+            ...state,
+            world: engine.initialWorld(state.room.mod, state.room.allowBots),
+            items: [],
+            current: {
+                ...state.current,
+                gameId: null,
+            },
         };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }

@@ -33,7 +33,7 @@ function updateUrl() {
 function onNotification(notifs: w.Notification[]) {
     let urlUpdated = false;
     notifs.forEach(n => {
-        if (n.type === "new" || n.type === "quit" || n.type === "disconnected") {
+        if (n.type === "disconnected") {
             urlUpdated = true;
         }
     });

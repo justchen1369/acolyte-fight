@@ -64,22 +64,19 @@ export function leaveCurrentGame() {
 		socket.emit('leave', leaveMsg);
 	}
 
-	store.world = engine.initialWorld(store.room.mod, store.room.allowBots);
-
-	notify({ type: "quit" });
+	StoreProvider.dispatch({ type: "leaveMatch" });
 }
 
 function onHeroMsg(data: m.JoinResponseMsg) {
-	const store = StoreProvider.getState();
-
 	const world = engine.initialWorld(data.mod, data.allowBots);
-	store.world = world;
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 
 	ticker.reset(data.history);
 
 	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod, data.allowBots);
+
+	StoreProvider.dispatch({ type: "joinMatch", world });
 	notify({
 		type: "new",
 		gameId: world.ui.myGameId,

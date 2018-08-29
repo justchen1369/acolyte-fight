@@ -45,15 +45,20 @@ export type Action =
     | UpdatePlayerNameAction
     | UpdateUrlAction
     | UpdatePageAction
-    | UpdateWorldAction
+    | JoinMatchAction
+    | LeaveMatchAction
     | UpdateNotificationsAction
     | JoinPartyAction
     | UpdatePartyAction
     | LeavePartyAction
 
-export interface UpdateWorldAction {
-    type: "updateWorld";
+export interface JoinMatchAction {
+    type: "joinMatch";
     world: w.World;
+}
+
+export interface LeaveMatchAction {
+    type: "leaveMatch";
 }
 
 export interface UpdateSocketAction {
