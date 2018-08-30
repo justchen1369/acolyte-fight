@@ -234,7 +234,7 @@ const flamestrike: Spell = {
 };
 const firespray: Spell = {
     id: 'firespray',
-    name: 'Splatter',
+    name: 'Firesplatter',
     description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
     action: "spray",
 
