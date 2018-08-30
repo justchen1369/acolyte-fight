@@ -315,7 +315,8 @@ declare interface WorldObjectContract {
 declare interface HeroContract extends WorldObjectContract {
 	health: number;
 	heading: Vec2;
-	casting?: CastingContract;
+	linkedToId?: string; // If set, this Hero currently has trapped another Hero in a link. This is the ID of the other Hero (the "victim").
+	casting?: CastingContract; // If set, currently casting a channelled spell
 	shieldTicksRemaining: number;
 }
 
@@ -326,7 +327,7 @@ declare interface ProjectileContract extends WorldObjectContract {
 	radius: number;
 
 	damage: number;
-	lifeSteal: number;
+	lifeSteal: number; // The fraction (between 0 and 1) of damage which will be return to the owner as health if this projectile hits someone.
 }
 
 declare interface CastingContract {
