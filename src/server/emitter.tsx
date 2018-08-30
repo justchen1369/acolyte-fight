@@ -16,14 +16,12 @@ interface RoomStats {
 
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
-export function attachToSocket(io: SocketIO.Server) {
-    io.on('connection', onConnection);
+let io: SocketIO.Server = null;
 
+export function attachToSocket(_io: SocketIO.Server) {
+	io = _io;
+    io.on('connection', onConnection);
     games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
-    games.attachToPartyEmitter(party => io.to(party.id).emit("party", {
-		partyId: party.id,
-		members: partyMembersToContract(party),
-	} as m.PartyMsg));
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -44,7 +42,8 @@ function onConnection(socket: SocketIO.Socket) {
 		--getStore().numConnections;
 		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
 
-		games.onDisconnect(socket.id, authToken);
+		const disconnectResult = games.onDisconnect(socket.id, authToken);
+		disconnectResult.changedParties.forEach(party => emitParty(party));
 	});
 
 	socket.on('proxy', (data, callback) => {
@@ -69,6 +68,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('room.create', (data, callback) => onRoomCreateMsg(socket, authToken, data, callback));
 	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
 	socket.on('party.create', (data, callback) => onPartyCreateMsg(socket, authToken, data, callback));
+	socket.on('party.leave', (data, callback) => onPartyLeaveMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
@@ -114,6 +114,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: timeout`);
 			}
 		});
+		upstream.on('hero', (data: any) => socket.emit('hero', data));
 		upstream.on('tick', (data: any) => socket.emit('tick', data));
 		upstream.on('party', (data: any) => socket.emit('party', data));
 		upstream.on('disconnect', () => {
@@ -163,6 +164,59 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 }
 
 function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
+	if (!(data.partyId && data.playerName)) {
+		callback({ success: false, error: `Bad request` });
+		return;
+	}
+
+	const store = getStore();
+
+	let party = store.parties.get(data.partyId);
+	if (!party) {
+		logger.info(`Party ${data.partyId} not found for user ${authToken}`);
+		callback({ success: false, error: `Party ${data.partyId} not found` });
+		return;
+	}
+
+	const joining = data.joining;
+	if (joining) {
+		socket.join(party.id);
+	} else {
+		if (!party.active.has(socket.id)) {
+			logger.info(`Party ${data.partyId} does not contain ${authToken}`);
+			callback({ success: false, error: `Cannot update ${data.partyId} as you are not a party member` });
+			return;
+		}
+	}
+
+	const partyMember: g.PartyMember = {
+		socketId: socket.id,
+		authToken,
+		name: data.playerName,
+		keyBindings: data.keyBindings,
+		isBot: data.isBot,
+		isMobile: data.isMobile,
+		ready: data.ready,
+	};
+	games.updatePartyMember(party, partyMember);
+
+	const result: m.PartyResponse = {
+		success: true,
+		partyId: party.id,
+		members: partyMembersToContract(party),
+		roomId: party.roomId,
+		server: getLocation().server,
+	};
+	callback(result);
+
+	const assignments = games.startPartyIfReady(party);
+	assignments.forEach(assignment => {
+		emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
+	});
+	emitParty(party);
+}
+
+function onPartyLeaveMsg(socket: SocketIO.Socket, authToken: string, data: m.LeavePartyRequest, callback: (output: m.LeavePartyResponseMsg) => void) {
 	if (!data.partyId) {
 		callback({ success: false, error: `Party field required` });
 		return;
@@ -177,25 +231,16 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		return;
 	}
 
-	if (data.playerName) {
-		const joining = !party.active.has(socket.id);
-		if (joining) {
-			socket.join(party.id);
-		}
-		games.updatePartyMember(party, socket.id, authToken, data.playerName, data.ready);
-	} else {
-		games.removePartyMember(party, socket.id);
-		socket.leave(party.id);
-	}
+	games.removePartyMember(party, socket.id);
+	socket.leave(party.id);
 
-	const result: m.PartyResponse = {
+	const result: m.LeavePartyResponse = {
 		success: true,
 		partyId: party.id,
-		members: partyMembersToContract(party),
-		roomId: party.roomId,
-		server: getLocation().server,
 	};
 	callback(result);
+
+	emitParty(party);
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
@@ -205,36 +250,21 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const roomId = data.room;
 	const room = roomId ? store.rooms.get(roomId) : null;
 
-	const partyId = data.party;
-	const party = partyId ? store.parties.get(partyId) : null;
-
 	let game: g.Game = null;
 	if (data.gameId) {
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		game = games.findNewGame(room, party);
+		game = games.findNewGame(room);
 	}
 
 	if (game) {
 		let heroId = null;
 		if (!data.observe) {
-			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, partyId, socket.id);
+			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, socket.id);
 		}
 
-		const roomStats = calculateRoomStats(roomId);
-
-		socket.join(game.id);
-		callback({
-			gameId: game.id,
-			heroId,
-			room: game.roomId,
-			mod: game.mod,
-			allowBots: game.allowBots,
-			history: game.history,
-			numGames: roomStats.numGames,
-			numPlayers: roomStats.numPlayers,
-		});
+		emitHero(socket.id, game, heroId);
 
 		if (heroId) {
 			const botLog = data.isBot ? " (bot)" : "";
@@ -244,7 +274,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		}
 	} else {
 		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
-		callback(null);
+		callback({ success: false, error: `Unable to find game ${data.gameId}` });
 	}
 }
 
@@ -271,6 +301,28 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	}
 }
 
+function emitHero(socketId: string, game: g.Game, heroId: string) {
+	const socket = io.sockets.connected[socketId];
+	if (!socket) {
+		return;
+	}
+
+	socket.join(game.id);
+
+	const roomStats = calculateRoomStats(game.roomId);
+	const msg: m.HeroMsg = {
+		gameId: game.id,
+		heroId,
+		room: game.roomId,
+		mod: game.mod,
+		allowBots: game.allowBots,
+		history: game.history,
+		numGames: roomStats.numGames,
+		numPlayers: roomStats.numPlayers,
+	};
+	socket.emit('hero', msg);
+}
+
 function calculateRoomStats(room: string): RoomStats {
 	let numGames = 0;
 	let numPlayers = 0;
@@ -283,14 +335,22 @@ function calculateRoomStats(room: string): RoomStats {
 	return { numGames, numPlayers };
 }
 
+function emitParty(party: g.Party) {
+    io.to(party.id).emit("party", {
+		partyId: party.id,
+		members: partyMembersToContract(party),
+	} as m.PartyMsg);
+}
+
 function partyMembersToContract(party: g.Party) {
 	let members = new Array<m.PartyMemberMsg>();
 	party.active.forEach(member => {
-		members.push({
+		const contract: m.PartyMemberMsg = {
 			socketId: member.socketId,
 			name: member.name,
 			ready: member.ready,
-		});
+		}
+		members.push(contract);
 	});
 	return members;
 }

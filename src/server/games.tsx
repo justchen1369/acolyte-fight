@@ -12,7 +12,6 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
-let emitParty: Emitter<g.Party> = null;
 let emitTick: Emitter<m.TickMsg> = null;
 let ticksProcessing = false;
 
@@ -24,14 +23,21 @@ export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
 	emitTick = _emit;
 }
 
-export function attachToPartyEmitter(_emit: Emitter<g.Party>) {
-	emitParty = _emit;
+export interface DisconnectResult {
+	changedParties: g.Party[];
+}
+
+export interface PartyGameAssignment {
+	partyMember: g.PartyMember;
+	game: g.Game;
+	heroId: string;
 }
 
 export function onConnect(socketId: string, authToken: string) {
 }
 
-export function onDisconnect(socketId: string, authToken: string) {
+export function onDisconnect(socketId: string, authToken: string): DisconnectResult {
+	const changedParties = new Array<g.Party>();
 	getStore().activeGames.forEach(game => {
 		if (game.active.has(socketId)) {
 			leaveGame(game, socketId);
@@ -40,8 +46,10 @@ export function onDisconnect(socketId: string, authToken: string) {
 	getStore().parties.forEach(party => {
 		if (party.active.has(socketId)) {
 			removePartyMember(party, socketId);
+			changedParties.push(party);
 		}
 	});
+	return { changedParties }
 }
 
 function startTickProcessing() {
@@ -69,18 +77,18 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room | null, myParty: g.Party | null): g.Game {
+export function findNewGame(room: g.Room | null, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
 	const store = getStore();
 
-	let numPlayers = 1; // +1 player because the current player calling this method is a new player
+	let numPlayers = numNewPlayers; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
 	store.activeGames.forEach(g => {
 		if (g.roomId === roomId) {
 			if (isGameRunning(g)) {
 				numPlayers += g.active.size;
 			}
-			if (g.joinable && g.active.size < Matchmaking.MaxPlayers) {
+			if (g.joinable && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
 				openGames.push(g);
 			}
 		}
@@ -92,7 +100,7 @@ export function findNewGame(room: g.Room | null, myParty: g.Party | null): g.Gam
 	if (openGames.length > 0) {
 		let minSize = Infinity;
 		openGames.forEach(g => {
-			const size = getActiveAndReservedSize(g, myParty ? myParty.id : null, store.parties);
+			const size = g.active.size;
 			if (size < Matchmaking.MaxPlayers && size < minSize) {
 				minSize = size;
 				game = g;
@@ -103,39 +111,11 @@ export function findNewGame(room: g.Room | null, myParty: g.Party | null): g.Gam
 		// Start a new game early to stop a single player ending up in the same game
 		game = null;
 	}
-	if (game && myParty && !canFitParty(game, myParty)) {
-		game = null;
-
-	}
 
 	if (!game) {
 		game = initGame(room);
 	}
 	return game;
-}
-
-function canFitParty(game: g.Game, party: g.Party) {
-	const numOutsideParty = [...game.active.values()].filter(p => p.partyId !== party.id).length;
-	const numInsideParty = apportionPerGame(party.active.size);
-	const numPlayers = numOutsideParty + numInsideParty;
-	return numPlayers <= Matchmaking.MaxPlayers;
-}
-
-function getActiveAndReservedSize(game: g.Game, myPartyId: string, parties: Map<string, g.Party>): number {
-	let numActive = 0;
-	const reservedPerParty = new Map<string, number>();
-	game.active.forEach(player => {
-		const party = player.partyId ? parties.get(player.partyId) : null;
-		if (party && party.id !== myPartyId) { // Not allowed to use reservations belonging to other parties
-			if (!reservedPerParty.has(party.id)) {
-				reservedPerParty.set(party.id, apportionPerGame(party.active.size));
-			}
-		} else {
-			++numActive;
-		}
-	});
-
-	return numActive + _.sum([...reservedPerParty.values()]);
 }
 
 function apportionPerGame(totalPlayers: number) {
@@ -233,13 +213,12 @@ export function initGame(room: g.Room = null) {
 	return game;
 }
 
-export function updatePartyMember(party: g.Party, socketId: string, authToken: string, name: string, ready: boolean) {
+export function updatePartyMember(party: g.Party, member: g.PartyMember) {
+	const socketId = member.socketId;
 	const joined = !party.active.has(socketId);
-	party.active.set(socketId, { socketId, name, ready });
-	logger.info(`Party ${party.id} ${joined ? "joined" : "updated"} by user ${name} [${authToken}]]: ready=${ready}`);
+	party.active.set(socketId, member);
+	logger.info(`Party ${party.id} ${joined ? "joined" : "updated"} by user ${member.name} [${member.authToken}]]: ready=${member.ready}`);
 	party.modified = moment();
-
-	setTimeout(() => reprocessParty(party), 1);
 }
 
 export function removePartyMember(party: g.Party, socketId: string) {
@@ -255,16 +234,40 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	party.active.forEach(member => {
 		member.ready = false;
 	});
-
-	setTimeout(() => reprocessParty(party), 1);
 }
 
-export function reprocessParty(party: g.Party) {
+export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
+	const assignments = new Array<PartyGameAssignment>();
 	if (party.active.size === 0) {
-		return;
+		return assignments;
 	}
 
-	emitParty(party);
+	const allReady = [...party.active.values()].every(p => p.ready);
+	if (allReady) {
+		assignPartyToGames(party, assignments);
+	}
+	return assignments;
+}
+
+function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) {
+	const store = getStore();
+
+	const room = store.rooms.get(party.roomId);
+	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready));
+	const maxPlayersPerGame = apportionPerGame(remaining.length);
+	while (remaining.length > 0) {
+		const group = new Array<g.PartyMember>();
+		for (let i = 0; i < maxPlayersPerGame; ++i) {
+			group.push(remaining.shift());
+		}
+
+		const game = findNewGame(room, group.length);
+		for (const member of group) {
+			member.ready = false;
+			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
+			assignments.push({ partyMember: member, game, heroId });
+		}
+	}
 }
 
 function formatHeroId(index: number): string {
@@ -395,7 +398,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string, partyId: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -410,7 +413,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	game.active.set(socketId, {
 		socketId,
 		heroId,
-		partyId,
+		partyId: null,
 		name: playerName,
 	});
 	game.bots.delete(heroId);

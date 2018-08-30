@@ -64,5 +64,9 @@ export interface Party {
 export interface PartyMember {
     socketId: string;
     name: string;
+    authToken: string;
+    keyBindings: KeyBindings;
+    isBot: boolean;
+    isMobile: boolean;
     ready: boolean;
 }

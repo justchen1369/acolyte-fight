@@ -4,10 +4,13 @@ import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
+import * as sockets from './sockets';
 import * as url from '../url';
 import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
+
+sockets.listeners.onHeroMsg = onHeroMsg;
 
 export function joinNewGame(observeGameId?: string) {
 	const store = StoreProvider.getState();
@@ -19,15 +22,12 @@ export function joinNewGame(observeGameId?: string) {
 			name: store.playerName,
 			keyBindings: store.keyBindings,
 			room: store.room.id,
-			party: store.party ? store.party.id : null,
 			isBot: ai.playingAsAI(store.room.allowBots) && !observeGameId,
 			isMobile,
 			observe: !!observeGameId,
 		};
-		socket.emit('join', msg, (hero: m.JoinResponseMsg) => {
-			if (hero) {
-				onHeroMsg(hero);
-			} else {
+		socket.emit('join', msg, (response: m.JoinResponseMsg) => {
+			if (!response.success) {
 				notify({ type: "replayNotFound" });
 			}
 		});
@@ -62,12 +62,11 @@ export function leaveCurrentGame() {
 	if (world.ui.myGameId) {
 		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
 		socket.emit('leave', leaveMsg);
+		StoreProvider.dispatch({ type: "leaveMatch" });
 	}
-
-	StoreProvider.dispatch({ type: "leaveMatch" });
 }
 
-function onHeroMsg(data: m.JoinResponseMsg) {
+function onHeroMsg(data: m.HeroMsg) {
 	const world = engine.initialWorld(data.mod, data.allowBots);
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;

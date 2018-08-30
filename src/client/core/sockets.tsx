@@ -9,11 +9,13 @@ export let socket: SocketIOClient.Socket = null;
 export let listeners: Listeners = {
 	onTickMsg: () => { },
 	onPartyMsg: () => { },
+	onHeroMsg: () => { },
 };
 
 export interface Listeners {
 	onTickMsg: (msg: m.TickMsg) => void;
 	onPartyMsg: (msg: m.PartyMsg) => void;
+	onHeroMsg: (msg: m.HeroMsg) => void;
 }
 
 export function connectToServer(server: string): Promise<void> {
@@ -45,6 +47,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	});
 	socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
+	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
 }
 function onDisconnectMsg() {
 	StoreProvider.dispatch({ type: "disconnected" });

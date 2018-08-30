@@ -1,6 +1,7 @@
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as matches from './matches';
 import * as sockets from './sockets';
@@ -10,6 +11,7 @@ import * as url from '../url';
 import { notify } from './notifications';
 import { readFileAsync } from './fileUtils';
 import { socket } from './sockets';
+import { isMobile } from './userAgent';
 
 sockets.listeners.onPartyMsg = onPartyMsg;
 
@@ -113,8 +115,12 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 		let response: m.PartyResponse;
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.PartyRequest = {
+				joining: true,
 				partyId,
 				playerName: store.playerName,
+				keyBindings: store.keyBindings,
+				isBot: ai.playingAsAI(store.room.allowBots),
+				isMobile,
 				ready: false,
 			};
 			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
@@ -151,8 +157,12 @@ export function updateParty(ready: boolean): Promise<void> {
 
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyRequest = {
+			joining: false,
 			partyId: store.party.id,
 			playerName: store.playerName,
+			keyBindings: store.keyBindings,
+			isBot: ai.playingAsAI(store.room.allowBots),
+			isMobile,
 			ready,
 		};
 		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
@@ -172,12 +182,8 @@ export function leaveParty(): Promise<void> {
 	}
 
 	return new Promise<void>((resolve, reject) => {
-		let msg: m.PartyRequest = {
-			partyId: store.party.id,
-			playerName: null,
-			ready: false,
-		};
-		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+		let msg: m.LeavePartyRequest = { partyId: store.party.id };
+		socket.emit('party.leave', msg, (response: m.LeavePartyResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -194,24 +200,5 @@ function onPartyMsg(msg: m.PartyMsg) {
 		return;
 	}
 
-    const world = store.world;
-
 	StoreProvider.dispatch({ type: "updateParty", partyId: msg.partyId, members: msg.members });
-
-	let meReady = false;
-	let allReady = true;
-	msg.members.forEach(member => {
-		if (!member.ready) {
-			allReady = false;
-		}
-		if (member.socketId === socket.id) {
-			meReady = member.ready;
-		}
-	});
-	if (msg.members.length > 0 && allReady && meReady && matches.worldInterruptible(world)) {
-        setTimeout(() => {
-			matches.joinNewGame();
-			updateParty(false);
-		}, 1);
-	}
 }

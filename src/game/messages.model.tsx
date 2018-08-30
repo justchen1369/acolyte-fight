@@ -68,13 +68,17 @@ export interface TickMsg {
 export interface JoinMsg {
     gameId: string | null;
     room: string | null;
-    party: string | null;
     name: string;
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
     observe: boolean;
 }
+
+export interface JoinResponse {
+    success: true;
+}
+export type JoinResponseMsg = JoinResponse | ErrorResponseMsg;
 
 export interface BotMsg {
     gameId: string;
@@ -112,7 +116,7 @@ export interface JoinRoomResponse {
 
 export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
 
-export interface JoinResponseMsg {
+export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
     room: string | null;
@@ -138,8 +142,12 @@ export type CreatePartyResponseMsg = CreatePartyResponse | ErrorResponseMsg;
 
 
 export interface PartyRequest {
+    joining: boolean;
     partyId: string;
     playerName: string;
+    keyBindings: KeyBindings;
+    isBot: boolean;
+    isMobile: boolean;
     ready: boolean;
 }
 export interface PartyResponse {
@@ -150,6 +158,16 @@ export interface PartyResponse {
     server: string;
 }
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
+
+
+export interface LeavePartyRequest {
+    partyId: string;
+}
+export interface LeavePartyResponse {
+    success: true;
+    partyId: string;
+}
+export type LeavePartyResponseMsg = LeavePartyResponse | ErrorResponseMsg;
 
 
 export interface PartyMsg {
