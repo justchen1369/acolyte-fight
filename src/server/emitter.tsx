@@ -71,6 +71,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('party.leave', (data, callback) => onPartyLeaveMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
+	socket.on('start', data => onStartGameMsg(socket, authToken, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 }
@@ -283,6 +284,14 @@ function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 	if (game && game.active.has(socket.id) && game.active.size <= 1 && game.bots.size === 0) { // Only allow adding one bot
 		games.addBot(game, {});
 		logger.info(`Game [${game.id}]: playing vs AI`);
+	}
+}
+
+function onStartGameMsg(socket: SocketIO.Socket, authToken: string, data: m.BotMsg) {
+	const game = getStore().activeGames.get(data.gameId);
+	if (game && game.active.has(socket.id)) {
+		games.startGame(game);
+		logger.info(`Game [${game.id}]: started manually by ${authToken}`);
 	}
 }
 

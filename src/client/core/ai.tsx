@@ -1,5 +1,6 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
 import { sendAction } from './sockets';
@@ -139,10 +140,14 @@ class AiWorker {
     private onWorkerMessage(ev: MessageEvent) {
         const message: MsgContract = JSON.parse(ev.data);
         if (message.type === "action") {
-            sendAction(this.gameId, this.heroId, {
-                type: message.action.spellId,
-                target: message.action.target,
-            });
+            const world = StoreProvider.getState().world;
+            const spellsAllowed = engine.hasGameStarted(world);
+            if (message.action.spellId === "move" || spellsAllowed) {
+                sendAction(this.gameId, this.heroId, {
+                    type: message.action.spellId,
+                    target: message.action.target,
+                });
+            }
         }
     }
 }
@@ -166,6 +171,7 @@ function worldToState(world: w.World): WorldContract {
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
                 health: obj.health,
+                linkedToId: obj.link ? obj.link.targetId : null,
                 shieldTicksRemaining: 0,
             };
         } else if (obj.category === "projectile") {

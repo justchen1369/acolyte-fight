@@ -64,6 +64,10 @@ export function initialWorld(mod: Object, allowBots: boolean): w.World {
 	return world;
 }
 
+export function hasGameStarted(world: w.World) {
+	return world.startTick < constants.Matchmaking.MaxHistoryLength;
+}
+
 export function takeNotifications(world: w.World): w.Notification[] {
 	const notifications = world.ui.notifications;
 	if (notifications.length > 0) {

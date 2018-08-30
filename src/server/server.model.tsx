@@ -30,10 +30,14 @@ export interface Game {
     playerNames: string[];
     accessTokens: Set<string>;
     numPlayers: number;
+
     tick: number;
+
+    startManually?: boolean;
     joinable: boolean;
     activeTick: number;
-	closeTick: number;
+    closeTick: number;
+
 	actions: Map<string, m.ActionMsg>; // heroId -> actionData
 	history: m.TickMsg[];
 }

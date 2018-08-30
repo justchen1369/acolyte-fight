@@ -5,6 +5,7 @@ import * as ReactRedux from 'react-redux';
 import { HeroColors, Matchmaking } from '../../game/constants';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as engine from '../../game/engine';
 import * as matches from '../core/matches';
 import InfoPanelPlayer from './infoPanelPlayer';
 
@@ -12,6 +13,7 @@ interface Props {
     myHeroId: string;
     activePlayers: Immutable.Set<string>;
     players: Immutable.Map<string, w.Player>;
+    started: boolean;
     waitingForPlayers: boolean;
 }
 interface State {
@@ -23,6 +25,7 @@ function stateToProps(state: s.State): Props {
         myHeroId: world.ui.myHeroId,
         activePlayers: world.activePlayers,
         players: world.players,
+        started: engine.hasGameStarted(world),
         waitingForPlayers: world.tick < world.startTick,
     };
 }
@@ -50,17 +53,23 @@ class InfoPanel extends React.Component<Props, State> {
                     )}
                     {this.renderPlayerList()}
                 </div>}
-                {(this.props.myHeroId && this.props.players.size === 1) && this.renderPlayVsAiBtn()}
+                {this.renderButtons()}
             </div>
         );
     }
 
-    private renderPlayVsAiBtn() {
-        return <div className="btn play-vs-ai-btn" onClick={() => this.onPlayVsAiClick()}>Play vs AI</div>;
-    }
+    private renderButtons() {
+        if (this.props.started || !this.props.myHeroId) {
+            return null;
+        }
 
-    private onPlayVsAiClick() {
-        matches.addBotToCurrentGame();
+        if (this.props.players.size === 1) {
+            return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
+        } else if (this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
+            return <div className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</div>;
+        } else {
+            return null;
+        }
     }
 
     private renderPlayerList() {

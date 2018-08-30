@@ -41,10 +41,6 @@ export class PartyPanel extends React.Component<Props, State> {
         return <div>
             <h1>Party</h1>
             {this.props.party ? this.renderCurrentParty() : this.renderNoParty()}
-            <h1>Community</h1>
-            <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
-            <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
-            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
         </div>
     }
 

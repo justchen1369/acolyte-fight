@@ -59,6 +59,10 @@ export class TitleSection extends React.Component<Props, State> {
                 Acolytes become more dangerous as they lose health - dealing up to {1 + this.props.settings.Hero.AdditionalDamageMultiplier}x more damage!
                 This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
+            <h1>Community</h1>
+            <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
+            <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
+            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
             <h1>FAQ</h1>
             <h2>Is there a Mobile App?</h2>
             <p>
