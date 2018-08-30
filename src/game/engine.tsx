@@ -64,7 +64,7 @@ export function initialWorld(mod: Object, allowBots: boolean): w.World {
 	return world;
 }
 
-export function hasGameStarted(world: w.World) {
+export function hasGamePrestarted(world: w.World) {
 	return world.startTick < constants.Matchmaking.MaxHistoryLength;
 }
 

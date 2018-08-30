@@ -294,14 +294,14 @@ declare interface Vec2 {
 
 declare interface WorldContract {
 	tick: number;
-	started: boolean;
-	winner: string | null;
+	prestarted: boolean; // Whether spells are allowed to be cast yet
+	started: boolean; // Whether heroes can take damage yet
 
 	heroes: { [id: string]: HeroContract };
 	projectiles: { [id: string]: ProjectileContract };
 	obstacles: { [id: string]: ObstacleContract };
 
-	radius: number;
+	radius: number; // The current radius of the stage
 
 	actions: { [id: string]: ActionContract };
 }
@@ -313,11 +313,11 @@ declare interface WorldObjectContract {
 }
 
 declare interface HeroContract extends WorldObjectContract {
-	health: number;
-	heading: Vec2;
+	health: number; // The current health of the hero (out of 100)
+	heading: Vec2; // A unit vector representing the direction the Hero is currently facing
 	linkedToId?: string; // If set, this Hero currently has trapped another Hero in a link. This is the ID of the other Hero (the "victim").
 	casting?: CastingContract; // If set, currently casting a channelled spell
-	shieldTicksRemaining: number;
+	shieldTicksRemaining: number; // The number of ticks that the hero will continue to be shielded for, 0 if unshielded
 }
 
 declare interface ProjectileContract extends WorldObjectContract {

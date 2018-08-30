@@ -141,7 +141,7 @@ class AiWorker {
         const message: MsgContract = JSON.parse(ev.data);
         if (message.type === "action") {
             const world = StoreProvider.getState().world;
-            const spellsAllowed = engine.hasGameStarted(world);
+            const spellsAllowed = engine.hasGamePrestarted(world);
             if (message.action.spellId === "move" || spellsAllowed) {
                 sendAction(this.gameId, this.heroId, {
                     type: message.action.spellId,
@@ -155,8 +155,8 @@ class AiWorker {
 function worldToState(world: w.World): WorldContract {
     const contract: WorldContract = {
         tick: world.tick,
+        prestarted: engine.hasGamePrestarted(world),
         started: world.tick >= world.startTick,
-        winner: world.winner,
         heroes: {},
         projectiles: {},
         obstacles: {},

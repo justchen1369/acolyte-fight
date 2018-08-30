@@ -25,7 +25,7 @@ function stateToProps(state: s.State): Props {
         myHeroId: world.ui.myHeroId,
         activePlayers: world.activePlayers,
         players: world.players,
-        started: engine.hasGameStarted(world),
+        started: engine.hasGamePrestarted(world),
         waitingForPlayers: world.tick < world.startTick,
     };
 }
