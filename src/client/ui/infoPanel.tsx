@@ -67,7 +67,7 @@ class InfoPanel extends React.Component<Props, State> {
         let result = new Array<JSX.Element>();
 
         this.props.players.forEach(player => {
-            result.push(<InfoPanelPlayer key={player.heroId} myHeroId={player.heroId} />);
+            result.push(<InfoPanelPlayer key={player.heroId} heroId={player.heroId} />);
         });
 
         return result;

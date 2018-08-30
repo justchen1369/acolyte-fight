@@ -7,6 +7,7 @@ import { HeroColors } from '../../game/constants';
 interface Props {
     player: w.Player;
     myHeroId: string;
+    colorOverride?: string;
 }
 
 export class PlayerName extends React.PureComponent<Props> {
@@ -14,7 +15,9 @@ export class PlayerName extends React.PureComponent<Props> {
         const player = this.props.player;
         
         let color;
-        if (player.heroId === this.props.myHeroId) {
+        if (this.props.colorOverride) {
+            color = this.props.colorOverride;
+        } else if (player.heroId === this.props.myHeroId) {
             color = HeroColors.MyHeroColor;
         } else {
             color = player.uiColor;

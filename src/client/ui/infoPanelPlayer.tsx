@@ -8,9 +8,10 @@ import * as matches from '../core/matches';
 import { PlayerName } from './playerNameComponent';
 
 interface OwnProps {
-    myHeroId: string;
+    heroId: string;
 }
-interface Props extends OwnProps {
+interface Props {
+    myHeroId: string;
     isAlive: boolean;
     isActive: boolean;
     player: w.Player;
@@ -21,7 +22,7 @@ interface State {
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const world = state.world;
-    const player = world.players.get(ownProps.myHeroId);
+    const player = world.players.get(ownProps.heroId);
 
     let numKills = 0;
     {
@@ -32,7 +33,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     }
 
     return {
-        myHeroId: ownProps.myHeroId,
+        myHeroId: world.ui.myHeroId,
         player,
         numKills,
         isAlive: world.objects.has(player.heroId),
@@ -47,16 +48,14 @@ class InfoPanelPlayer extends React.Component<Props, State> {
         const isActive = this.props.isActive;
         const player = this.props.player;
 
-        let color = player.uiColor;
+        let colorOverride: string = null;
         if (!(isAlive && isActive)) {
-            color = HeroColors.InactiveColor;
-        } else if (player.heroId === this.props.myHeroId) {
-            color = HeroColors.MyHeroColor;
+            colorOverride = HeroColors.InactiveColor;
         }
 
         return <div className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
             <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
-            <PlayerName player={player} myHeroId={this.props.myHeroId}/>
+            <PlayerName player={player} myHeroId={this.props.myHeroId} colorOverride={colorOverride} />
         </div>;
     }
 }
