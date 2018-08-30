@@ -18,6 +18,7 @@ function initialState(): s.State {
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
+        aiCode: null,
         current: {},
         socketId: null,
         room,
@@ -118,6 +119,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         } else {
             return state;
         }
+    } else if (action.type === "updateAiCode") {
+        return { ...state, aiCode: action.aiCode };
     } else {
         console.log(action);
         return state;

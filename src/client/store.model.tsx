@@ -7,6 +7,8 @@ export interface State {
     playerName: string;
     keyBindings: KeyBindings;
 
+    aiCode: string;
+
     socketId: string;
     party: PartyState;
     room: RoomState;
@@ -53,6 +55,7 @@ export type Action =
     | JoinPartyAction
     | UpdatePartyAction
     | LeavePartyAction
+    | UpdateAiCodeAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -117,4 +120,9 @@ export interface UpdatePartyAction {
 export interface LeavePartyAction {
     type: "leaveParty";
     partyId: string;
+}
+
+export interface UpdateAiCodeAction {
+    type: "updateAiCode";
+    aiCode: string;
 }

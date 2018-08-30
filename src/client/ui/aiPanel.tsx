@@ -3,14 +3,15 @@ import * as ReactRedux from 'react-redux';
 import * as ai from '../core/ai';
 import * as parties from '../core/parties';
 import * as s from '../store.model';
+import * as StoreProvider from '../storeProvider';
 import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
     allowBots: boolean;
+    aiCode: string;
 }
 interface State {
     loading: boolean;
-    code: string;
     error: string;
     selectedFile: File;
 }
@@ -18,6 +19,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         allowBots: state.world.allowBots,
+        aiCode: state.aiCode,
     };
 }
 
@@ -26,7 +28,6 @@ class AiPanel extends React.Component<Props, State> {
         super(props);
         this.state = {
             loading: false,
-            code: ai.getCode(),
             error: null,
             selectedFile: null,
         };
@@ -35,7 +36,7 @@ class AiPanel extends React.Component<Props, State> {
     render() {
         return <div>
             <h1>AI (EXPERIMENTAL)</h1>
-            {this.state.code ? this.renderAttached() : this.renderDetached()}
+            {this.props.aiCode ? this.renderAttached() : this.renderDetached()}
         </div>;
     }
 
@@ -43,7 +44,7 @@ class AiPanel extends React.Component<Props, State> {
         return <div>
             <p>Currently, your Acolyte will be controlled by the AI code below:</p>
             <textarea className="ai-js" readOnly>
-                {this.state.code}
+                {this.props.aiCode}
             </textarea>
             <p><div className="btn" onClick={() => this.onDetach()}>Deactivate Autopilot</div></p>
         </div>;
@@ -75,12 +76,14 @@ class AiPanel extends React.Component<Props, State> {
     
     private renderCreateRoom() {
         return <div>
-            <h2>Create AI room</h2>
+            <h2>Create AI party</h2>
             <p>
-                AI programming is only allowed within certain private rooms.
-                Click the button below to create a room that allows bots.
-                You can join the room from another browser tab to play against your AI.</p>
-            <p><div className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => this.onCreateAIRoom()}>Create AI room</div></p>
+                AI programming is only allowed within an AI party.
+                Click the button below to create a party that allows bots.
+                Human players are allowed to join an AI party (you can even join the party from another browser tab to play against your own AI!).
+                If you don't make your party private, your party will compete with any other AI parties that are online at the same time.
+            </p>
+            <p><div className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => this.onCreateAIRoom()}>Create AI party</div></p>
             {this.state.error && <p className="error">{this.state.error}</p>}
         </div>;
     }
@@ -98,21 +101,23 @@ class AiPanel extends React.Component<Props, State> {
     private onAttach() {
         this.setState({ loading: true });
         readFileAsync(this.state.selectedFile)
-            .then(code => {
-                ai.overwriteAI(code);
-                this.setState({ code, loading: false });
+            .then(aiCode => {
+                StoreProvider.dispatch({ type: "updateAiCode", aiCode });
+                this.setState({ loading: false });
             });
         ;
     }
 
     private onDetach() {
-        ai.resetAI();
-        this.setState({ loading: false, code: null });
+        StoreProvider.dispatch({ type: "updateAiCode", aiCode: null });
+        this.setState({ loading: false });
     }
 
     private onCreateAIRoom() {
         this.setState({ loading: true });
-        parties.createRoom({}, true, "ai"); // Return to this page
+        parties.createRoom({}, true).then(() => {
+            this.setState({ loading: false });
+        });
     }
 }
 

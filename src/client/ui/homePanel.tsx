@@ -16,10 +16,9 @@ interface Props {
     current: s.PathElements;
     party: s.PartyState;
     settings: AcolyteFightSettings;
-    allowBots: boolean;
+    playingAsAI: boolean;
 }
 interface State {
-    playingAsAI: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -27,7 +26,7 @@ function stateToProps(state: s.State): Props {
         current: state.current,
         party: state.party,
         settings: state.world.settings,
-        allowBots: state.world.allowBots,
+        playingAsAI: ai.playingAsAI(state),
     };
 }
 
@@ -37,7 +36,7 @@ class HomePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            playingAsAI: ai.playingAsAI(this.props.allowBots),
+            playingAsAI: ai.playingAsAI(),
         };
     }
 
@@ -56,7 +55,7 @@ class HomePanel extends React.Component<Props, State> {
                 <div className="spacer" />
                 <div className="button-row">
                     <PlayButton
-                        label={this.state.playingAsAI ? "Play as AI" : "Play"}
+                        label={this.props.playingAsAI ? "Play as AI" : "Play"}
                         party={this.props.party}
                     />
                 </div>

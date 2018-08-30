@@ -1,3 +1,4 @@
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
@@ -7,24 +8,11 @@ const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
-let code: string = null;
-
 setInterval(() => onTick(StoreProvider.getState().world), 200);
 
-export function getCode() {
-    return code;
-}
-
-export function playingAsAI(allowBots: boolean) {
-    return allowBots && !!code;
-}
-
-export function overwriteAI(_code: string) {
-    code = _code;
-}
-
-export function resetAI() {
-    code = null;
+export function playingAsAI(store: s.State = null) {
+    store = store || StoreProvider.getState();
+    return store.room.allowBots && !!store.aiCode;
 }
 
 export function onTick(world: w.World) {
@@ -64,8 +52,9 @@ function startBotIfNecessary(world: w.World, heroId: string) {
 }
 
 function createCodeUrl(allowCustomCode: boolean) {
-    if (code && allowCustomCode) {
-        return `data:text/javascript;base64,${btoa(code)}`;
+    const store = StoreProvider.getState();
+    if (store.aiCode && allowCustomCode) {
+        return `data:text/javascript;base64,${btoa(store.aiCode)}`;
     } else {
         return DefaultCodeUrl;
     }

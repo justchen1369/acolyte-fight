@@ -29,18 +29,9 @@ function createRoomFromMod(mod: Object) {
     return createRoom(mod, false);
 }
 
-export function createRoom(mod: Object, allowBots: boolean, nextPage: string = "party") {
+export function createRoom(mod: Object, allowBots: boolean) {
     console.log("Creating room", mod, allowBots);
     return createRoomCall(mod, allowBots).then(response => createParty(response.roomId))
-        .then(msg => {
-            const path = url.getPath({
-                gameId: null,
-                page: nextPage,
-                party: msg.partyId,
-                server: msg.server,
-            });
-            window.location.href = path;
-        })
 }
 
 function createRoomCall(mod: Object, allowBots: boolean): Promise<m.CreateRoomResponse> {
@@ -119,7 +110,7 @@ export function joinParty(partyId: string): Promise<m.PartyResponse> {
 				partyId,
 				playerName: store.playerName,
 				keyBindings: store.keyBindings,
-				isBot: ai.playingAsAI(store.room.allowBots),
+				isBot: ai.playingAsAI(store),
 				isMobile,
 				ready: false,
 			};
@@ -161,7 +152,7 @@ export function updateParty(ready: boolean): Promise<void> {
 			partyId: store.party.id,
 			playerName: store.playerName,
 			keyBindings: store.keyBindings,
-			isBot: ai.playingAsAI(store.room.allowBots),
+			isBot: ai.playingAsAI(store),
 			isMobile,
 			ready,
 		};

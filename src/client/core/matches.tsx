@@ -22,7 +22,7 @@ export function joinNewGame(observeGameId?: string) {
 			name: store.playerName,
 			keyBindings: store.keyBindings,
 			room: store.room.id,
-			isBot: ai.playingAsAI(store.room.allowBots) && !observeGameId,
+			isBot: ai.playingAsAI(store) && !observeGameId,
 			isMobile,
 			observe: !!observeGameId,
 		};

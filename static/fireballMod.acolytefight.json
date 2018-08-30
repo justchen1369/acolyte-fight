@@ -1,10 +1,10 @@
 {
     "Spells": {
         "fireball": {
-            "cooldown": 120
+            "cooldown": 30
         },
         "flamestrike": {
-            "cooldown": 120
+            "cooldown": 30
         }
     }
 }
