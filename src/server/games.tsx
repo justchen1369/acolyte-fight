@@ -273,8 +273,12 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 		return assignments;
 	}
 
-	const allReady = [...party.active.values()].every(p => p.ready || p.isObserver);
-	if (allReady) {
+	const players = [...party.active.values()].filter(p => !p.isObserver);
+	if (players.length === 0) {
+		return assignments;
+	}
+
+	if (players.every(p => p.ready)) {
 		assignPartyToGames(party, assignments);
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 	}
