@@ -28,7 +28,12 @@ class HomePanel extends React.Component<Props, State> {
 
     private renderParty() {
         return <div className="party-list">
-            <b>Current <a href={this.getPartyDetailsUrl()} onClick={(ev) => this.onPartyDetailsClick(ev)}>party</a>{this.props.isModded && <i className="settings-icon fas fa-cog" title="Settings modified for this party" onClick={() => pages.changePage("modding")} />}: </b>
+            <b>
+                Current <a href={this.getPartyDetailsUrl()} onClick={(ev) => this.onPartyDetailsClick(ev)}>party</a>
+                {this.props.party.isPrivate && <i className="settings-icon fas fa-lock" title="This is a private party" onClick={() => pages.changePage("party")} />}
+                {this.props.isModded && <i className="settings-icon fas fa-cog" title="Settings modified for this party" onClick={() => pages.changePage("modding")} />}
+                :
+            </b>
             {" "}
             {this.props.party.members.map(member => this.renderMember(member))}
         </div>

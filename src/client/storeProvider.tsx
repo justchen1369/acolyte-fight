@@ -104,6 +104,7 @@ function reducer(state: s.State, action: s.Action): s.State {
                     roomId: action.roomId,
                     members: action.members,
                     ready: action.members.some(m => m.socketId === state.socketId && m.ready),
+                    isPrivate: action.isPrivate,
                 },
             };
         } else {

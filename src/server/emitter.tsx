@@ -179,12 +179,19 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		return;
 	}
 
-	const changed = games.updatePartyRoom(party, data.roomId);
+	let changed = false;
+	if (data.roomId !== undefined && games.updatePartyRoom(party, data.roomId)) {
+		changed = true;
+	}
+	if (data.isPrivate !== undefined && games.updatePartyPrivacy(party, data.isPrivate)) {
+		changed = true;
+	}
 
 	const result: m.PartySettingsResponseMsg = {
 		success: true,
 		partyId: party.id,
 		roomId: party.roomId,
+		isPrivate: party.isPrivate,
 	};
 	callback(result);
 
@@ -234,6 +241,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		success: true,
 		partyId: party.id,
 		members: partyMembersToContract(party),
+		isPrivate: party.isPrivate,
 		roomId: party.roomId,
 		server: getLocation().server,
 	};
@@ -374,11 +382,13 @@ function calculateRoomStats(room: string): RoomStats {
 }
 
 function emitParty(party: g.Party) {
-    io.to(party.id).emit("party", {
+	const msg: m.PartyMsg = {
 		partyId: party.id,
 		roomId: party.roomId,
 		members: partyMembersToContract(party),
-	} as m.PartyMsg);
+		isPrivate: party.isPrivate,
+	};
+    io.to(party.id).emit("party", msg);
 }
 
 function partyMembersToContract(party: g.Party) {

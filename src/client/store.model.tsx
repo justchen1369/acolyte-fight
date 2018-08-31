@@ -25,8 +25,9 @@ export interface NotificationItem {
 export interface PartyState {
     id: string;
     roomId: string;
+    isPrivate: boolean;
     members: w.PartyMemberState[];
-    ready: boolean; // TODO: Reselect this out of members[].ready
+    ready: boolean;
 }
 
 export interface RoomState {
@@ -118,6 +119,7 @@ export interface UpdatePartyAction {
     partyId: string;
     roomId: string;
     members: w.PartyMemberState[];
+    isPrivate: boolean;
 }
 
 export interface LeavePartyAction {

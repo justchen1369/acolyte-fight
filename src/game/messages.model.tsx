@@ -160,18 +160,21 @@ export interface PartyResponse {
     members: PartyMemberMsg[];
     roomId: string;
     server: string;
+    isPrivate: boolean;
 }
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
 
 
 export interface PartySettingsRequest {
     partyId: string;
-    roomId: string;
+    roomId?: string;
+    isPrivate?: boolean;
 }
 export interface PartySettingsResponse {
     success: true;
     partyId: string;
     roomId: string;
+    isPrivate: boolean;
 }
 export type PartySettingsResponseMsg = PartySettingsResponse | ErrorResponseMsg;
 
@@ -190,6 +193,7 @@ export interface PartyMsg {
     partyId: string;
     roomId: string;
     members: PartyMemberMsg[];
+    isPrivate: boolean;
 }
 
 export interface PartyMemberMsg {

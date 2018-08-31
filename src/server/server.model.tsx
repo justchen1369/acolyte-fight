@@ -63,6 +63,7 @@ export interface Party {
     created: moment.Moment;
     modified: moment.Moment;
     active: Map<string, PartyMember>; // socketId -> party member
+    isPrivate: boolean;
 }
 
 export interface PartyMember {

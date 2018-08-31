@@ -170,6 +170,7 @@ export function initParty(roomId: string = null): g.Party {
 		modified: moment(),
 		roomId,
 		active: new Map<string, g.PartyMember>(),
+		isPrivate: false,
 	};
 	getStore().parties.set(party.id, party);
 	return party;
@@ -218,18 +219,28 @@ export function initGame(room: g.Room = null) {
 }
 
 export function updatePartyRoom(party: g.Party, roomId: string): boolean {
-	if (party.roomId === roomId) {
-		return false;
+	let changed = false;
+	if (party.roomId !== roomId) {
+		party.roomId = roomId;
+		changed = true;
+		party.active.forEach(member => { // Unready so users can read new settings
+			member.ready = false;
+		});
+
+		logger.info(`Party ${party.id} moved to room=${party.roomId}`);
 	}
+	return changed;
+}
 
-	party.roomId = roomId;
-	logger.info(`Party ${party.id} moved to room ${roomId}`);
+export function updatePartyPrivacy(party: g.Party, isPrivate: boolean): boolean {
+	let changed = false;
+	if (party.isPrivate !== isPrivate) {
+		party.isPrivate = isPrivate;
+		changed = true;
 
-	// All members become unready when room changes
-	party.active.forEach(member => {
-		member.ready = false;
-	});
-	return true;
+		logger.info(`Party ${party.id} changed to isPrivate=${party.isPrivate}`);
+	}
+	return changed;
 }
 
 export function updatePartyMember(party: g.Party, member: g.PartyMember, joining: boolean) {
@@ -266,6 +277,7 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 	const allReady = [...party.active.values()].every(p => p.ready);
 	if (allReady) {
 		assignPartyToGames(party, assignments);
+		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 	}
 	return assignments;
 }
@@ -282,11 +294,15 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 			group.push(remaining.shift());
 		}
 
-		const game = findNewGame(room, group.length);
+		const game = party.isPrivate ? initGame(room) : findNewGame(room, group.length);
 		for (const member of group) {
 			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
 			assignments.push({ partyMember: member, game, heroId });
+		}
+
+		if (party.isPrivate) {
+			game.joinable = false;
 		}
 	}
 }

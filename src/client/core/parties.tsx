@@ -66,6 +66,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 					id: response.partyId,
 					roomId: response.roomId,
 					members: response.members,
+					isPrivate: response.isPrivate,
 					ready: false,
 				},
 				server: response.server,
@@ -83,12 +84,29 @@ export function movePartyAsync(roomId: string | null): Promise<void> {
 		return Promise.resolve();
 	}
 
+	let msg: m.PartySettingsRequest = {
+		partyId: store.party.id,
+		roomId,
+	};
+	return updatePartySettingsAsync(msg);
+}
+
+export function privatePartyAsync(isPrivate: boolean): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return Promise.resolve();
+	}
+
+	let msg: m.PartySettingsRequest = {
+		partyId: store.party.id,
+		isPrivate,
+	};
+	return updatePartySettingsAsync(msg);
+}
+
+function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	return new Promise<void>((resolve, reject) => {
-		let msg: m.PartySettingsRequest = {
-			partyId: store.party.id,
-			roomId,
-		};
-		socket.emit('party.settings', msg, (response: m.PartySettingsResponseMsg) => {
+		socket.emit('party.settings', request, (response: m.PartySettingsResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -155,6 +173,7 @@ function onPartyMsg(msg: m.PartyMsg) {
 		partyId: msg.partyId,
 		roomId: msg.roomId,
 		members: msg.members,
+		isPrivate: msg.isPrivate,
 	});
 	joinCurrentPartyRoomAsync();
 }

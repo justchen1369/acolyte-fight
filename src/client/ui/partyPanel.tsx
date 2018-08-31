@@ -11,7 +11,7 @@ interface Props {
     party: s.PartyState;
 }
 interface State {
-    creating: boolean;
+    loading: boolean;
     error: string;
 }
 
@@ -26,7 +26,7 @@ export class PartyPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            creating: false,
+            loading: false,
             error: null,
         };
     }
@@ -41,32 +41,34 @@ export class PartyPanel extends React.Component<Props, State> {
     private renderNoParty() {
         return <div>
             <p>Play together with friends as a party. Forming a party ensures that you and your friends are matched to the same game.</p>
-            <p><span className={this.state.creating ? "btn btn-disabled" : "btn"} onClick={() => this.onCreatePartyClick()}>Create Party</span></p>
+            <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.createPartyAsync()}>Create Party</span></p>
         </div>
     }
 
     private renderCurrentParty() {
         const currentPartyPath = parties.getPartyHomePath(this.props.current);
         return <div>
-            <p><b>Currently in party:</b> <span>{this.props.party.members.map(m => m.name).join(", ")}</span></p>
             <p>Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
-            <p><span className="btn" onClick={() => this.onLeavePartyClick()}>Leave Party</span></p>
+            <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
+            {this.props.party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty()}
         </div>
     }
 
-    private onCreatePartyClick() {
-        const party = this.props.party;
-        if (!party) {
-            parties.createPartyAsync();
-        }
+    private renderPrivateParty() {
+        return <div>
+            <h2>Private party <i className="fas fa-lock" /></h2>
+            <p>Your party is <b>private</b>: your games will only contain the players in your party.</p>
+            <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(false)}>Make Public</span></p>
+        </div>
     }
 
-    private onLeavePartyClick() {
-        const party = this.props.party;
-        if (party) {
-            parties.leavePartyAsync();
-        }
+    private renderPublicParty() {
+        return <div>
+            <h2>Public party <i className="fa fa-lock-open" /> </h2>
+            <p>Your party is <b>public</b>: your party will be matched with other players on the public server.</p>
+            <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(true)}>Make Private</span></p>
+        </div>
     }
 }
 
