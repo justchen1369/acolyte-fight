@@ -173,10 +173,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private touchStartHandler(...points: PointInfo[]) {
         const world = this.props.world;
-
-        const currentPlayer = world.players.get(world.ui.myHeroId);
-        if (!currentPlayer || currentPlayer.isBot) {
-            // No interaction allowed if an observer or a bot
+        if (!CanvasPanel.interactive(world)) {
             return;
         }
 
@@ -280,6 +277,10 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private gameKeyDown(e: KeyboardEvent) {
         const world = this.props.world;
+        if (!CanvasPanel.interactive(world)) {
+            return;
+        }
+
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
         if (spellType && world.ui.nextTarget) {
@@ -357,6 +358,11 @@ class CanvasPanel extends React.Component<Props, State> {
             case "Space": return ' ';
             default: return e.key && e.key.toLowerCase();
         }
+    }
+
+    private static interactive(world: w.World) {
+        const currentPlayer = world.players.get(world.ui.myHeroId);
+        return currentPlayer && !currentPlayer.isBot;
     }
 
     private fullScreenCanvas() {
