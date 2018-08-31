@@ -54,7 +54,6 @@ export interface Room {
     created: moment.Moment;
     accessed: moment.Moment;
     mod: Object;
-    allowBots: boolean;
 }
 
 export interface Party {

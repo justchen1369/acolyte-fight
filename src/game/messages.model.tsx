@@ -115,7 +115,6 @@ export interface JoinRoomResponse {
     success: true;
     roomId: string;
     mod: Object;
-    allowBots: boolean;
 }
 
 export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
@@ -232,7 +231,6 @@ export interface LocationMsg {
 
 export interface CreateRoomRequest {
     mod: Object;
-    allowBots: boolean;
 }
 export interface CreateRoomResponse {
     success: true;

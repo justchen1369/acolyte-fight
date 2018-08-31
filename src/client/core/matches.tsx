@@ -77,7 +77,7 @@ export function leaveCurrentGame() {
 }
 
 function onHeroMsg(data: m.HeroMsg) {
-	const world = engine.initialWorld(data.mod, data.allowBots);
+	const world = engine.initialWorld(data.mod);
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 

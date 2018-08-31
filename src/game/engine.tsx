@@ -22,7 +22,7 @@ import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants
 	settings.polygonRadius = (2.0 * settings.linearSlop);
 }
 
-export function initialWorld(mod: Object, allowBots: boolean): w.World {
+export function initialWorld(mod: Object): w.World {
 	const settings = calculateMod(mod);
 
 	let world = {
@@ -48,7 +48,6 @@ export function initialWorld(mod: Object, allowBots: boolean): w.World {
 
 		settings,
 		mod,
-		allowBots,
 
 		ui: {
 			myGameId: null,

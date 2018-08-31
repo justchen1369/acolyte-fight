@@ -16,17 +16,13 @@ import { isMobile } from './userAgent';
 export function createRoomFromFileAsync(file: File) {
     return readFileAsync(file)
         .then(json => json ? JSON.parse(json) : {})
-        .then(mod => createRoomFromModAsync(mod))
+        .then(mod => createRoomAsync(mod))
 }
 
-function createRoomFromModAsync(mod: Object) {
-    return createRoomAsync(mod, false);
-}
-
-export function createRoomAsync(mod: Object, allowBots: boolean) {
-    console.log("Creating room", mod, allowBots);
+export function createRoomAsync(mod: Object) {
+    console.log("Creating room", mod);
 	return new Promise<string>((resolve, reject) => {
-		let msg: m.CreateRoomRequest = { mod, allowBots };
+		let msg: m.CreateRoomRequest = { mod };
 		socket.emit('room.create', msg, (response: m.CreateRoomResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
@@ -66,14 +62,12 @@ export function joinRoomAsync(roomId: string): Promise<string> {
 }
 
 export function joinRoomFrom(response: m.JoinRoomResponse) {
-    const allowBots = response.allowBots || false;
     const mod = response.mod || {};
     StoreProvider.dispatch({
         type: "updateRoom",
         room: {
             id: response.roomId,
             mod,
-            allowBots,
             settings: settings.calculateMod(mod),
         }
     });
@@ -91,7 +85,6 @@ export function leaveRoom() {
 	const room: s.RoomState = store.room = {
 		id: null,
 		mod: {},
-        allowBots: false,
         settings: settings.DefaultSettings,
 	};
 	StoreProvider.dispatch({ type: "updateRoom", room });

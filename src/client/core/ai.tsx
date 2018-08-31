@@ -13,7 +13,7 @@ setInterval(() => onTick(StoreProvider.getState().world), 200);
 
 export function playingAsAI(store: s.State = null) {
     store = store || StoreProvider.getState();
-    return store.room.allowBots && !!store.aiCode;
+    return !!store.aiCode;
 }
 
 export function onTick(world: w.World) {

@@ -131,15 +131,15 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 	const store = getStore();
 	const room = store.rooms.get(data.roomId);
 	if (room) {
-		callback({ success: true, roomId: room.id, mod: room.mod, allowBots: room.allowBots });
+		callback({ success: true, roomId: room.id, mod: room.mod });
 	} else {
 		callback({ success: false, error: `Unable to find room ${data.roomId}` });
 	}
 }
 
 function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreateRoomRequest, callback: (output: m.CreateRoomResponseMsg) => void) {
-    if (data && data.mod && typeof data.mod === "object" && typeof data.allowBots === "boolean") {
-        const room = games.initRoom(data.mod, data.allowBots, authToken);
+    if (data && data.mod && typeof data.mod === "object") {
+        const room = games.initRoom(data.mod, authToken);
         const result: m.CreateRoomResponse = {
 			success: true,
             roomId: room.id,
@@ -293,7 +293,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		game = games.findNewGame(room);
+		game = games.findNewGame(room, data.isBot);
 	}
 
 	if (game) {
@@ -355,7 +355,7 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 
 	socket.join(game.id);
 
-	const roomStats = calculateRoomStats(game.roomId);
+	const roomStats = calculateRoomStats(game.roomId, game.allowBots);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
@@ -369,11 +369,11 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 	socket.emit('hero', msg);
 }
 
-function calculateRoomStats(room: string): RoomStats {
+function calculateRoomStats(room: string, allowBots: boolean): RoomStats {
 	let numGames = 0;
 	let numPlayers = 0;
 	getStore().activeGames.forEach(game => {
-		if (game.roomId === room && games.isGameRunning(game)) {
+		if (game.roomId === room && game.allowBots === allowBots && games.isGameRunning(game)) {
 			numGames += 1;
 			numPlayers += game.active.size;
 		}

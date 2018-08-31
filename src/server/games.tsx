@@ -77,14 +77,14 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room | null, numNewPlayers: number = 1): g.Game {
+export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
 	const store = getStore();
 
 	let numPlayers = numNewPlayers; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
 	store.activeGames.forEach(g => {
-		if (g.roomId === roomId) {
+		if (g.roomId === roomId && g.allowBots == allowBots) {
 			if (isGameRunning(g)) {
 				numPlayers += g.active.size;
 			}
@@ -113,7 +113,7 @@ export function findNewGame(room: g.Room | null, numNewPlayers: number = 1): g.G
 	}
 
 	if (!game) {
-		game = initGame(room);
+		game = initGame(room, allowBots);
 	}
 	return game;
 }
@@ -139,11 +139,11 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	}
 }
 
-export function initRoom(mod: Object, allowBots: boolean, authToken: string): g.Room {
+export function initRoom(mod: Object, authToken: string): g.Room {
 	const store = getStore();
 
 	// Same settings -> same room
-	const id = crypto.createHash('md5').update(JSON.stringify({mod, allowBots})).digest('hex');
+	const id = crypto.createHash('md5').update(JSON.stringify({mod})).digest('hex');
 	let room = store.rooms.get(id);
 	if (!room) {
 		room = {
@@ -151,11 +151,10 @@ export function initRoom(mod: Object, allowBots: boolean, authToken: string): g.
 			created: moment(),
 			accessed: moment(),
 			mod,
-			allowBots,
 		};
 		store.rooms.set(room.id, room);
 
-        logger.info(`Room ${room.id} created by user ${authToken} with bots=${allowBots} and mod ${JSON.stringify(mod).substr(0, 1000)}`);
+        logger.info(`Room ${room.id} created by user ${authToken} mod ${JSON.stringify(mod).substr(0, 1000)}`);
 	} else {
         logger.info(`Room ${room.id} joined by user ${authToken}`);
 	}
@@ -176,13 +175,13 @@ export function initParty(roomId: string = null): g.Party {
 	return party;
 }
 
-export function initGame(room: g.Room = null) {
+export function initGame(room: g.Room, allowBots: boolean) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		roomId: room ? room.id : null,
 		mod: room ? room.mod : {},
-		allowBots: room ? room.allowBots : false,
+		allowBots,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
@@ -286,6 +285,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 	const store = getStore();
 
 	const room = store.rooms.get(party.roomId);
+	const allowBots = [...party.active.values()].some(p => p.isBot);
 	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready));
 	const maxPlayersPerGame = apportionPerGame(remaining.length);
 	while (remaining.length > 0) {
@@ -294,7 +294,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 			group.push(remaining.shift());
 		}
 
-		const game = party.isPrivate ? initGame(room) : findNewGame(room, group.length);
+		const game = party.isPrivate ? initGame(room, allowBots) : findNewGame(room, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);

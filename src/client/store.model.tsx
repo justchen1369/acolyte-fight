@@ -33,7 +33,6 @@ export interface PartyState {
 export interface RoomState {
     id: string;
     mod: Object;
-    allowBots: boolean;
     settings: AcolyteFightSettings;
 }
 

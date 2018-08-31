@@ -34,7 +34,6 @@ export interface World {
 	
 	settings: AcolyteFightSettings;
 	mod: Object;
-	allowBots: boolean;
 
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };

@@ -71,7 +71,10 @@ class AiPanel extends React.Component<Props, State> {
             </p>
             <div>
                 <h2>Activate AI autopilot</h2>
-                <p>Autopilot your Acolyte with an AI. This override will only last until you close this browser tab.</p>
+                <p>
+                    Autopilot your Acolyte with an AI. This override will only last until you close this browser tab.
+                    While in autopilot, you will enter the AI matchmaking pool, which only contains (a) other players who are using AI autopilot and (b) parties that consist of both AI and non-AI.
+                </p>
                 <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
                 <p><div className={(this.state.loading || !this.state.selectedFile) ? "btn btn-disabled" : "btn"} onClick={() => this.onAttach()}>Activate Autopilot</div></p>
                 {this.state.error && <p className="error">{this.state.error}</p>}
@@ -82,11 +85,7 @@ class AiPanel extends React.Component<Props, State> {
     private onAttach() {
         this.setState({ loading: true });
 
-        const allowBots = true;
-        rooms.createRoomAsync({}, allowBots)
-            .then(roomId => rooms.joinRoomAsync(roomId))
-            .then(roomId => parties.movePartyAsync(roomId))
-            .then(() => readFileAsync(this.state.selectedFile))
+        readFileAsync(this.state.selectedFile)
             .then(aiCode => {
                 StoreProvider.dispatch({ type: "updateAiCode", aiCode });
                 this.setState({ loading: false });
@@ -95,15 +94,11 @@ class AiPanel extends React.Component<Props, State> {
                 console.error(error);
                 this.setState({ loading: false, error: `${error}` });
             })
-        ;
     }
 
     private onDetach() {
         this.setState({ loading: true });
         StoreProvider.dispatch({ type: "updateAiCode", aiCode: null });
-
-        rooms.leaveRoom();
-        parties.movePartyAsync(null);
 
         this.setState({ loading: false });
     }

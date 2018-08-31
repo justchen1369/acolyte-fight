@@ -13,7 +13,6 @@ function initialState(): s.State {
     const room: s.RoomState = {
         id: null,
         mod: {},
-        allowBots: false,
         settings: settings.DefaultSettings,
     };
     return {
@@ -25,7 +24,7 @@ function initialState(): s.State {
         socketId: null,
         room,
         party: null,
-        world: engine.initialWorld(room.mod, room.allowBots),
+        world: engine.initialWorld(room.mod),
         items: [],
     };
 }
@@ -66,7 +65,7 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "leaveMatch") {
         return {
             ...state,
-            world: engine.initialWorld(state.room.mod, state.room.allowBots),
+            world: engine.initialWorld(state.room.mod),
             items: [],
             current: {
                 ...state.current,
@@ -79,7 +78,6 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             room: action.room,
-            aiCode: action.room.allowBots ? state.aiCode : null,
         };
     } else if (action.type === "joinParty") {
         if (!(state.party && state.party.id === action.party.id)) {
