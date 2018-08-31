@@ -199,7 +199,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		isMobile: data.isMobile,
 		ready: data.ready,
 	};
-	games.updatePartyMember(party, partyMember);
+	games.updatePartyMember(party, partyMember, joining);
 
 	const result: m.PartyResponse = {
 		success: true,

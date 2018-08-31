@@ -213,12 +213,14 @@ export function initGame(room: g.Room = null) {
 	return game;
 }
 
-export function updatePartyMember(party: g.Party, member: g.PartyMember) {
+export function updatePartyMember(party: g.Party, member: g.PartyMember, joining: boolean) {
 	const socketId = member.socketId;
-	const joined = !party.active.has(socketId);
 	party.active.set(socketId, member);
-	logger.info(`Party ${party.id} ${joined ? "joined" : "updated"} by user ${member.name} [${member.authToken}]]: ready=${member.ready}`);
 	party.modified = moment();
+
+	if (joining) {
+		logger.info(`Party ${party.id} joined by user ${member.name} [${member.authToken}]]`);
+	}
 }
 
 export function removePartyMember(party: g.Party, socketId: string) {
