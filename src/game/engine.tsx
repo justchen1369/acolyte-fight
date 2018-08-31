@@ -589,6 +589,9 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
 	let action = nextAction;
+	if (!action && hero.moveTo) {
+		action = { type: "move", target: hero.moveTo };
+	}
 	if (hero.casting && hero.casting.uninterruptible) {
 		action = hero.casting.action;
 	}
@@ -1357,7 +1360,9 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 		}
 	});
 
-	return vector.distance(current, target) < constants.Pixel;
+	const done = vector.distance(current, target) < constants.Pixel;
+	hero.moveTo = done ? null : action.target;
+	return done;
 }
 
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ProjectileSpell) {

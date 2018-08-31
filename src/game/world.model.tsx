@@ -257,6 +257,7 @@ export interface Hero extends WorldObjectBase {
 	additionalDamagePower: number;
 	additionalDamageMultiplier: number;
 
+	moveTo?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 
