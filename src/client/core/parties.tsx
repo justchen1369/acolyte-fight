@@ -14,6 +14,11 @@ import { readFileAsync } from './fileUtils';
 import { socket } from './sockets';
 import { isMobile } from './userAgent';
 
+export interface UpdatePartyConfig {
+	ready?: boolean;
+	observing?: boolean;
+}
+
 sockets.listeners.onPartyMsg = onPartyMsg;
 
 export function getPartyHomePath(current: s.PathElements) {
@@ -48,6 +53,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				keyBindings: store.keyBindings,
 				isBot: ai.playingAsAI(store),
 				isMobile,
+				isObserver: false,
 				ready: false,
 			};
 			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
@@ -68,6 +74,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 					members: response.members,
 					isPrivate: response.isPrivate,
 					ready: false,
+					observing: false,
 				},
 				server: response.server,
 			});
@@ -116,7 +123,7 @@ function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	});
 }
 
-export function updatePartyAsync(ready: boolean): Promise<void> {
+export function updatePartyAsync(config: UpdatePartyConfig): Promise<void> {
 	const store = StoreProvider.getState();
 	if (!store.party) {
 		return Promise.resolve();
@@ -130,7 +137,8 @@ export function updatePartyAsync(ready: boolean): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
-			ready,
+			isObserver: config.observing !== undefined ? config.observing : store.party.observing,
+			ready: config.ready !== undefined ? config.ready : store.party.ready,
 		};
 		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
 			if (response.success === false) {

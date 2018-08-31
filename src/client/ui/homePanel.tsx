@@ -7,7 +7,7 @@ import * as ai from '../core/ai';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import { NameConfig } from './nameConfig';
-import { PlayButton } from './playButton';
+import PlayButton from './playButton';
 import SpellConfig from './spellConfig';
 import NavBar from './navbar';
 import PartyList from './partyList';
@@ -15,17 +15,8 @@ import PartyList from './partyList';
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
-    party: s.PartyState;
-    playingAsAI: boolean;
 }
 interface State {
-}
-
-function stateToProps(state: s.State): Props {
-    return {
-        party: state.party,
-        playingAsAI: ai.playingAsAI(state),
-    };
 }
 
 class HomePanel extends React.Component<Props, State> {
@@ -34,7 +25,6 @@ class HomePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            playingAsAI: ai.playingAsAI(),
         };
     }
 
@@ -52,10 +42,7 @@ class HomePanel extends React.Component<Props, State> {
                 </div>
                 <div className="spacer" />
                 <div className="button-row">
-                    <PlayButton
-                        label={this.props.playingAsAI ? "Play as AI" : "Play"}
-                        party={this.props.party}
-                    />
+                    <PlayButton />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
                 <PartyList />
@@ -95,4 +82,4 @@ class HomePanel extends React.Component<Props, State> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(HomePanel);
+export default HomePanel;

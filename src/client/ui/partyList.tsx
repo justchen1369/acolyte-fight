@@ -48,6 +48,7 @@ class HomePanel extends React.Component<Props, State> {
             {member.ready ? <i className="check-icon fas fa-check-square" /> : <i className="check-icon fas fa-square" />} 
             <span className="party-member-name">{member.name}</span>
             {member.isBot && <i className="settings-icon fas fa-microchip" title={`${member.name} is playing using AI autopilot`} onClick={() => pages.changePage("ai")} />}
+            {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => pages.changePage("party")} />}
         </div>
     }
 

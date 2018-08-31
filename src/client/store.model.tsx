@@ -28,6 +28,7 @@ export interface PartyState {
     isPrivate: boolean;
     members: w.PartyMemberState[];
     ready: boolean;
+    observing: boolean;
 }
 
 export interface RoomState {
@@ -56,6 +57,7 @@ export type Action =
     | UpdateRoomAction
     | JoinPartyAction
     | UpdatePartyAction
+    | UpdateObservingPartyAction
     | LeavePartyAction
     | UpdateAiCodeAction
 
@@ -119,6 +121,12 @@ export interface UpdatePartyAction {
     roomId: string;
     members: w.PartyMemberState[];
     isPrivate: boolean;
+}
+
+export interface UpdateObservingPartyAction {
+    type: "updateObservingParty";
+    partyId: string;
+    observing: boolean;
 }
 
 export interface LeavePartyAction {

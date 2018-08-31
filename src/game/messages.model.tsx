@@ -151,6 +151,7 @@ export interface PartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    isObserver: boolean;
     ready: boolean;
 }
 export interface PartyResponse {
@@ -200,6 +201,7 @@ export interface PartyMemberMsg {
     name: string;
     ready: boolean;
     isBot: boolean;
+    isObserver: boolean;
 }
 
 

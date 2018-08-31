@@ -273,7 +273,7 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 		return assignments;
 	}
 
-	const allReady = [...party.active.values()].every(p => p.ready);
+	const allReady = [...party.active.values()].every(p => p.ready || p.isObserver);
 	if (allReady) {
 		assignPartyToGames(party, assignments);
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
@@ -286,7 +286,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 
 	const room = store.rooms.get(party.roomId);
 	const allowBots = [...party.active.values()].some(p => p.isBot);
-	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready));
+	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready && !p.isObserver));
 	const maxPlayersPerGame = apportionPerGame(remaining.length);
 	while (remaining.length > 0) {
 		const group = new Array<g.PartyMember>();
@@ -303,6 +303,14 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 
 		if (party.isPrivate) {
 			game.joinable = false;
+		}
+	}
+
+	if (assignments.length > 0) {
+		const observers = [...party.active.values()].filter(p => p.ready && p.isObserver);
+		const game = assignments[0].game;
+		for (const observer of observers) {
+			assignments.push({ game, partyMember: observer, heroId: null });
 		}
 	}
 }

@@ -233,6 +233,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
+		isObserver: data.isObserver,
 		ready: data.ready,
 	};
 	games.updatePartyMember(party, partyMember, joining);
@@ -399,6 +400,7 @@ function partyMembersToContract(party: g.Party) {
 			name: member.name,
 			ready: member.ready,
 			isBot: member.isBot,
+			isObserver: member.isObserver,
 		}
 		members.push(contract);
 	});

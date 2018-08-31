@@ -52,12 +52,17 @@ export class PartyPanel extends React.Component<Props, State> {
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
             {this.props.party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty()}
+            <h2>Observer Mode {this.props.party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
+            <p>Observer mode lets you watch games played by this party.</p>
+            {this.props.party.observing
+                ? <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: false })}>Deactivate Observer Mode</span></p>
+                : <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: true })}>Activate Observer Mode</span></p>}
         </div>
     }
 
     private renderPrivateParty() {
         return <div>
-            <h2>Private party <i className="fas fa-lock" /></h2>
+            <h2>Private Party <i className="fas fa-lock" /></h2>
             <p>Your party is <b>private</b>: your games will only contain the players in your party.</p>
             <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(false)}>Make Public</span></p>
         </div>
@@ -65,7 +70,7 @@ export class PartyPanel extends React.Component<Props, State> {
 
     private renderPublicParty() {
         return <div>
-            <h2>Public party <i className="fa fa-lock-open" /> </h2>
+            <h2>Private Party <i className="fa fa-lock-open" /> </h2>
             <p>Your party is <b>public</b>: your party will be matched with other players on the public server.</p>
             <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(true)}>Make Private</span></p>
         </div>

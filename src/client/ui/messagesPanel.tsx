@@ -5,13 +5,12 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
 import { ButtonBar } from '../../game/constants';
-import { PlayButton } from './playButton';
+import PlayButton from './playButton';
 import { isMobile } from '../core/userAgent';
 import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
 
 interface Props {
-    party: s.PartyState;
     isNewPlayer: boolean;
     myGameId: string;
     myHeroId: string;
@@ -29,7 +28,6 @@ let helpedThisSession = false; // Store across games so the user only has to dis
 
 function stateToProps(state: s.State): Props {
     return {
-        party: state.party,
         isNewPlayer: state.isNewPlayer,
         myGameId: state.world.ui.myGameId,
         myHeroId: state.world.ui.myHeroId,
@@ -212,12 +210,9 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderWinAction() {
         const observing = !this.props.myHeroId;
         if (observing) {
-            return <span className="btn new-game-btn" onClick={() => matches.leaveCurrentGame()}>Exit Replay</span>;
+            return <span className="btn new-game-btn" onClick={() => matches.leaveCurrentGame()}>Exit</span>;
         } else {
-            return <PlayButton
-                label="Play Again"
-                party={this.props.party}
-            />;
+            return <PlayButton again={true} />;
         }
     }
     

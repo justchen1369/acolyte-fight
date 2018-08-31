@@ -95,13 +95,15 @@ function reducer(state: s.State, action: s.Action): s.State {
         }
     } else if (action.type === "updateParty") {
         if (state.party && state.party.id == action.partyId) {
+            const self = action.members.find(m => m.socketId === state.socketId);
             return {
                 ...state,
                 party: {
                     ...state.party,
                     roomId: action.roomId,
                     members: action.members,
-                    ready: action.members.some(m => m.socketId === state.socketId && m.ready),
+                    ready: self && self.ready,
+                    observing: self && self.isObserver,
                     isPrivate: action.isPrivate,
                 },
             };

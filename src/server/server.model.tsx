@@ -72,5 +72,6 @@ export interface PartyMember {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    isObserver: boolean;
     ready: boolean;
 }

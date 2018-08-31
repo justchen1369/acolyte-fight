@@ -186,6 +186,7 @@ export interface PartyMemberState {
 	name: string;
 	ready: boolean;
 	isBot: boolean;
+	isObserver: boolean;
 }
 
 export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed;
