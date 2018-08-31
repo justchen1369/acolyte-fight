@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as ai from '../core/ai';
@@ -11,9 +12,14 @@ interface Props {
     aiCode: string;
 }
 interface State {
+    aiCode: string;
+
     loading: boolean;
     error: string;
     selectedFile: File;
+
+    changed: boolean;
+    saved: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -23,12 +29,17 @@ function stateToProps(state: s.State): Props {
 }
 
 class AiPanel extends React.Component<Props, State> {
+    private saveStateDebounced = _.debounce(() => this.saveState(), 200);
+
     constructor(props: Props) {
         super(props);
         this.state = {
             loading: false,
             error: null,
             selectedFile: null,
+            aiCode: props.aiCode,
+            changed: false,
+            saved: true,
         };
     }
 
@@ -42,9 +53,14 @@ class AiPanel extends React.Component<Props, State> {
     private renderAttached() {
         return <div>
             <p>Currently, your Acolyte will be controlled by the AI code below:</p>
-            <textarea className="ai-js" readOnly>
+            <textarea className="ai-js" onChange={(ev) => this.onChange(ev)}>
                 {this.props.aiCode}
             </textarea>
+            {this.state.changed && <div style={{ marginTop: 8, marginBottom: 16 }}>
+                {this.state.saved 
+                    ? "Changes saved"
+                    : "Unsaved changes"}
+            </div>}
             <p><div className="btn" onClick={() => this.onDetach()}>Deactivate Autopilot</div></p>
         </div>;
     }
@@ -101,6 +117,23 @@ class AiPanel extends React.Component<Props, State> {
         StoreProvider.dispatch({ type: "updateAiCode", aiCode: null });
 
         this.setState({ loading: false });
+    }
+
+    private onChange(ev: React.ChangeEvent<HTMLTextAreaElement>) {
+        this.setState({
+            aiCode: ev.target.value,
+            changed: true,
+            saved: false,
+        });
+        this.saveStateDebounced();
+    }
+
+    private saveState() {
+        StoreProvider.dispatch({ type: "updateAiCode", aiCode: this.state.aiCode });
+
+        this.setState({
+            saved: true,
+        });
     }
 }
 
