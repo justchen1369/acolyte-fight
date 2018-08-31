@@ -173,6 +173,13 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private touchStartHandler(...points: PointInfo[]) {
         const world = this.props.world;
+
+        const currentPlayer = world.players.get(world.ui.myHeroId);
+        if (!currentPlayer || currentPlayer.isBot) {
+            // No interaction allowed if an observer or a bot
+            return;
+        }
+
         points.forEach(p => {
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
