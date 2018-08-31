@@ -3,6 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
+import * as parties from '../core/parties';
 import * as url from '../url';
 
 interface Props {
@@ -59,6 +60,10 @@ class HomePanel extends React.Component<Props, State> {
     private onPartyDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
         ev.preventDefault();
         pages.changePage("party");
+
+        if (!this.props.party) {
+            parties.createPartyAsync();
+        }
     }
 }
 
