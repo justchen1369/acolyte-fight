@@ -1399,6 +1399,8 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	let newPosition = vector.towards(currentPosition, action.target, spell.maxRange);
 	hero.body.setPosition(newPosition);
 
+	hero.moveTo = action.target;
+
 	return true;
 }
 
@@ -1421,6 +1423,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
 		hero.thrust = thrust;
+		hero.moveTo = action.target;
 	}
 
 	if (hero.thrust && !hero.thrust.nullified) {
