@@ -139,7 +139,7 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	}
 }
 
-export function initRoom(mod: Object, allowBots: boolean): g.Room {
+export function initRoom(mod: Object, allowBots: boolean, authToken: string): g.Room {
 	const store = getStore();
 
 	// Same settings -> same room
@@ -154,6 +154,10 @@ export function initRoom(mod: Object, allowBots: boolean): g.Room {
 			allowBots,
 		};
 		store.rooms.set(room.id, room);
+
+        logger.info(`Room ${room.id} created by user ${authToken} with bots=${allowBots} and mod ${JSON.stringify(mod).substr(0, 1000)}`);
+	} else {
+        logger.info(`Room ${room.id} joined by user ${authToken}`);
 	}
 	return room;
 }
@@ -211,6 +215,21 @@ export function initGame(room: g.Room = null) {
 	}
 	logger.info("Game [" + gameName + "]: started");
 	return game;
+}
+
+export function updatePartyRoom(party: g.Party, roomId: string): boolean {
+	if (party.roomId === roomId) {
+		return false;
+	}
+
+	party.roomId = roomId;
+	logger.info(`Party ${party.id} moved to room ${roomId}`);
+
+	// All members become unready when room changes
+	party.active.forEach(member => {
+		member.ready = false;
+	});
+	return true;
 }
 
 export function updatePartyMember(party: g.Party, member: g.PartyMember, joining: boolean) {

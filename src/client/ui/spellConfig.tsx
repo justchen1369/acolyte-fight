@@ -1,5 +1,6 @@
 import * as React from 'react';
-import * as c from '../../game/world.model';
+import * as ReactRedux from 'react-redux';
+import * as s from '../store.model';
 import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../storage';
@@ -15,7 +16,13 @@ interface State {
     saved: Set<string>;
 }
 
-export class SpellConfig extends React.Component<Props, State> {
+function stateToProps(state: s.State): Props {
+    return {
+        settings: state.room.settings,
+    };
+}
+
+class SpellConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -87,3 +94,5 @@ export class SpellConfig extends React.Component<Props, State> {
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
 }
+
+export default ReactRedux.connect(stateToProps)(SpellConfig);

@@ -580,6 +580,15 @@ textarea.ai-js {
     color: #444;
 }
 
-.party-member i {
+.party-list .settings-icon {
+    margin-left: 5px;
+    cursor: pointer;
+}
+
+.party-list .settings-icon:hover {
+    color: #00ccff;
+}
+
+.party-member .check-icon {
     margin-right: 5px;
 }

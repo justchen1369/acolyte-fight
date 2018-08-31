@@ -3,6 +3,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';
 import * as engine from '../game/engine';
+import * as settings from '../game/settings';
 
 const store = Redux.createStore(reducer, initialState());
 
@@ -13,6 +14,7 @@ function initialState(): s.State {
         id: null,
         mod: {},
         allowBots: false,
+        settings: settings.DefaultSettings,
     };
     return {
         isNewPlayer,
@@ -77,7 +79,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             room: action.room,
-            world: engine.initialWorld(action.room.mod, action.room.allowBots),
+            aiCode: action.room.allowBots ? state.aiCode : null,
         };
     } else if (action.type === "joinParty") {
         if (!(state.party && state.party.id === action.party.id)) {
@@ -99,6 +101,7 @@ function reducer(state: s.State, action: s.Action): s.State {
                 ...state,
                 party: {
                     ...state.party,
+                    roomId: action.roomId,
                     members: action.members,
                     ready: action.members.some(m => m.socketId === state.socketId && m.ready),
                 },

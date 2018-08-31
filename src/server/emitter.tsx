@@ -68,6 +68,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('room.create', (data, callback) => onRoomCreateMsg(socket, authToken, data, callback));
 	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
 	socket.on('party.create', (data, callback) => onPartyCreateMsg(socket, authToken, data, callback));
+	socket.on('party.settings', (data, callback) => onPartySettingsMsg(socket, authToken, data, callback));
 	socket.on('party.leave', (data, callback) => onPartyLeaveMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
@@ -138,13 +139,12 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 
 function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreateRoomRequest, callback: (output: m.CreateRoomResponseMsg) => void) {
     if (data && data.mod && typeof data.mod === "object" && typeof data.allowBots === "boolean") {
-        const room = games.initRoom(data.mod, data.allowBots);
+        const room = games.initRoom(data.mod, data.allowBots, authToken);
         const result: m.CreateRoomResponse = {
 			success: true,
             roomId: room.id,
             server: getLocation().server,
         };
-        logger.info(`Room ${room.id} created by user ${authToken} with bots=${data.allowBots} and mod ${JSON.stringify(data.mod).substr(0, 1000)}`);
         callback(result);
     } else {
         callback({ success: false, error: `Bad request` });
@@ -164,6 +164,35 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 	callback(result);
 }
 
+function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.PartySettingsRequest, callback: (output: m.PartySettingsResponseMsg) => void) {
+	if (!(data.partyId)) {
+		callback({ success: false, error: `Bad request` });
+		return;
+	}
+
+	const store = getStore();
+
+	const party = store.parties.get(data.partyId);
+	if (!(party && party.active.has(socket.id))) {
+		logger.info(`Party ${data.partyId} not found or inaccessible for user ${socket.id} [${authToken}]`);
+		callback({ success: false, error: `Party ${data.partyId} not found or inaccessible` });
+		return;
+	}
+
+	const changed = games.updatePartyRoom(party, data.roomId);
+
+	const result: m.PartySettingsResponseMsg = {
+		success: true,
+		partyId: party.id,
+		roomId: party.roomId,
+	};
+	callback(result);
+
+	if (changed) {
+		emitParty(party);
+	}
+}
+
 function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
 	if (!(data.partyId && data.playerName)) {
 		callback({ success: false, error: `Bad request` });
@@ -172,9 +201,9 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 
 	const store = getStore();
 
-	let party = store.parties.get(data.partyId);
+	const party = store.parties.get(data.partyId);
 	if (!party) {
-		logger.info(`Party ${data.partyId} not found for user ${authToken}`);
+		logger.info(`Party ${data.partyId} not found for user ${socket.id} [${authToken}]`);
 		callback({ success: false, error: `Party ${data.partyId} not found` });
 		return;
 	}
@@ -184,7 +213,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		socket.join(party.id);
 	} else {
 		if (!party.active.has(socket.id)) {
-			logger.info(`Party ${data.partyId} does not contain ${authToken}`);
+			logger.info(`Party ${data.partyId} does not contain ${socket.id} [${authToken}]`);
 			callback({ success: false, error: `Cannot update ${data.partyId} as you are not a party member` });
 			return;
 		}
@@ -347,6 +376,7 @@ function calculateRoomStats(room: string): RoomStats {
 function emitParty(party: g.Party) {
     io.to(party.id).emit("party", {
 		partyId: party.id,
+		roomId: party.roomId,
 		members: partyMembersToContract(party),
 	} as m.PartyMsg);
 }
@@ -358,6 +388,7 @@ function partyMembersToContract(party: g.Party) {
 			socketId: member.socketId,
 			name: member.name,
 			ready: member.ready,
+			isBot: member.isBot,
 		}
 		members.push(contract);
 	});

@@ -186,6 +186,7 @@ export interface PartyMemberState {
 	socketId: string;
 	name: string;
 	ready: boolean;
+	isBot: boolean;
 }
 
 export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed;

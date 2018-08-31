@@ -8,10 +8,6 @@ import * as url from '../url';
 
 interface Props {
     current: s.PathElements;
-
-    mod: Object;
-    allowBots: boolean;
-
     party: s.PartyState;
 }
 interface State {
@@ -22,8 +18,6 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         current: state.current,
-        mod: state.world.mod,
-        allowBots: state.world.allowBots,
         party: state.party,
     };
 }
@@ -58,35 +52,21 @@ export class PartyPanel extends React.Component<Props, State> {
             <p>Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => this.onLeavePartyClick()}>Leave Party</span></p>
-            <h2>Party modifications</h2>
-            {Object.keys(this.props.mod).length > 0
-                ? <p>
-                    The following modifications are active in this room:
-                    <textarea className="mod-json">{JSON.stringify(this.props.mod, null, 2)}</textarea>
-                </p>
-                : <p>No <a href="modding" onClick={(ev) => this.anchorClick(ev, "modding")}>modifications</a> are in effect in this party.</p>}
-            <h2>Bots</h2>
-            <p><a href="ai" onClick={(ev) => this.anchorClick(ev, "ai")}>Bots</a> are {this.props.allowBots ? "allowed" : "not allowed"} in this party.</p>
         </div>
     }
 
     private onCreatePartyClick() {
         const party = this.props.party;
         if (!party) {
-            parties.createParty(null);
+            parties.createPartyAsync();
         }
     }
 
     private onLeavePartyClick() {
         const party = this.props.party;
         if (party) {
-            parties.leaveParty();
+            parties.leavePartyAsync();
         }
-    }
-
-    private anchorClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
-        ev.preventDefault();
-        pages.changePage(newPage);
     }
 }
 

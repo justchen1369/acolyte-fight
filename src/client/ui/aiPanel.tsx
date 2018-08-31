@@ -2,12 +2,12 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as ai from '../core/ai';
 import * as parties from '../core/parties';
+import * as rooms from '../core/rooms';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
-    allowBots: boolean;
     aiCode: string;
 }
 interface State {
@@ -18,7 +18,6 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        allowBots: state.world.allowBots,
         aiCode: state.aiCode,
     };
 }
@@ -70,54 +69,43 @@ class AiPanel extends React.Component<Props, State> {
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings and contracts (see MsgContract).</li>
                 </ul>
             </p>
-            {this.props.allowBots ? this.renderStartAutopilotForm() : this.renderCreateRoom()}
+            <div>
+                <h2>Activate AI autopilot</h2>
+                <p>Autopilot your Acolyte with an AI. This override will only last until you close this browser tab.</p>
+                <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
+                <p><div className={(this.state.loading || !this.state.selectedFile) ? "btn btn-disabled" : "btn"} onClick={() => this.onAttach()}>Activate Autopilot</div></p>
+                {this.state.error && <p className="error">{this.state.error}</p>}
+            </div>
         </div>;
-    }
-    
-    private renderCreateRoom() {
-        return <div>
-            <h2>Create AI party</h2>
-            <p>
-                AI programming is only allowed within an AI party.
-                Click the button below to create a party that allows bots.
-                Human players are allowed to join an AI party (you can even join the party from another browser tab to play against your own AI!).
-                If you don't make your party private, your party will compete with any other AI parties that are online at the same time.
-            </p>
-            <p><div className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => this.onCreateAIRoom()}>Create AI party</div></p>
-            {this.state.error && <p className="error">{this.state.error}</p>}
-        </div>;
-    }
-
-    private renderStartAutopilotForm() {
-        return <div>
-            <h2>Use your AI</h2>
-            <p>Autopilot your Acolyte with an AI. This override will only last until you close this browser tab.</p>
-            <p>Choose an AI file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
-            <p><div className={(this.state.loading || !this.state.selectedFile) ? "btn btn-disabled" : "btn"} onClick={() => this.onAttach()}>Activate Autopilot</div></p>
-            {this.state.error && <p className="error">{this.state.error}</p>}
-        </div>
     }
 
     private onAttach() {
         this.setState({ loading: true });
-        readFileAsync(this.state.selectedFile)
+
+        const allowBots = true;
+        rooms.createRoomAsync({}, allowBots)
+            .then(roomId => rooms.joinRoomAsync(roomId))
+            .then(roomId => parties.movePartyAsync(roomId))
+            .then(() => readFileAsync(this.state.selectedFile))
             .then(aiCode => {
                 StoreProvider.dispatch({ type: "updateAiCode", aiCode });
                 this.setState({ loading: false });
-            });
+            })
+            .catch(error => {
+                console.error(error);
+                this.setState({ loading: false, error: `${error}` });
+            })
         ;
     }
 
     private onDetach() {
-        StoreProvider.dispatch({ type: "updateAiCode", aiCode: null });
-        this.setState({ loading: false });
-    }
-
-    private onCreateAIRoom() {
         this.setState({ loading: true });
-        parties.createRoom({}, true).then(() => {
-            this.setState({ loading: false });
-        });
+        StoreProvider.dispatch({ type: "updateAiCode", aiCode: null });
+
+        rooms.leaveRoom();
+        parties.movePartyAsync(null);
+
+        this.setState({ loading: false });
     }
 }
 

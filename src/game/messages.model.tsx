@@ -164,6 +164,18 @@ export interface PartyResponse {
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
 
 
+export interface PartySettingsRequest {
+    partyId: string;
+    roomId: string;
+}
+export interface PartySettingsResponse {
+    success: true;
+    partyId: string;
+    roomId: string;
+}
+export type PartySettingsResponseMsg = PartySettingsResponse | ErrorResponseMsg;
+
+
 export interface LeavePartyRequest {
     partyId: string;
 }
@@ -176,6 +188,7 @@ export type LeavePartyResponseMsg = LeavePartyResponse | ErrorResponseMsg;
 
 export interface PartyMsg {
     partyId: string;
+    roomId: string;
     members: PartyMemberMsg[];
 }
 
@@ -183,6 +196,7 @@ export interface PartyMemberMsg {
     socketId: string;
     name: string;
     ready: boolean;
+    isBot: boolean;
 }
 
 

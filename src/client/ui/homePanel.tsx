@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -7,15 +8,14 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 import { NameConfig } from './nameConfig';
 import { PlayButton } from './playButton';
-import { SpellConfig } from './spellConfig';
+import SpellConfig from './spellConfig';
 import NavBar from './navbar';
+import PartyList from './partyList';
 
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
-    current: s.PathElements;
     party: s.PartyState;
-    settings: AcolyteFightSettings;
     playingAsAI: boolean;
 }
 interface State {
@@ -23,9 +23,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        current: state.current,
         party: state.party,
-        settings: state.world.settings,
         playingAsAI: ai.playingAsAI(state),
     };
 }
@@ -60,7 +58,7 @@ class HomePanel extends React.Component<Props, State> {
                     />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                {this.props.party ? this.renderParty() : this.renderNoParty()}
+                <PartyList />
                 <div className="spacer" />
                 <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
@@ -82,37 +80,9 @@ class HomePanel extends React.Component<Props, State> {
                 <h2>Your Name</h2>
                 <NameConfig />
                 <h1>Your Spell Configuration</h1>
-                <SpellConfig settings={this.props.settings} />
+                <SpellConfig />
             </div>
         </div>;
-    }
-
-    private renderParty() {
-        return <div className="party-list">
-            <b>Current party (<a href={this.getPartyDetailsUrl()} onClick={(ev) => this.onPartyDetailsClick(ev)}>settings</a>): </b>
-            {" "}
-            {this.props.party.members.map(member => this.renderMember(member))}
-        </div>
-    }
-
-    private renderNoParty() {
-        return <div className="party-invite">Invite friends to <b><a href={this.getPartyDetailsUrl()} onClick={ev => this.onPartyDetailsClick(ev)}>party</a>!</b></div>
-    }
-
-    private renderMember(member: w.PartyMemberState) {
-        return <div className={member.ready ? "party-member party-member-ready" : "party-member party-member-not-ready"} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
-            {member.ready ? <i className="fas fa-check-square" /> : <i className="fas fa-square" />} 
-            <span className="party-member-name">{member.name}</span>
-        </div>
-    }
-
-    private getPartyDetailsUrl() {
-        return url.getPath(Object.assign({}, this.props.current, { page: "party" }));
-    }
-
-    private onPartyDetailsClick(ev: React.MouseEvent<HTMLAnchorElement>) {
-        ev.preventDefault();
-        pages.changePage("party");
     }
 
     private scrollBelowFold() {

@@ -58,7 +58,7 @@ export class PlayButton extends React.Component<Props, State> {
                 screenLifecycle.enterGame();
             }
             matches.leaveCurrentGame();
-            parties.updateParty(ready);
+            parties.updatePartyAsync(ready);
         }
     }
 

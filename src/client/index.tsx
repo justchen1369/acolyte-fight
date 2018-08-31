@@ -32,7 +32,7 @@ function initialize() {
 
     sockets.attachToSocket(socket, () => {
         sockets.connectToServer(current.server)
-            .then(() => parties.joinParty(current.party))
+            .then(() => parties.joinPartyAsync(current.party))
             .then(() => {
                 if (!alreadyConnected) {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart

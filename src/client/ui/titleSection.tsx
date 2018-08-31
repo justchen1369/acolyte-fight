@@ -8,18 +8,11 @@ interface Props {
 }
 
 interface State {
-    roomUrl: string;
-}
-
-function retrieveLocationAsync() {
-    return fetch('location', { credentials: "same-origin" })
-        .then(res => res.json())
-        .then((msg: m.LocationMsg) => msg);
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        settings: state.world.settings,
+        settings: state.room.settings,
     };
 }
 
@@ -27,23 +20,7 @@ export class TitleSection extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            roomUrl: null,
         };
-    }
-
-    componentDidMount() {
-        retrieveLocationAsync().then(locationMsg => {
-            const room = Math.floor(Math.random() * 1e9).toString(36);
-            const server = locationMsg.currentServer;
-
-            let roomUrl = `play?room=${room}`;
-            if (locationMsg.currentServer) {
-                roomUrl = `${roomUrl}&server=${encodeURIComponent(server)}`;
-            }
-            this.setState({ roomUrl });
-        }).catch((error) => {
-            console.error("Unable to generate room URL", error);
-        });
     }
 
     render() {

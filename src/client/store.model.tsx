@@ -24,6 +24,7 @@ export interface NotificationItem {
 
 export interface PartyState {
     id: string;
+    roomId: string;
     members: w.PartyMemberState[];
     ready: boolean; // TODO: Reselect this out of members[].ready
 }
@@ -32,6 +33,7 @@ export interface RoomState {
     id: string;
     mod: Object;
     allowBots: boolean;
+    settings: AcolyteFightSettings;
 }
 
 export interface PathElements {
@@ -114,6 +116,7 @@ export interface JoinPartyAction {
 export interface UpdatePartyAction {
     type: "updateParty";
     partyId: string;
+    roomId: string;
     members: w.PartyMemberState[];
 }
 
