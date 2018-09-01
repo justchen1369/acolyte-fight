@@ -591,7 +591,8 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
 	let action = nextAction;
-	if (!action && hero.moveTo) {
+	if ((!action || cooldownRemaining(world, hero, action.type) > 0) && hero.moveTo) {
+		// Keep moving after a spell is complete, or if trying to cast a spell on cooldown
 		action = { type: "move", target: hero.moveTo };
 	}
 	if (hero.casting && hero.casting.uninterruptible) {
@@ -1372,7 +1373,8 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 
 	const done = vector.distance(current, target) < constants.Pixel;
 	hero.moveTo = done ? null : action.target;
-	return done;
+
+	return true;
 }
 
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ProjectileSpell) {
