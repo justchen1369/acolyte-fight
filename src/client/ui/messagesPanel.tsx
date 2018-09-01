@@ -145,6 +145,7 @@ class MessagesPanel extends React.Component<Props, State> {
                     <div className="help-box">
                         <div className="help-title">How to play:</div>
                         <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> Right-click to dash</div>
                         <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
                         {closeLink}
                     </div>
