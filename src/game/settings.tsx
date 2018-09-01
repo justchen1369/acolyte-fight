@@ -651,11 +651,11 @@ const teleport: Spell = {
     name: 'Blink',
     description: "Teleport to a nearby location. Get close, or get away.",
 
-    maxRange: 0.4,
+    maxRange: 0.3,
     maxAngleDiffInRevs: 0.01,
-    cooldown: 0.5 * TicksPerSecond,
-    recoveryTicks: 15 * TicksPerSecond,
-    chargeTicks: 12,
+    cooldown: 1.0 * TicksPerSecond,
+    recoveryTicks: 12 * TicksPerSecond,
+    chargeTicks: 9,
     interruptible: false,
 
     icon: "teleport",
@@ -670,7 +670,7 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 0.5 * TicksPerSecond,
+    cooldown: 1.0 * TicksPerSecond,
     recoveryTicks: 12 * TicksPerSecond,
 
     damage: 1,
