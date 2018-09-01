@@ -56,7 +56,7 @@ const Choices: ChoiceSettings = {
 		"q": ["fireball", "flamestrike"],
 		"w": ["link", "lightning"],
 		"e": ["homing", "boomerang", "gravity"],
-		"r": ["meteor", "kamehameha", "supernova"],
+		"r": ["kamehameha", "meteor", "supernova"],
 		"f": ["firespray", "bouncer", "scourge"],
 	},
 	Defaults: {
@@ -65,7 +65,7 @@ const Choices: ChoiceSettings = {
 		"q": "fireball",
 		"w": "link",
 		"e": "homing",
-		"r": "meteor",
+		"r": "kamehameha",
 		"f": "firespray",
 	},
 }
