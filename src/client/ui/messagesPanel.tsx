@@ -133,17 +133,17 @@ class MessagesPanel extends React.Component<Props, State> {
                 ? (
                     <div className="help-box">
                         <div className="help-title">How to play:</div>
-                        <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> Move/aim by dragging</div>
-                        <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> Double-tap to dash</div>
+                        <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Touch</b> to move/aim</div>
+                        <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Double-tap</b> to dash</div>
                         {closeLink}
                     </div>
                 )
                 : (
                     <div className="help-box">
                         <div className="help-title">How to play:</div>
-                        <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> Move/aim with mouse</div>
-                        <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> Right-click to dash</div>
-                        <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> Cast spells with the keyboard</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Mouse</b> to move/aim</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> <b>Right-click</b> to dash</div>
+                        <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> <b>Keyboard</b> to cast spells</div>
                         {closeLink}
                     </div>
                 );
