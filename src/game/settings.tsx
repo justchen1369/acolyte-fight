@@ -324,6 +324,7 @@ const kamehameha: Spell = {
         damage: 5,
         damageScaling: false,
         trailTicks: 1.0 * TicksPerSecond,
+        categories: Categories.Projectile | Categories.Massive,
         expireOn: Categories.All,
 
         render: "ray",
