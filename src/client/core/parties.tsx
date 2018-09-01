@@ -34,10 +34,10 @@ export function createPartyAsync(): Promise<void> {
 				resolve(response.partyId);
 			}
 		});
-	}).then(partyId => joinPartyAsync(partyId));
+	}).then(partyId => joinPartyAsync(partyId, true));
 }
 
-export function joinPartyAsync(partyId: string): Promise<void> {
+export function joinPartyAsync(partyId: string, isLeader: boolean = false): Promise<void> {
 	const store = StoreProvider.getState();
 	if (partyId) {
 		let response: m.PartyResponse;
@@ -69,6 +69,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 					server: response.server,
 					roomId: response.roomId,
 					members: response.members,
+					isLeader,
 					isPrivate: response.isPrivate,
 					ready: false,
 					observing: false,

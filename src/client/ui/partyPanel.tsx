@@ -52,7 +52,7 @@ export class PartyPanel extends React.Component<Props, State> {
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
-            {party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty()}
+            {party.isLeader && (party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty())}
             <h2>Observer Mode {party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
             <p>Observer mode lets you join the party games as an observer.</p>
             {party.observing

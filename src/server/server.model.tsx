@@ -59,6 +59,7 @@ export interface Room {
 export interface Party {
     id: string;
     roomId: string;
+    leaderSocketId: string;
     created: moment.Moment;
     modified: moment.Moment;
     active: Map<string, PartyMember>; // socketId -> party member

@@ -151,7 +151,7 @@ function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cre
 }
 
 function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreatePartyRequest, callback: (output: m.CreatePartyResponseMsg) => void) {
-	const party = games.initParty(data.roomId);
+	const party = games.initParty(socket.id, data.roomId);
 	logger.info(`Party ${party.id} created by user ${authToken}`);
 
 	const result: m.CreatePartyResponse = {
@@ -172,7 +172,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	const store = getStore();
 
 	const party = store.parties.get(data.partyId);
-	if (!(party && party.active.has(socket.id))) {
+	if (!(party && party.active.has(socket.id) && party.leaderSocketId === socket.id)) {
 		logger.info(`Party ${data.partyId} not found or inaccessible for user ${socket.id} [${authToken}]`);
 		callback({ success: false, error: `Party ${data.partyId} not found or inaccessible` });
 		return;

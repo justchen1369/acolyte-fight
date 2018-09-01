@@ -161,12 +161,13 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initParty(roomId: string = null): g.Party {
+export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
 	const partyIndex = getStore().nextPartyId++;
 	const party: g.Party = {
 		id: "p" + partyIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		created: moment(),
 		modified: moment(),
+		leaderSocketId,
 		roomId,
 		active: new Map<string, g.PartyMember>(),
 		isPrivate: false,

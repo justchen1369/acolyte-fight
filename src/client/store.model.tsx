@@ -27,6 +27,7 @@ export interface PartyState {
     server: string;
     roomId: string;
     isPrivate: boolean;
+    isLeader: boolean;
     members: w.PartyMemberState[];
     ready: boolean;
     observing: boolean;
