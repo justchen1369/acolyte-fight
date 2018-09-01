@@ -648,7 +648,12 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		}
 
 		hero.casting.uninterruptible = false;
+		hero.casting.initialPosition = vector.clone(hero.body.getPosition()); // Store this to compare against for knockback cancel
 		++hero.casting.stage;
+	}
+
+	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
+		hero.casting.stage = w.CastStage.Complete;
 	}
 
 	if (hero.casting.stage === w.CastStage.Charging) {
@@ -680,24 +685,14 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 			hero.casting.channellingStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
 			hero.casting.movementProportion = spell.movementProportionWhileChannelling;
-			hero.casting.initialPosition = vector.clone(hero.body.getPosition());
-			hero.casting.initialAngle = hero.body.getAngle();
+			hero.casting.initialPosition = hero.casting.initialPosition || vector.clone(hero.body.getPosition());
 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
 		}
 
-		let cancelled = false;
-		if (!cancelled && spell.knockbackCancel) {
-			cancelled = vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel;
-		}
-		if (!cancelled) {
-			done = applyAction(world, hero, action, spell);
-		} else {
-			done = true;
-		}
-
+		const done = applyAction(world, hero, action, spell);
 		if (done) {
 			hero.casting.uninterruptible = false;
 			hero.casting.movementProportion = 0.0;

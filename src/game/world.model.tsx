@@ -299,7 +299,6 @@ export interface CastState {
 	chargeStartTick?: number;
 	channellingStartTick?: number;
 	initialPosition?: pl.Vec2;
-	initialAngle?: number;
 
 	proportion?: number;
 	color?: string;
