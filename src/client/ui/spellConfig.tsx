@@ -49,6 +49,7 @@ class SpellConfig extends React.Component<Props, State> {
         const chosen = Spells[chosenId];
 
         const name = chosen.name || chosen.id;
+        const isRightClick = key.length > 1;
         return <div className="key">
             <div className="key-options">
                 {options.map(spellId => Spells[spellId]).map(spell =>
@@ -63,10 +64,10 @@ class SpellConfig extends React.Component<Props, State> {
             <div className="key-detail">
                 <div className="spell-name">{name}</div>
                 <div className="description">{chosen.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${key.length > 1 ? "right-click" : key.toUpperCase()} `}spell will be {this.capitalize(name)} in your next game.</div>}
+                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {this.capitalize(name)} in your next game.</div>}
             </div>
             {!isMobile && <div className="key-name-container">
-                <div className="key-name">{key && key.length > 1 ? <i className="fa fa-mouse-pointer" /> : key}</div>
+                <div className="key-name">{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : key}</div>
             </div>}
         </div>;
     }
