@@ -54,7 +54,7 @@ export class PartyPanel extends React.Component<Props, State> {
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
             {party.isLeader && (party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty())}
             <h2>Observer Mode {party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
-            <p>Observer mode lets you join the party games as an observer.</p>
+            <p>If you activate observer mode, you will just watch the party games rather than play them.</p>
             {party.observing
                 ? <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: false })}>Deactivate Observer Mode</span></p>
                 : <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: true })}>Activate Observer Mode</span></p>}
