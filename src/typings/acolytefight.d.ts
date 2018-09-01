@@ -261,18 +261,19 @@ declare interface ShieldSpell extends SpellBase {
     radius: number;
 }
 
-declare interface TeleportSpell extends SpellBase {
-    action: "teleport";
-
+declare interface DashSpell extends SpellBase {
 	recoveryTicks: number;
 }
 
-declare interface ThrustSpell extends SpellBase {
+declare interface TeleportSpell extends DashSpell {
+    action: "teleport";
+}
+
+declare interface ThrustSpell extends DashSpell {
     action: "thrust";
 
 	damage: number;
 	damageScaling?: boolean;
-	recoveryTicks: number;
     speed: number;
 }
 

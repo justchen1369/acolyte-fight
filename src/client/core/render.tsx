@@ -4,7 +4,7 @@ import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { ButtonBar, ChargingIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
+import { ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
 import { Icons } from './icons';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
@@ -431,6 +431,34 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
+
+	// Dash range
+	if (hero.id === world.ui.myHeroId && hero.recoveryTicks > 0 && hero.maxRecoveryTicks > 0 && world.ui.nextTarget) {
+		const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks) * Hero.MaxDashRange;
+		const proportion = 1 - range / DashIndicator.MaxRenderRange;
+
+		const dashDirection = vector.diff(world.ui.nextTarget, pos);
+		const dashAngle = vector.angle(dashDirection);
+
+		if (proportion > 0) {
+			ctx.save();
+
+			const radialStop = vector.relengthen(dashDirection, range);
+
+			const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);
+			gradient.addColorStop(0, "#888");
+			gradient.addColorStop(1, "transparent");
+
+			ctx.globalAlpha = proportion;
+			ctx.strokeStyle = gradient;
+			ctx.lineWidth = DashIndicator.Width;
+			ctx.beginPath();
+			ctx.arc(0, 0, range, dashAngle - DashIndicator.ArcWidth, dashAngle + DashIndicator.ArcWidth);
+			ctx.stroke();
+
+			ctx.restore();
+		}
+	}
 
 	// Fill
 	{

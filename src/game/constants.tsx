@@ -45,6 +45,11 @@ export namespace ChargingIndicator {
 	export const Margin = Pixel * 5;
 	export const Width = Pixel * 2;
 }
+export namespace DashIndicator {
+	export const Width = Pixel * 2;
+	export const ArcWidth = Math.PI / 4;
+	export const MaxRenderRange = 0.1;
+}
 export namespace ButtonBar {
 	export const Spacing = 8;
 	export const Margin = 5;

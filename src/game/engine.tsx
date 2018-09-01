@@ -217,6 +217,7 @@ function addHero(world: w.World, heroId: string) {
 		casting: null,
 		cooldowns: {},
 		recoveryTicks: 0,
+		maxRecoveryTicks: null,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -1460,6 +1461,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 
 	hero.body.setPosition(newPosition);
 	hero.recoveryTicks += usedTicks;
+	hero.maxRecoveryTicks = spell.recoveryTicks;
 	hero.moveTo = action.target;
 
 	return true;
@@ -1469,7 +1471,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const maxTicks = world.settings.Hero.MaxDashRange / spell.speed;
+		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / spell.speed;
 		const tickLimit = Math.floor(dashRangeMultiplier(hero, spell.recoveryTicks) * maxTicks);
 
 		const diff = vector.diff(action.target, hero.body.getPosition());
@@ -1490,6 +1492,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		const usedTicks = Math.ceil(spell.recoveryTicks * ticks / maxTicks);
 		hero.recoveryTicks += usedTicks;
+		hero.maxRecoveryTicks = spell.recoveryTicks;
 
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
@@ -1502,7 +1505,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	return !hero.thrust;
 }
 
-function dashRangeMultiplier(hero: w.Hero, recoveryTicks: number) {
+export function dashRangeMultiplier(hero: w.Hero, recoveryTicks: number) {
 	const availableTicks = Math.max(0, recoveryTicks - hero.recoveryTicks);
 	return availableTicks / recoveryTicks;
 }
