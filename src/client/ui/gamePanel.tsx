@@ -12,9 +12,6 @@ import UrlListener from './urlListener';
 
 interface Props {
     party: s.PartyState;
-    isNewPlayer: boolean;
-    playerName: string;
-    items: s.NotificationItem[];
     connected: boolean;
     exitable: boolean;
 }
@@ -24,9 +21,6 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         party: state.party,
-        isNewPlayer: state.isNewPlayer,
-        playerName: state.playerName,
-        items: state.items,
         connected: !!state.socketId,
         exitable: matches.worldInterruptible(state.world),
     };
@@ -55,7 +49,10 @@ class GamePanel extends React.Component<Props, State> {
     }
 
     private onExitClicked(ev: React.MouseEvent) {
-        screenLifecycle.exitGame();
+        if (!(this.props.party && this.props.party.ready)) {
+            // If in party, might get called back in at any time, so stay in fullscreen mode
+            screenLifecycle.exitGame();
+        }
         matches.leaveCurrentGame();
     }
 }
