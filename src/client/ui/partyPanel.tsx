@@ -46,15 +46,16 @@ export class PartyPanel extends React.Component<Props, State> {
     }
 
     private renderCurrentParty() {
-        const currentPartyPath = parties.getPartyHomePath(this.props.current);
+        const party = this.props.party;
+        const currentPartyPath = url.getPath({ ...this.props.current, page: null, party: party.id, server: party.server });
         return <div>
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
-            {this.props.party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty()}
-            <h2>Observer Mode {this.props.party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
+            {party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty()}
+            <h2>Observer Mode {party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
             <p>Observer mode lets you join the party games as an observer.</p>
-            {this.props.party.observing
+            {party.observing
                 ? <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: false })}>Deactivate Observer Mode</span></p>
                 : <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: true })}>Activate Observer Mode</span></p>}
         </div>

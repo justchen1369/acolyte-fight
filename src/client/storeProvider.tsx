@@ -84,11 +84,6 @@ function reducer(state: s.State, action: s.Action): s.State {
             return {
                 ...state,
                 party: action.party,
-                current: {
-                    ...state.current,
-                    party: action.party.id,
-                    server: action.server,
-                },
             };
         } else {
             return state;

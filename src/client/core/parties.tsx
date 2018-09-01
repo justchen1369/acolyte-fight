@@ -21,10 +21,6 @@ export interface UpdatePartyConfig {
 
 sockets.listeners.onPartyMsg = onPartyMsg;
 
-export function getPartyHomePath(current: s.PathElements) {
-    return url.getPath({ ...current, page: null });
-} 
-
 export function createPartyAsync(): Promise<void> {
 	const store = StoreProvider.getState();
 	return new Promise<string>((resolve, reject) => {
@@ -70,13 +66,13 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				type: "joinParty",
 				party: {
 					id: response.partyId,
+					server: response.server,
 					roomId: response.roomId,
 					members: response.members,
 					isPrivate: response.isPrivate,
 					ready: false,
 					observing: false,
 				},
-				server: response.server,
 			});
 			return joinCurrentPartyRoomAsync();
 		});

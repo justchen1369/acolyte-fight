@@ -28,7 +28,9 @@ rerender();
 
 function initialize() {
     const current = url.parseLocation(window.location);
-    StoreProvider.dispatch({ type: "updateUrl", current });
+
+    // Remove the party ID from the URL so that people can't stream snipe their way into the party
+    StoreProvider.dispatch({ type: "updateUrl", current: { ...current, party: null, server: null } });
 
     sockets.attachToSocket(socket, () => {
         sockets.connectToServer(current.server)

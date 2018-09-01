@@ -24,6 +24,7 @@ export interface NotificationItem {
 
 export interface PartyState {
     id: string;
+    server: string;
     roomId: string;
     isPrivate: boolean;
     members: w.PartyMemberState[];
@@ -112,7 +113,6 @@ export interface UpdateRoomAction {
 export interface JoinPartyAction {
     type: "joinParty";
     party: PartyState;
-    server: string;
 }
 
 export interface UpdatePartyAction {
