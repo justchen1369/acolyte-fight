@@ -557,16 +557,22 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 }
 
 function handleActions(world: w.World) {
-	let newActions = new Map();
 	world.objects.forEach(hero => {
 		if (hero.category !== "hero") { return; }
 		let action = world.actions.get(hero.id);
-		let completed = performHeroActions(world, hero, action);
-		if (action && !completed) {
-			newActions.set(hero.id, action);
+		if (action && action.type === w.Actions.Move) {
+			// Movement actions are special
+			hero.moveTo = action.target;
+			action = null;
+		}
+
+		performHeroActions(world, hero, action);
+
+		if (!hero.casting || hero.casting.movementProportion > 0) {
+			moveTowards(world, hero, hero.moveTo, (hero.casting && hero.casting.movementProportion) || 1.0);
 		}
 	});
-	world.actions = newActions;
+	world.actions = new Map<string, w.Action>();
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
@@ -591,11 +597,7 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
 	let action = nextAction;
-	if ((!action || cooldownRemaining(world, hero, action.type) > 0) && hero.moveTo) {
-		// Keep moving after a spell is complete, or if trying to cast a spell on cooldown
-		action = { type: "move", target: hero.moveTo };
-	}
-	if (hero.casting && hero.casting.uninterruptible) {
+	if (hero.casting && (hero.casting.uninterruptible || !nextAction)) {
 		action = hero.casting.action;
 	}
 	if (!action || !isValidAction(action, hero)) {
@@ -609,18 +611,21 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown };
 	}
 
-	const angleDiff = spell.untargeted ? 0 : turnTowards(hero, action.target);
-
 	if (hero.casting.stage === w.CastStage.Cooldown) {
+		hero.casting.movementProportion = 1.0;
+
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
 			return false; // Cannot perform action, waiting for cooldown
 		}
+
+		hero.casting.movementProportion = 0.0;
 		++hero.casting.stage;
 	}
 
 	if (hero.casting.stage === w.CastStage.Orientating) {
 		hero.casting.uninterruptible = uninterruptible;
 
+		const angleDiff = spell.untargeted ? 0 : turnTowards(hero, action.target);
 		if (spell.maxAngleDiffInRevs !== undefined && angleDiff > spell.maxAngleDiffInRevs * 2 * Math.PI) {
 			return false; // Wait until are facing the target
 		}
@@ -634,6 +639,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		if (!hero.casting.chargeStartTick) {
 			hero.casting.chargeStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
+			hero.casting.movementProportion = spell.movementProportionWhileCharging;
 		}
 		
 		// Waiting for charging to complete
@@ -646,6 +652,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		// Exiting charging stage
 		hero.casting.proportion = null;
 		hero.casting.uninterruptible = false;
+		hero.casting.movementProportion = 0.0;
 		++hero.casting.stage;
 	}
 
@@ -655,6 +662,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		if (!hero.casting.channellingStartTick) {
 			hero.casting.channellingStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
+			hero.casting.movementProportion = spell.movementProportionWhileChannelling;
 			hero.casting.initialPosition = vector.clone(hero.body.getPosition());
 			hero.casting.initialAngle = hero.body.getAngle();
 
@@ -677,6 +685,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 		if (done) {
 			hero.casting.uninterruptible = false;
+			hero.casting.movementProportion = 0.0;
 			++hero.casting.stage;
 		}
 	}
@@ -700,16 +709,12 @@ function turnTowards(hero: w.Hero, target: pl.Vec2) {
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
-	if (action.type === "move") {
-		return true;
-	} else {
-		return hero.spellsToKeys.has(action.type);
-	}
+	return hero.spellsToKeys.has(action.type);
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
-		case "move": return moveAction(world, hero, action, spell);
+		case "move": return true; // Handled separately
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
@@ -1348,13 +1353,14 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.ui.destroyed.push(object);
 }
 
-function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
-	if (!action.target) { return true; }
+function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {
+	if (!target) { return; }
 
-	let current = hero.body.getPosition();
-	let target = action.target;
+	turnTowards(hero, target);
 
-	const idealStep = vector.truncate(vector.diff(target, current), hero.moveSpeedPerSecond / TicksPerSecond);
+	const current = hero.body.getPosition();
+
+	const idealStep = vector.truncate(vector.diff(target, current), movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
 	const facing = vector.fromAngle(hero.body.getAngle());
 	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
 
@@ -1372,9 +1378,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 	});
 
 	const done = vector.distance(current, target) < constants.Pixel;
-	hero.moveTo = done ? null : action.target;
-
-	return true;
+	hero.moveTo = done ? null : target;
 }
 
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ProjectileSpell) {

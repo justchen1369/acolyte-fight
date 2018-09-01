@@ -592,11 +592,12 @@ const supernova: Spell = {
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
-    description: "Takes time to charge, but will send enemies flying, if they're caught in the blast. Be careful though, each blast takes 10% off your health!",
+    description: "Release a powerful close-range explosion to knockback your enemies.",
     untargeted: true,
 
     radius: Hero.Radius * 4,
     chargeTicks: 0.5 * TicksPerSecond,
+    movementProportionWhileCharging: 0.5,
     cooldown: 10 * TicksPerSecond,
     interruptible: true,
     damage: 20,

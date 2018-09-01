@@ -294,6 +294,7 @@ export interface CastState {
 	action: Action;
 	stage: number;
 	uninterruptible?: boolean;
+	movementProportion?: number;
 
 	chargeStartTick?: number;
 	channellingStartTick?: number;

@@ -122,7 +122,9 @@ declare interface SpellBase {
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
-    chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
+	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
+	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
+	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
     cooldown: number;
     interruptible?: boolean; // Whether this spell can be interrupted by moving.
     knockbackCancel?: boolean; // If this spell is being channelled, whether knockback cancels it.

@@ -785,8 +785,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
-		const heroAction = world.actions.get(myHero.id);
-		renderButtons(ctx, rect, world, myHero, heroAction);
+		renderButtons(ctx, rect, world, myHero);
 	} else {
 		ctx.clearRect(0, 0, rect.width, rect.height);
 	}
@@ -845,8 +844,8 @@ export function touchControls(config: w.ButtonConfig): boolean {
 	}
 }
 
-function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, heroAction?: w.Action) {
-	let selectedAction = heroAction && heroAction.type;
+function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero) {
+	let selectedAction = hero.casting && hero.casting.action && hero.casting.action.type;
 	const keys = world.settings.Choices.Keys;
 
 	if (!world.ui.buttonBar) {
