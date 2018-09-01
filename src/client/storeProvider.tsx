@@ -8,7 +8,7 @@ import * as settings from '../game/settings';
 const store = Redux.createStore(reducer, initialState());
 
 function initialState(): s.State {
-    const isNewPlayer = !storage.loadName();
+    const isNewPlayer = true; // !storage.loadName();
 
     const room: s.RoomState = {
         id: null,
