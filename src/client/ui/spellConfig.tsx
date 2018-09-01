@@ -33,17 +33,11 @@ class SpellConfig extends React.Component<Props, State> {
 
     render() {
         return <div className="spell-config">
-            {this.props.settings.Choices.Keys.map(key => this.renderKey(key))}
+            {Object.keys(this.props.settings.Choices.Options).map(key => this.renderKey(key))}
         </div>;
     }
 
-    private renderKey(keyConfig: KeyConfig) {
-        if (!keyConfig) {
-            return null;
-        }
-
-        const key = keyConfig.btn;
-
+    private renderKey(key: string) {
         const Choices = this.props.settings.Choices;
         const Spells = this.props.settings.Spells;
 
@@ -69,10 +63,10 @@ class SpellConfig extends React.Component<Props, State> {
             <div className="key-detail">
                 <div className="spell-name">{name}</div>
                 <div className="description">{chosen.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${key.toUpperCase()} `}spell will be {this.capitalize(name)} in your next game.</div>}
+                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${key.length > 1 ? "right-click" : key.toUpperCase()} `}spell will be {this.capitalize(name)} in your next game.</div>}
             </div>
             {!isMobile && <div className="key-name-container">
-                <div className="key-name">{key}</div>
+                <div className="key-name">{key && key.length > 1 ? <i className="fa fa-mouse-pointer" /> : key}</div>
             </div>}
         </div>;
     }

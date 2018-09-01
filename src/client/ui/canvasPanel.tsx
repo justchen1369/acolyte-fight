@@ -9,8 +9,11 @@ import { TicksPerSecond } from '../../game/constants';
 import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../core/render';
 import { sendAction } from '../core/sockets';
 import { frame } from '../core/ticker';
+import { isMobile } from '../core/userAgent';
 
 const MouseId = "mouse";
+const DoubleTapMilliseconds = 250;
+const DoubleTapPixels = 10;
 
 interface Props {
     world: w.World;
@@ -24,6 +27,8 @@ interface PointInfo {
     touchId: string;
     interfacePoint: pl.Vec2;
     worldPoint: pl.Vec2;
+    time: number;
+    secondaryBtn?: boolean;
 }
 
 interface TargetSurfaceState {
@@ -71,6 +76,7 @@ function stateToProps(state: s.State): Props {
 
 class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: string = null;
+    private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
 
@@ -147,7 +153,8 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private takeMousePoint(e: React.MouseEvent<HTMLCanvasElement>): PointInfo {
-        return this.pointInfo(MouseId, e.target as HTMLCanvasElement, e.clientX, e.clientY);
+        const secondaryBtn = !!e.button;
+        return this.pointInfo(MouseId, e.target as HTMLCanvasElement, e.clientX, e.clientY, secondaryBtn);
     }
 
     private takeTouchPoint(e: React.TouchEvent<HTMLCanvasElement>): PointInfo[] {
@@ -159,7 +166,7 @@ class CanvasPanel extends React.Component<Props, State> {
         return points;
     }
 
-    private pointInfo(touchId: string, elem: HTMLCanvasElement, clientX: number, clientY: number) {
+    private pointInfo(touchId: string, elem: HTMLCanvasElement, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
         const rect = elem.getBoundingClientRect();
         const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
         const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect);
@@ -168,6 +175,8 @@ class CanvasPanel extends React.Component<Props, State> {
             touchId,
             interfacePoint,
             worldPoint,
+            time: Date.now(),
+            secondaryBtn,
         };
     }
 
@@ -199,9 +208,22 @@ class CanvasPanel extends React.Component<Props, State> {
                     } else {
                         world.ui.nextTarget = p.worldPoint;
                     }
+
+                    const doubleClick = 
+                        this.previousTouchStart
+                        && (p.time - this.previousTouchStart.time) < DoubleTapMilliseconds
+                        && vector.distance(p.interfacePoint, this.previousTouchStart.interfacePoint) <= DoubleTapPixels
+                    if (isMobile && doubleClick || p.secondaryBtn) {
+                        const dashSpell = this.keyToSpellId(w.Actions.Dash);
+                        if (dashSpell) {
+                            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: dashSpell, target: world.ui.nextTarget });
+                        }
+                    }
+                    this.previousTouchStart = p;
                 }
             }
         });
+
         this.processCurrentTouch();
     }
 

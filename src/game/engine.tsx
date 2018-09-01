@@ -216,6 +216,7 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
+		recoveryTicks: 0,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -366,6 +367,7 @@ export function tick(world: w.World) {
 	}
 
 	applySpeedLimit(world);
+	decayRecovery(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -1110,6 +1112,14 @@ function updateMaskBits(fixture: pl.Fixture, newMaskBits: number) {
 	}
 }
 
+function decayRecovery(world: w.World) {
+	world.objects.forEach(hero => {
+		if (hero.category === "hero" && hero.recoveryTicks > 0) {
+			--hero.recoveryTicks;
+		}
+	});
+}
+
 function decayThrust(world: w.World) {
 	world.objects.forEach(hero => {
 		if (hero.category === "hero" && hero.thrust) {
@@ -1395,10 +1405,14 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
 	if (!action.target) { return true; }
 
-	let currentPosition = hero.body.getPosition();
-	let newPosition = vector.towards(currentPosition, action.target, spell.maxRange);
-	hero.body.setPosition(newPosition);
+	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks) * spell.maxRange;
 
+	const currentPosition = hero.body.getPosition();
+	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
+	const usedTicks = Math.ceil(spell.recoveryTicks * vector.distance(newPosition, currentPosition) / spell.maxRange);
+
+	hero.body.setPosition(newPosition);
+	hero.recoveryTicks += usedTicks;
 	hero.moveTo = action.target;
 
 	return true;
@@ -1408,19 +1422,26 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
+		const tickLimit = Math.floor(dashRangeMultiplier(hero, spell.recoveryTicks) * spell.maxTicks);
+
 		const diff = vector.diff(action.target, hero.body.getPosition());
 		const distancePerTick = spell.speed / TicksPerSecond;
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
 		const velocity = vector.multiply(vector.unit(diff), spell.speed);
 
+		const ticks = Math.min(tickLimit, ticksToTarget);
+
 		let thrust: w.ThrustState = {
 			damage: spell.damage,
 			velocity,
-			ticks: Math.min(spell.maxTicks, ticksToTarget),
+			ticks,
 			nullified: false,
 			alreadyHit: new Set<string>(),
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
+
+		const usedTicks = Math.ceil(spell.recoveryTicks * ticks / spell.maxTicks);
+		hero.recoveryTicks += usedTicks;
 
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
@@ -1431,6 +1452,11 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	}
 
 	return !hero.thrust;
+}
+
+function dashRangeMultiplier(hero: w.Hero, recoveryTicks: number) {
+	const availableTicks = Math.max(0, recoveryTicks - hero.recoveryTicks);
+	return availableTicks / recoveryTicks;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {

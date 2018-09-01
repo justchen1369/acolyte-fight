@@ -1,7 +1,6 @@
 import _ from 'lodash';
-
 import { TicksPerSecond, Categories } from './constants';
-import { HomingTargets } from './world.model';
+import { Actions, HomingTargets } from './world.model';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
@@ -43,35 +42,31 @@ const Obstacle: ObstacleSettings = {
 const Choices: ChoiceSettings = {
 	Keys: [
         { btn: "a", primary: false },
-        { btn: "s", primary: false },
 		null,
         { btn: "q", primary: true },
         { btn: "w", primary: true },
         { btn: "e", primary: true },
         { btn: "r", primary: true },
 		null,
-        { btn: "d", primary: false },
         { btn: "f", primary: false },
     ],
 	Options: {
-		"a": ["teleport", "thrust"],
-		"s": ["shield", "icewall", "drain"],
+		[Actions.Dash]: ["thrust", "teleport"],
+		"a": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["lightning", "link"],
 		"e": ["homing", "boomerang", "gravity"],
 		"r": ["meteor", "kamehameha", "supernova"],
-		"d": ["firespray", "bouncer"],
-		"f": ["scourge"],
+		"f": ["firespray", "bouncer", "scourge"],
 	},
 	Defaults: {
-		"a": "teleport",
-		"s": "shield",
+		[Actions.Dash]: "thrust",
+		"a": "shield",
 		"q": "fireball",
 		"w": "lightning",
 		"e": "homing",
 		"r": "meteor",
-		"d": "firespray",
-		"f": "scourge",
+		"f": "firespray",
 	},
 }
 
@@ -658,8 +653,9 @@ const teleport: Spell = {
 
     maxRange: 0.4,
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
-    chargeTicks: 6,
+    cooldown: 0.5 * TicksPerSecond,
+    recoveryTicks: 15 * TicksPerSecond,
+    chargeTicks: 12,
     interruptible: false,
 
     icon: "teleport",
@@ -674,7 +670,8 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 0.5 * TicksPerSecond,
+    recoveryTicks: 12 * TicksPerSecond,
 
     damage: 1,
     maxTicks: 0.4 * TicksPerSecond,

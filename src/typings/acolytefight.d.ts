@@ -254,7 +254,8 @@ declare interface ShieldSpell extends SpellBase {
 declare interface TeleportSpell extends SpellBase {
     action: "teleport";
 
-    maxRange: number;
+	maxRange: number;
+	recoveryTicks: number;
 }
 
 declare interface ThrustSpell extends SpellBase {
@@ -263,6 +264,7 @@ declare interface ThrustSpell extends SpellBase {
 	damage: number;
 	damageScaling?: boolean;
     maxTicks: number;
+	recoveryTicks: number;
     speed: number;
 }
 

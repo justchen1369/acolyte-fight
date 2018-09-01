@@ -1,6 +1,11 @@
 import * as pl from 'planck-js';
 import * as Immutable from 'immutable';
 
+export namespace Actions {
+	export const Dash = "dash";
+	export const Move = "move";
+}
+
 export namespace CastStage {
 	export const Cooldown = 1;
 	export const Orientating = 2;
@@ -260,6 +265,7 @@ export interface Hero extends WorldObjectBase {
 	moveTo?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
+	recoveryTicks: number;
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
