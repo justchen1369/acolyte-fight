@@ -433,31 +433,9 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	ctx.translate(pos.x, pos.y);
 
 	// Dash range
-	if (hero.id === world.ui.myHeroId && hero.recoveryTicks > 0 && hero.maxRecoveryTicks > 0 && world.ui.nextTarget) {
-		const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks) * Hero.MaxDashRange;
-		const proportion = 1 - range / DashIndicator.MaxRenderRange;
-
+	if (hero.id === world.ui.myHeroId && world.ui.nextTarget && hero.maxRecoveryTicks > 0) {
 		const dashDirection = vector.diff(world.ui.nextTarget, pos);
-		const dashAngle = vector.angle(dashDirection);
-
-		if (proportion > 0) {
-			ctx.save();
-
-			const radialStop = vector.relengthen(dashDirection, range);
-
-			const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);
-			gradient.addColorStop(0, "#888");
-			gradient.addColorStop(1, "transparent");
-
-			ctx.globalAlpha = proportion;
-			ctx.strokeStyle = gradient;
-			ctx.lineWidth = DashIndicator.Width;
-			ctx.beginPath();
-			ctx.arc(0, 0, range, dashAngle - DashIndicator.ArcWidth, dashAngle + DashIndicator.ArcWidth);
-			ctx.stroke();
-
-			ctx.restore();
-		}
+		renderDashRange(ctx, hero, world, dashDirection, DashIndicator.MaxRenderRange, DashIndicator.ArcWidth);
 	}
 
 	// Fill
@@ -549,6 +527,34 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	}
 
 	ctx.restore();
+}
+
+function renderDashRange(ctx: CanvasRenderingContext2D, hero: w.Hero, world: w.World, dashDirection: pl.Vec2, maxRenderRange: number, arcWidth: number) {
+	const Hero = world.settings.Hero;
+
+	const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks) * Hero.MaxDashRange;
+	const proportion = 1 - range / maxRenderRange;
+
+	const dashAngle = vector.angle(dashDirection);
+
+	if (proportion > 0) {
+		ctx.save();
+
+		const radialStop = vector.relengthen(dashDirection, range);
+
+		const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);
+		gradient.addColorStop(0, "#888");
+		gradient.addColorStop(1, "transparent");
+
+		ctx.globalAlpha = proportion;
+		ctx.strokeStyle = gradient;
+		ctx.lineWidth = DashIndicator.Width;
+		ctx.beginPath();
+		ctx.arc(0, 0, range, dashAngle - arcWidth, dashAngle + arcWidth);
+		ctx.stroke();
+
+		ctx.restore();
+	}
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {

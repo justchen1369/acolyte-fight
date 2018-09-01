@@ -611,6 +611,8 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 	}
 	hero.keysToSpells = keysToSpells;
 	hero.spellsToKeys = spellsToKeys;
+
+	hero.maxRecoveryTicks = calculateRecoveryTicks(world, hero);
 }
 
 function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
@@ -1447,6 +1449,20 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
 	}
 	return currentLength >= spell.lengthTicks;
+}
+
+function calculateRecoveryTicks(world: w.World, hero: w.Hero): number {
+	const spellId = hero.keysToSpells.get(w.Actions.Dash);
+	if (!spellId) {
+		return null;
+	}
+
+	const spell = world.settings.Spells[spellId] as DashSpell;
+	if (!spell) {
+		return null;
+	}
+
+	return spell.recoveryTicks;
 }
 
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
