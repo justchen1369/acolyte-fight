@@ -170,6 +170,15 @@ const move: Spell = {
     cooldown: 0,
     action: "move",
 };
+const stop: Spell = {
+    id: 'stop',
+    description: "",
+    color: 'white',
+    maxAngleDiffInRevs: 1.0,
+    interruptible: true,
+    cooldown: 0,
+    action: "stop",
+};
 const fireball: Spell = {
     id: 'fireball',
     description: "Quick cooldown and packs a punch. Good old trusty fireball.",
@@ -687,6 +696,7 @@ const thrust: Spell = {
 
 const Spells = {
     move,
+    stop,
     fireball,
     flamestrike,
     firespray,

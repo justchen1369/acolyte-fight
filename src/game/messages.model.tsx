@@ -80,10 +80,6 @@ export interface JoinResponse {
 }
 export type JoinResponseMsg = JoinResponse | ErrorResponseMsg;
 
-export interface StartGameMsg {
-    gameId: string;
-}
-
 export interface BotMsg {
     gameId: string;
 }

@@ -6,6 +6,7 @@ import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
 import * as sockets from './sockets';
 import * as url from '../url';
+import * as vector from '../../game/vector';
 import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
@@ -56,8 +57,7 @@ export function startCurrentGame() {
 	const world = store.world;
 
 	if (world.ui.myGameId && world.ui.myHeroId) {
-		const startMsg: m.StartGameMsg = { gameId: world.ui.myGameId };
-		socket.emit('start', startMsg);
+		sockets.sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Stop, target: vector.zero() });
 	}
 }
 

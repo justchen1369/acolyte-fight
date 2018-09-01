@@ -723,12 +723,17 @@ function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
-	return hero.spellsToKeys.has(action.type);
+	if (action.type === w.Actions.Move || action.type === w.Actions.Stop) {
+		return true;
+	} else {
+		return hero.spellsToKeys.has(action.type);
+	}
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
 		case "move": return true; // Handled separately
+		case "stop": return true; // Do nothing
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);

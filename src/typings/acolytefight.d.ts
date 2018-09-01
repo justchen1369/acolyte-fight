@@ -105,6 +105,7 @@ declare interface Spells {
 
 declare type Spell =
 	MoveSpell
+	| StopSpell
 	| ProjectileSpell
 	| SpraySpell
 	| ScourgeSpell
@@ -136,6 +137,10 @@ declare interface SpellBase {
 
 declare interface MoveSpell extends SpellBase {
     action: "move";
+}
+
+declare interface StopSpell extends SpellBase {
+    action: "stop";
 }
 
 declare interface ProjectileSpell extends SpellBase {

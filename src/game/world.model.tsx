@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 export namespace Actions {
 	export const Dash = "dash";
 	export const Move = "move";
+	export const Stop = "stop";
 }
 
 export namespace CastStage {
@@ -439,7 +440,7 @@ export interface LifeStealEvent extends WorldEventBase {
 
 export interface Action {
 	type: string;
-	target?: pl.Vec2;
+	target: pl.Vec2;
 }
 
 export type Trail = CircleTrail | LineTrail;
