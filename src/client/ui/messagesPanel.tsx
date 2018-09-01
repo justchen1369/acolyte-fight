@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
+import * as StoreProvider from '../storeProvider';
 import { ButtonBar } from '../../game/constants';
 import PlayButton from './playButton';
 import { isMobile } from '../core/userAgent';
@@ -21,10 +22,7 @@ interface Props {
 }
 interface State {
     spectatingGameId: string;
-    helped: boolean;
 }
-
-let helpedThisSession = false; // Store across games so the user only has to dismiss the help once
 
 function stateToProps(state: s.State): Props {
     return {
@@ -43,7 +41,6 @@ class MessagesPanel extends React.Component<Props, State> {
         super(props);
         this.state = {
             spectatingGameId: null,
-            helped: helpedThisSession,
         };
     }
 
@@ -125,7 +122,7 @@ class MessagesPanel extends React.Component<Props, State> {
             return null; // Observer doesn't need instructions
         }
 
-        if (!this.state.helped && this.props.isNewPlayer) {
+        if (this.props.isNewPlayer) {
             const closeLink =
                 <div className="action-row">
                     <span className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</span>
@@ -157,8 +154,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private onCloseHelpClicked(e: React.MouseEvent) {
-        helpedThisSession = true;
-        this.setState({ helped: true });
+        StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {

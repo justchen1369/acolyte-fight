@@ -120,6 +120,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         }
     } else if (action.type === "updateAiCode") {
         return { ...state, aiCode: action.aiCode };
+    } else if (action.type === "clearNewPlayerFlag") {
+        return { ...state, isNewPlayer: false };
     } else {
         console.log(action);
         return state;

@@ -62,6 +62,7 @@ export type Action =
     | UpdateObservingPartyAction
     | LeavePartyAction
     | UpdateAiCodeAction
+    | ClearNewPlayerFlagAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -138,4 +139,8 @@ export interface LeavePartyAction {
 export interface UpdateAiCodeAction {
     type: "updateAiCode";
     aiCode: string;
+}
+
+export interface ClearNewPlayerFlagAction {
+    type: "clearNewPlayerFlag";
 }
