@@ -690,9 +690,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 		let cancelled = false;
 		if (!cancelled && spell.knockbackCancel) {
-			cancelled = 
-				Math.abs(vector.angleDelta(hero.casting.initialAngle, hero.body.getAngle())) > spell.maxAngleDiffInRevs * 2 * Math.PI
-				|| vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel;
+			cancelled = vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel;
 		}
 		if (!cancelled) {
 			done = applyAction(world, hero, action, spell);
@@ -715,11 +713,15 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	return action === nextAction && done;
 }
 
-function turnTowards(hero: w.Hero, target: pl.Vec2) {
+function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
+	if (revsPerTick === undefined) {
+		revsPerTick = hero.revolutionsPerTick;
+	}
+
 	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
 	const currentAngle = hero.body.getAngle();
 
-	const newAngle = vector.turnTowards(currentAngle, targetAngle, hero.revolutionsPerTick * 2 * Math.PI);
+	const newAngle = vector.turnTowards(currentAngle, targetAngle, revsPerTick * 2 * Math.PI);
 	hero.body.setAngle(newAngle);
 
 	return Math.abs(vector.angleDelta(newAngle, targetAngle));
@@ -1421,14 +1423,25 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
 	if (currentLength % spell.intervalTicks === 0) {
-		const currentAngle = vector.angle(hero.body.getPosition());
+		if (spell.retargettingRevsPerTick > 0 && hero.moveTo) {
+			turnTowards(hero, hero.moveTo, spell.retargettingRevsPerTick);
+		}
+
+		const pos = hero.body.getPosition();
+
+		let target = action.target;
+		if (spell.retargettingRevsPerTick > 0) {
+			target = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
+		}
+
+		const currentAngle = vector.angle(pos);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
 		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
 		const newAngle = currentAngle + 2 * Math.PI * projectileIndex / numProjectiles;
 
-		const jitterRadius = vector.distance(hero.body.getPosition(), action.target) * spell.jitterRatio;
-		const newTarget = vector.plus(action.target, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
+		const jitterRadius = vector.distance(pos, target) * spell.jitterRatio;
+		const newTarget = vector.plus(target, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
 
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
 	}

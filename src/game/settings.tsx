@@ -293,16 +293,17 @@ const kamehameha: Spell = {
     color: '#44ddff',
     icon: "glowingHands",
 
-    maxAngleDiffInRevs: 0.01,
+    maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
     chargeTicks: 0.75 * TicksPerSecond,
     cooldown: 20 * TicksPerSecond,
+    retargettingRevsPerTick: 0.0003,
 
     knockbackCancel: true,
     interruptible: true,
     jitterRatio: 0.0,
 
     intervalTicks: 0.1 * TicksPerSecond,
-    lengthTicks: 3 * TicksPerSecond,
+    lengthTicks: 5 * TicksPerSecond,
 
     projectile: {
         color: '#ffffff',

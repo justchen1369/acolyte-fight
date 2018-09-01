@@ -152,7 +152,9 @@ declare interface SpraySpell extends SpellBase {
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 
-    jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
+	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
+
+	retargettingRevsPerTick?: number; // If set, this spell's firing angle can change at this rate each second.
 }
 
 declare interface WallSpell extends SpellBase {
