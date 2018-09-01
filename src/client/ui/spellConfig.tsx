@@ -5,6 +5,7 @@ import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
+import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
 interface Props {
@@ -48,7 +49,7 @@ class SpellConfig extends React.Component<Props, State> {
 		}
         const chosen = Spells[chosenId];
 
-        const name = chosen.name || chosen.id;
+        const name = spellUtils.spellName(chosen);
         const isRightClick = key.length > 1;
         return <div className="key">
             <div className="key-options">
@@ -57,14 +58,14 @@ class SpellConfig extends React.Component<Props, State> {
                         className={spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
                         icon={spell.icon}
                         color={spell.color}
-                        title={spell.name || this.capitalize(spell.id)}
+                        title={spellUtils.spellName(spell)}
                         onClick={() => this.onChoose(key, spell.id)}
                         size={48} />)}
             </div>
             <div className="key-detail">
                 <div className="spell-name">{name}</div>
                 <div className="description">{chosen.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {this.capitalize(name)} in your next game.</div>}
+                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
             </div>
             {!isMobile && <div className="key-name-container">
                 <div className="key-name">{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : key}</div>

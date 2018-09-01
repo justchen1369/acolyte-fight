@@ -403,6 +403,37 @@ a:hover, a:active {
     font-size: 150%;
 }
 
+#spell-info-panel {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+
+    min-width: 200px;
+    max-width: 25%;
+    pointer-events: none;
+
+    background: linear-gradient(to left, #111, rgba(0,0,0,0));
+    padding: 20px;
+    text-align: right;
+}
+
+#spell-info-panel .spell-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#spell-info-panel .spell-name {
+    font-size: 36px;
+    font-weight: bold;
+    margin-right: 16px;
+}
+
+#spell-info-panel .spell-description {
+    font-size: 16px;
+    color: #ccc;
+}
+
 .player-name {
     font-weight: bold;
 }

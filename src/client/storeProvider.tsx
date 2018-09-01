@@ -122,6 +122,9 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, aiCode: action.aiCode };
     } else if (action.type === "clearNewPlayerFlag") {
         return { ...state, isNewPlayer: false };
+    } else if (action.type === "updateHoverSpell") {
+        state.world.ui.hoverSpellId = action.hoverSpellId; // World always gets mutated
+        return { ...state } // Create new object to trigger redux
     } else {
         console.log(action);
         return state;

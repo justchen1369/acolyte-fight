@@ -63,6 +63,7 @@ export type Action =
     | LeavePartyAction
     | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
+    | UpdateHoverSpellAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -143,4 +144,9 @@ export interface UpdateAiCodeAction {
 
 export interface ClearNewPlayerFlagAction {
     type: "clearNewPlayerFlag";
+}
+
+export interface UpdateHoverSpellAction {
+    type: "updateHoverSpell";
+    hoverSpellId: string;
 }

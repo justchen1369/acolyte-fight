@@ -58,6 +58,7 @@ export interface UIState {
 	myHeroId: string | null;
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;
+	hoverSpellId?: string;
 	renderedTick: number | null;
 
 	destroyed: WorldObject[];

@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as StoreProvider from '../storeProvider';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
@@ -239,6 +240,13 @@ class CanvasPanel extends React.Component<Props, State> {
         }
     }
 
+    private handleButtonHover(key: string, world: w.World) {
+        const hoverSpellId = this.keyToSpellId(key);
+        if (world.ui.hoverSpellId !== hoverSpellId) {
+            StoreProvider.dispatch({ type: "updateHoverSpell", hoverSpellId });
+        }
+    }
+
     private touchMoveHandler(...points: PointInfo[]) {
         const world = this.props.world;
         points.forEach(p => {
@@ -256,6 +264,12 @@ class CanvasPanel extends React.Component<Props, State> {
                 } else {
                     world.ui.nextTarget = p.worldPoint;
                 }
+            }
+
+            // Hover
+            if (p.touchId === MouseId) {
+                const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
+                this.handleButtonHover(key, world);
             }
         });
         this.processCurrentTouch();
