@@ -45,7 +45,8 @@ declare interface HeroSettings {
     MaxHealth: number;
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
 
-    RevolutionsPerTick: number; // Hero turn rate
+	RevolutionsPerTick: number; // Hero turn rate
+	MaxDashRange: number; // The maximum range of teleport/thrust
 }
 
 declare interface WorldSettings {
@@ -263,7 +264,6 @@ declare interface ShieldSpell extends SpellBase {
 declare interface TeleportSpell extends SpellBase {
     action: "teleport";
 
-	maxRange: number;
 	recoveryTicks: number;
 }
 
@@ -272,7 +272,6 @@ declare interface ThrustSpell extends SpellBase {
 
 	damage: number;
 	damageScaling?: boolean;
-    maxTicks: number;
 	recoveryTicks: number;
     speed: number;
 }

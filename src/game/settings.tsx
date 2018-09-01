@@ -17,6 +17,7 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 0.05,
+    MaxDashRange: 0.4,
 }
 
 const World: WorldSettings = {
@@ -662,10 +663,9 @@ const teleport: Spell = {
     id: 'teleport',
     description: "Teleport to a nearby location. Get close, or get away.",
 
-    maxRange: 0.3,
     maxAngleDiffInRevs: 1.0,
     cooldown: 1.0 * TicksPerSecond,
-    recoveryTicks: 10 * TicksPerSecond,
+    recoveryTicks: 12 * TicksPerSecond,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
@@ -686,7 +686,6 @@ const thrust: Spell = {
     recoveryTicks: 12 * TicksPerSecond,
 
     damage: 1,
-    maxTicks: 0.3 * TicksPerSecond,
     speed: 1.0,
 
     icon: "fireDash",

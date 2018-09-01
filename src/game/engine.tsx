@@ -1451,11 +1451,12 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
 	if (!action.target) { return true; }
 
-	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks) * spell.maxRange;
+	const maxRange = world.settings.Hero.MaxDashRange;
+	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks) * maxRange;
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
-	const usedTicks = Math.ceil(spell.recoveryTicks * vector.distance(newPosition, currentPosition) / spell.maxRange);
+	const usedTicks = Math.ceil(spell.recoveryTicks * vector.distance(newPosition, currentPosition) / maxRange);
 
 	hero.body.setPosition(newPosition);
 	hero.recoveryTicks += usedTicks;
@@ -1468,7 +1469,8 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const tickLimit = Math.floor(dashRangeMultiplier(hero, spell.recoveryTicks) * spell.maxTicks);
+		const maxTicks = world.settings.Hero.MaxDashRange / spell.speed;
+		const tickLimit = Math.floor(dashRangeMultiplier(hero, spell.recoveryTicks) * maxTicks);
 
 		const diff = vector.diff(action.target, hero.body.getPosition());
 		const distancePerTick = spell.speed / TicksPerSecond;
@@ -1486,7 +1488,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
-		const usedTicks = Math.ceil(spell.recoveryTicks * ticks / spell.maxTicks);
+		const usedTicks = Math.ceil(spell.recoveryTicks * ticks / maxTicks);
 		hero.recoveryTicks += usedTicks;
 
 		hero.thrust = thrust;
