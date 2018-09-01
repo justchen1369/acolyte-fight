@@ -16,7 +16,7 @@ sockets.listeners.onHeroMsg = onHeroMsg;
 export function joinNewGame(observeGameId?: string) {
 	const store = StoreProvider.getState();
 	if (store.socketId) {
-		leaveCurrentGame();
+		leaveCurrentGame(false);
 
 		const msg: m.JoinMsg = {
 			gameId: observeGameId || null,
@@ -61,7 +61,7 @@ export function startCurrentGame() {
 	}
 }
 
-export function leaveCurrentGame() {
+export function leaveCurrentGame(close: boolean = true) {
 	const store = StoreProvider.getState();
 	const world = store.world;
 
@@ -72,12 +72,14 @@ export function leaveCurrentGame() {
 	if (world.ui.myGameId) {
 		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
 		socket.emit('leave', leaveMsg);
-		StoreProvider.dispatch({ type: "leaveMatch" });
+		if (close) {
+			StoreProvider.dispatch({ type: "leaveMatch" });
+		}
 	}
 }
 
 function onHeroMsg(data: m.HeroMsg) {
-	leaveCurrentGame();
+	leaveCurrentGame(false);
 
 	const world = engine.initialWorld(data.mod);
 	world.ui.myGameId = data.gameId;
