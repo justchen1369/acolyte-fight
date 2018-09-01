@@ -279,7 +279,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
         if (this.currentTouchId !== null && world.ui.nextTarget) {
             let spell = world.settings.Spells[world.ui.nextSpellId];
-            if (!spell && (!this.actionSurface || this.actionSurface.activeKey === " ")) {
+            if (!spell) {
                 spell = Spells.move;
             }
             if (spell) {
