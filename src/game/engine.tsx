@@ -248,7 +248,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
 
-	const offset = world.settings.Hero.Radius + projectileTemplate.radius + constants.Pixel;
+	const offset = Math.max(0, world.settings.Hero.Radius - projectileTemplate.radius); // Larger projectiles spawn more inside the hero to ensure they still work at point blank range
 	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
@@ -265,6 +265,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
+		filterGroupIndex: hero.filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
 		density: projectileTemplate.density,
@@ -280,6 +281,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		categories,
 		type: spell.id,
 		body,
+		passthrough: true,
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		strafe: projectileTemplate.strafe,
@@ -367,6 +369,7 @@ export function tick(world: w.World) {
 	}
 
 	applySpeedLimit(world);
+	removePassthrough(world);
 	decayRecovery(world);
 	decayThrust(world);
 	decayObstacles(world);
@@ -391,6 +394,20 @@ function applySpeedLimit(world: w.World) {
 			if (Math.abs(diff) > world.settings.World.ProjectileSpeedMaxError) {
 				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
 				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, newSpeed));
+			}
+		}
+	});
+}
+
+function removePassthrough(world: w.World) {
+	world.objects.forEach(projectile => {
+		if (projectile.category === "projectile" && projectile.passthrough) {
+			// Projectiles will passthrough their owner until they are clear of their owner - this is so they don't die on spawn because the hero is walking in the same direction as the spawning projectile.
+			// Also allows meteor to be shot further back and so is more likely to push back another hero if they are at point blank range.
+			const hero = world.objects.get(projectile.owner);
+			if (!hero || (hero.category === "hero" && vector.distance(hero.body.getPosition(), projectile.body.getPosition()) > hero.radius + projectile.radius + constants.Pixel)) {
+				updateGroupIndex(projectile.body.getFixtureList(), 0);
+				projectile.passthrough = false;
 			}
 		}
 	});
@@ -1114,6 +1131,16 @@ function updateMaskBits(fixture: pl.Fixture, newMaskBits: number) {
 			groupIndex: fixture.getFilterGroupIndex(),
 			categoryBits: fixture.getFilterCategoryBits(),
 			maskBits: newMaskBits,
+		});
+	}
+}
+
+function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
+	if (fixture.getFilterGroupIndex() !== newGroupIndex) {
+		fixture.setFilterData({
+			groupIndex: newGroupIndex,
+			categoryBits: fixture.getFilterCategoryBits(),
+			maskBits: fixture.getFilterMaskBits(),
 		});
 	}
 }

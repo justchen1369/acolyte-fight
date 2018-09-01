@@ -346,6 +346,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 
 	owner: string;
 	body: pl.Body;
+	passthrough: boolean;
 	collideWith: number;
 	hit?: boolean;
 	speed: number;
