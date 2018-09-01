@@ -660,7 +660,6 @@ const icewall: Spell = {
 };
 const teleport: Spell = {
     id: 'teleport',
-    name: 'Blink',
     description: "Teleport to a nearby location. Get close, or get away.",
 
     maxRange: 0.3,
