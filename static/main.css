@@ -148,6 +148,26 @@ a:hover, a:active {
     text-decoration: none;
 }
 
+.navbar .nav-item .nav-item-label {
+    position: relative;
+}
+
+
+.navbar .nav-item .nav-item-label .badge {
+    position: absolute;
+    top: 0;
+
+    /* font-size + margin */
+    right: -12;
+    font-size: 10px;
+
+    color: #00ccff;
+}
+
+.navbar .nav-item:hover .nav-item-label .badge {
+    color: #ff8800;
+}
+
 @media (max-width: 512px) {
     .nav-optional {
         display: none;

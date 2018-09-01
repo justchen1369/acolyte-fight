@@ -3,21 +3,23 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import NavBarItem from './navbarItem';
 
 interface Props {
-    current: s.PathElements;
-}
-
-interface State {
+    isUsingAI: boolean;
+    isModded: boolean;
+    inParty: boolean;
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        current: state.current,
+        isUsingAI: !!state.aiCode,
+        isModded: Object.keys(state.room.mod).length > 0,
+        inParty: !!state.party,
     };
 }
 
-class NavBar extends React.Component<Props, State> {
+class NavBar extends React.Component<Props> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -25,33 +27,16 @@ class NavBar extends React.Component<Props, State> {
     }
     render() {
         return <div className="navbar">
-            {this.renderNavBarItem("", "Home")}
-            {this.renderNavBarItem("replays", "Replays")}
-            {this.renderNavBarItem("modding", "Modding", true)}
-            {this.renderNavBarItem("ai", "AI", true)}
-            {this.renderNavBarItem("party", "Party")}
-            {this.renderNavBarItem("about", "About")}
+            <NavBarItem page="">Home</NavBarItem>
+            <NavBarItem page="replays">Replays</NavBarItem>
+            <NavBarItem page="modding" hideOnMobile={true} badge={this.props.isModded}>Modding</NavBarItem>
+            <NavBarItem page="ai" hideOnMobile={true} badge={this.props.isUsingAI}>AI</NavBarItem>
+            <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
+            <NavBarItem page="about">About</NavBarItem>
             <div className="spacer" />
         </div>
     }
 
-    private renderNavBarItem(page: string, label: string, hideOnMobile: boolean = false) {
-        const classNames = ["nav-item"];
-        if (this.props.current.page === page) {
-            classNames.push("nav-item-selected");
-        }
-        if (hideOnMobile) {
-            classNames.push("nav-optional");
-        }
-
-        const newPath = url.getPath(Object.assign({}, this.props.current, { page }));
-        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>{label}</a>
-    }
-
-    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
-        ev.preventDefault();
-        pages.changePage(newPage);
-    }
 }
 
 export default ReactRedux.connect(stateToProps)(NavBar);
