@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/logging-winston": "^0.9.0",
+    "@types/color": "^3.0.0",
     "@types/commander": "^2.12.2",
     "@types/cookie": "^0.3.1",
     "@types/cookie-parser": "^1.4.1",
@@ -33,6 +34,7 @@
     "@types/socket.io-client": "^1.4.32",
     "@types/uuid": "^3.4.3",
     "@types/winston": "^2.3.9",
+    "color": "^3.0.0",
     "commander": "^2.15.1",
     "cookie": "^0.3.1",
     "cookie-parser": "^1.4.3",

@@ -1,3 +1,4 @@
+import Color from 'color';
 import * as pl from 'planck-js';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
@@ -845,7 +846,7 @@ export function touchControls(config: w.ButtonConfig): boolean {
 }
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero) {
-	let selectedAction = hero.casting && hero.casting.action && hero.casting.action.type;
+	const selectedAction = hero.casting && hero.casting.action && hero.casting.action.type;
 	const keys = world.settings.Choices.Keys;
 
 	if (!world.ui.buttonBar) {
@@ -1088,13 +1089,16 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	};
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
+	let isHovered = world.ui.hoverSpellId === spell.id;
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 	if (isSelected) {
 		button.color = '#f0f0f0';
 	} else if (remainingInSeconds > 0) {
 		button.color = '#444444';
-	}
+	} else if (isHovered) {
+		button.color = Color(spell.color).lighten(0.5).string();
+	} 
 
 	if (remainingInSeconds > 0) {
 		// Cooldown

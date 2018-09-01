@@ -267,7 +267,7 @@ class CanvasPanel extends React.Component<Props, State> {
             }
 
             // Hover
-            if (p.touchId === MouseId) {
+            if (p.touchId === MouseId || (this.actionSurface && this.actionSurface.touchId === p.touchId)) {
                 const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
                 this.handleButtonHover(key, world);
             }
