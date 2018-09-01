@@ -666,7 +666,7 @@ const teleport: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 1.0 * TicksPerSecond,
     recoveryTicks: 10 * TicksPerSecond,
-    chargeTicks: 0.25 * TicksPerSecond,
+    chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
 
@@ -686,7 +686,7 @@ const thrust: Spell = {
     recoveryTicks: 12 * TicksPerSecond,
 
     damage: 1,
-    maxTicks: 0.4 * TicksPerSecond,
+    maxTicks: 0.3 * TicksPerSecond,
     speed: 1.0,
 
     icon: "fireDash",
