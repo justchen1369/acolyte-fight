@@ -287,11 +287,6 @@ class CanvasPanel extends React.Component<Props, State> {
 
                 if (spell.id !== Spells.move.id) {
                     world.ui.nextSpellId = null;
-
-                    if (spell.interruptible) {
-                        // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick
-                        this.currentTouchId = null;
-                    }
                 }
             }
         }
