@@ -58,24 +58,3 @@ export function cleanupOldRooms(maxAgeUnusedHours: number) {
         store.rooms.delete(id);
     });
 }
-
-export function cleanupOldParties(maxAgeUnusedHours: number) {
-    const now = moment();
-
-    const idsToCleanup = new Array<string>();
-    store.parties.forEach(party => {
-        const ageInHours = moment(now).diff(party.modified, 'hours', true);
-        if (ageInHours > maxAgeUnusedHours) {
-            idsToCleanup.push(party.id);
-        }
-    });
-
-    if (idsToCleanup.length === 0) {
-        return;
-    }
-
-    logger.info(`Cleaning up ${idsToCleanup.length} old parties`); 
-    idsToCleanup.forEach(id => {
-        store.parties.delete(id);
-    });
-}

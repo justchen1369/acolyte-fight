@@ -261,10 +261,17 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	party.active.delete(socketId);
 	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
 
-	// All members become unready when someone leaves
-	party.active.forEach(member => {
-		member.ready = false;
-	});
+	if (party.active.size > 0) {
+		// All members become unready when someone leaves
+		party.active.forEach(member => {
+			member.ready = false;
+		});
+	} else {
+		// This party is finished, delete it
+		const store = getStore();
+		store.parties.delete(party.id);
+		logger.info(`Party ${party.id} deleted`);
+	}
 }
 
 export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
