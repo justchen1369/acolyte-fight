@@ -13,7 +13,7 @@ import { isMobile } from '../core/userAgent';
 
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
-const DoubleTapPixels = 10;
+const DoubleTapPixels = 100;
 
 interface Props {
     world: w.World;
