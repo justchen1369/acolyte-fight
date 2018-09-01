@@ -1,5 +1,6 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
+var missRadius = 0.05;
 
 onmessage = function (e) {
     var msg = JSON.parse(e.data);
@@ -105,7 +106,7 @@ function castSpell(state, hero, opponent, cooldowns) {
             && readyToCast
             && (spell.action === "projectile" || spell.action === "spray")) {
 
-            return { spellId, target: opponent.pos };
+            return { spellId, target: jitter(opponent.pos, missRadius) };
         }
     }
     return null;
@@ -120,6 +121,15 @@ function alreadyHasProjectile(state, heroId) {
         }
     }
     return false;
+}
+
+function jitter(target, missRadius) {
+    var radius = Math.random() * missRadius;
+    var angle = Math.random() * 2 * Math.PI;
+    return {
+        x: target.x + radius * Math.cos(angle),
+        y: target.y + radius * Math.sin(angle),
+    };
 }
 
 function move(state, hero, opponent) {
