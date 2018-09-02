@@ -196,7 +196,7 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderWinNotification(key: string, notification: w.WinNotification) {
         return <div key={key} className="winner">
             <div className="winner-row"><PlayerName player={notification.winner} myHeroId={this.props.myHeroId} /> is the winner!</div>
-            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)}%)</div>
+            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)})</div>
             <div className="award-row">Most kills: <PlayerName player={notification.mostKills} myHeroId={this.props.myHeroId} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 {this.renderWinAction()}

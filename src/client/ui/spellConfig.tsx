@@ -8,6 +8,8 @@ import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
+import SpellStats from './SpellStats';
+
 interface Props {
     settings: AcolyteFightSettings;
 }
@@ -66,6 +68,7 @@ class SpellConfig extends React.Component<Props, State> {
                 <div className="spell-name">{name}</div>
                 <div className="description">{chosen.description}</div>
                 {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
+                <SpellStats spellId={chosenId} />
             </div>
             {!isMobile && <div className="key-name-container">
                 <div className="key-name">{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : key}</div>

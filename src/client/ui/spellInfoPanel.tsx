@@ -6,6 +6,7 @@ import * as w from '../../game/world.model';
 import * as spellUtils from '../core/spellUtils';
 import { ButtonBar } from '../../game/constants';
 import { SpellIcon } from './spellIcon';
+import SpellStats from './spellStats';
 
 interface Props {
     hoverSpellId: string;
@@ -31,7 +32,6 @@ class SpellInfoPanel extends React.Component<Props, State> {
     }
 
     render() {
-        console.log("SpellInfoPanel", this.props.hoverSpellId);
         if (!this.props.hoverSpellId) {
             return null; // Nothing to render
         }
@@ -68,6 +68,7 @@ class SpellInfoPanel extends React.Component<Props, State> {
             <div className="spell-description">
                 {spell.description}
             </div>
+            <SpellStats spellId={this.props.hoverSpellId} />
         </div>;
     }
 }
