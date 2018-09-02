@@ -33,7 +33,6 @@ export interface Game {
 
     tick: number;
 
-    startManually?: boolean;
     joinable: boolean;
     activeTick: number;
     closeTick: number;
