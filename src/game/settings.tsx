@@ -17,7 +17,7 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 0.05,
-    MaxDashRange: 0.4,
+    MaxDashRange: 0.3,
 }
 
 const World: WorldSettings = {
