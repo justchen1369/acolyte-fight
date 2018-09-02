@@ -615,7 +615,7 @@ const scourge: Spell = {
     damage: 20,
     selfDamage: 10,
     damageScaling: false,
-    minImpulse: 0.00035,
+    minImpulse: 0.0005,
     maxImpulse: 0.0005,
 
     icon: "deadlyStrike",
