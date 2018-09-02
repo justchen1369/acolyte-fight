@@ -612,7 +612,7 @@ const scourge: Spell = {
     movementProportionWhileCharging: 0.3,
     cooldown: 10 * TicksPerSecond,
     interruptible: true,
-    damage: 10,
+    damage: 20,
     selfDamage: 0,
     damageScaling: false,
     minImpulse: 0.0002,
