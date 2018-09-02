@@ -435,10 +435,6 @@ a:hover, a:active {
     margin-bottom: 10px;
 }
 
-#spell-info-panel .spell-stats {
-    color: #aaa;
-}
-
 .player-name {
     font-weight: bold;
 }
@@ -468,7 +464,7 @@ h2 {
 
 .spell-stats {
     font-size: 80%;
-    color: #ccc;
+    color: #aaa;
 }
 
 .spell-stats .spell-stats-item {
@@ -496,7 +492,6 @@ h2 {
 .spell-config .key-name-container {
     min-width: 200px;
     height: 100%;
-    margin-left: 50px;
 
     background:#222;
     color: white;
@@ -514,16 +509,26 @@ h2 {
     text-align: center;
 }
 
-.spell-config .key-detail {
-    position: relative;
+.spell-config .key-detail-container {
+    height: 100%;
     flex-grow: 1;
+    position: relative;
+
+    display: flex;
+    align-items: center;
+}
+
+
+.spell-config .key-detail {
     margin-left: 50px;
+    margin-right: 50px;
 }
 
 .spell-config .spell-stats {
     position: absolute;
     top: 0;
     right: 0;
+    margin: 20px;
 }
 
 .spell-config .key-saved {

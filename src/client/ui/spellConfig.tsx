@@ -64,10 +64,12 @@ class SpellConfig extends React.Component<Props, State> {
                         onClick={() => this.onChoose(key, spell.id)}
                         size={48} />)}
             </div>
-            <div className="key-detail">
-                <div className="spell-name">{name}</div>
-                <div className="description">{chosen.description}</div>
-                {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
+            <div className="key-detail-container">
+                <div className="key-detail">
+                    <div className="spell-name">{name}</div>
+                    <div className="description">{chosen.description}</div>
+                    {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
+                </div>
                 <SpellStats spellId={chosenId} />
             </div>
             {!isMobile && <div className="key-name-container">
