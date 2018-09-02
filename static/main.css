@@ -493,6 +493,16 @@ h2 {
     box-shadow: 5px 5px 5px black;
 }
 
+@media (max-width: 512px) {
+    .spell-config .key {
+        height: 250px;
+    }
+
+    .spell-config .key-detail {
+        font-size: 75%;
+    }
+}
+
 .spell-config .key-name-container {
     min-width: 200px;
     height: 100%;
