@@ -60,7 +60,7 @@ export class SpellIcon extends React.Component<Props, State> {
 
             let color = this.props.color;
             if (this.props.hoverWash && !this.state.hovering) {
-                color = "#aaa";
+                color = "#888";
             }
 
             ctx.clearRect(0, 0, rect.width, rect.height);

@@ -43,19 +43,19 @@ class SpellStats extends React.Component<Props, State> {
 
         if (spell.action === "projectile") {
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.projectile.damage}{this.renderScaling(spell)}{spell.projectile.bounce && " per bounce"}</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.projectile.damage}{spell.projectile.damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "spray") {
             const hits = spell.lengthTicks / spell.intervalTicks;
             const totalDamage = spell.projectile.damage * hits;
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{this.renderScaling(spell)} over {formatTime(spell.lengthTicks)} s</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{spell.projectile.damage > 0 && this.renderScaling(spell.projectile.damageScaling)} over {formatTime(spell.lengthTicks)} s</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.damage}</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.damage}{spell.damage > 0 && this.renderScaling(spell.damageScaling)}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else {
@@ -65,8 +65,8 @@ class SpellStats extends React.Component<Props, State> {
         }
     }
 
-    renderScaling(spell: ProjectileSpell | SpraySpell) {
-        const scales = spell.projectile.damage > 0 && (spell.projectile.damageScaling === undefined ? true : spell.projectile.damageScaling);
+    renderScaling(damageScaling: boolean) {
+        const scales = damageScaling === undefined ? true : damageScaling;
         if (scales) {
             const maxScaling = 1 + this.props.settings.Hero.AdditionalDamageMultiplier;
             return <span className="spell-stats-scaling" title={`This spell scales up to ${maxScaling}x damage as the Acolyte loses health`}>+</span>;
