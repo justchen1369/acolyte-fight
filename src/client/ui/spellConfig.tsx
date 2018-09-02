@@ -8,7 +8,7 @@ import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
-import SpellStats from './SpellStats';
+import SpellStats from './spellStats';
 
 interface Props {
     settings: AcolyteFightSettings;
