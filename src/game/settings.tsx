@@ -628,7 +628,7 @@ const scourge: Spell = {
 const shield: Spell = {
     id: 'shield',
     name: 'Reflect',
-    description: "Reflect any projectiles. Reflected projectiles become your projectiles. Ineffective against area-of-effect spells.",
+    description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
     untargeted: true,
 
     maxTicks: 3 * TicksPerSecond,
