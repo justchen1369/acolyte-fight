@@ -513,10 +513,6 @@ function findExistingSlot(game: g.Game): string {
 	return null;
 }
 
-export function startGame(game: g.Game) {
-	game.startManually = true;
-}
-
 function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (!game.joinable) {
 		return;
@@ -524,8 +520,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 
 	let statusChanged = false;
 
-	if (game.startManually
-		|| ((game.active.size + game.bots.size) > 1 && data.actions.some(action => isSpell(action)))) {
+	if ((game.active.size + game.bots.size) > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
 		const newCloseTick = game.tick + Matchmaking.JoinPeriod;
 		if (newCloseTick < game.closeTick) {
