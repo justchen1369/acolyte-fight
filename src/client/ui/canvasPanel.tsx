@@ -82,7 +82,6 @@ class CanvasPanel extends React.Component<Props, State> {
     private targetSurface: TargetSurfaceState = null;
 
     private keyDownListener = this.gameKeyDown.bind(this);
-    private keyUpListener = this.gameKeyUp.bind(this);
     private resizeListener = this.fullScreenCanvas.bind(this);
 
     private animationLoop = new AnimationLoop(() => this.frame());
@@ -105,7 +104,6 @@ class CanvasPanel extends React.Component<Props, State> {
 
     componentWillMount() {
         window.addEventListener('keydown', this.keyDownListener);
-        window.addEventListener('keyup', this.keyUpListener);
         window.addEventListener('resize', this.resizeListener);
 
         this.animationLoop.start();
@@ -119,7 +117,6 @@ class CanvasPanel extends React.Component<Props, State> {
 
         window.removeEventListener('resize', this.resizeListener);
         window.removeEventListener('keydown', this.keyDownListener);
-        window.removeEventListener('keyup', this.keyUpListener);
     }
 
     render() {
@@ -312,6 +309,11 @@ class CanvasPanel extends React.Component<Props, State> {
             return;
         }
 
+        if (e.repeat) {
+            // Ignore repeats because they cancel channelling spells
+            return;
+        }
+
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
         if (spellType && world.ui.nextTarget) {
@@ -334,10 +336,6 @@ class CanvasPanel extends React.Component<Props, State> {
         if (!spell) { return null; }
 
         return spell.id;
-    }
-
-    private gameKeyUp(e: KeyboardEvent) {
-        this.processCurrentTouch();
     }
 
     private readKey(e: KeyboardEvent) {
