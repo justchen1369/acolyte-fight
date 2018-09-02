@@ -1551,6 +1551,9 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 	});
 
+	// Remove the link so that the hit player can go flying
+	hero.link = null;
+
 	world.ui.events.push({
 		heroId: hero.id,
 		pos: hero.body.getPosition(),
