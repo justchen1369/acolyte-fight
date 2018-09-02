@@ -267,7 +267,9 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	if (party.active.size > 0) {
 		// All members become unready when someone leaves
 		party.active.forEach(member => {
-			member.ready = false;
+			if (!member.isObserver) {
+				member.ready = false;
+			}
 		});
 	} else {
 		// This party is finished, delete it
