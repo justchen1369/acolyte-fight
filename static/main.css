@@ -467,6 +467,10 @@ h2 {
     color: #aaa;
 }
 
+.spell-stats-item:hover .spell-stats-scaling {
+    color: white;
+}
+
 .spell-stats .spell-stats-item {
     margin-right: 15px;
 }
