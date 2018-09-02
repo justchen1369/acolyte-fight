@@ -564,17 +564,11 @@ h2 {
 }
 
 .spell-config .spell-icon-chosen {
-    opacity: 1.0;
     border: 3px #222 solid;
-}
-
-.spell-config .spell-icon-not-chosen {
-    opacity: 0.5;
 }
 
 .spell-config .spell-icon:hover {
     border: 3px white solid;
-    opacity: 1.0;
 }
 
 .game-list {

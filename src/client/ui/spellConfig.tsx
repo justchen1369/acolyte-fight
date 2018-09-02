@@ -62,7 +62,8 @@ class SpellConfig extends React.Component<Props, State> {
                         color={spell.color}
                         title={spellUtils.spellName(spell)}
                         onClick={() => this.onChoose(key, spell.id)}
-                        size={48} />)}
+                        size={48}
+                        hoverWash={spell.id !== chosen.id} />)}
             </div>
             <div className="key-detail-container">
                 <div className="key-detail">
