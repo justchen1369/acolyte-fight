@@ -56,6 +56,7 @@ class SpellStats extends React.Component<Props, State> {
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.damage}{spell.damage > 0 && this.renderScaling(spell.damageScaling)}</span>
+                <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />{spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else {
