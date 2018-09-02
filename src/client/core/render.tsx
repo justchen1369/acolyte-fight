@@ -80,10 +80,7 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 		renderCursor(cursorCtx, world, rect, worldRect);
 	}
 
-	// Other items only get rerendered if changed
-	if (world.ui.renderedTick === world.tick) {
-		return;
-	}
+	// Everything also always gets rendered (used to wait for changes, TODO: merge with cursor rendering)
 	world.ui.renderedTick = world.tick;
 
 	let ctxStack = {
@@ -1096,8 +1093,10 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 		button.color = '#f0f0f0';
 	} else if (remainingInSeconds > 0) {
 		button.color = '#444444';
-	} else if (isHovered) {
-		button.color = Color(spell.color).lighten(0.5).string();
+	}
+
+	if (isHovered) {
+		button.color = Color(button.color).lighten(0.25).string();
 	} 
 
 	if (remainingInSeconds > 0) {
