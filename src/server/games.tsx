@@ -224,7 +224,9 @@ export function updatePartyRoom(party: g.Party, roomId: string): boolean {
 		party.roomId = roomId;
 		changed = true;
 		party.active.forEach(member => { // Unready so users can read new settings
-			member.ready = false;
+			if (!member.isObserver) {
+				member.ready = false;
+			}
 		});
 
 		logger.info(`Party ${party.id} moved to room=${party.roomId}`);
@@ -281,12 +283,8 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 		return assignments;
 	}
 
-	const players = [...party.active.values()].filter(p => !p.isObserver);
-	if (players.length === 0) {
-		return assignments;
-	}
-
-	if (players.every(p => p.ready)) {
+	;
+	if ([...party.active.values()].every(p => p.ready)) {
 		assignPartyToGames(party, assignments);
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 	}
