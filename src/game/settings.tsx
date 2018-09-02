@@ -609,7 +609,7 @@ const scourge: Spell = {
 
     radius: Hero.Radius * 4,
     chargeTicks: 0.5 * TicksPerSecond,
-    movementProportionWhileCharging: 0.3,
+    movementProportionWhileCharging: 0.5,
     cooldown: 10 * TicksPerSecond,
     interruptible: true,
     damage: 20,
