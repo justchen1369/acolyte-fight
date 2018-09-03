@@ -42,8 +42,8 @@ const Obstacle: ObstacleSettings = {
 
 const Choices: ChoiceSettings = {
 	Keys: [
-        { btn: "a", primary: false },
-		null,
+        { btn: "d", primary: false },
+        null,
         { btn: "q", primary: true },
         { btn: "w", primary: true },
         { btn: "e", primary: true },
@@ -53,7 +53,7 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		[Actions.Dash]: ["thrust", "teleport"],
-		"a": ["shield", "icewall", "drain"],
+		"d": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["link", "lightning", "gravity"],
 		"e": ["homing", "boomerang"],
@@ -62,7 +62,7 @@ const Choices: ChoiceSettings = {
 	},
 	Defaults: {
 		[Actions.Dash]: "thrust",
-		"a": "shield",
+		"d": "shield",
 		"q": "fireball",
 		"w": "link",
 		"e": "homing",
