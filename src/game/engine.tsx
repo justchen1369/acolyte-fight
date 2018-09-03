@@ -856,8 +856,6 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		projectile.owner = shield.owner;
 	}
 
-	projectile.expireTick = world.tick + projectile.maxTicks; // Make the spell last longer when deflected
-
 	if (projectile.bounce) {
 		bounceToNext(projectile, shield.owner, world);
 	}
