@@ -435,8 +435,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		const range = Math.max(radius + Pixel * 2, engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks, world) * Hero.MaxDashRange);
 		const proportion = 1 - range / Math.max(1e-6, vector.length(dashTargetOffset));
 
-		const dashAngle = vector.angle(dashTargetOffset);
-
 		if (proportion > 0) {
 			ctx.save();
 
@@ -1048,7 +1046,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.Butt
 
 	const region = calculateButtonWheelRegion(rect);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;
-	const innerRadius = outerRadius / 3.0;
+	const innerRadius = outerRadius / 2.5;
 	const center = pl.Vec2((region.left + region.right) / 2, (region.top + region.bottom) / 2);
 
 	const targetSurfaceCenter = pl.Vec2(rect.right - (center.x - rect.left), center.y); // Mirror the wheel on the right

@@ -244,6 +244,7 @@ class CanvasPanel extends React.Component<Props, State> {
         if (spell) {
             if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+                this.avoidSpellInterrupt(spell);
             } else {
                 world.ui.nextSpellId = spellId;
             }
