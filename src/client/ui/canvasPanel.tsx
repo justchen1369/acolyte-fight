@@ -206,7 +206,7 @@ class CanvasPanel extends React.Component<Props, State> {
                     if (this.currentTouch) {
                         ++this.currentTouch.stack;
                     } else {
-                        this.currentTouch = { id: p.touchId, stack: 0 };
+                        this.currentTouch = { id: p.touchId, stack: 1 };
                     }
 
                     if (touchControls(world.ui.buttonBar)) {
