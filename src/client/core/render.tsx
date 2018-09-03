@@ -450,7 +450,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 			const arcWidth = 3 * Hero.Radius / range;
 
-			ctx.globalAlpha = 0.25 * proportion;
+			ctx.globalAlpha = 0.9 * proportion;
 			ctx.strokeStyle = gradient;
 			ctx.lineWidth = DashIndicator.Width;
 			ctx.beginPath();
