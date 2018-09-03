@@ -1106,7 +1106,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	const rebindingLookup = keyboardUtils.getRebindingLookup(rebindings);
 	let button: w.ButtonRenderState = {
-		key: rebindingLookup.get(key) || key,
+		key: rebindingLookup.get(key) || "",
 		color: spell.color,
 		icon: spell.icon,
 		cooldownText: null,

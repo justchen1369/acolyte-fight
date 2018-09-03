@@ -1,12 +1,20 @@
 import * as Reselect from 'reselect';
+import { DefaultSettings } from '../../game/settings';
 
 export const getRebindingLookup = Reselect.createSelector(
 	(rebindings: KeyBindings) => rebindings,
 	(rebindings) => {
         const lookup = new Map<string, string>();
-		for (const key in rebindings) {
-			lookup.set(rebindings[key], key);
-		}
+        for (const newKey in rebindings) {
+            const initialKey = rebindings[newKey];
+			lookup.set(initialKey, newKey);
+        }
+        
+        DefaultSettings.Choices.Keys.forEach(keyConfig => {
+            if (keyConfig && !lookup.has(keyConfig.btn) && !rebindings[keyConfig.btn]) {
+                lookup.set(keyConfig.btn, keyConfig.btn);
+            }
+        });
 		return lookup;
 	}
 );

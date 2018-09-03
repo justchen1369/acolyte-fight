@@ -36,10 +36,9 @@ class KeyControl extends React.Component<Props, State> {
 
         const rebindingLookup = keyboardUtils.getRebindingLookup(this.props.rebindings);
         const remappedKey = rebindingLookup.get(initialKey);
-        const key = remappedKey || initialKey;
 
         return <div className="key-name-container" onKeyDown={(ev) => this.onKeyDown(ev)} tabIndex={0}>
-            <div className={remappedKey ? "key-name rebinding" : "key-name"}>{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : key}</div>
+            <div className={remappedKey ? "key-name rebinding" : "key-name"}>{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : remappedKey}</div>
             {!isRightClick && <div className="rebind-help">Press key to rebind</div>}
         </div>
     }
@@ -51,13 +50,14 @@ class KeyControl extends React.Component<Props, State> {
             return;
         }
 
-        const oldKey = keyboardUtils.getRebindingLookup(this.props.rebindings).get(targetKey);
         const newKey = keyboardUtils.readKey(ev.nativeEvent);
         const rebindings = { ...this.props.rebindings };
         
-        if (oldKey) {
+        const oldKeys = Object.keys(rebindings).filter(oldKey => rebindings[oldKey] === targetKey);
+        for (const oldKey of oldKeys) {
             delete rebindings[oldKey];
         }
+
         if (newKey && newKey.length === 1) { // No special keys allowed
             rebindings[newKey] = targetKey;
         }
