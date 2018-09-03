@@ -32,23 +32,20 @@ class KeyControl extends React.Component<Props, State> {
 
     render() {
         const initialKey = this.props.initialKey;
-        const isRightClick = keyboardUtils.isRightClick(initialKey);
 
         const rebindingLookup = keyboardUtils.getRebindingLookup(this.props.rebindings);
         const remappedKey = rebindingLookup.get(initialKey);
+        const isRightClick = keyboardUtils.isRightClick(remappedKey);
+        const isRebound = !!this.props.rebindings[remappedKey];
 
         return <div className="key-name-container" onKeyDown={(ev) => this.onKeyDown(ev)} tabIndex={0}>
             <div className={remappedKey ? "key-name rebinding" : "key-name"}>{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : remappedKey}</div>
-            {!isRightClick && <div className="rebind-help">Press key to rebind</div>}
+            <div className="rebind-help">{isRebound ? "Press ESC to reset" : "Press key to rebind"}</div>
         </div>
     }
 
     private onKeyDown(ev: React.KeyboardEvent) {
         const targetKey = this.props.initialKey;
-        if (keyboardUtils.isRightClick(targetKey)) {
-            // Can't rebind right-click
-            return;
-        }
 
         const newKey = keyboardUtils.readKey(ev.nativeEvent);
         const rebindings = { ...this.props.rebindings };

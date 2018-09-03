@@ -10,9 +10,9 @@ export const getRebindingLookup = Reselect.createSelector(
 			lookup.set(initialKey, newKey);
         }
         
-        DefaultSettings.Choices.Keys.forEach(keyConfig => {
-            if (keyConfig && !lookup.has(keyConfig.btn) && !rebindings[keyConfig.btn]) {
-                lookup.set(keyConfig.btn, keyConfig.btn);
+        Object.keys(DefaultSettings.Choices.Defaults).forEach(key => {
+            if (key && !lookup.has(key) && !rebindings[key]) {
+                lookup.set(key, key);
             }
         });
 		return lookup;
