@@ -4,6 +4,7 @@ import * as Immutable from 'immutable';
 export namespace Actions {
 	export const Dash = "dash";
 	export const Move = "move";
+	export const Retarget = "retarget";
 	export const Stop = "stop";
 }
 
@@ -265,6 +266,7 @@ export interface Hero extends WorldObjectBase {
 	additionalDamageMultiplier: number;
 
 	moveTo?: pl.Vec2;
+	target?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	recoveryTicks: number;

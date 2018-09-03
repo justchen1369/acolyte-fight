@@ -349,6 +349,8 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 1000;
 	} else if (actionData.actionType === "game" && actionData.spellId === "move") {
 		return 10;
+	} else if (actionData.actionType === "game" && actionData.spellId === "retarget") {
+		return 1;
 	} else {
 		return 100;
 	}

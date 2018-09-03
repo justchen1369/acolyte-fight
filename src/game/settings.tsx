@@ -171,6 +171,15 @@ const move: Spell = {
     cooldown: 0,
     action: "move",
 };
+const retarget: Spell = {
+    id: 'retarget',
+    description: "",
+    color: 'white',
+    maxAngleDiffInRevs: 1.0,
+    interruptible: true,
+    cooldown: 0,
+    action: "retarget",
+};
 const stop: Spell = {
     id: 'stop',
     description: "",
@@ -309,6 +318,7 @@ const kamehameha: Spell = {
     retargettingRevsPerTick: 0.0003,
 
     knockbackCancel: true,
+    movementCancel: true,
     interruptible: true,
     jitterRatio: 0.0,
 
@@ -695,6 +705,7 @@ const thrust: Spell = {
 
 const Spells = {
     move,
+    retarget,
     stop,
     fireball,
     flamestrike,

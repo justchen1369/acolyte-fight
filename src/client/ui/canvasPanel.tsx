@@ -42,6 +42,11 @@ interface ActionSurfaceState {
     activeKey: string;
 }
 
+interface TouchState {
+    id: string;
+    stack: number;
+}
+
 class AnimationLoop {
     private animate: () => void;
     private currentHandle = 0;
@@ -76,8 +81,7 @@ function stateToProps(state: s.State): Props {
 }
 
 class CanvasPanel extends React.Component<Props, State> {
-    private currentTouchId: string = null;
-    private currentTouchStack: number = 0;
+    private currentTouch: TouchState = null;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
@@ -194,9 +198,12 @@ class CanvasPanel extends React.Component<Props, State> {
                 };
                 this.handleButtonClick(key, world);
             } else {
-                if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
-                    this.currentTouchId = p.touchId;
-                    ++this.currentTouchStack;
+                if (this.currentTouch === null || this.currentTouch.id === p.touchId) {
+                    if (this.currentTouch) {
+                        ++this.currentTouch.stack;
+                    } else {
+                        this.currentTouch = { id: p.touchId, stack: 0 };
+                    }
 
                     if (touchControls(world.ui.buttonBar)) {
                         world.ui.nextTarget = world.ui.nextTarget || pl.Vec2(0.5, 0.5);
@@ -257,7 +264,7 @@ class CanvasPanel extends React.Component<Props, State> {
                         this.handleButtonClick(key, world);
                     }
                 }
-            } else if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
+            } else if (this.currentTouch === null || this.currentTouch.id === p.touchId) {
                 if (this.targetSurface) {
                     world.ui.nextTarget = vector.plus(this.targetSurface.startWorldPoint, vector.diff(p.worldPoint, this.targetSurface.startTargetPoint));
                 } else {
@@ -278,11 +285,10 @@ class CanvasPanel extends React.Component<Props, State> {
         points.forEach(p => {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
                 this.actionSurface = null;
-            } else if (this.currentTouchId === p.touchId) {
-                --this.currentTouchStack;
-                if (this.currentTouchStack <= 0) {
-                    this.currentTouchStack = 0;
-                    this.currentTouchId = null;
+            } else if (this.currentTouch && this.currentTouch.id === p.touchId) {
+                --this.currentTouch.stack;
+                if (this.currentTouch.stack <= 0) {
+                    this.currentTouch = null;
                     this.targetSurface = null;
                 }
             } 
@@ -294,17 +300,22 @@ class CanvasPanel extends React.Component<Props, State> {
         const world = this.props.world;
         const Spells = world.settings.Spells;
 
-        if (this.currentTouchId !== null && world.ui.nextTarget) {
-            let spell = world.settings.Spells[world.ui.nextSpellId];
-            if (!spell) {
-                spell = Spells.move;
-            }
-            if (spell) {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
-
-                if (spell.id !== Spells.move.id) {
-                    world.ui.nextSpellId = null;
+        if (world.ui.nextTarget) {
+            if (this.currentTouch !== null) {
+                let spell = world.settings.Spells[world.ui.nextSpellId];
+                if (!spell) {
+                    spell = Spells.move;
                 }
+                if (spell) {
+                    sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
+
+                    if (spell.id !== Spells.move.id) {
+                        world.ui.nextSpellId = null;
+                        this.avoidSpellInterrupt(spell);
+                    }
+                }
+            } else {
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "retarget", target: world.ui.nextTarget });
             }
         }
     }
@@ -322,8 +333,17 @@ class CanvasPanel extends React.Component<Props, State> {
 
         const key = this.readKey(e);
         const spellType = this.keyToSpellId(key);
-        if (spellType && world.ui.nextTarget) {
+        const spell = world.settings.Spells[spellType];
+        if (spell && world.ui.nextTarget) {
             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
+            this.avoidSpellInterrupt(spell);
+        }
+    }
+
+    private avoidSpellInterrupt(spell: Spell) {
+        if (spell.movementCancel) {
+            // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick	
+            this.currentTouch = null;
         }
     }
 

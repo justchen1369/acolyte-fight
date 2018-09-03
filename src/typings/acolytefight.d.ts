@@ -107,6 +107,7 @@ declare interface Spells {
 declare type Spell =
 	MoveSpell
 	| StopSpell
+	| RetargetSpell
 	| ProjectileSpell
 	| SpraySpell
 	| ScourgeSpell
@@ -129,6 +130,7 @@ declare interface SpellBase {
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
     cooldown: number;
     interruptible?: boolean; // Whether this spell can be interrupted by moving.
+    movementCancel?: boolean; // Whether moving cancels the spell.
     knockbackCancel?: boolean; // If this spell is being channelled, whether knockback cancels it.
 
     icon?: string;
@@ -142,6 +144,10 @@ declare interface MoveSpell extends SpellBase {
 
 declare interface StopSpell extends SpellBase {
     action: "stop";
+}
+
+declare interface RetargetSpell extends SpellBase {
+    action: "retarget";
 }
 
 declare interface ProjectileSpell extends SpellBase {

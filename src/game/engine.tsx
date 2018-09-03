@@ -581,6 +581,15 @@ function handleActions(world: w.World) {
 		if (action && action.type === w.Actions.Move) {
 			// Movement actions are special
 			hero.moveTo = action.target;
+			if (hero.casting && !hero.casting.uninterruptible) {
+				const spell = world.settings.Spells[hero.casting.action.type];
+				if (spell.movementCancel) {
+					hero.casting = null;
+				}
+			}
+			action = null;
+		} else if (action && action.type === w.Actions.Retarget) {
+			hero.target = action.target;
 			action = null;
 		}
 
@@ -726,7 +735,7 @@ function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
-	if (action.type === w.Actions.Move || action.type === w.Actions.Stop) {
+	if (action.type === w.Actions.Move || action.type === w.Actions.Stop || action.type === w.Actions.Retarget) {
 		return true;
 	} else {
 		return hero.spellsToKeys.has(action.type);
@@ -737,6 +746,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 	switch (spell.action) {
 		case "move": return true; // Handled separately
 		case "stop": return true; // Do nothing
+		case "retarget": return true; // Handled separately
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
@@ -1424,8 +1434,8 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
 	if (currentLength % spell.intervalTicks === 0) {
-		if (spell.retargettingRevsPerTick > 0 && hero.moveTo) {
-			turnTowards(hero, hero.moveTo, spell.retargettingRevsPerTick);
+		if (spell.retargettingRevsPerTick > 0 && hero.target) {
+			turnTowards(hero, hero.target, spell.retargettingRevsPerTick);
 		}
 
 		const pos = hero.body.getPosition();
