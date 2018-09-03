@@ -1476,7 +1476,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	if (!action.target) { return true; }
 
 	const maxRange = world.settings.Hero.MaxDashRange;
-	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks) * maxRange;
+	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks, world) * maxRange;
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
@@ -1494,7 +1494,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const multiplier = dashRangeMultiplier(hero, spell.recoveryTicks);
+		const multiplier = dashRangeMultiplier(hero, spell.recoveryTicks, world);
 		const speed = Math.max(world.settings.Hero.MoveSpeedPerSecond, spell.speed * ((1 - spell.speedDecayAlpha) + spell.speedDecayAlpha * multiplier));
 
 		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / speed;
@@ -1531,9 +1531,9 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	return !hero.thrust;
 }
 
-export function dashRangeMultiplier(hero: w.Hero, maxRecoveryTicks: number) {
+export function dashRangeMultiplier(hero: w.Hero, maxRecoveryTicks: number, world: w.World) {
 	const availableTicks = Math.max(0, maxRecoveryTicks - hero.recoveryTicks);
-	return Math.pow(availableTicks / maxRecoveryTicks, 2);
+	return Math.pow(availableTicks / maxRecoveryTicks, world.settings.Hero.DashRangePower);
 }
 
 export function dashRangeCost(proportion: number, maxRecoveryTicks: number) {

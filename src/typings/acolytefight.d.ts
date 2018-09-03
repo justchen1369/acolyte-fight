@@ -47,6 +47,7 @@ declare interface HeroSettings {
 
 	RevolutionsPerTick: number; // Hero turn rate
 	MaxDashRange: number; // The maximum range of teleport/thrust
+	DashRangePower: number; // The power curve for teleport/thrust replenishing
 }
 
 declare interface WorldSettings {

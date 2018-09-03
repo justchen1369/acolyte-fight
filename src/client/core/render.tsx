@@ -432,7 +432,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	if (hero.id === world.ui.myHeroId && world.ui.nextTarget && hero.maxRecoveryTicks > 0) {
 		const dashTargetOffset = vector.diff(world.ui.nextTarget, pos);
 
-		const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks) * Hero.MaxDashRange;
+		const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks, world) * Hero.MaxDashRange;
 		const proportion = 1 - range / Math.max(1e-6, vector.length(dashTargetOffset));
 
 		const dashAngle = vector.angle(dashTargetOffset);

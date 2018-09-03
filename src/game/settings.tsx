@@ -18,6 +18,7 @@ const Hero: HeroSettings = {
 
     RevolutionsPerTick: 0.05,
     MaxDashRange: 0.3,
+    DashRangePower: 1.25,
 }
 
 const World: WorldSettings = {
