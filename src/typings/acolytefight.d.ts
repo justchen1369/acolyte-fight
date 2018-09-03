@@ -280,7 +280,8 @@ declare interface ThrustSpell extends DashSpell {
 
 	damage: number;
 	damageScaling?: boolean;
-    speed: number;
+	speed: number;
+	speedDecayAlpha: number; // Higher means more decay when used a lot
 }
 
 declare interface KeyBindingOptions {

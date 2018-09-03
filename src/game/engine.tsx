@@ -1495,7 +1495,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 	if (world.tick == hero.casting.channellingStartTick) {
 		const multiplier = dashRangeMultiplier(hero, spell.recoveryTicks);
-		const speed = spell.speed;
+		const speed = Math.max(world.settings.Hero.MoveSpeedPerSecond, spell.speed * ((1 - spell.speedDecayAlpha) + spell.speedDecayAlpha * multiplier));
 
 		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / speed;
 		const tickLimit = Math.floor(multiplier * maxTicks);
