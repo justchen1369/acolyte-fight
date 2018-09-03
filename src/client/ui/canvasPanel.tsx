@@ -77,6 +77,7 @@ function stateToProps(state: s.State): Props {
 
 class CanvasPanel extends React.Component<Props, State> {
     private currentTouchId: string = null;
+    private currentTouchStack: number = 0;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
@@ -195,6 +196,7 @@ class CanvasPanel extends React.Component<Props, State> {
             } else {
                 if (this.currentTouchId === null || this.currentTouchId === p.touchId) {
                     this.currentTouchId = p.touchId;
+                    ++this.currentTouchStack;
 
                     if (touchControls(world.ui.buttonBar)) {
                         world.ui.nextTarget = world.ui.nextTarget || pl.Vec2(0.5, 0.5);
@@ -277,8 +279,12 @@ class CanvasPanel extends React.Component<Props, State> {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
                 this.actionSurface = null;
             } else if (this.currentTouchId === p.touchId) {
-                this.currentTouchId = null;
-                this.targetSurface = null;
+                --this.currentTouchStack;
+                if (this.currentTouchStack <= 0) {
+                    this.currentTouchStack = 0;
+                    this.currentTouchId = null;
+                    this.targetSurface = null;
+                }
             } 
         });
         this.processCurrentTouch();
