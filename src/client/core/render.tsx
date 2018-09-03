@@ -432,7 +432,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	if (hero.id === world.ui.myHeroId && world.ui.nextTarget && hero.maxRecoveryTicks > 0) {
 		const dashTargetOffset = vector.diff(world.ui.nextTarget, pos);
 
-		const range = engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks, world) * Hero.MaxDashRange;
+		const range = Math.max(radius + Pixel * 2, engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks, world) * Hero.MaxDashRange);
 		const proportion = 1 - range / Math.max(1e-6, vector.length(dashTargetOffset));
 
 		const dashAngle = vector.angle(dashTargetOffset);
@@ -446,13 +446,14 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			gradient.addColorStop(0, "white");
 			gradient.addColorStop(1, "transparent");
 
-			const arcWidth = Math.PI / 2;
+			const circumference = 2 * Math.PI * range;
 
 			ctx.globalAlpha = 0.9 * proportion;
 			ctx.strokeStyle = gradient;
 			ctx.lineWidth = DashIndicator.Width;
 			ctx.beginPath();
-			ctx.arc(0, 0, range, dashAngle - arcWidth, dashAngle + arcWidth);
+			ctx.setLineDash([circumference / 100, circumference / 100]);
+			ctx.arc(0, 0, range, 0, 2 * Math.PI);
 			ctx.stroke();
 
 			ctx.restore();
