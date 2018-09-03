@@ -6,6 +6,7 @@ export interface State {
     isNewPlayer: boolean;
     playerName: string;
     keyBindings: KeyBindings;
+    rebindings: KeyBindings;
 
     aiCode: string;
 
@@ -64,6 +65,7 @@ export type Action =
     | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
     | UpdateHoverSpellAction
+    | UpdateRebindingsAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -149,4 +151,9 @@ export interface ClearNewPlayerFlagAction {
 export interface UpdateHoverSpellAction {
     type: "updateHoverSpell";
     hoverSpellId: string;
+}
+
+export interface UpdateRebindingsAction {
+    type: "updateRebindings";
+    rebindings: KeyBindings;
 }

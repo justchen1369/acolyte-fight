@@ -25,7 +25,7 @@ import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants
 export function initialWorld(mod: Object): w.World {
 	const settings = calculateMod(mod);
 
-	let world = {
+	let world: w.World = {
 		seed: null,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
@@ -41,7 +41,6 @@ export function initialWorld(mod: Object): w.World {
 		actions: new Map(),
 		radius: settings.World.InitialRadius,
 
-		nextObstacleId: 0,
 		nextPositionId: 0,
 		nextObjectId: 0,
 		nextColorId: 0,
@@ -58,7 +57,7 @@ export function initialWorld(mod: Object): w.World {
 			trails: [],
 			notifications: [],
 		} as w.UIState,
-	} as w.World;
+	};
 
 	return world;
 }

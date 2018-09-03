@@ -92,7 +92,7 @@ export function frame(canvasStack: CanvasStack) {
 		applyTickActions(tickData, world, preferredColors);
 		engine.tick(world);
 	}
-	render(world, canvasStack);
+	render(world, canvasStack, store.rebindings);
 
 	const notifications = engine.takeNotifications(world);
 	notify(...notifications);

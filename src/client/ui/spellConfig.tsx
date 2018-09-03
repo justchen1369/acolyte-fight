@@ -3,24 +3,27 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
+import * as keyboardUtils from '../core/keyboardUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
+import KeyControl from './keyControl';
 import SpellStats from './spellStats';
 
 interface Props {
+    config: KeyBindings;
     settings: AcolyteFightSettings;
 }
 
 interface State {
-    config: KeyBindings;
     saved: Set<string>;
 }
 
 function stateToProps(state: s.State): Props {
     return {
+        config: state.keyBindings,
         settings: state.room.settings,
     };
 }
@@ -29,7 +32,6 @@ class SpellConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            config: Storage.loadKeyBindingConfig() || DefaultSettings.Choices.Defaults,
             saved: new Set<string>(),
         };
     }
@@ -45,14 +47,14 @@ class SpellConfig extends React.Component<Props, State> {
         const Spells = this.props.settings.Spells;
 
         const options = Choices.Options[key];
-        let chosenId = this.state.config[key];
+        let chosenId = this.props.config[key];
 		if (!(options.indexOf(chosenId) >= 0)) {
 			chosenId = Choices.Defaults[key];
 		}
         const chosen = Spells[chosenId];
 
         const name = spellUtils.spellName(chosen);
-        const isRightClick = key.length > 1;
+        const isRightClick = keyboardUtils.isRightClick(key);
         return <div className="key">
             <div className="key-options">
                 {options.map(spellId => Spells[spellId]).map(spell =>
@@ -73,14 +75,12 @@ class SpellConfig extends React.Component<Props, State> {
                 </div>
                 <SpellStats spellId={chosenId} />
             </div>
-            {!isMobile && <div className="key-name-container">
-                <div className="key-name">{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : key}</div>
-            </div>}
+            {!isMobile && <KeyControl initialKey={key} />}
         </div>;
     }
     
     private onChoose(key: string, spellId: string) {
-        const config = this.state.config;
+        const config = this.props.config;
         const saved = this.state.saved;
 
         config[key] = spellId;
@@ -89,7 +89,7 @@ class SpellConfig extends React.Component<Props, State> {
         StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
         Storage.saveKeyBindingConfig(config);
 
-        this.setState({ config, saved });
+        this.setState({ saved });
     }
 
     private capitalize(str: string) {

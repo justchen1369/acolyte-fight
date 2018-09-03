@@ -19,6 +19,7 @@ function initialState(): s.State {
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
+        rebindings: storage.getRebindingsOrDefaults(),
         aiCode: null,
         current: {},
         socketId: null,
@@ -125,6 +126,8 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updateHoverSpell") {
         state.world.ui.hoverSpellId = action.hoverSpellId; // World always gets mutated
         return { ...state } // Create new object to trigger redux
+    } else if (action.type === "updateRebindings") {
+        return { ...state, rebindings: action.rebindings };
     } else {
         console.log(action);
         return state;

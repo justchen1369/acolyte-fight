@@ -504,6 +504,7 @@ h2 {
 }
 
 .spell-config .key-name-container {
+    position: relative;
     min-width: 200px;
     height: 100%;
 
@@ -512,6 +513,8 @@ h2 {
 
     display: flex;
     align-items: center;
+
+    pointer-events: all;
 }
 
 .spell-config .key-name {
@@ -521,6 +524,24 @@ h2 {
     font-size: 100pt;
     text-transform: uppercase;
     text-align: center;
+}
+
+.spell-config .key-name-container .rebind-help {
+    visibility: hidden;
+
+    position: absolute;
+    bottom: 0;
+    margin-bottom: 5px;
+
+    width: 100%;
+    text-align: center;
+
+    font-size: 80%;
+    color: #ccc;
+}
+
+.spell-config .key-name-container:focus .rebind-help {
+    visibility: visible;
 }
 
 .spell-config .key-detail-container {

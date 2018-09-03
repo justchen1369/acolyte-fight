@@ -1,6 +1,8 @@
 import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+
+import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';
@@ -18,6 +20,7 @@ const DoubleTapPixels = 100;
 
 interface Props {
     world: w.World;
+    rebindings: KeyBindings;
 }
 interface State {
     width: number;
@@ -77,6 +80,7 @@ class AnimationLoop {
 function stateToProps(state: s.State): Props {
     return {
         world: state.world,
+        rebindings: state.rebindings,
     };
 }
 
@@ -331,7 +335,7 @@ class CanvasPanel extends React.Component<Props, State> {
             return;
         }
 
-        const key = this.readKey(e);
+        const key = this.rebind(keyboardUtils.readKey(e));
         const spellType = this.keyToSpellId(key);
         const spell = world.settings.Spells[spellType];
         if (spell && world.ui.nextTarget) {
@@ -364,55 +368,8 @@ class CanvasPanel extends React.Component<Props, State> {
         return spell.id;
     }
 
-    private readKey(e: KeyboardEvent) {
-        switch (e.code) {
-            case "KeyQ": return 'q';
-            case "KeyW": return 'w';
-            case "KeyE": return 'e';
-            case "KeyR": return 'r';
-            case "KeyT": return 't';
-            case "KeyY": return 'y';
-            case "KeyU": return 'u';
-            case "KeyI": return 'i';
-            case "KeyO": return 'o';
-            case "KeyP": return 'p';
-            case "KeyA": return 'a';
-            case "KeyS": return 's';
-            case "KeyD": return 'd';
-            case "KeyF": return 'f';
-            case "KeyG": return 'g';
-            case "KeyH": return 'h';
-            case "KeyJ": return 'j';
-            case "KeyK": return 'k';
-            case "KeyL": return 'l';
-            case "KeyZ": return 'z';
-            case "KeyX": return 'x';
-            case "KeyC": return 'c';
-            case "KeyV": return 'v';
-            case "KeyB": return 'b';
-            case "KeyN": return 'n';
-            case "KeyM": return 'm';
-            case "Digit0": return '0';
-            case "Digit1": return '1';
-            case "Digit2": return '2';
-            case "Digit3": return '3';
-            case "Digit4": return '4';
-            case "Digit5": return '5';
-            case "Digit6": return '6';
-            case "Digit7": return '7';
-            case "Digit8": return '8';
-            case "Digit9": return '9';
-            case "Minus": return '-';
-            case "Equal": return '=';
-            case "BracketLeft": return '[';
-            case "BracketRight": return ']';
-            case "Semicolon": return ';';
-            case "Quote": return "'";
-            case "Comma": return ',';
-            case "Period": return '.';
-            case "Space": return ' ';
-            default: return e.key && e.key.toLowerCase();
-        }
+    private rebind(key: string) {
+        return this.props.rebindings[key] || key;
     }
 
     private static interactive(world: w.World) {

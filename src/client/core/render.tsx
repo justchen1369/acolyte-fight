@@ -1,7 +1,9 @@
 import Color from 'color';
 import * as pl from 'planck-js';
+import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
+import * as keyboardUtils from './keyboardUtils';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
@@ -69,7 +71,7 @@ function calculateWorldRect(viewRect: ClientRect): ClientRect {
 	return { left, top, right, bottom, width, height };
 }
 
-export function render(world: w.World, canvasStack: CanvasStack) {
+export function render(world: w.World, canvasStack: CanvasStack, rebindings: KeyBindings) {
 	const rect = canvasStack.canvas.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect);
 	const worldRect = calculateWorldRect(viewRect);
@@ -96,7 +98,7 @@ export function render(world: w.World, canvasStack: CanvasStack) {
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
 	renderWorld(ctxStack, world, worldRect);
-	renderInterface(ctxStack.ui, world, rect);
+	renderInterface(ctxStack.ui, world, rect, rebindings);
 	all(ctxStack, ctx => ctx.restore());
 
 	world.ui.destroyed = [];
@@ -804,10 +806,10 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	return false;
 }
 
-function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect) {
+function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, rebindings: KeyBindings) {
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	if (myHero) {
-		renderButtons(ctx, rect, world, myHero);
+		renderButtons(ctx, rect, world, myHero, rebindings);
 	} else {
 		ctx.clearRect(0, 0, rect.width, rect.height);
 	}
@@ -866,7 +868,7 @@ export function touchControls(config: w.ButtonConfig): boolean {
 	}
 }
 
-function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero) {
+function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, rebindings: KeyBindings) {
 	const selectedAction = hero.casting && hero.casting.action && hero.casting.action.type;
 	const keys = world.settings.Choices.Keys;
 
@@ -876,9 +878,9 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 
 	const config = world.ui.buttonBar;
 	if (config.view === "bar") {
-		renderButtonBar(ctx, config, keys, hero, selectedAction, world);
+		renderButtonBar(ctx, config, keys, hero, selectedAction, world, rebindings);
 	} else if (config.view === "wheel") {
-		renderButtonWheel(ctx, config, keys, hero, selectedAction, world);
+		renderButtonWheel(ctx, config, keys, hero, selectedAction, world, rebindings);
 		// renderTargetSurface(ctx, config, selectedAction, world);
 	}
 }
@@ -891,7 +893,7 @@ function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect): w.ButtonCon
 	}
 }
 
-function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World) {
+function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings) {
 	ctx.save();
 	ctx.translate(config.region.left, config.region.top);
 	ctx.scale(config.scaleFactor, config.scaleFactor);
@@ -902,7 +904,7 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 			continue;
 		}
 
-		const newState = calculateButtonState(key.btn, hero, selectedAction, world);
+		const newState = calculateButtonState(key.btn, hero, selectedAction, world, rebindings);
 		const currentState = config.buttons.get(key.btn);
 
 		if (buttonStateChanged(currentState, newState)) {
@@ -920,7 +922,7 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 	ctx.restore();
 }
 
-function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World) {
+function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings) {
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
@@ -930,7 +932,7 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 			continue;
 		}
 
-		const newState = calculateButtonState(key.btn, hero, selectedAction, world);
+		const newState = calculateButtonState(key.btn, hero, selectedAction, world, rebindings);
 		const currentState = config.buttons.get(key.btn);
 
 		if (buttonStateChanged(currentState, newState)) {
@@ -1093,7 +1095,7 @@ function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRend
 	}
 }
 
-function calculateButtonState(key: string, hero: w.Hero, selectedAction: string, world: w.World): w.ButtonRenderState {
+function calculateButtonState(key: string, hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings): w.ButtonRenderState {
 	if (!key) { return null; }
 
 	const spellId = hero.keysToSpells.get(key);
@@ -1102,8 +1104,9 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const spell = (world.settings.Spells as Spells)[spellId];
 	if (!spell) { return null; }
 
+	const rebindingLookup = keyboardUtils.getRebindingLookup(rebindings);
 	let button: w.ButtonRenderState = {
-		key,
+		key: rebindingLookup.get(key) || key,
 		color: spell.color,
 		icon: spell.icon,
 		cooldownText: null,
