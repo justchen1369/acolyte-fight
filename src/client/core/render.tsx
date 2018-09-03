@@ -423,10 +423,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const angle = hero.body.getAngle();
 	let radius = Hero.Radius;
 
-	if (hero.thrust && !hero.thrust.nullified) {
-		radius = Hero.Radius * 1.25;
-	}
-
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
 
@@ -448,7 +444,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			gradient.addColorStop(0, "white");
 			gradient.addColorStop(1, "transparent");
 
-			const arcWidth = 3 * Hero.Radius / range;
+			const arcWidth = Math.PI / 2;
 
 			ctx.globalAlpha = 0.9 * proportion;
 			ctx.strokeStyle = gradient;
@@ -489,9 +485,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		ctx.lineWidth = Pixel;
 
 		ctx.globalAlpha = 0.5;
-		if (hero.casting && hero.casting.stage >= w.CastStage.Orientating && hero.casting.action.type !== "move") {
-			ctx.globalAlpha = 0.75;
-		}
 
 		ctx.beginPath();
 		ctx.moveTo(0, 0);

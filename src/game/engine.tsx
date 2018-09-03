@@ -1471,7 +1471,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
-	const usedTicks = Math.ceil(spell.recoveryTicks * vector.distance(newPosition, currentPosition) / maxRange);
+	const usedTicks = dashRangeCost(vector.distance(newPosition, currentPosition) / maxRange, spell.recoveryTicks);
 
 	hero.body.setPosition(newPosition);
 	hero.recoveryTicks += usedTicks;
@@ -1485,13 +1485,16 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / spell.speed;
-		const tickLimit = Math.floor(dashRangeMultiplier(hero, spell.recoveryTicks) * maxTicks);
+		const multiplier = dashRangeMultiplier(hero, spell.recoveryTicks);
+		const speed = spell.speed;
+
+		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / speed;
+		const tickLimit = Math.floor(multiplier * maxTicks);
 
 		const diff = vector.diff(action.target, hero.body.getPosition());
-		const distancePerTick = spell.speed / TicksPerSecond;
+		const distancePerTick = speed / TicksPerSecond;
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
-		const velocity = vector.multiply(vector.unit(diff), spell.speed);
+		const velocity = vector.multiply(vector.unit(diff), speed);
 
 		const ticks = Math.min(tickLimit, ticksToTarget);
 
@@ -1504,8 +1507,8 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
-		const usedTicks = Math.ceil(spell.recoveryTicks * ticks / maxTicks);
-		hero.recoveryTicks += usedTicks;
+		hero.recoveryTicks += dashRangeCost(ticks / maxTicks, spell.recoveryTicks);
+		console.log(hero.recoveryTicks);
 		hero.maxRecoveryTicks = spell.recoveryTicks;
 
 		hero.thrust = thrust;
@@ -1519,9 +1522,13 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	return !hero.thrust;
 }
 
-export function dashRangeMultiplier(hero: w.Hero, recoveryTicks: number) {
-	const availableTicks = Math.max(0, recoveryTicks - hero.recoveryTicks);
-	return availableTicks / recoveryTicks;
+export function dashRangeMultiplier(hero: w.Hero, maxRecoveryTicks: number) {
+	const availableTicks = Math.max(0, maxRecoveryTicks - hero.recoveryTicks);
+	return Math.pow(availableTicks / maxRecoveryTicks, 2);
+}
+
+export function dashRangeCost(proportion: number, maxRecoveryTicks: number) {
+	return Math.ceil(Math.pow(proportion, 1 / 2) * maxRecoveryTicks);
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
