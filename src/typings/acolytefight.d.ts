@@ -110,9 +110,9 @@ declare type Spell =
 	| StopSpell
 	| RetargetSpell
 	| ProjectileSpell
+	| ReflectSpell
 	| SpraySpell
 	| ScourgeSpell
-	| ShieldSpell
 	| TeleportSpell
 	| ThrustSpell
 	| WallSpell;
@@ -168,18 +168,6 @@ declare interface SpraySpell extends SpellBase {
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
 
 	retargettingRevsPerTick?: number; // If set, this spell's firing angle can change at this rate each second.
-}
-
-declare interface WallSpell extends SpellBase {
-	action: "wall";
-
-	maxRange: number;
-
-	length: number;
-	width: number;
-
-	health: number;
-	maxTicks: number;
 }
 
 declare interface ProjectileTemplate extends DamagePacket {
@@ -262,10 +250,24 @@ declare interface ScourgeSpell extends SpellBase {
 }
 
 declare interface ShieldSpell extends SpellBase {
-    action: "shield";
-
     maxTicks: number;
+}
+
+declare interface ReflectSpell extends ShieldSpell {
+    action: "shield";
     radius: number;
+}
+
+declare interface WallSpell extends ShieldSpell {
+	action: "wall";
+
+	maxRange: number;
+
+	length: number;
+	width: number;
+
+	growthTicks: number;
+	maxTicks: number;
 }
 
 declare interface DashSpell extends SpellBase {

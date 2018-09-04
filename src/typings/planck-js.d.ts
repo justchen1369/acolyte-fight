@@ -3,6 +3,7 @@ declare module "planck-js" {
         interface World {
             createBody(bodyDef: BodyDef): Body;
             destroyBody(body: Body): void;
+            rayCast(from: Vec2, to: Vec2, callback: RayCastCallback): void;
             on(eventName: string, callback : any): void;
             step(timeSpan: number): void;
             getContactList(): Contact;
@@ -100,6 +101,10 @@ declare module "planck-js" {
 
         interface Manifold {
             points: Vec2[];
+        }
+
+        interface RayCastCallback {
+            (fixture: Fixture, point: Vec2, normal: Vec2, fraction: number): number;
         }
 
         function Circle(radius: number): Circle;

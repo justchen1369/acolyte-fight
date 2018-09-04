@@ -130,7 +130,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
-function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
+function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 	const shieldId = "shield" + (world.nextObjectId++);
 
 	const body = world.physics.createBody({
@@ -148,10 +148,12 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 	const shield: w.Shield = {
 		id: shieldId,
 		category: "shield",
+		type: "reflect",
 		categories: Categories.Shield,
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
+		growthTicks: 0,
 		owner: hero.id,
 		radius: spell.radius,
 		color: spell.color,
@@ -159,6 +161,41 @@ function addShield(world: w.World, hero: w.Hero, spell: ShieldSpell) {
 
 	world.objects.set(shield.id, shield);
 	hero.shieldIds.add(shield.id);
+
+	return shield;
+}
+
+function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
+	const shieldId = "shield" + (world.nextObjectId++);
+
+	const body = world.physics.createBody({
+		userData: shieldId,
+		type: 'static',
+		position,
+		angle,
+	});
+
+	body.createFixture(pl.Polygon(points), {
+		filterCategoryBits: Categories.Shield,
+		filterMaskBits: Categories.Hero | Categories.Projectile,
+	});
+
+	const shield: w.Shield = {
+		id: shieldId,
+		category: "shield",
+		type: "wall",
+		categories: Categories.Shield,
+		body,
+		createTick: world.tick,
+		expireTick: world.tick + spell.maxTicks,
+		growthTicks: spell.growthTicks,
+		owner: hero.id,
+		points,
+		extent,
+		color: spell.color,
+	};
+
+	world.objects.set(shield.id, shield);
 
 	return shield;
 }
@@ -1120,7 +1157,7 @@ function linkForce(world: w.World) {
 
 function shields(world: w.World) {
 	world.objects.forEach(shield => {
-		if (shield.category === "shield" && world.tick < shield.expireTick) {
+		if (shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
 			const hero = world.objects.get(shield.owner);
 			if (hero) {
 				shield.body.setPosition(vector.clone(hero.body.getPosition()));
@@ -1490,7 +1527,9 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	if (!action.target) { return true; }
 
 	const maxRange = world.settings.Hero.MaxDashRange;
-	const rangeLimit = dashRangeMultiplier(hero, spell.recoveryTicks, world) * maxRange;
+	let rangeLimit = Math.min(
+		dashRangeMultiplier(hero, spell.recoveryTicks, world) * maxRange,
+		shieldCollisionLimit(hero.body.getPosition(), action.target, world));
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
@@ -1502,6 +1541,25 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	hero.moveTo = action.target;
 
 	return true;
+}
+
+function shieldCollisionLimit(from: pl.Vec2, to: pl.Vec2, world: w.World): number {
+	let hit: pl.Vec2 = null;
+	world.physics.rayCast(from, to, (fixture, point, normal, fraction) => {
+		const obj = world.objects.get(fixture.getBody().getUserData());
+		if (obj.category === "shield") {
+			hit = point;
+			return 0; // Stop search after first hit
+		} else {
+			return fraction; // Keep searching after this polygon
+		}
+	});
+
+	if (hit) {
+		return Math.max(0, vector.distance(hit, from) - constants.Pixel); // -Pixel so we are on this side of the shield
+	} else {
+		return vector.distance(to, from);
+	}
 }
 
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
@@ -1606,18 +1664,12 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: WallS
 	const angle = 0.5 * Math.PI + vector.angle(diff);
 
 	const position = vector.plus(hero.body.getPosition(), diff);
-	let obstacle = addObstacle(world, position, angle, points, Math.min(halfWidth, halfLength));
-
-	const health = spell.health;
-	obstacle.health = health;
-	obstacle.maxHealth = health;
-	obstacle.damagePerTick = obstacle.maxHealth / spell.maxTicks;
-	obstacle.growthTicks = 5;
+	addWall(world, hero, spell, position, angle, points, Math.min(halfWidth, halfLength));
 
 	return true;
 }
 
-function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: ShieldSpell) {
+function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: ReflectSpell) {
 	addShield(world, hero, spell);
 	return true;
 }

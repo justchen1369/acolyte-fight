@@ -286,14 +286,28 @@ export interface Hero extends WorldObjectBase {
 	spellsToKeys: Map<string, string>;
 }
 
-export interface Shield extends WorldObjectBase {
+export interface ShieldBase extends WorldObjectBase {
 	category: "shield";
-	radius: number;
+	type: string;
 	createTick: number;
 	expireTick: number;
+	growthTicks: number;
 	owner: string;
 	color: string;
 }
+
+export interface Reflect extends ShieldBase {
+	type: "reflect";
+	radius: number;
+}
+
+export interface Wall extends ShieldBase {
+	type: "wall";
+	extent: number;
+	points: pl.Vec2[];
+}
+
+export type Shield = Reflect | Wall;
 
 export interface CastState {
 	action: Action;

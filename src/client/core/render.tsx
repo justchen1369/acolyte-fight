@@ -551,27 +551,57 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const MinAlpha = 0.10;
 	const ctx = ctxStack.canvas;
 
-	const hero = world.objects.get(shield.owner);
-	if (!hero) {
-		return;
-	}
-	const pos = hero.body.getPosition();
-
 	const ticksRemaining = shield.expireTick - world.tick;
 	const maxTicks = shield.expireTick - shield.createTick;
-	let proportion = 1.0 * ticksRemaining / maxTicks;
+	const proportion = 1.0 * ticksRemaining / maxTicks;
 
 	ctx.save();
 
+	let body: pl.Body;
+	if (shield.type === "reflect") {
+		const hero = world.objects.get(shield.owner);
+		if (!hero) {
+			return;
+		}
+		body = hero.body;
+	} else if (shield.type === "wall") {
+		body = shield.body;
+	} else {
+		return;
+	}
+	const pos = body.getPosition();
 	ctx.translate(pos.x, pos.y);
+	ctx.rotate(body.getAngle());
+
+	if (world.tick - shield.createTick < shield.growthTicks) {
+		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
+		ctx.scale(growthProportion, growthProportion);
+	}
 
 	ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
 	ctx.fillStyle = shield.color;
+	ctx.lineWidth = Pixel * 3;
 	ctx.shadowColor = shield.color;
 	ctx.shadowBlur = 10;
 
 	ctx.beginPath();
-	ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
+	if (shield.type === "reflect") {
+		ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
+	} else {
+        ctx.beginPath();
+
+        const points = shield.points;
+        for (let i = 0; i < points.length; ++i) {
+            const point = points[i % points.length];
+            if (i === 0) {
+                ctx.moveTo(point.x, point.y);
+            }
+            ctx.lineTo(point.x, point.y);
+        }
+
+        ctx.closePath();
+        ctx.fill();
+	}
 	ctx.fill();
 
 
