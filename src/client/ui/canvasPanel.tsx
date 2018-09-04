@@ -145,7 +145,7 @@ class CanvasPanel extends React.Component<Props, State> {
                     onMouseDown={(ev) => this.touchStartHandler(this.takeMousePoint(ev))}
                     onMouseEnter={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
                     onMouseMove={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
-                    onMouseLeave={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
+                    onMouseLeave={(ev) => this.touchEndHandler(this.takeMousePoint(ev))}
                     onMouseUp={(ev) => this.touchEndHandler(this.takeMousePoint(ev))}
 
                     onTouchStart={(ev) => this.touchStartHandler(...this.takeTouchPoint(ev))}
