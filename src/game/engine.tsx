@@ -252,8 +252,7 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
-		recoveryTicks: 0,
-		maxRecoveryTicks: null,
+		charges: {},
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -265,6 +264,10 @@ function addHero(world: w.World, heroId: string) {
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	return hero;
+}
+
+export function chargesAvailable(world: w.World, hero: w.Hero, spell: string) {
+	return (!cooldownRemaining(world, hero, spell) ? 1 : 0) + (hero.charges[spell] || 0);
 }
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spell: string) {
@@ -409,7 +412,7 @@ export function tick(world: w.World) {
 
 	applySpeedLimit(world);
 	removePassthrough(world);
-	decayRecovery(world);
+	recharge(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -669,8 +672,6 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 	}
 	hero.keysToSpells = keysToSpells;
 	hero.spellsToKeys = spellsToKeys;
-
-	hero.maxRecoveryTicks = calculateRecoveryTicks(world, hero);
 }
 
 function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
@@ -690,7 +691,9 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 		if (spell.cooldown) {
 			const cooldown = cooldownRemaining(world, hero, spell.id);
-			if (cooldown > 0) {
+			if (hero.charges[spell.id] > 0) {
+				// Use up a charge
+			} else if (cooldown > 0) {
 				if (cooldown > constants.MaxCooldownWait) {
 					// Just cancel spells if they're too far off cooldown
 					hero.casting = null;
@@ -751,7 +754,11 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.casting.initialPosition = hero.casting.initialPosition || vector.clone(hero.body.getPosition());
 
 			if (spell.cooldown) {
-				setCooldown(world, hero, spell.id, spell.cooldown);
+				if (hero.charges[spell.id] > 0) {
+					--hero.charges[spell.id];
+				} else {
+					setCooldown(world, hero, spell.id, spell.cooldown);
+				}
 			}
 		}
 
@@ -1210,10 +1217,17 @@ function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
 	}
 }
 
-function decayRecovery(world: w.World) {
+function recharge(world: w.World) {
 	world.objects.forEach(hero => {
-		if (hero.category === "hero" && hero.recoveryTicks > 0) {
-			--hero.recoveryTicks;
+		if (hero.category === "hero") {
+			for (const spellId of hero.spellsToKeys.keys()) {
+				const spell = world.settings.Spells[spellId];
+				const numCharges = 1 + (hero.charges[spell.id] || 0);
+				if (spell.numCharges > 1 && numCharges < spell.numCharges && !cooldownRemaining(world, hero, spellId)) {
+					hero.charges[spell.id] = numCharges;
+					setCooldown(world, hero, spellId, spell.cooldown);
+				}
+			}
 		}
 	});
 }
@@ -1519,35 +1533,15 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return currentLength >= spell.lengthTicks;
 }
 
-function calculateRecoveryTicks(world: w.World, hero: w.Hero): number {
-	const spellId = hero.keysToSpells.get(w.Actions.RightClick);
-	if (!spellId) {
-		return null;
-	}
-
-	const spell = world.settings.Spells[spellId] as DashSpell;
-	if (!spell) {
-		return null;
-	}
-
-	return spell.recoveryTicks;
-}
-
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
 	if (!action.target) { return true; }
 
-	const maxRange = world.settings.Hero.MaxDashRange;
-	let rangeLimit = Math.min(
-		dashRangeMultiplier(hero, spell.recoveryTicks, world) * maxRange,
-		shieldCollisionLimit(hero.body.getPosition(), action.target, world));
+	const rangeLimit = Math.min(world.settings.Hero.MaxDashRange, shieldCollisionLimit(hero.body.getPosition(), action.target, world));
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
-	const usedTicks = dashRangeCost(vector.distance(newPosition, currentPosition) / maxRange, spell.recoveryTicks);
 
 	hero.body.setPosition(newPosition);
-	hero.recoveryTicks += usedTicks;
-	hero.maxRecoveryTicks = spell.recoveryTicks;
 	hero.moveTo = action.target;
 
 	return true;
@@ -1576,18 +1570,16 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const multiplier = dashRangeMultiplier(hero, spell.recoveryTicks, world);
-		const speed = Math.max(world.settings.Hero.MoveSpeedPerSecond, spell.speed * ((1 - spell.speedDecayAlpha) + spell.speedDecayAlpha * multiplier));
+		const speed = spell.speed;
 
 		const maxTicks = TicksPerSecond * world.settings.Hero.MaxDashRange / speed;
-		const tickLimit = Math.floor(multiplier * maxTicks);
 
 		const diff = vector.diff(action.target, hero.body.getPosition());
 		const distancePerTick = speed / TicksPerSecond;
 		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
 		const velocity = vector.multiply(vector.unit(diff), speed);
 
-		const ticks = Math.min(tickLimit, ticksToTarget);
+		const ticks = Math.min(maxTicks, ticksToTarget);
 
 		let thrust: w.ThrustState = {
 			damage: spell.damage,
@@ -1597,9 +1589,6 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 			alreadyHit: new Set<string>(),
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
-
-		hero.recoveryTicks += dashRangeCost(ticks / maxTicks, spell.recoveryTicks);
-		hero.maxRecoveryTicks = spell.recoveryTicks;
 
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
@@ -1614,15 +1603,6 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	}
 
 	return !hero.thrust;
-}
-
-export function dashRangeMultiplier(hero: w.Hero, maxRecoveryTicks: number, world: w.World) {
-	const availableTicks = Math.max(0, maxRecoveryTicks - hero.recoveryTicks);
-	return Math.pow(availableTicks / maxRecoveryTicks, world.settings.Hero.DashRangePower);
-}
-
-export function dashRangeCost(proportion: number, maxRecoveryTicks: number) {
-	return Math.ceil(Math.pow(proportion, 1 / 2) * maxRecoveryTicks);
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {

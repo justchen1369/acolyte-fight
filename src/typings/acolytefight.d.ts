@@ -47,7 +47,7 @@ declare interface HeroSettings {
 
 	RevolutionsPerTick: number; // Hero turn rate
 	MaxDashRange: number; // The maximum range of teleport/thrust
-	DashRangePower: number; // The power curve for teleport/thrust replenishing
+	NumDashCharges: number;
 }
 
 declare interface WorldSettings {
@@ -129,6 +129,7 @@ declare interface SpellBase {
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
+	numCharges?: number;
     cooldown: number;
     interruptible?: boolean; // Whether this spell can be interrupted by moving.
     movementCancel?: boolean; // Whether moving cancels the spell.
@@ -273,7 +274,6 @@ declare interface WallSpell extends ShieldSpell {
 }
 
 declare interface DashSpell extends SpellBase {
-	recoveryTicks: number;
 }
 
 declare interface TeleportSpell extends DashSpell {

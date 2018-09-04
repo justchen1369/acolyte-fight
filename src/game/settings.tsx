@@ -17,8 +17,8 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 0.05,
-    MaxDashRange: 0.3,
-    DashRangePower: 1.25,
+    MaxDashRange: 0.15,
+    NumDashCharges: 2,
 }
 
 const World: WorldSettings = {
@@ -666,7 +666,7 @@ const icewall: Spell = {
     length: 0.005,
     width: 0.15,
 
-    categories: Categories.Shield | Categories.Obstacle,
+    categories: Categories.Shield,
 
     icon: "woodenFence",
 
@@ -679,8 +679,8 @@ const teleport: Spell = {
     description: "Teleport to a nearby location. Get close, or get away.",
 
     maxAngleDiffInRevs: 1.0,
-    cooldown: 1.0 * TicksPerSecond,
-    recoveryTicks: 12 * TicksPerSecond,
+    cooldown: 8.0 * TicksPerSecond,
+    numCharges: 2,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
@@ -697,8 +697,8 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 1.0 * TicksPerSecond,
-    recoveryTicks: 12 * TicksPerSecond,
+    cooldown: 8.0 * TicksPerSecond,
+    numCharges: 2,
 
     damage: 1,
     speed: 1.0,

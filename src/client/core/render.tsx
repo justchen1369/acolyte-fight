@@ -428,36 +428,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
 
-	// Dash range
-	if (hero.id === world.ui.myHeroId && world.ui.nextTarget && hero.maxRecoveryTicks > 0) {
-		const dashTargetOffset = vector.diff(world.ui.nextTarget, pos);
-
-		const range = Math.max(radius + Pixel * 2, engine.dashRangeMultiplier(hero, hero.maxRecoveryTicks, world) * Hero.MaxDashRange);
-		const proportion = 1 - range / Math.max(1e-6, vector.length(dashTargetOffset));
-
-		if (proportion > 0) {
-			ctx.save();
-
-			const radialStop = vector.relengthen(dashTargetOffset, range);
-
-			const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);
-			gradient.addColorStop(0, "white");
-			gradient.addColorStop(1, "transparent");
-
-			const circumference = 2 * Math.PI * range;
-
-			ctx.globalAlpha = 0.9 * proportion;
-			ctx.strokeStyle = gradient;
-			ctx.lineWidth = DashIndicator.Width;
-			ctx.beginPath();
-			ctx.setLineDash([circumference / 100, circumference / 100]);
-			ctx.arc(0, 0, range, 0, 2 * Math.PI);
-			ctx.stroke();
-
-			ctx.restore();
-		}
-	}
-
 	// Fill
 	{
 		ctx.save();
@@ -539,6 +509,33 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			healthBarPath(ctx, radius, healthProportion, world);
 			ctx.fill();
 
+			ctx.restore();
+		}
+	}
+
+	// Num dashes
+	if (hero.id === world.ui.myHeroId) {
+		const spellId = hero.keysToSpells.get(w.Actions.RightClick);
+		const spell = world.settings.Spells[spellId];
+		const numDashes = engine.chargesAvailable(world, hero, spellId);
+
+		const left = -Hero.Radius * HealthBar.HeroRadiusFraction;
+		const y = -Hero.Radius - DashIndicator.Margin;
+		for (let i = 0; i < numDashes; ++i) {
+			const x = left + DashIndicator.Width * i * 2; // *2 for pip + gap
+
+			ctx.save();
+			ctx.fillStyle = "black";
+			ctx.beginPath();
+			ctx.rect(x - Pixel, y - Pixel, DashIndicator.Width + Pixel * 2, DashIndicator.Height + Pixel * 2);
+			ctx.fill();
+			ctx.restore();
+
+			ctx.save();
+			ctx.fillStyle = "white";
+			ctx.beginPath();
+			ctx.rect(x, y, DashIndicator.Width, DashIndicator.Height);
+			ctx.fill();
 			ctx.restore();
 		}
 	}
