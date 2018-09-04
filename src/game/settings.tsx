@@ -660,7 +660,7 @@ const icewall: Spell = {
     description: "Create a wall that blocks projectiles and any teleporting/charging heroes. Heroes can still walk through the wall at a normal speed.",
 
     maxRange: 0.25,
-    maxTicks: 5 * TicksPerSecond,
+    maxTicks: 3 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 20 * TicksPerSecond,
 

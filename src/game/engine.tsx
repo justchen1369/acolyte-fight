@@ -176,7 +176,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 	});
 
 	body.createFixture(pl.Polygon(points), {
-		filterCategoryBits: Categories.Shield,
+		filterCategoryBits: Categories.Shield | Categories.Obstacle,
 		filterMaskBits: Categories.Hero | Categories.Projectile,
 	});
 
