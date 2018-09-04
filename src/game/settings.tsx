@@ -622,13 +622,13 @@ const scourge: Spell = {
 
     radius: Hero.Radius * 4,
     chargeTicks: 0.5 * TicksPerSecond,
-    movementProportionWhileCharging: 0.3,
+    movementProportionWhileCharging: 0.1,
     cooldown: 10 * TicksPerSecond,
     interruptible: true,
     damage: 10,
     selfDamage: 5,
     damageScaling: false,
-    minImpulse: 0.00035,
+    minImpulse: 0.0002,
     maxImpulse: 0.0005,
 
     icon: "deadlyStrike",
@@ -666,6 +666,8 @@ const icewall: Spell = {
 
     length: 0.005,
     width: 0.15,
+
+    categories: Categories.Shield | Categories.Obstacle,
 
     icon: "woodenFence",
 

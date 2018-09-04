@@ -268,6 +268,8 @@ declare interface WallSpell extends ShieldSpell {
 
 	growthTicks: number;
 	maxTicks: number;
+
+	categories?: number;
 }
 
 declare interface DashSpell extends SpellBase {
