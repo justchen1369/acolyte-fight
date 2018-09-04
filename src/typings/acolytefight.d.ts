@@ -237,7 +237,7 @@ declare interface HomingParametersTemplate {
 	speedWhenClose?: number; // When the projectile is within minDistanceToTarget, change the speed to this. Used to stop projectiles when they reach targets.
 }
 
-declare interface DetonateParametersTemplate {
+declare interface DetonateParametersTemplate extends DamagePacket {
 	radius: number; // The radius of the explosion
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback

@@ -234,10 +234,11 @@ const flamestrike: Spell = {
         radius: 0.005,
         speed: 0.18,
         maxTicks: 2 * TicksPerSecond,
-        damage: 10,
+        damage: 0,
         categories: Categories.Projectile,
 
         detonate: {
+            damage: 10,
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
@@ -603,6 +604,7 @@ const supernova: Spell = {
 
         detonate: {
             waitTicks: 0.5 * TicksPerSecond,
+            damage: 0,
             radius: 0.05,
             minImpulse: 0.0002,
             maxImpulse: 0.0005,

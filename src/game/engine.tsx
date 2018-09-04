@@ -305,6 +305,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		} as w.HomingParameters,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
+			damage: projectileTemplate.detonate.damage,
+			lifeSteal: projectileTemplate.detonate.lifeSteal,
 			radius: projectileTemplate.detonate.radius,
 			minImpulse: projectileTemplate.detonate.minImpulse,
 			maxImpulse: projectileTemplate.detonate.maxImpulse,
@@ -846,12 +848,14 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 	}
 
 	if (expireOn(world, projectile, obstacle)) {
+		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
 	}
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
 	if (expireOn(world, projectile, other)) {
+		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -869,6 +873,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		bounceToNext(projectile, shield.owner, world);
 	}
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
+		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -893,6 +898,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		bounceToNext(projectile, hero.id, world);
 	}
 	if (expireOn(world, projectile, hero)) {
+		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -1198,35 +1204,43 @@ function detonate(world: w.World) {
 		}
 
 		if (world.tick === obj.detonate.detonateTick + obj.detonate.waitTicks) {
-			// Apply damage
-			world.objects.forEach(other => {
-				if (other.category === "hero") {
-					const diff = vector.diff(other.body.getPosition(), obj.body.getPosition());
-					const distance = vector.length(diff);
-					if (other.id !== obj.owner && distance <= obj.detonate.radius + other.radius) {
-						applyDamage(other, obj, obj.owner, world);
-
-						const proportion = 1.0 - (distance / (obj.detonate.radius + other.radius)); // +HeroRadius because only need to touch the edge
-						const magnitude = obj.detonate.minImpulse + proportion * (obj.detonate.maxImpulse - obj.detonate.minImpulse);
-						other.body.applyLinearImpulse(
-							vector.relengthen(diff, magnitude),
-							other.body.getWorldPoint(vector.zero()),
-							true);
-					}
-				} else if (other.category === "obstacle") {
-					if (vector.distance(obj.body.getPosition(), other.body.getPosition()) <= obj.detonate.radius + other.extent) {
-						applyDamageToObstacle(other, obj.damage, world);
-					}
-				}
-			});
-
-			world.ui.events.push({
-				type: "detonate",
-				pos: vector.clone(obj.body.getPosition()),
-				radius: obj.detonate.radius,
-			});
+			detonateProjectile(obj, world);
 			destroyObject(world, obj);
 		}
+	});
+}
+
+function detonateProjectile(projectile: w.Projectile, world: w.World) {
+	if (!projectile.detonate) {
+		return;
+	}
+
+	// Apply damage
+	world.objects.forEach(other => {
+		if (other.category === "hero") {
+			const diff = vector.diff(other.body.getPosition(), projectile.body.getPosition());
+			const distance = vector.length(diff);
+			if (other.id !== projectile.owner && distance <= projectile.detonate.radius + other.radius) {
+				applyDamage(other, projectile.detonate, projectile.owner, world);
+
+				const proportion = 1.0 - (distance / (projectile.detonate.radius + other.radius)); // +HeroRadius because only need to touch the edge
+				const magnitude = projectile.detonate.minImpulse + proportion * (projectile.detonate.maxImpulse - projectile.detonate.minImpulse);
+				other.body.applyLinearImpulse(
+					vector.relengthen(diff, magnitude),
+					other.body.getWorldPoint(vector.zero()),
+					true);
+			}
+		} else if (other.category === "obstacle") {
+			if (vector.distance(projectile.body.getPosition(), other.body.getPosition()) <= projectile.detonate.radius + other.extent) {
+				applyDamageToObstacle(other, projectile.damage, world);
+			}
+		}
+	});
+
+	world.ui.events.push({
+		type: "detonate",
+		pos: vector.clone(projectile.body.getPosition()),
+		radius: projectile.detonate.radius,
 	});
 }
 

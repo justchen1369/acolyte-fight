@@ -488,7 +488,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 }
 
 export function addBot(game: g.Game, keyBindings: KeyBindings) {
-	if (!game.joinable || game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0) {
+	if (game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0) {
 		return null;
 	}
 

@@ -401,7 +401,7 @@ export interface HomingParameters {
 	speedWhenClose: number;
 }
 
-export interface DetonateParameters {
+export interface DetonateParameters extends DamagePacket {
 	radius: number;
 	minImpulse: number;
 	maxImpulse: number;
