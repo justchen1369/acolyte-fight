@@ -357,7 +357,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.actionType === "game" && actionData.spellId !== "move";
+	return actionData.actionType === "game" && actionData.spellId !== "move" && actionData.spellId !== "retarget";
 }
 
 export function leaveGame(game: g.Game, socketId: string) {
