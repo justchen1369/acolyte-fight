@@ -613,6 +613,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 }
 
 function handleActions(world: w.World) {
+	const nextActions = new Map<string, w.Action>();
 	world.objects.forEach(hero => {
 		if (hero.category !== "hero") { return; }
 		let action = world.actions.get(hero.id);
@@ -631,13 +632,23 @@ function handleActions(world: w.World) {
 			action = null;
 		}
 
+		if (hero.casting) {
+			if (!action || hero.casting.uninterruptible) {
+				// Wait until casting action is completed
+				nextActions.set(hero.id, action);
+				action = hero.casting.action;
+			} else {
+				// Allow the casting action to be interrupted
+			}
+		}
+
 		performHeroActions(world, hero, action);
 
 		if (!hero.casting || hero.casting.movementProportion > 0) {
 			moveTowards(world, hero, hero.moveTo, (hero.casting && hero.casting.movementProportion) || 1.0);
 		}
 	});
-	world.actions = new Map<string, w.Action>();
+	world.actions = nextActions;
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
@@ -662,11 +673,7 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 	hero.maxRecoveryTicks = calculateRecoveryTicks(world, hero);
 }
 
-function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) {
-	let action = nextAction;
-	if (hero.casting && (hero.casting.uninterruptible || !nextAction)) {
-		action = hero.casting.action;
-	}
+function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 	if (!action || !isValidAction(action, hero)) {
 		return; // Nothing to do
 	}
