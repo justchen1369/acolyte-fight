@@ -488,9 +488,12 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
 	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
+		ctx.lineWidth = Pixel * 2;
+		ctx.strokeStyle = '#111';
 		ctx.fillStyle = '#111';
 		ctx.beginPath();
 		healthBarPath(ctx, radius, 1.0, world);
+		ctx.stroke();
 		ctx.fill();
 
 		let healthProportion = hero.health / Hero.MaxHealth;
@@ -525,16 +528,12 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			const x = left + DashIndicator.Width * i * 2; // *2 for pip + gap
 
 			ctx.save();
-			ctx.fillStyle = "black";
-			ctx.beginPath();
-			ctx.rect(x - Pixel, y - Pixel, DashIndicator.Width + Pixel * 2, DashIndicator.Height + Pixel * 2);
-			ctx.fill();
-			ctx.restore();
-
-			ctx.save();
+			ctx.lineWidth = Pixel * 2;
+			ctx.strokeStyle = "black";
 			ctx.fillStyle = "white";
 			ctx.beginPath();
 			ctx.rect(x, y, DashIndicator.Width, DashIndicator.Height);
+			ctx.stroke();
 			ctx.fill();
 			ctx.restore();
 		}
