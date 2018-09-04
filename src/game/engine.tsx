@@ -1520,7 +1520,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 }
 
 function calculateRecoveryTicks(world: w.World, hero: w.Hero): number {
-	const spellId = hero.keysToSpells.get(w.Actions.Dash);
+	const spellId = hero.keysToSpells.get(w.Actions.RightClick);
 	if (!spellId) {
 		return null;
 	}

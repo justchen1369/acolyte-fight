@@ -53,7 +53,7 @@ const Choices: ChoiceSettings = {
         { btn: "f", primary: false },
     ],
 	Options: {
-		[Actions.Dash]: ["thrust", "teleport"],
+		[Actions.RightClick]: ["thrust", "teleport"],
 		"d": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike"],
 		"w": ["link", "lightning", "gravity"],
@@ -62,7 +62,7 @@ const Choices: ChoiceSettings = {
 		"f": ["firespray", "bouncer", "scourge"],
 	},
 	Defaults: {
-		[Actions.Dash]: "thrust",
+		[Actions.RightClick]: "thrust",
 		"d": "shield",
 		"q": "fireball",
 		"w": "link",

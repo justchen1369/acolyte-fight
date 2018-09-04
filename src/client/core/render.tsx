@@ -1167,8 +1167,6 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect, buttonState: w.ButtonRenderState) {
 	const size = buttonRegion.width; // assume square
 	if (buttonState) {
-		const key = buttonState.key || "";
-
 		ctx.save();
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
@@ -1183,13 +1181,17 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
 			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2);
 		} else {
-			// Keyboard shortcut
-			ctx.save();
+			const key = buttonState.key;
+			if (key && !keyboardUtils.isRightClick(key)) {
+				// Keyboard shortcut
+				ctx.save();
 
-			ctx.font = 'bold ' + (size / 2 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4);
+				ctx.font = 'bold ' + (size / 2 - 1) + 'px sans-serif';
 
-			ctx.restore();
+				renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4);
+
+				ctx.restore();
+			}
 		}
 
 

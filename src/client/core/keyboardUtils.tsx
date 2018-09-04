@@ -1,4 +1,5 @@
 import * as Reselect from 'reselect';
+import * as w from '../../game/world.model';
 import { DefaultSettings } from '../../game/settings';
 
 export const getRebindingLookup = Reselect.createSelector(
@@ -71,5 +72,5 @@ export function readKey(e: KeyboardEvent) {
 }
 
 export function isRightClick(key: string) {
-    return key && key.length > 1;
+    return key === w.Actions.RightClick;
 }

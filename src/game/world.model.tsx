@@ -2,7 +2,7 @@ import * as pl from 'planck-js';
 import * as Immutable from 'immutable';
 
 export namespace Actions {
-	export const Dash = "dash";
+	export const RightClick = "dash";
 	export const Move = "move";
 	export const Retarget = "retarget";
 	export const Stop = "stop";
