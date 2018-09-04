@@ -668,7 +668,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		action = hero.casting.action;
 	}
 	if (!action || !isValidAction(action, hero)) {
-		return true; // Nothing to do
+		return; // Nothing to do
 	}
 	const spell = world.settings.Spells[action.type];
 	const uninterruptible = !spell.interruptible;
@@ -681,8 +681,13 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
 		hero.casting.movementProportion = 1.0;
 
-		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
-			return false; // Cannot perform action, waiting for cooldown
+		if (spell.cooldown) {
+			const cooldown = cooldownRemaining(world, hero, spell.id);
+			if (cooldown > 0) {
+				// Just cancel spells if we can't cast them
+				hero.casting = null;
+				return;
+			}
 		}
 
 		hero.casting.movementProportion = 0.0;
@@ -694,7 +699,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 
 		const angleDiff = spell.untargeted ? 0 : turnTowards(hero, action.target);
 		if (spell.maxAngleDiffInRevs !== undefined && angleDiff > spell.maxAngleDiffInRevs * 2 * Math.PI) {
-			return false; // Wait until are facing the target
+			return; // Wait until are facing the target
 		}
 
 		hero.casting.uninterruptible = false;
@@ -718,7 +723,7 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		const ticksCharging = world.tick - hero.casting.chargeStartTick;
 		if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
 			hero.casting.proportion = 1.0 * ticksCharging / spell.chargeTicks;
-			return false;
+			return;
 		}
 
 		// Exiting charging stage
@@ -728,7 +733,6 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 		++hero.casting.stage;
 	}
 
-	let done = false;
 	if (hero.casting.stage === w.CastStage.Channelling) {
 		// Start channelling
 		if (!hero.casting.channellingStartTick) {
@@ -753,9 +757,6 @@ function performHeroActions(world: w.World, hero: w.Hero, nextAction: w.Action) 
 	if (hero.casting.stage === w.CastStage.Complete) {
 		hero.casting = null;
 	}
-
-	// Only mark nextAction as completed if we actually did it and not the uninterruptible action
-	return action === nextAction && done;
 }
 
 function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
