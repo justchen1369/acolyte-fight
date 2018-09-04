@@ -681,7 +681,7 @@ const teleport: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 1.0 * TicksPerSecond,
     recoveryTicks: 12 * TicksPerSecond,
-    chargeTicks: 12,
+    chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
 
