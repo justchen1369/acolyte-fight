@@ -619,7 +619,12 @@ function handleActions(world: w.World) {
 	const nextActions = new Map<string, w.Action>();
 	world.objects.forEach(hero => {
 		if (hero.category !== "hero") { return; }
+
 		let action = world.actions.get(hero.id);
+		if (action) {
+			hero.target = action.target;
+		}
+
 		if (action && action.type === w.Actions.Move) {
 			// Movement actions are special
 			hero.moveTo = action.target;

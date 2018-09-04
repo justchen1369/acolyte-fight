@@ -516,29 +516,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		}
 	}
 
-	// Num dashes
-	if (hero.id === world.ui.myHeroId) {
-		const spellId = hero.keysToSpells.get(w.Actions.RightClick);
-		const spell = world.settings.Spells[spellId];
-		const numDashes = engine.chargesAvailable(world, hero, spellId);
-
-		const left = -Hero.Radius * HealthBar.HeroRadiusFraction;
-		const y = -Hero.Radius - DashIndicator.Margin;
-		for (let i = 0; i < numDashes; ++i) {
-			const x = left + DashIndicator.Width * i * 2; // *2 for pip + gap
-
-			ctx.save();
-			ctx.lineWidth = Pixel * 2;
-			ctx.strokeStyle = "black";
-			ctx.fillStyle = "white";
-			ctx.beginPath();
-			ctx.rect(x, y, DashIndicator.Width, DashIndicator.Height);
-			ctx.stroke();
-			ctx.fill();
-			ctx.restore();
-		}
-	}
-
 	ctx.restore();
 }
 
@@ -873,7 +850,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 				}
 			});
 		} else if (radius <= config.innerRadius) {
-			key = " ";
+			key = w.Actions.RightClick;
 		}
 	}
 
@@ -950,6 +927,9 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings) {
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
+
+	const rightClick: KeyConfig = { btn: w.Actions.RightClick };
+	keys = [...keys, rightClick];
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
@@ -1069,6 +1049,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.Butt
 			nextAngle += arcWidth;
 		}
 	});
+	hitSectors.set(w.Actions.RightClick, { startAngle: null, endAngle: null });
 
 	const region = calculateButtonWheelRegion(rect);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;
@@ -1204,8 +1185,12 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 	ctx.fillStyle = buttonState.color;
 
 	ctx.beginPath();
-	ctx.arc(0, 0, outerRadius, sector.startAngle, sector.endAngle, false);
-	ctx.arc(0, 0, innerRadius, sector.endAngle, sector.startAngle, true);
+	if (sector.startAngle && sector.endAngle) {
+		ctx.arc(0, 0, outerRadius, sector.startAngle, sector.endAngle, false);
+		ctx.arc(0, 0, innerRadius, sector.endAngle, sector.startAngle, true);
+	} else {
+		ctx.arc(0, 0, innerRadius, 0, 2 * Math.PI)
+	}
 	ctx.closePath();
 	ctx.fill();
 
@@ -1215,10 +1200,12 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 		ctx.save();
 
 		// Translate to center of button
-		const midVector = vector.multiply(
-			vector.fromAngle((sector.startAngle + sector.endAngle) / 2),
-			(innerRadius + outerRadius) / 2);
-		ctx.translate(midVector.x, midVector.y);
+		if (sector.startAngle && sector.endAngle) {
+			const midVector = vector.multiply(
+				vector.fromAngle((sector.startAngle + sector.endAngle) / 2),
+				(innerRadius + outerRadius) / 2);
+			ctx.translate(midVector.x, midVector.y);
+		}
 
 		const size = outerRadius - innerRadius;
 

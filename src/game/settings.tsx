@@ -53,18 +53,18 @@ const Choices: ChoiceSettings = {
         { btn: "f", primary: false },
     ],
 	Options: {
-		[Actions.RightClick]: ["thrust", "teleport"],
+		[Actions.RightClick]: ["fireball", "flamestrike"],
 		"d": ["shield", "icewall", "drain"],
-		"q": ["fireball", "flamestrike"],
+		"q": ["thrust", "teleport"],
 		"w": ["link", "lightning", "gravity"],
 		"e": ["homing", "boomerang"],
 		"r": ["kamehameha", "meteor", "supernova"],
 		"f": ["firespray", "bouncer", "scourge"],
 	},
 	Defaults: {
-		[Actions.RightClick]: "thrust",
+		[Actions.RightClick]: "fireball",
 		"d": "shield",
-		"q": "fireball",
+		"q": "thrust",
 		"w": "link",
 		"e": "homing",
 		"r": "kamehameha",
@@ -320,7 +320,7 @@ const kamehameha: Spell = {
     retargettingRevsPerTick: 0.0003,
 
     knockbackCancel: true,
-    movementCancel: true,
+    movementCancel: false,
     interruptible: true,
     jitterRatio: 0.0,
 
@@ -680,7 +680,6 @@ const teleport: Spell = {
 
     maxAngleDiffInRevs: 1.0,
     cooldown: 8.0 * TicksPerSecond,
-    numCharges: 2,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
@@ -698,7 +697,6 @@ const thrust: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 8.0 * TicksPerSecond,
-    numCharges: 2,
 
     damage: 1,
     speed: 1.0,
