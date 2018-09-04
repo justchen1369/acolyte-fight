@@ -1599,7 +1599,6 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
 		hero.recoveryTicks += dashRangeCost(ticks / maxTicks, spell.recoveryTicks);
-		console.log(hero.recoveryTicks);
 		hero.maxRecoveryTicks = spell.recoveryTicks;
 
 		hero.thrust = thrust;
