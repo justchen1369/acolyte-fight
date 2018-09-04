@@ -1596,8 +1596,12 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		hero.moveTo = action.target;
 	}
 
-	if (hero.thrust && !hero.thrust.nullified) {
-		hero.body.setLinearVelocity(hero.thrust.velocity);
+	if (hero.thrust) {
+		if (hero.thrust.nullified) {
+			hero.thrust.ticks = Math.min(spell.bounceTicks, hero.thrust.ticks);
+		} else {
+			hero.body.setLinearVelocity(hero.thrust.velocity);
+		}
 	}
 
 	return !hero.thrust;

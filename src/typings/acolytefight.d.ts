@@ -281,6 +281,7 @@ declare interface TeleportSpell extends DashSpell {
 declare interface ThrustSpell extends DashSpell {
     action: "thrust";
 
+	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
 	damage: number;
 	damageScaling?: boolean;
 	speed: number;
