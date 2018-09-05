@@ -514,6 +514,27 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 			ctx.restore();
 		}
+
+		// Num dashes	
+		if (hero.id === world.ui.myHeroId) {
+			const spellId = hero.keysToSpells.get(w.Actions.RightClick);	
+			const spell = world.settings.Spells[spellId];	
+			const numDashes = engine.chargesAvailable(world, hero, spellId);	
+			const left = -Hero.Radius * HealthBar.HeroRadiusFraction;	
+			const y = -Hero.Radius - DashIndicator.Margin;	
+			for (let i = 0; i < numDashes; ++i) {	
+				const x = left + DashIndicator.Width * i * 2; // *2 for pip + gap	
+				ctx.save();	
+				ctx.lineWidth = Pixel * 2;	
+				ctx.strokeStyle = "black";	
+				ctx.fillStyle = "white";	
+				ctx.beginPath();	
+				ctx.rect(x, y, DashIndicator.Width, DashIndicator.Height);	
+				ctx.stroke();	
+				ctx.fill();	
+				ctx.restore();	
+			}	
+		}
 	}
 
 	ctx.restore();
@@ -850,7 +871,11 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 				}
 			});
 		} else if (radius <= config.innerRadius) {
-			key = w.Actions.RightClick;
+			config.hitSectors.forEach((hitSector, candidateKey) => {
+				if (hitSector.startAngle && hitSector.endAngle) {
+					key = candidateKey;
+				}
+			});
 		}
 	}
 
@@ -928,8 +953,10 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
+	/*
 	const rightClick: KeyConfig = { btn: w.Actions.RightClick };
 	keys = [...keys, rightClick];
+	*/
 
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];

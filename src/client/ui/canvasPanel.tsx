@@ -309,7 +309,7 @@ class CanvasPanel extends React.Component<Props, State> {
             if (this.currentTouch !== null) {
                 let spell = world.settings.Spells[world.ui.nextSpellId];
                 if (!spell) {
-                    spell = isMobile ? Spells.move : Spells[this.keyToSpellId(w.Actions.RightClick)];
+                    spell = Spells.move;
                 }
                 if (spell) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
@@ -320,7 +320,7 @@ class CanvasPanel extends React.Component<Props, State> {
                     }
                 }
             } else {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "move", target: world.ui.nextTarget });
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "retarget", target: world.ui.nextTarget });
             }
         }
     }

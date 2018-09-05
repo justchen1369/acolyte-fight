@@ -17,8 +17,7 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 0.05,
-    MaxDashRange: 0.15,
-    NumDashCharges: 2,
+    MaxDashRange: 0.3,
 }
 
 const World: WorldSettings = {
@@ -53,18 +52,18 @@ const Choices: ChoiceSettings = {
         { btn: "f", primary: false },
     ],
 	Options: {
-		[Actions.RightClick]: ["fireball", "flamestrike"],
+		[Actions.RightClick]: ["thrust", "teleport"],
 		"d": ["shield", "icewall", "drain"],
-		"q": ["thrust", "teleport"],
+		"q": ["fireball", "flamestrike"],
 		"w": ["link", "lightning", "gravity"],
 		"e": ["homing", "boomerang"],
 		"r": ["kamehameha", "meteor", "supernova"],
 		"f": ["firespray", "bouncer", "scourge"],
 	},
 	Defaults: {
-		[Actions.RightClick]: "fireball",
+		[Actions.RightClick]: "thrust",
 		"d": "shield",
-		"q": "thrust",
+		"q": "fireball",
 		"w": "link",
 		"e": "homing",
 		"r": "kamehameha",
@@ -679,7 +678,7 @@ const teleport: Spell = {
     description: "Teleport to a nearby location. Get close, or get away.",
 
     maxAngleDiffInRevs: 1.0,
-    cooldown: 8.0 * TicksPerSecond,
+    cooldown: 12.0 * TicksPerSecond,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
@@ -696,7 +695,7 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 8.0 * TicksPerSecond,
+    cooldown: 12.0 * TicksPerSecond,
 
     damage: 1,
     speed: 1.0,
