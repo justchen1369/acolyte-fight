@@ -423,51 +423,81 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
-	let radius = Hero.Radius;
+	const dashRange = engine.calculateAvailableRange(hero, world);
+	const radius = Hero.Radius;
 
 	ctx.save();
 	ctx.translate(pos.x, pos.y);
 
-	// Fill
+	// Dash range	
+	if (hero.id === world.ui.myHeroId && world.ui.nextTarget) {
+		const displayRange = Math.max(Hero.Radius, dashRange);
+		const dashTargetOffset = vector.diff(world.ui.nextTarget, pos);	
+		const proportion = 1 - displayRange / Math.max(1e-6, vector.length(dashTargetOffset));	
+ 		if (proportion > 0) {	
+			ctx.save();	
+ 			const radialStop = vector.relengthen(dashTargetOffset, displayRange);	
+ 			const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);	
+			gradient.addColorStop(0, "white");	
+			gradient.addColorStop(1, "transparent");	
+ 			const circumference = 2 * Math.PI * displayRange;	
+ 			ctx.globalAlpha = 0.9 * proportion;	
+			ctx.strokeStyle = gradient;	
+			ctx.lineWidth = DashIndicator.Width;	
+			ctx.beginPath();	
+			ctx.setLineDash([circumference / 100, circumference / 100]);	
+			ctx.arc(0, 0, displayRange, 0, 2 * Math.PI);	
+			ctx.stroke();	
+ 			ctx.restore();	
+		}	
+	}	
+
+	// Draw hero
 	{
 		ctx.save();
 
-		ctx.fillStyle = color;
-		ctx.beginPath();
-		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-		ctx.fill();
+		// Fill
+		{
+			ctx.save();
 
-		ctx.restore();
-	}
+			ctx.fillStyle = color;
+			ctx.beginPath();
+			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+			ctx.fill();
 
-	// Orientation
-	{
-		ctx.save();
+			ctx.restore();
+		}
 
-		ctx.beginPath();
-		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-		ctx.clip();
+		// Orientation
+		{
+			ctx.save();
 
-		ctx.rotate(angle);
-		ctx.scale(radius, radius);
+			ctx.beginPath();
+			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+			ctx.clip();
 
-		ctx.fillStyle = "white";
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = Pixel;
+			ctx.rotate(angle);
+			ctx.scale(radius, radius);
 
-		ctx.globalAlpha = 0.5;
+			ctx.fillStyle = "white";
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = Pixel;
 
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(-1, 1);
-		ctx.lineTo(0, 1);
-		ctx.lineTo(0.5, 0);
-		ctx.lineTo(0, -1);
-		ctx.lineTo(-1, -1);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
+			ctx.globalAlpha = 0.5;
 
+			ctx.beginPath();
+			ctx.moveTo(0, 0);
+			ctx.lineTo(-1, 1);
+			ctx.lineTo(0, 1);
+			ctx.lineTo(0.5, 0);
+			ctx.lineTo(0, -1);
+			ctx.lineTo(-1, -1);
+			ctx.closePath();
+			ctx.fill();
+			ctx.stroke();
+
+			ctx.restore();
+		}
 		ctx.restore();
 	}
 
@@ -488,6 +518,8 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
 	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
+		ctx.save();
+
 		ctx.lineWidth = Pixel * 2;
 		ctx.strokeStyle = '#111';
 		ctx.fillStyle = '#111';
@@ -515,26 +547,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			ctx.restore();
 		}
 
-		// Num dashes	
-		if (hero.id === world.ui.myHeroId) {
-			const spellId = hero.keysToSpells.get(w.Actions.RightClick);	
-			const spell = world.settings.Spells[spellId];	
-			const numDashes = engine.chargesAvailable(world, hero, spellId);	
-			const left = -Hero.Radius * HealthBar.HeroRadiusFraction;	
-			const y = -Hero.Radius - DashIndicator.Margin;	
-			for (let i = 0; i < numDashes; ++i) {	
-				const x = left + DashIndicator.Width * i * 2; // *2 for pip + gap	
-				ctx.save();	
-				ctx.lineWidth = Pixel * 2;	
-				ctx.strokeStyle = "black";	
-				ctx.fillStyle = "white";	
-				ctx.beginPath();	
-				ctx.rect(x, y, DashIndicator.Width, DashIndicator.Height);	
-				ctx.stroke();	
-				ctx.fill();	
-				ctx.restore();	
-			}	
-		}
+		ctx.restore();
 	}
 
 	ctx.restore();

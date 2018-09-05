@@ -68,7 +68,4 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		targetY: action.target.y,
 	}
 	socket.emit('action', actionMsg);
-	if (actionMsg.spellId !== "retarget") {
-		console.log(actionMsg.spellId);
-	}
 }
