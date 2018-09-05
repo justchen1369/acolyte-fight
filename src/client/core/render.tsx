@@ -525,7 +525,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		ctx.fillStyle = '#111';
 		ctx.beginPath();
 		healthBarPath(ctx, radius, 1.0, world);
-		ctx.stroke();
 		ctx.fill();
 
 		let healthProportion = hero.health / Hero.MaxHealth;
