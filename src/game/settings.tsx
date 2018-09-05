@@ -647,6 +647,7 @@ const shield: Spell = {
     maxTicks: 3 * TicksPerSecond,
     cooldown: 20 * TicksPerSecond,
     radius: Hero.Radius * 2,
+    takesOwnership: true,
 
     icon: "shieldReflect",
 
@@ -660,9 +661,10 @@ const icewall: Spell = {
     description: "Create a wall that blocks projectiles and any teleporting/charging heroes. Heroes can still walk through the wall at a normal speed.",
 
     maxRange: 0.25,
-    maxTicks: 3 * TicksPerSecond,
+    maxTicks: 5 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 20 * TicksPerSecond,
+    takesOwnership: false,
 
     length: 0.005,
     width: 0.15,

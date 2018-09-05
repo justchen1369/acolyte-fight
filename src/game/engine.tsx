@@ -154,6 +154,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: 0,
+		takesOwnership: spell.takesOwnership,
 		owner: hero.id,
 		radius: spell.radius,
 		color: spell.color,
@@ -189,6 +190,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: spell.growthTicks,
+		takesOwnership: spell.takesOwnership,
 		owner: hero.id,
 		points,
 		extent,
@@ -924,7 +926,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
 	const myProjectile = shield.owner === projectile.owner;
 
-	if (!myProjectile && projectile.shieldTakesOwnership) { // Stop double redirections cancelling out
+	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership) { // Stop double redirections cancelling out
 		// Redirect back to owner
 		projectile.targetId = projectile.owner;
 		projectile.owner = shield.owner;

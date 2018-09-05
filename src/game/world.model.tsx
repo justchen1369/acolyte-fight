@@ -292,6 +292,7 @@ export interface ShieldBase extends WorldObjectBase {
 	createTick: number;
 	expireTick: number;
 	growthTicks: number;
+	takesOwnership: boolean;
 	owner: string;
 	color: string;
 }
