@@ -1634,8 +1634,7 @@ export function calculateAvailableRange(hero: w.Hero, world: w.World) {
 
 function reduceAvailableRange(hero: w.Hero, distanceTravelled: number, world: w.World) {
 	const Hero = world.settings.Hero;
-	const cost = Math.ceil(distanceTravelled / Hero.DashRangeCostBase) * Hero.DashRangeCostBase;
-	hero.availableRange = Math.max(0, hero.availableRange - cost);
+	hero.availableRange = Math.floor(Math.max(0, hero.availableRange - distanceTravelled) / Hero.DashRangeCostBase) * Hero.DashRangeCostBase;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {

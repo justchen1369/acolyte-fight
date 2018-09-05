@@ -17,8 +17,8 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 0.05,
-    MaxDashRange: 0.3,
-    DashRangeCostBase: 0.1,
+    MaxDashRange: 0.25,
+    DashRangeCostBase: 0.125,
     DashCooldownTicks: 12 * TicksPerSecond,
 }
 
