@@ -1562,9 +1562,9 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
 
+	reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 	hero.body.setPosition(newPosition);
 	hero.moveTo = action.target;
-	reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 
 	return true;
 }
@@ -1613,9 +1613,9 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
+		reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
-		reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 	}
 
 	if (hero.thrust) {
