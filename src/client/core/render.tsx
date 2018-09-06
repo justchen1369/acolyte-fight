@@ -97,8 +97,8 @@ export function render(world: w.World, canvasStack: CanvasStack, rebindings: Key
 
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
-	renderWorld(ctxStack, world, worldRect);
 	renderVignette(ctxStack, world, rect);
+	renderWorld(ctxStack, world, worldRect);
 	renderInterface(ctxStack.ui, world, rect, rebindings);
 	all(ctxStack, ctx => ctx.restore());
 
@@ -152,7 +152,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 }
 
 function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
-	const ctx = ctxStack.canvas;
+	const ctx = ctxStack.background;
 
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (!(hero && hero.category === "hero")) {
