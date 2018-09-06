@@ -1,6 +1,9 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
 var missRadius = 0.05;
+var delayMilliseconds = 2000;
+
+var nextSpell = 0;
 
 onmessage = function (e) {
     var msg = JSON.parse(e.data);
@@ -88,15 +91,13 @@ function deflect(state, hero, cooldowns) {
 }
 
 function castSpell(state, hero, opponent, cooldowns) {
-    if (opponent.shieldTicksRemaining) {
+    if (Date.now() < nextSpell) {
+        return null;
+    } else if (opponent.shieldTicksRemaining) {
         return null;
     }
 
-    if (alreadyHasProjectile(state, hero.id)) {
-        // Only shoot one thing at a time
-        return null;
-    }
-
+    var candidates = [];
     for (var spellId in cooldowns) {
         var readyToCast = !cooldowns[spellId];
         var spell = settings.Spells[spellId];
@@ -106,21 +107,17 @@ function castSpell(state, hero, opponent, cooldowns) {
             && readyToCast
             && (spell.action === "projectile" || spell.action === "spray")) {
 
-            return { spellId, target: jitter(opponent.pos, missRadius) };
+            candidates.push(spellId);
         }
     }
-    return null;
-}
 
-function alreadyHasProjectile(state, heroId) {
-    for (var projectileId in state.projectiles) {
-        var projectile = state.projectiles[projectileId];
-        if (projectile.ownerId === heroId && vectorDistance(projectile.pos, center) <= state.radius) {
-            // Projectiles stay alive a long time off the screen, so don't get blocked by those
-            return true;
-        }
+    if (candidates.length > 0) {
+        var spellId = candidates[Math.floor(Math.random() * candidates.length)];
+        nextSpell = Date.now() + delayMilliseconds;
+        return { spellId, target: jitter(opponent.pos, missRadius) };
+    } else {
+        return null;
     }
-    return false;
 }
 
 function jitter(target, missRadius) {
