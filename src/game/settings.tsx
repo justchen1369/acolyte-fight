@@ -376,7 +376,7 @@ const homing: Spell = {
     color: '#44ffcc',
     icon: "boltSaw",
 
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 18 * TicksPerSecond,
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
