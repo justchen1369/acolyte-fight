@@ -166,7 +166,7 @@ function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRe
 	}
 
 	const proportion = engine.cooldownRemaining(world, hero, spellId) / spell.cooldown;
-	const color = "#ff0044";
+	const color = "#66ccff";
 	const maxWidth = 0.25;
 
 	ctx.save();
