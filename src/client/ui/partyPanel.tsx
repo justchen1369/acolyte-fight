@@ -4,6 +4,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
+import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
 
 interface Props {
@@ -54,10 +55,10 @@ export class PartyPanel extends React.Component<Props, State> {
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
             {party.isLeader && (party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty())}
             <h2>Observer Mode {party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
-            <p>If you activate observer mode, you will just watch the party games rather than play them.</p>
+            <p>If you enter observer mode, you will just watch the party games rather than play them.</p>
             {party.observing
-                ? <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: false })}>Deactivate Observer Mode</span></p>
-                : <p><span className="btn" onClick={() => parties.updatePartyAsync({ ready: false, observing: true })}>Activate Observer Mode</span></p>}
+                ? <p><span className="btn" onClick={() => this.onExitObserverMode()}>Exit Observer Mode</span></p>
+                : <p><span className="btn" onClick={() => this.onEnterObserverMode()}>Enter Observer Mode</span></p>}
         </div>
     }
 
@@ -75,6 +76,16 @@ export class PartyPanel extends React.Component<Props, State> {
             <p>Your party is <b>public</b>: your party will be matched with other players on the public server.</p>
             <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(true)}>Make Private</span></p>
         </div>
+    }
+
+    private onEnterObserverMode() {
+        screenLifecycle.enterGame();
+        parties.updatePartyAsync({ ready: true, observing: true })
+    }
+
+    private onExitObserverMode() {
+        screenLifecycle.exitGame();
+        parties.updatePartyAsync({ ready: false, observing: false })
     }
 }
 
