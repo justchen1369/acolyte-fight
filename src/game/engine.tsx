@@ -931,9 +931,6 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		projectile.owner = shield.owner;
 	}
 
-	if (projectile.bounce) {
-		bounceToNext(projectile, shield.owner, world);
-	}
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
