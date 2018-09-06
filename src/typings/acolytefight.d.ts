@@ -47,8 +47,6 @@ declare interface HeroSettings {
 
 	RevolutionsPerTick: number; // Hero turn rate
 	MaxDashRange: number; // The maximum range of teleport/thrust
-	DashRangeCostBase: number;
-	DashCooldownTicks: number;
 }
 
 declare interface WorldSettings {

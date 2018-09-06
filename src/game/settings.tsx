@@ -18,8 +18,6 @@ const Hero: HeroSettings = {
 
     RevolutionsPerTick: 0.05,
     MaxDashRange: 0.25,
-    DashRangeCostBase: 0.125,
-    DashCooldownTicks: 12 * TicksPerSecond,
 }
 
 const World: WorldSettings = {
@@ -682,7 +680,7 @@ const teleport: Spell = {
     description: "Teleport to a nearby location. Get close, or get away.",
 
     maxAngleDiffInRevs: 1.0,
-    cooldown: 0.5 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
@@ -699,7 +697,7 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 0.5 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
 
     damage: 1,
     speed: 1.0,

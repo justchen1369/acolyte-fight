@@ -415,7 +415,6 @@ export function tick(world: w.World) {
 
 	applySpeedLimit(world);
 	removePassthrough(world);
-	replenishRanges(world);
 	recharge(world);
 	decayThrust(world);
 	decayObstacles(world);
@@ -1226,15 +1225,6 @@ function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
 	}
 }
 
-function replenishRanges(world: w.World) {
-	const Hero = world.settings.Hero;
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			hero.availableRange = Math.min(Hero.MaxDashRange, hero.availableRange + Hero.MaxDashRange / Hero.DashCooldownTicks);
-		}
-	});
-}
-
 function recharge(world: w.World) {
 	world.objects.forEach(hero => {
 		if (hero.category === "hero") {
@@ -1552,9 +1542,10 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 }
 
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
+	const Hero = world.settings.Hero;
 	if (!action.target) { return true; }
 
-	const availableRange = calculateAvailableRange(hero, world);
+	const availableRange = Hero.MaxDashRange;
 	const rangeLimit = Math.min(
 		availableRange,
 		shieldCollisionLimit(hero.body.getPosition(), action.target, world));
@@ -1562,7 +1553,6 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
 
-	reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 	hero.body.setPosition(newPosition);
 	hero.moveTo = action.target;
 
@@ -1593,7 +1583,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const availableRange = calculateAvailableRange(hero, world);
+		const availableRange = Hero.MaxDashRange;
 		const speed = spell.speed * ((1 - spell.speedDecayAlpha) + spell.speedDecayAlpha * availableRange / Hero.MaxDashRange);
 		const maxTicks = TicksPerSecond * availableRange / speed;
 
@@ -1613,7 +1603,6 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		} as w.ThrustState;
 		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
-		reduceAvailableRange(hero, vector.distance(action.target, hero.body.getPosition()), world);
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
 	}
@@ -1627,16 +1616,6 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	}
 
 	return !hero.thrust;
-}
-
-export function calculateAvailableRange(hero: w.Hero, world: w.World) {
-	const Hero = world.settings.Hero;
-	return Math.floor(hero.availableRange / Hero.DashRangeCostBase) * Hero.DashRangeCostBase;
-}
-
-function reduceAvailableRange(hero: w.Hero, distanceTravelled: number, world: w.World) {
-	const Hero = world.settings.Hero;
-	hero.availableRange = Math.max(0, hero.availableRange - distanceTravelled);
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {

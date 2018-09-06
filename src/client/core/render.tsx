@@ -98,6 +98,7 @@ export function render(world: w.World, canvasStack: CanvasStack, rebindings: Key
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
 	renderWorld(ctxStack, world, worldRect);
+	renderVignette(ctxStack, world, rect);
 	renderInterface(ctxStack.ui, world, rect, rebindings);
 	all(ctxStack, ctx => ctx.restore());
 
@@ -148,6 +149,55 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	world.ui.trails = newTrails;
 
 	all(ctxStack, ctx => ctx.restore());
+}
+
+function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
+	const ctx = ctxStack.canvas;
+
+	const hero = world.objects.get(world.ui.myHeroId);
+	if (!(hero && hero.category === "hero")) {
+		return;
+	}
+
+	const spellId = hero.keysToSpells.get(w.Actions.RightClick);
+	const spell = world.settings.Spells[spellId];
+	if (!spell) {
+		return;
+	}
+
+	const proportion = engine.cooldownRemaining(world, hero, spellId) / spell.cooldown;
+	const color = "#ff0044";
+	const maxWidth = 0.25;
+
+	ctx.save();
+	ctx.scale(rect.width, rect.height); // this is different from the other scaling in that it takes the whole rectangular screen, not just the largest square
+	ctx.globalAlpha = 0.25;
+
+	// Left
+	{
+		const gradient = ctx.createLinearGradient(0, 0, maxWidth, 0);
+		gradient.addColorStop(0, color);
+		gradient.addColorStop(proportion, "transparent");
+		ctx.fillStyle = gradient;
+
+		ctx.beginPath();
+		ctx.rect(0, 0, maxWidth, 1.0);
+		ctx.fill();
+	}
+
+	// Right
+	{
+		const gradient = ctx.createLinearGradient(1.0, 0, 1 - maxWidth, 0);
+		gradient.addColorStop(0, color);
+		gradient.addColorStop(proportion, "transparent");
+		ctx.fillStyle = gradient;
+
+		ctx.beginPath();
+		ctx.rect(0.5, 0, 1 - maxWidth, 1.0);
+		ctx.fill();
+	}
+
+	ctx.restore();
 }
 
 function renderCursor(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, worldRect: ClientRect) {
@@ -423,81 +473,51 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
-	const dashRange = engine.calculateAvailableRange(hero, world);
 	const radius = Hero.Radius;
 
-	ctx.save();
-	ctx.translate(pos.x, pos.y);
+	foreground(ctxStack, ctx => ctx.save());
+	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
-	// Dash range	
-	if (hero.id === world.ui.myHeroId && world.ui.nextTarget) {
-		const displayRange = Math.max(Hero.Radius, dashRange);
-		const dashTargetOffset = vector.diff(world.ui.nextTarget, pos);	
-		const proportion = 1 - displayRange / Math.max(1e-6, vector.length(dashTargetOffset));	
- 		if (proportion > 0) {	
-			ctx.save();	
- 			const radialStop = vector.relengthen(dashTargetOffset, displayRange);	
- 			const gradient = ctx.createLinearGradient(radialStop.x, radialStop.y, 0, 0);	
-			gradient.addColorStop(0, "white");	
-			gradient.addColorStop(1, "transparent");	
- 			const circumference = 2 * Math.PI * displayRange;	
- 			ctx.globalAlpha = 0.9 * proportion;	
-			ctx.strokeStyle = gradient;	
-			ctx.lineWidth = DashIndicator.Width;	
-			ctx.beginPath();	
-			ctx.setLineDash([circumference / 100, circumference / 100]);	
-			ctx.arc(0, 0, displayRange, 0, 2 * Math.PI);	
-			ctx.stroke();	
- 			ctx.restore();	
-		}	
-	}	
-
-	// Draw hero
+	// Fill
 	{
 		ctx.save();
 
-		// Fill
-		{
-			ctx.save();
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+		ctx.fill();
 
-			ctx.fillStyle = color;
-			ctx.beginPath();
-			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-			ctx.fill();
+		ctx.restore();
+	}
 
-			ctx.restore();
-		}
+	// Orientation
+	{
+		ctx.save();
 
-		// Orientation
-		{
-			ctx.save();
+		ctx.beginPath();
+		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+		ctx.clip();
 
-			ctx.beginPath();
-			ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-			ctx.clip();
+		ctx.rotate(angle);
+		ctx.scale(radius, radius);
 
-			ctx.rotate(angle);
-			ctx.scale(radius, radius);
+		ctx.fillStyle = "white";
+		ctx.strokeStyle = "black";
+		ctx.lineWidth = Pixel;
 
-			ctx.fillStyle = "white";
-			ctx.strokeStyle = "black";
-			ctx.lineWidth = Pixel;
+		ctx.globalAlpha = 0.5;
 
-			ctx.globalAlpha = 0.5;
+		ctx.beginPath();
+		ctx.moveTo(0, 0);
+		ctx.lineTo(-1, 1);
+		ctx.lineTo(0, 1);
+		ctx.lineTo(0.5, 0);
+		ctx.lineTo(0, -1);
+		ctx.lineTo(-1, -1);
+		ctx.closePath();
+		ctx.fill();
+		ctx.stroke();
 
-			ctx.beginPath();
-			ctx.moveTo(0, 0);
-			ctx.lineTo(-1, 1);
-			ctx.lineTo(0, 1);
-			ctx.lineTo(0.5, 0);
-			ctx.lineTo(0, -1);
-			ctx.lineTo(-1, -1);
-			ctx.closePath();
-			ctx.fill();
-			ctx.stroke();
-
-			ctx.restore();
-		}
 		ctx.restore();
 	}
 
@@ -549,7 +569,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		ctx.restore();
 	}
 
-	ctx.restore();
+	foreground(ctxStack, ctx => ctx.restore());
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
