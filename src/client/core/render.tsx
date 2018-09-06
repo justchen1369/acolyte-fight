@@ -194,7 +194,7 @@ function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRe
 		ctx.fillStyle = gradient;
 
 		ctx.beginPath();
-		ctx.rect(0.5, 0, 1 - maxWidth, 1.0);
+		ctx.rect(0.5 + maxWidth, 0, maxWidth, 1.0);
 		ctx.fill();
 	}
 
