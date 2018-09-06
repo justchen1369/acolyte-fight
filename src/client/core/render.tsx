@@ -172,6 +172,7 @@ function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRe
 	ctx.save();
 	ctx.scale(rect.width, rect.height); // this is different from the other scaling in that it takes the whole rectangular screen, not just the largest square
 	ctx.globalAlpha = 0.25;
+	ctx.globalCompositeOperation = "lighten";
 
 	// Left
 	{
