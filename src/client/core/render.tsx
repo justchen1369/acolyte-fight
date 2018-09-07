@@ -415,18 +415,30 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
+	const pos = hero.body.getPosition();
+	const radius = Hero.Radius;
+
+	foreground(ctxStack, ctx => ctx.save());
+	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
+
+	renderHeroCharacter(ctxStack, hero, world);
+	renderHeroBars(ctxStack, hero, world);
+
+	foreground(ctxStack, ctx => ctx.restore());
+}
+
+function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const Hero = world.settings.Hero;
+	const ctx = ctxStack.canvas;
+
 	const player = world.players.get(hero.id);
 	let color = heroColor(hero.id, world);
 	if (!(world.activePlayers.has(hero.id) || (player && player.isSharedBot))) {
 		color = HeroColors.InactiveColor;
 	}
 
-	const pos = hero.body.getPosition();
 	const angle = hero.body.getAngle();
 	const radius = Hero.Radius;
-
-	foreground(ctxStack, ctx => ctx.save());
-	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
 	// Fill
 	{
@@ -484,10 +496,22 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 		ctx.restore();
 	}
+}
+
+function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const Hero = world.settings.Hero;
+	const ctx = ctxStack.canvas;
+
+	const radius = Hero.Radius;
 
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
-	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
+	if (!(ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth)) {
+		return;
+	}
+
+	// Health
+	{
 		const healthProportion = hero.health / Hero.MaxHealth;
 		const startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
 
@@ -496,27 +520,51 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			color = color.lighten(0.75 + 0.25 * startProportion);
 		}
 
-		// Health
-		{
+		ctx.save();
+
+		ctx.lineWidth = Pixel * 2;
+		ctx.strokeStyle = '#111';
+		ctx.fillStyle = '#111';
+		ctx.beginPath();
+		healthBarPath(ctx, radius, 1.0, world);
+		ctx.fill();
+
+		ctx.fillStyle = color.string();
+		ctx.beginPath();
+		healthBarPath(ctx, radius, healthProportion, world);
+		ctx.fill();
+
+		ctx.restore();
+	}
+
+	// Dash
+	if (hero.id === world.ui.myHeroId) {
+		const spellId = hero.keysToSpells.get(w.Actions.RightClick);	
+		const spell = world.settings.Spells[spellId];	
+		if (!spell) {	
+			return;	
+		}	
+		const proportion = engine.cooldownRemaining(world, hero, spellId) / spell.cooldown;
+
+		if (proportion > 0) {
 			ctx.save();
 
-			ctx.lineWidth = Pixel * 2;
-			ctx.strokeStyle = '#111';
-			ctx.fillStyle = '#111';
+			ctx.fillStyle = "black";
+			ctx.strokeStyle = "black";
+			ctx.lineWidth = Pixel;
 			ctx.beginPath();
-			healthBarPath(ctx, radius, 1.0, world);
+			dashBarPath(ctx, radius, 1.0, world);
+			ctx.stroke();
 			ctx.fill();
 
-			ctx.fillStyle = color.string();
+			ctx.fillStyle = DashIndicator.Color;
 			ctx.beginPath();
-			healthBarPath(ctx, radius, healthProportion, world);
+			dashBarPath(ctx, radius, proportion, world);
 			ctx.fill();
 
 			ctx.restore();
 		}
 	}
-
-	foreground(ctxStack, ctx => ctx.restore());
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
@@ -591,8 +639,16 @@ function heroColor(heroId: string, world: w.World) {
 }
 
 function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, world: w.World) {
-	const healthBarRadius = HealthBar.HeroRadiusFraction * world.settings.Hero.Radius;
-	ctx.rect(-healthBarRadius, -radius - HealthBar.Height - HealthBar.Margin, healthBarRadius * 2 * proportion, HealthBar.Height);
+	barPath(ctx, radius, proportion, HealthBar.Margin, HealthBar.Height, world);
+}
+
+function dashBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, world: w.World) {
+	barPath(ctx, radius, proportion, DashIndicator.Margin, DashIndicator.Height, world);
+}
+
+function barPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, margin: number, height: number, world: w.World) {
+	const barRadius = HealthBar.HeroRadiusFraction * world.settings.Hero.Radius;
+	ctx.rect(-barRadius, -radius - height - margin, barRadius * 2 * proportion, height);
 }
 
 function rgColor(proportion: number) {

@@ -47,7 +47,9 @@ export namespace ChargingIndicator {
 	export const Width = Pixel * 2;
 }
 export namespace DashIndicator {
-	export const Width = Pixel * 4;
+	export const Color = "#44eeff";
+	export const Height = Pixel * 2;
+	export const Margin = Pixel * 0;
 }
 export namespace ButtonBar {
 	export const Spacing = 8;
