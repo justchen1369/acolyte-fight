@@ -1,6 +1,7 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as React from 'react';
 import * as PlayerName from '../../game/sanitize';
+import * as parties from '../core/parties';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
@@ -14,7 +15,7 @@ interface State {
 }
 
 export class NameConfig extends React.Component<Props, State> {
-    private saveStateDebounced = _.debounce(() => this.saveState(), 200);
+    private saveStateDebounced = _.debounce(() => this.saveState(), 500);
 
     constructor(props: Props) {
         super(props);
@@ -47,9 +48,8 @@ export class NameConfig extends React.Component<Props, State> {
     private saveState() {
         StoreProvider.dispatch({ type: "updatePlayerName", playerName: this.state.name });
         Storage.saveName(this.state.name);
-
-        this.setState({
-            saved: true,
+        parties.updatePartyAsync({}).then(() => {
+            this.setState({ saved: true });
         });
     }
 }

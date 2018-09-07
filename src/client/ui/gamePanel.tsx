@@ -3,6 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
+import * as pages from '../core/pages';
 import * as screenLifecycle from './screenLifecycle';
 
 import InfoPanel from './infoPanel';
@@ -56,6 +57,7 @@ class GamePanel extends React.Component<Props, State> {
             screenLifecycle.exitGame();
         }
         matches.leaveCurrentGame();
+        pages.reloadPageIfNecessary();
     }
 }
 

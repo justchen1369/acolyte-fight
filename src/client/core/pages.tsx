@@ -12,3 +12,10 @@ export function changePage(newPage: string) {
         StoreProvider.dispatch({ type: "updatePage", page: newPage });
     }
 }
+
+export function reloadPageIfNecessary() {
+    const store = StoreProvider.getState();
+    if (!store.socketId) {
+        window.location.href = url.getPath(store.current);
+    }
+}
