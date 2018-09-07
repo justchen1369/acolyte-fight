@@ -646,6 +646,7 @@ const shield: Spell = {
     cooldown: 20 * TicksPerSecond,
     radius: Hero.Radius * 2,
     takesOwnership: true,
+    blocksTeleporters: false,
 
     icon: "shieldReflect",
 
@@ -663,6 +664,7 @@ const icewall: Spell = {
     growthTicks: 5,
     cooldown: 20 * TicksPerSecond,
     takesOwnership: true,
+    blocksTeleporters: true,
 
     length: 0.005,
     width: 0.15,

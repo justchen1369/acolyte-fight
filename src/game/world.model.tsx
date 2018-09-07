@@ -236,6 +236,7 @@ export interface WorldObjectBase {
 	categories: number;
 	body: pl.Body;
 	destroyed?: boolean;
+	blocksTeleporters?: boolean;
 }
 
 export interface Obstacle extends WorldObjectBase {

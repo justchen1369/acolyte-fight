@@ -155,6 +155,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: 0,
 		takesOwnership: spell.takesOwnership,
+		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		radius: spell.radius,
 		color: spell.color,
@@ -191,6 +192,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: spell.growthTicks,
 		takesOwnership: spell.takesOwnership,
+		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		points,
 		extent,
@@ -1560,7 +1562,7 @@ function shieldCollisionLimit(from: pl.Vec2, to: pl.Vec2, world: w.World): numbe
 	let hit: pl.Vec2 = null;
 	world.physics.rayCast(from, to, (fixture, point, normal, fraction) => {
 		const obj = world.objects.get(fixture.getBody().getUserData());
-		if (obj.category === "shield") {
+		if (obj.blocksTeleporters) {
 			hit = point;
 			return 0; // Stop search after first hit
 		} else {
