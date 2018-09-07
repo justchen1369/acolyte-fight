@@ -97,7 +97,6 @@ export function render(world: w.World, canvasStack: CanvasStack, rebindings: Key
 
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
-	renderVignette(ctxStack, world, rect);
 	renderWorld(ctxStack, world, worldRect);
 	renderInterface(ctxStack.ui, world, rect, rebindings);
 	all(ctxStack, ctx => ctx.restore());
@@ -149,56 +148,6 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	world.ui.trails = newTrails;
 
 	all(ctxStack, ctx => ctx.restore());
-}
-
-function renderVignette(ctxStack: CanvasCtxStack, world: w.World, rect: ClientRect) {
-	const ctx = ctxStack.background;
-
-	const hero = world.objects.get(world.ui.myHeroId);
-	if (!(hero && hero.category === "hero")) {
-		return;
-	}
-
-	const spellId = hero.keysToSpells.get(w.Actions.RightClick);
-	const spell = world.settings.Spells[spellId];
-	if (!spell) {
-		return;
-	}
-
-	const proportion = engine.cooldownRemaining(world, hero, spellId) / spell.cooldown;
-	const color = "#66ccff";
-	const maxWidth = 0.25;
-
-	ctx.save();
-	ctx.scale(rect.width, rect.height); // this is different from the other scaling in that it takes the whole rectangular screen, not just the largest square
-	ctx.globalAlpha = 0.25;
-	ctx.globalCompositeOperation = "lighten";
-
-	// Left
-	{
-		const gradient = ctx.createLinearGradient(0, 0, maxWidth, 0);
-		gradient.addColorStop(0, color);
-		gradient.addColorStop(proportion, "transparent");
-		ctx.fillStyle = gradient;
-
-		ctx.beginPath();
-		ctx.rect(0, 0, maxWidth, 1.0);
-		ctx.fill();
-	}
-
-	// Right
-	{
-		const gradient = ctx.createLinearGradient(1.0, 0, 1 - maxWidth, 0);
-		gradient.addColorStop(0, color);
-		gradient.addColorStop(proportion, "transparent");
-		ctx.fillStyle = gradient;
-
-		ctx.beginPath();
-		ctx.rect(1 - maxWidth, 0, maxWidth, 1.0);
-		ctx.fill();
-	}
-
-	ctx.restore();
 }
 
 function renderCursor(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, worldRect: ClientRect) {
@@ -539,35 +488,32 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
 	if (ticksUntilStart <= constants.Matchmaking.JoinPeriod || hero.health < Hero.MaxHealth) {
-		ctx.save();
+		const healthProportion = hero.health / Hero.MaxHealth;
+		const startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
 
-		ctx.lineWidth = Pixel * 2;
-		ctx.strokeStyle = '#111';
-		ctx.fillStyle = '#111';
-		ctx.beginPath();
-		healthBarPath(ctx, radius, 1.0, world);
-		ctx.fill();
-
-		let healthProportion = hero.health / Hero.MaxHealth;
-		ctx.fillStyle = rgColor(healthProportion);
-		ctx.beginPath();
-		healthBarPath(ctx, radius, healthProportion, world);
-		ctx.fill();
-
-		let startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
+		let color = Color(rgColor(healthProportion));
 		if (startProportion > 0) {
+			color = color.lighten(0.75 + 0.25 * startProportion);
+		}
+
+		// Health
+		{
 			ctx.save();
 
-			ctx.fillStyle = "#ffffff";
-			ctx.globalAlpha = 0.75 + 0.25 * startProportion;
+			ctx.lineWidth = Pixel * 2;
+			ctx.strokeStyle = '#111';
+			ctx.fillStyle = '#111';
+			ctx.beginPath();
+			healthBarPath(ctx, radius, 1.0, world);
+			ctx.fill();
+
+			ctx.fillStyle = color.string();
 			ctx.beginPath();
 			healthBarPath(ctx, radius, healthProportion, world);
 			ctx.fill();
 
 			ctx.restore();
 		}
-
-		ctx.restore();
 	}
 
 	foreground(ctxStack, ctx => ctx.restore());
