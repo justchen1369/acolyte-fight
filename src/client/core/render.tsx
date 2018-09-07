@@ -570,13 +570,12 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
 	const MaxAlpha = 0.75;
 	const MinAlpha = 0.10;
-	const ctx = ctxStack.canvas;
 
 	const ticksRemaining = shield.expireTick - world.tick;
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
 
-	ctx.save();
+	foreground(ctxStack, ctx => ctx.save());
 
 	let body: pl.Body;
 	if (shield.type === "reflect") {
@@ -591,42 +590,42 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		return;
 	}
 	const pos = body.getPosition();
-	ctx.translate(pos.x, pos.y);
-	ctx.rotate(body.getAngle());
+	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
+	foreground(ctxStack, ctx => ctx.rotate(body.getAngle()));
 
-	if (world.tick - shield.createTick < shield.growthTicks) {
-		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
-		ctx.scale(growthProportion, growthProportion);
-	}
+	foreground(ctxStack, ctx => {
+		if (world.tick - shield.createTick < shield.growthTicks) {
+			const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
+			ctx.scale(growthProportion, growthProportion);
+		}
 
-	ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
-	ctx.fillStyle = shield.color;
-	ctx.lineWidth = Pixel * 3;
-	ctx.shadowColor = shield.color;
-	ctx.shadowBlur = 10;
+		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
+		ctx.fillStyle = shield.color;
+		ctx.lineWidth = Pixel * 3;
 
-	ctx.beginPath();
-	if (shield.type === "reflect") {
-		ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
-	} else {
-        ctx.beginPath();
+		ctx.beginPath();
+		if (shield.type === "reflect") {
+			ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
+		} else {
+			ctx.beginPath();
 
-        const points = shield.points;
-        for (let i = 0; i < points.length; ++i) {
-            const point = points[i % points.length];
-            if (i === 0) {
-                ctx.moveTo(point.x, point.y);
-            }
-            ctx.lineTo(point.x, point.y);
-        }
+			const points = shield.points;
+			for (let i = 0; i < points.length; ++i) {
+				const point = points[i % points.length];
+				if (i === 0) {
+					ctx.moveTo(point.x, point.y);
+				}
+				ctx.lineTo(point.x, point.y);
+			}
 
-        ctx.closePath();
-        ctx.fill();
-	}
-	ctx.fill();
+			ctx.closePath();
+			ctx.fill();
+		}
+		ctx.fill();
+	});
 
 
-	ctx.restore();
+	foreground(ctxStack, ctx => ctx.restore());
 }
 
 function heroColor(heroId: string, world: w.World) {
