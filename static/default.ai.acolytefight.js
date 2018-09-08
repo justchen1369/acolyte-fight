@@ -30,10 +30,13 @@ function handleInput(state, heroId, cooldowns) {
         action =
             recovery(state, hero, cooldowns)
             || deflect(state, hero, cooldowns)
+            || dodge(state, hero)
             || castSpell(state, hero, opponent, cooldowns)
             || move(state, hero, opponent);
     } else {
-        action = move(state, hero, opponent);
+        action =
+            dodge(state, hero)
+            || move(state, hero, opponent);
     }
 
     if (action) {
@@ -143,6 +146,40 @@ function move(state, hero, opponent) {
     return { spellId: "move", target };
 }
 
+function dodge(state, hero) {
+    for (var projectileId in state.projectiles) {
+        var projectile = state.projectiles[projectileId];
+        if (projectile.ownerId === hero.id) {
+            // This is my own projectile
+            continue;
+        }
+
+        var diff = vectorDiff(hero.pos, projectile.pos);
+        var distancePerTimeStep = vectorDot(projectile.velocity, vectorUnit(diff));
+        if (distancePerTimeStep <= 0) {
+            // Not coming towards us
+            continue;
+        }
+
+        var timeToCollision = vectorLength(diff) / distancePerTimeStep;
+        if (timeToCollision <= 0) {
+            // Not coming towards us
+            continue;
+        }
+
+        var collisionPoint = vectorPlus(projectile.pos, vectorMultiply(projectile.velocity, timeToCollision));
+        var distanceToCollision = vectorDistance(collisionPoint, hero.pos);
+        if (distanceToCollision <= projectile.radius + hero.radius) {
+            // Run away from collision point
+            var direction = vectorUnit(vectorNegate(vectorDiff(collisionPoint, hero.pos)));
+            var step = vectorMultiply(direction, projectile.radius + hero.radius);
+            var target = vectorPlus(hero.pos, step);
+            return { spellId: "move", target };
+        }
+    }
+    return null;
+}
+
 function vectorDiff(to, from) {
     return { x: to.x - from.x, y: to.y - from.y };
 }
@@ -153,4 +190,25 @@ function vectorLength(vector) {
 
 function vectorDistance(from, to) {
     return vectorLength(vectorDiff(from, to));
+}
+
+function vectorUnit(vec) {
+    var length = vectorLength(vec);
+    return length === 0 ? vec : vectorMultiply(vec, 1 / length);
+}
+
+function vectorPlus(from, offset) {
+    return { x: from.x + offset.x, y: from.y + offset.y };
+}
+
+function vectorMultiply(vec, multiplier) {
+    return { x: vec.x * multiplier, y: vec.y * multiplier };
+}
+
+function vectorNegate(vec) {
+    return vectorMultiply(vec, -1);
+}
+
+function vectorDot(a, b) {
+    return (a.x * b.x) + (a.y * b.y);
 }

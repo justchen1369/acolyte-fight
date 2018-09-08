@@ -327,8 +327,6 @@ declare interface WorldContract {
 	obstacles: { [id: string]: ObstacleContract };
 
 	radius: number; // The current radius of the stage
-
-	actions: { [id: string]: ActionContract };
 }
 
 declare interface WorldObjectContract {
@@ -340,6 +338,7 @@ declare interface WorldObjectContract {
 declare interface HeroContract extends WorldObjectContract {
 	health: number; // The current health of the hero (out of 100)
 	heading: Vec2; // A unit vector representing the direction the Hero is currently facing
+	radius: number; // The radius of the hero
 	linkedToId?: string; // If set, this Hero currently has trapped another Hero in a link. This is the ID of the other Hero (the "victim").
 	casting?: CastingContract; // If set, currently casting a channelled spell
 	shieldTicksRemaining: number; // The number of ticks that the hero will continue to be shielded for, 0 if unshielded

@@ -139,7 +139,9 @@ class AiWorker {
 
     private onWorkerMessage(ev: MessageEvent) {
         const message: MsgContract = JSON.parse(ev.data);
-        if (message.type === "action") {
+        if (!message) {
+            // Nothing to do
+        } else if (message.type === "action") {
             const world = StoreProvider.getState().world;
             const spellsAllowed = engine.hasGamePrestarted(world);
             if (message.action.spellId === "move" || spellsAllowed) {
@@ -161,12 +163,12 @@ function worldToState(world: w.World): WorldContract {
         projectiles: {},
         obstacles: {},
         radius: world.radius,
-        actions: {},
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
             contract.heroes[obj.id] = {
                 id: obj.id,
+                radius: obj.radius,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
@@ -202,12 +204,6 @@ function worldToState(world: w.World): WorldContract {
                 hero.shieldTicksRemaining = Math.max(0, shield.expireTick - world.tick);
             }
         }
-    });
-    world.actions.forEach((action: w.Action, heroId: string) => {
-        contract.actions[heroId] = {
-            spellId: action.type,
-            target: action.target,
-        };
     });
     return contract;
 }
