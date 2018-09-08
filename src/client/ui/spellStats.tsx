@@ -44,14 +44,14 @@ class SpellStats extends React.Component<Props, State> {
         if (spell.action === "projectile") {
             const damage = this.calculateProjectileDamage(spell.projectile);
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{spell.projectile.damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "spray") {
             const hits = spell.lengthTicks / spell.intervalTicks;
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{spell.projectile.damage > 0 && this.renderScaling(spell.projectile.damageScaling)} over {formatTime(spell.lengthTicks)} s</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)} over {formatTime(spell.lengthTicks)} s</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "scourge") {
