@@ -553,7 +553,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (game.tick >= game.closeTick) {
 		game.joinable = false;
 		statusChanged = true;
-		logger.info("Game [" + game.id + "]: now unjoinable with " + game.numPlayers + " players after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players after " + game.tick + " ticks");
 	}
 
 	if (statusChanged) {
