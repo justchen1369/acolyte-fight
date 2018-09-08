@@ -36,7 +36,7 @@ export namespace HeroColors {
 		"#cc7c88",
 	];
 	export const HitGlowFactor = 0.7;
-	export const HitFlashTicks = 6;
+	export const HitFlashTicks = 3;
 };
 
 export namespace HealthBar {
