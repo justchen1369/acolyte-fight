@@ -18,6 +18,8 @@ declare module "planck-js" {
             setPosition(pos: Vec2): void;
             getAngle(): number;
             setAngle(angle: number): void;
+            getAngularVelocity(): number;
+            setAngularVelocity(angularVelocity: number): void;
             getLinearVelocity(): Vec2;
             setLinearVelocity(velocity: Vec2): void;
             setLinearDamping(damping: number): void;

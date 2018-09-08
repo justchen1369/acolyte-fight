@@ -1517,6 +1517,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (currentLength % spell.intervalTicks === 0) {
 		if (spell.retargettingRevsPerTick > 0 && hero.target) {
 			turnTowards(hero, hero.target, spell.retargettingRevsPerTick);
+			hero.body.setAngularVelocity(0); // Don't allow the spray to go everywhere if hit
 		}
 
 		const pos = hero.body.getPosition();
