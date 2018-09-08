@@ -318,8 +318,9 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 
 function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 	const game = getStore().activeGames.get(data.gameId);
-	if (game && game.active.has(socket.id) && game.numPlayers <= 1 && game.bots.size === 0) { // Only allow adding one bot
-		games.addBot(game, {});
+	if (game && game.active.has(socket.id) && game.numPlayers <= 1 && game.bots.size === 0) { // Only allow adding bots once
+		games.addBot(game);
+		games.addBot(game);
 		logger.info(`Game [${game.id}]: playing vs AI`);
 	}
 }

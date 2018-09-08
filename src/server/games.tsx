@@ -8,6 +8,7 @@ import * as m from '../game/messages.model';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
+import { DefaultSettings } from '../game/settings';
 
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
@@ -487,25 +488,43 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	return heroId;
 }
 
-export function addBot(game: g.Game, keyBindings: KeyBindings) {
+export function addBot(game: g.Game) {
 	if (game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0) {
 		return null;
 	}
 
-	const heroId = findExistingSlot(game) || formatHeroId(game.numPlayers); // Bot doesn't count as a player, so don't increment numPlayers
+	const replaceBots = false;
+	const heroId = findExistingSlot(game, replaceBots) || formatHeroId(game.numPlayers++);
 
 	// Nominate first player as simulator
 	const player = [...game.active.values()][0];
 	game.bots.set(heroId, player.socketId);
 
+	const keyBindings = randomKeyBindings(game);
 	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
 
 	return heroId;
 }
 
-function findExistingSlot(game: g.Game): string {
+function randomKeyBindings(game: g.Game): KeyBindings {
+	const keyBindings: KeyBindings = {};
+	const allOptions = DefaultSettings.Choices.Options
+	for (const key in allOptions) {
+		const options = allOptions[key];
+		if (options.length > 1) {
+			keyBindings[key] = options[Math.floor(Math.random() * options.length)];
+		}
+	}
+	return keyBindings;
+}
+
+function findExistingSlot(game: g.Game, replaceBots: boolean = true): string {
 	// Take an existing slot, if possible
-	let activeHeroIds = new Set<string>(mapMap(game.active, x => x.heroId));
+	let activeHeroIds = new Set<string>([...game.active.values()].map(x => x.heroId));
+	if (!replaceBots) {
+		[...game.bots.keys()].forEach(heroId => activeHeroIds.add(heroId));
+	}
+
 	for (let i = 0; i < game.numPlayers; ++i) {
 		let candidate = formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {

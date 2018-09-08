@@ -29,14 +29,11 @@ function handleInput(state, heroId, cooldowns) {
     if (state.started) {
         action =
             recovery(state, hero, cooldowns)
-            || deflect(state, hero, cooldowns)
-            || dodge(state, hero)
+            || dodge(state, hero, cooldowns)
             || castSpell(state, hero, opponent, cooldowns)
             || move(state, hero, opponent);
     } else {
-        action =
-            dodge(state, hero)
-            || move(state, hero, opponent);
+        action = move(state, hero, opponent);
     }
 
     if (action) {
@@ -85,9 +82,12 @@ function recovery(state, hero, cooldowns) {
     }
 }
 
-function deflect(state, hero, cooldowns) {
+function deflect(state, hero, cooldowns, projectile) {
     if (cooldowns["shield"] === 0) {
         return { spellId: "shield", target: center };
+    } else if (cooldowns["icewall"] === 0) {
+        var target = vectorMidpoint(hero.pos, projectile.pos);
+        return { spellId: "icewall", target };
     } else {
         return null;
     }
@@ -106,7 +106,6 @@ function castSpell(state, hero, opponent, cooldowns) {
         var spell = settings.Spells[spellId];
 
         if (spell
-            && !spell.chargeTicks
             && readyToCast
             && (spell.action === "projectile" || spell.action === "spray")) {
 
@@ -133,9 +132,9 @@ function jitter(target, missRadius) {
 }
 
 function move(state, hero, opponent) {
-    // Move to the opposite side of the arena
-    var offset = vectorDiff(opponent.pos, center);
-    var target = { x: center.x - offset.x, y: center.y - offset.y };
+    var offset = vectorNegate(vectorDiff(opponent.pos, center)); // Move to the opposite side of the arena
+    var targetDistance = state.radius / 2; // Halfway between the center and the edge
+    var target = vectorPlus(center, vectorRelengthen(offset, targetDistance));
 
     var distanceToTarget = vectorDistance(hero.pos, target);
     if (distanceToTarget <= 0.001) {
@@ -146,7 +145,7 @@ function move(state, hero, opponent) {
     return { spellId: "move", target };
 }
 
-function dodge(state, hero) {
+function dodge(state, hero, cooldowns) {
     for (var projectileId in state.projectiles) {
         var projectile = state.projectiles[projectileId];
         if (projectile.ownerId === hero.id) {
@@ -169,13 +168,20 @@ function dodge(state, hero) {
 
         var collisionPoint = vectorPlus(projectile.pos, vectorMultiply(projectile.velocity, timeToCollision));
         var distanceToCollision = vectorDistance(collisionPoint, hero.pos);
-        if (distanceToCollision <= projectile.radius + hero.radius) {
-            // Run away from collision point
-            var direction = vectorUnit(vectorNegate(vectorDiff(collisionPoint, hero.pos)));
-            var step = vectorMultiply(direction, projectile.radius + hero.radius);
-            var target = vectorPlus(hero.pos, step);
-            return { spellId: "move", target };
+        if (distanceToCollision > projectile.radius + hero.radius) {
+            // Won't hit us
         }
+
+        var deflectAction = deflect(state, hero, cooldowns, projectile);
+        if (deflectAction) {
+            return deflectAction;
+        }
+
+        // Run away from collision point
+        var direction = vectorUnit(vectorNegate(vectorDiff(collisionPoint, hero.pos)));
+        var step = vectorMultiply(direction, projectile.radius + hero.radius);
+        var target = vectorPlus(hero.pos, step);
+        return { spellId: "move", target };
     }
     return null;
 }
@@ -205,10 +211,19 @@ function vectorMultiply(vec, multiplier) {
     return { x: vec.x * multiplier, y: vec.y * multiplier };
 }
 
+function vectorRelengthen(vec, length) {
+    return vectorMultiply(vectorUnit(vec), length);
+}
+
 function vectorNegate(vec) {
     return vectorMultiply(vec, -1);
 }
 
 function vectorDot(a, b) {
     return (a.x * b.x) + (a.y * b.y);
+}
+
+function vectorMidpoint(a, b) {
+    var diff = vectorDiff(b, a);
+    return vectorPlus(a, vectorMultiply(diff, 0.5));
 }
