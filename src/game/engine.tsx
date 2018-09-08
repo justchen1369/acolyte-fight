@@ -862,10 +862,11 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 	}
 }
 
-function handleHeroHitShield(world: w.World, hero: w.Hero, other: w.Shield) {
+function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
 	if (hero.thrust) {
 		// Thrust into shield means the hero bounces off
 		hero.thrust.nullified = true;
+		shield.hitTick = world.tick;
 	}
 }
 
@@ -926,6 +927,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
 	const myProjectile = shield.owner === projectile.owner;
+	shield.hitTick = world.tick;
 
 	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership) { // Stop double redirections cancelling out
 		// Redirect back to owner
@@ -1705,6 +1707,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	// Apply damage
 	let amount = Math.min(toHero.health, packet.damage);
 	toHero.health -= amount;
+	toHero.damagedTick = world.tick;
 
 	// Apply lifesteal
 	if (fromHeroId && packet.lifeSteal) {
@@ -1732,6 +1735,7 @@ function applyDamageToObstacle(obstacle: w.Obstacle, damage: number, world: w.Wo
 		return;
 	}
 	obstacle.health = Math.max(0, obstacle.health - damage);
+	obstacle.hitTick = world.tick;
 }
 
 export function initScore(heroId: string): w.HeroScore {

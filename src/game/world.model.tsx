@@ -250,6 +250,8 @@ export interface Obstacle extends WorldObjectBase {
 	damagePerTick: number;
 	extent: number;
 	points: pl.Vec2[];
+
+	hitTick?: number;
 }
 
 export interface Hero extends WorldObjectBase {
@@ -262,6 +264,7 @@ export interface Hero extends WorldObjectBase {
 	radius: number;
 	moveSpeedPerSecond: number;
 	revolutionsPerTick: number;
+	damagedTick?: number;
 
 	additionalDamagePower: number;
 	additionalDamageMultiplier: number;
@@ -295,6 +298,7 @@ export interface ShieldBase extends WorldObjectBase {
 	takesOwnership: boolean;
 	owner: string;
 	color: string;
+	hitTick?: number;
 }
 
 export interface Reflect extends ShieldBase {

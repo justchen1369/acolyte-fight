@@ -575,6 +575,14 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
 
+	let color = shield.color;
+	if (shield.hitTick >= 0) {
+		const hitAge = world.tick - shield.hitTick;
+		if (hitAge < HeroColors.HitFlashTicks) {
+			color = Color(color).lighten(HeroColors.HitGlowFactor * (1 - hitAge / HeroColors.HitFlashTicks)).string();
+		}
+	}
+
 	foreground(ctxStack, ctx => ctx.save());
 
 	let body: pl.Body;
@@ -600,7 +608,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		}
 
 		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
-		ctx.fillStyle = shield.color;
+		ctx.fillStyle = color;
 		ctx.lineWidth = Pixel * 3;
 
 		ctx.beginPath();
