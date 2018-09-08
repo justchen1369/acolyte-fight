@@ -1317,11 +1317,11 @@ function applyLavaDamage(world: w.World) {
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
+			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.radius > world.radius) {
 				applyDamage(obj, { damage: lavaDamagePerTick }, null, world);
 			}
 		} else if (obj.category === "obstacle") {
-			if (vector.distance(obj.body.getPosition(), mapCenter) > world.radius) {
+			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.extent > world.radius) {
 				applyDamageToObstacle(obj, lavaDamagePerTick, world);
 			}
 		}
