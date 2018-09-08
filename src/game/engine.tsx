@@ -927,7 +927,10 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
 	const myProjectile = shield.owner === projectile.owner;
-	shield.hitTick = world.tick;
+
+	if (projectile.owner !== shield.owner) {
+		shield.hitTick = world.tick;
+	}
 
 	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership) { // Stop double redirections cancelling out
 		// Redirect back to owner
