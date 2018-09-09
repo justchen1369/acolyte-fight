@@ -38,7 +38,7 @@ export function joinNewGame(observeGameId?: string) {
 		if (observeGameId) {
 			window.location.href = url.getPath({ ...store.current, gameId: observeGameId });
 		} else {
-			window.location.href = url.getPath({ ...store.current, page: "join", gameId: null });
+			window.location.href = url.getPath({ ...store.current, gameId: null });
 		}
 	}
 }

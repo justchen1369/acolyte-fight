@@ -9,6 +9,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 
 import * as matches from './core/matches';
+import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
@@ -23,6 +24,7 @@ const socket = socketLib();
 let alreadyConnected = false;
 
 stats.attachListener();
+pages.attachListener();
 initialize();
 rerender();
 

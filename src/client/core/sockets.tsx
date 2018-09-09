@@ -4,6 +4,8 @@ import * as engine from '../../game/engine';
 import * as StoreProvider from '../storeProvider';
 import { notify } from './notifications';
 
+let serverInstanceId: string = null;
+
 export let socket: SocketIOClient.Socket = null;
 
 export let listeners: Listeners = {
@@ -39,7 +41,16 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
-		onConnect();
+		socket.emit('instance', {} as m.ServerInstanceRequest, (msg: m.ServerInstanceResponse) => {
+			const newInstanceId = msg.instanceId;
+			if (serverInstanceId && serverInstanceId !== newInstanceId) {
+				// The server has restarted, we need to reload because there might be a new release
+				onDisconnectMsg();
+			} else {
+				serverInstanceId = newInstanceId;
+				onConnect();
+			}
+		});
 	});
 	socket.on('disconnect', () => {
 		console.log("Disconnected");

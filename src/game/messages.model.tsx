@@ -104,6 +104,16 @@ export interface ProxyResponse {
 
 export type ProxyResponseMsg = ProxyResponse | ErrorResponseMsg;
 
+
+export interface ServerInstanceRequest {
+}
+export interface ServerInstanceResponse {
+    success: true;
+    instanceId: string;
+}
+export type ServerInstanceResponseMsg = ServerInstanceResponse | ErrorResponseMsg;
+
+
 export interface JoinRoomRequest {
     roomId: string;
 }

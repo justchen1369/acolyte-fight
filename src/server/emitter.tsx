@@ -1,4 +1,5 @@
 import moment from 'moment';
+import * as uuid from 'uuid';
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -17,6 +18,7 @@ interface RoomStats {
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
 let io: SocketIO.Server = null;
+const instanceId = uuid.v4();
 
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
@@ -64,6 +66,7 @@ function onConnection(socket: SocketIO.Socket) {
 		}
 	});
 
+	socket.on('instance', (data, callback) => onInstanceMsg(socket, authToken, data, callback));
 	socket.on('room', (data, callback) => onRoomMsg(socket, authToken, data, callback));
 	socket.on('room.create', (data, callback) => onRoomCreateMsg(socket, authToken, data, callback));
 	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
@@ -124,6 +127,10 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			socket.disconnect();
 		});
 	}
+}
+
+function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
+	callback({ success: true, instanceId });
 }
 
 function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomRequest, callback: (output: m.JoinRoomResponseMsg) => void) {

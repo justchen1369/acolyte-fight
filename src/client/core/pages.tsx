@@ -1,7 +1,16 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
+
+export function attachListener() {
+    notifications.attachListener(notifs => {
+        if (notifs.some(n => n.type === "disconnected")) {
+            reloadPageIfNecessary();
+        }
+    });
+}
 
 export function changePage(newPage: string) {
     const store = StoreProvider.getState();
@@ -16,6 +25,6 @@ export function changePage(newPage: string) {
 export function reloadPageIfNecessary() {
     const store = StoreProvider.getState();
     if (!store.socketId) {
-        window.location.href = url.getPath(store.current);
+        window.location.href = url.getPath({ ...store.current, gameId: null });
     }
 }
