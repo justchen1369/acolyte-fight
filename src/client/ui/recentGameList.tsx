@@ -234,8 +234,10 @@ class RecentGameList extends React.Component<Props, State> {
 
     private renderPlayer(player: PlayerCell): JSX.Element {
         return <span className="player-cell" title={`${player.name}: ${player.isWinner ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
-            {player.isWinner && <i className="fas fa-crown" />}
-            <span className={player.isWinner ? "winner" : ""}>{player.name}</span>
+            <span className={player.isWinner ? "winner" : ""}>
+                {player.isWinner && <i className="fas fa-crown" />}
+                {player.name}
+            </span>
         </span>
     }
 
