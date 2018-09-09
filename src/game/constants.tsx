@@ -56,6 +56,6 @@ export namespace DashIndicator {
 export namespace ButtonBar {
 	export const Spacing = 8;
 	export const Margin = 5;
-	export const Size = 64;
+	export const Size = 72;
 	export const Gap = 12;
 }
