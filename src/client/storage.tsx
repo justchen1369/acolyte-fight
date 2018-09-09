@@ -15,20 +15,23 @@ export function saveName(name: string) {
 }
 
 export function loadKeyBindingConfig(): KeyBindings {
-    const json = window.localStorage.getItem(StorageKeys.Buttons);
-    if (json) {
-        return JSON.parse(json);
-    } else {
-        return null;
-    }
+    return loadJson(StorageKeys.Buttons) as KeyBindings;
 }
 
 export function saveKeyBindingConfig(config: KeyBindings) {
-    window.localStorage.setItem(StorageKeys.Buttons, JSON.stringify(config));
+    saveJson(StorageKeys.Buttons, config);
 }
 
 export function loadRebindingConfig(): KeyBindings {
-    const json = window.localStorage.getItem(StorageKeys.Rebindings);
+    return loadJson(StorageKeys.Rebindings) as KeyBindings;
+}
+
+export function saveRebindingConfig(config: KeyBindings) {
+    saveJson(StorageKeys.Rebindings, config);
+}
+
+function loadJson(key: string): Object {
+    const json = window.localStorage.getItem(key);
     if (json) {
         return JSON.parse(json);
     } else {
@@ -36,8 +39,8 @@ export function loadRebindingConfig(): KeyBindings {
     }
 }
 
-export function saveRebindingConfig(config: KeyBindings) {
-    window.localStorage.setItem(StorageKeys.Rebindings, JSON.stringify(config));
+function saveJson(key: string, data: Object) {
+    window.localStorage.setItem(key, JSON.stringify(data));
 }
 
 export function getOrCreatePlayerName(): string {
