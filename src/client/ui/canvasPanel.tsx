@@ -225,7 +225,9 @@ class CanvasPanel extends React.Component<Props, State> {
                         && (p.time - this.previousTouchStart.time) < DoubleTapMilliseconds
                         && vector.distance(p.interfacePoint, this.previousTouchStart.interfacePoint) <= DoubleTapPixels
                     if (isMobile && doubleClick || p.secondaryBtn) {
-                        const spellId = this.keyToSpellId(this.rebind(w.Actions.RightClick));
+                        const spellId =
+                            this.keyToSpellId(this.rebind(w.Actions.RightClick))
+                            || this.keyToSpellId(this.rebind("a")); // Dash spell
                         if (spellId) {
                             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
                         }
