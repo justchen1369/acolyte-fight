@@ -57,6 +57,5 @@ export namespace ButtonBar {
 	export const Spacing = 8;
 	export const Margin = 5;
 	export const Size = 64;
-	export const SecondaryButtonSize = 48;
 	export const Gap = 12;
 }

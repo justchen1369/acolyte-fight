@@ -536,35 +536,6 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 
 		ctx.restore();
 	}
-
-	// Dash
-	if (hero.id === world.ui.myHeroId) {
-		const spellId = hero.keysToSpells.get(w.Actions.RightClick);	
-		const spell = world.settings.Spells[spellId];	
-		if (!spell) {	
-			return;	
-		}	
-		const proportion = engine.cooldownRemaining(world, hero, spellId) / spell.cooldown;
-
-		if (proportion > 0) {
-			ctx.save();
-
-			ctx.fillStyle = "black";
-			ctx.strokeStyle = "black";
-			ctx.lineWidth = Pixel;
-			ctx.beginPath();
-			dashBarPath(ctx, radius, 1.0, world);
-			ctx.stroke();
-			ctx.fill();
-
-			ctx.fillStyle = DashIndicator.Color;
-			ctx.beginPath();
-			dashBarPath(ctx, radius, proportion, world);
-			ctx.fill();
-
-			ctx.restore();
-		}
-	}
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
@@ -1030,7 +1001,7 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 
 		if (key) {
 			const offset = nextOffset;
-			const size = key.primary ? ButtonBar.Size : ButtonBar.SecondaryButtonSize;
+			const size = ButtonBar.Size * (key.weight || 1);
 
 			const left = offset;
 			const top = ButtonBar.Size - size;

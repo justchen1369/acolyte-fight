@@ -97,7 +97,7 @@ declare interface ChoiceSettings {
 
 declare interface KeyConfig {
 	btn: string;
-	primary?: boolean;
+	weight?: number;
 }
 
 declare interface Spells {
