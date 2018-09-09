@@ -323,7 +323,7 @@ const kamehameha: Spell = {
     retargettingRevsPerTick: 0.0003,
 
     knockbackCancel: true,
-    movementCancel: false,
+    movementCancel: true,
     interruptible: true,
     jitterRatio: 0.0,
 
@@ -624,9 +624,9 @@ const scourge: Spell = {
 
     radius: Hero.Radius * 4,
     chargeTicks: 0.5 * TicksPerSecond,
-    movementProportionWhileCharging: 0.3,
     cooldown: 10 * TicksPerSecond,
     interruptible: true,
+    movementCancel: true,
     damage: 20,
     selfDamage: 10,
     damageScaling: false,
