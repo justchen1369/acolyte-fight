@@ -8,13 +8,14 @@ import * as storage from '../storage';
 import * as url from '../url';
 
 interface Stats {
+    games: number;
     wins: number;
     kills: number;
     damage: number;
 }
 
 interface GlobalStats {
-    players: Map<string, PlayerStats>;
+    players: Map<string, LeaderboardStats>;
     totals: Stats;
 }
 
@@ -34,6 +35,13 @@ interface GameRow {
 interface PlayerStats extends Stats {
     name: string;
     userHash: string;
+}
+
+interface LeaderboardStats extends PlayerStats { 
+    winRate: number;
+    winRateLowerBound: number;
+    killsPerGame: number;
+    damagePerGame: number;
 }
 
 interface Props {
@@ -66,10 +74,11 @@ function retrieveReplaysAsync() {
 }
 
 function initStats(): Stats {
-    return { wins: 0, kills: 0, damage: 0 };
+    return { games: 0, wins: 0, kills: 0, damage: 0 };
 }
 
 function accumulateStats(accumulator: Stats, addend: Stats) {
+    accumulator.games += addend.games;
     accumulator.wins += addend.wins;
     accumulator.kills += addend.kills;
     accumulator.damage += addend.damage;
@@ -92,6 +101,7 @@ function convertGame(stats: d.GameStats): GameRow {
         const cell: PlayerStats = {
             name: player.name,
             userHash: player.userHash,
+            games: 1,
             wins: player.userHash === stats.winner ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
@@ -124,32 +134,54 @@ function joinWithComma(elements: JSX.Element[]): Array<JSX.Element | string> {
 
 function calculateGlobalStats(games: GameRow[]): GlobalStats {
     const totals = initStats();
-    const players = new Map<string, PlayerStats>();
+    const statsPerPlayer = new Map<string, PlayerStats>();
 
     for (const game of games) {
         accumulateStats(totals, game.totals);
 
         for (const gamePlayer of game.players.values()) {
-            let globalPlayer = players.get(gamePlayer.userHash);
+            let globalPlayer = statsPerPlayer.get(gamePlayer.userHash);
             if (!globalPlayer) {
                 globalPlayer = {
+                    ...initStats(),
                     name: gamePlayer.name,
                     userHash: gamePlayer.userHash,
-                    wins: 0,
-                    kills: 0,
-                    damage: 0,
                 };
-                players.set(globalPlayer.userHash, globalPlayer);
+                statsPerPlayer.set(globalPlayer.userHash, globalPlayer);
             }
 
             accumulateStats(globalPlayer, gamePlayer);
         }
     }
 
+    const players = new Map<string, LeaderboardStats>();
+    for (const stats of statsPerPlayer.values()) {
+        const winRate = stats.wins / Math.max(1, stats.games);
+
+        players.set(stats.userHash, {
+            ...stats,
+            winRate,
+            winRateLowerBound: wilsonLowerBound(stats.wins, stats.games, 1.96),
+            killsPerGame: stats.kills / Math.max(1, stats.games),
+            damagePerGame: stats.damage / Math.max(1, stats.games),
+        });
+    }
+
     return {
         players,
         totals,
     };
+}
+
+function wilsonLowerBound(nSuccess: number, n: number, z: number) {
+    if (n === 0) {
+        return 0;
+    }
+
+    const nFailure = n - nSuccess;
+    const mean = (nSuccess + z * z / 2) / (n + z * z);
+    const interval = (z / (n + z * z)) * Math.sqrt((nSuccess * nFailure) / n + (z * z / 4));
+    return mean - interval;
 }
 
 function findSelf(games: GameRow[]): string {
@@ -224,7 +256,6 @@ class RecentGameList extends React.Component<Props, State> {
             return null;
         }
 
-        const size = this.state.games.length; // Use this instead of total.wins as the user may leave early before they see the winner
         const self = this.state.global.players.get(this.state.self);
         const total = this.state.global.totals;
         if (!(self && total)) {
@@ -234,17 +265,17 @@ class RecentGameList extends React.Component<Props, State> {
         return <div>
             <h1>Previous {this.state.games.length} games</h1>
             <div className="stats-card-row">
-                <div className="stats-card" title={`You won ${self.wins} out of ${size} games`}>
+                <div className="stats-card" title={`You won ${self.wins} out of ${self.games} games`}>
                     <div className="label">Win rate</div>
-                    <div className="value">{Math.round(100 * self.wins / Math.max(1, size))}%</div>
+                    <div className="value">{Math.round(100 * self.winRate)}%</div>
                 </div>
                 <div className="stats-card" title={`You scored ${self.kills} kills out of ${total.kills} total`}>
                     <div className="label">Kills per game</div>
-                    <div className="value">{(self.kills / size).toFixed(1)}</div>
+                    <div className="value">{self.killsPerGame.toFixed(1)}</div>
                 </div>
                 <div className="stats-card" title={`You did ${Math.round(self.damage)} damage out of ${Math.round(total.damage)} total`}>
                     <div className="label">Damage per game</div>
-                    <div className="value">{Math.round(self.damage / size)}</div>
+                    <div className="value">{Math.round(self.damagePerGame)}</div>
                 </div>
             </div>
         </div>
@@ -260,13 +291,12 @@ class RecentGameList extends React.Component<Props, State> {
 
         let players = [...this.state.global.players.values()];
         players = players.filter(p => p.wins > 0);
-        players = _.sortBy(players, (p: PlayerStats) => -p.wins);
+        players = _.sortBy(players, (p: LeaderboardStats) => -p.winRateLowerBound);
         players = _.take(players, MaxLeaderboardLength);
         if (players.length === 0) {
             return null;
         }
 
-        let position = 0;
         return <div>
             <h1>Leaderboard</h1>
             <div className="leaderboard">
@@ -275,11 +305,13 @@ class RecentGameList extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderLeaderboardRow(player: PlayerStats, index: number) {
-        return <div className={index === 0 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}>
+    private renderLeaderboardRow(player: LeaderboardStats, index: number) {
+        return <div
+            className={index === 0 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}
+            title={`${Math.round(100 * player.winRate)}% win rate (${player.games} games), ${player.killsPerGame.toFixed(1)} kills per game, ${Math.round(player.damagePerGame)} damage per game`}>
             <span className="position">{index + 1}</span>
             <span className="player-name">{player.name}</span>
-            <span className="win-count">{player.wins} wins, {player.kills} kills, {Math.round(player.damage)} damage</span>
+            <span className="win-count">{Math.round(100 * player.winRate)}% win rate ({player.games} games)</span>
         </div>
     }
     
