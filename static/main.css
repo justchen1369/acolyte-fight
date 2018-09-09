@@ -633,6 +633,41 @@ h2 {
     text-shadow: 2px 2px 2px black;
 }
 
+.leaderboard-row {
+    background: #333;
+    border: 1px #555 solid;
+    box-shadow: 5px 5px 5px black;
+
+    display: flex;
+    align-items: center;
+
+    margin: 10px;
+    padding: 10px;
+}
+
+.leaderboard-row.leaderboard-best {
+    background: #555;
+}
+
+.leaderboard-row.leaderboard-best .player-name {
+    font-size: 200%;
+}
+
+.leaderboard-row .position {
+    margin-right: 20px;
+    color: #ccc;
+}
+
+.leaderboard-row .player-name {
+    font-size: 120%;
+    font-weight: bold;
+}
+
+.leaderboard-row .win-count {
+    margin-left: 20px;
+    color: #ccc;
+}
+
 .game-list {
     background: #333;
     box-shadow: 5px 5px 5px black;

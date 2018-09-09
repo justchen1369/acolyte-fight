@@ -7,42 +7,41 @@ import * as matches from '../core/matches';
 import * as storage from '../storage';
 import * as url from '../url';
 
-interface Proportions {
-    myWins: number;
-    totalWins: number;
+interface Stats {
+    wins: number;
+    kills: number;
+    damage: number;
+}
 
-    myKills: number;
-    totalKills: number;
-
-    myDamage: number;
-    totalDamage: number;
+interface GlobalStats {
+    players: Map<string, PlayerStats>;
+    totals: Stats;
 }
 
 interface GameRow {
     id: string;
     createdTimestamp: moment.Moment;
-    players: PlayerCell[];
 
-    proportions: Proportions;
+    self: string;
+    winner: string;
+    players: Map<string, PlayerStats>;
+    totals: Stats;
 
     lengthSeconds: number;
     server: string;
 }
 
-interface PlayerCell {
+interface PlayerStats extends Stats {
     name: string;
-    isSelf: boolean;
-    isWinner: boolean;
-    kills: number;
-    damage: number;
 }
 
 interface Props {
 }
 
 interface State {
+    self: string;
     games: GameRow[];
-    proportions: Proportions;
+    global: GlobalStats;
     error: string;
     availableReplays: Set<string>;
 }
@@ -65,47 +64,45 @@ function retrieveReplaysAsync() {
         })
 }
 
+function initStats(): Stats {
+    return { wins: 0, kills: 0, damage: 0 };
+}
+
+function accumulateStats(accumulator: Stats, addend: Stats) {
+    accumulator.wins += addend.wins;
+    accumulator.kills += addend.kills;
+    accumulator.damage += addend.damage;
+}
+
 function convertGame(stats: d.GameStats): GameRow {
     const game: GameRow = {
         id: stats.id,
         createdTimestamp: moment(stats.timestamp),
-        players: [],
-        proportions: {
-            myWins: 0,
-            totalWins: 1,
-            myDamage: 0,
-            totalDamage: 0,
-            myKills: 0,
-            totalKills: 0,
-        },
+        players: new Map<string, PlayerStats>(),
+        self: null,
+        winner: null,
+        totals: initStats(),
         lengthSeconds: stats.lengthSeconds,
         server: stats.server,
     };
 
     for (const userHash in stats.players) {
         const player = stats.players[userHash];
-        const cell: PlayerCell = {
+        const cell: PlayerStats = {
             name: player.name,
-            isSelf: player.userHash === stats.self,
-            isWinner: player.userHash === stats.winner,
+            wins: player.userHash === stats.winner ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
         };
 
-        game.proportions.totalKills += player.kills;
-        game.proportions.totalDamage += player.damage;
+        game.players.set(userHash, cell);
+        accumulateStats(game.totals, cell);
 
         if (stats.winner === userHash) {
-            game.players.unshift(cell); // Put winner at start of list
-            ++game.proportions.totalWins;
-        } else {
-            game.players.push(cell);
+            game.winner = userHash;
         }
-
         if (stats.self === userHash) {
-            game.proportions.myKills = player.kills;
-            game.proportions.myDamage = player.damage;
-            game.proportions.myWins = stats.winner === stats.self ? 1 : 0;
+            game.self = userHash;
         }
     }
 
@@ -123,36 +120,51 @@ function joinWithComma(elements: JSX.Element[]): Array<JSX.Element | string> {
     return result;
 }
 
-function sumProportions(games: GameRow[]): Proportions {
-    const proportions: Proportions = {
-        myWins: 0,
-        totalWins: 0,
+function calculateGlobalStats(games: GameRow[]): GlobalStats {
+    const totals = initStats();
+    const players = new Map<string, PlayerStats>();
 
-        myKills: 0,
-        totalKills: 0,
+    for (const game of games) {
+        accumulateStats(totals, game.totals);
 
-        myDamage: 0,
-        totalDamage: 0,
+        game.players.forEach((gamePlayer, userHash) => {
+            let globalPlayer = players.get(userHash);
+            if (!globalPlayer) {
+                globalPlayer = {
+                    name: gamePlayer.name,
+                    wins: 0,
+                    kills: 0,
+                    damage: 0,
+                };
+                players.set(userHash, globalPlayer);
+            }
+
+            accumulateStats(globalPlayer, gamePlayer);
+        });
+    }
+
+    return {
+        players,
+        totals,
     };
-    games.forEach(g => {
-        proportions.myWins += g.proportions.myWins;
-        proportions.totalWins += g.proportions.totalWins;
+}
 
-        proportions.myKills += g.proportions.myKills;
-        proportions.totalKills += g.proportions.totalKills;
-
-        proportions.myDamage += g.proportions.myDamage;
-        proportions.totalDamage += g.proportions.totalDamage;
-    });
-    return proportions;
+function findSelf(games: GameRow[]): string {
+    for (const game of games) {
+        if (game.self) {
+            return game.self;
+        }
+    }
+    return null;
 }
 
 class RecentGameList extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            self: null,
             games: null,
-            proportions: null,
+            global: null,
             availableReplays: new Set<string>(),
             error: null,
         };
@@ -160,7 +172,11 @@ class RecentGameList extends React.Component<Props, State> {
 
     componentDidMount() {
         retrieveGamesAsync().then(games => {
-            this.setState({ games, proportions: sumProportions(games) });
+            this.setState({
+                games,
+                global: calculateGlobalStats(games),
+                self: findSelf(games),
+            });
         }).then(() => retrieveReplaysAsync()).then(availableReplays => {
             this.setState({ availableReplays });
         }).catch(error => {
@@ -170,7 +186,8 @@ class RecentGameList extends React.Component<Props, State> {
 
     render() {
         return <div className="recent-game-list-section">
-            {this.renderStats(this.state.proportions)}
+            {this.renderGlobals()}
+            {this.renderLeaderboard()}
             <h1>Stats</h1>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
             {!this.state.games && <p className="loading-text">Loading...</p>}
@@ -199,43 +216,81 @@ class RecentGameList extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderStats(proportions: Proportions): JSX.Element {
-        if (!(proportions && proportions.totalWins > 0)) {
+    private renderGlobals(): JSX.Element {
+        if (!(this.state.self && this.state.global && this.state.games && this.state.games.length > 0)) {
             return null;
         }
+
+        const size = this.state.games.length; // Use this instead of total.wins as the user may leave early before they see the winner
+        const self = this.state.global.players.get(this.state.self);
+        const total = this.state.global.totals;
+        if (!(self && total)) {
+            return null;
+        }
+
         return <div>
-            <h1>Previous {proportions.totalWins} games</h1>
+            <h1>Previous {this.state.games.length} games</h1>
             <div className="stats-card-row">
-                <div className="stats-card" title={`You won ${proportions.myWins} out of ${proportions.totalWins} games`}>
+                <div className="stats-card" title={`You won ${self.wins} out of ${size} games`}>
                     <div className="label">Win rate</div>
-                    <div className="value">{Math.round(100 * proportions.myWins / Math.max(1, proportions.totalWins))}%</div>
+                    <div className="value">{Math.round(100 * self.wins / Math.max(1, size))}%</div>
                 </div>
-                <div className="stats-card" title={`You scored ${proportions.myKills} kills out of ${proportions.totalKills} total`}>
+                <div className="stats-card" title={`You scored ${self.kills} kills out of ${total.kills} total`}>
                     <div className="label">Kills</div>
-                    <div className="value">{proportions.myKills}</div>
+                    <div className="value">{self.kills}</div>
                 </div>
-                <div className="stats-card" title={`You did ${Math.round(proportions.myDamage)} damage out of ${Math.round(proportions.totalDamage)} total`}>
+                <div className="stats-card" title={`You did ${Math.round(self.damage)} damage out of ${Math.round(total.damage)} total`}>
                     <div className="label">Damage</div>
-                    <div className="value">{Math.round(proportions.myDamage)}</div>
+                    <div className="value">{Math.round(self.damage)}</div>
                 </div>
             </div>
         </div>
     }
 
+    private renderLeaderboard(): JSX.Element {
+        if (!(this.state.global)) {
+            return null;
+        }
+
+        let players = [...this.state.global.players.values()];
+        players = players.filter(p => p.wins > 0);
+        players = _.sortBy(players, (p: PlayerStats) => -p.wins);
+        if (players.length === 0) {
+            return null;
+        }
+
+        let position = 1;
+        return <div>
+            <h1>Leaderboard</h1>
+            <div className="leaderboard">
+                {players.map(player => <div className={position === 1 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}>
+                    <span className="position">{position++}</span>
+                    <span className="player-name">{player.name}</span>
+                    <span className="win-count">{player.wins} wins</span>
+                </div>)}
+            </div>
+        </div>;
+    }
+    
     private renderRow(game: GameRow): JSX.Element {
+        const self = game.players.get(game.self);
+        if (!self) {
+            return null;
+        }
+
         return <tr>
             <td title={game.createdTimestamp.toLocaleString()}>{game.createdTimestamp.fromNow()}</td>
-            <td>{joinWithComma(game.players.map(player => this.renderPlayer(player)))}</td>
-            <td title={`You scored ${game.proportions.myKills} kills out of ${game.proportions.totalKills} total`}>{game.proportions.myKills}</td>
-            <td title={`You did ${Math.round(game.proportions.myDamage)} damage out of ${Math.round(game.proportions.totalDamage)} total`}>{Math.round(game.proportions.myDamage)}</td>
+            <td>{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</td>
+            <td title={`You scored ${self.kills} kills out of ${game.totals.kills} total`}>{self.kills}</td>
+            <td title={`You did ${Math.round(self.damage)} damage out of ${Math.round(game.totals.damage)} total`}>{Math.round(self.damage)}</td>
             <td>{this.state.availableReplays.has(game.id) && <a href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}>Watch <i className="fa fa-external-link-square-alt" /></a>}</td>
         </tr>
     }
 
-    private renderPlayer(player: PlayerCell): JSX.Element {
-        return <span className="player-cell" title={`${player.name}: ${player.isWinner ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
-            <span className={player.isWinner ? "winner" : ""}>
-                {player.isWinner && <i className="fas fa-crown" />}
+    private renderPlayer(player: PlayerStats): JSX.Element {
+        return <span className="player-cell" title={`${player.name}: ${player.wins ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
+            <span className={player.wins ? "winner" : ""}>
+                {player.wins ? <i className="fas fa-crown" /> : null}
                 {player.name}
             </span>
         </span>
