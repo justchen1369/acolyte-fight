@@ -57,8 +57,12 @@ class MessagesPanel extends React.Component<Props, State> {
             }
         }
 
-        let rows = new Array<JSX.Element>();
         let actionRow: JSX.Element = this.renderHelp("help");
+        if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
+            actionRow = this.renderDead("dead", this.props.myGameId);
+        }
+
+        let rows = new Array<JSX.Element>();
         const now = new Date().getTime();
         this.props.items.forEach(item => {
             if (now >= item.expiryTime) {
@@ -76,10 +80,6 @@ class MessagesPanel extends React.Component<Props, State> {
                 rows.push(row);
             }
         });
-
-        if (!actionRow && this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
-            actionRow = this.renderDead("dead", this.props.myGameId);
-        }
 
         if (actionRow) {
             rows.push(actionRow);
