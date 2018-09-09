@@ -914,7 +914,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 			});
 		} else if (radius <= config.innerRadius) {
 			config.hitSectors.forEach((hitSector, candidateKey) => {
-				if (hitSector.startAngle && hitSector.endAngle) {
+				if (!(hitSector.startAngle && hitSector.endAngle)) {
 					key = candidateKey;
 				}
 			});
@@ -1122,7 +1122,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.Butt
 
 	const region = calculateButtonWheelRegion(rect);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;
-	const innerRadius = outerRadius / 2.5;
+	const innerRadius = outerRadius / 2;
 	const center = pl.Vec2((region.left + region.right) / 2, (region.top + region.bottom) / 2);
 
 	const targetSurfaceCenter = pl.Vec2(rect.right - (center.x - rect.left), center.y); // Mirror the wheel on the right
