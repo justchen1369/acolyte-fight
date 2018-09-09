@@ -421,6 +421,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	foreground(ctxStack, ctx => ctx.save());
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
+	renderRangeIndicator(ctxStack, hero, world);
 	renderHeroCharacter(ctxStack, hero, world);
 	renderHeroBars(ctxStack, hero, world);
 
@@ -494,6 +495,44 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		ctx.arc(0, 0, radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
 		ctx.stroke();
 
+		ctx.restore();
+	}
+}
+
+function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	if (!(hero.id === world.ui.myHeroId && world.ui.hoverSpellId)) {
+		return;
+	}
+
+	const ctx = ctxStack.canvas;
+
+	let range = null;
+
+	const spell = world.settings.Spells[world.ui.hoverSpellId];
+	if (spell.action === "projectile" || spell.action === "spray") {
+		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
+	} else if (spell.action === "teleport" || spell.action === "thrust") {
+		range = world.settings.Hero.MaxDashRange;
+	} else if (spell.action === "scourge" || spell.action === "shield") {
+		range = spell.radius;
+	} else if (spell.action === "wall") {
+		range = spell.maxRange;
+	}
+
+	if (range > 0.5) {
+		range = 0.5;
+	}
+
+	if (range) {
+		ctx.save();
+
+		ctx.globalAlpha = 0.25;
+		ctx.strokeStyle = spell.color;
+		ctx.lineWidth = HeroColors.RangeIndicatorWidth;
+		ctx.setLineDash([ Pixel * 5, Pixel * 5 ]);
+		ctx.beginPath();
+		ctx.arc(0, 0, range, 0, 2 * Math.PI);
+		ctx.stroke();
 		ctx.restore();
 	}
 }
