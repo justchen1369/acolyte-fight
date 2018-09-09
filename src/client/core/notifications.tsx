@@ -2,10 +2,19 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
 
+export interface NotificationListener {
+    (newNotifications: w.Notification[]): void;
+}
+
 const ExpiryMilliseconds = 15000;
 
+const listeners = new Array<NotificationListener>();
 let nextNotificationId = 0;
 setInterval(notificationCleanup, ExpiryMilliseconds);
+
+export function attachListener(listener: NotificationListener) {
+    listeners.push(listener);
+}
 
 export function notify(...newNotifications: w.Notification[]) {
     const store = StoreProvider.getState();
@@ -23,6 +32,8 @@ export function notify(...newNotifications: w.Notification[]) {
     });
 
     StoreProvider.dispatch({ type: "updateNotifications", items: newItems });
+
+    listeners.forEach(listener => listener(newNotifications));
 }
 
 function calculateExpiryMilliseconds(notification: w.Notification): number {

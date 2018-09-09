@@ -11,11 +11,9 @@ import * as w from '../game/world.model';
 import * as matches from './core/matches';
 import * as parties from './core/parties';
 import * as sockets from './core/sockets';
+import * as stats from './core/stats';
 import * as StoreProvider from './storeProvider';
 import * as url from './url';
-
-import { getState } from './storeProvider';
-import * as Storage from './storage';
 
 import Root from './ui/root';
 
@@ -23,6 +21,7 @@ const socket = socketLib();
 
 let alreadyConnected = false;
 
+stats.attachListener();
 initialize();
 rerender();
 

@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 import pl from 'planck-js';
 import * as Immutable from 'immutable';
 import * as constants from './constants';
@@ -49,6 +50,7 @@ export function initialWorld(mod: Object): w.World {
 		mod,
 
 		ui: {
+			createTime: moment(),
 			myGameId: null,
 			myHeroId: null,
 			renderedTick: null,
@@ -56,7 +58,7 @@ export function initialWorld(mod: Object): w.World {
 			events: new Array<w.WorldEvent>(),
 			trails: [],
 			notifications: [],
-		} as w.UIState,
+		},
 	};
 
 	return world;
@@ -531,13 +533,15 @@ function handleBotting(ev: w.Botting, world: w.World) {
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world); 
 
-	const player = {
+	const player: w.Player = {
 		heroId: hero.id,
+		userHash: null,
 		name: Matchmaking.BotName,
 		uiColor: HeroColors.BotColor,
+		isMobile: false,
 		isBot: true,
 		isSharedBot: true,
-	} as w.Player;
+	};
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.delete(hero.id);
@@ -556,14 +560,15 @@ function handleJoining(ev: w.Joining, world: w.World) {
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world);
 
-	const player = {
+	const player: w.Player = {
 		heroId: hero.id,
+		userHash: ev.userHash,
 		name: ev.playerName,
 		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
 		isBot: ev.isBot,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
-	} as w.Player;
+	};
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.add(hero.id);
@@ -1437,6 +1442,7 @@ function notifyWin(world: w.World) {
 	}
 
 	world.winner = bestScore.heroId;
+	world.winTick = world.tick;
 	world.ui.notifications.push({
 		type: "win",
 		winner: world.players.get(bestScore.heroId),

@@ -2,6 +2,7 @@ import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as stats from './stats';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
 import * as sockets from './sockets';
@@ -65,6 +66,8 @@ export function leaveCurrentGame(close: boolean = true) {
 	const store = StoreProvider.getState();
 	const world = store.world;
 
+	// Save previous game
+	stats.save(world); // Note, this is async, but we don't care about waiting for it to finish
 	world.players.forEach(player => {
 		ticker.setPreferredColor(player.name, player.uiColor);
 	});

@@ -1,4 +1,5 @@
-import * as pl from 'planck-js';
+import moment from 'moment';
+import pl from 'planck-js';
 import * as Immutable from 'immutable';
 
 export namespace Actions {
@@ -25,6 +26,7 @@ export interface World {
 	players: Immutable.Map<string, Player>; // heroId -> Player
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
 	winner: string | null;
+	winTick?: number;
 
 	objects: Map<string, WorldObject>,
 
@@ -55,6 +57,8 @@ export interface HeroScore {
 }
 
 export interface UIState {
+	createTime: moment.Moment;
+
 	myGameId: string | null;
 	myHeroId: string | null;
 	nextTarget?: pl.Vec2;
@@ -104,6 +108,7 @@ export interface HitSector {
 
 export interface Player {
 	heroId: string;
+	userHash: string;
 	name: string;
 	uiColor: string; // Not synced across clients
 	isSharedBot: boolean; // Not synced across clients
@@ -211,6 +216,7 @@ export interface Closing {
 
 export interface Joining {
 	type: "join";
+	userHash: string;
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;

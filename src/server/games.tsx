@@ -483,9 +483,14 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		game.accessTokens.add(authToken);
 	}
 
-	queueAction(game, { gameId: game.id, heroId, actionType: "join", playerName, keyBindings, isBot, isMobile });
+	const userHash = hashAuthToken(authToken);
+	queueAction(game, { gameId: game.id, heroId, actionType: "join", userHash, playerName, keyBindings, isBot, isMobile });
 
 	return heroId;
+}
+
+function hashAuthToken(authToken: string): string {
+	return crypto.createHash('md5').update(authToken).digest('hex');
 }
 
 export function addBot(game: g.Game) {

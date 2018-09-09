@@ -1,4 +1,8 @@
+import localForage from 'localforage';
 import { DefaultSettings } from '../game/settings';
+import * as d from './stats.model';
+
+const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
 
 namespace StorageKeys {
     export const Name = "enigma-name";
@@ -58,4 +62,19 @@ export function getKeyBindingsOrDefaults() {
 
 export function getRebindingsOrDefaults() {
     return loadRebindingConfig() || {};
+}
+
+export function loadAllGameStats(): Promise<d.GameStats[]> {
+    const allGames = new Array<d.GameStats>();
+    return gameStorage.iterate<d.GameStats, void>(game => {
+        allGames.push(game);
+    }).then(() => Promise.resolve(allGames));
+}
+
+export function loadGameStats(gameId: string): Promise<d.GameStats> {
+    return gameStorage.getItem<d.GameStats>(gameId);
+}
+
+export function saveGameStats(gameStats: d.GameStats): Promise<void> {
+    return gameStorage.setItem(gameStats.id, gameStats).then(() => Promise.resolve());
 }
