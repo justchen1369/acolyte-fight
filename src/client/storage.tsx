@@ -1,6 +1,10 @@
+import _ from 'lodash';
 import localForage from 'localforage';
+import moment from 'moment';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
+
+const GamesToKeep = 100;
 
 const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
 
@@ -77,4 +81,12 @@ export function loadGameStats(gameId: string): Promise<d.GameStats> {
 
 export function saveGameStats(gameStats: d.GameStats): Promise<void> {
     return gameStorage.setItem(gameStats.id, gameStats).then(() => Promise.resolve());
+}
+
+export function cleanupGameStats() {
+    loadAllGameStats().then(games => {
+        const ids = _.sortBy(games, (g: d.GameStats) => -moment(g.timestamp).unix()).map(g => g.id);
+        const idsToDelete = _.drop(ids, GamesToKeep);
+        idsToDelete.forEach(id => gameStorage.removeItem(id));
+    });
 }

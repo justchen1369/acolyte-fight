@@ -647,7 +647,7 @@ h2 {
 }
 
 .game-list .player-cell i {
-    margin-left: 2px;
+    margin-right: 2px;
 }
 
 .game-list .player-cell .winner {

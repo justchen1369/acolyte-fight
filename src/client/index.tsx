@@ -12,6 +12,7 @@ import * as matches from './core/matches';
 import * as parties from './core/parties';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
+import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
 import * as url from './url';
 
@@ -58,6 +59,8 @@ function initialize() {
                 }
             });
     });
+
+    storage.cleanupGameStats();
 }
 
 function rerender() {
