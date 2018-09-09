@@ -918,6 +918,9 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 					key = candidateKey;
 				}
 			});
+			if (!key) {
+				key = " ";
+			}
 		}
 	}
 
@@ -995,24 +998,18 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
-	/*
-	const rightClick: KeyConfig = { btn: w.Actions.RightClick };
-	keys = [...keys, rightClick];
-	*/
-
-	for (let i = 0; i < keys.length; ++i) {
-		const key = keys[i];
+	for (const key of config.hitSectors.keys()) {
 		if (!key) {
 			continue;
 		}
 
-		const newState = calculateButtonState(key.btn, hero, selectedAction, world, rebindings);
-		const currentState = config.buttons.get(key.btn);
+		const newState = calculateButtonState(key, hero, selectedAction, world, rebindings);
+		const currentState = config.buttons.get(key);
 
 		if (buttonStateChanged(currentState, newState)) {
-			const buttonSector = config.hitSectors.get(key.btn);
+			const buttonSector = config.hitSectors.get(key);
 			if (buttonSector) {
-				config.buttons.set(key.btn, newState);
+				config.buttons.set(key, newState);
 
 				ctx.save();
 				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState);
@@ -1020,20 +1017,6 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 			}
 		}
 	}
-	ctx.restore();
-}
-
-function renderTargetSurface(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, selectedAction: string, world: w.World) {
-	ctx.save();
-	ctx.translate(config.targetSurfaceCenter.x, config.targetSurfaceCenter.y);
-
-	ctx.lineWidth = 3;
-	ctx.strokeStyle = world.ui.nextSpellId ? "#cccccc" : "#888888";
-
-	ctx.beginPath();
-	ctx.arc(0, 0, config.outerRadius, 0, 2 * Math.PI);
-	ctx.stroke();
-
 	ctx.restore();
 }
 
@@ -1118,7 +1101,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.Butt
 			nextAngle += arcWidth;
 		}
 	});
-	hitSectors.set(w.Actions.RightClick, { startAngle: null, endAngle: null });
+	// hitSectors.set(w.Actions.RightClick, { startAngle: null, endAngle: null });
 
 	const region = calculateButtonWheelRegion(rect);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;
