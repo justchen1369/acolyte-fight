@@ -623,6 +623,11 @@ h2 {
     text-align: center;
 }
 
+.stats-card-row .stats-card:hover {
+    background: #555;
+    border: 1px #666 solid;
+}
+
 .stats-card-row .stats-card .label {
     font-size: 16px;
 }
@@ -645,12 +650,22 @@ h2 {
     padding: 10px;
 }
 
+.leaderboard-row:hover {
+    background: #555;
+    border: 1px #666 solid;
+}
+
 .leaderboard-row.leaderboard-best {
     background: #555;
+    border: 1px #888 solid;
+}
+
+.leaderboard-row.leaderboard-best:hover {
+    background: #666;
 }
 
 .leaderboard-row.leaderboard-best .player-name {
-    font-size: 200%;
+    font-size: 250%;
 }
 
 .leaderboard-row .position {

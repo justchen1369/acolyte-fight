@@ -33,6 +33,7 @@ interface GameRow {
 
 interface PlayerStats extends Stats {
     name: string;
+    userHash: string;
 }
 
 interface Props {
@@ -90,6 +91,7 @@ function convertGame(stats: d.GameStats): GameRow {
         const player = stats.players[userHash];
         const cell: PlayerStats = {
             name: player.name,
+            userHash: player.userHash,
             wins: player.userHash === stats.winner ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
@@ -127,20 +129,21 @@ function calculateGlobalStats(games: GameRow[]): GlobalStats {
     for (const game of games) {
         accumulateStats(totals, game.totals);
 
-        game.players.forEach((gamePlayer, userHash) => {
-            let globalPlayer = players.get(userHash);
+        for (const gamePlayer of game.players.values()) {
+            let globalPlayer = players.get(gamePlayer.userHash);
             if (!globalPlayer) {
                 globalPlayer = {
                     name: gamePlayer.name,
+                    userHash: gamePlayer.userHash,
                     wins: 0,
                     kills: 0,
                     damage: 0,
                 };
-                players.set(userHash, globalPlayer);
+                players.set(globalPlayer.userHash, globalPlayer);
             }
 
             accumulateStats(globalPlayer, gamePlayer);
-        });
+        }
     }
 
     return {
@@ -236,40 +239,48 @@ class RecentGameList extends React.Component<Props, State> {
                     <div className="value">{Math.round(100 * self.wins / Math.max(1, size))}%</div>
                 </div>
                 <div className="stats-card" title={`You scored ${self.kills} kills out of ${total.kills} total`}>
-                    <div className="label">Kills</div>
-                    <div className="value">{self.kills}</div>
+                    <div className="label">Kills per game</div>
+                    <div className="value">{(self.kills / size).toFixed(1)}</div>
                 </div>
                 <div className="stats-card" title={`You did ${Math.round(self.damage)} damage out of ${Math.round(total.damage)} total`}>
-                    <div className="label">Damage</div>
-                    <div className="value">{Math.round(self.damage)}</div>
+                    <div className="label">Damage per game</div>
+                    <div className="value">{Math.round(self.damage / size)}</div>
                 </div>
             </div>
         </div>
     }
 
     private renderLeaderboard(): JSX.Element {
-        if (!(this.state.global)) {
+        if (!(this.state.self && this.state.global)) {
             return null;
         }
+
+        const MaxLeaderboardLength = 10;
+        const self = this.state.self;
 
         let players = [...this.state.global.players.values()];
         players = players.filter(p => p.wins > 0);
         players = _.sortBy(players, (p: PlayerStats) => -p.wins);
+        players = _.take(players, MaxLeaderboardLength);
         if (players.length === 0) {
             return null;
         }
 
-        let position = 1;
+        let position = 0;
         return <div>
             <h1>Leaderboard</h1>
             <div className="leaderboard">
-                {players.map(player => <div className={position === 1 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}>
-                    <span className="position">{position++}</span>
-                    <span className="player-name">{player.name}</span>
-                    <span className="win-count">{player.wins} wins</span>
-                </div>)}
+                {players.map((player, index) => (index < MaxLeaderboardLength || player.userHash === self) ?  this.renderLeaderboardRow(player, index) : null)}
             </div>
         </div>;
+    }
+
+    private renderLeaderboardRow(player: PlayerStats, index: number) {
+        return <div className={index === 0 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}>
+            <span className="position">{index + 1}</span>
+            <span className="player-name">{player.name}</span>
+            <span className="win-count">{player.wins} wins, {player.kills} kills, {Math.round(player.damage)} damage</span>
+        </div>
     }
     
     private renderRow(game: GameRow): JSX.Element {
