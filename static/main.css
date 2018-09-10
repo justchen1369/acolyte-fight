@@ -515,6 +515,11 @@ h2 {
     align-items: center;
 
     pointer-events: all;
+    cursor: hand;
+}
+
+.spell-config .key-name-container:hover {
+    background: #555;
 }
 
 .spell-config .key-name {
