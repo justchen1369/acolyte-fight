@@ -57,6 +57,9 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     if (numHumans + numAI <= 1) {
         // Don't save if played by self
         return null;
+    } else if (!(winningPlayer || !world.objects.get(world.ui.myHeroId))) {
+        // Store complete games only - either a winner has been decided, or we are dead
+        return null;
     }
 
     let category: string;
