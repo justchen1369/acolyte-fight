@@ -77,6 +77,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
+	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
 
 function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
@@ -345,6 +346,12 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	if (game) {
 		games.receiveAction(game, data, socket.id);
 	}
+}
+
+function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponse) => void) {
+	const store = getStore();
+	const availableIds = data.ids.filter(id => store.activeGames.has(id) || store.inactiveGames.has(id));
+	callback({ success: true, ids: availableIds });
 }
 
 function emitHero(socketId: string, game: g.Game, heroId: string) {

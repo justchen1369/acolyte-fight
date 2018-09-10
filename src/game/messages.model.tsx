@@ -218,20 +218,15 @@ export interface ServerStats {
     serverLoad: number;
 }
 
-export interface GameListMsg {
-    games: GameMsg[];
+export interface GameListRequest {
+    ids: string[];
 }
+export interface GameListResponse {
+    success: true;
+    ids: string[];
+}
+export type GameListResponseMsg = GameListResponse | ErrorResponseMsg;
 
-export interface GameMsg {
-    id: string;
-    createdTimestamp: string;
-    playerNames: string[];
-    numActivePlayers: number;
-    joinable: boolean;
-    numTicks: number;
-    roomId: string;
-    server: string;
-}
 
 export interface LocationMsg {
     targetServer: string;

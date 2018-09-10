@@ -63,14 +63,8 @@ function retrieveGamesAsync(): Promise<GameRow[]> {
     });
 }
 
-function retrieveReplaysAsync() {
-    return fetch('api/games', { credentials: "same-origin" })
-        .then(res => res.json())
-        .then((data: m.GameListMsg) => {
-            let ids = new Set<string>();
-            data.games.forEach(g => ids.add(g.id));
-            return ids;
-        })
+function retrieveReplaysAsync(gameIds: string[]) {
+    return matches.replays(gameIds);
 }
 
 function initStats(): Stats {
@@ -212,8 +206,8 @@ class RecentGameList extends React.Component<Props, State> {
                 global: calculateGlobalStats(games),
                 self: findSelf(games),
             });
-        }).then(() => retrieveReplaysAsync()).then(availableReplays => {
-            this.setState({ availableReplays });
+        }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
+            this.setState({ availableReplays: new Set<string>(ids) });
         }).catch(error => {
             this.setState({ error: `${error}` });
         });

@@ -81,6 +81,19 @@ export function leaveCurrentGame(close: boolean = true) {
 	}
 }
 
+export function replays(ids: string[]): Promise<string[]> {
+	const request: m.GameListRequest = { ids };
+	return new Promise<string[]>((resolve, reject) => {
+		socket.emit('replays', request, (response: m.GameListResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				resolve(response.ids);
+			}
+		});
+	});
+}
+
 function onHeroMsg(data: m.HeroMsg) {
 	leaveCurrentGame(false);
 
