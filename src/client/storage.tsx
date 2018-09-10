@@ -71,16 +71,23 @@ export function getRebindingsOrDefaults() {
 export function loadAllGameStats(): Promise<d.GameStats[]> {
     const allGames = new Array<d.GameStats>();
     return gameStorage.iterate<d.GameStats, void>(game => {
-        allGames.push(game);
+        allGames.push(migrateGame(game));
     }).then(() => Promise.resolve(allGames));
 }
 
 export function loadGameStats(gameId: string): Promise<d.GameStats> {
-    return gameStorage.getItem<d.GameStats>(gameId);
+    return gameStorage.getItem<d.GameStats>(gameId).then(migrateGame);
 }
 
 export function saveGameStats(gameStats: d.GameStats): Promise<void> {
     return gameStorage.setItem(gameStats.id, gameStats).then(() => Promise.resolve());
+}
+
+function migrateGame(game: d.GameStats): d.GameStats {
+    return {
+        ...game,
+        category: game.category || d.GameCategory.PvP,
+    };
 }
 
 export function cleanupGameStats() {

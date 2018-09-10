@@ -688,6 +688,35 @@ h2 {
     color: #ccc;
 }
 
+.recent-game-list-section {
+    position: relative;
+}
+
+.recent-game-list-section .category-selector {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.recent-game-list-section .category {
+    display: inline-block;
+    font-weight: bold;
+    font-size: 120%;
+    padding: 10px 20px;
+    background: #333;
+    border: 1px #444 solid;
+}
+
+.recent-game-list-section .category:hover {
+    background: #555;
+    cursor: hand;
+}
+
+.recent-game-list-section .category-selected {
+    background: #444;
+    color: #00ccff;
+}
+
 .game-list {
     background: #333;
     box-shadow: 5px 5px 5px black;

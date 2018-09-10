@@ -23,7 +23,7 @@ function onNotification(notifs: w.Notification[]) {
 
 export function save(world: w.World, server: string): Promise<void> {
     const gameStats = gameStatsFromWorld(world, server);
-    if (gameStats && Object.keys(gameStats.players).length > 1) {
+    if (gameStats) {
         return storage.saveGameStats(gameStats);
     } else {
         return Promise.resolve();
@@ -35,19 +35,42 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         return null;
     }
 
+    let numHumans = 0;
+    let numAI = 0;
+
     const players: d.PlayerStatsLookup = {};
     world.scores.forEach((score, heroId) => {
         const player = world.players.get(heroId);
-        if (player && player.userHash) {
-            players[player.userHash] = playerStatsFromScore(player, score);
+        if (player) {
+            if (player.userHash) {
+                ++numHumans;
+                players[player.userHash] = playerStatsFromScore(player, score);
+            } else {
+                ++numAI;
+            }
         }
     });
 
     const selfPlayer = world.players.get(world.ui.myHeroId);
     const winningPlayer = world.players.get(world.winner);
 
+    if (numHumans + numAI <= 1) {
+        // Don't save if played by self
+        return null;
+    }
+
+    let category: string;
+    if (selfPlayer.isBot) {
+        category = d.GameCategory.AIvAI;
+    } else if (numHumans > 1) {
+        category = d.GameCategory.PvP;
+    } else {
+        category = d.GameCategory.PvAI;
+    }
+
     const stats: d.GameStats = {
         id: world.ui.myGameId,
+        category,
         timestamp: world.ui.createTime.toISOString(),
         players,
         self: selfPlayer.userHash,

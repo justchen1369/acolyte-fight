@@ -2,12 +2,17 @@ import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as matches from '../core/matches';
 import * as storage from '../storage';
 import * as url from '../url';
+
+interface CategoryCounts {
+    [category: string]: number;
+}
 
 interface Stats {
     games: number;
@@ -23,6 +28,7 @@ interface GlobalStats {
 
 interface GameRow {
     id: string;
+    category: string;
     server: string;
     createdTimestamp: moment.Moment;
 
@@ -50,12 +56,47 @@ interface Props {
 }
 
 interface State {
+    category: string;
     self: string;
     games: GameRow[];
-    global: GlobalStats;
     error: string;
     availableReplays: Set<string>;
 }
+
+const getCategoryCounts = Reselect.createSelector(
+    (games: GameRow[]) => games,
+    (games) => {
+        const counts: CategoryCounts = {};
+        if (games) {
+            for (const game of games) {
+                counts[game.category] = (counts[game.category] || 0) + 1;
+            }
+        }
+        return counts;
+    }
+);
+
+const getGameSubset = Reselect.createSelector(
+    (state: State) => state.category,
+    (state: State) => state.games,
+    (category, games) => {
+        if (games) {
+            return games.filter(g => g.category === category);
+        } else {
+            return null;
+        }
+    });
+
+const getGlobalStats = Reselect.createSelector(
+    getGameSubset,
+    (games) => {
+        if (games) {
+            return calculateGlobalStats(games);
+        } else {
+            return null;
+        }
+    }
+);
 
 function retrieveGamesAsync(): Promise<GameRow[]> {
     return storage.loadAllGameStats().then(gameStats => {
@@ -83,6 +124,7 @@ function accumulateStats(accumulator: Stats, addend: Stats) {
 function convertGame(stats: d.GameStats): GameRow {
     const game: GameRow = {
         id: stats.id,
+        category: stats.category,
         server: stats.server,
         createdTimestamp: moment(stats.timestamp),
         players: new Map<string, PlayerStats>(),
@@ -199,9 +241,9 @@ class RecentGameList extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            category: d.GameCategory.PvP,
             self: null,
             games: null,
-            global: null,
             availableReplays: new Set<string>(),
             error: null,
         };
@@ -209,9 +251,16 @@ class RecentGameList extends React.Component<Props, State> {
 
     componentDidMount() {
         retrieveGamesAsync().then(games => {
+            const counts = getCategoryCounts(games);
+
+            // Choose a category with data in it
+            let category = this.state.category;
+            if (!counts[category] && Object.keys(counts).length > 0) {
+                category = Object.keys(counts)[0];
+            }
+
             this.setState({
                 games,
-                global: calculateGlobalStats(games),
                 self: findSelf(games),
             });
         }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
@@ -223,13 +272,21 @@ class RecentGameList extends React.Component<Props, State> {
 
     render() {
         return <div className="recent-game-list-section">
+            {this.renderCategorySelector()}
             {this.renderGlobals()}
             {this.renderLeaderboard()}
+            {this.renderGames()}
+        </div>;
+    }
+
+    private renderGames(): JSX.Element {
+        const games = getGameSubset(this.state);
+        return <div>
             <h1>Stats</h1>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
             {!this.state.games && <p className="loading-text">Loading...</p>}
-            {this.state.games && this.state.games.length === 0 && <p>No recent games</p>}
-            {this.state.games && this.state.games.length > 0 && <div className="game-list">
+            {games && games.length === 0 && <p>No recent games</p>}
+            {games && games.length > 0 && <div className="game-list">
                 <table style={{width: "100%"}}>
                     <col className="timestamp" />
                     <col />
@@ -246,26 +303,42 @@ class RecentGameList extends React.Component<Props, State> {
                         </tr>
                     </thead>
                     <tbody>
-                        {this.state.games.map(game => this.renderRow(game))}
+                        {games.map(game => this.renderRow(game))}
                     </tbody>
                 </table>
             </div>}
-        </div>;
+        </div>
+    }
+
+    private renderCategorySelector(): JSX.Element {
+        const categoryCounts = getCategoryCounts(this.state.games);
+        return <div className="category-selector">
+            {Object.keys(categoryCounts).map(category => (
+                <div
+                    key={category}
+                    className={category === this.state.category ? "category category-selected" : "category"}
+                    onClick={() => this.setState({ category })}
+                    >
+                    {category}
+                </div>
+            ))}
+        </div>
     }
 
     private renderGlobals(): JSX.Element {
-        if (!(this.state.self && this.state.global && this.state.games && this.state.games.length > 0)) {
+        const global = getGlobalStats(this.state);
+        if (!(this.state.self && global && this.state.games && this.state.games.length > 0)) {
             return null;
         }
 
-        const self = this.state.global.players.get(this.state.self);
-        const total = this.state.global.totals;
-        if (!(self && total)) {
+        const self = global.players.get(this.state.self);
+        const total = global.totals;
+        if (!(self && total && self.games > 0)) {
             return null;
         }
 
         return <div>
-            <h1>Previous {this.state.games.length} games</h1>
+            <h1>Previous {self.games} games</h1>
             <div className="stats-card-row">
                 <div className="stats-card" title={`You won ${self.wins} out of ${self.games} games`}>
                     <div className="label">Win rate</div>
@@ -284,14 +357,15 @@ class RecentGameList extends React.Component<Props, State> {
     }
 
     private renderLeaderboard(): JSX.Element {
-        if (!(this.state.self && this.state.global)) {
+        const global = getGlobalStats(this.state);
+        if (!(this.state.self && global)) {
             return null;
         }
 
         const MaxLeaderboardLength = 10;
         const self = this.state.self;
 
-        let players = [...this.state.global.players.values()];
+        let players = [...global.players.values()];
         players = players.filter(p => p.wins > 0);
         players = _.sortBy(players, (p: LeaderboardStats) => -p.winRateLowerBound);
         players = _.take(players, MaxLeaderboardLength);
