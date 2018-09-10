@@ -12,6 +12,7 @@ export interface State {
 
     socketId: string;
     party: PartyState;
+    server: string;
     room: RoomState;
     world: w.World;
     items: NotificationItem[];
@@ -66,6 +67,7 @@ export type Action =
     | ClearNewPlayerFlagAction
     | UpdateHoverSpellAction
     | UpdateRebindingsAction
+    | UpdateServerAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -156,4 +158,9 @@ export interface UpdateHoverSpellAction {
 export interface UpdateRebindingsAction {
     type: "updateRebindings";
     rebindings: KeyBindings;
+}
+
+export interface UpdateServerAction {
+    type: "updateServer";
+    server: string;
 }

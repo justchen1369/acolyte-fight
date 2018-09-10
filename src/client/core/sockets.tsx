@@ -28,6 +28,7 @@ export function connectToServer(server: string): Promise<void> {
 				if (response.success === false) {
 					reject(response.error);
 				} else {
+					StoreProvider.dispatch({ type: "updateServer", server: response.server });
 					resolve();
 				}
 			});
@@ -41,12 +42,13 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
-		socket.emit('instance', {} as m.ServerInstanceRequest, (msg: m.ServerInstanceResponse) => {
-			const newInstanceId = msg.instanceId;
+		socket.emit('instance', {} as m.ServerInstanceRequest, (response: m.ServerInstanceResponse) => {
+			const newInstanceId = response.instanceId;
 			if (serverInstanceId && serverInstanceId !== newInstanceId) {
 				// The server has restarted, we need to reload because there might be a new release
 				onDisconnectMsg();
 			} else {
+				StoreProvider.dispatch({ type: "updateServer", server: response.server });
 				serverInstanceId = newInstanceId;
 				onConnect();
 			}

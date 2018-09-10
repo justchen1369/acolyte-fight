@@ -23,6 +23,7 @@ function initialState(): s.State {
         aiCode: null,
         current: {},
         socketId: null,
+        server: null,
         room,
         party: null,
         world: engine.initialWorld(room.mod),
@@ -128,6 +129,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state } // Create new object to trigger redux
     } else if (action.type === "updateRebindings") {
         return { ...state, rebindings: action.rebindings };
+    } else if (action.type === "updateServer") {
+        return { ...state, server: action.server };
     } else {
         console.log(action);
         return state;

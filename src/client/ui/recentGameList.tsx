@@ -1,8 +1,10 @@
 import _ from 'lodash';
 import moment from 'moment';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
+import * as s from '../store.model';
 import * as matches from '../core/matches';
 import * as storage from '../storage';
 import * as url from '../url';
@@ -21,6 +23,7 @@ interface GlobalStats {
 
 interface GameRow {
     id: string;
+    server: string;
     createdTimestamp: moment.Moment;
 
     self: string;
@@ -29,7 +32,6 @@ interface GameRow {
     totals: Stats;
 
     lengthSeconds: number;
-    server: string;
 }
 
 interface PlayerStats extends Stats {
@@ -81,13 +83,13 @@ function accumulateStats(accumulator: Stats, addend: Stats) {
 function convertGame(stats: d.GameStats): GameRow {
     const game: GameRow = {
         id: stats.id,
+        server: stats.server,
         createdTimestamp: moment(stats.timestamp),
         players: new Map<string, PlayerStats>(),
         self: null,
         winner: null,
         totals: initStats(),
         lengthSeconds: stats.lengthSeconds,
-        server: stats.server,
     };
 
     for (const userHash in stats.players) {
@@ -185,6 +187,12 @@ function findSelf(games: GameRow[]): string {
         }
     }
     return null;
+}
+
+function stateToProps(state: s.State): Props {
+    return {
+        server: state.server,
+    };
 }
 
 class RecentGameList extends React.Component<Props, State> {
@@ -349,4 +357,4 @@ class RecentGameList extends React.Component<Props, State> {
     }
 }
 
-export default RecentGameList;
+export default ReactRedux.connect(stateToProps)(RecentGameList);

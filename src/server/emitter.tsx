@@ -84,7 +84,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 	const location = getLocation();
 	if (!location.server || !data.server || location.server === data.server) {
 		// Already connected to the correct server
-		callback({ success: true });
+		callback({ success: true, server: location.server });
 	} else {
 		const server = sanitizeHostname(data.server);
 		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
@@ -101,7 +101,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			if (!attached) {
 				attached = true;
 				upstreams.set(socket.id, upstream);
-				callback({ success: true });
+				callback({ success: true, server });
 				logger.error(`Socket ${socket.id} connected to upstream ${server}`);
 			}
 		});
@@ -131,7 +131,8 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
-	callback({ success: true, instanceId });
+	const location = getLocation();
+	callback({ success: true, instanceId, server: location.server });
 }
 
 function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomRequest, callback: (output: m.JoinRoomResponseMsg) => void) {

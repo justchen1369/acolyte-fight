@@ -67,7 +67,7 @@ export function leaveCurrentGame(close: boolean = true) {
 	const world = store.world;
 
 	// Save previous game
-	stats.save(world); // Note, this is async, but we don't care about waiting for it to finish
+	stats.save(store.world, store.server); // Note, this is async, but we don't care about waiting for it to finish
 	world.players.forEach(player => {
 		ticker.setPreferredColor(player.name, player.uiColor);
 	});

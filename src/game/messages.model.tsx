@@ -100,6 +100,7 @@ export interface ProxyRequestMsg {
 
 export interface ProxyResponse {
     success: true;
+    server: string;
 }
 
 export type ProxyResponseMsg = ProxyResponse | ErrorResponseMsg;
@@ -110,6 +111,7 @@ export interface ServerInstanceRequest {
 export interface ServerInstanceResponse {
     success: true;
     instanceId: string;
+    server: string;
 }
 export type ServerInstanceResponseMsg = ServerInstanceResponse | ErrorResponseMsg;
 

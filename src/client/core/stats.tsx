@@ -1,4 +1,5 @@
 import * as d from '../stats.model';
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as notifications from './notifications';
 import * as storage from '../storage';
@@ -15,13 +16,13 @@ function onNotification(notifs: w.Notification[]) {
         const store = StoreProvider.getState();
         const world = store.world;
         if (world.winner) {
-            save(world);
+            save(world, store.server);
         }
     }
 }
 
-export function save(world: w.World): Promise<void> {
-    const gameStats = gameStatsFromWorld(world);
+export function save(world: w.World, server: string): Promise<void> {
+    const gameStats = gameStatsFromWorld(world, server);
     if (gameStats && Object.keys(gameStats.players).length > 1) {
         return storage.saveGameStats(gameStats);
     } else {
@@ -29,7 +30,7 @@ export function save(world: w.World): Promise<void> {
     }
 }
 
-function gameStatsFromWorld(world: w.World): d.GameStats {
+function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     if (!(world.ui.myGameId && world.ui.myHeroId)) {
         return null;
     }
@@ -52,6 +53,7 @@ function gameStatsFromWorld(world: w.World): d.GameStats {
         self: selfPlayer.userHash,
         winner: winningPlayer ? winningPlayer.userHash : undefined,
         lengthSeconds: world.winTick >= 0 ? world.winTick / TicksPerSecond : undefined,
+        server,
     };
     return stats;
 }
