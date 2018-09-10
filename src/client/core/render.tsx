@@ -500,7 +500,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 }
 
 function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	if (!(hero.id === world.ui.myHeroId && world.ui.hoverSpellId)) {
+	if (!(hero.id === world.ui.myHeroId && world.ui.hoverSpellId && !isMobile)) {
 		return;
 	}
 
