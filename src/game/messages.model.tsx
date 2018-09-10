@@ -228,11 +228,6 @@ export interface GameListResponse {
 export type GameListResponseMsg = GameListResponse | ErrorResponseMsg;
 
 
-export interface LocationMsg {
-    targetServer: string;
-    currentServer: string;
-}
-
 export interface CreateRoomRequest {
     mod: Object;
 }

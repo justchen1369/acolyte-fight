@@ -46,7 +46,6 @@ app.use('/logs', express.static('./logs'));
 
 app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typings/acolytefight.d.ts'));
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
-app.get('/api/location', (req, res) => api.onLocation(req, res));
 app.get('/api/status', (req, res) => res.send(getServerStats()));
 app.get('/status', (req, res) => res.send(getServerStats()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
