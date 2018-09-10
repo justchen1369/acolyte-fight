@@ -4,7 +4,7 @@ import moment from 'moment';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
 
-const GamesToKeep = 100;
+const GamesToKeep = 250;
 
 const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
 
