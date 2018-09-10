@@ -262,6 +262,7 @@ class RecentGameList extends React.Component<Props, State> {
             this.setState({
                 games,
                 self: findSelf(games),
+                category,
             });
         }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
             this.setState({ availableReplays: new Set<string>(ids) });
