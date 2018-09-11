@@ -82,3 +82,13 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 	}
 	socket.emit('action', actionMsg);
 }
+
+export function sendTextMessage(gameId: string, heroId: string, text: string) {
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
+		actionType: m.ActionType.Text,
+		text,
+	};
+	socket.emit('action', actionMsg);
+}

@@ -37,7 +37,8 @@ export interface Game {
     activeTick: number;
     closeTick: number;
 
-	actions: Map<string, m.ActionMsg>; // heroId -> actionData
+    actions: Map<string, m.ActionMsg>; // heroId -> actionData
+    messages: m.TextMsg[];
 	history: m.TickMsg[];
 }
 

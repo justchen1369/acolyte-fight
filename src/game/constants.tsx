@@ -2,6 +2,7 @@ export const TicksPerSecond = 60;
 export const TicksPerTurn = 2;
 export const MaxIdleTicks = 30 * TicksPerSecond;
 export const MaxCooldownWait = 0;
+export const MaxTextMessageLength = 255;
 export const Pixel = 0.001;
 
 export namespace Categories {

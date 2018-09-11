@@ -9,6 +9,7 @@ export namespace ActionType {
 	export const Leave = "leave";
 	export const GameAction = "game";
 	export const CloseGame = "close";
+	export const Text = "text";
 }
 
 export type ActionMsg =
@@ -17,7 +18,8 @@ export type ActionMsg =
     | BotActionMsg
     | LeaveActionMsg
     | CloseGameMsg
-    | GameActionMsg;
+    | GameActionMsg
+    | TextMsg
 
 export interface ActionMsgBase {
     actionType: string;
@@ -58,6 +60,11 @@ export interface GameActionMsg extends ActionMsgBase {
     spellId: string;
     targetX: number;
     targetY: number;
+}
+
+export interface TextMsg extends ActionMsgBase {
+    actionType: "text";
+    text: string;
 }
 
 export interface TickMsg {

@@ -2,9 +2,9 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
-import * as c from '../game/world.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as constants from '../game/constants';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
@@ -125,8 +125,13 @@ function apportionPerGame(totalPlayers: number) {
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
-	if (data.actionType !== "game") {
+	if (!(data.actionType === "game" || data.actionType === "text")) {
 		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
+		return;
+	}
+
+	if (data.actionType === "text" && data.text.length > constants.MaxTextMessageLength) {
+		logger.info("Game [" + game.id + "]: text message received from socket " + socketId + " was too long");
 		return;
 	}
 
@@ -195,6 +200,7 @@ export function initGame(room: g.Room, allowBots: boolean) {
 		joinable: true,
 		closeTick: Matchmaking.MaxHistoryLength,
 		actions: new Map<string, m.ActionMsg>(),
+		messages: new Array<m.TextMsg>(),
 		history: [],
 	};
 	getStore().activeGames.set(game.id, game);
@@ -333,6 +339,11 @@ function formatHeroId(index: number): string {
 }
 
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
+	if (actionData.actionType === "text") {
+		game.messages.push(actionData);
+		return;
+	}
+
 	let currentPrecedence = actionPrecedence(game.actions.get(actionData.heroId));
 	let newPrecedence = actionPrecedence(actionData);
 
@@ -435,12 +446,13 @@ function gameTurn(game: g.Game) {
 	let data = {
 		gameId: game.id,
 		tick: game.tick++,
-		actions: [...game.actions.values()],
+		actions: [...game.actions.values(), ...game.messages],
 	} as m.TickMsg;
-	if (game.actions.size > 0) {
+	if (game.actions.size > 0 || game.messages.length > 0) {
 		game.activeTick = game.tick;
 	}
 	game.actions.clear();
+	game.messages.length = 0;
 
 	if (game.history) {
 		if (game.history.length < Matchmaking.MaxHistoryLength) {

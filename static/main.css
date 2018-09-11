@@ -329,6 +329,41 @@ a:hover, a:active {
     margin-top: 10px;
 }
 
+.text-message-container {
+    position: relative;
+    margin-top: 10px;
+    border: transparent 1px solid;
+}
+
+.text-message-container:hover {
+    border: #888 1px solid;
+}
+
+.text-message-container .hint {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    padding: 4px;
+    font-size: 75%;
+    font-style: italic;
+
+    color: #888;
+}
+
+.text-message-container .hint .hint-enter-key {
+    color: #ccc;
+    font-weight: bold;
+}
+
+.text-message-container .text-message-box {
+    background: transparent;
+    color: white;
+    font-size: 75%;
+    border: none;
+    padding: 4px;
+}
+
 #messages-panel {
     position: absolute;
     bottom: 8;
@@ -348,6 +383,10 @@ a:hover, a:active {
     from { opacity: 1.0 }
     75% { opacity: 1.0 }
     to { opacity: 0.0 }
+}
+
+#messages-panel .text-message {
+    color: #ccc;
 }
 
 #messages-panel .help-box {

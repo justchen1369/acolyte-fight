@@ -4,9 +4,11 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
+import * as sockets from '../core/sockets';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar } from '../../game/constants';
 import PlayButton from './playButton';
+import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
 import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
@@ -85,13 +87,17 @@ class MessagesPanel extends React.Component<Props, State> {
             rows.push(actionRow);
         }
 
-        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>{rows}</div>;
+        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>
+            {rows}
+            <TextMessageBox />
+        </div>;
     }
 
     private renderNotification(key: string, notification: w.Notification) {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "replayNotFound": return this.renderReplayNotFoundNotification(key, notification);
+            case "text": return this.renderTextNotification(key, notification);
             case "new": return this.renderNewGameNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
@@ -155,6 +161,10 @@ class MessagesPanel extends React.Component<Props, State> {
 
     private onCloseHelpClicked(e: React.MouseEvent) {
         StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
+    }
+
+    private renderTextNotification(key: string, notification: w.TextNotification) {
+        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} />: <span className="text-message">{notification.text}</span></div>
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {

@@ -474,6 +474,8 @@ function handleOccurences(world: w.World) {
 			handleLeaving(ev, world);
 		} else if (ev.type === "environment") {
 			seedEnvironment(ev, world);
+		} else if (ev.type === "text") {
+			handleTexting(ev, world);
 		}
 	});
 	world.occurrences = [];
@@ -504,6 +506,17 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 			addObstacle(world, position, orientationAngle, points, obstacleTemplate.extent);
 		}
 	});
+}
+
+function handleTexting(ev: w.Texting, world: w.World) {
+	const player = world.players.get(ev.heroId);
+	if (player) {
+		world.ui.notifications.push({
+			type: "text",
+			player,
+			text: ev.text,
+		});
+	}
 }
 
 function handleClosing(ev: w.Closing, world: w.World) {

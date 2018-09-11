@@ -150,6 +150,12 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				type: "environment",
 				seed: actionData.seed,
 			});
+		} else if (actionData.actionType === m.ActionType.Text) {
+			world.occurrences.push({
+				type: "text",
+				heroId: actionData.heroId,
+				text: actionData.text,
+			});
 		}
 	});
 }

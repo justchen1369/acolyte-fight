@@ -125,6 +125,7 @@ export interface ButtonRenderState {
 
 export type Notification =
 	HelpNotification 
+	| TextNotification
 	| JoinNotification 
 	| BotNotification 
 	| LeaveNotification 
@@ -137,6 +138,12 @@ export type Notification =
 
 export interface HelpNotification {
 	type: "help";
+}
+
+export interface TextNotification {
+	type: "text";
+	player: Player;
+	text: string;
 }
 
 export interface JoinNotification {
@@ -202,11 +209,17 @@ export interface PartyMemberState {
 	isObserver: boolean;
 }
 
-export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed;
+export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting;
 
 export interface EnvironmentSeed {
 	type: "environment";
 	seed: number;
+}
+
+export interface Texting {
+	type: "text";
+	heroId: string;
+	text: string;
 }
 
 export interface Closing {
