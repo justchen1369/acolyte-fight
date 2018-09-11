@@ -363,11 +363,12 @@ class RecentGameList extends React.Component<Props, State> {
             return null;
         }
 
+        const MinGames = 5;
         const MaxLeaderboardLength = 10;
         const self = this.state.self;
 
         let players = [...global.players.values()];
-        players = players.filter(p => p.wins > 0);
+        players = players.filter(p => p.games >= MinGames);
         players = _.sortBy(players, (p: LeaderboardStats) => -p.winRateLowerBound);
         players = _.take(players, MaxLeaderboardLength);
         if (players.length === 0) {
