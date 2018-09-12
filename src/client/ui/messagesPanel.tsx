@@ -164,7 +164,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderTextNotification(key: string, notification: w.TextNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} />: <span className="text-message">{notification.text}</span></div>
+        return <div key={key} className="row text-row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} />: <span className="text-message">{notification.text}</span></div>
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {

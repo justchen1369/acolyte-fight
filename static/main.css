@@ -374,6 +374,8 @@ a:hover, a:active {
 }
 
 #messages-panel .row {
+    color: #ccc;
+
     animation-name: fade-out;
     animation-duration: 15s;
     animation-fill-mode: both;
@@ -385,11 +387,17 @@ a:hover, a:active {
     to { opacity: 0.0 }
 }
 
+#messages-panel .text-row {
+    font-size: 120%;
+}
+
 #messages-panel .text-message {
-    color: #ccc;
+    color: white;
+    font-weight: bold;
 }
 
 #messages-panel .help-box {
+    color: white;
     margin-top: 30px;
     padding: 20px;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
@@ -422,6 +430,7 @@ a:hover, a:active {
 }
 
 #messages-panel .winner {
+    color: white;
     margin-top: 30px;
     padding: 20px;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
