@@ -370,7 +370,6 @@ class RecentGameList extends React.Component<Props, State> {
         let players = [...global.players.values()];
         players = players.filter(p => p.games >= MinGames);
         players = _.sortBy(players, (p: LeaderboardStats) => -p.winRateLowerBound);
-        players = _.take(players, MaxLeaderboardLength);
         if (players.length === 0) {
             return null;
         }
@@ -378,7 +377,7 @@ class RecentGameList extends React.Component<Props, State> {
         return <div>
             <h1>Leaderboard</h1>
             <div className="leaderboard">
-                {players.map((player, index) => (index < MaxLeaderboardLength || player.userHash === self) ?  this.renderLeaderboardRow(player, index) : null)}
+                {players.map((player, index) => (index < MaxLeaderboardLength || player.userHash === self) ? this.renderLeaderboardRow(player, index) : null)}
             </div>
         </div>;
     }
