@@ -421,7 +421,7 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 
 function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {
 	if (!(required(data, "object")
-		&& required(data.ids, "array") && data.ids.every(id => required(id, "string"))
+		&& required(data.ids, "object") && Array.isArray(data.ids) && data.ids.every(id => required(id, "string"))
 	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
