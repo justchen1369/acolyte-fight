@@ -9,6 +9,7 @@ import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
 import { DefaultSettings } from '../game/settings';
+import { required, optional } from './schema';
 
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
@@ -125,7 +126,17 @@ function apportionPerGame(totalPlayers: number) {
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
-	if (!(data.actionType === "game" || data.actionType === "text")) {
+	if (!(
+		(
+			data.actionType === "game"
+			&& required(data.spellId, "string")
+			&& required(data.targetX, "number")
+			&& required(data.targetY, "number")
+		) || (
+			data.actionType === "text"
+			&& required(data.text, "string")
+		)
+	)) {
 		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
 		return;
 	}

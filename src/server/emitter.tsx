@@ -5,6 +5,7 @@ import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
 import { getLocation, sanitizeHostname } from './mirroring';
 import { logger } from './logging';
+import { required, optional } from './schema';
 import * as PlayerName from '../game/sanitize';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -81,6 +82,12 @@ function onConnection(socket: SocketIO.Socket) {
 }
 
 function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
+	if (!(required(data, "object")
+		&& required(data.server, "string"))) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const location = getLocation();
 	if (!location.server || !data.server || location.server === data.server) {
 		// Already connected to the correct server
@@ -131,11 +138,22 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
+	if (!(required(data, "object"))) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const location = getLocation();
 	callback({ success: true, instanceId, server: location.server });
 }
 
 function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomRequest, callback: (output: m.JoinRoomResponseMsg) => void) {
+	if (!(required(data, "object")
+		&& required(data.roomId, "string"))) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const store = getStore();
 	const room = store.rooms.get(data.roomId);
 	if (room) {
@@ -146,20 +164,28 @@ function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomR
 }
 
 function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreateRoomRequest, callback: (output: m.CreateRoomResponseMsg) => void) {
-    if (data && data.mod && typeof data.mod === "object") {
-        const room = games.initRoom(data.mod, authToken);
-        const result: m.CreateRoomResponse = {
-			success: true,
-            roomId: room.id,
-            server: getLocation().server,
-        };
-        callback(result);
-    } else {
-        callback({ success: false, error: `Bad request` });
-    }
+	if (!(required(data, "object")
+		&& required(data.mod, "object"))) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+	const room = games.initRoom(data.mod, authToken);
+	const result: m.CreateRoomResponse = {
+		success: true,
+		roomId: room.id,
+		server: getLocation().server,
+	};
+	callback(result);
 }
 
 function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreatePartyRequest, callback: (output: m.CreatePartyResponseMsg) => void) {
+	if (!(required(data, "object")
+		&& optional(data.roomId, "string"))) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const party = games.initParty(socket.id, data.roomId);
 	logger.info(`Party ${party.id} created by user ${authToken}`);
 
@@ -173,8 +199,11 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 }
 
 function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.PartySettingsRequest, callback: (output: m.PartySettingsResponseMsg) => void) {
-	if (!(data.partyId)) {
-		callback({ success: false, error: `Bad request` });
+	if (!(required(data, "object")
+		&& required(data.partyId, "string")
+		&& optional(data.isPrivate, "boolean")
+		&& optional(data.roomId, "string"))) {
+		callback({ success: false, error: "Bad request" });
 		return;
 	}
 
@@ -209,8 +238,17 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 }
 
 function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
-	if (!(data.partyId && data.playerName)) {
-		callback({ success: false, error: `Bad request` });
+	if (!(required(data, "object")
+		&& required(data.partyId, "string")
+		&& required(data.playerName, "string")
+		&& required(data.keyBindings, "object")
+		&& required(data.ready, "boolean")
+		&& optional(data.joining, "boolean")
+		&& optional(data.isBot, "boolean")
+		&& optional(data.isMobile, "boolean")
+		&& optional(data.isObserver, "boolean")
+	)) {
+		callback({ success: false, error: "Bad request" });
 		return;
 	}
 
@@ -264,8 +302,10 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 }
 
 function onPartyLeaveMsg(socket: SocketIO.Socket, authToken: string, data: m.LeavePartyRequest, callback: (output: m.LeavePartyResponseMsg) => void) {
-	if (!data.partyId) {
-		callback({ success: false, error: `Party field required` });
+	if (!(required(data, "object")
+		&& required(data.partyId, "string")
+	)) {
+		callback({ success: false, error: "Bad request" });
 		return;
 	}
 
@@ -291,6 +331,19 @@ function onPartyLeaveMsg(socket: SocketIO.Socket, authToken: string, data: m.Lea
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
+	if (!(required(data, "object")
+		&& required(data.name, "string")
+		&& required(data.keyBindings, "object")
+		&& optional(data.room, "string")
+		&& optional(data.gameId, "string")
+		&& optional(data.isBot, "boolean")
+		&& optional(data.isMobile, "boolean")
+		&& optional(data.observe, "boolean")
+	)) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
@@ -326,6 +379,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 }
 
 function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
+	if (!(required(data, "object")
+		&& optional(data.gameId, "string")
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+
 	const game = getStore().activeGames.get(data.gameId);
 	if (game && game.active.has(socket.id) && game.numPlayers <= 1 && game.bots.size === 0) { // Only allow adding bots once
 		games.addBot(game);
@@ -343,13 +404,29 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 }
 
 function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
+	if (!(required(data, "object")
+		&& required(data.actionType, "string")
+		&& required(data.gameId, "string")
+		&& required(data.heroId, "string")
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const game = getStore().activeGames.get(data.gameId);
 	if (game) {
 		games.receiveAction(game, data, socket.id);
 	}
 }
 
-function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponse) => void) {
+function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {
+	if (!(required(data, "object")
+		&& required(data.ids, "array") && data.ids.every(id => required(id, "string"))
+	)) {
+		callback({ success: false, error: "Bad request" });
+		return;
+	}
+
 	const store = getStore();
 	const availableIds = data.ids.filter(id => store.activeGames.has(id) || store.inactiveGames.has(id));
 	callback({ success: true, ids: availableIds });
