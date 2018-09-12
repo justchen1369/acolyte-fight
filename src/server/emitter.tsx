@@ -11,11 +11,6 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import socketClient from 'socket.io-client';
 
-interface RoomStats {
-	numGames: number;
-	numPlayers: number;
-}
-
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
 let io: SocketIO.Server = null;
@@ -440,7 +435,7 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 
 	socket.join(game.id);
 
-	const roomStats = calculateRoomStats(game.roomId, game.allowBots);
+	const numPlayers = games.calculateRoomStats(game.roomId, game.allowBots);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
@@ -448,22 +443,9 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 		mod: game.mod,
 		allowBots: game.allowBots,
 		history: game.history,
-		numGames: roomStats.numGames,
-		numPlayers: roomStats.numPlayers,
+		numPlayers: numPlayers,
 	};
 	socket.emit('hero', msg);
-}
-
-function calculateRoomStats(room: string, allowBots: boolean): RoomStats {
-	let numGames = 0;
-	let numPlayers = 0;
-	getStore().activeGames.forEach(game => {
-		if (game.roomId === room && game.allowBots === allowBots && games.isGameRunning(game)) {
-			numGames += 1;
-			numPlayers += game.active.size;
-		}
-	});
-	return { numGames, numPlayers };
 }
 
 function emitParty(party: g.Party) {

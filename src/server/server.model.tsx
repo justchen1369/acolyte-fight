@@ -5,8 +5,10 @@ export interface ServerStore {
     nextGameId: 0;
     nextPartyId: 0;
     numConnections: number;
+    playerCounts: PlayerCounts;
     rooms: Map<string, Room>; // id -> room
     parties: Map<string, Party>; // id -> party
+    joinableGames: Set<string>; // game ids
     activeGames: Map<string, Game>; // id -> game
     inactiveGames: Map<string, Game>; // id -> game
     recentTickMilliseconds: number[];
@@ -19,6 +21,7 @@ export interface LocationStore {
 
 export interface Game {
     id: string;
+    category: string;
     roomId: string | null;
     created: moment.Moment;
 
@@ -75,4 +78,8 @@ export interface PartyMember {
     isMobile: boolean;
     isObserver: boolean;
     ready: boolean;
+}
+
+export interface PlayerCounts {
+    [category: string]: number;
 }

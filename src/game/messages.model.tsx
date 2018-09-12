@@ -144,7 +144,6 @@ export interface HeroMsg {
     allowBots: boolean;
 
     history: TickMsg[];
-    numGames: number;
     numPlayers: number;
 }
 

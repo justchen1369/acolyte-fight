@@ -64,10 +64,16 @@ function startTickProcessing() {
 		const milliseconds = tickTimer.time(() => {
 			let anyGameRunning = false;
 
+			const playerCounts: g.PlayerCounts = {};
 			getStore().activeGames.forEach(game => {
 				const isGameRunning = gameTick(game);
 				anyGameRunning = anyGameRunning || isGameRunning;
+
+				if (isGameRunning) {
+					playerCounts[game.category] = (playerCounts[game.category] || 0) + game.active.size;
+				}
 			});
+			getStore().playerCounts = playerCounts;
 
 			if (!anyGameRunning) {
 				ticksProcessing = false;
@@ -81,15 +87,14 @@ function startTickProcessing() {
 
 export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
+	const category = calculateGameCategory(roomId, allowBots);
 	const store = getStore();
 
-	let numPlayers = numNewPlayers; // +1 player because the current player calling this method is a new player
+	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
-	store.activeGames.forEach(g => {
-		if (g.roomId === roomId && g.allowBots == allowBots) {
-			if (isGameRunning(g)) {
-				numPlayers += g.active.size;
-			}
+	store.joinableGames.forEach(gameId => {
+		const g = store.activeGames.get(gameId);
+		if (g && g.roomId === roomId && g.allowBots == allowBots) {
 			if (g.joinable && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
 				openGames.push(g);
 			}
@@ -118,6 +123,15 @@ export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlaye
 		game = initGame(room, allowBots);
 	}
 	return game;
+}
+
+export function calculateRoomStats(room: string, allowBots: boolean): number {
+	const category = calculateGameCategory(room, allowBots);
+	return getStore().playerCounts[category] || 0;
+}
+
+function calculateGameCategory(roomId: string, allowBots: boolean) {
+	return `room=${roomId}/allowBots=${allowBots}`;
 }
 
 function apportionPerGame(totalPlayers: number) {
@@ -194,10 +208,14 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 }
 
 export function initGame(room: g.Room, allowBots: boolean) {
+	const store = getStore();
+	const roomId = room ? room.id : null;
+
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		roomId: room ? room.id : null,
+		category: calculateGameCategory(roomId, allowBots),
+		roomId,
 		mod: room ? room.mod : {},
 		allowBots,
 		created: moment(),
@@ -214,7 +232,8 @@ export function initGame(room: g.Room, allowBots: boolean) {
 		messages: new Array<m.TextMsg>(),
 		history: [],
 	};
-	getStore().activeGames.set(game.id, game);
+	store.activeGames.set(game.id, game);
+	store.joinableGames.add(game.id);
 	if (room) {
 		room.accessed = moment();
 	}
@@ -397,6 +416,13 @@ export function leaveGame(game: g.Game, socketId: string) {
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 
 	finishGameIfNecessary(game);
+
+	// Update counts
+	{
+		// Note, this can be a little bit wrong if a player leaves a game that was not being counted due to inactivity - it gets fixed up every 32 milliseconds so we don't care
+		const playerCounts = getStore().playerCounts;
+		playerCounts[game.category] = Math.max(0, (playerCounts[game.category] || 0) - 1);
+	}
 }
 
 function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string) {
@@ -509,6 +535,12 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	const userHash = hashAuthToken(authToken);
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", userHash, playerName, keyBindings, isBot, isMobile });
 
+	// Update counts
+	{
+		const playerCounts = getStore().playerCounts;
+		playerCounts[game.category] = (playerCounts[game.category] || 0) + 1;
+	}
+
 	return heroId;
 }
 
@@ -579,6 +611,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	if (game.tick >= game.closeTick) {
+		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
 		statusChanged = true;
 		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players after " + game.tick + " ticks");

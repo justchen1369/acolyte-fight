@@ -113,7 +113,6 @@ function onHeroMsg(data: m.HeroMsg) {
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
 		room: data.room,
-		numGames: data.numGames,
 		numPlayers: data.numPlayers,
 	});
 }
