@@ -78,6 +78,8 @@ export function leaveCurrentGame(close: boolean = true) {
 		if (close) {
 			StoreProvider.dispatch({ type: "leaveMatch" });
 		}
+
+		console.log("Left game " + world.ui.myGameId);
 	}
 }
 
