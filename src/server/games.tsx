@@ -351,7 +351,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 		}
 
 		if (party.isPrivate) {
-			game.joinable = false;
+			store.joinableGames.delete(game.id);
 		}
 	}
 
