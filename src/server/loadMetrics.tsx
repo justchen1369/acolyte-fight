@@ -27,6 +27,7 @@ export function getServerStats(): m.ServerStats {
 	return {
         numGames: store.activeGames.size,
         numPlayers: store.numConnections,
+        breakdown: store.playerCounts,
         serverLoad: getLoadAverage(),
     };
 }

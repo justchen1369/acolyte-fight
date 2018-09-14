@@ -223,6 +223,7 @@ export interface PartyMemberMsg {
 export interface ServerStats {
     numGames: number;
     numPlayers: number;
+    breakdown: Object;
     serverLoad: number;
 }
 
