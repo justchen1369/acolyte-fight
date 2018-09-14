@@ -63,7 +63,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     }
 
     let category: string;
-    if (selfPlayer.userHash) {
+    if (!selfPlayer.userHash) {
         // The user cleared the cookies and haven't been assigned a new hash - we can't store anything for them as we don't know who they are
         return null;
     } else if (selfPlayer.isBot) {
