@@ -34,7 +34,7 @@ export interface EnvironmentMsg extends ActionMsgBase {
 
 export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
-    userHash: string;
+    userHash: string | null;
     playerName: string;
     keyBindings: KeyBindings;
     isBot: boolean;

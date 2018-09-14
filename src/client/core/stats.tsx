@@ -63,7 +63,10 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     }
 
     let category: string;
-    if (selfPlayer.isBot) {
+    if (selfPlayer.userHash) {
+        // The user cleared the cookies and haven't been assigned a new hash - we can't store anything for them as we don't know who they are
+        return null;
+    } else if (selfPlayer.isBot) {
         category = d.GameCategory.AIvAI;
     } else if (numHumans > 1) {
         category = d.GameCategory.PvP;

@@ -507,7 +507,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string, socketId: string) {
+export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string | null, socketId: string) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -544,8 +544,12 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	return heroId;
 }
 
-function hashAuthToken(authToken: string): string {
-	return crypto.createHash('md5').update(authToken).digest('hex');
+function hashAuthToken(authToken: string | null): string {
+	if (authToken) {
+		return crypto.createHash('md5').update(authToken).digest('hex');
+	} else {
+		return null;
+	}
 }
 
 export function addBot(game: g.Game) {

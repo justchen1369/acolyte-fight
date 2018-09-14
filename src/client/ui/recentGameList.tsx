@@ -151,7 +151,7 @@ function convertGame(stats: d.GameStats): GameRow {
         if (stats.winner === userHash) {
             game.winner = userHash;
         }
-        if (stats.self === userHash) {
+        if (stats.self && stats.self === userHash) {
             game.self = userHash;
         }
     }

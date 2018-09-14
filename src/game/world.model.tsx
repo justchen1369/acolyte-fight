@@ -108,7 +108,7 @@ export interface HitSector {
 
 export interface Player {
 	heroId: string;
-	userHash: string;
+	userHash: string | null;
 	name: string;
 	uiColor: string; // Not synced across clients
 	isSharedBot: boolean; // Not synced across clients
@@ -228,7 +228,7 @@ export interface Closing {
 
 export interface Joining {
 	type: "join";
-	userHash: string;
+	userHash: string | null;
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;
