@@ -94,10 +94,13 @@ export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlaye
 	let openGames = new Array<g.Game>();
 	store.joinableGames.forEach(gameId => {
 		const g = store.activeGames.get(gameId);
-		if (g && g.roomId === roomId && g.allowBots == allowBots) {
-			if (g.joinable && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
+		if (g && g.joinable) {
+			if (g.category === category && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
 				openGames.push(g);
 			}
+		} else {
+			// This entry shouldn't be in here - perhaps it was terminated before it could be removed
+			store.joinableGames.delete(gameId);
 		}
 	});
 
