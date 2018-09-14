@@ -71,7 +71,7 @@ function isMyBot(world: w.World, heroId: string) {
     }
 
     const player = world.players.get(heroId);
-    if (player && player.isBot) {
+    if (player && player.isBot && world.objects.has(heroId)) {
         return player.heroId === world.ui.myHeroId || player.isSharedBot;
     } else {
         return false;
