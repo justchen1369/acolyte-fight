@@ -68,6 +68,8 @@ function onDisconnectMsg() {
 }
 
 export function sendAction(gameId: string, heroId: string, action: w.Action) {
+	const Precision = 0.001;
+
 	if (!(gameId && heroId)) {
 		return;
 	}
@@ -77,8 +79,8 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		heroId,
 		actionType: m.ActionType.GameAction,
 		spellId: action.type,
-		targetX: action.target.x,
-		targetY: action.target.y,
+		targetX: Math.round(action.target.x / Precision) * Precision,
+		targetY: Math.round(action.target.y / Precision) * Precision,
 	}
 	socket.emit('action', actionMsg);
 }
