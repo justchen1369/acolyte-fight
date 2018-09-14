@@ -8,6 +8,7 @@ import { render, CanvasStack } from './render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
 
+const BufferGrowthPerTick = 0.1;
 const BufferDecayPerTick = 0.999;
 
 const preferredColors = new Map<string, string>(); // player name -> color
@@ -51,7 +52,7 @@ function incomingLoop() {
 	if (world.ui.myHeroId) {
 		if (incomingQueue.length === 0) {
 			numFramesToProcess = 0;
-			allowedDelay = Math.min(TicksPerSecond, allowedDelay + 1);
+			allowedDelay = Math.min(TicksPerSecond, allowedDelay + BufferGrowthPerTick);
 		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
 			numFramesToProcess = 1; // We're on time, process at normal rate
 		} else if (incomingQueue.length <= TicksPerSecond) {
