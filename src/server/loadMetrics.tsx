@@ -10,7 +10,7 @@ export function addTickMilliseconds(milliseconds: number) {
     }
 }
 
-function getLoadAverage() {
+export function getLoadAverage(): number {
     const recentTickMilliseconds = getStore().recentTickMilliseconds;
     if (recentTickMilliseconds.length === 0) {
         return 0;
@@ -20,14 +20,4 @@ function getLoadAverage() {
     const maxMilliseconds = TicksPerTurn * 1000 / TicksPerSecond;
     const load = averageMilliseconds / maxMilliseconds;
     return load;
-}
-
-export function getServerStats(): m.ServerStats {
-    const store = getStore();
-	return {
-        numGames: store.activeGames.size,
-        numPlayers: store.numConnections,
-        breakdown: store.playerCounts,
-        serverLoad: getLoadAverage(),
-    };
 }

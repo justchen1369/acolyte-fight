@@ -6,7 +6,6 @@ import * as os from 'os';
 import * as api from './api';
 import { authMiddleware } from './auth';
 import { attachToSocket } from './emitter';
-import { getServerStats } from './loadMetrics';
 import { setLocation } from './mirroring';
 import { logger } from './logging';
 import * as serverStore from './serverStore';
@@ -46,8 +45,8 @@ app.use('/logs', express.static('./logs'));
 
 app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typings/acolytefight.d.ts'));
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
-app.get('/api/status', (req, res) => res.send(getServerStats()));
-app.get('/status', (req, res) => res.send(getServerStats()));
+app.get('/api/status', (req, res) => res.send(api.getInternalStatus()));
+app.get('/status', (req, res) => res.send(api.getExternalStatus()));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
 app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest.webmanifest'));
 
@@ -60,9 +59,9 @@ setInterval(() => {
 }, cleanupIntervalMinutes * 60 * 1000);
 
 setInterval(() => {
-	const stats = getServerStats();
-	if (stats.numGames > 0) {
-		logger.info(`Current status: ${(stats.serverLoad * 100).toFixed(1)}% load, ${stats.numGames} games, ${stats.numPlayers} players`);
+	const status = api.getInternalStatus();
+	if (status.numPlayers > 0) {
+		logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
 	}
 }, 60 * 1000);
 

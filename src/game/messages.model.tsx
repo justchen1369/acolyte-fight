@@ -223,10 +223,18 @@ export interface PartyMemberMsg {
     isObserver: boolean;
 }
 
+export interface ExternalStatus {
+    region: string;
+    host: string;
+    numPlayers: number;
+}
 
-export interface ServerStats {
+export interface InternalStatus {
+    region: string;
+    host: string;
     numGames: number;
     numPlayers: number;
+    numConnections: number;
     breakdown: Object;
     serverLoad: number;
 }

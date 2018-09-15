@@ -3,7 +3,10 @@ import { logger } from './logging';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 
+const devRegion = "dev";
+
 let location: g.LocationStore = {
+    region: devRegion,
     server: null,
     upstreamSuffix: "",
 };
@@ -14,9 +17,10 @@ export function getLocation() {
 
 export function setLocation(hostname: string, upstreamSuffix: string) {
     location.server = sanitizeHostname(hostname);
+    location.region = extractRegion(location.server);
     location.upstreamSuffix = upstreamSuffix;
 
-    logger.info(`Location: server=${location.server} fqdnSuffix=${location.upstreamSuffix}`);
+    logger.info(`Location: region=${location.region} server=${location.server} fqdnSuffix=${location.upstreamSuffix}`);
 }
 
 export function sanitizeHostname(hostname: string): string {
@@ -29,4 +33,13 @@ export function sanitizeHostname(hostname: string): string {
     server = server.replace(/[^A-Za-z0-9_-]/g, '');
 
     return server;
+}
+
+function extractRegion(server: string) {
+    if (server) {
+        const split = server.indexOf('-');
+        return split === -1 ? devRegion : server.substring(0, split);
+    } else {
+        return devRegion;
+    }
 }
