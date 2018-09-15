@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
+import * as pages from '../core/pages';
 import * as sockets from '../core/sockets';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar } from '../../game/constants';
@@ -123,7 +124,14 @@ class MessagesPanel extends React.Component<Props, State> {
                 {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}
                 {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
             </div>
+            {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && !isMobile && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
         </div>
+    }
+
+    private onRegionsLinkClick(ev: React.MouseEvent) {
+        ev.preventDefault();
+        matches.leaveCurrentGame(true);
+        pages.changePage("regions");
     }
 
     private renderHelp(key: string) {

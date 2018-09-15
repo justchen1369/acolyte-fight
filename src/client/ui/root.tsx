@@ -10,6 +10,7 @@ import PartyPanel from './partyPanel';
 import TitleSection from './titleSection';
 import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
+import RegionsPanel from './regionsPanel';
 import UrlListener from './urlListener';
 
 interface Props {
@@ -62,6 +63,7 @@ class Root extends React.Component<Props> {
                 {page === "party" && this.renderParty()}
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
+                {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
                 <UrlListener />
             </div>
@@ -104,6 +106,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <RecentGameList />
+            </div>
+        </div>;
+    }
+
+    private renderRegions() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <RegionsPanel />
             </div>
         </div>;
     }

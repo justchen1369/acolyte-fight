@@ -18,10 +18,14 @@ export function onDefaultSettings(req: express.Request, res: express.Response) {
     res.send(JSON.stringify(DefaultSettings));
 }
 
-export function getInternalStatus(): m.InternalStatus {
+export function onInternalStatus(req: express.Request, res: express.Response) {
+    res.send(getInternalStatus());
+}
+
+export function getInternalStatus() {
     const store = getStore();
     const location = getLocation();
-	return {
+	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
         numGames: store.activeGames.size,
@@ -30,14 +34,21 @@ export function getInternalStatus(): m.InternalStatus {
         breakdown: store.playerCounts,
         serverLoad: loadMetrics.getLoadAverage(),
     };
+    return status;
 }
 
-export function getExternalStatus(): m.ExternalStatus {
-    const store = getStore();
+export function onExternalStatus(req: express.Request, res: express.Response) {
+	res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.send(getExternalStatus());
+}
+
+export function getExternalStatus() {
     const location = getLocation();
-	return {
+	const status: m.ExternalStatus = {
         region: location.region,
         host: location.server,
         numPlayers: games.calculateRoomStats(games.publicCategory()),
     };
+    return status;
 }
