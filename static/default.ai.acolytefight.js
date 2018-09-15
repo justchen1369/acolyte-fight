@@ -1,6 +1,6 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
-var missRadius = 0.1;
+var missRadius = 0.05;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
 
@@ -116,7 +116,7 @@ function deflect(state, hero, cooldowns, projectile) {
 }
 
 function castSpell(state, hero, opponent, cooldowns) {
-    if (Date.now() < nextSpell) {
+    if (Date.now() < nextSpell && !hero.linkedToId) {
         return null;
     } else if (opponent.shieldTicksRemaining) {
         return null;

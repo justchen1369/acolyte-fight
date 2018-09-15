@@ -136,6 +136,10 @@ export function calculateGameCategory(roomId: string, privatePartyId: string, al
 	return `room=${roomId}/party=${privatePartyId}/allowBots=${allowBots}`;
 }
 
+export function publicCategory() {
+	return calculateGameCategory(null, null, false);
+}
+
 function apportionPerGame(totalPlayers: number) {
 	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
 	return Math.ceil(totalPlayers / maxGames);
@@ -611,6 +615,14 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 		if (newCloseTick < game.closeTick) {
 			game.closeTick = newCloseTick;
 			statusChanged = true;
+		}
+
+		// Public games must always have 3 players
+		if (game.bots.size === 0 && game.category === publicCategory()) {
+			const botsToAdd = Matchmaking.TargetGameSize - game.numPlayers;
+			for (let i = 0; i < botsToAdd; ++i) {
+				addBot(game);
+			}
 		}
 	}
 

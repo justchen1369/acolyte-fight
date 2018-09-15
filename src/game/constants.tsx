@@ -20,6 +20,7 @@ export namespace Matchmaking {
 	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
 	export const MaxPlayers = 5;
+	export const TargetGameSize = 3;
 	export const BotName = "AcolyteBot";
 }
 
