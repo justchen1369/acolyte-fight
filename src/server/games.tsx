@@ -35,6 +35,11 @@ export interface PartyGameAssignment {
 	heroId: string;
 }
 
+export interface RoomStats {
+	numOnline: number;
+	numInCategory: number;
+}
+
 export function onConnect(socketId: string, authToken: string) {
 }
 
@@ -87,7 +92,8 @@ function startTickProcessing() {
 
 export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const category = calculateGameCategory(roomId, allowBots);
+	const privatePartyId: string = null; // This method is for joining public games only
+	const category = calculateGameCategory(roomId, null, allowBots);
 	const store = getStore();
 
 	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
@@ -123,18 +129,20 @@ export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlaye
 	}
 
 	if (!game) {
-		game = initGame(room, allowBots);
+		game = initGame(room, privatePartyId, allowBots);
 	}
 	return game;
 }
 
-export function calculateRoomStats(room: string, allowBots: boolean): number {
-	const category = calculateGameCategory(room, allowBots);
-	return getStore().playerCounts[category] || 0;
+export function calculateRoomStats(category: string): RoomStats {
+	const playerCounts = getStore().playerCounts;
+	const numInCategory = playerCounts[category] || 0;
+	const numOnline = _.sum(Object.keys(playerCounts).map(category => playerCounts[category]));
+	return { numOnline, numInCategory };
 }
 
-function calculateGameCategory(roomId: string, allowBots: boolean) {
-	return `room=${roomId}/allowBots=${allowBots}`;
+function calculateGameCategory(roomId: string, privatePartyId: string, allowBots: boolean) {
+	return `room=${roomId}/party=${privatePartyId}/allowBots=${allowBots}`;
 }
 
 function apportionPerGame(totalPlayers: number) {
@@ -210,14 +218,14 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 	return party;
 }
 
-export function initGame(room: g.Room, allowBots: boolean) {
+export function initGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
-		category: calculateGameCategory(roomId, allowBots),
+		category: calculateGameCategory(roomId, privatePartyId, allowBots),
 		roomId,
 		mod: room ? room.mod : {},
 		allowBots,
@@ -346,7 +354,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 			group.push(remaining.shift());
 		}
 
-		const game = party.isPrivate ? initGame(room, allowBots) : findNewGame(room, allowBots, group.length);
+		const game = party.isPrivate ? initGame(room, party.id, allowBots) : findNewGame(room, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);

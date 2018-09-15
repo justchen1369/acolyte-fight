@@ -145,6 +145,7 @@ export interface HeroMsg {
 
     history: TickMsg[];
     numPlayers: number;
+    numInCategory: number;
 }
 
 export interface CreatePartyRequest {

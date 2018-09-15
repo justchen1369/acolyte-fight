@@ -435,7 +435,7 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 
 	socket.join(game.id);
 
-	const numPlayers = games.calculateRoomStats(game.roomId, game.allowBots);
+	const roomStats = games.calculateRoomStats(game.category);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
@@ -443,7 +443,8 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 		mod: game.mod,
 		allowBots: game.allowBots,
 		history: game.history,
-		numPlayers: numPlayers,
+		numPlayers: roomStats.numOnline,
+		numInCategory: roomStats.numInCategory,
 	};
 	socket.emit('hero', msg);
 }

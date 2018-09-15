@@ -173,7 +173,8 @@ export interface NewGameNotification {
 	gameId: string;
 	heroId: string;
 	room: string | null;
-	numPlayers: number;
+	numPlayersOnline: number;
+	numPlayersInGameMode: number;
 }
 
 export interface CloseGameNotification {
