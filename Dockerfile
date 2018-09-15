@@ -10,6 +10,7 @@ ENV PORT 80
 CMD node js/server/index
 WORKDIR /app
 RUN mkdir /app/logs
+RUN mkdir /app/replays
 
 ADD . /app
 RUN npm install && npm run build
