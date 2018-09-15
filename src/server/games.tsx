@@ -36,8 +36,7 @@ export interface PartyGameAssignment {
 }
 
 export interface RoomStats {
-	numOnline: number;
-	numInCategory: number;
+	numPlayersInCategory: number;
 }
 
 export function onConnect(socketId: string, authToken: string) {
@@ -136,9 +135,8 @@ export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlaye
 
 export function calculateRoomStats(category: string): RoomStats {
 	const playerCounts = getStore().playerCounts;
-	const numInCategory = playerCounts[category] || 0;
-	const numOnline = _.sum(Object.keys(playerCounts).map(category => playerCounts[category]));
-	return { numOnline, numInCategory };
+	const numPlayersInCategory = playerCounts[category] || 0;
+	return { numPlayersInCategory };
 }
 
 function calculateGameCategory(roomId: string, privatePartyId: string, allowBots: boolean) {

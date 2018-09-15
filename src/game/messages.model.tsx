@@ -144,8 +144,7 @@ export interface HeroMsg {
     allowBots: boolean;
 
     history: TickMsg[];
-    numPlayers: number;
-    numInCategory: number;
+    numPlayersInCategory: number;
 }
 
 export interface CreatePartyRequest {

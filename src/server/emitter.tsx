@@ -443,8 +443,7 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 		mod: game.mod,
 		allowBots: game.allowBots,
 		history: game.history,
-		numPlayers: roomStats.numOnline,
-		numInCategory: roomStats.numInCategory,
+		numPlayersInCategory: roomStats.numPlayersInCategory,
 	};
 	socket.emit('hero', msg);
 }
