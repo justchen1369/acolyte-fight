@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as constants from '../../game/constants';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -41,16 +42,23 @@ export class TitleSection extends React.Component<Props, State> {
             <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
             <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
             <h1>FAQ</h1>
+            <h2>When does the game start?</h2>
+            <p>
+                The game starts whenever you want it to - just start casting some spells.
+                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
+            </p>
+            <h2>What are these random bots that keep getting added to the game?</h2>
+            <p>
+                Where there are fewer than {constants.Matchmaking.TargetGameSize} players in a public game, a bot is added automatically to balance out the game.
+                The reason is because a lot of newbies would get matched with pros, get stomped on 10 times a row, and then quit the game forever.
+                The bot gives the pro something else to fight, slowing down the game for the newbie while they learn their skills.
+                The bot always targets the player with the highest health, which is normally the pro.
+            </p>
             <h2>Is there a Mobile App?</h2>
             <p>
                 Add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
                 On iPhone - tap the Share button, click Add to Home Screen.
                 On Android - tap the triple dot menu button, click Add to Home Screen.
-            </p>
-            <h2>When does the game start?</h2>
-            <p>
-                The game starts whenever you want it to - just start casting some spells.
-                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
             </p>
             <h1>Credits</h1>
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
