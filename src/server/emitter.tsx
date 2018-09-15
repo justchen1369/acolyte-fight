@@ -350,7 +350,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
 	}
 	if (!game) {
-		game = games.findNewGame(room, data.isBot);
+		game = games.findNewGame(room, data.privatePartyId, data.isBot);
 	}
 
 	if (game) {

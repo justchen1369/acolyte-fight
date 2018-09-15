@@ -89,10 +89,9 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
+export function findNewGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const privatePartyId: string = null; // This method is for joining public games only
-	const category = calculateGameCategory(roomId, null, allowBots);
+	const category = calculateGameCategory(roomId, privatePartyId, allowBots);
 	const store = getStore();
 
 	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
@@ -260,7 +259,7 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 	if (room) {
 		gameName = room.id + "/" + gameName;
 	}
-	logger.info("Game [" + gameName + "]: started");
+	logger.info(`Game [${gameName}]: started (${game.category})`);
 	return game;
 }
 
@@ -332,7 +331,7 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 	}
 
 	;
-	if ([...party.active.values()].every(p => p.ready)) {
+	if (party.isPrivate || [...party.active.values()].every(p => p.ready)) {
 		assignPartyToGames(party, assignments);
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 	}
@@ -352,15 +351,12 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 			group.push(remaining.shift());
 		}
 
-		const game = party.isPrivate ? initGame(room, party.id, allowBots) : findNewGame(room, allowBots, group.length);
+		const privatePartyId = party.isPrivate ? party.id : null;
+		const game = findNewGame(room, privatePartyId, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
 			assignments.push({ partyMember: member, game, heroId });
-		}
-
-		if (party.isPrivate) {
-			store.joinableGames.delete(game.id);
 		}
 	}
 

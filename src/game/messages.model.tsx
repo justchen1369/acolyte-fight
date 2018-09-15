@@ -75,6 +75,7 @@ export interface TickMsg {
 
 export interface JoinMsg {
     gameId: string | null;
+    privatePartyId: string | null;
     room: string | null;
     name: string;
     keyBindings: KeyBindings;
