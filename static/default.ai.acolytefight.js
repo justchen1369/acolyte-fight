@@ -1,6 +1,7 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
 var missRadius = 0.05;
+var reactionTimeMilliseconds = 100;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
 
@@ -39,7 +40,9 @@ function handleInput(state, heroId, cooldowns) {
     }
 
     if (action) {
-        postMessage(JSON.stringify({ type: "action", action }));
+        setTimeout(function() {
+            postMessage(JSON.stringify({ type: "action", action }));
+        }, reactionTimeMilliseconds);
     }
 }
 
