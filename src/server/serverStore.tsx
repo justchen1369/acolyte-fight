@@ -12,32 +12,12 @@ let store: g.ServerStore = {
     parties: new Map<string, g.Party>(),
     joinableGames: new Set<string>(),
     activeGames: new Map<string, g.Game>(),
-    inactiveGames: new Map<string, g.Game>(),
+    storedGameIds: new Set<string>(),
     recentTickMilliseconds: [],
 };
 
 export function getStore() {
     return store;
-}
-
-export function cleanupOldInactiveGames(maxInactiveGames: number) {
-    const numToCleanup = Math.max(0, store.inactiveGames.size - maxInactiveGames);
-    if (numToCleanup <= 0) {
-        return;
-    }
-
-    const inactiveGames = [...store.inactiveGames.values()];
-    const idsToCleanup =
-        _.chain(inactiveGames)
-        .orderBy(x => x.created.unix())
-        .map(x => x.id)
-        .take(numToCleanup)
-        .value();
-
-    logger.info(`Cleaning up ${idsToCleanup.length} inactive games`); 
-    idsToCleanup.forEach(id => {
-        store.inactiveGames.delete(id);
-    });
 }
 
 export function cleanupOldRooms(maxAgeUnusedHours: number) {

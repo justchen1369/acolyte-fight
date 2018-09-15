@@ -10,7 +10,7 @@ export interface ServerStore {
     parties: Map<string, Party>; // id -> party
     joinableGames: Set<string>; // game ids
     activeGames: Map<string, Game>; // id -> game
-    inactiveGames: Map<string, Game>; // id -> game
+    storedGameIds: Set<string>;
     recentTickMilliseconds: number[];
 }
 
@@ -20,21 +20,26 @@ export interface LocationStore {
     upstreamSuffix: string;
 }
 
-export interface Game {
+export interface Replay {
     id: string;
     category: string;
+
     roomId: string | null;
     privatePartyId: string | null;
-    created: moment.Moment;
 
     mod: Object;
     allowBots: boolean;
 
+    numPlayers: number;
+	history: m.TickMsg[];
+}
+
+export interface Game extends Replay {
+    created: moment.Moment;
+
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
     playerNames: string[];
-    accessTokens: Set<string>;
-    numPlayers: number;
 
     tick: number;
 
@@ -44,7 +49,6 @@ export interface Game {
 
     actions: Map<string, m.ActionMsg>; // heroId -> actionData
     messages: m.TextMsg[];
-	history: m.TickMsg[];
 }
 
 export interface Player {

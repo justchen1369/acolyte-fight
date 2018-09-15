@@ -8,6 +8,7 @@ import { authMiddleware } from './auth';
 import { attachToSocket } from './emitter';
 import { setLocation } from './mirroring';
 import { logger } from './logging';
+import * as gameStorage from './gameStorage';
 import * as serverStore from './serverStore';
 
 const rootDir = path.resolve('.');
@@ -23,10 +24,12 @@ program.parse(process.argv);
 const port = program.port || process.env.PORT || 7770;
 const maxReplays = parseInt(process.env.MAX_REPLAYS) || 1000;
 const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) || 60;
+const replaysBasePath = rootDir + "/replays";
 const mirrored = !!process.env.MIRRORED;
 
 logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes} mirrored=${mirrored}`);
 
+gameStorage.initStorage(replaysBasePath);
 if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
 }
@@ -54,7 +57,6 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(() => {
-	serverStore.cleanupOldInactiveGames(maxReplays);
 	serverStore.cleanupOldRooms(1);
 }, cleanupIntervalMinutes * 60 * 1000);
 

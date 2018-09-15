@@ -5,6 +5,7 @@ import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as constants from '../game/constants';
+import * as gameStorage from './gameStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
@@ -229,7 +230,6 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
 		playerNames: new Array<string>(),
-		accessTokens: new Set<string>(),
 		numPlayers: 0,
 		tick: 0,
 		activeTick: 0,
@@ -458,7 +458,7 @@ function finishGameIfNecessary(game: g.Game) {
 	if (game.active.size === 0) {
 		game.bots.clear();
 		getStore().activeGames.delete(game.id);
-		getStore().inactiveGames.set(game.id, game);
+		gameStorage.saveGame(game);
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;
@@ -531,10 +531,6 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	});
 	game.bots.delete(heroId);
 	game.playerNames.push(playerName);
-
-	if (authToken) {
-		game.accessTokens.add(authToken);
-	}
 
 	const userHash = hashAuthToken(authToken);
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", userHash, playerName, keyBindings, isBot, isMobile });

@@ -9,6 +9,7 @@ import { required, optional } from './schema';
 import * as PlayerName from '../game/sanitize';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as gameStorage from './gameStorage';
 import socketClient from 'socket.io-client';
 
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -345,32 +346,41 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const roomId = data.room;
 	const room = roomId ? store.rooms.get(roomId) : null;
 
-	let game: g.Game = null;
-	if (data.gameId) {
-		game = store.activeGames.get(data.gameId) || store.inactiveGames.get(data.gameId);
-	}
-	if (!game) {
-		game = games.findNewGame(room, data.privatePartyId, data.isBot);
-	}
-
-	if (game) {
-		let heroId = null;
-		if (!data.observe) {
-			heroId = games.joinGame(game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, socket.id);
-		}
-
-		emitHero(socket.id, game, heroId);
-
-		if (heroId) {
-			const botLog = data.isBot ? " (bot)" : "";
-			logger.info(`Game [${game.id}]: player ${playerName}${botLog} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+	Promise.resolve().then(() => {
+		if (data.gameId) {
+			const replay = store.activeGames.get(data.gameId);
+			if (!replay) {
+				return gameStorage.loadGame(data.gameId);
+			} else {
+				return replay;
+			}
 		} else {
-			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			const game = games.findNewGame(room, data.privatePartyId, data.isBot);
+			return game;
 		}
-	} else {
-		logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
-		callback({ success: false, error: `Unable to find game ${data.gameId}` });
-	}
+	}).catch(err => {
+		console.error("Error joining game: ", err);
+		return null as g.Replay;
+	}).then(game => {
+		if (game) {
+			let heroId = null;
+			if (!data.observe && store.activeGames.has(game.id)) {
+				heroId = games.joinGame(game as g.Game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, socket.id);
+			}
+
+			emitHero(socket.id, game, heroId);
+
+			if (heroId) {
+				const botLog = data.isBot ? " (bot)" : "";
+				logger.info(`Game [${game.id}]: player ${playerName}${botLog} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+			} else {
+				logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			}
+		} else {
+			logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
+			callback({ success: false, error: `Unable to find game ${data.gameId}` });
+		}
+	});
 }
 
 function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
@@ -391,10 +401,11 @@ function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 }
 
 function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
+	socket.leave(data.gameId);
+
 	const game = getStore().activeGames.get(data.gameId);
 	if (game) {
 		games.leaveGame(game, socket.id);
-		socket.leave(game.id);
 	}
 }
 
@@ -423,11 +434,11 @@ function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameLi
 	}
 
 	const store = getStore();
-	const availableIds = data.ids.filter(id => store.activeGames.has(id) || store.inactiveGames.has(id));
+	const availableIds = data.ids.filter(id => store.activeGames.has(id) || gameStorage.hasGame(id));
 	callback({ success: true, ids: availableIds });
 }
 
-function emitHero(socketId: string, game: g.Game, heroId: string) {
+function emitHero(socketId: string, game: g.Replay, heroId: string) {
 	const socket = io.sockets.connected[socketId];
 	if (!socket) {
 		return;
