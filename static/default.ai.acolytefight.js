@@ -1,7 +1,8 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
-var missRadius = 0.05;
+var missRadius = 0.1;
 var delayMilliseconds = 2000;
+var delayJitterMilliseconds = 500;
 
 var nextSpell = 0;
 
@@ -19,8 +20,9 @@ onmessage = function (e) {
 
 function handleInput(state, heroId, cooldowns) {
     var hero = state.heroes[heroId];
-    var opponent = findOpponent(state.heroes, heroId);
-    if (!hero || !opponent) {
+    var strongest = findStrongest(state.heroes, heroId);
+    var closest = findClosest(state.heroes, heroId);
+    if (!(hero && strongest && closest)) {
         // Either we're dead, or everyone else is, nothing to do
         return;
     }
@@ -30,10 +32,10 @@ function handleInput(state, heroId, cooldowns) {
         action =
             recovery(state, hero, cooldowns)
             || dodge(state, hero, cooldowns)
-            || castSpell(state, hero, opponent, cooldowns)
-            || move(state, hero, opponent);
+            || castSpell(state, hero, strongest, cooldowns)
+            || move(state, hero, closest);
     } else {
-        action = move(state, hero, opponent);
+        action = move(state, hero, closest);
     }
 
     if (action) {
@@ -41,7 +43,7 @@ function handleInput(state, heroId, cooldowns) {
     }
 }
 
-function findOpponent(heroes, myHeroId) {
+function findClosest(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -60,6 +62,26 @@ function findOpponent(heroes, myHeroId) {
         }
     }
     return closest;
+}
+
+function findStrongest(heroes, myHeroId) {
+    var myHero = heroes[myHeroId];
+    if (!myHero) {
+        return null;
+    }
+
+    var choice = null;
+    var mostHealth = 0;
+    for (var heroId in heroes) {
+        var hero = heroes[heroId];
+        if (hero.id !== myHeroId) {
+            if (hero.health > mostHealth) {
+                mostHealth = hero.health;
+                choice = hero;
+            }
+        }
+    }
+    return choice;
 }
 
 function recovery(state, hero, cooldowns) {
@@ -115,7 +137,7 @@ function castSpell(state, hero, opponent, cooldowns) {
 
     if (candidates.length > 0) {
         var spellId = candidates[Math.floor(Math.random() * candidates.length)];
-        nextSpell = Date.now() + delayMilliseconds;
+        nextSpell = Date.now() + delayMilliseconds + Math.floor((Math.random() < 0.5 ? -1 : 1) * Math.random() * delayJitterMilliseconds);
         return { spellId, target: jitter(opponent.pos, missRadius) };
     } else {
         return null;

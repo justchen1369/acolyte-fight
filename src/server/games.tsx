@@ -553,7 +553,7 @@ function hashAuthToken(authToken: string | null): string {
 }
 
 export function addBot(game: g.Game) {
-	if (game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0) {
+	if (game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
 		return null;
 	}
 
