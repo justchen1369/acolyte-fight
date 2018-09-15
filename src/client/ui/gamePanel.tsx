@@ -44,7 +44,7 @@ class GamePanel extends React.Component<Props, State> {
                 <MessagesPanel />
                 <SpellInfoPanel />
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
-                    <i className="fa fa-chevron-left" /> Back to Home
+                    <i className="fa fa-chevron-left" /> Back to Spell Selection
                 </a>}
                 <UrlListener />
             </div>

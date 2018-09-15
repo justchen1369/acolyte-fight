@@ -284,7 +284,8 @@ a:hover, a:active {
 }
 
 .home .fold-indicator {
-    animation: fold-animation alternate 2s infinite;
+    position: relative;
+    animation: fold-animation alternate 1s infinite;
     cursor: pointer;
 }
 
@@ -303,8 +304,8 @@ a:hover, a:active {
 }
 
 @keyframes fold-animation {
-    from { color: #888; }
-    to { color: white; }
+    from { color: #888; bottom: 5px }
+    to { color: white; bottom: 0 }
 }
 
 #info-panel {
