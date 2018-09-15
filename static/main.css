@@ -71,6 +71,12 @@ canvas.game {
     filter: blur(5px);
 }
 
+@supports ( -moz-appearance:none ){
+    #glows {
+        filter: none; /* firefox blurring is done in software and so is slow */
+    }
+}
+
 input {
     padding: 10px;
     font-size: 14pt;
