@@ -139,12 +139,15 @@ export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
 export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
+    isPrivate: boolean;
+    privatePartyId: string | null;
     room: string | null;
 
     mod: Object;
     allowBots: boolean;
 
     history: TickMsg[];
+    numPlayersPublic: number;
     numPlayersInCategory: number;
 }
 

@@ -35,10 +35,6 @@ export interface PartyGameAssignment {
 	heroId: string;
 }
 
-export interface RoomStats {
-	numPlayersInCategory: number;
-}
-
 export function onConnect(socketId: string, authToken: string) {
 }
 
@@ -132,13 +128,11 @@ export function findNewGame(room: g.Room | null, privatePartyId: string | null, 
 	return game;
 }
 
-export function calculateRoomStats(category: string): RoomStats {
-	const playerCounts = getStore().playerCounts;
-	const numPlayersInCategory = playerCounts[category] || 0;
-	return { numPlayersInCategory };
+export function calculateRoomStats(category: string): number {
+	return getStore().playerCounts[category] || 0;
 }
 
-function calculateGameCategory(roomId: string, privatePartyId: string, allowBots: boolean) {
+export function calculateGameCategory(roomId: string, privatePartyId: string, allowBots: boolean) {
 	return `room=${roomId}/party=${privatePartyId}/allowBots=${allowBots}`;
 }
 
@@ -224,6 +218,7 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
 		category: calculateGameCategory(roomId, privatePartyId, allowBots),
 		roomId,
+		privatePartyId,
 		mod: room ? room.mod : {},
 		allowBots,
 		created: moment(),

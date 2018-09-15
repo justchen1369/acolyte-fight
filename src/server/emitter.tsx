@@ -435,15 +435,20 @@ function emitHero(socketId: string, game: g.Game, heroId: string) {
 
 	socket.join(game.id);
 
-	const roomStats = games.calculateRoomStats(game.category);
+	const publicCategory = games.calculateGameCategory(null, null, false);
+	const numPlayersPublic = games.calculateRoomStats(publicCategory);
+	const numPlayersInCategory = games.calculateRoomStats(game.category);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
+		isPrivate: game.category !== publicCategory,
+		privatePartyId: game.privatePartyId,
 		room: game.roomId,
 		mod: game.mod,
 		allowBots: game.allowBots,
 		history: game.history,
-		numPlayersInCategory: roomStats.numPlayersInCategory,
+		numPlayersPublic,
+		numPlayersInCategory,
 	};
 	socket.emit('hero', msg);
 }

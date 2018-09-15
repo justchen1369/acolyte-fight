@@ -23,6 +23,7 @@ export interface Game {
     id: string;
     category: string;
     roomId: string | null;
+    privatePartyId: string | null;
     created: moment.Moment;
 
     mod: Object;

@@ -120,7 +120,8 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
         return <div key={key} className="row">
             <div>
-                {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"} online
+                {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}
+                {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
             </div>
         </div>
     }
