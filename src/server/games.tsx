@@ -330,7 +330,7 @@ export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
 	}
 
 	;
-	if (party.isPrivate || [...party.active.values()].every(p => p.ready)) {
+	if ([...party.active.values()].every(p => p.ready)) {
 		assignPartyToGames(party, assignments);
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 	}
