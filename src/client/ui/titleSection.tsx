@@ -47,13 +47,6 @@ export class TitleSection extends React.Component<Props, State> {
                 The game starts whenever you want it to - just start casting some spells.
                 Within the first 3 seconds of the game, no damage can be done, and some players may still join.
             </p>
-            <h2>What are these random bots that keep getting added to the game?</h2>
-            <p>
-                Where there are fewer than {constants.Matchmaking.TargetGameSize} players in a public game, a bot is added automatically to balance out the game.
-                The reason is because a lot of newbies would get matched with pros, get stomped on 10 times a row, and then quit the game forever.
-                The bot gives the pro something else to fight, slowing down the game for the newbie while they learn their skills.
-                The bot always targets the player with the highest health, which is normally the pro.
-            </p>
             <h2>Is there a Mobile App?</h2>
             <p>
                 Add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
