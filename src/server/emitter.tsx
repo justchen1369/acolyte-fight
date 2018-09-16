@@ -9,6 +9,7 @@ import { required, optional } from './schema';
 import * as PlayerName from '../game/sanitize';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import socketClient from 'socket.io-client';
 
@@ -393,9 +394,11 @@ function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 
 
 	const game = getStore().activeGames.get(data.gameId);
-	if (game && game.active.has(socket.id) && game.numPlayers <= 1 && game.bots.size === 0) { // Only allow adding bots once
-		games.addBot(game);
-		games.addBot(game);
+	if (game && game.active.has(socket.id) && game.bots.size === 0) { // Only allow adding bots once
+		const botsToAdd = Math.max(0, constants.Matchmaking.TargetGameSize - game.numPlayers);
+		for (let i = 0; i < botsToAdd; ++i) {
+			games.addBot(game);
+		}
 		logger.info(`Game [${game.id}]: playing vs AI`);
 	}
 }

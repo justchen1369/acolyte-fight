@@ -59,14 +59,14 @@ class InfoPanel extends React.Component<Props, State> {
     }
 
     private renderButtons() {
-        if (this.props.started || !this.props.myHeroId) {
+        if (!this.props.myHeroId) {
             return null;
         }
 
-        if (this.props.players.size === 1) {
-            return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
-        } else if (this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
+        if (!this.props.started && this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
             return <div className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</div>;
+        } else if (this.props.waitingForPlayers && this.props.players.size < Matchmaking.TargetGameSize) {
+            return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
         } else {
             return null;
         }

@@ -612,14 +612,6 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 			game.closeTick = newCloseTick;
 			statusChanged = true;
 		}
-
-		// Public games must always have 3 players
-		if (game.bots.size === 0 && game.category === publicCategory()) {
-			const botsToAdd = Matchmaking.TargetGameSize - game.numPlayers;
-			for (let i = 0; i < botsToAdd; ++i) {
-				addBot(game);
-			}
-		}
 	}
 
 	if (game.tick >= game.closeTick) {
