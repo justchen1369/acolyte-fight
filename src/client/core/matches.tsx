@@ -37,9 +37,9 @@ export function joinNewGame(observeGameId?: string) {
 	} else {
 		// New server? Reload the client, just in case the version has changed.
 		if (observeGameId) {
-			window.location.href = url.getPath({ ...store.current, gameId: observeGameId });
+			window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
 		} else {
-			window.location.href = url.getPath({ ...store.current, gameId: null });
+			window.location.href = url.getPath({ ...store.current, gameId: null, server: null });
 		}
 	}
 }
