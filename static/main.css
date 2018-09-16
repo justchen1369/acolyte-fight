@@ -270,21 +270,23 @@ a:hover, a:active {
 }
 
 .home .social-bar {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-
     display: flex;
     justify-content: space-between;
     width: 108px;
 }
 
-.home .social-bar a {
+.social-bar {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.social-bar a {
     color: #888;
     font-size: 32px;
 }
 
-.home .social-bar a:hover {
+.social-bar a:hover {
     color: white;
 }
 
