@@ -226,6 +226,7 @@ export interface Texting {
 export interface Closing {
 	type: "closing";
 	startTick: number;
+	ticksUntilClose: number;
 }
 
 export interface Joining {

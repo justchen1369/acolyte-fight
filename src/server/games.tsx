@@ -603,31 +603,45 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 		return;
 	}
 
-	let statusChanged = false;
+	let waitPeriod: number = null;
 
-	if ((game.active.size + game.bots.size) > 1 && data.actions.some(action => isSpell(action))) {
+	const numPlayers = game.active.size + game.bots.size;
+	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
-		const newCloseTick = game.tick + Matchmaking.JoinPeriod;
+		const joinPeriod = calculateJoinPeriod(game.category, numPlayers);
+
+		const newCloseTick = game.tick + joinPeriod;
 		if (newCloseTick < game.closeTick) {
 			game.closeTick = newCloseTick;
-			statusChanged = true;
+			waitPeriod = joinPeriod;
 		}
 	}
 
 	if (game.tick >= game.closeTick) {
 		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
-		statusChanged = true;
+		waitPeriod = 0;
 		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players after " + game.tick + " ticks");
 	}
 
-	if (statusChanged) {
+	if (waitPeriod !== null) {
 		queueAction(game, {
 			gameId: game.id,
 			heroId: systemHeroId(m.ActionType.CloseGame),
 			actionType: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
+			waitPeriod,
 		});
+	}
+}
+
+function calculateJoinPeriod(category: string, numPlayers: number): number {
+	const halfFull = Math.ceil(Matchmaking.MaxPlayers / 2);
+	const numInRoom = calculateRoomStats(category);
+	if (numInRoom >= halfFull && numPlayers < halfFull) {
+		return Matchmaking.WaitForMorePeriod;
+	} else {
+		return Matchmaking.JoinPeriod;
 	}
 }
 

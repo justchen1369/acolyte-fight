@@ -7,7 +7,7 @@ import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as sockets from '../core/sockets';
 import * as StoreProvider from '../storeProvider';
-import { ButtonBar } from '../../game/constants';
+import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from './playButton';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
@@ -181,8 +181,10 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
             return <div key={key} className="row game-started">Game started</div>
-        } else {
+        } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
+        } else {
+            return <div key={key} className="row game-started">Waiting {notification.ticksUntilClose / TicksPerSecond} seconds for up to {Math.ceil(Matchmaking.MaxPlayers / 2)} players to join...</div>
         }
     }
 

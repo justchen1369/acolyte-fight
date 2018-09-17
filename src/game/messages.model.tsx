@@ -53,6 +53,7 @@ export interface LeaveActionMsg extends ActionMsgBase {
 export interface CloseGameMsg extends ActionMsgBase {
     actionType: "close";
     closeTick: number;
+    waitPeriod: number;
 }
 
 export interface GameActionMsg extends ActionMsgBase {

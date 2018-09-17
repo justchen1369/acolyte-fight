@@ -530,7 +530,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 
 	world.ui.notifications.push({
 		type: "closing",
-		ticksUntilClose: world.startTick - world.tick,
+		ticksUntilClose: ev.ticksUntilClose,
 	});
 }
 

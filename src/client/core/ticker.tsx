@@ -123,6 +123,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 			world.occurrences.push({
 				type: "closing",
 				startTick: actionData.closeTick,
+				ticksUntilClose: actionData.waitPeriod,
 			});
 		} else if (actionData.actionType === m.ActionType.Join) {
 			world.occurrences.push({
