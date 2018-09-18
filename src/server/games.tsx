@@ -347,7 +347,11 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 	while (remaining.length > 0) {
 		const group = new Array<g.PartyMember>();
 		for (let i = 0; i < maxPlayersPerGame; ++i) {
-			group.push(remaining.shift());
+			if (remaining.length > 0) {
+				group.push(remaining.shift());
+			} else {
+				break;
+			}
 		}
 
 		const privatePartyId = party.isPrivate ? party.id : null;
