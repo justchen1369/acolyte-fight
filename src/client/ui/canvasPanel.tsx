@@ -17,8 +17,8 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
-const FpsAlpha = 0.05;
-const FpsThreshold = 0.9;
+const FpsAlpha = 0.1;
+const FpsThreshold = 0.5;
 
 interface Props {
     world: w.World;
