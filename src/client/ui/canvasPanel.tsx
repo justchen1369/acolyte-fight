@@ -17,6 +17,8 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
+const FpsAlpha = 0.05;
+const FpsThreshold = 0.9;
 
 interface Props {
     world: w.World;
@@ -25,6 +27,7 @@ interface Props {
 interface State {
     width: number;
     height: number;
+    rtx: boolean;
 }
 
 interface PointInfo {
@@ -55,8 +58,14 @@ class AnimationLoop {
     private currentHandle = 0;
     private isRunning = false;
 
-    constructor(animate: () => void) {
+    private slow: () => void;
+    private notifiedSlow = false;
+    private fps = TicksPerSecond;
+    private timeOfLastFrame = 0;
+
+    constructor(animate: () => void, slow: () => void) {
         this.animate = animate;
+        this.slow = slow;
     }
 
     start() {
@@ -71,6 +80,20 @@ class AnimationLoop {
 
     private loop(handle: number) {
         this.animate();
+
+        const timeOfThisFrame = Date.now();
+        const renderingMilliseconds = timeOfThisFrame - this.timeOfLastFrame;
+        if (renderingMilliseconds < 1000) {
+            const newFps = 1000 / Math.max(1, renderingMilliseconds);
+            this.fps = newFps * FpsAlpha + this.fps * (1 - FpsAlpha);
+
+            if (!this.notifiedSlow && this.fps < FpsThreshold * TicksPerSecond) {
+                this.notifiedSlow = true;
+                this.slow();
+            }
+        }
+        this.timeOfLastFrame = timeOfThisFrame;
+        
         if (this.isRunning && this.currentHandle === handle) {
             window.requestAnimationFrame(() => this.loop(handle));
         }
@@ -93,7 +116,10 @@ class CanvasPanel extends React.Component<Props, State> {
     private keyDownListener = this.gameKeyDown.bind(this);
     private resizeListener = this.fullScreenCanvas.bind(this);
 
-    private animationLoop = new AnimationLoop(() => this.frame());
+    private animationLoop = new AnimationLoop(
+        () => this.frame(),
+        () => this.setState({ rtx: false }),
+    );
 
     private canvasStack: CanvasStack = {
         background: null,
@@ -108,6 +134,7 @@ class CanvasPanel extends React.Component<Props, State> {
         this.state = {
             width: 0,
             height: 0,
+            rtx: true,
         };
     }
 
@@ -130,7 +157,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
     render() {
         return (
-            <div id="canvas-container">
+            <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
                 <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
