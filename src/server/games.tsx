@@ -174,10 +174,6 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 
 	if (data.heroId === player.heroId || game.bots.get(data.heroId) === socketId) {
 		queueAction(game, data);
-
-		if (data.actionType === "text") {
-			logger.info(`Game [${game.id}]: ${player.name} says: ${data.text}`);
-		}
 	}
 }
 
