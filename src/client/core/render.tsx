@@ -1313,5 +1313,5 @@ function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: nu
 }
 
 function hsl(h: number, sProportion: number, lProportion: number): string {
-	return 'hsl(' + h + ', ' + (100 * sProportion).toFixed(2) + '%, ' + (100 * lProportion).toFixed(2) + '%)';
+	return 'hsl(' + h.toFixed(0) + ', ' + (100 * sProportion).toFixed(2) + '%, ' + (100 * lProportion).toFixed(2) + '%)';
 }
