@@ -207,11 +207,11 @@ const fireball: Spell = {
     projectile: {
         color: '#ff8800',
 
-        density: 7.5,
+        density: 10,
         radius: 0.003,
         speed: 0.5,
         maxTicks: 1 * TicksPerSecond,
-        damage: 10,
+        damage: 7.5,
         categories: Categories.Projectile,
 
         render: "projectile",
