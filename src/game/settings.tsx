@@ -207,7 +207,7 @@ const fireball: Spell = {
     projectile: {
         color: '#ff8800',
 
-        density: 10,
+        density: 7.5,
         radius: 0.003,
         speed: 0.5,
         maxTicks: 1 * TicksPerSecond,
@@ -241,7 +241,7 @@ const flamestrike: Spell = {
         categories: Categories.Projectile,
 
         detonate: {
-            damage: 15,
+            damage: 10,
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
