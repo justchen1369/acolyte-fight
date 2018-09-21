@@ -18,7 +18,7 @@ const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const FpsAlpha = 0.1;
-const FpsThreshold = 0.5;
+const FpsThreshold = 0.75;
 
 interface Props {
     world: w.World;
