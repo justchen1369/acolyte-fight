@@ -380,6 +380,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	} as w.Projectile;
 
 	scaleDamagePacket(projectile, hero, projectileTemplate.damageScaling);
+	scaleDamagePacket(projectile.detonate, hero, projectileTemplate.damageScaling);
 
 	world.objects.set(id, projectile);
 	if (projectile.strafe) {
@@ -1705,6 +1706,10 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 }
 
 function scaleDamagePacket(packet: DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
+	if (!packet) {
+		return;
+	}
+
 	let scaleFactor = 1.0;
 	if (fromHero && damageScaling) {
 		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
