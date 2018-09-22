@@ -183,6 +183,19 @@ a:hover, a:active {
     .nav-optional {
         display: none;
     }
+
+    .navbar {
+        justify-content: space-evenly;
+    }
+
+    .navbar .nav-item {
+        font-size: 80%;
+        padding: 10px 0px;
+    }
+
+    .navbar .spacer {
+        display: none;
+    }
 }
 
 .navbar .nav-item:hover {
