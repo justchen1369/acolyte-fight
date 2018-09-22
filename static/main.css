@@ -288,6 +288,22 @@ a:hover, a:active {
     width: 108px;
 }
 
+@media (max-width: 790px) {
+    #game-panel .social-bar {
+        display: none;
+    }
+}
+
+#game-panel .social-bar a {
+    display: flex;
+    align-items: center;
+}
+
+#game-panel .social-bar .label {
+    font-size: 50%;
+    margin-right: 10px;
+}
+
 .social-bar {
     position: absolute;
     bottom: 20px;

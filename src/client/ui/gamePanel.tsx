@@ -47,7 +47,7 @@ class GamePanel extends React.Component<Props, State> {
                     <i className="fa fa-chevron-left" /> Back to Home <span className="return-home-subtext">(spell selection, replays and more)</span>
                 </a>}
                 {allowExit && <div className="social-bar">
-                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><i className="fab fa-discord" /></a>
+                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Discord</span><i className="fab fa-discord" /></a>
                 </div>}
                 <UrlListener />
             </div>
