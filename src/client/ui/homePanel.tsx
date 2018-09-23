@@ -54,7 +54,7 @@ class HomePanel extends React.Component<Props, State> {
                 <div style={{ flexGrow: 0.1 }} />
                 <div className="social-bar">
                     <a href="http://facebook.com/acolytefight" target="_blank" title="Facebook"><i className="fab fa-facebook" /></a>
-                    <a href="http://twitter.com/acolytefight" target="_blank" title="Twitter"><i className="fab fa-twitter-square" /></a>
+                    <a href="http://reddit.com/r/acolytefight" target="_blank" title="Reddit"><i className="fab fa-reddit-square" /></a>
                     <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><i className="fab fa-discord" /></a>
                 </div>
             </div>
