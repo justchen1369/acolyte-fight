@@ -134,7 +134,7 @@ class CanvasPanel extends React.Component<Props, State> {
         this.state = {
             width: 0,
             height: 0,
-            rtx: true,
+            rtx: !isMobile,
         };
     }
 
