@@ -927,3 +927,15 @@ textarea.ai-js {
 .party-member .check-icon:hover {
     color: white;
 }
+
+.region-list-section .region {
+    font-size: 120%;
+    border: #555 1px solid;
+    background: #333;
+    padding: 20px;
+    margin: 12px 0;
+}
+
+.region-list-section .region-name {
+    font-weight: bold;
+}

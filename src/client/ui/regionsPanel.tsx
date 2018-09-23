@@ -22,6 +22,7 @@ interface Region {
 }
 
 interface Props {
+    server: string;
 }
 
 interface State {
@@ -70,10 +71,11 @@ class RegionList extends React.Component<Props, State> {
         return <div className="region-list-section">
             <h1>Regions</h1>
             <p>Normally, you are automatically connected to your closest server. If there is no one online on your home server, you can try connecting to other regions.</p>
+            {this.props.server && <p>You are currently connected to server <b>{this.props.server}</b></p>}
             {this.state.regions.length === 0 && <div className="loading">Loading regions...</div>}
             {this.state.error && <div className="error">{this.state.error}</div>}
             {this.state.regions.map(region => <div className="region">
-                <a href={region.url}>Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
+                <a href={region.url} className="region-name">Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
             </div>)}
         </div>;
     }
