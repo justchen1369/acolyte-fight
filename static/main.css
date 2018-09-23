@@ -416,6 +416,12 @@ a:hover, a:active {
     pointer-events: none;
 }
 
+@media (max-height: 768px) {
+    #messages-panel {
+        font-size: 75%;
+    }
+}
+
 #messages-panel .row {
     color: #ccc;
 
