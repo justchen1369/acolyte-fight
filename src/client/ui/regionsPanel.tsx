@@ -12,6 +12,7 @@ const RegionUrls = [
     "http://us.acolytefight.io",
     "http://eu.acolytefight.io",
     "http://au.acolytefight.io",
+    "http://sg.acolytefight.io",
 ];
 
 interface Region {
