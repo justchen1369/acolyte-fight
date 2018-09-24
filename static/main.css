@@ -282,7 +282,7 @@ a:hover, a:active {
     background-color: #ccc;
 }
 
-.home .social-bar {
+.social-bar {
     display: flex;
     justify-content: space-between;
     width: 108px;
@@ -292,16 +292,6 @@ a:hover, a:active {
     #game-panel .social-bar {
         display: none;
     }
-}
-
-#game-panel .social-bar a {
-    display: flex;
-    align-items: center;
-}
-
-#game-panel .social-bar .label {
-    font-size: 50%;
-    margin-right: 10px;
 }
 
 .social-bar {
@@ -498,6 +488,28 @@ a:hover, a:active {
 
 #messages-panel .winner .action-row .btn {
     font-size: 150%;
+}
+
+#messages-panel .advert-row {
+    display: flex;
+    align-items: center;
+
+    margin: 10px 0;
+    animation: none;
+}
+
+#messages-panel .advert-row a {
+    display: flex;
+    align-items: center;
+}
+
+#messages-panel .advert-row .label {
+    font-size: 80%;
+}
+
+#messages-panel .advert-row i {
+    font-size: 150%;
+    margin-left: 5px;
 }
 
 #spell-info-panel {

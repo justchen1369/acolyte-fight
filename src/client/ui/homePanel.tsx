@@ -8,6 +8,7 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 import { NameConfig } from './nameConfig';
 import PlayButton from './playButton';
+import SocialBar from './socialBar';
 import SpellConfig from './spellConfig';
 import NavBar from './navbar';
 import PartyList from './partyList';
@@ -52,11 +53,7 @@ class HomePanel extends React.Component<Props, State> {
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                <div className="social-bar">
-                    <a href="http://facebook.com/acolytefight" target="_blank" title="Facebook"><i className="fab fa-facebook" /></a>
-                    <a href="http://reddit.com/r/acolytefight" target="_blank" title="Reddit"><i className="fab fa-reddit-square" /></a>
-                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><i className="fab fa-discord" /></a>
-                </div>
+                <SocialBar />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>

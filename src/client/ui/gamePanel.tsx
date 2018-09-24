@@ -9,6 +9,7 @@ import * as screenLifecycle from './screenLifecycle';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
+import SocialBar from './socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
 
@@ -46,9 +47,7 @@ class GamePanel extends React.Component<Props, State> {
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home <span className="return-home-subtext">(spell selection, replays and more)</span>
                 </a>}
-                {allowExit && <div className="social-bar">
-                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Discord</span><i className="fab fa-discord" /></a>
-                </div>}
+                {allowExit && <SocialBar />}
                 <UrlListener />
             </div>
         );
