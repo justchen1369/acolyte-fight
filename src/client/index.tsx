@@ -24,7 +24,6 @@ const socket = socketLib();
 let alreadyConnected = false;
 
 stats.attachListener();
-pages.attachListener();
 initialize();
 rerender();
 

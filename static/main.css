@@ -420,6 +420,10 @@ a:hover, a:active {
     animation-fill-mode: both;
 }
 
+#messages-panel .row.error {
+    color: red;
+}
+
 @keyframes fade-out {
     from { opacity: 1.0 }
     75% { opacity: 1.0 }

@@ -4,14 +4,6 @@ import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
-export function attachListener() {
-    notifications.attachListener(notifs => {
-        if (notifs.some(n => n.type === "disconnected")) {
-            reloadPageIfNecessary();
-        }
-    });
-}
-
 export function changePage(newPage: string) {
     const store = StoreProvider.getState();
     if (!store.socketId) {
