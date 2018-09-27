@@ -674,7 +674,7 @@ const icewall: Spell = {
     length: 0.005,
     width: 0.15,
 
-    categories: Categories.Shield,
+    categories: Categories.Shield | Categories.Obstacle,
 
     icon: "woodenFence",
 
