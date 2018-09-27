@@ -2,6 +2,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import pl from 'planck-js';
 import * as Immutable from 'immutable';
+import * as colorWheel from './colorWheel';
 import * as constants from './constants';
 import * as vector from './vector';
 import * as w from './world.model';
@@ -578,7 +579,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		heroId: hero.id,
 		userHash: ev.userHash,
 		name: ev.playerName,
-		uiColor: chooseNewPlayerColor(ev.preferredColor, world),
+		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : colorWheel.takeColor(ev.preferredColor),
 		isBot: ev.isBot,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
@@ -588,30 +589,6 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	world.activePlayers = world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
-}
-
-function chooseNewPlayerColor(preferredColor: string, world: w.World) {
-	let alreadyUsedColors = new Set<string>();
-	world.players.forEach(player => {
-		if (world.activePlayers.has(player.heroId)) {
-			alreadyUsedColors.add(player.uiColor);
-		}
-	});
-
-	let uiColor = HeroColors.Colors[0];
-	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
-		uiColor = preferredColor;
-	} else {
-		for (let i = 0; i < HeroColors.Colors.length; ++i) {
-			let candidate = HeroColors.Colors[i];
-			if (!alreadyUsedColors.has(candidate)) {
-				uiColor = candidate;
-				break;
-			}
-		}
-	}
-
-	return uiColor;
 }
 
 function handleLeaving(ev: w.Leaving, world: w.World) {

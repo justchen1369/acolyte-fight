@@ -31,12 +31,13 @@ export namespace HeroColors {
 	export const InactiveColor = '#666666';
 	export const HealColor = '#22ee88';
 	export const Colors = [
-		"#6d89cc",
 		"#cb8fc1",
 		"#7db37d",
-		"#56b5bf",
 		"#917ccc",
 		"#cc7c88",
+		"#d0c16b",
+		"#56b5bf",
+		"#6d89cc",
 	];
 
 	export const HitGlowFactor = 0.3;

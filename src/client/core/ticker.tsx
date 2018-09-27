@@ -5,13 +5,13 @@ import * as engine from '../../game/engine';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
 import { render, CanvasStack } from './render';
-import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
+import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
 const BufferGrowthPerTick = 0.1;
 const BufferDecayPerTick = 0.999;
 
-const preferredColors = new Map<string, string>(); // player name -> color
+const preferredColors = new Map<string, string>(); // userHash -> color
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
@@ -30,8 +30,8 @@ export function reset(history: m.TickMsg[]) {
 	}
 }
 
-export function setPreferredColor(heroId: string, color: string) {
-	preferredColors.set(heroId, color);
+export function setPreferredColor(userHash: string, color: string) {
+	preferredColors.set(userHash, color);
 }
 
 function isStartGameTick(tickData: m.TickMsg) {
@@ -132,7 +132,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				userHash: actionData.userHash,
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
-				preferredColor: preferredColors.get(actionData.playerName) || null,
+				preferredColor: preferredColors.get(actionData.userHash),
 				isBot: actionData.isBot,
 				isMobile: actionData.isMobile,
 			});

@@ -70,7 +70,9 @@ export function leaveCurrentGame(close: boolean = true) {
 	// Save previous game
 	stats.save(store.world, store.server); // Note, this is async, but we don't care about waiting for it to finish
 	world.players.forEach(player => {
-		ticker.setPreferredColor(player.name, player.uiColor);
+		if (player.userHash) {
+			ticker.setPreferredColor(player.userHash, player.uiColor);
+		}
 	});
 
 	if (world.ui.myGameId) {
