@@ -579,7 +579,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		heroId: hero.id,
 		userHash: ev.userHash,
 		name: ev.playerName,
-		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : colorWheel.takeColor(ev.preferredColor),
+		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : chooseNewPlayerColor(ev.preferredColor, world),
 		isBot: ev.isBot,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
@@ -589,6 +589,37 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	world.activePlayers = world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
+}
+
+function chooseNewPlayerColor(preferredColor: string, world: w.World) {
+	let alreadyUsedColors = new Set<string>();	
+	world.players.forEach(player => {
+		if (world.activePlayers.has(player.heroId)) {
+			alreadyUsedColors.add(player.uiColor);	
+		}
+	});	
+ 	let uiColor: string = null;
+	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
+		uiColor = colorWheel.takeColor(preferredColor)
+	} else {
+		uiColor = colorWheel.takeColor(null);
+	}
+
+	if (!uiColor || alreadyUsedColors.has(uiColor)) {
+		for (let i = 0; i < HeroColors.Colors.length; ++i) {	
+			let candidate = HeroColors.Colors[i];
+			if (!alreadyUsedColors.has(candidate)) {	
+				uiColor = candidate;	
+				break;	
+			}	
+		}	
+	}
+
+	if (!uiColor) {
+		uiColor = HeroColors.Colors[0];
+	}
+
+ 	return uiColor;	
 }
 
 function handleLeaving(ev: w.Leaving, world: w.World) {
