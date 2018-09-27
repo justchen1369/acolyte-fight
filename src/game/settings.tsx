@@ -661,10 +661,10 @@ const shield: Spell = {
 const icewall: Spell = {
     id: 'icewall',
     name: 'Forcefield',
-    description: "Create a wall that blocks projectiles and any teleporting/charging heroes. Heroes can still walk through the wall at a normal speed.",
+    description: "Create a wall that reflects projectiles and blocks heroes. Heroes cannot charge or teleport through the wall.",
 
     maxRange: 0.25,
-    maxTicks: 3 * TicksPerSecond,
+    maxTicks: 2 * TicksPerSecond,
     chargeTicks: 6,
     growthTicks: 5,
     cooldown: 20 * TicksPerSecond,
