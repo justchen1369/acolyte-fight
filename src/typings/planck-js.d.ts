@@ -62,6 +62,7 @@ declare module "planck-js" {
             getFilterCategoryBits(): number;
             getFilterMaskBits(): number;
             setFilterData(filter: Filter): void;
+            shouldCollide(other: Fixture): boolean;
         }
 
         interface FixtureDef {

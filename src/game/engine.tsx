@@ -1588,7 +1588,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	const availableRange = Hero.MaxDashRange;
 	const rangeLimit = Math.min(
 		availableRange,
-		shieldCollisionLimit(hero.body.getPosition(), action.target, world));
+		shieldCollisionLimit(hero, action.target, world));
 
 	const currentPosition = hero.body.getPosition();
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
@@ -1599,11 +1599,13 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	return true;
 }
 
-function shieldCollisionLimit(from: pl.Vec2, to: pl.Vec2, world: w.World): number {
+function shieldCollisionLimit(hero: w.Hero, to: pl.Vec2, world: w.World): number {
+	const from = hero.body.getPosition();
+
 	let hit: pl.Vec2 = null;
 	world.physics.rayCast(from, to, (fixture, point, normal, fraction) => {
 		const obj = world.objects.get(fixture.getBody().getUserData());
-		if (obj.blocksTeleporters) {
+		if (obj.blocksTeleporters && shouldCollide(hero, obj)) {
 			hit = point;
 			return 0; // Stop search after first hit
 		} else {
@@ -1615,6 +1617,16 @@ function shieldCollisionLimit(from: pl.Vec2, to: pl.Vec2, world: w.World): numbe
 		return Math.max(0, vector.distance(hit, from) - constants.Pixel); // -Pixel so we are on this side of the shield
 	} else {
 		return vector.distance(to, from);
+	}
+}
+
+function shouldCollide(a: w.WorldObject, b: w.WorldObject) {
+	const fixtureA = a.body.getFixtureList();
+	const fixtureB = b.body.getFixtureList();
+	if (fixtureA && fixtureB) {
+		return fixtureA.shouldCollide(fixtureB);
+	} else {
+		return false;
 	}
 }
 
