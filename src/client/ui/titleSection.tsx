@@ -47,18 +47,30 @@ export class TitleSection extends React.Component<Props, State> {
                 The game starts whenever you want it to - just start casting some spells.
                 Within the first 3 seconds of the game, no damage can be done, and some players may still join.
             </p>
-            <h2>Is there a Mobile App?</h2>
+            <h2>How can I play this game on my phone?</h2>
+            <p>The game already works on mobile, just go to <a href="http://acolytefight.io" target="_blank">acolytefight.io</a> and click Play.</p>
             <p>
-                Add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
+                To make the game more accessible, add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
                 On iPhone - tap the Share button, click Add to Home Screen.
                 On Android - tap the triple dot menu button, click Add to Home Screen.
             </p>
+            <h2>How long are replays stored for?</h2>
+            <p>
+                Replays are stored until the server is updated. This can sometimes be days and sometimes it can be hours.
+                Replays cannot be stored across game updates as the game simulation changes with each update and that changes the meaning of the replay data.
+                If you want to keep your replay permanently, take a video of your game.
+            </p>
+            <h2>How is the leaderboard calculated?</h2>
+            <p>The leaderboard is only calculated from games which you have participated in. The game will only store stats for a maximum of {constants.MaxGamesToKeep} games.</p>
+            <h2>What is the tech stack for this game?</h2>
+            <p>Server and client are coded in TypeScript. Canvas is used for graphics, React for UI elements. Networking uses socket.io. Physics engine is Planck.js.</p>
             <h1>Credits</h1>
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
             was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
             originally created by <b>Zymoran</b>, <b>Adynathos</b>, <b>Toraxxx</b> and <b>sides</b>.</p>
             <p>
                 <ul>
+                    <li><a href="http://piqnt.com/planck.js/" target="_blank">Planck.js</a> created by Erin Catto and Ali Shakiba and used under zlib license.</li>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
                     <li>Icons created by <a href="https://opengameart.org/content/95-game-icons" target="_blank">sbed</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
                     <li>RPG Awesome font used under <a href="https://github.com/nagoshiashumari/Rpg-Awesome" target="_blank">CC 3.0, SIL and MIT license</a>.</li>
