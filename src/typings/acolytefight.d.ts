@@ -271,7 +271,8 @@ declare interface WallSpell extends ShieldSpell {
 	growthTicks: number;
 	maxTicks: number;
 
-	categories?: number;
+	categories?: number; // Use this to make a wall an impassable obstacle
+	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
 }
 
 declare interface DashSpell extends SpellBase {

@@ -675,6 +675,7 @@ const icewall: Spell = {
     width: 0.15,
 
     categories: Categories.Shield | Categories.Obstacle,
+    selfPassthrough: true,
 
     icon: "woodenFence",
 

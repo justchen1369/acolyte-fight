@@ -585,7 +585,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
 
-	let color = shield.color;
+	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color;
 	if (shield.hitTick >= 0) {
 		const hitAge = world.tick - shield.hitTick;
 		if (hitAge < HeroColors.HitFlashTicks) {

@@ -183,6 +183,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 	body.createFixture(pl.Polygon(points), {
 		filterCategoryBits: spell.categories !== undefined ? spell.categories : Categories.Shield,
 		filterMaskBits: Categories.Hero | Categories.Projectile,
+		filterGroupIndex: spell.selfPassthrough ? hero.filterGroupIndex : undefined,
 	});
 
 	const shield: w.Shield = {
@@ -200,6 +201,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		points,
 		extent,
 		color: spell.color,
+		selfColor: spell.selfPassthrough,
 	};
 
 	world.objects.set(shield.id, shield);

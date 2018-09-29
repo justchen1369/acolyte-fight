@@ -319,6 +319,7 @@ export interface ShieldBase extends WorldObjectBase {
 	takesOwnership: boolean;
 	owner: string;
 	color: string;
+	selfColor?: boolean;
 	hitTick?: number;
 }
 
