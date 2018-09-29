@@ -241,7 +241,7 @@ const flamestrike: Spell = {
         categories: Categories.Projectile,
 
         detonate: {
-            damage: 15,
+            damage: 12.5,
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
