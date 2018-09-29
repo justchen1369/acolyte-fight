@@ -458,12 +458,17 @@ function removePassthrough(world: w.World) {
 			// Projectiles will passthrough their owner until they are clear of their owner - this is so they don't die on spawn because the hero is walking in the same direction as the spawning projectile.
 			// Also allows meteor to be shot further back and so is more likely to push back another hero if they are at point blank range.
 			const hero = world.objects.get(projectile.owner);
-			if (!hero || (hero.category === "hero" && vector.distance(hero.body.getPosition(), projectile.body.getPosition()) > hero.radius + projectile.radius + constants.Pixel)) {
+			if (!hero || (hero.category === "hero" && projectileClearedHero(projectile, hero))) {
 				updateGroupIndex(projectile.body.getFixtureList(), 0);
 				projectile.passthrough = false;
 			}
 		}
 	});
+}
+
+function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
+	const distance = vector.distance(hero.body.getPosition(), projectile.body.getPosition());
+	return distance > hero.radius + projectile.radius + hero.moveSpeedPerSecond / TicksPerSecond;
 }
 
 function handleOccurences(world: w.World) {
