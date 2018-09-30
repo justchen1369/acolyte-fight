@@ -20,6 +20,12 @@ class UrlListener extends React.Component<Props, State> {
         const path = url.getPath(this.props.current);
         window.history.replaceState(null, null, path);
 
+        const gtag = (window as any).gtag;
+        const gaTrackingId = (window as any).gaTrackingId;
+        if (gtag && gaTrackingId) {
+            gtag('config', gaTrackingId, {'page_path': path});
+        }
+
         return null;
     }
 }
