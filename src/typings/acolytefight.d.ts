@@ -187,8 +187,8 @@ declare interface ProjectileTemplate extends DamagePacket {
 	detonate?: DetonateParametersTemplate; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
-	minTicks?: number;
-	maxTicks: number;
+	minTicks?: number; // The minimum number of ticks that a projectile will live for. The main purpose of this is to work around a quirk in the physics engine where if projectiles doesn't live for more than 1 tick, it doesn't affect the physics.
+	maxTicks: number; // The maximum number of ticks that a projectile will live for. The maximum range can be determined by speed * maxTicks / TicksPerSecond.
 	categories?: number; // Collision flags: What flags this object has
     collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
