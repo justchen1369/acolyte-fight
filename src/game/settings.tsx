@@ -290,7 +290,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
 
     projectile: {
         color: '#ff0000',
