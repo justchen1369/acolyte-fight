@@ -666,7 +666,7 @@ const icewall: Spell = {
     maxRange: 0.25,
     maxTicks: 1 * TicksPerSecond,
     growthTicks: 5,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 15 * TicksPerSecond,
     takesOwnership: true,
     blocksTeleporters: true,
 
