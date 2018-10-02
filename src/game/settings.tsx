@@ -290,7 +290,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
 
     projectile: {
         color: '#ff0000',
@@ -666,7 +666,7 @@ const icewall: Spell = {
     maxRange: 0.25,
     maxTicks: 1 * TicksPerSecond,
     growthTicks: 5,
-    cooldown: 15 * TicksPerSecond,
+    cooldown: 20 * TicksPerSecond,
     takesOwnership: true,
     blocksTeleporters: true,
 
