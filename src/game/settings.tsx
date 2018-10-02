@@ -584,7 +584,7 @@ const gravity: Spell = {
 };
 const supernova: Spell = {
     id: 'supernova',
-    description: "A delayed explosion to knock back your enemies",
+    description: "A delayed explosion to knock back your enemies. Knockback is higher at the center of the blast.",
     action: "projectile",
 
     color: '#ffaa00',
@@ -664,7 +664,7 @@ const icewall: Spell = {
     description: "Create a wall that reflects projectiles and blocks other heroes. You can pass through your own forcefield, but other heroes cannot, even if they are using teleport.",
 
     maxRange: 0.25,
-    maxTicks: 1 * TicksPerSecond,
+    maxTicks: 1.25 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 20 * TicksPerSecond,
     takesOwnership: true,
