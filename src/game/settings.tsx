@@ -498,7 +498,7 @@ const bouncer: Spell = {
 
         density: 2,
         radius: 0.001,
-        speed: 0.75,
+        speed: 1.0,
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
