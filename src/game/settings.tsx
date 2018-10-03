@@ -483,7 +483,7 @@ const link: Spell = {
 };
 const bouncer: Spell = {
     id: 'bouncer',
-    description: "The more times this bounces, the more damage this does. Stay close to your enemy.",
+    description: "The more times this bounces, the more damage this does. Get in close and keep it bouncing.",
     action: "projectile",
 
     color: '#88ee22',
