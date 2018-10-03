@@ -8,16 +8,14 @@ import { render, CanvasStack } from './render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
-const BufferGrowthPerTick = 0.1;
-const BufferDecayPerTick = 0.999;
-
 const preferredColors = new Map<string, string>(); // userHash -> color
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
 
-setInterval(incomingLoop, Math.floor(1000 / TicksPerSecond));
+const interval = Math.floor(1000 / TicksPerSecond);
+let next = Date.now();
 sockets.listeners.onTickMsg = onTickMsg;
 
 export function reset(history: m.TickMsg[]) {
@@ -52,20 +50,13 @@ function incomingLoop() {
 	if (world.ui.myHeroId) {
 		if (incomingQueue.length === 0) {
 			numFramesToProcess = 0;
-			allowedDelay = Math.min(TicksPerSecond, allowedDelay + BufferGrowthPerTick);
 		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
 			numFramesToProcess = 1; // We're on time, process at normal rate
 		} else if (incomingQueue.length <= TicksPerSecond) {
 			numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
-			allowedDelay = Math.max(1, allowedDelay - 1);
 		} else {
 			// We're very behind, skip ahead
 			numFramesToProcess = incomingQueue.length;
-			allowedDelay = 0;
-		}
-
-		if (allowedDelay > 1) {
-			allowedDelay = Math.max(1, allowedDelay * BufferDecayPerTick);
 		}
 	} else {
 		// Don't catch up to live when watching a replay
@@ -79,7 +70,12 @@ function incomingLoop() {
 
 export function frame(canvasStack: CanvasStack) {
     const store = StoreProvider.getState();
-    const world = store.world;
+	const world = store.world;
+	
+	if (Date.now() >= next) {
+		next = (Math.floor(Date.now() / interval) + 1) * interval;
+		incomingLoop();
+	}
 
 	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
 		tickQueue.shift(); // Get rid of any leftover ticks from other games
