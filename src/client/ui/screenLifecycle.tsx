@@ -1,8 +1,8 @@
 import * as screenfull from 'screenfull';
-import { isMobile } from '../core/userAgent';
+import { isMobile, isSafari } from '../core/userAgent';
 
 export function enterGame() {
-    if (isMobile) {
+    if (isMobile && !isSafari) {
         if (screenfull && screenfull.request) {
             screenfull.request();
         }
