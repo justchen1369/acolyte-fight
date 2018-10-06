@@ -3,6 +3,7 @@ import * as w from '../game/world.model';
 export interface State {
     current: PathElements;
 
+    userId?: string;
     isNewPlayer: boolean;
     playerName: string;
     keyBindings: KeyBindings;
@@ -51,6 +52,7 @@ export interface PathElements {
 export type Action =
     UpdateSocketAction
     | DisconnectedAction
+    | UpdateUserIdAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
     | UpdateUrlAction
@@ -85,6 +87,11 @@ export interface UpdateSocketAction {
 
 export interface DisconnectedAction {
     type: "disconnected";
+}
+
+export interface UpdateUserIdAction {
+    type: "updateUserId";
+    userId: string;
 }
 
 export interface UpdatePlayerNameAction {

@@ -1,9 +1,16 @@
 import cookie from 'cookie';
+import crypto from 'crypto';
 import express from 'express';
 import * as uuid from 'uuid';
+
+import * as dbStorage from './dbStorage';
+import * as discord from './discord';
+import * as g from './server.model';
 import * as m from '../game/messages.model';
 
 export const AuthHeader = "x-enigma-auth";
+
+const accessKeyToUserIdCache = new Map<string, string>();
 
 export function authMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
     let authToken = parseAuthTokenFromRequest(req);
@@ -11,6 +18,7 @@ export function authMiddleware(req: express.Request, res: express.Response, next
         authToken = uuid.v4();
         res.cookie(m.AuthCookieName, authToken, {
             maxAge: 20 * 365 * 24 * 60 * 60 * 1000,
+            domain: `.${req.hostname}`,
             httpOnly: true,
         });
     }
@@ -46,4 +54,32 @@ function parseAuthTokenFromRequest(req: express.Request): string | null {
     }
 
     return null;
+}
+
+export function getUserHashFromAuthToken(authToken: string | null): string {
+    return crypto.createHash('md5').update(authToken).digest('hex');
+}
+
+export function discordAccessKey(discordUser: discord.DiscordUser) {
+    return `discord.${discordUser.id}`;
+}
+
+export function enigmaAccessKey(authToken: string) {
+    return `enigma.${authToken}`;
+}
+
+export async function getUserIdFromAccessKey(accessKey: string, allowCache: boolean = true): Promise<string> {
+    let userId = accessKeyToUserIdCache.get(accessKey);
+    if (allowCache && userId) {
+        return userId;
+    } else {
+        userId = await dbStorage.getUserIdFromAccessKey(accessKey);
+        accessKeyToUserIdCache.set(accessKey, userId);
+        return userId;
+    }
+}
+
+export async function associateAccessKey(accessKey: string, userId: string): Promise<void> {
+    await dbStorage.associateAccessKey(accessKey, userId);
+    accessKeyToUserIdCache.set(accessKey, userId);
 }

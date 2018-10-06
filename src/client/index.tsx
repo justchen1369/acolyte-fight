@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
+import * as cloud from './core/cloud';
 import * as matches from './core/matches';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
@@ -61,6 +62,7 @@ function initialize() {
             });
     });
 
+    cloud.downloadSettings();
     storage.cleanupGameStats();
 }
 

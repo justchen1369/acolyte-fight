@@ -4,6 +4,7 @@ import moment from 'moment';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as auth from './auth';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import { getStore } from './serverStore';
@@ -536,7 +537,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	game.bots.delete(heroId);
 	game.playerNames.push(playerName);
 
-	const userHash = hashAuthToken(authToken);
+	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
 	queueAction(game, { gameId: game.id, heroId, actionType: "join", userHash, playerName, keyBindings, isBot, isMobile });
 
 	// Update counts
@@ -546,14 +547,6 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	}
 
 	return heroId;
-}
-
-function hashAuthToken(authToken: string | null): string {
-	if (authToken) {
-		return crypto.createHash('md5').update(authToken).digest('hex');
-	} else {
-		return null;
-	}
 }
 
 export function addBot(game: g.Game) {

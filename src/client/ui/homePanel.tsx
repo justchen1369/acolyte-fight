@@ -6,7 +6,7 @@ import * as w from '../../game/world.model';
 import * as ai from '../core/ai';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import { NameConfig } from './nameConfig';
+import NameConfig from './nameConfig';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
 import SpellConfig from './spellConfig';

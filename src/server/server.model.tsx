@@ -20,6 +20,13 @@ export interface LocationStore {
     upstreamSuffix: string;
 }
 
+export interface UserSettings {
+    userId: string;
+    name: string;
+    buttons: KeyBindings;
+    rebindings: KeyBindings;
+}
+
 export interface Replay {
     id: string;
     category: string;

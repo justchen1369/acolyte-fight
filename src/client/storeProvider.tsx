@@ -43,6 +43,8 @@ function reducer(state: s.State, action: s.Action): s.State {
                 activePlayers: state.world.activePlayers.clear(),
             },
         };
+    } else if (action.type === "updateUserId") {
+        return { ...state, userId: action.userId };
     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {

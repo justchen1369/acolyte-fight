@@ -1,5 +1,7 @@
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as cloud from '../core/cloud';
 import * as s from '../store.model';
 import { DefaultSettings } from '../../game/settings';
 import { SpellIcon } from './spellIcon';
@@ -29,6 +31,9 @@ function stateToProps(state: s.State): Props {
 }
 
 class SpellConfig extends React.Component<Props, State> {
+    private uploadStateDebounced = _.debounce(() => this.uploadState(), 500);
+
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -88,12 +93,13 @@ class SpellConfig extends React.Component<Props, State> {
 
         StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
         Storage.saveKeyBindingConfig(config);
+        this.uploadStateDebounced();
 
         this.setState({ saved });
     }
 
-    private capitalize(str: string) {
-        return str.charAt(0).toUpperCase() + str.slice(1);
+    private uploadState() {
+        cloud.uploadSettings();
     }
 }
 

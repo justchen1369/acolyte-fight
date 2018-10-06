@@ -3,6 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
 
 interface Props {
@@ -35,6 +36,7 @@ class NavBar extends React.Component<Props> {
             <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
             <NavBarItem page="about">About</NavBarItem>
             <div className="spacer" />
+            <LoginButton />
         </div>
     }
 

@@ -6,8 +6,10 @@ import * as url from '../url';
 
 interface OwnProps {
     page: string;
+    className?: string;
     hideOnMobile?: boolean;
     badge?: boolean;
+    onClick?: (ev: React.MouseEvent) => void;
 }
 interface Props extends OwnProps {
     current: s.PathElements;
@@ -25,6 +27,9 @@ class NavBarItem extends React.Component<Props> {
         const page = this.props.page;
 
         const classNames = ["nav-item"];
+        if (this.props.className) {
+            classNames.push(this.props.className);
+        }
         if (this.props.current.page === page) {
             classNames.push("nav-item-selected");
         }
@@ -42,8 +47,12 @@ class NavBarItem extends React.Component<Props> {
     }
 
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
-        ev.preventDefault();
-        pages.changePage(newPage);
+        if (this.props.onClick) {
+            this.props.onClick(ev);
+        } else {
+            ev.preventDefault();
+            pages.changePage(newPage);
+        }
     }
 }
 

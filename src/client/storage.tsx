@@ -50,10 +50,14 @@ function saveJson(key: string, data: Object) {
     window.localStorage.setItem(key, JSON.stringify(data));
 }
 
+export function createPlayerName(): string {
+    return "Acolyte" + (Math.random() * 10000).toFixed(0);
+}
+
 export function getOrCreatePlayerName(): string {
     let name = loadName();
     if (!name) {
-        name = "Acolyte" + (Math.random() * 10000).toFixed(0);
+        name = createPlayerName();
         saveName(name);
     }
     return name;

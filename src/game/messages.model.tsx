@@ -12,6 +12,26 @@ export namespace ActionType {
 	export const Text = "text";
 }
 
+export interface GetUserSettingsRequest {
+}
+
+export interface GetUserSettingsResponse {
+    userId: string;
+    name: string;
+    buttons: KeyBindings;
+    rebindings: KeyBindings;
+}
+
+export interface UpdateUserSettingsRequest {
+    name: string;
+    buttons: KeyBindings;
+    rebindings: KeyBindings;
+}
+
+export interface UpdateUserSettingsResponse {
+}
+
+
 export type ActionMsg =
     EnvironmentMsg
     | JoinActionMsg
