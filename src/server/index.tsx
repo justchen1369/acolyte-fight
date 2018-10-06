@@ -54,6 +54,7 @@ app.use('/logs', express.static('./logs'));
 
 app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typings/acolytefight.d.ts'));
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
+app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));
 app.post('/api/settings', (req, res) => api.onUpdateUserSettings(req, res));

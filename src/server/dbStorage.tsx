@@ -52,3 +52,7 @@ export async function associateAccessKey(accessKey: string, userId: string): Pro
     const data: db.AccessKeyUserData = { userId };
     await firestore.collection('accessKey').doc(accessKey).set(data);
 }
+
+export async function disassociateAccessKey(accessKey: string): Promise<void> {
+    await firestore.collection('accessKey').doc(accessKey).delete();
+}

@@ -83,3 +83,8 @@ export async function associateAccessKey(accessKey: string, userId: string): Pro
     await dbStorage.associateAccessKey(accessKey, userId);
     accessKeyToUserIdCache.set(accessKey, userId);
 }
+
+export async function disassociateAccessKey(accessKey: string): Promise<void> {
+    await dbStorage.disassociateAccessKey(accessKey);
+    accessKeyToUserIdCache.delete(accessKey);
+}

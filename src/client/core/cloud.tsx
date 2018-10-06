@@ -61,3 +61,8 @@ export async function uploadSettings(): Promise<void> {
         console.error(`Failed to update cloud: ${res.status} - ${await res.text()}`);
     }
 }
+
+export async function logout(): Promise<void> {
+    await fetch('api/logout', { credentials: "same-origin" });
+    StoreProvider.dispatch({ type: "updateUserId", userId: null });
+}

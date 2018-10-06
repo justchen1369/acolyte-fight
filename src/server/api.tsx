@@ -111,6 +111,20 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
     }
 }
 
+export function onLogout(req: express.Request, res: express.Response) {
+    onLogoutAsync(req, res).catch(error => handleError(error, res));
+;
+}
+
+async function onLogoutAsync(req: express.Request, res: express.Response): Promise<void> {
+    const authToken = getAuthToken(req);
+    if (authToken) {
+        const accessKey = auth.enigmaAccessKey(authToken);
+        await auth.disassociateAccessKey(accessKey);
+    }
+    res.send("OK");
+}
+
 export function onGetUserSettings(req: express.Request, res: express.Response) {
     onGetUserSettingsAsync(req, res).catch(error => handleError(error, res));
 }

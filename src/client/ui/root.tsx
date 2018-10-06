@@ -7,6 +7,7 @@ import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
 import RecentGameList from './recentGameList';
 import PartyPanel from './partyPanel';
+import ProfilePanel from './profilePanel';
 import TitleSection from './titleSection';
 import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
@@ -65,6 +66,7 @@ class Root extends React.Component<Props> {
                 {page === "ai" && this.renderAi()}
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
+                {page === "profile" && this.renderProfile()}
                 <UrlListener />
             </div>
         );
@@ -124,6 +126,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <TitleSection />
+            </div>
+        </div>;
+    }
+
+    private renderProfile() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <ProfilePanel />
             </div>
         </div>;
     }
