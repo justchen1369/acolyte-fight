@@ -72,7 +72,7 @@ export function onLogin(req: express.Request, res: express.Response) {
 }
 
 async function onLoginAsync(req: express.Request, res: express.Response): Promise<void> {
-    const authToken = getAuthToken(req);
+    const authToken = auth.resendAuthToken(req, res);
     const origin = getOrigin(req);
     if (req.query.code && authToken) {
         const code = req.query.code;

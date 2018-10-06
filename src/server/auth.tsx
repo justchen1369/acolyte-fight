@@ -14,20 +14,36 @@ const accessKeyToUserIdCache = new Map<string, string>();
 
 export function authMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
     let authToken = parseAuthTokenFromRequest(req);
+    if (authToken) {
+        setAuthToken(req, authToken);
+    } else {
+        resendAuthToken(req, res);
+    }
+    next();
+}
+
+export function resendAuthToken(req: express.Request, res: express.Response) {
+    let authToken = getAuthToken(req);
     if (!authToken) {
         authToken = uuid.v4();
-        res.cookie(m.AuthCookieName, authToken, {
-            maxAge: 20 * 365 * 24 * 60 * 60 * 1000,
-            domain: `.${req.hostname}`,
-            httpOnly: true,
-        });
     }
-    (req as any).enigmaAuthToken = authToken;
-    next();
+
+    res.cookie(m.AuthCookieName, authToken, {
+        maxAge: 20 * 365 * 24 * 60 * 60 * 1000,
+        domain: `.${req.hostname}`,
+        httpOnly: true,
+    });
+    setAuthToken(req, authToken);
+
+    return authToken;
 }
 
 export function getAuthToken(req: express.Request) {
     return (req as any).enigmaAuthToken;
+}
+
+export function setAuthToken(req: express.Request, authToken: string) {
+    (req as any).enigmaAuthToken = authToken;
 }
 
 export function getAuthTokenFromSocket(socket: SocketIO.Socket) {
