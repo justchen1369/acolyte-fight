@@ -29,18 +29,13 @@ export class ProfilePanel extends React.Component<Props, State> {
     }
 
     render() {
-        return this.props.loggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+        return this.props.loggedIn ? this.renderLoggedIn() : null;
     }
 
     renderLoggedIn() {
         return <div>
             <h1>{this.props.playerName}</h1>
             <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>
-        </div>
-    }
-
-    renderNotLoggedIn() {
-        return <div>
         </div>
     }
 
