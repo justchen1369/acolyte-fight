@@ -47,6 +47,7 @@ export interface PathElements {
     gameId?: string;
     party?: string;
     server?: string;
+    hash?: string;
 }
 
 export type Action =

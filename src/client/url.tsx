@@ -6,6 +6,7 @@ export function parseLocation(location: Location): s.PathElements {
     let gameId: string = null;
     let party: string = null;
     let server: string = null;
+    let hash: string = null;
 
     if (location.pathname) {
         const elems = location.pathname.split("/");
@@ -23,8 +24,11 @@ export function parseLocation(location: Location): s.PathElements {
             server = params["server"];
         }
     }
+    if (location.hash) {
+        hash = location.hash;
+    }
 
-    return { page, gameId, party, server };
+    return { page, gameId, party, server, hash };
 }
 
 export function getPath(elems: s.PathElements) {
@@ -47,6 +51,10 @@ export function getPath(elems: s.PathElements) {
     let path = "/" + pathElements.join("/");
     if (params.length > 0) {
         path += "?" + params.join("&");
+    }
+
+    if (elems.hash) {
+        path += "#" + elems.hash;
     }
 
     return path;

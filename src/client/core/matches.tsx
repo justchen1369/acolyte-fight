@@ -39,7 +39,8 @@ export function joinNewGame(observeGameId?: string) {
 		if (observeGameId) {
 			window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
 		} else {
-			window.location.href = url.getPath({ ...store.current, gameId: null, server: null });
+			window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash: "join" });
+			window.location.reload(); // to get the hash respected
 		}
 	}
 }

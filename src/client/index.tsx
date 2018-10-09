@@ -32,7 +32,7 @@ function initialize() {
     const current = url.parseLocation(window.location);
 
     // Remove the party ID from the URL so that people can't stream snipe their way into the party
-    StoreProvider.dispatch({ type: "updateUrl", current: { ...current, party: null, server: null } });
+    StoreProvider.dispatch({ type: "updateUrl", current: { ...current, party: null, server: null, hash: null } });
 
     sockets.attachToSocket(socket, () => {
         sockets.connectToServer(current.server)
@@ -42,8 +42,8 @@ function initialize() {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
                     StoreProvider.dispatch({ type: "updateSocket", socketId: socket.id });
 
-                    if (current.gameId || current.page === "join") {
-                        if (current.page === "join") {
+                    if (current.gameId || current.hash === "#join") {
+                        if (current.hash === "#join") {
                             // Return to the home page when we exit
                             StoreProvider.dispatch({ type: "updatePage", page: "" });
                         }
@@ -57,7 +57,7 @@ function initialize() {
 
                 if (current.party || current.server) {
                     // Failed to join party/server, try without server
-                    window.location.href = url.getPath({ ...current, party: null, server: null });
+                    window.location.href = url.getPath({ ...current, party: null, server: null, hash: null });
                 }
             });
     });
