@@ -1,7 +1,7 @@
 import cookie from 'cookie';
 import crypto from 'crypto';
 import express from 'express';
-import * as uuid from 'uuid';
+import uniqid from 'uniqid';
 
 import * as dbStorage from './dbStorage';
 import * as discord from './discord';
@@ -25,7 +25,7 @@ export function authMiddleware(req: express.Request, res: express.Response, next
 export function resendAuthToken(req: express.Request, res: express.Response) {
     let authToken = getAuthToken(req);
     if (!authToken) {
-        authToken = uuid.v4();
+        authToken = uniqid('a-');
     }
 
     res.cookie(m.AuthCookieName, authToken, {

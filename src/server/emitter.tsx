@@ -1,5 +1,5 @@
 import moment from 'moment';
-import * as uuid from 'uuid';
+import uniqid from 'uniqid';
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -16,7 +16,7 @@ import socketClient from 'socket.io-client';
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
 let io: SocketIO.Server = null;
-const instanceId = uuid.v4();
+const instanceId = uniqid('s-');
 
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
