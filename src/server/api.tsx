@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import moment from 'moment';
 import express from 'express';
+import uniqid from 'uniqid';
 import url from 'url';
-import * as uuid from 'uuid';
 
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -92,7 +92,7 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
             // Create a new user
             logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - creating new user`);
 
-            userId = uuid.v4();
+            userId = uniqid("u-");
             const userSettings: g.UserSettings = {
                 userId,
                 name: sanitize.sanitizeName(discordUser.username),

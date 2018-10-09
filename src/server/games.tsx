@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
+import uniqid from 'uniqid';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -203,7 +204,7 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
 	const partyIndex = getStore().nextPartyId++;
 	const party: g.Party = {
-		id: "p" + partyIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		id: uniqid("p" + partyIndex + "-"),
 		created: moment(),
 		modified: moment(),
 		leaderSocketId,
@@ -221,7 +222,7 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
-		id: "g" + gameIndex + "-" + Math.floor(Math.random() * 1e9).toString(36),
+		id: uniqid("g" + gameIndex + "-"),
 		category: calculateGameCategory(roomId, privatePartyId, allowBots),
 		roomId,
 		privatePartyId,
