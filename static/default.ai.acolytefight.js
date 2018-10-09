@@ -5,6 +5,13 @@ var reactionTimeMilliseconds = 100;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
 
+var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain spells
+    shield: 300,
+    icewall: 300,
+    teleport: 500,
+    thrust: 500
+};
+
 var nextSpell = 0;
 
 onmessage = function (e) {
@@ -42,7 +49,7 @@ function handleInput(state, heroId, cooldowns) {
     if (action) {
         setTimeout(function() {
             postMessage(JSON.stringify({ type: "action", action }));
-        }, reactionTimeMilliseconds);
+        }, spellReactionTimeMilliseconds[action.spellId] || reactionTimeMilliseconds);
     }
 }
 
