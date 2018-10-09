@@ -1492,17 +1492,19 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
 	world.ui.notifications.push({ type: "kill", killed, killer, assist });
 
-	if (hero) {
-		const score = world.scores.get(hero.id);
-		world.scores = world.scores.set(hero.id, { ...score, deathTick: world.tick });
-	}
-	if (hero.killerHeroId) {
-		const score = world.scores.get(hero.killerHeroId);
-		world.scores = world.scores.set(hero.killerHeroId, { ...score, kills: score.kills + 1 });
-	}
-	if (hero.assistHeroId) {
-		const score = world.scores.get(hero.assistHeroId);
-		world.scores = world.scores.set(hero.assistHeroId, { ...score, assists: score.assists + 1 });
+	if (!world.winner) {
+		if (hero) {
+			const score = world.scores.get(hero.id);
+			world.scores = world.scores.set(hero.id, { ...score, deathTick: world.tick });
+		}
+		if (hero.killerHeroId) {
+			const score = world.scores.get(hero.killerHeroId);
+			world.scores = world.scores.set(hero.killerHeroId, { ...score, kills: score.kills + 1 });
+		}
+		if (hero.assistHeroId) {
+			const score = world.scores.get(hero.assistHeroId);
+			world.scores = world.scores.set(hero.assistHeroId, { ...score, assists: score.assists + 1 });
+		}
 	}
 }
 
@@ -1773,13 +1775,15 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	}
 
 	// Update scores
-	if (fromHeroId && fromHeroId !== toHero.id) {
-		const score = world.scores.get(fromHeroId);
-		world.scores = world.scores.set(fromHeroId, { ...score, damage: score.damage + amount });
-	}
-	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
-		toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
-		toHero.killerHeroId = fromHeroId;
+	if (!world.winner) {
+		if (fromHeroId && fromHeroId !== toHero.id) {
+			const score = world.scores.get(fromHeroId);
+			world.scores = world.scores.set(fromHeroId, { ...score, damage: score.damage + amount });
+		}
+		if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
+			toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
+			toHero.killerHeroId = fromHeroId;
+		}
 	}
 }
 
