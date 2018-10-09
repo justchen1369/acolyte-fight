@@ -66,6 +66,7 @@ class Root extends React.Component<Props> {
                 {page === "ai" && this.renderAi()}
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
+                {page === "profile" && this.renderProfile()}
                 <UrlListener />
             </div>
         );
@@ -106,7 +107,6 @@ class Root extends React.Component<Props> {
         return <div className="content-container">
             <NavBar />
             <div className="page">
-                <ProfilePanel />
                 <RecentGameList />
             </div>
         </div>;
@@ -126,6 +126,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <TitleSection />
+            </div>
+        </div>;
+    }
+
+    private renderProfile() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <ProfilePanel />
             </div>
         </div>;
     }

@@ -29,6 +29,7 @@ class NavBar extends React.Component<Props> {
     render() {
         return <div className="navbar">
             <NavBarItem page="">Home</NavBarItem>
+            <NavBarItem page="replays" hideOnMobile={true}>Replays</NavBarItem>
             <NavBarItem page="modding" hideOnMobile={true} badge={this.props.isModded}>Modding</NavBarItem>
             <NavBarItem page="ai" hideOnMobile={true} badge={this.props.isUsingAI}>AI</NavBarItem>
             <NavBarItem page="regions">Regions</NavBarItem>

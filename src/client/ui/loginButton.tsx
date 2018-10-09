@@ -27,19 +27,15 @@ class LoginButton extends React.Component<Props> {
     }
 
     render() {
-        if (this.props.loginAttempted) {
-            return this.props.loggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
-        } else {
-            return null;
-        }
+        return this.props.loggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
     }
 
     private renderNotLoggedIn() {
-        return <NavBarItem page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
+        return <NavBarItem className={this.props.loginAttempted ? null : "logging-in"} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
     }
 
     private renderLoggedIn() {
-        return <NavBarItem className="nav-profile-item" page="replays">{this.props.playerName}</NavBarItem>
+        return <NavBarItem className="nav-profile-item" page="profile">{this.props.playerName}</NavBarItem>
     }
 }
 

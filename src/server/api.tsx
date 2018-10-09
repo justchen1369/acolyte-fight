@@ -163,7 +163,7 @@ export function onUpdateUserSettings(req: express.Request, res: express.Response
 
 export async function onUpdateUserSettingsAsync(req: express.Request, res: express.Response): Promise<void> {
     const input = req.body as m.UpdateUserSettingsRequest;
-    if (!(input
+    if (!(required(input, "object")
         && required(input.name, "string")
         && required(input.buttons, "object") && Object.keys(input.buttons).map(key => input.buttons[key]).every(x => required(x, "string"))
         && required(input.rebindings, "object") && Object.keys(input.rebindings).map(key => input.rebindings[key]).every(x => required(x, "string"))

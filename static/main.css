@@ -207,6 +207,10 @@ a:hover, a:active {
     color: #00ccff;
 }
 
+.navbar .nav-item.logging-in {
+    color: #888;
+}
+
 .spacer {
     flex-grow: 1;
 }
