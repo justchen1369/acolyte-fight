@@ -46,6 +46,35 @@ function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
     };
 }
 
+export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameStats {
+    const players: d.PlayerStatsLookup = {};
+    let self: string = null;
+    for (const p of msg.players) {
+        players[p.userHash] = {
+            userId: p.userId,
+            userHash: p.userHash,
+            name: p.name,
+            damage: p.damage,
+            kills: p.kills,
+        };
+
+        if (p.userId === userId) {
+            self = p.userHash;
+        }
+    }
+
+    return {
+        id: msg.gameId,
+        category: msg.category,
+        timestamp: moment.unix(msg.unixTimestamp).toISOString(),
+        self,
+        winner: msg.winner,
+        lengthSeconds: msg.lengthSeconds,
+        players,
+        server: msg.server,
+    };
+}
+
 export async function save(world: w.World, server: string): Promise<d.GameStats> {
     const gameStats = gameStatsFromWorld(world, server);
     if (gameStats) {

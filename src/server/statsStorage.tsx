@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import crypto from 'crypto';
+import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as g from './server.model';
@@ -15,6 +16,31 @@ interface CandidateHash {
     frequency: number;
 }
 
+export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
+    const gameRefsCollection = firestore.collection('userStats').doc(userId).collection('games');
+
+    let query = gameRefsCollection.orderBy("unixTimestamp", "desc");
+    if (after) {
+        query = query.startAfter(after);
+    }
+    if (before) {
+        query = query.endBefore(before);
+    }
+    const gameRefDocs = await query.limit(limit).get();
+
+    const games = new Array<m.GameStatsMsg>();
+    for (const gameRefDoc of gameRefDocs.docs) {
+        const gameDoc = await firestore.collection('gameStats').doc(gameRefDoc.id).get();
+
+        const game = await gameDoc.data() as m.GameStatsMsg;
+        game.gameId = gameDoc.id;
+
+        games.push(game);
+    }
+
+    return games;
+}
+
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
     gameStats = untaint(gameStats);
 
@@ -26,7 +52,7 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     for (const player of gameStats.players) {
         if (player.userId) {
             const data: db.UserGameReference = {
-                timestamp: (Firestore.FieldValue.serverTimestamp() as any),
+                unixTimestamp: gameStats.unixTimestamp,
             };
             await firestore.collection('userStats').doc(player.userId).collection('games').doc(gameId).set(data);
         }

@@ -91,6 +91,19 @@ export function saveGameStats(gameStats: d.GameStats): Promise<void> {
     return gameStorage.setItem(gameStats.id, gameStats).then(() => Promise.resolve());
 }
 
+export async function getStatsLoadedUntil(): Promise<moment.Moment> {
+    const unix = await settingsStorage.getItem<number>(SettingsKeys.LatestGameStatUnixTimestamp);
+    if (unix) {
+        return moment.unix(unix);
+    } else {
+        return null;
+    }
+}
+
+export async function setStatsLoadedUntil(until: moment.Moment) {
+    await settingsStorage.setItem(SettingsKeys.LatestGameStatUnixTimestamp, until.unix());
+}
+
 function migrateGame(game: d.GameStats): d.GameStats {
     return {
         ...game,

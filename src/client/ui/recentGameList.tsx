@@ -6,6 +6,7 @@ import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
 import * as storage from '../storage';
 import * as url from '../url';
@@ -98,12 +99,13 @@ const getGlobalStats = Reselect.createSelector(
     }
 );
 
-function retrieveGamesAsync(): Promise<GameRow[]> {
-    return storage.loadAllGameStats().then(gameStats => {
-        let games = gameStats.map(convertGame);
-        games = _.sortBy(games, (g: GameRow) => -g.createdTimestamp.unix());
-        return games;
-    });
+async function retrieveGamesAsync(): Promise<GameRow[]> {
+    await cloud.downloadGameStats();
+    const gameStats = await storage.loadAllGameStats()
+
+    let games = gameStats.map(convertGame);
+    games = _.sortBy(games, (g: GameRow) => -g.createdTimestamp.unix());
+    return games;
 }
 
 function retrieveReplaysAsync(gameIds: string[]) {

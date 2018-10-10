@@ -297,3 +297,8 @@ export interface PlayerStatsMsg {
     kills: number;
     damage: number;
 }
+
+
+export interface GetGameStatsResponse {
+    stats: GameStatsMsg[];
+}

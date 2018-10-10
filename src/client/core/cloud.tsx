@@ -1,4 +1,7 @@
+import moment from 'moment';
 import * as m from '../../game/messages.model';
+import * as stats from './stats';
+import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
 export async function downloadSettings(): Promise<void> {
@@ -60,6 +63,42 @@ export async function uploadSettings(): Promise<void> {
     } else {
         console.error(`Failed to update cloud: ${res.status} - ${await res.text()}`);
     }
+}
+
+export async function downloadGameStats(): Promise<void> {
+    const state = StoreProvider.getState();
+    const userId = state.userId;
+
+    if (!userId) {
+        // Can't download if not logged in
+        return;
+    }
+
+    const until = await storage.getStatsLoadedUntil() || moment.unix(0);
+    let itemsLoaded = 0;
+    let oldestLoaded = moment();
+    while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
+        const res = await fetch(`api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}`, { credentials: "same-origin" });
+        const json: m.GetGameStatsResponse = await res.json();
+
+        for (const gameStatsMsg of json.stats) {
+            const gameStats = stats.messageToGameStats(gameStatsMsg, userId);
+            await storage.saveGameStats(gameStats);
+
+            const timestamp = moment(gameStats.timestamp);
+            if (timestamp.isBefore(oldestLoaded)) {
+                oldestLoaded = timestamp;
+            }
+
+            ++itemsLoaded;
+        }
+
+        if (json.stats.length === 0) {
+            // Reached the end
+            break;
+        }
+    }
+    await storage.setStatsLoadedUntil(oldestLoaded);
 }
 
 export async function logout(): Promise<void> {

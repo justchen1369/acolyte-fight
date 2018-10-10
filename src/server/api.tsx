@@ -10,6 +10,7 @@ import * as discord from './discord';
 import * as games from './games';
 import * as loadMetrics from './loadMetrics';
 import * as sanitize from '../game/sanitize';
+import * as statsStorage from './statsStorage';
 import * as userStorage from './userStorage';
 
 import { getAuthToken } from './auth';
@@ -122,6 +123,31 @@ async function onLogoutAsync(req: express.Request, res: express.Response): Promi
         await auth.disassociateAccessKey(accessKey);
     }
     res.send("OK");
+}
+
+export function onGetGameStats(req: express.Request, res: express.Response) {
+    onGetGameStatsAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetGameStatsAsync(req: express.Request, res: express.Response): Promise<void> {
+    const maxLimit = 10;
+
+    const after = req.query.after ? parseInt(req.query.after) : null;
+    const before = req.query.before ? parseInt(req.query.before) : null;
+    const limit = req.query.limit ? Math.min(maxLimit, parseInt(req.query.limit)) : maxLimit;
+
+    const authToken = getAuthToken(req);
+    const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
+    if (!userId) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    const allGameStats = await statsStorage.loadGamesForUser(userId, after, before, limit);
+    const response: m.GetGameStatsResponse = {
+        stats: allGameStats,
+    };
+    res.send(response);
 }
 
 export function onGetUserSettings(req: express.Request, res: express.Response) {
