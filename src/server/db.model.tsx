@@ -7,3 +7,8 @@ export interface UserSettingsData {
 export interface AccessKeyUserData {
     userId: string;
 }
+
+export interface UserGameReference {
+    gameId: string;
+    unixTimestamp: number;
+}

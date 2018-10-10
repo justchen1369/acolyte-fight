@@ -557,6 +557,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 
 	const player: w.Player = {
 		heroId: hero.id,
+		userId: null,
 		userHash: null,
 		name: Matchmaking.BotName,
 		uiColor: HeroColors.BotColor,
@@ -584,6 +585,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 
 	const player: w.Player = {
 		heroId: hero.id,
+		userId: ev.userId,
 		userHash: ev.userHash,
 		name: ev.playerName,
 		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : chooseNewPlayerColor(ev.preferredColor, world),

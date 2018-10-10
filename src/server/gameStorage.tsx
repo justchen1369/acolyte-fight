@@ -2,6 +2,7 @@ import fs from 'fs';
 import zlib from 'zlib';
 import * as g from './server.model';
 import { getStore } from './serverStore';
+import { logger } from './logging';
 
 let basePath: string = null;
 

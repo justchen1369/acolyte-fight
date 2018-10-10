@@ -3,10 +3,10 @@ import crypto from 'crypto';
 import express from 'express';
 import uniqid from 'uniqid';
 
-import * as dbStorage from './dbStorage';
 import * as discord from './discord';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as userStorage from './userStorage';
 
 export const AuthHeader = "x-enigma-auth";
 
@@ -84,23 +84,27 @@ export function enigmaAccessKey(authToken: string) {
     return `enigma.${authToken}`;
 }
 
+export function getUserIdFromCache(accessKey: string): string {
+    return accessKeyToUserIdCache.get(accessKey);
+}
+
 export async function getUserIdFromAccessKey(accessKey: string, allowCache: boolean = true): Promise<string> {
     let userId = accessKeyToUserIdCache.get(accessKey);
     if (allowCache && userId) {
         return userId;
     } else {
-        userId = await dbStorage.getUserIdFromAccessKey(accessKey);
+        userId = await userStorage.getUserIdFromAccessKey(accessKey);
         accessKeyToUserIdCache.set(accessKey, userId);
         return userId;
     }
 }
 
 export async function associateAccessKey(accessKey: string, userId: string): Promise<void> {
-    await dbStorage.associateAccessKey(accessKey, userId);
+    await userStorage.associateAccessKey(accessKey, userId);
     accessKeyToUserIdCache.set(accessKey, userId);
 }
 
 export async function disassociateAccessKey(accessKey: string): Promise<void> {
-    await dbStorage.disassociateAccessKey(accessKey);
+    await userStorage.disassociateAccessKey(accessKey);
     accessKeyToUserIdCache.delete(accessKey);
 }

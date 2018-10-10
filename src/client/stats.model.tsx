@@ -21,6 +21,7 @@ export interface PlayerStatsLookup {
 }
 
 export interface PlayerStats {
+    userId?: string;
     userHash: string;
     name: string;
     kills: number;

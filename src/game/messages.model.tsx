@@ -31,7 +31,6 @@ export interface UpdateUserSettingsRequest {
 export interface UpdateUserSettingsResponse {
 }
 
-
 export type ActionMsg =
     EnvironmentMsg
     | JoinActionMsg
@@ -54,6 +53,7 @@ export interface EnvironmentMsg extends ActionMsgBase {
 
 export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
+    userId: string | null;
     userHash: string | null;
     playerName: string;
     keyBindings: KeyBindings;
@@ -279,3 +279,21 @@ export interface CreateRoomResponse {
     server: string;
 }
 export type CreateRoomResponseMsg = CreateRoomResponse | ErrorResponseMsg;
+
+
+export interface GameStatsMsg {
+    gameId: string;
+    category: string;
+    unixTimestamp: number;
+    winner: string; // userHash
+    lengthSeconds: number;
+    players: PlayerStatsMsg[];
+    server: string;
+}
+export interface PlayerStatsMsg {
+    userId?: string;
+    userHash: string;
+    name: string;
+    kills: number;
+    damage: number;
+}

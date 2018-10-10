@@ -1,17 +1,16 @@
 import _ from 'lodash';
 import moment from 'moment';
 import express from 'express';
-import uniqid from 'uniqid';
 import url from 'url';
 
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
 import * as discord from './discord';
-import * as dbStorage from './dbStorage';
 import * as games from './games';
 import * as loadMetrics from './loadMetrics';
 import * as sanitize from '../game/sanitize';
+import * as userStorage from './userStorage';
 
 import { getAuthToken } from './auth';
 import { getLocation } from './mirroring';
@@ -92,7 +91,7 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
             // Create a new user
             logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - creating new user`);
 
-            userId = uniqid("u-");
+            userId = userStorage.generateUserId();
             const userSettings: g.UserSettings = {
                 userId,
                 name: sanitize.sanitizeName(discordUser.username),
@@ -100,7 +99,7 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
                 rebindings: null,
             };
 
-            await dbStorage.createOrUpdateUser(userSettings);
+            await userStorage.createOrUpdateUser(userSettings);
             await auth.associateAccessKey(auth.discordAccessKey(discordUser), userId);
             await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
         }
@@ -141,7 +140,7 @@ function handleError(error: any, res: express.Response) {
 export async function onGetUserSettingsAsync(req: express.Request, res: express.Response): Promise<void> {
     const authToken = getAuthToken(req);
     const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
-    const user = await dbStorage.getUserById(userId);
+    const user = await userStorage.getUserById(userId);
     if (user) {
         const result: m.GetUserSettingsResponse = {
             userId: user.userId,
@@ -181,7 +180,7 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
             buttons: input.buttons,
             rebindings: input.rebindings,
         };
-        await dbStorage.createOrUpdateUser(user);
+        await userStorage.createOrUpdateUser(user);
 
         const result: m.UpdateUserSettingsResponse = {};
         res.header("Content-Type", "application/json");

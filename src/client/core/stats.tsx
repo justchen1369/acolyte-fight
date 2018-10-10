@@ -1,9 +1,12 @@
+import moment from 'moment';
 import * as d from '../stats.model';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as notifications from './notifications';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
+import { socket } from './sockets';
 import { TicksPerSecond } from '../../game/constants';
 
 export function attachListener() {
@@ -16,18 +19,40 @@ function onNotification(notifs: w.Notification[]) {
         const store = StoreProvider.getState();
         const world = store.world;
         if (world.winner) {
-            save(world, store.server);
+            save(world, store.server)
         }
     }
 }
 
-export function save(world: w.World, server: string): Promise<void> {
+function gameStatsToMessage(gameStats: d.GameStats): m.GameStatsMsg {
+    return {
+        gameId: gameStats.id,
+        category: gameStats.category,
+        unixTimestamp: moment(gameStats.timestamp).unix(),
+        winner: gameStats.winner,
+        lengthSeconds: gameStats.lengthSeconds,
+        players: Object.keys(gameStats.players).map(userHash => playerStatsToMessage(gameStats.players[userHash])),
+        server: gameStats.server,
+    };
+}
+
+function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
+    return {
+        userId: playerStats.userId,
+        userHash: playerStats.userHash,
+        name: playerStats.name,
+        kills: playerStats.kills,
+        damage: playerStats.damage,
+    };
+}
+
+export async function save(world: w.World, server: string): Promise<d.GameStats> {
     const gameStats = gameStatsFromWorld(world, server);
     if (gameStats) {
-        return storage.saveGameStats(gameStats);
-    } else {
-        return Promise.resolve();
+        socket.emit('score', gameStatsToMessage(gameStats));
+        await storage.saveGameStats(gameStats);
     }
+    return gameStats;
 }
 
 function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
@@ -83,7 +108,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         players,
         self: selfPlayer.userHash,
         winner: winningPlayer ? winningPlayer.userHash : undefined,
-        lengthSeconds: world.winTick >= 0 ? world.winTick / TicksPerSecond : undefined,
+        lengthSeconds: world.winTick >= 0 ? Math.round(world.winTick / TicksPerSecond) : undefined,
         server,
     };
     return stats;
@@ -91,9 +116,10 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
 
 function playerStatsFromScore(player: w.Player, score: w.HeroScore): d.PlayerStats {
     return {
+        userId: player.userId,
         userHash: player.userHash,
         name: player.name,
         kills: score.kills,
-        damage: score.damage,
+        damage: Math.round(score.damage),
     };
 }

@@ -125,6 +125,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 			world.occurrences.push({
 				type: "join",
 				heroId: actionData.heroId,
+				userId: actionData.userId,
 				userHash: actionData.userHash,
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,

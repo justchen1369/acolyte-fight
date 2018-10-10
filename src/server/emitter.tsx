@@ -1,5 +1,6 @@
 import moment from 'moment';
 import uniqid from 'uniqid';
+import * as auth from './auth';
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -73,6 +74,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('party.leave', (data, callback) => onPartyLeaveMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
+	socket.on('score', data => onScoreMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
@@ -400,6 +402,30 @@ function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 			games.addBot(game);
 		}
 		logger.info(`Game [${game.id}]: playing vs AI`);
+	}
+}
+
+function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
+	if (!(required(data, "object")
+		&& required(data.category, "string")
+		&& required(data.gameId, "string")
+		&& required(data.lengthSeconds, "number")
+		&& required(data.winner, "string")
+		&& required(data.players, "object")
+		&& data.players.every(p =>
+			optional(p.userId, "string")
+			&& required(p.userHash, "string")
+			&& required(p.name, "string")
+			&& required(p.damage, "number")
+			&& required(p.kills, "number")
+		)
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+ 	const game = getStore().activeGames.get(data.gameId);
+	if (game) {
+		games.receiveScore(game, socket.id, data);
 	}
 }
 

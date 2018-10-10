@@ -8,6 +8,8 @@ import * as m from '../game/messages.model';
 import * as auth from './auth';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as mirroring from './mirroring';
+import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
@@ -233,6 +235,8 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 		bots: new Map<string, string>(),
 		playerNames: new Array<string>(),
 		numPlayers: 0,
+		winTick: null,
+		scores: new Map<string, m.GameStatsMsg>(),
 		tick: 0,
 		activeTick: 0,
 		joinable: true,
@@ -360,6 +364,7 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 		const game = findNewGame(room, privatePartyId, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
+			const userId = member.authToken ? auth.getUserIdFromCache(auth.enigmaAccessKey(member.authToken)) : null;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
 			assignments.push({ partyMember: member, game, heroId });
 		}
@@ -412,6 +417,17 @@ function isSpell(actionData: m.ActionMsg): boolean {
 	return actionData.actionType === "game" && actionData.spellId !== "move" && actionData.spellId !== "retarget";
 }
 
+export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {
+	// consistensify stats, otherwise the corroboration process won't work
+	stats = {...stats, unixTimestamp: game.created.unix() };
+
+	game.scores.set(socketId, stats);
+	if (game.scores.size >= game.active.size) {
+		// Everyone has reported that the game is finished
+		game.winTick = game.tick;
+	}
+}
+
 export function leaveGame(game: g.Game, socketId: string) {
 	let player = game.active.get(socketId);
 	if (!player) {
@@ -461,10 +477,16 @@ function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string)
 }
 
 function finishGameIfNecessary(game: g.Game) {
+	if (game.winTick && game.tick >= game.winTick + MaxIdleTicks) {
+		// Forcibly remove everyone from the game
+		game.active.clear();
+	}
+
 	if (game.active.size === 0) {
 		game.bots.clear();
 		getStore().activeGames.delete(game.id);
 		gameStorage.saveGame(game);
+		statsStorage.saveGame(game);
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;
@@ -538,8 +560,9 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	game.bots.delete(heroId);
 	game.playerNames.push(playerName);
 
+	const userId = authToken ? auth.getUserIdFromCache(auth.enigmaAccessKey(authToken)) : null;
 	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
-	queueAction(game, { gameId: game.id, heroId, actionType: "join", userHash, playerName, keyBindings, isBot, isMobile });
+	queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
 
 	// Update counts
 	{
