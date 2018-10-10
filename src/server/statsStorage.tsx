@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import crypto from 'crypto';
+import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -20,7 +21,10 @@ export async function saveGameStats(gameId: string, gameStats: m.GameStatsMsg) {
 
     for (const player of gameStats.players) {
         if (player.userId) {
-            const data: db.UserGameReference = { gameId, unixTimestamp: gameStats.unixTimestamp };
+            const data: db.UserGameReference = {
+                gameId,
+                timestamp: (Firestore.FieldValue.serverTimestamp() as any),
+            };
             await firestore.collection('userStats').doc(player.userId).collection('games').doc(gameId).set(data);
         }
     }

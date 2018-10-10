@@ -5,12 +5,17 @@ import { MaxGamesToKeep } from '../game/constants';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
 
+const settingsStorage = localForage.createInstance({ name: 'acolyte-fight-settings' });
 const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
 
 namespace StorageKeys {
     export const Name = "enigma-name";
     export const Buttons = "enigma-buttons";
     export const Rebindings = "enigma-rebindings";
+}
+
+namespace SettingsKeys {
+    export const LatestGameStatUnixTimestamp = "latest-game-unix";
 }
 
 export function loadName(): string {

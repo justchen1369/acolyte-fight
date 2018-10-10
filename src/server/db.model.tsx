@@ -1,3 +1,5 @@
+import * as Firestore from '@google-cloud/firestore';
+
 export interface UserSettingsData {
     name: string;
     buttons: KeyBindings;
@@ -10,5 +12,5 @@ export interface AccessKeyUserData {
 
 export interface UserGameReference {
     gameId: string;
-    unixTimestamp: number;
+    timestamp: Firestore.Timestamp;
 }
