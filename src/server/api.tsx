@@ -151,6 +151,17 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
 
         res.header("Content-Type", "application/json");
         res.send(result);
+    } else if (userId) {
+        // This user hasn't yet uploaded their settings
+        const result: m.GetUserSettingsResponse = {
+            userId,
+            name: null,
+            buttons: null,
+            rebindings: null,
+        };
+
+        res.header("Content-Type", "application/json");
+        res.send(result);
     } else {
         res.status(404).send("User not found");
     }
