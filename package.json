@@ -45,6 +45,7 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
     "form-urlencoded": "^3.0.0",
+    "glicko2": "^0.8.4",
     "immutable": "^3.8.2",
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",

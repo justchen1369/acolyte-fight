@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import crypto from 'crypto';
+import glicko from 'glicko2';
 import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
@@ -15,6 +16,13 @@ interface CandidateHash {
     hash: string;
     frequency: number;
 }
+
+const glickoSettings: glicko.Settings = {
+    tau: 0.5,
+    rating: 1500,
+    rd: 200,
+    vol: 0.06,
+};
 
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
     const gameRefsCollection = firestore.collection('userStats').doc(userId).collection('games');
@@ -59,11 +67,59 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     }
 }
 
+async function saveUpdatedRatings(winnerId: string, loserIds: string[]) {
+    const userRatings = firestore.collection('userRatings');
+    const userIds = [winnerId, ...loserIds];
+
+    firestore.runTransaction(async (transaction) => {
+        const ratings = new glicko.Glicko2(glickoSettings);
+
+        const docs = await transaction.getAll(...userIds.map(userId => userRatings.doc(userId)));
+
+        const players = new Array<glicko.Player>();
+        for (const doc of docs) {
+            const data = doc.data() as db.UserRating;
+            players.push(data ? ratings.makePlayer(data.rating, data.rd) : ratings.makePlayer());
+        }
+
+        const race = ratings.makeRace([
+            [players[0]],
+            players.slice(1),
+        ]);
+        ratings.updateRatings(race);
+
+        for (let i = 0; i < players.length; ++i) {
+            const doc = docs[i];
+            const player = players[i];
+
+            const data: db.UserRating = { rating: player.getRating(), rd: player.getRd() };
+            transaction.set(doc.ref, data);
+        }
+    });
+}
+
+async function updateRatings(gameStats: m.GameStatsMsg) {
+    const knownPlayers = gameStats.players.filter(p => !!p.userId);
+    if (knownPlayers.length <= 1) {
+        // No one to rerate
+        return;
+    }
+
+    let winningPlayer: m.PlayerStatsMsg = knownPlayers.find(p => p.userHash === gameStats.winner);
+    if (!winningPlayer) {
+        // Can't update if winner is unranked
+    }
+
+    await saveUpdatedRatings(winningPlayer.userId, knownPlayers.map(p => p.userId).filter(userId => userId !== winningPlayer.userId));
+}
+
 export async function saveGame(game: g.Game) {
     try {
         const gameStats = findStats(game);
         if (gameStats) {
+            // TODO: Validate players are actually in the game
             await saveGameStats(gameStats);
+            await updateRatings(gameStats);
         }
     } catch (error) {
         logger.error("Unable to save game stats:");

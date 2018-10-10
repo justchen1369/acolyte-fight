@@ -560,9 +560,10 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	game.bots.delete(heroId);
 	game.playerNames.push(playerName);
 
-	const userId = authToken ? auth.getUserIdFromCache(auth.enigmaAccessKey(authToken)) : null;
 	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
-	queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
+	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken)).then(userId => {
+		queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
+	});
 
 	// Update counts
 	{

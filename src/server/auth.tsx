@@ -73,15 +73,15 @@ function parseAuthTokenFromRequest(req: express.Request): string | null {
 }
 
 export function getUserHashFromAuthToken(authToken: string | null): string {
-    return crypto.createHash('md5').update(authToken).digest('hex');
+    return authToken ? crypto.createHash('md5').update(authToken).digest('hex') : null;
 }
 
 export function discordAccessKey(discordUser: discord.DiscordUser) {
-    return `discord.${discordUser.id}`;
+    return discordUser ? `discord.${discordUser.id}` : null;
 }
 
 export function enigmaAccessKey(authToken: string) {
-    return `enigma.${authToken}`;
+    return authToken ? `enigma.${authToken}` : null;
 }
 
 export function getUserIdFromCache(accessKey: string): string {

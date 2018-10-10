@@ -13,3 +13,8 @@ export interface AccessKeyUserData {
 export interface UserGameReference {
     unixTimestamp: number;
 }
+
+export interface UserRating {
+    rating: number;
+    rd: number;
+}

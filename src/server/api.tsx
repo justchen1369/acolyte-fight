@@ -68,7 +68,6 @@ export function getExternalStatus() {
 
 export function onLogin(req: express.Request, res: express.Response) {
     onLoginAsync(req, res).catch(error => handleError(error, res));
-;
 }
 
 async function onLoginAsync(req: express.Request, res: express.Response): Promise<void> {
@@ -109,6 +108,29 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
     } else {
         res.redirect(discord.getAuthUrl(origin));
     }
+}
+
+export function onCreateTestUser(req: express.Request, res: express.Response) {
+    onCreateTestUserAsync(req, res).catch(error => handleError(error, res));
+}
+
+async function onCreateTestUserAsync(req: express.Request, res: express.Response): Promise<void> {
+    const authToken = auth.resendAuthToken(req, res);
+    const origin = getOrigin(req);
+
+    const allowCache = false;
+    let userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken), allowCache)
+    if (userId) {
+        // Already logged in
+
+    } else {
+        // Create a new user
+        logger.info(`Creating test user ${authToken}`);
+        userId = userStorage.generateUserId();
+        await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
+    }
+
+    res.redirect('/');
 }
 
 export function onLogout(req: express.Request, res: express.Response) {
