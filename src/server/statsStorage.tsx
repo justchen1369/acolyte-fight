@@ -15,14 +15,17 @@ interface CandidateHash {
     frequency: number;
 }
 
-export async function saveGameStats(gameId: string, gameStats: m.GameStatsMsg) {
+export async function saveGameStats(gameStats: m.GameStatsMsg) {
     gameStats = untaint(gameStats);
+
+    const gameId = gameStats.gameId;
+    delete gameStats.gameId; // Don't store ID in database because it's already stored implicitly
+
     await firestore.collection('gameStats').doc(gameId).set(gameStats);
 
     for (const player of gameStats.players) {
         if (player.userId) {
             const data: db.UserGameReference = {
-                gameId,
                 timestamp: (Firestore.FieldValue.serverTimestamp() as any),
             };
             await firestore.collection('userStats').doc(player.userId).collection('games').doc(gameId).set(data);
@@ -34,7 +37,7 @@ export async function saveGame(game: g.Game) {
     try {
         const gameStats = findStats(game);
         if (gameStats) {
-            await saveGameStats(game.id, gameStats);
+            await saveGameStats(gameStats);
         }
     } catch (error) {
         logger.error("Unable to save game stats:");

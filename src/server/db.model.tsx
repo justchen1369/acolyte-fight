@@ -11,6 +11,5 @@ export interface AccessKeyUserData {
 }
 
 export interface UserGameReference {
-    gameId: string;
     timestamp: Firestore.Timestamp;
 }
