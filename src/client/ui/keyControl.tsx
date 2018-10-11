@@ -1,8 +1,10 @@
+import _ from 'lodash'
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
+import * as cloud from '../core/cloud';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
@@ -26,6 +28,8 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 }
 
 class KeyControl extends React.Component<Props, State> {
+    private uploadStateDebounced = _.debounce(() => this.uploadState(), 500);
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -78,6 +82,11 @@ class KeyControl extends React.Component<Props, State> {
 
         StoreProvider.dispatch({ type: "updateRebindings", rebindings });
         Storage.saveRebindingConfig(rebindings);
+        this.uploadStateDebounced();
+    }
+
+    private uploadState() {
+        cloud.uploadSettings();
     }
 }
 
