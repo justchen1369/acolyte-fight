@@ -425,6 +425,10 @@ function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
 	}
  	const game = getStore().activeGames.get(data.gameId);
 	if (game) {
+		// Ensure the client cannot override certain fields
+		data.unixTimestamp = game.created.unix();
+		data.server = getLocation().server;
+
 		games.receiveScore(game, socket.id, data);
 	}
 }

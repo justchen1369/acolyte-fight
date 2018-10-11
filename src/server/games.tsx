@@ -418,9 +418,6 @@ function isSpell(actionData: m.ActionMsg): boolean {
 }
 
 export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {
-	// consistensify stats, otherwise the corroboration process won't work
-	stats = {...stats, unixTimestamp: game.created.unix() };
-
 	game.scores.set(socketId, stats);
 	if (game.scores.size >= game.active.size) {
 		// Everyone has reported that the game is finished

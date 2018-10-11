@@ -115,6 +115,8 @@ export function onCreateTestUser(req: express.Request, res: express.Response) {
 }
 
 async function onCreateTestUserAsync(req: express.Request, res: express.Response): Promise<void> {
+    // TODO: Add authentication
+
     const authToken = auth.resendAuthToken(req, res);
     const origin = getOrigin(req);
 

@@ -24,25 +24,69 @@ const glickoSettings: glicko.Settings = {
     vol: 0.06,
 };
 
-export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
-    const gameRefsCollection = firestore.collection('userStats').doc(userId).collection('games');
+function gameStatsToDb(data: m.GameStatsMsg): db.GameStats {
+	return {
+		category: data.category,
+		lengthSeconds: data.lengthSeconds,
+		unixTimestamp: data.unixTimestamp,
+		winner: data.winner,
+        players: data.players.map(playerToDb),
+        userIds: data.players.map(p => p.userId).filter(x => !!x),
+		server: data.server,
+	};
+}
 
-    let query = gameRefsCollection.orderBy("unixTimestamp", "desc");
+function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
+    const result: m.PlayerStatsMsg = {
+        userHash: p.userHash,
+        name: p.name,
+        damage: p.damage,
+        kills: p.kills,
+    };
+
+    if (p.userId) {
+        // Don't store userId in database unless it is actually set
+        result.userId = p.userId;
+    }
+
+    return result;
+}
+
+function dbToGameStats(gameId: string, data: db.GameStats): m.GameStatsMsg {
+    return {
+        gameId: gameId,
+		category: data.category,
+		lengthSeconds: data.lengthSeconds,
+		unixTimestamp: data.unixTimestamp,
+		winner: data.winner,
+        players: data.players.map(dbToPlayer),
+		server: data.server,
+    }
+}
+
+function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
+    return {
+        userId: player.userId,
+        userHash: player.userHash,
+        name: player.name,
+        damage: player.damage,
+        kills: player.kills,
+    };
+}
+
+export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
+    let query = firestore.collection('gameStats').where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
     if (after) {
         query = query.startAfter(after);
     }
     if (before) {
         query = query.endBefore(before);
     }
-    const gameRefDocs = await query.limit(limit).get();
+    const querySnapshot = await query.limit(limit).get();
 
     const games = new Array<m.GameStatsMsg>();
-    for (const gameRefDoc of gameRefDocs.docs) {
-        const gameDoc = await firestore.collection('gameStats').doc(gameRefDoc.id).get();
-
-        const game = await gameDoc.data() as m.GameStatsMsg;
-        game.gameId = gameDoc.id;
-
+    for (const gameDoc of querySnapshot.docs) {
+        const game = dbToGameStats(gameDoc.id, await gameDoc.data() as db.GameStats);
         games.push(game);
     }
 
@@ -50,21 +94,8 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
 }
 
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
-    gameStats = untaint(gameStats);
-
-    const gameId = gameStats.gameId;
-    delete gameStats.gameId; // Don't store ID in database because it's already stored implicitly
-
-    await firestore.collection('gameStats').doc(gameId).set(gameStats);
-
-    for (const player of gameStats.players) {
-        if (player.userId) {
-            const data: db.UserGameReference = {
-                unixTimestamp: gameStats.unixTimestamp,
-            };
-            await firestore.collection('userStats').doc(player.userId).collection('games').doc(gameId).set(data);
-        }
-    }
+    const data = gameStatsToDb(gameStats);
+    await firestore.collection('gameStats').doc(gameStats.gameId).set(data);
 }
 
 async function saveUpdatedRatings(winnerId: string, loserIds: string[]) {
