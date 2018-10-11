@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
@@ -25,6 +26,8 @@ export class ProfilePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            leaderboard: null,
+            error: null,
         };
     }
 
@@ -32,7 +35,7 @@ export class ProfilePanel extends React.Component<Props, State> {
         return this.props.loggedIn ? this.renderLoggedIn() : null;
     }
 
-    renderLoggedIn() {
+    private renderLoggedIn() {
         return <div>
             <h1>{this.props.playerName}</h1>
             <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>

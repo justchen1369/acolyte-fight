@@ -101,6 +101,25 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
+export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.rating`, 'desc').limit(100).get();
+
+    let result = new Array<m.LeaderboardPlayer>();
+    for (const doc of querySnapshot.docs) {
+        const user = doc.data() as db.User;
+        if (user && user.ratings && user.ratings[category]) {
+            const ratings = user.ratings[category];
+            result.push({
+                userId: doc.id,
+                name: user.settings && user.settings.name || doc.id,
+                rating: ratings.rating,
+                rd: ratings.rd,
+            });
+        }
+    }
+    return result;
+}
+
 async function saveUpdatedRatings(category: string, winnerId: string, loserIds: string[]) {
     const users = firestore.collection(Collections.User);
     const userIds = [winnerId, ...loserIds];

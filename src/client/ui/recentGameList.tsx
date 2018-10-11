@@ -59,6 +59,7 @@ interface Props {
 interface State {
     category: string;
     self: string;
+    leaderboard: m.LeaderboardPlayer[];
     games: GameRow[];
     error: string;
     availableReplays: Set<string>;
@@ -98,6 +99,14 @@ const getGlobalStats = Reselect.createSelector(
         }
     }
 );
+
+async function retrieveLeaderboardAsync() {
+    const res = await fetch('api/leaderboard', {
+        credentials: 'same-origin'
+    });
+    const json = await res.json() as m.GetLeaderboardResponse;
+    return json.leaderboard;
+}
 
 async function retrieveGamesAsync(): Promise<GameRow[]> {
     await cloud.downloadGameStats();
@@ -246,6 +255,7 @@ class RecentGameList extends React.Component<Props, State> {
             category: d.GameCategory.PvP,
             self: null,
             games: null,
+            leaderboard: null,
             availableReplays: new Set<string>(),
             error: null,
         };
@@ -268,6 +278,8 @@ class RecentGameList extends React.Component<Props, State> {
             });
         }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
             this.setState({ availableReplays: new Set<string>(ids) });
+        }).then(() => retrieveLeaderboardAsync()).then(leaderboard => {
+            this.setState({ leaderboard });
         }).catch(error => {
             this.setState({ error: `${error}` });
         });
@@ -277,7 +289,7 @@ class RecentGameList extends React.Component<Props, State> {
         return <div className="recent-game-list-section">
             {this.renderCategorySelector()}
             {this.renderGlobals()}
-            {this.renderLeaderboard()}
+            {this.renderLeaderboard2()}
             {this.renderGames()}
         </div>;
     }
@@ -355,6 +367,23 @@ class RecentGameList extends React.Component<Props, State> {
                     <div className="label">Damage per game</div>
                     <div className="value">{Math.round(self.damagePerGame)}</div>
                 </div>
+            </div>
+        </div>
+    }
+
+    private renderLeaderboard2() {
+        if (!this.state.leaderboard) {
+            return null;
+        }
+
+        return <div>
+            <h1>Leaderboard</h1>
+            <div className="leaderboard">
+                {this.state.leaderboard.map((player, index) => <div className="leaderboard-row">
+                    <span className="position">{index + 1}</span>
+                    <span className="player-name">{player.name}</span>
+                    <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.rating)} rating</span>
+                </div>)}
             </div>
         </div>
     }

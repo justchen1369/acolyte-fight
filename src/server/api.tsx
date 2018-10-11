@@ -251,3 +251,15 @@ function getOrigin(req: express.Request): string {
     }
     return origin;
 }
+
+export function onGetLeaderboard(req: express.Request, res: express.Response) {
+    onGetLeaderboardAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetLeaderboardAsync(req: express.Request, res: express.Response): Promise<void> {
+    const leaderboard = await statsStorage.getLeaderboard("PvP");
+    const response: m.GetLeaderboardResponse = {
+        leaderboard,
+    };
+    res.send(response);
+}

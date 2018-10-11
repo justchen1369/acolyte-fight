@@ -302,3 +302,14 @@ export interface PlayerStatsMsg {
 export interface GetGameStatsResponse {
     stats: GameStatsMsg[];
 }
+
+
+export interface GetLeaderboardResponse {
+    leaderboard: LeaderboardPlayer[];
+}
+export interface LeaderboardPlayer {
+    userId: string;
+    name: string;
+    rating: number;
+    rd: number;
+}

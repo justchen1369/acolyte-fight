@@ -56,6 +56,7 @@ app.get('/api/acolytefight.d.ts', (req, res) => res.sendFile(rootDir + '/src/typ
 app.get('/api/createTestUser', (req, res) => api.onCreateTestUser(req, res));
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
 app.get('/api/gameStats', (req, res) => api.onGetGameStats(req, res));
+app.get('/api/leaderboard', (req, res) => api.onGetLeaderboard(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));
