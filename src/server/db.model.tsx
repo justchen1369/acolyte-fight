@@ -1,30 +1,38 @@
 import * as Firestore from '@google-cloud/firestore';
 
 export namespace Collections {
-    export const UserSettings = 'userSettings';
-    export const UserRating = 'userRating';
-    export const GameStats = 'gameStats';
+    export const User = 'user';
+    export const Game = 'game';
 }
 
-export interface UserSettings {
+export interface User {
     accessKeys: string[];
-
+    settings: UserSettings;
+    ratings: UserRatingLookup;
+}
+export interface UserSettings {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+}
+export interface UserRatingLookup {
+    [category: string]: UserRating;
 }
 export interface UserRating {
     rating: number;
     rd: number;
 }
 
+export interface Game {
+    unixTimestamp: number;
+    userIds: string[];
+    stats: GameStats;
+}
 export interface GameStats {
     category: string;
-    unixTimestamp: number;
     winner: string; // userHash
     lengthSeconds: number;
     players: PlayerStats[];
-    userIds: string[];
     server: string;
 }
 export interface PlayerStats {

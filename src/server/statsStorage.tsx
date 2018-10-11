@@ -8,6 +8,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as mirroring from './mirroring';
 import * as s from './server.model';
+import { Collections  } from './db.model';
 import { firestore } from './dbStorage';
 import { logger } from './logging';
 
@@ -24,16 +25,18 @@ const glickoSettings: glicko.Settings = {
     vol: 0.06,
 };
 
-function gameStatsToDb(data: m.GameStatsMsg): db.GameStats {
+function gameStatsToDb(data: m.GameStatsMsg): db.Game {
 	return {
-		category: data.category,
-		lengthSeconds: data.lengthSeconds,
-		unixTimestamp: data.unixTimestamp,
-		winner: data.winner,
-        players: data.players.map(playerToDb),
+        unixTimestamp: data.unixTimestamp,
         userIds: data.players.map(p => p.userId).filter(x => !!x),
-		server: data.server,
-	};
+        stats: {
+            category: data.category,
+            lengthSeconds: data.lengthSeconds,
+            winner: data.winner,
+            players: data.players.map(playerToDb),
+            server: data.server,
+        }
+    };
 }
 
 function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
@@ -52,15 +55,15 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
     return result;
 }
 
-function dbToGameStats(gameId: string, data: db.GameStats): m.GameStatsMsg {
+function dbToGameStats(gameId: string, data: db.Game): m.GameStatsMsg {
     return {
         gameId: gameId,
-		category: data.category,
-		lengthSeconds: data.lengthSeconds,
+		category: data.stats.category,
+		lengthSeconds: data.stats.lengthSeconds,
 		unixTimestamp: data.unixTimestamp,
-		winner: data.winner,
-        players: data.players.map(dbToPlayer),
-		server: data.server,
+		winner: data.stats.winner,
+        players: data.stats.players.map(dbToPlayer),
+		server: data.stats.server,
     }
 }
 
@@ -75,7 +78,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
 }
 
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
-    let query = firestore.collection('gameStats').where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
+    let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
     if (after) {
         query = query.startAfter(after);
     }
@@ -86,7 +89,7 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
 
     const games = new Array<m.GameStatsMsg>();
     for (const gameDoc of querySnapshot.docs) {
-        const game = dbToGameStats(gameDoc.id, await gameDoc.data() as db.GameStats);
+        const game = dbToGameStats(gameDoc.id, await gameDoc.data() as db.Game);
         games.push(game);
     }
 
@@ -95,22 +98,23 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
 
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
     const data = gameStatsToDb(gameStats);
-    await firestore.collection('gameStats').doc(gameStats.gameId).set(data);
+    await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
-async function saveUpdatedRatings(winnerId: string, loserIds: string[]) {
-    const userRatings = firestore.collection('userRatings');
+async function saveUpdatedRatings(category: string, winnerId: string, loserIds: string[]) {
+    const users = firestore.collection(Collections.User);
     const userIds = [winnerId, ...loserIds];
 
     firestore.runTransaction(async (transaction) => {
         const ratings = new glicko.Glicko2(glickoSettings);
 
-        const docs = await transaction.getAll(...userIds.map(userId => userRatings.doc(userId)));
+        const docs = await transaction.getAll(...userIds.map(userId => users.doc(userId)));
 
         const players = new Array<glicko.Player>();
         for (const doc of docs) {
-            const data = doc.data() as db.UserRating;
-            players.push(data ? ratings.makePlayer(data.rating, data.rd) : ratings.makePlayer());
+            const data = doc.data() as db.User;
+            const userRatings = data && data.ratings && data.ratings[category];
+            players.push(userRatings ? ratings.makePlayer(userRatings.rating, userRatings.rd) : ratings.makePlayer());
         }
 
         const race = ratings.makeRace([
@@ -123,8 +127,15 @@ async function saveUpdatedRatings(winnerId: string, loserIds: string[]) {
             const doc = docs[i];
             const player = players[i];
 
-            const data: db.UserRating = { rating: player.getRating(), rd: player.getRd() };
-            transaction.set(doc.ref, data);
+            const delta: Partial<db.User> = {
+                ratings: {
+                    [category]: {
+                        rating: player.getRating(),
+                        rd: player.getRd(),
+                    }
+                },
+            };
+            transaction.update(doc.ref, delta);
         }
     });
 }
@@ -141,7 +152,11 @@ async function updateRatings(gameStats: m.GameStatsMsg) {
         // Can't update if winner is unranked
     }
 
-    await saveUpdatedRatings(winningPlayer.userId, knownPlayers.map(p => p.userId).filter(userId => userId !== winningPlayer.userId));
+    await saveUpdatedRatings(
+        gameStats.category,
+        winningPlayer.userId,
+        knownPlayers.map(p => p.userId).filter(userId => userId !== winningPlayer.userId)
+    );
 }
 
 export async function saveGame(game: g.Game) {
