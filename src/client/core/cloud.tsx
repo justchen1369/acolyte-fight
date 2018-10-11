@@ -5,8 +5,9 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
 export async function downloadSettings(): Promise<void> {
-    const res = await fetch('api/settings', {
+    const res = await fetch(`api/settings?cachebuster=${Date.now()}`, {
         credentials: "same-origin",
+        cache: "no-store",
     });
     if (res.status === 200) {
         const json: m.GetUserSettingsResponse = await res.json();

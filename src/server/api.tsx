@@ -99,9 +99,7 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
                 rebindings: null,
             };
 
-            await userStorage.createOrUpdateUser(userSettings);
-            await auth.associateAccessKey(auth.discordAccessKey(discordUser), userId);
-            await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
+            await userStorage.createUser(userSettings, auth.discordAccessKey(discordUser), auth.enigmaAccessKey(authToken));
         }
 
         res.redirect('/');
@@ -129,7 +127,14 @@ async function onCreateTestUserAsync(req: express.Request, res: express.Response
         // Create a new user
         logger.info(`Creating test user ${authToken}`);
         userId = userStorage.generateUserId();
-        await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
+        const userSettings: g.UserSettings = {
+            userId,
+            name: null,
+            buttons: null,
+            rebindings: null,
+        };
+        await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
+        const verify = await userStorage.getUserByAccessKey(auth.enigmaAccessKey(authToken));
     }
 
     res.redirect('/');
@@ -189,25 +194,13 @@ function handleError(error: any, res: express.Response) {
 
 export async function onGetUserSettingsAsync(req: express.Request, res: express.Response): Promise<void> {
     const authToken = getAuthToken(req);
-    const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
-    const user = await userStorage.getUserById(userId);
+    const user = await auth.getUserFromAccessKey(auth.enigmaAccessKey(authToken));
     if (user) {
         const result: m.GetUserSettingsResponse = {
             userId: user.userId,
             name: user.name,
             buttons: user.buttons,
             rebindings: user.rebindings,
-        };
-
-        res.header("Content-Type", "application/json");
-        res.send(result);
-    } else if (userId) {
-        // This user hasn't yet uploaded their settings
-        const result: m.GetUserSettingsResponse = {
-            userId,
-            name: null,
-            buttons: null,
-            rebindings: null,
         };
 
         res.header("Content-Type", "application/json");
@@ -241,7 +234,7 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
             buttons: input.buttons,
             rebindings: input.rebindings,
         };
-        await userStorage.createOrUpdateUser(user);
+        await userStorage.updateUser(user);
 
         const result: m.UpdateUserSettingsResponse = {};
         res.header("Content-Type", "application/json");

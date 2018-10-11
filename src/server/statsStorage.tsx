@@ -185,33 +185,3 @@ function findStats(game: g.Game): m.GameStatsMsg {
 export function hashStats(gameStats: m.GameStatsMsg): string {
     return crypto.createHash('md5').update(JSON.stringify(gameStats)).digest('hex');
 } 
-
- // Don't allow users to inject fields other than the ones requested
-function untaint(data: m.GameStatsMsg): m.GameStatsMsg {
-	const location = mirroring.getLocation();
-	return {
-		gameId: data.gameId,
-		category: data.category,
-		lengthSeconds: data.lengthSeconds,
-		unixTimestamp: data.unixTimestamp,
-		winner: data.winner,
-		players: data.players.map(untaintPlayer),
-		server: location.server,
-	};
-}
-
-function untaintPlayer(p: m.PlayerStatsMsg): m.PlayerStatsMsg {
-    const result: m.PlayerStatsMsg = {
-        userHash: p.userHash,
-        name: p.name,
-        damage: p.damage,
-        kills: p.kills,
-    };
-
-    if (p.userId) {
-        // Don't store userId in database unless it is actually set
-        result.userId = p.userId;
-    }
-
-    return result;
-}

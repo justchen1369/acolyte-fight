@@ -99,6 +99,16 @@ export async function getUserIdFromAccessKey(accessKey: string, allowCache: bool
     }
 }
 
+export async function getUserFromAccessKey(accessKey: string): Promise<g.UserSettings> {
+    const user = await userStorage.getUserByAccessKey(accessKey);
+    if (user) {
+        accessKeyToUserIdCache.set(accessKey, user.userId);
+        return user;
+    } else {
+        return null;
+    }
+}
+
 export async function associateAccessKey(accessKey: string, userId: string): Promise<void> {
     await userStorage.associateAccessKey(accessKey, userId);
     accessKeyToUserIdCache.set(accessKey, userId);
