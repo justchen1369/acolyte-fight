@@ -382,7 +382,7 @@ class RecentGameList extends React.Component<Props, State> {
                 {this.state.leaderboard.map((player, index) => <div className="leaderboard-row">
                     <span className="position">{index + 1}</span>
                     <span className="player-name">{player.name}</span>
-                    <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.rating)} rating</span>
+                    <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating</span>
                 </div>)}
             </div>
         </div>

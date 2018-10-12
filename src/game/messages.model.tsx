@@ -312,4 +312,5 @@ export interface LeaderboardPlayer {
     name: string;
     rating: number;
     rd: number;
+    lowerBound: number;
 }

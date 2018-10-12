@@ -19,9 +19,9 @@ interface CandidateHash {
 }
 
 const glickoSettings: glicko.Settings = {
-    tau: 0.5,
-    rating: 1500,
-    rd: 200,
+    tau: 0.2,
+    rating: 1100,
+    rd: 50,
     vol: 0.06,
 };
 
@@ -102,7 +102,7 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
 }
 
 export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
-    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.rating`, 'desc').limit(100).get();
+    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(100).get();
 
     let result = new Array<m.LeaderboardPlayer>();
     for (const doc of querySnapshot.docs) {
@@ -114,6 +114,7 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
                 name: user.settings && user.settings.name || doc.id,
                 rating: ratings.rating,
                 rd: ratings.rd,
+                lowerBound: ratings.lowerBound,
             });
         }
     }
@@ -151,6 +152,7 @@ async function saveUpdatedRatings(category: string, winnerId: string, loserIds: 
                     [category]: {
                         rating: player.getRating(),
                         rd: player.getRd(),
+                        lowerBound: player.getRating() - 2 * player.getRd(),
                     }
                 },
             };
