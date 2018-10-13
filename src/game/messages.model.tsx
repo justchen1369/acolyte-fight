@@ -296,6 +296,7 @@ export interface PlayerStatsMsg {
     name: string;
     kills: number;
     damage: number;
+    ratingDelta?: number;
 }
 
 

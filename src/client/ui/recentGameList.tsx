@@ -44,6 +44,7 @@ interface GameRow {
 interface PlayerStats extends Stats {
     name: string;
     userHash: string;
+    ratingDelta: number;
 }
 
 interface LeaderboardStats extends PlayerStats { 
@@ -154,6 +155,7 @@ function convertGame(stats: d.GameStats): GameRow {
             wins: player.userHash === stats.winner ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
+            ratingDelta: player.ratingDelta || 0,
         };
 
         game.players.set(userHash, cell);
@@ -195,6 +197,7 @@ function calculateGlobalStats(games: GameRow[]): GlobalStats {
                     ...initStats(),
                     name: gamePlayer.name,
                     userHash: gamePlayer.userHash,
+                    ratingDelta: gamePlayer.ratingDelta || 0,
                 };
                 statsPerPlayer.set(globalPlayer.userHash, globalPlayer);
             }
@@ -306,14 +309,12 @@ class RecentGameList extends React.Component<Props, State> {
                     <col className="timestamp" />
                     <col />
                     <col />
-                    <col />
                     <col className="actions" />
                     <thead>
                         <tr>
                             <th>Time</th>
                             <th>Players</th>
-                            <th>Kills</th>
-                            <th>Damage</th>
+                            <th>Rating</th>
                             <th>Watch</th>
                         </tr>
                     </thead>
@@ -432,10 +433,21 @@ class RecentGameList extends React.Component<Props, State> {
         return <tr>
             <td title={game.createdTimestamp.toLocaleString()}>{game.createdTimestamp.fromNow()}</td>
             <td>{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</td>
-            <td title={`You scored ${self.kills} kills out of ${game.totals.kills} total`}>{self.kills}</td>
-            <td title={`You did ${Math.round(self.damage)} damage out of ${Math.round(game.totals.damage)} total`}>{Math.round(self.damage)}</td>
+            <td>{this.renderRatingDelta(self.ratingDelta)}</td>
             <td>{this.state.availableReplays.has(game.id) && <a href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}>Watch <i className="fa fa-external-link-square-alt" /></a>}</td>
         </tr>
+    }
+
+    private renderRatingDelta(ratingDelta: number): JSX.Element {
+        if (!ratingDelta) {
+            return null;
+        }
+
+        if (ratingDelta > 0) {
+            return <span className="rating-increase">{ratingDelta.toFixed(0)}</span>
+        } else {
+            return <span className="rating-decrease">{ratingDelta.toFixed(0)}</span>
+        }
     }
 
     private renderPlayer(player: PlayerStats): JSX.Element {

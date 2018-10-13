@@ -19,6 +19,10 @@ interface CandidateHash {
     frequency: number;
 }
 
+interface RatingDeltas {
+    [userId: string]: number;
+}
+
 const glickoSettings: glicko.Settings = {
     tau: 0.2,
     rating: 1100,
@@ -53,7 +57,7 @@ function gameStatsToDb(data: m.GameStatsMsg): db.Game {
 }
 
 function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
-    const result: m.PlayerStatsMsg = {
+    const result: db.PlayerStats = {
         userHash: p.userHash,
         name: p.name,
         damage: p.damage,
@@ -63,6 +67,9 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
     if (p.userId) {
         // Don't store userId in database unless it is actually set
         result.userId = p.userId;
+    }
+    if (p.ratingDelta) {
+        result.ratingDelta = p.ratingDelta;
     }
 
     return result;
@@ -87,6 +94,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         name: player.name,
         damage: player.damage,
         kills: player.kills,
+        ratingDelta: player.ratingDelta,
     };
 }
 
@@ -143,23 +151,28 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
     return result;
 }
 
-async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg) {
+async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<RatingDeltas> {
     const category = gameStats.category;
     const knownPlayers = gameStats.players.filter(p => !!p.userId);
     const winningPlayer = knownPlayers.find(p => p.userHash === gameStats.winner);
     if (!(knownPlayers.length >= 2 && winningPlayer)) {
         // Only rank known players
-        return;
+        return {};
     }
 
-    firestore.runTransaction(async (transaction) => {
+    const ratingDeltas = await firestore.runTransaction(async (transaction) => {
+        // Load initial data
         const docs = await transaction.getAll(...knownPlayers.map(p => firestore.collection(Collections.User).doc(p.userId)));
 
+        const initialRatings = new Map<string, db.UserRating>();
         const userRatings = new Map<string, db.UserRating>();
         for (const doc of docs) {
-            userRatings.set(doc.id, dbToUserRating(doc.data() as db.User, category));
+            const initialRating = dbToUserRating(doc.data() as db.User, category);
+            initialRatings.set(doc.id, initialRating);
+            userRatings.set(doc.id, {...initialRating});
         }
 
+        // Calculate changes
         calculateNewGlickoRatings(userRatings, winningPlayer.userId);
 
         for (const player of knownPlayers) {
@@ -168,6 +181,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg) {
             calculateNewStats(userRating, player, isWinner);
         }
 
+        // Performupdate
         for (const doc of docs) {
             const userRating = userRatings.get(doc.id);
 
@@ -176,7 +190,19 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg) {
             };
             transaction.update(doc.ref, delta);
         }
+
+        // Calculate rating deltas
+        const ratingDeltas: RatingDeltas = {};
+        for (const player of knownPlayers) {
+            const initialRating = initialRatings.get(player.userId);
+            const userRating = userRatings.get(player.userId);
+            ratingDeltas[player.userId] = userRating.lowerBound - initialRating.lowerBound;
+        }
+
+        return ratingDeltas;
     });
+
+    return ratingDeltas;
 }
 
 function calculateNewGlickoRatings(allRatings: Map<string, db.UserRating>, winningUserId: string) {
@@ -225,12 +251,22 @@ export async function saveGame(game: g.Game) {
         const gameStats = findStats(game);
         if (gameStats) {
             // TODO: Validate players are actually in the game
+
+            const ratingDeltas = await updateRatingsIfNecessary(gameStats);
+            applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);
-            await updateRatingsIfNecessary(gameStats);
         }
     } catch (error) {
         logger.error("Unable to save game stats:");
         logger.error(error);
+    }
+}
+
+function applyRatingDeltas(gameStats: m.GameStatsMsg, ratingDeltas: RatingDeltas) {
+    for (const player of gameStats.players) {
+        if (player.userId in ratingDeltas) {
+            player.ratingDelta = ratingDeltas[player.userId];
+        }
     }
 }
 

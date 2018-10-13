@@ -870,6 +870,14 @@ h2 {
     text-align: left;
 }
 
+.game-list .rating-increase {
+    color: #22ee88;
+}
+
+.game-list .rating-decrease {
+    color: #ff4466;
+}
+
 textarea.mod-json {
     width: 100%;
     height: 20em;

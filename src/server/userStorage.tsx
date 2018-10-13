@@ -35,13 +35,10 @@ export async function getUserByAccessKey(accessKey: string): Promise<s.UserSetti
         return null;
     }
 
-    console.log("looking up " + accessKey);
     const querySnapshot = await firestore.collection(Collections.User).where('accessKeys', 'array-contains', accessKey).limit(1).get()
     for (const doc of querySnapshot.docs) {
-        console.log("found");
         return dbToUserSettings(doc.id, doc.data() as db.User);
     }
-    console.log("not found");
     return null;
 }
 

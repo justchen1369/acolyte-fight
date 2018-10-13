@@ -56,6 +56,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             name: p.name,
             damage: p.damage,
             kills: p.kills,
+            ratingDelta: p.ratingDelta,
         };
 
         if (p.userId === userId) {

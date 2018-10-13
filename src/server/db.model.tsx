@@ -46,5 +46,6 @@ export interface PlayerStats {
     name: string;
     kills: number;
     damage: number;
+    ratingDelta?: number;
 }
 
