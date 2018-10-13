@@ -22,6 +22,10 @@ export interface UserRating {
     rating: number;
     rd: number;
     lowerBound: number;
+    numGames: number;
+    killsPerGame: number;
+    damagePerGame: number;
+    winRate: number;
 }
 
 export interface Game {

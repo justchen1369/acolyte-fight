@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import glicko from 'glicko2';
 import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
+import * as constants from '../game/constants';
 import * as db from './db.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -24,6 +25,18 @@ const glickoSettings: glicko.Settings = {
     rd: 50,
     vol: 0.06,
 };
+
+function initialRating(): db.UserRating {
+    return {
+        numGames: 0,
+        killsPerGame: 0,
+        damagePerGame: 0,
+        winRate: 0,
+        rating: glickoSettings.rating,
+        rd: glickoSettings.rd,
+        lowerBound: calculateLowerBound(glickoSettings.rating, glickoSettings.rd),
+    };
+}
 
 function gameStatsToDb(data: m.GameStatsMsg): db.Game {
 	return {
@@ -77,6 +90,15 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
     };
 }
 
+function dbToUserRating(user: db.User, category: string): db.UserRating {
+    const result = initialRating();
+    const userRating = user && user.ratings && user.ratings[category]
+    if (userRating) {
+        Object.assign(result, userRating);
+    }
+    return result;
+}
+
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
     let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
     if (after) {
@@ -121,63 +143,81 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
     return result;
 }
 
-async function saveUpdatedRatings(category: string, winnerId: string, loserIds: string[]) {
-    const users = firestore.collection(Collections.User);
-    const userIds = [winnerId, ...loserIds];
+async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg) {
+    const category = gameStats.category;
+    const knownPlayers = gameStats.players.filter(p => !!p.userId);
+    const winningPlayer = knownPlayers.find(p => p.userHash === gameStats.winner);
+    if (!(knownPlayers.length >= 2 && winningPlayer)) {
+        // Only rank known players
+        return;
+    }
 
     firestore.runTransaction(async (transaction) => {
-        const ratings = new glicko.Glicko2(glickoSettings);
+        const docs = await transaction.getAll(...knownPlayers.map(p => firestore.collection(Collections.User).doc(p.userId)));
 
-        const docs = await transaction.getAll(...userIds.map(userId => users.doc(userId)));
-
-        const players = new Array<glicko.Player>();
+        const userRatings = new Map<string, db.UserRating>();
         for (const doc of docs) {
-            const data = doc.data() as db.User;
-            const userRatings = data && data.ratings && data.ratings[category];
-            players.push(userRatings ? ratings.makePlayer(userRatings.rating, userRatings.rd) : ratings.makePlayer());
+            userRatings.set(doc.id, dbToUserRating(doc.data() as db.User, category));
         }
 
-        const race = ratings.makeRace([
-            [players[0]],
-            players.slice(1),
-        ]);
-        ratings.updateRatings(race);
+        calculateNewGlickoRatings(userRatings, winningPlayer.userId);
 
-        for (let i = 0; i < players.length; ++i) {
-            const doc = docs[i];
-            const player = players[i];
+        for (const player of knownPlayers) {
+            const userRating = userRatings.get(player.userId);
+            const isWinner = winningPlayer === player;
+            calculateNewStats(userRating, player, isWinner);
+        }
+
+        for (const doc of docs) {
+            const userRating = userRatings.get(doc.id);
 
             const delta: Partial<db.User> = {
-                ratings: {
-                    [category]: {
-                        rating: player.getRating(),
-                        rd: player.getRd(),
-                        lowerBound: player.getRating() - 2 * player.getRd(),
-                    }
-                },
+                ratings: { [category]: userRating },
             };
             transaction.update(doc.ref, delta);
         }
     });
 }
 
-async function updateRatings(gameStats: m.GameStatsMsg) {
-    const knownPlayers = gameStats.players.filter(p => !!p.userId);
-    if (knownPlayers.length <= 1) {
-        // No one to rerate
-        return;
-    }
+function calculateNewGlickoRatings(allRatings: Map<string, db.UserRating>, winningUserId: string) {
+    const glicko2 = new glicko.Glicko2(glickoSettings);
 
-    let winningPlayer: m.PlayerStatsMsg = knownPlayers.find(p => p.userHash === gameStats.winner);
-    if (!winningPlayer) {
-        // Can't update if winner is unranked
-    }
+    // Create players
+    const allPlayers = new Map<string, glicko.Player>();
+    allRatings.forEach((rating, userId) => {
+        allPlayers.set(userId, glicko2.makePlayer(rating.rating, rating.rd));
+    });
 
-    await saveUpdatedRatings(
-        gameStats.category,
-        winningPlayer.userId,
-        knownPlayers.map(p => p.userId).filter(userId => userId !== winningPlayer.userId)
-    );
+    // Update ratings
+    const race = glicko2.makeRace([
+        [allPlayers.get(winningUserId)], // Winner
+        [...allRatings.keys()].filter(userId => userId !== winningUserId).map(userId => allPlayers.get(userId)),
+    ]);
+    glicko2.updateRatings(race);
+
+    // Save results
+    allPlayers.forEach((player, userId) => {
+        const userRating = allRatings.get(userId);
+        userRating.rating = player.getRating();
+        userRating.rd = player.getRd();
+        userRating.lowerBound = calculateLowerBound(userRating.rating, userRating.rd);
+    });
+}
+
+function calculateNewStats(userRating: db.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
+    const previousGames = Math.min(constants.MaxGamesToKeep, userRating.numGames);
+    userRating.damagePerGame = incrementAverage(userRating.damagePerGame, previousGames, player.damage);
+    userRating.killsPerGame = incrementAverage(userRating.killsPerGame, previousGames, player.kills);
+    userRating.winRate = incrementAverage(userRating.winRate, previousGames, isWinner ? 1 : 0);
+    ++userRating.numGames;
+}
+
+function incrementAverage(current: number, count: number, newValue: number) {
+    return (current * count + newValue) / (count + 1);
+}
+
+function calculateLowerBound(rating: number, rd: number) {
+    return rating - 2 * rd;
 }
 
 export async function saveGame(game: g.Game) {
@@ -186,7 +226,7 @@ export async function saveGame(game: g.Game) {
         if (gameStats) {
             // TODO: Validate players are actually in the game
             await saveGameStats(gameStats);
-            await updateRatings(gameStats);
+            await updateRatingsIfNecessary(gameStats);
         }
     } catch (error) {
         logger.error("Unable to save game stats:");
