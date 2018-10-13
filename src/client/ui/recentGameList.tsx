@@ -8,6 +8,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
+import * as pages from '../core/pages';
 import * as storage from '../storage';
 import * as url from '../url';
 
@@ -20,11 +21,6 @@ interface Stats {
     wins: number;
     kills: number;
     damage: number;
-}
-
-interface GlobalStats {
-    players: Map<string, LeaderboardStats>;
-    totals: Stats;
 }
 
 interface GameRow {
@@ -43,24 +39,20 @@ interface GameRow {
 
 interface PlayerStats extends Stats {
     name: string;
+    userId?: string;
     userHash: string;
     ratingDelta: number;
 }
 
-interface LeaderboardStats extends PlayerStats { 
-    winRate: number;
-    winRateLowerBound: number;
-    killsPerGame: number;
-    damagePerGame: number;
+interface OwnProps {
+    category: string;
 }
-
-interface Props {
+interface Props extends OwnProps {
+    current: s.PathElements;
 }
-
 interface State {
     category: string;
     self: string;
-    leaderboard: m.LeaderboardPlayer[];
     games: GameRow[];
     error: string;
     availableReplays: Set<string>;
@@ -89,25 +81,6 @@ const getGameSubset = Reselect.createSelector(
             return null;
         }
     });
-
-const getGlobalStats = Reselect.createSelector(
-    getGameSubset,
-    (games) => {
-        if (games) {
-            return calculateGlobalStats(games);
-        } else {
-            return null;
-        }
-    }
-);
-
-async function retrieveLeaderboardAsync() {
-    const res = await fetch('api/leaderboard', {
-        credentials: 'same-origin'
-    });
-    const json = await res.json() as m.GetLeaderboardResponse;
-    return json.leaderboard;
-}
 
 async function retrieveGamesAsync(): Promise<GameRow[]> {
     await cloud.downloadGameStats();
@@ -150,6 +123,7 @@ function convertGame(stats: d.GameStats): GameRow {
         const player = stats.players[userHash];
         const cell: PlayerStats = {
             name: player.name,
+            userId: player.userId,
             userHash: player.userHash,
             games: 1,
             wins: player.userHash === stats.winner ? 1 : 0,
@@ -183,59 +157,6 @@ function joinWithComma(elements: JSX.Element[]): Array<JSX.Element | string> {
     return result;
 }
 
-function calculateGlobalStats(games: GameRow[]): GlobalStats {
-    const totals = initStats();
-    const statsPerPlayer = new Map<string, PlayerStats>();
-
-    for (const game of games) {
-        accumulateStats(totals, game.totals);
-
-        for (const gamePlayer of game.players.values()) {
-            let globalPlayer = statsPerPlayer.get(gamePlayer.userHash);
-            if (!globalPlayer) {
-                globalPlayer = {
-                    ...initStats(),
-                    name: gamePlayer.name,
-                    userHash: gamePlayer.userHash,
-                    ratingDelta: gamePlayer.ratingDelta || 0,
-                };
-                statsPerPlayer.set(globalPlayer.userHash, globalPlayer);
-            }
-
-            accumulateStats(globalPlayer, gamePlayer);
-        }
-    }
-
-    const players = new Map<string, LeaderboardStats>();
-    for (const stats of statsPerPlayer.values()) {
-        const winRate = stats.wins / Math.max(1, stats.games);
-
-        players.set(stats.userHash, {
-            ...stats,
-            winRate,
-            winRateLowerBound: wilsonLowerBound(stats.wins, stats.games, 1.96),
-            killsPerGame: stats.kills / Math.max(1, stats.games),
-            damagePerGame: stats.damage / Math.max(1, stats.games),
-        });
-    }
-
-    return {
-        players,
-        totals,
-    };
-}
-
-function wilsonLowerBound(nSuccess: number, n: number, z: number) {
-    if (n === 0) {
-        return 0;
-    }
-
-    const nFailure = n - nSuccess;
-    const mean = (nSuccess + z * z / 2) / (n + z * z);
-    const interval = (z / (n + z * z)) * Math.sqrt((nSuccess * nFailure) / n + (z * z / 4));
-    return mean - interval;
-}
-
 function findSelf(games: GameRow[]): string {
     for (const game of games) {
         if (game.self) {
@@ -245,9 +166,10 @@ function findSelf(games: GameRow[]): string {
     return null;
 }
 
-function stateToProps(state: s.State): Props {
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
-        server: state.server,
+        ...ownProps,
+        current: state.current,
     };
 }
 
@@ -258,10 +180,13 @@ class RecentGameList extends React.Component<Props, State> {
             category: d.GameCategory.PvP,
             self: null,
             games: null,
-            leaderboard: null,
             availableReplays: new Set<string>(),
             error: null,
         };
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+        this.setState({ category: newProps.category });
     }
 
     componentDidMount() {
@@ -281,8 +206,6 @@ class RecentGameList extends React.Component<Props, State> {
             });
         }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
             this.setState({ availableReplays: new Set<string>(ids) });
-        }).then(() => retrieveLeaderboardAsync()).then(leaderboard => {
-            this.setState({ leaderboard });
         }).catch(error => {
             this.setState({ error: `${error}` });
         });
@@ -290,9 +213,6 @@ class RecentGameList extends React.Component<Props, State> {
 
     render() {
         return <div className="recent-game-list-section">
-            {this.renderCategorySelector()}
-            {this.renderGlobals()}
-            {this.renderLeaderboard2()}
             {this.renderGames()}
         </div>;
     }
@@ -300,7 +220,7 @@ class RecentGameList extends React.Component<Props, State> {
     private renderGames(): JSX.Element {
         const games = getGameSubset(this.state);
         return <div>
-            <h1>Stats</h1>
+            <h1>Games</h1>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
             {!this.state.games && <p className="loading-text">Loading...</p>}
             {games && games.length === 0 && <p>No recent games</p>}
@@ -326,104 +246,6 @@ class RecentGameList extends React.Component<Props, State> {
         </div>
     }
 
-    private renderCategorySelector(): JSX.Element {
-        const categoryCounts = getCategoryCounts(this.state.games);
-        return <div className="category-selector">
-            {Object.keys(categoryCounts).map(category => (
-                <div
-                    key={category}
-                    className={category === this.state.category ? "category category-selected" : "category"}
-                    onClick={() => this.setState({ category })}
-                    >
-                    {category}
-                </div>
-            ))}
-        </div>
-    }
-
-    private renderGlobals(): JSX.Element {
-        const global = getGlobalStats(this.state);
-        if (!(this.state.self && global && this.state.games && this.state.games.length > 0)) {
-            return null;
-        }
-
-        const self = global.players.get(this.state.self);
-        const total = global.totals;
-        if (!(self && total && self.games > 0)) {
-            return null;
-        }
-
-        return <div>
-            <h1>Previous {self.games} games</h1>
-            <div className="stats-card-row">
-                <div className="stats-card" title={`You won ${self.wins} out of ${self.games} games`}>
-                    <div className="label">Win rate</div>
-                    <div className="value">{Math.round(100 * self.winRate)}%</div>
-                </div>
-                <div className="stats-card" title={`You scored ${self.kills} kills out of ${total.kills} total`}>
-                    <div className="label">Kills per game</div>
-                    <div className="value">{self.killsPerGame.toFixed(1)}</div>
-                </div>
-                <div className="stats-card" title={`You did ${Math.round(self.damage)} damage out of ${Math.round(total.damage)} total`}>
-                    <div className="label">Damage per game</div>
-                    <div className="value">{Math.round(self.damagePerGame)}</div>
-                </div>
-            </div>
-        </div>
-    }
-
-    private renderLeaderboard2() {
-        if (!this.state.leaderboard) {
-            return null;
-        }
-
-        return <div>
-            <h1>Leaderboard</h1>
-            <div className="leaderboard">
-                {this.state.leaderboard.map((player, index) => <div className="leaderboard-row">
-                    <span className="position">{index + 1}</span>
-                    <span className="player-name">{player.name}</span>
-                    <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating</span>
-                </div>)}
-            </div>
-        </div>
-    }
-
-    private renderLeaderboard(): JSX.Element {
-        const global = getGlobalStats(this.state);
-        if (!(this.state.self && global)) {
-            return null;
-        }
-
-        const MinGames = 5;
-        const MaxLeaderboardLength = 10;
-        const self = this.state.self;
-
-        let players = [...global.players.values()];
-        players = players.filter(p => p.games >= MinGames);
-        players = _.sortBy(players, (p: LeaderboardStats) => -p.winRateLowerBound);
-        if (players.length === 0) {
-            return null;
-        }
-
-        return <div>
-            <h1>Leaderboard</h1>
-            <div className="leaderboard">
-                {players.map((player, index) => (index < MaxLeaderboardLength || player.userHash === self) ? this.renderLeaderboardRow(player, index) : null)}
-            </div>
-        </div>;
-    }
-
-    private renderLeaderboardRow(player: LeaderboardStats, index: number) {
-        return <div
-            className={index === 0 ? "leaderboard-row leaderboard-best" : "leaderboard-row"}
-            title={`${Math.round(100 * player.winRate)}% win rate (${player.games} games), ${player.killsPerGame.toFixed(1)} kills per game, ${Math.round(player.damagePerGame)} damage per game`}>
-            <span className="position">{index + 1}</span>
-            <span className="player-name">{player.name}</span>
-            <span className="win-count">{Math.round(100 * player.winRate)}% win rate ({player.games} games)</span>
-        </div>
-    }
-    
     private renderRow(game: GameRow): JSX.Element {
         const self = game.players.get(game.self);
         if (!self) {
@@ -451,12 +273,21 @@ class RecentGameList extends React.Component<Props, State> {
     }
 
     private renderPlayer(player: PlayerStats): JSX.Element {
+        const playerUrl = player.userId ? url.getPath({ ...this.props.current, page: "profile", profileId: player.userId }) : null;
+
         return <span className="player-cell" title={`${player.name}: ${player.wins ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
-            <span className={player.wins ? "winner" : ""}>
+            <a href={playerUrl} onClick={(ev) => this.onPlayerClick(ev, player.userId)} className={`${player.wins ? "winner" : "loser"} ${playerUrl ? "known" : "unknown"}`}>
                 {player.wins ? <i className="fas fa-crown" /> : null}
                 {player.name}
-            </span>
+            </a>
         </span>
+    }
+
+    private onPlayerClick(ev: React.MouseEvent, userId: string) {
+        if (userId) {
+            ev.preventDefault();
+            pages.changePage("profile", userId);
+        }
     }
 
     private gameUrl(game: GameRow): string {

@@ -48,6 +48,7 @@ export interface PathElements {
     party?: string;
     server?: string;
     hash?: string;
+    profileId?: string;
 }
 
 export type Action =
@@ -113,6 +114,7 @@ export interface UpdateUrlAction {
 export interface UpdatePageAction {
     type: "updatePage";
     page: string;
+    profileId?: string;
 }
 
 export interface UpdateNotificationsAction {

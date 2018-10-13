@@ -806,17 +806,17 @@ h2 {
     color: #ccc;
 }
 
-.recent-game-list-section {
+.profile-panel {
     position: relative;
 }
 
-.recent-game-list-section .category-selector {
+.profile-panel .category-selector {
     position: absolute;
     top: 0;
     right: 0;
 }
 
-.recent-game-list-section .category {
+.profile-panel .category {
     display: inline-block;
     font-weight: bold;
     font-size: 120%;
@@ -825,12 +825,12 @@ h2 {
     border: 1px #444 solid;
 }
 
-.recent-game-list-section .category:hover {
+.profile-panel .category:hover {
     background: #555;
     cursor: hand;
 }
 
-.recent-game-list-section .category-selected {
+.profile-panel .category-selected {
     background: #444;
     color: #00ccff;
 }
@@ -855,6 +855,20 @@ h2 {
 .game-list .player-cell .winner {
     font-weight: bold;
     color: #00ccff;
+}
+
+.game-list .player-cell .loser.known {
+    font-weight: normal;
+    color: white;
+}
+
+.game-list .player-cell .loser.unknown {
+    font-weight: normal;
+    color: #ccc;
+}
+
+.game-list .player-cell .known:hover {
+    color: #ff8800 !important;
 }
 
 .game-list table thead {

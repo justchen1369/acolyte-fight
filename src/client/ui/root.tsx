@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as d from '../stats.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import AiPanel from './aiPanel';
 import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
-import RecentGameList from './recentGameList';
+import LeaderboardPanel from './leaderboardPanel';
 import PartyPanel from './partyPanel';
 import ProfilePanel from './profilePanel';
 import TitleSection from './titleSection';
@@ -60,7 +61,7 @@ class Root extends React.Component<Props> {
         return (
             <div className="root-panel">
                 {page === "" && this.renderHome()}
-                {page === "replays" && this.renderReplays()}
+                {page === "leaderboard" && this.renderLeaderboard()}
                 {page === "party" && this.renderParty()}
                 {page === "modding" && this.renderModding()}
                 {page === "ai" && this.renderAi()}
@@ -103,15 +104,6 @@ class Root extends React.Component<Props> {
         </div>;
     }
 
-    private renderReplays() {
-        return <div className="content-container">
-            <NavBar />
-            <div className="page">
-                <RecentGameList />
-            </div>
-        </div>;
-    }
-
     private renderRegions() {
         return <div className="content-container">
             <NavBar />
@@ -126,6 +118,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <TitleSection />
+            </div>
+        </div>;
+    }
+
+    private renderLeaderboard() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <LeaderboardPanel category={d.GameCategory.PvP} />
             </div>
         </div>;
     }

@@ -4,13 +4,13 @@ import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
-export function changePage(newPage: string) {
+export function changePage(newPage: string, profileId: string = null) {
     const store = StoreProvider.getState();
     if (!store.socketId) {
-        const newTarget: s.PathElements = { ...store.current, page: newPage };
+        const newTarget: s.PathElements = { ...store.current, page: newPage, profileId };
         window.location.href = url.getPath(newTarget);
     } else {
-        StoreProvider.dispatch({ type: "updatePage", page: newPage });
+        StoreProvider.dispatch({ type: "updatePage", page: newPage, profileId });
     }
 }
 

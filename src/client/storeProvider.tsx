@@ -54,7 +54,11 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updatePage") {
         return {
              ...state,
-            current: { ...state.current, page: action.page },
+            current: {
+                ...state.current,
+                page: action.page,
+                profileId: action.profileId,
+            },
         };
     } else if (action.type === "joinMatch") {
         return {

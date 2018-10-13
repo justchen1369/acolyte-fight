@@ -58,6 +58,7 @@ app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(re
 app.get('/api/gameStats', (req, res) => api.onGetGameStats(req, res));
 app.get('/api/leaderboard', (req, res) => api.onGetLeaderboard(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
+app.get('/api/profile', (req, res) => api.onGetProfile(req, res));
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));
 app.post('/api/settings', (req, res) => api.onUpdateUserSettings(req, res));

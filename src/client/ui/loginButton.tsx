@@ -7,14 +7,14 @@ import NavBarItem from './navbarItem';
 
 interface Props {
     loginAttempted: boolean;
-    loggedIn: boolean;
+    userId: string;
     playerName: string;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         loginAttempted: state.userId !== undefined,
-        loggedIn: !!state.userId,
+        userId: state.userId,
         playerName: state.playerName,
     };
 }
@@ -27,7 +27,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     render() {
-        return this.props.loggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+        return this.props.userId ? this.renderLoggedIn() : this.renderNotLoggedIn();
     }
 
     private renderNotLoggedIn() {
@@ -35,7 +35,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     private renderLoggedIn() {
-        return <NavBarItem className="nav-profile-item" page="profile">{this.props.playerName}</NavBarItem>
+        return <NavBarItem className="nav-profile-item" page="profile" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
     }
 }
 

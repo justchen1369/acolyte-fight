@@ -107,6 +107,35 @@ function dbToUserRating(user: db.User, category: string): db.UserRating {
     return result;
 }
 
+function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
+    if (!data) {
+        return null;
+    }
+
+    const ratings: m.UserRatingLookup = {};
+
+    if (data.ratings) {
+        for (const category in data.ratings) {
+            const rating = data.ratings[category];
+            ratings[category] = {
+                numGames: rating.numGames,
+                damagePerGame: rating.damagePerGame,
+                killsPerGame: rating.killsPerGame,
+                winRate: rating.winRate,
+                rating: rating.rating,
+                rd: rating.rd,
+                lowerBound: rating.lowerBound,
+            };
+        }
+    }
+
+    return {
+        userId,
+        name: data.settings && data.settings.name || userId,
+        ratings,
+    };
+}
+
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
     let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
     if (after) {
@@ -149,6 +178,11 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
         }
     }
     return result;
+}
+
+export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
+    const doc = await firestore.collection('user').doc(userId).get();
+    return dbToProfile(userId, doc.data() as db.User);
 }
 
 async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<RatingDeltas> {

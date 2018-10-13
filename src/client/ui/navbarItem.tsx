@@ -6,6 +6,7 @@ import * as url from '../url';
 
 interface OwnProps {
     page: string;
+    profileId?: string;
     className?: string;
     hideOnMobile?: boolean;
     badge?: boolean;
@@ -25,6 +26,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 class NavBarItem extends React.Component<Props> {
     render() {
         const page = this.props.page;
+        const profileId = this.props.profileId || null;
 
         const classNames = ["nav-item"];
         if (this.props.className) {
@@ -37,8 +39,8 @@ class NavBarItem extends React.Component<Props> {
             classNames.push("nav-optional");
         }
 
-        const newPath = url.getPath(Object.assign({}, this.props.current, { page }));
-        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page)}>
+        const newPath = url.getPath(Object.assign({}, this.props.current, { page, profileId }));
+        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page, profileId)}>
             <span className="nav-item-label">
                 {this.props.children}
                 {this.props.badge && <i className="badge fas fa-circle" />}
@@ -46,12 +48,12 @@ class NavBarItem extends React.Component<Props> {
         </a>
     }
 
-    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string) {
+    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string, profileId: string) {
         if (this.props.onClick) {
             this.props.onClick(ev);
         } else {
             ev.preventDefault();
-            pages.changePage(newPage);
+            pages.changePage(newPage, profileId);
         }
     }
 }

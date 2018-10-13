@@ -315,3 +315,24 @@ export interface LeaderboardPlayer {
     rd: number;
     lowerBound: number;
 }
+
+
+export interface GetProfileResponse {
+    userId: string;
+    name: string;
+    ratings: UserRatingLookup;
+}
+
+export interface UserRatingLookup {
+    [category: string]: UserRating;
+}
+
+export interface UserRating {
+    rating: number;
+    rd: number;
+    lowerBound: number;
+    numGames: number;
+    damagePerGame: number;
+    killsPerGame: number;
+    winRate: number;
+}

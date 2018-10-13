@@ -179,6 +179,25 @@ export async function onGetGameStatsAsync(req: express.Request, res: express.Res
     res.send(response);
 }
 
+export function onGetProfile(req: express.Request, res: express.Response) {
+    onGetProfileAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetProfileAsync(req: express.Request, res: express.Response): Promise<void> {
+    const userId = req.query.p;
+    if (!userId) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    const profile = await statsStorage.getProfile(userId);
+    if (profile) {
+        res.send(profile);
+    } else {
+        res.status(404).send("Not found");
+    }
+}
+
 export function onGetUserSettings(req: express.Request, res: express.Response) {
     onGetUserSettingsAsync(req, res).catch(error => handleError(error, res));
 }
@@ -257,7 +276,8 @@ export function onGetLeaderboard(req: express.Request, res: express.Response) {
 }
 
 export async function onGetLeaderboardAsync(req: express.Request, res: express.Response): Promise<void> {
-    const leaderboard = await statsStorage.getLeaderboard("PvP");
+    const category = req.query.category;
+    const leaderboard = await statsStorage.getLeaderboard(category);
     const response: m.GetLeaderboardResponse = {
         leaderboard,
     };
