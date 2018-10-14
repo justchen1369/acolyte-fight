@@ -21,7 +21,7 @@ function initialState(): s.State {
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(),
         aiCode: null,
-        current: {},
+        current: { page: "", profileId: null },
         socketId: null,
         server: null,
         room,

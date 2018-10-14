@@ -102,8 +102,13 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
         return <div>
             <h1>{profile.name}</h1>
-            <div>{rating.lowerBound.toFixed(0)} rating</div>
-            <h1>Played {rating.numGames} games</h1>
+            <div className="stats-card-row">
+                <div className="stats-card">
+                    <div className="label">Rating</div>
+                    <div className="value">{rating.lowerBound.toFixed(0)}</div>
+                </div>
+            </div>
+            <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
                 <div className="stats-card">
                     <div className="label">Win rate</div>
