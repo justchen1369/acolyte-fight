@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import crypto from 'crypto';
 import glicko from 'glicko2';
+import moment from 'moment';
 import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
 import * as constants from '../game/constants';
@@ -223,14 +224,24 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
             calculateNewStats(userRating, player, isWinner);
         }
 
-        // Performupdate
+        // Perform update
         for (const doc of docs) {
             const userRating = userRatings.get(doc.id);
 
+            // Save rating
             const delta: Partial<db.User> = {
                 ratings: { [category]: userRating },
             };
             transaction.update(doc.ref, delta);
+
+            // Save rating to history
+            const unixDate = unixDateFromTimestamp(gameStats.unixTimestamp);
+            const historyItem: db.UserRatingHistoryItem = {
+                unixDate,
+                ratings: { [category]: userRating },
+            };
+            const historyId = moment.unix(unixDate).format("YYYY-MM-DD");
+            doc.ref.collection(Collections.UserRatingHistory).doc(historyId).set(historyItem);
         }
 
         // Calculate rating deltas
@@ -245,6 +256,11 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
     });
 
     return ratingDeltas;
+}
+
+function unixDateFromTimestamp(unixTimestamp: number): number {
+    const SecondsPerDay = 86400;
+    return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
 function calculateNewGlickoRatings(allRatings: Map<string, db.UserRating>, winningUserId: string) {

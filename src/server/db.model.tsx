@@ -2,6 +2,7 @@ import * as Firestore from '@google-cloud/firestore';
 
 export namespace Collections {
     export const User = 'user';
+    export const UserRatingHistory = 'ratingHistory';
     export const Game = 'game';
 }
 
@@ -26,6 +27,11 @@ export interface UserRating {
     killsPerGame: number;
     damagePerGame: number;
     winRate: number;
+}
+
+export interface UserRatingHistoryItem {
+    unixDate: number;
+    ratings: UserRatingLookup;
 }
 
 export interface Game {
