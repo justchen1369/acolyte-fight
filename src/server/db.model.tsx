@@ -36,6 +36,7 @@ export interface Game {
 export interface GameStats {
     category: string;
     winner: string; // userHash
+    winnerUserId?: string;
     lengthSeconds: number;
     players: PlayerStats[];
     server: string;

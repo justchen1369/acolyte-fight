@@ -43,7 +43,7 @@ function initialRating(): db.UserRating {
 }
 
 function gameStatsToDb(data: m.GameStatsMsg): db.Game {
-	return {
+	const game: db.Game = {
         unixTimestamp: data.unixTimestamp,
         userIds: data.players.map(p => p.userId).filter(x => !!x),
         stats: {
@@ -54,6 +54,13 @@ function gameStatsToDb(data: m.GameStatsMsg): db.Game {
             server: data.server,
         }
     };
+
+    const winningPlayer = data.players && data.players.find(p => p.userHash === data.winner);
+    if (winningPlayer && winningPlayer.userId) {
+        game.stats.winnerUserId = winningPlayer.userId;
+    }
+
+    return game;
 }
 
 function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
