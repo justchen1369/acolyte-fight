@@ -35,6 +35,8 @@ function calculateNextRefresh(cumulativeFrequencies: Map<string, number[]>) {
     const numUsers = _.max([...cumulativeFrequencies.values()].map(cumulativeFrequency => _.last(cumulativeFrequency)));
     if (numUsers < 100) {
         return 5 * 60 * 1000;
+    } else if (numUsers < 1000) {
+        return 20 * 60 * 1000;
     } else {
         return 60 * 60 * 1000;
     }
