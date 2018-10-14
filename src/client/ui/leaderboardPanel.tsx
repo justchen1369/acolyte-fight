@@ -23,6 +23,7 @@ interface Props extends OwnProps {
 interface State {
     category: string;
     leaderboard: m.LeaderboardPlayer[];
+    profile: m.GetProfileResponse;
     error: string;
 }
 
@@ -30,8 +31,24 @@ async function retrieveLeaderboardAsync(category: string) {
     const res = await fetch(`api/leaderboard?category=${encodeURIComponent(category)}&limit=100`, {
         credentials: 'same-origin'
     });
-    const json = await res.json() as m.GetLeaderboardResponse;
-    return json.leaderboard;
+    if (res.status === 200) {
+        const json = await res.json() as m.GetLeaderboardResponse;
+        return json.leaderboard;
+    } else {
+        throw await res.text();
+    }
+}
+
+async function retrieveUserStatsAsync(profileId: string) {
+    const res = await fetch(`api/profile?p=${encodeURIComponent(profileId)}`, {
+        credentials: 'same-origin'
+    });
+    if (res.status === 200) {
+        const json = await res.json() as m.GetProfileResponse;
+        return json;
+    } else {
+        throw await res.text();
+    }
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -48,6 +65,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
         this.state = {
             category: null,
             leaderboard: null,
+            profile: null,
             error: null,
         };
     }
@@ -69,6 +87,11 @@ class LeaderboardPanel extends React.Component<Props, State> {
                 if (category === this.state.category) {
                     this.setState({ leaderboard });
                 }
+
+                if (this.props.myUserId) {
+                    const profile = await retrieveUserStatsAsync(this.props.myUserId);
+                    this.setState({ profile });
+                }
             } catch(error) {
                 console.error("LeaderboardPanel error", error);
                 this.setState({ error: `${error}` });
@@ -87,20 +110,48 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     private renderLeaderboard() {
+        const category = this.state.category;
+        const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
             <h1>Leaderboard</h1>
             <div className="leaderboard">
-                {this.state.leaderboard.map((player, index) => this.renderRow(player, index))}
+                {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
+                {!isOnLeaderboard && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
             </div>
         </div>
     }
 
-    private renderRow(player: m.LeaderboardPlayer, index: number) {
+    private renderRow(player: m.LeaderboardPlayer, position: number) {
+        if (!player) {
+            return null;
+        }
+
         return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"}>
-            <span className="position">{index + 1}</span>
+            <span className="position">{position}</span>
             {this.renderPlayerName(player)}
             <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
+    }
+
+    private createSelfPlayer(profile: m.GetProfileResponse, category: string): m.LeaderboardPlayer {
+        if (!profile) {
+            return null;
+        }
+
+        const userRating = profile.ratings[category];
+        if (!userRating) {
+            return null;
+        }
+
+        const result: m.LeaderboardPlayer = {
+            userId: profile.userId,
+            name: profile.name,
+            rating: userRating.rating,
+            rd: userRating.rd,
+            lowerBound: userRating.lowerBound,
+            numGames: userRating.numGames,
+        };
+        return result;
     }
 
     private renderPlayerName(player: m.LeaderboardPlayer) {

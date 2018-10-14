@@ -28,8 +28,8 @@ interface RatingDeltas {
 
 const glickoSettings: glicko.Settings = {
     tau: 0.2,
-    rating: 1100,
-    rd: 50,
+    rating: 1700,
+    rd: 350,
     vol: 0.06,
 };
 
