@@ -129,7 +129,6 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderNoRating(profile: m.GetProfileResponse) {
         return <div>
             <h1>{profile.name}</h1>
-            <p>No stats for this mode yet!</p>
         </div>
     }
 }

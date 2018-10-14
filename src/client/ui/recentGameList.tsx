@@ -194,7 +194,7 @@ class RecentGameList extends React.Component<Props, State> {
     private renderGames(): JSX.Element {
         const games = getGameSubset(this.state);
         return <div>
-            <h1>Games</h1>
+            <h2>Games</h2>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
             {!this.state.games && <p className="loading-text">Loading...</p>}
             {games && games.length === 0 && <p>No recent games</p>}
