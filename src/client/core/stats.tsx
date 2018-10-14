@@ -122,13 +122,13 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         // The user cleared the cookies and haven't been assigned a new hash - we can't store anything for them as we don't know who they are
         return null;
     } else if (Object.keys(world.mod).length > 0) {
-        category = d.GameCategory.Mods;
+        category = m.GameCategory.Mods;
     } else if (selfPlayer.isBot) {
-        category = d.GameCategory.AIvAI;
+        category = m.GameCategory.AIvAI;
     } else if (numHumans > 1) {
-        category = d.GameCategory.PvP;
+        category = m.GameCategory.PvP;
     } else {
-        category = d.GameCategory.PvAI;
+        category = m.GameCategory.PvAI;
     }
 
     const stats: d.GameStats = {

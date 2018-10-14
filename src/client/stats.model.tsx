@@ -1,17 +1,3 @@
-export namespace GameCategory {
-    export const PvP = "PvP";
-    export const PvAI = "PvAI";
-    export const AIvAI = "AIvAI";
-    export const Mods = "Mods";
-
-    export const All = [
-        PvP,
-        PvAI,
-        AIvAI,
-        Mods,
-    ];
-}
-
 export interface GameStats {
     id: string;
     category: string;

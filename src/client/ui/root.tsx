@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as d from '../stats.model';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import AiPanel from './aiPanel';
@@ -126,7 +127,7 @@ class Root extends React.Component<Props> {
         return <div className="content-container">
             <NavBar />
             <div className="page">
-                <LeaderboardPanel category={d.GameCategory.PvP} />
+                <LeaderboardPanel category={m.GameCategory.PvP} />
             </div>
         </div>;
     }

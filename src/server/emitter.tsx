@@ -1,6 +1,7 @@
 import moment from 'moment';
 import uniqid from 'uniqid';
 import * as auth from './auth';
+import * as categories from './categories';
 import * as games from './games';
 import { AuthHeader, getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -479,7 +480,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 
 	socket.join(game.id);
 
-	const publicCategory = games.publicCategory();
+	const publicCategory = categories.publicCategory();
 	const numPlayersPublic = games.calculateRoomStats(publicCategory);
 	const numPlayersInCategory = games.calculateRoomStats(game.category);
 	const msg: m.HeroMsg = {

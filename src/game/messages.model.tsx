@@ -2,6 +2,20 @@ import * as c from './world.model';
 
 export const AuthCookieName = "enigma-auth";
 
+export namespace GameCategory {
+    export const PvP = "PvP";
+    export const PvAI = "PvAI";
+    export const AIvAI = "AIvAI";
+    export const Mods = "Mods";
+
+    export const All = [
+        PvP,
+        PvAI,
+        AIvAI,
+        Mods,
+    ];
+}
+
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";

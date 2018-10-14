@@ -6,6 +6,7 @@ import url from 'url';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
+import * as categories from './categories';
 import * as discord from './discord';
 import * as games from './games';
 import * as loadMetrics from './loadMetrics';
@@ -61,7 +62,7 @@ export function getExternalStatus() {
 	const status: m.ExternalStatus = {
         region: location.region,
         host: location.server,
-        numPlayers: games.calculateRoomStats(games.publicCategory()),
+        numPlayers: games.calculateRoomStats(categories.publicCategory()),
     };
     return status;
 }

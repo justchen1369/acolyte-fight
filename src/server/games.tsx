@@ -6,6 +6,7 @@ import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
+import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as mirroring from './mirroring';
@@ -92,7 +93,7 @@ function startTickProcessing() {
 
 export function findNewGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const category = calculateGameCategory(roomId, privatePartyId, allowBots);
+	const category = categories.calculateGameCategory(roomId, privatePartyId, allowBots);
 	const store = getStore();
 
 	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
@@ -135,14 +136,6 @@ export function findNewGame(room: g.Room | null, privatePartyId: string | null, 
 
 export function calculateRoomStats(category: string): number {
 	return getStore().playerCounts[category] || 0;
-}
-
-export function calculateGameCategory(roomId: string, privatePartyId: string, allowBots: boolean) {
-	return `room=${roomId}/party=${privatePartyId}/allowBots=${allowBots}`;
-}
-
-export function publicCategory() {
-	return calculateGameCategory(null, null, false);
 }
 
 function apportionPerGame(totalPlayers: number) {
@@ -225,7 +218,7 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		category: calculateGameCategory(roomId, privatePartyId, allowBots),
+		category: categories.calculateGameCategory(roomId, privatePartyId, allowBots),
 		roomId,
 		privatePartyId,
 		mod: room ? room.mod : {},
@@ -234,6 +227,7 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
 		playerNames: new Array<string>(),
+		userIds: new Set<string>(),
 		numPlayers: 0,
 		winTick: null,
 		scores: new Map<string, m.GameStatsMsg>(),
@@ -559,6 +553,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 
 	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken)).then(userId => {
+		game.userIds.add(userId);
 		queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
 	});
 

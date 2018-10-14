@@ -29,7 +29,7 @@ export class ProfilePanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            category: d.GameCategory.PvP,
+            category: m.GameCategory.PvP,
         };
     }
 
@@ -37,7 +37,7 @@ export class ProfilePanel extends React.Component<Props, State> {
         const profileId = this.props.current.profileId || this.props.myUserId;
         const isMe = profileId === this.props.myUserId;
 
-        const category = isMe ? this.state.category : d.GameCategory.PvP;
+        const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && this.renderCategorySelector()}
             {isMe && <AccountPanel />}
@@ -48,7 +48,7 @@ export class ProfilePanel extends React.Component<Props, State> {
 
     private renderCategorySelector(): JSX.Element {
         return <div className="category-selector">
-            {d.GameCategory.All.map(category => (
+            {m.GameCategory.All.map(category => (
                 <div
                     key={category}
                     className={category === this.state.category ? "category category-selected" : "category"}

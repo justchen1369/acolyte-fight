@@ -4,6 +4,7 @@ import moment from 'moment';
 import { MaxGamesToKeep } from '../game/constants';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
+import * as m from '../game/messages.model';
 
 const settingsStorage = localForage.createInstance({ name: 'acolyte-fight-settings' });
 const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
@@ -107,7 +108,7 @@ export async function setStatsLoadedUntil(until: moment.Moment) {
 function migrateGame(game: d.GameStats): d.GameStats {
     return {
         ...game,
-        category: game.category || d.GameCategory.PvP,
+        category: game.category || m.GameCategory.PvP,
     };
 }
 

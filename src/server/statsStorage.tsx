@@ -4,6 +4,7 @@ import glicko from 'glicko2';
 import moment from 'moment';
 import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
+import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as db from './db.model';
 import * as g from './server.model';
@@ -307,9 +308,7 @@ function calculateLowerBound(rating: number, rd: number) {
 export async function saveGame(game: g.Game) {
     try {
         const gameStats = findStats(game);
-        if (gameStats) {
-            // TODO: Validate players are actually in the game
-
+        if (gameStats && validateGameStats(gameStats, game)) {
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
             applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);
@@ -317,6 +316,27 @@ export async function saveGame(game: g.Game) {
     } catch (error) {
         logger.error("Unable to save game stats:");
         logger.error(error);
+    }
+}
+
+function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
+    const gameCategory = calculateGameCategory(game);
+    if (!gameCategory) {
+        return false;
+    }
+
+    return gameStats.category === gameCategory
+        && gameStats.players.some(p => p.userHash === gameStats.winner)
+        && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId));
+}
+
+function calculateGameCategory(game: g.Game) {
+    if (game.category === categories.publicCategory()) {
+        return m.GameCategory.PvP;
+    } else if (game.category === categories.publicCategory(true)) {
+        return m.GameCategory.AIvAI;
+    } else {
+        return null;
     }
 }
 
@@ -329,8 +349,8 @@ function applyRatingDeltas(gameStats: m.GameStatsMsg, ratingDeltas: RatingDeltas
 }
 
 function findStats(game: g.Game): m.GameStatsMsg {
-    if (game.scores.size <= 1) {
-        // Only store multiplayer games because people can fake stats otherwise
+    if (game.scores.size <= 1 // Only store multiplayer games because people can fake stats otherwise
+        || game.category !== categories.publicCategory()) {
         return null;
     }
     const corroborateThreshold = Math.max(2, Math.ceil(game.scores.size / 2)); // Majority must agree

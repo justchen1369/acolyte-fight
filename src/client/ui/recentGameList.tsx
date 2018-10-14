@@ -160,7 +160,7 @@ class RecentGameList extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            category: d.GameCategory.PvP,
+            category: m.GameCategory.PvP,
             self: null,
             games: null,
             availableReplays: new Set<string>(),
