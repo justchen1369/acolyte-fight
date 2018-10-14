@@ -7,6 +7,7 @@ import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
 
 interface Props {
+    isLoggedIn: boolean;
     isUsingAI: boolean;
     isModded: boolean;
     inParty: boolean;
@@ -14,6 +15,7 @@ interface Props {
 
 function stateToProps(state: s.State): Props {
     return {
+        isLoggedIn: !!state.userId,
         isUsingAI: !!state.aiCode,
         isModded: Object.keys(state.room.mod).length > 0,
         inParty: !!state.party,
@@ -30,8 +32,8 @@ class NavBar extends React.Component<Props> {
         return <div className="navbar">
             <NavBarItem page="">Home</NavBarItem>
             <NavBarItem page="leaderboard">Leaderboard</NavBarItem>
-            <NavBarItem page="modding" hideOnMobile={true} badge={this.props.isModded}>Modding</NavBarItem>
-            <NavBarItem page="ai" hideOnMobile={true} badge={this.props.isUsingAI}>AI</NavBarItem>
+            {(this.props.isLoggedIn || this.props.isModded) && <NavBarItem page="modding" hideOnMobile={true} badge={this.props.isModded}>Modding</NavBarItem>}
+            {(this.props.isLoggedIn || this.props.isUsingAI) && <NavBarItem page="ai" hideOnMobile={true} badge={this.props.isUsingAI}>AI</NavBarItem>}
             <NavBarItem page="regions">Regions</NavBarItem>
             <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
             <NavBarItem page="about">About</NavBarItem>
