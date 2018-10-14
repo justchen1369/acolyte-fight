@@ -11,6 +11,7 @@ import { logger } from './logging';
 import * as dbStorage from './dbStorage';
 import * as discord from './discord';
 import * as gameStorage from './gameStorage';
+import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
 
 const rootDir = path.resolve('.');
@@ -36,6 +37,7 @@ api.init(port);
 dbStorage.init();
 discord.init(discordSecret);
 gameStorage.initStorage(replaysBasePath);
+percentiles.init();
 if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
 }

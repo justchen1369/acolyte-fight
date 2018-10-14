@@ -10,6 +10,7 @@ import * as categories from './categories';
 import * as discord from './discord';
 import * as games from './games';
 import * as loadMetrics from './loadMetrics';
+import * as percentiles from './percentiles';
 import * as sanitize from '../game/sanitize';
 import * as statsStorage from './statsStorage';
 import * as userStorage from './userStorage';

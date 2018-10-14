@@ -8,3 +8,11 @@ export const firestore = new Firestore.Firestore({
 
 export function init() {
 }
+
+export function stream(query: Firestore.Query, func: (doc: Firestore.DocumentSnapshot) => void): Promise<void> {
+    return new Promise((resolve, reject) => {
+        query.stream().on('data', func).on('end', () => {
+            resolve();
+        });
+    });
+}

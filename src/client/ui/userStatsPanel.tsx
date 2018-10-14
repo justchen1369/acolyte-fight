@@ -3,6 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
+import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -107,6 +108,10 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="label">Rating</div>
                     <div className="value">{rating.lowerBound.toFixed(0)}</div>
                 </div>
+                {rating.numGames >= constants.Placements.MinGames && <div className="stats-card">
+                    <div className="label">{rating.percentile.toFixed(1)} percentile</div>
+                    <div className="value">{this.getLeagueName(rating.percentile)}</div>
+                </div>}
             </div>
             <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
@@ -130,6 +135,24 @@ class UserStatsPanel extends React.Component<Props, State> {
         return <div>
             <h1>{profile.name}</h1>
         </div>
+    }
+
+    private getLeagueName(percentile: number) {
+        if (percentile >= constants.Placements.Grandmaster) {
+            return "Grandmaster";
+        } else if (percentile >= constants.Placements.Master) {
+            return "Master";
+        } else if (percentile >= constants.Placements.Diamond) {
+            return "Diamond";
+        } else if (percentile >= constants.Placements.Platinum) {
+            return "Platinum";
+        } else if (percentile >= constants.Placements.Gold) {
+            return "Gold";
+        } else if (percentile >= constants.Placements.Silver) {
+            return "Silver";
+        } else {
+            return "Bronze";
+        }
     }
 }
 

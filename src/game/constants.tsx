@@ -26,6 +26,17 @@ export namespace Matchmaking {
 	export const BotName = "AcolyteBot";
 }
 
+export namespace Placements {
+	export const MinGames = 10;
+	export const Grandmaster = 98;
+	export const Master = 90;
+	export const Diamond = 80;
+	export const Platinum = 70;
+	export const Gold = 60;
+	export const Silver = 30;
+	export const Bronze = 0;
+}
+
 export namespace HeroColors {
 	export const MyHeroColor = '#00ccff';
 	export const BotColor = '#cccccc';

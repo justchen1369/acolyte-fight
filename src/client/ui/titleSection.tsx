@@ -54,6 +54,19 @@ export class TitleSection extends React.Component<Props, State> {
                 On iPhone - tap the Share button, click Add to Home Screen.
                 On Android - tap the triple dot menu button, click Add to Home Screen.
             </p>
+            <h2>How are the leagues calculated?</h2>
+            <p>
+                These are the leagues and the minimum percentiles:
+                <ul>
+                    <li>Grandmaster: {constants.Placements.Grandmaster} percentile</li>
+                    <li>Master: {constants.Placements.Master} percentile</li>
+                    <li>Diamond {constants.Placements.Diamond} percentile</li>
+                    <li>Platinum: {constants.Placements.Platinum} percentile</li>
+                    <li>Gold: {constants.Placements.Gold} percentile</li>
+                    <li>Silver: {constants.Placements.Silver} percentile</li>
+                    <li>Bronze: {constants.Placements.Bronze} percentile</li>
+                </ul>
+            </p>
             <h2>How long are replays stored for?</h2>
             <p>
                 Replays are stored until the server is updated. This can sometimes be days and sometimes it can be hours.

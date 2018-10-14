@@ -350,4 +350,5 @@ export interface UserRating {
     damagePerGame: number;
     killsPerGame: number;
     winRate: number;
+    percentile: number;
 }

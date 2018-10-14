@@ -10,6 +10,7 @@ import * as db from './db.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as mirroring from './mirroring';
+import * as percentiles from './percentiles';
 import * as s from './server.model';
 import { Collections  } from './db.model';
 import { firestore } from './dbStorage';
@@ -134,6 +135,7 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
                 rating: rating.rating,
                 rd: rating.rd,
                 lowerBound: rating.lowerBound,
+                percentile: 50, // Filled out later
             };
         }
     }
@@ -192,7 +194,14 @@ export async function getLeaderboard(category: string, limit: number): Promise<m
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
     const doc = await firestore.collection('user').doc(userId).get();
-    return dbToProfile(userId, doc.data() as db.User);
+
+    const profile = dbToProfile(userId, doc.data() as db.User);
+    for (const category in profile.ratings) {
+        const userRatings = profile.ratings[category];
+        userRatings.percentile = percentiles.estimatePercentile(userRatings.lowerBound, category);
+    }
+
+    return profile;
 }
 
 async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<RatingDeltas> {
