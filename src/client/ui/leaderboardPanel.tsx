@@ -63,7 +63,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
 
     private async loadDataAsync(category: string) {
         if (category !== this.state.category) {
-            this.setState({ category, leaderboard: null });
+            this.setState({ category, leaderboard: null, error: null });
             try {
                 const leaderboard = await retrieveLeaderboardAsync(category);
                 if (category === this.state.category) {

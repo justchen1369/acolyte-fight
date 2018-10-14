@@ -60,7 +60,7 @@ class UserStatsPanel extends React.Component<Props, State> {
 
     private async loadDataAsync(profileId: string) {
         if (profileId !== this.state.profileId) {
-            this.setState({ profileId, profile: null });
+            this.setState({ profileId, profile: null, error: null });
             try {
                 const profile = await retrieveUserStatsAsync(profileId);
                 if (profile.userId === this.state.profileId) {
