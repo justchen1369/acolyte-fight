@@ -35,8 +35,8 @@ class NavBar extends React.Component<Props> {
             {(this.props.isLoggedIn || this.props.isModded) && <NavBarItem page="modding" hideOnMobile={true} badge={this.props.isModded}>Modding</NavBarItem>}
             {(this.props.isLoggedIn || this.props.isUsingAI) && <NavBarItem page="ai" hideOnMobile={true} badge={this.props.isUsingAI}>AI</NavBarItem>}
             <NavBarItem page="regions">Regions</NavBarItem>
-            <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
-            <NavBarItem page="about">About</NavBarItem>
+            <NavBarItem page="party" badge={this.props.inParty} hideOnMobile={true}>Party</NavBarItem>
+            <NavBarItem page="about" hideOnMobile={true}>About</NavBarItem>
             <div className="spacer" />
             <LoginButton />
         </div>
