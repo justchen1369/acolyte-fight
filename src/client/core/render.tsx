@@ -82,7 +82,7 @@ export function render(world: w.World, canvasStack: CanvasStack, rebindings: Key
 		renderCursor(cursorCtx, world, rect, worldRect);
 	}
 
-	// Everything also always gets rendered (used to wait for changes, TODO: merge with cursor rendering)
+	// Everything also always gets rendered (used to wait for changes)
 	world.ui.renderedTick = world.tick;
 
 	let ctxStack = {

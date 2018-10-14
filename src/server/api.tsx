@@ -114,7 +114,10 @@ export function onCreateTestUser(req: express.Request, res: express.Response) {
 }
 
 async function onCreateTestUserAsync(req: express.Request, res: express.Response): Promise<void> {
-    // TODO: Add authentication
+    if (!(req.query.a && req.query.a === "secret123")) {
+        res.status(403).send("Forbidden");
+        return;
+    }
 
     const authToken = auth.resendAuthToken(req, res);
     const origin = getOrigin(req);
