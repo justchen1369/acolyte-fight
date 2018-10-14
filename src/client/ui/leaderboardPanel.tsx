@@ -17,6 +17,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     current: s.PathElements;
+    myUserId: string;
 }
 
 interface State {
@@ -26,7 +27,7 @@ interface State {
 }
 
 async function retrieveLeaderboardAsync(category: string) {
-    const res = await fetch(`api/leaderboard?category=${encodeURIComponent(category)}`, {
+    const res = await fetch(`api/leaderboard?category=${encodeURIComponent(category)}&limit=100`, {
         credentials: 'same-origin'
     });
     const json = await res.json() as m.GetLeaderboardResponse;
@@ -37,6 +38,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         current: state.current,
+        myUserId: state.userId,
     };
 }
 
@@ -94,10 +96,10 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     private renderRow(player: m.LeaderboardPlayer, index: number) {
-        return <div className="leaderboard-row">
+        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"}>
             <span className="position">{index + 1}</span>
             {this.renderPlayerName(player)}
-            <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating</span>
+            <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
     }
 

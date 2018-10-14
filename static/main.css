@@ -778,17 +778,25 @@ h2 {
     border: 1px #666 solid;
 }
 
-.leaderboard-row.leaderboard-best {
+.leaderboard-row.leaderboard-self {
     background: #555;
     border: 1px #888 solid;
 }
 
-.leaderboard-row.leaderboard-best:hover {
+.leaderboard-row.leaderboard-self:hover {
     background: #666;
 }
 
-.leaderboard-row.leaderboard-best .player-name {
+.leaderboard-row.leaderboard-self .player-name {
     font-size: 250%;
+}
+
+.leaderboard-row .leaderboard-num-games {
+    opacity: 0;
+}
+
+.leaderboard-row:hover .leaderboard-num-games {
+    opacity: 1;
 }
 
 .leaderboard-row .position {
@@ -799,6 +807,14 @@ h2 {
 .leaderboard-row .player-name {
     font-size: 120%;
     font-weight: bold;
+}
+
+.leaderboard-row .player-name a {
+    color: white;
+}
+
+.leaderboard-row .player-name a:hover {
+    color: #ff8800;
 }
 
 .leaderboard-row .win-count {

@@ -160,8 +160,8 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
-export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
-    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(100).get();
+export async function getLeaderboard(category: string, limit: number): Promise<m.LeaderboardPlayer[]> {
+    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(limit).get();
 
     let result = new Array<m.LeaderboardPlayer>();
     for (const doc of querySnapshot.docs) {
@@ -174,6 +174,7 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
                 rating: ratings.rating,
                 rd: ratings.rd,
                 lowerBound: ratings.lowerBound,
+                numGames: ratings.numGames,
             });
         }
     }

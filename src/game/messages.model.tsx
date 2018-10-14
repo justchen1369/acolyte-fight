@@ -314,6 +314,7 @@ export interface LeaderboardPlayer {
     rating: number;
     rd: number;
     lowerBound: number;
+    numGames: number;
 }
 
 

@@ -276,8 +276,15 @@ export function onGetLeaderboard(req: express.Request, res: express.Response) {
 }
 
 export async function onGetLeaderboardAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.category && req.query.limit)) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
     const category = req.query.category;
-    const leaderboard = await statsStorage.getLeaderboard(category);
+    const limit = Math.min(100, parseInt(req.query.limit));
+
+    const leaderboard = await statsStorage.getLeaderboard(category, limit);
     const response: m.GetLeaderboardResponse = {
         leaderboard,
     };
