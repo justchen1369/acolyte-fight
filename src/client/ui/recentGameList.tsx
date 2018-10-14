@@ -12,10 +12,6 @@ import * as pages from '../core/pages';
 import * as storage from '../storage';
 import * as url from '../url';
 
-interface CategoryCounts {
-    [category: string]: number;
-}
-
 interface Stats {
     games: number;
     wins: number;
@@ -57,19 +53,6 @@ interface State {
     error: string;
     availableReplays: Set<string>;
 }
-
-const getCategoryCounts = Reselect.createSelector(
-    (games: GameRow[]) => games,
-    (games) => {
-        const counts: CategoryCounts = {};
-        if (games) {
-            for (const game of games) {
-                counts[game.category] = (counts[game.category] || 0) + 1;
-            }
-        }
-        return counts;
-    }
-);
 
 const getGameSubset = Reselect.createSelector(
     (state: State) => state.category,
@@ -191,18 +174,9 @@ class RecentGameList extends React.Component<Props, State> {
 
     componentDidMount() {
         retrieveGamesAsync().then(games => {
-            const counts = getCategoryCounts(games);
-
-            // Choose a category with data in it
-            let category = this.state.category;
-            if (!counts[category] && Object.keys(counts).length > 0) {
-                category = Object.keys(counts)[0];
-            }
-
             this.setState({
                 games,
                 self: findSelf(games),
-                category,
             });
         }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
             this.setState({ availableReplays: new Set<string>(ids) });
