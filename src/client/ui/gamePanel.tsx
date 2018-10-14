@@ -54,6 +54,8 @@ class GamePanel extends React.Component<Props, State> {
     }
 
     private onExitClicked(ev: React.MouseEvent) {
+        ev.preventDefault();
+
         if (!(this.props.party && this.props.party.ready)) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();

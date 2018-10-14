@@ -17,14 +17,11 @@ function stateToProps(state: s.State): Props {
 
 class UrlListener extends React.Component<Props, State> {
     render(): JSX.Element {
-        return null;
-    }
+        const previous = window.history.state || url.parseLocation(window.location);
 
-    componentWillReceiveProps(newProps: Props) {
-        const current = this.props.current;
-        const next = newProps.current;
+        const next = this.props.current;
         const path = url.getPath(next);
-        if (current.page !== next.page || current.profileId !== next.profileId || current.gameId !== next.gameId) {
+        if (previous.page !== next.page || previous.profileId !== next.profileId || previous.gameId !== next.gameId) {
             window.history.pushState(next, null, path);
         } else {
             window.history.replaceState(next, null, path);
@@ -35,6 +32,8 @@ class UrlListener extends React.Component<Props, State> {
         if (gtag && gaTrackingId) {
             gtag('config', gaTrackingId, {'page_path': path});
         }
+
+        return null;
     }
 }
 

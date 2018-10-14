@@ -22,9 +22,13 @@ export function reloadPageIfNecessary() {
 }
 
 export function go(elems: s.PathElements) {
-    if (elems.gameId) {
+    const store = StoreProvider.getState();
+    if (elems.gameId && store.current.gameId !== elems.gameId) {
         matches.joinNewGame(elems.gameId);
     } else {
+        if (store.current.gameId) {
+            matches.leaveCurrentGame();
+        }
         changePage(elems.page, elems.profileId);
     }
 }
