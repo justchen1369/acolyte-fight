@@ -61,7 +61,7 @@ export class TitleSection extends React.Component<Props, State> {
                 If you want to keep your replay permanently, take a video of your game.
             </p>
             <h2>How is the leaderboard calculated?</h2>
-            <p>The leaderboard is only calculated from games which you have participated in. The game will only store stats for a maximum of {constants.MaxGamesToKeep} games.</p>
+            <p>The leaderboard calculated according to the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system" target="_blank">Glicko-2 rating system</a>.</p>
             <h2>What is the tech stack for this game?</h2>
             <p>Server and client are coded in TypeScript. Canvas is used for graphics, React for UI elements. Networking uses socket.io. Physics engine is Planck.js.</p>
             <h1>Credits</h1>
