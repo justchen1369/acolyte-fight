@@ -12,18 +12,36 @@ import * as matches from '../core/matches';
 import * as storage from '../storage';
 import * as url from '../url';
 
+interface League {
+    name: string;
+    minPercentile: number;
+}
+
 interface OwnProps {
     profileId: string;
     category: string;
 }
 interface Props extends OwnProps {
+    myUserId: string;
 }
 
 interface State {
     profileId: string;
     profile: m.GetProfileResponse;
+    distributions: m.GetDistributionsResponse;
     error: string;
 }
+
+export const leagues = [
+    { name: "Grandmaster", minPercentile: constants.Placements.Grandmaster },
+    { name: "Master", minPercentile: constants.Placements.Master },
+    { name: "Diamond", minPercentile: constants.Placements.Diamond },
+    { name: "Platinum", minPercentile: constants.Placements.Platinum },
+    { name: "Gold", minPercentile: constants.Placements.Gold },
+    { name: "Silver", minPercentile: constants.Placements.Silver },
+    { name: "Bronze", minPercentile: constants.Placements.Bronze },
+    { name: "Wood", minPercentile: constants.Placements.Wood },
+];
 
 async function retrieveUserStatsAsync(profileId: string) {
     const res = await fetch(`api/profile?p=${encodeURIComponent(profileId)}`, {
@@ -37,8 +55,23 @@ async function retrieveUserStatsAsync(profileId: string) {
     }
 }
 
+async function retrieveDistributionsAsync() {
+    const res = await fetch(`api/distributions`, {
+        credentials: 'same-origin'
+    });
+    if (res.status === 200) {
+        const json = await res.json() as m.GetDistributionsResponse;
+        return json;
+    } else {
+        throw await res.text();
+    }
+}
+
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    return { ...ownProps };
+    return {
+        ...ownProps,
+        myUserId: state.userId,
+    };
 }
 
 class UserStatsPanel extends React.Component<Props, State> {
@@ -47,6 +80,7 @@ class UserStatsPanel extends React.Component<Props, State> {
         this.state = {
             profileId: null,
             profile: null,
+            distributions: null,
             error: null,
         };
     }
@@ -66,6 +100,11 @@ class UserStatsPanel extends React.Component<Props, State> {
                 const profile = await retrieveUserStatsAsync(profileId);
                 if (profile.userId === this.state.profileId) {
                     this.setState({ profile });
+                }
+
+                if (this.props.myUserId === this.props.profileId) {
+                    const distributions = await retrieveDistributionsAsync();
+                    this.setState({ distributions });
                 }
             } catch(error) {
                 console.error("UserStatsPanel error", error);
@@ -101,6 +140,8 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
+        const leagueName = this.getLeagueName(rating.percentile);
+        const pointsUntilNextLeague = this.calculatePointsUntilNextLeague(rating.lowerBound, rating.percentile, this.props.category);
         return <div>
             <h1>{profile.name}</h1>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
@@ -116,9 +157,10 @@ class UserStatsPanel extends React.Component<Props, State> {
                 </div>
                 <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
                     <div className="label">League</div>
-                    <div className="value">{this.getLeagueName(rating.percentile)}</div>
+                    <div className="value">{leagueName}</div>
                 </div>
             </div>}
+            {pointsUntilNextLeague > 0 && <p className="points-to-next-league">You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.</p>}
             <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
                 <div className="stats-card">
@@ -137,6 +179,25 @@ class UserStatsPanel extends React.Component<Props, State> {
         </div>
     }
 
+    private calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): number | null {
+        const nextLeague = this.calculateNextLeague(percentile);
+        if (!nextLeague) {
+            return null;
+        }
+
+        const distribution = this.state.distributions && this.state.distributions[category];
+        if (!distribution) {
+            return null;
+        }
+
+        const minRating = distribution[Math.ceil(nextLeague.minPercentile)];
+        if (minRating) {
+            return minRating - ratingLB;
+        } else {
+            return null;
+        }
+    }
+
     private renderNoRating(profile: m.GetProfileResponse) {
         return <div>
             <h1>{profile.name}</h1>
@@ -144,25 +205,21 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private getLeagueName(percentile: number) {
-        if (percentile >= constants.Placements.Grandmaster) {
-            return "Grandmaster";
-        } else if (percentile >= constants.Placements.Master) {
-            return "Master";
-        } else if (percentile >= constants.Placements.Diamond) {
-            return "Diamond";
-        } else if (percentile >= constants.Placements.Platinum) {
-            return "Platinum";
-        } else if (percentile >= constants.Placements.Gold) {
-            return "Gold";
-        } else if (percentile >= constants.Placements.Silver) {
-            return "Silver";
-        } else if (percentile >= constants.Placements.Bronze) {
-            return "Bronze";
-        } else if (percentile >= constants.Placements.Wood) {
-            return "Wood";
-        } else {
-            return "";
+        for (const league of leagues) {
+            if (percentile >= league.minPercentile) {
+                return league.name;
+            }
         }
+        return "";
+    }
+
+    private calculateNextLeague(percentile: number): League {
+        const higher = leagues.filter(l => percentile < l.minPercentile);
+        if (higher.length === 0) {
+            return null;
+        }
+
+        return _.minBy(higher, l => l.minPercentile);
     }
 }
 

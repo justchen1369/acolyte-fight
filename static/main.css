@@ -725,6 +725,11 @@ h2 {
     border: 3px white solid;
 }
 
+.points-to-next-league {
+    text-align: center;
+    margin-bottom: 100px;
+}
+
 .stats-card-row {
     width: 100%;
     display: flex;

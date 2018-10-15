@@ -184,6 +184,19 @@ export async function onGetGameStatsAsync(req: express.Request, res: express.Res
     res.send(response);
 }
 
+export function onGetDistributions(req: express.Request, res: express.Response) {
+    onGetDistributionsAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetDistributionsAsync(req: express.Request, res: express.Response): Promise<void> {
+    const distributions = await percentiles.estimateDistributions();
+    if (distributions) {
+        res.send(distributions);
+    } else {
+        res.status(404).send("Not found");
+    }
+}
+
 export function onGetProfile(req: express.Request, res: express.Response) {
     onGetProfileAsync(req, res).catch(error => handleError(error, res));
 }
