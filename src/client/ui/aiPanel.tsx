@@ -10,6 +10,7 @@ import { readFileAsync } from '../core/fileUtils';
 
 interface Props {
     aiCode: string;
+    isLoggedIn: boolean;
 }
 interface State {
     aiCode: string;
@@ -25,6 +26,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         aiCode: state.aiCode,
+        isLoggedIn: !!state.userId,
     };
 }
 
@@ -44,6 +46,18 @@ class AiPanel extends React.Component<Props, State> {
     }
 
     render() {
+        return this.props.isLoggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+    }
+
+    private renderNotLoggedIn() {
+        return <div>
+            <h1>AI programming</h1>
+            <p>Program a bot for this game!</p>
+            <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to access AI programming tools.</p>
+        </div>;
+    }
+
+    private renderLoggedIn() {
         return <div>
             <h1>AI (EXPERIMENTAL)</h1>
             {this.props.aiCode ? this.renderAttached() : this.renderDetached()}

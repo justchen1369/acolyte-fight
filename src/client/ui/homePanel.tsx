@@ -16,8 +16,15 @@ import PartyList from './partyList';
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {
+    isLoggedIn: boolean;
 }
 interface State {
+}
+
+function stateToProps(state: s.State): Props {
+    return {
+        isLoggedIn: !!state.userId,
+    };
 }
 
 class HomePanel extends React.Component<Props, State> {
@@ -61,8 +68,11 @@ class HomePanel extends React.Component<Props, State> {
                     Time to practice your skills.
                     In this arena, you'll find others just like you. Will you be the last one standing?
                 </p>
-                <h2>Your Name</h2>
-                <NameConfig />
+                {!this.props.isLoggedIn && <p className="login-ad"><div className="btn" onClick={() => this.onLoginClick()}>Login</div> to change name, view stats or watch replays</p>}
+                {this.props.isLoggedIn && <div>
+                    <h2>Your Name</h2>
+                    <NameConfig />
+                </div>}
                 <h1>Your Spell Configuration</h1>
                 <SpellConfig />
             </div>
@@ -77,6 +87,10 @@ class HomePanel extends React.Component<Props, State> {
             });
         }
     }
+
+    private onLoginClick() {
+        window.location.href = "login";
+    }
 }
 
-export default HomePanel;
+export default ReactRedux.connect(stateToProps)(HomePanel);

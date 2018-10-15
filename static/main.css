@@ -339,6 +339,17 @@ a:hover, a:active {
     to { color: white; bottom: 0 }
 }
 
+.login-ad {
+    text-align: center;
+    font-size: 120%;
+    padding: 20px;
+    margin: 10px;
+}
+
+.login-ad .btn {
+    margin: 5px;
+}
+
 #info-panel {
     position: absolute;
     top: 8;

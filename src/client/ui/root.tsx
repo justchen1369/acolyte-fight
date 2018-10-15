@@ -4,6 +4,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import AccountPanel from './accountPanel';
 import AiPanel from './aiPanel';
 import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
@@ -69,6 +70,7 @@ class Root extends React.Component<Props> {
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
+                {page === "account" && this.renderAccount()}
                 <UrlListener />
             </div>
         );
@@ -137,6 +139,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <ProfilePanel />
+            </div>
+        </div>;
+    }
+
+    private renderAccount() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <AccountPanel />
             </div>
         </div>;
     }

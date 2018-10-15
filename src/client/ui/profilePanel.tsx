@@ -7,8 +7,10 @@ import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import AccountPanel from './accountPanel';
+import CategorySelector from './categorySelector';
 import RecentGamesList from './recentGameList';
 import UserStatsPanel from './userStatsPanel';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     current: s.PathElements;
@@ -39,24 +41,16 @@ export class ProfilePanel extends React.Component<Props, State> {
 
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
-            {isMe && this.renderCategorySelector()}
-            {isMe && <AccountPanel />}
-            <UserStatsPanel profileId={profileId} category={category} />
-            {isMe && <RecentGamesList category={category} />}
-        </div>
-    }
-
-    private renderCategorySelector(): JSX.Element {
-        return <div className="category-selector">
-            {m.GameCategory.All.map(category => (
-                <div
-                    key={category}
-                    className={category === this.state.category ? "category category-selected" : "category"}
-                    onClick={() => this.setState({ category })}
-                    >
-                    {category}
-                </div>
-            ))}
+            {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
+            {this.props.myUserId && <UserStatsPanel profileId={profileId} category={category} />}
+            {!this.props.myUserId && <div>
+                <h1>Profile</h1>
+                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to view ratings and stats</p>
+            </div>}
+            {isMe && <div>
+                <h1>Replays</h1>
+                <RecentGamesList category={category} />
+            </div>}
         </div>
     }
 

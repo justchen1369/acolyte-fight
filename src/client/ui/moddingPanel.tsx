@@ -9,6 +9,7 @@ import * as url from '../url';
 interface Props {
     mod: Object;
     isLeader: boolean;
+    isLoggedIn: boolean;
 }
 interface State {
     error: string;
@@ -20,6 +21,7 @@ function stateToProps(state: s.State): Props {
     return {
         mod: state.room.mod,
         isLeader: state.party ? state.party.isLeader : true,
+        isLoggedIn: !!state.userId,
     };
 }
 
@@ -34,6 +36,18 @@ class ModdingPanel extends React.Component<Props, State> {
     }
 
     render() {
+        return this.props.isLoggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+    }
+
+    private renderNotLoggedIn() {
+        return <div>
+            <h1>Modding</h1>
+            <p>Modding allows you to change the rules of the game.</p>
+            <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to access modding tools</p>
+        </div>;
+    }
+
+    private renderLoggedIn() {
         return <div>
             <h1>Modding (EXPERIMENTAL)</h1>
             {Object.keys(this.props.mod).length > 0 ? this.renderAttached() : this.renderDetached()}

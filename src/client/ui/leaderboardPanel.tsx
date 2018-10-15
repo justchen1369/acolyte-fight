@@ -101,13 +101,23 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.state.error) {
+        if (!this.props.myUserId) {
+            return this.renderNotLoggedIn();
+        } else if (this.state.error) {
             return this.renderError();
         } else if (!this.state.leaderboard) {
             return this.renderLoading();
         } else {
             return this.renderLeaderboard();
         }
+    }
+
+    private renderNotLoggedIn() {
+        return <div>
+            <h1>Leaderboard</h1>
+            <p>The leaderboard shows all players ranked according to the Glicko-2 rating system.</p>
+            <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see the leaderboard</p>
+        </div>
     }
 
     private renderLeaderboard() {
