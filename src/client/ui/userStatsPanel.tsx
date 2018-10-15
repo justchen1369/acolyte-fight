@@ -103,16 +103,22 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
         return <div>
             <h1>{profile.name}</h1>
-            <div className="stats-card-row">
+            {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
+                <div className="stats-card">
+                    <div className="label">Placement matches remaining</div>
+                    <div className="value">{constants.Placements.MinGames - rating.numGames}</div>
+                </div>
+            </div>}
+            {rating.numGames >= constants.Placements.MinGames && <div className="stats-card-row">
                 <div className="stats-card" title={`${rating.rd.toFixed(0)} rating deviation`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.lowerBound.toFixed(0)}</div>
                 </div>
-                {rating.numGames >= constants.Placements.MinGames && <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
+                <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
                     <div className="label">League</div>
                     <div className="value">{this.getLeagueName(rating.percentile)}</div>
-                </div>}
-            </div>
+                </div>
+            </div>}
             <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
                 <div className="stats-card">

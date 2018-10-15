@@ -3,6 +3,7 @@ import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
+import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -140,6 +141,10 @@ class LeaderboardPanel extends React.Component<Props, State> {
 
         const userRating = profile.ratings[category];
         if (!userRating) {
+            return null;
+        }
+
+        if (userRating.numGames < constants.Placements.MinGames) {
             return null;
         }
 
