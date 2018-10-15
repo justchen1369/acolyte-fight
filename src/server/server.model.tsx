@@ -27,6 +27,15 @@ export interface UserSettings {
     rebindings: KeyBindings;
 }
 
+export interface UserRating {
+    rating: number;
+    rd: number;
+    numGames: number;
+    killsPerGame: number;
+    damagePerGame: number;
+    winRate: number;
+}
+
 export interface Replay {
     id: string;
     category: string;

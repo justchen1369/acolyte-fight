@@ -104,12 +104,12 @@ class UserStatsPanel extends React.Component<Props, State> {
         return <div>
             <h1>{profile.name}</h1>
             <div className="stats-card-row">
-                <div className="stats-card">
+                <div className="stats-card" title={`${rating.rd.toFixed(0)} rating deviation`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.lowerBound.toFixed(0)}</div>
                 </div>
-                {rating.numGames >= constants.Placements.MinGames && <div className="stats-card">
-                    <div className="label">{rating.percentile.toFixed(1)} percentile</div>
+                {rating.numGames >= constants.Placements.MinGames && <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
+                    <div className="label">League</div>
                     <div className="value">{this.getLeagueName(rating.percentile)}</div>
                 </div>}
             </div>

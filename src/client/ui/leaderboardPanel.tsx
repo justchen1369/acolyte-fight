@@ -126,10 +126,10 @@ class LeaderboardPanel extends React.Component<Props, State> {
             return null;
         }
 
-        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"}>
+        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={`${player.rd.toFixed(0)} ratings deviation`}>
             <span className="position">{position}</span>
             {this.renderPlayerName(player)}
-            <span className="win-count" title={`${player.rd} ratings deviation`}>{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
+            <span className="win-count">{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
     }
 

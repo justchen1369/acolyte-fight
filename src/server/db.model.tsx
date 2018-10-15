@@ -22,7 +22,7 @@ export interface UserRatingLookup {
 export interface UserRating {
     rating: number;
     rd: number;
-    lowerBound: number;
+    lowerBound?: number;
     numGames: number;
     killsPerGame: number;
     damagePerGame: number;

@@ -33,7 +33,7 @@ const glickoSettings: glicko.Settings = {
     vol: 0.06,
 };
 
-function initialRating(): db.UserRating {
+function initialRating(): g.UserRating {
     return {
         numGames: 0,
         killsPerGame: 0,
@@ -41,7 +41,6 @@ function initialRating(): db.UserRating {
         winRate: 0,
         rating: glickoSettings.rating,
         rd: glickoSettings.rd,
-        lowerBound: calculateLowerBound(glickoSettings.rating, glickoSettings.rd),
     };
 }
 
@@ -85,6 +84,14 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
     return result;
 }
 
+function userRatingToDb(userRating: g.UserRating): db.UserRating {
+    const dbUserRating: db.UserRating = { ...userRating };
+    if (userRating.numGames >= constants.Placements.MinGames) {
+        dbUserRating.lowerBound = calculateLowerBound(userRating.rating, userRating.rd);
+    }
+    return dbUserRating;
+}
+
 function dbToGameStats(gameId: string, data: db.Game): m.GameStatsMsg {
     return {
         gameId: gameId,
@@ -108,7 +115,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
     };
 }
 
-function dbToUserRating(user: db.User, category: string): db.UserRating {
+function dbToUserRating(user: db.User, category: string): g.UserRating {
     const result = initialRating();
     const userRating = user && user.ratings && user.ratings[category]
     if (userRating) {
@@ -126,7 +133,8 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
 
     if (data.ratings) {
         for (const category in data.ratings) {
-            const rating = data.ratings[category];
+            const rating = dbToUserRating(data, category);
+            const lowerBound = calculateLowerBound(rating.rating, rating.rd);
             ratings[category] = {
                 numGames: rating.numGames,
                 damagePerGame: rating.damagePerGame,
@@ -134,8 +142,8 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
                 winRate: rating.winRate,
                 rating: rating.rating,
                 rd: rating.rd,
-                lowerBound: rating.lowerBound,
-                percentile: 50, // Filled out later
+                lowerBound,
+                percentile: percentiles.estimatePercentile(lowerBound, category),
             };
         }
     }
@@ -194,13 +202,7 @@ export async function getLeaderboard(category: string, limit: number): Promise<m
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
     const doc = await firestore.collection('user').doc(userId).get();
-
     const profile = dbToProfile(userId, doc.data() as db.User);
-    for (const category in profile.ratings) {
-        const userRatings = profile.ratings[category];
-        userRatings.percentile = percentiles.estimatePercentile(userRatings.lowerBound, category);
-    }
-
     return profile;
 }
 
@@ -217,8 +219,8 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
         // Load initial data
         const docs = await transaction.getAll(...knownPlayers.map(p => firestore.collection(Collections.User).doc(p.userId)));
 
-        const initialRatings = new Map<string, db.UserRating>();
-        const userRatings = new Map<string, db.UserRating>();
+        const initialRatings = new Map<string, g.UserRating>();
+        const userRatings = new Map<string, g.UserRating>();
         for (const doc of docs) {
             const initialRating = dbToUserRating(doc.data() as db.User, category);
             initialRatings.set(doc.id, initialRating);
@@ -235,12 +237,13 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
         }
 
         // Perform update
+        const ratingDeltas: RatingDeltas = {};
         for (const doc of docs) {
-            const userRating = userRatings.get(doc.id);
+            const dbUserRating = userRatingToDb(userRatings.get(doc.id));
 
             // Save rating
             const delta: Partial<db.User> = {
-                ratings: { [category]: userRating },
+                ratings: { [category]: dbUserRating },
             };
             transaction.update(doc.ref, delta);
 
@@ -248,18 +251,19 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
             const unixDate = unixDateFromTimestamp(gameStats.unixTimestamp);
             const historyItem: db.UserRatingHistoryItem = {
                 unixDate,
-                ratings: { [category]: userRating },
+                ratings: { [category]: dbUserRating },
             };
             const historyId = moment.unix(unixDate).format("YYYY-MM-DD");
             doc.ref.collection(Collections.UserRatingHistory).doc(historyId).set(historyItem);
         }
 
         // Calculate rating deltas
-        const ratingDeltas: RatingDeltas = {};
         for (const player of knownPlayers) {
             const initialRating = initialRatings.get(player.userId);
             const userRating = userRatings.get(player.userId);
-            ratingDeltas[player.userId] = userRating.lowerBound - initialRating.lowerBound;
+            if (initialRating.numGames >= constants.Placements.MinGames) {
+                ratingDeltas[player.userId] = calculateLowerBound(userRating.rating, userRating.rd) - calculateLowerBound(initialRating.rating, initialRating.rd);
+            }
         }
 
         return ratingDeltas;
@@ -273,7 +277,7 @@ function unixDateFromTimestamp(unixTimestamp: number): number {
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
-function calculateNewGlickoRatings(allRatings: Map<string, db.UserRating>, winningUserId: string) {
+function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, winningUserId: string) {
     const glicko2 = new glicko.Glicko2(glickoSettings);
 
     // Create players
@@ -294,11 +298,10 @@ function calculateNewGlickoRatings(allRatings: Map<string, db.UserRating>, winni
         const userRating = allRatings.get(userId);
         userRating.rating = player.getRating();
         userRating.rd = player.getRd();
-        userRating.lowerBound = calculateLowerBound(userRating.rating, userRating.rd);
     });
 }
 
-function calculateNewStats(userRating: db.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
+function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
     const previousGames = Math.min(constants.MaxGamesToKeep, userRating.numGames);
     userRating.damagePerGame = incrementAverage(userRating.damagePerGame, previousGames, player.damage);
     userRating.killsPerGame = incrementAverage(userRating.killsPerGame, previousGames, player.kills);
