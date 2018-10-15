@@ -65,6 +65,7 @@ export class TitleSection extends React.Component<Props, State> {
                     <li>Gold: {constants.Placements.Gold} percentile</li>
                     <li>Silver: {constants.Placements.Silver} percentile</li>
                     <li>Bronze: {constants.Placements.Bronze} percentile</li>
+                    <li>Wood: {constants.Placements.Wood} percentile</li>
                 </ul>
             </p>
             <h2>How long are replays stored for?</h2>

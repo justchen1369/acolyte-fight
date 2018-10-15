@@ -156,8 +156,12 @@ class UserStatsPanel extends React.Component<Props, State> {
             return "Gold";
         } else if (percentile >= constants.Placements.Silver) {
             return "Silver";
-        } else {
+        } else if (percentile >= constants.Placements.Bronze) {
             return "Bronze";
+        } else if (percentile >= constants.Placements.Wood) {
+            return "Wood";
+        } else {
+            return "";
         }
     }
 }

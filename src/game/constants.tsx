@@ -33,8 +33,9 @@ export namespace Placements {
 	export const Diamond = 80;
 	export const Platinum = 70;
 	export const Gold = 60;
-	export const Silver = 30;
-	export const Bronze = 0;
+	export const Silver = 40;
+	export const Bronze = 20;
+	export const Wood = 0;
 }
 
 export namespace HeroColors {
