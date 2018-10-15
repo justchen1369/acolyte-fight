@@ -12,6 +12,8 @@ import * as pages from '../core/pages';
 import * as storage from '../storage';
 import * as url from '../url';
 
+const MaxReplaysToDisplay = 100;
+
 interface Stats {
     games: number;
     wins: number;
@@ -59,7 +61,7 @@ const getGameSubset = Reselect.createSelector(
     (state: State) => state.games,
     (category, games) => {
         if (games) {
-            return games.filter(g => g.category === category);
+            return _.take(games.filter(g => g.category === category), MaxReplaysToDisplay);
         } else {
             return null;
         }
