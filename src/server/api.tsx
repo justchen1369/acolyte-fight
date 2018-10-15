@@ -287,9 +287,9 @@ export async function onGetLeaderboardAsync(req: express.Request, res: express.R
     }
 
     const category = req.query.category;
-    const limit = Math.min(100, parseInt(req.query.limit));
+    const limit = parseInt(req.query.limit);
 
-    const leaderboard = await statsStorage.getLeaderboard(category, limit);
+    const leaderboard = _.take(await statsStorage.getLeaderboard(category), limit);
     const response: m.GetLeaderboardResponse = {
         leaderboard,
     };

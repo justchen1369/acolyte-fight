@@ -16,6 +16,8 @@ import { Collections  } from './db.model';
 import { firestore } from './dbStorage';
 import { logger } from './logging';
 
+const MaxLeaderboardLength = 100;
+
 interface CandidateHash {
     gameStats: m.GameStatsMsg;
     hash: string;
@@ -26,12 +28,19 @@ interface RatingDeltas {
     [userId: string]: number;
 }
 
+interface LeaderboardCacheItem {
+    leaderboard: m.LeaderboardPlayer[];
+    expiry: number; // unix timestamp
+}
+
 const glickoSettings: glicko.Settings = {
     tau: 0.2,
     rating: 1700,
     rd: 350,
     vol: 0.06,
 };
+
+const leaderboardCache = new Map<string, LeaderboardCacheItem>();
 
 function initialRating(): g.UserRating {
     return {
@@ -179,8 +188,22 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
-export async function getLeaderboard(category: string, limit: number): Promise<m.LeaderboardPlayer[]> {
-    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(limit).get();
+export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+    const cached = leaderboardCache.get(category);
+    if (cached && moment().unix() < cached.expiry) {
+        return cached.leaderboard;
+    } else {
+        const leaderboard = await retrieveLeaderboard(category);
+        leaderboardCache.set(category, {
+            leaderboard,
+            expiry: moment().add(1, 'minute').unix(),
+        });
+        return leaderboard;
+    }
+}
+
+export async function retrieveLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength).get();
 
     let result = new Array<m.LeaderboardPlayer>();
     for (const doc of querySnapshot.docs) {
