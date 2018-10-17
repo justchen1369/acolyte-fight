@@ -140,6 +140,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
+        const isPlaced = rating.numGames >= constants.Placements.MinGames ;
         const leagueName = this.getLeagueName(rating.percentile);
         const pointsUntilNextLeague = this.calculatePointsUntilNextLeague(rating.lowerBound, rating.percentile, this.props.category);
         return <div>
@@ -150,7 +151,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{constants.Placements.MinGames - rating.numGames}</div>
                 </div>
             </div>}
-            {rating.numGames >= constants.Placements.MinGames && <div className="stats-card-row">
+            {isPlaced && <div className="stats-card-row">
                 <div className="stats-card" title={`${rating.rd.toFixed(0)} rating deviation`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.lowerBound.toFixed(0)}</div>
@@ -160,7 +161,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {pointsUntilNextLeague > 0 && <p className="points-to-next-league">You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.</p>}
+            {isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.</p>}
             <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
                 <div className="stats-card">

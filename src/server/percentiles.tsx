@@ -50,7 +50,7 @@ async function refreshCumulativeFrequenciesLoop() {
 
 function calculateNextRefresh(cumulativeFrequencies: Map<string, number[]>) {
     const numUsers = _.max([...cumulativeFrequencies.values()].map(cumulativeFrequency => _.last(cumulativeFrequency)));
-    if (numUsers < 100) {
+    if (!numUsers || numUsers < 100) {
         return 5 * 60 * 1000;
     } else if (numUsers < 1000) {
         return 20 * 60 * 1000;
@@ -68,7 +68,7 @@ function calculateDistribution(cumulativeFrequency: number[]): number[] {
     const distribution = new Array<number>();
     const numUsers = cumulativeFrequency[cumulativeFrequency.length - 1];
     for (let rating = 0; rating < cumulativeFrequency.length; ++rating) {
-        const percentile = cumulativeFrequency[rating] / numUsers;
+        const percentile = 100 * cumulativeFrequency[rating] / numUsers;
         while (true) {
             const nextPercentile = distribution.length;
             if (percentile >= nextPercentile) {
