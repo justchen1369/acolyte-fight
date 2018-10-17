@@ -140,7 +140,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
-        const isPlaced = rating.numGames >= constants.Placements.MinGames ;
+        const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = this.getLeagueName(rating.percentile);
         const pointsUntilNextLeague = this.calculatePointsUntilNextLeague(rating.lowerBound, rating.percentile, this.props.category);
         return <div>
@@ -161,7 +161,9 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.</p>}
+            {profile.userId === this.props.myUserId && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
+                You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.
+            </p>}
             <h2>Previous {rating.numGames} games</h2>
             <div className="stats-card-row">
                 <div className="stats-card">
