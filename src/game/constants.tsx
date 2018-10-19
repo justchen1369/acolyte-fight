@@ -28,6 +28,7 @@ export namespace Matchmaking {
 
 export namespace Placements {
 	export const MinGames = 10;
+	export const VerificationGames = 10;
 	export const InitialRating = 1700;
 	export const InitialRd = 350;
 

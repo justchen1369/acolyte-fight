@@ -81,6 +81,11 @@ export async function save(world: w.World, server: string): Promise<d.GameStats>
     if (gameStats) {
         socket.emit('score', gameStatsToMessage(gameStats));
         await storage.saveGameStats(gameStats);
+
+        if (!world.ui.saved) { // Game is saved twice, once at win, once at leaving, don't double count it
+            world.ui.saved = true;
+            await storage.incrementNumGames();
+        }
     }
     return gameStats;
 }

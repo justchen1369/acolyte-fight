@@ -73,6 +73,8 @@ export interface UIState {
 	notifications: Notification[];
 
 	buttonBar?: ButtonConfig;
+
+	saved?: boolean;
 }
 
 export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;

@@ -16,6 +16,7 @@ namespace StorageKeys {
 }
 
 namespace SettingsKeys {
+    export const NumGames = "num-games";
     export const LatestGameStatUnixTimestamp = "latest-game-unix";
 }
 
@@ -103,6 +104,16 @@ export async function getStatsLoadedUntil(): Promise<moment.Moment> {
 
 export async function setStatsLoadedUntil(until: moment.Moment) {
     await settingsStorage.setItem(SettingsKeys.LatestGameStatUnixTimestamp, until.unix());
+}
+
+export async function getNumGames() {
+    const numGames = await settingsStorage.getItem<number>(SettingsKeys.NumGames);
+    return numGames || 0;
+}
+
+export async function incrementNumGames() {
+    const numGames = await getNumGames();
+    await settingsStorage.setItem(SettingsKeys.NumGames, numGames + 1);
 }
 
 function migrateGame(game: d.GameStats): d.GameStats {

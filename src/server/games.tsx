@@ -358,7 +358,6 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 		const game = findNewGame(room, privatePartyId, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
-			const userId = member.authToken ? auth.getUserIdFromCache(auth.enigmaAccessKey(member.authToken)) : null;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
 			assignments.push({ partyMember: member, game, heroId });
 		}

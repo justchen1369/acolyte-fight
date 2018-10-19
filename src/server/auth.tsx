@@ -34,14 +34,11 @@ export function resendAuthToken(req: express.Request, res: express.Response) {
     const maxAge = 20 * 365 * 24 * 60 * 60 * 1000;
     const domain = calculateDomain(req.hostname);
     if (domain) {
-        // Unset the cookie with no domain
-        res.cookie(m.AuthCookieName, authToken, { maxAge: -1, httpOnly: true });
+        // Unset all the cookies we don't want to have
+        res.clearCookie(m.AuthCookieName, { httpOnly: true });
+        res.clearCookie(m.AuthCookieName, { httpOnly: true, domain: `.${req.hostname}` });
     }
-    res.cookie(m.AuthCookieName, authToken, {
-        maxAge,
-        domain: calculateDomain(req.hostname),
-        httpOnly: true,
-    });
+    res.cookie(m.AuthCookieName, authToken, { maxAge, domain, httpOnly: true });
     setAuthToken(req, authToken);
 
     return authToken;
@@ -133,6 +130,7 @@ export async function getUserFromAccessKey(accessKey: string): Promise<g.User> {
 }
 
 export async function associateAccessKey(accessKey: string, userId: string): Promise<void> {
+    await userStorage.disassociateAccessKey(accessKey);
     await userStorage.associateAccessKey(accessKey, userId);
     accessKeyToUserIdCache.set(accessKey, userId);
 }

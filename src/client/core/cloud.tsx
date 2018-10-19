@@ -1,11 +1,19 @@
 import moment from 'moment';
+import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
 export async function downloadSettings(): Promise<void> {
-    const res = await fetch(`api/settings?create=1&cachebuster=${Date.now()}`, {
+    const numGames = await storage.getNumGames();
+
+    let url = `api/settings?cachebuster=${Date.now()}`;
+    if (numGames >= constants.Placements.VerificationGames) {
+        url += "&create=1";
+    }
+
+    const res = await fetch(url, {
         credentials: "same-origin",
         cache: "no-store",
     });
