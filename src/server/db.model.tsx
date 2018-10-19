@@ -7,6 +7,7 @@ export namespace Collections {
 }
 
 export interface User {
+    accessed: Firestore.Timestamp;
     loggedIn: boolean;
     accessKeys: string[];
     settings: UserSettings;

@@ -261,6 +261,9 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
 
         res.header("Content-Type", "application/json");
         res.send(result);
+
+        // Do this after the result has been sent as there is no need to wait for this
+        await userStorage.touch(user.userId);
     } else if (req.query.create) {
         // Create anonymous user
         logger.info(`Creating anonymous user ${authToken}`);

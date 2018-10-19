@@ -71,9 +71,14 @@ export async function getUserById(userId: string): Promise<s.User> {
     return doc.exists ? dbToUser(doc.id, doc.data() as db.User) : null;
 }
 
+export async function touch(userId: string) {
+    await firestore.collection(Collections.User).doc(userId).update('accessed', Firestore.FieldValue.serverTimestamp());
+}
+
 export async function createUser(user: s.User, ...accessKeys: string[]): Promise<void> {
     const data: db.User = {
         loggedIn: user.loggedIn,
+        accessed: Firestore.FieldValue.serverTimestamp() as any,
         accessKeys,
         settings: {
             name: user.settings.name,
