@@ -54,7 +54,7 @@ export async function getUserByAccessKey(accessKey: string): Promise<s.User> {
         const data = doc.data() as db.User;
         if (data.loggedIn === undefined) { // Migrate logged-in flag when user reconnects
             const loggedIn = dbUserLoggedIn(data);
-            doc.ref.set({ loggedIn: loggedIn });
+            doc.ref.update({ loggedIn: loggedIn });
             data.loggedIn = loggedIn;
         }
         return dbToUser(doc.id, data);
