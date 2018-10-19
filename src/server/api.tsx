@@ -43,6 +43,7 @@ export function getInternalStatus() {
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
+        numUsers: percentiles.estimateNumUsers(m.GameCategory.PvP),
         numGames: store.activeGames.size,
         numPlayers: _.sum(_.values(store.playerCounts)),
         numConnections: store.numConnections,

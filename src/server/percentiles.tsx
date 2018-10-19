@@ -14,8 +14,14 @@ import { Collections } from './db.model';
 import { firestore } from './dbStorage';
 import { logger } from './logging';
 
+interface DbFrequenciesResult {
+    frequencies: Map<string, number[]>;
+    numUsers: number;
+}
+
 let cumulativeFrequenciesCache: Map<string, number[]> = new Map<string, number[]>();
 let distributionCache: Map<string, number[]> = new Map<string, number[]>();
+let numUsersCache: number = 0;
 
 export async function init() {
     refreshCumulativeFrequenciesLoop();
@@ -36,12 +42,22 @@ export function estimateDistribution(category: string): number[] {
     return distributionCache.get(category);
 }
 
+export function estimateNumUsers(category: string): number {
+    return numUsersCache;
+}
+
 async function refreshCumulativeFrequenciesLoop() {
-    cumulativeFrequenciesCache = await calculateCumulativeFrequency();
+    const start = Date.now();
+
+    const result = await calculateFrequencies();
+    numUsersCache = result.numUsers;
+    cumulativeFrequenciesCache = calculateCumulativeFrequency(result.frequencies);
 
     for (const category of cumulativeFrequenciesCache.keys()) {
         distributionCache.set(category, calculateDistribution(cumulativeFrequenciesCache.get(category)));
     }
+
+    logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
 
     const delayMilliseconds = calculateNextRefresh(cumulativeFrequenciesCache);
 
@@ -87,13 +103,14 @@ function calculateDistribution(cumulativeFrequency: number[]): number[] {
     return distribution;
 }
 
-async function calculateCumulativeFrequency(): Promise<Map<string, number[]>> {
-    const start = Date.now();
-
+async function calculateFrequencies(): Promise<DbFrequenciesResult> {
     const query = firestore.collection(db.Collections.User).select('ratings');
 
+    let numUsers = 0;
     const frequencies = new Map<string, number[]>();
     await dbStorage.stream(query, doc => {
+        ++numUsers;
+
         const user = doc.data() as db.User;
         if (!(user && user.ratings)) {
             return
@@ -117,6 +134,10 @@ async function calculateCumulativeFrequency(): Promise<Map<string, number[]>> {
         }
     });
 
+    return { frequencies, numUsers };
+}
+
+function calculateCumulativeFrequency(frequencies: Map<string, number[]>): Map<string, number[]> {
     const cumulativeFrequencies = new Map<string, number[]>();
     frequencies.forEach((frequency, category) => {
         const cumulativeFrequency = new Array<number>();
@@ -129,8 +150,6 @@ async function calculateCumulativeFrequency(): Promise<Map<string, number[]>> {
 
         cumulativeFrequencies.set(category, cumulativeFrequency);
     });
-
-    logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
 
     return cumulativeFrequencies;
 }

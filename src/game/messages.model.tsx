@@ -268,6 +268,7 @@ export interface ExternalStatus {
 export interface InternalStatus {
     region: string;
     host: string;
+    numUsers: number;
     numGames: number;
     numPlayers: number;
     numConnections: number;
