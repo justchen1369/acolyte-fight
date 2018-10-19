@@ -75,6 +75,11 @@ class PlayButton extends React.Component<Props, State> {
         this.setState({ joining: true });
         screenLifecycle.enterGame();
         matches.joinNewGame();
+
+        const attachEndorseTracker = (window as any).attachEndorseTracker;
+        if (attachEndorseTracker) {
+            attachEndorseTracker();
+        }
     }
 
     private onPartyReadyClicked(ready: boolean) {
