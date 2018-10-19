@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import cookie from 'cookie';
 import crypto from 'crypto';
 import express from 'express';
@@ -9,6 +10,8 @@ import * as m from '../game/messages.model';
 import * as userStorage from './userStorage';
 
 export const AuthHeader = "x-enigma-auth";
+
+const ipAddressRegex = /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/;
 
 const accessKeyToUserIdCache = new Map<string, string>();
 
@@ -28,14 +31,34 @@ export function resendAuthToken(req: express.Request, res: express.Response) {
         authToken = uniqid('a-');
     }
 
+    const maxAge = 20 * 365 * 24 * 60 * 60 * 1000;
+    const domain = calculateDomain(req.hostname);
+    if (domain) {
+        // Unset the cookie with no domain
+        res.cookie(m.AuthCookieName, authToken, { maxAge: -1, httpOnly: true });
+    }
     res.cookie(m.AuthCookieName, authToken, {
-        maxAge: 20 * 365 * 24 * 60 * 60 * 1000,
-        domain: `.${req.hostname}`,
+        maxAge,
+        domain: calculateDomain(req.hostname),
         httpOnly: true,
     });
     setAuthToken(req, authToken);
 
     return authToken;
+}
+
+function calculateDomain(hostname: string): string {
+    if (hostname || ipAddressRegex.test(hostname)) {
+        return null;
+    }
+
+    const parts = hostname.split('.');
+    if (parts.length > 1) {
+        // e.g. .acolytefight.io
+        return '.' + _.takeRight(parts, 2).join('.');
+    } else {
+        return null;
+    }
 }
 
 export function getAuthToken(req: express.Request) {
@@ -77,7 +100,7 @@ export function getUserHashFromAuthToken(authToken: string | null): string {
 }
 
 export function discordAccessKey(discordUser: discord.DiscordUser) {
-    return discordUser ? `discord.${discordUser.id}` : null;
+    return discordUser ? `${userStorage.DiscordPrefix}${discordUser.id}` : null;
 }
 
 export function enigmaAccessKey(authToken: string) {
@@ -99,7 +122,7 @@ export async function getUserIdFromAccessKey(accessKey: string, allowCache: bool
     }
 }
 
-export async function getUserFromAccessKey(accessKey: string): Promise<g.UserSettings> {
+export async function getUserFromAccessKey(accessKey: string): Promise<g.User> {
     const user = await userStorage.getUserByAccessKey(accessKey);
     if (user) {
         accessKeyToUserIdCache.set(accessKey, user.userId);

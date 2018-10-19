@@ -19,6 +19,7 @@ interface OwnProps {
 interface Props extends OwnProps {
     current: s.PathElements;
     myUserId: string;
+    loggedIn: boolean;
 }
 
 interface State {
@@ -57,6 +58,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         current: state.current,
         myUserId: state.userId,
+        loggedIn: state.loggedIn,
     };
 }
 
@@ -89,7 +91,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
                     this.setState({ leaderboard });
                 }
 
-                if (this.props.myUserId) {
+                if (this.props.myUserId && this.props.loggedIn) {
                     const profile = await retrieveUserStatsAsync(this.props.myUserId);
                     this.setState({ profile });
                 }
@@ -101,7 +103,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     render() {
-        if (!this.props.myUserId) {
+        if (!this.props.loggedIn) {
             return this.renderNotLoggedIn();
         } else if (this.state.error) {
             return this.renderError();
@@ -127,7 +129,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
             <h1>Leaderboard</h1>
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
-                {!isOnLeaderboard && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
+                {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
             </div>
         </div>
     }

@@ -31,6 +31,7 @@ export interface GetUserSettingsRequest {
 
 export interface GetUserSettingsResponse {
     userId: string;
+    loggedIn: boolean;
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;

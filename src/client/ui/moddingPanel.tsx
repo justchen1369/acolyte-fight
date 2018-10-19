@@ -21,7 +21,7 @@ function stateToProps(state: s.State): Props {
     return {
         mod: state.room.mod,
         isLeader: state.party ? state.party.isLeader : true,
-        isLoggedIn: !!state.userId,
+        isLoggedIn: state.loggedIn,
     };
 }
 

@@ -5,7 +5,7 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
 export async function downloadSettings(): Promise<void> {
-    const res = await fetch(`api/settings?cachebuster=${Date.now()}`, {
+    const res = await fetch(`api/settings?create=1&cachebuster=${Date.now()}`, {
         credentials: "same-origin",
         cache: "no-store",
     });
@@ -13,7 +13,7 @@ export async function downloadSettings(): Promise<void> {
         const json: m.GetUserSettingsResponse = await res.json();
 
         let upload = false;
-        StoreProvider.dispatch({ type: "updateUserId", userId: json.userId });
+        StoreProvider.dispatch({ type: "updateUserId", userId: json.userId, loggedIn: json.loggedIn });
         if (json.name && json.name.length > 0) {
             StoreProvider.dispatch({ type: "updatePlayerName", playerName: json.name });
         } else {
@@ -38,7 +38,7 @@ export async function downloadSettings(): Promise<void> {
         }
     } else {
         // This user is not logged in
-        StoreProvider.dispatch({ type: "updateUserId", userId: null });
+        StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
     }
 }
 
@@ -70,7 +70,7 @@ export async function downloadGameStats(): Promise<void> {
     const state = StoreProvider.getState();
     const userId = state.userId;
 
-    if (!userId) {
+    if (!(state.loggedIn && userId)) {
         // Can't download if not logged in
         return;
     }
@@ -104,5 +104,5 @@ export async function downloadGameStats(): Promise<void> {
 
 export async function logout(): Promise<void> {
     await fetch('api/logout', { credentials: "same-origin" });
-    StoreProvider.dispatch({ type: "updateUserId", userId: null });
+    StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
 }

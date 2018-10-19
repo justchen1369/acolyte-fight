@@ -90,18 +90,33 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
             await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
 
         } else {
-            // Create a new user
-            logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - creating new user`);
+            const name = sanitize.sanitizeName(discordUser.username);
 
-            userId = userStorage.generateUserId();
-            const userSettings: g.UserSettings = {
-                userId,
-                name: sanitize.sanitizeName(discordUser.username),
-                buttons: null,
-                rebindings: null,
-            };
+            const existingUser = await auth.getUserFromAccessKey(auth.enigmaAccessKey(authToken));
+            if (existingUser && !existingUser.loggedIn) {
+                // Upgrade an existing anonymous user
+                logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - upgrading existing anonymous user`);
 
-            await userStorage.createUser(userSettings, auth.discordAccessKey(discordUser), auth.enigmaAccessKey(authToken));
+                userId = existingUser.userId;
+
+                await userStorage.upgradeUser(userId, name, auth.discordAccessKey(discordUser));
+            } else {
+                // Create a new user
+                logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - creating new user`);
+
+                userId = userStorage.generateUserId();
+                const userSettings: g.User = {
+                    userId,
+                    loggedIn: true,
+                    settings: {
+                        name,
+                        buttons: null,
+                        rebindings: null,
+                    },
+                };
+
+                await userStorage.createUser(userSettings, auth.discordAccessKey(discordUser), auth.enigmaAccessKey(authToken));
+            }
         }
 
         res.redirect('/');
@@ -132,14 +147,16 @@ async function onCreateTestUserAsync(req: express.Request, res: express.Response
         // Create a new user
         logger.info(`Creating test user ${authToken}`);
         userId = userStorage.generateUserId();
-        const userSettings: g.UserSettings = {
+        const userSettings: g.User = {
             userId,
-            name: null,
-            buttons: null,
-            rebindings: null,
+            loggedIn: true,
+            settings: {
+                name: null,
+                buttons: null,
+                rebindings: null,
+            },
         };
         await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
-        const verify = await userStorage.getUserByAccessKey(auth.enigmaAccessKey(authToken));
     }
 
     res.redirect('/');
@@ -235,9 +252,35 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
     if (user) {
         const result: m.GetUserSettingsResponse = {
             userId: user.userId,
-            name: user.name,
-            buttons: user.buttons,
-            rebindings: user.rebindings,
+            loggedIn: user.loggedIn,
+            name: user.settings && user.settings.name,
+            buttons: user.settings && user.settings.buttons,
+            rebindings: user.settings && user.settings.rebindings,
+        };
+
+        res.header("Content-Type", "application/json");
+        res.send(result);
+    } else if (req.query.create) {
+        // Create anonymous user
+        logger.info(`Creating anonymous user ${authToken}`);
+        const userId = userStorage.generateUserId();
+        const userSettings: g.User = {
+            userId,
+            loggedIn: false,
+            settings: {
+                name: null,
+                buttons: null,
+                rebindings: null,
+            },
+        };
+        await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
+
+        const result: m.GetUserSettingsResponse = {
+            userId: userId,
+            loggedIn: false,
+            name: null,
+            buttons: null,
+            rebindings: null,
         };
 
         res.header("Content-Type", "application/json");
@@ -265,11 +308,13 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
     const authToken = getAuthToken(req);
     const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken))
     if (userId) {
-        const user: g.UserSettings = {
+        const user: Partial<g.User> = {
             userId: userId,
-            name: input.name,
-            buttons: input.buttons,
-            rebindings: input.rebindings,
+            settings: {
+                name: input.name,
+                buttons: input.buttons,
+                rebindings: input.rebindings,
+            },
         };
         await userStorage.updateUser(user);
 

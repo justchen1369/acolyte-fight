@@ -23,7 +23,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        isLoggedIn: !!state.userId,
+        isLoggedIn: state.loggedIn,
     };
 }
 

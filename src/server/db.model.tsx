@@ -7,6 +7,7 @@ export namespace Collections {
 }
 
 export interface User {
+    loggedIn: boolean;
     accessKeys: string[];
     settings: UserSettings;
     ratings: UserRatingLookup;

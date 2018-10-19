@@ -16,6 +16,7 @@ function initialState(): s.State {
         settings: settings.DefaultSettings,
     };
     return {
+        loggedIn: false,
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
@@ -44,7 +45,7 @@ function reducer(state: s.State, action: s.Action): s.State {
             },
         };
     } else if (action.type === "updateUserId") {
-        return { ...state, userId: action.userId };
+        return { ...state, userId: action.userId, loggedIn: action.loggedIn };
     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {

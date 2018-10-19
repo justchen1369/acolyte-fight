@@ -28,6 +28,9 @@ export namespace Matchmaking {
 
 export namespace Placements {
 	export const MinGames = 10;
+	export const InitialRating = 1700;
+	export const InitialRd = 350;
+
 	export const Grandmaster = 98;
 	export const Master = 90;
 	export const Diamond = 80;

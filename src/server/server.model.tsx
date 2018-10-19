@@ -20,11 +20,20 @@ export interface LocationStore {
     upstreamSuffix: string;
 }
 
-export interface UserSettings {
+export interface User {
     userId: string;
+    loggedIn: boolean;
+    settings: UserSettings;
+}
+
+export interface UserSettings {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+}
+
+export interface UserRatingLookup {
+    [category: string]: UserRating;
 }
 
 export interface UserRating {

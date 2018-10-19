@@ -15,6 +15,7 @@ import { isMobile } from '../core/userAgent';
 interface Props {
     current: s.PathElements;
     myUserId: string;
+    loggedIn: boolean;
 }
 interface State {
     category: string;
@@ -24,6 +25,7 @@ function stateToProps(state: s.State): Props {
     return {
         current: state.current,
         myUserId: state.userId,
+        loggedIn: state.loggedIn,
     };
 }
 
@@ -37,15 +39,15 @@ export class ProfilePanel extends React.Component<Props, State> {
 
     render() {
         const profileId = this.props.current.profileId || this.props.myUserId;
-        const isMe = profileId === this.props.myUserId;
+        const isMe = this.props.loggedIn && profileId === this.props.myUserId;
 
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
-            {this.props.myUserId && <UserStatsPanel profileId={profileId} category={category} />}
-            {!this.props.myUserId && <div>
+            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} />}
+            {!this.props.loggedIn && <div>
                 <h1>Profile</h1>
-                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to view ratings and stats</p>
+                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to view replays and stats</p>
             </div>}
             {isMe && <div>
                 <h1>Replays</h1>

@@ -4,6 +4,7 @@ export interface State {
     current: PathElements;
 
     userId?: string;
+    loggedIn: boolean;
     isNewPlayer: boolean;
     playerName: string;
     keyBindings: KeyBindings;
@@ -94,6 +95,7 @@ export interface DisconnectedAction {
 export interface UpdateUserIdAction {
     type: "updateUserId";
     userId: string;
+    loggedIn: boolean;
 }
 
 export interface UpdatePlayerNameAction {

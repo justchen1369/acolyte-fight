@@ -22,6 +22,7 @@ interface OwnProps {
     category: string;
 }
 interface Props extends OwnProps {
+    loggedIn: boolean;
     myUserId: string;
 }
 
@@ -70,6 +71,7 @@ async function retrieveDistributionsAsync() {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
+        loggedIn: state.loggedIn,
         myUserId: state.userId,
     };
 }
@@ -161,7 +163,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {profile.userId === this.props.myUserId && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
+            {this.props.loggedIn && profile.userId === this.props.myUserId && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
                 You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.
             </p>}
             <h2>Previous {rating.numGames} games</h2>
