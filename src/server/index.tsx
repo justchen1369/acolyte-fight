@@ -13,6 +13,7 @@ import * as discord from './discord';
 import * as gameStorage from './gameStorage';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
+import * as statsStorage from './statsStorage';
 
 const rootDir = path.resolve('.');
 
@@ -75,6 +76,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(() => {
 	serverStore.cleanupOldRooms(1);
+	statsStorage.cleanupGames(7);
 }, cleanupIntervalMinutes * 60 * 1000);
 
 setInterval(() => {

@@ -2,11 +2,11 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import glicko from 'glicko2';
 import moment from 'moment';
-import stream from 'stream';
 import * as Firestore from '@google-cloud/firestore';
 import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as db from './db.model';
+import * as dbStorage from './dbStorage';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as mirroring from './mirroring';
@@ -187,6 +187,21 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
     const data = gameStatsToDb(gameStats);
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
+}
+
+export async function cleanupGames(maxAgeDays: number) {
+    const cutoff = moment().subtract(maxAgeDays, 'days').unix();
+    const query = firestore.collection(Collections.Game).where('unixTimestamp', '<', cutoff);
+
+    let numDeleted = 0;
+    await dbStorage.stream(query, doc => {
+        ++numDeleted;
+        doc.ref.delete();
+    });
+
+    if (numDeleted > 0) {
+        logger.info(`Deleted ${numDeleted} games from database`);
+    }
 }
 
 export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
