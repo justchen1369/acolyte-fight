@@ -26,9 +26,11 @@ export function connectToServer(server: string): Promise<void> {
 			let msg: m.ProxyRequestMsg = { server };
 			socket.emit('proxy', msg, (response: m.ProxyResponseMsg) => {
 				if (response.success === false) {
+					console.log(`Failed to connect to upstream ${server}`);
 					reject(response.error);
 				} else {
 					StoreProvider.dispatch({ type: "updateServer", server: response.server });
+					console.log(`Connected to upstream ${server}`);
 					resolve();
 				}
 			});

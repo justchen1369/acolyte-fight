@@ -23,10 +23,10 @@ export function reloadPageIfNecessary() {
 
 export function go(elems: s.PathElements) {
     const store = StoreProvider.getState();
-    if (elems.gameId && store.current.gameId !== elems.gameId) {
+    if (elems.gameId && store.world.ui.myGameId !== elems.gameId) {
         matches.joinNewGame(elems.gameId);
     } else {
-        if (store.current.gameId) {
+        if (store.world.ui.myGameId) {
             matches.leaveCurrentGame();
         }
         changePage(elems.page, elems.profileId);
