@@ -56,6 +56,7 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page="">Home</NavBarItem>
                 <NavBarItem page="leaderboard" shrink={true}>Leaderboard</NavBarItem>
+                <NavBarItem page="regions" shrink={true}>Regions</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty} shrink={true}>Party</NavBarItem>
                 <div className="spacer" />
                 <LoginButton />
