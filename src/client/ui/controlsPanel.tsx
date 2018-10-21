@@ -126,7 +126,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
-            {this.state.changed && <div style={{ marginTop: 8 }}>
+            {this.state.changed && <div style={{ textAlign: "center", marginTop: 8 }}>
                 {this.state.saved 
                     ? "Changes saved"
                     : "Unsaved changes"}
