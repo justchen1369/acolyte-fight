@@ -841,7 +841,7 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 function applyPreAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
 		case "move": return moveAction(world, hero, action, spell);
-		case "retarget": return retargetAction(world, hero, action, spell);
+		case "retarget": return true; // All actions retarget - nothing extra to do
 		default: return false;
 	}
 }
@@ -854,11 +854,6 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 			hero.casting = null;
 		}
 	}
-	return true;
-}
-
-function retargetAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
-	hero.target = action.target;
 	return true;
 }
 
