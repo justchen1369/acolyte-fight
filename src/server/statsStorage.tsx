@@ -14,7 +14,7 @@ import * as percentiles from './percentiles';
 import * as userStorage from './userStorage';
 import * as s from './server.model';
 import { Collections  } from './db.model';
-import { firestore } from './dbStorage';
+import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
@@ -166,6 +166,7 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
 }
 
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
+    const firestore = getFirestore();
     let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
     if (after) {
         query = query.startAfter(after);
@@ -185,11 +186,13 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
 }
 
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
+    const firestore = getFirestore();
     const data = gameStatsToDb(gameStats);
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
 export async function cleanupGames(maxAgeDays: number) {
+    const firestore = getFirestore();
     const cutoff = moment().subtract(maxAgeDays, 'days').unix();
     const query = firestore.collection(Collections.Game).where('unixTimestamp', '<', cutoff);
 
@@ -219,6 +222,7 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
 }
 
 export async function retrieveLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+    const firestore = getFirestore();
     const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength).get();
 
     let result = new Array<m.LeaderboardPlayer>();
@@ -240,12 +244,15 @@ export async function retrieveLeaderboard(category: string): Promise<m.Leaderboa
 }
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
+    const firestore = getFirestore();
     const doc = await firestore.collection('user').doc(userId).get();
     const profile = dbToProfile(userId, doc.data() as db.User);
     return profile;
 }
 
 async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<RatingDeltas> {
+    const firestore = getFirestore();
+
     const category = gameStats.category;
     const knownPlayers = gameStats.players.filter(p => !!p.userId);
     const winningPlayer = knownPlayers.find(p => p.userHash === gameStats.winner);

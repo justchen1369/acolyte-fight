@@ -3,7 +3,7 @@ import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as s from './server.model';
 import uniqid from 'uniqid';
-import { firestore } from './dbStorage';
+import { getFirestore } from './dbStorage';
 import { Collections } from './db.model';
 
 export const DiscordPrefix = "discord.";
@@ -37,6 +37,7 @@ export async function getUserIdFromAccessKey(accessKey: string): Promise<string>
         return null;
     }
 
+    const firestore = getFirestore();
     const querySnapshot = await firestore.collection(Collections.User).where('accessKeys', 'array-contains', accessKey).limit(1).get()
     for (const doc of querySnapshot.docs) {
         return doc.id;
@@ -49,6 +50,7 @@ export async function getUserByAccessKey(accessKey: string): Promise<s.User> {
         return null;
     }
 
+    const firestore = getFirestore();
     const querySnapshot = await firestore.collection(Collections.User).where('accessKeys', 'array-contains', accessKey).limit(1).get()
     for (const doc of querySnapshot.docs) {
         const data = doc.data() as db.User;
@@ -67,15 +69,18 @@ export async function getUserById(userId: string): Promise<s.User> {
         return null;
     }
 
+    const firestore = getFirestore();
     const doc = await firestore.collection(Collections.User).doc(userId).get();
     return doc.exists ? dbToUser(doc.id, doc.data() as db.User) : null;
 }
 
 export async function touch(userId: string) {
+    const firestore = getFirestore();
     await firestore.collection(Collections.User).doc(userId).update('accessed', Firestore.FieldValue.serverTimestamp());
 }
 
 export async function createUser(user: s.User, ...accessKeys: string[]): Promise<void> {
+    const firestore = getFirestore();
     const data: db.User = {
         loggedIn: user.loggedIn,
         accessed: Firestore.FieldValue.serverTimestamp() as any,
@@ -91,6 +96,7 @@ export async function createUser(user: s.User, ...accessKeys: string[]): Promise
 }
 
 export async function updateUser(user: Partial<s.User>): Promise<void> {
+    const firestore = getFirestore();
     const data: Partial<db.User> = _.omitBy({
         loggedIn: user.loggedIn,
         settings: user.settings && {
@@ -103,6 +109,7 @@ export async function updateUser(user: Partial<s.User>): Promise<void> {
 }
 
 export async function upgradeUser(userId: string, name: string, discordAccessKey: string): Promise<void> {
+    const firestore = getFirestore();
     const data: Partial<db.User> = {
         loggedIn: true,
         accessKeys: Firestore.FieldValue.arrayUnion(discordAccessKey) as any,
@@ -114,10 +121,12 @@ export async function upgradeUser(userId: string, name: string, discordAccessKey
 }
 
 export async function associateAccessKey(accessKey: string, userId: string): Promise<void> {
+    const firestore = getFirestore();
     await firestore.collection(Collections.User).doc(userId).update('accessKeys', Firestore.FieldValue.arrayUnion(accessKey));
 }
 
 export async function disassociateAccessKey(accessKey: string): Promise<void> {
+    const firestore = getFirestore();
     const querySnapshot = await firestore.collection(Collections.User).where('accessKeys', 'array-contains', accessKey).get();
     for (const doc of querySnapshot.docs) {
         await doc.ref.update('accessKeys', Firestore.FieldValue.arrayRemove(accessKey));

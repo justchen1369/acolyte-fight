@@ -11,7 +11,6 @@ import * as m from '../game/messages.model';
 import * as mirroring from './mirroring';
 import * as s from './server.model';
 import { Collections } from './db.model';
-import { firestore } from './dbStorage';
 import { logger } from './logging';
 
 interface DbFrequenciesResult {
@@ -104,7 +103,7 @@ function calculateDistribution(cumulativeFrequency: number[]): number[] {
 }
 
 async function calculateFrequencies(): Promise<DbFrequenciesResult> {
-    const query = firestore.collection(db.Collections.User).select('ratings');
+    const query = dbStorage.getFirestore().collection(db.Collections.User).select('ratings');
 
     let numUsers = 0;
     const frequencies = new Map<string, number[]>();

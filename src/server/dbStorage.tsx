@@ -1,10 +1,27 @@
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as s from './server.model';
+import { logger } from './logging';
 
-export const firestore = new Firestore.Firestore({
-    timestampsInSnapshots: true,
-});
+const MaxFirestoreAgeHours = 1;
+
+let firestore: Firestore.Firestore = null;
+let firestoreExpiry: number = 0;
+
+export function getFirestore() {
+    if (!firestore || Date.now() >= firestoreExpiry) {
+        firestoreExpiry = Date.now() + MaxFirestoreAgeHours * 60 * 60 * 1000;
+        recreateFirestore();
+    }
+    return firestore;
+}
+
+function recreateFirestore() {
+    logger.info("Recreating firestore...");
+    firestore = new Firestore.Firestore({
+        timestampsInSnapshots: true,
+    });
+}
 
 export function init() {
 }
