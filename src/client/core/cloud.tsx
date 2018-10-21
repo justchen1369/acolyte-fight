@@ -59,6 +59,10 @@ export async function downloadSettings(): Promise<void> {
 
 export async function uploadSettings(): Promise<void> {
     const state = StoreProvider.getState();
+    if (!state.userId) {
+        // Can't upload if no user ID
+        return;
+    }
 
     const input: m.UpdateUserSettingsRequest = {
         name: state.playerName,
