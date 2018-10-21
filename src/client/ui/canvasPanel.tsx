@@ -284,6 +284,7 @@ class CanvasPanel extends React.Component<Props, State> {
         }
         if (spellId) {
             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+            this.notifyButtonPress();
         }
     }
 
@@ -297,7 +298,12 @@ class CanvasPanel extends React.Component<Props, State> {
             } else {
                 world.ui.nextSpellId = spellId;
             }
+            this.notifyButtonPress();
         }
+    }
+
+    private notifyButtonPress() {
+        navigator.vibrate(10);
     }
 
     private handleButtonHover(key: string, world: w.World) {
