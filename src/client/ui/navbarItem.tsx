@@ -51,7 +51,6 @@ class NavBarItem extends React.Component<Props> {
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string, profileId: string) {
         if (this.props.onClick) {
             this.props.onClick(ev);
-            ev.preventDefault();
         } else {
             ev.preventDefault();
             pages.changePage(newPage, profileId);

@@ -83,6 +83,7 @@ class NavBar extends React.Component<Props, State> {
     private onToggleOpen(ev: React.MouseEvent) {
         // Stop bubbling because that would close the navigation bar
         ev.stopPropagation();
+        ev.preventDefault();
         this.setState({ open: !this.state.open });
     }
 
