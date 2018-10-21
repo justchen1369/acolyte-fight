@@ -144,26 +144,88 @@ a:hover, a:active {
     flex-direction: column;
 }
 
-.navbar {
-    min-height: 50px;
+.navbar-container {
     width: 100%;
-    display: flex;
+}
+
+.navbar {
     align-items: center;
 }
 
+.navbar-horizontal {
+    display: flex;
+    width: 100%;
+}
+
+.navbar-vertical {
+    display: none;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: auto;
+
+    display: none;
+
+    flex-direction: column;
+    z-index: 100;
+
+    background: #333;
+    box-shadow: 0px 0px 5px black;
+}
+.navbar-vertical.navbar-open {
+    display: flex;
+}
+
 .navbar .nav-item {
+    display: flex;
+    align-content: center;
+    align-items: center;
+
     color: white;
     font-size: 20px;
-    padding: 0px 20px;
+    box-sizing: border-box;
+    height: 50px;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
 }
 
+@media (max-width: 768px) {
+    .navbar .nav-item.nav-optional {
+        display: none;
+    }
+}
+
+.navbar-horizontal .nav-item {
+    padding: 0px 20px;
+}
+
+.navbar-vertical .nav-item {
+    width: 100%;
+    padding: 10px 20px;
+}
+
+.navbar .login-btn {
+    background: #00ccff;
+    cursor: pointer;
+    box-shadow: 3px 3px 3px #0c0c0c;
+    text-shadow: 1px 1px 1px black;
+}
+
+.navbar .nav-item.login-btn:hover {
+    background: #ff8800;
+    color: white;
+}
+
+.navbar .nav-profile-item {
+    background: #333;
+}
+
 .navbar .nav-item .nav-item-label {
     position: relative;
 }
-
 
 .navbar .nav-item .nav-item-label .badge {
     position: absolute;
@@ -180,27 +242,9 @@ a:hover, a:active {
     color: #ff8800;
 }
 
-@media (max-width: 512px) {
-    .nav-optional {
-        display: none;
-    }
-
-    .navbar {
-        justify-content: space-evenly;
-    }
-
-    .navbar .nav-item {
-        font-size: 80%;
-        padding: 10px 0px;
-    }
-
-    .navbar .spacer {
-        display: none;
-    }
-}
-
 .navbar .nav-item:hover {
-    color: #ff8800;
+    background: #555;
+    color: #00ccff;
 }
 
 .navbar .nav-item-selected {
@@ -208,7 +252,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-item.logging-in {
-    color: #888;
+    opacity: 0.5;
 }
 
 .spacer {

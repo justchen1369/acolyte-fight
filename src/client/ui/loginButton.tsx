@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -33,7 +34,11 @@ class LoginButton extends React.Component<Props> {
     }
 
     private renderNotLoggedIn() {
-        return <NavBarItem className={this.props.loginAttempted ? null : "logging-in"} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
+        const className = classNames({
+            "login-btn": true,
+            "logging-in": !this.props.loginAttempted,
+        });
+        return <NavBarItem className={className} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
     }
 
     private renderLoggedIn() {

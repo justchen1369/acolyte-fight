@@ -8,7 +8,7 @@ interface OwnProps {
     page: string;
     profileId?: string;
     className?: string;
-    hideOnMobile?: boolean;
+    shrink?: boolean;
     badge?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
 }
@@ -35,7 +35,7 @@ class NavBarItem extends React.Component<Props> {
         if (this.props.current.page === page) {
             classNames.push("nav-item-selected");
         }
-        if (this.props.hideOnMobile) {
+        if (this.props.shrink) {
             classNames.push("nav-optional");
         }
 
@@ -51,6 +51,7 @@ class NavBarItem extends React.Component<Props> {
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string, profileId: string) {
         if (this.props.onClick) {
             this.props.onClick(ev);
+            ev.preventDefault();
         } else {
             ev.preventDefault();
             pages.changePage(newPage, profileId);

@@ -17,6 +17,7 @@
   "dependencies": {
     "@google-cloud/firestore": "^0.17.0",
     "@google-cloud/logging-winston": "^0.9.0",
+    "@types/classnames": "^2.2.6",
     "@types/color": "^3.0.0",
     "@types/commander": "^2.12.2",
     "@types/cookie": "^0.3.1",
@@ -39,6 +40,7 @@
     "@types/uniqid": "^4.1.2",
     "@types/url-join": "^0.8.2",
     "@types/winston": "^2.3.9",
+    "classnames": "^2.2.6",
     "color": "^3.0.0",
     "commander": "^2.15.1",
     "cookie": "^0.3.1",
