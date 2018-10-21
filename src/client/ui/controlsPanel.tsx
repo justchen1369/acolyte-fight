@@ -173,14 +173,8 @@ class ControlsPanel extends React.Component<Props, State> {
 
         // Update rebindings
         {
-            let followCursor = state.moveWith === MoveWith.FollowCursor;
-            if (state.leftClickKey && state.rightClickKey) {
-                // Follow cursor otherwise there is no method to move
-                followCursor = true;
-            }
-
             const rebindings = { ...this.props.rebindings };
-            rebindings[w.SpecialKeys.Hover] = followCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
+            rebindings[w.SpecialKeys.Hover] = state.moveWith === MoveWith.FollowCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
             rebindings[w.SpecialKeys.LeftClick] = state.leftClickKey;
             rebindings[w.SpecialKeys.RightClick] = state.rightClickKey;
 
