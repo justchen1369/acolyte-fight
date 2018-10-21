@@ -676,7 +676,6 @@ h2 {
     position: relative;
     min-width: 200px;
     height: 100%;
-    margin-left: 50px;
 
     background:#222;
     color: white;
@@ -731,6 +730,7 @@ h2 {
 
 .spell-config .key-detail {
     margin-left: 50px;
+    margin-right: 50px;
 }
 
 .spell-config .spell-stats {
@@ -787,6 +787,7 @@ h2 {
 
     .spell-config .key-detail {
         font-size: 75%;
+        margin-right: 0;
     }
 
     .spell-config .key-name-container {
