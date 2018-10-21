@@ -9,6 +9,9 @@ export const getRebindingLookup = Reselect.createSelector(
 	(rebindings) => {
         const lookup = new Map<string, string>();
         for (const newKey in rebindings) {
+            if (isSpecialKey(newKey)) {
+                continue;
+            }
             const initialKey = rebindings[newKey];
 			lookup.set(initialKey, newKey);
         }

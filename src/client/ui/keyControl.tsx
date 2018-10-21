@@ -86,7 +86,7 @@ class KeyControl extends React.Component<Props, State> {
             delete rebindings[oldKey];
         }
 
-        if (newKey && (newKey.length === 1 || newKey === w.SpecialKeys.RightClick)) { // No special keys allowed
+        if (newKey && !keyboardUtils.isSpecialKey(newKey)) {
             rebindings[newKey] = targetKey;
         }
 
