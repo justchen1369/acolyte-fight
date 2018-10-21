@@ -377,7 +377,7 @@ class CanvasPanel extends React.Component<Props, State> {
                     }
                 }
             } else {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: "retarget", target: world.ui.nextTarget });
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Retarget, target: world.ui.nextTarget });
             }
         }
     }
