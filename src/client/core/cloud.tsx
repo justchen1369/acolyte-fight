@@ -39,6 +39,13 @@ export async function downloadSettings(): Promise<void> {
         } else {
             upload = true;
         }
+
+        if (json.options) {
+            StoreProvider.dispatch({ type: "updateOptions", options: json.options });
+        } else {
+            upload = true;
+        }
+
         console.log(`Logged in as ${json.userId} - ${json.name}`);
 
         if (upload) {
@@ -57,6 +64,7 @@ export async function uploadSettings(): Promise<void> {
         name: state.playerName,
         buttons: state.keyBindings,
         rebindings: state.rebindings,
+        options: state.options,
     };
 
     const res = await fetch('api/settings', {

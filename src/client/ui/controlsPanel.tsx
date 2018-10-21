@@ -193,6 +193,7 @@ class ControlsPanel extends React.Component<Props, State> {
             const options = { ...this.props.options };
             options.wheelOnRight = state.actionWheelSide === Side.Right;
             StoreProvider.dispatch({ type: "updateOptions", options });
+            Storage.saveOptions(options);
         }
 
         this.setState({ saved: true });

@@ -30,6 +30,7 @@ export interface UserSettings {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+    options: m.GameOptions;
 }
 
 export interface UserRatingLookup {

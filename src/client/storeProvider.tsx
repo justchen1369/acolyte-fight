@@ -21,9 +21,7 @@ function initialState(): s.State {
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(),
-        options: {
-            wheelOnRight: false,
-        },
+        options: storage.getOptionsOrDefaults(),
         aiCode: null,
         current: { page: "", profileId: null },
         socketId: null,

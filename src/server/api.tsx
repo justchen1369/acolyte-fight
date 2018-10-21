@@ -113,6 +113,7 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
                         name,
                         buttons: null,
                         rebindings: null,
+                        options: null,
                     },
                 };
 
@@ -155,6 +156,7 @@ async function onCreateTestUserAsync(req: express.Request, res: express.Response
                 name: null,
                 buttons: null,
                 rebindings: null,
+                options: null,
             },
         };
         await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
@@ -257,6 +259,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
             name: user.settings && user.settings.name,
             buttons: user.settings && user.settings.buttons,
             rebindings: user.settings && user.settings.rebindings,
+            options: user.settings && user.settings.options,
         };
 
         res.header("Content-Type", "application/json");
@@ -275,6 +278,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
                 name: null,
                 buttons: null,
                 rebindings: null,
+                options: null,
             },
         };
         await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
@@ -285,6 +289,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
             name: null,
             buttons: null,
             rebindings: null,
+            options: null,
         };
 
         res.header("Content-Type", "application/json");
@@ -318,6 +323,7 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
                 name: input.name,
                 buttons: input.buttons,
                 rebindings: input.rebindings,
+                options: input.options,
             },
         };
         await userStorage.updateUser(user);

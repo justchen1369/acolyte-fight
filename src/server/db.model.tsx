@@ -1,4 +1,5 @@
 import * as Firestore from '@google-cloud/firestore';
+import * as m from '../game/messages.model';
 
 export namespace Collections {
     export const User = 'user';
@@ -17,6 +18,7 @@ export interface UserSettings {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+    options: m.GameOptions;
 }
 export interface UserRatingLookup {
     [category: string]: UserRating;

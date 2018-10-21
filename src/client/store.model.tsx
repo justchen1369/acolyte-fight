@@ -22,7 +22,7 @@ export interface State {
 }
 
 export interface GameOptions {
-    wheelOnRight: boolean;
+    wheelOnRight?: boolean;
 }
 
 export interface NotificationItem {

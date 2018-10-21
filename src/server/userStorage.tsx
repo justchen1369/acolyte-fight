@@ -20,6 +20,7 @@ function dbToUser(userId: string, data: db.User): s.User {
             name: data.settings.name,
             buttons: data.settings.buttons,
             rebindings: data.settings.rebindings,
+            options: data.settings.options,
         }
     };
 }
@@ -89,6 +90,7 @@ export async function createUser(user: s.User, ...accessKeys: string[]): Promise
             name: user.settings.name,
             buttons: user.settings.buttons,
             rebindings: user.settings.rebindings,
+            options: user.settings.options,
         },
         ratings: null,
     };
@@ -103,6 +105,7 @@ export async function updateUser(user: Partial<s.User>): Promise<void> {
             name: user.settings.name,
             buttons: user.settings.buttons,
             rebindings: user.settings.rebindings,
+            options: user.settings.options,
         }
     }, _.isUndefined);
     await firestore.collection(Collections.User).doc(user.userId).update(data);

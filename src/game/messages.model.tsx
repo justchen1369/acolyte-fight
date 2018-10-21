@@ -35,15 +35,21 @@ export interface GetUserSettingsResponse {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+    options: GameOptions;
 }
 
 export interface UpdateUserSettingsRequest {
     name: string;
     buttons: KeyBindings;
     rebindings: KeyBindings;
+    options: GameOptions;
 }
 
 export interface UpdateUserSettingsResponse {
+}
+
+export interface GameOptions {
+    wheelOnRight?: boolean;
 }
 
 export type ActionMsg =
