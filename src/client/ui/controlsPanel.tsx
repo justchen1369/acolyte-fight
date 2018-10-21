@@ -7,6 +7,7 @@ import * as cloud from '../core/cloud';
 import * as spellUtils from '../core/spellUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
+import { isMobile } from '../core/userAgent';
 
 namespace MoveWith {
     export const FollowCursor = "follow";
@@ -78,14 +79,14 @@ class ControlsPanel extends React.Component<Props, State> {
 
     render() {
         return <p className="controls-panel">
-            <div className="row">
+            {!isMobile && <div className="row">
                 <span className="label">Move with</span>
                 <select className="value" value={this.state.moveWith} onChange={ev => this.onMoveWithSelected(ev.target.value)}>
                     <option value={MoveWith.Click}>Click</option>
                     <option value={MoveWith.FollowCursor}>Follow cursor</option>
                 </select>
-            </div>
-            <div className="row">
+            </div>}
+            {!isMobile && <div className="row">
                 <span className="label">Left click</span>
                 <select
                     className="value"
@@ -96,8 +97,8 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={formatOption(null)}>Move</option>
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
-            </div>
-            <div className="row">
+            </div>}
+            {!isMobile && <div className="row">
                 <span className="label">Right click</span>
                 <select
                     className="value"
@@ -109,7 +110,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={formatOption(null)}>Move</option>
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
-            </div>
+            </div>}
             {this.state.changed && <div style={{ marginTop: 8 }}>
                 {this.state.saved 
                     ? "Changes saved"
@@ -157,14 +158,14 @@ class ControlsPanel extends React.Component<Props, State> {
         }
 
         const rebindings = { ...this.props.rebindings };
-        rebindings[w.SpecialKeys.Hover] = followCursor ? w.SpecialKeys.Move : null;
+        rebindings[w.SpecialKeys.Hover] = followCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
         rebindings[w.SpecialKeys.LeftClick] = state.leftClickKey;
         rebindings[w.SpecialKeys.RightClick] = state.rightClickKey;
 
-        console.log(state, rebindings);
         StoreProvider.dispatch({ type: "updateRebindings", rebindings });
 
-        this.setState({ saved: true })
+        this.setState({ saved: true });
+        cloud.uploadSettings();
     }
 }
 
