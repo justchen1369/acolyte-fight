@@ -323,9 +323,8 @@ a:hover, a:active {
 }
 
 .home .btn {
-    min-width: 250px;
+    width: 250px;
     font-size: 40px;
-    margin: 0px 50px;
 }
 .home .btn.disabled {
     background-color: #ccc;
@@ -664,6 +663,7 @@ h2 {
 }
 
 .spell-config .key {
+    box-sizing: border-box;
     display: flex;
     margin-bottom: 30px;
     background: #333;
@@ -673,20 +673,11 @@ h2 {
     box-shadow: 5px 5px 5px black;
 }
 
-@media (max-width: 512px) {
-    .spell-config .key {
-        height: 250px;
-    }
-
-    .spell-config .key-detail {
-        font-size: 75%;
-    }
-}
-
 .spell-config .key-name-container {
     position: relative;
     min-width: 200px;
     height: 100%;
+    margin-left: 50px;
 
     background:#222;
     color: white;
@@ -741,7 +732,6 @@ h2 {
 
 .spell-config .key-detail {
     margin-left: 50px;
-    margin-right: 50px;
 }
 
 .spell-config .spell-stats {
@@ -785,6 +775,24 @@ h2 {
 
 .spell-config .spell-icon:hover {
     border: 3px white solid;
+}
+
+@media (max-width: 768px) {
+    .spell-config .spell-name {
+        font-size: 24pt;
+    }
+
+    .spell-config .key {
+        height: 250px;
+    }
+
+    .spell-config .key-detail {
+        font-size: 75%;
+    }
+
+    .spell-config .key-name-container {
+        display: none;
+    }
 }
 
 .controls-panel .row {
