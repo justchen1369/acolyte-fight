@@ -21,6 +21,9 @@ function initialState(): s.State {
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(),
+        options: {
+            wheelOnRight: false,
+        },
         aiCode: null,
         current: { page: "", profileId: null },
         socketId: null,
@@ -50,6 +53,14 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {
         return { ...state, keyBindings: action.keyBindings };
+    } else if (action.type === "updateOptions") {
+        return {
+            ...state,
+            options: {
+                ...state.options,
+                ...action.options,
+            },
+        };
     } else if (action.type === "updateUrl") {
         return { ...state, current: action.current };
     } else if (action.type === "updatePage") {

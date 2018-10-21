@@ -14,17 +14,23 @@ namespace MoveWith {
     export const Click = "click";
 }
 
+namespace Side {
+    export const Left = "left";
+    export const Right = "right";
+}
+
 interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
     settings: AcolyteFightSettings;
+    options: s.GameOptions;
 }
 
 interface ControlState {
     moveWith: string;
     leftClickKey: string;
     rightClickKey: string;
-
+    actionWheelSide: string;
 }
 interface State extends ControlState {
     changed: boolean;
@@ -36,15 +42,17 @@ function stateToProps(state: s.State): Props {
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
         settings: state.room.settings,
+        options: state.options,
     };
 }
 
-function controlConfigToState(rebindings: KeyBindings): ControlState {
+function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): ControlState {
     const moveWith = rebindings[w.SpecialKeys.Hover] === w.SpecialKeys.Move ? MoveWith.FollowCursor : MoveWith.Click;
     return {
         moveWith,
         leftClickKey: rebindings[w.SpecialKeys.LeftClick],
         rightClickKey: rebindings[w.SpecialKeys.RightClick],
+        actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
     };
 }
 
@@ -67,14 +75,14 @@ class ControlsPanel extends React.Component<Props, State> {
         super(props);
 
         this.state = {
-            ...controlConfigToState(props.rebindings),
+            ...controlConfigToState(props.rebindings, props.options),
             changed: false,
             saved: true,
         };
     }
 
     componentWillReceiveProps(newProps: Props) {
-        this.setState(controlConfigToState(newProps.rebindings));
+        this.setState(controlConfigToState(newProps.rebindings, newProps.options));
     }
 
     render() {
@@ -109,6 +117,13 @@ class ControlsPanel extends React.Component<Props, State> {
                     {this.state.rightClickKey === undefined && <option value={formatOption(undefined)}></option>}
                     <option value={formatOption(null)}>Move</option>
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
+                </select>
+            </div>}
+            {isMobile && <div className="row">
+                <span className="label">Action wheel</span>
+                <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onActionWheelSideSelected(ev.target.value)}>
+                    <option value={formatOption(Side.Left)}>Left</option>
+                    <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
             {this.state.changed && <div style={{ marginTop: 8 }}>
@@ -148,21 +163,37 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
+    private onActionWheelSideSelected(actionWheelSide: string) {
+        this.setState({ actionWheelSide, changed: true, saved: false });
+        this.saveStateDebounced();
+    }
+
     private saveState() {
         const state = this.state;
 
-        let followCursor = state.moveWith === MoveWith.FollowCursor;
-        if (state.leftClickKey && state.rightClickKey) {
-            // Follow cursor otherwise there is no method to move
-            followCursor = true;
+        // Update rebindings
+        {
+            let followCursor = state.moveWith === MoveWith.FollowCursor;
+            if (state.leftClickKey && state.rightClickKey) {
+                // Follow cursor otherwise there is no method to move
+                followCursor = true;
+            }
+
+            const rebindings = { ...this.props.rebindings };
+            rebindings[w.SpecialKeys.Hover] = followCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
+            rebindings[w.SpecialKeys.LeftClick] = state.leftClickKey;
+            rebindings[w.SpecialKeys.RightClick] = state.rightClickKey;
+
+            StoreProvider.dispatch({ type: "updateRebindings", rebindings });
+            Storage.saveRebindingConfig(rebindings);
         }
 
-        const rebindings = { ...this.props.rebindings };
-        rebindings[w.SpecialKeys.Hover] = followCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
-        rebindings[w.SpecialKeys.LeftClick] = state.leftClickKey;
-        rebindings[w.SpecialKeys.RightClick] = state.rightClickKey;
-
-        StoreProvider.dispatch({ type: "updateRebindings", rebindings });
+        // Update options
+        {
+            const options = { ...this.props.options };
+            options.wheelOnRight = state.actionWheelSide === Side.Right;
+            StoreProvider.dispatch({ type: "updateOptions", options });
+        }
 
         this.setState({ saved: true });
         cloud.uploadSettings();

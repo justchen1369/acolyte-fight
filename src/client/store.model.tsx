@@ -9,6 +9,7 @@ export interface State {
     playerName: string;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
+    options: GameOptions;
 
     aiCode: string;
 
@@ -18,6 +19,10 @@ export interface State {
     room: RoomState;
     world: w.World;
     items: NotificationItem[];
+}
+
+export interface GameOptions {
+    wheelOnRight: boolean;
 }
 
 export interface NotificationItem {
@@ -58,6 +63,7 @@ export type Action =
     | UpdateUserIdAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
+    | UpdateOptionsAction
     | UpdateUrlAction
     | UpdatePageAction
     | JoinMatchAction
@@ -106,6 +112,11 @@ export interface UpdatePlayerNameAction {
 export interface UpdateKeyBindingsAction {
     type: "updateKeyBindings";
     keyBindings: KeyBindings;
+}
+
+export interface UpdateOptionsAction {
+    type: "updateOptions";
+    options: Partial<GameOptions>;
 }
 
 export interface UpdateUrlAction {
