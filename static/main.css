@@ -774,7 +774,6 @@ h2 {
     padding: 25px;
 
     background: #333;
-    border: 1px #555 solid;
     box-shadow: 5px 5px 5px black;
 
     text-align: center;
@@ -782,7 +781,6 @@ h2 {
 
 .stats-card-row .stats-card:hover {
     background: #555;
-    border: 1px #666 solid;
 }
 
 .stats-card-row .stats-card .label {
@@ -797,7 +795,6 @@ h2 {
 
 .leaderboard-row {
     background: #333;
-    border: 1px #555 solid;
     box-shadow: 5px 5px 5px black;
 
     display: flex;
@@ -809,12 +806,10 @@ h2 {
 
 .leaderboard-row:hover {
     background: #555;
-    border: 1px #666 solid;
 }
 
 .leaderboard-row.leaderboard-self {
     background: #555;
-    border: 1px #888 solid;
 }
 
 .leaderboard-row.leaderboard-self:hover {
@@ -1023,8 +1018,8 @@ textarea.ai-js {
 
 .region-list-section .region {
     font-size: 120%;
-    border: #555 1px solid;
     background: #333;
+    box-shadow: 5px 5px 5px black;
     padding: 20px;
     margin: 12px 0;
 }
