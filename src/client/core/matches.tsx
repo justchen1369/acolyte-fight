@@ -32,6 +32,7 @@ export function joinNewGame(observeGameId?: string) {
 		socket.emit('join', msg, (response: m.JoinResponseMsg) => {
 			if (!response.success) {
 				notify({ type: "replayNotFound" });
+				StoreProvider.dispatch({ type: "leaveMatch" });
 			}
 		});
 	} else {
