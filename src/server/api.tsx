@@ -308,7 +308,9 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
     if (!(required(input, "object")
         && required(input.name, "string")
         && required(input.buttons, "object") && Object.keys(input.buttons).map(key => input.buttons[key]).every(x => required(x, "string"))
-        && required(input.rebindings, "object") && Object.keys(input.rebindings).map(key => input.rebindings[key]).every(x => required(x, "string"))
+        && required(input.rebindings, "object") && Object.keys(input.rebindings).map(key => input.rebindings[key]).every(x => optional(x, "string"))
+        && required(input.options, "object")
+        && optional(input.options.wheelOnRight, "boolean")
     )) {
         res.status(400).send("Bad request");
         return;
