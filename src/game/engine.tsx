@@ -666,19 +666,14 @@ function handleActions(world: w.World) {
 			hero.target = action.target;
 		}
 
-		if (action && action.type === w.Actions.Move) {
-			// Movement actions are special
-			hero.moveTo = action.target;
-			if (hero.casting && !hero.casting.uninterruptible) {
-				const spell = world.settings.Spells[hero.casting.action.type];
-				if (spell.movementCancel) {
-					hero.casting = null;
+		if (action) {
+			const spell = world.settings.Spells[action.type];
+			if (spell) {
+				const done = applyPreAction(world, hero, action, spell);
+				if (done) {
+					action = null;
 				}
 			}
-			action = null;
-		} else if (action && action.type === w.Actions.Retarget) {
-			hero.target = action.target;
-			action = null;
 		}
 
 		if (hero.casting) {
@@ -843,11 +838,33 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 	}
 }
 
+function applyPreAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
+	switch (spell.action) {
+		case "move": return moveAction(world, hero, action, spell);
+		case "retarget": return retargetAction(world, hero, action, spell);
+		default: return false;
+	}
+}
+
+function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
+	hero.moveTo = action.target;
+	if (spell.cancelChanneling && hero.casting && !hero.casting.uninterruptible) {
+		const channelling = world.settings.Spells[hero.casting.action.type];
+		if (channelling.movementCancel) {
+			hero.casting = null;
+		}
+	}
+	return true;
+}
+
+function retargetAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
+	hero.target = action.target;
+	return true;
+}
+
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
-		case "move": return true; // Handled separately
 		case "stop": return true; // Do nothing
-		case "retarget": return true; // Handled separately
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
@@ -855,6 +872,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "thrust": return thrustAction(world, hero, action, spell);
 		case "wall": return wallAction(world, hero, action, spell);
 		case "shield": return shieldAction(world, hero, action, spell);
+		default: return true;
 	}
 }
 

@@ -1111,7 +1111,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect): w.Butt
 			nextAngle += arcWidth;
 		}
 	});
-	// hitSectors.set(w.Actions.RightClick, { startAngle: null, endAngle: null });
+	// hitSectors.set(w.SpecialKeys.RightClick, { startAngle: null, endAngle: null });
 
 	const region = calculateButtonWheelRegion(rect);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;

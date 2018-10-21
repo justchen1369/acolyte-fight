@@ -5,6 +5,7 @@ import uniqid from 'uniqid';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as w from '../game/world.model';
 import * as auth from './auth';
 import * as categories from './categories';
 import * as constants from '../game/constants';
@@ -397,9 +398,11 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 0;
 	} else if (actionData.actionType === "join" || actionData.actionType === "leave" || actionData.actionType === "bot") {
 		return 1000;
-	} else if (actionData.actionType === "game" && actionData.spellId === "move") {
+	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.MoveAndCancel) {
+		return 11;
+	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.Move) {
 		return 10;
-	} else if (actionData.actionType === "game" && actionData.spellId === "retarget") {
+	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.Retarget) {
 		return 1;
 	} else {
 		return 100;
@@ -407,7 +410,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.actionType === "game" && actionData.spellId !== "move" && actionData.spellId !== "retarget";
+	return actionData.actionType === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.spellId);
 }
 
 export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {

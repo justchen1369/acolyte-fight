@@ -261,6 +261,10 @@ class CanvasPanel extends React.Component<Props, State> {
             }
         });
 
+        if (!world.ui.nextSpellId) {
+            // Start of a touch will cancel any channelling spells
+            world.ui.nextSpellId = w.Actions.MoveAndCancel;
+        }
         this.processCurrentTouch();
     }
 
@@ -278,7 +282,7 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private handleRightClick(world: w.World) {
-        let spellId = this.keyToSpellId(this.rebind(w.Actions.RightClick));
+        let spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.RightClick));
         if (!spellId && this.dashWithSecondary) {
             spellId = this.keyToSpellId(this.rebind("a")); // Dash spell
         }
@@ -294,7 +298,6 @@ class CanvasPanel extends React.Component<Props, State> {
         if (spell) {
             if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
-                this.avoidSpellInterrupt(spell);
             } else {
                 world.ui.nextSpellId = spellId;
             }
@@ -371,7 +374,6 @@ class CanvasPanel extends React.Component<Props, State> {
 
                     if (spell.id !== Spells.move.id) {
                         world.ui.nextSpellId = null;
-                        this.avoidSpellInterrupt(spell);
                     }
                 }
             } else {
@@ -396,14 +398,6 @@ class CanvasPanel extends React.Component<Props, State> {
         const spell = world.settings.Spells[spellType];
         if (spell && world.ui.nextTarget) {
             sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
-            this.avoidSpellInterrupt(spell);
-        }
-    }
-
-    private avoidSpellInterrupt(spell: Spell) {
-        if (spell.movementCancel) {
-            // Stop responding to this touch, or else we will interrupt this spell by moving on the next tick	
-            this.currentTouch = null;
         }
     }
 

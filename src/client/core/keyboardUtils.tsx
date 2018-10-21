@@ -72,5 +72,5 @@ export function readKey(e: KeyboardEvent) {
 }
 
 export function isRightClick(key: string) {
-    return key === w.Actions.RightClick;
+    return key === w.SpecialKeys.RightClick;
 }

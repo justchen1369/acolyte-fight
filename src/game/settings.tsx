@@ -166,17 +166,28 @@ const Layouts: Layouts = {
     },
 };
 
-const move: Spell = {
-    id: 'move',
+const move: MoveSpell = {
+    id: Actions.Move,
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 0.25,
     interruptible: true,
     cooldown: 0,
     action: "move",
+    cancelChanneling: false,
+};
+const go: MoveSpell = {
+    id: Actions.MoveAndCancel,
+    description: "",
+    color: 'white',
+    maxAngleDiffInRevs: 0.25,
+    interruptible: true,
+    cooldown: 0,
+    action: "move",
+    cancelChanneling: true,
 };
 const retarget: Spell = {
-    id: 'retarget',
+    id: Actions.Retarget,
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 1.0,
@@ -718,6 +729,7 @@ const thrust: Spell = {
 
 const Spells = {
     move,
+    go,
     retarget,
     stop,
     fireball,

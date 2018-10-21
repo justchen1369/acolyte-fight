@@ -3,10 +3,16 @@ import pl from 'planck-js';
 import * as Immutable from 'immutable';
 
 export namespace Actions {
-	export const RightClick = "dash";
 	export const Move = "move";
+	export const MoveAndCancel = "go";
 	export const Retarget = "retarget";
 	export const Stop = "stop";
+
+	export const NonGameStarters = [Move, MoveAndCancel, Retarget, Stop];
+}
+
+export namespace SpecialKeys {
+	export const RightClick = "dash";
 }
 
 export namespace CastStage {

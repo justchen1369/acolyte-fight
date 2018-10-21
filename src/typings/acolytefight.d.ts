@@ -140,7 +140,8 @@ declare interface SpellBase {
 }
 
 declare interface MoveSpell extends SpellBase {
-    action: "move";
+	action: "move";
+	cancelChanneling: boolean;
 }
 
 declare interface StopSpell extends SpellBase {

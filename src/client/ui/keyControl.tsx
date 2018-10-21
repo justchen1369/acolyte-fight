@@ -58,7 +58,7 @@ class KeyControl extends React.Component<Props, State> {
 
     private onMouseDown(ev: React.MouseEvent) {
         if (ev.button === 2) {
-            this.rebind(w.Actions.RightClick);
+            this.rebind(w.SpecialKeys.RightClick);
         }
     }
 
