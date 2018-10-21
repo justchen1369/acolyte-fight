@@ -42,7 +42,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     private renderLoggedIn() {
-        return <NavBarItem className="nav-profile-item" page="account" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
+        return <NavBarItem page="profile" className="nav-profile-item" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
     }
 }
 

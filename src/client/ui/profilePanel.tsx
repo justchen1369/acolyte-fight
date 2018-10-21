@@ -44,7 +44,11 @@ export class ProfilePanel extends React.Component<Props, State> {
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
-            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} />}
+            {isMe && <div>
+                <h1>Your Account</h1>
+                <AccountPanel />
+            </div>}
+            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} more={true} />}
             {!this.props.loggedIn && <div>
                 <h1>Profile</h1>
                 <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to view replays and stats</p>

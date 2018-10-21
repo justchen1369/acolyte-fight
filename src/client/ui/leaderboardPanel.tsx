@@ -7,11 +7,10 @@ import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as cloud from '../core/cloud';
-import * as matches from '../core/matches';
 import * as pages from '../core/pages';
-import * as storage from '../storage';
 import * as url from '../url';
+import Link from './link';
+import UserStatsPanel from './userStatsPanel';
 
 interface OwnProps {
     category: string;
@@ -126,6 +125,8 @@ class LeaderboardPanel extends React.Component<Props, State> {
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
+            <UserStatsPanel profileId={this.props.myUserId} category={category} more={false} />
+            <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
             <h1>Leaderboard</h1>
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}

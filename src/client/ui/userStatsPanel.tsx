@@ -20,6 +20,7 @@ interface League {
 interface OwnProps {
     profileId: string;
     category: string;
+    more: boolean;
 }
 interface Props extends OwnProps {
     loggedIn: boolean;
@@ -142,6 +143,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
+        const isMe = this.props.loggedIn && profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = this.getLeagueName(rating.percentile);
         const pointsUntilNextLeague = this.calculatePointsUntilNextLeague(rating.lowerBound, rating.percentile, this.props.category);
@@ -163,11 +165,11 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {this.props.loggedIn && profile.userId === this.props.myUserId && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
+            {isMe && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
                 You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.
             </p>}
-            <h2>Previous {rating.numGames} games</h2>
-            <div className="stats-card-row">
+            {this.props.more && <h2>Previous {rating.numGames} games</h2>}
+            {this.props.more && <div className="stats-card-row">
                 <div className="stats-card">
                     <div className="label">Win rate</div>
                     <div className="value">{Math.round(100 * rating.winRate)}%</div>
@@ -180,7 +182,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="label">Damage per game</div>
                     <div className="value">{Math.round(rating.damagePerGame)}</div>
                 </div>
-            </div>
+            </div>}
         </div>
     }
 

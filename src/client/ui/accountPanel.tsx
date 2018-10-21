@@ -5,7 +5,6 @@ import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import NameConfig from './nameConfig';
 
 interface Props {
     loggedIn: boolean;
@@ -32,10 +31,7 @@ export class LogoutPanel extends React.Component<Props, State> {
 
     private renderLoggedIn() {
         return <div>
-            <h1>Your Account</h1>
             <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>
-            <h2>Your Name</h2>
-            <NameConfig />
         </div>
     }
 

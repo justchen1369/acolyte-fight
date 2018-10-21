@@ -11,6 +11,7 @@ import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
 import PartyPanel from './partyPanel';
 import ProfilePanel from './profilePanel';
+import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
 import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
@@ -70,7 +71,7 @@ class Root extends React.Component<Props> {
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
-                {page === "account" && this.renderAccount()}
+                {page === "settings" && this.renderSettings()}
                 <UrlListener />
             </div>
         );
@@ -143,11 +144,11 @@ class Root extends React.Component<Props> {
         </div>;
     }
 
-    private renderAccount() {
+    private renderSettings() {
         return <div className="content-container">
             <NavBar />
             <div className="page">
-                <AccountPanel />
+                <SettingsPanel />
             </div>
         </div>;
     }

@@ -244,7 +244,7 @@ a:hover, a:active {
 
 .navbar .nav-item:hover {
     background: #555;
-    color: #00ccff;
+    color: #ff8800;
 }
 
 .navbar .nav-item-selected {
@@ -381,6 +381,13 @@ a:hover, a:active {
 @keyframes fold-animation {
     from { color: #888; bottom: 5px }
     to { color: white; bottom: 0 }
+}
+
+.view-more-ad {
+    text-align: center;
+    font-size: 120%;
+    padding: 20px;
+    margin: 10px;
 }
 
 .login-ad {
@@ -800,7 +807,7 @@ h2 {
 
 .points-to-next-league {
     text-align: center;
-    margin-bottom: 100px;
+    margin-bottom: 50px;
 }
 
 .stats-card-row {

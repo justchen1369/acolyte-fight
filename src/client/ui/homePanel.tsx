@@ -10,6 +10,7 @@ import ControlsPanel from './controlsPanel';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
 import SpellConfig from './spellConfig';
+import Link from './link';
 import NavBar from './navbar';
 import PartyList from './partyList';
 
@@ -69,10 +70,10 @@ class HomePanel extends React.Component<Props, State> {
                     In this arena, you'll find others just like you. Will you be the last one standing?
                 </p>
                 {!this.props.isLoggedIn && <p className="login-ad"><div className="btn" onClick={() => this.onLoginClick()}>Login</div> to change name, view stats or watch replays</p>}
-                <h1>Your Spell Configuration</h1>
+                <h1>Your Spells</h1>
                 <SpellConfig />
-                <h1>Your Controls</h1>
-                <ControlsPanel />
+                <h1>More Settings</h1>
+                <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
             </div>
         </div>;
     }

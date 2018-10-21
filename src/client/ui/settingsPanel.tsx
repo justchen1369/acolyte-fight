@@ -1,0 +1,52 @@
+import * as React from 'react';
+import * as ReactRedux from 'react-redux';
+import * as d from '../stats.model';
+import * as m from '../../game/messages.model';
+import * as s from '../store.model';
+import * as pages from '../core/pages';
+import * as url from '../url';
+import AccountPanel from './accountPanel';
+import ControlsPanel from './controlsPanel';
+import NameConfig from './nameConfig';
+import SpellConfig from './spellConfig';
+import { isMobile } from '../core/userAgent';
+
+interface Props {
+    current: s.PathElements;
+    loggedIn: boolean;
+}
+interface State {
+    category: string;
+}
+
+function stateToProps(state: s.State): Props {
+    return {
+        current: state.current,
+        loggedIn: state.loggedIn,
+    };
+}
+
+export class SettingsPanel extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            category: m.GameCategory.PvP,
+        };
+    }
+
+    render() {
+        return <div className="settings-panel">
+            <h1>Your Account</h1>
+            <AccountPanel />
+            <h1>Your Name</h1>
+            <NameConfig />
+            <h1>Your Controls</h1>
+            <ControlsPanel />
+            <h1>Your Spells</h1>
+            <SpellConfig />
+        </div>
+    }
+
+}
+
+export default ReactRedux.connect(stateToProps)(SettingsPanel);

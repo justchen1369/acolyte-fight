@@ -56,7 +56,6 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page="">Home</NavBarItem>
                 <NavBarItem page="leaderboard" shrink={true}>Leaderboard</NavBarItem>
-                <NavBarItem page="profile" profileId={this.props.userId} shrink={true}>Replays</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty} shrink={true}>Party</NavBarItem>
                 <div className="spacer" />
                 <LoginButton />
@@ -65,11 +64,11 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page="">Home</NavBarItem>
                 <NavBarItem page="leaderboard">Leaderboard</NavBarItem>
-                <NavBarItem page="profile" profileId={this.props.userId}>Replays</NavBarItem>
                 <NavBarItem page="modding" badge={this.props.isModded}>Modding</NavBarItem>
                 <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>
                 <NavBarItem page="regions">Regions</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
+                <NavBarItem page="settings">Settings</NavBarItem>
                 <NavBarItem page="about">About</NavBarItem>
                 <div className="spacer" />
             </div>
