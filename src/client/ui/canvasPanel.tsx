@@ -113,6 +113,8 @@ class CanvasPanel extends React.Component<Props, State> {
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
 
+    private dashWithSecondary: boolean = null;
+
     private keyDownListener = this.gameKeyDown.bind(this);
     private resizeListener = this.fullScreenCanvas.bind(this);
 
@@ -247,17 +249,12 @@ class CanvasPanel extends React.Component<Props, State> {
                         world.ui.nextTarget = p.worldPoint;
                     }
 
-                    const doubleClick = 
-                        this.previousTouchStart
-                        && (p.time - this.previousTouchStart.time) < DoubleTapMilliseconds
-                        && vector.distance(p.interfacePoint, this.previousTouchStart.interfacePoint) <= DoubleTapPixels
-                    if (isMobile && doubleClick || p.secondaryBtn) {
-                        const spellId =
-                            this.keyToSpellId(this.rebind(w.Actions.RightClick))
-                            || this.keyToSpellId(this.rebind("a")); // Dash spell
-                        if (spellId) {
-                            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
-                        }
+                    if (this.dashWithSecondary === null) {
+                        this.dashWithSecondary = this.determineIfRightClickDashEnabled(p.secondaryBtn);
+                    }
+
+                    if (isMobile && this.isDoubleClick(p) || p.secondaryBtn) {
+                        this.handleRightClick(world);
                     }
                     this.previousTouchStart = p;
                 }
@@ -265,6 +262,29 @@ class CanvasPanel extends React.Component<Props, State> {
         });
 
         this.processCurrentTouch();
+    }
+
+    private determineIfRightClickDashEnabled(isRightClicking: boolean) {
+        // If the first button they use is right click, then move with right click, don't dash
+        return !isRightClicking;
+    }
+
+    private isDoubleClick(p: PointInfo) {
+        const doubleClick =
+            this.previousTouchStart
+            && (p.time - this.previousTouchStart.time) < DoubleTapMilliseconds
+            && vector.distance(p.interfacePoint, this.previousTouchStart.interfacePoint) <= DoubleTapPixels
+        return doubleClick;
+    }
+
+    private handleRightClick(world: w.World) {
+        let spellId = this.keyToSpellId(this.rebind(w.Actions.RightClick));
+        if (!spellId && this.dashWithSecondary) {
+            spellId = this.keyToSpellId(this.rebind("a")); // Dash spell
+        }
+        if (spellId) {
+            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+        }
     }
 
     private handleButtonClick(key: string, world: w.World) {
