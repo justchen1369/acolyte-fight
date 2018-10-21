@@ -20,6 +20,7 @@ interface Props {
     myHeroId: string;
     isDead: boolean;
     buttonBar: w.ButtonConfig;
+    options: s.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
 }
@@ -34,6 +35,7 @@ function stateToProps(state: s.State): Props {
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
         buttonBar: state.world.ui.buttonBar,
+        options: state.options,
         exitable: worldInterruptible(state.world),
         items: state.items,
     };
@@ -58,12 +60,12 @@ class MessagesPanel extends React.Component<Props, State> {
                 left = 0;
                 bottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
             } else if (buttonBar.view === "wheel") {
-                if (buttonBar.region.left === 0) {
-                    // Wheel is left-aligned, put messages to the right
-                    left = buttonBar.region.right;
-                } else {
+                if (this.props.options.wheelOnRight) {
                     // Wheel is right-aligned, put messages to the left
-                    right = buttonBar.region.left;
+                    left = 0;
+                } else {
+                    // Wheel is left-aligned, put messages to the right
+                    right = 0;
                 }
             }
         }
@@ -107,7 +109,7 @@ class MessagesPanel extends React.Component<Props, State> {
             rows.push(actionRow);
         }
 
-        return <div id="messages-panel" style={{ left, bottom }}>
+        return <div id="messages-panel" style={{ left, right, bottom }}>
             {rows}
             <TextMessageBox />
         </div>;
