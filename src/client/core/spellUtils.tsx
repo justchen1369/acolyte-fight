@@ -5,3 +5,14 @@ export function spellName(spell: Spell) {
 function capitalize(str: string) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function resolveSpellForKey(key: string, keyBindings: KeyBindings, settings: AcolyteFightSettings): Spell {
+    const options = settings.Choices.Options[key];
+
+    let chosenId = keyBindings[key];
+    if (!(options.indexOf(chosenId) >= 0)) {
+        chosenId = settings.Choices.Defaults[key];
+    }
+    const chosen = settings.Spells[chosenId];
+    return chosen;
+}

@@ -113,7 +113,8 @@ class CanvasPanel extends React.Component<Props, State> {
     private actionSurface: ActionSurfaceState = null;
     private targetSurface: TargetSurfaceState = null;
 
-    private dashWithSecondary: boolean = null;
+    private leftClickKey: string;
+    private rightClickKey: string;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private resizeListener = this.fullScreenCanvas.bind(this);
@@ -138,6 +139,9 @@ class CanvasPanel extends React.Component<Props, State> {
             height: 0,
             rtx: !isMobile,
         };
+
+        this.leftClickKey = props.rebindings[w.SpecialKeys.LeftClick];
+        this.rightClickKey = props.rebindings[w.SpecialKeys.RightClick];
     }
 
     componentWillMount() {
@@ -249,12 +253,14 @@ class CanvasPanel extends React.Component<Props, State> {
                         world.ui.nextTarget = p.worldPoint;
                     }
 
-                    if (this.dashWithSecondary === null) {
-                        this.dashWithSecondary = this.determineIfRightClickDashEnabled(p.secondaryBtn);
+                    if (!this.rightClickKey) {
+                        this.autoBindRightClick(p.secondaryBtn);
                     }
 
                     if (isMobile && this.isDoubleClick(p) || p.secondaryBtn) {
-                        this.handleRightClick(world);
+                        this.handleButtonClick(this.rightClickKey, world);
+                    } else {
+                        this.handleButtonClick(this.leftClickKey, world);
                     }
                     this.previousTouchStart = p;
                 }
@@ -268,9 +274,8 @@ class CanvasPanel extends React.Component<Props, State> {
         this.processCurrentTouch();
     }
 
-    private determineIfRightClickDashEnabled(isRightClicking: boolean) {
-        // If the first button they use is right click, then move with right click, don't dash
-        return !isRightClicking;
+    private autoBindRightClick(isRightClicking: boolean) {
+        this.rightClickKey = keyboardUtils.autoBindRightClick(isRightClicking);
     }
 
     private isDoubleClick(p: PointInfo) {
@@ -281,18 +286,11 @@ class CanvasPanel extends React.Component<Props, State> {
         return doubleClick;
     }
 
-    private handleRightClick(world: w.World) {
-        let spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.RightClick));
-        if (!spellId && this.dashWithSecondary) {
-            spellId = this.keyToSpellId(this.rebind("a")); // Dash spell
-        }
-        if (spellId) {
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
-            this.notifyButtonPress();
-        }
-    }
-
     private handleButtonClick(key: string, world: w.World) {
+        if (!key) {
+            return;
+        }
+
         const spellId = this.keyToSpellId(key);
         const spell = world.settings.Spells[spellId];
         if (spell) {
@@ -377,7 +375,8 @@ class CanvasPanel extends React.Component<Props, State> {
                     }
                 }
             } else {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Retarget, target: world.ui.nextTarget });
+                const spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             }
         }
     }
@@ -405,6 +404,11 @@ class CanvasPanel extends React.Component<Props, State> {
         const world = this.props.world;
 
         if (!key) { return null; }
+
+        const specialSpellId = world.settings.Choices.Special[key];
+        if (specialSpellId) {
+            return specialSpellId;
+        }
 
         const hero = world.objects.get(world.ui.myHeroId);
         if (!hero || hero.category !== "hero") { return null; }

@@ -736,6 +736,23 @@ h2 {
     border: 3px white solid;
 }
 
+.controls-panel .row {
+    font-size: 120%;
+}
+
+.controls-panel .row .label {
+    display: inline-block;
+    min-width: 30%;
+    text-align: right;
+    margin: 15px;
+}
+
+.controls-panel .row .value {
+    margin-left: 10px;
+    font-size: 120%;
+    min-width: 30%;
+}
+
 .points-to-next-league {
     text-align: center;
     margin-bottom: 100px;

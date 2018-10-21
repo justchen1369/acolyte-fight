@@ -1221,7 +1221,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2);
 		} else {
 			const key = buttonState.key;
-			if (key && !keyboardUtils.isRightClick(key)) {
+			if (key && !keyboardUtils.isSpecialKey(key)) {
 				// Keyboard shortcut
 				ctx.save();
 

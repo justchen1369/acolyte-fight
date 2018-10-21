@@ -12,6 +12,10 @@ export namespace Actions {
 }
 
 export namespace SpecialKeys {
+	export const Hover = "hover";
+	export const Retarget = "retarget";
+	export const Move = "move";
+	export const LeftClick = "primary";
 	export const RightClick = "dash";
 }
 

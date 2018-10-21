@@ -6,7 +6,7 @@ import * as w from '../../game/world.model';
 import * as ai from '../core/ai';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import NameConfig from './nameConfig';
+import ControlsPanel from './controlsPanel';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
 import SpellConfig from './spellConfig';
@@ -69,12 +69,10 @@ class HomePanel extends React.Component<Props, State> {
                     In this arena, you'll find others just like you. Will you be the last one standing?
                 </p>
                 {!this.props.isLoggedIn && <p className="login-ad"><div className="btn" onClick={() => this.onLoginClick()}>Login</div> to change name, view stats or watch replays</p>}
-                {this.props.isLoggedIn && <div>
-                    <h2>Your Name</h2>
-                    <NameConfig />
-                </div>}
                 <h1>Your Spell Configuration</h1>
                 <SpellConfig />
+                <h1>Your Controls</h1>
+                <ControlsPanel />
             </div>
         </div>;
     }

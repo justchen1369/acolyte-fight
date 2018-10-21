@@ -52,14 +52,10 @@ class SpellConfig extends React.Component<Props, State> {
         const Spells = this.props.settings.Spells;
 
         const options = Choices.Options[key];
-        let chosenId = this.props.config[key];
-		if (!(options.indexOf(chosenId) >= 0)) {
-			chosenId = Choices.Defaults[key];
-		}
-        const chosen = Spells[chosenId];
+        const chosen = spellUtils.resolveSpellForKey(key, this.props.config, this.props.settings);
 
         const name = spellUtils.spellName(chosen);
-        const isRightClick = keyboardUtils.isRightClick(key);
+        const isRightClick = keyboardUtils.isSpecialKey(key);
         return <div className="key">
             <div className="key-options">
                 {options.map(spellId => Spells[spellId]).map(spell =>
@@ -78,14 +74,14 @@ class SpellConfig extends React.Component<Props, State> {
                     <div className="description">{chosen.description}</div>
                     {this.state.saved.has(key) && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
                 </div>
-                <SpellStats spellId={chosenId} />
+                <SpellStats spellId={chosen.id} />
             </div>
             {!isMobile && <KeyControl initialKey={key} />}
         </div>;
     }
     
     private onChoose(key: string, spellId: string) {
-        const config = this.props.config;
+        const config = { ...this.props.config };
         const saved = this.state.saved;
 
         config[key] = spellId;

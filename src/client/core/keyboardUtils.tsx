@@ -1,4 +1,6 @@
 import * as Reselect from 'reselect';
+import * as cloud from './cloud';
+import * as StoreProvider from '../storeProvider';
 import * as w from '../../game/world.model';
 import { DefaultSettings } from '../../game/settings';
 
@@ -71,6 +73,28 @@ export function readKey(e: KeyboardEvent) {
     }
 }
 
-export function isRightClick(key: string) {
-    return key === w.SpecialKeys.RightClick;
+export function isSpecialKey(key: string) {
+    return key && key.length > 1;
+}
+
+export function autoBindRightClick(rightClickedFirst: boolean): string {
+    let rightClickKey: string;
+    if (rightClickedFirst) {
+        // If the first button they use is right click, then move with right click, don't dash
+        rightClickKey = w.SpecialKeys.Move;
+    } else {
+        // Moved with the left click first, bind the right click to dash
+        rightClickKey = "a";
+    }
+
+    const store = StoreProvider.getState();
+    const rebindings = { ...store.rebindings };
+    rebindings[w.SpecialKeys.RightClick] = rightClickKey;
+    StoreProvider.dispatch({
+        type: "updateRebindings",
+        rebindings,
+    });
+    setTimeout(() => cloud.uploadSettings(), 1);
+
+    return rightClickKey;
 }

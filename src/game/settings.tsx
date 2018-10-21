@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import { TicksPerSecond, Categories } from './constants';
-import { Actions, HomingTargets } from './world.model';
+import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
@@ -72,7 +72,11 @@ const Choices: ChoiceSettings = {
 		"r": "kamehameha",
 		"d": "firespray",
 		"f": "scourge",
-	},
+    },
+    Special: {
+        [(SpecialKeys.Move)]: Actions.Move,
+        [(SpecialKeys.Retarget)]: Actions.Retarget,
+    },
 }
 
 const Layouts: Layouts = {

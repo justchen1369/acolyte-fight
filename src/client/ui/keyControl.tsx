@@ -41,7 +41,7 @@ class KeyControl extends React.Component<Props, State> {
 
         const rebindingLookup = keyboardUtils.getRebindingLookup(this.props.rebindings);
         const remappedKey = rebindingLookup.get(initialKey);
-        const isRightClick = keyboardUtils.isRightClick(remappedKey);
+        const isSpecialKey = keyboardUtils.isSpecialKey(remappedKey);
         const isRebound = !!this.props.rebindings[remappedKey];
 
         return <div
@@ -51,9 +51,19 @@ class KeyControl extends React.Component<Props, State> {
             onContextMenu={(ev) => ev.preventDefault()}
             tabIndex={0}>
 
-            <div className={remappedKey ? "key-name rebinding" : "key-name"}>{isRightClick ? <i className="fa fa-mouse-pointer" title="Right click" /> : remappedKey}</div>
+            <div className={remappedKey ? "key-name rebinding" : "key-name"}>{isSpecialKey ? <i className="fa fa-mouse-pointer" title={this.formatSpecialKey(remappedKey)} /> : remappedKey}</div>
             <div className="rebind-help">{isRebound ? "Press ESC to reset" : "Press key to rebind"}</div>
         </div>
+    }
+
+    private formatSpecialKey(key: string): string {
+        if (key === w.SpecialKeys.LeftClick) {
+            return "Left-click";
+        } else if (key === w.SpecialKeys.RightClick) {
+            return "Right-click";
+        } else {
+            return key;
+        }
     }
 
     private onMouseDown(ev: React.MouseEvent) {
@@ -76,7 +86,7 @@ class KeyControl extends React.Component<Props, State> {
             delete rebindings[oldKey];
         }
 
-        if (newKey && (newKey.length === 1 || keyboardUtils.isRightClick(newKey))) { // No special keys allowed
+        if (newKey && (newKey.length === 1 || newKey === w.SpecialKeys.RightClick)) { // No special keys allowed
             rebindings[newKey] = targetKey;
         }
 

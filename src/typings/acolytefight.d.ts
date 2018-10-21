@@ -93,6 +93,7 @@ declare interface ChoiceSettings {
 	Keys: KeyConfig[];
 	Options: KeyBindingOptions;
 	Defaults: KeyBindings;
+	Special: KeyBindings;
 }
 
 declare interface KeyConfig {
