@@ -49,14 +49,22 @@ class MessagesPanel extends React.Component<Props, State> {
 
     render() {
         // Offset the messages from the button bar
-        let marginBottom = 0;
-        let marginLeft = 0;
+        let bottom = 0;
+        let left: number = undefined;
+        let right: number = undefined;
         const buttonBar = this.props.buttonBar;
         if (buttonBar) {
             if (buttonBar.view === "bar") {
-                marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+                left = 0;
+                bottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
             } else if (buttonBar.view === "wheel") {
-                marginLeft = buttonBar.region.right;
+                if (buttonBar.region.left === 0) {
+                    // Wheel is left-aligned, put messages to the right
+                    left = buttonBar.region.right;
+                } else {
+                    // Wheel is right-aligned, put messages to the left
+                    right = buttonBar.region.left;
+                }
             }
         }
 
@@ -99,7 +107,7 @@ class MessagesPanel extends React.Component<Props, State> {
             rows.push(actionRow);
         }
 
-        return <div id="messages-panel" style={{ marginLeft, marginBottom }}>
+        return <div id="messages-panel" style={{ left, bottom }}>
             {rows}
             <TextMessageBox />
         </div>;
