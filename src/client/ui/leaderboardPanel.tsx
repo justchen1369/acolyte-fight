@@ -29,7 +29,7 @@ interface State {
 }
 
 async function retrieveLeaderboardAsync(category: string) {
-    const res = await fetch(`api/leaderboard?category=${encodeURIComponent(category)}&limit=100`, {
+    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}&limit=100`, {
         credentials: 'same-origin'
     });
     if (res.status === 200) {
@@ -41,7 +41,7 @@ async function retrieveLeaderboardAsync(category: string) {
 }
 
 async function retrieveUserStatsAsync(profileId: string) {
-    const res = await fetch(`api/profile?p=${encodeURIComponent(profileId)}`, {
+    const res = await fetch(`${url.base}/api/profile?p=${encodeURIComponent(profileId)}`, {
         credentials: 'same-origin'
     });
     if (res.status === 200) {

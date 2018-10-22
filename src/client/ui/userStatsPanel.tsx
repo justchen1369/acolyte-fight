@@ -46,7 +46,7 @@ export const leagues = [
 ];
 
 async function retrieveUserStatsAsync(profileId: string) {
-    const res = await fetch(`api/profile?p=${encodeURIComponent(profileId)}`, {
+    const res = await fetch(`${url.base}/api/profile?p=${encodeURIComponent(profileId)}`, {
         credentials: 'same-origin'
     });
     if (res.status === 200) {
@@ -58,7 +58,7 @@ async function retrieveUserStatsAsync(profileId: string) {
 }
 
 async function retrieveDistributionsAsync() {
-    const res = await fetch(`api/distributions`, {
+    const res = await fetch(`${url.base}/api/distributions`, {
         credentials: 'same-origin'
     });
     if (res.status === 200) {

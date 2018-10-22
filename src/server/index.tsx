@@ -1,3 +1,4 @@
+import cors from 'cors';
 import path from 'path';
 import httpLib from 'http';
 import socketLib from 'socket.io';
@@ -43,6 +44,7 @@ if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
 }
 
+app.use(cors());
 app.use(express.json());
 app.use(authMiddleware);
 

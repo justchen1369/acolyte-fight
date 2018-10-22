@@ -62,7 +62,31 @@
 
 	</head>
 	<body class="game">
+		<!--
+		<script src="https://connect.facebook.net/en_US/fbinstant.6.2.js"></script>
+		<script>
+			window.baseUrl = "https://acolytefight.io";
+		</script>
+		-->
+
 		<div id="root"></div>
 		<script src="dist/client.js"></script>
+
+		<!--
+        <script>
+            FBInstant.initializeAsync().then(function() {        
+                return FBInstant.startGameAsync();
+            }).then(function() {
+                // Retrieving context and player information can only be done
+                // once startGameAsync() resolves
+                var contextId = FBInstant.context.getID();
+                var contextType = FBInstant.context.getType();
+
+                var playerName = FBInstant.player.getName();
+                var playerPic = FBInstant.player.getPhoto();
+                var playerId = FBInstant.player.getID();
+            });
+		</script>
+		-->
 	</body>
 </html>

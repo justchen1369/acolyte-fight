@@ -20,7 +20,8 @@ import * as url from './url';
 
 import Root from './ui/root';
 
-const socket = socketLib();
+const socketUrl: string = (window as any).baseUrl || undefined;
+const socket = socketLib(socketUrl);
 
 let alreadyConnected = false;
 

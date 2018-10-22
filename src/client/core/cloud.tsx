@@ -4,11 +4,12 @@ import * as m from '../../game/messages.model';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
+import { base } from '../url';
 
 export async function downloadSettings(): Promise<void> {
     const numGames = await storage.getNumGames();
 
-    let url = `api/settings?cachebuster=${Date.now()}`;
+    let url = `${base}/api/settings?cachebuster=${Date.now()}`;
     if (numGames >= constants.Placements.VerificationGames) {
         url += "&create=1";
     }
@@ -71,7 +72,7 @@ export async function uploadSettings(): Promise<void> {
         options: state.options,
     };
 
-    const res = await fetch('api/settings', {
+    const res = await fetch(`${base}/api/settings`, {
         credentials: "same-origin",
         method: "POST",
         headers: {
@@ -100,7 +101,7 @@ export async function downloadGameStats(): Promise<void> {
     let itemsLoaded = 0;
     let oldestLoaded = moment();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
-        const res = await fetch(`api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
+        const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = await res.json();
 
         for (const gameStatsMsg of json.stats) {
@@ -124,6 +125,6 @@ export async function downloadGameStats(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
-    await fetch('api/logout', { credentials: "same-origin" });
+    await fetch(`${base}/api/logout`, { credentials: "same-origin" });
     StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
 }
