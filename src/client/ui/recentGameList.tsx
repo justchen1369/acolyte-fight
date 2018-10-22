@@ -242,7 +242,7 @@ class RecentGameList extends React.Component<Props, State> {
             return null;
         }
 
-        return <tr>
+        return <tr key={game.id}>
             <td title={game.createdTimestamp.toLocaleString()}>{game.createdTimestamp.fromNow()}</td>
             <td>{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</td>
             <td>{this.renderRatingDelta(self.ratingDelta)}</td>
@@ -265,7 +265,7 @@ class RecentGameList extends React.Component<Props, State> {
     private renderPlayer(player: PlayerStats): JSX.Element {
         const playerUrl = player.userId ? url.getPath({ ...this.props.current, page: "profile", profileId: player.userId }) : null;
 
-        return <span className="player-cell" title={`${player.name}: ${player.wins ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
+        return <span key={player.userHash} className="player-cell" title={`${player.name}: ${player.wins ? "winner, " : ""}${player.kills} kills, ${Math.round(player.damage)} damage`}>
             <a href={playerUrl} onClick={(ev) => this.onPlayerClick(ev, player.userId)} className={`${player.wins ? "winner" : "loser"} ${playerUrl ? "known" : "unknown"}`}>
                 {player.wins ? <i className="fas fa-crown" /> : null}
                 {player.name}
