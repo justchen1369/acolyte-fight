@@ -184,7 +184,7 @@ export function onGetGameStats(req: express.Request, res: express.Response) {
 }
 
 export async function onGetGameStatsAsync(req: express.Request, res: express.Response): Promise<void> {
-    const maxLimit = 10;
+    const maxLimit = 100;
 
     const after = req.query.after ? parseInt(req.query.after) : null;
     const before = req.query.before ? parseInt(req.query.before) : null;

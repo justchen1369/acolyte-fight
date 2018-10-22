@@ -96,10 +96,11 @@ export async function downloadGameStats(): Promise<void> {
     }
 
     const until = await storage.getStatsLoadedUntil() || moment.unix(0);
+    const limit = 100;
     let itemsLoaded = 0;
     let oldestLoaded = moment();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
-        const res = await fetch(`api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}`, { credentials: "same-origin" });
+        const res = await fetch(`api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = await res.json();
 
         for (const gameStatsMsg of json.stats) {
@@ -114,7 +115,7 @@ export async function downloadGameStats(): Promise<void> {
             ++itemsLoaded;
         }
 
-        if (json.stats.length === 0) {
+        if (json.stats.length === 0 || json.stats.length < limit) {
             // Reached the end
             break;
         }
