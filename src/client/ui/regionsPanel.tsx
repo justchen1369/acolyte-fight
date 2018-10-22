@@ -9,10 +9,10 @@ import * as storage from '../storage';
 import * as url from '../url';
 
 const RegionUrls = [
-    "http://us.acolytefight.io",
-    "http://eu.acolytefight.io",
-    "http://au.acolytefight.io",
-    "http://sg.acolytefight.io",
+    "https://us.acolytefight.io",
+    "https://eu.acolytefight.io",
+    "https://au.acolytefight.io",
+    "https://sg.acolytefight.io",
 ];
 
 interface Region {
