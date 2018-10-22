@@ -68,7 +68,6 @@ const getGameSubset = Reselect.createSelector(
     });
 
 async function retrieveGamesAsync(): Promise<GameRow[]> {
-    await cloud.downloadGameStats();
     const gameStats = await storage.loadAllGameStats()
 
     let games = gameStats.map(convertGame);
@@ -175,16 +174,32 @@ class RecentGameList extends React.Component<Props, State> {
     }
 
     componentDidMount() {
-        retrieveGamesAsync().then(games => {
-            this.setState({
-                games,
-                self: findSelf(games),
-            });
-        }).then(() => retrieveReplaysAsync(this.state.games.map(g => g.id))).then(ids => {
-            this.setState({ availableReplays: new Set<string>(ids) });
-        }).catch(error => {
+        this.retrieveData();
+    }
+
+    private async retrieveData() {
+        try {
+            await this.loadGames(false);
+            await this.loadGames(true);
+            await this.loadReplays();
+        } catch (error) {
+            console.error(error);
             this.setState({ error: `${error}` });
-        });
+        }
+    }
+
+    private async loadGames(useCloud: boolean) {
+        if (useCloud) {
+            await cloud.downloadGameStats();
+        }
+
+        const games = await retrieveGamesAsync();
+        this.setState({ games, self: findSelf(games) });
+    }
+
+    private async loadReplays() {
+        const ids = await retrieveReplaysAsync(this.state.games.map(g => g.id));
+        this.setState({ availableReplays: new Set<string>(ids) });
     }
 
     render() {
