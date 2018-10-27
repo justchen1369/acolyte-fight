@@ -43,7 +43,7 @@ export function getInternalStatus() {
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
-        numUsers: percentiles.estimateNumUsers(m.GameCategory.PvP),
+        numUsers: percentiles.estimateNumUsers(),
         numGames: store.activeGames.size,
         numPlayers: _.sum(_.values(store.playerCounts)),
         numConnections: store.numConnections,
@@ -204,17 +204,19 @@ export async function onGetGameStatsAsync(req: express.Request, res: express.Res
     res.send(response);
 }
 
-export function onGetDistributions(req: express.Request, res: express.Response) {
-    onGetDistributionsAsync(req, res).catch(error => handleError(error, res));
+export function onGetRatingAtPercentile(req: express.Request, res: express.Response) {
+    onGetRatingAtPercentileAsync(req, res).catch(error => handleError(error, res));
 }
 
-export async function onGetDistributionsAsync(req: express.Request, res: express.Response): Promise<void> {
-    const distributions = await percentiles.estimateDistributions();
-    if (distributions) {
-        res.send(distributions);
-    } else {
-        res.status(404).send("Not found");
+export async function onGetRatingAtPercentileAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.category && req.query.percentile)) {
+        res.status(400).send("Bad request");
+        return;
     }
+
+    const rating = percentiles.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
+    const response: m.GetRatingAtPercentileResponse = { rating };
+    res.send(response);
 }
 
 export function onGetProfile(req: express.Request, res: express.Response) {

@@ -11,15 +11,16 @@ import * as m from '../game/messages.model';
 import * as mirroring from './mirroring';
 import * as s from './server.model';
 import { Collections } from './db.model';
+import { FixedIntegerArray } from './fixedIntegerArray';
 import { logger } from './logging';
 
 interface DbFrequenciesResult {
-    frequencies: Map<string, number[]>;
+    frequencies: Map<string, FixedIntegerArray>;
     numUsers: number;
 }
 
-let cumulativeFrequenciesCache: Map<string, number[]> = new Map<string, number[]>();
-let distributionCache: Map<string, number[]> = new Map<string, number[]>();
+let cumulativeFrequenciesCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
+let distributionCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
 let numUsersCache: number = 0;
 
 export async function init() {
@@ -30,18 +31,17 @@ export function estimatePercentile(ratingLB: number, category: string): number {
     return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(category));
 }
 
-export function estimateDistributions(): m.GetDistributionsResponse {
-    const result: m.GetDistributionsResponse = {};
-    for (const category of distributionCache.keys()) {
-        result[category] = distributionCache.get(category);
+export function estimateRatingAtPercentile(category: string, percentile: number): number {
+    const distribution = distributionCache.get(category);
+    if (!distribution) {
+        return 0;
     }
-    return result;
-}
-export function estimateDistribution(category: string): number[] {
-    return distributionCache.get(category);
+
+    const minRating = distribution.at(Math.floor(percentile));
+    return minRating || 0;
 }
 
-export function estimateNumUsers(category: string): number {
+export function estimateNumUsers(): number {
     return numUsersCache;
 }
 
@@ -58,13 +58,12 @@ async function refreshCumulativeFrequenciesLoop() {
 
     logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
 
-    const delayMilliseconds = calculateNextRefresh(cumulativeFrequenciesCache);
+    const delayMilliseconds = calculateNextRefresh(numUsersCache);
 
     setTimeout(() => refreshCumulativeFrequenciesLoop(), delayMilliseconds);
 }
 
-function calculateNextRefresh(cumulativeFrequencies: Map<string, number[]>) {
-    const numUsers = _.max([...cumulativeFrequencies.values()].map(cumulativeFrequency => _.last(cumulativeFrequency)));
+function calculateNextRefresh(numUsers: number) {
     if (!numUsers || numUsers < 100) {
         return 5 * 60 * 1000;
     } else if (numUsers < 1000) {
@@ -75,15 +74,15 @@ function calculateNextRefresh(cumulativeFrequencies: Map<string, number[]>) {
 }
 
 // Returns the rating required to reach each percentile
-function calculateDistribution(cumulativeFrequency: number[]): number[] {
+function calculateDistribution(cumulativeFrequency: FixedIntegerArray): FixedIntegerArray {
     if (!cumulativeFrequency || cumulativeFrequency.length === 0) {
-        return [];
+        return new FixedIntegerArray([]);
     }
 
     const distribution = new Array<number>();
-    const numUsers = cumulativeFrequency[cumulativeFrequency.length - 1];
+    const numUsers = cumulativeFrequency.at(cumulativeFrequency.length - 1);
     for (let rating = 0; rating < cumulativeFrequency.length; ++rating) {
-        const percentile = 100 * cumulativeFrequency[rating] / numUsers;
+        const percentile = 100 * cumulativeFrequency.at(rating) / numUsers;
         while (true) {
             const nextPercentile = distribution.length;
             if (percentile >= nextPercentile) {
@@ -99,7 +98,7 @@ function calculateDistribution(cumulativeFrequency: number[]): number[] {
         distribution.push(maxRating);
     }
 
-    return distribution;
+    return new FixedIntegerArray(distribution);
 }
 
 async function calculateFrequencies(): Promise<DbFrequenciesResult> {
@@ -133,32 +132,36 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
         }
     });
 
-    return { frequencies, numUsers };
+    const frequenciesFixed = new Map<string, FixedIntegerArray>();
+    frequencies.forEach((frequency, category) => {
+        frequenciesFixed.set(category, new FixedIntegerArray(frequency));
+    });
+    return { frequencies: frequenciesFixed, numUsers };
 }
 
-function calculateCumulativeFrequency(frequencies: Map<string, number[]>): Map<string, number[]> {
-    const cumulativeFrequencies = new Map<string, number[]>();
+function calculateCumulativeFrequency(frequencies: Map<string, FixedIntegerArray>): Map<string, FixedIntegerArray> {
+    const cumulativeFrequencies = new Map<string, FixedIntegerArray>();
     frequencies.forEach((frequency, category) => {
         const cumulativeFrequency = new Array<number>();
 
         let total = 0;
         for (let i = 0; i < frequency.length; ++i) {
-            total += (frequency[i] || 0);
+            total += (frequency.at(i) || 0);
             cumulativeFrequency.push(total);
         }
 
-        cumulativeFrequencies.set(category, cumulativeFrequency);
+        cumulativeFrequencies.set(category, new FixedIntegerArray(cumulativeFrequency));
     });
 
     return cumulativeFrequencies;
 }
 
-function estimatePercentileFrom(ratingLB: number, cumulativeFrequency: number[]): number {
+function estimatePercentileFrom(ratingLB: number, cumulativeFrequency: FixedIntegerArray): number {
     if (!cumulativeFrequency || cumulativeFrequency.length <= 0) {
         return 100;
     }
 
-    const numUsers = cumulativeFrequency[cumulativeFrequency.length - 1];
+    const numUsers = cumulativeFrequency.at(cumulativeFrequency.length - 1);
 
     const index = Math.ceil(ratingLB);
     const above = clampRead(index, cumulativeFrequency) / numUsers;
@@ -169,11 +172,11 @@ function estimatePercentileFrom(ratingLB: number, cumulativeFrequency: number[])
     return 100.0 * (below * alpha + above * (1 - alpha));
 }
 
-function clampRead(index: number, array: number[]): number {
+function clampRead(index: number, array: FixedIntegerArray): number {
     if (array.length === 0) {
         return undefined;
     } else {
         index = Math.max(0, Math.min(array.length - 1, index));
-        return array[index];
+        return array.at(index);
     }
 }

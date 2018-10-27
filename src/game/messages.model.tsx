@@ -348,8 +348,8 @@ export interface LeaderboardPlayer {
     numGames: number;
 }
 
-export interface GetDistributionsResponse {
-    [category: string]: number[];
+export interface GetRatingAtPercentileResponse {
+    rating: number;
 }
 
 export interface GetProfileResponse {

@@ -16,6 +16,9 @@ interface League {
     name: string;
     minPercentile: number;
 }
+interface PointsToNextLeagueLookup {
+    [category: string]: number;
+}
 
 interface OwnProps {
     profileId: string;
@@ -30,7 +33,7 @@ interface Props extends OwnProps {
 interface State {
     profileId: string;
     profile: m.GetProfileResponse;
-    distributions: m.GetDistributionsResponse;
+    pointsToNextLeague: PointsToNextLeagueLookup;
     error: string;
 }
 
@@ -57,16 +60,57 @@ async function retrieveUserStatsAsync(profileId: string) {
     }
 }
 
-async function retrieveDistributionsAsync() {
-    const res = await fetch(`${url.base}/api/distributions`, {
-        credentials: 'same-origin'
+async function retrievePointsToNextLeagueAsync(profile: m.GetProfileResponse): Promise<PointsToNextLeagueLookup> {
+    const categories = [m.GameCategory.PvP];
+    const lookup: PointsToNextLeagueLookup = {};
+    for (const category of categories) {
+        const userRating = profile.ratings[category];
+        if (!userRating) {
+            continue;
+        }
+
+        const ratingLB = userRating.lowerBound;
+        const percentile = userRating.percentile;
+        if (ratingLB && percentile) {
+            lookup[category] = await calculatePointsUntilNextLeague(ratingLB, percentile, category);
+        }
+    }
+    return lookup;
+}
+
+async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
+    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
+        credentials: 'same-origin',
     });
     if (res.status === 200) {
-        const json = await res.json() as m.GetDistributionsResponse;
-        return json;
+        const json = await res.json() as m.GetRatingAtPercentileResponse;
+        return json.rating;
     } else {
         throw await res.text();
     }
+}
+
+async function calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): Promise<number> {
+    const nextLeague = calculateNextLeague(percentile);
+    if (!nextLeague) {
+        return null;
+    }
+
+    const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
+    if (minRating) {
+        return minRating - ratingLB;
+    } else {
+        return null;
+    }
+}
+
+function calculateNextLeague(percentile: number): League {
+    const higher = leagues.filter(l => percentile < l.minPercentile);
+    if (higher.length === 0) {
+        return null;
+    }
+
+    return _.minBy(higher, l => l.minPercentile);
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -83,7 +127,7 @@ class UserStatsPanel extends React.Component<Props, State> {
         this.state = {
             profileId: null,
             profile: null,
-            distributions: null,
+            pointsToNextLeague: {},
             error: null,
         };
     }
@@ -106,8 +150,8 @@ class UserStatsPanel extends React.Component<Props, State> {
                 }
 
                 if (this.props.myUserId === this.props.profileId) {
-                    const distributions = await retrieveDistributionsAsync();
-                    this.setState({ distributions });
+                    const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
+                    this.setState({ pointsToNextLeague });
                 }
             } catch(error) {
                 console.error("UserStatsPanel error", error);
@@ -146,7 +190,7 @@ class UserStatsPanel extends React.Component<Props, State> {
         const isMe = this.props.loggedIn && profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = this.getLeagueName(rating.percentile);
-        const pointsUntilNextLeague = this.calculatePointsUntilNextLeague(rating.lowerBound, rating.percentile, this.props.category);
+        const pointsUntilNextLeague = this.state.pointsToNextLeague[this.props.category];
         return <div>
             <h1>{profile.name}</h1>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
@@ -186,25 +230,6 @@ class UserStatsPanel extends React.Component<Props, State> {
         </div>
     }
 
-    private calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): number | null {
-        const nextLeague = this.calculateNextLeague(percentile);
-        if (!nextLeague) {
-            return null;
-        }
-
-        const distribution = this.state.distributions && this.state.distributions[category];
-        if (!distribution) {
-            return null;
-        }
-
-        const minRating = distribution[Math.ceil(nextLeague.minPercentile)];
-        if (minRating) {
-            return minRating - ratingLB;
-        } else {
-            return null;
-        }
-    }
-
     private renderNoRating(profile: m.GetProfileResponse) {
         return <div>
             <h1>{profile.name}</h1>
@@ -218,15 +243,6 @@ class UserStatsPanel extends React.Component<Props, State> {
             }
         }
         return "";
-    }
-
-    private calculateNextLeague(percentile: number): League {
-        const higher = leagues.filter(l => percentile < l.minPercentile);
-        if (higher.length === 0) {
-            return null;
-        }
-
-        return _.minBy(higher, l => l.minPercentile);
     }
 }
 
