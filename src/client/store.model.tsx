@@ -1,3 +1,4 @@
+import * as d from './stats.model';
 import * as w from '../game/world.model';
 
 export interface State {
@@ -19,6 +20,8 @@ export interface State {
     room: RoomState;
     world: w.World;
     items: NotificationItem[];
+
+    allGameStats: Map<string, d.GameStats>;
 }
 
 export interface GameOptions {
@@ -86,6 +89,7 @@ export type Action =
     | UpdateHoverSpellAction
     | UpdateRebindingsAction
     | UpdateServerAction
+    | UpdateGameStatsAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -194,4 +198,9 @@ export interface UpdateRebindingsAction {
 export interface UpdateServerAction {
     type: "updateServer";
     server: string;
+}
+
+export interface UpdateGameStatsAction {
+    type: "updateGameStats";
+    allGameStats: d.GameStats[];
 }

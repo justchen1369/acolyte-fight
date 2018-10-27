@@ -1,5 +1,6 @@
 import moment from 'moment';
 import * as constants from '../../game/constants';
+import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as stats from './stats';
 import * as storage from '../storage';
@@ -100,12 +101,14 @@ export async function downloadGameStats(): Promise<void> {
     const limit = 10;
     let itemsLoaded = 0;
     let oldestLoaded = moment();
+    const allGameStats = new Array<d.GameStats>();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
         const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = await res.json();
 
         for (const gameStatsMsg of json.stats) {
             const gameStats = stats.messageToGameStats(gameStatsMsg, userId);
+            allGameStats.push(gameStats);
             await storage.saveGameStats(gameStats);
 
             const timestamp = moment(gameStats.timestamp);
@@ -122,6 +125,8 @@ export async function downloadGameStats(): Promise<void> {
         }
     }
     await storage.setStatsLoadedUntil(oldestLoaded);
+
+    StoreProvider.dispatch({ type: "updateGameStats", allGameStats });
 }
 
 export async function logout(): Promise<void> {

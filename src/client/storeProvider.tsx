@@ -1,4 +1,5 @@
 import * as Redux from 'redux';
+import * as d from './stats.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';
@@ -30,6 +31,7 @@ function initialState(): s.State {
         party: null,
         world: engine.initialWorld(room.mod),
         items: [],
+        allGameStats: new Map<string, d.GameStats>(),
     };
 }
 
@@ -148,6 +150,12 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, rebindings: action.rebindings };
     } else if (action.type === "updateServer") {
         return { ...state, server: action.server };
+    } else if (action.type === "updateGameStats") {
+        const allGameStats = new Map<string, d.GameStats>(state.allGameStats);
+        for (const gameStats of action.allGameStats) {
+            allGameStats.set(gameStats.id, gameStats);
+        }
+        return { ...state, allGameStats };
     } else {
         console.log(action);
         return state;

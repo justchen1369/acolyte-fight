@@ -10,6 +10,8 @@ import * as StoreProvider from '../storeProvider';
 import { socket } from './sockets';
 import { TicksPerSecond } from '../../game/constants';
 
+let alreadyLoadedGameStats = false;
+
 export function attachListener() {
     notifications.attachListener(notifs => onNotification(notifs));
     sockets.listeners.onGameMsg = onGameMsg;
@@ -31,6 +33,16 @@ async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
     const state = StoreProvider.getState();
     const gameStats = messageToGameStats(gameStatsMsg, state.userId);
     await storage.saveGameStats(gameStats);
+}
+
+export async function loadAllGameStats() {
+    if (alreadyLoadedGameStats) {
+        return;
+    }
+
+    alreadyLoadedGameStats = true;
+    const allGameStats = await storage.loadAllGameStats();
+    StoreProvider.dispatch({ type: "updateGameStats", allGameStats });
 }
 
 function gameStatsToMessage(gameStats: d.GameStats): m.GameStatsMsg {
@@ -97,6 +109,8 @@ export async function save(world: w.World, server: string): Promise<d.GameStats>
             world.ui.saved = true;
             await storage.incrementNumGames();
         }
+
+        StoreProvider.dispatch({ type: "updateGameStats", allGameStats: [gameStats] });
     }
     return gameStats;
 }

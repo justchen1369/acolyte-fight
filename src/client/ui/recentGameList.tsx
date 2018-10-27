@@ -9,7 +9,7 @@ import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
-import * as storage from '../storage';
+import * as stats from '../core/stats';
 import * as url from '../url';
 
 const MaxReplaysToDisplay = 100;
@@ -46,18 +46,25 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     current: s.PathElements;
+    games: GameRow[];
 }
 interface State {
-    category: string;
-    self: string;
-    games: GameRow[];
     error: string;
     availableReplays: Set<string>;
 }
 
+const getGames = Reselect.createSelector(
+    (state: s.State) => state.allGameStats,
+    (gameStats) => {
+        let games = [...gameStats.values()].map(convertGame);
+        games = _.sortBy(games, (g: GameRow) => -g.createdTimestamp.unix());
+        return games;
+    }
+);
+
 const getGameSubset = Reselect.createSelector(
-    (state: State) => state.category,
-    (state: State) => state.games,
+    (props: Props) => props.category,
+    (props: Props) => props.games,
     (category, games) => {
         if (games) {
             return _.take(games.filter(g => g.category === category), MaxReplaysToDisplay);
@@ -65,14 +72,6 @@ const getGameSubset = Reselect.createSelector(
             return null;
         }
     });
-
-async function retrieveGamesAsync(): Promise<GameRow[]> {
-    const gameStats = await storage.loadAllGameStats()
-
-    let games = gameStats.map(convertGame);
-    games = _.sortBy(games, (g: GameRow) => -g.createdTimestamp.unix());
-    return games;
-}
 
 function retrieveReplaysAsync(gameIds: string[]) {
     return matches.replays(gameIds);
@@ -127,19 +126,11 @@ function joinWithComma(elements: JSX.Element[]): Array<JSX.Element | string> {
     return result;
 }
 
-function findSelf(games: GameRow[]): string {
-    for (const game of games) {
-        if (game.self) {
-            return game.self;
-        }
-    }
-    return null;
-}
-
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         current: state.current,
+        games: getGames(state),
     };
 }
 
@@ -147,16 +138,9 @@ class RecentGameList extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            category: m.GameCategory.PvP,
-            self: null,
-            games: null,
             availableReplays: new Set<string>(),
             error: null,
         };
-    }
-
-    componentWillReceiveProps(newProps: Props) {
-        this.setState({ category: newProps.category });
     }
 
     componentDidMount() {
@@ -165,8 +149,8 @@ class RecentGameList extends React.Component<Props, State> {
 
     private async retrieveData() {
         try {
-            await this.loadGames(false);
-            await this.loadGames(true);
+            await stats.loadAllGameStats();
+            await cloud.downloadGameStats();
             await this.loadReplays();
         } catch (error) {
             console.error(error);
@@ -174,17 +158,8 @@ class RecentGameList extends React.Component<Props, State> {
         }
     }
 
-    private async loadGames(useCloud: boolean) {
-        if (useCloud) {
-            await cloud.downloadGameStats();
-        }
-
-        const games = await retrieveGamesAsync();
-        this.setState({ games, self: findSelf(games) });
-    }
-
     private async loadReplays() {
-        const ids = await retrieveReplaysAsync(this.state.games.map(g => g.id));
+        const ids = await retrieveReplaysAsync(this.props.games.map(g => g.id));
         this.setState({ availableReplays: new Set<string>(ids) });
     }
 
@@ -195,10 +170,10 @@ class RecentGameList extends React.Component<Props, State> {
     }
 
     private renderGames(): JSX.Element {
-        const games = getGameSubset(this.state);
+        const games = getGameSubset(this.props);
         return <div>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
-            {!this.state.games && <p className="loading-text">Loading...</p>}
+            {!this.props.games && <p className="loading-text">Loading...</p>}
             {games && games.length === 0 && <p>No recent games</p>}
             {games && games.length > 0 && <div className="game-list">
                 <table style={{width: "100%"}}>
