@@ -30,7 +30,6 @@ interface GameRow {
     self: string;
     winner: string;
     players: Map<string, PlayerStats>;
-    totals: Stats;
 
     lengthSeconds: number;
 }
@@ -79,17 +78,6 @@ function retrieveReplaysAsync(gameIds: string[]) {
     return matches.replays(gameIds);
 }
 
-function initStats(): Stats {
-    return { games: 0, wins: 0, kills: 0, damage: 0 };
-}
-
-function accumulateStats(accumulator: Stats, addend: Stats) {
-    accumulator.games += addend.games;
-    accumulator.wins += addend.wins;
-    accumulator.kills += addend.kills;
-    accumulator.damage += addend.damage;
-}
-
 function convertGame(stats: d.GameStats): GameRow {
     const game: GameRow = {
         id: stats.id,
@@ -99,7 +87,6 @@ function convertGame(stats: d.GameStats): GameRow {
         players: new Map<string, PlayerStats>(),
         self: null,
         winner: null,
-        totals: initStats(),
         lengthSeconds: stats.lengthSeconds,
     };
 
@@ -117,7 +104,6 @@ function convertGame(stats: d.GameStats): GameRow {
         };
 
         game.players.set(userHash, cell);
-        accumulateStats(game.totals, cell);
 
         if (stats.winner === userHash) {
             game.winner = userHash;
