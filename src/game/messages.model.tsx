@@ -8,6 +8,8 @@ export namespace GameCategory {
     export const AIvAI = "AIvAI";
     export const Mods = "Mods";
 
+    export const AllCategory = "All";
+
     export const All = [
         PvP,
         PvAI,

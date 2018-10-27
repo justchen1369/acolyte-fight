@@ -5,6 +5,12 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 
+const categories = [
+    m.GameCategory.PvP,
+    m.GameCategory.PvAI,
+    m.GameCategory.AllCategory,
+];
+
 interface Props {
     category: string;
     onCategoryChange: (category: string) => void;
@@ -21,7 +27,7 @@ export class CategorySelector extends React.PureComponent<Props, State> {
 
     render(): JSX.Element {
         return <div className="category-selector">
-            {m.GameCategory.All.map(category => (
+            {categories.map(category => (
                 <div
                     key={category}
                     className={category === this.props.category ? "category category-selected" : "category"}

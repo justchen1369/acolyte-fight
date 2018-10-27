@@ -66,7 +66,7 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page="">Home</NavBarItem>
                 <NavBarItem page="leaderboard">Leaderboard</NavBarItem>
                 <NavBarItem page="modding" badge={this.props.isModded}>Modding</NavBarItem>
-                <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>
+                {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>}
                 <NavBarItem page="regions">Regions</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
                 <NavBarItem page="settings">Settings</NavBarItem>

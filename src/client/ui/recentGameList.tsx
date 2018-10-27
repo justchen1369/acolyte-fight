@@ -40,7 +40,12 @@ class RecentGameList extends React.Component<Props, State> {
         (props: Props) => props.allGameStats,
         (category, allGameStats) => {
             if (allGameStats) {
-                return _.take([...allGameStats.values()].filter(g => g.category === category), MaxReplaysToDisplay);
+                let replays = [...allGameStats.values()];
+                if (category !== m.GameCategory.AllCategory) {
+                    replays = replays.filter(g => g.category === category);
+                }
+                replays = _.take(replays, MaxReplaysToDisplay);
+                return replays;
             } else {
                 return null;
             }
