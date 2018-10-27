@@ -143,7 +143,13 @@ class LeaderboardPanel extends React.Component<Props, State> {
             return null;
         }
 
-        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={`${player.rd.toFixed(0)} ratings deviation`}>
+        const title = [
+            `${player.rd.toFixed(0)} ratings deviation`,
+            `${(player.winRate * 100).toFixed(0)}% win rate`,
+            `${player.killsPerGame.toFixed(1)} kills per game`,
+            `${player.damagePerGame.toFixed(1)} damage per game`,
+        ].join(', ');
+        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
             <span className="position">{position}</span>
             {this.renderPlayerName(player)}
             <span className="win-count">{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
@@ -171,6 +177,9 @@ class LeaderboardPanel extends React.Component<Props, State> {
             rd: userRating.rd,
             lowerBound: userRating.lowerBound,
             numGames: userRating.numGames,
+            winRate: userRating.winRate,
+            killsPerGame: userRating.killsPerGame,
+            damagePerGame: userRating.damagePerGame,
         };
         return result;
     }

@@ -231,6 +231,9 @@ export async function retrieveLeaderboard(category: string): Promise<m.Leaderboa
                 rd: ratings.rd,
                 lowerBound: ratings.lowerBound,
                 numGames: ratings.numGames,
+                winRate: ratings.winRate,
+                killsPerGame: ratings.killsPerGame,
+                damagePerGame: ratings.damagePerGame,
             });
         }
     });

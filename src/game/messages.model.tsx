@@ -348,6 +348,10 @@ export interface LeaderboardPlayer {
     rd: number;
     lowerBound: number;
     numGames: number;
+
+    winRate: number;
+    damagePerGame: number;
+    killsPerGame: number;
 }
 
 export interface GetRatingAtPercentileResponse {
