@@ -13,6 +13,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as parties from './parties';
 import socketClient from 'socket.io-client';
 
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -72,7 +73,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('party', (data, callback) => onPartyMsg(socket, authToken, data, callback));
 	socket.on('party.create', (data, callback) => onPartyCreateMsg(socket, authToken, data, callback));
 	socket.on('party.settings', (data, callback) => onPartySettingsMsg(socket, authToken, data, callback));
-	socket.on('party.leave', (data, callback) => onPartyLeaveMsg(socket, authToken, data, callback));
+	socket.on('party.status', (data, callback) => onPartyStatusMsg(socket, authToken, data, callback));
 	socket.on('join', (data, callback) => onJoinGameMsg(socket, authToken, data, callback));
 	socket.on('bot', data => onBotMsg(socket, data));
 	socket.on('score', data => onScoreMsg(socket, data));
@@ -181,13 +182,28 @@ function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cre
 
 function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreatePartyRequest, callback: (output: m.CreatePartyResponseMsg) => void) {
 	if (!(required(data, "object")
-		&& optional(data.roomId, "string"))) {
+		&& optional(data.roomId, "string")
+		&& required(data.playerName, "string")
+		&& required(data.keyBindings, "object")
+		&& optional(data.isBot, "boolean")
+		&& optional(data.isMobile, "boolean")
+	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
 	}
 
-	const party = games.initParty(socket.id, data.roomId);
-	logger.info(`Party ${party.id} created by user ${authToken}`);
+	const settings: g.PartyMemberSettings = {
+		name: data.playerName,
+		authToken,
+		keyBindings: data.keyBindings,
+		isBot: data.isBot,
+		isMobile: data.isMobile,
+	};
+
+	const party = parties.initParty(socket.id, data.roomId);
+	parties.createOrUpdatePartyMember(party, socket.id, settings);
+	parties.updatePartyMemberStatus(party, socket.id, { isLeader: true });
+	logger.info(`Party ${party.id} created by user ${settings.name} [${authToken}]`);
 
 	const result: m.CreatePartyResponse = {
 		success: true,
@@ -202,7 +218,10 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	if (!(required(data, "object")
 		&& required(data.partyId, "string")
 		&& optional(data.isPrivate, "boolean")
-		&& optional(data.roomId, "string"))) {
+		&& optional(data.isLocked, "boolean")
+		&& optional(data.roomId, "string")
+		&& optional(data.initialObserver, "boolean")
+	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
 	}
@@ -210,19 +229,19 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	const store = getStore();
 
 	const party = store.parties.get(data.partyId);
-	if (!(party && party.active.has(socket.id) && party.leaderSocketId === socket.id)) {
+	if (!parties.isAuthorizedToPromote(party, socket.id)) {
 		logger.info(`Party ${data.partyId} not found or inaccessible for user ${socket.id} [${authToken}]`);
 		callback({ success: false, error: `Party ${data.partyId} not found or inaccessible` });
 		return;
 	}
 
-	let changed = false;
-	if (data.roomId !== undefined && games.updatePartyRoom(party, data.roomId)) {
-		changed = true;
-	}
-	if (data.isPrivate !== undefined && games.updatePartyPrivacy(party, data.isPrivate)) {
-		changed = true;
-	}
+	const newStatus: Partial<g.PartyStatus> = {
+		roomId: data.roomId,
+		isPrivate: data.isPrivate,
+		isLocked: data.isLocked,
+		initialObserver: data.initialObserver,
+	};
+	parties.updatePartyStatus(party, newStatus);
 
 	const result: m.PartySettingsResponseMsg = {
 		success: true,
@@ -232,9 +251,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	};
 	callback(result);
 
-	if (changed) {
-		emitParty(party);
-	}
+	emitParty(party);
 }
 
 function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyRequest, callback: (output: m.PartyResponseMsg) => void) {
@@ -242,11 +259,9 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		&& required(data.partyId, "string")
 		&& required(data.playerName, "string")
 		&& required(data.keyBindings, "object")
-		&& required(data.ready, "boolean")
 		&& optional(data.joining, "boolean")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
-		&& optional(data.isObserver, "boolean")
 	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
@@ -272,38 +287,31 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		}
 	}
 
-	const partyMember: g.PartyMember = {
-		socketId: socket.id,
+	const partyMember: g.PartyMemberSettings = {
 		authToken,
 		name: data.playerName,
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
-		isObserver: data.isObserver,
-		ready: data.ready,
 	};
-	games.updatePartyMember(party, partyMember, joining);
+	parties.createOrUpdatePartyMember(party, socket.id, partyMember);
 
 	const result: m.PartyResponse = {
 		success: true,
-		partyId: party.id,
-		members: partyMembersToContract(party),
-		isPrivate: party.isPrivate,
-		roomId: party.roomId,
+		...partyToMsg(party),
 		server: getLocation().server,
 	};
 	callback(result);
-
-	const assignments = games.startPartyIfReady(party);
-	assignments.forEach(assignment => {
-		emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
-	});
 	emitParty(party);
 }
 
-function onPartyLeaveMsg(socket: SocketIO.Socket, authToken: string, data: m.LeavePartyRequest, callback: (output: m.LeavePartyResponseMsg) => void) {
+function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyStatusRequest, callback: (output: m.PartyStatusResponseMsg) => void) {
 	if (!(required(data, "object")
 		&& required(data.partyId, "string")
+		&& optional(data.memberId, "string")
+		&& optional(data.isLeader, "boolean")
+		&& optional(data.isObserver, "boolean")
+		&& optional(data.kick, "boolean")
 	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
@@ -311,23 +319,61 @@ function onPartyLeaveMsg(socket: SocketIO.Socket, authToken: string, data: m.Lea
 
 	const store = getStore();
 
-	let party = store.parties.get(data.partyId);
+	const party = store.parties.get(data.partyId);
 	if (!party) {
-		logger.info(`Party ${data.partyId} not found for user ${authToken}`);
+		logger.info(`Party ${data.partyId} not found for user ${socket.id} [${authToken}]`);
 		callback({ success: false, error: `Party ${data.partyId} not found` });
 		return;
 	}
 
-	games.removePartyMember(party, socket.id);
-	socket.leave(party.id);
+	const memberId = data.memberId || socket.id;
+	if (data.isLeader && !parties.isAuthorizedToPromote(party, socket.id)) {
+		logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] cannot promote`);
+		callback({ success: false, error: `Party ${data.partyId} unauthorized to promote to leader` });
+		return;
+	} else if (!parties.isAuthorizedToChange(party, socket.id, memberId)) {
+		logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] unauthorized`);
+		callback({ success: false, error: `Party ${data.partyId} unauthorized` });
+		return;
+	}
 
-	const result: m.LeavePartyResponse = {
+	const newStatus: Partial<g.PartyMemberStatus> = {};
+	if (data.isLeader !== undefined) {
+		newStatus.isLeader = data.isLeader;
+	}
+	if (data.isObserver !== undefined) {
+		newStatus.isObserver = data.isObserver;
+	}
+	if (data.isReady !== undefined) {
+		newStatus.ready = data.isReady;
+	}
+	parties.updatePartyMemberStatus(party, memberId, newStatus);
+
+	if (parties.isPartyReady(party)) {
+		logger.info(`Party ${party.id} started with ${party.active.size} players`);
+		const assignments = games.assignPartyToGames(party);
+		assignments.forEach(assignment => {
+			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
+		});
+	}
+
+	if (data.kick) {
+		parties.removePartyMember(party, memberId);
+	}
+
+	const result: m.PartyStatusResponse = {
 		success: true,
-		partyId: party.id,
 	};
 	callback(result);
-
 	emitParty(party);
+
+	// Must emit kick before removing
+	if (data.kick) {
+		const memberSocket = io.sockets.connected[memberId];
+		if (memberSocket) {
+			memberSocket.leave(party.id);
+		}
+	}
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
@@ -499,13 +545,18 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 }
 
 function emitParty(party: g.Party) {
+    io.to(party.id).emit("party", partyToMsg(party));
+}
+
+function partyToMsg(party: g.Party): m.PartyMsg {
 	const msg: m.PartyMsg = {
 		partyId: party.id,
 		roomId: party.roomId,
 		members: partyMembersToContract(party),
 		isPrivate: party.isPrivate,
+		isLocked: party.isLocked,
 	};
-    io.to(party.id).emit("party", msg);
+	return msg;
 }
 
 function partyMembersToContract(party: g.Party) {
@@ -517,6 +568,7 @@ function partyMembersToContract(party: g.Party) {
 			ready: member.ready,
 			isBot: member.isBot,
 			isObserver: member.isObserver,
+			isLeader: member.isLeader,
 		}
 		members.push(contract);
 	});

@@ -2,22 +2,12 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as ai from './ai';
-import * as engine from '../../game/engine';
-import * as matches from './matches';
 import * as rooms from './rooms';
 import * as sockets from './sockets';
-import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
-import { notify } from './notifications';
-import { readFileAsync } from './fileUtils';
 import { socket } from './sockets';
 import { isMobile } from './userAgent';
-
-export interface UpdatePartyConfig {
-	ready?: boolean;
-	observing?: boolean;
-}
 
 sockets.listeners.onPartyMsg = onPartyMsg;
 
@@ -26,6 +16,10 @@ export function createPartyAsync(): Promise<void> {
 	return new Promise<string>((resolve, reject) => {
 		let msg: m.CreatePartyRequest = {
 			roomId: store.room.id,
+			playerName: store.playerName,
+			keyBindings: store.keyBindings,
+			isBot: ai.playingAsAI(store),
+			isMobile,
 		};
 		socket.emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
 			if (response.success === false) {
@@ -34,10 +28,10 @@ export function createPartyAsync(): Promise<void> {
 				resolve(response.partyId);
 			}
 		});
-	}).then(partyId => joinPartyAsync(partyId, true));
+	}).then(partyId => joinPartyAsync(partyId));
 }
 
-export function joinPartyAsync(partyId: string, isLeader: boolean = false): Promise<void> {
+export function joinPartyAsync(partyId: string): Promise<void> {
 	const store = StoreProvider.getState();
 	if (partyId) {
 		let response: m.PartyResponse;
@@ -49,8 +43,6 @@ export function joinPartyAsync(partyId: string, isLeader: boolean = false): Prom
 				keyBindings: store.keyBindings,
 				isBot: ai.playingAsAI(store),
 				isMobile,
-				isObserver: false,
-				ready: false,
 			};
 			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
 				if (_response.success === false) {
@@ -69,10 +61,8 @@ export function joinPartyAsync(partyId: string, isLeader: boolean = false): Prom
 					server: response.server,
 					roomId: response.roomId,
 					members: response.members,
-					isLeader,
 					isPrivate: response.isPrivate,
-					ready: false,
-					observing: false,
+					isLocked: response.isLocked,
 				},
 			});
 			return joinCurrentPartyRoomAsync();
@@ -95,7 +85,7 @@ export function movePartyAsync(roomId: string | null): Promise<void> {
 	return updatePartySettingsAsync(msg);
 }
 
-export function privatePartyAsync(isPrivate: boolean): Promise<void> {
+export function publicPartyAsync(): Promise<void> {
 	const store = StoreProvider.getState();
 	if (!store.party) {
 		return Promise.resolve();
@@ -103,7 +93,39 @@ export function privatePartyAsync(isPrivate: boolean): Promise<void> {
 
 	let msg: m.PartySettingsRequest = {
 		partyId: store.party.id,
-		isPrivate,
+		isPrivate: false,
+		isLocked: false,
+		initialObserver: false,
+	};
+	return updatePartySettingsAsync(msg);
+}
+
+export function privatePartyAsync(): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return Promise.resolve();
+	}
+
+	let msg: m.PartySettingsRequest = {
+		partyId: store.party.id,
+		isPrivate: true,
+		isLocked: false,
+		initialObserver: false,
+	};
+	return updatePartySettingsAsync(msg);
+}
+
+export function tournamentPartyAsync(): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return Promise.resolve();
+	}
+
+	let msg: m.PartySettingsRequest = {
+		partyId: store.party.id,
+		isPrivate: true,
+		isLocked: true,
+		initialObserver: true,
 	};
 	return updatePartySettingsAsync(msg);
 }
@@ -120,7 +142,7 @@ function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	});
 }
 
-export function updatePartyAsync(config: UpdatePartyConfig): Promise<void> {
+export function updatePartyAsync(): Promise<void> {
 	const store = StoreProvider.getState();
 	if (!store.party) {
 		return Promise.resolve();
@@ -134,10 +156,56 @@ export function updatePartyAsync(config: UpdatePartyConfig): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
-			isObserver: config.observing !== undefined ? config.observing : store.party.observing,
-			ready: config.ready !== undefined ? config.ready : store.party.ready,
 		};
 		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+			if (response.success === false) {
+				reject(response.error);
+			} else {
+				resolve();
+			}
+		});
+	});
+}
+
+export async function kick(memberId: string): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return;
+	}
+
+	return updatePartyStatusAsync({ partyId: store.party.id, memberId, kick: true });
+}
+
+export async function makeLeaderAsync(memberId: string): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return;
+	}
+
+	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isLeader: true });
+}
+
+export async function makeObserverAsync(memberId: string, isObserver: boolean): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return;
+	}
+
+	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isObserver });
+}
+
+export async function updateReadyStatusAsync(isReady: boolean): Promise<void> {
+	const store = StoreProvider.getState();
+	if (!store.party) {
+		return;
+	}
+
+	return updatePartyStatusAsync({ partyId: store.party.id, isReady });
+}
+
+async function updatePartyStatusAsync(request: m.PartyStatusRequest): Promise<void> {
+	return new Promise<void>((resolve, reject) => {
+		socket.emit('party.status', request, (response: m.PartyStatusResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -156,8 +224,8 @@ export function leavePartyAsync(): Promise<void> {
 	StoreProvider.dispatch({ type: "leaveParty", partyId: store.party.id });
 
 	return new Promise<void>((resolve, reject) => {
-		let msg: m.LeavePartyRequest = { partyId: store.party.id };
-		socket.emit('party.leave', msg, (response: m.LeavePartyResponseMsg) => {
+		let msg: m.PartyStatusRequest = { partyId: store.party.id, kick: true };
+		socket.emit('party.status', msg, (response: m.PartyStatusResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -167,20 +235,25 @@ export function leavePartyAsync(): Promise<void> {
 	});
 }
 
-function onPartyMsg(msg: m.PartyMsg) {
+async function onPartyMsg(msg: m.PartyMsg) {
 	const store = StoreProvider.getState();
 	if (!(store.party && store.party.id === msg.partyId)) {
 		return;
 	}
 
-	StoreProvider.dispatch({
-		type: "updateParty",
-		partyId: msg.partyId,
-		roomId: msg.roomId,
-		members: msg.members,
-		isPrivate: msg.isPrivate,
-	});
-	joinCurrentPartyRoomAsync();
+	if (msg.members.some(m => m.socketId === socket.id)) {
+		StoreProvider.dispatch({
+			type: "updateParty",
+			partyId: msg.partyId,
+			roomId: msg.roomId,
+			members: msg.members,
+			isPrivate: msg.isPrivate,
+			isLocked: msg.isLocked,
+		});
+		await joinCurrentPartyRoomAsync();
+	} else {
+		await leavePartyAsync();
+	}
 }
 
 function joinCurrentPartyRoomAsync(): Promise<void> {

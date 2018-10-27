@@ -1044,6 +1044,33 @@ textarea.ai-js {
     font-size: 75%;
 }
 
+.party-mode-row {
+    display: flex;
+    align-items: center;
+
+    font-size: 120%;
+    background: #333;
+    box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin: 12px 0;
+
+    cursor: pointer;
+}
+
+.party-mode-row:hover {
+    background: #555;
+}
+
+.party-mode-row .party-mode-label {
+    margin-left: 0.5em;
+;
+}
+
+.party-mode-row.party-mode-selected {
+    background: #22ee88;
+    color: #444;
+}
+
 .party-list .party-member {
     display: inline-block;
     background: #444;
@@ -1059,7 +1086,7 @@ textarea.ai-js {
 }
 
 .party-list .settings-icon {
-    margin-left: 5px;
+    margin-left: 0.5em;
     cursor: pointer;
 }
 
@@ -1068,11 +1095,21 @@ textarea.ai-js {
 }
 
 .party-member .check-icon {
-    margin-right: 5px;
+    margin-right: 0.5em;
+    cursor: pointer;
 }
 
 .party-member .check-icon:hover {
     color: white;
+}
+
+.party-panel .party-member {
+    display: flex;
+    align-items: center;
+    font-size: 120%;
+    box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin: 12px 0;
 }
 
 .region-list-section .region {

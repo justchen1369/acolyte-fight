@@ -195,6 +195,11 @@ export interface HeroMsg {
 
 export interface CreatePartyRequest {
     roomId: string;
+
+    playerName: string;
+    keyBindings: KeyBindings;
+    isBot: boolean;
+    isMobile: boolean;
 }
 export interface CreatePartyResponse {
     success: true;
@@ -212,24 +217,36 @@ export interface PartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
-    isObserver: boolean;
-    ready: boolean;
 }
-export interface PartyResponse {
+export interface PartyResponse extends PartyMsg {
     success: true;
     partyId: string;
-    members: PartyMemberMsg[];
-    roomId: string;
     server: string;
-    isPrivate: boolean;
 }
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
+
+
+export interface PartyStatusRequest {
+    partyId: string;
+    memberId?: string;
+    isLeader?: boolean;
+    isObserver?: boolean;
+    isReady?: boolean;
+    kick?: boolean;
+}
+export interface PartyStatusResponse {
+    success: true;
+}
+export type PartyStatusResponseMsg = PartyStatusResponse | ErrorResponseMsg;
 
 
 export interface PartySettingsRequest {
     partyId: string;
     roomId?: string;
     isPrivate?: boolean;
+    isLocked?: boolean;
+
+    initialObserver?: boolean;
 }
 export interface PartySettingsResponse {
     success: true;
@@ -240,21 +257,12 @@ export interface PartySettingsResponse {
 export type PartySettingsResponseMsg = PartySettingsResponse | ErrorResponseMsg;
 
 
-export interface LeavePartyRequest {
-    partyId: string;
-}
-export interface LeavePartyResponse {
-    success: true;
-    partyId: string;
-}
-export type LeavePartyResponseMsg = LeavePartyResponse | ErrorResponseMsg;
-
-
 export interface PartyMsg {
     partyId: string;
     roomId: string;
     members: PartyMemberMsg[];
     isPrivate: boolean;
+    isLocked: boolean;
 }
 
 export interface PartyMemberMsg {
@@ -263,6 +271,7 @@ export interface PartyMemberMsg {
     ready: boolean;
     isBot: boolean;
     isObserver: boolean;
+    isLeader: boolean;
 }
 
 export interface ExternalStatus {

@@ -94,25 +94,36 @@ export interface Room {
     mod: Object;
 }
 
-export interface Party {
+export interface Party extends PartyStatus {
     id: string;
-    roomId: string;
-    leaderSocketId: string;
     created: moment.Moment;
     modified: moment.Moment;
     active: Map<string, PartyMember>; // socketId -> party member
-    isPrivate: boolean;
 }
 
-export interface PartyMember {
+export interface PartyStatus {
+    roomId: string;
+    isPrivate: boolean;
+    isLocked: boolean;
+    initialObserver: boolean;
+}
+
+export interface PartyMember extends PartyMemberSettings, PartyMemberStatus {
     socketId: string;
+}
+
+export interface PartyMemberSettings {
     name: string;
     authToken: string;
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
-    isObserver: boolean;
+}
+
+export interface PartyMemberStatus {
     ready: boolean;
+    isObserver: boolean;
+    isLeader: boolean;
 }
 
 export interface PlayerCounts {

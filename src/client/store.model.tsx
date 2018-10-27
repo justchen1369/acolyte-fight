@@ -36,10 +36,17 @@ export interface PartyState {
     server: string;
     roomId: string;
     isPrivate: boolean;
+    isLocked: boolean;
+    members: PartyMemberState[];
+}
+
+export interface PartyMemberState {
+	socketId: string;
+	name: string;
+	ready: boolean;
+	isBot: boolean;
+    isObserver: boolean;
     isLeader: boolean;
-    members: w.PartyMemberState[];
-    ready: boolean;
-    observing: boolean;
 }
 
 export interface RoomState {
@@ -149,8 +156,9 @@ export interface UpdatePartyAction {
     type: "updateParty";
     partyId: string;
     roomId: string;
-    members: w.PartyMemberState[];
+    members: PartyMemberState[];
     isPrivate: boolean;
+    isLocked: boolean;
 }
 
 export interface UpdateObservingPartyAction {

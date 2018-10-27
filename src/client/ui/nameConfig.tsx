@@ -62,7 +62,7 @@ class NameConfig extends React.Component<Props, State> {
         Storage.saveName(name);
         this.setState({ name: null, saved: true })
 
-        parties.updatePartyAsync({})
+        parties.updatePartyAsync()
         .then(() => cloud.uploadSettings())
     }
 }

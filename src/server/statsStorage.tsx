@@ -167,20 +167,19 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
 
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
     const firestore = getFirestore();
-    let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc");
+    let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc").limit(limit);
     if (after) {
         query = query.startAfter(after);
     }
     if (before) {
         query = query.endBefore(before);
     }
-    const querySnapshot = await query.limit(limit).get();
 
     const games = new Array<m.GameStatsMsg>();
-    for (const gameDoc of querySnapshot.docs) {
-        const game = dbToGameStats(gameDoc.id, await gameDoc.data() as db.Game);
+    await dbStorage.stream(query, gameDoc => {
+        const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
         games.push(game);
-    }
+    });
 
     return games;
 }
@@ -223,10 +222,10 @@ export async function getLeaderboard(category: string): Promise<m.LeaderboardPla
 
 export async function retrieveLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
     const firestore = getFirestore();
-    const querySnapshot = await firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength).get();
+    const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength);
 
     let result = new Array<m.LeaderboardPlayer>();
-    for (const doc of querySnapshot.docs) {
+    await dbStorage.stream(query, doc => {
         const user = doc.data() as db.User;
         if (user && user.ratings && user.ratings[category]) {
             const ratings = user.ratings[category];
@@ -239,7 +238,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.Leaderboa
                 numGames: ratings.numGames,
             });
         }
-    }
+    });
     return result;
 }
 

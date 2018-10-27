@@ -5,9 +5,11 @@ import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as url from '../url';
+import PartyMemberControl from './partyMemberControl';
 
 interface Props {
     current: s.PathElements;
+    selfId: string;
     isModded: boolean;
     party: s.PartyState;
 }
@@ -17,6 +19,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         current: state.current,
+        selfId: state.socketId,
         isModded: Object.keys(state.room.mod).length > 0,
         party: state.party,
     };
@@ -44,13 +47,13 @@ class HomePanel extends React.Component<Props, State> {
         return <div className="party-invite">Invite friends to <b><a href={this.getPartyDetailsUrl()} onClick={ev => this.onPartyDetailsClick(ev)}>party</a>!</b></div>
     }
 
-    private renderMember(member: w.PartyMemberState) {
-        return <div className={member.ready ? "party-member party-member-ready" : "party-member party-member-not-ready"} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
-            {member.ready ? <i className="check-icon fas fa-check-square" /> : <i className="check-icon fas fa-square" />} 
-            <span className="party-member-name">{member.name}</span>
-            {member.isBot && <i className="settings-icon fas fa-microchip" title={`${member.name} is playing using AI autopilot`} onClick={() => pages.changePage("ai")} />}
-            {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => pages.changePage("party")} />}
-        </div>
+    private renderMember(member: s.PartyMemberState) {
+        if (!member.isObserver || member.socketId == this.props.selfId || member.isLeader) {
+            // Don't render any observers, unless they are myself or a leader
+            return <PartyMemberControl member={member} />
+        } else {
+            return null;
+        }
     }
 
     private getPartyDetailsUrl() {

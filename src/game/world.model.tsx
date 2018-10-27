@@ -215,14 +215,6 @@ export interface ReplayNotFoundNotification {
 	type: "replayNotFound";
 }
 
-export interface PartyMemberState {
-	socketId: string;
-	name: string;
-	ready: boolean;
-	isBot: boolean;
-	isObserver: boolean;
-}
-
 export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting;
 
 export interface EnvironmentSeed {

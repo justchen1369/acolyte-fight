@@ -8,7 +8,8 @@ import * as url from '../url';
 
 interface Props {
     mod: Object;
-    isLeader: boolean;
+    selfId: string;
+    party: s.PartyState;
     isLoggedIn: boolean;
 }
 interface State {
@@ -20,7 +21,8 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         mod: state.room.mod,
-        isLeader: state.party ? state.party.isLeader : true,
+        selfId: state.socketId,
+        party: state.party,
         isLoggedIn: state.loggedIn,
     };
 }
@@ -55,17 +57,19 @@ class ModdingPanel extends React.Component<Props, State> {
     }
 
     private renderAttached() {
+        const isAdmin = this.isAdmin();
         return <div>
             <p>
                 Currently, the following modifications will affect your games:
                 <textarea className="mod-json">{JSON.stringify(this.props.mod, null, 2)}</textarea>
             </p>
-            {this.props.isLeader && <p><div className={!this.state.loading ? "btn" : "btn btn-disabled"} onClick={() => this.onDetach()}>Deactivate mod</div></p>}
-            {!this.props.isLeader && <p>Only the party leader can change the mod.</p>}
+            {isAdmin && <p><div className={!this.state.loading ? "btn" : "btn btn-disabled"} onClick={() => this.onDetach()}>Deactivate mod</div></p>}
+            {!isAdmin && <p>Only the party leader can change the mod.</p>}
         </div>
     }
 
     private renderDetached() {
+        const isAdmin = this.isAdmin();
         return <div>
             <p>
                 Mods allow you to change the rules of the game for your party. Mods are represented as JSON files.
@@ -89,18 +93,26 @@ class ModdingPanel extends React.Component<Props, State> {
                     <li><a href="/api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings</li>
                 </ul>
             </p>
-            {this.props.isLeader && <div>
+            {isAdmin && <div>
                 <h2>Use a mod</h2>
                 <p>You will automatically be matched to other players who currently have the same mod activated. If you are in a party, this applies the mod to the party.</p>
                 <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
                 <p><div className={!this.state.loading && this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onAttach()}>Activate mod</div></p>
                 {this.state.error && <p className="error">{this.state.error}</p>}
             </div>}
-            {!this.props.isLeader && <div>
+            {!isAdmin && <div>
                 <h2>Use a mod</h2>
                 <p>There is no mod active currently for this party. Only the party leader can change the mod.</p>
             </div>}
         </div>
+    }
+
+    private isAdmin() {
+        if (this.props.party) {
+            return this.props.party.members.some(m => m.isLeader && m.socketId === this.props.selfId);
+        } else {
+            return true;
+        }
     }
 
     private onAttach() {

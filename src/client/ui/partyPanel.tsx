@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -6,8 +7,10 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
+import PartyMemberControl from './partyMemberControl';
 
 interface Props {
+    selfId: string
     current: s.PathElements;
     party: s.PartyState;
 }
@@ -18,9 +21,22 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        selfId: state.socketId,
         current: state.current,
         party: state.party,
     };
+}
+
+function PartyMode(props: { selected: boolean, onClick: () => void, children?: JSX.Element }) {
+    const className = classNames({
+        'party-mode-row': true,
+        'party-mode-selected': props.selected,
+    });
+    return <div className={className} onClick={props.onClick}>
+        {props.selected && <i className="check-icon fas fa-check-square" />} 
+        {!props.selected && <i className="check-icon fas fa-square" />}
+        {props.children}
+    </div>
 }
 
 export class PartyPanel extends React.Component<Props, State> {
@@ -33,7 +49,7 @@ export class PartyPanel extends React.Component<Props, State> {
     }
 
     render() {
-        return <div>
+        return <div className="party-panel">
             <h1>Party</h1>
             {this.props.party ? this.renderCurrentParty() : this.renderNoParty()}
         </div>
@@ -49,43 +65,42 @@ export class PartyPanel extends React.Component<Props, State> {
     private renderCurrentParty() {
         const party = this.props.party;
         const currentPartyPath = url.getPath({ ...this.props.current, page: null, party: party.id, server: party.server });
+        const self = party.members.find(m => m.socketId === this.props.selfId);
+        if (!self) {
+            return this.renderNoParty();
+        }
+
         return <div>
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
-            {party.isLeader && (party.isPrivate ? this.renderPrivateParty() : this.renderPublicParty())}
-            <h2>Observer Mode {party.observing ? <i className="fas fa-eye" /> : <i className="fas fa-eye-slash" />}</h2>
-            <p>If you enter observer mode, you will just watch the party games rather than play them.</p>
-            {party.observing
-                ? <p><span className="btn" onClick={() => this.onExitObserverMode()}>Exit Observer Mode</span></p>
-                : <p><span className="btn" onClick={() => this.onEnterObserverMode()}>Enter Observer Mode</span></p>}
+            {this.renderPartyMode(self.isLeader)}
+            <h1>Players</h1>
+            <div className="party-list">
+                {party.members.map(m => <PartyMemberControl
+                    member={m}
+                    isLeader={self.isLeader}
+                    isSelf={m.socketId === self.socketId}
+                    showMenu={true}
+                />)}
+            </div>
         </div>
     }
 
-    private renderPrivateParty() {
+    private renderPartyMode(editable: boolean) {
+        const party = this.props.party;
         return <div>
-            <h2>Private Party <i className="fas fa-lock" /></h2>
-            <p>Your party is <b>private</b>: your games will only contain the players in your party.</p>
-            <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(false)}>Make Public</span></p>
+            <h2>Party mode</h2>
+            <PartyMode selected={!party.isPrivate} onClick={() => editable && parties.publicPartyAsync()} >
+                <span className="party-mode-label"><b>Public</b>: your party will be matched with other players on the public server.</span>
+            </PartyMode>
+            <PartyMode selected={party.isPrivate && !party.isLocked} onClick={() => editable && parties.privatePartyAsync()} >
+                <span className="party-mode-label"><b>Private</b>: your games will only contain the players in your party.</span>
+            </PartyMode>
+            <PartyMode selected={party.isPrivate && party.isLocked} onClick={() => editable && parties.tournamentPartyAsync()} >
+                <span className="party-mode-label"><b>Tournament</b>: private party where only the party leader can change settings, and new players default to observing.</span>
+            </PartyMode>
         </div>
-    }
-
-    private renderPublicParty() {
-        return <div>
-            <h2>Private Party <i className="fa fa-lock-open" /> </h2>
-            <p>Your party is <b>public</b>: your party will be matched with other players on the public server.</p>
-            <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.privatePartyAsync(true)}>Make Private</span></p>
-        </div>
-    }
-
-    private onEnterObserverMode() {
-        screenLifecycle.enterGame();
-        parties.updatePartyAsync({ ready: true, observing: true })
-    }
-
-    private onExitObserverMode() {
-        screenLifecycle.exitGame();
-        parties.updatePartyAsync({ ready: false, observing: false })
     }
 }
 

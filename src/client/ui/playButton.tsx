@@ -13,6 +13,7 @@ interface OwnProps {
 }
 interface Props {
     again: boolean;
+    selfId: string;
     party: s.PartyState;
     playingAsAI: boolean;
 }
@@ -24,6 +25,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         again: ownProps.again || false,
         party: state.party,
+        selfId: state.socketId,
         playingAsAI: ai.playingAsAI(state),
     };
 }
@@ -38,9 +40,10 @@ class PlayButton extends React.Component<Props, State> {
 
     render() {
         const party = this.props.party;
+        const self = party && party.members.find(m => m.socketId === this.props.selfId);
 
         let label;
-        if (party && party.observing) {
+        if (party && self && self.isObserver) {
             label = this.props.again ? "Continue" : "Watch";
         } else {
             if (this.props.again) {
@@ -51,9 +54,10 @@ class PlayButton extends React.Component<Props, State> {
         }
 
         if (party) {
-            if (party.ready) {
-                const readyCount = party.members.filter(m => m.ready).length;
-                const partySize = party.members.length;
+            if (party && self && self.ready) {
+                const relevant = party.members.filter(m => m.isLeader || !m.isObserver);
+                const readyCount = relevant.filter(m => m.ready).length;
+                const partySize = Math.max(1, relevant.length);
                 return <span className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)} title="Click to cancel">
                     <div className="waiting-for-party-progress" style={{ width: `${100 * readyCount / partySize}%` }}></div>
                     <div className="waiting-for-party-label">Waiting for Party...</div>
@@ -89,10 +93,9 @@ class PlayButton extends React.Component<Props, State> {
                 screenLifecycle.enterGame();
             }
             matches.leaveCurrentGame();
-            parties.updatePartyAsync({ ready });
+            parties.updateReadyStatusAsync(ready);
         }
     }
-
 }
 
 export default ReactRedux.connect(stateToProps)(PlayButton);

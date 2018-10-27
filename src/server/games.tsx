@@ -11,6 +11,7 @@ import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as mirroring from './mirroring';
+import * as parties from './parties';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
@@ -54,7 +55,7 @@ export function onDisconnect(socketId: string, authToken: string): DisconnectRes
 	});
 	getStore().parties.forEach(party => {
 		if (party.active.has(socketId)) {
-			removePartyMember(party, socketId);
+			parties.removePartyMember(party, socketId);
 			changedParties.push(party);
 		}
 	});
@@ -197,21 +198,6 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
-	const partyIndex = getStore().nextPartyId++;
-	const party: g.Party = {
-		id: uniqid("p" + partyIndex + "-"),
-		created: moment(),
-		modified: moment(),
-		leaderSocketId,
-		roomId,
-		active: new Map<string, g.PartyMember>(),
-		isPrivate: false,
-	};
-	getStore().parties.set(party.id, party);
-	return party;
-}
-
 export function initGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
@@ -263,82 +249,8 @@ export function initGame(room: g.Room | null, privatePartyId: string | null, all
 	return game;
 }
 
-export function updatePartyRoom(party: g.Party, roomId: string): boolean {
-	let changed = false;
-	if (party.roomId !== roomId) {
-		party.roomId = roomId;
-		changed = true;
-		party.active.forEach(member => { // Unready so users can read new settings
-			if (!member.isObserver) {
-				member.ready = false;
-			}
-		});
-
-		logger.info(`Party ${party.id} moved to room=${party.roomId}`);
-	}
-	return changed;
-}
-
-export function updatePartyPrivacy(party: g.Party, isPrivate: boolean): boolean {
-	let changed = false;
-	if (party.isPrivate !== isPrivate) {
-		party.isPrivate = isPrivate;
-		changed = true;
-
-		logger.info(`Party ${party.id} changed to isPrivate=${party.isPrivate}`);
-	}
-	return changed;
-}
-
-export function updatePartyMember(party: g.Party, member: g.PartyMember, joining: boolean) {
-	const socketId = member.socketId;
-	party.active.set(socketId, member);
-	party.modified = moment();
-
-	if (joining) {
-		logger.info(`Party ${party.id} joined by user ${member.name} [${member.authToken}]]`);
-	}
-}
-
-export function removePartyMember(party: g.Party, socketId: string) {
-	const member = party.active.get(socketId);
-	if (!member) {
-		return;
-	}
-
-	party.active.delete(socketId);
-	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
-
-	if (party.active.size > 0) {
-		// All members become unready when someone leaves
-		party.active.forEach(member => {
-			if (!member.isObserver) {
-				member.ready = false;
-			}
-		});
-	} else {
-		// This party is finished, delete it
-		const store = getStore();
-		store.parties.delete(party.id);
-		logger.info(`Party ${party.id} deleted`);
-	}
-}
-
-export function startPartyIfReady(party: g.Party): PartyGameAssignment[] {
+export function assignPartyToGames(party: g.Party) {
 	const assignments = new Array<PartyGameAssignment>();
-	if (party.active.size === 0) {
-		return assignments;
-	}
-
-	;
-	if ([...party.active.values()].every(p => p.ready)) {
-		assignPartyToGames(party, assignments);
-		logger.info(`Party ${party.id} started with ${party.active.size} players`);
-	}
-	return assignments;
-}
-
-function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) {
 	const store = getStore();
 
 	const room = store.rooms.get(party.roomId);
@@ -371,6 +283,8 @@ function assignPartyToGames(party: g.Party, assignments: PartyGameAssignment[]) 
 			assignments.push({ game, partyMember: observer, heroId: null });
 		}
 	}
+
+	return assignments;
 }
 
 function formatHeroId(index: number): string {
