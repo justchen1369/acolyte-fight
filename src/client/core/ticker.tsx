@@ -15,7 +15,8 @@ let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
 
 const interval = Math.floor(1000 / TicksPerSecond);
-let next = Date.now();
+let tickEpoch = Date.now();
+let tickCounter = 0;
 sockets.listeners.onTickMsg = onTickMsg;
 
 export function reset(history: m.TickMsg[]) {
@@ -72,8 +73,17 @@ export function frame(canvasStack: CanvasStack) {
     const store = StoreProvider.getState();
 	const world = store.world;
 	
-	if (Date.now() >= next) {
-		next = (Math.floor(Date.now() / interval) + 1) * interval;
+	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
+	if (tickTarget > tickCounter) {
+		const diff = tickTarget - tickCounter;
+		if (diff <= 2) {
+			// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
+			++tickCounter;
+		} else {
+			// Too many frames behind, stpo trying to catch up
+			tickEpoch = Date.now();
+			tickCounter = 0;
+		}
 		incomingLoop();
 	}
 
