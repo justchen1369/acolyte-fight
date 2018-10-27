@@ -44,7 +44,7 @@ function isStartGameTick(tickData: m.TickMsg) {
 }
 
 
-function incomingLoop() {
+function incomingLoop(minFramesToProcess: number) {
 	const world = StoreProvider.getState().world;
 
 	let numFramesToProcess;
@@ -64,8 +64,12 @@ function incomingLoop() {
 		numFramesToProcess = incomingQueue.length > 0 ? 1 : 0;
 	}
 
+	numFramesToProcess = Math.max(minFramesToProcess, numFramesToProcess);
+
 	for (let i = 0; i < numFramesToProcess; ++i) {
-		tickQueue.push(incomingQueue.shift());
+		if (incomingQueue.length > 0) {
+			tickQueue.push(incomingQueue.shift());
+		}
 	}
 }
 
@@ -75,16 +79,16 @@ export function frame(canvasStack: CanvasStack) {
 	
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
-		const diff = tickTarget - tickCounter;
-		if (diff <= 2) {
+		const numFrames = tickTarget - tickCounter;
+		incomingLoop(numFrames);
+		if (numFrames <= 4) {
 			// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
-			++tickCounter;
+			tickCounter += numFrames;
 		} else {
-			// Too many frames behind, stpo trying to catch up
+			// Too many frames behind, stop trying to catch up
 			tickEpoch = Date.now();
 			tickCounter = 0;
 		}
-		incomingLoop();
 	}
 
 	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
