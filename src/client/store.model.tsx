@@ -21,7 +21,8 @@ export interface State {
     world: w.World;
     items: NotificationItem[];
 
-    allGameStats: Map<string, d.GameStats>;
+    allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
+    hasReplayLookup: Map<string, boolean>; // gameId -> hasReplay
 }
 
 export interface GameOptions {
@@ -90,6 +91,7 @@ export type Action =
     | UpdateRebindingsAction
     | UpdateServerAction
     | UpdateGameStatsAction
+    | UpdateHasReplayAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -203,4 +205,9 @@ export interface UpdateServerAction {
 export interface UpdateGameStatsAction {
     type: "updateGameStats";
     allGameStats: d.GameStats[];
+}
+
+export interface UpdateHasReplayAction {
+    type: "updateHasReplay";
+    hasReplayLookup: Map<string, boolean>;
 }

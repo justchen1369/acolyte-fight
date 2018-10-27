@@ -32,6 +32,7 @@ function initialState(): s.State {
         world: engine.initialWorld(room.mod),
         items: [],
         allGameStats: new Map<string, d.GameStats>(),
+        hasReplayLookup: new Map<string, boolean>(),
     };
 }
 
@@ -156,6 +157,12 @@ function reducer(state: s.State, action: s.Action): s.State {
             allGameStats.set(gameStats.id, gameStats);
         }
         return { ...state, allGameStats };
+    } else if (action.type === "updateHasReplay") {
+        const hasReplayLookup = new Map<string, boolean>(state.hasReplayLookup);
+        action.hasReplayLookup.forEach((hasReplay, gameId) => {
+            hasReplayLookup.set(gameId, hasReplay);
+        });
+        return { ...state, hasReplayLookup };
     } else {
         console.log(action);
         return state;

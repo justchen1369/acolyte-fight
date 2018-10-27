@@ -11,7 +11,7 @@ interface CandidateHash {
 
 export function calculateResult(game: g.Game) {
     const gameStats = findStats(game);
-    if (validateGameStats(gameStats, game)) {
+    if (gameStats && validateGameStats(gameStats, game)) {
         return gameStats;
     } else {
         return null;
