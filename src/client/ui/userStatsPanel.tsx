@@ -10,6 +10,7 @@ import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
 import * as storage from '../storage';
+import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
 interface League {
@@ -26,6 +27,7 @@ interface OwnProps {
     more: boolean;
 }
 interface Props extends OwnProps {
+    myProfile: m.GetProfileResponse;
     playerName: string;
     loggedIn: boolean;
     myUserId: string;
@@ -117,6 +119,7 @@ function calculateNextLeague(percentile: number): League {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
+        myProfile: state.profile,
         playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
@@ -144,7 +147,11 @@ class UserStatsPanel extends React.Component<Props, State> {
 
     private async loadDataAsync(profileId: string) {
         if (profileId !== this.state.profileId) {
-            this.setState({ profileId, profile: null, error: null });
+            let profile: m.GetProfileResponse = null;
+            if (this.props.myProfile && this.props.myProfile.userId === profileId) {
+                profile = this.props.myProfile;
+            }
+            this.setState({ profileId, profile, error: null });
             try {
                 const profile = await retrieveUserStatsAsync(profileId);
                 if (profile.userId === this.state.profileId) {
@@ -154,6 +161,8 @@ class UserStatsPanel extends React.Component<Props, State> {
                 if (this.props.myUserId === this.props.profileId) {
                     const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
                     this.setState({ pointsToNextLeague });
+
+                    StoreProvider.dispatch({ type: "updateProfile", profile });
                 }
             } catch(error) {
                 console.error("UserStatsPanel error", error);

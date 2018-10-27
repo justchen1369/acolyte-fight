@@ -31,6 +31,7 @@ function initialState(): s.State {
         party: null,
         world: engine.initialWorld(room.mod),
         items: [],
+        profile: null,
         allGameStats: new Map<string, d.GameStats>(),
         hasReplayLookup: new Map<string, boolean>(),
     };
@@ -151,6 +152,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, rebindings: action.rebindings };
     } else if (action.type === "updateServer") {
         return { ...state, server: action.server };
+    } else if (action.type === "updateProfile") {
+        return { ...state, profile: action.profile };
     } else if (action.type === "updateGameStats") {
         const allGameStats = new Map<string, d.GameStats>(state.allGameStats);
         for (const gameStats of action.allGameStats) {

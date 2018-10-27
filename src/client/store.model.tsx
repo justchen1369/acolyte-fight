@@ -1,4 +1,5 @@
 import * as d from './stats.model';
+import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
 export interface State {
@@ -21,6 +22,7 @@ export interface State {
     world: w.World;
     items: NotificationItem[];
 
+    profile: m.GetProfileResponse;
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
     hasReplayLookup: Map<string, boolean>; // gameId -> hasReplay
 }
@@ -90,6 +92,7 @@ export type Action =
     | UpdateHoverSpellAction
     | UpdateRebindingsAction
     | UpdateServerAction
+    | UpdateProfileAction
     | UpdateGameStatsAction
     | UpdateHasReplayAction
 
@@ -200,6 +203,11 @@ export interface UpdateRebindingsAction {
 export interface UpdateServerAction {
     type: "updateServer";
     server: string;
+}
+
+export interface UpdateProfileAction {
+    type: "updateProfile";
+    profile: m.GetProfileResponse;
 }
 
 export interface UpdateGameStatsAction {
