@@ -25,11 +25,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
 	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
-	games.attachFinishedGameListener(gameStats => {
-		if (gameStats.partyId) {
-			io.to(gameStats.partyId).emit('game', gameStats);
-		}
-	});
+	games.attachFinishedGameListener(emitGameResult);
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -577,4 +573,12 @@ function partyMembersToContract(party: g.Party) {
 		members.push(contract);
 	});
 	return members;
+}
+
+function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
+	if (result) {
+		if (game.partyId) {
+			io.to(game.partyId).emit('game', result);
+		}
+	}
 }

@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import crypto from 'crypto';
 import glicko from 'glicko2';
 import moment from 'moment';
 import * as Firestore from '@google-cloud/firestore';
@@ -18,12 +17,6 @@ import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
-
-interface CandidateHash {
-    gameStats: m.GameStatsMsg;
-    hash: string;
-    frequency: number;
-}
 
 interface RatingDeltas {
     [userId: string]: number;
@@ -376,10 +369,9 @@ function calculateLowerBound(rating: number, rd: number) {
     return rating - 2 * rd;
 }
 
-export async function saveGame(game: g.Game): Promise<m.GameStatsMsg> {
+export async function saveGame(gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
     try {
-        const gameStats = findStats(game);
-        if (gameStats && validateGameStats(gameStats, game)) {
+        if (gameStats) {
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
             applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);
@@ -394,28 +386,6 @@ export async function saveGame(game: g.Game): Promise<m.GameStatsMsg> {
     }
 }
 
-function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
-    const gameCategory = calculateGameCategory(game);
-    if (!gameCategory) {
-        return false;
-    }
-
-    return gameStats.category === gameCategory
-        && gameStats.players.some(p => p.userHash === gameStats.winner)
-        && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId))
-        && gameStats.partyId === game.partyId;
-}
-
-function calculateGameCategory(game: g.Game) {
-    if (game.category === categories.publicCategory()) {
-        return m.GameCategory.PvP;
-    } else if (game.category === categories.publicCategory(true)) {
-        return m.GameCategory.AIvAI;
-    } else {
-        return null;
-    }
-}
-
 function applyRatingDeltas(gameStats: m.GameStatsMsg, ratingDeltas: RatingDeltas) {
     for (const player of gameStats.players) {
         if (player.userId in ratingDeltas) {
@@ -423,31 +393,3 @@ function applyRatingDeltas(gameStats: m.GameStatsMsg, ratingDeltas: RatingDeltas
         }
     }
 }
-
-function findStats(game: g.Game): m.GameStatsMsg {
-    if (game.scores.size <= 1 // Only store multiplayer games because people can fake stats otherwise
-        || game.category !== categories.publicCategory()) {
-        return null;
-    }
-    const corroborateThreshold = Math.max(2, Math.ceil(game.scores.size / 2)); // Majority must agree
-    const candidates = new Map<string, CandidateHash>();
-    for (const gameStats of game.scores.values()) {
-        const hash = hashStats(gameStats);
-        if (candidates.has(hash)) {
-            const candidate = candidates.get(hash);
-            candidate.frequency += 1;
-            if (candidate.frequency >= corroborateThreshold) {
-                // This candidate has been corroborated by enough players
-                return candidate.gameStats;
-            }
-        } else {
-            candidates.set(hash, { gameStats, hash, frequency: 1 });
-        }
-    }
-    // No candidates corroborated
-    return null;
-}
-
-export function hashStats(gameStats: m.GameStatsMsg): string {
-    return crypto.createHash('md5').update(JSON.stringify(gameStats)).digest('hex');
-} 

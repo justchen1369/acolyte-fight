@@ -33,6 +33,7 @@ async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
     const state = StoreProvider.getState();
     const gameStats = messageToGameStats(gameStatsMsg, state.userId);
     await storage.saveGameStats(gameStats);
+    StoreProvider.dispatch({ type: "updateGameStats", allGameStats: [gameStats] });
 }
 
 export async function loadAllGameStats() {

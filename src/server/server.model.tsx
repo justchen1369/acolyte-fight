@@ -68,6 +68,7 @@ export interface Game extends Replay {
     bots: Map<string, string>; // heroId -> socketId
     playerNames: string[];
     userIds: Set<string>;
+    socketIds: Set<string>;
 
     tick: number;
     winTick: number | null;

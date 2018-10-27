@@ -10,8 +10,8 @@ import * as auth from './auth';
 import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
-import * as mirroring from './mirroring';
 import * as parties from './parties';
+import * as results from './results';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
@@ -32,7 +32,7 @@ export interface Emitter<T> {
 }
 
 export interface FinishedGameListener {
-	(gameStats: m.GameStatsMsg): void;
+	(game: g.Game, result: m.GameStatsMsg): void;
 }
 
 export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
@@ -226,6 +226,7 @@ export function initGame(room: g.Room | null, partyId: string | null, isPrivate:
 		bots: new Map<string, string>(),
 		playerNames: new Array<string>(),
 		userIds: new Set<string>(),
+		socketIds: new Set<string>(),
 		numPlayers: 0,
 		winTick: null,
 		scores: new Map<string, m.GameStatsMsg>(),
@@ -402,14 +403,14 @@ function finishGameIfNecessary(game: g.Game) {
 	if (game.active.size === 0) {
 		game.bots.clear();
 		getStore().activeGames.delete(game.id);
+
+		const result = results.calculateResult(game);
 		gameStorage.saveGame(game);
-		statsStorage.saveGame(game).then(gameStats => {
-			if (gameStats) {
-				for (const listener of finishedGameListeners) {
-					listener(gameStats);
-				}
-			}
-		});
+		statsStorage.saveGame(result)
+
+		for (const listener of finishedGameListeners) {
+			listener(game, result);
+		}
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;
@@ -486,6 +487,7 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken)).then(userId => {
 		game.userIds.add(userId);
+		game.socketIds.add(socketId);
 		queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
 	});
 
