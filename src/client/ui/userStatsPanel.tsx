@@ -24,7 +24,8 @@ interface PointsToNextLeagueLookup {
 interface OwnProps {
     profileId: string;
     category: string;
-    more: boolean;
+    showRanking?: boolean;
+    showWinRates?: boolean;
 }
 interface Props extends OwnProps {
     myProfile: m.GetProfileResponse;
@@ -200,8 +201,8 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
         return <div>
             <h1>{profile.name}</h1>
-            {this.renderRankingStats(profile, rating)}
-            {this.props.more && this.renderWinRateStats(rating)}
+            {this.props.showRanking && this.renderRankingStats(profile, rating)}
+            {this.props.showWinRates && this.renderWinRateStats(rating)}
         </div>
     }
 

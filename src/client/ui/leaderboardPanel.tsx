@@ -116,7 +116,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
     private renderNotLoggedIn() {
         return <div>
             {this.props.myUserId && <div>
-                <UserStatsPanel profileId={this.props.myUserId} category={this.state.category} more={true} />
+                <UserStatsPanel profileId={this.props.myUserId} category={this.state.category} showWinRates={true} />
             </div>}
             <h1>Leaderboard</h1>
             <p>How do you compare to your fellow acolytes?</p>
@@ -128,7 +128,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
-            <UserStatsPanel profileId={this.props.myUserId} category={category} more={false} />
+            <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
             <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
             <h1>Leaderboard</h1>
             <div className="leaderboard">

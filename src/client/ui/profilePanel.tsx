@@ -48,7 +48,7 @@ export class ProfilePanel extends React.Component<Props, State> {
                 <h1>Your Account</h1>
                 <AccountPanel />
             </div>}
-            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} more={true} />}
+            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />}
             {!this.props.loggedIn && <div>
                 <h1>Replays</h1>
                 <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your replays</p>
