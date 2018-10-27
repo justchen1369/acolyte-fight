@@ -39,13 +39,9 @@ export class SettingsPanel extends React.Component<Props, State> {
             {this.props.loggedIn && <div>
                 <h1>Your Account</h1>
                 <AccountPanel />
-                <h1>Your Name</h1>
-                <NameConfig />
             </div>}
-            {!this.props.loggedIn && <div>
-                <h1>Your Name</h1>
-                <p className="login-ad"><div className="btn" onClick={() => this.onLoginClick()}>Login</div> to change name</p>
-            </div>}
+            <h1>Your Name</h1>
+            <NameConfig />
             <h1>Your Controls</h1>
             <ControlsPanel />
             <h1>Your Spells</h1>

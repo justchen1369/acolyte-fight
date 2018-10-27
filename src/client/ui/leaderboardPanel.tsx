@@ -115,8 +115,12 @@ class LeaderboardPanel extends React.Component<Props, State> {
 
     private renderNotLoggedIn() {
         return <div>
+            {this.props.myUserId && <div>
+                <UserStatsPanel profileId={this.props.myUserId} category={this.state.category} more={false} />
+                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see more</p>
+            </div>}
             <h1>Leaderboard</h1>
-            <p>The leaderboard shows all players ranked according to the Glicko-2 rating system.</p>
+            <p>How do you compare to your fellow acolytes?</p>
             <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see the leaderboard</p>
         </div>
     }
