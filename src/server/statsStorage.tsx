@@ -369,9 +369,9 @@ function calculateLowerBound(rating: number, rd: number) {
     return rating - 2 * rd;
 }
 
-export async function saveGame(gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
+export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
     try {
-        if (gameStats) {
+        if (gameStats && game.category === categories.publicCategory()) { // Private games don't count towards ranking
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
             applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);

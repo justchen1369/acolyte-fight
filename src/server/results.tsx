@@ -19,11 +19,12 @@ export function calculateResult(game: g.Game) {
 }
 
 function findStats(game: g.Game): m.GameStatsMsg {
-    if (game.scores.size <= 1 // Only store multiplayer games because people can fake stats otherwise
-        || game.category !== categories.publicCategory()) {
+    if (game.scores.size <= 1) { // Only store multiplayer games because people can fake stats otherwise
         return null;
     }
-    const corroborateThreshold = Math.max(2, Math.ceil(game.scores.size / 2)); // Majority must agree
+
+
+    const corroborateThreshold = game.scores.size; // Unaninmous agreement
     const candidates = new Map<string, CandidateHash>();
     for (const gameStats of game.scores.values()) {
         const hash = hashStats(gameStats);
@@ -43,12 +44,8 @@ function findStats(game: g.Game): m.GameStatsMsg {
 }
 
 function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
-    const gameCategory = calculateGameCategory(game);
-    if (!gameCategory) {
-        return false;
-    }
-
-    return gameStats.category === gameCategory
+    const requiredCategory = calculateGameCategory(game);
+    return (!requiredCategory || gameStats.category === requiredCategory)
         && gameStats.players.some(p => p.userHash === gameStats.winner)
         && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId))
         && gameStats.partyId === game.partyId;

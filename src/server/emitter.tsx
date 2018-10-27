@@ -409,7 +409,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			return game;
 		}
 	}).catch(err => {
-		console.error("Error joining game: ", err);
+		logger.error(`Error joining game: ${err}`);
 		return null as g.Replay;
 	}).then(game => {
 		if (game) {

@@ -7,6 +7,7 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
+import PartyGameList from './partyGameList';
 import PartyMemberControl from './partyMemberControl';
 
 interface Props {
@@ -84,6 +85,8 @@ export class PartyPanel extends React.Component<Props, State> {
                     showMenu={true}
                 />)}
             </div>
+            <h1>Games</h1>
+            <PartyGameList partyId={party.id} />
         </div>
     }
 
