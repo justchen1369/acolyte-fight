@@ -578,8 +578,17 @@ function partyMembersToContract(party: g.Party) {
 
 function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 	if (result) {
+		const rooms = [...game.socketIds];
 		if (game.partyId) {
-			io.to(game.partyId).emit('game', result);
+			rooms.push(game.partyId);
+		}
+
+		if (rooms.length > 0) {
+			let emitTo = io.to(null);
+			for (const room of rooms) {
+				emitTo = emitTo.to(room);
+			}
+			emitTo.emit('game', result);
 		}
 	}
 }
