@@ -349,6 +349,7 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 	if (parties.isPartyReady(party)) {
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 		const assignments = games.assignPartyToGames(party);
+		parties.onPartyStarted(party, assignments);
 		assignments.forEach(assignment => {
 			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
 		});

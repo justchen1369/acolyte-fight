@@ -8,15 +8,15 @@ import * as url from '../url';
 
 interface Props {
     member: s.PartyMemberState;
-    showMenu?: boolean;
-    isLeader?: boolean;
+    editable?: boolean;
+    showAll?: boolean;
     isSelf?: boolean;
 }
 
 export class PartyMemberControl extends React.PureComponent<Props> {
     render() {
-        const showMenu = this.props.showMenu;
-        const isLeader = this.props.isLeader;
+        const showAll = this.props.showAll;
+        const editable = this.props.editable;
         const isSelf = this.props.isSelf;
         const member = this.props.member;
 
@@ -24,18 +24,19 @@ export class PartyMemberControl extends React.PureComponent<Props> {
             'party-member': true,
             'party-member-ready': member.ready,
             'party-member-not-ready': !member.ready,
-            'party-member-editable': this.props.showMenu,
+            'party-member-editable': this.props.editable,
+            'party-member-observing': this.props.member.isObserver,
         });
         return <div className={className} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
             {member.ready && <i className="check-icon fas fa-check-square" onClick={() => isSelf && parties.updateReadyStatusAsync(false)} />} 
             {!member.ready && <i className="check-icon fas fa-square" onClick={() => isSelf && parties.updateReadyStatusAsync(true)} />}
             <span className="party-member-name">{member.name}</span>
-            {showMenu && member.isLeader && <i className="settings-icon fas fa-crown" title={`${member.name} is the party leader`} />}
+            {showAll && member.isLeader && <i className="settings-icon fas fa-crown" title={`${member.name} is the party leader`} />}
             {member.isBot && <i className="settings-icon fas fa-microchip" title={`${member.name} is playing using AI autopilot`} onClick={() => pages.changePage("ai")} />}
-            {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => isLeader && parties.makeObserverAsync(member.socketId, false)} />}
-            {showMenu && isLeader && !member.isObserver && <i className="settings-icon fas fa-gamepad" title={`${member.name} is playing (not observing)`} onClick={() => parties.makeObserverAsync(member.socketId, true)} />}
+            {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => editable && parties.makeObserverAsync(member.socketId, false)} />}
+            {showAll && !member.isObserver && <i className="settings-icon fas fa-gamepad" title={`${member.name} is playing (not observing)`} onClick={() => editable && parties.makeObserverAsync(member.socketId, true)} />}
             <div className="spacer" />
-            {showMenu && isLeader && <i className="settings-icon fas fa-times" title={`Remove ${member.name} from party`} onClick={() => parties.kick(member.socketId)} />}
+            {showAll && (editable || isSelf) && <i className="settings-icon fas fa-times" title={`Remove ${member.name} from party`} onClick={() => parties.kick(member.socketId)} />}
         </div>
     }
 }

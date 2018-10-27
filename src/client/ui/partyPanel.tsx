@@ -80,9 +80,9 @@ export class PartyPanel extends React.Component<Props, State> {
             <div className="party-list">
                 {party.members.map(m => <PartyMemberControl
                     member={m}
-                    isLeader={self.isLeader}
+                    editable={self.isLeader || (!party.isLocked && m.socketId === self.socketId)}
                     isSelf={m.socketId === self.socketId}
-                    showMenu={true}
+                    showAll={true}
                 />)}
             </div>
             <h1>Games</h1>

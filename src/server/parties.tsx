@@ -100,6 +100,20 @@ export function isPartyReady(party: g.Party): boolean {
     return relevant.length > 0 && relevant.every(p => p.ready);
 }
 
+export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignment[]) {
+    for (const assignment of assignments) {
+        const member = assignment.partyMember;
+        if (assignment.heroId) {
+            // Unready after each game
+            member.ready = false;
+
+            if (party.initialObserver) { // Only allow players to play one game in a tournament
+                member.isObserver = true;
+            }
+        }
+    }
+}
+
 export function removePartyMember(party: g.Party, socketId: string) {
 	const member = party.active.get(socketId);
 	if (!member) {

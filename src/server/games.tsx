@@ -47,12 +47,6 @@ export interface DisconnectResult {
 	changedParties: g.Party[];
 }
 
-export interface PartyGameAssignment {
-	partyMember: g.PartyMember;
-	game: g.Game;
-	heroId: string;
-}
-
 export function onConnect(socketId: string, authToken: string) {
 }
 
@@ -262,7 +256,7 @@ export function initGame(room: g.Room | null, partyId: string | null, isPrivate:
 }
 
 export function assignPartyToGames(party: g.Party) {
-	const assignments = new Array<PartyGameAssignment>();
+	const assignments = new Array<g.PartyGameAssignment>();
 	const store = getStore();
 
 	const room = store.rooms.get(party.roomId);
@@ -281,7 +275,6 @@ export function assignPartyToGames(party: g.Party) {
 
 		const game = findNewGame(room, party.id, party.isPrivate, allowBots, group.length);
 		for (const member of group) {
-			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
 			assignments.push({ partyMember: member, game, heroId });
 		}

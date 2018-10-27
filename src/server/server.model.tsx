@@ -128,6 +128,12 @@ export interface PartyMemberStatus {
     isLeader: boolean;
 }
 
+export interface PartyGameAssignment {
+	partyMember: PartyMember;
+	game: Game;
+	heroId: string;
+}
+
 export interface PlayerCounts {
     [category: string]: number;
 }

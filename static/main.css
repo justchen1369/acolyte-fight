@@ -1109,6 +1109,10 @@ textarea.ai-js {
     color: white;
 }
 
+.party-member.party-member-observing {
+    opacity: 0.5;
+}
+
 .party-panel .party-member {
     display: flex;
     align-items: center;
