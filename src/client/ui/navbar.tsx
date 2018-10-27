@@ -65,13 +65,13 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page="">Home</NavBarItem>
                 <NavBarItem page="leaderboard">Leaderboard</NavBarItem>
-                <NavBarItem page="modding" badge={this.props.isModded}>Modding</NavBarItem>
-                {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>}
                 <NavBarItem page="regions">Regions</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
                 <NavBarItem page="settings">Settings</NavBarItem>
-                <NavBarItem page="about">About</NavBarItem>
                 <div className="spacer" />
+                <NavBarItem page="modding" badge={this.props.isModded}>Modding</NavBarItem>
+                <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>
+                <NavBarItem page="about">About</NavBarItem>
             </div>
         </div>
     }
