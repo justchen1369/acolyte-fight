@@ -1087,6 +1087,9 @@ textarea.ai-js {
 
 .party-list .settings-icon {
     margin-left: 0.5em;
+}
+
+.party-member-editable .settings-icon {
     cursor: pointer;
 }
 
@@ -1096,6 +1099,9 @@ textarea.ai-js {
 
 .party-member .check-icon {
     margin-right: 0.5em;
+}
+
+.party-member-editable .check-icon {
     cursor: pointer;
 }
 

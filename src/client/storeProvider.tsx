@@ -40,6 +40,7 @@ function reducer(state: s.State, action: s.Action): s.State {
 	    return {
             ...state,
             socketId: null,
+            party: null,
             world: {
                 ...state.world,
                 activePlayers: state.world.activePlayers.clear(),

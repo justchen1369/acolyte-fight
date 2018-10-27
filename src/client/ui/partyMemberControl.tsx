@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -17,9 +18,15 @@ export class PartyMemberControl extends React.PureComponent<Props> {
         const showMenu = this.props.showMenu;
         const isLeader = this.props.isLeader;
         const isSelf = this.props.isSelf;
-
         const member = this.props.member;
-        return <div className={member.ready ? "party-member party-member-ready" : "party-member party-member-not-ready"} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
+
+        const className = classNames({
+            'party-member': true,
+            'party-member-ready': member.ready,
+            'party-member-not-ready': !member.ready,
+            'party-member-editable': this.props.showMenu,
+        });
+        return <div className={className} title={`${member.name}: ${member.ready ? "Ready" : "Not Ready"}`}>
             {member.ready && <i className="check-icon fas fa-check-square" onClick={() => isSelf && parties.updateReadyStatusAsync(false)} />} 
             {!member.ready && <i className="check-icon fas fa-square" onClick={() => isSelf && parties.updateReadyStatusAsync(true)} />}
             <span className="party-member-name">{member.name}</span>

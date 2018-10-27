@@ -229,7 +229,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	const store = getStore();
 
 	const party = store.parties.get(data.partyId);
-	if (!parties.isAuthorizedToPromote(party, socket.id)) {
+	if (!(party && parties.isAuthorizedToAdmin(party, socket.id))) {
 		logger.info(`Party ${data.partyId} not found or inaccessible for user ${socket.id} [${authToken}]`);
 		callback({ success: false, error: `Party ${data.partyId} not found or inaccessible` });
 		return;
@@ -327,16 +327,6 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 	}
 
 	const memberId = data.memberId || socket.id;
-	if (data.isLeader && !parties.isAuthorizedToPromote(party, socket.id)) {
-		logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] cannot promote`);
-		callback({ success: false, error: `Party ${data.partyId} unauthorized to promote to leader` });
-		return;
-	} else if (!parties.isAuthorizedToChange(party, socket.id, memberId)) {
-		logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] unauthorized`);
-		callback({ success: false, error: `Party ${data.partyId} unauthorized` });
-		return;
-	}
-
 	const newStatus: Partial<g.PartyMemberStatus> = {};
 	if (data.isLeader !== undefined) {
 		newStatus.isLeader = data.isLeader;
@@ -346,6 +336,11 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 	}
 	if (data.isReady !== undefined) {
 		newStatus.ready = data.isReady;
+	}
+	if (!parties.isAuthorizedToChange(party, socket.id, memberId, newStatus)) {
+		logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] unauthorized to modify ${memberId} ${JSON.stringify(newStatus)}`);
+		callback({ success: false, error: `Party ${data.partyId} unauthorized` });
+		return;
 	}
 	parties.updatePartyMemberStatus(party, memberId, newStatus);
 

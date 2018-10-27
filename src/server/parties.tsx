@@ -24,16 +24,37 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 	return party;
 }
 
-export function isAuthorizedToChange(party: g.Party, initiatorId: string, memberId: string) {
+export function isAuthorizedToChange(party: g.Party, initiatorId: string, memberId: string, newStatus: Partial<g.PartyMemberStatus>) {
     const initiator = party.active.get(initiatorId);
-    if (initiator && initiator.isLeader) {
-        return true;
+    const isLeader = initiator && initiator.isLeader;
+    const isSelf = initiatorId === memberId;
+
+    if (newStatus.isLeader !== undefined) {
+        if (!isLeader) {
+            return false;
+        }
+    }
+    if (newStatus.isObserver !== undefined) {
+        if (party.isLocked) {
+            if (!isLeader) {
+                return false;
+            }
+        } else {
+            if (!(isSelf || isLeader)) {
+                return false;
+            }
+        }
+    }
+    if (newStatus.ready !== undefined) {
+        if (!isSelf) {
+            return false;
+        }
     }
 
-    return party.isLocked ? false : initiatorId === memberId;
+    return true;
 }
 
-export function isAuthorizedToPromote(party: g.Party, initiatorId: string) {
+export function isAuthorizedToAdmin(party: g.Party, initiatorId: string) {
     const initiator = party.active.get(initiatorId);
     return initiator && initiator.isLeader;
 }
@@ -84,13 +105,15 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	party.active.delete(socketId);
 	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
 
-	if (party.active.size > 0 && !member.isObserver) {
-		// All members become unready when a player leaves
-		party.active.forEach(member => {
-			if (!member.isObserver) {
-				member.ready = false;
-			}
-		});
+	if (party.active.size > 0) {
+        if (!member.isObserver) {
+            // All members become unready when a player leaves
+            party.active.forEach(member => {
+                if (!member.isObserver) {
+                    member.ready = false;
+                }
+            });
+        }
 	} else {
 		// This party is finished, delete it
 		const store = getStore();
