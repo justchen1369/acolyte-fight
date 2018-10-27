@@ -85,9 +85,13 @@ export function createOrUpdatePartyMember(party: g.Party, socketId: string, newS
 export function updatePartyMemberStatus(party: g.Party, socketId: string, newStatus: Partial<g.PartyMemberStatus>) {
 	let member = party.active.get(socketId);
 	if (member) {
+        if (newStatus.isObserver === false) { // When setting the player to playing, unready them as they need to accept the change
+            newStatus.ready = false;
+        }
+
 		member = { ...member, ...newStatus };
 		party.active.set(socketId, member);
-		party.modified = moment();
+        party.modified = moment();
 	}
 }
 
