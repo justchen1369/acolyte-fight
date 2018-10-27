@@ -65,6 +65,7 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page=""><i className="fas fa-home" /> Home</NavBarItem>
                 <NavBarItem page="leaderboard"><i className="fas fa-star" /> Leaderboard</NavBarItem>
+                <NavBarItem page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="fas fa-video" /> Replays</NavBarItem>
                 <NavBarItem page="regions"><i className="fas fa-globe-americas" /> Regions</NavBarItem>
                 <NavBarItem page="party" badge={this.props.inParty}><i className="fas fa-user-friends" /> Party</NavBarItem>
                 <NavBarItem page="settings"><i className="fas fa-cog" /> Settings</NavBarItem>
