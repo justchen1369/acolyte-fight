@@ -101,7 +101,7 @@ export class PartyPanel extends React.Component<Props, State> {
                 <span className="party-mode-label"><b>Private</b>: your games will only contain the players in your party.</span>
             </PartyMode>
             <PartyMode selected={party.isPrivate && party.isLocked} onClick={() => editable && parties.tournamentPartyAsync()} >
-                <span className="party-mode-label"><b>Restricted</b>: private party where only the party leader controls all the settings and decides who is allowed to play. Useful for running tournaments.</span>
+                <span className="party-mode-label"><b>Tournament</b>: private party where only the party leader controls all the settings and decides who is allowed to play. Useful for running tournaments.</span>
             </PartyMode>
         </div>
     }
