@@ -97,7 +97,7 @@ export async function downloadGameStats(): Promise<void> {
     }
 
     const until = await storage.getStatsLoadedUntil() || moment.unix(0);
-    const limit = 100;
+    const limit = 10;
     let itemsLoaded = 0;
     let oldestLoaded = moment();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
