@@ -24,7 +24,12 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
-    games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
+	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
+	games.attachFinishedGameListener(gameStats => {
+		if (gameStats.partyId) {
+			io.to(gameStats.partyId).emit('game', gameStats);
+		}
+	});
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -130,6 +135,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 		upstream.on('hero', (data: any) => socket.emit('hero', data));
 		upstream.on('tick', (data: any) => socket.emit('tick', data));
 		upstream.on('party', (data: any) => socket.emit('party', data));
+		upstream.on('game', (data: any) => socket.emit('game', data));
 		upstream.on('disconnect', () => {
 			// Only disconnect if we've actually connected before
 			if (!attached) { return; }
@@ -400,7 +406,10 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 				return replay;
 			}
 		} else {
-			const game = games.findNewGame(room, data.privatePartyId, data.isBot);
+			// This method is always used for public games
+			const partyId: string = null;
+			const isPrivate: boolean = false;
+			const game = games.findNewGame(room, partyId, isPrivate, data.isBot);
 			return game;
 		}
 	}).catch(err => {
@@ -528,7 +537,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 		gameId: game.id,
 		heroId,
 		isPrivate: game.category !== publicCategory,
-		privatePartyId: game.privatePartyId,
+		partyId: game.partyId,
 		room: game.roomId,
 		mod: game.mod,
 		allowBots: game.allowBots,

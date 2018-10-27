@@ -1,5 +1,6 @@
 export interface GameStats {
     id: string;
+    partyId: string;
     category: string;
     timestamp: string;
     self: string; // user hash

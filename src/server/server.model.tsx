@@ -51,7 +51,8 @@ export interface Replay {
     category: string;
 
     roomId: string | null;
-    privatePartyId: string | null;
+    partyId: string | null;
+    isPrivate: boolean;
 
     mod: Object;
     allowBots: boolean;

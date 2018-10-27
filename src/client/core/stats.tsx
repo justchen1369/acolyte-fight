@@ -4,6 +4,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as notifications from './notifications';
+import * as sockets from './sockets';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { socket } from './sockets';
@@ -11,6 +12,7 @@ import { TicksPerSecond } from '../../game/constants';
 
 export function attachListener() {
     notifications.attachListener(notifs => onNotification(notifs));
+    sockets.listeners.onGameMsg = onGameMsg;
 }
 
 function onNotification(notifs: w.Notification[]) {
@@ -24,9 +26,17 @@ function onNotification(notifs: w.Notification[]) {
     }
 }
 
+async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
+    console.log("Received final game results", gameStatsMsg);
+    const state = StoreProvider.getState();
+    const gameStats = messageToGameStats(gameStatsMsg, state.userId);
+    await storage.saveGameStats(gameStats);
+}
+
 function gameStatsToMessage(gameStats: d.GameStats): m.GameStatsMsg {
     return {
         gameId: gameStats.id,
+        partyId: gameStats.partyId,
         category: gameStats.category,
         unixTimestamp: moment(gameStats.timestamp).unix(),
         winner: gameStats.winner,
@@ -66,6 +76,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
 
     return {
         id: msg.gameId,
+        partyId: msg.partyId,
         category: msg.category,
         timestamp: moment.unix(msg.unixTimestamp).toISOString(),
         self,
@@ -138,6 +149,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
 
     const stats: d.GameStats = {
         id: world.ui.myGameId,
+        partyId: world.ui.myPartyId,
         category,
         timestamp: world.ui.createTime.toISOString(),
         players,

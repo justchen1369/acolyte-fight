@@ -25,12 +25,22 @@ const tickTimer = new NanoTimer();
 let emitTick: Emitter<m.TickMsg> = null;
 let ticksProcessing = false;
 
+const finishedGameListeners = new Array<FinishedGameListener>();
+
 export interface Emitter<T> {
 	(data: T): void;
 }
 
+export interface FinishedGameListener {
+	(gameStats: m.GameStatsMsg): void;
+}
+
 export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
 	emitTick = _emit;
+}
+
+export function attachFinishedGameListener(listener: FinishedGameListener) {
+	finishedGameListeners.push(listener);
 }
 
 export interface DisconnectResult {
@@ -93,9 +103,9 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean, numNewPlayers: number = 1): g.Game {
+export function findNewGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const category = categories.calculateGameCategory(roomId, privatePartyId, allowBots);
+	const category = categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
 	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
@@ -131,7 +141,7 @@ export function findNewGame(room: g.Room | null, privatePartyId: string | null, 
 	}
 
 	if (!game) {
-		game = initGame(room, privatePartyId, allowBots);
+		game = initGame(room, partyId, isPrivate, allowBots);
 	}
 	return game;
 }
@@ -198,16 +208,17 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initGame(room: g.Room | null, privatePartyId: string | null, allowBots: boolean) {
+export function initGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		category: categories.calculateGameCategory(roomId, privatePartyId, allowBots),
+		category: categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots),
 		roomId,
-		privatePartyId,
+		partyId,
+		isPrivate,
 		mod: room ? room.mod : {},
 		allowBots,
 		created: moment(),
@@ -267,8 +278,7 @@ export function assignPartyToGames(party: g.Party) {
 			}
 		}
 
-		const privatePartyId = party.isPrivate ? party.id : null;
-		const game = findNewGame(room, privatePartyId, allowBots, group.length);
+		const game = findNewGame(room, party.id, party.isPrivate, allowBots, group.length);
 		for (const member of group) {
 			member.ready = false;
 			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
@@ -393,7 +403,13 @@ function finishGameIfNecessary(game: g.Game) {
 		game.bots.clear();
 		getStore().activeGames.delete(game.id);
 		gameStorage.saveGame(game);
-		statsStorage.saveGame(game);
+		statsStorage.saveGame(game).then(gameStats => {
+			if (gameStats) {
+				for (const listener of finishedGameListeners) {
+					listener(gameStats);
+				}
+			}
+		});
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;

@@ -21,7 +21,6 @@ export function joinNewGame(observeGameId?: string) {
 
 		const msg: m.JoinMsg = {
 			gameId: observeGameId || null,
-			privatePartyId: null, // This method is always used for public parties
 			name: store.playerName,
 			keyBindings: store.keyBindings,
 			room: store.room.id,
@@ -107,6 +106,7 @@ function onHeroMsg(data: m.HeroMsg) {
 	const world = engine.initialWorld(data.mod);
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
+	world.ui.myPartyId = data.partyId;
 
 	ticker.reset(data.history);
 

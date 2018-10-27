@@ -224,14 +224,10 @@ class RecentGameList extends React.Component<Props, State> {
 
     private renderRow(game: GameRow): JSX.Element {
         const self = game.players.get(game.self);
-        if (!self) {
-            return null;
-        }
-
         return <tr key={game.id}>
             <td title={game.createdTimestamp.toLocaleString()}>{game.createdTimestamp.fromNow()}</td>
             <td>{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</td>
-            <td>{this.renderRatingDelta(self.ratingDelta)}</td>
+            <td>{self && this.renderRatingDelta(self.ratingDelta)}</td>
             <td>{this.state.availableReplays.has(game.id) && <a href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}>Watch <i className="fa fa-external-link-square-alt" /></a>}</td>
         </tr>
     }

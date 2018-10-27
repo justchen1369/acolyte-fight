@@ -74,7 +74,8 @@ function extractReplay(game: g.Game): g.Replay {
         id: game.id,
         category: game.category,
         roomId: game.roomId,
-        privatePartyId: game.privatePartyId,
+        partyId: game.partyId,
+        isPrivate: game.isPrivate,
 
         mod: game.mod,
         allowBots: game.allowBots,

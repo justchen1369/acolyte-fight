@@ -58,6 +58,7 @@ function gameStatsToDb(data: m.GameStatsMsg): db.Game {
 	const game: db.Game = {
         unixTimestamp: data.unixTimestamp,
         userIds: data.players.map(p => p.userId).filter(x => !!x),
+        partyId: data.partyId || null,
         stats: {
             category: data.category,
             lengthSeconds: data.lengthSeconds,
@@ -105,6 +106,7 @@ function userRatingToDb(userRating: g.UserRating, loggedIn: boolean): db.UserRat
 function dbToGameStats(gameId: string, data: db.Game): m.GameStatsMsg {
     return {
         gameId: gameId,
+        partyId: data.partyId || null,
 		category: data.stats.category,
 		lengthSeconds: data.stats.lengthSeconds,
 		unixTimestamp: data.unixTimestamp,
@@ -374,17 +376,21 @@ function calculateLowerBound(rating: number, rd: number) {
     return rating - 2 * rd;
 }
 
-export async function saveGame(game: g.Game) {
+export async function saveGame(game: g.Game): Promise<m.GameStatsMsg> {
     try {
         const gameStats = findStats(game);
         if (gameStats && validateGameStats(gameStats, game)) {
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
             applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);
+            return gameStats;
+        } else {
+            return null;
         }
     } catch (error) {
         logger.error("Unable to save game stats:");
         logger.error(error);
+        return null;
     }
 }
 
@@ -396,7 +402,8 @@ function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
 
     return gameStats.category === gameCategory
         && gameStats.players.some(p => p.userHash === gameStats.winner)
-        && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId));
+        && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId))
+        && gameStats.partyId === game.partyId;
 }
 
 function calculateGameCategory(game: g.Game) {

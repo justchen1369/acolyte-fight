@@ -41,6 +41,7 @@ export interface UserRatingHistoryItem {
 export interface Game {
     unixTimestamp: number;
     userIds: string[];
+    partyId: string;
     stats: GameStats;
 }
 export interface GameStats {

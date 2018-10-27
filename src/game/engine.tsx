@@ -54,6 +54,7 @@ export function initialWorld(mod: Object): w.World {
 			createTime: moment(),
 			myGameId: null,
 			myHeroId: null,
+			myPartyId: null,
 			renderedTick: null,
 			destroyed: [],
 			events: new Array<w.WorldEvent>(),

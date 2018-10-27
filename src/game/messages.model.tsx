@@ -117,7 +117,6 @@ export interface TickMsg {
 
 export interface JoinMsg {
     gameId: string | null;
-    privatePartyId: string | null;
     room: string | null;
     name: string;
     keyBindings: KeyBindings;
@@ -182,7 +181,7 @@ export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
     isPrivate: boolean;
-    privatePartyId: string | null;
+    partyId: string;
     room: string | null;
 
     mod: Object;
@@ -314,6 +313,7 @@ export type CreateRoomResponseMsg = CreateRoomResponse | ErrorResponseMsg;
 
 export interface GameStatsMsg {
     gameId: string;
+    partyId: string;
     category: string;
     unixTimestamp: number;
     winner: string; // userHash
