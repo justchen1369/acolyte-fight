@@ -26,6 +26,7 @@ interface OwnProps {
     more: boolean;
 }
 interface Props extends OwnProps {
+    playerName: string;
     loggedIn: boolean;
     myUserId: string;
 }
@@ -116,6 +117,7 @@ function calculateNextLeague(percentile: number): League {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
+        playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
     };
@@ -174,14 +176,14 @@ class UserStatsPanel extends React.Component<Props, State> {
 
     private renderError() {
         return <div>
-            <h1>Profile</h1>
+            <h1>{this.props.playerName}</h1>
             <p className="error">Unable to load data for user: {this.state.error}</p>
         </div>
     }
 
     private renderLoading() {
         return <div>
-            <h1>Profile</h1>
+            <h1>{this.props.playerName}</h1>
             <p className="loading-text">Loading...</p>
         </div>
     }

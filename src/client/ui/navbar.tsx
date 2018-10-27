@@ -54,24 +54,24 @@ class NavBar extends React.Component<Props, State> {
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
-                <NavBarItem page="">Home</NavBarItem>
-                <NavBarItem page="leaderboard" shrink={true}>Leaderboard</NavBarItem>
-                <NavBarItem page="regions" shrink={true}>Regions</NavBarItem>
-                <NavBarItem page="party" badge={this.props.inParty} shrink={true}>Party</NavBarItem>
+                <NavBarItem page=""><i className="fas fa-home" title="Home" /><span className="shrink"> Home</span></NavBarItem>
+                <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
+                <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
+                {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <LoginButton />
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
-                <NavBarItem page="">Home</NavBarItem>
-                <NavBarItem page="leaderboard">Leaderboard</NavBarItem>
-                <NavBarItem page="regions">Regions</NavBarItem>
-                <NavBarItem page="party" badge={this.props.inParty}>Party</NavBarItem>
-                <NavBarItem page="settings">Settings</NavBarItem>
+                <NavBarItem page=""><i className="fas fa-home" /> Home</NavBarItem>
+                <NavBarItem page="leaderboard"><i className="fas fa-star" /> Leaderboard</NavBarItem>
+                <NavBarItem page="regions"><i className="fas fa-globe-americas" /> Regions</NavBarItem>
+                <NavBarItem page="party" badge={this.props.inParty}><i className="fas fa-user-friends" /> Party</NavBarItem>
+                <NavBarItem page="settings"><i className="fas fa-cog" /> Settings</NavBarItem>
                 <div className="spacer" />
-                <NavBarItem page="modding" badge={this.props.isModded}>Modding</NavBarItem>
-                <NavBarItem page="ai" badge={this.props.isUsingAI}>AI</NavBarItem>
-                <NavBarItem page="about">About</NavBarItem>
+                <NavBarItem page="modding" badge={this.props.isModded}><i className="fas fa-wrench" /> Modding</NavBarItem>
+                <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="fas fa-microchip" /> AI</NavBarItem>
+                <NavBarItem page="about"><i className="fas fa-info-circle" /> About</NavBarItem>
             </div>
         </div>
     }

@@ -103,6 +103,12 @@ a:hover, a:active {
     animation: loading-text-animation alternate 4s infinite;
 }
 
+@media (max-width: 768px) {
+    .shrink {
+        display: none;
+    }
+}
+
 @keyframes loading-text-animation {
     from { color: white; }
     to { color: #888; }
@@ -225,6 +231,12 @@ a:hover, a:active {
 
 .navbar .nav-item .nav-item-label {
     position: relative;
+}
+
+.navbar-vertical .nav-item-label i {
+    display: inline-block;
+    width: 1em;
+    margin-right: 1em;
 }
 
 .navbar .nav-item .nav-item-label .badge {
