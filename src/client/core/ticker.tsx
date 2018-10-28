@@ -80,16 +80,17 @@ export function frame(canvasStack: CanvasStack) {
 	
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
-		const numFrames = tickTarget - tickCounter;
-		incomingLoop(numFrames);
-		if (numFrames <= 4) {
-			// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
-			tickCounter += numFrames;
-		} else {
-			// Too many frames behind, stop trying to catch up
+		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
+		let numFrames = tickTarget - tickCounter;
+		if (numFrames > 4) {
+			// Too many frames behind, we probably closed the window or exited a game and started a new one, just proceed at the normal pace
 			tickEpoch = Date.now();
 			tickCounter = 0;
+			numFrames = 1;
+		} else {
+			tickCounter += numFrames;
 		}
+		incomingLoop(numFrames);
 	}
 
 	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
