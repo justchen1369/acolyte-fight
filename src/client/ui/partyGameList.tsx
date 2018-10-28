@@ -36,7 +36,7 @@ class PartyGameList extends React.Component<Props, State> {
         (props: Props) => props.allGameStats,
         (partyId, allGameStats) => {
             if (partyId && allGameStats) {
-                return _.take([...allGameStats.values()].filter(g => g.partyId === partyId), MaxReplaysToDisplay);
+                return [...allGameStats.values()].filter(g => g.partyId === partyId);
             } else {
                 return [];
             }
@@ -51,7 +51,7 @@ class PartyGameList extends React.Component<Props, State> {
 
     render() {
         const allGameStats = this.getGameSubset(this.props);
-        return <GameList allGameStats={allGameStats} />
+        return <GameList allGameStats={allGameStats} limit={MaxReplaysToDisplay} />
     }
 }
 

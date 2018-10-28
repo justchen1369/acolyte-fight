@@ -43,6 +43,7 @@ interface PlayerStats extends Stats {
 
 interface OwnProps {
     allGameStats: d.GameStats[];
+    limit: number;
 }
 interface Props extends OwnProps {
     current: s.PathElements;
@@ -113,10 +114,12 @@ class GameList extends React.Component<Props, State> {
     private alreadyCheckedReplays = new Set<string>();
 
     private getGames = Reselect.createSelector(
-        (allGameStats: d.GameStats[]) => allGameStats,
-        (allGameStats) => {
+        (props: Props) => props.allGameStats,
+        (props: Props) => props.limit,
+        (allGameStats, limit) => {
             let games = allGameStats.map(convertGame);
             games = _.sortBy(games, (g: GameRow) => -g.createdTimestamp.unix());
+            games = _.take(games, limit);
             return games;
         }
     );
@@ -163,7 +166,7 @@ class GameList extends React.Component<Props, State> {
     }
 
     private renderGames(): JSX.Element {
-        const games = this.getGames(this.props.allGameStats);
+        const games = this.getGames(this.props);
         return <div>
             {this.state.error && <p className="error">Error loading recent games: {this.state.error}</p>}
             {!games && <p className="loading-text">Loading...</p>}

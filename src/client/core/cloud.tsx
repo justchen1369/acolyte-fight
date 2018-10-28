@@ -98,15 +98,16 @@ export async function downloadGameStats(): Promise<void> {
         return;
     }
 
+    const allGameStats = new Array<d.GameStats>();
     const until = await storage.getStatsLoadedUntil() || moment.unix(0);
     const limit = 10;
     let itemsLoaded = 0;
+    let newestLoaded = until;
     let oldestLoaded = moment();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
         const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = msgpack.decode(new Uint8Array(await res.arrayBuffer()));
 
-        const allGameStats = new Array<d.GameStats>();
         for (const gameStatsMsg of json.stats) {
             const gameStats = stats.messageToGameStats(gameStatsMsg, userId);
             allGameStats.push(gameStats);
@@ -116,17 +117,20 @@ export async function downloadGameStats(): Promise<void> {
             if (timestamp.isBefore(oldestLoaded)) {
                 oldestLoaded = timestamp;
             }
+            if (timestamp.isAfter(newestLoaded)) {
+                newestLoaded = timestamp;
+            }
 
             ++itemsLoaded;
         }
-        StoreProvider.dispatch({ type: "updateGameStats", allGameStats });
 
         if (json.stats.length === 0 || json.stats.length < limit) {
             // Reached the end
             break;
         }
     }
-    await storage.setStatsLoadedUntil(oldestLoaded);
+    await storage.setStatsLoadedUntil(newestLoaded);
+    StoreProvider.dispatch({ type: "updateGameStats", allGameStats });
 }
 
 export async function logout(): Promise<void> {

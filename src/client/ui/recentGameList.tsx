@@ -44,7 +44,6 @@ class RecentGameList extends React.Component<Props, State> {
                 if (category !== m.GameCategory.AllCategory) {
                     replays = replays.filter(g => g.category === category);
                 }
-                replays = _.take(replays, MaxReplaysToDisplay);
                 return replays;
             } else {
                 return null;
@@ -74,7 +73,7 @@ class RecentGameList extends React.Component<Props, State> {
 
     render() {
         const allGameStats = this.getGameSubset(this.props);
-        return <GameList allGameStats={allGameStats} />
+        return <GameList allGameStats={allGameStats} limit={MaxReplaysToDisplay} />
     }
 }
 
