@@ -104,7 +104,7 @@ export async function downloadGameStats(): Promise<void> {
     let itemsLoaded = 0;
     let newestLoaded = until;
     let oldestLoaded = moment();
-    while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
+    while (until.isBefore(oldestLoaded) && itemsLoaded < constants.MaxGamesToKeep) {
         const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = msgpack.decode(new Uint8Array(await res.arrayBuffer()));
 
