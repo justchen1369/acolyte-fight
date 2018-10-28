@@ -101,10 +101,9 @@ export async function downloadGameStats(): Promise<void> {
     const allGameStats = new Array<d.GameStats>();
     const until = await storage.getStatsLoadedUntil() || moment.unix(0);
     const limit = 10;
-    let itemsLoaded = 0;
     let newestLoaded = until;
     let oldestLoaded = moment();
-    while (itemsLoaded < constants.MaxGamesToKeep) {
+    while (allGameStats.length < constants.MaxGamesToKeep) {
         const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
         const json: m.GetGameStatsResponse = msgpack.decode(new Uint8Array(await res.arrayBuffer()));
 
@@ -120,8 +119,6 @@ export async function downloadGameStats(): Promise<void> {
             if (timestamp.isAfter(newestLoaded)) {
                 newestLoaded = timestamp;
             }
-
-            ++itemsLoaded;
         }
 
         if (json.stats.length === 0 || json.stats.length < limit) {
