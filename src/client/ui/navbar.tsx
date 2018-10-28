@@ -57,8 +57,8 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page=""><i className="fas fa-home" title="Home" /><span className="shrink"> Home</span></NavBarItem>
                 <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
                 <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
-                {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /></NavBarItem>}
-                {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" /></NavBarItem>}
+                {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></NavBarItem>}
+                {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <LoginButton />
