@@ -863,6 +863,12 @@ h2 {
     text-shadow: 2px 2px 2px black;
 }
 
+@media (max-width: 768px) {
+    .stats-card-row {
+        flex-wrap: wrap;
+    }
+}
+
 .leaderboard-row {
     background: #333;
     box-shadow: 5px 5px 5px black;
@@ -919,6 +925,13 @@ h2 {
 .leaderboard-row .win-count {
     margin-left: 20px;
     color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .leaderboard-row {
+        font-size: 75%;
+        flex-wrap: wrap;
+    }
 }
 
 .profile-panel {
