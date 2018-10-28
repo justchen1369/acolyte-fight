@@ -1,4 +1,5 @@
 import moment from 'moment';
+import msgpack from 'msgpack-lite';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -28,7 +29,8 @@ function onNotification(notifs: w.Notification[]) {
     }
 }
 
-async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
+async function onGameMsg(buffer: ArrayBuffer) {
+    const gameStatsMsg: m.GameStatsMsg = msgpack.decode(new Uint8Array(buffer));
     console.log("Received final game results", gameStatsMsg);
     const state = StoreProvider.getState();
     const gameStats = messageToGameStats(gameStatsMsg, state.userId);

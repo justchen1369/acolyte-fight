@@ -596,7 +596,8 @@ function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 			for (const room of rooms) {
 				emitTo = emitTo.to(room);
 			}
-			emitTo.emit('game', result);
+			const buffer = msgpack.encode(result);
+			emitTo.emit('game', buffer);
 		}
 	}
 }
