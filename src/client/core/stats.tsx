@@ -105,7 +105,9 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
 export async function save(world: w.World, server: string): Promise<d.GameStats> {
     const gameStats = gameStatsFromWorld(world, server);
     if (gameStats) {
-        socket.emit('score', gameStatsToMessage(gameStats));
+        if (world.winner) { // Don't confuse server with wrong stats if left early
+            socket.emit('score', gameStatsToMessage(gameStats));
+        }
         await storage.saveGameStats(gameStats);
 
         if (!world.ui.saved) { // Game is saved twice, once at win, once at leaving, don't double count it

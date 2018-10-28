@@ -401,7 +401,6 @@ function finishGameIfNecessary(game: g.Game) {
 		gameStorage.saveGame(game);
 		statsStorage.saveGame(game, result)
 
-		console.log("Result: " + JSON.stringify(result));
 		for (const listener of finishedGameListeners) {
 			listener(game, result);
 		}
