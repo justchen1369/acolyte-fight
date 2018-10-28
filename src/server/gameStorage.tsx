@@ -1,4 +1,5 @@
 import fs from 'fs';
+import msgpack from 'msgpack-lite';
 import zlib from 'zlib';
 import * as g from './server.model';
 import { getStore } from './serverStore';
@@ -33,7 +34,7 @@ export function loadGame(id: string): Promise<g.Replay> {
                     if (err2) {
                         reject(err2);
                     } else {
-                        const replay = JSON.parse(data2.toString('utf8')) as g.Replay;
+                        const replay = msgpack.decode(data2) as g.Replay;
                         resolve(replay);
                     }
                 });
@@ -48,8 +49,8 @@ export function saveGame(game: g.Game) {
     }
 
     const replay = extractReplay(game);
-    const json = JSON.stringify(replay);
-    zlib.gzip(new Buffer(json, 'utf8'), (err, result) => {
+    const buffer = msgpack.encode(replay);
+    zlib.gzip(buffer, (err, result) => {
         if (err) {
             console.error("Unable to compress replay", game.id, err);
         } else {
@@ -66,7 +67,7 @@ export function saveGame(game: g.Game) {
 }
 
 function gamePath(id: string) {
-    return `${basePath}/${id}.json.gz`;
+    return `${basePath}/${id}.msgpack.gz`;
 }
 
 function extractReplay(game: g.Game): g.Replay {
