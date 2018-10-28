@@ -933,6 +933,7 @@ h2 {
 
 .profile-panel .category {
     display: inline-block;
+    text-align: center;
     font-weight: bold;
     font-size: 120%;
     padding: 10px 20px;
@@ -948,6 +949,18 @@ h2 {
 .profile-panel .category-selected {
     background: #444;
     color: #00ccff;
+}
+
+@media (max-width: 768px) {
+    .profile-panel .category-selector {
+        display: flex;
+        position: static;
+        margin-top: 2em;
+    }
+
+    .profile-panel .category {
+        flex-grow: 1;
+    }
 }
 
 .game-list {
