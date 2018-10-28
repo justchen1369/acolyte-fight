@@ -549,7 +549,8 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 		numPlayersPublic,
 		numPlayersInCategory,
 	};
-	socket.emit('hero', msg);
+	const buffer = msgpack.encode(msg);
+	socket.emit('hero', buffer);
 }
 
 function emitParty(party: g.Party) {

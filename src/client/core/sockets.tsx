@@ -20,7 +20,7 @@ export interface Listeners {
 	onTickMsg: (msg: ArrayBuffer) => void;
 	onPartyMsg: (msg: m.PartyMsg) => void;
 	onGameMsg: (msg: m.GameStatsMsg) => void;
-	onHeroMsg: (msg: m.HeroMsg) => void;
+	onHeroMsg: (msg: ArrayBuffer) => void;
 }
 
 export function connectToServer(server: string): Promise<void> {
@@ -66,7 +66,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 	socket.on('tick', (msg: ArrayBuffer) => listeners.onTickMsg(msg));
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 	socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
-	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
+	socket.on('hero', (msg: ArrayBuffer) => listeners.onHeroMsg(msg));
 }
 function onDisconnectMsg() {
 	StoreProvider.dispatch({ type: "disconnected" });
