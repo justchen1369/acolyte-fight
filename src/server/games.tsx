@@ -388,7 +388,7 @@ function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string)
 }
 
 function finishGameIfNecessary(game: g.Game) {
-	if (game.winTick && game.tick >= game.winTick + MaxIdleTicks) {
+	if (game.winTick && game.tick >= game.winTick + constants.MaxEndTicks) {
 		// Forcibly remove everyone from the game
 		game.active.clear();
 	}
