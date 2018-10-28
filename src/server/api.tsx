@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import msgpack from 'msgpack-lite';
 import express from 'express';
 import url from 'url';
 
@@ -201,7 +202,8 @@ export async function onGetGameStatsAsync(req: express.Request, res: express.Res
     const response: m.GetGameStatsResponse = {
         stats: allGameStats,
     };
-    res.send(response);
+    const buffer = msgpack.encode(response);
+    res.send(buffer);
 }
 
 export function onGetRatingAtPercentile(req: express.Request, res: express.Response) {

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import msgpack from 'msgpack-lite';
 import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
@@ -104,7 +105,7 @@ export async function downloadGameStats(): Promise<void> {
     const allGameStats = new Array<d.GameStats>();
     while (until.isBefore(oldestLoaded) && itemsLoaded < 1000) {
         const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
-        const json: m.GetGameStatsResponse = await res.json();
+        const json: m.GetGameStatsResponse = msgpack.decode(new Uint8Array(await res.arrayBuffer()));
 
         for (const gameStatsMsg of json.stats) {
             const gameStats = stats.messageToGameStats(gameStatsMsg, userId);
