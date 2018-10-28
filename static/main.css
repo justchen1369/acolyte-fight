@@ -233,8 +233,7 @@ a:hover, a:active {
     position: relative;
 }
 
-.navbar-vertical .nav-item-label i {
-    display: inline-block;
+.navbar-vertical .nav-item-label .icon {
     width: 1em;
     margin-right: 1em;
 }
