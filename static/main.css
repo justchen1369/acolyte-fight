@@ -976,17 +976,20 @@ h2 {
     }
 }
 
-.game-list {
+.game-list .game-card {
+    display: flex;
+    position: relative;
     background: #333;
     box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin-bottom: 1em;
+    align-items: center;
 }
 
-.game-list table {
-    border-collapse: collapse;
-}
-
-.game-list col.timestamp {
-    width: 200px;
+.game-list .game-card .label {
+    color: #aaa;
+    font-size: 80%;
+    margin-bottom: 0.25em;
 }
 
 .game-list .player-cell i {
@@ -1012,17 +1015,18 @@ h2 {
     color: #ff8800 !important;
 }
 
-.game-list table thead {
-    background: #222;
-}
-
-.game-list tr:hover {
+.game-list .game-card:hover {
     background: #555;
 }
 
-.game-list th, .game-list td {
-    padding: 20px;
+.game-list .game-card .player-list {
     text-align: left;
+    font-size: 120%;
+}
+
+.game-list .rating {
+    font-size: 200%;
+    font-weight: bold;
 }
 
 .game-list .rating-increase {
@@ -1031,6 +1035,9 @@ h2 {
 
 .game-list .rating-decrease {
     color: #ff4466;
+}
+
+@media (max-width: 768px) {
 }
 
 textarea.mod-json {

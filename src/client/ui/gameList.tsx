@@ -168,35 +168,25 @@ class GameList extends React.Component<Props, State> {
             {!games && <p className="loading-text">Loading...</p>}
             {games && games.length === 0 && <p>No recent games</p>}
             {games && games.length > 0 && <div className="game-list">
-                <table style={{width: "100%"}}>
-                    <col className="timestamp" />
-                    <col />
-                    <col />
-                    <col className="actions" />
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Players</th>
-                            <th>Rating</th>
-                            <th>Watch</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {games.map(game => this.renderRow(game))}
-                    </tbody>
-                </table>
+                {games.map(game => this.renderRow(game))}
             </div>}
         </div>
     }
 
     private renderRow(game: GameRow): JSX.Element {
         const self = game.players.get(game.self);
-        return <tr key={game.id}>
-            <td title={game.createdTimestamp.toLocaleString()}>{game.createdTimestamp.fromNow()}</td>
-            <td>{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</td>
-            <td>{self && this.renderRatingDelta(self.ratingDelta)}</td>
-            <td>{this.props.hasReplayLookup.get(game.id) && <a href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}>Watch <i className="fa fa-external-link-square-alt" /></a>}</td>
-        </tr>
+        const hasReplay = this.props.hasReplayLookup.get(game.id);
+        return <div className="game-card">
+            <div className="game-info">
+                <div className="label">
+                    <span className="timestamp">{game.createdTimestamp.fromNow()}</span>
+                    {hasReplay && <a className="watch" href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}> - watch <i className="fas fa-video" /></a>}
+                </div>
+                <div className="player-list">{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</div>
+            </div>
+            <div className="spacer" />
+            <div>{self && this.renderRatingDelta(self.ratingDelta)}</div>
+        </div>
     }
 
     private renderRatingDelta(ratingDelta: number): JSX.Element {
@@ -205,9 +195,9 @@ class GameList extends React.Component<Props, State> {
         }
 
         if (ratingDelta > 0) {
-            return <span className="rating-increase">{ratingDelta.toFixed(0)}</span>
+            return <span className="rating rating-increase">{ratingDelta.toFixed(0)}</span>
         } else {
-            return <span className="rating-decrease">{ratingDelta.toFixed(0)}</span>
+            return <span className="rating rating-decrease">{ratingDelta.toFixed(0)}</span>
         }
     }
 
