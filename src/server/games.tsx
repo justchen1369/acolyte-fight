@@ -399,11 +399,11 @@ function finishGameIfNecessary(game: g.Game) {
 
 		const result = results.calculateResult(game);
 		gameStorage.saveGame(game);
-		statsStorage.saveGame(game, result)
-
-		for (const listener of finishedGameListeners) {
-			listener(game, result);
-		}
+		statsStorage.saveGame(game, result).then(newResult => {
+			for (const listener of finishedGameListeners) {
+				listener(game, newResult || result);
+			}
+		});
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;

@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import msgpack from 'msgpack-lite';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as categories from './categories';
@@ -53,7 +54,7 @@ function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
 
 
 function hashStats(gameStats: m.GameStatsMsg): string {
-    return crypto.createHash('md5').update(JSON.stringify(gameStats)).digest('hex');
+    return crypto.createHash('md5').update(msgpack.encode(gameStats)).digest('hex');
 } 
 
 function calculateGameCategory(game: g.Game) {

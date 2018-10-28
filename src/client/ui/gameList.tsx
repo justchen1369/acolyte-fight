@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
@@ -185,7 +186,7 @@ class GameList extends React.Component<Props, State> {
                 <div className="player-list">{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</div>
             </div>
             <div className="spacer" />
-            <div>{self && this.renderRatingDelta(self.ratingDelta)}</div>
+            <div title="Rating adjustment">{self && this.renderRatingDelta(self.ratingDelta)}</div>
         </div>
     }
 
@@ -194,11 +195,18 @@ class GameList extends React.Component<Props, State> {
             return null;
         }
 
+        const className = classNames({
+            'rating': true,
+            'rating-increase': ratingDelta > 0,
+            'rating-decrease': ratingDelta < 0,
+        });
+        let text = ratingDelta.toFixed(0);
         if (ratingDelta > 0) {
-            return <span className="rating rating-increase">{ratingDelta.toFixed(0)}</span>
-        } else {
-            return <span className="rating rating-decrease">{ratingDelta.toFixed(0)}</span>
+            text = `+${text}`;
         }
+        return <div className="rating-container">
+            <div className={className}>{text}</div>
+        </div>
     }
 
     private renderPlayer(player: PlayerStats): JSX.Element {

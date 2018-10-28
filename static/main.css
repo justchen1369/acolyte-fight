@@ -981,9 +981,12 @@ h2 {
     position: relative;
     background: #333;
     box-shadow: 5px 5px 5px black;
-    padding: 20px;
     margin-bottom: 1em;
     align-items: center;
+}
+
+.game-list .game-card .game-info {
+    margin: 20px;
 }
 
 .game-list .game-card .label {
@@ -1024,7 +1027,12 @@ h2 {
     font-size: 120%;
 }
 
+.game-list .rating-container {
+    position: relative;
+}
+
 .game-list .rating {
+    margin: 20px;
     font-size: 200%;
     font-weight: bold;
 }
