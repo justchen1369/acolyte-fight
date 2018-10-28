@@ -57,6 +57,8 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page=""><i className="fas fa-home" title="Home" /><span className="shrink"> Home</span></NavBarItem>
                 <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
                 <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
+                {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /></NavBarItem>}
+                {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <LoginButton />
@@ -72,7 +74,7 @@ class NavBar extends React.Component<Props, State> {
                 <div className="spacer" />
                 <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>
                 <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" /> AI</NavBarItem>
-                <NavBarItem page="about"><i className="fas fa-info-circle" /> About</NavBarItem>
+                <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>
             </div>
         </div>
     }
