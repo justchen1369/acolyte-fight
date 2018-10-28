@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import glicko from 'glicko2';
 import moment from 'moment';
+import msgpack from 'msgpack-lite';
 import * as Firestore from '@google-cloud/firestore';
 import * as categories from './categories';
 import * as constants from '../game/constants';
@@ -23,7 +24,7 @@ interface RatingDeltas {
 }
 
 interface LeaderboardCacheItem {
-    leaderboard: m.LeaderboardPlayer[];
+    leaderboardBuffer: Buffer; // m.GetLeaderboardResponse
     expiry: number; // unix timestamp
 }
 
@@ -201,21 +202,22 @@ export async function cleanupGames(maxAgeDays: number) {
     }
 }
 
-export async function getLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+export async function getLeaderboard(category: string): Promise<Buffer> {
     const cached = leaderboardCache.get(category);
     if (cached && moment().unix() < cached.expiry) {
-        return cached.leaderboard;
+        return cached.leaderboardBuffer;
     } else {
         const leaderboard = await retrieveLeaderboard(category);
+        const leaderboardBuffer = msgpack.encode(leaderboard);
         leaderboardCache.set(category, {
-            leaderboard,
+            leaderboardBuffer,
             expiry: moment().add(1, 'minute').unix(),
         });
-        return leaderboard;
+        return leaderboardBuffer;
     }
 }
 
-export async function retrieveLeaderboard(category: string): Promise<m.LeaderboardPlayer[]> {
+export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
     const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength);
 
@@ -237,7 +239,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.Leaderboa
             });
         }
     });
-    return result;
+    return { leaderboard: result };
 }
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {

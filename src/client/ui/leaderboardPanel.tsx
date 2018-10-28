@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import msgpack from 'msgpack-lite';
 import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
@@ -29,11 +30,12 @@ interface State {
 }
 
 async function retrieveLeaderboardAsync(category: string) {
-    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}&limit=100`, {
+    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}`, {
         credentials: 'same-origin'
     });
     if (res.status === 200) {
-        const json = await res.json() as m.GetLeaderboardResponse;
+        const buffer = new Uint8Array(await res.arrayBuffer());
+        const json = msgpack.decode(buffer) as m.GetLeaderboardResponse;
         return json.leaderboard;
     } else {
         throw await res.text();
