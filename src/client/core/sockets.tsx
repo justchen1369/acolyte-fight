@@ -1,3 +1,4 @@
+import msgpack from 'msgpack-lite';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
@@ -16,7 +17,7 @@ export let listeners: Listeners = {
 };
 
 export interface Listeners {
-	onTickMsg: (msg: m.TickMsg) => void;
+	onTickMsg: (msg: ArrayBuffer) => void;
 	onPartyMsg: (msg: m.PartyMsg) => void;
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
@@ -62,7 +63,7 @@ export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => 
 		console.log("Disconnected");
 		onDisconnectMsg();
 	});
-	socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
+	socket.on('tick', (msg: ArrayBuffer) => listeners.onTickMsg(msg));
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 	socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
@@ -87,7 +88,8 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		targetX: Math.round(action.target.x / Precision) * Precision,
 		targetY: Math.round(action.target.y / Precision) * Precision,
 	}
-	socket.emit('action', actionMsg);
+	const buffer = msgpack.encode(actionMsg);
+	socket.emit('action', buffer);
 }
 
 export function sendTextMessage(gameId: string, heroId: string, text: string) {
@@ -97,5 +99,6 @@ export function sendTextMessage(gameId: string, heroId: string, text: string) {
 		actionType: m.ActionType.Text,
 		text,
 	};
-	socket.emit('action', actionMsg);
+	const buffer = msgpack.encode(actionMsg);
+	socket.emit('action', buffer);
 }

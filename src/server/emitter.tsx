@@ -1,4 +1,5 @@
 import moment from 'moment';
+import msgpack from 'msgpack-lite';
 import uniqid from 'uniqid';
 import * as auth from './auth';
 import * as categories from './categories';
@@ -24,7 +25,7 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
-	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
+	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", msgpack.encode(data)));
 	games.attachFinishedGameListener(emitGameResult);
 }
 
@@ -490,7 +491,13 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	}
 }
 
-function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
+function onActionMsg(socket: SocketIO.Socket, buffer: Buffer) {
+	if (!(buffer instanceof Buffer)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+	const data: m.ActionMsg = msgpack.decode(buffer);
 	if (!(required(data, "object")
 		&& required(data.actionType, "string")
 		&& required(data.gameId, "string")
