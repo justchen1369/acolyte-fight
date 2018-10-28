@@ -8,7 +8,7 @@ export namespace Actions {
 	export const Retarget = "retarget";
 	export const Stop = "stop";
 
-	export const NonGameStarters = [Move, MoveAndCancel, Retarget, Stop];
+	export const NonGameStarters = [Move, MoveAndCancel, Retarget];
 }
 
 export namespace SpecialKeys {
