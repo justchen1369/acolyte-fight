@@ -1111,7 +1111,12 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options
 			const startAngle = nextAngle;
 			const endAngle = startAngle + arcWidth;
 
-			hitSectors.set(key.btn, { startAngle, endAngle });
+			let hitSector = { startAngle, endAngle };
+			if (options.wheelOnRight) {
+				hitSector = invertSector(hitSector);
+			}
+
+			hitSectors.set(key.btn, hitSector);
 
 			nextAngle += arcWidth;
 		}
@@ -1134,6 +1139,13 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options
 		innerRadius,
 		targetSurfaceCenter,
 		buttons: new Map<string, w.ButtonRenderState>(),
+	};
+}
+
+function invertSector(input: w.HitSector): w.HitSector {
+	return {
+		startAngle: Math.PI - input.endAngle,
+		endAngle: Math.PI - input.startAngle,
 	};
 }
 
