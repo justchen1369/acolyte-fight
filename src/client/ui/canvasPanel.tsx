@@ -115,6 +115,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private leftClickKey: string;
     private rightClickKey: string;
+    private doubleTapKey: string;
 
     private keyDownListener = this.gameKeyDown.bind(this);
     private resizeListener = this.fullScreenCanvas.bind(this);
@@ -142,6 +143,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
         this.leftClickKey = props.rebindings[w.SpecialKeys.LeftClick];
         this.rightClickKey = props.rebindings[w.SpecialKeys.RightClick];
+        this.doubleTapKey = keyboardUtils.doubleTapDefault(props.rebindings[w.SpecialKeys.DoubleTap]);
     }
 
     componentWillMount() {
@@ -257,7 +259,9 @@ class CanvasPanel extends React.Component<Props, State> {
                         this.autoBindRightClick(p.secondaryBtn);
                     }
 
-                    if (isMobile && this.isDoubleClick(p) || p.secondaryBtn) {
+                    if (isMobile && this.isDoubleClick(p)) {
+                        this.handleButtonClick(this.doubleTapKey, world);
+                    } else if (p.secondaryBtn) {
                         this.handleButtonClick(this.rightClickKey, world);
                     } else {
                         this.handleButtonClick(this.leftClickKey, world);

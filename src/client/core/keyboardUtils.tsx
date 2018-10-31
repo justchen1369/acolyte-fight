@@ -4,6 +4,12 @@ import * as StoreProvider from '../storeProvider';
 import * as w from '../../game/world.model';
 import { DefaultSettings } from '../../game/settings';
 
+const Dash = "a";
+
+export function doubleTapDefault(key: string) {
+    return key === undefined ? Dash : key;
+}
+
 export const getRebindingLookup = Reselect.createSelector(
 	(rebindings: KeyBindings) => rebindings,
 	(rebindings) => {
@@ -87,7 +93,7 @@ export function autoBindRightClick(rightClickedFirst: boolean): string {
         rightClickKey = w.SpecialKeys.Move;
     } else {
         // Moved with the left click first, bind the right click to dash
-        rightClickKey = "a";
+        rightClickKey = Dash;
     }
 
     const store = StoreProvider.getState();

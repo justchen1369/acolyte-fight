@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as keyboardUtils from '../core/keyboardUtils';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as cloud from '../core/cloud';
@@ -30,6 +31,7 @@ interface ControlState {
     moveWith: string;
     leftClickKey: string;
     rightClickKey: string;
+    doubleTapKey: string;
     actionWheelSide: string;
 }
 interface State extends ControlState {
@@ -52,6 +54,7 @@ function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): 
         moveWith,
         leftClickKey: rebindings[w.SpecialKeys.LeftClick],
         rightClickKey: rebindings[w.SpecialKeys.RightClick],
+        doubleTapKey: rebindings[w.SpecialKeys.DoubleTap],
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
     };
 }
@@ -120,6 +123,18 @@ class ControlsPanel extends React.Component<Props, State> {
                 </select>
             </div>}
             {isMobile && <div className="row">
+                <span className="label">Double tap</span>
+                <select
+                    className="value"
+                    value={formatOption(keyboardUtils.doubleTapDefault(this.state.doubleTapKey))}
+                    onChange={ev => this.onDoubleTapSelected(parseOption(ev.target.value))}
+                    >
+
+                    <option value={formatOption(null)}>Move</option>
+                    {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
+                </select>
+            </div>}
+            {isMobile && <div className="row">
                 <span className="label">Action wheel</span>
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onActionWheelSideSelected(ev.target.value)}>
                     <option value={formatOption(Side.Left)}>Left</option>
@@ -163,6 +178,11 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
+    private onDoubleTapSelected(doubleTapKey: string) {
+        this.setState({ doubleTapKey, changed: true, saved: false });
+        this.saveStateDebounced();
+    }
+
     private onActionWheelSideSelected(actionWheelSide: string) {
         this.setState({ actionWheelSide, changed: true, saved: false });
         this.saveStateDebounced();
@@ -177,6 +197,7 @@ class ControlsPanel extends React.Component<Props, State> {
             rebindings[w.SpecialKeys.Hover] = state.moveWith === MoveWith.FollowCursor ? w.SpecialKeys.Move : w.SpecialKeys.Retarget;
             rebindings[w.SpecialKeys.LeftClick] = state.leftClickKey;
             rebindings[w.SpecialKeys.RightClick] = state.rightClickKey;
+            rebindings[w.SpecialKeys.DoubleTap] = state.doubleTapKey;
 
             StoreProvider.dispatch({ type: "updateRebindings", rebindings });
             Storage.saveRebindingConfig(rebindings);
