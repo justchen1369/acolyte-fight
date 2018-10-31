@@ -51,18 +51,21 @@ export function onConnect(socketId: string, authToken: string) {
 }
 
 export function onDisconnect(socketId: string, authToken: string): DisconnectResult {
+	const store = getStore();
+
 	const changedParties = new Array<g.Party>();
-	getStore().activeGames.forEach(game => {
+	store.activeGames.forEach(game => {
 		if (game.active.has(socketId)) {
 			leaveGame(game, socketId);
 		}
 	});
-	getStore().parties.forEach(party => {
+	store.parties.forEach(party => {
 		if (party.active.has(socketId)) {
 			parties.removePartyMember(party, socketId);
 			changedParties.push(party);
 		}
 	});
+
 	return { changedParties }
 }
 
@@ -275,7 +278,7 @@ export function assignPartyToGames(party: g.Party) {
 
 		const game = findNewGame(room, party.id, party.isPrivate, allowBots, group.length);
 		for (const member of group) {
-			const heroId = joinGame(game, member.name, member.keyBindings, member.isBot, member.isMobile, member.authToken, member.socketId);
+			const heroId = joinGame(game, member);
 			assignments.push({ partyMember: member, game, heroId });
 		}
 	}
@@ -456,7 +459,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindings, isBot: boolean, isMobile: boolean, authToken: string | null, socketId: string) {
+export function joinGame(game: g.Game, params: g.JoinParameters) {
 	if (!game.joinable || game.active.size >= Matchmaking.MaxPlayers) {
 		return null;
 	}
@@ -468,20 +471,30 @@ export function joinGame(game: g.Game, playerName: string, keyBindings: KeyBindi
 		heroId = formatHeroId(game.numPlayers++);
 	}
 
-	game.active.set(socketId, {
-		socketId,
+	game.active.set(params.socketId, {
+		socketId: params.socketId,
 		heroId,
 		partyId: null,
-		name: playerName,
+		name: params.name,
 	});
 	game.bots.delete(heroId);
-	game.playerNames.push(playerName);
+	game.playerNames.push(params.name);
 
-	const userHash = authToken ? auth.getUserHashFromAuthToken(authToken) : null;
-	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken)).then(userId => {
+	const userHash = params.authToken ? auth.getUserHashFromAuthToken(params.authToken) : null;
+	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
 		game.userIds.add(userId);
-		game.socketIds.add(socketId);
-		queueAction(game, { gameId: game.id, heroId, actionType: "join", userId, userHash, playerName, keyBindings, isBot, isMobile });
+		game.socketIds.add(params.socketId);
+		queueAction(game, {
+			gameId: game.id,
+			heroId,
+			actionType: "join",
+			userId,
+			userHash,
+			playerName: params.name,
+			keyBindings: params.keyBindings,
+			isBot: params.isBot,
+			isMobile: params.isMobile,
+		 });
 	});
 
 	// Update counts

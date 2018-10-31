@@ -110,11 +110,11 @@ export interface PartyStatus {
     initialObserver: boolean;
 }
 
-export interface PartyMember extends PartyMemberSettings, PartyMemberStatus {
-    socketId: string;
+export interface PartyMember extends JoinParameters, PartyMemberStatus {
 }
 
-export interface PartyMemberSettings {
+export interface JoinParameters {
+    socketId: string;
     name: string;
     authToken: string;
     keyBindings: KeyBindings;

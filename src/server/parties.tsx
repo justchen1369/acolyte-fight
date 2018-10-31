@@ -64,13 +64,12 @@ export function updatePartyStatus(party: g.Party, status: Partial<g.PartyStatus>
     logger.info(`Party ${party.id} changed to room=${party.roomId} isPrivate=${party.isPrivate} isLocked=${party.isLocked} initialObserver=${party.initialObserver}`);
 }
 
-export function createOrUpdatePartyMember(party: g.Party, socketId: string, newSettings: g.PartyMemberSettings) {
-	let member: g.PartyMember = party.active.get(socketId);
+export function createOrUpdatePartyMember(party: g.Party, newSettings: g.JoinParameters) {
+	let member: g.PartyMember = party.active.get(newSettings.socketId);
 	if (member) {
 		member = { ...member, ...newSettings };
 	} else {
 		member = {
-            socketId,
             ...newSettings,
             isObserver: party.initialObserver,
             isLeader: false,
@@ -78,7 +77,7 @@ export function createOrUpdatePartyMember(party: g.Party, socketId: string, newS
         };
 		logger.info(`Party ${party.id} joined by user ${member.name} [${member.authToken}]]`);
 	}
-	party.active.set(socketId, member);
+	party.active.set(newSettings.socketId, member);
 	party.modified = moment();
 }
 

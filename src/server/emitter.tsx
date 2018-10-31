@@ -195,7 +195,8 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		return;
 	}
 
-	const settings: g.PartyMemberSettings = {
+	const settings: g.JoinParameters = {
+		socketId: socket.id,
 		name: data.playerName,
 		authToken,
 		keyBindings: data.keyBindings,
@@ -204,7 +205,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 	};
 
 	const party = parties.initParty(socket.id, data.roomId);
-	parties.createOrUpdatePartyMember(party, socket.id, settings);
+	parties.createOrUpdatePartyMember(party, settings);
 	parties.updatePartyMemberStatus(party, socket.id, { isLeader: true });
 	logger.info(`Party ${party.id} created by user ${settings.name} [${authToken}]`);
 
@@ -290,14 +291,15 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		}
 	}
 
-	const partyMember: g.PartyMemberSettings = {
+	const partyMember: g.JoinParameters = {
+		socketId: socket.id,
 		authToken,
 		name: data.playerName,
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
 	};
-	parties.createOrUpdatePartyMember(party, socket.id, partyMember);
+	parties.createOrUpdatePartyMember(party, partyMember);
 
 	const result: m.PartyResponse = {
 		success: true,
@@ -417,7 +419,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		if (game) {
 			let heroId = null;
 			if (!data.observe && store.activeGames.has(game.id)) {
-				heroId = games.joinGame(game as g.Game, playerName, data.keyBindings, data.isBot, data.isMobile, authToken, socket.id);
+				heroId = games.joinGame(game as g.Game, {
+					name: playerName,
+					keyBindings: data.keyBindings,
+					isBot: data.isBot,
+					isMobile: data.isMobile,
+					authToken,
+					socketId: socket.id,
+				});
 			}
 
 			emitHero(socket.id, game, heroId);
