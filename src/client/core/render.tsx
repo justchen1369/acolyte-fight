@@ -1235,9 +1235,15 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 		ctx.save();
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
+        ctx.fillStyle = buttonState.color;
 		
-		let color = buttonState.color;
-		renderIconButton(ctx, buttonState.icon && Icons[buttonState.icon], color, 0.6, size);
+        ctx.beginPath();
+        ctx.rect(0, 0, size, size);
+        ctx.fill();
+
+		ctx.clip();
+
+		renderIconOnly(ctx, buttonState.icon && Icons[buttonState.icon], 0.6, size);
 
 		if (buttonState.cooldownText) {
 			// Cooldown
