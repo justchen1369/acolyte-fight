@@ -428,6 +428,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			} else {
 				logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 			}
+			callback({ success: true });
 		} else {
 			logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
 			callback({ success: false, error: `Unable to find game ${data.gameId}` });
