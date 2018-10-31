@@ -409,8 +409,13 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			// This method is always used for public games
 			const partyId: string = null;
 			const isPrivate: boolean = false;
-			const game = games.findNewGame(room, partyId, isPrivate, data.isBot);
-			return game;
+
+			if (data.observe) {
+				return games.findExistingGame(room, partyId, isPrivate, data.isBot);
+			} else {
+				const game = games.findNewGame(room, partyId, isPrivate, data.isBot);
+				return game;
+			}
 		}
 	}).catch(err => {
 		logger.error(`Error joining game: ${err}`);
@@ -439,8 +444,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			}
 			callback({ success: true });
 		} else {
-			logger.info("Game [" + data.gameId + "]: unable to find game for " + playerName);
-			callback({ success: false, error: `Unable to find game ${data.gameId}` });
+			logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
+			callback({ success: false, error: `Unable to find game` });
 		}
 	});
 }
@@ -542,6 +547,8 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 		return;
 	}
 
+	const live = !!(game as g.Game).active && !(game as g.Game).winTick;
+
 	socket.join(game.id);
 
 	const publicCategory = categories.publicCategory();
@@ -555,6 +562,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 		room: game.roomId,
 		mod: game.mod,
 		allowBots: game.allowBots,
+		live,
 		history: game.history,
 		numPlayersPublic,
 		numPlayersInCategory,

@@ -189,6 +189,7 @@ export interface HeroMsg {
     mod: Object;
     allowBots: boolean;
 
+    live: boolean;
     history: TickMsg[];
     numPlayersPublic: number;
     numPlayersInCategory: number;

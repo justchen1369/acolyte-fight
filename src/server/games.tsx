@@ -143,6 +143,32 @@ export function findNewGame(room: g.Room | null, partyId: string | null, isPriva
 	return game;
 }
 
+export function findExistingGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
+	const roomId = room ? room.id : null;
+	const category = categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots);
+	const store = getStore();
+
+	const candidates = [...store.activeGames.values()].filter(x => x.category === category);
+	if (candidates.length === 0) {
+		return null;
+	}
+
+	return _.maxBy(candidates, x => watchPriority(x));
+}
+
+function watchPriority(game: g.Game): number {
+	if (game.winTick) {
+		// Discourage watching a game which is not live
+		return game.numPlayers;
+	} else if (!game.joinable) {
+		// Encourage watching a game in-progress
+		return 1000 + game.numPlayers;
+	} else {
+		// Watch a game that is only starting
+		return 100 + game.numPlayers;
+	}
+}
+
 export function calculateRoomStats(category: string): number {
 	return getStore().playerCounts[category] || 0;
 }

@@ -20,13 +20,18 @@ let tickEpoch = Date.now();
 let tickCounter = 0;
 sockets.listeners.onTickMsg = onTickMsg;
 
-export function reset(history: m.TickMsg[]) {
-	// Skip to start of game
-	tickQueue = [];
-	incomingQueue = [...history];
+export function reset(history: m.TickMsg[], live: boolean) {
+	if (live) {
+		tickQueue = [...history];
+		incomingQueue = [];
+	} else {
+		// Skip to start of game
+		tickQueue = [];
+		incomingQueue = [...history];
 
-	while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
-		tickQueue.push(incomingQueue.shift());
+		while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
+			tickQueue.push(incomingQueue.shift());
+		}
 	}
 }
 

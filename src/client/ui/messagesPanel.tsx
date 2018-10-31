@@ -146,6 +146,7 @@ class MessagesPanel extends React.Component<Props, State> {
                 {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
             </div>
             {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
+            {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
         </div>
     }
 
@@ -153,6 +154,11 @@ class MessagesPanel extends React.Component<Props, State> {
         ev.preventDefault();
         matches.leaveCurrentGame(true);
         pages.changePage("regions");
+    }
+
+    private onWatchLiveClick(ev: React.MouseEvent) {
+        ev.preventDefault();
+        matches.watchLiveGame();
     }
 
     private renderHelp(key: string) {
@@ -248,12 +254,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderWinAction() {
-        const observing = !this.props.myHeroId;
-        if (observing) {
-            return <span className="btn new-game-btn" onClick={() => matches.leaveCurrentGame()}>Exit</span>;
-        } else {
-            return <PlayButton again={true} />;
-        }
+        return <PlayButton again={!!this.props.myHeroId} />;
     }
     
     private renderDead(key: string, spectatingGameId: string) {

@@ -15,7 +15,9 @@ import { socket } from './sockets';
 
 sockets.listeners.onHeroMsg = onHeroMsg;
 
-export function joinNewGame(observeGameId?: string) {
+export function joinNewGame(observeGameId?: string, observe?: boolean) {
+	observe = observe || !!observeGameId;
+
 	const store = StoreProvider.getState();
 	if (store.socketId) {
 		leaveCurrentGame(false);
@@ -27,7 +29,7 @@ export function joinNewGame(observeGameId?: string) {
 			room: store.room.id,
 			isBot: ai.playingAsAI(store) && !observeGameId,
 			isMobile,
-			observe: !!observeGameId,
+			observe,
 		};
 		socket.emit('join', msg, (response: m.JoinResponseMsg) => {
 			if (!response.success) {
@@ -40,10 +42,15 @@ export function joinNewGame(observeGameId?: string) {
 		if (observeGameId) {
 			window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
 		} else {
-			window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash: "join" });
+			const hash = observe ? "watch" : "join";
+			window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
 			window.location.reload(); // to get the hash respected
 		}
 	}
+}
+
+export function watchLiveGame() {
+	joinNewGame(null, true);
 }
 
 export function addBotToCurrentGame() {
@@ -110,7 +117,7 @@ function onHeroMsg(buffer: ArrayBuffer) {
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;
 
-	ticker.reset(data.history);
+	ticker.reset(data.history, data.live);
 
 	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod, data.allowBots);
 
