@@ -19,6 +19,7 @@ interface Props {
     myGameId: string;
     myHeroId: string;
     isDead: boolean;
+    isFinished: boolean;
     buttonBar: w.ButtonConfig;
     options: s.GameOptions;
     exitable: boolean;
@@ -34,6 +35,7 @@ function stateToProps(state: s.State): Props {
         myGameId: state.world.ui.myGameId,
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
+        isFinished: state.world.activePlayers.size === 0,
         buttonBar: state.world.ui.buttonBar,
         options: state.options,
         exitable: worldInterruptible(state.world),
@@ -75,6 +77,9 @@ class MessagesPanel extends React.Component<Props, State> {
         let actionRow: JSX.Element = this.renderHelp("help");
         if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
             actionRow = this.renderDead("dead", this.props.myGameId);
+            finished = true;
+        } else if (this.props.isFinished) {
+            actionRow = this.renderFinished("finished");
             finished = true;
         }
 
@@ -248,12 +253,12 @@ class MessagesPanel extends React.Component<Props, State> {
             <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)})</div>
             <div className="award-row">Most kills: <PlayerName player={notification.mostKills} myHeroId={this.props.myHeroId} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
-                {this.renderWinAction()}
+                {this.renderAgainButton()}
             </div>
         </div>;
     }
 
-    private renderWinAction() {
+    private renderAgainButton() {
         return <PlayButton again={!!this.props.myHeroId} />;
     }
     
@@ -264,7 +269,18 @@ class MessagesPanel extends React.Component<Props, State> {
                 <div style={{ marginBottom: 12 }}>
                     <b><a href="#" onClick={() => this.setState({ spectatingGameId })}>Continue Watching</a></b> or
                 </div>
-                <div className="btn new-game-btn" onClick={() => matches.joinNewGame()}>Play Again</div>
+                <div>
+                    {this.renderAgainButton()}
+                </div>
+            </div>
+        </div>;
+    }
+
+    private renderFinished(key: string) {
+        return <div key={key} className="winner">
+            <div className="winner-row">Game finished.</div>
+            <div className="action-row">
+                {this.renderAgainButton()}
             </div>
         </div>;
     }

@@ -381,8 +381,6 @@ export function leaveGame(game: g.Game, socketId: string) {
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 
-	finishGameIfNecessary(game);
-
 	// Update counts
 	{
 		// Note, this can be a little bit wrong if a player leaves a game that was not being counted due to inactivity - it gets fixed up every 32 milliseconds so we don't care
@@ -442,19 +440,18 @@ function finishGameIfNecessary(game: g.Game) {
 }
 
 function gameTick(game: g.Game): boolean {
-	if (finishGameIfNecessary(game)) {
-		return false;
-	}
-
-	if (isGameRunning(game) || game.actions.size > 0) {
+	let running = isGameRunning(game) || game.actions.size > 0;
+	if (running) {
 		for (let i = 0; i < TicksPerTurn; ++i) {
 			gameTurn(game);
 		}
-
-		return true;
-	} else {
-		return false;
 	}
+
+	if (finishGameIfNecessary(game)) {
+		running = false;
+	}
+
+	return running;
 }
 
 function gameTurn(game: g.Game) {
