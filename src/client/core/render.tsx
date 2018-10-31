@@ -1111,7 +1111,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options
 			const startAngle = nextAngle;
 			const endAngle = startAngle + arcWidth;
 
-			let hitSector = { startAngle, endAngle };
+			let hitSector = { startAngle, endAngle, weight: key.weight || 1.0 };
 			if (options.wheelOnRight) {
 				hitSector = invertSector(hitSector);
 			}
@@ -1146,6 +1146,7 @@ function invertSector(input: w.HitSector): w.HitSector {
 	return {
 		startAngle: Math.PI - input.endAngle,
 		endAngle: Math.PI - input.startAngle,
+		weight: input.weight,
 	};
 }
 
@@ -1266,6 +1267,8 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 }
 
 function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState) {
+	outerRadius = innerRadius + (0.5 + 0.5 * sector.weight) * (outerRadius - innerRadius);
+
 	ctx.save();
 
 	// Render button

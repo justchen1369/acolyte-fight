@@ -119,6 +119,7 @@ export interface ButtonWheelConfig {
 export interface HitSector {
 	startAngle: number;
 	endAngle: number;
+	weight: number;
 }
 
 export interface Player {
