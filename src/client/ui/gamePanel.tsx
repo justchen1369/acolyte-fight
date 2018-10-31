@@ -13,6 +13,8 @@ import SocialBar from './socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
 
+import { isMobile } from '../core/userAgent';
+
 interface Props {
     party: s.PartyState;
     connected: boolean;
@@ -47,7 +49,7 @@ class GamePanel extends React.Component<Props, State> {
                 {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home <span className="return-home-subtext">(spell selection, replays and more)</span>
                 </a>}
-                {allowExit && <SocialBar />}
+                {!isMobile && allowExit && <SocialBar />}
                 <UrlListener />
             </div>
         );
