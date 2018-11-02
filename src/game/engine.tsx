@@ -1436,24 +1436,36 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	let bestScore: w.HeroScore = null;
-	world.scores.forEach(score => {
-		if (!(score.deathTick >= 0)) {
-			++numAlive;
+	const scores = world.scores.valueSeq().toArray();
+	scores.sort((a, b) => {
+		const deathA = a.deathTick || Infinity;
+		const deathB = b.deathTick || Infinity;
+		if (deathA > deathB) {
+			return -1;
+		} else if (deathA < deathB) {
+			return 1;
+		} else if (a.kills > b.kills) {
+			return -1;
+		} else if (a.kills < b.kills) {
+			return 1;
+		} else if (a.damage > b.damage) {
+			return -1;
+		} else if (a.damage < b.damage) {
+			return 1;
+		} else if (a.assists > b.assists) {
+			return -1;
+		} else if (a.assists < b.assists) {
+			return 1;
 		}
-		if (!bestScore) {
-			bestScore = score;
-			return;
-		}
-
-		const myDeathTick = score.deathTick || Infinity;
-		const bestDeathTick = bestScore.deathTick || Infinity;
-		if (myDeathTick > bestDeathTick) {
-			bestScore = score;
-		}
+		return 0;
 	});
+
+	let bestScore: w.HeroScore = scores[0];
 	if (!bestScore) {
 		return;
+	}
+	for (let i = 0; i < scores.length; ++i) {
+		scores[i].rank = i + 1;
 	}
 
 	let mostDamage: w.HeroScore = null;
@@ -1819,5 +1831,6 @@ export function initScore(heroId: string): w.HeroScore {
 		assists: 0,
 		damage: 0,
 		deathTick: null,
+		rank: null,
 	};
 }

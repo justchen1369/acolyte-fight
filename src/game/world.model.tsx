@@ -65,6 +65,7 @@ export interface HeroScore {
 	damage: number;
 
 	deathTick: number | null;
+	rank: number | null;
 }
 
 export interface UIState {

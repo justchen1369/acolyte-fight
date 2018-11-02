@@ -20,5 +20,7 @@ export interface PlayerStats {
     name: string;
     kills: number;
     damage: number;
+    rank: number;
+    ticks: number;
     ratingDelta?: number;
 }

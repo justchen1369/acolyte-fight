@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import * as d from '../stats.model';
@@ -68,6 +69,8 @@ function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
         name: playerStats.name,
         kills: playerStats.kills,
         damage: playerStats.damage,
+        ticks: playerStats.ticks,
+        rank: playerStats.rank,
     };
 }
 
@@ -81,6 +84,8 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             name: p.name,
             damage: p.damage,
             kills: p.kills,
+            rank: p.rank,
+            ticks: p.ticks,
             ratingDelta: p.ratingDelta,
         };
 
@@ -128,18 +133,19 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     let numHumans = 0;
     let numAI = 0;
 
-    const players: d.PlayerStatsLookup = {};
+    let players = new Array<d.PlayerStats>();
     world.scores.forEach((score, heroId) => {
         const player = world.players.get(heroId);
         if (player) {
             if (player.userHash) {
                 ++numHumans;
-                players[player.userHash] = playerStatsFromScore(player, score);
+                players.push(playerStatsFromScore(player, score));
             } else {
                 ++numAI;
             }
         }
     });
+    players = _.orderBy(players, p => p.rank);
 
     const selfPlayer = world.players.get(world.ui.myHeroId);
     const winningPlayer = world.players.get(world.winner);
@@ -171,7 +177,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         partyId: world.ui.myPartyId,
         category,
         timestamp: world.ui.createTime.toISOString(),
-        players,
+        players: _.keyBy(players, p => p.userHash),
         self: selfPlayer.userHash,
         winner: winningPlayer ? winningPlayer.userHash : undefined,
         lengthSeconds: world.winTick >= 0 ? Math.round(world.winTick / TicksPerSecond) : undefined,
@@ -187,5 +193,7 @@ function playerStatsFromScore(player: w.Player, score: w.HeroScore): d.PlayerSta
         name: player.name,
         kills: score.kills,
         damage: Math.round(score.damage),
+        ticks: score.deathTick,
+        rank: score.rank,
     };
 }

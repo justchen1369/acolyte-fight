@@ -2,6 +2,7 @@ import _ from 'lodash';
 import glicko from 'glicko2';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
+import * as ts from 'ts-trueskill';
 import * as Firestore from '@google-cloud/firestore';
 import * as categories from './categories';
 import * as constants from '../game/constants';
@@ -19,6 +20,9 @@ import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
 
+const TrueSkill = new ts.TrueSkill();
+const GlickoMultiplier = 200 / TrueSkill.beta; // In Glicko the beta (difference required for 76% win probability) is 200
+
 interface RatingDeltas {
     [userId: string]: number;
 }
@@ -28,13 +32,6 @@ interface LeaderboardCacheItem {
     expiry: number; // unix timestamp
 }
 
-const glickoSettings: glicko.Settings = {
-    tau: 0.2,
-    rating: constants.Placements.InitialRating,
-    rd: constants.Placements.InitialRd,
-    vol: 0.06,
-};
-
 const leaderboardCache = new Map<string, LeaderboardCacheItem>();
 
 function initialRating(): g.UserRating {
@@ -43,8 +40,8 @@ function initialRating(): g.UserRating {
         killsPerGame: 0,
         damagePerGame: 0,
         winRate: 0,
-        rating: glickoSettings.rating,
-        rd: glickoSettings.rd,
+        rating: constants.Placements.InitialRating,
+        rd: constants.Placements.InitialRd,
     };
 }
 
@@ -76,6 +73,8 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
         name: p.name,
         damage: p.damage,
         kills: p.kills,
+        ticks: p.ticks,
+        rank: p.rank,
     };
 
     if (p.userId) {
@@ -117,6 +116,8 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         name: player.name,
         damage: player.damage,
         kills: player.kills,
+        ticks: player.ticks || 0, // Might not be present in old data
+        rank: player.rank || 0, // Might not be present in old data
         ratingDelta: player.ratingDelta,
     };
 }
@@ -281,7 +282,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
         }
 
         // Calculate changes
-        calculateNewGlickoRatings(userRatings, winningPlayer.userId);
+        calculateNewGlickoRatings(userRatings, knownPlayers);
 
         for (const player of knownPlayers) {
             const userRating = userRatings.get(player.userId);
@@ -334,28 +335,34 @@ function unixDateFromTimestamp(unixTimestamp: number): number {
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
-function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, winningUserId: string) {
-    const glicko2 = new glicko.Glicko2(glickoSettings);
+function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
+    // Create initial rankings
+    const userIds = new Array<string>();
+    const initialRatings = new Array<ts.Rating>();
+    const ranks = new Array<number>();
+    for (const player of players) {
+        const rating = allRatings.get(player.userId);
+        if (!rating) {
+            continue;
+        }
 
-    // Create players
-    const allPlayers = new Map<string, glicko.Player>();
-    allRatings.forEach((rating, userId) => {
-        allPlayers.set(userId, glicko2.makePlayer(rating.rating, rating.rd));
-    });
+        userIds.push(player.userId);
+        initialRatings.push(TrueSkill.createRating(rating.rating / GlickoMultiplier, rating.rd / GlickoMultiplier));
+        ranks.push(player.rank);
+    }
 
-    // Update ratings
-    const race = glicko2.makeRace([
-        [allPlayers.get(winningUserId)], // Winner
-        [...allPlayers.keys()].filter(userId => userId !== winningUserId).map(userId => allPlayers.get(userId)),
-    ]);
-    glicko2.updateRatings(race);
+    // Update rankings
+    const teams = initialRatings.map(r => [r]);
+    const finalRatings: ts.Rating[][] = TrueSkill.rate(teams, ranks);
 
     // Save results
-    allPlayers.forEach((player, userId) => {
+    for (let i = 0; i < userIds.length; ++i) {
+        const userId = userIds[i];
+        const finalRating = finalRatings[i][0];
         const userRating = allRatings.get(userId);
-        userRating.rating = player.getRating();
-        userRating.rd = player.getRd();
-    });
+        userRating.rating = finalRating.mu * GlickoMultiplier;
+        userRating.rd = finalRating.sigma * GlickoMultiplier;
+    }
 }
 
 function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {

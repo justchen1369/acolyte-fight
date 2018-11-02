@@ -32,6 +32,7 @@ export namespace Placements {
 	export const VerificationGames = 10;
 	export const InitialRating = 1700;
 	export const InitialRd = 350;
+	export const Tau = 0.2;
 
 	export const Grandmaster = 98;
 	export const Master = 90;
