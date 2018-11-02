@@ -51,7 +51,11 @@ function reducer(state: s.State, action: s.Action): s.State {
             },
         };
     } else if (action.type === "updateUserId") {
-        return { ...state, userId: action.userId, loggedIn: action.loggedIn };
+        let newState = { ...state, userId: action.userId, loggedIn: action.loggedIn };
+        if (action.loggedIn) {
+            newState.isNewPlayer = false;
+        }
+        return newState;
     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {

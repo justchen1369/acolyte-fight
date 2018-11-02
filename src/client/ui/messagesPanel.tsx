@@ -15,6 +15,8 @@ import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
 
 interface Props {
+    userId: string;
+    loggedIn: boolean;
     isNewPlayer: boolean;
     myGameId: string;
     myHeroId: string;
@@ -31,6 +33,8 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        userId: state.userId,
+        loggedIn: state.loggedIn,
         isNewPlayer: state.isNewPlayer,
         myGameId: state.world.ui.myGameId,
         myHeroId: state.world.ui.myHeroId,
@@ -73,6 +77,7 @@ class MessagesPanel extends React.Component<Props, State> {
         }
 
         let finished = false;
+        let winner = false;
 
         let actionRow: JSX.Element = this.renderHelp("help");
         if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
@@ -98,16 +103,24 @@ class MessagesPanel extends React.Component<Props, State> {
             if (item.notification.type === "win") {
                 actionRow = row;
                 finished = true;
+                winner = item.notification.winner.heroId === this.props.myHeroId;
             } else {
                 rows.push(row);
             }
         });
 
         if (finished) {
-            rows.push(<div key="advert-row" className="row advert-row">
-                <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
-                <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>
-            </div>);
+            if (!this.props.loggedIn && this.props.userId && winner) {
+                rows.push(<div key="advert-row" className="row advert-row">
+                    <span className="label" style={{ marginRight: 5 }}>Want to see your win rate and ranking?</span>
+                    <a href="login" title="Login with Discord"><span className="label">Login with Discord</span><i className="fab fa-discord" /></a>
+                </div>);
+            } else {
+                rows.push(<div key="advert-row" className="row advert-row">
+                    <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
+                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>
+                </div>);
+            }
         }
 
         if (actionRow) {
