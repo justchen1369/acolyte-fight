@@ -318,7 +318,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
             const loggedIn = loggedInUsers.has(player.userId);
             const initialRating = initialRatings.get(player.userId);
             const userRating = userRatings.get(player.userId);
-            if (loggedIn && initialRating.numGames >= constants.Placements.MinGames) {
+            if (initialRating.numGames >= constants.Placements.MinGames) {
                 ratingDeltas[player.userId] = calculateLowerBound(userRating.rating, userRating.rd) - calculateLowerBound(initialRating.rating, initialRating.rd);
             }
         }
