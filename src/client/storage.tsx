@@ -129,6 +129,10 @@ export async function incrementNumGames() {
     await settingsStorage.setItem(SettingsKeys.NumGames, numGames + 1);
 }
 
+export async function resetNumGames() {
+    await settingsStorage.setItem(SettingsKeys.NumGames, 0);
+}
+
 function migrateGame(game: d.GameStats): d.GameStats {
     return {
         ...game,

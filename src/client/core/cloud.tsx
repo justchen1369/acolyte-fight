@@ -133,4 +133,5 @@ export async function downloadGameStats(): Promise<void> {
 export async function logout(): Promise<void> {
     await fetch(`${base}/api/logout`, { credentials: "same-origin" });
     StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
+    storage.resetNumGames();
 }
