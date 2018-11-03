@@ -110,17 +110,10 @@ class MessagesPanel extends React.Component<Props, State> {
         });
 
         if (finished) {
-            if (!this.props.loggedIn && this.props.userId && winner) {
-                rows.push(<div key="advert-row" className="row advert-row">
-                    <span className="label" style={{ marginRight: 5 }}>Want to see your win rate and ranking?</span>
-                    <a href="login" title="Login with Discord"><span className="label">Login with Discord</span><i className="fab fa-discord" /></a>
-                </div>);
-            } else {
-                rows.push(<div key="advert-row" className="row advert-row">
-                    <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
-                    <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>
-                </div>);
-            }
+            rows.push(<div key="advert-row" className="row advert-row">
+                <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
+                <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>
+            </div>);
         }
 
         if (actionRow) {
@@ -145,6 +138,7 @@ class MessagesPanel extends React.Component<Props, State> {
             case "leave": return this.renderLeaveNotification(key, notification);
             case "kill": return this.renderKillNotification(key, notification);
             case "win": return this.renderWinNotification(key, notification);
+            case "ratingAdjustment": return this.renderRatingAdjustmentNotification(key, notification);
             default: return null; // Ignore this notification
         }
     }
@@ -269,6 +263,33 @@ class MessagesPanel extends React.Component<Props, State> {
                 {this.renderAgainButton()}
             </div>
         </div>;
+    }
+
+    private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
+        if (notification.gameId === this.props.myGameId) {
+            return <div key={key} className="row rating-notification">
+                <span>Your rating has changed: {this.renderRatingAdjustment(notification.ratingDelta)}. </span>
+                {this.props.loggedIn && <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to see more.</span>}
+                {!this.props.loggedIn && <span><a href="login">Login</a> to see more.</span>}
+            </div>
+        } else {
+            return null;
+        }
+    }
+
+    private onProfileClicked(ev: React.MouseEvent) {
+        ev.preventDefault();
+        matches.leaveCurrentGame();
+        pages.changePage("profile", this.props.userId);
+    }
+
+
+    private renderRatingAdjustment(ratingDelta: number) {
+        if (ratingDelta >= 0) {
+            return <span className="rating rating-increase">+{ratingDelta.toFixed(0)}</span>
+        } else {
+            return <span className="rating rating-decrease">{ratingDelta.toFixed(0)}</span>
+        }
     }
 
     private renderAgainButton() {

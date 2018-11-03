@@ -152,7 +152,8 @@ export type Notification =
 	| CloseGameNotification
 	| WinNotification
 	| DisconnectedNotification
-	| ReplayNotFoundNotification;
+	| ReplayNotFoundNotification
+	| RatingAdjustmentNotification
 
 export interface HelpNotification {
 	type: "help";
@@ -218,6 +219,12 @@ export interface DisconnectedNotification {
 
 export interface ReplayNotFoundNotification {
 	type: "replayNotFound";
+}
+
+export interface RatingAdjustmentNotification {
+	type: "ratingAdjustment";
+	gameId: string;
+	ratingDelta: number;
 }
 
 export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting;

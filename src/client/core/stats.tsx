@@ -33,8 +33,21 @@ function onNotification(notifs: w.Notification[]) {
 async function onGameMsg(buffer: ArrayBuffer) {
     const gameStatsMsg: m.GameStatsMsg = msgpack.decode(new Uint8Array(buffer));
     console.log("Received final game results", gameStatsMsg);
+
     const state = StoreProvider.getState();
     const gameStats = messageToGameStats(gameStatsMsg, state.userId);
+
+    // Notify
+    const self = gameStats.players[gameStats.self];
+    if (self && self.ratingDelta) {
+        notifications.notify({
+            type: "ratingAdjustment",
+            gameId: gameStats.id,
+            ratingDelta: self.ratingDelta,
+        });
+    }
+
+    // Add to replays list
     await storage.saveGameStats(gameStats);
     StoreProvider.dispatch({ type: "updateGameStats", allGameStats: [gameStats] });
 }

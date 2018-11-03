@@ -515,6 +515,10 @@ a:hover, a:active {
     font-weight: bold;
 }
 
+#messages-panel .rating {
+    font-weight: bold;
+}
+
 #messages-panel .help-box {
     color: white;
     margin-top: 30px;
@@ -1037,11 +1041,11 @@ h2 {
     font-weight: bold;
 }
 
-.game-list .rating-increase {
+.rating-increase {
     color: #22ee88;
 }
 
-.game-list .rating-decrease {
+.rating-decrease {
     color: #ff4466;
 }
 

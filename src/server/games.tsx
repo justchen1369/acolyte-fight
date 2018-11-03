@@ -257,6 +257,7 @@ export function initGame(room: g.Room | null, partyId: string | null, isPrivate:
 		activeTick: 0,
 		joinable: true,
 		closeTick: Matchmaking.MaxHistoryLength,
+		ranked: false,
 		actions: new Map<string, m.ActionMsg>(),
 		messages: new Array<m.TextMsg>(),
 		history: [],
@@ -365,6 +366,7 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 	if (game.scores.size >= game.active.size) {
 		// Everyone has reported that the game is finished
 		game.winTick = game.tick;
+		rankGameIfNecessary(game);
 	}
 }
 
@@ -414,23 +416,30 @@ function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string)
 	});
 }
 
-function finishGameIfNecessary(game: g.Game) {
-	if (game.winTick && game.tick >= game.winTick + constants.MaxEndTicks) {
-		// Forcibly remove everyone from the game
-		game.active.clear();
+function rankGameIfNecessary(game: g.Game) {
+	if (!game.winTick) {
+		return;
 	}
 
+	if (game.ranked) {
+		return;
+	}
+	game.ranked = true;
+
+	const result = results.calculateResult(game);
+	statsStorage.saveGame(game, result).then(newResult => {
+		for (const listener of finishedGameListeners) {
+			listener(game, newResult || result);
+		}
+	});
+}
+
+function finishGameIfNecessary(game: g.Game) {
 	if (game.active.size === 0) {
 		game.bots.clear();
 		getStore().activeGames.delete(game.id);
 
-		const result = results.calculateResult(game);
 		gameStorage.saveGame(game);
-		statsStorage.saveGame(game, result).then(newResult => {
-			for (const listener of finishedGameListeners) {
-				listener(game, newResult || result);
-			}
-		});
 
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 		return true;
