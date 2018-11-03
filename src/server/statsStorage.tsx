@@ -285,7 +285,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
 
         for (const player of knownPlayers) {
             const userRating = userRatings.get(player.userId);
-            const isWinner = player.rank === 1;
+            const isWinner = player.rank === constants.Placements.Rank1;
             calculateNewStats(userRating, player, isWinner);
         }
 

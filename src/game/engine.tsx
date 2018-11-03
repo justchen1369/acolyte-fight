@@ -1465,7 +1465,7 @@ function notifyWin(world: w.World) {
 		return;
 	}
 	for (let i = 0; i < scores.length; ++i) {
-		scores[i].rank = i + 1;
+		scores[i].rank = i + constants.Placements.Rank1;
 	}
 
 	let mostDamage: w.HeroScore = null;
