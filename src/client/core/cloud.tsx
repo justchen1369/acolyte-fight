@@ -3,10 +3,36 @@ import msgpack from 'msgpack-lite';
 import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
+import * as w from '../../game/world.model';
+import * as notifications from './notifications';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { base } from '../url';
+
+export function attachListener() {
+    notifications.attachListener(notifs => onNotification(notifs));
+}
+
+function onNotification(notifs: w.Notification[]) {
+    // Save the world if it has been won
+    if (notifs.some(n => n.type === "win")) {
+        loginAnonymouslyIfNecessary(); // Don't care that this is async
+    }
+}
+
+export async function loginAnonymouslyIfNecessary(): Promise<void> {
+    const state = StoreProvider.getState();
+    if (state.userId) {
+        // Already logged in
+        return;
+    }
+
+    const numGames = await storage.getNumGames();
+    if (numGames >= constants.Placements.VerificationGames) {
+        downloadSettings();
+    }
+}
 
 export async function downloadSettings(): Promise<void> {
     const numGames = await storage.getNumGames();
