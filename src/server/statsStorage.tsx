@@ -255,8 +255,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
 
     const category = gameStats.category;
     const knownPlayers = gameStats.players.filter(p => !!p.userId);
-    const winningPlayer = knownPlayers.find(p => p.userHash === gameStats.winner);
-    if (!(knownPlayers.length >= 2 && winningPlayer)) {
+    if (!(knownPlayers.length >= 2)) {
         // Only rank known players
         return {};
     }
@@ -286,7 +285,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
 
         for (const player of knownPlayers) {
             const userRating = userRatings.get(player.userId);
-            const isWinner = winningPlayer === player;
+            const isWinner = player.rank === 1;
             calculateNewStats(userRating, player, isWinner);
         }
 
