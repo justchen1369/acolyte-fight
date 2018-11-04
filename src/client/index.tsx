@@ -26,6 +26,7 @@ const socket = socketLib(socketUrl);
 let alreadyConnected = false;
 
 stats.attachListener();
+cloud.attachListener();
 initialize();
 rerender();
 

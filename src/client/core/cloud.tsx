@@ -15,7 +15,6 @@ export function attachListener() {
 }
 
 function onNotification(notifs: w.Notification[]) {
-    // Save the world if it has been won
     if (notifs.some(n => n.type === "win")) {
         loginAnonymouslyIfNecessary(); // Don't care that this is async
     }
