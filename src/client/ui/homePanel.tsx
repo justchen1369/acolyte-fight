@@ -62,7 +62,7 @@ class HomePanel extends React.Component<Props, State> {
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                {!isMobile && <div className="more-io-games"><a href="">More .io Games</a></div>}
+                <div className="more-io-games"><a href="https://iogames.space">More .io Games</a></div>
                 <SocialBar />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>
