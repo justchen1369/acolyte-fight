@@ -13,6 +13,7 @@ import SpellConfig from './spellConfig';
 import Link from './link';
 import NavBar from './navbar';
 import PartyList from './partyList';
+import { isMobile } from '../core/userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -61,6 +62,7 @@ class HomePanel extends React.Component<Props, State> {
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
+                {!isMobile && <div className="more-io-games"><a href="">More .io Games</a></div>}
                 <SocialBar />
             </div>
             <div className="page" ref={(elem) => this.belowFoldElem = elem}>
