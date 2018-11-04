@@ -52,6 +52,7 @@ attachToSocket(io);
 
 app.get('/ping', (req, res) => res.send("OK"));
 
+app.use('/static/fontawesome-pro', express.static('./node_modules/@fortawesome/fontawesome-pro'));
 app.use('/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
 app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));

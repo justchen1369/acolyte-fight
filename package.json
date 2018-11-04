@@ -82,6 +82,7 @@
     "winston": "^3.0.0"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-pro": "^5.5.0",
     "uglifyjs-webpack-plugin": "^1.2.7"
   }
 }
