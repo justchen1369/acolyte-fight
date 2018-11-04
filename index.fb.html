@@ -1,0 +1,74 @@
+<html>
+	<head>
+		<title>Acolyte Fight!</title>
+		<link rel="apple-touch-icon" sizes="180x180" href="static/icons/favicon-180.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="static/icons/favicon-32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="static/icons/favicon-16.png">
+		<meta name="theme-color" content="#00ccff">
+		<link rel="stylesheet" href="static/main.css"></link>
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+		<link rel="stylesheet" href="static/rpg-awesome/css/rpg-awesome.min.css">
+		<link rel="manifest" href="manifest.webmanifest" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<style>
+			html, body {
+				overflow: hidden;
+				padding: 0;
+				margin: 0;
+			}
+
+			canvas {
+				background: black;
+			}
+
+			canvas.center {
+				margin: auto;
+				padding: 0;
+				display: block;
+			}
+		</style>
+
+		<!-- Global site tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-122657176-1"></script>
+		<script>
+			window.gaTrackingId = 'UA-122657176-1';
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', window.gaTrackingId);
+		</script>
+
+		<script crossorigin src="https://unpkg.com/react@16/umd/react.production.min.js"></script>
+		<script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.production.min.js"></script>
+	</head>
+	<body class="game">
+		<script src="https://connect.facebook.net/en_US/fbinstant.6.2.js"></script>
+		<script>
+			window.baseUrl = "https://acolytefight.io";
+		</script>
+
+        <script>
+            FBInstant.initializeAsync().then(function() {        
+                FBInstant.setLoadingProgress(0);
+                FBInstant.setLoadingProgress(100);
+                return FBInstant.startGameAsync();
+            }).then(function() {
+                console.log("FBInstant game started");
+                // Retrieving context and player information can only be done
+                // once startGameAsync() resolves
+                var contextId = FBInstant.context.getID();
+                var contextType = FBInstant.context.getType();
+
+                var playerName = FBInstant.player.getName();
+                var playerPic = FBInstant.player.getPhoto();
+                var playerId = FBInstant.player.getID();
+            });
+        </script>
+
+		<div id="root"></div>
+		<script id="code" src="dist/client.js"></script>
+
+	</body>
+</html>
