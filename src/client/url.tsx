@@ -14,6 +14,9 @@ export function parseLocation(location: Location): s.PathElements {
     if (location.pathname) {
         const elems = location.pathname.split("/");
         page = elems[1] || "";
+        if (page === "index.html" || page === "instant-bundle") {
+            page = "";
+        }
     }
     if (location.search) {
         const params = queryString.parse(location.search);
