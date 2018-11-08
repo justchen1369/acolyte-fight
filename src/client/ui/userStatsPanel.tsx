@@ -257,6 +257,12 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderNoRating(profile: m.GetProfileResponse) {
         return <div>
             <h1>{profile.name}</h1>
+            {this.props.category === m.GameCategory.PvP && <div className="stats-card-row">
+                <div className="stats-card">
+                    <div className="label">Placement matches remaining</div>
+                    <div className="value">{constants.Placements.MinGames}</div>
+                </div>
+            </div>}
         </div>
     }
 
