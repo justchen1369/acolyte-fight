@@ -13,7 +13,7 @@ import * as stats from '../core/stats';
 import * as url from '../url';
 import GameList from './gameList';
 
-const MaxReplaysToDisplay = 100;
+const MaxReplaysToDisplay = 50;
 
 interface OwnProps {
     category: string;
