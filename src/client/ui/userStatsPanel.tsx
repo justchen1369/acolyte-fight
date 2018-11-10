@@ -151,26 +151,30 @@ class UserStatsPanel extends React.Component<Props, State> {
 
     private async loadDataAsync(profileId: string) {
         if (profileId !== this.state.profileId) {
-            let profile: m.GetProfileResponse = null;
-            if (this.props.myProfile && this.props.myProfile.userId === profileId) {
-                profile = this.props.myProfile;
-            }
-            this.setState({ profileId, profile, error: null });
-            try {
-                const profile = await retrieveUserStatsAsync(profileId);
-                if (profile.userId === this.state.profileId) {
-                    this.setState({ profile });
+            if (profileId) {
+                let profile: m.GetProfileResponse = null;
+                if (this.props.myProfile && this.props.myProfile.userId === profileId) {
+                    profile = this.props.myProfile;
                 }
+                this.setState({ profileId, profile, error: null });
+                try {
+                    const profile = await retrieveUserStatsAsync(profileId);
+                    if (profile.userId === this.state.profileId) {
+                        this.setState({ profile });
+                    }
 
-                if (this.props.myUserId === this.props.profileId) {
-                    const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
-                    this.setState({ pointsToNextLeague });
+                    if (this.props.myUserId === this.props.profileId) {
+                        const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
+                        this.setState({ pointsToNextLeague });
 
-                    StoreProvider.dispatch({ type: "updateProfile", profile });
+                        StoreProvider.dispatch({ type: "updateProfile", profile });
+                    }
+                } catch(error) {
+                    console.error("UserStatsPanel error", error);
+                    this.setState({ error: `${error}` });
                 }
-            } catch(error) {
-                console.error("UserStatsPanel error", error);
-                this.setState({ error: `${error}` });
+            } else {
+                this.setState({ profileId, profile: null, error: null });
             }
         }
     }
@@ -178,6 +182,8 @@ class UserStatsPanel extends React.Component<Props, State> {
     render() {
         if (this.state.error) {
             return this.renderError();
+        } else if (!this.state.profileId) {
+            return this.renderNoProfile();
         } else if (!this.state.profile) {
             return this.renderLoading();
         }
@@ -210,7 +216,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
-        const isMe = this.props.loggedIn && profile.userId === this.props.myUserId;
+        const isMe = profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = this.getLeagueName(rating.percentile);
         const pointsUntilNextLeague = this.state.pointsToNextLeague[this.props.category];
@@ -266,6 +272,13 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{constants.Placements.MinGames}</div>
                 </div>
             </div>}
+        </div>
+    }
+
+    private renderNoProfile() {
+        return <div>
+            <h1>{this.props.playerName}</h1>
+            {!this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to receive your rating and stats</p>}
         </div>
     }
 

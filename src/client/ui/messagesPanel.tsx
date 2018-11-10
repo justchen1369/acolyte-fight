@@ -269,8 +269,7 @@ class MessagesPanel extends React.Component<Props, State> {
         if (notification.gameId === this.props.myGameId) {
             return <div key={key} className="row rating-notification">
                 <span>Your rating has changed: {this.renderRatingAdjustment(notification.ratingDelta)}. </span>
-                {this.props.loggedIn && <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to see more.</span>}
-                {!this.props.loggedIn && <span><a href="login">Login</a> to see more.</span>}
+                <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to see more.</span>
             </div>
         } else {
             return null;

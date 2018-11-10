@@ -39,20 +39,20 @@ export class ProfilePanel extends React.Component<Props, State> {
 
     render() {
         const profileId = this.props.current.profileId || this.props.myUserId;
-        const isMe = this.props.loggedIn && profileId === this.props.myUserId;
+        const isMe = profileId === this.props.myUserId;
 
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
-            {isMe && <div>
+            {isMe && this.props.loggedIn && <div>
                 <h1>Your Account</h1>
                 <AccountPanel />
             </div>}
-            {this.props.loggedIn && <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />}
-            {!this.props.loggedIn && <div>
-                <h1>Replays</h1>
-                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your replays</p>
+            {isMe && !this.props.loggedIn && <div>
+                <h1>Your Stats</h1>
+                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to ensure you don't lose your stats</p>
             </div>}
+            <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />
             {isMe && <div>
                 <h1>Replays</h1>
                 <RecentGamesList category={category} />

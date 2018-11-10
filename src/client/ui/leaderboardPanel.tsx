@@ -107,26 +107,13 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     render() {
-        if (!this.props.loggedIn) {
-            return this.renderNotLoggedIn();
-        } else if (this.state.error) {
+        if (this.state.error) {
             return this.renderError();
         } else if (!this.state.leaderboard) {
             return this.renderLoading();
         } else {
             return this.renderLeaderboard();
         }
-    }
-
-    private renderNotLoggedIn() {
-        return <div>
-            {this.props.myUserId && <div>
-                <UserStatsPanel profileId={this.props.myUserId} category={this.state.category} showWinRates={true} />
-            </div>}
-            <h1>Leaderboard</h1>
-            <p>How do you compare to your fellow acolytes?</p>
-            <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your ranking on the leaderboard</p>
-        </div>
     }
 
     private renderLeaderboard() {
@@ -136,6 +123,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
             <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
             <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
             <h1>Leaderboard</h1>
+            {!this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your ranking on the leaderboard</p>}
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
                 {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
