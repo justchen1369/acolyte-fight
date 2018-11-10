@@ -3,12 +3,14 @@ import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import express from 'express';
 import url from 'url';
+import * as http from 'http';
 
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
 import * as categories from './categories';
 import * as discord from './discord';
+import * as facebook from './facebook';
 import * as games from './games';
 import * as loadMetrics from './loadMetrics';
 import * as percentiles from './percentiles';
@@ -60,6 +62,16 @@ export function onExternalStatus(req: express.Request, res: express.Response) {
     res.send(getExternalStatus());
 }
 
+export function handlePreflightRequest(req: express.Request, res: express.Response) {
+    var headers: http.OutgoingHttpHeaders = {
+        'Access-Control-Allow-Headers': [m.AuthHeader],
+        'Access-Control-Allow-Origin': req.headers.origin || "*",
+        'Access-Control-Allow-Credentials': 'true',
+    };
+    res.writeHead(200, headers);
+    res.end();
+}
+
 export function getExternalStatus() {
     const location = getLocation();
 	const status: m.ExternalStatus = {
@@ -70,11 +82,35 @@ export function getExternalStatus() {
     return status;
 }
 
-export function onLogin(req: express.Request, res: express.Response) {
-    onLoginAsync(req, res).catch(error => handleError(error, res));
+export function onFacebookLogin(req: express.Request, res: express.Response) {
+    onFacebookLoginAsync(req, res).catch(error => handleError(error, res));
 }
 
-async function onLoginAsync(req: express.Request, res: express.Response): Promise<void> {
+async function onFacebookLoginAsync(req: express.Request, res: express.Response): Promise<void> {
+    const input = req.body as m.FacebookLoginRequest;
+    if (!(required(input, "object")
+        && required(input.signature, "string"))) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    const facebookId = facebook.verifyPlayerId(input.signature);
+    if (!facebookId) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    const response: m.FacebookLoginResponse = {
+        authToken: facebook.authToken(facebookId),
+    };
+    res.send(response);
+}
+
+export function onDiscordLogin(req: express.Request, res: express.Response) {
+    onDiscordLoginAsync(req, res).catch(error => handleError(error, res));
+}
+
+async function onDiscordLoginAsync(req: express.Request, res: express.Response): Promise<void> {
     const authToken = auth.resendAuthToken(req, res);
     const origin = getOrigin(req);
     if (req.query.code && authToken) {
@@ -84,44 +120,10 @@ async function onLoginAsync(req: express.Request, res: express.Response): Promis
             throw "Unable to find Discord user";
         }
 
-        const allowCache = false;
-        let userId = await auth.getUserIdFromAccessKey(auth.discordAccessKey(discordUser), allowCache)
-        if (userId) {
-            // Associate this browser with the existing user
-            logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - logged in`);
-            await auth.associateAccessKey(auth.enigmaAccessKey(authToken), userId);
-
-        } else {
-            const name = sanitize.sanitizeName(discordUser.username);
-
-            const existingUser = await auth.getUserFromAccessKey(auth.enigmaAccessKey(authToken));
-            if (existingUser && !existingUser.loggedIn) {
-                // Upgrade an existing anonymous user
-                logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - upgrading existing anonymous user`);
-
-                userId = existingUser.userId;
-
-                await userStorage.upgradeUser(userId, name, auth.discordAccessKey(discordUser));
-            } else {
-                // Create a new user
-                logger.info(`Discord user ${discordUser.id} - ${discordUser.username} - creating new user`);
-
-                userId = userStorage.generateUserId();
-                const userSettings: g.User = {
-                    userId,
-                    loggedIn: true,
-                    settings: {
-                        name,
-                        buttons: null,
-                        rebindings: null,
-                        options: null,
-                    },
-                };
-
-                await userStorage.createUser(userSettings, auth.discordAccessKey(discordUser), auth.enigmaAccessKey(authToken));
-            }
-        }
-
+        auth.loginAsUser({
+            accessKey: auth.discordAccessKey(discordUser),
+            username: discordUser.username,
+        }, auth.enigmaAccessKey(authToken));
         res.redirect('/');
     } else {
         res.redirect(discord.getAuthUrl(origin));
@@ -133,7 +135,7 @@ export function onCreateTestUser(req: express.Request, res: express.Response) {
 }
 
 async function onCreateTestUserAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.a && req.query.a === "secret123")) {
+    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
         res.status(403).send("Forbidden");
         return;
     }

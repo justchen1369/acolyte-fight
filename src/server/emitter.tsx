@@ -4,7 +4,7 @@ import uniqid from 'uniqid';
 import * as auth from './auth';
 import * as categories from './categories';
 import * as games from './games';
-import { AuthHeader, getAuthTokenFromSocket } from './auth';
+import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
 import { getLocation, sanitizeHostname } from './mirroring';
 import { logger } from './logging';
@@ -101,7 +101,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			forceNew: true,
 			transportOptions: {
 				polling: {
-					extraHeaders: { [AuthHeader]: authToken }
+					extraHeaders: { [m.AuthHeader]: authToken }
 				}
 			},
 		});

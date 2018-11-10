@@ -7,6 +7,7 @@ import { getFirestore } from './dbStorage';
 import { Collections } from './db.model';
 
 export const DiscordPrefix = "discord.";
+export const FacebookPrefix = "fb.";
 
 export function generateUserId() {
     return uniqid("u-");

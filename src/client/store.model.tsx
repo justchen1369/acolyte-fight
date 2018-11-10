@@ -2,6 +2,11 @@ import * as d from './stats.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
+export interface GlobalConfig {
+    baseUrl?: string;
+    acolyteAuthToken?: string;
+}
+
 export interface State {
     current: PathElements;
 

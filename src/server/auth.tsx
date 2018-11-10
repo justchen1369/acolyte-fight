@@ -7,13 +7,28 @@ import uniqid from 'uniqid';
 import * as discord from './discord';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
+import * as sanitize from '../game/sanitize';
 import * as userStorage from './userStorage';
 
-export const AuthHeader = "x-enigma-auth";
+import { logger } from './logging';
 
+interface CreateUserArgs {
+    accessKey: string;
+    username: string;
+}
+
+let enigmaSecret: string = "Unknown";
 const ipAddressRegex = /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/;
 
 const accessKeyToUserIdCache = new Map<string, string>();
+
+export function init(_enigmaSecret: string) {
+    enigmaSecret = _enigmaSecret;
+}
+
+export function getEnigmaSecret() {
+    return enigmaSecret;
+}
 
 export function authMiddleware(req: express.Request, res: express.Response, next: express.NextFunction) {
     let authToken = parseAuthTokenFromRequest(req);
@@ -31,6 +46,12 @@ export function resendAuthToken(req: express.Request, res: express.Response) {
         authToken = uniqid('a-');
     }
 
+    sendAuthToken(authToken, req, res);
+
+    return authToken;
+}
+
+export function sendAuthToken(authToken: string, req: express.Request, res: express.Response) {
     const maxAge = 20 * 365 * 24 * 60 * 60 * 1000;
     const domain = calculateDomain(req.hostname);
     if (domain) {
@@ -40,8 +61,6 @@ export function resendAuthToken(req: express.Request, res: express.Response) {
     }
     res.cookie(m.AuthCookieName, authToken, { maxAge, domain, httpOnly: true });
     setAuthToken(req, authToken);
-
-    return authToken;
 }
 
 function calculateDomain(hostname: string): string {
@@ -79,7 +98,7 @@ function parseAuthTokenFromRequest(req: express.Request): string | null {
         return null;
     } 
 
-    let headerValue = req.headers[AuthHeader];
+    let headerValue = req.headers[m.AuthHeader];
     if (headerValue && typeof headerValue === "string") {
         return headerValue
     } 
@@ -138,4 +157,44 @@ export async function associateAccessKey(accessKey: string, userId: string): Pro
 export async function disassociateAccessKey(accessKey: string): Promise<void> {
     await userStorage.disassociateAccessKey(accessKey);
     accessKeyToUserIdCache.delete(accessKey);
+}
+
+export async function loginAsUser(user: CreateUserArgs, enigmaAccessKey: string): Promise<void> {
+    const allowCache = false;
+    let userId = await getUserIdFromAccessKey(user.accessKey, allowCache)
+    if (userId) {
+        // Associate this browser with the existing user
+        logger.info(`User ${user.accessKey} - ${user.username} - logged in`);
+        await associateAccessKey(enigmaAccessKey, userId);
+
+    } else {
+        const name = sanitize.sanitizeName(user.username);
+
+        const existingUser = await getUserFromAccessKey(enigmaAccessKey);
+        if (existingUser && !existingUser.loggedIn) {
+            // Upgrade an existing anonymous user
+            logger.info(`User ${user.accessKey} - ${user.username} - upgrading existing anonymous user`);
+
+            userId = existingUser.userId;
+
+            await userStorage.upgradeUser(userId, name, user.accessKey);
+        } else {
+            // Create a new user
+            logger.info(`User ${user.accessKey} - ${user.username} - creating new user`);
+
+            userId = userStorage.generateUserId();
+            const userSettings: g.User = {
+                userId,
+                loggedIn: true,
+                settings: {
+                    name,
+                    buttons: null,
+                    rebindings: null,
+                    options: null,
+                },
+            };
+
+            await userStorage.createUser(userSettings, user.accessKey, enigmaAccessKey);
+        }
+    }
 }

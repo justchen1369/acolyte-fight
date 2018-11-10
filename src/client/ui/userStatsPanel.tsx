@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
+import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -54,7 +55,8 @@ export const leagues = [
 
 async function retrieveUserStatsAsync(profileId: string) {
     const res = await fetch(`${url.base}/api/profile?p=${encodeURIComponent(profileId)}`, {
-        credentials: 'same-origin'
+        headers: credentials.headers(),
+        credentials: 'same-origin',
     });
     if (res.status === 200) {
         const json = await res.json() as m.GetProfileResponse;
@@ -84,6 +86,7 @@ async function retrievePointsToNextLeagueAsync(profile: m.GetProfileResponse): P
 
 async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
     const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
+        headers: credentials.headers(),
         credentials: 'same-origin',
     });
     if (res.status === 200) {

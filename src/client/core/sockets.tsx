@@ -1,7 +1,7 @@
 import msgpack from 'msgpack-lite';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
-import * as engine from '../../game/engine';
+import * as SocketIO from 'socket.io-client';
 import * as StoreProvider from '../storeProvider';
 import { notify } from './notifications';
 
@@ -23,6 +23,21 @@ export interface Listeners {
 	onHeroMsg: (msg: ArrayBuffer) => void;
 }
 
+export function connect(socketUrl: string, authToken: string, onConnect: (socket: SocketIOClient.Socket) => void) {
+	const config: SocketIOClient.ConnectOpts = {};
+	if (authToken) {
+        config.transportOptions = {
+            polling: {
+                extraHeaders: { [m.AuthHeader]: authToken }
+            },
+        };
+	}
+	socket = SocketIO.default(socketUrl, config);
+
+	attachToSocket(socket, () => onConnect(socket));
+}
+
+
 export function connectToServer(server: string): Promise<void> {
 	if (server) {
 		return new Promise<void>((resolve, reject) => {
@@ -43,7 +58,7 @@ export function connectToServer(server: string): Promise<void> {
 	}
 }
 
-export function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
+function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);

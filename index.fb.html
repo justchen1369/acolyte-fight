@@ -43,29 +43,70 @@
 	<body class="game">
 		<script src="https://connect.facebook.net/en_US/fbinstant.6.2.js"></script>
 		<script>
-			window.baseUrl = "https://acolytefight.io";
+			if (window.location.hostname === "localhost") {
+				window.baseUrl = "https://dev.acolytefight.io:7770";
+			} else {
+				window.baseUrl = "https://acolytefight.io";
+			}
 		</script>
 
         <script>
+			function authenticate() {
+                return FBInstant.player.getSignedPlayerInfoAsync().then(function (result) {
+                    var signature = result.getSignature();
+                    return fetch(window.baseUrl + "/api/facebook", {
+						method: "POST",
+						headers: {
+							'Content-Type': 'application/json',
+						},
+                        body: JSON.stringify({ signature }),
+					}).then(function(res) { 
+						if (res.status === 200) {
+							return res.json().then(function(json) {
+								console.log("Facebook login succeeded");
+								window.acolyteAuthToken = json.authToken;
+							});
+						} else {
+							return res.text().then(function(text) {
+								console.error("Facebook login failed: ", res.status, text);
+							});
+						}
+					})
+                })
+			}
+
+			function loadScript() {
+				return new Promise(function(resolve) {
+					var scriptTag = document.createElement('script');
+					scriptTag.setAttribute('src','dist/client.js');
+					scriptTag.addEventListener('load', resolve);
+
+					document.head.appendChild(scriptTag);
+				});
+			}
+
             FBInstant.initializeAsync().then(function() {        
-                FBInstant.setLoadingProgress(0);
+				FBInstant.setLoadingProgress(0);
+				return authenticate();
+            }).then(function() {
+				FBInstant.setLoadingProgress(10);
+				return loadScript();
+			}).then(function() {
                 FBInstant.setLoadingProgress(100);
                 return FBInstant.startGameAsync();
             }).then(function() {
-                console.log("FBInstant game started");
+				console.log("Starting Acolyte Fight!...");
+				window.acolyteInitialize();
+
                 // Retrieving context and player information can only be done
                 // once startGameAsync() resolves
                 var contextId = FBInstant.context.getID();
                 var contextType = FBInstant.context.getType();
-
-                var playerName = FBInstant.player.getName();
-                var playerPic = FBInstant.player.getPhoto();
-                var playerId = FBInstant.player.getID();
-            });
+				var username = FBInstant.player.getName();
+				var avatarUrl = FBInstant.player.getPhoto();
+            }).catch(error => console.error(error));
         </script>
 
 		<div id="root"></div>
-		<script id="code" src="dist/client.js"></script>
-
 	</body>
 </html>

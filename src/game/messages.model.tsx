@@ -1,5 +1,6 @@
 import * as c from './world.model';
 
+export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
 
 export namespace GameCategory {
@@ -380,4 +381,12 @@ export interface UserRating {
     killsPerGame: number;
     winRate: number;
     percentile: number;
+}
+
+export interface FacebookLoginRequest {
+    signature: string;
+}
+
+export interface FacebookLoginResponse {
+    authToken: string;
 }

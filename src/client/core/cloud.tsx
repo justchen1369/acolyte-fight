@@ -4,6 +4,7 @@ import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as credentials from './credentials';
 import * as notifications from './notifications';
 import * as stats from './stats';
 import * as storage from '../storage';
@@ -42,6 +43,7 @@ export async function downloadSettings(): Promise<void> {
     }
 
     const res = await fetch(url, {
+        headers: credentials.headers(),
         credentials: "same-origin",
         cache: "no-store",
     });
@@ -103,6 +105,7 @@ export async function uploadSettings(): Promise<void> {
         credentials: "same-origin",
         method: "POST",
         headers: {
+            ...credentials.headers(),
             'Content-Type': 'application/json',
         },
         body: JSON.stringify(input),
@@ -129,7 +132,10 @@ export async function downloadGameStats(): Promise<void> {
     let newestLoaded = until;
     let oldestLoaded = moment();
     while (allGameStats.length < constants.MaxGamesToKeep) {
-        const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, { credentials: "same-origin" });
+        const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, {
+            headers: { ...credentials.headers() },
+            credentials: "same-origin",
+        });
         const json: m.GetGameStatsResponse = msgpack.decode(new Uint8Array(await res.arrayBuffer()));
 
         for (const gameStatsMsg of json.stats) {
@@ -156,7 +162,10 @@ export async function downloadGameStats(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
-    await fetch(`${base}/api/logout`, { credentials: "same-origin" });
+    await fetch(`${base}/api/logout`, {
+        headers: { ...credentials.headers() },
+        credentials: "same-origin",
+    });
     StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
     storage.resetNumGames();
 }
