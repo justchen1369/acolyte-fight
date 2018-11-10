@@ -8,7 +8,7 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
-import * as config from './core/config';
+import * as config from './config';
 import * as cloud from './core/cloud';
 import * as matches from './core/matches';
 import * as pages from './core/pages';
@@ -24,8 +24,10 @@ import Root from './ui/root';
 let alreadyConnected = false;
 
 export function initialize() {
+    StoreProvider.init();
     stats.attachListener();
     cloud.attachListener();
+
     start();
     render();
 

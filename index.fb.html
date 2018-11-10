@@ -95,15 +95,17 @@
                 FBInstant.setLoadingProgress(100);
                 return FBInstant.startGameAsync();
             }).then(function() {
-				console.log("Starting Acolyte Fight!...");
-				window.acolyteInitialize();
-
                 // Retrieving context and player information can only be done
                 // once startGameAsync() resolves
                 var contextId = FBInstant.context.getID();
                 var contextType = FBInstant.context.getType();
 				var username = FBInstant.player.getName();
 				var avatarUrl = FBInstant.player.getPhoto();
+
+				window.acolyteDefaultName = username;
+
+				console.log("Starting Acolyte Fight!...", contextId, contextType, username, avatarUrl);
+				window.acolyteInitialize();
             }).catch(error => console.error(error));
         </script>
 

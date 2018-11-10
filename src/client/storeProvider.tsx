@@ -6,7 +6,11 @@ import * as storage from './storage';
 import * as engine from '../game/engine';
 import * as settings from '../game/settings';
 
-const store = Redux.createStore(reducer, initialState());
+let store: Redux.Store<s.State> = null;
+
+export function init() {
+    store = Redux.createStore(reducer, initialState());
+}
 
 function initialState(): s.State {
     const isNewPlayer = true; // !storage.loadName();

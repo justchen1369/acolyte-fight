@@ -8,3 +8,7 @@ export function sanitizeName(input: string) {
     }
     return name;
 }
+
+export function validName(name: string) {
+    return name && name.trim().length > 0;
+}

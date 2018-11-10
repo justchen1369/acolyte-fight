@@ -5,6 +5,7 @@ import * as w from '../game/world.model';
 export interface GlobalConfig {
     baseUrl?: string;
     acolyteAuthToken?: string;
+    acolyteDefaultName?: string;
 }
 
 export interface State {

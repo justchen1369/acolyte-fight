@@ -36,6 +36,7 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
 
 export async function downloadSettings(): Promise<void> {
     const numGames = await storage.getNumGames();
+    console.log(`Downloading settings... numGames=${numGames}`);
 
     let url = `${base}/api/settings?cachebuster=${Date.now()}`;
     if (numGames >= constants.Placements.VerificationGames) {
