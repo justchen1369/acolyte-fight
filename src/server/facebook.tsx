@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import * as base64url from 'base64-url';
 import * as CryptoJS from 'crypto-js';
 import * as auth from './auth';
 
@@ -34,8 +35,9 @@ export function verifyPlayerId(signedRequest: string): string {
 
 export function authToken(facebookId: string) {
     if (facebookId) {
-        const hash = crypto.createHash('sha256').update(`${auth.getEnigmaSecret()}.${facebookId}`).digest('hex');
-        return `fb-${hash}`;
+        const hash = crypto.createHash('sha256').update(`${auth.getEnigmaSecret()}.${facebookId}`).digest('base64');
+        const hashUrl = base64url.escape(hash);
+        return `fb-${hashUrl}`;
     } else {
         return null;
     }
