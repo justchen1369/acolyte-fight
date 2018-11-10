@@ -103,8 +103,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		targetX: Math.round(action.target.x / Precision) * Precision,
 		targetY: Math.round(action.target.y / Precision) * Precision,
 	}
-	const buffer = msgpack.encode(actionMsg);
-	socket.emit('action', buffer);
+	send(actionMsg);
 }
 
 export function sendTextMessage(gameId: string, heroId: string, text: string) {
@@ -114,6 +113,24 @@ export function sendTextMessage(gameId: string, heroId: string, text: string) {
 		actionType: m.ActionType.Text,
 		text,
 	};
-	const buffer = msgpack.encode(actionMsg);
+	send(actionMsg);
+}
+
+export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings) {
+	if (!(gameId && heroId)) {
+		return;
+	}
+
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
+		actionType: m.ActionType.Spells,
+		keyBindings,
+	}
+	send(actionMsg);
+}
+
+function send(msg: m.ActionMsg) {
+	const buffer = msgpack.encode(msg);
 	socket.emit('action', buffer);
 }

@@ -188,6 +188,9 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		) || (
 			data.actionType === "text"
 			&& required(data.text, "string")
+		) || (
+			data.actionType === "spells"
+			&& required(data.keyBindings, "object")
 		)
 	)) {
 		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
@@ -348,6 +351,8 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 0;
 	} else if (actionData.actionType === "join" || actionData.actionType === "leave" || actionData.actionType === "bot") {
 		return 1000;
+	} else if (actionData.actionType === "spells") {
+		return 101;
 	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.MoveAndCancel) {
 		return 11;
 	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.Move) {

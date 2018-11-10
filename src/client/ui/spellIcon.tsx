@@ -38,9 +38,23 @@ export class SpellIcon extends React.Component<Props, State> {
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={this.props.size}
             height={this.props.size}
-            onMouseEnter={() => this.setState({ hovering: true })}
-            onMouseLeave={() => this.setState({ hovering: false })}
+            onMouseEnter={(ev) => this.onMouseEnter(ev)}
+            onMouseLeave={(ev) => this.onMouseLeave(ev)}
         />
+    }
+
+    private onMouseEnter(ev: React.MouseEvent<HTMLCanvasElement>) {
+        this.setState({ hovering: true });
+        if (this.props.onMouseEnter) {
+            this.props.onMouseEnter(ev);
+        }
+    }
+
+    private onMouseLeave(ev: React.MouseEvent<HTMLCanvasElement>) {
+        this.setState({ hovering: false });
+        if (this.props.onMouseLeave) {
+            this.props.onMouseLeave(ev);
+        }
     }
 
     private onCanvasElem(_elem: HTMLCanvasElement) {

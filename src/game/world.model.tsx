@@ -18,6 +18,7 @@ export namespace SpecialKeys {
 	export const LeftClick = "primary";
 	export const RightClick = "dash";
 	export const DoubleTap = "double";
+	export const WheelCenter = "center";
 }
 
 export namespace CastStage {
@@ -87,6 +88,8 @@ export interface UIState {
 	notifications: Notification[];
 
 	buttonBar?: ButtonConfig;
+	hoverBtn?: string;
+	customizingBtn?: string;
 
 	saved?: boolean;
 }
@@ -227,11 +230,17 @@ export interface RatingAdjustmentNotification {
 	ratingDelta: number;
 }
 
-export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting;
+export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting | ChoosingSpells;
 
 export interface EnvironmentSeed {
 	type: "environment";
 	seed: number;
+}
+
+export interface ChoosingSpells {
+	type: "spells";
+	heroId: string;
+	keyBindings: KeyBindings;
 }
 
 export interface Texting {

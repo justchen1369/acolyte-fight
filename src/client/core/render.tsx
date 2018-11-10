@@ -934,7 +934,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 				}
 			});
 			if (!key) {
-				key = " ";
+				key = w.SpecialKeys.WheelCenter;
 			}
 		}
 	}

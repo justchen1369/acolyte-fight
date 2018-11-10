@@ -26,7 +26,8 @@ export namespace ActionType {
 	export const Leave = "leave";
 	export const GameAction = "game";
 	export const CloseGame = "close";
-	export const Text = "text";
+    export const Text = "text";
+    export const Spells = "spells";
 }
 
 export interface GetUserSettingsRequest {
@@ -63,6 +64,7 @@ export type ActionMsg =
     | CloseGameMsg
     | GameActionMsg
     | TextMsg
+    | SpellsMsg
 
 export interface ActionMsgBase {
     actionType: string;
@@ -110,6 +112,11 @@ export interface GameActionMsg extends ActionMsgBase {
 export interface TextMsg extends ActionMsgBase {
     actionType: "text";
     text: string;
+}
+
+export interface SpellsMsg extends ActionMsgBase {
+    actionType: "spells";
+    keyBindings: KeyBindings;
 }
 
 export interface TickMsg {

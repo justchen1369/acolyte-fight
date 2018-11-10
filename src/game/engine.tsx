@@ -490,6 +490,8 @@ function handleOccurences(world: w.World) {
 			seedEnvironment(ev, world);
 		} else if (ev.type === "text") {
 			handleTexting(ev, world);
+		} else if (ev.type === "spells") {
+			handleSpellChoosing(ev, world);
 		}
 	});
 	world.occurrences = [];
@@ -522,6 +524,23 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	});
 }
 
+export function allowSpellChoosing(world: w.World) {
+	// Only allow spells to be changed before game starts
+	return world.tick < world.startTick || !!world.winner;
+}
+
+function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
+	if (!allowSpellChoosing(world)) {
+		return;
+	}
+
+	const hero = world.objects.get(ev.heroId);
+	if (hero && hero.category === "hero") {
+		assignKeyBindingsToHero(hero, ev.keyBindings, world);
+		removeUnknownProjectilesFromHero(hero, world); // Disallow strategies which use two spells that should never co-occur
+	}
+}
+
 function handleTexting(ev: w.Texting, world: w.World) {
 	const player = world.players.get(ev.heroId);
 	if (player) {
@@ -541,6 +560,11 @@ function handleClosing(ev: w.Closing, world: w.World) {
 			obstacle.body.resetMassData();
 		}
 	});
+
+	if (world.tick >= world.startTick) {
+		// Close any customising dialogs as they cannot be used anymore now the game has started
+		world.ui.customizingBtn = null;
+	}
 
 	world.ui.notifications.push({
 		type: "closing",
@@ -718,6 +742,14 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 	}
 	hero.keysToSpells = keysToSpells;
 	hero.spellsToKeys = spellsToKeys;
+}
+
+function removeUnknownProjectilesFromHero(hero: w.Hero, world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.category === "projectile" && obj.owner === hero.id && !hero.spellsToKeys.has(obj.type)) {
+			destroyObject(world, obj);
+		}
+	});
 }
 
 function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {

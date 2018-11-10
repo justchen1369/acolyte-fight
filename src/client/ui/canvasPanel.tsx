@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
+import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
@@ -17,6 +18,7 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
+const LongPressMilliseconds = 250;
 const FpsAlpha = 0.1;
 const FpsThreshold = 0.75;
 
@@ -46,6 +48,7 @@ interface TargetSurfaceState {
 interface ActionSurfaceState {
     touchId: string;
     activeKey: string;
+    time: number;
 }
 
 interface TouchState {
@@ -234,8 +237,13 @@ class CanvasPanel extends React.Component<Props, State> {
                 this.actionSurface = {
                     touchId: p.touchId,
                     activeKey: key,
+                    time: Date.now(),
                 };
-                this.handleButtonClick(key, world);
+                if (p.secondaryBtn) {
+                    this.handleCustomizeBtn(key);
+                } else {
+                    this.handleButtonClick(key, world);
+                }
             } else {
                 if (this.currentTouch === null || this.currentTouch.id === p.touchId) {
                     if (this.currentTouch) {
@@ -314,7 +322,7 @@ class CanvasPanel extends React.Component<Props, State> {
     private handleButtonHover(key: string, world: w.World) {
         const hoverSpellId = this.keyToSpellId(key);
         if (world.ui.hoverSpellId !== hoverSpellId) {
-            StoreProvider.dispatch({ type: "updateHoverSpell", hoverSpellId });
+            StoreProvider.dispatch({ type: "updateHoverSpell", hoverSpellId, hoverBtn: key });
         }
     }
 
@@ -325,6 +333,7 @@ class CanvasPanel extends React.Component<Props, State> {
                 const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
                 if (this.actionSurface.activeKey !== key) {
                     this.actionSurface.activeKey = key; // Ignore dragging on the same key
+                    this.actionSurface.time = Date.now();
                     if (key) {
                         this.handleButtonClick(key, world);
                     }
@@ -382,6 +391,23 @@ class CanvasPanel extends React.Component<Props, State> {
                 const spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             }
+        }
+    }
+
+    private handleLongProcessIfNecessary() {
+        if (this.actionSurface) {
+            const pressLength = Date.now() - this.actionSurface.time;
+            if (pressLength >= LongPressMilliseconds) {
+                const btn = this.actionSurface.activeKey;
+                this.actionSurface.time += 1e9; // Don't repeat the long press
+                this.handleCustomizeBtn(btn);
+            }
+        }
+    }
+
+    private handleCustomizeBtn(customizingBtn: string) {
+        if (engine.allowSpellChoosing(this.props.world)) {
+            StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
         }
     }
 
@@ -447,6 +473,7 @@ class CanvasPanel extends React.Component<Props, State> {
     private frame() {
         if (this.canvasStack.background && this.canvasStack.canvas && this.canvasStack.glows && this.canvasStack.ui) {
             frame(this.canvasStack);
+            this.handleLongProcessIfNecessary();
         }
     }
 }

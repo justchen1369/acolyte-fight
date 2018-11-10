@@ -94,6 +94,7 @@ export type Action =
     | LeavePartyAction
     | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
+    | CustomizeBtnAction
     | UpdateHoverSpellAction
     | UpdateRebindingsAction
     | UpdateServerAction
@@ -195,9 +196,15 @@ export interface ClearNewPlayerFlagAction {
     type: "clearNewPlayerFlag";
 }
 
+export interface CustomizeBtnAction {
+    type: "customizeBtn";
+    customizingBtn: string;
+}
+
 export interface UpdateHoverSpellAction {
     type: "updateHoverSpell";
     hoverSpellId: string;
+    hoverBtn: string;
 }
 
 export interface UpdateRebindingsAction {

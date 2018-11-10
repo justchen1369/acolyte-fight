@@ -15,6 +15,8 @@ import SpellStats from './spellStats';
 
 interface OwnProps {
     btn: string;
+    rebinding?: boolean;
+    onChosen?: (keyBindings: KeyBindings) => void;
 }
 interface Props extends OwnProps {
     config: KeyBindings;
@@ -22,6 +24,7 @@ interface Props extends OwnProps {
 }
 
 interface State {
+    hovering: string;
     saved: boolean;
 }
 
@@ -33,14 +36,14 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
+const cloudUploadDebounced = _.debounce(() => cloud.uploadSettings(), 500);
+
 class SpellKeyConfig extends React.Component<Props, State> {
-    private uploadStateDebounced = _.debounce(() => this.uploadState(), 500);
-
-
     constructor(props: Props) {
         super(props);
         this.state = {
             saved: false,
+            hovering: null,
         };
     }
 
@@ -51,10 +54,10 @@ class SpellKeyConfig extends React.Component<Props, State> {
 
         const options = Choices.Options[key];
         const chosen = spellUtils.resolveSpellForKey(key, this.props.config, this.props.settings);
+        const hovering = Spells[this.state.hovering];
 
-        const name = spellUtils.spellName(chosen);
         const isRightClick = keyboardUtils.isSpecialKey(key);
-        return <div className="key">
+        return <div className="key" onClick={ev => ev.stopPropagation()}>
             <div className="key-options">
                 {options.map(spellId => Spells[spellId]).map(spell =>
                     <SpellIcon
@@ -63,19 +66,30 @@ class SpellKeyConfig extends React.Component<Props, State> {
                         color={spell.color}
                         title={spellUtils.spellName(spell)}
                         onClick={() => this.onChoose(key, spell.id)}
+                        onMouseEnter={() => this.onMouseHoverSpell(spell.id)}
+                        onMouseLeave={() => this.onMouseLeaveSpell()}
                         size={48}
                         hoverWash={spell.id !== chosen.id} />)}
             </div>
             <div className="key-detail-container">
                 <div className="key-detail">
-                    <div className="spell-name">{name}</div>
-                    <div className="description">{chosen.description}</div>
-                    {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell will be {name} in your next game.</div>}
+                    <div className="spell-name">{spellUtils.spellName(hovering ? hovering : chosen)}</div>
+                    <div className="description">{hovering ? hovering.description : chosen.description}</div>
+                    {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
                 </div>
-                <SpellStats spellId={chosen.id} />
+                <SpellStats spellId={hovering ? hovering.id : chosen.id} />
             </div>
-            {!isMobile && <KeyControl initialKey={key} />}
+            {!isMobile && this.props.rebinding && <KeyControl initialKey={key} />}
         </div>;
+    }
+
+    private onMouseHoverSpell(hovering: string) {
+        console.log("hovering", hovering);
+        this.setState({ hovering });
+    }
+
+    private onMouseLeaveSpell() {
+        this.setState({ hovering: null });
     }
     
     private onChoose(key: string, spellId: string) {
@@ -85,13 +99,13 @@ class SpellKeyConfig extends React.Component<Props, State> {
 
         StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
         Storage.saveKeyBindingConfig(config);
-        this.uploadStateDebounced();
+        cloudUploadDebounced();
 
-        this.setState({ saved: true });
-    }
+        this.setState({ saved: true, hovering: null });
 
-    private uploadState() {
-        cloud.uploadSettings();
+        if (this.props.onChosen) {
+            this.props.onChosen(config);
+        }
     }
 }
 

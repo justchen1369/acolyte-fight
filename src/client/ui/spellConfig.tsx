@@ -29,7 +29,7 @@ class SpellConfig extends React.PureComponent<Props, State> {
 
     render() {
         return <div className="spell-config">
-            {Object.keys(this.props.settings.Choices.Options).map(key => <SpellBtnConfig btn={key} />)}
+            {Object.keys(this.props.settings.Choices.Options).map(key => <SpellBtnConfig btn={key} rebinding={true} />)}
         </div>;
     }
 }

@@ -181,6 +181,12 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				heroId: actionData.heroId,
 				text: actionData.text,
 			});
+		} else if (actionData.actionType === m.ActionType.Spells) {
+			world.occurrences.push({
+				type: "spells",
+				heroId: actionData.heroId,
+				keyBindings: actionData.keyBindings,
+			});
 		}
 	});
 }

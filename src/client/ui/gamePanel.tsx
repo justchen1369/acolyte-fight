@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as keyboardUtils from '../core/keyboardUtils';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from './screenLifecycle';
@@ -9,6 +10,7 @@ import * as screenLifecycle from './screenLifecycle';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
+import GameKeyCustomizer from './gameKeyCustomizer';
 import SocialBar from './socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
@@ -41,7 +43,7 @@ class GamePanel extends React.Component<Props, State> {
     render() {
         const allowExit = this.props.exitable || !this.props.connected;
         return (
-            <div id="game-panel">
+            <div id="game-panel" className={isMobile ? "mobile" : "desktop"}>
                 <CanvasPanel />
                 <InfoPanel />
                 <MessagesPanel />
@@ -50,6 +52,7 @@ class GamePanel extends React.Component<Props, State> {
                     <i className="fa fa-chevron-left" /> Back to Home <span className="return-home-subtext">(spell selection, replays and more)</span>
                 </a>}
                 {!isMobile && allowExit && <SocialBar />}
+                <GameKeyCustomizer />
                 <UrlListener />
             </div>
         );
