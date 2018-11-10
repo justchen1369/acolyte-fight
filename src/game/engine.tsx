@@ -25,7 +25,7 @@ import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants
 }
 
 export function version() {
-	return "1.0.1142";
+	return "1.0.1147";
 }
 
 export function initialWorld(mod: Object): w.World {
