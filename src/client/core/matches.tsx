@@ -30,6 +30,7 @@ export function joinNewGame(observeGameId?: string, observe?: boolean) {
 			isBot: ai.playingAsAI(store) && !observeGameId,
 			isMobile,
 			observe,
+			version: engine.version(),
 		};
 		socket.emit('join', msg, (response: m.JoinResponseMsg) => {
 			if (!response.success) {

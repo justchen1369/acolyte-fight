@@ -2,6 +2,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as ai from './ai';
+import * as engine from '../../game/engine';
 import * as rooms from './rooms';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
@@ -20,6 +21,7 @@ export function createPartyAsync(): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
+			version: engine.version(),
 		};
 		socket.emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
 			if (response.success === false) {
@@ -43,6 +45,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				keyBindings: store.keyBindings,
 				isBot: ai.playingAsAI(store),
 				isMobile,
+				version: engine.version(),
 			};
 			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
 				if (_response.success === false) {
@@ -156,6 +159,7 @@ export function updatePartyAsync(): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
+			version: engine.version(),
 		};
 		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
 			if (response.success === false) {

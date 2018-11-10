@@ -202,6 +202,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
+		version: data.version,
 	};
 
 	const party = parties.initParty(socket.id, data.roomId);
@@ -298,6 +299,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
+		version: data.version,
 	};
 	parties.createOrUpdatePartyMember(party, partyMember);
 
@@ -411,9 +413,9 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			const isPrivate: boolean = false;
 
 			if (data.observe) {
-				return games.findExistingGame(room, partyId, isPrivate, data.isBot);
+				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);
 			} else {
-				const game = games.findNewGame(room, partyId, isPrivate, data.isBot);
+				const game = games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);
 				return game;
 			}
 		}
@@ -431,6 +433,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 					isMobile: data.isMobile,
 					authToken,
 					socketId: socket.id,
+					version: data.version,
 				});
 			}
 

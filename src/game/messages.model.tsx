@@ -126,6 +126,7 @@ export interface JoinMsg {
     isBot: boolean;
     isMobile: boolean;
     observe: boolean;
+    version: string;
 }
 
 export interface JoinResponse {
@@ -203,6 +204,7 @@ export interface CreatePartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    version: string;
 }
 export interface CreatePartyResponse {
     success: true;
@@ -220,6 +222,7 @@ export interface PartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    version: string;
 }
 export interface PartyResponse extends PartyMsg {
     success: true;

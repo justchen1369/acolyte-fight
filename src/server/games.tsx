@@ -100,9 +100,9 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, numNewPlayers: number = 1): g.Game {
+export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const category = categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots);
+	const category = categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
 	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
@@ -138,14 +138,14 @@ export function findNewGame(room: g.Room | null, partyId: string | null, isPriva
 	}
 
 	if (!game) {
-		game = initGame(room, partyId, isPrivate, allowBots);
+		game = initGame(version, room, partyId, isPrivate, allowBots);
 	}
 	return game;
 }
 
-export function findExistingGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
+export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
 	const roomId = room ? room.id : null;
-	const category = categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots);
+	const category = categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
 	const candidates = [...store.activeGames.values()].filter(x => x.category === category);
@@ -231,14 +231,14 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initGame(room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean) {
+export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		category: categories.calculateGameCategory(roomId, partyId, isPrivate, allowBots),
+		category: categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots),
 		roomId,
 		partyId,
 		isPrivate,
@@ -297,13 +297,15 @@ export function assignPartyToGames(party: g.Party) {
 		const group = new Array<g.PartyMember>();
 		for (let i = 0; i < maxPlayersPerGame; ++i) {
 			if (remaining.length > 0) {
-				group.push(remaining.shift());
+				const next = remaining.shift();
+				group.push(next);
 			} else {
 				break;
 			}
 		}
 
-		const game = findNewGame(room, party.id, party.isPrivate, allowBots, group.length);
+		// Assume all party members on same engine version
+		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, allowBots, group.length);
 		for (const member of group) {
 			const heroId = joinGame(game, member);
 			assignments.push({ partyMember: member, game, heroId });

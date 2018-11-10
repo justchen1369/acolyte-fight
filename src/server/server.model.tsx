@@ -121,6 +121,7 @@ export interface JoinParameters {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    version: string;
 }
 
 export interface PartyMemberStatus {

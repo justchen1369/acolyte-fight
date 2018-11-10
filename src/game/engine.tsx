@@ -24,6 +24,10 @@ import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants
 	settings.polygonRadius = (2.0 * settings.linearSlop);
 }
 
+export function version() {
+	return "1.0.1142";
+}
+
 export function initialWorld(mod: Object): w.World {
 	const settings = calculateMod(mod);
 
