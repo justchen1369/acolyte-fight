@@ -68,6 +68,7 @@ export interface RoomState {
 }
 
 export interface PathElements {
+    path?: string;
     page?: string;
     gameId?: string;
     party?: string;

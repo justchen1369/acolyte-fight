@@ -4,6 +4,7 @@ import * as s from './store.model';
 export const base = (window as any).baseUrl || "";
 
 export function parseLocation(location: Location): s.PathElements {
+    let path: string = null;
     let page: string = null;
     let gameId: string = null;
     let party: string = null;
@@ -13,8 +14,12 @@ export function parseLocation(location: Location): s.PathElements {
 
     if (location.pathname) {
         const elems = location.pathname.split("/");
-        page = elems[1] || "";
-        if (page === "index.html" || page === "instant-bundle") {
+        if (elems.length > 0) {
+            page = elems.pop();
+        }
+        path = elems.join("/");
+
+        if (!page || page === "index.html") {
             page = "";
         }
     }
@@ -37,7 +42,7 @@ export function parseLocation(location: Location): s.PathElements {
         hash = location.hash;
     }
 
-    return { page, gameId, profileId, party, server, hash };
+    return { path, page, gameId, profileId, party, server, hash };
 }
 
 export function getPath(elems: s.PathElements) {
@@ -59,7 +64,7 @@ export function getPath(elems: s.PathElements) {
         params.push("server=" + elems.server);
     }
 
-    let path = "/" + pathElements.join("/");
+    let path = (elems.path || "") + "/" + pathElements.join("/");
     if (params.length > 0) {
         path += "?" + params.join("&");
     }
