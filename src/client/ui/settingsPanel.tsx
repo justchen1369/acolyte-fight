@@ -8,7 +8,7 @@ import * as url from '../url';
 import AccountPanel from './accountPanel';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
-import SpellConfig from './spellConfig';
+import SpellBtnConfig from './spellConfig';
 import { isMobile } from '../core/userAgent';
 
 interface Props {
@@ -45,7 +45,7 @@ export class SettingsPanel extends React.Component<Props, State> {
             <h1>Your Controls</h1>
             <ControlsPanel />
             <h1>Your Spells</h1>
-            <SpellConfig />
+            <SpellBtnConfig />
         </div>
     }
 

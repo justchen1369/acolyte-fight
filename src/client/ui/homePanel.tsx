@@ -9,7 +9,7 @@ import * as url from '../url';
 import NameConfig from './nameConfig';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
-import SpellConfig from './spellConfig';
+import SpellBtnConfig from './spellConfig';
 import Link from './link';
 import NavBar from './navbar';
 import PartyList from './partyList';
@@ -74,7 +74,7 @@ class HomePanel extends React.Component<Props, State> {
                 <h2>Your Name</h2>
                 <NameConfig />
                 <h1>Your Spells</h1>
-                <SpellConfig />
+                <SpellBtnConfig />
                 <h1>More Settings</h1>
                 <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
             </div>
