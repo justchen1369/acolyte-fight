@@ -59,6 +59,8 @@ class NavBar extends React.Component<Props, State> {
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
                 <NavBarItem page=""><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</NavBarItem>
+                <div className="spacer" />
+                <LoginButton />
             </div>
         </div>
     }
