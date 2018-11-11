@@ -1,7 +1,12 @@
-import * as s from './store.model';
+export interface GlobalConfig {
+    baseUrl?: string;
+    acolyteAuthToken?: string;
+    acolyteDefaultName?: string;
+    acolyteFacebook?: boolean;
+}
 
 export function getConfig() {
-    return window as any as s.GlobalConfig;
+    return window as any as GlobalConfig;
 }
 
 export function getBaseUrl() {

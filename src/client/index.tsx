@@ -18,6 +18,7 @@ import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
 import * as url from './url';
+import * as userAgent from './core/userAgent';
 
 import Root from './ui/root';
 
@@ -25,8 +26,9 @@ let alreadyConnected = false;
 
 export function initialize() {
     StoreProvider.init();
-    stats.attachListener();
-    cloud.attachListener();
+    stats.init();
+    cloud.init();
+    userAgent.init();
 
     start();
     render();

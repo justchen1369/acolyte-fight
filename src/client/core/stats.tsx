@@ -14,7 +14,7 @@ import { TicksPerSecond } from '../../game/constants';
 
 let alreadyLoadedGameStats = false;
 
-export function attachListener() {
+export function init() {
     notifications.attachListener(notifs => onNotification(notifs));
     sockets.listeners.onGameMsg = onGameMsg;
 }

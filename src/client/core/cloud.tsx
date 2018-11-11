@@ -11,7 +11,7 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { base } from '../url';
 
-export function attachListener() {
+export function init() {
     notifications.attachListener(notifs => onNotification(notifs));
 }
 
