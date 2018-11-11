@@ -6,7 +6,8 @@
   "scripts": {
     "compile": "tsc",
     "bundle": "webpack",
-    "build": "npm run compile && npm run bundle",
+    "build": "npm run compile && npm run bundle && npm run facebook",
+    "facebook": "./create-fb-package.sh",
     "server": "node js/server/index",
     "postinstall": "npm run build",
     "start": "npm run server",
