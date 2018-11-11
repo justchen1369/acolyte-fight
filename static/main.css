@@ -281,15 +281,6 @@ a:hover, a:active {
 }
 
 .navbar .nav-item-ranking {
-    font-size: 80%;
-    color: #ccc;
-}
-
-.navbar .nav-item-ranking .ranking-league {
-    font-weight: bold;
-}
-
-.navbar .nav-item-ranking .ranking-rating {
     font-weight: normal;
 }
 

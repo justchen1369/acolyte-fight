@@ -1,12 +1,13 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
+import * as rankings from '../core/rankings';
 import * as url from '../url';
 import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
-import RankingControl from './rankingControl';
 
 interface Props {
     page: string;
@@ -14,6 +15,7 @@ interface Props {
     isUsingAI: boolean;
     isModded: boolean;
     inParty: boolean;
+    profile: m.GetProfileResponse;
 }
 
 interface State {
@@ -27,6 +29,7 @@ function stateToProps(state: s.State): Props {
         isUsingAI: !!state.aiCode,
         isModded: Object.keys(state.room.mod).length > 0,
         inParty: !!state.party,
+        profile: state.profile,
     };
 }
 
@@ -75,13 +78,12 @@ class NavBar extends React.Component<Props, State> {
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
-                <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
+                {this.renderRanking() || <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>}
                 <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
                 {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></NavBarItem>}
                 {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
-                <RankingControl />
                 <LoginButton />
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>
@@ -98,6 +100,23 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>
             </div>
         </div>
+    }
+
+    private renderRanking() {
+        const profile = this.props.profile;
+        if (!(profile && profile.ratings)) {
+            return null;
+        }
+
+        const rating = profile.ratings[m.GameCategory.PvP];
+        if (!(rating && rating.lowerBound && rating.percentile >= 0)) {
+            return null;
+        }
+
+        const league = rankings.getLeagueName(rating.percentile);
+        return <NavBarItem page="leaderboard" className="nav-item-ranking" shrink={true}>
+            <i className="fas fa-star" title="Leaderboard" /><span className="shrink"> You: <b>{league}</b> {rating.lowerBound.toFixed(0)}</span>
+        </NavBarItem>
     }
 
     private stopBubbling(ev: React.MouseEvent) {
