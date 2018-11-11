@@ -1002,6 +1002,8 @@ function calculateButtonStatesFromHero(world: w.World, hero: w.Hero, options: Re
 
 function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>) {
 	const keys = world.settings.Choices.Keys;
+	const hoverSpellId = world.ui.hoverSpellId;
+
 	const buttonStateLookup = new Map<string, w.ButtonRenderState>();
 	for (let i = 0; i < keys.length; ++i) {
 		const key = keys[i];
@@ -1015,7 +1017,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 
 		const btnState: w.ButtonRenderState = {
 			key: null,
-			color: "#444444",
+			color: spell.id === hoverSpellId ? "#555555" : "#444444",
 			icon: spell.icon,
 			cooldownText: null,
 		};
