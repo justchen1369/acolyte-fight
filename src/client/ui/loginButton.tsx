@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
@@ -62,7 +63,7 @@ class LoginButton extends React.Component<Props> {
         }
 
         const rating = profile.ratings[m.GameCategory.PvP];
-        if (!(rating && rating.lowerBound && rating.percentile >= 0)) {
+        if (!(rating && rating.lowerBound && rating.percentile >= 0 && rating.numGames >= constants.Placements.MinGames)) {
             return this.renderUnrankedLoggedIn();
         }
 
