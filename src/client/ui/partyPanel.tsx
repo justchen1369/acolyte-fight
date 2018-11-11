@@ -74,7 +74,7 @@ export class PartyPanel extends React.Component<Props, State> {
         return <div>
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
-            <p><span className="btn" onClick={() => parties.leavePartyAsync()}>Leave Party</span></p>
+            <p><span className="btn" onClick={() => this.onLeaveParty()}>Leave Party</span></p>
             {this.renderPartyMode(self.isLeader)}
             <h1>Players</h1>
             <div className="party-list">
@@ -104,6 +104,11 @@ export class PartyPanel extends React.Component<Props, State> {
                 <span className="party-mode-label"><b>Tournament</b>: private party where only the party leader controls all the settings and decides who is allowed to play. Useful for running tournaments.</span>
             </PartyMode>
         </div>
+    }
+
+    private async onLeaveParty() {
+        await parties.leavePartyAsync();
+        pages.changePage("");
     }
 }
 
