@@ -10,6 +10,7 @@ import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { base } from '../url';
+import { isFacebook } from './userAgent';
 
 export function init() {
     notifications.attachListener(notifs => onNotification(notifs));
@@ -165,6 +166,11 @@ export async function downloadGameStats(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
+    if (isFacebook) {
+        // Don't ever logout of a Facebook account because that effectively deletes it
+        return;
+   }
+
     await fetch(`${base}/api/logout`, {
         headers: { ...credentials.headers() },
         credentials: "same-origin",

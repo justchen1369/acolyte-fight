@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import { isFacebook } from '../core/userAgent';
 
 interface Props {
     loggedIn: boolean;
@@ -31,7 +32,7 @@ export class LogoutPanel extends React.Component<Props, State> {
 
     private renderLoggedIn() {
         return <div>
-            <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>
+            {!isFacebook && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
         </div>
     }
 

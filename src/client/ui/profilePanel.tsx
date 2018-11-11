@@ -10,7 +10,7 @@ import AccountPanel from './accountPanel';
 import CategorySelector from './categorySelector';
 import RecentGamesList from './recentGameList';
 import UserStatsPanel from './userStatsPanel';
-import { isMobile } from '../core/userAgent';
+import { isMobile, isFacebook } from '../core/userAgent';
 
 interface Props {
     current: s.PathElements;
@@ -44,7 +44,7 @@ export class ProfilePanel extends React.Component<Props, State> {
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
-            {isMe && this.props.loggedIn && <div>
+            {!isFacebook && isMe && this.props.loggedIn && <div>
                 <h1>Your Account</h1>
                 <AccountPanel />
             </div>}
