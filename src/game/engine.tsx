@@ -10,6 +10,11 @@ import { calculateMod } from './settings';
 
 import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
+export interface ResolvedKeyBindings {
+	keysToSpells: Map<string, string>;
+	spellsToKeys: Map<string, string>;
+}
+
 // Reset planck.js constants
 {
 	const settings = (pl as any).internal.Settings;
@@ -524,13 +529,13 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	});
 }
 
-export function allowSpellChoosing(world: w.World) {
-	// Only allow spells to be changed before game starts
-	return world.tick < world.startTick || !!world.winner;
+export function allowSpellChoosing(world: w.World, heroId: string) {
+	// Only allow spells to be changed before game starts or if hero has died
+	return world.tick < world.startTick || !!world.winner || !world.objects.has(heroId);
 }
 
 function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
-	if (!allowSpellChoosing(world)) {
+	if (!allowSpellChoosing(world, ev.heroId)) {
 		return;
 	}
 
@@ -725,7 +730,13 @@ function handleActions(world: w.World) {
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
-	const Choices = world.settings.Choices;
+	const resolved = resolveKeyBindings(keyBindings, world.settings);
+	hero.keysToSpells = resolved.keysToSpells;
+	hero.spellsToKeys = resolved.spellsToKeys;
+}
+
+export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFightSettings): ResolvedKeyBindings {
+	const Choices = settings.Choices;
 
 	let keysToSpells = new Map<string, string>();
 	let spellsToKeys = new Map<string, string>();
@@ -739,9 +750,11 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 
 		keysToSpells.set(key, spellId);
 		spellsToKeys.set(spellId, key);
-	}
-	hero.keysToSpells = keysToSpells;
-	hero.spellsToKeys = spellsToKeys;
+    }
+    return {
+        keysToSpells: keysToSpells,
+        spellsToKeys: spellsToKeys,
+    };
 }
 
 function removeUnknownProjectilesFromHero(hero: w.Hero, world: w.World) {

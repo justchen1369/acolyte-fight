@@ -5,7 +5,7 @@ import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
-import { render, CanvasStack } from './render';
+import { render, CanvasStack, RenderOptions } from './render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
@@ -79,10 +79,7 @@ function incomingLoop(minFramesToProcess: number) {
 	}
 }
 
-export function frame(canvasStack: CanvasStack) {
-    const store = StoreProvider.getState();
-	const world = store.world;
-	
+export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
 		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
@@ -110,10 +107,7 @@ export function frame(canvasStack: CanvasStack) {
 		applyTickActions(tickData, world, preferredColors);
 		engine.tick(world);
 	}
-	render(world, canvasStack, {
-		wheelOnRight: store.options.wheelOnRight,
-		rebindings: store.rebindings,
-	});
+	render(world, canvasStack, renderOptions);
 
 	const notifications = engine.takeNotifications(world);
 	notify(...notifications);

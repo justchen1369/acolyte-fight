@@ -31,7 +31,7 @@ function stateToProps(state: s.State): Props {
         btn: state.world.ui.customizingBtn,
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
-        allowSpellChoosing: engine.allowSpellChoosing(state.world),
+        allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         hoverBtn: state.world.ui.hoverBtn,
         hoverSpellId: state.world.ui.hoverSpellId,
         wheelOnRight: state.options.wheelOnRight,

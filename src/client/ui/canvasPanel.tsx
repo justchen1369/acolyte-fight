@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as Reselect from 'reselect';
 
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
@@ -24,6 +25,8 @@ const FpsThreshold = 0.75;
 
 interface Props {
     world: w.World;
+    wheelOnRight: boolean;
+    keyBindings: KeyBindings;
     rebindings: KeyBindings;
 }
 interface State {
@@ -106,6 +109,8 @@ class AnimationLoop {
 function stateToProps(state: s.State): Props {
     return {
         world: state.world,
+        wheelOnRight: state.options.wheelOnRight,
+        keyBindings: state.keyBindings,
         rebindings: state.rebindings,
     };
 }
@@ -135,6 +140,12 @@ class CanvasPanel extends React.Component<Props, State> {
         ui: null,
         cursor: null,
     };
+
+    private resolveKeys = Reselect.createSelector(
+        (props: Props) => props.keyBindings,
+        (props: Props) => props.world.settings,
+        (keyBindings, settings) => engine.resolveKeyBindings(keyBindings, settings)
+    );
 
     constructor(props: Props) {
         super(props);
@@ -406,7 +417,8 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private handleCustomizeBtn(customizingBtn: string) {
-        if (engine.allowSpellChoosing(this.props.world)) {
+        const world = this.props.world;
+        if (engine.allowSpellChoosing(world, world.ui.myHeroId)) {
             StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
         }
     }
@@ -441,9 +453,9 @@ class CanvasPanel extends React.Component<Props, State> {
         }
 
         const hero = world.objects.get(world.ui.myHeroId);
-        if (!hero || hero.category !== "hero") { return null; }
+        const keysToSpells = (hero && hero.category === "hero") ? hero.keysToSpells : this.resolveKeys(this.props).keysToSpells;
 
-        const spellId = hero.keysToSpells.get(key);
+        const spellId = keysToSpells.get(key);
         if (!spellId) { return null; }
 
         const spell = world.settings.Spells[spellId];
@@ -472,7 +484,12 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private frame() {
         if (this.canvasStack.background && this.canvasStack.canvas && this.canvasStack.glows && this.canvasStack.ui) {
-            frame(this.canvasStack);
+            const resolvedKeys = this.resolveKeys(this.props);
+            frame(this.canvasStack, this.props.world, {
+                wheelOnRight: this.props.wheelOnRight,
+                keysToSpells: resolvedKeys.keysToSpells,
+                rebindings: this.props.rebindings,
+            });
             this.handleLongProcessIfNecessary();
         }
     }

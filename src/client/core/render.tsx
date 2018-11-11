@@ -11,6 +11,7 @@ import { ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pix
 import { Icons } from './icons';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
+import { stringify } from 'querystring';
 
 export interface CanvasStack {
 	background: HTMLCanvasElement;
@@ -29,7 +30,12 @@ export interface CanvasCtxStack {
 
 export interface RenderOptions {
 	wheelOnRight: boolean;
+	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
+}
+
+interface ButtonInput {
+	buttonRenderState: { [btn: string]: w.ButtonRenderState };
 }
 
 // Rendering
@@ -888,11 +894,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, options: RenderOptions) {
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
-	if (myHero) {
-		renderButtons(ctx, rect, world, myHero, options);
-	} else {
-		ctx.clearRect(0, 0, rect.width, rect.height);
-	}
+	renderButtons(ctx, rect, world, myHero, options);
 }
 
 export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
@@ -956,20 +958,70 @@ export function touchControls(config: w.ButtonConfig): boolean {
 }
 
 function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w.World, hero: w.Hero, options: RenderOptions) {
-	const selectedAction = hero.casting && hero.casting.action && hero.casting.action.type;
+	let buttonStateLookup: Map<string, w.ButtonRenderState> = null;
+	if (hero) {
+		buttonStateLookup = calculateButtonStatesFromHero(world, hero, options);
+	} else if (world.ui.myHeroId) {
+		// Dead - display buttons so user can continue customising
+		buttonStateLookup = calculateButtonStatesFromKeyBindings(world, options.keysToSpells);
+	} else {
+		buttonStateLookup = null;
+	}
+
+	if (buttonStateLookup) {
+		if (!world.ui.buttonBar) {
+			world.ui.buttonBar = calculateButtonLayout(world.settings.Choices.Keys, rect, options);
+		}
+
+		const config = world.ui.buttonBar;
+		if (config.view === "bar") {
+			renderButtonBar(ctx, config, buttonStateLookup);
+		} else if (config.view === "wheel") {
+			renderButtonWheel(ctx, config, buttonStateLookup);
+		}
+	} else {
+		ctx.clearRect(0, 0, rect.width, rect.height);
+	}
+}
+
+function calculateButtonStatesFromHero(world: w.World, hero: w.Hero, options: RenderOptions) {
+	const selectedAction = hero && hero.casting && hero.casting.action && hero.casting.action.type;
 	const keys = world.settings.Choices.Keys;
+	const buttonStateLookup = new Map<string, w.ButtonRenderState>();
+	for (let i = 0; i < keys.length; ++i) {
+		const key = keys[i];
+		if (!key) {
+			continue;
+		}
 
-	if (!world.ui.buttonBar) {
-		world.ui.buttonBar = calculateButtonLayout(keys, rect, options);
+		const btnState = calculateButtonState(key.btn, hero, selectedAction, world, options.rebindings);
+		buttonStateLookup.set(key.btn, btnState);
 	}
+	return buttonStateLookup;
+}
 
-	const config = world.ui.buttonBar;
-	if (config.view === "bar") {
-		renderButtonBar(ctx, config, keys, hero, selectedAction, world, options.rebindings);
-	} else if (config.view === "wheel") {
-		renderButtonWheel(ctx, config, keys, hero, selectedAction, world, options.rebindings);
-		// renderTargetSurface(ctx, config, selectedAction, world);
+function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>) {
+	const keys = world.settings.Choices.Keys;
+	const buttonStateLookup = new Map<string, w.ButtonRenderState>();
+	for (let i = 0; i < keys.length; ++i) {
+		const key = keys[i];
+		if (!key) { continue; }
+
+		const spellId = keysToSpells.get(key.btn);
+		if (!spellId) { continue }
+
+		const spell = world.settings.Spells[spellId];
+		if (!spell) { continue }
+
+		const btnState: w.ButtonRenderState = {
+			key: null,
+			color: "#444444",
+			icon: spell.icon,
+			cooldownText: null,
+		};
+		buttonStateLookup.set(key.btn, btnState);
 	}
+	return buttonStateLookup;
 }
 
 function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, options: RenderOptions): w.ButtonConfig {
@@ -980,18 +1032,18 @@ function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, options: Ren
 	}
 }
 
-function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings) {
+function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, states: Map<string, w.ButtonRenderState>) {
 	ctx.save();
 	ctx.translate(config.region.left, config.region.top);
 	ctx.scale(config.scaleFactor, config.scaleFactor);
 
-	for (let i = 0; i < keys.length; ++i) {
-		const key = keys[i];
+	for (let i = 0; i < config.keys.length; ++i) {
+		const key = config.keys[i];
 		if (!key) {
 			continue;
 		}
 
-		const newState = calculateButtonState(key.btn, hero, selectedAction, world, rebindings);
+		const newState = states.get(key.btn);
 		const currentState = config.buttons.get(key.btn);
 
 		if (buttonStateChanged(currentState, newState)) {
@@ -1009,7 +1061,7 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 	ctx.restore();
 }
 
-function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, keys: KeyConfig[], hero: w.Hero, selectedAction: string, world: w.World, rebindings: KeyBindings) {
+function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, states: Map<string, w.ButtonRenderState>) {
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
@@ -1018,7 +1070,7 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 			continue;
 		}
 
-		const newState = calculateButtonState(key, hero, selectedAction, world, rebindings);
+		const newState = states.get(key);
 		const currentState = config.buttons.get(key);
 
 		if (buttonStateChanged(currentState, newState)) {
@@ -1066,6 +1118,7 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 
 	return {
 		view: "bar",
+		keys,
 		hitBoxes,
 		region,
 		scaleFactor,

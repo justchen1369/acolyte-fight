@@ -101,6 +101,7 @@ export interface ButtonBarConfig {
 	region: ClientRect;
 	scaleFactor: number;
 
+	keys: KeyConfig[];
 	hitBoxes: Map<string, ClientRect>;
 
 	buttons: Map<string, ButtonRenderState>;
