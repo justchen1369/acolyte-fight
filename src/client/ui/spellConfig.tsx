@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 
-import SpellBtnConfig from './SpellBtnConfig';
+import SpellBtnConfig from './spellBtnConfig';
 
 interface Props {
     config: KeyBindings;
