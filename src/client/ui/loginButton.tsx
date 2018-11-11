@@ -36,10 +36,22 @@ class LoginButton extends React.Component<Props> {
     }
 
     render() {
-        return this.props.loggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+        const rating = this.getRating();
+
+        let items = new Array<JSX.Element>();
+        if (rating) {
+            items.push(this.renderRank(rating));
+        }
+        if (!this.props.loggedIn) {
+            items.push(this.renderLoginBtn());
+        }
+        if (items.length === 0) {
+            items.push(this.renderProfileLink());
+        }
+        return <>{items}</>
     }
 
-    private renderNotLoggedIn() {
+    private renderLoginBtn() {
         if (isFacebook) {
             // Can't force a login when playing through Facebook instant games - it happens automatically after NumVerificationGames
             return null;
@@ -49,28 +61,36 @@ class LoginButton extends React.Component<Props> {
             "login-btn": true,
             "logging-in": !this.props.loginAttempted,
         });
-        return <NavBarItem className={className} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
+        return <NavBarItem key="login" className={className} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
     }
 
-    private renderUnrankedLoggedIn() {
-        return <NavBarItem page="profile" className="nav-profile-item" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
+    private renderProfileLink() {
+        if (this.props.userId) {
+            return <NavBarItem key="profile" page="profile" className="nav-profile-item" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
+        } else {
+            return null;
+        }
     }
 
-    private renderLoggedIn() {
+    private renderRank(rating: m.UserRating) {
+        const league = rankings.getLeagueName(rating.percentile);
+        return <NavBarItem key="rank" page="profile" className="nav-profile-item nav-item-ranking" profileId={this.props.userId}>
+            You: <b>{league}</b> {rating.lowerBound.toFixed(0)}
+        </NavBarItem>
+    }
+
+    private getRating() {
         const profile = this.props.profile;
         if (!(profile && profile.ratings)) {
-            return this.renderUnrankedLoggedIn();
+            return null;
         }
 
         const rating = profile.ratings[m.GameCategory.PvP];
         if (!(rating && rating.lowerBound && rating.percentile >= 0 && rating.numGames >= constants.Placements.MinGames)) {
-            return this.renderUnrankedLoggedIn();
+            return null;
         }
 
-        const league = rankings.getLeagueName(rating.percentile);
-        return <NavBarItem page="profile" className="nav-profile-item nav-item-ranking" profileId={this.props.userId}>
-            You: <b>{league}</b> {rating.lowerBound.toFixed(0)}
-        </NavBarItem>
+        return rating;
     }
 }
 
