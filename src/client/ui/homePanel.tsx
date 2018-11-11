@@ -13,7 +13,7 @@ import SpellBtnConfig from './spellConfig';
 import Link from './link';
 import NavBar from './navbar';
 import PartyList from './partyList';
-import { isMobile } from '../core/userAgent';
+import { isMobile, isFacebook } from '../core/userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -55,17 +55,17 @@ class HomePanel extends React.Component<Props, State> {
                     <PlayButton />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                <PartyList />
+                {!isFacebook && <PartyList />}
                 <div className="spacer" />
-                <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
+                {!isFacebook && <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
-                </div>
+                </div>}
                 <div style={{ flexGrow: 0.1 }} />
-                <div className="more-io-games"><a href="https://iogames.space">More .io Games</a></div>
-                <SocialBar />
+                {!isFacebook && <div className="more-io-games"><a href="https://iogames.space">More .io Games</a></div>}
+                {!isFacebook && <SocialBar />}
             </div>
-            <div className="page" ref={(elem) => this.belowFoldElem = elem}>
+            {!isFacebook && <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>
                 <p>
                     Time to practice your skills.
@@ -77,7 +77,7 @@ class HomePanel extends React.Component<Props, State> {
                 <SpellBtnConfig />
                 <h1>More Settings</h1>
                 <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
-            </div>
+            </div>}
         </div>;
     }
 

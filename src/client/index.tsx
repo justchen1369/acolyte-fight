@@ -30,7 +30,6 @@ export function initialize() {
     stats.init();
     cloud.init();
     rankings.init();
-    userAgent.init();
 
     start();
     render();

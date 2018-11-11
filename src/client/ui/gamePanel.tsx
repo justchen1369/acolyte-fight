@@ -15,7 +15,7 @@ import SocialBar from './socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
 
-import { isMobile } from '../core/userAgent';
+import { isMobile, isFacebook } from '../core/userAgent';
 
 interface Props {
     party: s.PartyState;
@@ -51,7 +51,7 @@ class GamePanel extends React.Component<Props, State> {
                 {allowExit && <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
                     <i className="fa fa-chevron-left" /> Back to Home
                 </span>}
-                {!isMobile && allowExit && <SocialBar />}
+                {!isFacebook && !isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
                 <UrlListener />
             </div>

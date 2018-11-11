@@ -20,3 +20,7 @@ export function getAuthToken() {
 export function getDefaultName() {
     return getConfig().acolyteDefaultName;
 }
+
+export function isFacebook() {
+    return !!getConfig().acolyteFacebook;
+}

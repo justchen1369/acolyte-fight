@@ -38,6 +38,10 @@ export class ProfilePanel extends React.Component<Props, State> {
     }
 
     render() {
+        return isFacebook ? this.renderFacebook() : this.renderFull();
+    }
+
+    renderFull() {
         const profileId = this.props.current.profileId || this.props.myUserId;
         const isMe = profileId === this.props.myUserId;
 
@@ -57,6 +61,16 @@ export class ProfilePanel extends React.Component<Props, State> {
                 <h1>Replays</h1>
                 <RecentGamesList category={category} />
             </div>}
+        </div>
+    }
+
+    renderFacebook() {
+        const profileId = this.props.current.profileId || this.props.myUserId;
+        const isMe = profileId === this.props.myUserId;
+
+        const category = m.GameCategory.PvP;
+        return <div className="profile-panel">
+            <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />
         </div>
     }
 
