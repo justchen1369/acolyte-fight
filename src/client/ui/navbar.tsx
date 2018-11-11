@@ -8,6 +8,7 @@ import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
 
 interface Props {
+    page: string;
     userId: string;
     isUsingAI: boolean;
     isModded: boolean;
@@ -20,6 +21,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        page: state.current.page,
         userId: state.userId,
         isUsingAI: !!state.aiCode,
         isModded: Object.keys(state.room.mod).length > 0,
@@ -46,6 +48,22 @@ class NavBar extends React.Component<Props, State> {
     }
 
     render() {
+        if (this.props.page === "") {
+            return this.renderNavBar();
+        } else {
+            return this.renderBackToHome();
+        }
+    }
+
+    private renderBackToHome() {
+        return <div className="navbar-container">
+            <div className="navbar navbar-horizontal">
+                <NavBarItem page=""><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</NavBarItem>
+            </div>
+        </div>
+    }
+
+    private renderNavBar() {
         const verticalClasses = classNames({
             "navbar": true,
             "navbar-vertical": true,
@@ -54,7 +72,6 @@ class NavBar extends React.Component<Props, State> {
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
-                <NavBarItem page=""><i className="fas fa-home" title="Home" /><span className="shrink"> Home</span></NavBarItem>
                 <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
                 <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
                 {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></NavBarItem>}

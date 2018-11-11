@@ -48,9 +48,9 @@ class GamePanel extends React.Component<Props, State> {
                 <InfoPanel />
                 <MessagesPanel />
                 <SpellInfoPanel />
-                {allowExit && <a className="exit-link" href="#" onClick={(ev) => this.onExitClicked(ev)}>
-                    <i className="fa fa-chevron-left" /> Back to Home <span className="return-home-subtext">(spell selection, replays and more)</span>
-                </a>}
+                {allowExit && <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
+                    <i className="fa fa-chevron-left" /> Back to Home
+                </span>}
                 {!isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
                 <UrlListener />
@@ -58,9 +58,7 @@ class GamePanel extends React.Component<Props, State> {
         );
     }
 
-    private onExitClicked(ev: React.MouseEvent) {
-        ev.preventDefault();
-
+    private onExitClicked() {
         if (!(this.props.party)) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();

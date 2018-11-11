@@ -49,10 +49,24 @@ body .page {
 
 #game-panel .exit-link {
     position: absolute;
-    top: 8px;
-    left: 8px;
+    top: 0;
+    left: 0;
+
+    color: white;
     font-size: 20px;
+    padding: 15px 20px;
+    text-align: center;
+    vertical-align: center;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
 }
+
+#game-panel .exit-link:hover {
+    background: #555;
+    color: #ff8800;
+}
+
 
 .return-home-subtext {
     opacity: 0.75;
