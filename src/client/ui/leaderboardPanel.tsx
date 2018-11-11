@@ -10,6 +10,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
+import * as rankings from '../core/rankings';
 import * as url from '../url';
 import Link from './link';
 import UserStatsPanel from './userStatsPanel';
@@ -28,33 +29,6 @@ interface State {
     leaderboard: m.LeaderboardPlayer[];
     profile: m.GetProfileResponse;
     error: string;
-}
-
-async function retrieveLeaderboardAsync(category: string) {
-    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}`, {
-        headers: credentials.headers(),
-        credentials: 'same-origin'
-    });
-    if (res.status === 200) {
-        const buffer = new Uint8Array(await res.arrayBuffer());
-        const json = msgpack.decode(buffer) as m.GetLeaderboardResponse;
-        return json.leaderboard;
-    } else {
-        throw await res.text();
-    }
-}
-
-async function retrieveUserStatsAsync(profileId: string) {
-    const res = await fetch(`${url.base}/api/profile?p=${encodeURIComponent(profileId)}`, {
-        headers: credentials.headers(),
-        credentials: 'same-origin'
-    });
-    if (res.status === 200) {
-        const json = await res.json() as m.GetProfileResponse;
-        return json;
-    } else {
-        throw await res.text();
-    }
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -90,13 +64,13 @@ class LeaderboardPanel extends React.Component<Props, State> {
         if (category !== this.state.category) {
             this.setState({ category, leaderboard: null, error: null });
             try {
-                const leaderboard = await retrieveLeaderboardAsync(category);
+                const leaderboard = await rankings.retrieveLeaderboardAsync(category);
                 if (category === this.state.category) {
                     this.setState({ leaderboard });
                 }
 
                 if (this.props.myUserId && this.props.loggedIn) {
-                    const profile = await retrieveUserStatsAsync(this.props.myUserId);
+                    const profile = await rankings.retrieveUserStatsAsync(this.props.myUserId);
                     this.setState({ profile });
                 }
             } catch(error) {

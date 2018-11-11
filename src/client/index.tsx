@@ -13,6 +13,7 @@ import * as cloud from './core/cloud';
 import * as matches from './core/matches';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
+import * as rankings from './core/rankings';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
 import * as storage from './storage';
@@ -28,6 +29,7 @@ export function initialize() {
     StoreProvider.init();
     stats.init();
     cloud.init();
+    rankings.init();
     userAgent.init();
 
     start();
@@ -39,6 +41,9 @@ export function initialize() {
             pages.go(elems);
         }
     }
+
+    cloud.downloadSettings().then(userId => rankings.retrieveUserStatsAsync(userId));
+    storage.cleanupGameStats();
 }
 
 function start() {
@@ -80,9 +85,6 @@ function start() {
                 }
             });
     });
-
-    cloud.downloadSettings();
-    storage.cleanupGameStats();
 }
 
 function render() {

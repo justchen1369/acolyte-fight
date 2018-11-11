@@ -228,6 +228,7 @@ export interface RatingAdjustmentNotification {
 	type: "ratingAdjustment";
 	gameId: string;
 	ratingDelta: number;
+	category: string;
 }
 
 export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting | ChoosingSpells;

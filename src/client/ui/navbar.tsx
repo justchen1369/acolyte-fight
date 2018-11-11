@@ -6,6 +6,7 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
+import RankingControl from './rankingControl';
 
 interface Props {
     page: string;
@@ -80,6 +81,7 @@ class NavBar extends React.Component<Props, State> {
                 {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
+                <RankingControl />
                 <LoginButton />
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>

@@ -44,6 +44,7 @@ async function onGameMsg(buffer: ArrayBuffer) {
             type: "ratingAdjustment",
             gameId: gameStats.id,
             ratingDelta: self.ratingDelta,
+            category: gameStats.category,
         });
     }
 

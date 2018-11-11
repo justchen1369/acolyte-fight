@@ -35,7 +35,7 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
     }
 }
 
-export async function downloadSettings(): Promise<void> {
+export async function downloadSettings(): Promise<string> {
     const state = StoreProvider.getState();
 
     const numGames = await storage.getNumGames();
@@ -85,9 +85,12 @@ export async function downloadSettings(): Promise<void> {
         if (upload) {
             await uploadSettings();
         }
+
+        return json.userId;
     } else {
         // This user is not logged in
         StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
+        return null;
     }
 }
 

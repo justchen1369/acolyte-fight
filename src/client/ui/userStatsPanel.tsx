@@ -10,21 +10,10 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
+import * as rankings from '../core/rankings';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
-
-interface League {
-    name: string;
-    minPercentile: number;
-}
-interface PointsToNextLeague {
-    name: string;
-    pointsRemaining: number;
-}
-interface PointsToNextLeagueLookup {
-    [category: string]: PointsToNextLeague;
-}
 
 interface OwnProps {
     profileId: string;
@@ -42,89 +31,8 @@ interface Props extends OwnProps {
 interface State {
     profileId: string;
     profile: m.GetProfileResponse;
-    pointsToNextLeague: PointsToNextLeagueLookup;
+    pointsToNextLeague: rankings.PointsToNextLeagueLookup;
     error: string;
-}
-
-export const leagues = [
-    { name: "Grandmaster", minPercentile: constants.Placements.Grandmaster },
-    { name: "Master", minPercentile: constants.Placements.Master },
-    { name: "Diamond", minPercentile: constants.Placements.Diamond },
-    { name: "Platinum", minPercentile: constants.Placements.Platinum },
-    { name: "Gold", minPercentile: constants.Placements.Gold },
-    { name: "Silver", minPercentile: constants.Placements.Silver },
-    { name: "Bronze", minPercentile: constants.Placements.Bronze },
-    { name: "Wood", minPercentile: constants.Placements.Wood },
-];
-
-async function retrieveUserStatsAsync(profileId: string) {
-    const res = await fetch(`${url.base}/api/profile?p=${encodeURIComponent(profileId)}`, {
-        headers: credentials.headers(),
-        credentials: 'same-origin',
-    });
-    if (res.status === 200) {
-        const json = await res.json() as m.GetProfileResponse;
-        return json;
-    } else {
-        throw await res.text();
-    }
-}
-
-async function retrievePointsToNextLeagueAsync(profile: m.GetProfileResponse): Promise<PointsToNextLeagueLookup> {
-    const categories = [m.GameCategory.PvP];
-    const lookup: PointsToNextLeagueLookup = {};
-    for (const category of categories) {
-        const userRating = profile.ratings[category];
-        if (!userRating) {
-            continue;
-        }
-
-        const ratingLB = userRating.lowerBound;
-        const percentile = userRating.percentile;
-        if (ratingLB && percentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(ratingLB, percentile, category);
-        }
-    }
-    return lookup;
-}
-
-async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
-    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
-        headers: credentials.headers(),
-        credentials: 'same-origin',
-    });
-    if (res.status === 200) {
-        const json = await res.json() as m.GetRatingAtPercentileResponse;
-        return json.rating;
-    } else {
-        throw await res.text();
-    }
-}
-
-async function calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): Promise<PointsToNextLeague> {
-    const nextLeague = calculateNextLeague(percentile);
-    if (!nextLeague) {
-        return null;
-    }
-
-    const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
-    if (minRating) {
-        return {
-            name: nextLeague.name,
-            pointsRemaining: minRating - ratingLB,
-        };
-    } else {
-        return null;
-    }
-}
-
-function calculateNextLeague(percentile: number): League {
-    const higher = leagues.filter(l => percentile < l.minPercentile);
-    if (higher.length === 0) {
-        return null;
-    }
-
-    return _.minBy(higher, l => l.minPercentile);
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -165,15 +73,13 @@ class UserStatsPanel extends React.Component<Props, State> {
                 }
                 this.setState({ profileId, profile, pointsToNextLeague: {}, error: null });
                 try {
-                    const profile = await retrieveUserStatsAsync(profileId);
+                    const profile = await rankings.retrieveUserStatsAsync(profileId);
                     if (profile.userId === this.state.profileId) {
                         this.setState({ profile });
                     }
 
                     if (profile.userId === this.props.myUserId) {
-                        StoreProvider.dispatch({ type: "updateProfile", profile });
-
-                        const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
+                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings);
                         if (profile.userId === this.state.profileId) {
                             this.setState({ pointsToNextLeague });
                         }
@@ -227,7 +133,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
         const isMe = profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
-        const leagueName = this.getLeagueName(rating.percentile);
+        const leagueName = rankings.getLeagueName(rating.percentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
         return <div>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
@@ -289,15 +195,6 @@ class UserStatsPanel extends React.Component<Props, State> {
             <h1>{this.props.playerName}</h1>
             {!this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to receive your rating and stats</p>}
         </div>
-    }
-
-    private getLeagueName(percentile: number) {
-        for (const league of leagues) {
-            if (percentile >= league.minPercentile) {
-                return league.name;
-            }
-        }
-        return "";
     }
 }
 
