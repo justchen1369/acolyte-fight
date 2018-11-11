@@ -18,8 +18,12 @@ interface League {
     name: string;
     minPercentile: number;
 }
+interface PointsToNextLeague {
+    name: string;
+    pointsRemaining: number;
+}
 interface PointsToNextLeagueLookup {
-    [category: string]: number;
+    [category: string]: PointsToNextLeague;
 }
 
 interface OwnProps {
@@ -77,7 +81,7 @@ async function retrievePointsToNextLeagueAsync(profile: m.GetProfileResponse): P
 
         const ratingLB = userRating.lowerBound;
         const percentile = userRating.percentile;
-        if (ratingLB && percentile) {
+        if (ratingLB && percentile >= 0) {
             lookup[category] = await calculatePointsUntilNextLeague(ratingLB, percentile, category);
         }
     }
@@ -97,7 +101,7 @@ async function retrieveRatingAtPercentile(category: string, percentile: number):
     }
 }
 
-async function calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): Promise<number> {
+async function calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): Promise<PointsToNextLeague> {
     const nextLeague = calculateNextLeague(percentile);
     if (!nextLeague) {
         return null;
@@ -105,7 +109,10 @@ async function calculatePointsUntilNextLeague(ratingLB: number, percentile: numb
 
     const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
     if (minRating) {
-        return minRating - ratingLB;
+        return {
+            name: nextLeague.name,
+            pointsRemaining: minRating - ratingLB,
+        };
     } else {
         return null;
     }
@@ -142,11 +149,11 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     componentWillMount() {
-        this.loadDataAsync(this.props.profileId);
+        this.loadDataAsync(this.props.profileId || this.props.myUserId);
     }
 
     componentWillReceiveProps(newProps: Props) {
-        this.loadDataAsync(newProps.profileId);
+        this.loadDataAsync(newProps.profileId || this.props.myUserId);
     }
 
     private async loadDataAsync(profileId: string) {
@@ -156,18 +163,20 @@ class UserStatsPanel extends React.Component<Props, State> {
                 if (this.props.myProfile && this.props.myProfile.userId === profileId) {
                     profile = this.props.myProfile;
                 }
-                this.setState({ profileId, profile, error: null });
+                this.setState({ profileId, profile, pointsToNextLeague: {}, error: null });
                 try {
                     const profile = await retrieveUserStatsAsync(profileId);
                     if (profile.userId === this.state.profileId) {
                         this.setState({ profile });
                     }
 
-                    if (this.props.myUserId === this.props.profileId) {
-                        const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
-                        this.setState({ pointsToNextLeague });
-
+                    if (profile.userId === this.props.myUserId) {
                         StoreProvider.dispatch({ type: "updateProfile", profile });
+
+                        const pointsToNextLeague = await retrievePointsToNextLeagueAsync(profile);
+                        if (profile.userId === this.state.profileId) {
+                            this.setState({ pointsToNextLeague });
+                        }
                     }
                 } catch(error) {
                     console.error("UserStatsPanel error", error);
@@ -219,7 +228,7 @@ class UserStatsPanel extends React.Component<Props, State> {
         const isMe = profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = this.getLeagueName(rating.percentile);
-        const pointsUntilNextLeague = this.state.pointsToNextLeague[this.props.category];
+        const nextLeague = this.state.pointsToNextLeague[this.props.category];
         return <div>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
                 <div className="stats-card">
@@ -237,8 +246,8 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {isMe && isPlaced && pointsUntilNextLeague > 0 && <p className="points-to-next-league">
-                You are currently in the <b>{leagueName}</b> league. +{Math.ceil(pointsUntilNextLeague)} points until you are promoted into the next league.
+            {isMe && isPlaced && nextLeague && <p className="points-to-next-league">
+                You are currently in the <b>{leagueName}</b> league. +{Math.ceil(nextLeague.pointsRemaining)} points until you are promoted into the {nextLeague.name} league.
             </p>}
         </div>
     }
