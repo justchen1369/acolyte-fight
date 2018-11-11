@@ -35,12 +35,14 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
 }
 
 export async function downloadSettings(): Promise<void> {
+    const state = StoreProvider.getState();
+
     const numGames = await storage.getNumGames();
     console.log(`Downloading settings... numGames=${numGames}`);
 
     let url = `${base}/api/settings?cachebuster=${Date.now()}`;
     if (numGames >= constants.Placements.VerificationGames) {
-        url += "&create=1";
+        url += `&create=${encodeURIComponent(state.playerName)}`;
     }
 
     const res = await fetch(url, {

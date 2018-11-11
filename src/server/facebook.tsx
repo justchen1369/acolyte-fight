@@ -3,6 +3,8 @@ import * as base64url from 'base64-url';
 import * as CryptoJS from 'crypto-js';
 import * as auth from './auth';
 
+const FacebookAuthTokenPrefix = "fb-";
+
 let FacebookSecret = "unknown";
 
 interface SignedRequestPayload {
@@ -37,25 +39,12 @@ export function authToken(facebookId: string) {
     if (facebookId) {
         const hash = crypto.createHash('sha256').update(`${auth.getEnigmaSecret()}.${facebookId}`).digest('base64');
         const hashUrl = base64url.escape(hash);
-        return `fb-${hashUrl}`;
+        return FacebookAuthTokenPrefix + hashUrl;
     } else {
         return null;
     }
 }
 
-/*
-export function verifyPlayerId(signedRequest: string): string {
-    const parts = signedRequest.split('.');
-    const signature = base64url.decode(parts[0]);
-    const payload = base64url.decode(parts[1]);
-
-    const hash = crypto.createHmac('sha256', FacebookSecret).update(payload).read().toString();
-    console.log(signature, hash);
-    if (signature !== hash) {
-        return null;
-    }
-
-    const json: SignedRequestPayload = JSON.parse(payload);
-    return json.player_id;
+export function isFacebookAuthToken(authToken: string) {
+    return authToken && authToken.startsWith(FacebookAuthTokenPrefix);
 }
-*/

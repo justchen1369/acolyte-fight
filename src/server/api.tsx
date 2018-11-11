@@ -273,15 +273,22 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
 
         // Do this after the result has been sent as there is no need to wait for this
         await userStorage.touch(user.userId);
-    } else if (req.query.create) {
+    } else if (required(req.query.create, "string") && sanitize.validName(req.query.create)) {
         // Create anonymous user
-        logger.info(`Creating anonymous user ${authToken}`);
+        const name: string = req.query.create;
+
+        let loggedIn = false;
+        if (facebook.isFacebookAuthToken(authToken)) {
+            loggedIn = true;
+        }
+
+        logger.info(`Creating ${loggedIn ? "facebook" : "anonymous"} user ${authToken}: ${name}`);
         const userId = userStorage.generateUserId();
         const userSettings: g.User = {
             userId,
-            loggedIn: false,
+            loggedIn,
             settings: {
-                name: null,
+                name,
                 buttons: null,
                 rebindings: null,
                 options: null,
@@ -291,8 +298,8 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
 
         const result: m.GetUserSettingsResponse = {
             userId: userId,
-            loggedIn: false,
-            name: null,
+            loggedIn,
+            name,
             buttons: null,
             rebindings: null,
             options: null,
