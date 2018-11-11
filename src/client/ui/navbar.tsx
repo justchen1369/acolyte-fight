@@ -7,6 +7,7 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
+import RatingControl from './ratingControl';
 import { isFacebook } from '../core/userAgent';
 
 interface Props {
@@ -75,7 +76,7 @@ class NavBar extends React.Component<Props, State> {
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
                 <div className="spacer" />
-                <LoginButton />
+                <RatingControl />
             </div>
         </div>
     }
@@ -95,6 +96,7 @@ class NavBar extends React.Component<Props, State> {
                 {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
+                <RatingControl />
                 <LoginButton />
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>

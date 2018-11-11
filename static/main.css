@@ -282,6 +282,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-item-ranking {
+    background: #222;
     font-weight: normal;
 }
 

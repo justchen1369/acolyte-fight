@@ -5,7 +5,6 @@ import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
-import * as rankings from '../core/rankings';
 import * as url from '../url';
 import NavBarItem from './navbarItem';
 import { isFacebook } from '../core/userAgent';
@@ -15,7 +14,6 @@ interface Props {
     userId: string;
     loggedIn: boolean;
     playerName: string;
-    profile: m.GetProfileResponse;
 }
 
 function stateToProps(state: s.State): Props {
@@ -24,7 +22,6 @@ function stateToProps(state: s.State): Props {
         userId: state.userId,
         loggedIn: state.loggedIn,
         playerName: state.playerName,
-        profile: state.profile,
     };
 }
 
@@ -36,19 +33,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     render() {
-        const rating = this.getRating();
-
-        let items = new Array<JSX.Element>();
-        if (rating) {
-            items.push(this.renderRank(rating));
-        }
-        if (!this.props.loggedIn) {
-            items.push(this.renderLoginBtn());
-        }
-        if (items.length === 0) {
-            items.push(this.renderProfileLink());
-        }
-        return <>{items}</>
+        return this.props.loggedIn ? this.renderProfileLink() : this.renderLoginBtn();
     }
 
     private renderLoginBtn() {
@@ -70,27 +55,6 @@ class LoginButton extends React.Component<Props> {
         } else {
             return null;
         }
-    }
-
-    private renderRank(rating: m.UserRating) {
-        const league = rankings.getLeagueName(rating.percentile);
-        return <NavBarItem key="rank" page="profile" className="nav-profile-item nav-item-ranking" profileId={this.props.userId}>
-            You: <b>{league}</b> {rating.lowerBound.toFixed(0)}
-        </NavBarItem>
-    }
-
-    private getRating() {
-        const profile = this.props.profile;
-        if (!(profile && profile.ratings)) {
-            return null;
-        }
-
-        const rating = profile.ratings[m.GameCategory.PvP];
-        if (!(rating && rating.lowerBound && rating.percentile >= 0 && rating.numGames >= constants.Placements.MinGames)) {
-            return null;
-        }
-
-        return rating;
     }
 }
 
