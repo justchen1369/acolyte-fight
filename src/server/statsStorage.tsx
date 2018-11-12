@@ -243,6 +243,80 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
     return { leaderboard: result };
 }
 
+export async function decayLeaderboardIfNecessary(category: string): Promise<void> {
+    const numDecaysPerDay = 24 / constants.Placements.RdDecayIntervalHours;
+    const decayPerInterval = constants.Placements.RdDecayPerDay / numDecaysPerDay;
+    const intervalMilliseconds = constants.Placements.RdDecayIntervalHours * 60 * 60 * 1000;
+
+    const firestore = getFirestore();
+    const shouldUpdate = await firestore.runTransaction(async (t) => {
+        const doc = await t.get(firestore.collection('ratingDecay').doc('singleton'));
+        const data = doc.data() as db.RatingDecaySingleton;
+        if (!data || Date.now() >= data.updated.toMillis() + intervalMilliseconds) {
+            const newData: db.RatingDecaySingleton = {
+                updated: Firestore.FieldValue.serverTimestamp() as any,
+            };
+            t.set(doc.ref, newData);
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+    if (shouldUpdate) {
+        await decayLeaderboard(category, decayPerInterval);
+    }
+}
+
+async function decayLeaderboard(category: string, decay: number): Promise<void> {
+    const start = Date.now();
+    const firestore = getFirestore();
+
+    // Find lowest rating to be on leaderboard
+    const response = await retrieveLeaderboard(category);
+    if (response.leaderboard.length === 0) {
+        return;
+    }
+    const tailProfile = response.leaderboard[response.leaderboard.length - 1];
+    const cutoff = tailProfile.lowerBound;
+
+    // Decay all users (logged in or not) who are above the cutoff
+    let numUsers = 0;
+    const promises = new Array<Promise<void>>();
+    const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').where(`ratings.${category}.lowerBound`, '>=', cutoff);
+    await dbStorage.stream(query, doc => {
+        ++numUsers;
+        promises.push(decayUser(doc.id, category, decay));
+    });
+    await Promise.all(promises);
+
+    const elapsed = Date.now() - start;
+    logger.info(`Decayed ${numUsers} by ${decay} rd in ${elapsed.toFixed(0)} ms`);
+}
+
+async function decayUser(userId: string, category: string, decay: number): Promise<void> {
+    const firestore = getFirestore();
+    await firestore.runTransaction(async (t) => {
+        const doc = await t.get(firestore.collection('user').doc(userId));
+        const user = doc.data() as db.User;
+        if (!(user && user.ratings && user.ratings[category])) {
+            return;
+        }
+
+        const userRating = user.ratings[category];
+        if (!userRating.lowerBound) {
+            return;
+        }
+
+        userRating.rd = Math.min(constants.Placements.InitialRd, userRating.rd + decay);
+        userRating.lowerBound = calculateLowerBound(userRating.rating, userRating.rd);
+
+        await t.update(doc.ref, {
+            ratings: { [category]: userRating },
+        });
+    });
+}
+
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
     const firestore = getFirestore();
     const doc = await firestore.collection('user').doc(userId).get();

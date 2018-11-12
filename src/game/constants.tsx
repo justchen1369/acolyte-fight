@@ -32,6 +32,8 @@ export namespace Placements {
 	export const VerificationGames = 5;
 	export const InitialRating = 1700;
 	export const InitialRd = 350;
+	export const RdDecayPerDay = 1.5;
+	export const RdDecayIntervalHours = 8;
 
 	export const Grandmaster = 98;
 	export const Master = 90;

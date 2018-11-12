@@ -7,6 +7,10 @@ export namespace Collections {
     export const Game = 'game';
 }
 
+export interface RatingDecaySingleton {
+    updated: Firestore.Timestamp;
+}
+
 export interface User {
     accessed: Firestore.Timestamp;
     loggedIn: boolean;

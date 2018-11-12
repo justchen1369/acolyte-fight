@@ -97,7 +97,9 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 setInterval(() => {
 	serverStore.cleanupOldRooms(1);
 	statsStorage.cleanupGames(7);
+	statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP);
 }, cleanupIntervalMinutes * 60 * 1000);
+statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP); // TODO - remove this (testing only)
 
 setInterval(() => {
 	const status = api.getInternalStatus();
