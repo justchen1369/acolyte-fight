@@ -48,7 +48,7 @@ export function connectToServer(server: string): Promise<void> {
 					reject(response.error);
 				} else {
 					StoreProvider.dispatch({ type: "updateServer", server: response.server, socketId: response.socketId });
-					console.log(`Connected to upstream ${server}`);
+					console.log(`Connected to upstream ${server}, changed to socketId ${response.socketId}`);
 					resolve();
 				}
 			});
