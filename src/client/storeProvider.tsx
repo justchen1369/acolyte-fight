@@ -163,7 +163,7 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updateRebindings") {
         return { ...state, rebindings: action.rebindings };
     } else if (action.type === "updateServer") {
-        return { ...state, server: action.server };
+        return { ...state, server: action.server, socketId: action.socketId };
     } else if (action.type === "updateProfile") {
         return { ...state, profile: action.profile };
     } else if (action.type === "updateGameStats") {

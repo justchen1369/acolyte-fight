@@ -211,6 +211,7 @@ export interface UpdateRebindingsAction {
 export interface UpdateServerAction {
     type: "updateServer";
     server: string;
+    socketId: string;
 }
 
 export interface UpdateProfileAction {

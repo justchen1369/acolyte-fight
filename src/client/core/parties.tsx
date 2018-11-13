@@ -245,7 +245,7 @@ async function onPartyMsg(msg: m.PartyMsg) {
 		return;
 	}
 
-	if (msg.members.some(m => m.socketId === socket.id)) {
+	if (msg.members.some(m => m.socketId === store.socketId)) {
 		StoreProvider.dispatch({
 			type: "updateParty",
 			partyId: msg.partyId,

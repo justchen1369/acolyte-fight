@@ -160,6 +160,7 @@ export interface ProxyRequestMsg {
 
 export interface ProxyResponse {
     success: true;
+    socketId: string;
     server: string;
 }
 

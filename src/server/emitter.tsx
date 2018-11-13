@@ -94,7 +94,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 	const location = getLocation();
 	if (!location.server || !data.server || location.server === data.server) {
 		// Already connected to the correct server
-		callback({ success: true, server: location.server });
+		callback({ success: true, server: location.server, socketId: socket.id });
 	} else {
 		const server = sanitizeHostname(data.server);
 		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
@@ -111,7 +111,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			if (!attached) {
 				attached = true;
 				upstreams.set(socket.id, upstream);
-				callback({ success: true, server });
+				callback({ success: true, server, socketId: upstream.id });
 				logger.error(`Socket ${socket.id} connected to upstream ${server}`);
 			}
 		});
