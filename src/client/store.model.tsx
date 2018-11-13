@@ -74,8 +74,7 @@ export interface PathElements {
 }
 
 export type Action =
-    UpdateSocketAction
-    | DisconnectedAction
+    DisconnectedAction
     | UpdateUserIdAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
@@ -107,11 +106,6 @@ export interface JoinMatchAction {
 
 export interface LeaveMatchAction {
     type: "leaveMatch";
-}
-
-export interface UpdateSocketAction {
-    type: "updateSocket";
-    socketId: string;
 }
 
 export interface DisconnectedAction {

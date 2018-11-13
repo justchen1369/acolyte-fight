@@ -59,7 +59,6 @@ function start() {
             .then(() => {
                 if (!alreadyConnected) {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
-                    StoreProvider.dispatch({ type: "updateSocket", socketId: socket.id });
 
                     if (current.hash === "#join") {
                         // Return to the home page when we exit
@@ -76,7 +75,7 @@ function start() {
             }).catch(error => {
                 console.error(error)
                 socket.disconnect();
-                StoreProvider.dispatch({ type: "updateSocket", socketId: null });
+                StoreProvider.dispatch({ type: "disconnected" });
 
                 if (current.party || current.server) {
                     // Failed to join party/server, try without server

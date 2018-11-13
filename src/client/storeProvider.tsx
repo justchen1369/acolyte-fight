@@ -43,9 +43,7 @@ function initialState(): s.State {
 }
 
 function reducer(state: s.State, action: s.Action): s.State {
-    if (action.type === "updateSocket") {
-        return { ...state, socketId: action.socketId };
-    } else if (action.type === "disconnected") {
+    if (action.type === "disconnected") {
 	    return {
             ...state,
             socketId: null,

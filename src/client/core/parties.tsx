@@ -246,15 +246,19 @@ async function onPartyMsg(msg: m.PartyMsg) {
 		return;
 	}
 
-	StoreProvider.dispatch({
-		type: "updateParty",
-		partyId: msg.partyId,
-		roomId: msg.roomId,
-		members: msg.members,
-		isPrivate: msg.isPrivate,
-		isLocked: msg.isLocked,
-	});
-	await joinCurrentPartyRoomAsync();
+	if (msg.members.some(m => m.socketId === store.socketId)) {
+		StoreProvider.dispatch({
+			type: "updateParty",
+			partyId: msg.partyId,
+			roomId: msg.roomId,
+			members: msg.members,
+			isPrivate: msg.isPrivate,
+			isLocked: msg.isLocked,
+		});
+		await joinCurrentPartyRoomAsync();
+	} else {
+		await leavePartyAsync();
+	}
 }
 
 function joinCurrentPartyRoomAsync(): Promise<void> {
