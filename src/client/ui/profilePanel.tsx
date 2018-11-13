@@ -54,7 +54,7 @@ export class ProfilePanel extends React.Component<Props, State> {
             </div>}
             {isMe && !this.props.loggedIn && <div>
                 <h1>Your Stats</h1>
-                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to share stats across multiple devices</p>
+                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to share stats across devices</p>
             </div>}
             <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />
             {isMe && <div>

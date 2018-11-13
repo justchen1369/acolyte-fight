@@ -71,9 +71,10 @@ export class PartyPanel extends React.Component<Props, State> {
             return this.renderNoParty();
         }
 
+        const origin = url.getOrigin(party.region);
         return <div>
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
-            <p><input className="share-url" type="text" value={window.location.origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
+            <p><input className="share-url" type="text" value={origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => this.onLeaveParty()}>Leave Party</span></p>
             {this.renderPartyMode(self.isLeader)}
             <h1>Players</h1>

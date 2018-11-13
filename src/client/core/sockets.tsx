@@ -47,7 +47,7 @@ export function connectToServer(server: string): Promise<void> {
 					console.log(`Failed to connect to upstream ${server}`);
 					reject(response.error);
 				} else {
-					StoreProvider.dispatch({ type: "updateServer", server: response.server, socketId: response.socketId });
+					StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: response.socketId });
 					console.log(`Connected to upstream ${server}, changed to socketId ${response.socketId}`);
 					resolve();
 				}
@@ -68,7 +68,7 @@ function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 				// The server has restarted, we need to reload because there might be a new release
 				onDisconnectMsg();
 			} else {
-				StoreProvider.dispatch({ type: "updateServer", server: response.server, socketId: socket.id });
+				StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
 				serverInstanceId = newInstanceId;
 				onConnect();
 			}

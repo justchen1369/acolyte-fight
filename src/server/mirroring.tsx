@@ -3,10 +3,8 @@ import { logger } from './logging';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 
-const devRegion = "dev";
-
 let location: g.LocationStore = {
-    region: devRegion,
+    region: null,
     server: null,
     upstreamSuffix: "",
 };
@@ -42,8 +40,8 @@ export function sanitizeHostname(hostname: string): string {
 function extractRegion(server: string) {
     if (server) {
         const split = server.indexOf('-');
-        return split === -1 ? devRegion : server.substring(0, split);
+        return split === -1 ? null : server.substring(0, split);
     } else {
-        return devRegion;
+        return null;
     }
 }

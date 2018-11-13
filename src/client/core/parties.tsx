@@ -62,6 +62,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				party: {
 					id: response.partyId,
 					server: response.server,
+					region: response.region,
 					roomId: response.roomId,
 					members: response.members,
 					isPrivate: response.isPrivate,

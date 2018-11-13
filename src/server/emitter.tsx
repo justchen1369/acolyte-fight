@@ -94,7 +94,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 	const location = getLocation();
 	if (!location.server || !data.server || location.server === data.server) {
 		// Already connected to the correct server
-		callback({ success: true, server: location.server, socketId: socket.id });
+		callback({ success: true, server: location.server, region: location.region, socketId: socket.id });
 	} else {
 		const server = sanitizeHostname(data.server);
 		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
@@ -110,9 +110,11 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 		upstream.on('connect', () => {
 			if (!attached) {
 				attached = true;
-				upstreams.set(socket.id, upstream);
-				callback({ success: true, server, socketId: upstream.id });
-				logger.error(`Socket ${socket.id} connected to upstream ${server}`);
+				upstream.emit('instance', {} as m.ServerInstanceRequest, (result: m.ServerInstanceResponse) => {
+					upstreams.set(socket.id, upstream);
+					callback({ success: true, socketId: upstream.id, server: result.server, region: result.region });
+					logger.error(`Socket ${socket.id} connected to upstream ${server}`);
+				});
 			}
 		});
 		upstream.on('connect_error', (error: any) => {
@@ -148,7 +150,7 @@ function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.Serve
 	}
 
 	const location = getLocation();
-	callback({ success: true, instanceId, server: location.server });
+	callback({ success: true, instanceId, server: location.server, region: location.region });
 }
 
 function onRoomMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinRoomRequest, callback: (output: m.JoinRoomResponseMsg) => void) {
@@ -303,10 +305,12 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 	};
 	parties.createOrUpdatePartyMember(party, partyMember);
 
+	const location = getLocation();
 	const result: m.PartyResponse = {
 		success: true,
 		...partyToMsg(party),
-		server: getLocation().server,
+		server: location.server,
+		region: location.region,
 	};
 	callback(result);
 	emitParty(party);

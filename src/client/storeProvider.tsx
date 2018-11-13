@@ -31,6 +31,7 @@ function initialState(): s.State {
         current: { page: "", profileId: null },
         socketId: null,
         server: null,
+        region: null,
         room,
         party: null,
         world: engine.initialWorld(room.mod),
@@ -163,7 +164,7 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updateRebindings") {
         return { ...state, rebindings: action.rebindings };
     } else if (action.type === "updateServer") {
-        return { ...state, server: action.server, socketId: action.socketId };
+        return { ...state, server: action.server, region: action.region, socketId: action.socketId };
     } else if (action.type === "updateProfile") {
         return { ...state, profile: action.profile };
     } else if (action.type === "updateGameStats") {

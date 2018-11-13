@@ -18,6 +18,7 @@ export interface State {
     socketId: string;
     party: PartyState;
     server: string;
+    region: string;
     room: RoomState;
     world: w.World;
     items: NotificationItem[];
@@ -40,6 +41,7 @@ export interface NotificationItem {
 export interface PartyState {
     id: string;
     server: string;
+    region: string;
     roomId: string;
     isPrivate: boolean;
     isLocked: boolean;
@@ -211,6 +213,7 @@ export interface UpdateRebindingsAction {
 export interface UpdateServerAction {
     type: "updateServer";
     server: string;
+    region: string;
     socketId: string;
 }
 

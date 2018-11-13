@@ -9,10 +9,10 @@ import * as storage from '../storage';
 import * as url from '../url';
 
 const RegionUrls = [
-    "https://us.acolytefight.io",
-    "https://eu.acolytefight.io",
-    "https://au.acolytefight.io",
-    "https://sg.acolytefight.io",
+    url.getOrigin("au"),
+    url.getOrigin("eu"),
+    url.getOrigin("us"),
+    url.getOrigin("sg"),
 ];
 
 interface Region {
@@ -24,6 +24,7 @@ interface Region {
 
 interface Props {
     server: string;
+    region: string;
 }
 
 interface State {
@@ -48,6 +49,7 @@ function retrieveRegion(url: string): Promise<Region> {
 function stateToProps(state: s.State): Props {
     return {
         server: state.server,
+        region: state.region,
     };
 }
 
@@ -72,7 +74,7 @@ class RegionList extends React.Component<Props, State> {
         return <div className="region-list-section">
             <h1>Regions</h1>
             <p>Normally, you are automatically connected to your closest server. If there is no one online on your home server, you can try connecting to other regions.</p>
-            {this.props.server && <p>You are currently connected to server <b>{this.props.server}</b></p>}
+            {this.props.server && this.props.region && <p>You are currently connected to server <b>{this.props.server}</b> in region <b>{this.props.region}</b></p>}
             {this.state.regions.length === 0 && <div className="loading">Loading regions...</div>}
             {this.state.error && <div className="error">{this.state.error}</div>}
             {this.state.regions.map(region => <div className="region">

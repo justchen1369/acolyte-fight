@@ -3,6 +3,16 @@ import * as s from './store.model';
 
 export const base = (window as any).baseUrl || "";
 
+export function getOrigin(region: string) {
+    if (region) {
+        // Live
+        return `https://${region}.acolytefight.io`;
+    } else {
+        // Dev
+        return window.location.origin;
+    }
+}
+
 export function parseLocation(location: Location): s.PathElements {
     let path: string = null;
     let page: string = null;

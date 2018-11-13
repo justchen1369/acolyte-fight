@@ -162,6 +162,7 @@ export interface ProxyResponse {
     success: true;
     socketId: string;
     server: string;
+    region: string;
 }
 
 export type ProxyResponseMsg = ProxyResponse | ErrorResponseMsg;
@@ -173,6 +174,7 @@ export interface ServerInstanceResponse {
     success: true;
     instanceId: string;
     server: string;
+    region: string;
 }
 export type ServerInstanceResponseMsg = ServerInstanceResponse | ErrorResponseMsg;
 
@@ -236,6 +238,7 @@ export interface PartyResponse extends PartyMsg {
     success: true;
     partyId: string;
     server: string;
+    region: string;
 }
 export type PartyResponseMsg = PartyResponse | ErrorResponseMsg;
 
