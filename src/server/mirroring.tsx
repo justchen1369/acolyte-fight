@@ -11,6 +11,10 @@ let location: g.LocationStore = {
     upstreamSuffix: "",
 };
 
+export function isMirrored() {
+    return !!location.server;
+}
+
 export function getLocation() {
     return location;
 }

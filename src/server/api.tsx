@@ -141,7 +141,6 @@ async function onCreateTestUserAsync(req: express.Request, res: express.Response
     }
 
     const authToken = auth.resendAuthToken(req, res);
-    const origin = getOrigin(req);
 
     const allowCache = false;
     let userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken), allowCache)

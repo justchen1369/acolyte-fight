@@ -68,7 +68,7 @@ function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 				// The server has restarted, we need to reload because there might be a new release
 				onDisconnectMsg();
 			} else {
-				StoreProvider.dispatch({ type: "updateServer", server: response.server });
+				StoreProvider.dispatch({ type: "updateServer", server: response.server, socketId: socket.id });
 				serverInstanceId = newInstanceId;
 				onConnect();
 			}
