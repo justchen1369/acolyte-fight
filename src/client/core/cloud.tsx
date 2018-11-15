@@ -124,22 +124,15 @@ export async function uploadSettings(): Promise<void> {
     }
 }
 
-export async function downloadGameStats(): Promise<void> {
-    const state = StoreProvider.getState();
-    const userId = state.userId;
-
-    if (!(state.loggedIn && userId)) {
-        // Can't download if not logged in
-        return;
-    }
+export async function fetchGameStats(userId: string, limit: number, until?: moment.Moment): Promise<d.GameStats[]> {
+    until = until || moment.unix(0);
 
     const allGameStats = new Array<d.GameStats>();
-    const until = await storage.getStatsLoadedUntil() || moment.unix(0);
-    const limit = 10;
-    let newestLoaded = until;
+    const chunk = 10;
+
     let oldestLoaded = moment();
-    while (allGameStats.length < constants.MaxGamesToKeep) {
-        const res = await fetch(`${base}/api/gameStats?after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${limit}`, {
+    while (allGameStats.length < limit) {
+        const res = await fetch(`${base}/api/gameStats?p=${encodeURIComponent(userId)}&after=${oldestLoaded.unix()}&before=${until.unix()}&limit=${chunk}`, {
             headers: { ...credentials.headers() },
             credentials: "same-origin",
         });
@@ -154,14 +147,34 @@ export async function downloadGameStats(): Promise<void> {
             if (timestamp.isBefore(oldestLoaded)) {
                 oldestLoaded = timestamp;
             }
-            if (timestamp.isAfter(newestLoaded)) {
-                newestLoaded = timestamp;
-            }
         }
 
-        if (json.stats.length === 0 || json.stats.length < limit) {
+        if (json.stats.length === 0 || json.stats.length < chunk) {
             // Reached the end
             break;
+        }
+    }
+    return allGameStats;
+}
+
+export async function downloadGameStats(): Promise<void> {
+    const state = StoreProvider.getState();
+    const userId = state.userId;
+
+    if (!(state.loggedIn && userId)) {
+        // Can't download if not logged in
+        return;
+    }
+
+    const until = await storage.getStatsLoadedUntil() || moment.unix(0);
+    let newestLoaded = until;
+    const allGameStats = await fetchGameStats(userId, constants.MaxGamesToKeep, until);
+    for (const gameStats of allGameStats) {
+        await storage.saveGameStats(gameStats);
+
+        const timestamp = moment(gameStats.timestamp);
+        if (timestamp.isAfter(newestLoaded)) {
+            newestLoaded = timestamp;
         }
     }
     await storage.setStatsLoadedUntil(newestLoaded);

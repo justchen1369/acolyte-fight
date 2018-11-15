@@ -8,6 +8,7 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 import AccountPanel from './accountPanel';
 import CategorySelector from './categorySelector';
+import ProfileGameList from './profileGameList';
 import RecentGamesList from './recentGameList';
 import UserStatsPanel from './userStatsPanel';
 import { isMobile, isFacebook } from '../core/userAgent';
@@ -57,10 +58,12 @@ export class ProfilePanel extends React.Component<Props, State> {
                 <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to share stats across devices</p>
             </div>}
             <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />
-            {isMe && <div>
+            <div>
                 <h1>Replays</h1>
-                <RecentGamesList category={category} />
-            </div>}
+                {isMe
+                    ? <RecentGamesList category={category} />
+                    : <ProfileGameList profileId={profileId} category={category} /> }
+            </div>
         </div>
     }
 

@@ -1,0 +1,101 @@
+import _ from 'lodash';
+import moment from 'moment';
+import * as React from 'react';
+import * as ReactRedux from 'react-redux';
+import * as Reselect from 'reselect';
+import * as d from '../stats.model';
+import * as m from '../../game/messages.model';
+import * as s from '../store.model';
+import * as cloud from '../core/cloud';
+import * as matches from '../core/matches';
+import * as pages from '../core/pages';
+import * as stats from '../core/stats';
+import * as url from '../url';
+import GameList from './gameList';
+
+const MaxReplaysToDisplay = 50;
+
+interface OwnProps {
+    profileId: string;
+    category: string;
+}
+interface Props extends OwnProps {
+    current: s.PathElements;
+}
+interface State {
+    profileId: string;
+    allGameStats: d.GameStats[];
+    category: string;
+    error: string;
+}
+
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        current: state.current,
+    };
+}
+
+class ProfileGameList extends React.Component<Props, State> {
+    private getGameSubset = Reselect.createSelector(
+        (props: State) => props.category,
+        (props: State) => props.allGameStats,
+        (category, allGameStats) => {
+            if (allGameStats) {
+                let replays = allGameStats;
+                if (category !== m.GameCategory.AllCategory) {
+                    replays = replays.filter(g => g.category === category);
+                }
+                return replays;
+            } else {
+                return null;
+            }
+        });
+
+    constructor(props: Props) {
+        super(props);
+        this.state = {
+            profileId: props.profileId,
+            allGameStats: [],
+            category: props.category,
+            error: null,
+        };
+    }
+
+    componentDidMount() {
+        this.retrieveData(this.props.profileId);
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+        if (newProps.profileId !== this.state.profileId) {
+            this.retrieveData(newProps.profileId);
+        }
+    }
+
+    private async retrieveData(profileId: string) {
+        this.setState({ profileId, allGameStats: [] });
+        if (!profileId) {
+            return;
+        }
+
+        try {
+            const allGameStats = await cloud.fetchGameStats(profileId, MaxReplaysToDisplay);
+            if (this.state.profileId !== profileId) {
+                // Stopped showing this profile
+                return;
+            }
+
+            this.setState({ profileId, allGameStats });
+        } catch (error) {
+            console.error(error);
+            this.setState({ error: `${error}` });
+        }
+    }
+
+    render() {
+        const allGameStats = this.getGameSubset(this.state);
+        return <GameList allGameStats={allGameStats} limit={MaxReplaysToDisplay} />
+    }
+}
+
+export default ReactRedux.connect(stateToProps)(ProfileGameList);

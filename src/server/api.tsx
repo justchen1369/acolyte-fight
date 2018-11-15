@@ -9,6 +9,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
 import * as categories from './categories';
+import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
 import * as games from './games';
@@ -186,14 +187,14 @@ export function onGetGameStats(req: express.Request, res: express.Response) {
 }
 
 export async function onGetGameStatsAsync(req: express.Request, res: express.Response): Promise<void> {
-    const maxLimit = 100;
+    const maxLimit = constants.MaxGamesToKeep;
 
     const after = req.query.after ? parseInt(req.query.after) : null;
     const before = req.query.before ? parseInt(req.query.before) : null;
     const limit = req.query.limit ? Math.min(maxLimit, parseInt(req.query.limit)) : maxLimit;
 
     const authToken = getAuthToken(req);
-    const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
+    const userId = req.query.p ? req.query.p : await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
     if (!userId) {
         res.status(403).send("Forbidden");
         return;
