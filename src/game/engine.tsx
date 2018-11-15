@@ -1832,6 +1832,15 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
 	if (!toHero) { return; }
 
+	// Register hit
+	if (packet.damage > 0) {
+		if (packet.isLava) {
+			toHero.lavaTick = world.tick;
+		} else {
+			toHero.damagedTick = world.tick;
+		}
+	}
+
 	if (world.tick < world.startTick) {
 		// No damage until game started
 		return;
@@ -1850,15 +1859,6 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 		}
 	}
 
-	// Register damage
-	if (packet.damage > 0) {
-		if (packet.isLava) {
-			toHero.lavaTick = world.tick;
-		} else {
-			toHero.damagedTick = world.tick;
-		}
-	}
-
 	// Update scores
 	if (!world.winner) {
 		if (fromHeroId && fromHeroId !== toHero.id) {
@@ -1873,15 +1873,16 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 }
 
 function applyDamageToObstacle(obstacle: w.Obstacle, damage: number, world: w.World) {
+	// Register hit
+	if (damage > 0) {
+		obstacle.damagedTick = world.tick;
+	}
+
 	if (world.tick < world.startTick) {
 		// No damage until game started
 		return;
 	}
 	obstacle.health = Math.max(0, obstacle.health - damage);
-
-	if (damage > 0) {
-		obstacle.damagedTick = world.tick;
-	}
 }
 
 export function initScore(heroId: string): w.HeroScore {
