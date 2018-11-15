@@ -25,6 +25,7 @@ interface Props extends OwnProps {
 interface State {
     profileId: string;
     allGameStats: d.GameStats[];
+    loading: boolean;
     category: string;
     error: string;
 }
@@ -57,6 +58,7 @@ class ProfileGameList extends React.Component<Props, State> {
         this.state = {
             profileId: props.profileId,
             allGameStats: [],
+            loading: true,
             category: props.category,
             error: null,
         };
@@ -73,7 +75,7 @@ class ProfileGameList extends React.Component<Props, State> {
     }
 
     private async retrieveData(profileId: string) {
-        this.setState({ profileId, allGameStats: [] });
+        this.setState({ profileId, allGameStats: [], loading: true, error: null });
         if (!profileId) {
             return;
         }
@@ -85,16 +87,34 @@ class ProfileGameList extends React.Component<Props, State> {
                 return;
             }
 
-            this.setState({ profileId, allGameStats });
+            this.setState({ profileId, allGameStats, loading: false, error: null });
         } catch (error) {
             console.error(error);
-            this.setState({ error: `${error}` });
+            this.setState({ error: `${error}`, loading: false, });
         }
     }
 
     render() {
+        if (this.state.error) {
+            return this.renderError(this.state.error);
+        } else if (this.state.loading) {
+            return this.renderLoading();
+        } else {
+            return this.renderGames();
+        }
+    }
+
+    private renderGames() {
         const allGameStats = this.getGameSubset(this.state);
         return <GameList allGameStats={allGameStats} limit={MaxReplaysToDisplay} />
+    }
+
+    private renderLoading(): JSX.Element {
+        return <p className="loading-text">Loading...</p>;
+    }
+
+    private renderError(error: string): JSX.Element {
+        return <p className="error">Error loading recent games: {error}</p>;
     }
 }
 
