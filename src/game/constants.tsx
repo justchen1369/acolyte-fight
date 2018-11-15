@@ -60,8 +60,13 @@ export namespace HeroColors {
 		"#6d89cc",
 	];
 
-	export const HitGlowFactor = 0.3;
-	export const HitFlashTicks = 3;
+	export const LavaFlashInterval = 20;
+
+	export const DamageGlowFactor = 1.0;
+	export const DamageFlashTicks = 10;
+
+	export const ShieldGlowFactor = 0.3;
+	export const ShieldFlashTicks = 3;
 
 	export const RangeIndicatorWidth = Pixel * 2;
 };

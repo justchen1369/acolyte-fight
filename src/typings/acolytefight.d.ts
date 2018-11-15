@@ -313,6 +313,7 @@ declare interface LinkParameters {
 declare interface DamagePacket {
 	damage: number;
 	lifeSteal?: number;
+	isLava?: boolean;
 }
 
 declare interface Vec2 {

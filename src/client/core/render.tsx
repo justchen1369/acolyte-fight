@@ -456,7 +456,15 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 	{
 		ctx.save();
 
-		ctx.fillStyle = color;
+		const damageAge = hero.damagedTick ? world.tick - hero.damagedTick : Infinity;
+		const lavaAge = hero.lavaTick ? world.tick - (Math.floor(hero.lavaTick / HeroColors.LavaFlashInterval) * HeroColors.LavaFlashInterval) : Infinity;
+		const hitAge = Math.min(lavaAge, damageAge);
+
+		let fillColor = color;
+		if (hitAge < HeroColors.DamageFlashTicks) {
+			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * (1 - hitAge / HeroColors.DamageFlashTicks)).string();
+		}
+		ctx.fillStyle = fillColor;
 		ctx.beginPath();
 		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
 		ctx.fill();
@@ -599,8 +607,8 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color;
 	if (shield.hitTick >= 0) {
 		const hitAge = world.tick - shield.hitTick;
-		if (hitAge < HeroColors.HitFlashTicks) {
-			color = Color(color).lighten(HeroColors.HitGlowFactor * (1 - hitAge / HeroColors.HitFlashTicks)).string();
+		if (hitAge < HeroColors.ShieldFlashTicks) {
+			color = Color(color).lighten(HeroColors.ShieldGlowFactor * (1 - hitAge / HeroColors.ShieldFlashTicks)).string();
 		}
 	}
 

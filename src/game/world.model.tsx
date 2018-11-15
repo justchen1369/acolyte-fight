@@ -315,6 +315,7 @@ export interface Hero extends WorldObjectBase {
 	moveSpeedPerSecond: number;
 	revolutionsPerTick: number;
 	damagedTick?: number;
+	lavaTick?: number;
 
 	additionalDamagePower: number;
 	additionalDamageMultiplier: number;

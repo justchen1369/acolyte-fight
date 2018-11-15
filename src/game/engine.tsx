@@ -1422,7 +1422,7 @@ function applyLavaDamage(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.radius > world.radius) {
-				applyDamage(obj, { damage: lavaDamagePerTick }, null, world);
+				applyDamage(obj, { damage: lavaDamagePerTick, isLava: true }, null, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.extent > world.radius) {
@@ -1840,7 +1840,6 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	// Apply damage
 	let amount = Math.min(toHero.health, packet.damage);
 	toHero.health -= amount;
-	toHero.damagedTick = world.tick;
 
 	// Apply lifesteal
 	if (fromHeroId && packet.lifeSteal) {
@@ -1848,6 +1847,15 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
 			world.ui.events.push({ type: "lifeSteal", owner: fromHero.id });
+		}
+	}
+
+	// Register damage
+	if (packet.damage > 0) {
+		if (packet.isLava) {
+			toHero.lavaTick = world.tick;
+		} else {
+			toHero.damagedTick = world.tick;
 		}
 	}
 
