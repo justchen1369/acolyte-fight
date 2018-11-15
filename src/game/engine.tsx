@@ -1878,7 +1878,10 @@ function applyDamageToObstacle(obstacle: w.Obstacle, damage: number, world: w.Wo
 		return;
 	}
 	obstacle.health = Math.max(0, obstacle.health - damage);
-	obstacle.hitTick = world.tick;
+
+	if (damage > 0) {
+		obstacle.damagedTick = world.tick;
+	}
 }
 
 export function initScore(heroId: string): w.HeroScore {

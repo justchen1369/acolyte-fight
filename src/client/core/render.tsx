@@ -389,9 +389,16 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.strokeStyle = 'white'; // hsl(red, saturation, (0.5 + 0.5 * proportion));
 
 		if (ctx === ctxStack.canvas) {
+			const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
+
+			let lighten = 0;
+			if (hitAge < HeroColors.ObstacleFlashTicks) {
+				lighten = HeroColors.ObstacleGlowFactor * (1 - hitAge / HeroColors.ObstacleFlashTicks);
+			}
+
 			const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
-			gradient.addColorStop(0, hsl(red, saturation, 0.5));
-			gradient.addColorStop(1, hsl(red, saturation, 0.4));
+			gradient.addColorStop(0, hsl(red, saturation, lighten + (1 - lighten) * 0.5));
+			gradient.addColorStop(1, hsl(red, saturation, lighten + (1 - lighten) * 0.4));
 			ctx.fillStyle = gradient;
 		} else {
 			ctx.fillStyle = 'white';
