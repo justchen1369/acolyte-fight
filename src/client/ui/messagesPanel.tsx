@@ -23,6 +23,7 @@ interface Props {
     isDead: boolean;
     isFinished: boolean;
     buttonBar: w.ButtonConfig;
+    rebindings: KeyBindings;
     options: s.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
@@ -41,6 +42,7 @@ function stateToProps(state: s.State): Props {
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
         isFinished: state.world.activePlayers.size === 0,
         buttonBar: state.world.ui.buttonBar,
+        rebindings: state.rebindings,
         options: state.options,
         exitable: worldInterruptible(state.world),
         items: state.items,
@@ -184,25 +186,26 @@ class MessagesPanel extends React.Component<Props, State> {
                     <span className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</span>
                 </div>;
 
-            const help =
-                isMobile
-                ? (
-                    <div className="help-box">
-                        <div className="help-title">How to play:</div>
-                        <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Touch</b> to move/aim</div>
-                        <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Double-tap</b> to dash</div>
-                        {closeLink}
-                    </div>
-                )
-                : (
-                    <div className="help-box">
-                        <div className="help-title">How to play:</div>
-                        <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>
-                        <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> <b>Keyboard</b> to cast spells</div>
-                        {closeLink}
-                    </div>
-                );
-            return help;
+            if (isMobile) {
+                return <div className="help-box">
+                    <div className="help-title">How to play:</div>
+                    <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Touch</b> to move/aim</div>
+                    <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Double-tap</b> to dash</div>
+                    {closeLink}
+                </div>
+            } else {
+                const isLeftClickShoot = this.props.rebindings[w.SpecialKeys.LeftClick] === "q";
+                const isRightClickDash = this.props.rebindings[w.SpecialKeys.RightClick] === "a";
+                const showMouseHint = !(isLeftClickShoot || isRightClickDash);
+                return <div className="help-box">
+                    <div className="help-title">How to play:</div>
+                    {showMouseHint && <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>}
+                    {isLeftClickShoot && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Left-click</b> to shoot</div>}
+                    {isRightClickDash && <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> <b>Right-click</b> to dash</div>}
+                    <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> <b>Keyboard</b> to cast spells</div>
+                    {closeLink}
+                </div>
+            }
         } else {
             return null;
         }

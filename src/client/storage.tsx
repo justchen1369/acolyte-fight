@@ -88,15 +88,21 @@ export function getOrCreatePlayerName(): string {
 }
 
 export function getKeyBindingsOrDefaults() {
-    return loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
+    const keyBindings = loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
+    saveKeyBindingConfig(keyBindings);
+    return keyBindings;
 }
 
-export function getRebindingsOrDefaults() {
-    return loadRebindingConfig() || {};
+export function getRebindingsOrDefaults(defaults: KeyBindings) {
+    const rebindings = loadRebindingConfig() || defaults;
+    saveRebindingConfig(rebindings);
+    return rebindings;
 }
 
 export function getOptionsOrDefaults(): m.GameOptions {
-    return loadOptions() || {};
+    const options = loadOptions() || {};
+    saveOptions(options);
+    return options;
 }
 
 export function loadAllGameStats(): Promise<d.GameStats[]> {

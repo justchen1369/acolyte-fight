@@ -26,7 +26,7 @@ function initialState(): s.State {
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
-        rebindings: storage.getRebindingsOrDefaults(),
+        rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindings() : {}),
         options: storage.getOptionsOrDefaults(),
         aiCode: null,
         current: { page: "", profileId: null },
@@ -42,6 +42,15 @@ function initialState(): s.State {
         hasReplayLookup: new Map<string, boolean>(),
     };
 }
+
+function initialRebindings(): KeyBindings {
+    return {
+        [w.SpecialKeys.Hover]: w.Actions.Move,
+        [w.SpecialKeys.LeftClick]: "q",
+        [w.SpecialKeys.RightClick]: "a",
+    };
+}
+
 
 function reducer(state: s.State, action: s.Action): s.State {
     if (action.type === "disconnected") {
