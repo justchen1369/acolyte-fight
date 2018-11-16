@@ -1,13 +1,13 @@
 var settings = null;
 var center = { x: 0.5, y: 0.5 };
 var missRadius = 0.05;
-var reactionTimeMilliseconds = 100;
+var reactionTimeMilliseconds = 200;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
 
 var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain spells
-    shield: 300,
-    icewall: 300,
+    shield: 500,
+    icewall: 500,
     teleport: 500,
     thrust: 500
 };
