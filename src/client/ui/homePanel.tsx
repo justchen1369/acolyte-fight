@@ -6,6 +6,7 @@ import * as w from '../../game/world.model';
 import * as ai from '../core/ai';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
@@ -75,8 +76,8 @@ class HomePanel extends React.Component<Props, State> {
                 <NameConfig />
                 <h1>Your Spells</h1>
                 <SpellBtnConfig />
-                <h1>More Settings</h1>
-                <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
+                <h1>Your Controls</h1>
+                <ControlsPanel />
             </div>}
         </div>;
     }
