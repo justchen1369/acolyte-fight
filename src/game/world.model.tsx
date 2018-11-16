@@ -302,6 +302,7 @@ export interface Obstacle extends WorldObjectBase {
 	points: pl.Vec2[];
 
 	damagedTick?: number;
+	lavaTick?: number;
 }
 
 export interface Hero extends WorldObjectBase {

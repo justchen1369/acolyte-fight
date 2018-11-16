@@ -1000,7 +1000,7 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (hero.thrust) {
-		applyDamageToObstacle(obstacle, hero.thrust.damage, world);
+		applyDamageToObstacle(obstacle, hero.thrust, world);
 		hero.thrust.nullified = true;
 	}
 }
@@ -1008,7 +1008,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	if (!projectile.alreadyHit.has(obstacle.id)) {
 		projectile.alreadyHit.add(obstacle.id);
-		applyDamageToObstacle(obstacle, projectile.damage, world);
+		applyDamageToObstacle(obstacle, projectile, world);
 	}
 
 	if (expireOn(world, projectile, obstacle)) {
@@ -1404,7 +1404,7 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 			}
 		} else if (other.category === "obstacle") {
 			if (vector.distance(projectile.body.getPosition(), other.body.getPosition()) <= projectile.detonate.radius + other.extent) {
-				applyDamageToObstacle(other, projectile.damage, world);
+				applyDamageToObstacle(other, projectile, world);
 			}
 		}
 	});
@@ -1418,15 +1418,16 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 
 function applyLavaDamage(world: w.World) {
 	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
+	const damagePacket: DamagePacket = { damage: lavaDamagePerTick, isLava: true };
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.radius > world.radius) {
-				applyDamage(obj, { damage: lavaDamagePerTick, isLava: true }, null, world);
+				applyDamage(obj, damagePacket, null, world);
 			}
 		} else if (obj.category === "obstacle") {
 			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.extent > world.radius) {
-				applyDamageToObstacle(obj, lavaDamagePerTick, world);
+				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
 	});
@@ -1872,17 +1873,21 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	}
 }
 
-function applyDamageToObstacle(obstacle: w.Obstacle, damage: number, world: w.World) {
+function applyDamageToObstacle(obstacle: w.Obstacle, packet: DamagePacket, world: w.World) {
 	// Register hit
-	if (damage > 0) {
-		obstacle.damagedTick = world.tick;
+	if (packet.damage > 0) {
+		if (packet.isLava) {
+			obstacle.lavaTick = world.tick;
+		} else {
+			obstacle.damagedTick = world.tick;
+		}
 	}
 
 	if (world.tick < world.startTick) {
 		// No damage until game started
 		return;
 	}
-	obstacle.health = Math.max(0, obstacle.health - damage);
+	obstacle.health = Math.max(0, obstacle.health - packet.damage);
 }
 
 export function initScore(heroId: string): w.HeroScore {
