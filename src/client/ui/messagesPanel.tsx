@@ -194,7 +194,6 @@ class MessagesPanel extends React.Component<Props, State> {
                     <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
                     {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
                     {isDoubleTapDash && <div className="help-row"><span className="icon-container"><i className="fas fa-forward" /></span> <b>Double-tap</b> to dash</div>}
-                    <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> <b>Wheel buttons</b> to cast spells</div>
                     {closeLink}
                 </div>
             } else {
