@@ -187,10 +187,14 @@ class MessagesPanel extends React.Component<Props, State> {
                 </div>;
 
             if (isMobile) {
+                const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
+                const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
                 return <div className="help-box">
                     <div className="help-title">How to play:</div>
-                    <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Touch</b> to move/aim</div>
-                    <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Double-tap</b> to dash</div>
+                    <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
+                    {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
+                    {isDoubleTapDash && <div className="help-row"><span className="icon-container"><i className="fas fa-forward" /></span> <b>Double-tap</b> to dash</div>}
+                    <div className="help-row"><span className="icon-container"><i className="far fa-circle" /></span> <b>Wheel buttons</b> to cast spells</div>
                     {closeLink}
                 </div>
             } else {

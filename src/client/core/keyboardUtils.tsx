@@ -6,10 +6,6 @@ import { DefaultSettings } from '../../game/settings';
 
 const Dash = "a";
 
-export function doubleTapDefault(key: string) {
-    return key === undefined ? Dash : key;
-}
-
 export const getRebindingLookup = Reselect.createSelector(
 	(rebindings: KeyBindings) => rebindings,
 	(rebindings) => {
@@ -86,6 +82,12 @@ export function isSpecialKey(key: string) {
     return key && key.length > 1;
 }
 
+export function autoBindDoubleTap(): string {
+    const doubleTapKey: string = Dash;
+    saveRebinding(w.SpecialKeys.DoubleTap, doubleTapKey);
+    return doubleTapKey;
+}
+
 export function autoBindRightClick(rightClickedFirst: boolean): string {
     let rightClickKey: string;
     if (rightClickedFirst) {
@@ -96,14 +98,15 @@ export function autoBindRightClick(rightClickedFirst: boolean): string {
         rightClickKey = Dash;
     }
 
-    const store = StoreProvider.getState();
-    const rebindings = { ...store.rebindings };
-    rebindings[w.SpecialKeys.RightClick] = rightClickKey;
-    StoreProvider.dispatch({
-        type: "updateRebindings",
-        rebindings,
-    });
-    setTimeout(() => cloud.uploadSettings(), 1);
+    saveRebinding(w.SpecialKeys.RightClick, rightClickKey);
 
     return rightClickKey;
+}
+
+function saveRebinding(key: string, value: string) {
+    const store = StoreProvider.getState();
+    const rebindings = { ...store.rebindings };
+    rebindings[key] = value;
+    StoreProvider.dispatch({ type: "updateRebindings", rebindings });
+    setTimeout(() => cloud.uploadSettings(), 1);
 }

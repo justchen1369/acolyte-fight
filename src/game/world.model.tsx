@@ -17,6 +17,7 @@ export namespace SpecialKeys {
 	export const Move = "move";
 	export const LeftClick = "primary";
 	export const RightClick = "dash";
+	export const SingleTap = "single";
 	export const DoubleTap = "double";
 	export const WheelCenter = "center";
 }

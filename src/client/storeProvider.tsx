@@ -26,7 +26,7 @@ function initialState(): s.State {
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
-        rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindings() : {}),
+        rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
         options: storage.getOptionsOrDefaults(),
         aiCode: null,
         current: { page: "", profileId: null },
@@ -43,11 +43,19 @@ function initialState(): s.State {
     };
 }
 
-function initialRebindings(): KeyBindings {
+function initialRebindingsOld(): KeyBindings {
+    return {
+        [w.SpecialKeys.DoubleTap]: "a",
+    };
+}
+
+function initialRebindingsNew(): KeyBindings {
     return {
         [w.SpecialKeys.Hover]: w.Actions.Move,
         [w.SpecialKeys.LeftClick]: "q",
         [w.SpecialKeys.RightClick]: "a",
+        [w.SpecialKeys.SingleTap]: "q",
+        [w.SpecialKeys.DoubleTap]: "a",
     };
 }
 

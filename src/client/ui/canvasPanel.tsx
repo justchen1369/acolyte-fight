@@ -123,6 +123,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private leftClickKey: string;
     private rightClickKey: string;
+    private singleTapKey: string;
     private doubleTapKey: string;
 
     private keyDownListener = this.gameKeyDown.bind(this);
@@ -157,7 +158,8 @@ class CanvasPanel extends React.Component<Props, State> {
 
         this.leftClickKey = props.rebindings[w.SpecialKeys.LeftClick];
         this.rightClickKey = props.rebindings[w.SpecialKeys.RightClick];
-        this.doubleTapKey = keyboardUtils.doubleTapDefault(props.rebindings[w.SpecialKeys.DoubleTap]);
+        this.singleTapKey = props.rebindings[w.SpecialKeys.SingleTap];
+        this.doubleTapKey = props.rebindings[w.SpecialKeys.DoubleTap];
     }
 
     componentWillMount() {
@@ -274,16 +276,24 @@ class CanvasPanel extends React.Component<Props, State> {
                         world.ui.nextTarget = p.worldPoint;
                     }
 
-                    if (!this.rightClickKey) {
-                        this.autoBindRightClick(p.secondaryBtn);
-                    }
-
-                    if (isMobile && this.isDoubleClick(p)) {
-                        this.handleButtonClick(this.doubleTapKey, world);
-                    } else if (p.secondaryBtn) {
-                        this.handleButtonClick(this.rightClickKey, world);
+                    if (isMobile) {
+                        if (this.isDoubleClick(p)) {
+                            if (!this.doubleTapKey) {
+                                this.autoBindDoubleTap();
+                            }
+                            this.handleButtonClick(this.doubleTapKey, world);
+                        } else {
+                            this.handleButtonClick(this.singleTapKey, world);
+                        }
                     } else {
-                        this.handleButtonClick(this.leftClickKey, world);
+                        if (p.secondaryBtn) {
+                            if (!this.rightClickKey) {
+                                this.autoBindRightClick(p.secondaryBtn);
+                            }
+                            this.handleButtonClick(this.rightClickKey, world);
+                        } else {
+                            this.handleButtonClick(this.leftClickKey, world);
+                        }
                     }
                     this.previousTouchStart = p;
                 }
@@ -295,6 +305,10 @@ class CanvasPanel extends React.Component<Props, State> {
             world.ui.nextSpellId = w.Actions.MoveAndCancel;
         }
         this.processCurrentTouch();
+    }
+
+    private autoBindDoubleTap() {
+        this.doubleTapKey = keyboardUtils.autoBindDoubleTap();
     }
 
     private autoBindRightClick(isRightClicking: boolean) {
