@@ -5,8 +5,23 @@ import uniqid from 'uniqid';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
+import * as games from './games';
 import { getStore } from './serverStore';
 import { logger } from './logging';
+
+export function onDisconnect(socketId: string): g.Party[] {
+    const store = getStore();
+
+	const changedParties = new Array<g.Party>();
+	store.parties.forEach(party => {
+		if (party.active.has(socketId)) {
+			removePartyMember(party, socketId);
+			changedParties.push(party);
+		}
+	});
+
+	return changedParties;
+}
 
 export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
 	const partyIndex = getStore().nextPartyId++;
@@ -96,7 +111,8 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 
 export function isPartyReady(party: g.Party): boolean {
     const relevant = [...party.active.values()].filter(p => p.isLeader || !p.isObserver)
-    return relevant.length > 0 && relevant.every(p => p.ready);
+    const required = games.apportionPerGame(relevant.length);
+    return relevant.length > 0 && relevant.filter(p => p.ready).length >= required;
 }
 
 export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignment[]) {
@@ -123,14 +139,7 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
 
 	if (party.active.size > 0) {
-        if (!member.isObserver) {
-            // All members become unready when a player leaves
-            party.active.forEach(member => {
-                if (!member.isObserver) {
-                    member.ready = false;
-                }
-            });
-        }
+        // Used to unready players when someone left, no more
 	} else {
 		// This party is finished, delete it
 		const store = getStore();

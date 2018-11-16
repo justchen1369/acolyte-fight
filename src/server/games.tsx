@@ -10,7 +10,6 @@ import * as auth from './auth';
 import * as categories from './categories';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
-import * as parties from './parties';
 import * as results from './results';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
@@ -43,30 +42,17 @@ export function attachFinishedGameListener(listener: FinishedGameListener) {
 	finishedGameListeners.push(listener);
 }
 
-export interface DisconnectResult {
-	changedParties: g.Party[];
-}
-
 export function onConnect(socketId: string, authToken: string) {
 }
 
-export function onDisconnect(socketId: string, authToken: string): DisconnectResult {
+export function onDisconnect(socketId: string, authToken: string) {
 	const store = getStore();
 
-	const changedParties = new Array<g.Party>();
 	store.activeGames.forEach(game => {
 		if (game.active.has(socketId)) {
 			leaveGame(game, socketId);
 		}
 	});
-	store.parties.forEach(party => {
-		if (party.active.has(socketId)) {
-			parties.removePartyMember(party, socketId);
-			changedParties.push(party);
-		}
-	});
-
-	return { changedParties }
 }
 
 function startTickProcessing() {
@@ -173,7 +159,7 @@ export function calculateRoomStats(category: string): number {
 	return getStore().playerCounts[category] || 0;
 }
 
-function apportionPerGame(totalPlayers: number) {
+export function apportionPerGame(totalPlayers: number) {
 	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
 	return Math.ceil(totalPlayers / maxGames);
 }

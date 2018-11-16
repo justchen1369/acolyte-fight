@@ -47,8 +47,9 @@ function onConnection(socket: SocketIO.Socket) {
 		--getStore().numConnections;
 		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
 
-		const disconnectResult = games.onDisconnect(socket.id, authToken);
-		disconnectResult.changedParties.forEach(party => emitParty(party));
+		games.onDisconnect(socket.id, authToken);
+		const changedParties = parties.onDisconnect(socket.id);
+		changedParties.forEach(party => emitParty(party));
 	});
 
 	socket.on('proxy', (data, callback) => {
