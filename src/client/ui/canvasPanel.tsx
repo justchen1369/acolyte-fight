@@ -10,7 +10,7 @@ import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { TicksPerSecond } from '../../game/constants';
+import { TicksPerSecond, Pixel } from '../../game/constants';
 import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../core/render';
 import { sendAction } from '../core/sockets';
 import { frame } from '../core/ticker';
@@ -399,10 +399,32 @@ class CanvasPanel extends React.Component<Props, State> {
                     }
                 }
             } else {
-                const spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+                let spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
+                let target = world.ui.nextTarget;
+                if (spellId === w.Actions.Move) {
+                    const hero = world.objects.get(world.ui.myHeroId);
+                    if (hero && hero.category === "hero") {
+                        target = this.clampToArena(target, hero, world);
+                    }
+                }
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
             }
         }
+    }
+
+    private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
+        const pos = hero.body.getPosition();
+        const center = pl.Vec2(0.5, 0.5);
+        const maxRadius = Math.max(0, world.radius - hero.radius - Pixel);
+        if (vector.distance(pos, center) <= maxRadius) {
+            return target;
+        }
+
+        if (vector.distance(target, center) <= maxRadius) {
+            return target;
+        }
+        
+        return vector.towards(center, target, maxRadius);
     }
 
     private handleLongProcessIfNecessary() {
