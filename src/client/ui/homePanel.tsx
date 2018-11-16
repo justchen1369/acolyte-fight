@@ -76,8 +76,8 @@ class HomePanel extends React.Component<Props, State> {
                 <NameConfig />
                 <h1>Your Spells</h1>
                 <SpellBtnConfig />
-                <h1>Your Controls</h1>
-                <ControlsPanel />
+                <h1>More Settings</h1>
+                <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
             </div>}
         </div>;
     }
