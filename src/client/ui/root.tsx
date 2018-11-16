@@ -20,23 +20,13 @@ import UrlListener from './urlListener';
 
 interface Props {
     myGameId: string;
-    isNewPlayer: boolean;
-    playerName: string;
-    party: s.PartyState;
     current: s.PathElements;
-    connected: boolean;
-    items: s.NotificationItem[];
 }
 
 function stateToProps(state: s.State): Props {
     return {
         myGameId: state.world.ui.myGameId,
-        isNewPlayer: state.isNewPlayer,
-        playerName: state.playerName,
-        party: state.party,
         current: state.current,
-        connected: !!state.socketId,
-        items: state.items,
     };
 }
 
