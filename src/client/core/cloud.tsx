@@ -141,7 +141,6 @@ export async function fetchGameStats(userId: string, limit: number, until?: mome
         for (const gameStatsMsg of json.stats) {
             const gameStats = stats.messageToGameStats(gameStatsMsg, userId);
             allGameStats.push(gameStats);
-            await storage.saveGameStats(gameStats);
 
             const timestamp = moment(gameStats.timestamp);
             if (timestamp.isBefore(oldestLoaded)) {
