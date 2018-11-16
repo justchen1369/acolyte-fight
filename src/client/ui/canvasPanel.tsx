@@ -341,7 +341,11 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private notifyButtonPress() {
-        navigator.vibrate(10);
+        try {
+            if (navigator.vibrate) {
+                navigator.vibrate(10);
+            }
+        } catch (ex) { }
     }
 
     private handleButtonHover(key: string, world: w.World) {
