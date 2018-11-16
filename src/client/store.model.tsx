@@ -8,6 +8,7 @@ export interface State {
     userId?: string;
     loggedIn: boolean;
     isNewPlayer: boolean;
+    showingHelp: boolean;
     playerName: string;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -91,6 +92,7 @@ export type Action =
     | LeavePartyAction
     | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
+    | UpdateShowingHelpAction
     | CustomizeBtnAction
     | UpdateHoverSpellAction
     | UpdateRebindingsAction
@@ -186,6 +188,11 @@ export interface UpdateAiCodeAction {
 
 export interface ClearNewPlayerFlagAction {
     type: "clearNewPlayerFlag";
+}
+
+export interface UpdateShowingHelpAction {
+    type: "updateShowingHelp";
+    showingHelp: boolean;
 }
 
 export interface CustomizeBtnAction {

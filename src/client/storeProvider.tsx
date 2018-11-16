@@ -13,7 +13,7 @@ export function init() {
 }
 
 function initialState(): s.State {
-    const isNewPlayer = true; // !storage.loadName();
+    const isNewPlayer = !storage.loadName();
 
     const room: s.RoomState = {
         id: null,
@@ -22,6 +22,7 @@ function initialState(): s.State {
     };
     return {
         loggedIn: false,
+        showingHelp: true,
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
@@ -150,6 +151,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         }
     } else if (action.type === "updateAiCode") {
         return { ...state, aiCode: action.aiCode };
+    } else if (action.type === "updateShowingHelp") {
+        return { ...state, showingHelp: action.showingHelp };
     } else if (action.type === "clearNewPlayerFlag") {
         return { ...state, isNewPlayer: false };
     } else if (action.type === "customizeBtn") {

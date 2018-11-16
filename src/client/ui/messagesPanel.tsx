@@ -17,7 +17,7 @@ import { worldInterruptible } from '../core/matches';
 interface Props {
     userId: string;
     loggedIn: boolean;
-    isNewPlayer: boolean;
+    showingHelp: boolean;
     myGameId: string;
     myHeroId: string;
     isDead: boolean;
@@ -35,7 +35,7 @@ function stateToProps(state: s.State): Props {
     return {
         userId: state.userId,
         loggedIn: state.loggedIn,
-        isNewPlayer: state.isNewPlayer,
+        showingHelp: state.showingHelp,
         myGameId: state.world.ui.myGameId,
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
@@ -178,7 +178,7 @@ class MessagesPanel extends React.Component<Props, State> {
             return null; // Observer doesn't need instructions
         }
 
-        if (this.props.isNewPlayer) {
+        if (this.props.showingHelp) {
             const closeLink =
                 <div className="action-row">
                     <span className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</span>
@@ -209,7 +209,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private onCloseHelpClicked(e: React.MouseEvent) {
-        StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
+        StoreProvider.dispatch({ type: "updateShowingHelp", showingHelp: false });
     }
 
     private renderTextNotification(key: string, notification: w.TextNotification) {
