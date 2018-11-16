@@ -70,8 +70,8 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="customize-hint" onClick={(ev) => this.onChangeClick(ev, hoverBtn)}>
-            <a href="#" ><span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change</a>
+        return <div className="customize-hint">
+            <span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change
         </div>;
     }
 
@@ -97,11 +97,6 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         if (!isMobile) {
             this.close();
         }
-    }
-
-    private onChangeClick(ev: React.MouseEvent, customizingBtn: string) {
-        ev.preventDefault();
-        StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
     }
 
     private close() {
