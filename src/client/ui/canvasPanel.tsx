@@ -278,7 +278,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
                     if (isMobile) {
                         if (this.isDoubleClick(p)) {
-                            if (!this.doubleTapKey) {
+                            if (this.doubleTapKey === undefined) {
                                 this.autoBindDoubleTap();
                             }
                             this.handleButtonClick(this.doubleTapKey, world);
@@ -287,7 +287,7 @@ class CanvasPanel extends React.Component<Props, State> {
                         }
                     } else {
                         if (p.secondaryBtn) {
-                            if (!this.rightClickKey) {
+                            if (this.rightClickKey === undefined) {
                                 this.autoBindRightClick(p.secondaryBtn);
                             }
                             this.handleButtonClick(this.rightClickKey, world);
