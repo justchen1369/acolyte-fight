@@ -601,7 +601,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
-		const joinPeriod = calculateJoinPeriod(game.category, numPlayers);
+		const joinPeriod = calculateJoinPeriod(game.category, game.active.size);
 
 		const newCloseTick = game.tick + joinPeriod;
 		if (newCloseTick < game.closeTick) {
@@ -628,10 +628,10 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 }
 
-function calculateJoinPeriod(category: string, numPlayers: number): number {
+function calculateJoinPeriod(category: string, numHumans: number): number {
 	const halfFull = Math.ceil(Matchmaking.MaxPlayers / 2);
 	const numInRoom = calculateRoomStats(category);
-	if (numInRoom >= halfFull && numPlayers < halfFull) {
+	if (numInRoom >= halfFull && numHumans < halfFull) {
 		return Matchmaking.WaitForMorePeriod;
 	} else {
 		return Matchmaking.JoinPeriod;
