@@ -41,7 +41,9 @@ export function initialize() {
         }
     }
 
-    cloud.downloadSettings().then(userId => rankings.retrieveUserStatsAsync(userId));
+    cloud.downloadSettings()
+        .then(() => parties.updatePartyAsync())
+        .then(() => rankings.retrieveCurrentUserStatsAsync())
     storage.cleanupGameStats();
 }
 
