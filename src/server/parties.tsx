@@ -2,6 +2,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import uniqid from 'uniqid';
+import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
@@ -139,7 +140,13 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	logger.info(`Party ${party.id} left by user ${member.name} [${member.socketId}]`);
 
 	if (party.active.size > 0) {
-        // Used to unready players when someone left, no more
+        // The party is not finished
+        if (party.active.size <= constants.Matchmaking.MaxPlayers) {
+            // Small party, mark everyone as unready instead when someone leaves
+            for (const member of party.active.values()) {
+                member.ready = false;
+            }
+        }
 	} else {
 		// This party is finished, delete it
 		const store = getStore();
