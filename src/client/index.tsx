@@ -46,30 +46,33 @@ export function initialize() {
 }
 
 function start() {
-    const current = url.parseLocation(window.location);
+    const query = url.parseLocation(window.location);
+    console.log("Initial location", query);
 
-    // Remove the party ID from the URL so that people can't stream snipe their way into the party
-    if (current.party || current.server) {
-        StoreProvider.dispatch({ type: "updateUrl", current: { ...current, party: null, server: null } });
+    let current = query;
+    if (query.party || query.server) {
+        // Remove the party ID from the URL so that people can't stream snipe their way into the party
+        current = { ...current, party: null, server: null };
     }
+    StoreProvider.dispatch({ type: "updateUrl", current });
 
     sockets.connect(config.getBaseUrl(), config.getAuthToken(), (socket) => {
-        sockets.connectToServer(current.server)
-            .then(() => parties.joinPartyAsync(current.party))
+        sockets.connectToServer(query.server)
+            .then(() => parties.joinPartyAsync(query.party))
             .then(() => {
                 if (!alreadyConnected) {
                     alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
 
-                    if (current.hash === "#join") {
+                    if (query.hash === "#join") {
                         // Return to the home page when we exit
                         StoreProvider.dispatch({ type: "updatePage", page: "" });
-                        matches.joinNewGame(current.gameId);
-                    } else if (current.hash === "#watch") {
+                        matches.joinNewGame(query.gameId);
+                    } else if (query.hash === "#watch") {
                         // Return to the home page when we exit
                         StoreProvider.dispatch({ type: "updatePage", page: "" });
                         matches.watchLiveGame();
                     } else {
-                        pages.go(current);
+                        pages.go(query);
                     }
                 }
             }).catch(error => {
@@ -77,9 +80,9 @@ function start() {
                 socket.disconnect();
                 StoreProvider.dispatch({ type: "disconnected" });
 
-                if (current.party || current.server) {
+                if (query.party || query.server) {
                     // Failed to join party/server, try without server
-                    window.location.href = url.getPath({ ...current, party: null, server: null, hash: null });
+                    window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
                 }
             });
     });

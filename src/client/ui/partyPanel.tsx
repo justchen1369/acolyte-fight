@@ -65,7 +65,7 @@ export class PartyPanel extends React.Component<Props, State> {
 
     private renderCurrentParty() {
         const party = this.props.party;
-        const currentPartyPath = url.getPath({ ...this.props.current, page: null, party: party.id, server: party.server });
+        const currentPartyPath = url.getPath({ ...this.props.current, page: null, party: party.id, server: party.server, gclid: null });
         const self = party.members.find(m => m.socketId === this.props.selfId);
         if (!self) {
             return this.renderNoParty();

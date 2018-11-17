@@ -5,4 +5,4 @@ export const isEdge = window.navigator.userAgent.indexOf("Edge") > -1;
 export const isMobile = window.navigator.userAgent.toLowerCase().indexOf("mobi") !== -1
 export const isFacebook = config.isFacebook();
 
-console.log(`isSafari=${isSafari} isEdge=${isEdge} isMobile=${isMobile} isFaecbook=${isFacebook}`);
+console.log(`isSafari=${isSafari} isEdge=${isEdge} isMobile=${isMobile} isFacebook=${isFacebook}`);

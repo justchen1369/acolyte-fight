@@ -72,6 +72,8 @@ export interface PathElements {
     server?: string;
     hash?: string;
     profileId?: string;
+
+    gclid?: string;
 }
 
 export type Action =
