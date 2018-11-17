@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as constants from '../../game/constants';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
@@ -58,7 +59,10 @@ export class PartyPanel extends React.Component<Props, State> {
 
     private renderNoParty() {
         return <div>
-            <p>Play together with friends as a party. Forming a party ensures that you and your friends are matched to the same game.</p>
+            <p>
+                Play together with friends as a party. Forming a party ensures that you and your friends are matched to the same game.
+                If there are more than {constants.Matchmaking.MaxPlayers} players in the party, the party will be split across multiple games.
+            </p>
             <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.createPartyAsync()}>Create Party</span></p>
         </div>
     }

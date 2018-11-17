@@ -356,6 +356,10 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 	}
 	parties.updatePartyMemberStatus(party, memberId, newStatus);
 
+	if (data.kick) {
+		parties.removePartyMember(party, memberId);
+	}
+
 	if (parties.isPartyReady(party)) {
 		logger.info(`Party ${party.id} started with ${party.active.size} players`);
 		const assignments = games.assignPartyToGames(party);
@@ -363,10 +367,6 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 		assignments.forEach(assignment => {
 			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
 		});
-	}
-
-	if (data.kick) {
-		parties.removePartyMember(party, memberId);
 	}
 
 	const result: m.PartyStatusResponse = {
