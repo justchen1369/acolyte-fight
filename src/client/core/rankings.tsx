@@ -90,13 +90,6 @@ function calculateNextLeague(percentile: number): League {
 }
 
 
-export async function retrieveCurrentUserStatsAsync() {
-    const state = StoreProvider.getState();
-    if (state.userId) {
-        await retrieveUserStatsAsync(state.userId);
-    }
-}
-
 export async function retrieveUserStatsAsync(profileId: string) {
     if (!profileId) {
         return null;

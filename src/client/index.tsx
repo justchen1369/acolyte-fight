@@ -18,6 +18,7 @@ import * as sockets from './core/sockets';
 import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
+import * as tracker from './core/tracker';
 import * as url from './url';
 import * as userAgent from './core/userAgent';
 
@@ -41,10 +42,17 @@ export function initialize() {
         }
     }
 
-    cloud.downloadSettings()
-        .then(() => parties.updatePartyAsync())
-        .then(() => rankings.retrieveCurrentUserStatsAsync())
+    loginAsync();
     storage.cleanupGameStats();
+}
+
+async function loginAsync() {
+    const userId = await cloud.downloadSettings();
+    if (userId) {
+        tracker.setUserId(userId);
+        await parties.updatePartyAsync();
+        await rankings.retrieveUserStatsAsync(userId);
+    }
 }
 
 function start() {
