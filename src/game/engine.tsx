@@ -65,9 +65,11 @@ export function initialWorld(mod: Object): w.World {
 			myHeroId: null,
 			myPartyId: null,
 			renderedTick: null,
+			playedTick: -1,
 			destroyed: [],
 			events: new Array<w.WorldEvent>(),
 			trails: [],
+			sounds: [],
 			notifications: [],
 		},
 	};
@@ -1053,7 +1055,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 		applyDamage(hero, projectile, projectile.owner, world);
 		linkTo(projectile, hero, world);
-		projectile.hit = true;
+		projectile.hit = world.tick;
 	}
 
 	if (projectile.gravity) {

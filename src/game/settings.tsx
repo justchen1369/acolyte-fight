@@ -314,7 +314,7 @@ const meteor: Spell = {
         radius: 0.03,
         speed: 0.2,
         minTicks: 1,
-        maxTicks: 12 * TicksPerSecond,
+        maxTicks: 5 * TicksPerSecond,
         damage: 0,
         trailTicks: 15,
         categories: Categories.Projectile | Categories.Massive,

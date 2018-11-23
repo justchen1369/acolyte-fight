@@ -15,6 +15,7 @@ import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
 import * as sockets from './core/sockets';
+import * as sounds from './core/sounds';
 import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
@@ -31,6 +32,7 @@ export function initialize() {
     stats.init();
     cloud.init();
     rankings.init();
+    sounds.init();
 
     start();
     render();

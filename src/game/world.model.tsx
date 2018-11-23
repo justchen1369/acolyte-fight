@@ -81,12 +81,14 @@ export interface UIState {
 	nextSpellId?: string;
 	hoverSpellId?: string;
 	renderedTick: number | null;
+	playedTick: number;
 
 	destroyed: WorldObject[];
 	events: WorldEvent[];
 
 	trails: Trail[];
 	notifications: Notification[];
+	sounds: Sound[];
 
 	buttonBar?: ButtonConfig;
 	hoverBtn?: string;
@@ -382,6 +384,9 @@ export interface CastState {
 	color?: string;
 
 	uiScale?: number;
+	uiChargingSoundPlayed?: boolean;
+	uiCastSoundPlayed?: boolean;
+	uiChannellingSoundPlayed?: number;
 }
 
 export interface LinkState {
@@ -425,7 +430,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	body: pl.Body;
 	passthrough: boolean;
 	collideWith: number;
-	hit?: boolean;
+	hit?: number;
 	speed: number;
 	fixedSpeed: boolean;
 	strafe?: boolean;
@@ -456,6 +461,10 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
     trailTicks: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
+	uiCreateSoundPlayed?: boolean;
+	uiFlightSoundPlayed?: number;
+	uiHitSoundPlayed?: number;
+	uiDestroyedSoundPlayed?: boolean;
 }
 
 export namespace HomingTargets {
@@ -539,4 +548,11 @@ export interface LineTrail extends TrailBase {
 	from: pl.Vec2;
 	to: pl.Vec2;
 	width: number;
+}
+
+export interface Sound {
+	id: string;
+	follow?: string;
+	pos: pl.Vec2;
+	tick: number;
 }
