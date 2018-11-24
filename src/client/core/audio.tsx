@@ -286,11 +286,6 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
         const startFreq = bite.startFreq || 440;
         const stopFreq = bite.stopFreq || 440;
 
-        const normalizer = ctx.createGain();
-		normalizer.gain.setValueAtTime(1 / ratios.length, t);
-		normalizer.connect(next);
-		next = normalizer;
-
 		for (const ratio of ratios) {
 			const osc = ctx.createOscillator();
 			osc.type = bite.wave;

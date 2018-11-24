@@ -251,13 +251,20 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 
 function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const ticks = 15;
+	const pos = vector.clone(hero.body.getPosition());
 	world.ui.trails.push({
 		type: "circle",
 		max: ticks,
 		initialTick: world.tick,
-		pos: hero.body.getPosition(),
+		pos,
 		fillStyle: 'white',
 		radius: world.settings.Hero.Radius * 1.5,
+	});
+
+	world.ui.sounds.push({
+		id: `${hero.id}-death`,
+		sound: 'death',
+		pos,
 	});
 }
 

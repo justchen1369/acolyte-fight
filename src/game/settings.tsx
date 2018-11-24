@@ -1343,6 +1343,24 @@ const Sounds: Sounds = {
             },
         ],
     },
+    "death": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 0.3,
+                attack: 0.01,
+                decay: 0.29,
+
+                startFreq: 225,
+                stopFreq: 225,
+                lowPass: 225,
+
+                wave: "triangle",
+
+                ratios: [1, 1.5],
+            },
+        ],
+    },
 };
 
 const Spells = {
