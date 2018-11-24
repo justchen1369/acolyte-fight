@@ -7,6 +7,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as matches from '../core/matches';
+import * as StoreProvider from '../storeProvider';
 import InfoPanelPlayer from './infoPanelPlayer';
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
     players: Immutable.Map<string, w.Player>;
     started: boolean;
     waitingForPlayers: boolean;
+    mute?: boolean;
 }
 interface State {
 }
@@ -27,6 +29,7 @@ function stateToProps(state: s.State): Props {
         players: world.players,
         started: engine.hasGamePrestarted(world),
         waitingForPlayers: world.tick < world.startTick,
+        mute: state.options && state.options.mute,
     };
 }
 
@@ -40,17 +43,16 @@ class InfoPanel extends React.Component<Props, State> {
     render() {
         return (
             <div id="info-panel">
-                {this.props.activePlayers.size > 0 && <div className="player-list">
+                <div className="info-title">
+                    <span className="control-bar"><i className={this.props.mute ? "fas fa-volume-mute clickable" : "fas fa-volume clickable"} onClick={() => this.onToggleMute()} /></span>
                     {this.props.waitingForPlayers
                     ? (
-                        <div className="player-list-title">
-                            <span className="waiting-for-players"><i className="fa fa-clock" /> Waiting for players</span>
-                        </div>
+                        <span className="waiting-for-players"><i className="fa fa-clock" /> Waiting for players</span>
                     ) : (
-                        <div className="player-list-title">
-                            <span className="player-list-num-players">{this.props.activePlayers.size} players</span>
-                        </div>
+                        <span className="player-list-num-players">{this.props.activePlayers.size} players</span>
                     )}
+                </div>
+                {this.props.activePlayers.size > 0 && <div className="player-list">
                     {this.renderPlayerList()}
                 </div>}
                 {this.renderButtons()}
@@ -80,6 +82,15 @@ class InfoPanel extends React.Component<Props, State> {
         });
 
         return result;
+    }
+
+    private onToggleMute() {
+        StoreProvider.dispatch({
+            type: "updateOptions",
+            options: {
+                mute: !this.props.mute,
+            },
+        });
     }
 }
 

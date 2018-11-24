@@ -31,6 +31,7 @@ export interface CanvasCtxStack {
 
 export interface RenderOptions {
 	wheelOnRight: boolean;
+	mute: boolean;
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
 }
@@ -113,15 +114,15 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	renderInterface(ctxStack.ui, world, rect, options);
 	all(ctxStack, ctx => ctx.restore());
 
-	playSounds(world);
+	playSounds(world, options);
 
 	world.ui.destroyed = [];
 	world.ui.events = [];
 	world.ui.sounds = [];
 }
 
-function playSounds(world: w.World) {
-	if (world.tick <= world.ui.playedTick) {
+function playSounds(world: w.World, options: RenderOptions) {
+	if (options.mute || world.tick <= world.ui.playedTick) {
 		return;
 	}
 	world.ui.playedTick = world.tick;

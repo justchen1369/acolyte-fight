@@ -155,6 +155,14 @@ a:hover, a:active {
     color: #ccc;
 }
 
+i.clickable {
+    color: #ccc;
+}
+
+i.clickable:hover, i.clickable:active {
+    color: white;
+}
+
 .error {
     color: red;
     font-weight: bold;
@@ -456,7 +464,11 @@ a:hover, a:active {
     font-size: 80%;
 }
 
-.player-list-title {
+.control-bar {
+    margin-right: 5px;
+}
+
+.info-title {
     font-size: 80%;
 }
 

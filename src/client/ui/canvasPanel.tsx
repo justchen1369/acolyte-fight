@@ -26,6 +26,7 @@ const FpsThreshold = 0.75;
 interface Props {
     world: w.World;
     wheelOnRight: boolean;
+    mute: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
 }
@@ -110,6 +111,7 @@ function stateToProps(state: s.State): Props {
     return {
         world: state.world,
         wheelOnRight: state.options.wheelOnRight,
+        mute: state.options.mute,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
     };
@@ -527,6 +529,7 @@ class CanvasPanel extends React.Component<Props, State> {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
                 wheelOnRight: this.props.wheelOnRight,
+                mute: this.props.mute,
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
             });

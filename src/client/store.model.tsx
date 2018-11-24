@@ -31,6 +31,7 @@ export interface State {
 
 export interface GameOptions {
     wheelOnRight?: boolean;
+    mute?: boolean;
 }
 
 export interface NotificationItem {
