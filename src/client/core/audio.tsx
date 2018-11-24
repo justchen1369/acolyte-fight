@@ -115,7 +115,7 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
 
     // Start/sustain current sound sources
     for (const elem of elems) {
-        let source = sources.get(elem.id);
+        let source = sources.get(elem.id) || keep.get(elem.id);
         if (!source) {
             const sound = sounds[elem.sound];
             if (sound) {
