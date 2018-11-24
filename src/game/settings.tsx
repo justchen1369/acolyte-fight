@@ -1105,6 +1105,7 @@ const Sounds: Sounds = {
         ],
     },
     "kamehameha-channelling": {
+        repeatIntervalSeconds: 0.1,
         start: [
             {
                 stopTime: 0.25,
@@ -1119,9 +1120,7 @@ const Sounds: Sounds = {
                 ratios: [1, 2, 4],
             },
         ],
-    },
-    "kamehameha": {
-        start: [
+        sustain: [
             {
                 stopTime: 0.25,
                 attack: 0.1,
@@ -1149,6 +1148,8 @@ const Sounds: Sounds = {
                 ratios: [1, 2, 2.16, 4, 4.16, 8, 16],
             },
         ],
+    },
+    "kamehameha": {
     },
     "meteor": {
         start: [
