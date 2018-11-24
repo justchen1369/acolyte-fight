@@ -385,6 +385,9 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 
+		sound: projectileTemplate.sound,
+		soundHit: projectileTemplate.soundHit,
+
 		render: projectileTemplate.render,
 		color: projectileTemplate.color,
 		selfColor: projectileTemplate.selfColor,

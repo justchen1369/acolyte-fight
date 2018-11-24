@@ -88,7 +88,7 @@ export interface UIState {
 
 	trails: Trail[];
 	notifications: Notification[];
-	sounds: Sound[];
+	sounds: AudioElement[];
 
 	buttonBar?: ButtonConfig;
 	hoverBtn?: string;
@@ -384,9 +384,6 @@ export interface CastState {
 	color?: string;
 
 	uiScale?: number;
-	uiChargingSoundPlayed?: boolean;
-	uiCastSoundPlayed?: boolean;
-	uiChannellingSoundPlayed?: number;
 }
 
 export interface LinkState {
@@ -455,16 +452,15 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	expireOn: number;
 
 	render: string;
+	sound?: string;
+	soundHit?: string;
     radius: number;
 	color: string;
 	selfColor: boolean;
     trailTicks: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
-	uiCreateSoundPlayed?: boolean;
-	uiFlightSoundPlayed?: number;
-	uiHitSoundPlayed?: number;
-	uiDestroyedSoundPlayed?: boolean;
+	uiHitSound?: number;
 }
 
 export namespace HomingTargets {
@@ -550,9 +546,8 @@ export interface LineTrail extends TrailBase {
 	width: number;
 }
 
-export interface Sound {
-	id: string;
-	follow?: string;
-	pos: pl.Vec2;
-	tick: number;
+export interface AudioElement {
+    id: string;
+    sound: string;
+    pos: pl.Vec2;
 }

@@ -8,6 +8,7 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
+import * as audio from './core/audio';
 import * as config from './config';
 import * as cloud from './core/cloud';
 import * as matches from './core/matches';
@@ -15,7 +16,6 @@ import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
 import * as sockets from './core/sockets';
-import * as sounds from './core/sounds';
 import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
@@ -32,7 +32,7 @@ export function initialize() {
     stats.init();
     cloud.init();
     rankings.init();
-    sounds.init();
+    audio.init();
 
     start();
     render();

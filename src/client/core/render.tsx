@@ -1,10 +1,10 @@
 import Color from 'color';
 import * as pl from 'planck-js';
 import * as Reselect from 'reselect';
+import * as audio from './audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as keyboardUtils from './keyboardUtils';
-import * as sounds from './sounds';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
@@ -121,16 +121,14 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 }
 
 function playSounds(world: w.World) {
-	const soundsToPlay = new Array<w.Sound>();
-	for (const sound of world.ui.sounds) {
-		if (sound.tick > world.ui.playedTick) {
-			soundsToPlay.push(sound);
-		}
+	if (world.tick <= world.ui.playedTick) {
+		return;
 	}
-
-	sounds.play(world, world.ui.myHeroId, soundsToPlay);
-
 	world.ui.playedTick = world.tick;
+
+	const hero = world.objects.get(world.ui.myHeroId);
+	const self = hero ? hero.body.getPosition() : pl.Vec2(0.5, 0.5);
+	audio.play(self, world.ui.sounds, world.settings.Sounds);
 }
 
 function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
@@ -232,6 +230,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		renderShield(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
+		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world);
 	}
@@ -242,6 +241,7 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 		renderHeroDeath(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
+		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacleDestroyed(ctxStack, obj, world);
 	}
@@ -272,8 +272,6 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 }
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
-	playSpellSounds(obj, world);
-
 	obj.uiPath.push(vector.clone(obj.body.getPosition()));
 
 	if (obj.render === "ball") {
@@ -300,39 +298,19 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 }
 
 function playSpellSounds(obj: w.Projectile, world: w.World) {
-	if (!obj.uiCreateSoundPlayed) {
-		obj.uiCreateSoundPlayed = true;
+	if (obj.sound) {
 		world.ui.sounds.push({
-			id: `${obj.type}-start`,
-			tick: world.tick,
+			id: obj.id,
+			sound: obj.sound,
 			pos: vector.clone(obj.body.getPosition()),
 		});
 	}
 
-	if (obj.uiFlightSoundPlayed === undefined || (world.tick - obj.uiFlightSoundPlayed) >= constants.TicksPerSecond) {
-		obj.uiFlightSoundPlayed = world.tick;
+	const hitSound = obj.soundHit || obj.sound;
+	if (hitSound && obj.hit && (!obj.uiHitSound || obj.hit > obj.uiHitSound)) {
 		world.ui.sounds.push({
-			id: `${obj.type}-flight`,
-			tick: world.tick,
-			follow: obj.id,
-			pos: vector.clone(obj.body.getPosition()),
-		});
-	}
-
-	if (obj.hit !== undefined && (obj.uiHitSoundPlayed === undefined || obj.hit > obj.uiHitSoundPlayed)) {
-		obj.uiHitSoundPlayed = obj.hit;
-		world.ui.sounds.push({
-			id: `${obj.type}-hit`,
-			tick: world.tick,
-			pos: vector.clone(obj.body.getPosition()),
-		});
-	}
-
-	if (obj.destroyed && !obj.uiDestroyedSoundPlayed) {
-		obj.uiDestroyedSoundPlayed = true;
-		world.ui.sounds.push({
-			id: `${obj.type}-destroyed`,
-			tick: world.tick,
+			id: `${obj.id}-hit-${obj.hit}`, // Each hit has a unique ID
+			sound: `${hitSound}-hit`,
 			pos: vector.clone(obj.body.getPosition()),
 		});
 	}
@@ -582,37 +560,23 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		ctx.restore();
 	}
 
-
 	// Sounds
 	if (hero.casting) {
-		if (hero.casting.stage >= w.CastStage.Charging && !hero.casting.uiChargingSoundPlayed) {
-			hero.casting.uiChargingSoundPlayed = true;
-			world.ui.sounds.push({
-				id: `${hero.casting.action.type}-charging`,
-				pos: vector.clone(hero.body.getPosition()),
-				tick: world.tick,
-			});
-		}
-
-		if (hero.casting.stage >= w.CastStage.Channelling && !hero.casting.uiCastSoundPlayed) {
-			hero.casting.uiCastSoundPlayed = true;
-			world.ui.sounds.push({
-				id: `${hero.casting.action.type}-casting`,
-				pos: vector.clone(hero.body.getPosition()),
-				tick: world.tick,
-			});
-		}
-
-		if (hero.casting.stage == w.CastStage.Channelling) {
-			const previous = hero.casting.uiChannellingSoundPlayed;
-			if (previous === undefined || (world.tick - previous) >= constants.TicksPerSecond) {
-				hero.casting.uiChannellingSoundPlayed = world.tick;
-				world.ui.sounds.push({
-					id: `${hero.casting.action.type}-channelling`,
-					pos: vector.clone(hero.body.getPosition()),
-					tick: world.tick,
-				});
+		const spell = world.settings.Spells[hero.casting.action.type];
+		if (spell && spell.sound) {
+			let stage: string = null;
+			if (hero.casting.stage === w.CastStage.Charging) {
+				stage = "charging";
+			} else if (hero.casting.stage === w.CastStage.Channelling) {
+				stage = "channelling";
 			}
+
+			const key = `${spell.sound}-${stage}`;
+			world.ui.sounds.push({
+				id: `${hero.id}-${key}`,
+				sound: key,
+				pos: vector.clone(hero.body.getPosition()),
+			});
 		}
 	}
 }

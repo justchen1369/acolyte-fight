@@ -28,7 +28,8 @@ declare interface AcolyteFightSettings {
     World: WorldSettings;
     Obstacle: ObstacleSettings;
     Spells: Spells;
-    Choices: ChoiceSettings;
+	Choices: ChoiceSettings;
+	Sounds: Sounds;
 }
 
 declare interface HeroSettings {
@@ -122,6 +123,7 @@ declare interface SpellBase {
 	name?: string;
     description: string;
 	action: string; // Which action function to use
+	sound?: string; // Which sound to use for charging/channelling
 	untargeted?: boolean; // No target required. i.e. cast instantly when you click the button
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
@@ -200,7 +202,9 @@ declare interface ProjectileTemplate extends DamagePacket {
 
     color: string; // Color of the projectile
     selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
-    render: string; // Which render function to use
+	render: string; // Which render function to use
+	sound?: string;
+	soundHit?: string;
 }
 
 declare interface GravityParameters {
@@ -319,6 +323,41 @@ declare interface DamagePacket {
 declare interface Vec2 {
 	x: number;
 	y: number;
+}
+
+type WaveType = "sine" | "square" | "sawtooth" | "triangle" | "brown-noise";
+
+interface Sounds {
+	[key: string]: Sound;
+}
+
+interface Sound {
+	start?: SoundBite[];
+
+	sustain?: SoundBite[];
+	repeatIntervalSeconds?: number;
+	cutoffSeconds?: number; // If this sound is stopped early, ramp volume to zero over this many seconds
+	cutoffEarly?: boolean; // Whether to cutoff the sound early if the action is cancelled (e.g. if the spell stops charging). Defaults to true.
+}
+
+interface SoundBite {
+	startTime?: number;
+	stopTime: number;
+
+	startFreq?: number;
+    stopFreq?: number;
+
+    tremoloFreq?: number;
+    tremoloStrength?: number;
+
+	highPass?: number;
+	lowPass?: number;
+
+	attack?: number;
+	decay?: number;
+
+	wave: WaveType;
+	ratios?: number[];
 }
 
 declare interface WorldContract {

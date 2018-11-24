@@ -229,6 +229,8 @@ const fireball: Spell = {
         damage: 7.5,
         categories: Categories.Projectile,
 
+        sound: "fireball",
+        soundHit: "standard",
         render: "projectile",
         trailTicks: 30,
     },
@@ -262,6 +264,7 @@ const flamestrike: Spell = {
             maxImpulse: 0.00005,
         },
 
+        sound: "flamestrike",
         render: "projectile",
         trailTicks: 30,
     },
@@ -320,6 +323,7 @@ const meteor: Spell = {
         categories: Categories.Projectile | Categories.Massive,
         expireOn: Categories.Obstacle,
 
+        sound: "meteor",
         render: "ball",
     },
 };
@@ -328,6 +332,7 @@ const kamehameha: Spell = {
     name: 'Acolyte Beam',
     description: "After a long charge time, unleash a beam so powerful it can wipe out a full-health enemy in seconds.",
     action: "spray",
+    sound: "kamehameha",
 
     color: '#44ddff',
     icon: "glowingHands",
@@ -357,6 +362,7 @@ const kamehameha: Spell = {
         trailTicks: 1.0 * TicksPerSecond,
         categories: Categories.Projectile | Categories.Massive,
 
+        sound: "kamehameha",
         render: "ray",
     },
 };
@@ -383,6 +389,7 @@ const lightning: Spell = {
         collideWith: Categories.All ^ Categories.Projectile,
         damage: 0,
 
+        sound: "lightning",
         render: "ray",
         trailTicks: 30,
     },
@@ -415,6 +422,8 @@ const homing: Spell = {
 
         trailTicks: 30,
 
+        sound: "homing",
+        soundHit: "standard",
         render: "projectile",
     },
 };
@@ -450,6 +459,8 @@ const boomerang: Spell = {
 
         trailTicks: 1 * TicksPerSecond,
 
+        sound: "boomerang",
+        soundHit: "standard",
         render: "projectile",
     },
 };
@@ -523,6 +534,7 @@ const bouncer: Spell = {
             damageFactor: 0.9,
         },
 
+        sound: "bouncer",
         render: "ray",
         trailTicks: 1.0 * TicksPerSecond,
     },
@@ -731,6 +743,293 @@ const thrust: Spell = {
     action: "thrust",
 };
 
+const Sounds: Sounds = {
+    "fireball": {
+        sustain: [
+            {
+                stopTime: 2,
+                attack: 0.25,
+                decay: 0.75,
+
+                highPass: 1000,
+                lowPass: 1000,
+
+                wave: "brown-noise",
+            },
+            {
+                stopTime: 1.5,
+                attack: 0.25,
+                decay: 0.25,
+
+                startFreq: 20,
+                stopFreq: 10,
+                highPass: 432,
+                lowPass: 432,
+
+                wave: "square",
+
+                ratios: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2],
+            },
+        ],
+    },
+    "flamestrike": {
+        sustain: [
+            {
+                stopTime: 1.5,
+                attack: 0.25,
+                decay: 0.25,
+
+                highPass: 300,
+                lowPass: 303,
+
+                wave: "brown-noise",
+            },
+        ],
+    },
+    "flamestrike-hit": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 2,
+                attack: 0.01,
+                decay: 1.95,
+
+                startFreq: 100,
+                stopFreq: 0.01,
+                lowPass: 300,
+
+                wave: "triangle",
+
+                ratios: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2],
+            }
+        ],
+    },
+    "lightning": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 0.3,
+                attack: 0.001,
+                decay: 0.29,
+
+                startFreq: 4500,
+                stopFreq: 5000,
+
+                wave: "sawtooth",
+                ratios: [1, 1.33, 1.5, 1.78, 2, 2.67, 3, 3.56],
+            },
+        ],
+    },
+    "homing": {
+        sustain: [
+            {
+                stopTime: 1.5,
+                attack: 0.25,
+                decay: 0.25,
+
+                highPass: 300,
+                lowPass: 318,
+
+                wave: "brown-noise",
+
+            },
+            {
+                stopTime: 1.5,
+                attack: 0.5,
+                decay: 1.0,
+
+                startFreq: 200,
+                stopFreq: 203,
+                lowPass: 203,
+
+                tremoloFreq: 4,
+                tremoloStrength: 0.2,
+
+                wave: "sine",
+
+                ratios: [1, 2, 2.75, 4, 5.5],
+            },
+        ],
+    },
+    "boomerang": {
+        sustain: [
+            {
+                stopTime: 1.5,
+                attack: 0.25,
+                decay: 0.5,
+
+                startFreq: 55,
+                stopFreq: 55.5,
+                lowPass: 55.5,
+
+                tremoloFreq: 7,
+                tremoloStrength: 0.3,
+
+                wave: "sine",
+
+                ratios: [1, 1.5, 2, 2.75, 4, 5.5],
+            },
+            {
+                stopTime: 1.5,
+                attack: 0.25,
+                decay: 0.25,
+
+                highPass: 495,
+                lowPass: 525,
+
+                wave: "brown-noise",
+            },
+        ],
+    },
+    "kamehameha-charging": {
+        start: [
+            {
+                stopTime: 0.75,
+                attack: 0.70,
+                decay: 0.05,
+
+                startFreq: 4,
+                stopFreq: 19,
+
+                wave: "triangle",
+
+                ratios: [1, 2, 2.5, 4, 5, 8, 10, 16],
+            },
+        ],
+    },
+    "kamehameha-channelling": {
+        start: [
+            {
+                stopTime: 0.25,
+                attack: 0.05,
+                decay: 0.20,
+
+                startFreq: 40,
+                stopFreq: 18,
+
+                wave: "triangle",
+
+                ratios: [1, 2, 4],
+            },
+        ],
+    },
+    "kamehameha": {
+        sustain: [
+            {
+                stopTime: 0.25,
+                attack: 0.1,
+                decay: 0.15,
+
+                startFreq: 18,
+                stopFreq: 18.1,
+                lowPass: 200,
+
+                wave: "triangle",
+
+                ratios: [1, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96],
+            },
+            {
+                stopTime: 0.25,
+                attack: 0.1,
+                decay: 0.15,
+
+                startFreq: 18,
+                stopFreq: 17.9,
+                lowPass: 200,
+
+                wave: "square",
+
+                ratios: [1, 2, 2.16, 4, 4.16, 8, 16],
+            },
+        ],
+    },
+    "meteor": {
+        start: [
+            {
+                stopTime: 1.0,
+                attack: 0.1,
+                decay: 0.9,
+
+                startFreq: 20,
+                stopFreq: 1,
+                lowPass: 300,
+
+                wave: "square",
+
+                ratios: [1, 2, 3, 4, 5, 6, 7, 8],
+            },
+        ],
+        sustain: [
+            {
+                stopTime: 2,
+                attack: 0.5,
+                decay: 1.0,
+
+                startFreq: 1,
+                stopFreq: 10,
+                lowPass: 100,
+
+                wave: "square",
+
+                ratios: [1, 1.5, 2, 2.1, 2.16, 3.5, 6.7, 8.2],
+            },
+        ],
+    },
+    "bouncer": {
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.1,
+                decay: 0.4,
+
+                startFreq: 8900,
+                stopFreq: 8100,
+                lowPass: 9000,
+
+                wave: "square",
+
+                ratios: [1, 1.33, 1.5, 2, 2.67, 3, 4],
+            },
+        ],
+    },
+    "bouncer-hit": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.001,
+                decay: 0.49,
+
+                startFreq: 8100,
+                stopFreq: 8500,
+                lowPass: 9000,
+
+                wave: "square",
+
+                ratios: [1, 1.33, 1.5, 2, 2.67, 3, 4],
+            },
+        ],
+    },
+    "standard-hit": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 0.75,
+                attack: 0.01,
+                decay: 0.70,
+
+                startFreq: 150,
+                stopFreq: 0.01,
+                lowPass: 500,
+
+                wave: "triangle",
+
+                ratios: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2],
+            },
+        ],
+    },
+};
+
 const Spells = {
     move,
     go,
@@ -763,6 +1062,7 @@ export const DefaultSettings: AcolyteFightSettings = {
     Choices,
     Spells,
     Layouts,
+    Sounds,
 };
 
 export function calculateMod(mod: Object): AcolyteFightSettings {
