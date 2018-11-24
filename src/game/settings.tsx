@@ -712,7 +712,7 @@ const icewall: Spell = {
     color: '#0088ff',
 
     action: "wall",
-    sound: "shield",
+    sound: "icewall",
 };
 const teleport: Spell = {
     id: 'teleport',
@@ -794,14 +794,30 @@ const Sounds: Sounds = {
         ],
     },
     "shield": {
-        sustain: [
+        start: [
             {
                 stopTime: 3,
-                attack: 0.1,
+                attack: 0.25,
                 decay: 2.9,
 
-                startFreq: 100,
-                stopFreq: 100,
+                startFreq: 90,
+                stopFreq: 90,
+
+                wave: "sine",
+
+                ratios: [1],
+            },
+        ],
+    },
+    "shield-hit": {
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.01,
+                decay: 0.49,
+
+                startFreq: 95,
+                stopFreq: 85,
                 lowPass: 100,
 
                 wave: "square",
@@ -810,15 +826,31 @@ const Sounds: Sounds = {
             },
         ],
     },
-    "shield-hit": {
+    "icewall": {
         start: [
             {
-                stopTime: 0.05,
-                attack: 0.01,
-                decay: 0.04,
+                stopTime: 1.25,
+                attack: 0.1,
+                decay: 1.15,
 
-                startFreq: 102,
+                startFreq: 100,
                 stopFreq: 100,
+
+                wave: "sine",
+
+                ratios: [1],
+            }
+        ],
+    },
+    "icewall-hit": {
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.01,
+                decay: 0.49,
+
+                startFreq: 105,
+                stopFreq: 95,
                 lowPass: 100,
 
                 wave: "square",
