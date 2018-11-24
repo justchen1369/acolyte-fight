@@ -823,7 +823,16 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 		return;
 	}
 
-	renderGravityAt(ctxStack, hero.gravity.location, world.settings.Spells[hero.gravity.spellId] as ProjectileSpell, world);
+	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
+	renderGravityAt(ctxStack, hero.gravity.location, spell, world);
+
+	if (spell.sound) {
+		world.ui.sounds.push({
+			id: `${hero.id}-trapped`,
+			sound: `${spell.sound}-trapped`,
+			pos: hero.gravity.location,
+		});
+	}
 }
 
 function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: ProjectileSpell, world: w.World) {

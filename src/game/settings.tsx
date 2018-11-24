@@ -578,6 +578,7 @@ const gravity: Spell = {
 
     color: '#0ace00',
     icon: "atomicSlashes",
+    sound: "gravity",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 8 * TicksPerSecond,
@@ -607,6 +608,7 @@ const gravity: Spell = {
             speedWhenClose: 0,
         },
 
+        sound: "gravity",
         render: "gravity",
         trailTicks: 0.25 * TicksPerSecond,
     },
@@ -988,6 +990,46 @@ const Sounds: Sounds = {
                 lowPass: 100,
 
                 wave: "sine",
+
+                ratios: [1, 1.33],
+            },
+        ],
+    },
+    "gravity": {
+        start: [
+            {
+                stopTime: 8,
+                attack: 0.25,
+                decay: 7.75,
+
+                startFreq: 410,
+                stopFreq: 415,
+                lowPass: 100,
+
+                tremoloFreq: 12,
+                tremoloStrength: 0.3,
+
+                wave: "square",
+
+                ratios: [1, 1.33],
+            },
+        ],
+    },
+    "gravity-trapped": {
+        start: [
+            {
+                stopTime: 8,
+                attack: 0.25,
+                decay: 7.75,
+
+                startFreq: 410,
+                stopFreq: 415,
+                lowPass: 100,
+
+                tremoloFreq: 18,
+                tremoloStrength: 0.5,
+
+                wave: "square",
 
                 ratios: [1, 1.33],
             },
