@@ -12,6 +12,7 @@ interface AudioEnvironment {
     ctx: AudioContext;
     brownNoise: AudioBuffer;
     reverb: ReverbNode;
+    locked: boolean;
 }
 
 interface AudioRef {
@@ -100,7 +101,17 @@ export function init() {
             ctx,
             brownNoise,
             reverb,
+            locked: true,
         };
+    }
+}
+
+export function unlock() {
+    if (env && env.locked) {
+        env.locked = false;
+        if (env.ctx.state === "suspended") {
+            env.ctx.resume();
+        }
     }
 }
 
