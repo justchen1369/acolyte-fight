@@ -973,26 +973,18 @@ const Sounds: Sounds = {
         start: [
             {
                 stopTime: 2,
-                attack: 0.25,
-                decay: 1.75,
+                attack: 1,
+                decay: 1,
 
-                highPass: 2100,
-                lowPass: 2103,
+                startFreq: 150,
+                stopFreq: 150,
+                lowPass: 150,
+                tremoloFreq: 10,
+                tremoloStrength: 0.2,
 
-                wave: "brown-noise",
-            },
-            {
-                stopTime: 2,
-                attack: 0.25,
-                decay: 1.75,
+                wave: "square",
 
-                startFreq: 210,
-                stopFreq: 215,
-                lowPass: 100,
-
-                wave: "sine",
-
-                ratios: [1, 1.33],
+                ratios: [1, 2, 4, 8, 16],
             },
         ],
     },
