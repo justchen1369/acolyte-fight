@@ -728,6 +728,7 @@ const teleport: Spell = {
     color: '#6666ff',
 
     action: "teleport",
+    sound: "teleport",
 };
 const thrust: Spell = {
     id: 'thrust',
@@ -750,6 +751,34 @@ const thrust: Spell = {
 
 const Sounds: Sounds = {
     "thrust-channelling": {
+        start: [
+            {
+                stopTime: 0.25,
+                attack: 0.03,
+                decay: 0.22,
+
+                highPass: 1080,
+                lowPass: 1100,
+
+                wave: "brown-noise",
+            },
+        ],
+    },
+    "teleport-channelling": {
+        start: [
+            {
+                stopTime: 0.1,
+                attack: 0.03,
+                decay: 0.07,
+
+                highPass: 780,
+                lowPass: 800,
+
+                wave: "brown-noise",
+            },
+        ],
+    },
+    "teleport-arriving": {
         start: [
             {
                 stopTime: 0.25,

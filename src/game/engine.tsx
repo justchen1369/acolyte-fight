@@ -1685,6 +1685,14 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	hero.body.setPosition(newPosition);
 	hero.moveTo = action.target;
 
+	world.ui.events.push({
+		type: "teleport",
+		fromPos: vector.clone(currentPosition),
+		toPos: vector.clone(newPosition),
+		heroId: hero.id,
+		sound: spell.sound,
+	});
+
 	return true;
 }
 

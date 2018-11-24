@@ -350,6 +350,8 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderDetonate(ctxStack, ev, world);
 	} else if (ev.type === "lifeSteal") {
 		renderLifeStealReturn(ctxStack, ev, world);
+	} else if (ev.type === "teleport") {
+		renderTeleport(ctxStack, ev, world);
 	} else {
 		return;
 	}
@@ -389,6 +391,16 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 			id: `${ev.projectileId}-detonating`,
 			sound: `${ev.sound}-detonating`,
 			pos: ev.pos,
+		});
+	}
+}
+
+function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
+	if (ev.sound) {
+		world.ui.sounds.push({
+			id: `${ev.heroId}-teleport-arriving`,
+			sound: `${ev.sound}-arriving`,
+			pos: ev.toPos,
 		});
 	}
 }

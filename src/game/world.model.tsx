@@ -497,7 +497,8 @@ export type WorldObject =
 export type WorldEvent =
 	DetonateEvent
 	| ScourgeEvent
-	| LifeStealEvent;
+	| LifeStealEvent
+	| TeleportEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -522,6 +523,14 @@ export interface ScourgeEvent extends WorldEventBase {
 export interface LifeStealEvent extends WorldEventBase {
 	type: "lifeSteal";
 	owner: string;
+}
+
+export interface TeleportEvent extends WorldEventBase {
+	type: "teleport";
+	fromPos: pl.Vec2;
+	toPos: pl.Vec2;
+	heroId: string;
+	sound?: string;
 }
 
 export interface Action {
