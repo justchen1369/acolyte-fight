@@ -1121,7 +1121,7 @@ const Sounds: Sounds = {
         ],
     },
     "kamehameha": {
-        sustain: [
+        start: [
             {
                 stopTime: 0.25,
                 attack: 0.1,
@@ -1318,6 +1318,7 @@ const Sounds: Sounds = {
                 startFreq: 20,
                 stopFreq: 21,
                 highPass: 300,
+                lowPass: 3000,
 
                 wave: "square",
 
