@@ -1067,15 +1067,25 @@ const Sounds: Sounds = {
         ],
     },
     "boomerang": {
-        sustain: [
+        start: [
             {
-                stopTime: 1.5,
+                stopTime: 5,
                 attack: 0.25,
-                decay: 0.5,
+                decay: 4,
 
-                startFreq: 55,
-                stopFreq: 55.5,
-                lowPass: 55.5,
+                highPass: 895,
+                lowPass: 925,
+
+                wave: "brown-noise",
+            },
+            {
+                stopTime: 5,
+                attack: 0.25,
+                decay: 4,
+
+                startFreq: 205,
+                stopFreq: 206,
+                lowPass: 100,
 
                 tremoloFreq: 7,
                 tremoloStrength: 0.3,
@@ -1083,16 +1093,6 @@ const Sounds: Sounds = {
                 wave: "sine",
 
                 ratios: [1, 1.5, 2, 2.75, 4, 5.5],
-            },
-            {
-                stopTime: 1.5,
-                attack: 0.25,
-                decay: 0.25,
-
-                highPass: 495,
-                lowPass: 525,
-
-                wave: "brown-noise",
             },
         ],
     },
