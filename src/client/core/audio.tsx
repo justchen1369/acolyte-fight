@@ -148,7 +148,7 @@ function generateBrownNoise(ctx: AudioContext) {
 	let lastOut = 0.0;
 	for (var i = 0; i < bufferSize; i++) {
 		var white = Math.random() * 2 - 1;
-		output[i] = (lastOut + (0.02 * white)) / 1.02;
+		output[i] = (lastOut + (0.01 * white)) / 1.01;
 		lastOut = output[i];
 		output[i] *= 3.5; // (roughly) compensate for gain
 	}
