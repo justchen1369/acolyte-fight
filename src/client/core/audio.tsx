@@ -86,8 +86,9 @@ class AudioSource {
 }
 
 export function init() {
-    if (AudioContext) {
-        const ctx = new AudioContext();
+    const audioContextConstructor = ((window as any).AudioContext || (window as any).webkitAudioContext);
+    if (audioContextConstructor) {
+        const ctx = new audioContextConstructor() as AudioContext;
         const brownNoise = generateBrownNoise(ctx);
         const reverb = createReverb(ctx);
         reverb.connect(ctx.destination);
