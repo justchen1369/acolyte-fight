@@ -504,6 +504,7 @@ const link: Spell = {
 
         trailTicks: 1,
 
+        sound: "link",
         render: "link",
     },
 };
@@ -962,6 +963,33 @@ const Sounds: Sounds = {
 
                 wave: "sawtooth",
                 ratios: [1, 1.33, 1.5, 1.78, 2, 2.67, 3, 3.56],
+            },
+        ],
+    },
+    "link": {
+        start: [
+            {
+                stopTime: 2,
+                attack: 0.25,
+                decay: 1.75,
+
+                highPass: 2100,
+                lowPass: 2103,
+
+                wave: "brown-noise",
+            },
+            {
+                stopTime: 2,
+                attack: 0.25,
+                decay: 1.75,
+
+                startFreq: 210,
+                stopFreq: 215,
+                lowPass: 100,
+
+                wave: "sine",
+
+                ratios: [1, 1.33],
             },
         ],
     },
