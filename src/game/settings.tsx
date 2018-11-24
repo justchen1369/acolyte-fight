@@ -1012,27 +1012,27 @@ const Sounds: Sounds = {
 
                 wave: "square",
 
-                ratios: [1, 1.33],
+                ratios: [1, 1.33, 1.4, 1.5],
             },
         ],
     },
     "gravity-trapped": {
         start: [
             {
-                stopTime: 8,
-                attack: 0.25,
-                decay: 7.75,
+                stopTime: 2,
+                attack: 0.01,
+                decay: 1.95,
 
                 startFreq: 410,
                 stopFreq: 415,
                 lowPass: 100,
 
-                tremoloFreq: 18,
-                tremoloStrength: 0.5,
+                tremoloFreq: 12,
+                tremoloStrength: 0.4,
 
                 wave: "square",
 
-                ratios: [1, 1.33],
+                ratios: [1, 1.33, 1.4, 1.5],
             },
         ],
     },
