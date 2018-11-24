@@ -120,7 +120,6 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
             if (sound) {
                 source = new AudioSource(elem.id, sound);
                 source.start(elem.pos);
-                console.log(elem.sound);
             }
         }
 

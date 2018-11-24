@@ -1024,7 +1024,7 @@ const Sounds: Sounds = {
 
                 wave: "square",
 
-                ratios: [1, 1.33, 1.5, 2, 2.67, 3, 4],
+                ratios: [1, 1.33, 1.5],
             },
         ],
     },
@@ -1042,7 +1042,7 @@ const Sounds: Sounds = {
 
                 wave: "square",
 
-                ratios: [1, 1.33, 1.5, 2, 2.67, 3, 4],
+                ratios: [1, 1.33, 1.5],
             },
         ],
     },
