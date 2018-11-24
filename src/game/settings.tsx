@@ -274,6 +274,7 @@ const firespray: Spell = {
     name: 'Firesplatter',
     description: "Shoot a stream of fire in a wide arc. Get closer to focus all your damage onto one target.",
     action: "spray",
+    sound: "firespray",
 
     color: '#ff0044',
     icon: "bubblingBeam",
@@ -1312,6 +1313,24 @@ const Sounds: Sounds = {
 
                 ratios: [1, 1.33, 1.5],
             },
+        ],
+    },
+    "firespray-channelling": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.1,
+                decay: 0.25,
+
+                startFreq: 20,
+                stopFreq: 21,
+                highPass: 300,
+
+                wave: "square",
+
+                ratios: [1, 1.12, 1.23, 1.32, 1.45, 1.56, 1.67],
+            }
         ],
     },
     "standard-hit": {
