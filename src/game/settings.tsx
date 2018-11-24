@@ -1244,9 +1244,9 @@ const Sounds: Sounds = {
                 attack: 0.49,
                 decay: 0.01,
 
-                startFreq: 10,
-                stopFreq: 20,
-                lowPass: 300,
+                startFreq: 200,
+                stopFreq: 400,
+                lowPass: 500,
 
                 wave: "triangle",
 
@@ -1268,7 +1268,7 @@ const Sounds: Sounds = {
 
                 wave: "triangle",
 
-                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9, 2],
             },
         ],
     },
