@@ -1053,16 +1053,16 @@ const Sounds: Sounds = {
                 attack: 0.5,
                 decay: 4.5,
 
-                startFreq: 200,
-                stopFreq: 205,
-                lowPass: 100,
+                startFreq: 800,
+                stopFreq: 850,
+                lowPass: 400,
 
-                tremoloFreq: 4,
+                tremoloFreq: 6,
                 tremoloStrength: 0.2,
 
                 wave: "sine",
 
-                ratios: [1, 2, 2.75, 4, 5.5],
+                ratios: [1, 1.5, 2, 2.73],
             },
         ],
     },
