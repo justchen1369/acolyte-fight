@@ -505,6 +505,8 @@ export interface WorldEventBase {
 
 export interface DetonateEvent extends WorldEventBase {
 	type: "detonate";
+	projectileId: string;
+	sound: string;
 	pos: pl.Vec2;
 	radius: number;
 }

@@ -639,6 +639,7 @@ const supernova: Spell = {
             maxImpulse: 0.0005,
         },
 
+        sound: "supernova",
         render: "supernova",
         trailTicks: 30,
     },
@@ -822,7 +823,7 @@ const Sounds: Sounds = {
             },
         ],
     },
-    "flamestrike-hit": {
+    "flamestrike-detonating": {
         cutoffEarly: false,
         start: [
             {
@@ -1008,6 +1009,61 @@ const Sounds: Sounds = {
                 wave: "square",
 
                 ratios: [1, 1.5, 2, 2.1, 2.16, 3.5, 6.7, 8.2],
+            },
+        ],
+    },
+    "supernova": {
+        start: [
+            {
+                stopTime: 3,
+                attack: 0.25,
+                decay: 2.75,
+
+                startFreq: 5000,
+                stopFreq: 3000,
+                lowPass: 1500,
+
+                tremoloFreq: 7,
+                tremoloStrength: 0.3,
+
+                wave: "square",
+
+                ratios: [1, 1.5, 2, 2.75],
+            },
+        ],
+    },
+    "supernova-detonate-charging": {
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.49,
+                decay: 0.01,
+
+                startFreq: 10,
+                stopFreq: 20,
+                lowPass: 300,
+
+                wave: "triangle",
+
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+            },
+        ],
+    },
+    "supernova-detonating": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 1,
+                attack: 0.01,
+                decay: 0.99,
+
+                startFreq: 100,
+                stopFreq: 10,
+                lowPass: 300,
+
+                wave: "triangle",
+
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
             },
         ],
     },

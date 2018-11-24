@@ -300,11 +300,19 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 
 function playSpellSounds(obj: w.Projectile, world: w.World) {
 	if (obj.sound) {
-		world.ui.sounds.push({
-			id: obj.id,
-			sound: obj.sound,
-			pos: vector.clone(obj.body.getPosition()),
-		});
+		if (obj.detonate && world.tick >= obj.detonate.detonateTick) {
+			world.ui.sounds.push({
+				id: obj.id,
+				sound: `${obj.sound}-detonate-charging`,
+				pos: vector.clone(obj.body.getPosition()),
+			});
+		} else {
+			world.ui.sounds.push({
+				id: obj.id,
+				sound: obj.sound,
+				pos: vector.clone(obj.body.getPosition()),
+			});
+		}
 	}
 
 	const hitSound = obj.soundHit || obj.sound;
@@ -366,6 +374,12 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
+	});
+
+	world.ui.sounds.push({
+		id: `${ev.projectileId}-detonating`,
+		sound: `${ev.sound}-detonating`,
+		pos: ev.pos,
 	});
 }
 

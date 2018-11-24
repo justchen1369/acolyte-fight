@@ -1418,6 +1418,8 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 
 	world.ui.events.push({
 		type: "detonate",
+		projectileId: projectile.id,
+		sound: projectile.sound,
 		pos: vector.clone(projectile.body.getPosition()),
 		radius: projectile.detonate.radius,
 	});
