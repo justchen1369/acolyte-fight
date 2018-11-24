@@ -552,6 +552,7 @@ const drain: Spell = {
 
     projectile: {
         color: '#22ee88',
+        sound: "drain",
 
         density: 2,
         radius: 0.002,
@@ -826,6 +827,36 @@ const Sounds: Sounds = {
             },
         ],
     },
+    "drain": {
+        start: [
+            {
+                stopTime: 2,
+                attack: 0.25,
+                decay: 1.75,
+
+                highPass: 2500,
+                lowPass: 2510,
+
+                wave: "brown-noise",
+            },
+            {
+                stopTime: 2,
+                attack: 0.25,
+                decay: 1.75,
+
+                startFreq: 1100,
+                stopFreq: 1103,
+                lowPass: 300,
+
+                tremoloFreq: 10,
+                tremoloStrength: 0.2,
+
+                wave: "square",
+
+                ratios: [1, 1.34, 1.5],
+            },
+        ],
+    },
     "fireball": {
         sustain: [
             {
@@ -903,26 +934,25 @@ const Sounds: Sounds = {
         ],
     },
     "homing": {
-        sustain: [
+        start: [
             {
-                stopTime: 1.5,
+                stopTime: 5,
                 attack: 0.25,
-                decay: 0.25,
+                decay: 4.5,
 
-                highPass: 300,
-                lowPass: 318,
+                highPass: 1800,
+                lowPass: 1803,
 
                 wave: "brown-noise",
-
             },
             {
-                stopTime: 1.5,
+                stopTime: 5,
                 attack: 0.5,
-                decay: 1.0,
+                decay: 4.5,
 
                 startFreq: 200,
-                stopFreq: 203,
-                lowPass: 203,
+                stopFreq: 205,
+                lowPass: 100,
 
                 tremoloFreq: 4,
                 tremoloStrength: 0.2,
