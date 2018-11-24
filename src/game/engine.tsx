@@ -1791,6 +1791,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 		heroId: hero.id,
 		pos: hero.body.getPosition(),
 		type: "scourge",
+		sound: spell.sound,
 		radius: spell.radius,
 	});
 

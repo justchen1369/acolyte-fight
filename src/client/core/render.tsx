@@ -364,6 +364,14 @@ function renderScourge(ctxStack: CanvasCtxStack, ev: w.ScourgeEvent, world: w.Wo
 		fillStyle: 'white',
 		radius: ev.radius,
 	});
+
+	if (ev.sound) {
+		world.ui.sounds.push({
+			id: `${ev.heroId}-detonating`,
+			sound: `${ev.sound}-detonating`,
+			pos: ev.pos,
+		});
+	}
 }
 
 function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.World) {
@@ -376,11 +384,13 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		radius: ev.radius,
 	});
 
-	world.ui.sounds.push({
-		id: `${ev.projectileId}-detonating`,
-		sound: `${ev.sound}-detonating`,
-		pos: ev.pos,
-	});
+	if (ev.sound) {
+		world.ui.sounds.push({
+			id: `${ev.projectileId}-detonating`,
+			sound: `${ev.sound}-detonating`,
+			pos: ev.pos,
+		});
+	}
 }
 
 function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {

@@ -506,7 +506,7 @@ export interface WorldEventBase {
 export interface DetonateEvent extends WorldEventBase {
 	type: "detonate";
 	projectileId: string;
-	sound: string;
+	sound?: string;
 	pos: pl.Vec2;
 	radius: number;
 }
@@ -515,6 +515,7 @@ export interface ScourgeEvent extends WorldEventBase {
 	type: "scourge";
 	pos: pl.Vec2;
 	heroId: string;
+	sound?: string;
 	radius: number;
 }
 

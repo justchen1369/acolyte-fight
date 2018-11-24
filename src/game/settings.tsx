@@ -666,6 +666,7 @@ const scourge: Spell = {
     trailTicks: 30,
     color: '#ffcc00',
 
+    sound: "scourge",
     action: "scourge",
 };
 const shield: Spell = {
@@ -1050,6 +1051,41 @@ const Sounds: Sounds = {
         ],
     },
     "supernova-detonating": {
+        cutoffEarly: false,
+        start: [
+            {
+                stopTime: 1,
+                attack: 0.01,
+                decay: 0.99,
+
+                startFreq: 100,
+                stopFreq: 10,
+                lowPass: 300,
+
+                wave: "triangle",
+
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+            },
+        ],
+    },
+    "scourge-charging": {
+        start: [
+            {
+                stopTime: 0.5,
+                attack: 0.49,
+                decay: 0.01,
+
+                startFreq: 10,
+                stopFreq: 20,
+                lowPass: 300,
+
+                wave: "triangle",
+
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+            },
+        ],
+    },
+    "scourge-detonating": {
         cutoffEarly: false,
         start: [
             {
