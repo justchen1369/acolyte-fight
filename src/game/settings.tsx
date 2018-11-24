@@ -762,8 +762,8 @@ const Sounds: Sounds = {
                 attack: 0.03,
                 decay: 0.22,
 
-                highPass: 1080,
-                lowPass: 1100,
+                highPass: 100,
+                lowPass: 900,
 
                 wave: "brown-noise",
             },
