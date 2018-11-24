@@ -61,11 +61,12 @@ function start() {
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
 
-    let current = query;
-    if (query.party || query.server) {
-        // Remove the party ID from the URL so that people can't stream snipe their way into the party
-        current = { ...current, party: null, server: null };
-    }
+    let current: s.PathElements = {
+        ...query,
+        party: null, // Remove the party ID from the URL so that people can't stream snipe their way into the party
+        server: null,
+        hash: null,
+    };
     StoreProvider.dispatch({ type: "updateUrl", current });
 
     sockets.connect(config.getBaseUrl(), config.getAuthToken(), (socket) => {
