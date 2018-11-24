@@ -684,6 +684,7 @@ const shield: Spell = {
     color: '#3366ff',
 
     action: "shield",
+    sound: "shield",
 };
 const icewall: Spell = {
     id: 'icewall',
@@ -708,6 +709,7 @@ const icewall: Spell = {
     color: '#0088ff',
 
     action: "wall",
+    sound: "shield",
 };
 const teleport: Spell = {
     id: 'teleport',
@@ -744,6 +746,40 @@ const thrust: Spell = {
 };
 
 const Sounds: Sounds = {
+    "shield": {
+        sustain: [
+            {
+                stopTime: 3,
+                attack: 0.1,
+                decay: 2.9,
+
+                startFreq: 100,
+                stopFreq: 100,
+                lowPass: 100,
+
+                wave: "square",
+
+                ratios: [1, 2, 3, 4, 5, 6, 7, 8],
+            },
+        ],
+    },
+    "shield-hit": {
+        start: [
+            {
+                stopTime: 0.05,
+                attack: 0.01,
+                decay: 0.04,
+
+                startFreq: 102,
+                stopFreq: 100,
+                lowPass: 100,
+
+                wave: "square",
+
+                ratios: [1, 2, 3, 4, 5, 6, 7, 8],
+            },
+        ],
+    },
     "fireball": {
         sustain: [
             {

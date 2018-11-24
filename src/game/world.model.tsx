@@ -347,6 +347,7 @@ export interface Hero extends WorldObjectBase {
 export interface ShieldBase extends WorldObjectBase {
 	category: "shield";
 	type: string;
+	sound?: string;
 	createTick: number;
 	expireTick: number;
 	growthTicks: number;
@@ -355,6 +356,7 @@ export interface ShieldBase extends WorldObjectBase {
 	color: string;
 	selfColor?: boolean;
 	hitTick?: number;
+
 }
 
 export interface Reflect extends ShieldBase {
@@ -460,7 +462,6 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
     trailTicks: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
-	uiHitSound?: number;
 }
 
 export namespace HomingTargets {

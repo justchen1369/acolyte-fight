@@ -228,6 +228,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		}
 	} else if (obj.category === "shield") {
 		renderShield(ctxStack, obj, world);
+		playShieldSounds(obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
 		playSpellSounds(obj, world);
@@ -307,7 +308,7 @@ function playSpellSounds(obj: w.Projectile, world: w.World) {
 	}
 
 	const hitSound = obj.soundHit || obj.sound;
-	if (hitSound && obj.hit && (!obj.uiHitSound || obj.hit > obj.uiHitSound)) {
+	if (hitSound && obj.hit) {
 		world.ui.sounds.push({
 			id: `${obj.id}-hit-${obj.hit}`, // Each hit has a unique ID
 			sound: `${hitSound}-hit`,
@@ -726,6 +727,24 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 
 	foreground(ctxStack, ctx => ctx.restore());
+}
+
+function playShieldSounds(obj: w.Shield, world: w.World) {
+	if (obj.sound) {
+		world.ui.sounds.push({
+			id: obj.id,
+			sound: obj.sound,
+			pos: vector.clone(obj.body.getPosition()),
+		});
+
+		if (obj.hitTick) {
+			world.ui.sounds.push({
+				id: `${obj.id}-hit-${obj.hitTick}`, // Each hit has a unique ID
+				sound: `${obj.sound}-hit`,
+				pos: vector.clone(obj.body.getPosition()),
+			});
+		}
+	}
 }
 
 function heroColor(heroId: string, world: w.World) {
