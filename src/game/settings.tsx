@@ -745,9 +745,24 @@ const thrust: Spell = {
     icon: "fireDash",
     color: '#ff00cc',
     action: "thrust",
+    sound: "thrust",
 };
 
 const Sounds: Sounds = {
+    "thrust-channelling": {
+        start: [
+            {
+                stopTime: 0.25,
+                attack: 0.03,
+                decay: 0.22,
+
+                highPass: 1080,
+                lowPass: 1100,
+
+                wave: "brown-noise",
+            },
+        ],
+    },
     "shield": {
         sustain: [
             {
