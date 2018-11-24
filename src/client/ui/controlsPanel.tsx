@@ -10,6 +10,11 @@ import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 
+namespace Sounds {
+    export const On = "on";
+    export const Off = "off";
+}
+
 namespace MoveWith {
     export const FollowCursor = "follow";
     export const Click = "click";
@@ -34,6 +39,7 @@ interface ControlState {
     singleTapKey: string;
     doubleTapKey: string;
     actionWheelSide: string;
+    sounds: string;
 }
 interface State extends ControlState {
     changed: boolean;
@@ -58,6 +64,7 @@ function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): 
         singleTapKey: rebindings[w.SpecialKeys.SingleTap],
         doubleTapKey: rebindings[w.SpecialKeys.DoubleTap],
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
+        sounds: options.mute ? Sounds.Off : Sounds.On,
     };
 }
 
@@ -155,6 +162,13 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
+            {<div className="row">
+                <span className="label">Sound</span>
+                <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
+                    <option value={Sounds.On}>On</option>
+                    <option value={Sounds.Off}>Off</option>
+                </select>
+            </div>}
             {this.state.changed && <div style={{ textAlign: "center", marginTop: 8 }}>
                 {this.state.saved 
                     ? "Changes saved"
@@ -207,6 +221,11 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
+    private onSoundsSelected(sounds: string) {
+        this.setState({ sounds, changed: true, saved: false });
+        this.saveStateDebounced();
+    }
+
     private saveState() {
         const state = this.state;
 
@@ -227,6 +246,7 @@ class ControlsPanel extends React.Component<Props, State> {
         {
             const options = { ...this.props.options };
             options.wheelOnRight = state.actionWheelSide === Side.Right;
+            options.mute = state.sounds === Sounds.Off;
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

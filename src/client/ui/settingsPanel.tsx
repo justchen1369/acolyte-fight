@@ -42,7 +42,7 @@ export class SettingsPanel extends React.Component<Props, State> {
             </div>}
             <h1>Your Name</h1>
             <NameConfig />
-            <h1>Your Controls</h1>
+            <h1>Your Options</h1>
             <ControlsPanel />
             <h1>Your Spells</h1>
             <SpellBtnConfig />
