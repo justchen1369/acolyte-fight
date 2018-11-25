@@ -8,6 +8,7 @@ let sources = new Map<string, AudioSource>();
 
 interface AudioEnvironment {
     ctx: AudioContext;
+    next: AudioNode;
     brownNoise: AudioBuffer;
     locked: boolean;
 }
@@ -92,8 +93,15 @@ export function init() {
         ctx.listener.setPosition(0.5, 0.5, 0);
         ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
 
+        let next: AudioNode = ctx.destination;
+
+        const compressor = ctx.createDynamicsCompressor();
+        compressor.connect(next);
+        next = compressor;
+
         env = {
             ctx,
+            next,
             brownNoise,
             locked: true,
         };
@@ -162,7 +170,8 @@ function generateBrownNoise(ctx: AudioContext) {
 }
 
 function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): AudioRef {
-    let next: AudioNode = env.ctx.destination;
+    let next: AudioNode = env.next;
+
     const panner = next = createPannerNode(pos, env, next);
     const volume = next = createAttackDecayNode(bite, env, next);
     next = createTremoloNode(bite, env, next);
