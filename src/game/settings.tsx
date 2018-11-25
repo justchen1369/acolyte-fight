@@ -1333,14 +1333,20 @@ const Sounds: Sounds = {
                 attack: 0.1,
                 decay: 0.25,
 
-                startFreq: 20,
-                stopFreq: 21,
-                highPass: 300,
-                lowPass: 3000,
+                startFreq: 4800,
+                stopFreq: 7200,
 
-                wave: "square",
+                modStartFreq: 30,
+                modStopFreq: 30,
+                modStartStrength: 3600,
+                modStopStrength: 10800,
 
-                ratios: [1, 1.12, 1.23, 1.32, 1.45, 1.56, 1.67],
+                tremoloFreq: 30,
+                tremoloStrength: 0.1,
+
+                wave: "triangle",
+
+                ratios: [1, 1.33, 1.5],
             }
         ],
     },
