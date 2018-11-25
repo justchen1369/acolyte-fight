@@ -1,7 +1,5 @@
 import * as pl from 'planck-js';
 import * as w from '../../game/world.model';
-import Reverb from 'soundbank-reverb';
-import { ReverbNode } from 'soundbank-reverb';
 
 const Z = -0.1;
 const RefDistance = 0.1;
@@ -11,7 +9,6 @@ let sources = new Map<string, AudioSource>();
 interface AudioEnvironment {
     ctx: AudioContext;
     brownNoise: AudioBuffer;
-    reverb: ReverbNode;
     locked: boolean;
 }
 
@@ -91,8 +88,6 @@ export function init() {
     if (audioContextConstructor) {
         const ctx = new audioContextConstructor() as AudioContext;
         const brownNoise = generateBrownNoise(ctx);
-        const reverb = createReverb(ctx);
-        reverb.connect(ctx.destination);
 
         ctx.listener.setPosition(0.5, 0.5, 0);
         ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
@@ -100,7 +95,6 @@ export function init() {
         env = {
             ctx,
             brownNoise,
-            reverb,
             locked: true,
         };
     }
@@ -167,21 +161,8 @@ function generateBrownNoise(ctx: AudioContext) {
 	return noiseBuffer;
 }
 
-function createReverb(ctx: AudioContext): ReverbNode {
-    const reverb = Reverb(ctx);
-
-    reverb.time = 1 //seconds
-    reverb.wet.value = 0.8
-    reverb.dry.value = 1
-
-    reverb.filterType = 'lowpass'
-    reverb.cutoff.value = 4000 //Hz
-
-    return reverb;
-}
-
 function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): AudioRef {
-    let next: AudioNode = env.reverb;
+    let next: AudioNode = env.ctx.destination;
     const panner = next = createPannerNode(pos, env, next);
     const volume = next = createAttackDecayNode(bite, env, next);
     next = createTremoloNode(bite, env, next);
