@@ -1382,6 +1382,9 @@ const Sounds: Sounds = {
                 stopFreq: 225,
                 lowPass: 225,
 
+                tremoloFreq: 6,
+                tremoloStrength: 1,
+
                 wave: "triangle",
 
                 ratios: [1, 1.5],
