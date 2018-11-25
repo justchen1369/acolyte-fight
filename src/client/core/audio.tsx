@@ -259,6 +259,13 @@ function createLowPassNode(bite: SoundBite, env: AudioEnvironment, next: AudioNo
     return lowPass;
 }
 
+function createNormalizer(divisor: number, env: AudioEnvironment, next: AudioNode) {
+    const normalizer = env.ctx.createGain();
+    normalizer.gain.value = 1 / divisor;
+    normalizer.connect(next);
+    return normalizer;
+}
+
 function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
     const ctx = env.ctx;
     const t = ctx.currentTime;
@@ -274,11 +281,12 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
 		noise.stop(t + stopTime);
 		noise.connect(next);
 	} else {
-        const ratios = bite.ratios || [];
+        const ratios = bite.ratios || [1];
         const startFreq = bite.startFreq || 440;
         const stopFreq = bite.stopFreq || 440;
 
         const frequencyModulator = createFrequencyModulator(bite, env);
+        next = createNormalizer(ratios.length, env, next); // Ensure volume is the same regardless of number of oscillators
 
 		for (const ratio of ratios) {
 			const osc = ctx.createOscillator();
