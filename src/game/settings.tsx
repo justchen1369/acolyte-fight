@@ -1218,8 +1218,13 @@ const Sounds: Sounds = {
                 startFreq: 100,
                 stopFreq: 10,
 
-                tremoloFreq: 10,
-                tremoloStrength: 0.7,
+                modStartFreq: 800,
+                modStopFreq: 800,
+                modStartStrength: 100,
+                modStopStrength: 100,
+
+                tremoloFreq: 3,
+                tremoloStrength: 0.1,
 
                 wave: "triangle",
 
