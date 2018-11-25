@@ -806,6 +806,7 @@ const Sounds: Sounds = {
 
                 startFreq: 90,
                 stopFreq: 90,
+                highPass: 40,
 
                 wave: "sine",
 
@@ -823,6 +824,7 @@ const Sounds: Sounds = {
                 startFreq: 90,
                 stopFreq: 90,
                 lowPass: 90,
+                highPass: 40,
 
                 modStartFreq: 180,
                 modStopFreq: 180,
@@ -844,6 +846,7 @@ const Sounds: Sounds = {
 
                 startFreq: 100,
                 stopFreq: 100,
+                highPass: 40,
 
                 wave: "sine",
 
@@ -861,6 +864,7 @@ const Sounds: Sounds = {
                 startFreq: 100,
                 stopFreq: 100,
                 lowPass: 100,
+                highPass: 40,
 
                 modStartFreq: 200,
                 modStopFreq: 200,
