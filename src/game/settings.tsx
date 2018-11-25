@@ -822,11 +822,12 @@ const Sounds: Sounds = {
 
                 startFreq: 90,
                 stopFreq: 90,
+                lowPass: 90,
 
-                modStartFreq: 90,
-                modStopFreq: 90,
+                modStartFreq: 180,
+                modStopFreq: 180,
                 modStartStrength: 90,
-                modStopStrength: 18,
+                modStopStrength: 90,
 
                 wave: "sine",
 
