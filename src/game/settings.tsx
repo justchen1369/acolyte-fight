@@ -1028,6 +1028,8 @@ const Sounds: Sounds = {
     "homing": {
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 5,
                 attack: 0.25,
                 decay: 4.5,
@@ -1063,6 +1065,8 @@ const Sounds: Sounds = {
     "boomerang": {
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 5,
                 attack: 0.25,
                 decay: 4,
