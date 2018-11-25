@@ -1244,6 +1244,8 @@ const Sounds: Sounds = {
     "scourge-charging": {
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 0.5,
                 attack: 0.49,
                 decay: 0.01,
@@ -1266,6 +1268,8 @@ const Sounds: Sounds = {
         cutoffEarly: false,
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 1,
                 attack: 0.01,
                 decay: 0.99,
@@ -1278,6 +1282,8 @@ const Sounds: Sounds = {
                 ratios: [1, 1.2, 1.4, 1.6, 1.8],
             },
             {
+                volume: 0.25,
+
                 stopTime: 1,
                 attack: 0.01,
                 decay: 0.99,
@@ -1338,7 +1344,7 @@ const Sounds: Sounds = {
         cutoffEarly: false,
         start: [
             {
-                volume: 0.3,
+                volume: 0.25,
 
                 stopTime: 0.5,
                 attack: 0.1,
