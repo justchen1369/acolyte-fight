@@ -1198,11 +1198,12 @@ const Sounds: Sounds = {
                 attack: 0.1,
                 decay: 0.9,
 
-                startFreq: 4000,
-                stopFreq: 4500,
+                lowPass: 450,
+                startFreq: 900,
+                stopFreq: 1000,
 
                 tremoloFreq: 7,
-                tremoloStrength: 0.1,
+                tremoloStrength: 0.3,
 
                 modStartFreq: 1000,
                 modStopFreq: 1000,
