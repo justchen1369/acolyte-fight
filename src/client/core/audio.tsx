@@ -194,11 +194,12 @@ function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, next: Aud
     const stopTime = bite.stopTime;
     const attack = bite.attack || 0.03;
     const decay = bite.decay || 0.03;
+    const maxVolume = bite.volume || 1;
 
 	const volume = env.ctx.createGain();
 	volume.gain.setValueAtTime(0, t + startTime);
-	volume.gain.linearRampToValueAtTime(1, t + startTime + attack);
-	volume.gain.linearRampToValueAtTime(1, t + stopTime - decay);
+	volume.gain.linearRampToValueAtTime(maxVolume, t + startTime + attack);
+	volume.gain.linearRampToValueAtTime(maxVolume, t + stopTime - decay);
 	volume.gain.linearRampToValueAtTime(0, t + stopTime);
 
 	volume.connect(next);

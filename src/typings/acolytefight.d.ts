@@ -341,6 +341,8 @@ interface Sound {
 }
 
 interface SoundBite {
+	volume?: number;
+
 	startTime?: number;
 	stopTime: number;
 

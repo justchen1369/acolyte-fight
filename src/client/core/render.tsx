@@ -525,6 +525,8 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	renderHeroBars(ctxStack, hero, world);
 
 	foreground(ctxStack, ctx => ctx.restore());
+
+	playHeroSounds(hero, world);
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -604,8 +606,10 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 
 		ctx.restore();
 	}
+}
 
-	// Sounds
+function playHeroSounds(hero: w.Hero, world: w.World) {
+	// Casting sounds
 	if (hero.casting) {
 		const spell = world.settings.Spells[hero.casting.action.type];
 		if (spell && spell.sound) {
@@ -616,12 +620,18 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 				stage = "channelling";
 			}
 
-			const key = `${spell.sound}-${stage}`;
-			world.ui.sounds.push({
-				id: `${hero.id}-${key}`,
-				sound: key,
-				pos: vector.clone(hero.body.getPosition()),
-			});
+			if (stage) {
+				// Make the sound happen in the correct direction
+				const pos = vector.plus(
+					hero.body.getPosition(),
+					vector.multiply(vector.fromAngle(hero.body.getAngle()), hero.radius));
+				const key = `${spell.sound}-${stage}`;
+				world.ui.sounds.push({
+					id: `${hero.id}-${key}`,
+					sound: key,
+					pos,
+				});
+			}
 		}
 	}
 }

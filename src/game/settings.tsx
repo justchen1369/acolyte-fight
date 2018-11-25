@@ -1331,6 +1331,8 @@ const Sounds: Sounds = {
         cutoffEarly: false,
         start: [
             {
+                volume: 0.3,
+
                 stopTime: 0.5,
                 attack: 0.1,
                 decay: 0.25,
