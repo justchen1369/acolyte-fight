@@ -820,13 +820,17 @@ const Sounds: Sounds = {
                 attack: 0.01,
                 decay: 0.49,
 
-                startFreq: 95,
-                stopFreq: 85,
-                lowPass: 100,
+                startFreq: 90,
+                stopFreq: 90,
 
-                wave: "square",
+                modStartFreq: 90,
+                modStopFreq: 90,
+                modStartStrength: 90,
+                modStopStrength: 18,
 
-                ratios: [1, 2, 3, 4, 5, 6, 7, 8],
+                wave: "sine",
+
+                ratios: [1],
             },
         ],
     },
@@ -853,13 +857,18 @@ const Sounds: Sounds = {
                 attack: 0.01,
                 decay: 0.49,
 
-                startFreq: 105,
-                stopFreq: 95,
+                startFreq: 100,
+                stopFreq: 100,
                 lowPass: 100,
 
-                wave: "square",
+                modStartFreq: 200,
+                modStopFreq: 200,
+                modStartStrength: 100,
+                modStopStrength: 100,
 
-                ratios: [1, 2, 3, 4, 5, 6, 7, 8],
+                wave: "sine",
+
+                ratios: [1],
             },
         ],
     },
