@@ -1236,7 +1236,11 @@ const Sounds: Sounds = {
 
                 startFreq: 50,
                 stopFreq: 200,
-                lowPass: 500,
+
+                modStartFreq: 25,
+                modStopFreq: 100,
+                modStartStrength: 25,
+                modStopStrength: 100,
 
                 wave: "triangle",
 
@@ -1254,11 +1258,30 @@ const Sounds: Sounds = {
 
                 startFreq: 100,
                 stopFreq: 10,
-                lowPass: 300,
 
                 wave: "triangle",
 
-                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9, 2],
+                ratios: [1, 1.2, 1.4, 1.6, 1.8],
+            },
+            {
+                stopTime: 1,
+                attack: 0.01,
+                decay: 0.99,
+
+                startFreq: 300,
+                stopFreq: 30,
+
+                modStartFreq: 713,
+                modStopFreq: 300,
+                modStartStrength: 600,
+                modStopStrength: 100,
+
+                tremoloFreq: 3,
+                tremoloStrength: 0.1,
+
+                wave: "triangle",
+
+                ratios: [1, 1.33, 1.5],
             },
         ],
     },
