@@ -286,6 +286,8 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
         const startFreq = bite.startFreq || 440;
         const stopFreq = bite.stopFreq || 440;
 
+        const frequencyModulator = createFrequencyModulator(bite, env);
+
 		for (const ratio of ratios) {
 			const osc = ctx.createOscillator();
 			osc.type = bite.wave;
@@ -296,7 +298,39 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
 			osc.start(t + startTime);
 			osc.stop(t + stopTime);
 
-			osc.connect(next);
+            osc.connect(next);
+            
+            if (frequencyModulator) {
+                frequencyModulator.connect(osc.frequency);
+            }
 		}
+    }
+}
+
+function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment) {
+    const ctx = env.ctx;
+    const t = ctx.currentTime;
+
+    const startTime = bite.startTime || 0;
+    const stopTime = bite.stopTime;
+
+    if (bite.modStartFreq && bite.modStopFreq && bite.modStartStrength && bite.modStopStrength) {
+        const mod = ctx.createOscillator();
+        const modGain = ctx.createGain();
+
+        mod.type = bite.wave as OscillatorType;
+        mod.frequency.setValueAtTime(bite.modStartFreq, t + startTime);
+        mod.frequency.exponentialRampToValueAtTime(bite.modStopFreq, t + stopTime);
+        modGain.gain.setValueAtTime(bite.modStartStrength, t + startTime);
+        modGain.gain.linearRampToValueAtTime(bite.modStopStrength, t + stopTime);
+
+        mod.connect(modGain);
+
+        mod.start(t + startTime);
+        mod.stop(t + stopTime);
+
+        return modGain;
+    } else {
+        return null;
     }
 }

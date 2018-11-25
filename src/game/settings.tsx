@@ -1186,37 +1186,24 @@ const Sounds: Sounds = {
     "supernova": {
         start: [
             {
-                stopTime: 3,
-                attack: 0.25,
-                decay: 2.75,
+                stopTime: 1,
+                attack: 0.1,
+                decay: 0.9,
 
-                startFreq: 5000,
-                stopFreq: 3000,
-                lowPass: 1500,
+                startFreq: 4000,
+                stopFreq: 4500,
 
                 tremoloFreq: 7,
-                tremoloStrength: 0.3,
+                tremoloStrength: 0.1,
 
-                wave: "square",
-
-                ratios: [1, 1.5, 2, 2.75],
-            },
-        ],
-    },
-    "supernova-detonate-charging": {
-        start: [
-            {
-                stopTime: 0.5,
-                attack: 0.49,
-                decay: 0.01,
-
-                startFreq: 10,
-                stopFreq: 20,
-                lowPass: 300,
+                modStartFreq: 1000,
+                modStopFreq: 1000,
+                modStartStrength: 1000,
+                modStopStrength: 1000,
 
                 wave: "triangle",
 
-                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+                ratios: [1],
             },
         ],
     },
@@ -1224,17 +1211,19 @@ const Sounds: Sounds = {
         cutoffEarly: false,
         start: [
             {
-                stopTime: 1,
+                stopTime: 0.75,
                 attack: 0.01,
-                decay: 0.99,
+                decay: 0.74,
 
                 startFreq: 100,
                 stopFreq: 10,
-                lowPass: 300,
+
+                tremoloFreq: 10,
+                tremoloStrength: 0.7,
 
                 wave: "triangle",
 
-                ratios: [1, 1.2, 1.4, 1.6, 1.8, 1.9],
+                ratios: [1, 1.2, 1.4, 1.6, 1.8, 2.4, 2.8, 3.2, 3.6],
             },
         ],
     },

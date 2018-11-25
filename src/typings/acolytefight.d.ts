@@ -348,7 +348,12 @@ interface SoundBite {
     stopFreq?: number;
 
     tremoloFreq?: number;
-    tremoloStrength?: number;
+	tremoloStrength?: number;
+
+	modStartFreq?: number;
+	modStopFreq?: number;
+	modStartStrength?: number;
+	modStopStrength?: number;
 
 	highPass?: number;
 	lowPass?: number;
