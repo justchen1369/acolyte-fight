@@ -12,6 +12,7 @@ interface AudioEnvironment {
     ctx: AudioContext;
     brownNoise: AudioBuffer;
     reverb: ReverbNode;
+    locked: boolean;
 }
 
 interface AudioRef {
@@ -100,7 +101,17 @@ export function init() {
             ctx,
             brownNoise,
             reverb,
+            locked: true,
         };
+    }
+}
+
+export function unlock() {
+    if (env && env.locked) {
+        env.locked = false;
+        if (env.ctx.state === "suspended") {
+            env.ctx.resume();
+        }
     }
 }
 
@@ -115,7 +126,7 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
 
     // Start/sustain current sound sources
     for (const elem of elems) {
-        let source = sources.get(elem.id);
+        let source = sources.get(elem.id) || keep.get(elem.id);
         if (!source) {
             const sound = sounds[elem.sound];
             if (sound) {

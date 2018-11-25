@@ -5,6 +5,7 @@ import * as Reselect from 'reselect';
 
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
+import * as audio from '../core/audio';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';
@@ -241,6 +242,8 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private touchStartHandler(...points: PointInfo[]) {
+        audio.unlock();
+
         const world = this.props.world;
         if (!CanvasPanel.interactive(world)) {
             return;
