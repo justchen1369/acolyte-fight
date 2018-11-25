@@ -1166,6 +1166,7 @@ const Sounds: Sounds = {
 
                 startFreq: 20,
                 stopFreq: 1,
+                highPass: 40,
                 lowPass: 300,
 
                 wave: "square",
@@ -1181,6 +1182,7 @@ const Sounds: Sounds = {
 
                 startFreq: 1,
                 stopFreq: 10,
+                highPass: 40,
                 lowPass: 100,
 
                 wave: "square",
