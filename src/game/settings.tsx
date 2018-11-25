@@ -1273,11 +1273,11 @@ const Sounds: Sounds = {
                 attack: 0.01,
                 decay: 0.99,
 
-                startFreq: 300,
+                startFreq: 100,
                 stopFreq: 30,
 
-                modStartFreq: 713,
-                modStopFreq: 300,
+                modStartFreq: 313,
+                modStopFreq: 100,
                 modStartStrength: 600,
                 modStopStrength: 100,
 
