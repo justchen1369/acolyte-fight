@@ -905,28 +905,15 @@ const Sounds: Sounds = {
     "fireball": {
         sustain: [
             {
-                stopTime: 2,
-                attack: 0.25,
-                decay: 0.75,
-
-                highPass: 1000,
-                lowPass: 1000,
-
-                wave: "brown-noise",
-            },
-            {
                 stopTime: 1.5,
                 attack: 0.25,
                 decay: 0.25,
 
-                startFreq: 20,
-                stopFreq: 10,
                 highPass: 432,
-                lowPass: 432,
+                lowPass: 438,
 
-                wave: "square",
+                wave: "brown-noise",
 
-                ratios: [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2],
             },
         ],
     },
