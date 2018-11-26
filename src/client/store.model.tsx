@@ -74,6 +74,7 @@ export interface PathElements {
     hash?: string;
     profileId?: string;
 
+    source?: string;
     gclid?: string;
 }
 

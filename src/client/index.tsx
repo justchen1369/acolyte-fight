@@ -8,6 +8,7 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
+import * as ads from './core/ads';
 import * as audio from './core/audio';
 import * as config from './config';
 import * as cloud from './core/cloud';
@@ -66,8 +67,13 @@ function start() {
         party: null, // Remove the party ID from the URL so that people can't stream snipe their way into the party
         server: null,
         hash: null,
+        source: null,
     };
     StoreProvider.dispatch({ type: "updateUrl", current });
+
+    if (query.source) {
+        ads.init(query.source);
+    }
 
     sockets.connect(config.getBaseUrl(), config.getAuthToken(), (socket) => {
         sockets.connectToServer(query.server)

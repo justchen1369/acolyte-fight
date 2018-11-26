@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as keyboardUtils from '../core/keyboardUtils';
+import * as ads from '../core/ads';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from './screenLifecycle';
@@ -38,6 +38,14 @@ class GamePanel extends React.Component<Props, State> {
         super(props);
         this.state = {
         };
+    }
+
+    componentWillMount() {
+        ads.gameplayStart();
+    }
+
+    componentWillUnmount() {
+        ads.gameplayStop();
     }
 
     render() {

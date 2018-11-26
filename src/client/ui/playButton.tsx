@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as ads from '../core/ads';
 import * as ai from '../core/ai';
 import * as matches from '../core/matches';
 import * as parties from '../core/parties';
@@ -72,13 +73,12 @@ class PlayButton extends React.Component<Props, State> {
         }
     }
 
-    private onPlayClicked(ev: React.MouseEvent) {
+    private async onPlayClicked(ev: React.MouseEvent) {
         if (this.state.joining) {
             return;
         }
         this.setState({ joining: true });
         screenLifecycle.enterGame();
-        matches.joinNewGame();
 
         const attachEndorseTracker = (window as any).attachEndorseTracker;
         if (attachEndorseTracker) {
@@ -89,6 +89,10 @@ class PlayButton extends React.Component<Props, State> {
         if (gtag) {
             gtag('event', 'conversion', {'send_to': 'AW-778742698/Tw7BCODZ1Y8BEKrXqvMC'});
         }
+
+        await ads.commercialBreak();
+
+        matches.joinNewGame();
     }
 
     private onPartyReadyClicked(ready: boolean) {
