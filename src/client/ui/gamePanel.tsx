@@ -14,10 +14,12 @@ import GameKeyCustomizer from './gameKeyCustomizer';
 import SocialBar from './socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
+import WatchLooper from './watchLooper';
 
 import { isMobile, isFacebook } from '../core/userAgent';
 
 interface Props {
+    watching: boolean;
     party: s.PartyState;
     connected: boolean;
     exitable: boolean;
@@ -27,6 +29,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        watching: state.current.page === "watch",
         party: state.party,
         connected: !!state.socketId,
         exitable: matches.worldInterruptible(state.world),
@@ -62,6 +65,7 @@ class GamePanel extends React.Component<Props, State> {
                 {!isFacebook && !isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
                 <UrlListener />
+                {this.props.watching && <WatchLooper />}
             </div>
         );
     }

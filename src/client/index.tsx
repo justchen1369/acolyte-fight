@@ -86,9 +86,7 @@ function start() {
                         // Return to the home page when we exit
                         StoreProvider.dispatch({ type: "updatePage", page: "" });
                         matches.joinNewGame(query.gameId);
-                    } else if (query.hash === "#watch") {
-                        // Return to the home page when we exit
-                        StoreProvider.dispatch({ type: "updatePage", page: "" });
+                    } else if (query.hash === "#watch" || query.page === "watch") {
                         matches.watchLiveGame();
                     } else {
                         pages.go(query);

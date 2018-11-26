@@ -131,7 +131,6 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderNotification(key: string, notification: w.Notification) {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
-            case "replayNotFound": return this.renderReplayNotFoundNotification(key, notification);
             case "text": return this.renderTextNotification(key, notification);
             case "new": return this.renderNewGameNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
@@ -147,10 +146,6 @@ class MessagesPanel extends React.Component<Props, State> {
 
     private renderDisconnectedNotification(key: string, notification: w.DisconnectedNotification) {
         return <div key={key} className="row error">Disconnected from server. Exit the game and try again.</div>
-    }
-
-    private renderReplayNotFoundNotification(key: string, notification: w.ReplayNotFoundNotification) {
-        return <div key={key} className="row error">Replay not found.</div>
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {

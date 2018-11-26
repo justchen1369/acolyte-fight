@@ -159,7 +159,6 @@ export type Notification =
 	| CloseGameNotification
 	| WinNotification
 	| DisconnectedNotification
-	| ReplayNotFoundNotification
 	| RatingAdjustmentNotification
 
 export interface HelpNotification {
@@ -222,10 +221,6 @@ export interface WinNotification {
 
 export interface DisconnectedNotification {
 	type: "disconnected";
-}
-
-export interface ReplayNotFoundNotification {
-	type: "replayNotFound";
 }
 
 export interface RatingAdjustmentNotification {

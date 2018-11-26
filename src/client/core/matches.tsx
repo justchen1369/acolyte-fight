@@ -15,43 +15,48 @@ import { socket } from './sockets';
 
 sockets.listeners.onHeroMsg = onHeroMsg;
 
-export function joinNewGame(observeGameId?: string, observe?: boolean) {
-	observe = observe || !!observeGameId;
+export async function joinNewGame(observeGameId?: string, observe?: boolean): Promise<boolean> {
+	return new Promise<boolean>(resolve => {
+		observe = observe || !!observeGameId;
 
-	const store = StoreProvider.getState();
-	if (store.socketId) {
-		leaveCurrentGame(false);
+		const store = StoreProvider.getState();
+		if (store.socketId) {
+			leaveCurrentGame(false);
 
-		const msg: m.JoinMsg = {
-			gameId: observeGameId || null,
-			name: store.playerName,
-			keyBindings: store.keyBindings,
-			room: store.room.id,
-			isBot: ai.playingAsAI(store) && !observeGameId,
-			isMobile,
-			observe,
-			version: engine.version(),
-		};
-		socket.emit('join', msg, (response: m.JoinResponseMsg) => {
-			if (!response.success) {
-				notify({ type: "replayNotFound" });
-				StoreProvider.dispatch({ type: "leaveMatch" });
-			}
-		});
-	} else {
-		// New server? Reload the client, just in case the version has changed.
-		if (observeGameId) {
-			window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
+			const msg: m.JoinMsg = {
+				gameId: observeGameId || null,
+				name: store.playerName,
+				keyBindings: store.keyBindings,
+				room: store.room.id,
+				isBot: ai.playingAsAI(store) && !observeGameId,
+				isMobile,
+				observe,
+				version: engine.version(),
+			};
+			socket.emit('join', msg, (response: m.JoinResponseMsg) => {
+				if (response.success) {
+					resolve(true);
+				} else {
+					StoreProvider.dispatch({ type: "leaveMatch" });
+					resolve(false);
+				}
+			});
 		} else {
-			const hash = observe ? "watch" : "join";
-			window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
-			window.location.reload(); // to get the hash respected
+			// New server? Reload the client, just in case the version has changed.
+			if (observeGameId) {
+				window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
+			} else {
+				const hash = observe ? "watch" : "join";
+				window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
+				window.location.reload(); // to get the hash respected
+			}
+			resolve(true);
 		}
-	}
+	});
 }
 
-export function watchLiveGame() {
-	joinNewGame(null, true);
+export async function watchLiveGame() {
+	return await joinNewGame(null, true);
 }
 
 export function addBotToCurrentGame() {

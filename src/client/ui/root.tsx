@@ -17,6 +17,7 @@ import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from './urlListener';
+import WatchLooper from './watchLooper';
 
 interface Props {
     myGameId: string;
@@ -62,6 +63,7 @@ class Root extends React.Component<Props> {
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
                 {page === "settings" && this.renderSettings()}
+                {page === "watch" && this.renderWatch()}
                 <UrlListener />
             </div>
         );
@@ -139,6 +141,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <SettingsPanel />
+            </div>
+        </div>;
+    }
+
+    private renderWatch() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <WatchLooper />
             </div>
         </div>;
     }

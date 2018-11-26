@@ -452,7 +452,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			}
 			callback({ success: true });
 		} else {
-			logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
+			// logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
 			callback({ success: false, error: `Unable to find game` });
 		}
 	});
