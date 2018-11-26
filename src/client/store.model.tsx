@@ -4,6 +4,7 @@ import * as w from '../game/world.model';
 
 export interface State {
     current: PathElements;
+    ads?: string;
 
     userId?: string;
     loggedIn: boolean;
@@ -80,6 +81,7 @@ export interface PathElements {
 
 export type Action =
     DisconnectedAction
+    | UpdateAdsAction
     | UpdateUserIdAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
@@ -116,6 +118,11 @@ export interface LeaveMatchAction {
 
 export interface DisconnectedAction {
     type: "disconnected";
+}
+
+export interface UpdateAdsAction {
+    type: "updateAds";
+    ads: string;
 }
 
 export interface UpdateUserIdAction {

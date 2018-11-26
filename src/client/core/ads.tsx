@@ -1,3 +1,5 @@
+import * as StoreProvider from '../storeProvider';
+
 let provider: AdProvider = null;
 
 interface AdProvider {
@@ -62,6 +64,8 @@ class PokiProvider implements AdProvider {
 export async function init(source: string) {
     if (source === "poki") {
         console.log("Initializing PokiSDK...");
+        StoreProvider.dispatch({ type: "updateAds", ads: "poki" });
+
         provider = await PokiProvider.create();
     }
     
