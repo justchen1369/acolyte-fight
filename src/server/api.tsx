@@ -121,7 +121,7 @@ async function onDiscordLoginAsync(req: express.Request, res: express.Response):
             throw "Unable to find Discord user";
         }
 
-        auth.loginAsUser({
+        await auth.loginAsUser({
             accessKey: auth.discordAccessKey(discordUser),
             username: discordUser.username,
         }, auth.enigmaAccessKey(authToken));
