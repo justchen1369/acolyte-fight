@@ -12,7 +12,8 @@ import { ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pix
 import { Icons } from './icons';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
-import { stringify } from 'querystring';
+
+const MaxSoundAgeInTicks = constants.TicksPerSecond;
 
 export interface CanvasStack {
 	background: HTMLCanvasElement;
@@ -122,14 +123,18 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 }
 
 function playSounds(world: w.World, options: RenderOptions) {
-	if (options.mute || world.tick <= world.ui.playedTick) {
-		return;
-	}
-	world.ui.playedTick = world.tick;
+	if (options.mute
+		|| world.tick <= world.ui.playedTick // Already played this tick
+		|| (world.tick - world.ui.playedTick) > MaxSoundAgeInTicks) { // We've lagged or entered a game late, don't replay all the sounds because it just causes WebAudio to hang
 
-	const hero = world.objects.get(world.ui.myHeroId);
-	const self = hero ? hero.body.getPosition() : pl.Vec2(0.5, 0.5);
-	audio.play(self, world.ui.sounds, world.settings.Sounds);
+		// Play nothing
+	} else {
+		const hero = world.objects.get(world.ui.myHeroId);
+		const self = hero ? hero.body.getPosition() : pl.Vec2(0.5, 0.5);
+		audio.play(self, world.ui.sounds, world.settings.Sounds);
+	}
+
+	world.ui.playedTick = world.tick; // Always update this so if user unmutes they don't classified as get sound lag
 }
 
 function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
