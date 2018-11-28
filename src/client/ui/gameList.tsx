@@ -113,8 +113,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 }
 
 class GameList extends React.Component<Props, State> {
-    private alreadyCheckedReplays = new Set<string>();
-
     private getGames = Reselect.createSelector(
         (props: Props) => props.allGameStats,
         (props: Props) => props.limit,
@@ -131,10 +129,6 @@ class GameList extends React.Component<Props, State> {
         this.state = {
             error: null,
         };
-
-        for (const gameId of props.hasReplayLookup.keys()) {
-            this.alreadyCheckedReplays.add(gameId);
-        }
     }
 
     componentWillReceiveProps(newProps: Props) {
@@ -142,21 +136,15 @@ class GameList extends React.Component<Props, State> {
     }
 
     private async checkForReplays(gameIds: string[]) {
-        const hasReplayLookup = new Map<string, boolean>();
-        for (const gameId of gameIds) {
-            if (!this.alreadyCheckedReplays.has(gameId)) {
-                hasReplayLookup.set(gameId, false);
-                this.alreadyCheckedReplays.add(gameId);
-            }
-        }
-
-        if (hasReplayLookup.size === 0) {
+        const gameIdsToCheck = _.difference(gameIds, [...this.props.hasReplayLookup.keys()]);
+        if (gameIdsToCheck.length === 0) {
             return;
         }
 
-        const replayIds = await matches.replays([...hasReplayLookup.keys()]);
-        for (const gameId of replayIds) {
-            hasReplayLookup.set(gameId, true);
+        const replayIds = new Set<string>(await matches.replays(gameIdsToCheck));
+        const hasReplayLookup = new Map<string, boolean>(this.props.hasReplayLookup);
+        for (const gameId of gameIdsToCheck) {
+            hasReplayLookup.set(gameId, replayIds.has(gameId));
         }
         StoreProvider.dispatch({ type: "updateHasReplay", hasReplayLookup });
     }
