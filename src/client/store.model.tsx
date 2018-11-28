@@ -83,6 +83,7 @@ export type Action =
     DisconnectedAction
     | UpdateAdsAction
     | UpdateUserIdAction
+    | LogoutAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
     | UpdateOptionsAction
@@ -129,6 +130,10 @@ export interface UpdateUserIdAction {
     type: "updateUserId";
     userId: string;
     loggedIn: boolean;
+}
+
+export interface LogoutAction {
+    type: "logout";
 }
 
 export interface UpdatePlayerNameAction {

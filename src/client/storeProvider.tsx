@@ -79,6 +79,13 @@ function reducer(state: s.State, action: s.Action): s.State {
             newState.isNewPlayer = false;
         }
         return newState;
+    } else if (action.type === "logout") {
+        return {
+            ...state,
+            userId: null,
+            loggedIn: false,
+            profile: null,
+        };
     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {

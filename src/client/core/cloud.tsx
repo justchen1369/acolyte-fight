@@ -190,6 +190,6 @@ export async function logout(): Promise<void> {
         headers: { ...credentials.headers() },
         credentials: "same-origin",
     });
-    StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
+    StoreProvider.dispatch({ type: "logout" });
     storage.resetNumGames();
 }
