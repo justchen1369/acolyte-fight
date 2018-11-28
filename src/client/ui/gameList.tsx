@@ -129,6 +129,8 @@ class GameList extends React.Component<Props, State> {
         this.state = {
             error: null,
         };
+
+        this.checkForReplays(props.allGameStats.map(gameStats => gameStats.id));
     }
 
     componentWillReceiveProps(newProps: Props) {
