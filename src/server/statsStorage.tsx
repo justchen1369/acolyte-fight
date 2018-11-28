@@ -221,12 +221,43 @@ export async function getLeaderboard(category: string): Promise<Buffer> {
 export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
     const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength);
+    
+    const now = Date.now();
 
+    const seen = new Set<string>();
     let result = new Array<m.LeaderboardPlayer>();
-    await dbStorage.stream(query, doc => {
-        const user = doc.data() as db.User;
-        if (user && user.ratings && user.ratings[category]) {
+    while (result.length < MaxLeaderboardLength) {
+        let chunk;
+        if (result.length > 0) {
+            const lowest = result[result.length - 1].lowerBound;
+            chunk = query.where(`ratings.${category}.lowerBound`, '<=', lowest);
+        } else {
+            chunk = query;
+        }
+
+        let addedAny = false;
+        await dbStorage.stream(chunk, doc => {
+            if (seen.has(doc.id)) {
+                return;
+            }
+            seen.add(doc.id);
+
+            const user = doc.data() as db.User;
+            if (!(user && user.accessed && user.ratings && user.ratings[category])) {
+                return;
+            }
+
             const ratings = user.ratings[category];
+            if (!ratings.numGames) {
+                return;
+            }
+
+            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.numGames) * 24 * 60 * 60 * 1000;
+            const age = now - user.accessed.toMillis();
+            if (age > maxAge) {
+                return;
+            }
+
             result.push({
                 userId: doc.id,
                 name: user.settings && user.settings.name || doc.id,
@@ -238,9 +269,23 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
                 killsPerGame: ratings.killsPerGame,
                 damagePerGame: ratings.damagePerGame,
             });
+            addedAny = true;
+        });
+
+        if (!addedAny) {
+            break;
         }
-    });
+    }
+    result = result.slice(0, MaxLeaderboardLength);
+
+    const elapsed = Date.now() - now;
+    logger.info(`Retrieved leaderboard in ${elapsed.toFixed(0)} ms, ${result.length}/${seen.size} results`);
+
     return { leaderboard: result };
+}
+
+function calculateMaxLeaderboardAgeInDays(numGames: number) {
+    return Math.min(365, numGames / 10);
 }
 
 export async function decayLeaderboardIfNecessary(category: string): Promise<void> {
