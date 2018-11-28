@@ -47,6 +47,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     current: s.PathElements;
+    region: string;
     hasReplayLookup: Map<string, boolean>;
 }
 interface State {
@@ -107,6 +108,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         current: state.current,
         hasReplayLookup: state.hasReplayLookup,
+        region: state.region,
     };
 }
 
@@ -231,12 +233,14 @@ class GameList extends React.Component<Props, State> {
     }
 
     private gameUrl(game: GameRow): string {
-        return url.getPath({
+        const origin = url.getOrigin(this.props.region);
+        const path = url.getPath({
             gameId: game.id,
             party: null,
             server: game.server,
             page: null,
         });
+        return origin + path;
     }
 
     private onWatchGameClicked(ev: React.MouseEvent, game: GameRow) {
