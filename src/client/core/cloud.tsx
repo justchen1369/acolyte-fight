@@ -39,10 +39,11 @@ export async function downloadSettings(): Promise<string> {
     const state = StoreProvider.getState();
 
     const numGames = await storage.getNumGames();
-    console.log(`Downloading settings... numGames=${numGames}`);
+    const known = await storage.getKnownUser();
+    console.log(`Downloading settings... numGames=${numGames} known=${known}`);
 
     let url = `${base}/api/settings?cachebuster=${Date.now()}`;
-    if (numGames >= constants.Placements.VerificationGames) {
+    if (!known && numGames >= constants.Placements.VerificationGames) {
         url += `&create=${encodeURIComponent(state.playerName)}`;
     }
 
@@ -191,5 +192,7 @@ export async function logout(): Promise<void> {
         credentials: "same-origin",
     });
     StoreProvider.dispatch({ type: "logout" });
-    storage.resetNumGames();
+
+    await storage.resetNumGames();
+    await storage.setKnownUser(true);
 }
