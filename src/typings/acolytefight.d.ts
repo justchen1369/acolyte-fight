@@ -131,6 +131,8 @@ declare interface SpellBase {
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
+	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging
+	revsPerTickWhileChannelling?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while channelling
 	numCharges?: number;
     cooldown: number;
     interruptible?: boolean; // Whether this spell can be interrupted by moving.
@@ -170,8 +172,6 @@ declare interface SpraySpell extends SpellBase {
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
-
-	retargettingRevsPerTick?: number; // If set, this spell's firing angle can change at this rate each second.
 }
 
 declare interface ProjectileTemplate extends DamagePacket {

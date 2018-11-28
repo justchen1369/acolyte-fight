@@ -815,7 +815,9 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.uninterruptible = false;
 		hero.casting.initialPosition = vector.clone(hero.body.getPosition()); // Store this to compare against for knockback cancel
 		++hero.casting.stage;
+	} else if (hero.casting.stage > w.CastStage.Orientating) {
 	}
+
 
 	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
 		hero.casting.stage = w.CastStage.Complete;
@@ -827,6 +829,10 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.casting.chargeStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
 			hero.casting.movementProportion = spell.movementProportionWhileCharging;
+		}
+		// Orientate during charging
+		if (spell.revsPerTickWhileCharging > 0 && hero.target) {
+			turnTowards(hero, hero.target, spell.revsPerTickWhileCharging);
 		}
 		
 		// Waiting for charging to complete
@@ -858,6 +864,12 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 					setCooldown(world, hero, spell.id, spell.cooldown);
 				}
 			}
+		}
+
+		// Orientate during channelling
+		hero.body.setAngularVelocity(0); // Don't allow a spray to go everywhere if hit creates angular momentum
+		if (spell.revsPerTickWhileChannelling > 0 && hero.target) {
+			turnTowards(hero, hero.target, spell.revsPerTickWhileChannelling);
 		}
 
 		const done = applyAction(world, hero, action, spell);
@@ -1644,15 +1656,10 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
 	if (currentLength % spell.intervalTicks === 0) {
-		if (spell.retargettingRevsPerTick > 0 && hero.target) {
-			turnTowards(hero, hero.target, spell.retargettingRevsPerTick);
-			hero.body.setAngularVelocity(0); // Don't allow the spray to go everywhere if hit
-		}
-
 		const pos = hero.body.getPosition();
 
 		let target = action.target;
-		if (spell.retargettingRevsPerTick > 0) {
+		if (spell.revsPerTickWhileChannelling > 0) {
 			target = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
 		}
 
