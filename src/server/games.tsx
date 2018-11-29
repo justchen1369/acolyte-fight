@@ -143,9 +143,12 @@ export function findExistingGame(version: string, room: g.Room | null, partyId: 
 }
 
 function watchPriority(game: g.Game): number {
-	if (game.winTick) {
+	if (!game.active.size) {
+		// Discourage watching finished game
+		return 0;
+	} else if (game.winTick) {
 		// Discourage watching a game which is not live
-		return game.active.size;
+		return game.numPlayers;
 	} else if (!game.joinable) {
 		// Encourage watching a game in-progress
 		return 1000 + game.numPlayers;
