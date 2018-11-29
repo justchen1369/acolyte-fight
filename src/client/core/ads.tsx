@@ -9,6 +9,21 @@ interface AdProvider {
     gameplayStop(): void;
 }
 
+function loadScript(src: string) {
+    return new Promise<PokiProvider>((resolve, reject) => {
+        const scriptTag = document.createElement("script");
+        scriptTag.src = src;
+        scriptTag.addEventListener('load', (ev) => {
+            resolve();
+        });
+        scriptTag.addEventListener('error', () => {
+            console.error("Error loading script", src);
+            reject();
+        });
+        document.head.appendChild(scriptTag);
+    });
+}
+
 class PokiProvider implements AdProvider {
     private sdk: Poki.SDK;
     
@@ -16,26 +31,15 @@ class PokiProvider implements AdProvider {
         this.sdk = sdk;
     }
 
-    static create(): Promise<PokiProvider> {
-        return new Promise<PokiProvider>((resolve, reject) => {
-            const scriptTag = document.createElement("script");
-            scriptTag.src = "//game-cdn.poki.com/scripts/v2/poki-sdk.js";
-            scriptTag.addEventListener('load', (ev) => {
-                const sdk = (window as any).PokiSDK;
-                if (sdk) {
-                    console.log("PokiSDK loaded");
-                    resolve(sdk);
-                } else {
-                    console.error("Failed to load PokiSDK");
-                    reject("PokiSDK failed to load");
-                }
-            });
-            scriptTag.addEventListener('error', () => {
-                console.error("Error loading PokiSDK");
-                reject("Error loading PokiSDK")
-            });
-            document.head.appendChild(scriptTag);
-        });
+    static async create(): Promise<PokiProvider> {
+        await loadScript("//game-cdn.poki.com/scripts/v2/poki-sdk.js");
+
+        const sdk = (window as any).PokiSDK;
+        if (sdk) {
+            return sdk;
+        } else {
+            throw "PokiSDK failed to load";
+        }
     }
 
     async init() {
