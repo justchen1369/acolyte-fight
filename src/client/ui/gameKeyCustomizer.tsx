@@ -17,6 +17,7 @@ interface Props {
     gameId: string;
     heroId: string;
     allowSpellChoosing: boolean;
+    gameStarted: boolean;
     hoverBtn: string;
     hoverSpellId: string;
     wheelOnRight: boolean;
@@ -32,6 +33,7 @@ function stateToProps(state: s.State): Props {
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
+        gameStarted: state.world.tick >= state.world.startTick,
         hoverBtn: state.world.ui.hoverBtn,
         hoverSpellId: state.world.ui.hoverSpellId,
         wheelOnRight: state.options.wheelOnRight,
@@ -59,8 +61,18 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             return this.renderMobileHint(this.props.hoverBtn, this.props.hoverSpellId);
         } else if (!isMobile && this.props.hoverBtn) {
             return this.renderDesktopHint();
+        } else if (this.props.gameStarted) {
+            return this.renderChangeSpellHint();
         } else {
             return null;
+        }
+    }
+
+    private renderChangeSpellHint() {
+        if (isMobile) {
+            return null; // No hint for mobile
+        } else {
+            return <div className="customize-hint">Right-click a button below to change spells</div>
         }
     }
 
