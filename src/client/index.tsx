@@ -58,7 +58,7 @@ async function loginAsync() {
     }
 }
 
-function start() {
+async function start() {
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
 
@@ -78,36 +78,40 @@ function start() {
     StoreProvider.dispatch({ type: "updateUrl", current });
 
     if (query.source) {
-        ads.init(query.source);
+        await ads.init(query.source);
     }
 
-    sockets.connect(config.getBaseUrl(), config.getAuthToken(), (socket) => {
-        sockets.connectToServer(query.server)
-            .then(() => parties.joinPartyAsync(query.party))
-            .then(() => {
-                if (!alreadyConnected) {
-                    alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
+    sockets.connect(config.getBaseUrl(), config.getAuthToken(), async (socket) => {
+        if (alreadyConnected) {
+            return;
+        }
+        alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
 
-                    if (query.hash === "#join") {
-                        // Return to the home page when we exit
-                        StoreProvider.dispatch({ type: "updatePage", page: "" });
-                        matches.joinNewGame(query.gameId);
-                    } else if (query.hash === "#watch" || query.page === "watch") {
-                        matches.watchLiveGame();
-                    } else {
-                        pages.go(query);
-                    }
-                }
-            }).catch(error => {
-                console.error(error)
-                socket.disconnect();
-                StoreProvider.dispatch({ type: "disconnected" });
+        await sockets.connectToServer(query.server)
+        await parties.joinPartyAsync(query.party)
 
-                if (query.party || query.server) {
-                    // Failed to join party/server, try without server
-                    window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
-                }
-            });
+        try {
+            if (query.hash === "#join") {
+                // Return to the home page when we exit
+                StoreProvider.dispatch({ type: "updatePage", page: "" });
+                await matches.joinNewGame(query.gameId);
+            } else if (query.hash === "#watch" || query.page === "watch") {
+                await matches.watchLiveGame();
+            } else {
+                pages.go(query);
+            }
+
+            ads.gameLoaded();
+        } catch(error) {
+            console.error(error)
+            socket.disconnect();
+            StoreProvider.dispatch({ type: "disconnected" });
+
+            if (query.party || query.server) {
+                // Failed to join party/server, try without server
+                window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
+            }
+        }
     });
 }
 

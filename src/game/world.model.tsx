@@ -210,6 +210,7 @@ export interface CloseGameNotification {
 
 export interface WinNotification {
 	type: "win";
+	myHeroId: string;
 	winner: Player;
 
 	mostDamage: Player;

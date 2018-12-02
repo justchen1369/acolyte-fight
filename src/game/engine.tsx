@@ -1573,6 +1573,7 @@ function notifyWin(world: w.World) {
 	world.winTick = world.tick;
 	world.ui.notifications.push({
 		type: "win",
+		myHeroId: world.ui.myHeroId,
 		winner: world.players.get(bestScore.heroId),
 		mostDamage: world.players.get(mostDamage.heroId),
 		mostDamageAmount: mostDamage.damage,
