@@ -5,6 +5,7 @@ import httpLib from 'http';
 import httpsLib from 'https';
 import socketLib from 'socket.io';
 import express from 'express';
+import compression from 'compression';
 import * as os from 'os';
 import * as m from '../game/messages.model';
 import * as api from './api';
@@ -55,6 +56,7 @@ if (mirrored) {
 const app = express();
 app.use(cors());
 app.options('*', cors());
+app.use(compression());
 
 const http = createServer(app, httpsKeyPath, httpsCertPath);
 const io = socketLib(http, {
