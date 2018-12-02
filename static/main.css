@@ -1,6 +1,13 @@
+@font-face {
+    font-family: 'ChicagoFLF';
+    src: url('ChicagoFLF.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 body {
     background: #111;
-    font-family: sans-serif;
+    font-family: "Helvetica", "Arial", sans-serif;
     font-size: 14pt;
     color: white;
 
@@ -339,7 +346,8 @@ i.clickable:hover, i.clickable:active {
 .home .title {
     width: 100%;
 
-    font-size: 400%;
+    font-family: "ChicagoFLF", "Helvetica", sans-serif;
+    font-size: 500%;
     font-weight: bold;
     text-shadow: 2px 2px black;
 }
