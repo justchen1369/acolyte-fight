@@ -100,7 +100,7 @@ export async function init(source: string) {
 
 export function gameLoaded() {
     if (provider) {
-        console.log("Game loaded.", provider);
+        console.log("Game loaded.");
         provider.gameLoaded();
     }
 }

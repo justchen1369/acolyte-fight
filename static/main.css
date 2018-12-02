@@ -222,6 +222,10 @@ i.clickable:hover, i.clickable:active {
 }
 
 @media (max-width: 768px) {
+    .navbar.navbar-vertical .nav-item {
+        font-size: 80%;
+    }
+
     .navbar .nav-item.nav-optional {
         display: none;
     }
@@ -356,6 +360,12 @@ i.clickable:hover, i.clickable:active {
     box-shadow: inset 0 0 10px black;
 }
 
+@media (max-width: 768px) {
+    .home .title {
+        font-size: 60px;
+    }
+}
+
 .home .button-row {
     display: flex;
     margin: 0px auto;
@@ -367,6 +377,13 @@ i.clickable:hover, i.clickable:active {
 }
 .home .btn.disabled {
     background-color: #ccc;
+}
+
+@media (max-width: 768px) {
+    .home .btn {
+        font-size: 30px;
+        width: 100px;
+    }
 }
 
 .more-io-games {
@@ -432,6 +449,16 @@ i.clickable:hover, i.clickable:active {
 @keyframes fold-animation {
     from { color: #888; bottom: 5px }
     to { color: white; bottom: 0 }
+}
+
+@media (max-width: 768px) {
+    .home .fold-indicator .fold-info {
+        font-size: 12px;
+    }
+
+    .home .fold-arrow {
+        font-size: 12px;
+    }
 }
 
 .view-more-ad {
