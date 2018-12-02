@@ -10,6 +10,12 @@ body {
     margin: 0;
 }
 
+@media (max-width: 768px) {
+    body {
+        font-size: 10pt;
+    }
+}
+
 body.game {
     width: 100%;
     height: 100%;
@@ -53,7 +59,7 @@ body .page {
     left: 0;
 
     color: white;
-    font-size: 20px;
+    font-size: 140%;
     padding: 15px 20px;
     text-align: center;
     vertical-align: center;
@@ -99,7 +105,7 @@ canvas.game {
 
 input {
     padding: 10px;
-    font-size: 14pt;
+    font-size: 100%;
     width: 100%;
 }
 
@@ -222,10 +228,6 @@ i.clickable:hover, i.clickable:active {
 }
 
 @media (max-width: 768px) {
-    .navbar.navbar-vertical .nav-item {
-        font-size: 80%;
-    }
-
     .navbar .nav-item.nav-optional {
         display: none;
     }
@@ -334,7 +336,7 @@ i.clickable:hover, i.clickable:active {
 .home .title {
     width: 100%;
 
-    font-size: 100px;
+    font-size: 700%;
     font-weight: bold;
     text-shadow: 2px 2px black;
 }
@@ -362,7 +364,7 @@ i.clickable:hover, i.clickable:active {
 
 @media (max-width: 768px) {
     .home .title {
-        font-size: 60px;
+        font-size: 400%;
     }
 }
 
@@ -373,7 +375,7 @@ i.clickable:hover, i.clickable:active {
 
 .home .btn {
     width: 250px;
-    font-size: 40px;
+    font-size: 285%;
 }
 .home .btn.disabled {
     background-color: #ccc;
@@ -381,7 +383,6 @@ i.clickable:hover, i.clickable:active {
 
 @media (max-width: 768px) {
     .home .btn {
-        font-size: 30px;
         width: 100px;
     }
 }
@@ -401,8 +402,6 @@ i.clickable:hover, i.clickable:active {
 
 .social-bar {
     display: flex;
-    justify-content: space-between;
-    width: 108px;
 }
 
 @media (max-width: 790px) {
@@ -419,7 +418,8 @@ i.clickable:hover, i.clickable:active {
 
 .social-bar a {
     color: #888;
-    font-size: 32px;
+    font-size: 250%;
+    margin-left: 0.2em;
 }
 
 .social-bar a:hover {
@@ -437,7 +437,7 @@ i.clickable:hover, i.clickable:active {
 }
 
 .home .fold-arrow {
-    font-size: 25px;
+    font-size: 170%;
     font-weight: bold;
 }
 
@@ -449,16 +449,6 @@ i.clickable:hover, i.clickable:active {
 @keyframes fold-animation {
     from { color: #888; bottom: 5px }
     to { color: white; bottom: 0 }
-}
-
-@media (max-width: 768px) {
-    .home .fold-indicator .fold-info {
-        font-size: 12px;
-    }
-
-    .home .fold-arrow {
-        font-size: 12px;
-    }
 }
 
 .view-more-ad {
@@ -689,13 +679,13 @@ i.clickable:hover, i.clickable:active {
 }
 
 #spell-info-panel .spell-name {
-    font-size: 36px;
+    font-size: 250%;
     font-weight: bold;
     margin-right: 16px;
 }
 
 #spell-info-panel .spell-description {
-    font-size: 16px;
+    font-size: 120%;
     color: #ccc;
     margin-bottom: 10px;
 }
@@ -780,13 +770,13 @@ i.clickable:hover, i.clickable:active {
 
 h1 {
     margin-top: 100px;
-    font-size: 36pt;
+    font-size: 250%;
 }
 
 h2 {
     margin-top: 36px;
     margin-bottom: 0px;
-    font-size: 24pt;
+    font-size: 170%;
 }
 
 .spell-stats {
@@ -844,7 +834,7 @@ h2 {
     flex-grow: 1;
 
     font-weight: bold;
-    font-size: 100pt;
+    font-size: 700%;
     text-transform: uppercase;
     text-align: center;
 }
@@ -898,7 +888,7 @@ h2 {
 .spell-config .spell-name {
     font-weight: bold;
     text-transform: capitalize;
-    font-size: 36pt;
+    font-size: 250%;
     margin-bottom: 12pt;
 }
 
@@ -927,7 +917,7 @@ h2 {
 
 @media (max-width: 768px) {
     .spell-config .spell-name {
-        font-size: 24pt;
+        font-size: 170%;
     }
 
     .spell-config .key {
@@ -997,11 +987,11 @@ h2 {
 }
 
 .stats-card-row .stats-card .label {
-    font-size: 16px;
+    font-size: 115%;
 }
 
 .stats-card-row .stats-card .value {
-    font-size: 72px;
+    font-size: 500%;
     font-weight: bold;
     text-shadow: 2px 2px 2px black;
 }
