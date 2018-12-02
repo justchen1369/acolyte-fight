@@ -62,6 +62,12 @@ function start() {
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
 
+    if (query.page === "poki") {
+        // Poki doesn't pass query parameters correctly, so do it with path instead
+        query.page = "";
+        query.source = "poki";
+    }
+
     let current: s.PathElements = {
         ...query,
         party: null, // Remove the party ID from the URL so that people can't stream snipe their way into the party
