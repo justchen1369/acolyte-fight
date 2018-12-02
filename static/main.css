@@ -47,6 +47,13 @@ body .page {
     margin-bottom: 300px;
 }
 
+@media (max-width: 768px) {
+    body .page {
+        margin-left: 4px;
+        margin-right: 4px;
+    }
+}
+
 #root {
     height: 100%;
 }
@@ -768,12 +775,13 @@ i.clickable:hover, i.clickable:active {
 }
 
 h1 {
-    margin-top: 100px;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
     font-size: 250%;
 }
 
 h2 {
-    margin-top: 36px;
+    margin-top: 1em;
     margin-bottom: 0px;
     font-size: 170%;
 }
