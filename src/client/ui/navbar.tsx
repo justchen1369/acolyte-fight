@@ -109,7 +109,6 @@ class NavBar extends React.Component<Props, State> {
                 <NavBarItem page="settings"><i className="icon fas fa-cog" /> Settings</NavBarItem>
                 <div className="spacer" />
                 <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>
-                <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" /> AI</NavBarItem>
                 <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>
             </div>
         </div>
