@@ -3,6 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as ads from '../core/ads';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
@@ -11,7 +12,6 @@ import CategorySelector from './categorySelector';
 import ProfileGameList from './profileGameList';
 import RecentGamesList from './recentGameList';
 import UserStatsPanel from './userStatsPanel';
-import { isMobile, isFacebook } from '../core/userAgent';
 
 interface Props {
     current: s.PathElements;
@@ -39,17 +39,14 @@ export class ProfilePanel extends React.Component<Props, State> {
     }
 
     render() {
-        return isFacebook ? this.renderFacebook() : this.renderFull();
-    }
-
-    renderFull() {
+        const a = ads.getProvider();
         const profileId = this.props.current.profileId || this.props.myUserId;
         const isMe = profileId === this.props.myUserId;
 
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
             {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
-            {!isFacebook && isMe && this.props.loggedIn && <div>
+            {!a.linkedAccount && isMe && this.props.loggedIn && <div>
                 <h1>Your Account</h1>
                 <AccountPanel />
             </div>}
@@ -66,17 +63,6 @@ export class ProfilePanel extends React.Component<Props, State> {
             </div>
         </div>
     }
-
-    renderFacebook() {
-        const profileId = this.props.current.profileId || this.props.myUserId;
-        const isMe = profileId === this.props.myUserId;
-
-        const category = m.GameCategory.PvP;
-        return <div className="profile-panel">
-            <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} />
-        </div>
-    }
-
 }
 
 export default ReactRedux.connect(stateToProps)(ProfilePanel);

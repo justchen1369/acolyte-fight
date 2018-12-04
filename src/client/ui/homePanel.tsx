@@ -3,8 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ai from '../core/ai';
-import * as pages from '../core/pages';
+import * as ads from '../core/ads';
 import * as url from '../url';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
@@ -14,7 +13,6 @@ import SpellBtnConfig from './spellConfig';
 import Link from './link';
 import NavBar from './navbar';
 import PartyList from './partyList';
-import { isMobile, isFacebook } from '../core/userAgent';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -40,6 +38,8 @@ class HomePanel extends React.Component<Props, State> {
     }
 
     render() {
+        const a = ads.getProvider();
+
         return <div className="content-container">
             <div className="home">
                 <NavBar />
@@ -56,17 +56,17 @@ class HomePanel extends React.Component<Props, State> {
                     <PlayButton />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                {!isFacebook && <PartyList />}
+                {!a.noExternalLinks && <PartyList />}
                 <div className="spacer" />
-                {!isFacebook && <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
+                {!a.noScrolling && <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
                 </div>}
                 <div style={{ flexGrow: 0.1 }} />
-                {!isFacebook && <div className="more-io-games"><a href="https://iogames.space">More .io Games</a></div>}
-                {!isFacebook && <SocialBar />}
+                {!a.name && <div className="more-io-games"><a href="https://iogames.space">More .io Games</a></div>}
+                {!a.noExternalLinks && <SocialBar />}
             </div>
-            {!isFacebook && <div className="page" ref={(elem) => this.belowFoldElem = elem}>
+            {!a.noScrolling && <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>
                 <p>
                     Time to practice your skills.
@@ -89,10 +89,6 @@ class HomePanel extends React.Component<Props, State> {
                 align: { top: 0 },
             });
         }
-    }
-
-    private onLoginClick() {
-        window.location.href = "login";
     }
 }
 

@@ -3,6 +3,9 @@ import * as w from '../../game/world.model';
 import * as util from './util';
 
 export class PokiProvider implements s.AdProvider {
+    name = "poki";
+    noExternalLinks = true;
+
     private sdk: Poki.SDK;
     
     constructor(sdk: Poki.SDK) {

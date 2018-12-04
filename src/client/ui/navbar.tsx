@@ -3,12 +3,13 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as ads from '../core/ads';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import { isMobile } from '../core/userAgent';
 import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
 import RatingControl from './ratingControl';
-import { isFacebook } from '../core/userAgent';
 
 interface Props {
     page: string;
@@ -52,11 +53,7 @@ class NavBar extends React.Component<Props, State> {
 
     render() {
         if (this.props.page === "") {
-            if (isFacebook) {
-                return this.renderFacebookNavBar();
-            } else {
-                return this.renderNavBar();
-            }
+            return this.renderNavBar();
         } else {
             return this.renderBackToHome();
         }
@@ -72,16 +69,8 @@ class NavBar extends React.Component<Props, State> {
         </div>
     }
 
-    private renderFacebookNavBar() {
-        return <div className="navbar-container">
-            <div className="navbar navbar-horizontal">
-                <div className="spacer" />
-                <RatingControl />
-            </div>
-        </div>
-    }
-
     private renderNavBar() {
+        const a = ads.getProvider();
         const verticalClasses = classNames({
             "navbar": true,
             "navbar-vertical": true,
@@ -89,27 +78,27 @@ class NavBar extends React.Component<Props, State> {
         });
         return <div className="navbar-container">
             <div className="navbar navbar-horizontal">
-                <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
-                <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>
-                <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>
+                {!a.noMenu && <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>}
+                {!a.noScrolling && <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>}
+                {!a.noExternalLinks && <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>}
                 {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></NavBarItem>}
                 {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <RatingControl />
-                <LoginButton />
+                {!a.linkedAccount && <LoginButton />}
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
                 <NavBarItem page=""><i className="icon fas fa-home" /> Home</NavBarItem>
-                <NavBarItem page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</NavBarItem>
+                {!a.noScrolling && <NavBarItem page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</NavBarItem>}
                 <NavBarItem page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</NavBarItem>
-                <NavBarItem page="regions"><i className="icon fas fa-globe-americas" /> Regions</NavBarItem>
-                <NavBarItem page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</NavBarItem>
-                <NavBarItem page="settings"><i className="icon fas fa-cog" /> Settings</NavBarItem>
+                {!a.noExternalLinks && <NavBarItem page="regions"><i className="icon fas fa-globe-americas" /> Regions</NavBarItem>}
+                {!a.noExternalLinks && <NavBarItem page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</NavBarItem>}
+                {!a.noScrolling && <NavBarItem page="settings"><i className="icon fas fa-cog" /> Settings</NavBarItem>}
                 <div className="spacer" />
-                <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>
-                <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>
+                {!isMobile && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>}
+                {!a.noExternalLinks && <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>}
             </div>
         </div>
     }

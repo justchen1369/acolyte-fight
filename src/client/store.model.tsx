@@ -252,6 +252,12 @@ export interface UpdateHasReplayAction {
 
 
 export interface AdProvider {
+    name?: string;
+    linkedAccount?: boolean;
+    noExternalLinks?: boolean;
+    noScrolling?: boolean;
+    noMenu?: boolean;
+
     init(): Promise<void>;
     gameLoaded(): void;
     commercialBreak(): Promise<void>;

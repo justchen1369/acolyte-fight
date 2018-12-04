@@ -8,7 +8,6 @@ import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
 import NavBarItem from './navbarItem';
-import { isFacebook } from '../core/userAgent';
 
 interface Props {
     userId: string;

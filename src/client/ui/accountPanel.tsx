@@ -2,10 +2,10 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as ads from '../core/ads';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import { isFacebook } from '../core/userAgent';
 
 interface Props {
     loggedIn: boolean;
@@ -31,8 +31,9 @@ export class LogoutPanel extends React.Component<Props, State> {
     }
 
     private renderLoggedIn() {
+        const a = ads.getProvider();
         return <div>
-            {!isFacebook && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
+            {!a.linkedAccount && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
         </div>
     }
 

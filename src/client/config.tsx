@@ -2,7 +2,6 @@ export interface GlobalConfig {
     baseUrl?: string;
     acolyteAuthToken?: string;
     acolyteDefaultName?: string;
-    acolyteFacebook?: boolean;
 }
 
 export function getConfig() {
@@ -19,8 +18,4 @@ export function getAuthToken() {
 
 export function getDefaultName() {
     return getConfig().acolyteDefaultName;
-}
-
-export function isFacebook() {
-    return !!getConfig().acolyteFacebook;
 }

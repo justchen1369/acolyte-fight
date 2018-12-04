@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as ads from '../core/ads';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as sockets from '../core/sockets';
@@ -10,7 +11,7 @@ import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from './playButton';
 import TextMessageBox from './textMessageBox';
-import { isMobile, isFacebook } from '../core/userAgent';
+import { isMobile } from '../core/userAgent';
 import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
 
@@ -149,12 +150,13 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
+        const a = ads.getProvider();
         return <div key={key} className="row">
             <div>
                 {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}
                 {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
             </div>
-            {!isFacebook && this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
+            {!a.noExternalLinks && this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
             {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
         </div>
     }

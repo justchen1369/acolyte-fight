@@ -4,10 +4,10 @@ import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as ads from '../core/ads';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import NavBarItem from './navbarItem';
-import { isFacebook } from '../core/userAgent';
 
 interface Props {
     loginAttempted: boolean;
@@ -37,7 +37,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     private renderLoginBtn() {
-        if (isFacebook) {
+        if (ads.getProvider().linkedAccount) {
             // Can't force a login when playing through Facebook instant games - it happens automatically after NumVerificationGames
             return null;
         }

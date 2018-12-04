@@ -4,13 +4,13 @@ import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as ads from './ads';
 import * as credentials from './credentials';
 import * as notifications from './notifications';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { base } from '../url';
-import { isFacebook } from './userAgent';
 
 export function init() {
     notifications.attachListener(notifs => onNotification(notifs));
@@ -182,8 +182,8 @@ export async function downloadGameStats(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
-    if (isFacebook) {
-        // Don't ever logout of a Facebook account because that effectively deletes it
+    if (ads.getProvider().linkedAccount) {
+        // Don't ever logout of a linked account because that effectively deletes it
         return;
    }
 

@@ -16,7 +16,7 @@ import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from './urlListener';
 import WatchLooper from './watchLooper';
 
-import { isMobile, isFacebook } from '../core/userAgent';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     watching: boolean;
@@ -52,6 +52,7 @@ class GamePanel extends React.Component<Props, State> {
     }
 
     render() {
+        const a = ads.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;
         return (
             <div id="game-panel" className={isMobile ? "mobile" : "desktop"}>
@@ -60,9 +61,9 @@ class GamePanel extends React.Component<Props, State> {
                 <MessagesPanel />
                 <SpellInfoPanel />
                 {allowExit && <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
-                    <i className="fa fa-chevron-left" /> Back to Home{!isFacebook && <span className="return-home-subtext"> (spell selection, replays and more)</span>}
+                    <i className="fa fa-chevron-left" /> Back to Home{!a.noScrolling && <span className="return-home-subtext"> (spell selection, replays and more)</span>}
                 </span>}
-                {!isFacebook && !isMobile && allowExit && <SocialBar />}
+                {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
                 <UrlListener />
                 {this.props.watching && <WatchLooper />}
