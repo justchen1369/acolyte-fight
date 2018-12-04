@@ -55,6 +55,36 @@ export class TitleSection extends React.Component<Props, State> {
                 On iPhone - tap the Share button, click Add to Home Screen.
                 On Android - tap the triple dot menu button, click Add to Home Screen.
             </p>
+            <h2>How is the ratings calculated?</h2>
+            <p>
+                The ratings are calculated according to the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system" target="_blank">Glicko-2 rating system</a>.
+                You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
+            </p>
+            <h2>Why do I lose so many more points for losing and gain so few points for winning?</h2>
+            <p>
+                All ELO rating systems work like this.
+                If you win 10 times more than you lose against a particular player,
+                than for each loss, you will lose 10x more points, against that particular player.
+                This creates equilibrium.
+                Any other system would cause for rating inflation,
+                which would mean the game is not measuring skill,
+                instead it would be measuring how many games you have played.
+                The points gained/lost depends on the relative skill levels of both players.
+                If a Master beats a Bronze, they will gain almost nothing.
+                If a Bronze beats a Master, they will gain a lot of points.
+                If you want to rank up the leaderboard,
+                the fastest way is to play at peak times when there are higher level players online.
+                If you are a Master repeatedly beating newbies,
+                at some point you will rank up so high that you stop gaining any points from them.
+            </p>
+            <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
+            <p>
+                No other factors are considered in the rating - kills do not matter, damage does not matter - the game is to be the last one standing
+                and that is how it is rated. A lot of other games have experimented with performance-based rankings and
+                found the ratings no longer measured skill accurately,
+                as everyone was incentivised to somewhat ignore the primary objective in favour of performance metrics.
+                Recently Overwatch and Heroes of the Storm removed performance-based rankings for that reason.
+            </p>
             <h2>How are the leagues calculated?</h2>
             <p>
                 These are the leagues and the minimum percentiles:
@@ -75,10 +105,6 @@ export class TitleSection extends React.Component<Props, State> {
                 Replays cannot be stored across game updates as the game simulation changes with each update and that changes the meaning of the replay data.
                 If you want to keep your replay permanently, take a video of your game.
             </p>
-            <h2>How is the leaderboard calculated?</h2>
-            <p>The leaderboard calculated according to the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system" target="_blank">Glicko-2 rating system</a>.</p>
-            <h2>What is the tech stack for this game?</h2>
-            <p>Server and client are coded in TypeScript. Canvas is used for graphics, React for UI elements. Networking uses socket.io. Physics engine is Planck.js.</p>
             <h1>Credits</h1>
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
             was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
