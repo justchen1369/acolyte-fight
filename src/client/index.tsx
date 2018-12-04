@@ -101,7 +101,7 @@ async function start() {
                 pages.go(query);
             }
 
-            ads.gameLoaded();
+            ads.getProvider().gameLoaded();
         } catch(error) {
             console.error(error)
             socket.disconnect();

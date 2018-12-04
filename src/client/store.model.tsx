@@ -248,3 +248,14 @@ export interface UpdateHasReplayAction {
     type: "updateHasReplay";
     hasReplayLookup: Map<string, boolean>;
 }
+
+
+
+export interface AdProvider {
+    init(): Promise<void>;
+    gameLoaded(): void;
+    commercialBreak(): Promise<void>;
+    gameplayStart(): void;
+    gameplayStop(): void;
+    onNotification(notifications: w.Notification[]): void;
+}

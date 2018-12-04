@@ -90,7 +90,7 @@ class PlayButton extends React.Component<Props, State> {
             gtag('event', 'conversion', {'send_to': 'AW-778742698/Tw7BCODZ1Y8BEKrXqvMC'});
         }
 
-        await ads.commercialBreak();
+        await ads.getProvider().commercialBreak();
 
         matches.joinNewGame();
     }

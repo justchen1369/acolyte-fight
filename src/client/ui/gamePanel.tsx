@@ -44,11 +44,11 @@ class GamePanel extends React.Component<Props, State> {
     }
 
     componentWillMount() {
-        ads.gameplayStart();
+        ads.getProvider().gameplayStart();
     }
 
     componentWillUnmount() {
-        ads.gameplayStop();
+        ads.getProvider().gameplayStop();
     }
 
     render() {
