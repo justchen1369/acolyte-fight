@@ -196,6 +196,9 @@ class GameList extends React.Component<Props, State> {
             'rating-decrease': ratingDelta < 0,
         });
         let text = ratingDelta.toFixed(0);
+        if (Math.abs(ratingDelta) < 1) {
+            text = ratingDelta.toFixed(1);
+        }
         if (ratingDelta > 0) {
             text = `+${text}`;
         }
