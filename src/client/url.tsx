@@ -61,7 +61,7 @@ export function parseLocation(location: Location): s.PathElements {
         hash = location.hash;
     }
 
-    return { path, page, gameId, profileId, party, server, source, gclid, hash };
+    return { path, page, gameId, profileId, party, server, gclid, hash };
 }
 
 export function getPath(elems: s.PathElements) {
@@ -83,9 +83,6 @@ export function getPath(elems: s.PathElements) {
         params.push("server=" + elems.server);
     }
 
-    if (elems.source) {
-        params.push("source=" + elems.source);
-    }
     if (elems.gclid) {
         params.push("gclid=" + elems.gclid);
     }

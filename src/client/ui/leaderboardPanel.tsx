@@ -9,6 +9,7 @@ import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as ads from '../core/ads';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
@@ -91,13 +92,14 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     private renderLeaderboard() {
+        const a = ads.getProvider();
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
             <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
             <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
             <h1>Leaderboard</h1>
-            {!this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your ranking on the leaderboard</p>}
+            {!a.noLogin && !this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your ranking on the leaderboard</p>}
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
                 {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}

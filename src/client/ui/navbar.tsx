@@ -86,7 +86,7 @@ class NavBar extends React.Component<Props, State> {
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <RatingControl />
-                {!a.linkedAccount && <LoginButton />}
+                {!a.noLogin && <LoginButton />}
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
@@ -97,7 +97,7 @@ class NavBar extends React.Component<Props, State> {
                 {!a.noExternalLinks && <NavBarItem page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</NavBarItem>}
                 {!a.noScrolling && <NavBarItem page="settings"><i className="icon fas fa-cog" /> Settings</NavBarItem>}
                 <div className="spacer" />
-                {!isMobile && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>}
+                {!a.noAdvanced && !isMobile && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>}
                 {!a.noExternalLinks && <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>}
             </div>
         </div>

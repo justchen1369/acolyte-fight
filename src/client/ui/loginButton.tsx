@@ -37,7 +37,7 @@ class LoginButton extends React.Component<Props> {
     }
 
     private renderLoginBtn() {
-        if (ads.getProvider().linkedAccount) {
+        if (ads.getProvider().noLogin) {
             // Can't force a login when playing through Facebook instant games - it happens automatically after NumVerificationGames
             return null;
         }

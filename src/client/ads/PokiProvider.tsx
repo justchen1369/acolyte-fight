@@ -1,47 +1,37 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as util from './util';
 
 export class PokiProvider implements s.AdProvider {
     name = "poki";
+    noLogin = true;
     noExternalLinks = true;
+    noAdvanced = true;
 
     private sdk: Poki.SDK;
+    private loadingFinished: boolean = false;
     
     constructor(sdk: Poki.SDK) {
         this.sdk = sdk;
     }
 
-    static async create(): Promise<PokiProvider> {
-        await util.loadScript("//game-cdn.poki.com/scripts/v2/poki-sdk.js");
-
-        const sdk: Poki.SDK = (window as any).PokiSDK;
-        if (sdk) {
-            return new PokiProvider(sdk);
-        } else {
-            throw "PokiSDK failed to load";
-        }
-    }
-
-    async init() {
-        await this.sdk.init()
-        console.log("PokiSDK initialized");
-
+    init() {
         const hostname = window.location.hostname;
         if (hostname === "localhost" || hostname === "dev.acolytefight.io") {
             this.sdk.setDebug(true);
         }
-
-        this.sdk.gameLoadingStart();
     }
 
-    gameLoaded() {
-        this.sdk.gameLoadingProgress({ percentageDone: 100.0 });
-        this.sdk.gameLoadingFinished();
+    loadingProgress(proportion: number) {
+        this.sdk.gameLoadingProgress({ percentageDone: 100 * proportion });
+
+        if (proportion >= 1 && !this.loadingFinished) {
+            this.loadingFinished = true;
+            this.sdk.gameLoadingFinished();
+        }
     }
 
     async commercialBreak() {
-        this.sdk.commercialBreak();
+        await this.sdk.commercialBreak();
     }
 
     gameplayStart() {

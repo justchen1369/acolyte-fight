@@ -34,6 +34,7 @@ export function initialize() {
     cloud.init();
     rankings.init();
     audio.init();
+    ads.init();
 
     start();
     render();
@@ -59,13 +60,13 @@ async function loginAsync() {
 }
 
 async function start() {
+    const a = ads.getProvider();
+
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
 
-    if (query.page === "poki") {
-        // Poki doesn't pass query parameters correctly, so do it with path instead
-        query.page = "";
-        query.source = "poki";
+    if (query.page === a.name) {
+        query.page = ""; // Handle ads being initiated by path name
     }
 
     let current: s.PathElements = {
@@ -73,14 +74,10 @@ async function start() {
         party: null, // Remove the party ID from the URL so that people can't stream snipe their way into the party
         server: null,
         hash: null,
-        source: null,
     };
     StoreProvider.dispatch({ type: "updateUrl", current });
 
-    if (query.source) {
-        await ads.init(query.source);
-    }
-
+    a.loadingProgress(0.9);
     sockets.connect(config.getBaseUrl(), config.getAuthToken(), async (socket) => {
         if (alreadyConnected) {
             return;
@@ -101,7 +98,7 @@ async function start() {
                 pages.go(query);
             }
 
-            ads.getProvider().gameLoaded();
+            a.loadingProgress(1.0);
         } catch(error) {
             console.error(error)
             socket.disconnect();

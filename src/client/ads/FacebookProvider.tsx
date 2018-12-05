@@ -1,22 +1,22 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as util from './util';
 
 export class FacebookProvider implements s.AdProvider {
     name = "fb";
-    linkedAccount = true;
+    noLogin = true;
     noExternalLinks = true;
     noScrolling = true;
     noMenu = true;
+    noAdvanced = true;
 
     static async create(): Promise<FacebookProvider> {
         return new FacebookProvider();
     }
 
-    async init(): Promise<void> {
+    init() {
     }
 
-    gameLoaded() { }
+    loadingProgress() { }
 
     async commercialBreak() { }
 

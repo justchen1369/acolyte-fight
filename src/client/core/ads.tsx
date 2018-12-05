@@ -7,20 +7,17 @@ import { PokiProvider } from '../ads/PokiProvider';
 
 let provider: s.AdProvider = new NullProvider();
 
-export async function init(source: string) {
-    if (source === "poki") {
-        console.log("Initializing PokiSDK...");
-        provider = await PokiProvider.create();
-    }
-
-    if (source === "fb") {
-        console.log("Initializing Facebook Instant...");
-        provider = await FacebookProvider.create();
+export async function init() {
+    const poki: Poki.SDK = (window as any).PokiSDK;
+    if (poki) {
+        provider = new PokiProvider(poki);
     }
     
     if (provider) {
-        await provider.init();
+        console.log("Initializing ads...", provider.name);
         StoreProvider.dispatch({ type: "updateAds", ads: provider.name });
+
+        await provider.init();
         notifications.attachListener((notifications) => provider.onNotification(notifications));
     }
 }

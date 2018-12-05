@@ -182,7 +182,7 @@ export async function downloadGameStats(): Promise<void> {
 }
 
 export async function logout(): Promise<void> {
-    if (ads.getProvider().linkedAccount) {
+    if (ads.getProvider().noLogin) {
         // Don't ever logout of a linked account because that effectively deletes it
         return;
    }

@@ -33,7 +33,7 @@ export class LogoutPanel extends React.Component<Props, State> {
     private renderLoggedIn() {
         const a = ads.getProvider();
         return <div>
-            {!a.linkedAccount && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
+            {!a.noLogin && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
         </div>
     }
 

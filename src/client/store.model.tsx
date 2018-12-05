@@ -75,7 +75,6 @@ export interface PathElements {
     hash?: string;
     profileId?: string;
 
-    source?: string;
     gclid?: string;
 }
 
@@ -253,13 +252,14 @@ export interface UpdateHasReplayAction {
 
 export interface AdProvider {
     name?: string;
-    linkedAccount?: boolean;
+    noLogin?: boolean;
     noExternalLinks?: boolean;
     noScrolling?: boolean;
     noMenu?: boolean;
+    noAdvanced?: boolean;
 
-    init(): Promise<void>;
-    gameLoaded(): void;
+    init(): void;
+    loadingProgress(proportion: number): void;
     commercialBreak(): Promise<void>;
     gameplayStart(): void;
     gameplayStop(): void;
