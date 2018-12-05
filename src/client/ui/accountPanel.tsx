@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
@@ -31,7 +31,7 @@ export class LogoutPanel extends React.Component<Props, State> {
     }
 
     private renderLoggedIn() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         return <div>
             {!a.noLogin && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
         </div>

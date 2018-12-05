@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from './screenLifecycle';
@@ -44,15 +44,15 @@ class GamePanel extends React.Component<Props, State> {
     }
 
     componentWillMount() {
-        ads.getProvider().gameplayStart();
+        options.getProvider().gameplayStart();
     }
 
     componentWillUnmount() {
-        ads.getProvider().gameplayStop();
+        options.getProvider().gameplayStop();
     }
 
     render() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;
         return (
             <div id="game-panel" className={isMobile ? "mobile" : "desktop"}>

@@ -1,11 +1,11 @@
 import * as notifications from './notifications';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
-import { FacebookProvider } from '../ads/FacebookProvider';
-import { NullProvider } from '../ads/NullProvider';
-import { PokiProvider } from '../ads/PokiProvider';
+import { FacebookProvider } from '../options/FacebookProvider';
+import { NullProvider } from '../options/NullProvider';
+import { PokiProvider } from '../options/PokiProvider';
 
-let provider: s.AdProvider = new NullProvider();
+let provider: s.OptionsProvider = new NullProvider();
 
 export async function init() {
     const poki: Poki.SDK = (window as any).PokiSDK;

@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as url from '../url';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
@@ -38,7 +38,7 @@ class HomePanel extends React.Component<Props, State> {
     }
 
     render() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
 
         return <div className="content-container">
             <div className="home">

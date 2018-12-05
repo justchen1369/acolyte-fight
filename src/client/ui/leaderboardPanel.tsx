@@ -9,7 +9,7 @@ import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
@@ -92,7 +92,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
     }
 
     private renderLeaderboard() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>

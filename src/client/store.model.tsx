@@ -250,7 +250,7 @@ export interface UpdateHasReplayAction {
 
 
 
-export interface AdProvider {
+export interface OptionsProvider {
     name?: string;
     noLogin?: boolean;
     noExternalLinks?: boolean;

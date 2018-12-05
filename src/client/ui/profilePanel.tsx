@@ -3,7 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
@@ -39,7 +39,7 @@ export class ProfilePanel extends React.Component<Props, State> {
     }
 
     render() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         const profileId = this.props.current.profileId || this.props.myUserId;
         const isMe = profileId === this.props.myUserId;
 

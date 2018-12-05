@@ -8,7 +8,7 @@ import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
 import * as rankings from '../core/rankings';
@@ -192,7 +192,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderNoProfile() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         return <div>
             <h1>{this.props.playerName}</h1>
             {!a.noLogin && !this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to receive your rating and stats</p>}

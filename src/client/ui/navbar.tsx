@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import { isMobile } from '../core/userAgent';
@@ -70,7 +70,7 @@ class NavBar extends React.Component<Props, State> {
     }
 
     private renderNavBar() {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         const verticalClasses = classNames({
             "navbar": true,
             "navbar-vertical": true,

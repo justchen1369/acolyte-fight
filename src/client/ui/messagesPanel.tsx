@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as sockets from '../core/sockets';
@@ -111,7 +111,7 @@ class MessagesPanel extends React.Component<Props, State> {
         });
 
         if (finished) {
-            if (!ads.getProvider().noExternalLinks) {
+            if (!options.getProvider().noExternalLinks) {
                 rows.push(<div key="advert-row" className="row advert-row">
                     <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
                     <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>
@@ -150,7 +150,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        const a = ads.getProvider();
+        const a = options.getProvider();
         return <div key={key} className="row">
             <div>
                 {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}

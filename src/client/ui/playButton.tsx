@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ads from '../core/ads';
+import * as options from '../core/options';
 import * as ai from '../core/ai';
 import * as matches from '../core/matches';
 import * as parties from '../core/parties';
@@ -90,7 +90,7 @@ class PlayButton extends React.Component<Props, State> {
             gtag('event', 'conversion', {'send_to': 'AW-778742698/Tw7BCODZ1Y8BEKrXqvMC'});
         }
 
-        await ads.getProvider().commercialBreak();
+        await options.getProvider().commercialBreak();
 
         matches.joinNewGame();
     }

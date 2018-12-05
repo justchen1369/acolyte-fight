@@ -1,7 +1,7 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-export class FacebookProvider implements s.AdProvider {
+export class FacebookProvider implements s.OptionsProvider {
     name = "fb";
     noLogin = true;
     noExternalLinks = true;

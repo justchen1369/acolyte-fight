@@ -1,7 +1,7 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-export class PokiProvider implements s.AdProvider {
+export class PokiProvider implements s.OptionsProvider {
     name = "poki";
     noLogin = true;
     noExternalLinks = true;

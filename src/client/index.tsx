@@ -8,11 +8,11 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
-import * as ads from './core/ads';
 import * as audio from './core/audio';
 import * as config from './config';
 import * as cloud from './core/cloud';
 import * as matches from './core/matches';
+import * as options from './core/options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
@@ -28,13 +28,14 @@ import Root from './ui/root';
 
 let alreadyConnected = false;
 
-export function initialize() {
+export async function initialize() {
     StoreProvider.init();
+    await options.init();
+
     stats.init();
     cloud.init();
     rankings.init();
     audio.init();
-    ads.init();
 
     start();
     render();
@@ -60,7 +61,7 @@ async function loginAsync() {
 }
 
 async function start() {
-    const a = ads.getProvider();
+    const a = options.getProvider();
 
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
