@@ -1273,7 +1273,10 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 		}
 	});
 
-	const scaleFactor = calculateButtonScaleFactor(rect, nextOffset);
+	const scaleFactor = Math.min(
+		calculateButtonScaleFactor(rect.width, nextOffset),
+		calculateButtonScaleFactor(rect.height * ButtonBar.MaxHeightProportion, ButtonBar.Size)
+	);
 	const region = calculateButtonBarRegion(rect, nextOffset, scaleFactor);
 
 	return {
@@ -1286,14 +1289,13 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 	};
 }
 
-function calculateButtonScaleFactor(rect: ClientRect, totalSize: number): number {
-	const availableSize = rect.width;
-	if (availableSize <= 0) {
+function calculateButtonScaleFactor(available: number, actual: number): number {
+	if (available <= 0) {
 		return 1.0; // Stop division by zero errors
-	} else if (totalSize <= availableSize) {
+	} else if (actual <= available) {
 		return 1.0;
 	} else {
-		return availableSize / totalSize;
+		return available / actual;
 	}
 }
 

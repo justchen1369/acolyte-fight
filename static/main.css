@@ -589,8 +589,8 @@ i.clickable:hover, i.clickable:active {
 
 #messages-panel .help-box {
     color: white;
-    margin-top: 30px;
-    padding: 20px;
+    margin-top: 1em;
+    padding: 0.5em;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
 }
 
@@ -602,18 +602,18 @@ i.clickable:hover, i.clickable:active {
 
 #messages-panel .help-box .help-title {
     font-weight: bold;
-    margin-bottom: 15px;
+    margin-bottom: 1em;
 }
 
 #messages-panel .help-box .help-row {
-    margin: 10px 0px;
+    margin: 0.1em 0px;
 }
 
 #messages-panel .help-box .icon-container {
     display: inline-block;
     width: 30px;
     text-align: center;
-    margin-right: 8px;
+    margin-right: 0.5em;
 }
 
 #messages-panel .game-started {
@@ -622,19 +622,19 @@ i.clickable:hover, i.clickable:active {
 
 #messages-panel .winner {
     color: white;
-    margin-top: 30px;
-    padding: 20px;
+    margin-top: 1em;
+    padding: 0.5em;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
 }
 
 #messages-panel .winner-row {
     font-weight: bold;
     font-size: 150%;
-    margin-bottom: 30px;
+    margin-bottom: 1em;
 }
 
 #messages-panel .action-row {
-    margin-top: 30px;
+    margin-top: 1em;
     align-items: center;
 }
 
@@ -646,7 +646,7 @@ i.clickable:hover, i.clickable:active {
     display: flex;
     align-items: center;
 
-    margin: 10px 0;
+    margin: 0.5em 0;
     animation: none;
 }
 
@@ -661,7 +661,7 @@ i.clickable:hover, i.clickable:active {
 
 #messages-panel .advert-row i {
     font-size: 150%;
-    margin-left: 5px;
+    margin-left: 0.25em;
 }
 
 #spell-info-panel {

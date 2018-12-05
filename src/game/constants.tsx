@@ -89,6 +89,7 @@ export namespace DashIndicator {
 	export const Margin = Pixel * 0;
 }
 export namespace ButtonBar {
+	export const MaxHeightProportion = 0.15;
 	export const Spacing = 8;
 	export const Margin = 5;
 	export const Size = 72;
