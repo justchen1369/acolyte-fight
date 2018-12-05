@@ -12,7 +12,8 @@ import * as audio from './core/audio';
 import * as config from './config';
 import * as cloud from './core/cloud';
 import * as matches from './core/matches';
-import * as options from './core/options';
+import * as notifications from './core/notifications';
+import * as options from './options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
@@ -20,6 +21,7 @@ import * as sockets from './core/sockets';
 import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
+import * as ticker from './core/ticker';
 import * as tracker from './core/tracker';
 import * as url from './url';
 import * as userAgent from './core/userAgent';
@@ -30,12 +32,19 @@ let alreadyConnected = false;
 
 export async function initialize() {
     StoreProvider.init();
+    audio.init();
+
     await options.init();
 
-    stats.init();
-    cloud.init();
-    rankings.init();
-    audio.init();
+    notifications.attachListener(options.getProvider().onNotification);
+    notifications.attachListener(cloud.onNotification);
+    notifications.attachListener(stats.onNotification);
+    notifications.attachListener(rankings.onNotification);
+
+    sockets.listeners.onGameMsg = stats.onGameMsg;
+    sockets.listeners.onHeroMsg = matches.onHeroMsg;
+    sockets.listeners.onPartyMsg = parties.onPartyMsg;
+    sockets.listeners.onTickMsg = ticker.onTickMsg;
 
     start();
     render();

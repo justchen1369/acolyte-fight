@@ -18,7 +18,6 @@ let allowedDelay = 1;
 const interval = Math.floor(1000 / TicksPerSecond);
 let tickEpoch = Date.now();
 let tickCounter = 0;
-sockets.listeners.onTickMsg = onTickMsg;
 
 export function reset(history: m.TickMsg[], live: boolean) {
 	if (live) {
@@ -113,7 +112,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	notify(...notifications);
 }
 
-function onTickMsg(buffer: ArrayBuffer) {
+export function onTickMsg(buffer: ArrayBuffer) {
 	const data: m.TickMsg = msgpack.decode(new Uint8Array(buffer));
 
 	const world = StoreProvider.getState().world;

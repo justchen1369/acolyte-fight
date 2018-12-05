@@ -13,8 +13,6 @@ import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
 
-sockets.listeners.onHeroMsg = onHeroMsg;
-
 export async function joinNewGame(observeGameId?: string, observe?: boolean): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
 		observe = observe || !!observeGameId;
@@ -114,7 +112,7 @@ export function replays(ids: string[]): Promise<string[]> {
 	});
 }
 
-function onHeroMsg(buffer: ArrayBuffer) {
+export function onHeroMsg(buffer: ArrayBuffer) {
 	const data: m.HeroMsg = msgpack.decode(new Uint8Array(buffer));
 	leaveCurrentGame(false);
 

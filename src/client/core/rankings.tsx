@@ -34,11 +34,7 @@ export const leagues = [
     { name: "Wood", minPercentile: constants.Placements.Wood },
 ];
 
-export function init() {
-    notifications.attachListener(notifs => onNotification(notifs));
-}
-
-function onNotification(notifs: w.Notification[]) {
+export function onNotification(notifs: w.Notification[]) {
     for (const notif of notifs) {
         if (notif.type === "ratingAdjustment") {
             adjustRating(notif);

@@ -4,7 +4,7 @@ import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
-import * as options from './options';
+import * as options from '../options';
 import * as credentials from './credentials';
 import * as notifications from './notifications';
 import * as stats from './stats';
@@ -12,11 +12,7 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { base } from '../url';
 
-export function init() {
-    notifications.attachListener(notifs => onNotification(notifs));
-}
-
-function onNotification(notifs: w.Notification[]) {
+export function onNotification(notifs: w.Notification[]) {
     if (notifs.some(n => n.type === "win")) {
         loginAnonymouslyIfNecessary(); // Don't care that this is async
     }

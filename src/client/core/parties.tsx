@@ -10,8 +10,6 @@ import * as url from '../url';
 import { socket } from './sockets';
 import { isMobile } from './userAgent';
 
-sockets.listeners.onPartyMsg = onPartyMsg;
-
 export function createPartyAsync(): Promise<void> {
 	const store = StoreProvider.getState();
 	return new Promise<string>((resolve, reject) => {
@@ -240,7 +238,7 @@ export function leavePartyAsync(): Promise<void> {
 	});
 }
 
-async function onPartyMsg(msg: m.PartyMsg) {
+export async function onPartyMsg(msg: m.PartyMsg) {
 	const store = StoreProvider.getState();
 	if (!(store.party && store.party.id === msg.partyId)) {
 		return;

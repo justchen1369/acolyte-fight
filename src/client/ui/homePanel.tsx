@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as options from '../core/options';
+import * as options from '../options';
 import * as url from '../url';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';

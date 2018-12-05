@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as options from '../core/options';
+import * as options from '../options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from './screenLifecycle';

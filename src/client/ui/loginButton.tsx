@@ -4,7 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as options from '../core/options';
+import * as options from '../options';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import NavBarItem from './navbarItem';

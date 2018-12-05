@@ -14,12 +14,7 @@ import { TicksPerSecond } from '../../game/constants';
 
 let alreadyLoadedGameStats = false;
 
-export function init() {
-    notifications.attachListener(notifs => onNotification(notifs));
-    sockets.listeners.onGameMsg = onGameMsg;
-}
-
-function onNotification(notifs: w.Notification[]) {
+export function onNotification(notifs: w.Notification[]) {
     // Save the world if it has been won
     if (notifs.some(n => n.type === "win")) {
         const store = StoreProvider.getState();
@@ -30,7 +25,7 @@ function onNotification(notifs: w.Notification[]) {
     }
 }
 
-async function onGameMsg(buffer: ArrayBuffer) {
+export async function onGameMsg(buffer: ArrayBuffer) {
     const gameStatsMsg: m.GameStatsMsg = msgpack.decode(new Uint8Array(buffer));
     console.log("Received final game results", gameStatsMsg);
 
