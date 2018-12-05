@@ -13,6 +13,7 @@ import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
 import * as games from './games';
+import * as kongregate from './kongregate';
 import * as loadMetrics from './loadMetrics';
 import * as percentiles from './percentiles';
 import * as sanitize from '../game/sanitize';
@@ -103,6 +104,34 @@ async function onFacebookLoginAsync(req: express.Request, res: express.Response)
 
     const response: m.FacebookLoginResponse = {
         authToken: facebook.authToken(facebookId),
+    };
+    res.send(response);
+}
+
+export function onKongregateLogin(req: express.Request, res: express.Response) {
+    onKongregateLoginAsync(req, res).catch(error => handleError(error, res));
+}
+
+async function onKongregateLoginAsync(req: express.Request, res: express.Response): Promise<void> {
+    const input = req.body as m.KongregateLoginRequest;
+    if (!(required(input, "object")
+        && required(input.signature, "string")
+        && required(input.kongregateId, "number")
+    )) {
+        console.log(input);
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    const name = await kongregate.getPlayerName(input.kongregateId, input.signature);
+    if (!name) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    const response: m.KongregateLoginResponse = {
+        authToken: kongregate.authToken(input.kongregateId),
+        name,
     };
     res.send(response);
 }

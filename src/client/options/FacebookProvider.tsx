@@ -2,7 +2,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 export class FacebookProvider implements s.OptionsProvider {
-    name = "fb";
+    source = "fb";
     noLogin = true;
     noExternalLinks = true;
     noScrolling = true;
@@ -13,8 +13,7 @@ export class FacebookProvider implements s.OptionsProvider {
         return new FacebookProvider();
     }
 
-    init() {
-    }
+    async init() { }
 
     loadingProgress() { }
 

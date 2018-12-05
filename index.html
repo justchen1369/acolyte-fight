@@ -86,6 +86,15 @@
 					.then(function() { return PokiSDK.init(); })
 					.then(function() { PokiSDK.gameLoadingStart(); })
 					.then(function() { console.log("Poki attached.") })
+			} else if (window.location.pathname === "/kongregate") {
+				console.log("Attaching kongregate...");
+				window.acolyteStartup = window.acolyteStartup
+					.then(function() { return loadScript("https://cdn1.kongregate.com/javascripts/kongregate_api.js"); })
+					.then(function() { return new Promise(function(resolve) {
+						kongregateAPI.loadAPI(resolve);
+					})})
+					.then(function() { window.kongregate = kongregateAPI.getAPI(); })
+					.then(function() { console.log("Kongregate attached.") })
 			}
 		</script>
 	</head>

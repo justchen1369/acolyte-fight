@@ -9,7 +9,9 @@ const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
 const workers = new Map<string, AiWorker>();
 
-setInterval(() => onTick(StoreProvider.getState().world), 100);
+export function startTimers() {
+    setInterval(() => onTick(StoreProvider.getState().world), 100);
+}
 
 export function playingAsAI(store: s.State = null) {
     store = store || StoreProvider.getState();

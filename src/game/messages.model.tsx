@@ -404,3 +404,13 @@ export interface FacebookLoginRequest {
 export interface FacebookLoginResponse {
     authToken: string;
 }
+
+export interface KongregateLoginRequest {
+    kongregateId: number;
+    signature: string;
+}
+
+export interface KongregateLoginResponse {
+    authToken: string;
+    name: string;
+}

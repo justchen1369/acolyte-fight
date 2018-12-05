@@ -8,6 +8,7 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
+import * as ai from './core/ai';
 import * as audio from './core/audio';
 import * as config from './config';
 import * as cloud from './core/cloud';
@@ -57,6 +58,8 @@ export async function initialize() {
     }
 
     loginAsync();
+    ai.startTimers();
+
     storage.cleanupGameStats();
 }
 
@@ -75,7 +78,7 @@ async function start() {
     const query = url.parseLocation(window.location);
     console.log("Initial location", query);
 
-    if (query.page === a.name) {
+    if (query.page === a.source) {
         query.page = ""; // Handle ads being initiated by path name
     }
 

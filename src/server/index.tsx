@@ -17,6 +17,7 @@ import { logger } from './logging';
 import * as dbStorage from './dbStorage';
 import * as discord from './discord';
 import * as facebook from './facebook';
+import * as kongregate from './kongregate';
 import * as gameStorage from './gameStorage';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
@@ -32,6 +33,7 @@ const port = program.port || process.env.PORT || 7770;
 const enigmaSecret = process.env.ENIGMA_SECRET || null;
 const discordSecret = process.env.DISCORD_SECRET || null;
 const facebookSecret = process.env.FACEBOOK_SECRET || null;
+const kongregateSecret = process.env.KONGREGATE_SECRET || null;
 const httpsKeyPath = process.env.HTTPS_KEY || null;
 const httpsCertPath = process.env.HTTPS_CERT || null;
 const maxReplays = parseInt(process.env.MAX_REPLAYS) || 1000;
@@ -39,13 +41,14 @@ const cleanupIntervalMinutes = parseInt(process.env.CLEANUP_INTERVAL_MINUTES) ||
 const replaysBasePath = rootDir + "/replays";
 const mirrored = !!process.env.MIRRORED;
 
-logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes} mirrored=${mirrored} discordSecretProvided=${!!discordSecret} facebookSecretProvided=${!!facebookSecret} enigmaSecretProvided=${!!enigmaSecret} httpsKeyPath=${httpsKeyPath} httpsCertPath=${httpsCertPath}`);
+logger.info(`Settings: port=${port} maxReplays=${maxReplays} cleanupIntervalMinutes=${cleanupIntervalMinutes} mirrored=${mirrored} discordSecretProvided=${!!discordSecret} facebookSecretProvided=${!!facebookSecret} kongregateSecretProvided=${!!kongregateSecret} enigmaSecretProvided=${!!enigmaSecret} httpsKeyPath=${httpsKeyPath} httpsCertPath=${httpsCertPath}`);
 
 api.init(port);
 auth.init(enigmaSecret);
 dbStorage.init();
 discord.init(discordSecret);
 facebook.init(facebookSecret);
+kongregate.init(kongregateSecret);
 gameStorage.initStorage(replaysBasePath);
 percentiles.init();
 if (mirrored) {
@@ -81,6 +84,7 @@ app.get('/api/createTestUser', (req, res) => api.onCreateTestUser(req, res));
 app.get('/api/default.acolytefight.json', (req, res) => api.onDefaultSettings(req, res));
 app.post('/api/facebook', (req, res) => api.onFacebookLogin(req, res));
 app.get('/api/gameStats', (req, res) => api.onGetGameStats(req, res));
+app.post('/api/kongregate', (req, res) => api.onKongregateLogin(req, res));
 app.get('/api/leaderboard', (req, res) => api.onGetLeaderboard(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/profile', (req, res) => api.onGetProfile(req, res));

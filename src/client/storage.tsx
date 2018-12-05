@@ -6,6 +6,7 @@ import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
 import * as m from '../game/messages.model';
 import * as config from './config';
+import * as options from './options';
 import * as sanitize from '../game/sanitize';
 
 const settingsStorage = localForage.createInstance({ name: 'acolyte-fight-settings' });
@@ -70,10 +71,8 @@ function saveJson(key: string, data: Object) {
 }
 
 export function createPlayerName(): string {
-    let name = sanitize.sanitizeName(config.getDefaultName());
-    if (sanitize.validName(name)) {
-        name += (Math.random() * 10000).toFixed(0);
-    } else {
+    let name = sanitize.sanitizeName(config.getDefaultName() || options.getProvider().playerName);
+    if (!sanitize.validName(name)) {
         name = "Acolyte" + (Math.random() * 10000).toFixed(0);
     }
     return name;

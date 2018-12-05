@@ -251,14 +251,17 @@ export interface UpdateHasReplayAction {
 
 
 export interface OptionsProvider {
-    name?: string;
+    source?: string;
     noLogin?: boolean;
     noExternalLinks?: boolean;
     noScrolling?: boolean;
     noMenu?: boolean;
     noAdvanced?: boolean;
 
-    init(): void;
+    playerName?: string;
+    authToken?: string;
+
+    init(): Promise<void>;
     loadingProgress(proportion: number): void;
     commercialBreak(): Promise<void>;
     gameplayStart(): void;
