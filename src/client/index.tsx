@@ -37,10 +37,10 @@ export async function initialize() {
 
     await options.init();
 
-    notifications.attachListener(options.getProvider().onNotification);
-    notifications.attachListener(cloud.onNotification);
-    notifications.attachListener(stats.onNotification);
-    notifications.attachListener(rankings.onNotification);
+    notifications.attachListener(n => options.getProvider().onNotification(n));
+    notifications.attachListener(n => cloud.onNotification(n));
+    notifications.attachListener(n => stats.onNotification(n));
+    notifications.attachListener(n => rankings.onNotification(n));
 
     sockets.listeners.onGameMsg = stats.onGameMsg;
     sockets.listeners.onHeroMsg = matches.onHeroMsg;
