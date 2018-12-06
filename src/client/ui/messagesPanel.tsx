@@ -225,7 +225,7 @@ class MessagesPanel extends React.Component<Props, State> {
         } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
         } else {
-            return <div key={key} className="row game-started">Waiting {notification.ticksUntilClose / TicksPerSecond} seconds for up to {Math.ceil(Matchmaking.MaxPlayers / 2)} players to join...</div>
+            return <div key={key} className="row game-started">Waiting {notification.ticksUntilClose / TicksPerSecond} seconds for more players to join...</div>
         }
     }
 

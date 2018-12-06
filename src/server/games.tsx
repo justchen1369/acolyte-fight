@@ -163,8 +163,16 @@ export function calculateRoomStats(category: string): number {
 }
 
 export function apportionPerGame(totalPlayers: number) {
+	return Math.ceil(averagePlayersPerGame(totalPlayers));
+}
+
+export function minPerGame(totalPlayers: number) {
+	return Math.floor(averagePlayersPerGame(totalPlayers));
+}
+
+export function averagePlayersPerGame(totalPlayers: number) {
 	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
-	return Math.ceil(totalPlayers / maxGames);
+	return totalPlayers / maxGames;
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
@@ -618,9 +626,9 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 }
 
 function calculateJoinPeriod(category: string, numHumans: number): number {
-	const halfFull = Math.ceil(Matchmaking.MaxPlayers / 2);
 	const numInRoom = calculateRoomStats(category);
-	if (numInRoom >= halfFull && numHumans < halfFull) {
+	const targetPerGame = minPerGame(numInRoom);
+	if (numHumans < targetPerGame) {
 		return Matchmaking.WaitForMorePeriod;
 	} else {
 		return Matchmaking.JoinPeriod;
