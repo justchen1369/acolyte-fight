@@ -537,8 +537,13 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 }
 
 export function allowSpellChoosing(world: w.World, heroId: string) {
-	// Only allow spells to be changed before game starts or if hero has died
-	return world.tick < world.startTick || !!world.winner || !world.objects.has(heroId);
+	if (heroId) {
+		// Only allow spells to be changed before game starts or if hero has died
+		return world.tick < world.startTick || !!world.winner || !world.objects.has(heroId);
+	} else {
+		// Cannot choose spells if observing
+		return false;
+	}
 }
 
 function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
