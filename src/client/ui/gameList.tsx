@@ -197,7 +197,7 @@ class GameList extends React.Component<Props, State> {
         });
         let text = ratingDelta.toFixed(0);
         if (Math.abs(ratingDelta) < 1) {
-            text = ratingDelta.toFixed(1);
+            text = ratingDelta.toPrecision(1);
         }
         if (ratingDelta > 0) {
             text = `+${text}`;
