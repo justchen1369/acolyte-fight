@@ -1468,6 +1468,7 @@ function reap(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (obj.health <= 0) {
+				resetKiller(obj, world);
 				destroyObject(world, obj);
 				notifyKill(obj, world);
 				heroKilled = true;
@@ -1490,6 +1491,16 @@ function reap(world: w.World) {
 	if (heroKilled) {
 		notifyWin(world);
 	}
+}
+
+function resetKiller(dead: w.Hero, world: w.World) {
+	const killer = world.objects.get(dead.killerHeroId);
+	if (!(killer && killer.category === "hero")) {
+		return;
+	}
+
+	// Reset all cooldowns on kill
+	killer.cooldowns = {};
 }
 
 function notifyWin(world: w.World) {
