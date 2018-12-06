@@ -21,7 +21,7 @@ const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const LongPressMilliseconds = 250;
-const FpsAlpha = 0.1;
+const MaxSlowFrames = 10;
 const FpsThreshold = 0.75;
 
 interface Props {
@@ -68,8 +68,9 @@ class AnimationLoop {
 
     private slow: () => void;
     private notifiedSlow = false;
-    private fps = TicksPerSecond;
     private timeOfLastFrame = 0;
+
+    private numSlowFrames = 0;
 
     constructor(animate: () => void, slow: () => void) {
         this.animate = animate;
@@ -92,10 +93,15 @@ class AnimationLoop {
         const timeOfThisFrame = Date.now();
         const renderingMilliseconds = timeOfThisFrame - this.timeOfLastFrame;
         if (renderingMilliseconds < 1000) {
-            const newFps = 1000 / Math.max(1, renderingMilliseconds);
-            this.fps = newFps * FpsAlpha + this.fps * (1 - FpsAlpha);
+            const targetMilliseconds = 1000 / TicksPerSecond;
+            const isSlow = renderingMilliseconds > targetMilliseconds / FpsThreshold;
+            if (isSlow) {
+                ++this.numSlowFrames;
+            } else {
+                this.numSlowFrames = 0;
+            }
 
-            if (!this.notifiedSlow && this.fps < FpsThreshold * TicksPerSecond) {
+            if (!this.notifiedSlow && this.numSlowFrames >= MaxSlowFrames) {
                 this.notifiedSlow = true;
                 this.slow();
             }
