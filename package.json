@@ -9,7 +9,6 @@
     "build": "npm run compile && npm run bundle",
     "facebook": "./create-fb-package.sh",
     "server": "node js/server/index",
-    "postinstall": "npm run build",
     "start": "npm run server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

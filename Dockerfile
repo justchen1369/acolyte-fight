@@ -4,7 +4,7 @@ RUN apt-get update \
     && curl -sL https://deb.nodesource.com/setup_10.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean \
-    && npm install -g npm@6.4
+    && npm install -g yarn
 
 ENV PORT 80
 CMD node js/server/index
@@ -13,4 +13,4 @@ RUN mkdir /app/logs
 RUN mkdir /app/replays
 
 ADD . /app
-RUN npm install && npm run build
+RUN yarn && npm run build

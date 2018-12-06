@@ -39,22 +39,22 @@ export function parseLocation(location: Location): s.PathElements {
     if (location.search) {
         const params = queryString.parse(location.search);
         if (params["g"]) {
-            gameId = params["g"];
+            gameId = flatten(params["g"]);
         }
         if (params["party"]) {
-            party = params["party"];
+            party = flatten(params["party"]);
         }
         if (params["server"]) {
-            server = params["server"];
+            server = flatten(params["server"]);
         }
         if (params["p"]) {
-            profileId = params["p"];
+            profileId = flatten(params["p"]);
         }
         if (params["source"]) {
-            source = params["source"];
+            source = flatten(params["source"]);
         }
         if (params["gclid"]) {
-            gclid = params["gclid"];
+            gclid = flatten(params["gclid"]);
         }
     }
     if (location.hash) {
@@ -62,6 +62,14 @@ export function parseLocation(location: Location): s.PathElements {
     }
 
     return { path, page, gameId, profileId, party, server, gclid, hash };
+}
+
+function flatten(param: string | string[]): string {
+    if (param instanceof Array) {
+        return param[0];
+    } else {
+        return param;
+    }
 }
 
 export function getPath(elems: s.PathElements) {
