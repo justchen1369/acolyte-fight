@@ -1,6 +1,6 @@
 {
   "instant_games": {
-    "navigation_menu_version": "NAV_FLOATING",
+    "navigation_menu_version": "NAV_BAR",
     "platform_version": "RICH_GAMEPLAY",
     "orientation": "LANDSCAPE"
   }
