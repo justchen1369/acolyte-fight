@@ -10,7 +10,6 @@ import * as w from '../game/world.model';
 
 import * as ai from './core/ai';
 import * as audio from './core/audio';
-import * as config from './config';
 import * as cloud from './core/cloud';
 import * as matches from './core/matches';
 import * as notifications from './core/notifications';
@@ -91,7 +90,7 @@ async function start() {
     };
     StoreProvider.dispatch({ type: "updateUrl", current });
 
-    sockets.connect(config.getBaseUrl(), config.getAuthToken(), async (socket) => {
+    sockets.connect(url.base, a.authToken, async (socket) => {
         if (alreadyConnected) {
             return;
         }

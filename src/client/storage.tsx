@@ -5,7 +5,6 @@ import { MaxGamesToKeep } from '../game/constants';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
 import * as m from '../game/messages.model';
-import * as config from './config';
 import * as options from './options';
 import * as sanitize from '../game/sanitize';
 
@@ -71,7 +70,7 @@ function saveJson(key: string, data: Object) {
 }
 
 export function createPlayerName(): string {
-    let name = sanitize.sanitizeName(config.getDefaultName() || options.getProvider().playerName);
+    let name = sanitize.sanitizeName(options.getProvider().playerName);
     if (!sanitize.validName(name)) {
         name = "Acolyte" + (Math.random() * 10000).toFixed(0);
     }
