@@ -306,8 +306,12 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
         // Create anonymous user
         const name: string = req.query.create;
 
-        const loggedIn = false;
-        logger.info(`Creating anonymous user ${authToken}: ${name}`);
+        let loggedIn = false;
+        if (facebook.isFacebookAuthToken(authToken) || kongregate.isKongregateAuthToken(authToken)) {
+            loggedIn = true;
+        }
+
+        logger.info(`Creating ${loggedIn ? "linked" : "anonymous"} user ${authToken}: ${name}`);
         const userId = userStorage.generateUserId();
         const userSettings: g.User = {
             userId,
