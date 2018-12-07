@@ -86,7 +86,7 @@ class NavBar extends React.Component<Props, State> {
                 {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
                 <div className="spacer" />
                 <RatingControl />
-                {!a.noLogin && <LoginButton />}
+                <LoginButton />
             </div>
             <div className={verticalClasses} onClick={(ev) => this.stopBubbling(ev)}>
                 <NavBarItem page={null} onClick={(ev) => this.onToggleOpen(ev)}><i className="fas fa-bars" /></NavBarItem>
