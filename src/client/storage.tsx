@@ -24,6 +24,12 @@ namespace SettingsKeys {
     export const LatestGameStatUnixTimestamp = "latest-game-unix";
 }
 
+export async function clear() {
+    await settingsStorage.clear();
+    await gameStorage.clear();
+    window.localStorage.clear();
+}
+
 export function loadName(): string {
     return window.localStorage.getItem(StorageKeys.Name);
 }

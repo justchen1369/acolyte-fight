@@ -157,3 +157,4 @@ function render() {
 }
 
 (window as any).acolyteInitialize = initialize;
+(window as any).acolyteGo = pages.changePage;

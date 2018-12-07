@@ -6,6 +6,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import AccountPanel from './accountPanel';
 import AiPanel from './aiPanel';
+import DebugPanel from './debugPanel';
 import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
@@ -55,6 +56,7 @@ class Root extends React.Component<Props> {
         return (
             <div className="root-panel">
                 {page === "" && this.renderHome()}
+                {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
                 {page === "party" && this.renderParty()}
                 {page === "modding" && this.renderModding()}
@@ -114,6 +116,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <TitleSection />
+            </div>
+        </div>;
+    }
+
+    private renderDebug() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <DebugPanel />
             </div>
         </div>;
     }
