@@ -85,11 +85,6 @@ class PlayButton extends React.Component<Props, State> {
             attachEndorseTracker();
         }
 
-        const gtag = (window as any).gtag;
-        if (gtag) {
-            gtag('event', 'conversion', {'send_to': 'AW-778742698/Tw7BCODZ1Y8BEKrXqvMC'});
-        }
-
         await options.getProvider().commercialBreak();
 
         matches.joinNewGame();
