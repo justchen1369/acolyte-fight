@@ -157,6 +157,7 @@ a:hover, a:active {
     text-align: center;
     box-shadow: 3px 3px 3px #0c0c0c;
     text-shadow: 1px 1px 1px black;
+    border-radius: 3px;
     background: #00ccff;
     padding: 10px 40px;
 }
