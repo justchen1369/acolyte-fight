@@ -26,11 +26,14 @@ import * as tracker from './core/tracker';
 import * as url from './url';
 import * as userAgent from './core/userAgent';
 
+import { base } from './url';
 import Root from './ui/root';
 
 let alreadyConnected = false;
 
 export async function initialize() {
+    await loadDependencies();
+
     StoreProvider.init();
     audio.init();
 
@@ -61,6 +64,24 @@ export async function initialize() {
     notifications.startTimers();
 
     storage.cleanupGameStats();
+}
+
+async function loadDependencies() {
+    await loadCSS(`${base}/static/main.css`);
+    await loadCSS(`${base}/static/fontawesome-pro/css/all.css`);
+    await loadCSS(`${base}/static/rpg-awesome/css/rpg-awesome.min.css`);
+}
+
+function loadCSS(href: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const linkTag = document.createElement("link");
+        linkTag.rel = "stylesheet";
+        linkTag.href = href;
+        linkTag.addEventListener('load', (ev) => {
+            resolve();
+        });
+        document.head.appendChild(linkTag);
+    });
 }
 
 async function loginAsync() {
@@ -95,7 +116,7 @@ async function start() {
         StoreProvider.dispatch({ type: "updatePlayerName", playerName: a.playerName });
     }
 
-    sockets.connect(url.base, a.authToken, async (socket) => {
+    sockets.connect(base, a.authToken, async (socket) => {
         if (alreadyConnected) {
             return;
         }
