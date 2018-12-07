@@ -3,6 +3,7 @@ import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
+import PrivacyPolicyPanel from './privacyPolicyPanel';
 
 interface Props {
     settings: AcolyteFightSettings;
@@ -118,12 +119,7 @@ export class TitleSection extends React.Component<Props, State> {
                     <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
                 </ul>
             </p>
-            <h1>Privacy Policy</h1>
-            <p>
-                Replays and game stats are collected are collected for the purpose of balancing the game and making it better.
-                Your user profile is stored via cookies and browser local storage.
-                No data is given to third parties.
-            </p>
+            <PrivacyPolicyPanel />
         </div>;
     }
 }

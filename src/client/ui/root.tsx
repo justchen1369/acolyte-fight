@@ -11,6 +11,7 @@ import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
 import PartyPanel from './partyPanel';
+import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from './profilePanel';
 import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
@@ -66,6 +67,7 @@ class Root extends React.Component<Props> {
                 {page === "profile" && this.renderProfile()}
                 {page === "settings" && this.renderSettings()}
                 {page === "watch" && this.renderWatch()}
+                {page === "privacy" && this.renderPrivacy()}
                 <UrlListener />
             </div>
         );
@@ -161,6 +163,15 @@ class Root extends React.Component<Props> {
             <NavBar />
             <div className="page">
                 <WatchLooper />
+            </div>
+        </div>;
+    }
+
+    private renderPrivacy() {
+        return <div className="content-container">
+            <NavBar />
+            <div className="page">
+                <PrivacyPolicyPanel />
             </div>
         </div>;
     }
