@@ -303,7 +303,10 @@ class CanvasPanel extends React.Component<Props, State> {
                             }
                             this.handleButtonClick(this.rightClickKey, world);
                         } else {
-                            this.handleButtonClick(this.leftClickKey, world);
+                            if (!world.ui.nextSpellId) {
+                                // If pressed the button bar, a left click should cast that spell, rather than cast what is normally bound to left click
+                                this.handleButtonClick(this.leftClickKey, world);
+                            }
                         }
                     }
                     this.previousTouchStart = p;
