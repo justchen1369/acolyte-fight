@@ -199,12 +199,11 @@ async function onCreateTestUserAsync(req: express.Request, res: express.Response
 
 export function onLogout(req: express.Request, res: express.Response) {
     onLogoutAsync(req, res).catch(error => handleError(error, res));
-;
 }
 
 async function onLogoutAsync(req: express.Request, res: express.Response): Promise<void> {
     const authToken = getAuthToken(req);
-    if (authToken) {
+    if (authToken && !isLinkedAuthToken(authToken)) {
         const accessKey = auth.enigmaAccessKey(authToken);
         await auth.disassociateAccessKey(accessKey);
     }
@@ -307,7 +306,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
         const name: string = req.query.create;
 
         let loggedIn = false;
-        if (facebook.isFacebookAuthToken(authToken) || kongregate.isKongregateAuthToken(authToken)) {
+        if (isLinkedAuthToken(authToken)) {
             loggedIn = true;
         }
 
@@ -402,4 +401,8 @@ export async function onGetLeaderboardAsync(req: express.Request, res: express.R
 
     const leaderboardBuffer = await statsStorage.getLeaderboard(category);
     res.send(leaderboardBuffer);
+}
+
+function isLinkedAuthToken(authToken: string) {
+    return facebook.isFacebookAuthToken(authToken) || kongregate.isKongregateAuthToken(authToken);
 }
