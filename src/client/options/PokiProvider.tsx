@@ -8,7 +8,6 @@ export class PokiProvider implements s.OptionsProvider {
     noAdvanced = true;
 
     private sdk: Poki.SDK;
-    private loadingFinished: boolean = false;
     
     constructor(sdk: Poki.SDK) {
         this.sdk = sdk;
@@ -19,15 +18,9 @@ export class PokiProvider implements s.OptionsProvider {
         if (hostname === "localhost" || hostname === "dev.acolytefight.io") {
             this.sdk.setDebug(true);
         }
-    }
 
-    loadingProgress(proportion: number) {
-        this.sdk.gameLoadingProgress({ percentageDone: 100 * proportion });
-
-        if (proportion >= 1 && !this.loadingFinished) {
-            this.loadingFinished = true;
-            this.sdk.gameLoadingFinished();
-        }
+        this.sdk.gameLoadingProgress({ percentageDone: 100 });
+        this.sdk.gameLoadingFinished();
     }
 
     async commercialBreak() {

@@ -262,7 +262,6 @@ export interface OptionsProvider {
     authToken?: string;
 
     init(): Promise<void>;
-    loadingProgress(proportion: number): void;
     commercialBreak(): Promise<void>;
     gameplayStart(): void;
     gameplayStop(): void;

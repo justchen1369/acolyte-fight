@@ -17,6 +17,11 @@ export async function init() {
     if (kongregate) {
         provider = new KongregateProvider(kongregate);
     }
+
+    const facebook: FBInstant.SDK = (window as any).FBInstant;
+    if (facebook) {
+        provider = new FacebookProvider(facebook);
+    }
     
     if (provider) {
         console.log("Initializing ads...", provider.source);

@@ -60,6 +60,7 @@
   ],
   "files": [
     "src/typings/acolytefight.d.ts",
+    "src/typings/fb-instant.d.ts",
     "src/typings/glicko2.d.ts",
     "src/typings/kongregate.d.ts",
     "src/typings/planck-js.d.ts",

@@ -10,7 +10,10 @@ const ExpiryMilliseconds = 15000;
 
 const listeners = new Array<NotificationListener>();
 let nextNotificationId = 0;
-setInterval(notificationCleanup, ExpiryMilliseconds);
+
+export function startTimers() {
+    setInterval(notificationCleanup, ExpiryMilliseconds);
+}
 
 export function attachListener(listener: NotificationListener) {
     listeners.push(listener);

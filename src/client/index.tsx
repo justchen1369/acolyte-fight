@@ -59,6 +59,7 @@ export async function initialize() {
 
     loginAsync();
     ai.startTimers();
+    notifications.startTimers();
 
     storage.cleanupGameStats();
 }
@@ -90,7 +91,6 @@ async function start() {
     };
     StoreProvider.dispatch({ type: "updateUrl", current });
 
-    a.loadingProgress(0.9);
     sockets.connect(config.getBaseUrl(), config.getAuthToken(), async (socket) => {
         if (alreadyConnected) {
             return;
@@ -110,8 +110,6 @@ async function start() {
             } else {
                 pages.go(query);
             }
-
-            a.loadingProgress(1.0);
         } catch(error) {
             console.error(error)
             socket.disconnect();
