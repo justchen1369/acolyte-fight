@@ -74,12 +74,13 @@
 				});
 			}
 
-			if (window.location.hostname === "localhost" || /\.acolytefight\.io/.test(window.location.hostname)) {
+			if (window.location.host === "localhost:8080") {
+				window.baseUrl = "https://dev.acolytefight.io:7770";
+			} else if (window.location.hostname === "localhost" || /\.acolytefight\.io/.test(window.location.hostname)) {
 				// URL is correct already
 			} else {
 				window.baseUrl = "https://acolytefight.io";
 			}
-
 			window.acolyteStartup = loadScript((window.baseUrl || "") + "/dist/client.js");
 
 			if (window.location.pathname === "/poki") {
@@ -98,7 +99,12 @@
 					})})
 					.then(function() { window.kongregate = kongregateAPI.getAPI(); })
 					.then(function() { console.log("Kongregate attached.") })
-			} else if (window.location.pathname === "/fb" || /\.fbsbx\.com/.test(window.location.origin) || /\.facebook\.com/.test(window.location.origin)) {
+			} else if (
+				window.location.pathname === "/fb"
+				|| window.location.host === "localhost:8080"
+				|| /\.fbsbx\.com/.test(window.location.origin)
+				|| /\.facebook\.com/.test(window.location.origin)) {
+
 				console.log("Attaching facebook...");
 				window.acolyteStartup = window.acolyteStartup
 					.then(function() { return loadScript("https://connect.facebook.net/en_US/fbinstant.6.2.js"); })
