@@ -68,8 +68,6 @@ export async function initialize() {
 
 async function loadDependencies() {
     await loadCSS(`${base}/static/main.css`);
-    await loadCSS(`${base}/static/fontawesome-pro/css/all.css`);
-    await loadCSS(`${base}/static/rpg-awesome/css/rpg-awesome.min.css`);
 }
 
 function loadCSS(href: string): Promise<void> {
