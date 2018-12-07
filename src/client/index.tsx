@@ -90,6 +90,11 @@ async function start() {
     };
     StoreProvider.dispatch({ type: "updateUrl", current });
 
+    if (a.playerName) {
+        // Load the player name from the ad account system
+        StoreProvider.dispatch({ type: "updatePlayerName", playerName: a.playerName });
+    }
+
     sockets.connect(url.base, a.authToken, async (socket) => {
         if (alreadyConnected) {
             return;
