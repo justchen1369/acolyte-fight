@@ -76,7 +76,7 @@
 
 			if (window.location.host === "localhost:8080") {
 				window.baseUrl = "https://dev.acolytefight.io:7770";
-			} else if (window.location.hostname === "localhost" || /\.acolytefight\.io/.test(window.location.hostname)) {
+			} else if (window.location.hostname === "localhost" || /(\.)?acolytefight\.io/.test(window.location.hostname)) {
 				// URL is correct already
 			} else {
 				window.baseUrl = "https://acolytefight.io";
