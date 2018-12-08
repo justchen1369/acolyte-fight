@@ -801,6 +801,8 @@ const Sounds: Sounds = {
     "shield": {
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 3,
                 attack: 0.25,
                 decay: 2.9,
@@ -818,6 +820,8 @@ const Sounds: Sounds = {
     "shield-hit": {
         start: [
             {
+                volume: 0.5,
+
                 stopTime: 0.5,
                 attack: 0.01,
                 decay: 0.49,
@@ -841,6 +845,8 @@ const Sounds: Sounds = {
     "icewall": {
         start: [
             {
+                volume: 0.25,
+
                 stopTime: 1.25,
                 attack: 0.1,
                 decay: 1.15,
@@ -858,6 +864,8 @@ const Sounds: Sounds = {
     "icewall-hit": {
         start: [
             {
+                volume: 0.5,
+
                 stopTime: 0.5,
                 attack: 0.01,
                 decay: 0.49,
