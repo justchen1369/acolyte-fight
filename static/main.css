@@ -1,10 +1,3 @@
-@font-face {
-    font-family: 'ChicagoFLF';
-    src: url('ChicagoFLF.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
     background: #111;
     font-family: "Helvetica", "Arial", sans-serif;
