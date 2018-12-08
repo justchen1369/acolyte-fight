@@ -143,7 +143,7 @@ export function findExistingGame(version: string, room: g.Room | null, partyId: 
 }
 
 function watchPriority(game: g.Game): number {
-	if (!game.active.size) {
+	if (!(game.active.size && isGameRunning(game))) {
 		// Discourage watching finished game
 		return 0;
 	} else if (game.winTick) {
