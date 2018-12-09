@@ -148,13 +148,13 @@ function watchPriority(game: g.Game): number {
 		return 0;
 	} else if (game.winTick) {
 		// Discourage watching a game which is not live
-		return game.numPlayers;
+		return game.active.size;
 	} else if (!game.joinable) {
 		// Encourage watching a game in-progress
-		return 1000 + game.numPlayers;
+		return 1000 + game.active.size;
 	} else {
 		// Watch a game that is only starting
-		return 100 + game.numPlayers;
+		return 100 + game.active.size;
 	}
 }
 
