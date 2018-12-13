@@ -94,6 +94,7 @@ export function leaveCurrentGame(close: boolean = true) {
 		if (close) {
 			StoreProvider.dispatch({ type: "leaveMatch" });
 		}
+		notify({ type: "exit" });
 
 		console.log("Left game " + world.ui.myGameId);
 	}

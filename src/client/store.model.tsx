@@ -263,7 +263,5 @@ export interface OptionsProvider {
 
     init(): Promise<void>;
     commercialBreak(): Promise<void>;
-    gameplayStart(): void;
-    gameplayStop(): void;
     onNotification(notifications: w.Notification[]): void;
 }

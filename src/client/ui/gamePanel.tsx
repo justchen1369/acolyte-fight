@@ -43,14 +43,6 @@ class GamePanel extends React.Component<Props, State> {
         };
     }
 
-    componentWillMount() {
-        options.getProvider().gameplayStart();
-    }
-
-    componentWillUnmount() {
-        options.getProvider().gameplayStop();
-    }
-
     render() {
         const a = options.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;

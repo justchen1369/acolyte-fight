@@ -8,6 +8,7 @@ export class PokiProvider implements s.OptionsProvider {
     noAdvanced = true;
 
     private sdk: Poki.SDK;
+    private inGame = false;
     
     constructor(sdk: Poki.SDK) {
         this.sdk = sdk;
@@ -27,16 +28,31 @@ export class PokiProvider implements s.OptionsProvider {
         await this.sdk.commercialBreak();
     }
 
-    gameplayStart() {
-        this.sdk.gameplayStart();
+    private gameplayStart() {
+        if (!this.inGame) {
+            this.inGame = true;
+            this.sdk.gameplayStart();
+        }
     }
 
-    gameplayStop() {
-        this.sdk.gameplayStop();
+    private gameplayStop() {
+        if (this.inGame) {
+            this.inGame = false;
+            this.sdk.gameplayStop();
+        }
     }
 
     onNotification(notifications: w.Notification[]) {
         for (const n of notifications) {
+            if (n.type === "new") {
+                this.gameplayStart();
+            }
+            if (n.type === "win"
+                || (n.type === "kill" && n.killed.heroId === n.myHeroId)
+                || n.type === "exit") {
+                this.gameplayStop();
+            }
+
             if (n.type === "win" && n.winner.heroId === n.myHeroId) {
                 this.sdk.happyTime();
             }

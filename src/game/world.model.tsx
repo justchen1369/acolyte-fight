@@ -150,6 +150,7 @@ export interface ButtonRenderState {
 
 export type Notification =
 	HelpNotification 
+	| ExitNotification
 	| TextNotification
 	| JoinNotification 
 	| BotNotification 
@@ -163,6 +164,10 @@ export type Notification =
 
 export interface HelpNotification {
 	type: "help";
+}
+
+export interface ExitNotification {
+	type: "exit";
 }
 
 export interface TextNotification {
@@ -188,6 +193,7 @@ export interface LeaveNotification {
 
 export interface KillNotification {
 	type: "kill";
+	myHeroId: string;
 	killed: Player;
 	killer: Player | null;
 	assist: Player | null;

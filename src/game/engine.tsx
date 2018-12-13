@@ -1593,9 +1593,11 @@ function notifyKill(hero: w.Hero, world: w.World) {
 		return;
 	}
 
+	const myHeroId = world.ui.myHeroId;
+
 	const killer = hero.killerHeroId && world.players.get(hero.killerHeroId) || null;
 	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
-	world.ui.notifications.push({ type: "kill", killed, killer, assist });
+	world.ui.notifications.push({ type: "kill", myHeroId, killed, killer, assist });
 
 	if (!world.winner) {
 		if (hero) {

@@ -30,9 +30,6 @@ export class FacebookProvider implements s.OptionsProvider {
 
     async commercialBreak() { }
 
-    gameplayStart() { }
-    gameplayStop() { }
-
     onNotification(notifications: w.Notification[]) { }
 
     private async authenticate(): Promise<string> {

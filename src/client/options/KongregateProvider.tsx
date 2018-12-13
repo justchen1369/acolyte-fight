@@ -53,8 +53,6 @@ export class KongregateProvider implements s.OptionsProvider {
     loadingProgress(proportion: number) { }
 
     async commercialBreak() { }
-    gameplayStart() { }
-    gameplayStop() { }
 
     onNotification(notifications: w.Notification[]) { }
 }

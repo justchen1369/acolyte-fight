@@ -8,9 +8,6 @@ export class NullProvider implements s.OptionsProvider {
 
     async commercialBreak() { }
 
-    gameplayStart() { }
-    gameplayStop() { }
-
     onNotification(notifications: w.Notification[]) { }
 }
 
