@@ -4,7 +4,7 @@ import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import * as ts from 'ts-trueskill';
 import * as Firestore from '@google-cloud/firestore';
-import * as categories from './categories';
+import * as categories from './segments';
 import * as constants from '../game/constants';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';
@@ -501,7 +501,7 @@ function calculateLowerBound(rating: number, rd: number) {
 
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
     try {
-        if (gameStats && game.category === categories.publicCategory()) { // Private games don't count towards ranking
+        if (gameStats && game.segment === categories.publicSegment()) { // Private games don't count towards ranking
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
             applyRatingDeltas(gameStats, ratingDeltas);
             await saveGameStats(gameStats);

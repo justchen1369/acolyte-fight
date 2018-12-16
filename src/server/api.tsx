@@ -8,7 +8,7 @@ import * as http from 'http';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
-import * as categories from './categories';
+import * as categories from './segments';
 import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
@@ -79,7 +79,7 @@ export function getExternalStatus() {
 	const status: m.ExternalStatus = {
         region: location.region,
         host: location.server,
-        numPlayers: games.calculateRoomStats(categories.publicCategory()),
+        numPlayers: games.calculateRoomStats(categories.publicSegment()),
     };
     return status;
 }

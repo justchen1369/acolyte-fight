@@ -2,7 +2,7 @@ import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import uniqid from 'uniqid';
 import * as auth from './auth';
-import * as categories from './categories';
+import * as segments from './segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -559,13 +559,13 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 
 	socket.join(game.id);
 
-	const publicCategory = categories.publicCategory();
-	const numPlayersPublic = games.calculateRoomStats(publicCategory);
-	const numPlayersInCategory = games.calculateRoomStats(game.category);
+	const publicSegment = segments.publicSegment();
+	const numPlayersPublic = games.calculateRoomStats(publicSegment);
+	const numPlayersInSegment = games.calculateRoomStats(game.segment);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
-		isPrivate: game.category !== publicCategory,
+		isPrivate: game.segment !== publicSegment,
 		partyId: game.partyId,
 		room: game.roomId,
 		mod: game.mod,
@@ -573,7 +573,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string) {
 		live,
 		history: game.history,
 		numPlayersPublic,
-		numPlayersInCategory,
+		numPlayersInSegment,
 	};
 	const buffer = msgpack.encode(msg);
 	socket.emit('hero', buffer);

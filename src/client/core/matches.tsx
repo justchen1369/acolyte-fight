@@ -134,7 +134,7 @@ export function onHeroMsg(buffer: ArrayBuffer) {
 		room: data.room,
 		isPrivate: data.isPrivate,
 		numPlayersPublic: data.numPlayersPublic,
-		numPlayersInGameMode: data.numPlayersInCategory,
+		numPlayersInGameMode: data.numPlayersInSegment,
 	});
 }
 

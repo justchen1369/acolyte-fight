@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import msgpack from 'msgpack-lite';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
-import * as categories from './categories';
+import * as categories from './segments';
 
 interface CandidateHash {
     gameStats: m.GameStatsMsg;
@@ -58,9 +58,9 @@ function hashStats(gameStats: m.GameStatsMsg): string {
 } 
 
 function calculateGameCategory(game: g.Game) {
-    if (game.category === categories.publicCategory()) {
+    if (game.segment === categories.publicSegment()) {
         return m.GameCategory.PvP;
-    } else if (game.category === categories.publicCategory(true)) {
+    } else if (game.segment === categories.publicSegment(true)) {
         return m.GameCategory.AIvAI;
     } else {
         return null;

@@ -7,7 +7,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 import * as auth from './auth';
-import * as categories from './categories';
+import * as segments from './segments';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as results from './results';
@@ -71,7 +71,7 @@ function startTickProcessing() {
 				anyGameRunning = anyGameRunning || isGameRunning;
 
 				if (isGameRunning) {
-					playerCounts[game.category] = (playerCounts[game.category] || 0) + game.active.size;
+					playerCounts[game.segment] = (playerCounts[game.segment] || 0) + game.active.size;
 				}
 			});
 			getStore().playerCounts = playerCounts;
@@ -88,15 +88,15 @@ function startTickProcessing() {
 
 export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, numNewPlayers: number = 1): g.Game {
 	const roomId = room ? room.id : null;
-	const category = categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots);
+	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
-	let numPlayers = (store.playerCounts[category] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
+	let numPlayers = (store.playerCounts[segment] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
 	let openGames = new Array<g.Game>();
 	store.joinableGames.forEach(gameId => {
 		const g = store.activeGames.get(gameId);
 		if (g && g.joinable) {
-			if (g.category === category && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
+			if (g.segment === segment && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
 				openGames.push(g);
 			}
 		} else {
@@ -131,10 +131,10 @@ export function findNewGame(version: string, room: g.Room | null, partyId: strin
 
 export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
 	const roomId = room ? room.id : null;
-	const category = categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots);
+	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
-	const candidates = [...store.activeGames.values()].filter(x => x.category === category);
+	const candidates = [...store.activeGames.values()].filter(x => x.segment === segment);
 	if (candidates.length === 0) {
 		return null;
 	}
@@ -158,8 +158,8 @@ function watchPriority(game: g.Game): number {
 	}
 }
 
-export function calculateRoomStats(category: string): number {
-	return getStore().playerCounts[category] || 0;
+export function calculateRoomStats(segment: string): number {
+	return getStore().playerCounts[segment] || 0;
 }
 
 export function apportionPerGame(totalPlayers: number) {
@@ -238,7 +238,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		category: categories.calculateGameCategory(version, roomId, partyId, isPrivate, allowBots),
+		segment: segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots),
 		roomId,
 		partyId,
 		isPrivate,
@@ -281,7 +281,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 	if (room) {
 		gameName = room.id + "/" + gameName;
 	}
-	logger.info(`Game [${gameName}]: started (${game.category})`);
+	logger.info(`Game [${gameName}]: started (${game.segment})`);
 	return game;
 }
 
@@ -391,7 +391,7 @@ export function leaveGame(game: g.Game, socketId: string) {
 	{
 		// Note, this can be a little bit wrong if a player leaves a game that was not being counted due to inactivity - it gets fixed up every 32 milliseconds so we don't care
 		const playerCounts = getStore().playerCounts;
-		playerCounts[game.category] = Math.max(0, (playerCounts[game.category] || 0) - 1);
+		playerCounts[game.segment] = Math.max(0, (playerCounts[game.segment] || 0) - 1);
 	}
 }
 
@@ -536,7 +536,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters) {
 	// Update counts
 	{
 		const playerCounts = getStore().playerCounts;
-		playerCounts[game.category] = (playerCounts[game.category] || 0) + 1;
+		playerCounts[game.segment] = (playerCounts[game.segment] || 0) + 1;
 	}
 
 	return heroId;
@@ -598,7 +598,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
-		const joinPeriod = calculateJoinPeriod(game.category, game.active.size);
+		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size);
 
 		const newCloseTick = game.tick + joinPeriod;
 		if (newCloseTick < game.closeTick) {
@@ -625,8 +625,8 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 }
 
-function calculateJoinPeriod(category: string, numHumans: number): number {
-	const numInRoom = calculateRoomStats(category);
+function calculateJoinPeriod(segment: string, numHumans: number): number {
+	const numInRoom = calculateRoomStats(segment);
 	const targetPerGame = minPerGame(numInRoom);
 	if (numHumans < targetPerGame) {
 		return Matchmaking.WaitForMorePeriod;

@@ -48,7 +48,7 @@ export interface UserRating {
 
 export interface Replay {
     id: string;
-    category: string;
+    segment: string;
 
     roomId: string | null;
     partyId: string | null;
