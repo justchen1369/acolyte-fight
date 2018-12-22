@@ -38,7 +38,9 @@ declare interface HeroSettings {
     Density: number;
 
     AngularDamping: number;
-    Damping: number; // How quickly knockback decayed. Higher number, faster decay.
+	Damping: number; // How quickly knockback decayed. Higher number, faster decay.
+	
+	DamageMitigationTicks: number; // Within these many ticks, damage does not stack between multiple players
 
     AdditionalDamageMultiplier: number; // Damage scaling
     AdditionalDamagePower: number;

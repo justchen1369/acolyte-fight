@@ -323,6 +323,9 @@ export interface Hero extends WorldObjectBase {
 	damagedTick?: number;
 	lavaTick?: number;
 
+	damageSources: Map<string, number>;
+	damageSourceHistory: DamageSourceHistoryItem[];
+
 	additionalDamagePower: number;
 	additionalDamageMultiplier: number;
 
@@ -344,6 +347,12 @@ export interface Hero extends WorldObjectBase {
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
+}
+
+export interface DamageSourceHistoryItem {
+	heroId: string;
+	amount: number;
+	expireTick: number;
 }
 
 export interface ShieldBase extends WorldObjectBase {

@@ -269,6 +269,8 @@ function addHero(world: w.World, heroId: string) {
 		maxHealth: Hero.MaxHealth,
 		body,
 		radius: Hero.Radius,
+		damageSources: new Map<string, number>(),
+		damageSourceHistory: [],
 		additionalDamageMultiplier: Hero.AdditionalDamageMultiplier,
 		additionalDamagePower: Hero.AdditionalDamagePower,
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
@@ -441,6 +443,7 @@ export function tick(world: w.World) {
 	applySpeedLimit(world);
 	removePassthrough(world);
 	recharge(world);
+	decayMitigation(world);
 	decayThrust(world);
 	decayObstacles(world);
 	detonate(world);
@@ -1367,6 +1370,28 @@ function recharge(world: w.World) {
 	});
 }
 
+function decayMitigation(world: w.World) {
+	world.objects.forEach(hero => {
+		if (hero.category === "hero" && hero.damageSourceHistory.length > 0) {
+			let newHistory = new Array<w.DamageSourceHistoryItem>();
+			hero.damageSourceHistory.forEach(item => {
+				if (world.tick >= item.expireTick) {
+					let amount = hero.damageSources.get(item.heroId);
+					amount -= item.amount;
+					if (amount > 0) {
+						hero.damageSources.set(item.heroId, amount);
+					} else {
+						hero.damageSources.delete(item.heroId);
+					}
+				} else {
+					newHistory.push(item);
+				}
+			});
+			hero.damageSourceHistory = newHistory;
+		}
+	});
+}
+
 function decayThrust(world: w.World) {
 	world.objects.forEach(hero => {
 		if (hero.category === "hero" && hero.thrust) {
@@ -1881,7 +1906,8 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	}
 
 	// Apply damage
-	let amount = Math.min(toHero.health, packet.damage);
+	let amount = mitigateDamage(toHero, packet.damage, fromHeroId, world);
+	amount = Math.min(toHero.health, packet.damage);
 	toHero.health -= amount;
 
 	// Apply lifesteal
@@ -1904,6 +1930,35 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 			toHero.killerHeroId = fromHeroId;
 		}
 	}
+}
+
+function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {
+	if (!fromHeroId) {
+		// Damage from environment not mitigated by damage from other heroes
+		return damage;
+	}
+
+	let damageFromThisSource = 0;
+	toHero.damageSources.forEach((amount, heroId) => {
+		if (heroId === fromHeroId) {
+			damageFromThisSource = amount;
+		} else {
+			// Damage from multiple opponents doesn't stack
+			damage -= amount;
+		}
+	});
+	damage = Math.max(0, damage);
+
+	if (damage > 0) {
+		toHero.damageSources.set(fromHeroId, damageFromThisSource + damage);
+		toHero.damageSourceHistory.push({
+			heroId: fromHeroId,
+			amount: damage,
+			expireTick: world.tick + world.settings.Hero.DamageMitigationTicks,
+		});
+	}
+
+	return damage;
 }
 
 function applyDamageToObstacle(obstacle: w.Obstacle, packet: DamagePacket, world: w.World) {

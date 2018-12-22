@@ -10,6 +10,8 @@ const Hero: HeroSettings = {
     AngularDamping: 1,
     Damping: 3,
 
+    DamageMitigationTicks: 90,
+
     AdditionalDamageMultiplier: 2.0,
     AdditionalDamagePower: 1.0,
 
