@@ -333,7 +333,6 @@ export interface Hero extends WorldObjectBase {
 	target?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
-	charges: Cooldowns;
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone

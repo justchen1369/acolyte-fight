@@ -277,7 +277,6 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
-		charges: {},
 		availableRange: Hero.MaxDashRange,
 		killerHeroId: null,
 		assistHeroId: null,
@@ -290,10 +289,6 @@ function addHero(world: w.World, heroId: string) {
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	return hero;
-}
-
-export function chargesAvailable(world: w.World, hero: w.Hero, spell: string) {
-	return (!cooldownRemaining(world, hero, spell) ? 1 : 0) + (hero.charges[spell] || 0);
 }
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spell: string) {
@@ -442,7 +437,6 @@ export function tick(world: w.World) {
 
 	applySpeedLimit(world);
 	removePassthrough(world);
-	recharge(world);
 	decayMitigation(world);
 	decayThrust(world);
 	decayObstacles(world);
@@ -797,9 +791,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 		if (spell.cooldown) {
 			const cooldown = cooldownRemaining(world, hero, spell.id);
-			if (hero.charges[spell.id] > 0) {
-				// Use up a charge
-			} else if (cooldown > 0) {
+			if (cooldown > 0) {
 				if (cooldown > constants.MaxCooldownWait) {
 					// Just cancel spells if they're too far off cooldown
 					hero.casting = null;
@@ -866,11 +858,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.casting.initialPosition = hero.casting.initialPosition || vector.clone(hero.body.getPosition());
 
 			if (spell.cooldown) {
-				if (hero.charges[spell.id] > 0) {
-					--hero.charges[spell.id];
-				} else {
-					setCooldown(world, hero, spell.id, spell.cooldown);
-				}
+				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
 		}
 
@@ -1353,21 +1341,6 @@ function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
 			maskBits: fixture.getFilterMaskBits(),
 		});
 	}
-}
-
-function recharge(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			for (const spellId of hero.spellsToKeys.keys()) {
-				const spell = world.settings.Spells[spellId];
-				const numCharges = 1 + (hero.charges[spell.id] || 0);
-				if (spell.numCharges > 1 && numCharges < spell.numCharges && !cooldownRemaining(world, hero, spellId)) {
-					hero.charges[spell.id] = numCharges;
-					setCooldown(world, hero, spellId, spell.cooldown);
-				}
-			}
-		}
-	});
 }
 
 function decayMitigation(world: w.World) {
