@@ -431,6 +431,9 @@ export function tick(world: w.World) {
 
 	shields(world);
 	physicsStep(world);
+
+	detonate(world); // Detonate before objects switch owners so its predictable who owns the detonate
+
 	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
 		handleContact(world, contact);
 	}
@@ -440,7 +443,6 @@ export function tick(world: w.World) {
 	decayMitigation(world);
 	decayThrust(world);
 	decayObstacles(world);
-	detonate(world);
 	applyLavaDamage(world);
 	shrink(world);
 
