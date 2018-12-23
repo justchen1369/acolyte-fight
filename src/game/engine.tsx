@@ -1882,7 +1882,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 
 	// Apply damage
 	let amount = mitigateDamage(toHero, packet.damage, fromHeroId, world);
-	amount = Math.min(toHero.health, packet.damage);
+	amount = Math.min(toHero.health, amount);
 	toHero.health -= amount;
 
 	// Apply lifesteal
