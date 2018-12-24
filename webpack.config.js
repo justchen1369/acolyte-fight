@@ -1,5 +1,4 @@
 const path = require('path');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const clientConfig = {
 	entry: './js/client/index.js',
@@ -11,11 +10,6 @@ const clientConfig = {
 };
 
 if (process.env.NODE_ENV === "production") {
-  clientConfig.optimization = {
-    minimizer: [
-      new UglifyJsPlugin()
-    ]
-  };
   clientConfig.mode = 'production';
 } else {
   clientConfig.mode = 'development';
