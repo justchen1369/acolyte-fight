@@ -521,7 +521,7 @@ const bouncer: Spell = {
     icon: "divert",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 8 * TicksPerSecond,
 
     projectile: {
         color: '#88ee22',
