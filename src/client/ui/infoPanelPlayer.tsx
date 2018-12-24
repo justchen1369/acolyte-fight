@@ -54,7 +54,7 @@ class InfoPanelPlayer extends React.Component<Props, State> {
         }
 
         return <div className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
-            <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i className="ra ra-sword" />)}</span>
+            <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i key={x} className="ra ra-sword" />)}</span>
             <PlayerName player={player} myHeroId={this.props.myHeroId} colorOverride={colorOverride} />
         </div>;
     }
