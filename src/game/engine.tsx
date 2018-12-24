@@ -618,7 +618,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {
-	console.log("Player joined:", ev.heroId);
+	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
 		hero = addHero(world, ev.heroId);
