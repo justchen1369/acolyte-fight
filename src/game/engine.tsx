@@ -379,7 +379,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		createTick: world.tick,
 		expireTick: world.tick + projectileTemplate.maxTicks,
-		minTicks: projectileTemplate.minTicks || 1,
+		minTicks: projectileTemplate.minTicks || 0,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
