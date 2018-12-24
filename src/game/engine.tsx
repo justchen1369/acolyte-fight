@@ -30,7 +30,7 @@ export interface ResolvedKeyBindings {
 }
 
 export function version() {
-	return "1.0.1149";
+	return "1.0.1150";
 }
 
 export function initialWorld(mod: Object): w.World {
