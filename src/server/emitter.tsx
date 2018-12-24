@@ -442,7 +442,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 				});
 			}
 
-			emitHero(socket.id, game, heroId);
+			const live = !!data.observe;
+			emitHero(socket.id, game, heroId, live);
 
 			if (heroId) {
 				const botLog = data.isBot ? " (bot)" : "";
@@ -549,13 +550,11 @@ function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameLi
 	callback({ success: true, ids: availableIds });
 }
 
-function emitHero(socketId: string, game: g.Replay, heroId: string) {
+function emitHero(socketId: string, game: g.Replay, heroId: string, live: boolean = false) {
 	const socket = io.sockets.connected[socketId];
 	if (!socket) {
 		return;
 	}
-
-	const live = !!(game as g.Game).active && !(game as g.Game).winTick;
 
 	socket.join(game.id);
 
