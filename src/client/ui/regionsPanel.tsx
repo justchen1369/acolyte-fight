@@ -13,7 +13,6 @@ const RetestCount = 5;
 const RetestDelayMilliseconds = 100;
 
 const RegionUrls = [
-    url.getOrigin("au"),
     url.getOrigin("eu"),
     url.getOrigin("us"),
     url.getOrigin("sg"),
@@ -57,15 +56,19 @@ function delay(milliseconds: number): Promise<void> {
 }
 
 async function measureRegion(url: string, onRegion: (region: Region) => void): Promise<void> {
-    let minPing = Infinity;
-    for (let repeat = 0; repeat < RetestCount; ++repeat) {
-        const region = await retrieveRegion(url);
-        if (region.pingMilliseconds < minPing) {
-            minPing = region.pingMilliseconds;
-            onRegion(region);
-        }
+    try {
+        let minPing = Infinity;
+        for (let repeat = 0; repeat < RetestCount; ++repeat) {
+            const region = await retrieveRegion(url);
+            if (region.pingMilliseconds < minPing) {
+                minPing = region.pingMilliseconds;
+                onRegion(region);
+            }
 
-        await delay(RetestDelayMilliseconds);
+            await delay(RetestDelayMilliseconds);
+        }
+    } catch (exception) {
+        console.error("Unable to connect to region", exception);
     }
 }
 
