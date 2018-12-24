@@ -6,6 +6,7 @@ RUN apt-get update \
     && apt-get clean \
     && npm install -g yarn
 
+ENV NODE_ENV production
 ENV PORT 80
 CMD node js/server/index
 WORKDIR /app

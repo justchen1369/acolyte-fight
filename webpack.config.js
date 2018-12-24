@@ -8,12 +8,17 @@ const clientConfig = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'client.js'
   },
-  optimization: {
+};
+
+if (process.env.NODE_ENV === "production") {
+  clientConfig.optimization = {
     minimizer: [
       new UglifyJsPlugin()
     ]
-  },
-  mode: 'production',
-};
+  };
+  clientConfig.mode = 'production';
+} else {
+  clientConfig.mode = 'development';
+}
 
 module.exports = [ clientConfig ];
