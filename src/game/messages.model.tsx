@@ -133,6 +133,7 @@ export interface JoinMsg {
     isBot: boolean;
     isMobile: boolean;
     observe: boolean;
+    live: boolean;
     version: string;
 }
 

@@ -442,8 +442,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 				});
 			}
 
-			const live = !!data.observe;
-			emitHero(socket.id, game, heroId, live);
+			emitHero(socket.id, game, heroId, data.live);
 
 			if (heroId) {
 				const botLog = data.isBot ? " (bot)" : "";

@@ -13,9 +13,9 @@ import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
 
-export async function joinNewGame(observeGameId?: string, observe?: boolean): Promise<boolean> {
+export async function joinNewGame(observeGameId?: string, live: boolean = false): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
-		observe = observe || !!observeGameId;
+		const observe = live || !!observeGameId;
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
@@ -29,6 +29,7 @@ export async function joinNewGame(observeGameId?: string, observe?: boolean): Pr
 				isBot: ai.playingAsAI(store) && !observeGameId,
 				isMobile,
 				observe,
+				live,
 				version: engine.version(),
 			};
 			socket.emit('join', msg, (response: m.JoinResponseMsg) => {
@@ -44,7 +45,7 @@ export async function joinNewGame(observeGameId?: string, observe?: boolean): Pr
 			if (observeGameId) {
 				window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
 			} else {
-				const hash = observe ? "watch" : "join";
+				const hash = live ? "watch" : "join";
 				window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
 				window.location.reload(); // to get the hash respected
 			}
