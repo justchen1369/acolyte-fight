@@ -1908,8 +1908,8 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {
-	if (!fromHeroId) {
-		// Damage from environment not mitigated by damage from other heroes
+	if (!fromHeroId // Damage from environment not mitigated by damage from other heroes
+		|| fromHeroId === toHero.id) { // Self damage always received in full
 		return damage;
 	}
 
