@@ -108,7 +108,9 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	render(world, canvasStack, renderOptions);
 
 	const notifications = engine.takeNotifications(world);
-	notify(...notifications);
+	if (notifications.length > 0) {
+		notify(...notifications);
+	}
 }
 
 export function onTickMsg(data: m.TickMsg) {
