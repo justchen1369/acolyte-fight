@@ -37,14 +37,14 @@ class NameConfig extends React.Component<Props, State> {
     }
     render() {
         const name = this.state.saved ? this.props.savedName : this.state.name;
-        return <p>
+        return <div>
             <div><input type="text" value={name} maxLength={PlayerName.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
             {this.state.changed && <div style={{ marginTop: 8 }}>
                 {this.state.saved 
                     ? "Your name has been set to " + name
                     : "Unsaved changes"}
             </div>}
-        </p>;
+        </div>;
     }
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {

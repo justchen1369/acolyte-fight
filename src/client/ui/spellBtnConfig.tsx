@@ -61,6 +61,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
             <div className="key-options">
                 {options.map(spellId => Spells[spellId]).map(spell =>
                     <SpellIcon
+                        key={spell.id}
                         className={spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
                         icon={spell.icon}
                         color={spell.color}

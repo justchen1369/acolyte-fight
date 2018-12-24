@@ -186,7 +186,7 @@ class MessagesPanel extends React.Component<Props, State> {
             if (isMobile) {
                 const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
                 const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
-                return <div className="help-box">
+                return <div key={key} className="help-box">
                     <div className="help-title">How to play:</div>
                     <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
                     {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
@@ -197,7 +197,7 @@ class MessagesPanel extends React.Component<Props, State> {
                 const isLeftClickShoot = this.props.rebindings[w.SpecialKeys.LeftClick] === "q";
                 const isRightClickDash = this.props.rebindings[w.SpecialKeys.RightClick] === "a";
                 const showMouseHint = !(isLeftClickShoot || isRightClickDash);
-                return <div className="help-box">
+                return <div key={key} className="help-box">
                     <div className="help-title">How to play:</div>
                     {showMouseHint && <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>}
                     {isLeftClickShoot && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Left-click</b> to shoot</div>}
