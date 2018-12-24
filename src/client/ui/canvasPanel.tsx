@@ -22,7 +22,7 @@ const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const LongPressMilliseconds = 250;
 const MaxSlowFrames = 10;
-const FpsThreshold = 0.75;
+const FpsThreshold = 0.9;
 
 interface Props {
     world: w.World;
