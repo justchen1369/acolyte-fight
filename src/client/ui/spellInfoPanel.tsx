@@ -62,8 +62,10 @@ class SpellInfoPanel extends React.Component<Props, State> {
                 <SpellIcon
                     icon={spell.icon}
                     color={spell.color}
-                    title={name}
-                    size={48} />
+                    size={48}
+                    attr={{
+                        title: name,
+                    }} />
             </div>
             <div className="spell-description">
                 {spell.description}

@@ -62,14 +62,16 @@ class SpellKeyConfig extends React.Component<Props, State> {
                 {options.map(spellId => Spells[spellId]).map(spell =>
                     <SpellIcon
                         key={spell.id}
-                        className={spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen"}
                         icon={spell.icon}
                         color={spell.color}
-                        title={spellUtils.spellName(spell)}
-                        onClick={() => this.onChoose(key, spell.id)}
-                        onMouseEnter={() => this.onMouseHoverSpell(spell.id)}
-                        onMouseLeave={() => this.onMouseLeaveSpell()}
                         size={48}
+                        attr={{
+                            className: spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen",
+                            title: spellUtils.spellName(spell),
+                            onClick: () => this.onChoose(key, spell.id),
+                            onMouseEnter: () => this.onMouseHoverSpell(spell.id),
+                            onMouseLeave: () => this.onMouseLeaveSpell(),
+                        }}
                         hoverWash={spell.id !== chosen.id} />)}
             </div>
             <div className="key-detail-container">

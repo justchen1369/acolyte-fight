@@ -5,7 +5,6 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as spellUtils from '../core/spellUtils';
 import { ButtonBar, TicksPerSecond } from '../../game/constants';
-import { SpellIcon } from './spellIcon';
 
 interface OwnProps {
     spellId: string;

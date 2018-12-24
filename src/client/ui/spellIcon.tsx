@@ -2,11 +2,13 @@ import * as React from 'react';
 import { Icons } from '../core/icons';
 import { renderIconButton } from '../core/renderIcon';
 
-interface Props extends React.HTMLAttributes<HTMLCanvasElement> {
+interface Props {
     icon: string;
     color: string;
     size: number;
     hoverWash?: boolean;
+
+    attr?: React.HTMLAttributes<HTMLCanvasElement>;
 }
 
 interface State {
@@ -25,15 +27,17 @@ export class SpellIcon extends React.Component<Props, State> {
     }
 
     render() {
+        const attr = this.props.attr || {};
+
         let className = "spell-icon";
-        if (this.props.className) {
-            className = className + " " + this.props.className;
+        if (attr.className) {
+            className = className + " " + attr.className;
         }
 
         this.redrawCanvas(); // Redraw previous canvas in response to state changes
 
         return <canvas
-            {...this.props}
+            {...attr}
             className={className}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={this.props.size}
@@ -45,15 +49,15 @@ export class SpellIcon extends React.Component<Props, State> {
 
     private onMouseEnter(ev: React.MouseEvent<HTMLCanvasElement>) {
         this.setState({ hovering: true });
-        if (this.props.onMouseEnter) {
-            this.props.onMouseEnter(ev);
+        if (this.props.attr && this.props.attr.onMouseEnter) {
+            this.props.attr.onMouseEnter(ev);
         }
     }
 
     private onMouseLeave(ev: React.MouseEvent<HTMLCanvasElement>) {
         this.setState({ hovering: false });
-        if (this.props.onMouseLeave) {
-            this.props.onMouseLeave(ev);
+        if (this.props.attr && this.props.attr.onMouseLeave) {
+            this.props.attr.onMouseLeave(ev);
         }
     }
 
