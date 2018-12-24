@@ -6,8 +6,9 @@
   "scripts": {
     "build": "webpack",
     "facebook": "./create-fb-package.sh",
-    "server": "node js/server/index",
-    "start": "npm run server",
+    "start": "npm-run-all --parallel watch:server watch:build",
+    "watch:build": "webpack --watch",
+    "watch:server": "nodemon ./dist/server.js --watch ./dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -53,6 +54,7 @@
     "cors": "^2.8.4",
     "crypto-js": "^3.1.9-1",
     "express": "^4.16.3",
+    "fork-ts-checker-webpack-plugin": "^0.5.2",
     "form-urlencoded": "^3.0.0",
     "glicko2": "^0.8.4",
     "immutable": "^3.8.2",
@@ -62,6 +64,8 @@
     "msgpack-lite": "^0.1.26",
     "nanotimer": "^0.3.15",
     "node-fetch": "^2.2.0",
+    "nodemon": "^1.18.9",
+    "npm-run-all": "^4.1.5",
     "path2d-polyfill": "^0.2.1",
     "planck-js": "^0.1.44",
     "promise-each": "^2.2.0",
@@ -83,8 +87,9 @@
     "typescript": "^3.2.2",
     "uniqid": "^5.0.3",
     "url-join": "^4.0.0",
-    "webpack": "^4.12.0",
+    "webpack": "^4.28.2",
     "webpack-cli": "^3.1.2",
+    "webpack-node-externals": "^1.7.2",
     "winston": "^3.0.0"
   }
 }

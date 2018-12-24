@@ -8,7 +8,7 @@ RUN apt-get update \
 
 ENV NODE_ENV production
 ENV PORT 80
-CMD node js/server/index
+CMD node dist/server.js
 WORKDIR /app
 RUN mkdir /app/logs
 RUN mkdir /app/replays
