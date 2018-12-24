@@ -1,8 +1,15 @@
 const path = require('path');
 
 const clientConfig = {
-	entry: './js/client/index.js',
-  target: 'web', // <=== can be omitted as default is 'web'
+  entry: './src/client/index.tsx',
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
+  },
+  module: {
+    rules: [
+      { test: /\.tsx?$/, loader: "ts-loader" },
+    ]
+  },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'client.js'

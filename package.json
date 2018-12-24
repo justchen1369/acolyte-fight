@@ -4,9 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "compile": "tsc",
-    "bundle": "webpack",
-    "build": "npm run compile && npm run bundle",
+    "build": "webpack",
     "facebook": "./create-fb-package.sh",
     "server": "node js/server/index",
     "start": "npm run server",
@@ -80,6 +78,7 @@
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.1.1",
     "socket.io-msgpack-parser": "^2.2.0",
+    "ts-loader": "^5.3.2",
     "ts-trueskill": "^2.2.9",
     "typescript": "^3.2.2",
     "uniqid": "^5.0.3",
