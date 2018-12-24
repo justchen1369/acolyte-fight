@@ -540,6 +540,7 @@ class CanvasPanel extends React.Component<Props, State> {
         if (this.canvasStack.background && this.canvasStack.canvas && this.canvasStack.glows && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
+                rtx: this.state.rtx,
                 wheelOnRight: this.props.wheelOnRight,
                 mute: this.props.mute,
                 keysToSpells: resolvedKeys.keysToSpells,

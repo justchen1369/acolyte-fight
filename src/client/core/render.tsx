@@ -35,6 +35,7 @@ export interface RenderOptions {
 	mute: boolean;
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
+	rtx: boolean;
 }
 
 interface ButtonInput {
@@ -111,7 +112,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
-	renderWorld(ctxStack, world, worldRect);
+	renderWorld(ctxStack, world, worldRect, options);
 	renderInterface(ctxStack.ui, world, rect, options);
 	all(ctxStack, ctx => ctx.restore());
 
@@ -157,14 +158,14 @@ function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
 	ctxStack.canvas.clearRect(0, 0, rect.width, rect.height);
 }
 
-function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: ClientRect) {
+function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: ClientRect, options: RenderOptions) {
 	all(ctxStack, ctx => ctx.save());
 	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
 	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
 	renderMap(ctxStack.background, world);
 
-	world.objects.forEach(obj => renderObject(ctxStack, obj, world));
+	world.objects.forEach(obj => renderObject(ctxStack, obj, world, options));
 	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
 	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
@@ -220,7 +221,7 @@ function renderTarget(ctx: CanvasRenderingContext2D, target: pl.Vec2, world: w.W
 	ctx.restore();
 }
 
-function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
+function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
 	if (obj.category === "hero") {
 		renderHero(ctxStack, obj, world);
 		if (obj.gravity) {
@@ -239,7 +240,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		renderSpell(ctxStack, obj, world);
 		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
-		renderObstacle(ctxStack, obj, world);
+		renderObstacle(ctxStack, obj, world, options);
 	}
 }
 
@@ -447,7 +448,7 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.restore();
 }
 
-function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World) {
+function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	if (obstacle.destroyed) {
 		return;
 	}
@@ -482,10 +483,14 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 				lighten = HeroColors.ObstacleGlowFactor * (1 - hitAge / HeroColors.ObstacleFlashTicks);
 			}
 
-			const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
-			gradient.addColorStop(0, hsl(red, saturation, lighten + (1 - lighten) * 0.5));
-			gradient.addColorStop(1, hsl(red, saturation, lighten + (1 - lighten) * 0.4));
-			ctx.fillStyle = gradient;
+			if (options.rtx) {
+				const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
+				gradient.addColorStop(0, hsl(red, saturation, lighten + (1 - lighten) * 0.5));
+				gradient.addColorStop(1, hsl(red, saturation, lighten + (1 - lighten) * 0.4));
+				ctx.fillStyle = gradient;
+			} else {
+				ctx.fillStyle = hsl(red, saturation, lighten + (1 - lighten) * 0.5);
+			}
 		} else {
 			ctx.fillStyle = 'white';
 		}
