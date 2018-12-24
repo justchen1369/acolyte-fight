@@ -25,7 +25,7 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
-	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", msgpack.encode(data)));
+	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
 }
 
@@ -514,13 +514,7 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	}
 }
 
-function onActionMsg(socket: SocketIO.Socket, buffer: Buffer) {
-	if (!(buffer instanceof Buffer)) {
-		// callback({ success: false, error: "Bad request" });
-		return;
-	}
-
-	const data: m.ActionMsg = msgpack.decode(buffer);
+function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	if (!(required(data, "object")
 		&& required(data.actionType, "string")
 		&& required(data.gameId, "string")
@@ -573,8 +567,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, live: boolea
 		numPlayersPublic,
 		numPlayersInSegment,
 	};
-	const buffer = msgpack.encode(msg);
-	socket.emit('hero', buffer);
+	socket.emit('hero', msg);
 }
 
 function emitParty(party: g.Party) {
@@ -620,8 +613,7 @@ function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 			for (const room of rooms) {
 				emitTo = emitTo.to(room);
 			}
-			const buffer = msgpack.encode(result);
-			emitTo.emit('game', buffer);
+			emitTo.emit('game', result);
 		}
 	}
 }

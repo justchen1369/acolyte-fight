@@ -1,4 +1,4 @@
-import msgpack from 'msgpack-lite';
+import msgpackParser from 'socket.io-msgpack-parser';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as SocketIO from 'socket.io-client';
@@ -17,14 +17,16 @@ export let listeners: Listeners = {
 };
 
 export interface Listeners {
-	onTickMsg: (msg: ArrayBuffer) => void;
+	onTickMsg: (msg: m.TickMsg) => void;
 	onPartyMsg: (msg: m.PartyMsg) => void;
-	onGameMsg: (msg: ArrayBuffer) => void;
-	onHeroMsg: (msg: ArrayBuffer) => void;
+	onGameMsg: (msg: m.GameStatsMsg) => void;
+	onHeroMsg: (msg: m.HeroMsg) => void;
 }
 
 export function connect(socketUrl: string, authToken: string, onConnect: (socket: SocketIOClient.Socket) => void) {
 	const config: SocketIOClient.ConnectOpts = {};
+	(config as any).parser = msgpackParser;
+
 	if (authToken) {
         config.transportOptions = {
             polling: {
@@ -78,10 +80,10 @@ function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 		console.log("Disconnected");
 		onDisconnectMsg();
 	});
-	socket.on('tick', (msg: ArrayBuffer) => listeners.onTickMsg(msg));
+	socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
-	socket.on('game', (msg: ArrayBuffer) => listeners.onGameMsg(msg));
-	socket.on('hero', (msg: ArrayBuffer) => listeners.onHeroMsg(msg));
+	socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
+	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
 }
 function onDisconnectMsg() {
 	StoreProvider.dispatch({ type: "disconnected" });
@@ -131,6 +133,5 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 }
 
 function send(msg: m.ActionMsg) {
-	const buffer = msgpack.encode(msg);
-	socket.emit('action', buffer);
+	socket.emit('action', msg);
 }

@@ -1,4 +1,3 @@
-import msgpack from 'msgpack-lite';
 import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as m from '../../game/messages.model';
@@ -114,8 +113,7 @@ export function replays(ids: string[]): Promise<string[]> {
 	});
 }
 
-export function onHeroMsg(buffer: ArrayBuffer) {
-	const data: m.HeroMsg = msgpack.decode(new Uint8Array(buffer));
+export function onHeroMsg(data: m.HeroMsg) {
 	leaveCurrentGame(false);
 
 	const world = engine.initialWorld(data.mod);

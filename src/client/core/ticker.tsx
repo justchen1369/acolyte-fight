@@ -1,5 +1,4 @@
 import pl from 'planck-js';
-import msgpack from 'msgpack-lite';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
@@ -112,9 +111,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	notify(...notifications);
 }
 
-export function onTickMsg(buffer: ArrayBuffer) {
-	const data: m.TickMsg = msgpack.decode(new Uint8Array(buffer));
-
+export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);

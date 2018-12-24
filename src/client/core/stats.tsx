@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import moment from 'moment';
-import msgpack from 'msgpack-lite';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -25,8 +24,7 @@ export function onNotification(notifs: w.Notification[]) {
     }
 }
 
-export async function onGameMsg(buffer: ArrayBuffer) {
-    const gameStatsMsg: m.GameStatsMsg = msgpack.decode(new Uint8Array(buffer));
+export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
     console.log("Received final game results", gameStatsMsg);
 
     const state = StoreProvider.getState();

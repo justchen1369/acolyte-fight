@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import msgpack from 'msgpack-lite';
 import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';

@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import httpLib from 'http';
 import httpsLib from 'https';
+import msgpackParser from 'socket.io-msgpack-parser';
 import socketLib from 'socket.io';
 import express from 'express';
 import compression from 'compression';
@@ -64,6 +65,7 @@ app.use(compression());
 const http = createServer(app, httpsKeyPath, httpsCertPath);
 const io = socketLib(http, {
 	handlePreflightRequest: api.handlePreflightRequest,
+	parser: msgpackParser,
 } as any); // needs to be as any because handlePreflightRequest not documented
 
 app.use(express.json());

@@ -64,7 +64,8 @@
     "src/typings/glicko2.d.ts",
     "src/typings/kongregate.d.ts",
     "src/typings/planck-js.d.ts",
-    "src/typings/poki.d.ts"
+    "src/typings/poki.d.ts",
+    "src/typings/socket.io-msgpack-parser.d.ts",
   ],
   "types": [
     "src/typings/acolytefight.d.ts",
