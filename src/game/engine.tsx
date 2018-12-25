@@ -30,7 +30,7 @@ export interface ResolvedKeyBindings {
 }
 
 export function version() {
-	return "1.0.1150";
+	return "1.0.1151";
 }
 
 export function initialWorld(mod: Object): w.World {
@@ -352,6 +352,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		alreadyHit: new Set<string>(),
 
 		damage: projectileTemplate.damage,
+		partialDamage: projectileTemplate.partialDamage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 
@@ -1068,7 +1069,11 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
 		projectile.alreadyHit.add(hero.id);
 
-		applyDamage(hero, projectile, projectile.owner, world);
+		const packet: DamagePacket = scaleForPartialDamage(world, projectile, {
+			damage: projectile.damage,
+			lifeSteal: projectile.lifeSteal,
+		});
+		applyDamage(hero, packet, projectile.owner, world);
 		linkTo(projectile, hero, world);
 		projectile.hit = world.tick;
 	}
@@ -1082,6 +1087,28 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (expireOn(world, projectile, hero)) {
 		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
+	}
+}
+
+export function calculatePartialDamageMultiplier(world: w.World, projectile: w.Projectile): number {
+	const partialDamage = projectile.partialDamage;
+	const lifetime = world.tick - projectile.createTick;
+	if (partialDamage && lifetime < partialDamage.ticks) {
+		return partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * (lifetime / partialDamage.ticks);
+	} else {
+		return 1;
+	}
+}
+
+function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet: DamagePacket): DamagePacket {
+	const multiplier = calculatePartialDamageMultiplier(world, projectile);
+	if (multiplier < 1) {
+		return {
+			...packet,
+			damage: packet.damage * multiplier,
+		};
+	} else {
+		return packet;
 	}
 }
 
@@ -1417,7 +1444,11 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 			const diff = vector.diff(other.body.getPosition(), projectile.body.getPosition());
 			const distance = vector.length(diff);
 			if (other.id !== projectile.owner && distance <= projectile.detonate.radius + other.radius) {
-				applyDamage(other, projectile.detonate, projectile.owner, world);
+				const packet = scaleForPartialDamage(world, projectile, {
+					damage: projectile.detonate.damage,
+					lifeSteal: projectile.detonate.lifeSteal,
+				});
+				applyDamage(other, packet, projectile.owner, world);
 
 				const proportion = 1.0 - (distance / (projectile.detonate.radius + other.radius)); // +HeroRadius because only need to touch the edge
 				const magnitude = projectile.detonate.minImpulse + proportion * (projectile.detonate.maxImpulse - projectile.detonate.minImpulse);
@@ -1881,8 +1912,9 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	}
 
 	// Apply damage
-	let amount = mitigateDamage(toHero, packet.damage, fromHeroId, world);
-	amount = Math.min(toHero.health, amount);
+	let amount = packet.damage;
+	amount = mitigateDamage(toHero, amount, fromHeroId, world);
+	amount = Math.min(amount, toHero.health);
 	toHero.health -= amount;
 
 	// Apply lifesteal

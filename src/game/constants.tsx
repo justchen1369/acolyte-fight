@@ -46,6 +46,8 @@ export namespace Placements {
 }
 
 export namespace HeroColors {
+	export const WorldColor = '#333333';
+
 	export const MyHeroColor = '#00ccff';
 	export const BotColor = '#cccccc';
 	export const InactiveColor = '#666666';

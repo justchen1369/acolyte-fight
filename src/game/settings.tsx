@@ -240,7 +240,7 @@ const fireball: Spell = {
 const flamestrike: Spell = {
     id: 'flamestrike',
     name: 'Fireboom',
-    description: "It's slower than fireball - harder to aim, but does more damage within a small area of effect.",
+    description: "It's slower than fireball - harder to aim, but does more damage at longer ranges. At short range, does the same amount of damage as fireball.",
     action: "projectile",
 
     color: '#ff4400',
@@ -264,6 +264,11 @@ const flamestrike: Spell = {
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
+        },
+
+        partialDamage: {
+            initialMultiplier: 0.5,
+            ticks: 0.5 * TicksPerSecond,
         },
 
         sound: "flamestrike",

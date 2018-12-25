@@ -425,13 +425,13 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.translate(0.5, 0.5);
 
 	ctx.lineWidth = Pixel * 5;
-	ctx.strokeStyle = "#333333";
+	ctx.strokeStyle = HeroColors.WorldColor;
 	if (world.winner) {
 		const color = heroColor(world.winner, world);
 		ctx.fillStyle = color;
 		ctx.globalAlpha = 0.5;
 	} else {
-		ctx.fillStyle = "#333333";
+		ctx.fillStyle = HeroColors.WorldColor;
 	}
 
 	let radius = world.radius;
@@ -957,6 +957,8 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, intermediatePoints: boolean = false) {
 	let previous: pl.Vec2 = null;
+
+	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
 	for (let pos of getRenderPoints(projectile.uiPath, intermediatePoints)) {
 		if (previous) {
 			world.ui.trails.push({
@@ -966,7 +968,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				from: previous,
 				to: pos,
 				fillStyle: projectileColor(projectile, world),
-				width: projectile.radius * 2,
+				width: multiplier * projectile.radius * 2,
 			} as w.LineTrail);
 		}
 
@@ -987,22 +989,23 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 }
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
 		max: projectile.trailTicks, 
 		pos: vector.clone(projectile.body.getPosition()),
 		fillStyle: projectileColor(projectile, world),
-		radius: projectile.radius,
+		radius: multiplier * projectile.radius,
 	} as w.CircleTrail);
 }
 
 function projectileColor(projectile: w.Projectile, world: w.World) {
-	let color = projectile.color;
 	if (projectile.selfColor && projectile.owner === world.ui.myHeroId) {
-		color = HeroColors.MyHeroColor;
+		return HeroColors.MyHeroColor;
+	} else {
+		return projectile.color;
 	}
-	return color;
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {

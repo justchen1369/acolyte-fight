@@ -449,6 +449,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	alreadyHit: Set<string>;
 
 	damage: number;
+	partialDamage?: PartialDamageParameters;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
 	homing?: HomingParameters;

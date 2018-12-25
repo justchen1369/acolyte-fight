@@ -179,7 +179,7 @@ declare interface SpraySpell extends SpellBase {
 declare interface ProjectileTemplate extends DamagePacket {
 	damage: number;
 	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
-    bounce?: BounceParameters;
+	partialDamage?: PartialDamageParameters;
 
     density: number;
     radius: number;
@@ -187,6 +187,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	strafe?: boolean; // if true, the projectile will move with the hero's movement
 
+    bounce?: BounceParameters;
     homing?: HomingParametersTemplate;
 	link?: LinkParameters;
 	gravity?: GravityParameters; // Trap a hero
@@ -207,6 +208,11 @@ declare interface ProjectileTemplate extends DamagePacket {
 	render: string; // Which render function to use
 	sound?: string;
 	soundHit?: string;
+}
+
+declare interface PartialDamageParameters {
+	initialMultiplier: number; // Initially, the projectile initially does this multiplier
+	ticks: number; // The projectile linearly grows to full damage when it reaches this lifetime
 }
 
 declare interface GravityParameters {
