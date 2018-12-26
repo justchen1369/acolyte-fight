@@ -5,11 +5,11 @@ import * as audio from './audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as keyboardUtils from './keyboardUtils';
+import * as icons from './icons';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
 import { ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
-import { Icons } from './icons';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
@@ -1140,10 +1140,11 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		}
 
 		const config = world.ui.buttonBar;
+		const iconLookup = world.settings.Icons;
 		if (config.view === "bar") {
-			renderButtonBar(ctx, config, buttonStateLookup);
+			renderButtonBar(ctx, config, buttonStateLookup, iconLookup);
 		} else if (config.view === "wheel") {
-			renderButtonWheel(ctx, config, buttonStateLookup);
+			renderButtonWheel(ctx, config, buttonStateLookup, iconLookup);
 		}
 	} else {
 		ctx.clearRect(0, 0, rect.width, rect.height);
@@ -1200,7 +1201,7 @@ function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, options: Ren
 	}
 }
 
-function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, states: Map<string, w.ButtonRenderState>) {
+function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfig, states: Map<string, w.ButtonRenderState>, icons: IconLookup) {
 	ctx.save();
 	ctx.translate(config.region.left, config.region.top);
 	ctx.scale(config.scaleFactor, config.scaleFactor);
@@ -1221,7 +1222,7 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 
 				ctx.save();
 				ctx.translate(buttonRegion.left, buttonRegion.top);
-				renderBarButton(ctx, buttonRegion, newState);
+				renderBarButton(ctx, buttonRegion, newState, icons);
 				ctx.restore();
 			}
 		}
@@ -1229,7 +1230,7 @@ function renderButtonBar(ctx: CanvasRenderingContext2D, config: w.ButtonBarConfi
 	ctx.restore();
 }
 
-function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, states: Map<string, w.ButtonRenderState>) {
+function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelConfig, states: Map<string, w.ButtonRenderState>, iconLookup: IconLookup) {
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
@@ -1247,7 +1248,7 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 				config.buttons.set(key, newState);
 
 				ctx.save();
-				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState);
+				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState, iconLookup);
 				ctx.restore();
 			}
 		}
@@ -1452,7 +1453,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	return button;
 }
 
-function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect, buttonState: w.ButtonRenderState) {
+function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
 	const size = buttonRegion.width; // assume square
 	if (buttonState) {
 		ctx.save();
@@ -1466,7 +1467,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
 		ctx.clip();
 
-		renderIconOnly(ctx, buttonState.icon && Icons[buttonState.icon], 0.6, size);
+		renderIconOnly(ctx, icons.getIcon(buttonState.icon, iconLookup), 0.6, size);
 
 		if (buttonState.cooldownText) {
 			// Cooldown
@@ -1495,7 +1496,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 	}
 }
 
-function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState) {
+function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
 	outerRadius = innerRadius + (0.5 + 0.5 * sector.weight) * (outerRadius - innerRadius);
 
 	ctx.save();
@@ -1533,7 +1534,7 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 			ctx.save();
 
 			ctx.translate(-size / 2, -size / 2); // Translate to top-left of button
-			renderIconOnly(ctx, buttonState.icon && Icons[buttonState.icon], 0.6, size);
+			renderIconOnly(ctx, icons.getIcon(buttonState.icon, iconLookup), 0.6, size);
 			
 			ctx.restore();
 		}

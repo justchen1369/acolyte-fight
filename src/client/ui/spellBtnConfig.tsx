@@ -5,6 +5,7 @@ import * as cloud from '../core/cloud';
 import * as s from '../store.model';
 import { SpellIcon } from './spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
+import * as icons from '../core/icons';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
@@ -62,7 +63,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
                 {options.map(spellId => Spells[spellId]).map(spell =>
                     <SpellIcon
                         key={spell.id}
-                        icon={spell.icon}
+                        icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
                         color={spell.color}
                         size={48}
                         attr={{

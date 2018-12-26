@@ -30,6 +30,7 @@ declare interface AcolyteFightSettings {
     Spells: Spells;
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
+	Icons: IconLookup;
 }
 
 declare interface HeroSettings {
@@ -331,6 +332,10 @@ declare interface DamagePacket {
 declare interface Vec2 {
 	x: number;
 	y: number;
+}
+
+interface IconLookup {
+	[key: string]: string;
 }
 
 type WaveType = "sine" | "square" | "sawtooth" | "triangle" | "brown-noise";

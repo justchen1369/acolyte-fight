@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as icons from '../core/icons';
 import * as spellUtils from '../core/spellUtils';
 import { ButtonBar } from '../../game/constants';
 import { SpellIcon } from './spellIcon';
@@ -60,7 +61,7 @@ class SpellInfoPanel extends React.Component<Props, State> {
                 <div className="spacer"></div>
                 <span className="spell-name">{name}</span>
                 <SpellIcon
-                    icon={spell.icon}
+                    icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
                     color={spell.color}
                     size={48}
                     attr={{

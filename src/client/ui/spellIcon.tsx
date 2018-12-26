@@ -1,9 +1,9 @@
 import * as React from 'react';
-import { Icons } from '../core/icons';
+import * as icons from '../core/icons';
 import { renderIconButton } from '../core/renderIcon';
 
 interface Props {
-    icon: string;
+    icon: Path2D;
     color: string;
     size: number;
     hoverWash?: boolean;
@@ -71,7 +71,7 @@ export class SpellIcon extends React.Component<Props, State> {
             return;
         }
 
-        const icon = Icons[this.props.icon];
+        const icon = this.props.icon;
         if (icon) {
             const ctx = this.elem.getContext('2d');
             const rect = this.elem.getBoundingClientRect();
