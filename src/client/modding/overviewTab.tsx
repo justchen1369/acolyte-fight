@@ -69,11 +69,13 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 This feature is experimental and will be subject to a lot of change!
                 Forward compatibility is not guaranteed - functional mods in the current version may be broken by future releases.
             </p>
-            <h2>Load from file</h2>
+            <h2>Create new mod</h2>
+            <p>Go to the other tabs (at the top) and start changing some values! Come back to this tab to save your mod file.</p>
+            <h2>Open file</h2>
             <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
             <div className={this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onLoadModFile(this.state.selectedFile)}>Load from file</div>
             {this.state.error && <p className="error">{this.state.error}</p>}
-            <h2>Load from example</h2>
+            <h2>Open example</h2>
             <ul>
                 <li><a href="static/fireballMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>fireballMod.acolytefight.json</a> - this example mod decreases fireball cooldown.</li>
                 <li><a href="static/homingClusterMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>homingClusterMod.acolytefight.json</a> - this is an example of creating a new spell - a slow cluster of homing missiles.</li>
@@ -84,16 +86,17 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private renderCurrentMod(currentMod: Object) {
         return <div>
-            <h2>Current mod</h2>
             <p>
                 The mod below is currently active.
                 You will automatically be matched to other players who currently have the same mod activated.
             </p>
             <textarea className="mod-json" value={stringifyMod(this.props.currentMod)} readOnly />
             <div className="button-row">
-                <div className="btn" onClick={() => this.props.onUpdateMod({})}>Reset to Default</div>
-                <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to file</div>
+                <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to File</div>
             </div>
+            <h2>Back to Default Settings</h2>
+            <p>Discard the current mod and revert back to default settings.</p>
+            <div className="btn" onClick={() => this.props.onUpdateMod({})}>Discard</div>
         </div>
     }
 

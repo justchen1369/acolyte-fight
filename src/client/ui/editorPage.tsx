@@ -44,7 +44,7 @@ class EditorPage extends React.PureComponent<Props, State> {
             <div className="page">
                 <h1>Modding</h1>
                 <p>Modding allows you to change the rules of the game.</p>
-                <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to access modding tools</p>
+                <div className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to access modding tools</div>
             </div>
         </div>;
     }
