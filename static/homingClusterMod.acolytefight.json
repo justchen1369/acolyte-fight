@@ -1,4 +1,7 @@
 {
+    "Mod": {
+        "name": "homingClusterMod"
+    },
     "Spells": {
         "cluster": {
             "id": "cluster",

@@ -23,6 +23,7 @@ Collision category flags (categories, expireOn and collideWith):
 */
 
 declare interface AcolyteFightSettings {
+	Mod: ModSettings;
     Layouts: Layouts;
     Hero: HeroSettings;
     World: WorldSettings;
@@ -31,6 +32,16 @@ declare interface AcolyteFightSettings {
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
 	Icons: IconLookup;
+}
+
+declare type ModTree = {
+	[K in keyof AcolyteFightSettings]?: any;
+}
+
+declare interface ModSettings {
+	name: string;
+	author: string;
+	description: string;
 }
 
 declare interface HeroSettings {

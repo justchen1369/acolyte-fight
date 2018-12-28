@@ -1476,7 +1476,14 @@ const Spells = {
     thrust,
 };
 
+export const Mod: ModSettings = {
+    name: null,
+    author: null,
+    description: null,
+};
+
 export const DefaultSettings: AcolyteFightSettings = {
+    Mod,
     World,
     Hero,
     Obstacle,

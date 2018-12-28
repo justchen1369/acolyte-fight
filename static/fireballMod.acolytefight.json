@@ -1,4 +1,7 @@
 {
+    "Mod": {
+        "name": "fireballMod"
+    },
     "Spells": {
         "fireball": {
             "cooldown": 30

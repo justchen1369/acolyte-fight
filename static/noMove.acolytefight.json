@@ -1,4 +1,7 @@
 {
+    "Mod": {
+        "name": "noMove"
+    },
 	"Hero": {
 		"MoveSpeedPerSecond": 0
 	},

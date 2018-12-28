@@ -115,6 +115,13 @@ class OverviewTab extends React.PureComponent<Props, State> {
         try {
             const json = await fileUtils.readFileAsync(file);
             const mod = JSON.parse(json);
+            if (!(mod && typeof mod === "object")) {
+                throw "Invalid mod";
+            }
+            if (!(mod.Mod && mod.Mod.name)) {
+                mod.Mod = mod.Mod || {};
+                mod.Mod.name = file.name;
+            }
             this.props.onUpdateMod(mod);
         } catch (exception) {
             console.error("Error loading mod from file", exception);
@@ -122,10 +129,16 @@ class OverviewTab extends React.PureComponent<Props, State> {
         }
     }
 
-    private onSaveModFile(currentMod: Object) {
+    private onSaveModFile(currentMod: ModTree) {
         if (currentMod) {
             const json = JSON.stringify(currentMod, null, "\t");
-            saveAs(new Blob([json], {type: "application/json;charset=utf-8"}));
+
+            let filename = (currentMod.Mod && currentMod.Mod.name) || "acolytefight.mod";
+            if (!/\.json$/.test(filename)) {
+                filename += ".json";
+            }
+
+            saveAs(new Blob([json], {type: "application/json;charset=utf-8"}), filename);
         }
     }
 }
