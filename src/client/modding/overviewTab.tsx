@@ -7,7 +7,8 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as url from '../url';
-import { saveAs } from 'file-saver';
+
+const FileSaver = require('../../lib/file-saver');
 
 const stringifyMod = Reselect.createSelector(
     (mod: Object) => mod,
@@ -138,7 +139,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 filename += ".json";
             }
 
-            saveAs(new Blob([json], {type: "application/json;charset=utf-8"}), filename);
+            FileSaver.saveAs(new Blob([json], {type: "application/json;charset=utf-8"}), filename);
         }
     }
 }
