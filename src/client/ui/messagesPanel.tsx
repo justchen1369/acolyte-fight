@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
+import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
 import * as sockets from '../core/sockets';
 import * as StoreProvider from '../storeProvider';
@@ -288,9 +289,9 @@ class MessagesPanel extends React.Component<Props, State> {
 
     private renderRatingAdjustment(ratingDelta: number) {
         if (ratingDelta >= 0) {
-            return <span className="rating rating-increase">+{ratingDelta.toFixed(0)}</span>
+            return <span className="rating rating-increase">{mathUtils.deltaPrecision(ratingDelta)}</span>
         } else {
-            return <span className="rating rating-decrease">{ratingDelta.toFixed(0)}</span>
+            return <span className="rating rating-decrease">{mathUtils.deltaPrecision(ratingDelta)}</span>
         }
     }
 

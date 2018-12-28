@@ -9,6 +9,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
+import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
 import * as stats from '../core/stats';
 import * as StoreProvider from '../storeProvider';
@@ -192,16 +193,10 @@ class GameList extends React.Component<Props, State> {
 
         const className = classNames({
             'rating': true,
-            'rating-increase': ratingDelta > 0,
+            'rating-increase': ratingDelta >= 0,
             'rating-decrease': ratingDelta < 0,
         });
-        let text = ratingDelta.toFixed(0);
-        if (Math.abs(ratingDelta) < 1) {
-            text = ratingDelta.toPrecision(1);
-        }
-        if (ratingDelta > 0) {
-            text = `+${text}`;
-        }
+        let text = mathUtils.deltaPrecision(ratingDelta);
         return <div className="rating-container">
             <div className={className}>{text}</div>
         </div>
