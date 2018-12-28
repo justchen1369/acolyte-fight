@@ -178,7 +178,7 @@ a:hover, a:active {
 }
 
 .button-row .btn:nth-child(n+2) {
-    margin-left: 1em;
+    margin-left: 0.5em;
 }
 
 i.clickable {
