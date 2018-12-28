@@ -7,6 +7,7 @@ import * as w from '../../game/world.model';
 import AccountPanel from './accountPanel';
 import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
+import EditorPage from './editorPage';
 import GamePanel from './gamePanel';
 import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
@@ -15,7 +16,6 @@ import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from './profilePanel';
 import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
-import ModdingPanel from './moddingPanel';
 import NavBar from './navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from './urlListener';
@@ -87,12 +87,7 @@ class Root extends React.Component<Props> {
     }
 
     private renderModding() {
-        return <div className="content-container">
-            <NavBar />
-            <div className="page">
-                <ModdingPanel />
-            </div>
-        </div>;
+        return <EditorPage />;
     }
 
     private renderAi() {
