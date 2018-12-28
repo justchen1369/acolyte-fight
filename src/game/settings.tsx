@@ -670,6 +670,7 @@ const scourge: Spell = {
     movementCancel: true,
     damage: 20,
     selfDamage: 10,
+    minSelfHealth: 1,
     damageScaling: false,
     minImpulse: 0.0002,
     maxImpulse: 0.0005,

@@ -1814,10 +1814,10 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
-	const selfPacket: DamagePacket = { damage: spell.selfDamage };
 	const damagePacket: DamagePacket = { damage: spell.damage };
 	scaleDamagePacket(damagePacket, hero, spell.damageScaling)
 
+	const selfPacket: DamagePacket = { damage: Math.max(0, Math.min(hero.health - spell.minSelfHealth, spell.selfDamage)) };
 	applyDamage(hero, selfPacket, hero.id, world);
 
 	let heroPos = hero.body.getPosition();
@@ -1912,7 +1912,7 @@ function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, w
 	}
 
 	// Apply damage
-	let amount = packet.damage;
+	let amount = Math.max(0, packet.damage);
 	amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	amount = Math.min(amount, toHero.health);
 	toHero.health -= amount;

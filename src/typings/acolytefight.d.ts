@@ -265,6 +265,7 @@ declare interface ScourgeSpell extends SpellBase {
 
     damage: number;
 	selfDamage: number;
+	minSelfHealth: number;
 	damageScaling?: boolean;
 
     radius: number;
