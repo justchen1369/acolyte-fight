@@ -16,6 +16,7 @@ interface Props {
     again: boolean;
     selfId: string;
     party: s.PartyState;
+    isModded: boolean;
     playingAsAI: boolean;
 }
 interface State {
@@ -27,6 +28,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         again: ownProps.again || false,
         party: state.party,
         selfId: state.socketId,
+        isModded: Object.keys(state.room.mod).length > 0,
         playingAsAI: ai.playingAsAI(state),
     };
 }
@@ -49,8 +51,12 @@ class PlayButton extends React.Component<Props, State> {
         } else {
             if (this.props.again) {
                 label = "Play Again";
+            } else if (this.props.playingAsAI) {
+                label = <>Play <i className="fas fa-microchip" title="You are playing as an AI" /></>;
+            } else if (this.props.isModded) {
+                label = <>Play <i className="fas fa-wrench" title="Mod active - game rules have been modified" /></>;
             } else {
-                label = this.props.playingAsAI ? "Play as AI" : "Play";
+                label = "Play";
             }
         }
 
