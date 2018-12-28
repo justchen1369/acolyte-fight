@@ -1,8 +1,16 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
+import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import ItemEditor from './itemEditor';
+
+const idSelector = Reselect.createSelector(
+    (section: e.CodeSection) => section,
+    (section) => {
+        return _.orderBy(Object.keys(section));
+    }
+);
 
 interface Props {
     section: e.CodeSection;
@@ -35,7 +43,7 @@ class SectionEditor extends React.PureComponent<Props, State> {
 
     private renderEntityList() {
         return <div className="entity-list">
-            {Object.keys(this.props.section).map(id => this.renderOption(id))}
+            {idSelector(this.props.section).map(id => this.renderOption(id))}
         </div>
     }
 
