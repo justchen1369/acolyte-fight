@@ -534,14 +534,14 @@ const bouncer: Spell = {
 
         density: 2,
         radius: 0.001,
-        speed: 1.0,
+        speed: 1.5,
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
         bounce: {
-            damageFactor: 0.9,
+            damageFactor: 0.95,
         },
 
         sound: "bouncer",
