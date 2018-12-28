@@ -1,13 +1,15 @@
 {
     "Mod": {
-        "name": "fireballMod"
+        "name": "fireballMod",
+        "author": "raysplaceinspace",
+        "description": "decreases fireball cooldown"
     },
     "Spells": {
         "fireball": {
-            "cooldown": 30
+            "cooldown": 10
         },
         "flamestrike": {
-            "cooldown": 30
+            "cooldown": 10
         }
     }
 }

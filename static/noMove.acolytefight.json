@@ -1,6 +1,8 @@
 {
     "Mod": {
-        "name": "noMove"
+        "name": "noMove",
+        "author": "raysplaceinspace",
+        "description": "disables normal movement, but speeds up teleportation and charging"
     },
 	"Hero": {
 		"MoveSpeedPerSecond": 0

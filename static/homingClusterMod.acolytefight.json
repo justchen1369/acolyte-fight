@@ -1,6 +1,8 @@
 {
     "Mod": {
-        "name": "homingClusterMod"
+        "name": "homingClusterMod",
+        "author": "raysplaceinspace",
+        "description": "creates a new spell called homing cluster"
     },
     "Spells": {
         "cluster": {
@@ -8,7 +10,7 @@
             "name": "Cluster",
             "description": "Shoot a cluster of slow-moving missiles at your enemy",
             "action": "spray",
-            "color": "#44ffcc",
+            "color": "#ffff00",
             "icon": "bubblingBeam",
             "maxAngleDiffInRevs": 0.01,
             "cooldown": 600,
@@ -16,7 +18,7 @@
             "lengthTicks": 20,
             "jitterRatio": 0.5,
             "projectile": {
-                "color": "#44ffcc",
+                "color": "#ffff00",
                 "density": 0.001,
                 "radius": 0.002,
                 "speed": 0.1,
