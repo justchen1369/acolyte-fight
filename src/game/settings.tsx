@@ -19,7 +19,7 @@ const Hero: HeroSettings = {
     MaxHealth: 100,
     SeparationImpulsePerTick: 0.01,
 
-    RevolutionsPerTick: 0.05,
+    RevolutionsPerTick: 1.0,
     MaxDashRange: 0.25,
 }
 
