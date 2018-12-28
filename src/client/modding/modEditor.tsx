@@ -8,6 +8,8 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
+import NavBar from '../ui/navbar';
+import NavBarItem from '../ui/navbarItem';
 import OverviewTab from './overviewTab';
 import SectionEditor from './sectionEditor';
 
@@ -71,7 +73,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     render() {
         return <div className="content-container full-height-page mod-editor">
-            <div className="tab-selector">
+            <NavBar>
                 {this.renderHomeHeader()}
                 {this.renderTabHeader("overview", "Modding")}
                 {this.renderTabHeader("spells", "Spells")}
@@ -80,7 +82,7 @@ class ModEditor extends React.PureComponent<Props, State> {
                 {this.renderTabHeader("maps", "Maps")}
                 {this.renderTabHeader("constants", "Constants")}
                 <div className="spacer"></div>
-            </div>
+            </NavBar>
             {this.state.tab === "overview" && <OverviewTab currentMod={this.state.currentMod} onUpdateMod={(mod) => this.updateMod(mod)} />}
             {this.state.tab === "spells" && this.renderSection("spells")}
             {this.state.tab === "sounds" && this.renderSection("sounds")}
@@ -91,20 +93,11 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     private renderHomeHeader() {
-        const className = classNames({
-            'tab-header': true,
-            'tab-disabled': !this.state.currentMod,
-        });
-        return <div className={className} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</div>;
+        return <NavBarItem disabled={!this.state.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</NavBarItem>;
     }
 
     private renderTabHeader(id: string, name: string) {
-        const className = classNames({
-            'tab-header': true,
-            'tab-selected': id === this.state.tab,
-            'error': id in this.state.errors,
-        });
-        return <div key={id} className={className} onMouseDown={() => this.setState({ tab: id })}>{name}</div>
+        return <NavBarItem key={id} selected={id === this.state.tab} badge={id in this.state.errors} onClick={() => this.setState({ tab: id })}>{name}</NavBarItem>
     }
 
     private renderSection(key: string) {

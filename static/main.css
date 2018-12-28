@@ -199,36 +199,6 @@ i.clickable:hover, i.clickable:active {
     flex-direction: column;
 }
 
-.tab-selector {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: row;
-}
-
-.tab-header {
-    font-weight: bold;
-
-    cursor: pointer;
-
-    display: inline-block;
-
-    padding: 15px 20px;
-    font-size: 20px;
-    box-sizing: border-box;
-}
-.tab-header.tab-selected {
-    color: #00ccff;
-}
-.tab-header:hover {
-    background: #555;
-}
-
-.tab-header.tab-disabled {
-    opacity: 0.5;
-    background: inherit;
-    cursor: not-allowed;
-}
-
 .navbar-container {
     width: 100%;
 }
@@ -275,6 +245,10 @@ i.clickable:hover, i.clickable:active {
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+}
+.navbar .nav-item.nav-item-disabled {
+    cursor: not-allowed;
+    color: #888;
 }
 .navbar.navbar-vertical .nav-item {
     font-size: 100%;

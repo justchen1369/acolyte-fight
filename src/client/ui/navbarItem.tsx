@@ -5,11 +5,13 @@ import * as pages from '../core/pages';
 import * as url from '../url';
 
 interface OwnProps {
-    page: string;
+    page?: string;
     profileId?: string;
     className?: string;
     shrink?: boolean;
     badge?: boolean;
+    disabled?: boolean;
+    selected?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
 }
 interface Props extends OwnProps {
@@ -32,11 +34,14 @@ class NavBarItem extends React.Component<Props> {
         if (this.props.className) {
             classNames.push(this.props.className);
         }
-        if (this.props.current.page === page) {
+        if (this.props.current.page === page || this.props.selected) {
             classNames.push("nav-item-selected");
         }
         if (this.props.shrink) {
             classNames.push("nav-optional");
+        }
+        if (this.props.disabled) {
+            classNames.push("nav-item-disabled");
         }
 
         const newPath = url.getPath(Object.assign({}, this.props.current, { page, profileId }));
@@ -49,8 +54,14 @@ class NavBarItem extends React.Component<Props> {
     }
 
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string, profileId: string) {
-        if (this.props.onClick) {
+        if (this.props.disabled) {
+            // do nothing
+            ev.preventDefault();
+        } else if (this.props.onClick) {
             this.props.onClick(ev);
+            if (!this.props.page) {
+                ev.preventDefault();
+            }
         } else {
             ev.preventDefault();
             pages.changePage(newPage, profileId);

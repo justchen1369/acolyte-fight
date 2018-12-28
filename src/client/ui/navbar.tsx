@@ -11,20 +11,25 @@ import LoginButton from './loginButton';
 import NavBarItem from './navbarItem';
 import RatingControl from './ratingControl';
 
+interface OwnProps {
+    children?: JSX.Element[];
+}
 interface Props {
     page: string;
     userId: string;
     isUsingAI: boolean;
     isModded: boolean;
     inParty: boolean;
+    children?: JSX.Element[];
 }
 
 interface State {
     open: boolean;
 }
 
-function stateToProps(state: s.State): Props {
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
+        ...ownProps,
         page: state.current.page,
         userId: state.userId,
         isUsingAI: !!state.aiCode,
@@ -52,11 +57,21 @@ class NavBar extends React.Component<Props, State> {
     }
 
     render() {
-        if (this.props.page === "") {
+        if (this.props.children) {
+            return this.renderCustom();
+        } else if (this.props.page === "") {
             return this.renderNavBar();
         } else {
             return this.renderBackToHome();
         }
+    }
+
+    private renderCustom() {
+        return <div className="navbar-container">
+            <div className="navbar navbar-horizontal">
+                {this.props.children}
+            </div>
+        </div>
     }
 
     private renderBackToHome() {
