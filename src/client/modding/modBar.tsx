@@ -4,10 +4,10 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
+import * as editing from './editing';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
-import * as selectors from './selectors';
 import * as StoreProvider from '../storeProvider';
 import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
@@ -22,7 +22,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = selectors.codeToMod(state.codeTree);
+    const modResult = editing.codeToMod(state.codeTree);
     return {
         codeTree: state.codeTree,
         currentMod: modResult.mod,

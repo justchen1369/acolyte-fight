@@ -7,7 +7,7 @@ import * as e from './editor.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as audio from '../core/audio';
-import * as selectors from './selectors';
+import * as editing from './editing';
 import SectionEditor from './sectionEditor';
 
 const center = pl.Vec2(0.5, 0.5);
@@ -22,7 +22,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const settings = selectors.codeToSettings(state.codeTree);
+    const settings = editing.codeToSettings(state.codeTree);
     return {
         settings,
         selectedId: state.current.hash,

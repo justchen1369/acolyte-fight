@@ -7,7 +7,6 @@ import * as e from './editor.model';
 import * as s from '../store.model';
 import * as convert from './convert';
 import * as pages from '../core/pages';
-import * as selectors from './selectors';
 import * as StoreProvider from '../storeProvider';
 import ConstantEditor from './constantEditor';
 import ModBar from './modBar';

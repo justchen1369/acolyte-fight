@@ -5,7 +5,6 @@ import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as editing from './editing';
-import * as selectors from './selectors';
 
 interface OwnProps {
     layoutId?: string;
@@ -15,7 +14,7 @@ interface Props extends OwnProps {
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const modResult = selectors.codeToMod(state.codeTree);
+    const modResult = editing.codeToMod(state.codeTree);
     return {
         ...ownProps,
         mod: modResult.mod,

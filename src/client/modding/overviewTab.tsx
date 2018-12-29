@@ -4,8 +4,8 @@ import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as convert from './convert';
+import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
-import * as selectors from './selectors';
 import * as StoreProvider from '../storeProvider';
 
 const FileSaver = require('../../lib/file-saver');
@@ -27,7 +27,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = selectors.codeToMod(state.codeTree);
+    const modResult = editing.codeToMod(state.codeTree);
     return {
         playerName: state.playerName,
         codeTree: state.codeTree,

@@ -7,7 +7,6 @@ import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as editing from './editing';
-import * as selectors from './selectors';
 import * as StoreProvider from '../storeProvider';
 
 interface OwnProps {
@@ -26,8 +25,8 @@ interface State {
 
 const noErrors = {}; // Reuse this to keep reference equality
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const modResult = selectors.codeToMod(state.codeTree);
-    const defaults = selectors.defaultTree[ownProps.sectionKey];
+    const modResult = editing.codeToMod(state.codeTree);
+    const defaults = editing.defaultTree[ownProps.sectionKey];
     return {
         ...ownProps,
         codeTree: state.codeTree,

@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
-import * as selectors from './selectors';
+import * as editing from './editing';
 import PreviewButton from './previewButton';
 import SectionEditor from './sectionEditor';
 
@@ -16,7 +16,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const settings = selectors.codeToSettings(state.codeTree);
+    const settings = editing.codeToSettings(state.codeTree);
     return {
         settings,
         selectedId: state.current.hash,
