@@ -111,9 +111,14 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 }
 
 export function isPartyReady(party: g.Party): boolean {
-    const relevant = [...party.active.values()].filter(p => p.isLeader || !p.isObserver)
-    const required = games.apportionPerGame(relevant.length);
-    return relevant.length > 0 && relevant.filter(p => p.ready).length >= required;
+    if (party.isPrivate) {
+        // Start private party games immediately
+        return [...party.active.values()].some(p => p.ready && !p.isObserver);
+    } else {
+        const relevant = [...party.active.values()].filter(p => p.isLeader || !p.isObserver)
+        const required = games.apportionPerGame(relevant.length);
+        return relevant.length > 0 && relevant.filter(p => p.ready).length >= required;
+    }
 }
 
 export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignment[]) {
