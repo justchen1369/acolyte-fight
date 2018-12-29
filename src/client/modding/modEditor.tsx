@@ -92,12 +92,7 @@ class ModEditor extends React.PureComponent<Props, State> {
                 {editing && this.renderTabHeader("maps", "Maps")}
                 {editing && this.renderTabHeader("constants", "Constants")}
             </CustomBar>
-            {this.state.tab === "overview" && this.renderOverviewTab()}
-            {this.state.tab === "spells" && this.renderSpellEditor("spells")}
-            {this.state.tab === "sounds" && this.renderSoundEditor("sounds")}
-            {this.state.tab === "icons" && this.renderIconEditor("icons")}
-            {this.state.tab === "maps" && this.renderMapEditor("maps")}
-            {this.state.tab === "constants" && this.renderConstantEditor("constants")}
+            {this.renderTab()}
         </div>
     }
 
@@ -112,6 +107,23 @@ class ModEditor extends React.PureComponent<Props, State> {
             badge={id in this.state.errors}
             error={id in this.state.errors}
             onClick={() => this.setState({ tab: id })}>{name}</HrefItem>
+    }
+
+    private renderTab() {
+        const editing = this.state.editing;
+        if (!editing) {
+            return this.renderOverviewTab();
+        }
+
+        switch (this.state.tab) {
+            case "spells": return this.renderSpellEditor("spells");
+            case "sounds": return this.renderSoundEditor("sounds");
+            case "icons": return this.renderIconEditor("icons");
+            case "maps": return this.renderMapEditor("maps");
+            case "constants": return this.renderConstantEditor("constants");
+            case "overview": return this.renderOverviewTab();
+            default: return this.renderOverviewTab();
+        }
     }
 
     private renderOverviewTab() {
