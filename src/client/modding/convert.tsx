@@ -140,7 +140,7 @@ function codeToIcons(codeTree: e.CodeTree, errorTree: e.ErrorTree): IconLookup {
             const json = JSON.parse(code);
 
             const id = json.id;
-            delete json[id];
+            delete json.id;
 
             icons[id] = json;
         } catch (exception) {

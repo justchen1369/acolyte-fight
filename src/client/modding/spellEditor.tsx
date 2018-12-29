@@ -13,7 +13,7 @@ interface Props {
 interface State {
 }
 
-class SoundEditor extends React.PureComponent<Props, State> {
+class SpellEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -25,9 +25,9 @@ class SoundEditor extends React.PureComponent<Props, State> {
             section={this.props.section}
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
-            prefix="sound"
+            prefix="spell"
             />
     }
 }
 
-export default SoundEditor;
+export default SpellEditor;

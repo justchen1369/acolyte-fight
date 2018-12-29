@@ -8,6 +8,9 @@ interface Props {
     section: e.CodeSection;
     errors: e.ErrorSection;
     onUpdate: (section: e.CodeSection) => void;
+
+    prefix?: string;
+    renderPreview?: (id: string) => React.ReactFragment;
 }
 interface State {
     selectedId: string;
@@ -29,13 +32,16 @@ class SectionEditor extends React.PureComponent<Props, State> {
                 selectedId={this.state.selectedId}
                 onUpdateSelected={selectedId => this.setState({ selectedId })}
                 onUpdate={section => this.props.onUpdate(section)}
+                prefix={this.props.prefix}
                 />
             <ItemEditor
                 selectedId={this.state.selectedId}
                 section={this.props.section}
                 errors={this.props.errors}
                 onUpdate={section => this.props.onUpdate(section)}
-                />
+                >
+                {this.props.renderPreview && this.props.renderPreview(this.state.selectedId)}
+                </ItemEditor>
         </div>
     }
 }

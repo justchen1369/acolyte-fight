@@ -7,13 +7,11 @@ interface Props {
     section: e.CodeSection;
     errors: e.ErrorSection;
     onUpdate: (section: e.CodeSection) => void;
-
-    settings: AcolyteFightSettings;
 }
 interface State {
 }
 
-class SoundEditor extends React.PureComponent<Props, State> {
+class ConstantEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -25,9 +23,8 @@ class SoundEditor extends React.PureComponent<Props, State> {
             section={this.props.section}
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
-            prefix="sound"
             />
     }
 }
 
-export default SoundEditor;
+export default ConstantEditor;

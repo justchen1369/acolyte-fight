@@ -8,12 +8,14 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
+import ConstantEditor from './constantEditor';
 import NavBar from '../ui/navbar';
 import NavBarItem from '../ui/navbarItem';
 import OverviewTab from './overviewTab';
 import IconEditor from './iconEditor';
-import SectionEditor from './sectionEditor';
+import MapEditor from './mapEditor';
 import SoundEditor from './soundEditor';
+import SpellEditor from './spellEditor';
 
 const applyMod = Reselect.createSelector(
     (mod: Object) => mod,
@@ -86,11 +88,11 @@ class ModEditor extends React.PureComponent<Props, State> {
                 <div className="spacer"></div>
             </NavBar>
             {this.state.tab === "overview" && <OverviewTab currentMod={this.state.currentMod} onUpdateMod={(mod) => this.updateMod(mod)} />}
-            {this.state.tab === "spells" && this.renderSection("spells")}
+            {this.state.tab === "spells" && this.renderSpellEditor("spells")}
             {this.state.tab === "sounds" && this.renderSoundEditor("sounds")}
             {this.state.tab === "icons" && this.renderIconEditor("icons")}
-            {this.state.tab === "maps" && this.renderSection("maps")}
-            {this.state.tab === "constants" && this.renderSection("constants")}
+            {this.state.tab === "maps" && this.renderMapEditor("maps")}
+            {this.state.tab === "constants" && this.renderConstantEditor("constants")}
         </div>
     }
 
@@ -101,17 +103,17 @@ class ModEditor extends React.PureComponent<Props, State> {
     private renderTabHeader(id: string, name: string) {
         return <NavBarItem key={id} selected={id === this.state.tab} badge={id in this.state.errors} onClick={() => this.setState({ tab: id })}>{name}</NavBarItem>
     }
-
-    private renderSection(key: string) {
-        return <SectionEditor
+    
+    private renderConstantEditor(key: string) {
+        return <ConstantEditor
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
             />
     }
 
-    private renderSoundEditor(key: string) {
-        return <SoundEditor
+    private renderIconEditor(key: string) {
+        return <IconEditor
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
@@ -119,8 +121,25 @@ class ModEditor extends React.PureComponent<Props, State> {
             />
     }
 
-    private renderIconEditor(key: string) {
-        return <IconEditor
+    private renderMapEditor(key: string) {
+        return <MapEditor
+            section={this.state.codeTree[key]}
+            errors={this.state.errors[key] || {}}
+            onUpdate={section => this.updateSection(key, section)}
+            />
+    }
+
+    private renderSpellEditor(key: string) {
+        return <SpellEditor
+            section={this.state.codeTree[key]}
+            errors={this.state.errors[key] || {}}
+            onUpdate={section => this.updateSection(key, section)}
+            settings={applyMod(this.state.currentMod)}
+            />
+    }
+
+    private renderSoundEditor(key: string) {
+        return <SoundEditor
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}

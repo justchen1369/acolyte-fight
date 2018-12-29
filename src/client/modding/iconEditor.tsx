@@ -1,8 +1,7 @@
 import _ from 'lodash';
 import * as React from 'react';
 import * as e from './editor.model';
-import EntityList from './entityList';
-import ItemEditor from './itemEditor';
+import SectionEditor from './sectionEditor';
 import SpellIcon from '../ui/spellIcon';
 
 interface Props {
@@ -13,38 +12,27 @@ interface Props {
     settings: AcolyteFightSettings;
 }
 interface State {
-    selectedId: string;
 }
 
 class IconEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedId: null,
         };
     }
 
     render() {
-        return <div className="json-editor">
-            <EntityList
-                section={this.props.section}
-                errors={this.props.errors}
-                selectedId={this.state.selectedId}
-                onUpdateSelected={selectedId => this.setState({ selectedId })}
-                onUpdate={section => this.props.onUpdate(section)}
-                prefix="icon"
-                />
-            <ItemEditor
-                selectedId={this.state.selectedId}
-                section={this.props.section}
-                errors={this.props.errors}
-                onUpdate={section => this.props.onUpdate(section)}>
-                {this.renderIconPreview(this.state.selectedId, this.props.settings)}
-            </ItemEditor>
-        </div>
+        return <SectionEditor
+            section={this.props.section}
+            errors={this.props.errors}
+            onUpdate={section => this.props.onUpdate(section)}
+            renderPreview={id => this.renderIconPreview(id)}
+            prefix="icon"
+            />
     }
 
-    private renderIconPreview(id: string, settings: AcolyteFightSettings): JSX.Element {
+    private renderIconPreview(id: string): JSX.Element {
+        const settings = this.props.settings;
         if (!settings) {
             return null;
         }
