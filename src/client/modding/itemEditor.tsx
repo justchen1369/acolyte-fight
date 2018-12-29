@@ -70,8 +70,8 @@ class ItemEditor extends React.PureComponent<Props, State> {
 
         const hasDefault = selectedId in this.props.default;
         const isModded = this.props.section[selectedId] !== this.props.default[selectedId];
-        const disabled = selectedId && hasDefault && isModded;
-        const className = classNames({ 'btn': true, 'btn-disabled': !disabled });
+        const disabled = !(selectedId && hasDefault && isModded);
+        const className = classNames({ 'btn': true, 'btn-disabled': disabled });
         return <div className={className} title="Revert to default settings" onClick={() => !disabled && this.onRevertClick()}><i className="fas fa-history" /></div>;
     }
 

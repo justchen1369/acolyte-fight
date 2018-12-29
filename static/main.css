@@ -177,7 +177,7 @@ a:hover, a:active {
     padding: 0.5em 0;
 }
 
-.button-row .btn:nth-child(n+2) {
+.button-row :nth-child(n+2) {
     margin-left: 0.5em;
 }
 
