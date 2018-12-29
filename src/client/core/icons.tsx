@@ -10,7 +10,7 @@ const iconToPathLookupSelector = Reselect.createSelector(
     (icons) => {
         const lookup: IconToPathLookup = {};
         for (const key of Object.keys(icons)) {
-            lookup[key] = new Path2D(icons[key]);
+            lookup[key] = new Path2D(icons[key].path);
         }
         return lookup;
     }
