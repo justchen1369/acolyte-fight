@@ -37,7 +37,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
         this.timerHandle = setInterval(() => this.onAudioTimer(), 16);
     }
     
-    componentDidUnmount() {
+    componentWillUnmount() {
         if (this.timerHandle) {
             clearInterval(this.timerHandle);
         }
