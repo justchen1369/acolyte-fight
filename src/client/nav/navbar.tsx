@@ -12,7 +12,7 @@ import NavBarItem from './navbarItem';
 import RatingControl from './ratingControl';
 
 interface OwnProps {
-    children?: JSX.Element[];
+    children?: React.ReactFragment;
 }
 interface Props {
     page: string;
@@ -20,7 +20,7 @@ interface Props {
     isUsingAI: boolean;
     isModded: boolean;
     inParty: boolean;
-    children?: JSX.Element[];
+    children?: React.ReactFragment;
 }
 
 interface State {

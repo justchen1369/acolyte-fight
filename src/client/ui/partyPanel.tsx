@@ -29,7 +29,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-function PartyMode(props: { selected: boolean, onClick: () => void, children?: JSX.Element }) {
+function PartyMode(props: { selected: boolean, onClick: () => void, children?: React.ReactFragment }) {
     const className = classNames({
         'party-mode-row': true,
         'party-mode-selected': props.selected,

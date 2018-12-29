@@ -45,7 +45,7 @@ class PlayButton extends React.Component<Props, State> {
         const party = this.props.party;
         const self = party && party.members.find(m => m.socketId === this.props.selfId);
 
-        let label: string | JSX.Element;
+        let label: React.ReactFragment;
         if (party && self && self.isObserver) {
             label = this.props.again ? "Continue" : "Watch";
         } else {
