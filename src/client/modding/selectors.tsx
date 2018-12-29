@@ -9,6 +9,10 @@ export const settingsToCodeTree = Reselect.createSelector(
     (settings: AcolyteFightSettings) => settings,
     (settings) => convert.settingsToCode(settings));
 
+export const codeTreeToSettings = Reselect.createSelector(
+    (codeTree: e.CodeTree) => codeTree,
+    (codeTree: e.CodeTree) => applyMod(createMod(codeTree).mod));
+
 export const applyMod = Reselect.createSelector(
     (mod: ModTree) => mod,
     (mod: ModTree) => {

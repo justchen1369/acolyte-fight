@@ -1,30 +1,54 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
+import * as s from '../store.model';
 import CodeEditor from './codeEditor';
+import * as editing from './editing';
+import * as selectors from './selectors';
 
-interface Props {
+interface OwnProps {
+    sectionKey: string;
+}
+interface Props extends OwnProps {
+    codeTree: e.CodeTree;
     selectedId: string;
-    default: e.CodeSection;
+    defaults: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
-    onUpdate: (section: e.CodeSection) => void;
     children?: React.ReactFragment;
 }
 interface State {
-    saved: boolean;
+}
+
+const noErrors = {}; // Reuse this to keep reference equality
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    const modResult = selectors.createMod(state.codeTree);
+    const defaults = selectors.defaultTree[ownProps.sectionKey];
+    return {
+        ...ownProps,
+        codeTree: state.codeTree,
+        defaults,
+        section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
+        errors: modResult.errors[ownProps.sectionKey] || noErrors,
+        selectedId: state.current.hash,
+    };
 }
 
 class ItemEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            saved: false,
         };
     }
 
     render() {
+        const codeTree = this.props.codeTree;
+        if (!codeTree) {
+            return null;
+        }
+
         const id = this.props.selectedId;
         if (id) {
             const error = this.props.errors[id];
@@ -56,10 +80,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     private onCodeChange(id: string, code: string) {
-        const section = { ...this.props.section };
-        section[id] = code;
-
-        this.props.onUpdate(section);
+        editing.updateItem(this.props.sectionKey, id, code);
     }
 
     private renderRevertButton() {
@@ -68,8 +89,8 @@ class ItemEditor extends React.PureComponent<Props, State> {
             return null;
         }
 
-        const hasDefault = selectedId in this.props.default;
-        const isModded = this.props.section[selectedId] !== this.props.default[selectedId];
+        const hasDefault = selectedId in this.props.defaults;
+        const isModded = this.props.section[selectedId] !== this.props.defaults[selectedId];
         const disabled = !(selectedId && hasDefault && isModded);
         const className = classNames({ 'btn': true, 'btn-disabled': disabled });
         return <div className={className} title="Revert to default settings" onClick={() => !disabled && this.onRevertClick()}><i className="fas fa-history" /></div>;
@@ -81,18 +102,13 @@ class ItemEditor extends React.PureComponent<Props, State> {
             return;
         }
 
-        const section: e.CodeSection = {
-            ...this.props.section,
-        };
-        delete section[selectedId];
-
-        if (selectedId in this.props.default) {
-            section[selectedId] = this.props.default[selectedId];
+        if (selectedId in this.props.defaults) {
+            editing.updateItem(this.props.sectionKey, selectedId, this.props.defaults[selectedId]);
+        } else {
+            editing.deleteItem(this.props.sectionKey, selectedId);
         }
-
-        this.props.onUpdate(section);
     }
 
 }
 
-export default ItemEditor;
+export default ReactRedux.connect(stateToProps)(ItemEditor);

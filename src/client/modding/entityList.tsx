@@ -2,22 +2,40 @@ import _ from 'lodash';
 import uniqid from 'uniqid';
 import classNames from 'classnames';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
+import * as s from '../store.model';
+import * as editing from './editing';
+import * as selectors from './selectors';
+import * as StoreProvider from '../storeProvider';
 
-interface Props {
-    default: e.CodeSection;
+interface OwnProps {
+    sectionKey: string;
+    addRemovePrefix?: string;
+}
+interface Props extends OwnProps {
+    codeTree: e.CodeTree;
+    defaults: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
     selectedId: string;
-    onUpdate: (section: e.CodeSection) => void;
-    onUpdateSelected: (selectedId: string) => void;
-
-    addRemovePrefix?: string;
-
-    children?: React.ReactFragment;
 }
 interface State {
+}
+
+const noErrors = {}; // Reuse this to keep reference equality
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    const modResult = selectors.createMod(state.codeTree);
+    const defaults = selectors.defaultTree[ownProps.sectionKey];
+    return {
+        ...ownProps,
+        codeTree: state.codeTree,
+        defaults,
+        section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
+        errors: modResult.errors[ownProps.sectionKey] || noErrors,
+        selectedId: state.current.hash,
+    };
 }
 
 class EntityList extends React.PureComponent<Props, State> {
@@ -36,6 +54,11 @@ class EntityList extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const codeTree = this.props.codeTree;
+        if (!codeTree) {
+            return null;
+        }
+
         return <div className="entity-panel">
             <div className="entity-list">
                 {this.idSelector(this.props.section).map(id => this.renderOption(id))}
@@ -43,13 +66,12 @@ class EntityList extends React.PureComponent<Props, State> {
             <div className="button-row">
                 {this.renderAddButton()}
                 {this.renderRemoveButton()}
-                {this.props.children}
             </div>
         </div>;
     }
 
     private renderOption(id: string) {
-        const isModded = this.props.section[id] !== this.props.default[id];
+        const isModded = this.props.section[id] !== this.props.defaults[id];
         const className = classNames({
             'entity-list-item': true,
             'selected': id === this.props.selectedId,
@@ -60,7 +82,7 @@ class EntityList extends React.PureComponent<Props, State> {
         return <div
             key={id}
             className={className}
-            onMouseDown={() => this.props.onUpdateSelected(id)}
+            onMouseDown={() => editing.updateSelected(id)}
             >{id}</div>
     }
 
@@ -81,7 +103,7 @@ class EntityList extends React.PureComponent<Props, State> {
         }
 
         const selectedId = this.props.selectedId;
-        const undeletable = selectedId && (selectedId in this.props.default);
+        const undeletable = selectedId && (selectedId in this.props.defaults);
         const disabled = undeletable || !selectedId;
         const className = classNames({ 'btn': true, 'btn-disabled': disabled });
         return <div className={className} title="Remove" onClick={() => !disabled && this.onRemoveClick()}><i className="fas fa-trash" /></div>;
@@ -103,13 +125,8 @@ class EntityList extends React.PureComponent<Props, State> {
             json = { id };
         }
 
-        const section: e.CodeSection = {
-            ...this.props.section,
-            [id]: JSON.stringify(json, null, "\t"),
-        };
-
-        this.props.onUpdate(section);
-        this.props.onUpdateSelected(id);
+        editing.updateItem(this.props.sectionKey, id, code);
+        editing.updateSelected(id);
     }
     
     private onRemoveClick() {
@@ -117,13 +134,9 @@ class EntityList extends React.PureComponent<Props, State> {
             return;
         }
 
-        const section: e.CodeSection = {
-            ...this.props.section,
-        };
-        delete section[this.props.selectedId];
-        this.props.onUpdate(section);
-        this.props.onUpdateSelected(null);
+        editing.deleteItem(this.props.sectionKey, this.props.selectedId);
+        editing.updateSelected(null);
     }
 }
 
-export default EntityList;
+export default ReactRedux.connect(stateToProps)(EntityList);

@@ -2,27 +2,31 @@ import _ from 'lodash';
 import uniqid from 'uniqid';
 import * as pl from 'planck-js';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as audio from '../core/audio';
+import * as selectors from './selectors';
 import SectionEditor from './sectionEditor';
 
 const center = pl.Vec2(0.5, 0.5);
 
 interface Props {
-    default: e.CodeSection;
-    section: e.CodeSection;
-    errors: e.ErrorSection;
-    onUpdate: (section: e.CodeSection) => void;
-
     settings: AcolyteFightSettings;
-
     selectedId: string;
-    onSelected: (selectedId: string) => void;
 }
 interface State {
     currentAudioElement: w.AudioElement;
     audioCancelTime: number;
+}
+
+function stateToProps(state: s.State): Props {
+    const settings = selectors.codeTreeToSettings(state.codeTree);
+    return {
+        settings,
+        selectedId: state.current.hash,
+    };
 }
 
 class SoundEditor extends React.PureComponent<Props, State> {
@@ -47,23 +51,11 @@ class SoundEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <SectionEditor
-            default={this.props.default}
-            section={this.props.section}
-            errors={this.props.errors}
-            onUpdate={section => this.props.onUpdate(section)}
-            renderPreview={(id) => this.renderPreview(id)}
-            addRemovePrefix="sound"
-            onSelected={this.props.onSelected}
-            selectedId={this.props.selectedId}
-            />
-    }
-
-    private renderPreview(id: string) {
-        return <>
+        const id = this.props.selectedId;
+        return <SectionEditor sectionKey="sounds" addRemovePrefix="sound">
             {(this.state.currentAudioElement) && <div className="btn" onClick={() => this.onStopClick()}>Stop</div>}
             {(this.props.settings && id) && <div className="btn" onClick={() => this.onPreviewClick(id)}>Preview</div>}
-        </>;
+        </SectionEditor>;
     }
 
     private onPreviewClick(soundId: string) {
@@ -104,4 +96,4 @@ class SoundEditor extends React.PureComponent<Props, State> {
     }
 }
 
-export default SoundEditor;
+export default ReactRedux.connect(stateToProps)(SoundEditor);

@@ -1,21 +1,25 @@
 import _ from 'lodash';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
+import * as s from '../store.model';
+import * as selectors from './selectors';
 import SectionEditor from './sectionEditor';
 import SpellIcon from '../controls/spellIcon';
 
 interface Props {
-    default: e.CodeSection;
-    section: e.CodeSection;
-    errors: e.ErrorSection;
-    onUpdate: (section: e.CodeSection) => void;
-
     settings: AcolyteFightSettings;
-
     selectedId: string;
-    onSelected: (selectedId: string) => void;
 }
 interface State {
+}
+
+function stateToProps(state: s.State): Props {
+    const settings = selectors.codeTreeToSettings(state.codeTree);
+    return {
+        settings,
+        selectedId: state.current.hash,
+    };
 }
 
 class IconEditor extends React.PureComponent<Props, State> {
@@ -26,16 +30,9 @@ class IconEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <SectionEditor
-            default={this.props.default}
-            section={this.props.section}
-            errors={this.props.errors}
-            onUpdate={section => this.props.onUpdate(section)}
-            renderPreview={id => this.renderIconPreview(id)}
-            onSelected={this.props.onSelected}
-            selectedId={this.props.selectedId}
-            addRemovePrefix="icon"
-            />
+        return <SectionEditor sectionKey="icons" addRemovePrefix="icon">
+            {this.renderIconPreview(this.props.selectedId)}
+        </SectionEditor>
     }
 
     private renderIconPreview(id: string): JSX.Element {
@@ -63,4 +60,4 @@ class IconEditor extends React.PureComponent<Props, State> {
     }
 }
 
-export default IconEditor;
+export default ReactRedux.connect(stateToProps)(IconEditor);

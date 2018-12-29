@@ -111,6 +111,8 @@ export type Action =
     | UpdateGameStatsAction
     | UpdateHasReplayAction
     | UpdateCodeTreeAction
+    | UpdateCodeTreeItemAction
+    | DeleteCodeTreeItemAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -261,6 +263,25 @@ export interface UpdateHasReplayAction {
 export interface UpdateCodeTreeAction {
     type: "updateCodeTree";
     codeTree: e.CodeTree;
+}
+
+export interface UpdateCodeTreeSectionAction {
+    type: "updateCodeSection";
+    sectionKey: string;
+    section: e.CodeSection;
+}
+
+export interface UpdateCodeTreeItemAction {
+    type: "updateCodeItem";
+    sectionKey: string;
+    itemId: string;
+    code: string;
+}
+
+export interface DeleteCodeTreeItemAction {
+    type: "deleteCodeItem";
+    sectionKey: string;
+    itemId: string;
 }
 
 

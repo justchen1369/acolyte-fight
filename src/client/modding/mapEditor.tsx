@@ -1,22 +1,26 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
+import * as s from '../store.model';
+import * as selectors from './selectors';
+import PreviewButton from './previewButton';
 import SectionEditor from './sectionEditor';
 
 interface Props {
-    default: e.CodeSection;
-    section: e.CodeSection;
-    errors: e.ErrorSection;
-    onUpdate: (section: e.CodeSection) => void;
-    onPreview: (layoutId: string) => void;
-
     settings: AcolyteFightSettings;
-
     selectedId: string;
-    onSelected: (selectedId: string) => void;
 }
 interface State {
+}
+
+function stateToProps(state: s.State): Props {
+    const settings = selectors.codeTreeToSettings(state.codeTree);
+    return {
+        settings,
+        selectedId: state.current.hash,
+    };
 }
 
 class MapEditor extends React.PureComponent<Props, State> {
@@ -27,29 +31,11 @@ class MapEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <SectionEditor
-            default={this.props.default}
-            section={this.props.section}
-            errors={this.props.errors}
-            onUpdate={section => this.props.onUpdate(section)}
-            renderPreview={(id) => this.renderPreview(id)}
-            addRemovePrefix="map"
-            onSelected={this.props.onSelected}
-            selectedId={this.props.selectedId}
-            />
-    }
-
-    private renderPreview(layoutId: string) {
-        if (!layoutId) {
-            return null;
-        }
-
-        const className = classNames({
-            'btn': true,
-            'btn-disabled': !this.props.settings,
-        });
-        return <div className={className} onClick={() => this.props.onPreview(layoutId)}>Preview</div>
+        const layoutExists = this.props.selectedId && (this.props.selectedId in this.props.settings.Layouts);
+        return <SectionEditor sectionKey="maps" addRemovePrefix="map">
+            {layoutExists && <PreviewButton layoutId={this.props.selectedId} />}
+        </SectionEditor>
     }
 }
 
-export default MapEditor;
+export default ReactRedux.connect(stateToProps)(MapEditor);

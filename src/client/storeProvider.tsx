@@ -217,6 +217,29 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, hasReplayLookup };
     } else if (action.type === "updateCodeTree") {
         return { ...state, codeTree: action.codeTree };
+    } else if (action.type === "updateCodeItem") {
+        return {
+            ...state,
+            codeTree: {
+                ...state.codeTree,
+                [action.sectionKey]: {
+                    ...state.codeTree[action.sectionKey],
+                    [action.itemId]: action.code,
+                },
+            },
+        };
+    } else if (action.type === "deleteCodeItem") {
+        const newSection = { ...state.codeTree[action.sectionKey] };
+        delete newSection[action.itemId];
+
+        const newState = {
+            ...state,
+            codeTree: {
+                ...state.codeTree,
+                [action.sectionKey]: newSection,
+            },
+        };
+        return newState;
     } else {
         console.log(action);
         return state;

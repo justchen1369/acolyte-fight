@@ -6,12 +6,8 @@ import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as convert from './convert';
-import * as matches from '../core/matches';
 import * as pages from '../core/pages';
-import * as parties from '../core/parties';
-import * as rooms from '../core/rooms';
 import * as selectors from './selectors';
-import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
 import ConstantEditor from './constantEditor';
 import ModBar from './modBar';
@@ -80,100 +76,23 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
     
     private renderConstantEditor(key: string) {
-        return <ConstantEditor
-            default={selectors.defaultTree[key]}
-            section={this.props.codeTree[key]}
-            errors={this.props.errors[key] || {}}
-            onUpdate={section => this.updateSection(key, section)}
-            onPreview={() => this.onPreviewClick()}
-            settings={selectors.applyMod(this.props.currentMod)}
-            selectedId={this.props.selectedId}
-            onSelected={selectedId => this.updateSelectedId(selectedId)}
-            />
+        return <ConstantEditor />
     }
 
     private renderIconEditor(key: string) {
-        return <IconEditor
-            default={selectors.defaultTree[key]}
-            section={this.props.codeTree[key]}
-            errors={this.props.errors[key] || {}}
-            onUpdate={section => this.updateSection(key, section)}
-            settings={selectors.applyMod(this.props.currentMod)}
-            selectedId={this.props.selectedId}
-            onSelected={selectedId => this.updateSelectedId(selectedId)}
-            />
+        return <IconEditor />
     }
 
     private renderMapEditor(key: string) {
-        return <MapEditor
-            default={selectors.defaultTree[key]}
-            section={this.props.codeTree[key]}
-            errors={this.props.errors[key] || {}}
-            onUpdate={section => this.updateSection(key, section)}
-            onPreview={(layoutId) => this.onPreviewClick(layoutId)}
-            settings={selectors.applyMod(this.props.currentMod)}
-            selectedId={this.props.selectedId}
-            onSelected={selectedId => this.updateSelectedId(selectedId)}
-            />
+        return <MapEditor />
     }
 
     private renderSpellEditor(key: string) {
-        return <SpellEditor
-            default={selectors.defaultTree[key]}
-            section={this.props.codeTree[key]}
-            errors={this.props.errors[key] || {}}
-            onUpdate={section => this.updateSection(key, section)}
-            onPreview={() => this.onPreviewClick()}
-            settings={selectors.applyMod(this.props.currentMod)}
-            selectedId={this.props.selectedId}
-            onSelected={selectedId => this.updateSelectedId(selectedId)}
-            />
+        return <SpellEditor />
     }
 
     private renderSoundEditor(key: string) {
-        return <SoundEditor
-            default={selectors.defaultTree[key]}
-            section={this.props.codeTree[key]}
-            errors={this.props.errors[key] || {}}
-            onUpdate={section => this.updateSection(key, section)}
-            settings={selectors.applyMod(this.props.currentMod)}
-            selectedId={this.props.selectedId}
-            onSelected={selectedId => this.updateSelectedId(selectedId)}
-            />
-    }
-
-    private updateSelectedId(selectedId: string) {
-        StoreProvider.dispatch({ type: "updateHash", hash: selectedId });
-    }
-
-    private updateSection(key: string, section: e.CodeSection) {
-        const codeTree = {
-            ...this.props.codeTree,
-            [key]: section,
-        };
-        this.updateCode(codeTree);
-    }
-
-    private updateCode(codeTree: e.CodeTree) {
-        StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
-    }
-
-    private async onHomeClick() {
-        const mod = this.props.currentMod;
-        if (mod) {
-            const roomId = await rooms.createRoomAsync(mod)
-            await rooms.joinRoomAsync(roomId);
-            await parties.movePartyAsync(roomId);
-            await pages.changePage("");
-        }
-    }
-
-    private async onPreviewClick(layoutId: string = null) {
-        const mod = this.props.currentMod;
-        if (mod) {
-            const roomId = await rooms.createRoomAsync(mod)
-            await matches.joinNewGame({ layoutId, roomId });
-        }
+        return <SoundEditor />
     }
 }
 

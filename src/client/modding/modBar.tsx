@@ -73,7 +73,7 @@ class ModBar extends React.PureComponent<Props, State> {
     }
 
     private async onHomeClick() {
-        const mod = this.props.currentMod;
+        const mod = this.props.codeTree ? this.props.currentMod : {};
         if (mod) {
             const roomId = await rooms.createRoomAsync(mod)
             await rooms.joinRoomAsync(roomId);
