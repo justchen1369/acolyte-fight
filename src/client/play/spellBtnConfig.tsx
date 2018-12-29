@@ -88,7 +88,6 @@ class SpellKeyConfig extends React.Component<Props, State> {
     }
 
     private onMouseHoverSpell(hovering: string) {
-        console.log("hovering", hovering);
         this.setState({ hovering });
     }
 
