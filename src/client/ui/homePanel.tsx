@@ -8,7 +8,7 @@ import * as url from '../url';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
 import PlayButton from './playButton';
-import SocialBar from './socialBar';
+import SocialBar from '../controls/socialBar';
 import SpellBtnConfig from './spellConfig';
 import Link from '../controls/link';
 import NavBar from '../nav/navbar';

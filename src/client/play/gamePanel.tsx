@@ -5,16 +5,16 @@ import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
-import * as screenLifecycle from './screenLifecycle';
+import * as screenLifecycle from '../ui/screenLifecycle';
 
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
-import SocialBar from './socialBar';
+import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
-import UrlListener from './urlListener';
-import WatchLooper from './watchLooper';
+import UrlListener from '../controls/urlListener';
+import WatchLooper from '../controls/watchLooper';
 
 import { isMobile } from '../core/userAgent';
 

@@ -8,7 +8,7 @@ import AccountPanel from './accountPanel';
 import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
 import EditorPage from './editorPage';
-import GamePanel from './gamePanel';
+import GamePanel from '../play/gamePanel';
 import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
 import PartyPanel from './partyPanel';
@@ -18,8 +18,8 @@ import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
-import UrlListener from './urlListener';
-import WatchLooper from './watchLooper';
+import UrlListener from '../controls/urlListener';
+import WatchLooper from '../controls/watchLooper';
 
 interface Props {
     myGameId: string;
