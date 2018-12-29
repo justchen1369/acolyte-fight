@@ -93,7 +93,7 @@ class PlayButton extends React.Component<Props, State> {
 
         await options.getProvider().commercialBreak();
 
-        matches.joinNewGame();
+        matches.joinNewGame({});
     }
 
     private onPartyReadyClicked(ready: boolean) {

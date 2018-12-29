@@ -12,20 +12,26 @@ import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { socket } from './sockets';
 
-export async function joinNewGame(observeGameId?: string, live: boolean = false): Promise<boolean> {
+export interface JoinParams {
+	observeGameId?: string;
+	live?: boolean;
+}
+
+export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
-		const observe = live || !!observeGameId;
+		const live = opts.live || false;
+		const observe = live || !!opts.observeGameId;
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
 			leaveCurrentGame(false);
 
 			const msg: m.JoinMsg = {
-				gameId: observeGameId || null,
+				gameId: opts.observeGameId || null,
 				name: store.playerName,
 				keyBindings: store.keyBindings,
 				room: store.room.id,
-				isBot: ai.playingAsAI(store) && !observeGameId,
+				isBot: ai.playingAsAI(store) && !opts.observeGameId,
 				isMobile,
 				observe,
 				live,
@@ -41,8 +47,8 @@ export async function joinNewGame(observeGameId?: string, live: boolean = false)
 			});
 		} else {
 			// New server? Reload the client, just in case the version has changed.
-			if (observeGameId) {
-				window.location.href = url.getPath({ ...store.current, gameId: observeGameId, server: null });
+			if (opts.observeGameId) {
+				window.location.href = url.getPath({ ...store.current, gameId: opts.observeGameId, server: null });
 			} else {
 				const hash = live ? "watch" : "join";
 				window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
@@ -54,7 +60,7 @@ export async function joinNewGame(observeGameId?: string, live: boolean = false)
 }
 
 export async function watchLiveGame() {
-	return await joinNewGame(null, true);
+	return await joinNewGame({ live: true });
 }
 
 export function addBotToCurrentGame() {

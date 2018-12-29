@@ -24,7 +24,7 @@ export function reloadPageIfNecessary() {
 export function go(elems: s.PathElements) {
     const store = StoreProvider.getState();
     if (elems.gameId && store.world.ui.myGameId !== elems.gameId) {
-        matches.joinNewGame(elems.gameId);
+        matches.joinNewGame({ observeGameId: elems.gameId });
     } else {
         if (store.world.ui.myGameId) {
             matches.leaveCurrentGame();

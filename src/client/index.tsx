@@ -127,7 +127,7 @@ async function start() {
             if (query.hash === "#join") {
                 // Return to the home page when we exit
                 StoreProvider.dispatch({ type: "updatePage", page: "" });
-                await matches.joinNewGame(query.gameId);
+                await matches.joinNewGame({ observeGameId: query.gameId });
             } else if (query.hash === "#watch" || query.page === "watch") {
                 await matches.watchLiveGame();
             } else {
