@@ -1177,8 +1177,6 @@ const Sounds: Sounds = {
             },
         ],
     },
-    "kamehameha": {
-    },
     "meteor": {
         start: [
             {
