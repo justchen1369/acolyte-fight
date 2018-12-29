@@ -14,10 +14,8 @@ import * as selectors from './selectors';
 import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
 import ConstantEditor from './constantEditor';
-import CustomBar from '../nav/customBar';
-import HrefItem from '../nav/hrefItem';
+import ModBar from './modBar';
 import OverviewTab from './overviewTab';
-import PageLink from '../nav/pageLink';
 import IconEditor from './iconEditor';
 import MapEditor from './mapEditor';
 import SoundEditor from './soundEditor';
@@ -54,38 +52,11 @@ class ModEditor extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.mod !== this.props.mod) {
-            this.updateMod(newProps.mod);
-        }
-    }
-
     render() {
-        const editing = !!this.props.codeTree;
         return <div className="content-container full-height-page mod-editor">
-            <CustomBar>
-                {this.renderHomeHeader()}
-                {editing && this.renderTabHeader("modding", "Overview")}
-                {editing && this.renderTabHeader("modding-spells", "Spells")}
-                {editing && this.renderTabHeader("modding-sounds", "Sounds")}
-                {editing && this.renderTabHeader("modding-icons", "Icons")}
-                {editing && this.renderTabHeader("modding-maps", "Maps")}
-                {editing && this.renderTabHeader("modding-constants", "Constants")}
-            </CustomBar>
+            <ModBar />
             {this.renderTab()}
         </div>
-    }
-
-    private renderHomeHeader() {
-        return <HrefItem onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> {this.props.codeTree ? "Play with Mod" : "Back to Home"}</HrefItem>;
-    }
-
-    private renderTabHeader(id: string, name: string) {
-        return <PageLink
-            key={id}
-            page={id}
-            badge={id in this.props.errors}
-            error={id in this.props.errors}>{name}</PageLink>
     }
 
     private renderTab() {
@@ -185,13 +156,6 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private updateCode(codeTree: e.CodeTree) {
         StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
-    }
-
-    private updateMod(mod: Object) {
-        StoreProvider.dispatch({
-            type: "updateCodeTree",
-            codeTree: convert.settingsToCode(selectors.applyMod(mod)),
-        });
     }
 
     private async onHomeClick() {
