@@ -7,7 +7,7 @@ import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
-import NavBarItem from './navbarItem';
+import PageLink from './pageLink';
 
 interface Props {
     userId: string;
@@ -39,9 +39,9 @@ class RatingControl extends React.Component<Props> {
 
     private renderRank(rating: m.UserRating) {
         const league = rankings.getLeagueName(rating.percentile);
-        return <NavBarItem shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
+        return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
             <b>{league}</b> {rating.lowerBound.toFixed(0)}
-        </NavBarItem>
+        </PageLink>
     }
 
     private getRating() {

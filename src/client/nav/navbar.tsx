@@ -9,7 +9,7 @@ import * as url from '../url';
 import { isMobile } from '../core/userAgent';
 import LoginButton from './loginButton';
 import CustomBar from './customBar';
-import NavBarItem from './navbarItem';
+import PageLink from './pageLink';
 import RatingControl from './ratingControl';
 
 interface Props {
@@ -50,7 +50,7 @@ class NavBar extends React.Component<Props, State> {
 
     private renderBackToHome() {
         return <CustomBar>
-            <NavBarItem page=""><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</NavBarItem>
+            <PageLink page=""><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</PageLink>
             <div className="spacer" />
             <LoginButton />
         </CustomBar>
@@ -59,26 +59,26 @@ class NavBar extends React.Component<Props, State> {
     private renderNavBar() {
         const a = options.getProvider();
         const horizontal = <>
-            {!a.noScrolling && <NavBarItem page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></NavBarItem>}
-            {!a.noExternalLinks && <NavBarItem page="regions"><i className="fas fa-globe-americas" title="Regions" /></NavBarItem>}
-            {this.props.isModded && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></NavBarItem>}
-            {this.props.isUsingAI && <NavBarItem page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></NavBarItem>}
-            {this.props.inParty && <NavBarItem page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></NavBarItem>}
+            {!a.noScrolling && <PageLink page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>}
+            {!a.noExternalLinks && <PageLink page="regions"><i className="fas fa-globe-americas" title="Regions" /></PageLink>}
+            {this.props.isModded && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></PageLink>}
+            {this.props.isUsingAI && <PageLink page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></PageLink>}
+            {this.props.inParty && <PageLink page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></PageLink>}
             <div className="spacer" />
             <RatingControl />
             <LoginButton />
         </>;
 
         const vertical = a.noMenu ? null : <>
-            <NavBarItem page=""><i className="icon fas fa-home" /> Home</NavBarItem>
-            {!a.noScrolling && <NavBarItem page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</NavBarItem>}
-            <NavBarItem page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</NavBarItem>
-            {!a.noExternalLinks && <NavBarItem page="regions"><i className="icon fas fa-globe-americas" /> Regions</NavBarItem>}
-            {!a.noExternalLinks && <NavBarItem page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</NavBarItem>}
-            {!a.noScrolling && <NavBarItem page="settings"><i className="icon fas fa-cog" /> Settings</NavBarItem>}
+            <PageLink page=""><i className="icon fas fa-home" /> Home</PageLink>
+            {!a.noScrolling && <PageLink page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</PageLink>}
+            <PageLink page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
+            {!a.noExternalLinks && <PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
+            {!a.noExternalLinks && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
+            {!a.noScrolling && <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>}
             <div className="spacer" />
-            {!a.noAdvanced && !isMobile && <NavBarItem page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</NavBarItem>}
-            {!a.noExternalLinks && <NavBarItem page="about"><i className="icon fas fa-info-circle" /> About</NavBarItem>}
+            {!a.noAdvanced && !isMobile && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}
+            {!a.noExternalLinks && <PageLink page="about"><i className="icon fas fa-info-circle" /> About</PageLink>}
         </>;
         return <CustomBar vertical={vertical}>{horizontal}</CustomBar>
     }

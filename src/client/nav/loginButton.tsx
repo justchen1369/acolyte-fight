@@ -8,7 +8,7 @@ import * as options from '../options';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import HrefItem from './hrefItem';
-import NavBarItem from './navbarItem';
+import PageLink from './pageLink';
 
 interface Props {
     loginAttempted: boolean;
@@ -52,7 +52,7 @@ class LoginButton extends React.Component<Props> {
 
     private renderProfileLink() {
         if (this.props.userId) {
-            return <NavBarItem key="profile" page="profile" className="nav-profile-item" profileId={this.props.userId}>{this.props.playerName}</NavBarItem>
+            return <PageLink key="profile" page="profile" className="nav-profile-item" profileId={this.props.userId}>{this.props.playerName}</PageLink>
         } else {
             return null;
         }

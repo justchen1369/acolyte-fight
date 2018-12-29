@@ -29,7 +29,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class NavBarItem extends React.Component<Props> {
+class PageLink extends React.Component<Props> {
     render() {
         const page = this.props.page;
         const profileId = this.props.profileId || null;
@@ -63,4 +63,4 @@ class NavBarItem extends React.Component<Props> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(NavBarItem);
+export default ReactRedux.connect(stateToProps)(PageLink);
