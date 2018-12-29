@@ -1,14 +1,17 @@
 import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
+import * as s from '../store.model';
 import * as convert from './convert';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
+import * as StoreProvider from '../storeProvider';
 import ConstantEditor from './constantEditor';
 import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
@@ -49,8 +52,11 @@ interface ModResult {
     errors?: e.ErrorTree;
 }
 
-interface Props {
+interface OwnProps {
     mod: Object;
+}
+interface Props extends OwnProps {
+   current: s.PathElements; 
 }
 interface State {
     editing: boolean;
@@ -58,6 +64,38 @@ interface State {
     currentMod: Object;
     errors: e.ErrorTree;
     tab: string;
+    selectedId: string;
+}
+
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        current: state.current,
+    };
+}
+
+function parseSelection(current: s.PathElements): e.Selection {
+    if (current.hash) {
+        let [tab, selectedId] = current.hash.split("/");
+
+        tab = tab || "";
+        selectedId = selectedId || null;
+        if (selectedId === "") {
+            selectedId = null;
+        }
+
+        return { tab, selectedId };
+    } else {
+        return { tab: "", selectedId: null };
+    }
+}
+
+function formatSelection(current: s.PathElements, selection: e.Selection): s.PathElements {
+    let hash = (selection.tab || "");
+    if (selection.selectedId) {
+        hash += "/" + selection.selectedId;
+    }
+    return { ...current, hash };
 }
 
 class ModEditor extends React.PureComponent<Props, State> {
@@ -65,12 +103,15 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     constructor(props: Props) {
         super(props);
+
+        const selection = parseSelection(props.current);
         this.state = {
             editing: Object.keys(props.mod).length > 0,
             codeTree: convert.settingsToCode(applyMod(props.mod)),
             currentMod: props.mod,
             errors: {},
-            tab: "overview",
+            tab: selection.tab,
+            selectedId: selection.selectedId,
         };
     }
 
@@ -85,7 +126,7 @@ class ModEditor extends React.PureComponent<Props, State> {
         return <div className="content-container full-height-page mod-editor">
             <CustomBar>
                 {this.renderHomeHeader()}
-                {editing && this.renderTabHeader("overview", "Overview")}
+                {editing && this.renderTabHeader("", "Overview")}
                 {editing && this.renderTabHeader("spells", "Spells")}
                 {editing && this.renderTabHeader("sounds", "Sounds")}
                 {editing && this.renderTabHeader("icons", "Icons")}
@@ -106,7 +147,7 @@ class ModEditor extends React.PureComponent<Props, State> {
             selected={id === this.state.tab}
             badge={id in this.state.errors}
             error={id in this.state.errors}
-            onClick={() => this.setState({ tab: id })}>{name}</HrefItem>
+            onClick={() => this.updateTab(id)}>{name}</HrefItem>
     }
 
     private renderTab() {
@@ -142,6 +183,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             onUpdate={section => this.updateSection(key, section)}
             onPreview={() => this.onPreviewClick()}
             settings={applyMod(this.state.currentMod)}
+            selectedId={this.state.selectedId}
+            onSelected={selectedId => this.updateSelectedId(selectedId)}
             />
     }
 
@@ -152,6 +195,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
             settings={applyMod(this.state.currentMod)}
+            selectedId={this.state.selectedId}
+            onSelected={selectedId => this.updateSelectedId(selectedId)}
             />
     }
 
@@ -163,6 +208,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             onUpdate={section => this.updateSection(key, section)}
             onPreview={(layoutId) => this.onPreviewClick(layoutId)}
             settings={applyMod(this.state.currentMod)}
+            selectedId={this.state.selectedId}
+            onSelected={selectedId => this.updateSelectedId(selectedId)}
             />
     }
 
@@ -174,6 +221,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             onUpdate={section => this.updateSection(key, section)}
             onPreview={() => this.onPreviewClick()}
             settings={applyMod(this.state.currentMod)}
+            selectedId={this.state.selectedId}
+            onSelected={selectedId => this.updateSelectedId(selectedId)}
             />
     }
 
@@ -184,7 +233,31 @@ class ModEditor extends React.PureComponent<Props, State> {
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
             settings={applyMod(this.state.currentMod)}
+            selectedId={this.state.selectedId}
+            onSelected={selectedId => this.updateSelectedId(selectedId)}
             />
+    }
+
+    private updateTab(tab: string) {
+        this.setState({ tab });
+        StoreProvider.dispatch({
+            type: "updateUrl",
+            current: formatSelection(this.props.current, {
+                tab,
+                selectedId: this.state.selectedId,
+            }),
+        });
+    }
+
+    private updateSelectedId(selectedId: string) {
+        this.setState({ selectedId });
+        StoreProvider.dispatch({
+            type: "updateUrl",
+            current: formatSelection(this.props.current, {
+                tab: this.state.tab,
+                selectedId,
+            }),
+        });
     }
 
     private updateSection(key: string, section: e.CodeSection) {
@@ -239,4 +312,4 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 }
 
-export default ModEditor;
+export default ReactRedux.connect(stateToProps)(ModEditor);

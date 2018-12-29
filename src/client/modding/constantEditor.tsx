@@ -12,6 +12,9 @@ interface Props {
     onPreview: () => void;
 
     settings: AcolyteFightSettings;
+
+    selectedId: string;
+    onSelected: (selectedId: string) => void;
 }
 interface State {
 }
@@ -30,6 +33,8 @@ class ConstantEditor extends React.PureComponent<Props, State> {
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
             renderPreview={() => this.renderPreview()}
+            onSelected={this.props.onSelected}
+            selectedId={this.props.selectedId}
             />
     }
 

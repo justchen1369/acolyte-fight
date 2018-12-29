@@ -12,6 +12,9 @@ interface Props {
     onPreview: () => void;
 
     settings: AcolyteFightSettings;
+
+    selectedId: string;
+    onSelected: (selectedId: string) => void;
 }
 interface State {
 }
@@ -30,7 +33,9 @@ class SpellEditor extends React.PureComponent<Props, State> {
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
             renderPreview={() => this.renderPreview()}
-            prefix="spell"
+            addRemovePrefix="spell"
+            onSelected={this.props.onSelected}
+            selectedId={this.props.selectedId}
             />
     }
 

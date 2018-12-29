@@ -16,6 +16,9 @@ interface Props {
     onUpdate: (section: e.CodeSection) => void;
 
     settings: AcolyteFightSettings;
+
+    selectedId: string;
+    onSelected: (selectedId: string) => void;
 }
 interface State {
     currentAudioElement: w.AudioElement;
@@ -50,7 +53,9 @@ class SoundEditor extends React.PureComponent<Props, State> {
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
             renderPreview={(id) => this.renderPreview(id)}
-            prefix="sound"
+            addRemovePrefix="sound"
+            onSelected={this.props.onSelected}
+            selectedId={this.props.selectedId}
             />
     }
 

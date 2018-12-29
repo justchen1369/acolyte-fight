@@ -12,6 +12,9 @@ interface Props {
     onPreview: (layoutId: string) => void;
 
     settings: AcolyteFightSettings;
+
+    selectedId: string;
+    onSelected: (selectedId: string) => void;
 }
 interface State {
 }
@@ -30,7 +33,9 @@ class MapEditor extends React.PureComponent<Props, State> {
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
             renderPreview={(id) => this.renderPreview(id)}
-            prefix="map"
+            addRemovePrefix="map"
+            onSelected={this.props.onSelected}
+            selectedId={this.props.selectedId}
             />
     }
 

@@ -11,6 +11,9 @@ interface Props {
     onUpdate: (section: e.CodeSection) => void;
 
     settings: AcolyteFightSettings;
+
+    selectedId: string;
+    onSelected: (selectedId: string) => void;
 }
 interface State {
 }
@@ -29,7 +32,9 @@ class IconEditor extends React.PureComponent<Props, State> {
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}
             renderPreview={id => this.renderIconPreview(id)}
-            prefix="icon"
+            onSelected={this.props.onSelected}
+            selectedId={this.props.selectedId}
+            addRemovePrefix="icon"
             />
     }
 
