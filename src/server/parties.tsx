@@ -127,10 +127,6 @@ export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignmen
         if (assignment.heroId) {
             // Unready after each game
             member.ready = false;
-
-            if (party.initialObserver) { // Only allow players to play one game in a tournament
-                member.isObserver = true;
-            }
         }
     }
 }
