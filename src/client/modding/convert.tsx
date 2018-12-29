@@ -72,7 +72,7 @@ function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
     };
 }
 
-function stringify(data: any): string {
+export function stringify(data: any): string {
     return JSON.stringify(data, null, "\t");
 }
 

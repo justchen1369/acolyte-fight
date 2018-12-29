@@ -4,8 +4,9 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
-import CodeEditor from './codeEditor';
 import * as editing from './editing';
+import * as StoreProvider from '../storeProvider';
+import CodeEditor from './codeEditor';
 
 interface OwnProps {
     sectionKey: string;
@@ -16,6 +17,7 @@ interface Props extends OwnProps {
     defaults: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
+    currentMod: ModTree;
     children?: React.ReactFragment;
 }
 interface State {
@@ -30,12 +32,15 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         codeTree: state.codeTree,
         defaults,
         section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
+        currentMod: modResult.mod,
         errors: modResult.errors[ownProps.sectionKey] || noErrors,
         selectedId: state.current.hash,
     };
 }
 
 class ItemEditor extends React.PureComponent<Props, State> {
+    private canonicalizeDebounced = _.debounce(() => this.canonicalize(), 1000);
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -80,6 +85,15 @@ class ItemEditor extends React.PureComponent<Props, State> {
 
     private onCodeChange(id: string, code: string) {
         editing.updateItem(this.props.sectionKey, id, code);
+        this.canonicalizeDebounced();
+    }
+
+    private canonicalize() {
+        // Respond to the user changing IDs or removing fields that can't be removed
+        if (this.props.currentMod) {
+            const codeTree = editing.modToCode(this.props.currentMod);
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
+        }
     }
 
     private renderRevertButton() {

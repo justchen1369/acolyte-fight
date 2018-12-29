@@ -7,6 +7,8 @@ import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
 
+export { stringify, modToCode } from './convert';
+
 export const defaultTree = convert.settingsToCode(settings.DefaultSettings);
 
 export function updateItem(sectionKey: string, itemId: string, code: string) {

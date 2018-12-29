@@ -114,7 +114,7 @@ class EntityList extends React.PureComponent<Props, State> {
         }
 
         const id = uniqid(`${this.props.addRemovePrefix}-`);
-        const code = this.props.section[this.props.selectedId];
+        let code = this.props.section[this.props.selectedId];
 
         let json: e.Entity;
         try {
@@ -123,6 +123,8 @@ class EntityList extends React.PureComponent<Props, State> {
         } catch {
             json = { id };
         }
+
+        code = editing.stringify(json);
 
         editing.updateItem(this.props.sectionKey, id, code);
         editing.updateSelected(id);
