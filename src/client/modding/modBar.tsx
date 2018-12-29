@@ -55,21 +55,13 @@ class ModBar extends React.PureComponent<Props, State> {
     private renderEditing() {
         return <CustomBar>
             <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Play with Mod</HrefItem>
-            {this.renderTabHeader("modding", "Overview")}
-            {this.renderTabHeader("modding-spells", "Spells")}
-            {this.renderTabHeader("modding-sounds", "Sounds")}
-            {this.renderTabHeader("modding-icons", "Icons")}
-            {this.renderTabHeader("modding-maps", "Maps")}
-            {this.renderTabHeader("modding-constants", "Constants")}
+            <PageLink page="modding">Overview</PageLink>
+            <PageLink page="modding-spells" error={"spells" in this.props.errors}>Spells</PageLink>
+            <PageLink page="modding-sounds" error={"sounds" in this.props.errors}>Sounds</PageLink>
+            <PageLink page="modding-icons" error={"icons" in this.props.errors}>Icons</PageLink>
+            <PageLink page="modding-maps" error={"maps" in this.props.errors}>Maps</PageLink>
+            <PageLink page="modding-constants" error={"constants" in this.props.errors}>Constants</PageLink>
         </CustomBar>
-    }
-
-    private renderTabHeader(id: string, name: string) {
-        return <PageLink
-            key={id}
-            page={id}
-            badge={id in this.props.errors}
-            error={id in this.props.errors}>{name}</PageLink>
     }
 
     private async onHomeClick() {
