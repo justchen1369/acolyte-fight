@@ -71,6 +71,7 @@ class ModBar extends React.PureComponent<Props, State> {
             await rooms.joinRoomAsync(roomId);
             await parties.movePartyAsync(roomId);
             await pages.changePage("");
+            StoreProvider.dispatch({ type: "updateHash", hash: null });
         }
     }
 }
