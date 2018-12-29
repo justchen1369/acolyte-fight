@@ -18,25 +18,14 @@ import SoundEditor from './soundEditor';
 import SpellEditor from './spellEditor';
 
 interface Props {
-    mod: ModTree;
     current: s.PathElements;
-    codeTree: e.CodeTree;
-    selectedId: string;
-    currentMod: ModTree;
-    errors: e.ErrorTree;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = selectors.createMod(state.codeTree);
     return {
-        mod: state.room.mod,
         current: state.current,
-        codeTree: state.codeTree,
-        selectedId: state.current.hash,
-        currentMod: modResult.mod,
-        errors: modResult.errors,
     };
 }
 
@@ -56,43 +45,14 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     private renderTab() {
-        const editing = !!this.props.codeTree;
-        if (!editing) {
-            return this.renderOverviewTab();
-        }
-
         switch (this.props.current.page) {
-            case "modding-spells": return this.renderSpellEditor("spells");
-            case "modding-sounds": return this.renderSoundEditor("sounds");
-            case "modding-icons": return this.renderIconEditor("icons");
-            case "modding-maps": return this.renderMapEditor("maps");
-            case "modding-constants": return this.renderConstantEditor("constants");
-            default: return this.renderOverviewTab();
+            case "modding-spells": return <SpellEditor />
+            case "modding-sounds": return <SoundEditor />
+            case "modding-icons": return <IconEditor />
+            case "modding-maps": return <MapEditor />
+            case "modding-constants": return <ConstantEditor />
+            default: return <OverviewTab />
         }
-    }
-
-    private renderOverviewTab() {
-        return <OverviewTab />;
-    }
-    
-    private renderConstantEditor(key: string) {
-        return <ConstantEditor />
-    }
-
-    private renderIconEditor(key: string) {
-        return <IconEditor />
-    }
-
-    private renderMapEditor(key: string) {
-        return <MapEditor />
-    }
-
-    private renderSpellEditor(key: string) {
-        return <SpellEditor />
-    }
-
-    private renderSoundEditor(key: string) {
-        return <SoundEditor />
     }
 }
 
