@@ -2,7 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import ModEditor from '../modding/modEditor';
-import NavBar from './navbar';
+import NavBar from '../nav/navbar';
 
 interface Props {
     mod: Object;

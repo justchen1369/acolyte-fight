@@ -16,7 +16,7 @@ import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from './profilePanel';
 import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
-import NavBar from './navbar';
+import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from './urlListener';
 import WatchLooper from './watchLooper';
