@@ -60,7 +60,7 @@ function soundsToCode(sounds: Sounds): e.CodeSection {
 
 function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
     return {
-        meta: stringify(settings.Mod),
+        mod: stringify(settings.Mod),
         world: stringify(settings.World),
         obstacle: stringify(settings.Obstacle),
         hero: stringify(settings.Hero),
@@ -79,7 +79,7 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         Sounds: codeToSounds(codeTree, errorTree),
         Icons: codeToIcons(codeTree, errorTree),
         Layouts: codeToLayouts(codeTree, errorTree),
-        Mod: codeToConstants(codeTree, "meta", errorTree),
+        Mod: codeToConstants(codeTree, "mod", errorTree),
         World: codeToConstants(codeTree, "world", errorTree),
         Obstacle: codeToConstants(codeTree, "obstacle", errorTree),
         Hero: codeToConstants(codeTree, "hero", errorTree),

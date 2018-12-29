@@ -13,7 +13,7 @@ export interface CodeSection {
 }
 
 export interface CodeConstants extends CodeSection {
-    meta: string;
+    mod: string;
     world: string;
     obstacle: string;
     hero: string;
