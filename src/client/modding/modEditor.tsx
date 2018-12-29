@@ -18,6 +18,8 @@ import SoundEditor from './soundEditor';
 import SpellEditor from './spellEditor';
 
 interface Props {
+    codeTree: e.CodeTree;
+    roomMod: ModTree;
     current: s.PathElements;
 }
 interface State {
@@ -25,6 +27,8 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        codeTree: state.codeTree,
+        roomMod: state.room.mod,
         current: state.current,
     };
 }
@@ -35,6 +39,13 @@ class ModEditor extends React.PureComponent<Props, State> {
 
         this.state = {
         };
+    }
+
+    componentWillMount() {
+        if (!this.props.codeTree && Object.keys(this.props.roomMod).length > 0) {
+            // Room is modded, load the settings from there when launching the mod editor
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
+        }
     }
 
     render() {
