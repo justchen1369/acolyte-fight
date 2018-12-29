@@ -51,12 +51,11 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <div className="page">
                 <h1>Modding</h1>
                 {this.renderCurrentState()}
-                {this.renderHelp()}
             </div>
         </div>;
     }
 
-    private renderHelp() {
+    private renderReference() {
         return <div>
             <h2>Reference</h2>
             <ul>
@@ -111,6 +110,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to File</div>
             </div>
             {this.renderDiscard()}
+            {this.renderReference()}
         </div>
     }
 
@@ -118,6 +118,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
         return <div>
             <p className="error">Your mod currently has an error - check the other tabs (above) to fix them.</p>
             {this.renderDiscard()}
+            {this.renderReference()}
         </div>
     }
 

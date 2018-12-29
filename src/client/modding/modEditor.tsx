@@ -53,6 +53,7 @@ interface Props {
     mod: Object;
 }
 interface State {
+    editing: boolean;
     codeTree: e.CodeTree;
     currentMod: Object;
     errors: e.ErrorTree;
@@ -65,6 +66,7 @@ class ModEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            editing: Object.keys(props.mod).length > 0,
             codeTree: convert.settingsToCode(applyMod(props.mod)),
             currentMod: props.mod,
             errors: {},
@@ -79,7 +81,7 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const editing = Object.keys(this.state.currentMod).length > 0;
+        const editing = this.state.editing;
         return <div className="content-container full-height-page mod-editor">
             <CustomBar>
                 {this.renderHomeHeader()}
@@ -188,6 +190,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private updateMod(mod: Object) {
         this.setState({
+            editing: Object.keys(mod).length > 0,
             codeTree: convert.settingsToCode(applyMod(mod)),
             currentMod: mod,
             errors: {},
