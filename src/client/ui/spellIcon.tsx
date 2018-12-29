@@ -86,3 +86,5 @@ export class SpellIcon extends React.Component<Props, State> {
         }
     }
 }
+
+export default SpellIcon;

@@ -352,7 +352,7 @@ interface IconLookup {
 
 interface Icon {
 	path: string; // The SVG path of the icon
-	src?: string; // A link to where the icon is from - not used by the game, just to give credit to the author
+	credit?: string; // A link to where the icon is from - not used by the game, just to give credit to the author
 }
 
 type WaveType = "sine" | "square" | "sawtooth" | "triangle" | "brown-noise";

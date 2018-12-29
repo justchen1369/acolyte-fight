@@ -40,7 +40,7 @@ function iconsToCode(icons: IconLookup): e.CodeSection {
         const icon = icons[id];
         lookup[id] = stringify({
             id: id,
-            icon,
+            ...icon,
         });
     }
     return lookup;
@@ -140,7 +140,9 @@ function codeToIcons(codeTree: e.CodeTree, errorTree: e.ErrorTree): IconLookup {
             const json = JSON.parse(code);
 
             const id = json.id;
-            icons[id] = json.icon;
+            delete json[id];
+
+            icons[id] = json;
         } catch (exception) {
             errors[key] = `${exception}`;
         }

@@ -5,9 +5,11 @@ import * as e from './editor.model';
 import CodeEditor from './codeEditor';
 
 interface Props {
-    code: string;
-    error: string;
-    onUpdate: (code: string) => void;
+    selectedId: string;
+    section: e.CodeSection;
+    errors: e.ErrorSection;
+    onUpdate: (section: e.CodeSection) => void;
+    children?: React.ReactFragment;
 }
 interface State {
     saved: boolean;
@@ -22,35 +24,40 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const id = this.props.selectedId;
+        if (id) {
+            const error = this.props.errors[id];
+            const code = this.props.section[id] || "";
+            return this.renderItemEditor(id, code, error);
+        } else {
+            return <div className="code-area"></div>;
+        }
+    }
+
+    private renderItemEditor(id: string, code: string, error: string) {
         return <div className="code-panel">
-            {this.renderCodeEditor()}
+            <CodeEditor key="code" code={code} onChange={(code) => this.onCodeChange(id, code)} />
             <div className="editor-actions">
-                {this.renderStatus()}
+                {this.renderStatus(error)}
                 <div className="spacer"></div>
+                {this.props.children}
             </div>
         </div>
     }
 
-    private renderStatus() {
-        if (this.props.error) {
-            return <div className="editor-status error">{this.props.error}</div>;
-        } else if (this.state.saved) {
-            return <div className="editor-status">Saved</div>;
+    private renderStatus(error: string) {
+        if (error) {
+            return <div className="editor-status error">{error}</div>;
         } else {
             return null;
         }
     }
 
-    private renderCodeEditor() {
-        return <CodeEditor key="code" code={this.props.code} onChange={(code) => this.onCodeChange(code)} />
-    }
+    private onCodeChange(id: string, code: string) {
+        const section = { ...this.props.section };
+        section[id] = code;
 
-    private onCodeChange(code: string) {
-        this.applyUpdate(code);
-    }
-
-    private applyUpdate(code: string) {
-        this.props.onUpdate(code);
+        this.props.onUpdate(section);
     }
 }
 
