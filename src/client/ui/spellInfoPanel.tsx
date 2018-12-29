@@ -6,7 +6,7 @@ import * as w from '../../game/world.model';
 import * as icons from '../core/icons';
 import * as spellUtils from '../core/spellUtils';
 import { ButtonBar } from '../../game/constants';
-import { SpellIcon } from './spellIcon';
+import { SpellIcon } from '../controls/spellIcon';
 import SpellStats from './spellStats';
 
 interface Props {

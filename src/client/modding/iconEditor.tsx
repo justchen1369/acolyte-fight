@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as e from './editor.model';
 import SectionEditor from './sectionEditor';
-import SpellIcon from '../ui/spellIcon';
+import SpellIcon from '../controls/spellIcon';
 
 interface Props {
     default: e.CodeSection;

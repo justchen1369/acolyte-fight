@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as cloud from '../core/cloud';
 import * as s from '../store.model';
-import { SpellIcon } from './spellIcon';
+import { SpellIcon } from '../controls/spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
 import * as Storage from '../storage';

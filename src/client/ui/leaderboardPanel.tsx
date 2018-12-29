@@ -12,7 +12,7 @@ import * as options from '../options';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
-import Link from './link';
+import Link from '../controls/link';
 import UserStatsPanel from './userStatsPanel';
 
 interface OwnProps {

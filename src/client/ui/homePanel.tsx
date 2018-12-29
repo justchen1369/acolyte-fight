@@ -10,7 +10,7 @@ import NameConfig from './nameConfig';
 import PlayButton from './playButton';
 import SocialBar from './socialBar';
 import SpellBtnConfig from './spellConfig';
-import Link from './link';
+import Link from '../controls/link';
 import NavBar from '../nav/navbar';
 import PartyList from './partyList';
 
