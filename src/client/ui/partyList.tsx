@@ -50,7 +50,7 @@ class HomePanel extends React.Component<Props, State> {
     private renderMember(member: s.PartyMemberState) {
         if (!member.isObserver || member.socketId == this.props.selfId || member.isLeader) {
             // Don't render any observers, unless they are myself or a leader
-            return <PartyMemberControl member={member} />
+            return <PartyMemberControl key={member.socketId} member={member} />
         } else {
             return null;
         }

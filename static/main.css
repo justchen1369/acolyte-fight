@@ -1293,10 +1293,6 @@ textarea.ai-js {
     color: #444;
 }
 
-.party-list .settings-icon {
-    margin-left: 0.5em;
-}
-
 .party-member-editable .settings-icon {
     cursor: pointer;
 }
@@ -1305,8 +1301,8 @@ textarea.ai-js {
     color: #00ccff;
 }
 
-.party-member .check-icon {
-    margin-right: 0.5em;
+.party-list .party-member :nth-child(n+2) {
+    margin-left: 0.5em;
 }
 
 .party-member-editable .check-icon {

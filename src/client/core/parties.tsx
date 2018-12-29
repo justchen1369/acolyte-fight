@@ -179,13 +179,13 @@ export async function kick(memberId: string): Promise<void> {
 	return updatePartyStatusAsync({ partyId: store.party.id, memberId, kick: true });
 }
 
-export async function makeLeaderAsync(memberId: string): Promise<void> {
+export async function makeLeaderAsync(memberId: string, isLeader: boolean = true): Promise<void> {
 	const store = StoreProvider.getState();
 	if (!store.party) {
 		return;
 	}
 
-	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isLeader: true });
+	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isLeader });
 }
 
 export async function makeObserverAsync(memberId: string, isObserver: boolean): Promise<void> {
