@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
+import * as s from '../store.model';
 import * as fileUtils from '../core/fileUtils';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
@@ -15,15 +16,25 @@ const stringifyMod = Reselect.createSelector(
     (mod: Object) => JSON.stringify(mod, null, "\t"),
 );
 
-interface Props {
+interface OwnProps {
     currentMod: Object;
     onUpdateMod: (mod: Object) => void;
 
     error: boolean;
 }
+interface Props extends OwnProps {
+    playerName: string;
+}
 interface State {
     selectedFile: File;
     loadFromFileError: string;
+}
+
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        playerName: state.playerName,
+    };
 }
 
 class OverviewTab extends React.PureComponent<Props, State> {
@@ -72,8 +83,9 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 This feature is experimental and will be subject to a lot of change!
                 Forward compatibility is not guaranteed - functional mods in the current version may be broken by future releases.
             </p>
-            <h2>Create new mod</h2>
-            <p>Go to the other tabs (at the top) and start changing some values! Come back to this tab to save your mod file.</p>
+            <h2>Create new</h2>
+            <p>Create a new mod from scratch.</p>
+            <div className="btn" onClick={() => this.onCreateMod()}>Create mod</div>
             <h2>Open file</h2>
             <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
             <div className={this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onLoadModFile(this.state.selectedFile)}>Load from file</div>
@@ -92,6 +104,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <p>
                 The mod below is currently active.
                 You will automatically be matched to other players who currently have the same mod activated.
+                Explore the tabs (above) to edit this mod.
             </p>
             <textarea className="mod-json" value={stringifyMod(this.props.currentMod)} readOnly />
             <div className="button-row">
@@ -114,6 +127,18 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <p>Discard the current mod and revert back to default settings.</p>
             <div className="btn" onClick={() => this.props.onUpdateMod({})}>Discard</div>
         </>
+    }
+
+    private async onCreateMod() {
+        const meta: ModSettings = {
+            name: `${this.props.playerName}'s mod`,
+            author: this.props.playerName,
+            description: new Date().toUTCString(),
+        };
+        const initialMod: ModTree = {
+            Mod: meta,
+        };
+        this.props.onUpdateMod(initialMod);
     }
 
     private async onLoadModHref(ev: React.MouseEvent<HTMLAnchorElement>) {
@@ -163,4 +188,4 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 }
 
-export default OverviewTab;
+export default ReactRedux.connect(stateToProps)(OverviewTab);

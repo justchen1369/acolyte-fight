@@ -79,16 +79,16 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const editing = Object.keys(this.state.currentMod).length > 0;
         return <div className="content-container full-height-page mod-editor">
             <CustomBar>
                 {this.renderHomeHeader()}
-                {this.renderTabHeader("overview", "Modding")}
-                {this.renderTabHeader("spells", "Spells")}
-                {this.renderTabHeader("sounds", "Sounds")}
-                {this.renderTabHeader("icons", "Icons")}
-                {this.renderTabHeader("maps", "Maps")}
-                {this.renderTabHeader("constants", "Constants")}
-                <div className="spacer"></div>
+                {editing && this.renderTabHeader("overview", "Overview")}
+                {editing && this.renderTabHeader("spells", "Spells")}
+                {editing && this.renderTabHeader("sounds", "Sounds")}
+                {editing && this.renderTabHeader("icons", "Icons")}
+                {editing && this.renderTabHeader("maps", "Maps")}
+                {editing && this.renderTabHeader("constants", "Constants")}
             </CustomBar>
             {this.state.tab === "overview" && this.renderOverviewTab()}
             {this.state.tab === "spells" && this.renderSpellEditor("spells")}
