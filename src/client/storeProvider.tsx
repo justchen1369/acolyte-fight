@@ -100,6 +100,14 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateUrl") {
         return { ...state, current: action.current };
+    } else if (action.type === "updateHash") {
+        return {
+            ...state,
+            current: {
+                ...state.current,
+                hash: action.hash,
+            },
+        };
     } else if (action.type === "updatePage") {
         return {
              ...state,
@@ -137,6 +145,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             room: action.room,
+            codeTree: null, // The mod has changed, make sure the modding window is showing the new mod
         };
     } else if (action.type === "joinParty") {
         if (!(state.party && state.party.id === action.party.id)) {
@@ -206,6 +215,8 @@ function reducer(state: s.State, action: s.Action): s.State {
             hasReplayLookup.set(gameId, hasReplay);
         });
         return { ...state, hasReplayLookup };
+    } else if (action.type === "updateCodeTree") {
+        return { ...state, codeTree: action.codeTree };
     } else {
         console.log(action);
         return state;

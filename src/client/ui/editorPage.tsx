@@ -65,7 +65,7 @@ class EditorPage extends React.PureComponent<Props, State> {
     }
 
     private renderEditor() {
-        return <ModEditor mod={this.props.mod} />;
+        return <ModEditor />;
     }
 
     private isAdmin() {

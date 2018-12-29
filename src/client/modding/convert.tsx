@@ -2,6 +2,10 @@ import _ from 'lodash';
 import * as settings from '../../game/settings';
 import * as e from './editor.model';
 
+export function modToCode(mod: ModTree): e.CodeTree {
+    return settingsToCode(settings.calculateMod(mod));
+}
+
 export function settingsToCode(settings: AcolyteFightSettings): e.CodeTree {
     const tree: e.CodeTree = {
         spells: spellsToCode(settings.Spells),

@@ -16,6 +16,7 @@ export interface JoinParams {
 	observeGameId?: string;
 	live?: boolean;
 	layoutId?: string;
+	roomId?: string;
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
@@ -31,7 +32,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				gameId: opts.observeGameId || null,
 				name: store.playerName,
 				keyBindings: store.keyBindings,
-				room: store.room.id,
+				room: opts.roomId || store.room.id,
 				layoutId: opts.layoutId || null,
 				isBot: ai.playingAsAI(store) && !opts.observeGameId,
 				isMobile,

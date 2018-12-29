@@ -1,4 +1,5 @@
 import * as d from './stats.model';
+import * as e from '../client/modding/editor.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 
@@ -16,6 +17,8 @@ export interface State {
     options: GameOptions;
 
     aiCode: string;
+
+    codeTree?: e.CodeTree;
 
     socketId: string;
     party: PartyState;
@@ -87,6 +90,7 @@ export type Action =
     | UpdateKeyBindingsAction
     | UpdateOptionsAction
     | UpdateUrlAction
+    | UpdateHashAction
     | UpdatePageAction
     | JoinMatchAction
     | LeaveMatchAction
@@ -106,6 +110,7 @@ export type Action =
     | UpdateProfileAction
     | UpdateGameStatsAction
     | UpdateHasReplayAction
+    | UpdateCodeTreeAction
 
 export interface JoinMatchAction {
     type: "joinMatch";
@@ -153,6 +158,11 @@ export interface UpdateOptionsAction {
 export interface UpdateUrlAction {
     type: "updateUrl";
     current: PathElements;
+}
+
+export interface UpdateHashAction {
+    type: "updateHash";
+    hash: string;
 }
 
 export interface UpdatePageAction {
@@ -246,6 +256,11 @@ export interface UpdateGameStatsAction {
 export interface UpdateHasReplayAction {
     type: "updateHasReplay";
     hasReplayLookup: Map<string, boolean>;
+}
+
+export interface UpdateCodeTreeAction {
+    type: "updateCodeTree";
+    codeTree: e.CodeTree;
 }
 
 

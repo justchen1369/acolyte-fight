@@ -3,11 +3,10 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as s from '../store.model';
+import * as convert from './convert';
 import * as fileUtils from '../core/fileUtils';
-import * as pages from '../core/pages';
-import * as parties from '../core/parties';
-import * as rooms from '../core/rooms';
-import * as url from '../url';
+import * as selectors from './selectors';
+import * as StoreProvider from '../storeProvider';
 
 const FileSaver = require('../../lib/file-saver');
 
@@ -16,13 +15,10 @@ const stringifyMod = Reselect.createSelector(
     (mod: Object) => JSON.stringify(mod, null, "\t"),
 );
 
-interface OwnProps {
-    currentMod: Object;
-    onUpdateMod: (mod: Object) => void;
-
-    error: boolean;
-}
-interface Props extends OwnProps {
+interface Props {
+    codeTree: e.CodeTree;
+    currentMod: ModTree;
+    errors: e.ErrorTree;
     playerName: string;
 }
 interface State {
@@ -30,10 +26,13 @@ interface State {
     loadFromFileError: string;
 }
 
-function stateToProps(state: s.State, ownProps: OwnProps): Props {
+function stateToProps(state: s.State): Props {
+    const modResult = selectors.createMod(state.codeTree);
     return {
-        ...ownProps,
         playerName: state.playerName,
+        codeTree: state.codeTree,
+        currentMod: modResult.mod,
+        errors: modResult.errors,
     };
 }
 
@@ -65,13 +64,14 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 
     private renderCurrentState() {
-        const currentMod = this.props.currentMod;
-        if (currentMod) {
-            return Object.keys(currentMod).length > 0 ? this.renderCurrentMod(currentMod) : this.renderEmptyMod();
-        } else if (this.props.error) {
-            return this.renderCurrentModError();
+        if (this.props.codeTree) {
+            if (this.props.currentMod) {
+                return this.renderCurrentMod(this.props.currentMod);
+            } else {
+                return this.renderCurrentModError();
+            }
         } else {
-            return <p>Processing...</p>;
+            return this.renderEmptyMod();
         }
     }
 
@@ -116,7 +116,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private renderCurrentModError() {
         return <div>
-            <p className="error">Your mod currently has an error - check the other tabs (above) to fix them.</p>
+            <p className="error">Your mod currently has errors - check the other tabs (above) to fix them.</p>
             {this.renderDiscard()}
             {this.renderReference()}
         </div>
@@ -126,11 +126,11 @@ class OverviewTab extends React.PureComponent<Props, State> {
         return <>
             <h2>Back to Default Settings</h2>
             <p>Discard the current mod and revert back to default settings.</p>
-            <div className="btn" onClick={() => this.props.onUpdateMod({})}>Discard</div>
+            <div className="btn" onClick={() => this.onDiscardMod()}>Discard</div>
         </>
     }
 
-    private async onCreateMod() {
+    private onCreateMod() {
         const meta: ModSettings = {
             name: `${this.props.playerName}'s mod`,
             author: this.props.playerName,
@@ -139,7 +139,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
         const initialMod: ModTree = {
             Mod: meta,
         };
-        this.props.onUpdateMod(initialMod);
+        const codeTree = convert.modToCode(initialMod);
+        StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
     }
 
     private async onLoadModHref(ev: React.MouseEvent<HTMLAnchorElement>) {
@@ -149,7 +150,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 ev.preventDefault();
                 const res = await fetch(el.href);
                 const mod = await res.json();
-                this.props.onUpdateMod(mod);
+                const codeTree = convert.modToCode(mod);
+                StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
             }
         } catch (exception) {
             console.error("Error loading mod from URL", exception);
@@ -168,11 +170,16 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 mod.Mod = mod.Mod || {};
                 mod.Mod.name = file.name;
             }
-            this.props.onUpdateMod(mod);
+            const codeTree = convert.modToCode(mod);
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
         } catch (exception) {
             console.error("Error loading mod from file", exception);
             this.setState({ loadFromFileError: `${exception}` });
         }
+    }
+
+    private onDiscardMod() {
+        StoreProvider.dispatch({ type: "updateCodeTree", codeTree: null });
     }
 
     private onSaveModFile(currentMod: ModTree) {
