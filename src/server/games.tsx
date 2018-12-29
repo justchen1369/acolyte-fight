@@ -231,7 +231,7 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, layoutId: string = null) {
+export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, locked: boolean = false, layoutId: string = null) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
@@ -263,7 +263,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		history: [],
 	};
 	store.activeGames.set(game.id, game);
-	if (!isPrivate) {
+	if (!locked) {
 		store.joinableGames.add(game.id);
 	}
 	if (room) {
