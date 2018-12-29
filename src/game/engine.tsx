@@ -6,7 +6,7 @@ import * as colorWheel from './colorWheel';
 import * as constants from './constants';
 import * as vector from './vector';
 import * as w from './world.model';
-import { calculateMod } from './settings';
+import { modToSettings } from './modder';
 
 import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
@@ -34,7 +34,7 @@ export function version() {
 }
 
 export function initialWorld(mod: Object): w.World {
-	const settings = calculateMod(mod);
+	const settings = modToSettings(mod);
 
 	let world: w.World = {
 		seed: null,

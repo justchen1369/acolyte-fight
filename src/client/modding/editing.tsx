@@ -3,6 +3,7 @@ import * as e from './editor.model';
 import * as s from '../store.model';
 import * as convert from './convert';
 import * as matches from '../core/matches';
+import * as modder from '../../game/modder';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
@@ -35,7 +36,7 @@ export const codeToSettings = Reselect.createSelector(
     (codeTree: e.CodeTree) => modToSettings(codeToMod(codeTree).mod));
 
 function modToSettings(mod: ModTree) {
-    return mod ? settings.calculateMod(mod) : null;
+    return mod ? modder.modToSettings(mod) : null;
 }
 
 export const codeToMod = Reselect.createSelector(

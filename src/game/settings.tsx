@@ -1470,7 +1470,3 @@ export const DefaultSettings: AcolyteFightSettings = {
     Sounds,
     Icons,
 };
-
-export function calculateMod(mod: Object): AcolyteFightSettings {
-    return _.merge(_.cloneDeep(DefaultSettings), mod);
-}

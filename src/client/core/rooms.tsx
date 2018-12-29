@@ -4,6 +4,7 @@ import * as w from '../../game/world.model';
 import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as matches from './matches';
+import * as modder from '../../game/modder';
 import * as settings from '../../game/settings';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
@@ -68,7 +69,7 @@ export function joinRoomFrom(response: m.JoinRoomResponse) {
         room: {
             id: response.roomId,
             mod,
-            settings: settings.calculateMod(mod),
+            settings: modder.modToSettings(mod),
         }
     });
     return response.roomId;

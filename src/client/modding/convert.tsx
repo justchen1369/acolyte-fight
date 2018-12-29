@@ -1,9 +1,10 @@
 import _ from 'lodash';
+import * as modder from '../../game/modder';
 import * as settings from '../../game/settings';
 import * as e from './editor.model';
 
 export function modToCode(mod: ModTree): e.CodeTree {
-    return settingsToCode(settings.calculateMod(mod));
+    return settingsToCode(modder.modToSettings(mod));
 }
 
 export function settingsToCode(settings: AcolyteFightSettings): e.CodeTree {
@@ -193,17 +194,6 @@ function codeToConstants(codeTree: e.CodeTree, key: string, errorTree: e.ErrorTr
 
 export function codeToMod(codeTree: e.CodeTree): Object {
     const newSettings = codeToSettings(codeTree);
-    const mod = difference(newSettings, settings.DefaultSettings);
-    return mod;
-}
-
-function difference(object: any, base: any) {
-	function changes(object: any, base: any) {
-		return _.transform(object, function(result, value, key) {
-			if (!_.isEqual(value, base[key])) {
-				result[key] = (_.isObject(value) && _.isObject(base[key])) ? changes(value, base[key]) : value;
-			}
-		});
-	}
-	return changes(object, base);
+    const mod = modder.diff(settings.DefaultSettings, newSettings);
+    return mod || {};
 }
