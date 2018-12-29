@@ -60,7 +60,7 @@ class Root extends React.Component<Props> {
                 {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
                 {page === "party" && this.renderParty()}
-                {page === "modding" && this.renderModding()}
+                {(page === "modding" || page.startsWith("modding-")) && this.renderModding()}
                 {page === "ai" && this.renderAi()}
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}

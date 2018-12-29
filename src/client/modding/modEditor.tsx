@@ -16,6 +16,7 @@ import ConstantEditor from './constantEditor';
 import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
 import OverviewTab from './overviewTab';
+import PageLink from '../nav/pageLink';
 import IconEditor from './iconEditor';
 import MapEditor from './mapEditor';
 import SoundEditor from './soundEditor';
@@ -63,7 +64,6 @@ interface State {
     codeTree: e.CodeTree;
     currentMod: Object;
     errors: e.ErrorTree;
-    tab: string;
     selectedId: string;
 }
 
@@ -74,28 +74,26 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-function parseSelection(current: s.PathElements): e.Selection {
+function parseSelection(current: s.PathElements): string {
     if (current.hash) {
-        let [tab, selectedId] = current.hash.split("/");
+        let selectedId = current.hash;
 
-        tab = tab || "";
         selectedId = selectedId || null;
         if (selectedId === "") {
             selectedId = null;
         }
 
-        return { tab, selectedId };
+        return selectedId;
     } else {
-        return { tab: "", selectedId: null };
+        return null;
     }
 }
 
-function formatSelection(current: s.PathElements, selection: e.Selection): s.PathElements {
-    let hash = (selection.tab || "");
-    if (selection.selectedId) {
-        hash += "/" + selection.selectedId;
-    }
-    return { ...current, hash };
+function formatSelection(current: s.PathElements, selectedId: string): s.PathElements {
+    return {
+        ...current,
+        hash: selectedId || "",
+    };
 }
 
 class ModEditor extends React.PureComponent<Props, State> {
@@ -104,14 +102,12 @@ class ModEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        const selection = parseSelection(props.current);
         this.state = {
             editing: Object.keys(props.mod).length > 0,
             codeTree: convert.settingsToCode(applyMod(props.mod)),
             currentMod: props.mod,
             errors: {},
-            tab: selection.tab,
-            selectedId: selection.selectedId,
+            selectedId: parseSelection(props.current),
         };
     }
 
@@ -126,12 +122,12 @@ class ModEditor extends React.PureComponent<Props, State> {
         return <div className="content-container full-height-page mod-editor">
             <CustomBar>
                 {this.renderHomeHeader()}
-                {editing && this.renderTabHeader("", "Overview")}
-                {editing && this.renderTabHeader("spells", "Spells")}
-                {editing && this.renderTabHeader("sounds", "Sounds")}
-                {editing && this.renderTabHeader("icons", "Icons")}
-                {editing && this.renderTabHeader("maps", "Maps")}
-                {editing && this.renderTabHeader("constants", "Constants")}
+                {editing && this.renderTabHeader("modding", "Overview")}
+                {editing && this.renderTabHeader("modding-spells", "Spells")}
+                {editing && this.renderTabHeader("modding-sounds", "Sounds")}
+                {editing && this.renderTabHeader("modding-icons", "Icons")}
+                {editing && this.renderTabHeader("modding-maps", "Maps")}
+                {editing && this.renderTabHeader("modding-constants", "Constants")}
             </CustomBar>
             {this.renderTab()}
         </div>
@@ -142,12 +138,11 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     private renderTabHeader(id: string, name: string) {
-        return <HrefItem
+        return <PageLink
             key={id}
-            selected={id === this.state.tab}
+            page={id}
             badge={id in this.state.errors}
-            error={id in this.state.errors}
-            onClick={() => this.updateTab(id)}>{name}</HrefItem>
+            error={id in this.state.errors}>{name}</PageLink>
     }
 
     private renderTab() {
@@ -156,13 +151,12 @@ class ModEditor extends React.PureComponent<Props, State> {
             return this.renderOverviewTab();
         }
 
-        switch (this.state.tab) {
-            case "spells": return this.renderSpellEditor("spells");
-            case "sounds": return this.renderSoundEditor("sounds");
-            case "icons": return this.renderIconEditor("icons");
-            case "maps": return this.renderMapEditor("maps");
-            case "constants": return this.renderConstantEditor("constants");
-            case "overview": return this.renderOverviewTab();
+        switch (this.props.current.page) {
+            case "modding-spells": return this.renderSpellEditor("spells");
+            case "modding-sounds": return this.renderSoundEditor("sounds");
+            case "modding-icons": return this.renderIconEditor("icons");
+            case "modding-maps": return this.renderMapEditor("maps");
+            case "modding-constants": return this.renderConstantEditor("constants");
             default: return this.renderOverviewTab();
         }
     }
@@ -238,25 +232,11 @@ class ModEditor extends React.PureComponent<Props, State> {
             />
     }
 
-    private updateTab(tab: string) {
-        this.setState({ tab });
-        StoreProvider.dispatch({
-            type: "updateUrl",
-            current: formatSelection(this.props.current, {
-                tab,
-                selectedId: this.state.selectedId,
-            }),
-        });
-    }
-
     private updateSelectedId(selectedId: string) {
         this.setState({ selectedId });
         StoreProvider.dispatch({
             type: "updateUrl",
-            current: formatSelection(this.props.current, {
-                tab: this.state.tab,
-                selectedId,
-            }),
+            current: formatSelection(this.props.current, selectedId),
         });
     }
 

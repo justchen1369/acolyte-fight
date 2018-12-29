@@ -13,7 +13,7 @@ interface OwnProps {
     shrink?: boolean;
     badge?: boolean;
     disabled?: boolean;
-    selected?: boolean;
+    error?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
 
     children?: React.ReactFragment;
@@ -41,7 +41,8 @@ class PageLink extends React.Component<Props> {
             shrink={this.props.shrink}
             badge={this.props.badge}
             disabled={this.props.disabled}
-            selected={this.props.selected !== undefined ? this.props.selected : this.props.current.page === page}
+            selected={this.props.current.page === page}
+            error={this.props.error}
             onClick={(ev) => this.onNavClick(ev, page, profileId)}>
             {this.props.children}
             </HrefItem>

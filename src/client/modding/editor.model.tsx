@@ -39,8 +39,3 @@ export class ParseException {
         this.errors = errors;
     }
 }
-
-export interface Selection {
-    tab: string;
-    selectedId: string;
-}
