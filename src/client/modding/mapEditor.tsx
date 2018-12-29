@@ -10,13 +10,16 @@ import PreviewButton from './previewButton';
 import SectionEditor from './sectionEditor';
 
 interface Props {
+    settings: AcolyteFightSettings;
     selectedId: string;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
+    const settings = editing.codeToSettings(state.codeTree);
     return {
+        settings,
         selectedId: state.current.hash,
     };
 }
@@ -31,9 +34,17 @@ class MapEditor extends React.PureComponent<Props, State> {
     render() {
         return <EditorPage expand={true}>
             <SectionEditor sectionKey="maps" addRemovePrefix="map">
-                <PreviewButton layoutId={this.props.selectedId} />
+                {this.renderPreview()}
             </SectionEditor>
         </EditorPage>
+    }
+
+    private renderPreview() {
+        if (this.props.settings && this.props.selectedId && this.props.selectedId in this.props.settings.Layouts) {
+            return <PreviewButton layoutId={this.props.selectedId} />;
+        } else {
+            return null;
+        }
     }
 }
 
