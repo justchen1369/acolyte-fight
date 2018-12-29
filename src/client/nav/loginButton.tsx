@@ -7,6 +7,7 @@ import * as s from '../store.model';
 import * as options from '../options';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import HrefItem from './hrefItem';
 import NavBarItem from './navbarItem';
 
 interface Props {
@@ -46,7 +47,7 @@ class LoginButton extends React.Component<Props> {
             "login-btn": true,
             "logging-in": !this.props.loginAttempted,
         });
-        return <NavBarItem key="login" className={className} page="login" onClick={() => { /* do nothing, just follow the link */ }}>Login</NavBarItem>
+        return <HrefItem key="login" className={className} href="login">Login</HrefItem>
     }
 
     private renderProfileLink() {

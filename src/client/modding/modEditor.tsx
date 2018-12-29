@@ -9,8 +9,8 @@ import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
 import ConstantEditor from './constantEditor';
-import NavBar from '../nav/navbar';
-import NavBarItem from '../nav/navbarItem';
+import CustomBar from '../nav/customBar';
+import CustomItem from '../nav/hrefItem';
 import OverviewTab from './overviewTab';
 import IconEditor from './iconEditor';
 import MapEditor from './mapEditor';
@@ -79,7 +79,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     render() {
         return <div className="content-container full-height-page mod-editor">
-            <NavBar>
+            <CustomBar>
                 {this.renderHomeHeader()}
                 {this.renderTabHeader("overview", "Modding")}
                 {this.renderTabHeader("spells", "Spells")}
@@ -88,7 +88,7 @@ class ModEditor extends React.PureComponent<Props, State> {
                 {this.renderTabHeader("maps", "Maps")}
                 {this.renderTabHeader("constants", "Constants")}
                 <div className="spacer"></div>
-            </NavBar>
+            </CustomBar>
             {this.state.tab === "overview" && <OverviewTab currentMod={this.state.currentMod} onUpdateMod={(mod) => this.updateMod(mod)} />}
             {this.state.tab === "spells" && this.renderSpellEditor("spells")}
             {this.state.tab === "sounds" && this.renderSoundEditor("sounds")}
@@ -99,11 +99,11 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     private renderHomeHeader() {
-        return <NavBarItem disabled={!this.state.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</NavBarItem>;
+        return <CustomItem disabled={!this.state.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</CustomItem>;
     }
 
     private renderTabHeader(id: string, name: string) {
-        return <NavBarItem key={id} selected={id === this.state.tab} badge={id in this.state.errors} onClick={() => this.setState({ tab: id })}>{name}</NavBarItem>
+        return <CustomItem key={id} selected={id === this.state.tab} badge={id in this.state.errors} onClick={() => this.setState({ tab: id })}>{name}</CustomItem>
     }
     
     private renderConstantEditor(key: string) {

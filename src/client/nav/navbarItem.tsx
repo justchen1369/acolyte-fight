@@ -1,8 +1,10 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as url from '../url';
+import CustomItem from './hrefItem';
 
 interface OwnProps {
     page?: string;
@@ -13,6 +15,8 @@ interface OwnProps {
     disabled?: boolean;
     selected?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
+
+    children?: React.ReactFragment;
 }
 interface Props extends OwnProps {
     current: s.PathElements;
@@ -30,30 +34,20 @@ class NavBarItem extends React.Component<Props> {
         const page = this.props.page;
         const profileId = this.props.profileId || null;
 
-        const classNames = ["nav-item"];
-        if (this.props.className) {
-            classNames.push(this.props.className);
-        }
-        if (this.props.current.page === page || this.props.selected) {
-            classNames.push("nav-item-selected");
-        }
-        if (this.props.shrink) {
-            classNames.push("nav-optional");
-        }
-        if (this.props.disabled) {
-            classNames.push("nav-item-disabled");
-        }
-
         const newPath = url.getPath(Object.assign({}, this.props.current, { page, profileId }));
-        return <a className={classNames.join(" ")} href={newPath} onClick={(ev) => this.onNavClick(ev, page, profileId)}>
-            <span className="nav-item-label">
-                {this.props.children}
-                {this.props.badge && <i className="badge fas fa-circle" />}
-            </span>
-        </a>
+        return <CustomItem
+            href={newPath}
+            className={this.props.className}
+            shrink={this.props.shrink}
+            badge={this.props.badge}
+            disabled={this.props.disabled}
+            selected={this.props.selected !== undefined ? this.props.selected : this.props.current.page === page}
+            onClick={(ev) => this.onNavClick(ev, page, profileId)}>
+            {this.props.children}
+            </CustomItem>
     }
 
-    private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>, newPage: string, profileId: string) {
+    private onNavClick(ev: React.MouseEvent, newPage: string, profileId: string) {
         if (this.props.disabled) {
             // do nothing
             ev.preventDefault();
