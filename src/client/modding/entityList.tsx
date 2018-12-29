@@ -6,13 +6,14 @@ import * as Reselect from 'reselect';
 import * as e from './editor.model';
 
 interface Props {
+    default: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
     selectedId: string;
     onUpdate: (section: e.CodeSection) => void;
     onUpdateSelected: (selectedId: string) => void;
 
-    prefix?: string;
+    addRemovePrefix?: string;
 
     children?: React.ReactFragment;
 }
@@ -40,16 +41,20 @@ class EntityList extends React.PureComponent<Props, State> {
                 {this.idSelector(this.props.section).map(id => this.renderOption(id))}
             </div>
             <div className="button-row">
-                {this.renderAddRemoveButtons()}
+                {this.renderAddButton()}
+                {this.renderRemoveButton()}
                 {this.props.children}
             </div>
         </div>;
     }
 
     private renderOption(id: string) {
+        const isModded = this.props.section[id] !== this.props.default[id];
         const className = classNames({
             'entity-list-item': true,
             'selected': id === this.props.selectedId,
+            'modded': isModded,
+            'unmodded': !isModded,
             'error': id in this.props.errors,
         });
         return <div
@@ -59,23 +64,35 @@ class EntityList extends React.PureComponent<Props, State> {
             >{id}</div>
     }
 
-    private renderAddRemoveButtons() {
-        if (this.props.prefix) {
-            return <>
-                <div className={this.props.selectedId ? "btn" : "btn btn-disabled"} onClick={() => this.onAddClick()}>+</div>
-                <div className={this.props.selectedId ? "btn" : "btn btn-disabled"} onClick={() => this.onRemoveClick()}>-</div>
-            </>
-        } else {
+    private renderAddButton() {
+        if (!this.props.addRemovePrefix) {
             return null;
         }
+
+        const selectedId = this.props.selectedId;
+        const disabled = !selectedId;
+        const className = classNames({ 'btn': true, 'btn-disabled': disabled });
+        return <div className={className} title="Add new" onClick={() => !disabled && this.onAddClick()}><i className="fas fa-plus" /></div>
+    }
+
+    private renderRemoveButton() {
+        if (!this.props.addRemovePrefix) {
+            return null;
+        }
+
+        const selectedId = this.props.selectedId;
+        const undeletable = selectedId && (selectedId in this.props.default);
+        const disabled = undeletable || !selectedId;
+        const className = classNames({ 'btn': true, 'btn-disabled': disabled });
+        return <div className={className} title="Remove" onClick={() => !disabled && this.onRemoveClick()}><i className="fas fa-trash" /></div>;
     }
 
     private onAddClick() {
-        if (!(this.props.prefix && this.props.selectedId)) {
+        if (!(this.props.addRemovePrefix && this.props.selectedId)) {
             return;
         }
 
-        const id = uniqid(`${this.props.prefix}-`);
+        const id = uniqid(`${this.props.addRemovePrefix}-`);
         const code = this.props.section[this.props.selectedId];
 
         let json: e.Entity;
@@ -94,7 +111,7 @@ class EntityList extends React.PureComponent<Props, State> {
         this.props.onUpdate(section);
         this.props.onUpdateSelected(id);
     }
-
+    
     private onRemoveClick() {
         if (!(this.props.selectedId)) {
             return;

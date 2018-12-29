@@ -5,6 +5,7 @@ import EntityList from './entityList';
 import ItemEditor from './itemEditor';
 
 interface Props {
+    default: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
     onUpdate: (section: e.CodeSection) => void;
@@ -27,15 +28,17 @@ class SectionEditor extends React.PureComponent<Props, State> {
     render() {
         return <div className="json-editor">
             <EntityList
+                default={this.props.default}
                 section={this.props.section}
                 errors={this.props.errors}
                 selectedId={this.state.selectedId}
                 onUpdateSelected={selectedId => this.setState({ selectedId })}
                 onUpdate={section => this.props.onUpdate(section)}
-                prefix={this.props.prefix}
+                addRemovePrefix={this.props.prefix}
                 />
             <ItemEditor
                 selectedId={this.state.selectedId}
+                default={this.props.default}
                 section={this.props.section}
                 errors={this.props.errors}
                 onUpdate={section => this.props.onUpdate(section)}

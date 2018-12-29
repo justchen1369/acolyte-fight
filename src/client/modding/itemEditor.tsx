@@ -6,6 +6,7 @@ import CodeEditor from './codeEditor';
 
 interface Props {
     selectedId: string;
+    default: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
     onUpdate: (section: e.CodeSection) => void;
@@ -38,6 +39,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
         return <div className="code-panel">
             <CodeEditor key="code" code={code} onChange={(code) => this.onCodeChange(id, code)} />
             <div className="editor-actions button-row">
+                {this.renderRevertButton()}
                 {this.renderStatus(error)}
                 <div className="spacer"></div>
                 {this.props.children}
@@ -59,6 +61,39 @@ class ItemEditor extends React.PureComponent<Props, State> {
 
         this.props.onUpdate(section);
     }
+
+    private renderRevertButton() {
+        const selectedId = this.props.selectedId;
+        if (!selectedId) {
+            return null;
+        }
+
+        const isModded = this.props.section[selectedId] !== this.props.default[selectedId];
+        const className = classNames({
+            'btn': true,
+            'btn-disabled': !(selectedId && isModded),
+        });
+        return <div className={className} title="Revert changes" onClick={() => this.onRevertClick()}><i className="fas fa-history" /></div>;
+    }
+
+    private onRevertClick() {
+        const selectedId = this.props.selectedId;
+        if (!(selectedId)) {
+            return;
+        }
+
+        const section: e.CodeSection = {
+            ...this.props.section,
+        };
+        delete section[selectedId];
+
+        if (selectedId in this.props.default) {
+            section[selectedId] = this.props.default[selectedId];
+        }
+
+        this.props.onUpdate(section);
+    }
+
 }
 
 export default ItemEditor;

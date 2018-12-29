@@ -1356,6 +1356,7 @@ textarea.ai-js {
 }
 
 .entity-panel {
+    padding: 5px;
     display: flex;
     flex-direction: column;
 }
@@ -1374,13 +1375,14 @@ textarea.ai-js {
     background: #555;
 }
 .entity-list-item.unmodded {
-    color: #ccc;
+    color: #888;
 }
 .entity-list-item.selected {
     background: #333;
 }
 
 .code-panel {
+    padding: 5px;
     display: flex;
     flex-direction: column;
 }

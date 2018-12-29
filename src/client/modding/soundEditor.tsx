@@ -10,6 +10,7 @@ import SectionEditor from './sectionEditor';
 const center = pl.Vec2(0.5, 0.5);
 
 interface Props {
+    default: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
     onUpdate: (section: e.CodeSection) => void;
@@ -44,6 +45,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
 
     render() {
         return <SectionEditor
+            default={this.props.default}
             section={this.props.section}
             errors={this.props.errors}
             onUpdate={section => this.props.onUpdate(section)}

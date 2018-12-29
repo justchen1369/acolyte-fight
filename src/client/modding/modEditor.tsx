@@ -17,6 +17,8 @@ import MapEditor from './mapEditor';
 import SoundEditor from './soundEditor';
 import SpellEditor from './spellEditor';
 
+const defaultTree = convert.settingsToCode(settings.DefaultSettings);
+
 const applyMod = Reselect.createSelector(
     (mod: Object) => mod,
     (mod: Object) => {
@@ -106,6 +108,7 @@ class ModEditor extends React.PureComponent<Props, State> {
     
     private renderConstantEditor(key: string) {
         return <ConstantEditor
+            default={defaultTree[key]}
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
@@ -114,6 +117,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private renderIconEditor(key: string) {
         return <IconEditor
+            default={defaultTree[key]}
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
@@ -123,6 +127,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private renderMapEditor(key: string) {
         return <MapEditor
+            default={defaultTree[key]}
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
@@ -131,6 +136,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private renderSpellEditor(key: string) {
         return <SpellEditor
+            default={defaultTree[key]}
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
@@ -140,6 +146,7 @@ class ModEditor extends React.PureComponent<Props, State> {
 
     private renderSoundEditor(key: string) {
         return <SoundEditor
+            default={defaultTree[key]}
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
