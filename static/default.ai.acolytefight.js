@@ -41,6 +41,7 @@ function handleInput(state, heroId, cooldowns) {
             recovery(state, hero, cooldowns)
             || dodge(state, hero, cooldowns)
             || castSpell(state, hero, strongest, cooldowns)
+            || focus(hero, strongest)
             || move(state, hero, closest);
     } else {
         action = move(state, hero, closest);
@@ -161,6 +162,14 @@ function jitter(target, missRadius) {
         x: target.x + radius * Math.cos(angle),
         y: target.y + radius * Math.sin(angle),
     };
+}
+
+function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - ensure we are focusing the enemy, otherwise we will miss
+    if (hero.casting) {
+        return { spellId: "retarget", target: opponent.pos };
+    } else {
+        return null;
+    }
 }
 
 function move(state, hero, opponent) {

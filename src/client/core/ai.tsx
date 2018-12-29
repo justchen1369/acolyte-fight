@@ -177,6 +177,9 @@ function worldToState(world: w.World): WorldContract {
                 health: obj.health,
                 linkedToId: obj.link ? obj.link.targetId : null,
                 shieldTicksRemaining: 0,
+                casting: obj.casting ? { 
+                    spellId: obj.casting.action.type,
+                } : null,
             };
         } else if (obj.category === "projectile") {
             contract.projectiles[obj.id] = {

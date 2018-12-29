@@ -436,7 +436,6 @@ declare interface ProjectileContract extends WorldObjectContract {
 
 declare interface CastingContract {
 	spellId: string;
-	target: Vec2;
 }
 
 declare interface CooldownsRemainingContract {
