@@ -13,6 +13,7 @@ import NavBarItem from '../ui/navbarItem';
 import OverviewTab from './overviewTab';
 import IconEditor from './iconEditor';
 import SectionEditor from './sectionEditor';
+import SoundEditor from './soundEditor';
 
 const applyMod = Reselect.createSelector(
     (mod: Object) => mod,
@@ -86,7 +87,7 @@ class ModEditor extends React.PureComponent<Props, State> {
             </NavBar>
             {this.state.tab === "overview" && <OverviewTab currentMod={this.state.currentMod} onUpdateMod={(mod) => this.updateMod(mod)} />}
             {this.state.tab === "spells" && this.renderSection("spells")}
-            {this.state.tab === "sounds" && this.renderSection("sounds")}
+            {this.state.tab === "sounds" && this.renderSoundEditor("sounds")}
             {this.state.tab === "icons" && this.renderIconEditor("icons")}
             {this.state.tab === "maps" && this.renderSection("maps")}
             {this.state.tab === "constants" && this.renderSection("constants")}
@@ -106,6 +107,15 @@ class ModEditor extends React.PureComponent<Props, State> {
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
+            />
+    }
+
+    private renderSoundEditor(key: string) {
+        return <SoundEditor
+            section={this.state.codeTree[key]}
+            errors={this.state.errors[key] || {}}
+            onUpdate={section => this.updateSection(key, section)}
+            settings={applyMod(this.state.currentMod)}
             />
     }
 
