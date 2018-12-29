@@ -7,6 +7,7 @@ import * as convert from './convert';
 import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
 import * as StoreProvider from '../storeProvider';
+import EditorPage from './editorPage';
 
 const FileSaver = require('../../lib/file-saver');
 
@@ -17,6 +18,7 @@ const stringifyMod = Reselect.createSelector(
 
 interface Props {
     codeTree: e.CodeTree;
+    roomMod: ModTree;
     currentMod: ModTree;
     errors: e.ErrorTree;
     playerName: string;
@@ -30,6 +32,7 @@ function stateToProps(state: s.State): Props {
     const modResult = editing.codeToMod(state.codeTree);
     return {
         playerName: state.playerName,
+        roomMod: state.room.mod,
         codeTree: state.codeTree,
         currentMod: modResult.mod,
         errors: modResult.errors,
@@ -45,13 +48,18 @@ class OverviewTab extends React.PureComponent<Props, State> {
         };
     }
 
+    componentWillMount() {
+        if (!this.props.codeTree && Object.keys(this.props.roomMod).length > 0) {
+            // Room is modded, load the settings from there when launching the mod editor
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
+        }
+    }
+
     render() {
-        return <div className="page-container">
-            <div className="page">
-                <h1>Modding</h1>
-                {this.renderCurrentState()}
-            </div>
-        </div>;
+        return <EditorPage>
+            <h1>Modding</h1>
+            {this.renderCurrentState()}
+        </EditorPage>;
     }
 
     private renderReference() {

@@ -7,7 +7,6 @@ import * as w from '../../game/world.model';
 import AccountPanel from './accountPanel';
 import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
-import EditorPage from './editorPage';
 import GamePanel from '../play/gamePanel';
 import HomePanel from './homePanel';
 import LeaderboardPanel from './leaderboardPanel';
@@ -20,6 +19,13 @@ import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
+
+import ModdingOverviewTab from '../modding/overviewTab';
+import IconEditor from '../modding/iconEditor';
+import MapEditor from '../modding/mapEditor';
+import SoundEditor from '../modding/soundEditor';
+import SpellEditor from '../modding/spellEditor';
+import ConstantEditor from '../modding/constantEditor';
 
 interface Props {
     myGameId: string;
@@ -60,7 +66,6 @@ class Root extends React.Component<Props> {
                 {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
                 {page === "party" && this.renderParty()}
-                {(page === "modding" || page.startsWith("modding-")) && this.renderModding()}
                 {page === "ai" && this.renderAi()}
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
@@ -68,6 +73,12 @@ class Root extends React.Component<Props> {
                 {page === "settings" && this.renderSettings()}
                 {page === "watch" && this.renderWatch()}
                 {page === "privacy" && this.renderPrivacy()}
+                {page === "modding" && <ModdingOverviewTab />}
+                {page === "modding-spells" && <SpellEditor />}
+                {page === "modding-icons" && <IconEditor />}
+                {page === "modding-sounds" && <SoundEditor />}
+                {page === "modding-maps" && <MapEditor />}
+                {page === "modding-constants" && <ConstantEditor />}
                 <UrlListener />
             </div>
         );
@@ -84,10 +95,6 @@ class Root extends React.Component<Props> {
                 <PartyPanel />
             </div>
         </div>;
-    }
-
-    private renderModding() {
-        return <EditorPage />;
     }
 
     private renderAi() {

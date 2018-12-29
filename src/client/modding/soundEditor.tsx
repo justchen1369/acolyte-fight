@@ -8,6 +8,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as audio from '../core/audio';
 import * as editing from './editing';
+import EditorPage from './editorPage';
 import SectionEditor from './sectionEditor';
 
 const center = pl.Vec2(0.5, 0.5);
@@ -52,10 +53,12 @@ class SoundEditor extends React.PureComponent<Props, State> {
 
     render() {
         const id = this.props.selectedId;
-        return <SectionEditor sectionKey="sounds" addRemovePrefix="sound">
-            {(this.state.currentAudioElement) && <div className="btn" onClick={() => this.onStopClick()}>Stop</div>}
-            {(this.props.settings && id) && <div className="btn" onClick={() => this.onPreviewClick(id)}>Preview</div>}
-        </SectionEditor>;
+        return <EditorPage expand={true}>
+            <SectionEditor sectionKey="sounds" addRemovePrefix="sound">
+                {(this.state.currentAudioElement) && <div className="btn" onClick={() => this.onStopClick()}>Stop</div>}
+                {(this.props.settings && id) && <div className="btn" onClick={() => this.onPreviewClick(id)}>Preview</div>}
+            </SectionEditor>
+        </EditorPage>;
     }
 
     private onPreviewClick(soundId: string) {

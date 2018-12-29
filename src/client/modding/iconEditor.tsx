@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as editing from './editing';
+import EditorPage from './editorPage';
 import SectionEditor from './sectionEditor';
 import SpellIcon from '../controls/spellIcon';
 
@@ -30,9 +31,11 @@ class IconEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <SectionEditor sectionKey="icons" addRemovePrefix="icon">
-            {this.renderIconPreview(this.props.selectedId)}
-        </SectionEditor>
+        return <EditorPage expand={true}>
+            <SectionEditor sectionKey="icons" addRemovePrefix="icon">
+                {this.renderIconPreview(this.props.selectedId)}
+            </SectionEditor>
+        </EditorPage>
     }
 
     private renderIconPreview(id: string): JSX.Element {

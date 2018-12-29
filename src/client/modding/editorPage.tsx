@@ -1,10 +1,14 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
-import ModEditor from '../modding/modEditor';
+import ModBar from './modBar';
 import NavBar from '../nav/navbar';
 
-interface Props {
+interface OwnProps {
+    expand?: boolean;
+}
+interface Props extends OwnProps {
     mod: Object;
     selfId: string;
     party: s.PartyState;
@@ -13,8 +17,9 @@ interface Props {
 interface State {
 }
 
-function stateToProps(state: s.State): Props {
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
+        ...ownProps,
         mod: state.room.mod,
         selfId: state.socketId,
         party: state.party,
@@ -65,7 +70,19 @@ class EditorPage extends React.PureComponent<Props, State> {
     }
 
     private renderEditor() {
-        return <ModEditor />;
+        if (this.props.expand) {
+            return <div className="content-container full-height-page">
+                <ModBar />
+                {this.props.children}
+            </div>
+        } else {
+            return <div className="content-container">
+                <ModBar />
+                <div className="page">
+                    {this.props.children}
+                </div>
+            </div>
+        }
     }
 
     private isAdmin() {

@@ -2,6 +2,7 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
 import * as e from './editor.model';
+import EditorPage from './editorPage';
 import PreviewButton from './previewButton';
 import SectionEditor from './sectionEditor';
 
@@ -18,9 +19,11 @@ class ConstantEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <SectionEditor sectionKey="constants">
-            <PreviewButton />
-        </SectionEditor>
+        return <EditorPage expand={true}>
+            <SectionEditor sectionKey="constants">
+                <PreviewButton />
+            </SectionEditor>
+        </EditorPage>
     }
 }
 

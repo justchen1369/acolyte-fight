@@ -5,20 +5,18 @@ import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as editing from './editing';
+import EditorPage from './editorPage';
 import PreviewButton from './previewButton';
 import SectionEditor from './sectionEditor';
 
 interface Props {
-    settings: AcolyteFightSettings;
     selectedId: string;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const settings = editing.codeToSettings(state.codeTree);
     return {
-        settings,
         selectedId: state.current.hash,
     };
 }
@@ -31,10 +29,11 @@ class MapEditor extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const layoutExists = this.props.selectedId && (this.props.selectedId in this.props.settings.Layouts);
-        return <SectionEditor sectionKey="maps" addRemovePrefix="map">
-            {layoutExists && <PreviewButton layoutId={this.props.selectedId} />}
-        </SectionEditor>
+        return <EditorPage expand={true}>
+            <SectionEditor sectionKey="maps" addRemovePrefix="map">
+                <PreviewButton layoutId={this.props.selectedId} />
+            </SectionEditor>
+        </EditorPage>
     }
 }
 
