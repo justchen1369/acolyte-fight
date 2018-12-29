@@ -246,6 +246,9 @@ i.clickable:hover, i.clickable:active {
     font-weight: bold;
     text-decoration: none;
 }
+.navbar .nav-item.error {
+    color: #ff0000;
+}
 .navbar .nav-item.nav-item-disabled {
     cursor: not-allowed;
     color: #888;
@@ -303,6 +306,10 @@ i.clickable:hover, i.clickable:active {
     font-size: 10px;
 
     color: #00ccff;
+}
+
+.navbar .nav-item.error .nav-item-label .badge {
+    color: #ff0000;
 }
 
 .navbar .nav-item:hover .nav-item-label .badge {

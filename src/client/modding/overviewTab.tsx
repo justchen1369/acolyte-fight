@@ -18,10 +18,12 @@ const stringifyMod = Reselect.createSelector(
 interface Props {
     currentMod: Object;
     onUpdateMod: (mod: Object) => void;
+
+    error: boolean;
 }
 interface State {
     selectedFile: File;
-    error: string;
+    loadFromFileError: string;
 }
 
 class OverviewTab extends React.PureComponent<Props, State> {
@@ -29,7 +31,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
         super(props);
         this.state = {
             selectedFile: null,
-            error: null,
+            loadFromFileError: null,
         };
     }
 
@@ -56,9 +58,10 @@ class OverviewTab extends React.PureComponent<Props, State> {
         const currentMod = this.props.currentMod;
         if (currentMod) {
             return Object.keys(currentMod).length > 0 ? this.renderCurrentMod(currentMod) : this.renderEmptyMod();
+        } else if (this.props.error) {
+            return this.renderCurrentModError();
         } else {
-            // Either the mod has not been parsed yet, or there was an error
-            return null;
+            return <p>Processing...</p>;
         }
     }
 
@@ -74,7 +77,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <h2>Open file</h2>
             <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
             <div className={this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onLoadModFile(this.state.selectedFile)}>Load from file</div>
-            {this.state.error && <p className="error">{this.state.error}</p>}
+            {this.state.loadFromFileError && <p className="error">{this.state.loadFromFileError}</p>}
             <h2>Examples</h2>
             <ul>
                 <li><a href="static/fireballMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>fireballMod.acolytefight.json</a> - this example mod decreases fireball cooldown.</li>
@@ -94,10 +97,23 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <div className="button-row">
                 <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to File</div>
             </div>
+            {this.renderDiscard()}
+        </div>
+    }
+
+    private renderCurrentModError() {
+        return <div>
+            <p className="error">Your mod currently has an error - check the other tabs (above) to fix them.</p>
+            {this.renderDiscard()}
+        </div>
+    }
+
+    private renderDiscard() {
+        return <>
             <h2>Back to Default Settings</h2>
             <p>Discard the current mod and revert back to default settings.</p>
             <div className="btn" onClick={() => this.props.onUpdateMod({})}>Discard</div>
-        </div>
+        </>
     }
 
     private async onLoadModHref(ev: React.MouseEvent<HTMLAnchorElement>) {
@@ -111,7 +127,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             }
         } catch (exception) {
             console.error("Error loading mod from URL", exception);
-            this.setState({ error: `${exception}` });
+            this.setState({ loadFromFileError: `${exception}` });
         }
     }
 
@@ -129,7 +145,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             this.props.onUpdateMod(mod);
         } catch (exception) {
             console.error("Error loading mod from file", exception);
-            this.setState({ error: `${exception}` });
+            this.setState({ loadFromFileError: `${exception}` });
         }
     }
 

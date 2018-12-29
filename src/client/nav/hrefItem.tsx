@@ -9,6 +9,7 @@ interface Props {
     badge?: boolean;
     disabled?: boolean;
     selected?: boolean;
+    error?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
 }
 
@@ -19,6 +20,7 @@ class CustomItem extends React.Component<Props> {
             'nav-item-selected': this.props.selected,
             'nav-optional': this.props.shrink,
             'nav-item-disabled': this.props.disabled,
+            'error': this.props.error,
         };
         if (this.props.className) {
             classSelectors[this.props.className] = true;

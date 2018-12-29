@@ -10,7 +10,7 @@ import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
 import ConstantEditor from './constantEditor';
 import CustomBar from '../nav/customBar';
-import CustomItem from '../nav/hrefItem';
+import HrefItem from '../nav/hrefItem';
 import OverviewTab from './overviewTab';
 import IconEditor from './iconEditor';
 import MapEditor from './mapEditor';
@@ -89,7 +89,7 @@ class ModEditor extends React.PureComponent<Props, State> {
                 {this.renderTabHeader("constants", "Constants")}
                 <div className="spacer"></div>
             </CustomBar>
-            {this.state.tab === "overview" && <OverviewTab currentMod={this.state.currentMod} onUpdateMod={(mod) => this.updateMod(mod)} />}
+            {this.state.tab === "overview" && this.renderOverviewTab()}
             {this.state.tab === "spells" && this.renderSpellEditor("spells")}
             {this.state.tab === "sounds" && this.renderSoundEditor("sounds")}
             {this.state.tab === "icons" && this.renderIconEditor("icons")}
@@ -99,11 +99,24 @@ class ModEditor extends React.PureComponent<Props, State> {
     }
 
     private renderHomeHeader() {
-        return <CustomItem disabled={!this.state.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</CustomItem>;
+        return <HrefItem disabled={!this.state.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Back to Home</HrefItem>;
     }
 
     private renderTabHeader(id: string, name: string) {
-        return <CustomItem key={id} selected={id === this.state.tab} badge={id in this.state.errors} onClick={() => this.setState({ tab: id })}>{name}</CustomItem>
+        return <HrefItem
+            key={id}
+            selected={id === this.state.tab}
+            badge={id in this.state.errors}
+            error={id in this.state.errors}
+            onClick={() => this.setState({ tab: id })}>{name}</HrefItem>
+    }
+
+    private renderOverviewTab() {
+        return <OverviewTab
+            currentMod={this.state.currentMod}
+            onUpdateMod={(mod) => this.updateMod(mod)}
+            error={!!this.state.errors}
+            />;
     }
     
     private renderConstantEditor(key: string) {
