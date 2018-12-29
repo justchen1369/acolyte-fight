@@ -393,6 +393,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& optional(data.gameId, "string")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
+		&& optional(data.private, "boolean")
 		&& optional(data.observe, "boolean")
 	)) {
 		callback({ success: false, error: "Bad request" });
@@ -416,12 +417,12 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		} else {
 			// This method is always used for public games
 			const partyId: string = null;
-			const isPrivate: boolean = false;
+			const isPrivate: boolean = data.private || false;
 
 			if (data.observe) {
 				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);
-			} else if (data.layoutId) {
-				// The user is modding and wants to try out their new map
+			} else if (isPrivate) {
+				// The user wants a private game, create one
 				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, data.layoutId);
 			} else {
 				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);

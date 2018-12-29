@@ -263,7 +263,9 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		history: [],
 	};
 	store.activeGames.set(game.id, game);
-	store.joinableGames.add(game.id);
+	if (!isPrivate) {
+		store.joinableGames.add(game.id);
+	}
 	if (room) {
 		room.accessed = moment();
 	}

@@ -17,12 +17,14 @@ export interface JoinParams {
 	live?: boolean;
 	layoutId?: string;
 	roomId?: string;
+	private?: boolean;
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
 		const live = opts.live || false;
 		const observe = live || !!opts.observeGameId;
+		const isPrivate = opts.private || false;
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
@@ -38,6 +40,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				isMobile,
 				observe,
 				live,
+				private: isPrivate,
 				version: engine.version(),
 			};
 			socket.emit('join', msg, (response: m.JoinResponseMsg) => {

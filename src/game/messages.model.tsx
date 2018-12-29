@@ -136,6 +136,7 @@ export interface JoinMsg {
     isMobile: boolean;
     observe: boolean;
     live: boolean;
+    private: boolean;
     version: string;
 }
 
