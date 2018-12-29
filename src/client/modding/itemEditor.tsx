@@ -37,7 +37,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
     private renderItemEditor(id: string, code: string, error: string) {
         return <div className="code-panel">
             <CodeEditor key="code" code={code} onChange={(code) => this.onCodeChange(id, code)} />
-            <div className="editor-actions">
+            <div className="editor-actions button-row">
                 {this.renderStatus(error)}
                 <div className="spacer"></div>
                 {this.props.children}
