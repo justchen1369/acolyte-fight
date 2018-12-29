@@ -200,6 +200,7 @@ i.clickable:hover, i.clickable:active {
 }
 
 .navbar-container {
+    flex-shrink: 0;
     width: 100%;
 }
 
@@ -409,12 +410,13 @@ i.clickable:hover, i.clickable:active {
 }
 
 .home .button-row {
+    flex-shrink: 0;
     display: flex;
     margin: 0px auto;
 }
 
 .home .btn {
-    width: 250px;
+    min-width: 250px;
     font-size: 285%;
 }
 .home .btn.disabled {
@@ -423,7 +425,7 @@ i.clickable:hover, i.clickable:active {
 
 @media (max-width: 768px) {
     .home .btn {
-        width: 100px;
+        min-width: 100px;
     }
 }
 
