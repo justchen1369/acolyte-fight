@@ -117,7 +117,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
             `${player.killsPerGame.toFixed(1)} kills per game`,
             `${player.damagePerGame.toFixed(1)} damage per game`,
         ].join(', ');
-        return <div className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
+        return <div key={player.userId} className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
             <span className="position">{position}</span>
             {this.renderPlayerName(player)}
             <span className="win-count">{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>

@@ -105,7 +105,7 @@ class RegionList extends React.Component<Props, State> {
             {this.props.server && this.props.region && <p>You are currently connected to server <b>{this.props.server}</b> in region <b>{this.props.region}</b></p>}
             {this.state.regions.size === 0 && <div className="loading">Loading regions...</div>}
             {this.state.error && <div className="error">{this.state.error}</div>}
-            {this.state.regions.valueSeq().map(region => <div className="region">
+            {this.state.regions.valueSeq().map(region => <div className="region" key={region.name}>
                 <a href={region.url} className="region-name">Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
             </div>).toArray()}
         </div>;

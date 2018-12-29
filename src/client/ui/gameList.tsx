@@ -173,7 +173,7 @@ class GameList extends React.Component<Props, State> {
     private renderRow(game: GameRow): JSX.Element {
         const self = game.players.get(game.self);
         const hasReplay = this.props.hasReplayLookup.get(game.id);
-        return <div className="game-card">
+        return <div key={game.id} className="game-card">
             <div className="game-info">
                 <div className="label">
                     <span className="timestamp">{game.createdTimestamp.fromNow()}</span>

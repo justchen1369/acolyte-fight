@@ -19,7 +19,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class LogoutPanel extends React.Component<Props, State> {
+export class AccountPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -33,7 +33,7 @@ export class LogoutPanel extends React.Component<Props, State> {
     private renderLoggedIn() {
         const a = options.getProvider();
         return <div>
-            {!a.noLogin && <p><div className="btn" onClick={() => this.logout()}>Logout</div></p>}
+            {!a.noLogin && <div className="btn" onClick={() => this.logout()}>Logout</div>}
         </div>
     }
 
@@ -42,4 +42,4 @@ export class LogoutPanel extends React.Component<Props, State> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(LogoutPanel);
+export default ReactRedux.connect(stateToProps)(AccountPanel);
