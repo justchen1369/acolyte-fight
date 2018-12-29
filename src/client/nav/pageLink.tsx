@@ -4,7 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import CustomItem from './hrefItem';
+import HrefItem from './hrefItem';
 
 interface OwnProps {
     page?: string;
@@ -35,7 +35,7 @@ class PageLink extends React.Component<Props> {
         const profileId = this.props.profileId || null;
 
         const newPath = url.getPath(Object.assign({}, this.props.current, { page, profileId }));
-        return <CustomItem
+        return <HrefItem
             href={newPath}
             className={this.props.className}
             shrink={this.props.shrink}
@@ -44,7 +44,7 @@ class PageLink extends React.Component<Props> {
             selected={this.props.selected !== undefined ? this.props.selected : this.props.current.page === page}
             onClick={(ev) => this.onNavClick(ev, page, profileId)}>
             {this.props.children}
-            </CustomItem>
+            </HrefItem>
     }
 
     private onNavClick(ev: React.MouseEvent, newPage: string, profileId: string) {
