@@ -98,7 +98,7 @@ class ControlsPanel extends React.Component<Props, State> {
     }
 
     render() {
-        return <p className="controls-panel">
+        return <div className="controls-panel">
             {!isMobile && <div className="row">
                 <span className="label">Move with</span>
                 <select className="value" value={this.state.moveWith} onChange={ev => this.onMoveWithSelected(ev.target.value)}>
@@ -174,7 +174,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     ? "Changes saved"
                     : "Unsaved changes"}
             </div>}
-        </p>;
+        </div>;
     }
 
     private renderKeyOption(keyConfig: KeyConfig) {
@@ -185,7 +185,7 @@ class ControlsPanel extends React.Component<Props, State> {
         const key = keyConfig.btn;
         const spell = spellUtils.resolveSpellForKey(key, this.props.keyBindings, this.props.settings);
         if (spell) {
-            return <option value={key}>{spellUtils.spellName(spell)}</option>
+            return <option key={key} value={key}>{spellUtils.spellName(spell)}</option>
         } else {
             return null;
         }
