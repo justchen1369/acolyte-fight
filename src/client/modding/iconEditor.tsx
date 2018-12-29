@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import uniqid from 'uniqid';
 import * as React from 'react';
 import * as e from './editor.model';
 import EntityList from './entityList';
@@ -30,7 +31,10 @@ class IconEditor extends React.PureComponent<Props, State> {
                 section={this.props.section}
                 errors={this.props.errors}
                 selectedId={this.state.selectedId}
-                onUpdateSelected={selectedId => this.setState({ selectedId })} />
+                onUpdateSelected={selectedId => this.setState({ selectedId })}
+                onUpdate={section => this.props.onUpdate(section)}
+                prefix="icon"
+                />
             <ItemEditor
                 selectedId={this.state.selectedId}
                 section={this.props.section}

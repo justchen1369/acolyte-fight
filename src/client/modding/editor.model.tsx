@@ -28,6 +28,10 @@ export interface ErrorSection {
     [key: string]: string;
 }
 
+export interface Entity {
+    id: string;
+}
+
 export class ParseException {
     errors: ErrorTree;
 

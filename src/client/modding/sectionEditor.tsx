@@ -27,7 +27,9 @@ class SectionEditor extends React.PureComponent<Props, State> {
                 section={this.props.section}
                 errors={this.props.errors}
                 selectedId={this.state.selectedId}
-                onUpdateSelected={selectedId => this.setState({ selectedId })} />
+                onUpdateSelected={selectedId => this.setState({ selectedId })}
+                onUpdate={section => this.props.onUpdate(section)}
+                />
             <ItemEditor
                 selectedId={this.state.selectedId}
                 section={this.props.section}

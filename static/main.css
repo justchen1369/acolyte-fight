@@ -1395,10 +1395,6 @@ textarea.ai-js {
     align-items: center;
 }
 
-.editor-actions .btn {
-    margin: 10px;
-}
-
 .code-area {
     display: flex;
     flex-direction: column;
