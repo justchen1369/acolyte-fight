@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as convert from './convert';
+import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
@@ -125,6 +126,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
+            onPreview={() => this.onPreviewClick()}
+            settings={applyMod(this.state.currentMod)}
             />
     }
 
@@ -144,6 +147,8 @@ class ModEditor extends React.PureComponent<Props, State> {
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
+            onPreview={(layoutId) => this.onPreviewClick(layoutId)}
+            settings={applyMod(this.state.currentMod)}
             />
     }
 
@@ -153,6 +158,7 @@ class ModEditor extends React.PureComponent<Props, State> {
             section={this.state.codeTree[key]}
             errors={this.state.errors[key] || {}}
             onUpdate={section => this.updateSection(key, section)}
+            onPreview={() => this.onPreviewClick()}
             settings={applyMod(this.state.currentMod)}
             />
     }
@@ -205,6 +211,15 @@ class ModEditor extends React.PureComponent<Props, State> {
             await rooms.joinRoomAsync(roomId);
             await parties.movePartyAsync(roomId);
             await pages.changePage("");
+        }
+    }
+
+    private async onPreviewClick(layoutId: string = null) {
+        const mod = this.state.currentMod;
+        if (mod) {
+            const roomId = await rooms.createRoomAsync(mod)
+            await rooms.joinRoomAsync(roomId);
+            await matches.joinNewGame({ layoutId });
         }
     }
 }

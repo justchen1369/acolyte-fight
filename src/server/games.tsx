@@ -231,7 +231,7 @@ export function initRoom(mod: Object, authToken: string): g.Room {
 	return room;
 }
 
-export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean) {
+export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, layoutId: string = null) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
@@ -274,6 +274,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		heroId,
 		actionType: m.ActionType.Environment,
 		seed: gameIndex,
+		layoutId: layoutId,
 	});
 	startTickProcessing();
 

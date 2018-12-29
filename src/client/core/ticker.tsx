@@ -166,6 +166,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 			world.occurrences.push({
 				type: "environment",
 				seed: actionData.seed,
+				layoutId: actionData.layoutId,
 			});
 		} else if (actionData.actionType === m.ActionType.Text) {
 			world.occurrences.push({

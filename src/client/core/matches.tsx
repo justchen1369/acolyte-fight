@@ -15,6 +15,7 @@ import { socket } from './sockets';
 export interface JoinParams {
 	observeGameId?: string;
 	live?: boolean;
+	layoutId?: string;
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
@@ -31,6 +32,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				name: store.playerName,
 				keyBindings: store.keyBindings,
 				room: store.room.id,
+				layoutId: opts.layoutId || null,
 				isBot: ai.playingAsAI(store) && !opts.observeGameId,
 				isMobile,
 				observe,

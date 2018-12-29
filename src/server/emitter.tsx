@@ -389,6 +389,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& required(data.name, "string")
 		&& required(data.keyBindings, "object")
 		&& optional(data.room, "string")
+		&& optional(data.layoutId, "string")
 		&& optional(data.gameId, "string")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
@@ -419,9 +420,11 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 
 			if (data.observe) {
 				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);
+			} else if (data.layoutId) {
+				// The user is modding and wants to try out their new map
+				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, data.layoutId);
 			} else {
-				const game = games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);
-				return game;
+				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);
 			}
 		}
 	}).catch(err => {

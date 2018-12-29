@@ -242,6 +242,7 @@ export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed
 export interface EnvironmentSeed {
 	type: "environment";
 	seed: number;
+	layoutId?: string;
 }
 
 export interface ChoosingSpells {

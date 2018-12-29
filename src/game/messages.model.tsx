@@ -75,6 +75,7 @@ export interface ActionMsgBase {
 export interface EnvironmentMsg extends ActionMsgBase {
     actionType: "environment";
     seed: number;
+    layoutId?: string;
 }
 
 export interface JoinActionMsg extends ActionMsgBase {
@@ -128,6 +129,7 @@ export interface TickMsg {
 export interface JoinMsg {
     gameId: string | null;
     room: string | null;
+    layoutId: string | null;
     name: string;
     keyBindings: KeyBindings;
     isBot: boolean;
