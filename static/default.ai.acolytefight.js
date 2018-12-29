@@ -140,7 +140,7 @@ function castSpell(state, hero, opponent, cooldowns) {
 
         if (spell
             && readyToCast
-            && (spell.action === "projectile" || spell.action === "spray")) {
+            && validAttack(state, hero, opponent, spell)) {
 
             candidates.push(spellId);
         }
@@ -152,6 +152,19 @@ function castSpell(state, hero, opponent, cooldowns) {
         return { spellId, target: jitter(opponent.pos, missRadius) };
     } else {
         return null;
+    }
+}
+
+function validAttack(state, hero, opponent, spell) {
+    var distance = vectorDistance(hero.pos, opponent.pos);
+    if (spell.action === "projectile" || spell.action === "spray") {
+        var range = spell.projectile.speed * spell.projectile.maxTicks / state.ticksPerSecond;
+        return distance <= range;
+    } else if (spell.action === "scourge") {
+        var range = spell.radius + opponent.radius;
+        return distance <= range;
+    } else {
+        return false;
     }
 }
 

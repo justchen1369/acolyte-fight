@@ -407,6 +407,8 @@ declare interface WorldContract {
 	obstacles: { [id: string]: ObstacleContract };
 
 	radius: number; // The current radius of the stage
+
+	ticksPerSecond: number;
 }
 
 declare interface WorldObjectContract {

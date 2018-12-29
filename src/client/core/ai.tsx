@@ -1,5 +1,6 @@
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
@@ -165,6 +166,7 @@ function worldToState(world: w.World): WorldContract {
         projectiles: {},
         obstacles: {},
         radius: world.radius,
+        ticksPerSecond: constants.TicksPerSecond,
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
