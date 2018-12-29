@@ -16,7 +16,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const settings = selectors.codeTreeToSettings(state.codeTree);
+    const settings = selectors.codeToSettings(state.codeTree);
     return {
         settings,
         selectedId: state.current.hash,

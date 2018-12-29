@@ -24,7 +24,7 @@ interface State {
 
 const noErrors = {}; // Reuse this to keep reference equality
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const modResult = selectors.createMod(state.codeTree);
+    const modResult = selectors.codeToMod(state.codeTree);
     const defaults = selectors.defaultTree[ownProps.sectionKey];
     return {
         ...ownProps,

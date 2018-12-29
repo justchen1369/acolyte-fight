@@ -5,22 +5,15 @@ import * as settings from '../../game/settings';
 
 export const defaultTree = convert.settingsToCode(settings.DefaultSettings);
 
-export const settingsToCodeTree = Reselect.createSelector(
-    (settings: AcolyteFightSettings) => settings,
-    (settings) => convert.settingsToCode(settings));
-
-export const codeTreeToSettings = Reselect.createSelector(
+export const codeToSettings = Reselect.createSelector(
     (codeTree: e.CodeTree) => codeTree,
-    (codeTree: e.CodeTree) => applyMod(createMod(codeTree).mod));
+    (codeTree: e.CodeTree) => modToSettings(codeToMod(codeTree).mod));
 
-export const applyMod = Reselect.createSelector(
-    (mod: ModTree) => mod,
-    (mod: ModTree) => {
-        return mod ? settings.calculateMod(mod) : null;
-    }
-);
+function modToSettings(mod: ModTree) {
+    return mod ? settings.calculateMod(mod) : null;
+}
 
-export const createMod = Reselect.createSelector(
+export const codeToMod = Reselect.createSelector(
     (codeTree: e.CodeTree) => codeTree,
     (codeTree: e.CodeTree) => {
         const result: ModResult = {

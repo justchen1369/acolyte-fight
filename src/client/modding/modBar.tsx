@@ -22,7 +22,7 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = selectors.createMod(state.codeTree);
+    const modResult = selectors.codeToMod(state.codeTree);
     return {
         codeTree: state.codeTree,
         currentMod: modResult.mod,
