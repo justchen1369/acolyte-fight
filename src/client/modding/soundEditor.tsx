@@ -56,7 +56,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
         return <EditorPage expand={true}>
             <SectionEditor sectionKey="sounds" addRemovePrefix="sound">
                 {(this.state.currentAudioElement) && <div className="btn" onClick={() => this.onStopClick()}>Stop</div>}
-                {(this.props.settings && id) && <div className="btn" onClick={() => this.onPreviewClick(id)}>Preview</div>}
+                {(this.props.settings && id) && <div className="btn" onClick={() => this.onPreviewClick(id)}>Preview Sound</div>}
             </SectionEditor>
         </EditorPage>;
     }

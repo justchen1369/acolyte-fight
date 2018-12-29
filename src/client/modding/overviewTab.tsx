@@ -8,6 +8,7 @@ import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
 import * as StoreProvider from '../storeProvider';
 import EditorPage from './editorPage';
+import PreviewButton from './previewButton';
 
 const FileSaver = require('../../lib/file-saver');
 
@@ -116,6 +117,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <textarea className="mod-json" value={stringifyMod(this.props.currentMod)} readOnly />
             <div className="button-row">
                 <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to File</div>
+                <PreviewButton>Preview</PreviewButton>
             </div>
             {this.renderDiscard()}
             {this.renderReference()}

@@ -31,7 +31,7 @@ class PreviewButton extends React.PureComponent<Props> {
             'btn': true,
             'btn-disabled': !this.props.mod,
         });
-        return <div className={className} onClick={() => this.onPreviewClick()}>Preview</div>
+        return <div className={className} onClick={() => this.onPreviewClick()}>{this.props.children}</div>
     }
 
     private onPreviewClick() {

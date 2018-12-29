@@ -61,6 +61,7 @@ class ModBar extends React.PureComponent<Props, State> {
             <PageLink page="modding-icons" error={"icons" in this.props.errors}>Icons</PageLink>
             <PageLink page="modding-maps" error={"maps" in this.props.errors}>Maps</PageLink>
             <PageLink page="modding-constants" error={"constants" in this.props.errors}>Constants</PageLink>
+            <div className="spacer">{this.props.children}</div>
         </CustomBar>
     }
 

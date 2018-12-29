@@ -41,7 +41,7 @@ class MapEditor extends React.PureComponent<Props, State> {
 
     private renderPreview() {
         if (this.props.settings && this.props.selectedId && this.props.selectedId in this.props.settings.Layouts) {
-            return <PreviewButton layoutId={this.props.selectedId} />;
+            return <PreviewButton layoutId={this.props.selectedId}>Preview Map</PreviewButton>;
         } else {
             return null;
         }
