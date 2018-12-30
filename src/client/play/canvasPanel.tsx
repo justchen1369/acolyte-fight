@@ -192,7 +192,7 @@ class CanvasPanel extends React.Component<Props, State> {
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
                 <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} />
+                <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} style={{ display: this.state.rtx ? "block" : "none" }} />
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="ui" ref={c => this.canvasStack.ui = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="cursor" ref={c => {

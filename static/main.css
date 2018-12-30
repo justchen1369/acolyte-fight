@@ -111,7 +111,6 @@ canvas.game {
 @supports ( -moz-appearance:none ){
     .rtx-on #glows {
         filter: none; /* firefox blurring is done in software and so is slow */
-        display: none;
     }
 }
 
