@@ -840,6 +840,8 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		// Orientate during charging
 		if (spell.revsPerTickWhileCharging > 0 && hero.target) {
 			turnTowards(hero, hero.target, spell.revsPerTickWhileCharging);
+		} else {
+			turnTowards(hero, action.target);
 		}
 		
 		// Waiting for charging to complete
@@ -873,6 +875,8 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.body.setAngularVelocity(0); // Don't allow a spray to go everywhere if hit creates angular momentum
 		if (spell.revsPerTickWhileChannelling > 0 && hero.target) {
 			turnTowards(hero, hero.target, spell.revsPerTickWhileChannelling);
+		} else {
+			turnTowards(hero, action.target);
 		}
 
 		const done = applyAction(world, hero, action, spell);

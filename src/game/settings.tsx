@@ -59,7 +59,7 @@ const Choices: ChoiceSettings = {
 	Options: {
 		"a": ["thrust", "teleport"],
 		"s": ["shield", "icewall", "drain"],
-		"q": ["fireball", "flamestrike"],
+		"q": ["fireball", "flamestrike", "triplet"],
 		"w": ["gravity", "link", "lightning"],
 		"e": ["homing", "boomerang"],
 		"r": ["kamehameha", "meteor", "supernova"],
@@ -351,6 +351,40 @@ const flamestrike: Spell = {
         sound: "flamestrike",
         render: "projectile",
         trailTicks: 30,
+    },
+};
+const triplet: Spell = {
+    id: 'triplet',
+    name: 'Triplet',
+    description: "Shoots 3 streams of fire. Easier to hit, but does less damage.",
+    action: "spray",
+    sound: "triplet",
+
+    color: '#ffcc00',
+    icon: "tripleScratches",
+
+    maxAngleDiffInRevs: 0,
+    cooldown: 1.5 * TicksPerSecond,
+
+    intervalTicks: 1,
+    lengthTicks: 3,
+
+    jitterRatio: 0.1,
+
+    projectile: {
+        color: '#ffcc00',
+
+        density: 5,
+        radius: 0.002,
+        speed: 0.3,
+        maxTicks: 100,
+        damage: 2.5,
+        categories: Categories.Projectile,
+
+        sound: "triplet",
+        soundHit: "standard",
+        render: "projectile",
+        trailTicks: 10,
     },
 };
 const firespray: Spell = {
@@ -1048,6 +1082,19 @@ const Sounds: Sounds = {
             }
         ],
     },
+    "triplet-channelling": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 0.5,
+                "attack": 0.25,
+                "decay": 0.25,
+                "highPass": 732,
+                "lowPass": 738,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "lightning": {
         cutoffEarly: false,
         start: [
@@ -1512,6 +1559,7 @@ const Spells = {
     fireball,
     flamestrike,
     firespray,
+    triplet,
     meteor,
     gravity,
     link,
