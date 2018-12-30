@@ -100,7 +100,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
             {this.state.loadFromFileError && <p className="error">{this.state.loadFromFileError}</p>}
             <h2>Examples</h2>
             <ul>
-                <li><a href="static/fireballMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>fireballMod.acolytefight.json</a> - this example mod decreases fireball cooldown.</li>
+                <li><a href="static/fireballMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>fireballMod.acolytefight.json</a> - this example mod decreases Fireball cooldown.</li>
+                <li><a href="static/acolyteBeamFiesta.mod.json" onClick={(ev) => this.onLoadModHref(ev)}>acolyteBeamFiesta.acolytefight.json</a> - this example mod decreases Acolyte Beam cooldown and removes other spells.</li>
                 <li><a href="static/homingClusterMod.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>homingClusterMod.acolytefight.json</a> - this is an example of creating a new spell - a slow cluster of homing missiles.</li>
                 <li><a href="static/noMove.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>noMove.acolytefight.json</a> - this example mod disables normal movement but reduces the speed of teleport.</li>
             </ul>

@@ -27,6 +27,7 @@ export function updateSelected(selectedId: string) {
 export async function previewMod(mod: ModTree, layoutId: string = null) {
     if (mod) {
         const roomId = await rooms.createRoomAsync(mod)
+        await rooms.joinRoomAsync(roomId);
         await matches.joinNewGame({ layoutId, roomId, locked: true });
     }
 }
