@@ -116,14 +116,6 @@ const Layouts: Layouts = {
             {
                 "numObstacles": 6,
                 "layoutRadius": 0.35,
-                "layoutAngleOffsetInRevs": 0,
-                "numPoints": 4,
-                "extent": 0.025,
-                "orientationAngleOffsetInRevs": 0
-            },
-            {
-                "numObstacles": 6,
-                "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.08333333333,
                 "numPoints": 4,
                 "extent": 0.01,
