@@ -226,13 +226,21 @@ const Layouts: Layouts = {
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.32,
                 "numPoints": 3,
+                "extent": 0.005,
+                "orientationAngleOffsetInRevs": 0.125
+            },
+            {
+                "numObstacles": 3,
+                "layoutRadius": 0.14,
+                "layoutAngleOffsetInRevs": 0.28,
+                "numPoints": 3,
                 "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0.125
             },
             {
                 "numObstacles": 3,
-                "layoutRadius": 0.15,
-                "layoutAngleOffsetInRevs": 0.25,
+                "layoutRadius": 0.22,
+                "layoutAngleOffsetInRevs": 0.23,
                 "numPoints": 3,
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.125
@@ -241,7 +249,7 @@ const Layouts: Layouts = {
                 "numObstacles": 3,
                 "layoutRadius": 0.3,
                 "layoutAngleOffsetInRevs": 0.18,
-                "numPoints": 3,
+                "numPoints": 6,
                 "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0.125
             }
