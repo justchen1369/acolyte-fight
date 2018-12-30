@@ -8,17 +8,16 @@ import { ButtonBar, TicksPerSecond } from '../../game/constants';
 
 interface OwnProps {
     spellId: string;
+    settings: AcolyteFightSettings;
 }
 interface Props extends OwnProps {
-    settings: AcolyteFightSettings;
 }
 interface State {
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
-        spellId: ownProps.spellId,
-        settings: state.world.settings,
+        ...ownProps,
     };
 }
 

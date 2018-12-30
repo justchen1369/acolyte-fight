@@ -413,8 +413,10 @@ function ticksToDetonate(projectileTemplate: ProjectileTemplate, distance: numbe
 		return 0;
 	}
 
-	let ticks = Math.floor(TicksPerSecond * distance / speed);
-	ticks = Math.min(ticks, projectileTemplate.maxTicks - (projectileTemplate.detonate.waitTicks || 0));
+	let ticks = projectileTemplate.maxTicks - (projectileTemplate.detonate.waitTicks || 0);
+	if (!projectileTemplate.detonate.maxRange) {
+		ticks = Math.min(ticks, Math.floor(TicksPerSecond * distance / speed));
+	}
 	return ticks;
 }
 

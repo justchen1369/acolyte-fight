@@ -257,6 +257,7 @@ declare interface DetonateParametersTemplate extends DamagePacket {
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
 
+	maxRange?: boolean; // Explode as maximum range, not where the user clicked
 	waitTicks?: number; // Don't explode straight away
 }
 

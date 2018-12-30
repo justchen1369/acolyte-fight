@@ -16,12 +16,12 @@ import SpellStats from './spellStats';
 
 interface OwnProps {
     btn: string;
+    settings: AcolyteFightSettings;
     rebinding?: boolean;
     onChosen?: (keyBindings: KeyBindings) => void;
 }
 interface Props extends OwnProps {
     config: KeyBindings;
-    settings: AcolyteFightSettings;
 }
 
 interface State {
@@ -33,7 +33,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         config: state.keyBindings,
-        settings: state.room.settings,
     };
 }
 
@@ -81,7 +80,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
                     <div className="description">{hovering ? hovering.description : chosen.description}</div>
                     {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
                 </div>
-                <SpellStats spellId={hovering ? hovering.id : chosen.id} />
+                <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={key} />}
         </div>;

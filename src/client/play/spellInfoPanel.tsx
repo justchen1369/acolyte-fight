@@ -71,7 +71,7 @@ class SpellInfoPanel extends React.Component<Props, State> {
             <div className="spell-description">
                 {spell.description}
             </div>
-            <SpellStats spellId={this.props.hoverSpellId} />
+            <SpellStats spellId={this.props.hoverSpellId} settings={this.props.settings} />
         </div>;
     }
 }

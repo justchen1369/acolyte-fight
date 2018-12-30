@@ -38,7 +38,7 @@ function stateToProps(state: s.State): Props {
         hoverSpellId: state.world.ui.hoverSpellId,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
-        settings: state.room.settings,
+        settings: state.world.settings,
     };
 }
 
@@ -94,7 +94,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private renderCustomizeBtn(btn: string) {
         return <div className="spell-config-container" onClick={() => this.close()} onContextMenu={ev => ev.preventDefault()}>
             <div className="spell-config">
-                <SpellBtnConfig btn={btn} onChosen={(keyBindings) => this.onChosen(keyBindings)} />
+                <SpellBtnConfig btn={btn} onChosen={(keyBindings) => this.onChosen(keyBindings)} settings={this.props.settings} />
                 <div className="accept-row">
                     {!this.props.wheelOnRight && <div className="spacer" />}
                     {isMobile && <div className="btn" onClick={() => this.close()}>OK</div>}

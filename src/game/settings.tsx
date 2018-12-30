@@ -59,7 +59,7 @@ const Choices: ChoiceSettings = {
 	Options: {
 		"a": ["thrust", "teleport"],
 		"s": ["shield", "icewall", "drain"],
-		"q": ["fireball", "flamestrike", "triplet"],
+		"q": ["fireball", "flamestrike"],
 		"w": ["gravity", "link", "lightning"],
 		"e": ["homing", "boomerang"],
 		"r": ["kamehameha", "meteor", "supernova"],
@@ -584,6 +584,47 @@ const boomerang: Spell = {
         render: "projectile",
     },
 };
+
+const whip: Spell = {
+    id: 'whip',
+    name: 'Electrowhip',
+    description: "Shock your enemies with the tip of your whip for maximum knockback.",
+    action: "projectile",
+
+    color: '#44ff44',
+    icon: "electricWhip",
+
+    maxAngleDiffInRevs: 0.01,
+    chargeTicks: 5,
+    cooldown: 5 * TicksPerSecond,
+
+    projectile: {
+        color: '#44ff44',
+
+        density: 5,
+        radius: 0.005,
+        speed: 0.7,
+        maxTicks: 8,
+        damage: 0,
+        categories: Categories.Projectile,
+        collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
+        expireOn: Categories.None,
+        strafe: true,
+        shieldTakesOwnership: false,
+
+        detonate: {
+            damage: 15,
+            radius: 0.025,
+            minImpulse: 0.0001,
+            maxImpulse: 0.0002,
+            maxRange: true,
+        },
+
+        render: "link",
+        trailTicks: 1,
+    },
+};
+
 const link: Spell = {
     id: 'link',
     description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
@@ -1567,6 +1608,7 @@ const Spells = {
     lightning,
     homing,
     boomerang,
+    whip,
     bouncer,
     drain,
     icewall,

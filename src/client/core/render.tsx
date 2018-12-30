@@ -929,10 +929,6 @@ function renderSupernova(ctxStack: CanvasCtxStack, projectile: w.Projectile, wor
 }
 
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
-	if (!projectile.link) {
-		return;
-	}
-
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
 	renderProjectile(ctxStack, projectile, world);
 
