@@ -129,8 +129,6 @@ function deflect(state, hero, cooldowns, projectile) {
 function castSpell(state, hero, opponent, cooldowns) {
     if (Date.now() < nextSpell && !hero.linkedToId) {
         return null;
-    } else if (opponent.shieldTicksRemaining) {
-        return null;
     }
 
     var candidates = [];
@@ -156,8 +154,14 @@ function castSpell(state, hero, opponent, cooldowns) {
 }
 
 function validAttack(state, hero, opponent, spell) {
+    var opponentShielded = !!opponent.shieldTicksRemaining;
+
     var distance = vectorDistance(hero.pos, opponent.pos);
     if (spell.action === "projectile" || spell.action === "spray") {
+        if (opponentShielded && !spell.projectile.detonate) { // Detonate spells can penetrate shields, nothing else can
+            return false;
+        }
+
         var range = spell.projectile.speed * spell.projectile.maxTicks / state.ticksPerSecond;
         return distance <= range;
     } else if (spell.action === "scourge") {
