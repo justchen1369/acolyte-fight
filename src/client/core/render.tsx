@@ -28,6 +28,7 @@ export interface CanvasCtxStack {
 	glows: CanvasRenderingContext2D;
 	canvas: CanvasRenderingContext2D;
 	ui: CanvasRenderingContext2D;
+	rtx: boolean;
 }
 
 export interface RenderOptions {
@@ -105,6 +106,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		glows: canvasStack.glows.getContext('2d', { alpha: true }),
 		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
+		rtx: options.rtx,
 	} as CanvasCtxStack;
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
 		throw "Error getting context";
@@ -140,13 +142,17 @@ function playSounds(world: w.World, options: RenderOptions) {
 
 function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
 	func(contextStack.background);
-	func(contextStack.glows);
+	if (contextStack.rtx) {
+		func(contextStack.glows);
+	}
 	func(contextStack.canvas);
 	func(contextStack.ui);
 }
 
 function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
-	func(contextStack.glows);
+	if (contextStack.rtx) {
+		func(contextStack.glows);
+	}
 	func(contextStack.canvas);
 }
 
