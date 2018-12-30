@@ -252,6 +252,8 @@ declare interface HomingParametersTemplate {
 }
 
 declare interface DetonateParametersTemplate extends DamagePacket {
+	outerDamage?: number;
+
 	radius: number; // The radius of the explosion
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback

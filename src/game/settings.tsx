@@ -589,7 +589,7 @@ const boomerang: Spell = {
 const whip: Spell = {
     id: 'whip',
     name: 'Electrowhip',
-    description: "Shock your enemies with the tip of your whip for maximum knockback.",
+    description: "Shock your enemies with the tip of your whip for maximum damage and knockback.",
     action: "projectile",
 
     color: '#44ff44',
@@ -614,7 +614,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 15,
+            damage: 20,
+            outerDamage: 5,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0002,

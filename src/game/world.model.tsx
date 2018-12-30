@@ -493,6 +493,7 @@ export interface HomingParameters {
 }
 
 export interface DetonateParameters extends DamagePacket {
+	outerDamage: number;
 	radius: number;
 	minImpulse: number;
 	maxImpulse: number;

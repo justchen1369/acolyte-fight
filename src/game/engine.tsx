@@ -368,6 +368,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			damage: projectileTemplate.detonate.damage,
+			outerDamage: projectileTemplate.detonate.outerDamage !== undefined ? projectileTemplate.detonate.outerDamage : projectileTemplate.detonate.damage,
 			lifeSteal: projectileTemplate.detonate.lifeSteal,
 			radius: projectileTemplate.detonate.radius,
 			minImpulse: projectileTemplate.detonate.minImpulse,
@@ -1450,26 +1451,28 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 
 	// Apply damage
 	world.objects.forEach(other => {
-		if (other.category === "hero") {
+		if (other.category === "hero" || other.category === "obstacle") {
 			const diff = vector.diff(other.body.getPosition(), projectile.body.getPosition());
 			const distance = vector.length(diff);
-			if (other.id !== projectile.owner && distance <= projectile.detonate.radius + other.radius) {
-				const packet = scaleForPartialDamage(world, projectile, {
-					damage: projectile.detonate.damage,
-					lifeSteal: projectile.detonate.lifeSteal,
-				});
-				applyDamage(other, packet, projectile.owner, world);
-
-				const proportion = 1.0 - (distance / (projectile.detonate.radius + other.radius)); // +HeroRadius because only need to touch the edge
+			const extent = other.category === "hero" ? other.radius : other.extent;
+			const explosionRadius = projectile.detonate.radius + extent; // +extent because only need to touch the edge
+			if (other.id !== projectile.owner && distance <= explosionRadius) {
+				const proportion = 1.0 - (distance / explosionRadius);
 				const magnitude = projectile.detonate.minImpulse + proportion * (projectile.detonate.maxImpulse - projectile.detonate.minImpulse);
 				other.body.applyLinearImpulse(
 					vector.relengthen(diff, magnitude),
 					other.body.getWorldPoint(vector.zero()),
 					true);
-			}
-		} else if (other.category === "obstacle") {
-			if (vector.distance(projectile.body.getPosition(), other.body.getPosition()) <= projectile.detonate.radius + other.extent) {
-				applyDamageToObstacle(other, projectile, world);
+
+				const packet = scaleForPartialDamage(world, projectile, {
+					damage: proportion * projectile.detonate.damage + (1 - proportion) * projectile.detonate.outerDamage,
+					lifeSteal: projectile.detonate.lifeSteal,
+				});
+				if (other.category === "hero") {
+					applyDamage(other, packet, projectile.owner, world);
+				} else {
+					applyDamageToObstacle(other, packet, world);
+				}
 			}
 		}
 	});
