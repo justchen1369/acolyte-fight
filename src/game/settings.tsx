@@ -356,12 +356,12 @@ const flamestrike: Spell = {
 };
 const triplet: Spell = {
     id: 'triplet',
-    name: 'Triplet',
-    description: "Shoots 3 streams of fire. Easier to hit, but does less damage.",
+    name: 'Triplasma',
+    description: "Shoots 3 bolts of plasma. Easy to hit, but also easy to do 1/3 damage.",
     action: "spray",
     sound: "triplet",
 
-    color: '#ffcc00',
+    color: '#ff0044',
     icon: "tripleScratches",
 
     maxAngleDiffInRevs: 0,
@@ -373,7 +373,7 @@ const triplet: Spell = {
     jitterRatio: 0.1,
 
     projectile: {
-        color: '#ffcc00',
+        color: '#ff0044',
 
         density: 5,
         radius: 0.002,
@@ -589,7 +589,7 @@ const boomerang: Spell = {
 const whip: Spell = {
     id: 'whip',
     name: 'Electrowhip',
-    description: "Shock your enemies with the tip of your whip for maximum damage and knockback.",
+    description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
     color: '#44ff44',
@@ -603,7 +603,7 @@ const whip: Spell = {
         color: '#44ff44',
 
         density: 5,
-        radius: 0.005,
+        radius: 0.001,
         speed: 0.7,
         maxTicks: 8,
         damage: 0,
