@@ -595,7 +595,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 5,
+    chargeTicks: 8,
     cooldown: 5 * TicksPerSecond,
 
     projectile: {
@@ -620,6 +620,7 @@ const whip: Spell = {
             maxRange: true,
         },
 
+        sound: "whip",
         render: "link",
         trailTicks: 1,
     },
@@ -1550,6 +1551,60 @@ const Sounds: Sounds = {
                 ratios: [1, 1.33, 1.5],
             }
         ],
+    },
+    "whip": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.25,
+                "attack": 0.05,
+                "decay": 0.2,
+                "startFreq": 4800,
+                "stopFreq": 7200,
+                "modStartFreq": 30,
+                "modStopFreq": 30,
+                "modStartStrength": 3600,
+                "modStopStrength": 3600,
+                "tremoloFreq": 30,
+                "tremoloStrength": 0.1,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.33,
+                    1.5
+                ]
+            }
+        ]
+    },
+    "whip-detonating": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 0.15,
+                "attack": 0.01,
+                "decay": 0.14,
+                "startFreq": 3000,
+                "stopFreq": 3000,
+                "modStartFreq": 20,
+                "modStopFreq": 10,
+                "modStartStrength": 6000,
+                "modStopStrength": 3000,
+                "tremoloFreq": 3,
+                "tremoloStrength": 0.1,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.2,
+                    1.4,
+                    1.6,
+                    1.8,
+                    2.4,
+                    2.8,
+                    3.2,
+                    3.6
+                ]
+            }
+        ]
     },
     "standard-hit": {
         cutoffEarly: false,
