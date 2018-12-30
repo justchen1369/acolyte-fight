@@ -1712,13 +1712,14 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 			target = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
 		}
 
-		const currentAngle = vector.angle(pos);
+		const diff = vector.diff(target, pos);
+		const currentAngle = vector.angle(diff);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
 		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
 		const newAngle = currentAngle + 2 * Math.PI * projectileIndex / numProjectiles;
 
-		const jitterRadius = vector.distance(pos, target) * spell.jitterRatio;
+		const jitterRadius = vector.length(diff) * spell.jitterRatio;
 		const newTarget = vector.plus(target, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
 
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
