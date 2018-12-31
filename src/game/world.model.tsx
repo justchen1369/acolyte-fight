@@ -408,7 +408,6 @@ export interface LinkState {
 
 	lifeSteal: number;
 	expireTick: number;
-	color: string;
 }
 
 export interface ThrustState extends DamagePacket {
@@ -470,9 +469,6 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	sound?: string;
 	soundHit?: string;
     radius: number;
-	color: string;
-	selfColor: boolean;
-    trailTicks: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
 }

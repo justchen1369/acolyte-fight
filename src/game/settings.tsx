@@ -86,13 +86,21 @@ const Choices: ChoiceSettings = {
 
 const renderLink: RenderLink = {
     type: "link",
+    color: '#4444ff',
     width: 5 * Pixel,
 };
 
 const renderGravity: RenderSwirl = {
     type: "swirl",
+
+    color: '#0ace00',
+    radius: 0.02,
+    ticks: 0.25 * TicksPerSecond,
+
     loopTicks: 20,
+
     numParticles: 3,
+    particleRadius: 0.02 / 3,
 };
 
 const move: MoveSpell = {
@@ -145,8 +153,6 @@ const fireball: Spell = {
     cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
-        color: '#ff8800',
-
         density: 10,
         radius: 0.003,
         speed: 0.5,
@@ -157,10 +163,9 @@ const fireball: Spell = {
         sound: "fireball",
         soundHit: "standard",
         renderers: [
-            { type: "projectile" },
-            { type: "ray" },
+            { type: "projectile", color: '#ff8800', ticks: 30 },
+            { type: "ray", color: '#ff8800', ticks: 30  },
         ],
-        trailTicks: 30,
     },
 };
 const flamestrike: Spell = {
@@ -176,8 +181,6 @@ const flamestrike: Spell = {
     cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
-        color: '#ff4400',
-
         density: 5,
         radius: 0.005,
         speed: 0.18,
@@ -201,10 +204,9 @@ const flamestrike: Spell = {
 
         sound: "flamestrike",
         renderers: [
-            { type: "projectile" },
-            { type: "ray" },
+            { type: "projectile", color: '#ff4400', ticks: 30 },
+            { type: "ray", color: '#ff4400', ticks: 30 },
         ],
-        trailTicks: 30,
     },
 };
 const triplet: Spell = {
@@ -226,8 +228,6 @@ const triplet: Spell = {
     jitterRatio: 0.1,
 
     projectile: {
-        color: '#ff0044',
-
         density: 5,
         radius: 0.002,
         speed: 0.3,
@@ -238,10 +238,9 @@ const triplet: Spell = {
         sound: "triplet",
         soundHit: "standard",
         renderers: [
-            { type: "projectile" },
-            { type: "ray" },
+            { type: "projectile", color: '#ff0044', ticks: 10 },
+            { type: "ray", color: '#ff0044', ticks: 10 },
         ],
-        trailTicks: 10,
     },
 };
 const firespray: Spell = {
@@ -263,8 +262,6 @@ const firespray: Spell = {
     jitterRatio: 0.4,
 
     projectile: {
-        color: '#ff0044',
-
         density: 1,
         radius: 0.002,
         speed: 0.5,
@@ -272,9 +269,8 @@ const firespray: Spell = {
         damage: 2.5,
 
         renderers: [
-            { type: "ray", intermediatePoints: true },
+            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 30 },
         ],
-        trailTicks: 30,
     },
 };
 const meteor: Spell = {
@@ -289,21 +285,18 @@ const meteor: Spell = {
     cooldown: 9 * TicksPerSecond,
 
     projectile: {
-        color: '#ff0000',
-
         density: 100,
         radius: 0.03,
         speed: 0.2,
         minTicks: 1,
         maxTicks: 5 * TicksPerSecond,
         damage: 0,
-        trailTicks: 15,
         categories: Categories.Projectile | Categories.Massive,
         expireOn: Categories.Obstacle,
 
         sound: "meteor",
         renderers: [
-            { type: "projectile" },
+            { type: "projectile", color: '#ff0000', ticks: 15 },
         ],
     },
 };
@@ -332,20 +325,17 @@ const kamehameha: Spell = {
     lengthTicks: 5 * TicksPerSecond,
 
     projectile: {
-        color: '#ffffff',
-
         density: 0.0001,
         radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         damage: 5,
         damageScaling: false,
-        trailTicks: 1.0 * TicksPerSecond,
         categories: Categories.Projectile | Categories.Massive,
 
         sound: "kamehameha",
         renderers: [
-            { type: "ray", intermediatePoints: true },
+            { type: "ray", intermediatePoints: true, color: '#ffffff', ticks: 60 },
         ],
     },
 };
@@ -363,8 +353,6 @@ const lightning: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        color: '#00ddff',
-
         density: 3,
         radius: 0.0025,
         speed: 3.0,
@@ -374,9 +362,8 @@ const lightning: Spell = {
 
         sound: "lightning",
         renderers: [
-            { type: "ray", intermediatePoints: true },
+            { type: "ray", intermediatePoints: true, color: '#00ddff', ticks: 30 },
         ],
-        trailTicks: 30,
     },
 };
 const homing: Spell = {
@@ -391,8 +378,6 @@ const homing: Spell = {
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
-        color: '#44ffcc',
-
         density: 25,
         radius: 0.003,
         speed: 0.15,
@@ -405,13 +390,11 @@ const homing: Spell = {
             maxTurnProportion: 0.05,
         },
 
-        trailTicks: 30,
-
         sound: "homing",
         soundHit: "standard",
         renderers: [
-            { type: "projectile" },
-            { type: "ray" },
+            { type: "projectile", color: '#44ffcc', ticks: 30 },
+            { type: "ray", color: '#44ffcc', ticks: 30 },
         ],
     },
 };
@@ -428,9 +411,6 @@ const boomerang: Spell = {
     cooldown: 20 * TicksPerSecond,
 
     projectile: {
-        color: '#ff00ff',
-        selfColor: true,
-
         density: 1,
         radius: 0.003,
         speed: 0.4,
@@ -445,13 +425,11 @@ const boomerang: Spell = {
             targetType: HomingTargets.self,
         },
 
-        trailTicks: 1 * TicksPerSecond,
-
         sound: "boomerang",
         soundHit: "standard",
         renderers: [
-            { type: "projectile" },
-            { type: "ray" },
+            { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 60 },
+            { type: "ray", color: '#ff00ff', selfColor: true, ticks: 60  },
         ],
     },
 };
@@ -470,8 +448,6 @@ const whip: Spell = {
     cooldown: 5 * TicksPerSecond,
 
     projectile: {
-        color: '#44ff44',
-
         density: 5,
         radius: 0.001,
         speed: 0.7,
@@ -494,9 +470,8 @@ const whip: Spell = {
 
         sound: "whip",
         renderers: [
-            { type: "link", width: Pixel * 5 },
+            { type: "link", color: '#44ff44', width: Pixel * 5 },
         ],
-        trailTicks: 1,
     },
 };
 
@@ -512,8 +487,6 @@ const link: Spell = {
     cooldown: 12 * TicksPerSecond,
 
     projectile: {
-        color: '#4444ff',
-
         density: 1,
         radius: 0.005,
         speed: 0.25,
@@ -537,10 +510,9 @@ const link: Spell = {
             targetType: HomingTargets.self,
         },
 
-        trailTicks: 1,
-
         sound: "link",
         renderers: [
+            { type: "projectile", color: "#4444ff", ticks: 1 },
             renderLink,
         ],
     },
@@ -557,9 +529,6 @@ const bouncer: Spell = {
     cooldown: 8 * TicksPerSecond,
 
     projectile: {
-        color: '#88ee22',
-        selfColor: true,
-
         density: 2,
         radius: 0.001,
         speed: 1.5,
@@ -574,9 +543,8 @@ const bouncer: Spell = {
 
         sound: "bouncer",
         renderers: [
-            { type: "ray", intermediatePoints: true },
+            { type: "ray", intermediatePoints: true, color: '#88ee22', selfColor: true, ticks: 60 },
         ],
-        trailTicks: 1.0 * TicksPerSecond,
     },
 };
 const drain: Spell = {
@@ -591,7 +559,6 @@ const drain: Spell = {
     cooldown: 5 * TicksPerSecond,
 
     projectile: {
-        color: '#22ee88',
         sound: "drain",
 
         density: 2,
@@ -606,9 +573,8 @@ const drain: Spell = {
         },
 
         renderers: [
-            { type: "ray", intermediatePoints: true },
+            { type: "ray", intermediatePoints: true, color: '#22ee88', ticks: 30 },
         ],
-        trailTicks: 0.5 * TicksPerSecond,
     },
 };
 const gravity: Spell = {
@@ -626,8 +592,6 @@ const gravity: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        color: '#0ace00',
-
         density: 0.0001,
         radius: 0.02,
         speed: 0.3,
@@ -652,7 +616,6 @@ const gravity: Spell = {
         renderers: [
             renderGravity,
         ],
-        trailTicks: 0.25 * TicksPerSecond,
     },
 };
 const supernova: Spell = {
@@ -667,8 +630,6 @@ const supernova: Spell = {
     cooldown: 12 * TicksPerSecond,
 
     projectile: {
-        color: '#ffaa00',
-
         density: 5,
         radius: 0.001,
         speed: 0.3,
@@ -693,10 +654,9 @@ const supernova: Spell = {
 
         sound: "supernova",
         renderers: [
-            { type: "ray" },
-            { type: "reticule", ticks: 0.5 * TicksPerSecond, radius: 0.05 },
+            { type: "ray", color: '#ffaa00', ticks: 30 },
+            { type: "reticule", color: '#ffaa00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
         ],
-        trailTicks: 30,
     },
 };
 const scourge: Spell = {

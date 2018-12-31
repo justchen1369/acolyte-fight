@@ -394,10 +394,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		soundHit: projectileTemplate.soundHit,
 
 		renderers: projectileTemplate.renderers,
-		color: projectileTemplate.color,
-		selfColor: projectileTemplate.selfColor,
 		radius: projectileTemplate.radius,
-		trailTicks: projectileTemplate.trailTicks,
 
 		uiPath: [vector.clone(position)],
 	} as w.Projectile;
@@ -1178,7 +1175,6 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
-		color: projectile.color,
 	};
 }
 

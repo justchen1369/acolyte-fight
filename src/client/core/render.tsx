@@ -236,7 +236,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
 			if (target) {
-				renderLinkBetween(ctxStack, obj, target, obj.link.color, world.settings.Render.link);
+				renderLinkBetween(ctxStack, obj, target, world.settings.Render.link);
 			}
 		}
 	} else if (obj.category === "shield") {
@@ -297,9 +297,9 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 
 	obj.renderers.forEach(render => {
 		if (render.type === "projectile") {
-			renderProjectile(ctxStack, obj, world);
+			renderProjectile(ctxStack, obj, world, render);
 		} else if (render.type == "ray") {
-			renderRay(ctxStack, obj, world, render.intermediatePoints || false);
+			renderRay(ctxStack, obj, world, render);
 		} else if (render.type === "link") {
 			renderLink(ctxStack, obj, world, render);
 		} else if (render.type === "swirl") {
@@ -849,7 +849,7 @@ function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		return;
 	}
 
-	renderGravityAt(ctxStack, projectile.body.getPosition(), world.settings.Spells[projectile.type] as ProjectileSpell, world, swirl);
+	renderGravityAt(ctxStack, projectile.body.getPosition(), world, swirl);
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -859,7 +859,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 
 	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
 	const swirl = world.settings.Render.gravity;
-	renderGravityAt(ctxStack, hero.gravity.location, spell, world, swirl);
+	renderGravityAt(ctxStack, hero.gravity.location, world, swirl);
 
 	if (spell.sound) {
 		world.ui.sounds.push({
@@ -870,7 +870,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 }
 
-function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: ProjectileSpell, world: w.World, swirl: RenderSwirl) {
+function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl) {
 	const animationLength = swirl.loopTicks;
 	const numParticles = swirl.numParticles;
 
@@ -879,11 +879,11 @@ function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: Pro
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		world.ui.trails.push({
 			type: "circle",
-			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), spell.projectile.radius)),
-			radius: spell.projectile.radius / numParticles,
+			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), swirl.radius)),
+			radius: swirl.particleRadius,
 			initialTick: world.tick,
-			max: spell.projectile.trailTicks, 
-			fillStyle: spell.projectile.color,
+			max: swirl.ticks, 
+			fillStyle: swirl.color,
 		});
 	}
 }
@@ -908,7 +908,7 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	foreground(ctxStack, ctx => {
 		ctx.save();
 
-		ctx.strokeStyle = projectile.color;
+		ctx.strokeStyle = reticule.color;
 		ctx.lineWidth = 3 * Pixel;
 
 		const perSegment = 2 * Math.PI / numSegments;
@@ -926,17 +926,15 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
-	renderProjectile(ctxStack, projectile, world);
-
 	if (owner && owner.category == "hero") {
-		renderLinkBetween(ctxStack, owner, projectile, projectile.color, render);
+		renderLinkBetween(ctxStack, owner, projectile, render);
 	}
 }
 
-function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, color: string, render: RenderLink) {
+function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
 	foreground(ctxStack, ctx => {
 		ctx.lineWidth = render.width;
-		ctx.strokeStyle = color;
+		ctx.strokeStyle = render.color;
 
 		const from = owner.body.getPosition();
 		const to = target.body.getPosition();
@@ -947,19 +945,19 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 	});
 }
 
-function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, intermediatePoints: boolean = false) {
+function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
 	let previous: pl.Vec2 = null;
 
 	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
-	for (let pos of getRenderPoints(projectile.uiPath, intermediatePoints)) {
+	for (let pos of getRenderPoints(projectile.uiPath, render.intermediatePoints)) {
 		if (previous) {
 			world.ui.trails.push({
 				type: 'line',
 				initialTick: world.tick,
-				max: projectile.trailTicks, 
+				max: render.ticks, 
 				from: previous,
 				to: pos,
-				fillStyle: projectileColor(projectile, world),
+				fillStyle: projectileColor(render, projectile, world),
 				width: multiplier * projectile.radius * 2,
 			} as w.LineTrail);
 		}
@@ -980,23 +978,23 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 	}
 }
 
-function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
 	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
-		max: projectile.trailTicks, 
+		max: render.ticks,
 		pos: vector.clone(projectile.body.getPosition()),
-		fillStyle: projectileColor(projectile, world),
+		fillStyle: projectileColor(render, projectile, world),
 		radius: multiplier * projectile.radius,
 	} as w.CircleTrail);
 }
 
-function projectileColor(projectile: w.Projectile, world: w.World) {
-	if (projectile.selfColor && projectile.owner === world.ui.myHeroId) {
+function projectileColor(render: ProjectileColorParams, projectile: w.Projectile, world: w.World) {
+	if (render.selfColor && projectile.owner === world.ui.myHeroId) {
 		return HeroColors.MyHeroColor;
 	} else {
-		return projectile.color;
+		return render.color;
 	}
 }
 

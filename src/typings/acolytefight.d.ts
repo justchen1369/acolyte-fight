@@ -216,10 +216,6 @@ declare interface ProjectileTemplate extends DamagePacket {
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
-    trailTicks: number; // How long is the trail? (Visual effect only)
-
-    color: string; // Color of the projectile
-    selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
 	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
@@ -282,28 +278,45 @@ declare interface RenderParamsBase {
 	type: string;
 }
 
-declare interface RenderRay extends RenderParamsBase {
-	type: "ray";
-	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
+declare interface ProjectileColorParams {
+    color: string; // Color of the projectile
+    selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
 }
 
-declare interface RenderProjectile extends RenderParamsBase {
+declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
+	type: "ray";
+	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
+
+    ticks: number; // How long is the trail?
+}
+
+declare interface RenderProjectile extends RenderParamsBase, ProjectileColorParams {
 	type: "projectile";
+
+    ticks: number; // How long is the trail?
 }
 
 declare interface RenderSwirl extends RenderParamsBase {
 	type: "swirl";
-	loopTicks: number;
+	radius: number;
+	color: string;
+	ticks: number; // How long is the trail?
+
+	loopTicks: number; // How long for the swirl to do one full rotation?
+
 	numParticles: number;
+	particleRadius: number;
 }
 
 declare interface RenderLink extends RenderParamsBase {
 	type: "link";
+	color: string;
 	width: number;
 }
 
 declare interface RenderReticule extends RenderParamsBase {
 	type: "reticule";
+	color: string;
 	ticks: number;
 	radius: number;
 }
