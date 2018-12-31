@@ -605,7 +605,7 @@ const whip: Spell = {
         density: 5,
         radius: 0.001,
         speed: 0.7,
-        maxTicks: 8,
+        maxTicks: 6,
         damage: 0,
         categories: Categories.Projectile,
         collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
