@@ -588,7 +588,7 @@ const boomerang: Spell = {
 
 const whip: Spell = {
     id: 'whip',
-    name: 'Electrowhip',
+    name: 'Electrolash',
     description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
