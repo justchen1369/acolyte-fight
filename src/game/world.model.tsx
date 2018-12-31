@@ -454,6 +454,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
 	homing?: HomingParameters;
+	redirect?: RedirectParameters;
 	link?: LinkParameters;
 	detonate?: DetonateParameters;
 	lifeSteal: number;
@@ -486,10 +487,13 @@ export interface HomingParameters {
 	turnRate: number;
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
-	targetType: string;
+	targetType: HomingType;
+}
+
+export interface RedirectParameters {
+	targetType: HomingType;
 	afterTick: number;
-	redirectionTick: number | null;
-	speedWhenClose: number;
+	newSpeed?: number;
 }
 
 export interface DetonateParameters extends DamagePacket {

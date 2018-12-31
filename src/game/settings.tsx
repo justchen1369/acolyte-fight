@@ -660,8 +660,7 @@ const link: Spell = {
             lifeSteal: 0.5,
         },
 
-        homing: {
-            revolutionsPerSecond: 1,
+        redirect: {
             afterTicks: 1.0 * TicksPerSecond,
             targetType: HomingTargets.self,
         },
@@ -725,9 +724,9 @@ const drain: Spell = {
         maxTicks: 2.0 * TicksPerSecond,
         damage: 5,
         lifeSteal: 1.0,
-        homing: {
-            revolutionsPerSecond: 0,
-            redirect: true,
+        redirect: {
+            targetType: "enemy",
+            atCursor: true,
         },
 
         render: "ray",
@@ -765,11 +764,10 @@ const gravity: Spell = {
             power: 1,
         },
 
-        homing: {
-            revolutionsPerSecond: 1,
+        redirect: {
             targetType: HomingTargets.cursor,
-            minDistanceToTarget: Hero.Radius / 2,
-            speedWhenClose: 0,
+            atCursor: true,
+            newSpeed: 0,
         },
 
         sound: "gravity",

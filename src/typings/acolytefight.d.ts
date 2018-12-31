@@ -200,7 +200,8 @@ declare interface ProjectileTemplate extends DamagePacket {
 	strafe?: boolean; // if true, the projectile will move with the hero's movement
 
     bounce?: BounceParameters;
-    homing?: HomingParametersTemplate;
+	homing?: HomingParametersTemplate;
+	redirect?: RedirectParametersTemplate;
 	link?: LinkParameters;
 	gravity?: GravityParameters; // Trap a hero
 	detonate?: DetonateParametersTemplate; // Explode at target
@@ -238,17 +239,23 @@ declare interface BounceParameters {
     damageFactor: number; // Used to decay the bouncer from repeated hits. 0.9 means it loses 10% damage each time.
 }
 
+declare type HomingType = "self" | "enemy" | "cursor";
+
 declare interface HomingParametersTemplate {
-	targetType?: string; // Whether to home towards "self", "enemy" or "cursor"
+	targetType?: HomingType; // Whether to home towards "self", "enemy" or "cursor". Defaults to "enemy".
 
 	revolutionsPerSecond: number; // The maximum turn rate of the homing projectile
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
 
-	afterTicks?: number; // Only apply homing after this many ticks
-	redirect?: boolean; // Redirect after a certain number of ticks
-
 	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
-	speedWhenClose?: number; // When the projectile is within minDistanceToTarget, change the speed to this. Used to stop projectiles when they reach targets.
+}
+
+declare interface RedirectParametersTemplate {
+	targetType?: HomingType; // Whether to redirect towards "self", "enemy" or "cursor". Defaults to "enemy".
+
+	afterTicks?: number; // Redirect after this many ticks
+	atCursor?: boolean; // Redirect when projectile reaches cursor
+	newSpeed?: number; // Change speed to this when redirected
 }
 
 declare interface DetonateParametersTemplate extends DamagePacket {

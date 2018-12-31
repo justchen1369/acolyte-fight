@@ -301,6 +301,8 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 }
 
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate) {
+	const NeverTicks = 1e6;
+
 	let id = spell.id + (world.nextObjectId++);
 
 	const from = hero.body.getPosition();
@@ -334,6 +336,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	} as pl.FixtureDef);
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && x.id !== hero.id);
+	const ticksToCursor = Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))
 
 	let projectile = {
 		id,
@@ -361,10 +364,16 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
 			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
 			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
-			afterTick: world.tick + (projectileTemplate.homing.afterTicks || 0),
-			redirectionTick: projectileTemplate.homing.redirect ? (world.tick + Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))) : null,
-			speedWhenClose: projectileTemplate.homing.speedWhenClose,
 		} as w.HomingParameters,
+		redirect: projectileTemplate.redirect && {
+			targetType: projectileTemplate.redirect.targetType || w.HomingTargets.enemy,
+			afterTick:
+				world.tick + Math.min(
+					(projectileTemplate.redirect.afterTicks || NeverTicks),
+					projectileTemplate.redirect.atCursor ? ticksToCursor : NeverTicks,
+				),
+			newSpeed: projectileTemplate.redirect.newSpeed,
+		} as w.RedirectParameters,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate && {
 			damage: projectileTemplate.detonate.damage,
@@ -406,6 +415,10 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
+	if (projectile.redirect) {
+		console.log("redirect", projectile.redirect);
+	}
+
 	return projectile;
 }
 
@@ -429,6 +442,7 @@ export function tick(world: w.World) {
 	handleActions(world);
 
 	homingForce(world);
+	redirect(world);
 	linkForce(world);
 	gravityForce(world);
 	updateKnockback(world);
@@ -1242,61 +1256,82 @@ function gravityForce(world: w.World) {
 	});
 }
 
+function findHomingTarget(targetType: HomingType, projectile: w.Projectile, world: w.World) {
+	let target: pl.Vec2 = null;
+	if (targetType === w.HomingTargets.self) {
+		const targetObj = world.objects.get(projectile.owner);
+		if (targetObj) {
+			target = targetObj.body.getPosition();
+		}
+	} else if (targetType === w.HomingTargets.enemy) {
+		const targetObj = world.objects.get(projectile.targetId);
+		if (targetObj) {
+			target = targetObj.body.getPosition();
+		}
+	} else if (targetType === w.HomingTargets.cursor) {
+		target = projectile.target;
+	}
+	return target;
+}
+
 function homingForce(world: w.World) {
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.homing && world.tick >= obj.homing.afterTick)) {
+		if (!(obj.category === "projectile" && obj.homing)) {
 			return;
 		}
 
-		let target: pl.Vec2 = null;
-		if (obj.homing.targetType === w.HomingTargets.self) {
-			const targetObj = world.objects.get(obj.owner);
-			if (targetObj) {
-				target = targetObj.body.getPosition();
-			}
-		} else if (obj.homing.targetType === w.HomingTargets.enemy) {
-			const targetObj = world.objects.get(obj.targetId);
-			if (targetObj) {
-				target = targetObj.body.getPosition();
-			}
-		} else if (obj.homing.targetType === w.HomingTargets.cursor) {
-			target = obj.target;
-		}
+		const target = findHomingTarget(obj.homing.targetType, obj, world);
 		if (!target) {
+			obj.homing = null;
 			return;
 		}
 
 		const diff = vector.diff(target, obj.body.getPosition());
-		const distanceToTarget = vector.length(diff);
-		if (distanceToTarget <= obj.homing.minDistanceToTarget) {
-			if (obj.homing.speedWhenClose !== undefined) {
-				obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), obj.homing.speedWhenClose));
-			}
+
+		// Home to target
+		const currentVelocity = obj.body.getLinearVelocity();
+
+		const currentAngle = vector.angle(currentVelocity);
+		const idealAngle = vector.angle(diff);
+
+		const maxTurnRate = obj.homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
+		const turnRate = Math.min(obj.homing.turnRate, maxTurnRate);
+		const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
+
+		const currentSpeed = vector.length(currentVelocity);
+		const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
+
+		obj.body.setLinearVelocity(newVelocity);
+	});
+}
+
+function redirect(world: w.World) {
+	world.objects.forEach(obj => {
+		if (!(obj.category === "projectile" && obj.redirect && world.tick >= obj.redirect.afterTick)) {
 			return;
 		}
 
-		if (obj.homing.redirectionTick && world.tick >= obj.homing.redirectionTick) {
-			obj.homing.redirectionTick = null;
+		console.log("redirecting", obj);
 
-			// Redirect directly towards target
-			const currentVelocity = obj.body.getLinearVelocity();
-			obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
-		} else {
-			// Home to target
-			const currentVelocity = obj.body.getLinearVelocity();
-
-			const currentAngle = vector.angle(currentVelocity);
-			const idealAngle = vector.angle(diff);
-
-			const maxTurnRate = obj.homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
-			const turnRate = Math.min(obj.homing.turnRate, maxTurnRate);
-			const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
-
-			const currentSpeed = vector.length(currentVelocity);
-			const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
-
-			obj.body.setLinearVelocity(newVelocity);
+		const target = findHomingTarget(obj.redirect.targetType, obj, world);
+		if (!target) {
+			obj.redirect = null;
+			return;
 		}
+
+		const diff = vector.diff(target, obj.body.getPosition());
+
+		// Redirect directly towards target
+		const currentVelocity = obj.body.getLinearVelocity();
+		obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
+
+		// Update speed
+		if (obj.redirect.newSpeed !== undefined) {
+			obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), obj.redirect.newSpeed));
+		}
+
+		// Clear redirect flags so we don't repeat this
+		obj.redirect = null;
 	});
 }
 
