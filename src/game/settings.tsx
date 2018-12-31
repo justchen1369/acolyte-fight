@@ -805,7 +805,7 @@ const gravity: Spell = {
 
         sound: "gravity",
         renderers: [
-            { type: "swirl" },
+            { type: "gravity" },
         ],
         trailTicks: 0.25 * TicksPerSecond,
     },

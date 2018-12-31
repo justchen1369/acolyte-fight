@@ -302,7 +302,7 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 			renderRay(ctxStack, obj, world, render.intermediatePoints || false);
 		} else if (render.type === "link") {
 			renderLink(ctxStack, obj, world);
-		} else if (render.type === "swirl") {
+		} else if (render.type === "gravity") {
 			renderGravity(ctxStack, obj, world);
 		} else if (render.type === "reticule") {
 			renderReticule(ctxStack, obj, world, render);

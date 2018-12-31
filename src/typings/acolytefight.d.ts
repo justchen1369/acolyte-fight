@@ -273,7 +273,7 @@ declare interface DetonateParameters extends DamagePacket {
 declare type RenderParams =
 	RenderRay
 	| RenderProjectile
-	| RenderSwirl
+	| RenderGravity
 	| RenderLink
 	| RenderReticule
 
@@ -290,8 +290,8 @@ declare interface RenderProjectile extends RenderParamsBase {
 	type: "projectile";
 }
 
-declare interface RenderSwirl extends RenderParamsBase {
-	type: "swirl";
+declare interface RenderGravity extends RenderParamsBase {
+	type: "gravity";
 }
 
 declare interface RenderLink extends RenderParamsBase {
