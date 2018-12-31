@@ -60,11 +60,11 @@ const Choices: ChoiceSettings = {
 	Options: {
 		"a": ["thrust", "teleport"],
 		"s": ["shield", "icewall", "drain"],
-		"q": ["fireball", "flamestrike"],
+		"q": ["fireball", "flamestrike", "triplet"],
 		"w": ["gravity", "link", "lightning"],
 		"e": ["homing", "boomerang"],
 		"r": ["kamehameha", "meteor", "supernova"],
-		"d": ["firespray", "bouncer"],
+		"d": ["firespray", "bouncer", "whip"],
 		"f": ["scourge"],
 	},
 	Defaults: {
@@ -356,8 +356,8 @@ const flamestrike: Spell = {
 };
 const triplet: Spell = {
     id: 'triplet',
-    name: 'Triplasma',
-    description: "Shoots 3 bolts of plasma. Easy to hit, but also easy to do 1/3 damage.",
+    name: 'Trifire',
+    description: "Shoots 3 bolts of fire. Easy to hit, but also easy to do 1/3 damage.",
     action: "spray",
     sound: "triplet",
 
