@@ -277,7 +277,6 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
-		availableRange: Hero.MaxDashRange,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -1745,7 +1744,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 	const Hero = world.settings.Hero;
 	if (!action.target) { return true; }
 
-	const availableRange = Hero.MaxDashRange;
+	const availableRange = spell.range;
 	const rangeLimit = Math.min(
 		availableRange,
 		shieldCollisionLimit(hero, action.target, world));
@@ -1803,8 +1802,8 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
-		const availableRange = Hero.MaxDashRange;
-		const speed = spell.speed * ((1 - spell.speedDecayAlpha) + spell.speedDecayAlpha * availableRange / Hero.MaxDashRange);
+		const availableRange = spell.range;
+		const speed = spell.speed;
 		const maxTicks = TicksPerSecond * availableRange / speed;
 
 		const diff = vector.diff(action.target, hero.body.getPosition());

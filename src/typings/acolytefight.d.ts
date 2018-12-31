@@ -62,7 +62,6 @@ declare interface HeroSettings {
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
 
 	RevolutionsPerTick: number; // Hero turn rate
-	MaxDashRange: number; // The maximum range of teleport/thrust
 }
 
 declare interface WorldSettings {
@@ -367,17 +366,18 @@ declare interface DashSpell extends SpellBase {
 }
 
 declare interface TeleportSpell extends DashSpell {
-    action: "teleport";
+	action: "teleport";
+	range: number;
 }
 
 declare interface ThrustSpell extends DashSpell {
     action: "thrust";
 
+	range: number;
 	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
 	damage: number;
 	damageScaling?: boolean;
 	speed: number;
-	speedDecayAlpha: number; // Higher means more decay when used a lot
 }
 
 declare interface KeyBindingOptions {
