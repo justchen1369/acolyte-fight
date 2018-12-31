@@ -32,6 +32,7 @@ declare interface AcolyteFightSettings {
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
 	Icons: IconLookup;
+	Render: RenderSettings;
 }
 
 declare type ModTree = {
@@ -292,6 +293,8 @@ declare interface RenderProjectile extends RenderParamsBase {
 
 declare interface RenderSwirl extends RenderParamsBase {
 	type: "swirl";
+	loopTicks: number;
+	numParticles: number;
 }
 
 declare interface RenderLink extends RenderParamsBase {
@@ -384,6 +387,11 @@ declare interface DamagePacket {
 	damage: number;
 	lifeSteal?: number;
 	isLava?: boolean;
+}
+
+declare interface RenderSettings {
+	link: RenderLink;
+	gravity: RenderSwirl;
 }
 
 declare interface Vec2 {

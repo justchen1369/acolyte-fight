@@ -84,6 +84,17 @@ const Choices: ChoiceSettings = {
     },
 }
 
+const renderLink: RenderLink = {
+    type: "link",
+    width: 5 * Pixel,
+};
+
+const renderGravity: RenderSwirl = {
+    type: "swirl",
+    loopTicks: 20,
+    numParticles: 3,
+};
+
 const move: MoveSpell = {
     id: Actions.Move,
     description: "",
@@ -530,7 +541,7 @@ const link: Spell = {
 
         sound: "link",
         renderers: [
-            { type: "link", width: Pixel * 5 },
+            renderLink,
         ],
     },
 };
@@ -639,7 +650,7 @@ const gravity: Spell = {
 
         sound: "gravity",
         renderers: [
-            { type: "swirl" },
+            renderGravity,
         ],
         trailTicks: 0.25 * TicksPerSecond,
     },
@@ -821,6 +832,11 @@ const Spells = {
     thrust,
 };
 
+const Render: RenderSettings = {
+    link: renderLink,
+    gravity: renderGravity,
+};
+
 export const Mod: ModSettings = {
     name: null,
     author: null,
@@ -837,4 +853,5 @@ export const DefaultSettings: AcolyteFightSettings = {
     Layouts,
     Sounds,
     Icons,
+    Render,
 };

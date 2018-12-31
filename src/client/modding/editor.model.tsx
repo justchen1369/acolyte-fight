@@ -18,6 +18,7 @@ export interface CodeConstants extends CodeSection {
     obstacle: string;
     hero: string;
     choices: string;
+    render: string;
 }
 
 export type ErrorTree = {

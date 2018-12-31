@@ -236,7 +236,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
 			if (target) {
-				renderLinkBetween(ctxStack, obj, target, obj.link.color);
+				renderLinkBetween(ctxStack, obj, target, obj.link.color, world.settings.Render.link);
 			}
 		}
 	} else if (obj.category === "shield") {
@@ -301,9 +301,9 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 		} else if (render.type == "ray") {
 			renderRay(ctxStack, obj, world, render.intermediatePoints || false);
 		} else if (render.type === "link") {
-			renderLink(ctxStack, obj, world);
+			renderLink(ctxStack, obj, world, render);
 		} else if (render.type === "swirl") {
-			renderGravity(ctxStack, obj, world);
+			renderGravity(ctxStack, obj, world, render);
 		} else if (render.type === "reticule") {
 			renderReticule(ctxStack, obj, world, render);
 		}
@@ -844,12 +844,12 @@ function rgColor(proportion: number) {
 	return hsl(hue, 1.0, 0.5);
 }
 
-function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
 	if (!projectile.gravity) {
 		return;
 	}
 
-	renderGravityAt(ctxStack, projectile.body.getPosition(), world.settings.Spells[projectile.type] as ProjectileSpell, world);
+	renderGravityAt(ctxStack, projectile.body.getPosition(), world.settings.Spells[projectile.type] as ProjectileSpell, world, swirl);
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -858,7 +858,8 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 
 	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
-	renderGravityAt(ctxStack, hero.gravity.location, spell, world);
+	const swirl = world.settings.Render.gravity;
+	renderGravityAt(ctxStack, hero.gravity.location, spell, world, swirl);
 
 	if (spell.sound) {
 		world.ui.sounds.push({
@@ -869,9 +870,9 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 }
 
-function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: ProjectileSpell, world: w.World) {
-	const animationLength = 0.33 * constants.TicksPerSecond;
-	const numParticles = 3;
+function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: ProjectileSpell, world: w.World, swirl: RenderSwirl) {
+	const animationLength = swirl.loopTicks;
+	const numParticles = swirl.numParticles;
 
 	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
 	for (let i = 0; i < numParticles; ++i) {
@@ -923,18 +924,18 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	});
 }
 
-function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
+function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
 	renderProjectile(ctxStack, projectile, world);
 
 	if (owner && owner.category == "hero") {
-		renderLinkBetween(ctxStack, owner, projectile, projectile.color);
+		renderLinkBetween(ctxStack, owner, projectile, projectile.color, render);
 	}
 }
 
-function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, color: string) {
+function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, color: string, render: RenderLink) {
 	foreground(ctxStack, ctx => {
-		ctx.lineWidth = Pixel * 5;
+		ctx.lineWidth = render.width;
 		ctx.strokeStyle = color;
 
 		const from = owner.body.getPosition();
