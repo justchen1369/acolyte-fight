@@ -3,7 +3,7 @@ import * as db from './db.model';
 import * as s from './server.model';
 import { logger } from './logging';
 
-const MaxFirestoreAgeHours = 1;
+const MaxFirestoreAgeHours = 0.25;
 
 let firestore: Firestore.Firestore = null;
 let firestoreExpiry: number = 0;
