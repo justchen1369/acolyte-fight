@@ -295,23 +295,19 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	obj.uiPath.push(vector.clone(obj.body.getPosition()));
 
-	if (obj.render === "ball") {
-        renderProjectile(ctxStack, obj, world);
-	} else if (obj.render === "projectile") {
-		// Render both to ensure there are no gaps in the trail
-        renderProjectile(ctxStack, obj, world);
-        renderRay(ctxStack, obj, world);
-	} else if (obj.render == "ray") {
-		// A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
-		const intermediatePoints = true;
-        renderRay(ctxStack, obj, world, intermediatePoints);
-	} else if (obj.render === "link") {
-		renderLink(ctxStack, obj, world);
-	} else if (obj.render === "gravity") {
-		renderGravity(ctxStack, obj, world);
-	} else if (obj.render === "supernova") {
-		renderSupernova(ctxStack, obj, world);
-	}
+	obj.renderers.forEach(render => {
+		if (render.type === "projectile") {
+			renderProjectile(ctxStack, obj, world);
+		} else if (render.type == "ray") {
+			renderRay(ctxStack, obj, world, render.intermediatePoints || false);
+		} else if (render.type === "link") {
+			renderLink(ctxStack, obj, world);
+		} else if (render.type === "swirl") {
+			renderGravity(ctxStack, obj, world);
+		} else if (render.type === "reticule") {
+			renderReticule(ctxStack, obj, world, render);
+		}
+	});
 
 	while (obj.uiPath.length > 1) {
 		obj.uiPath.shift();
@@ -320,19 +316,11 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 
 function playSpellSounds(obj: w.Projectile, world: w.World) {
 	if (obj.sound) {
-		if (obj.detonate && world.tick >= obj.detonate.detonateTick) {
-			world.ui.sounds.push({
-				id: obj.id,
-				sound: `${obj.sound}-detonate-charging`,
-				pos: vector.clone(obj.body.getPosition()),
-			});
-		} else {
-			world.ui.sounds.push({
-				id: obj.id,
-				sound: obj.sound,
-				pos: vector.clone(obj.body.getPosition()),
-			});
-		}
+		world.ui.sounds.push({
+			id: obj.id,
+			sound: obj.sound,
+			pos: vector.clone(obj.body.getPosition()),
+		});
 	}
 
 	const hitSound = obj.soundHit || obj.sound;
@@ -372,6 +360,8 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderLifeStealReturn(ctxStack, ev, world);
 	} else if (ev.type === "teleport") {
 		renderTeleport(ctxStack, ev, world);
+	} else if (ev.type === "redirect") {
+		renderRedirect(ctxStack, ev, world);
 	} else {
 		return;
 	}
@@ -399,7 +389,7 @@ function renderScourge(ctxStack: CanvasCtxStack, ev: w.ScourgeEvent, world: w.Wo
 function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.World) {
 	world.ui.trails.push({
 		type: "circle",
-		max: 10,
+		max: ev.explosionTicks,
 		initialTick: world.tick,
 		pos: ev.pos,
 		fillStyle: 'white',
@@ -421,6 +411,16 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 			id: `${ev.heroId}-teleport-arriving`,
 			sound: `${ev.sound}-arriving`,
 			pos: ev.toPos,
+		});
+	}
+}
+
+function renderRedirect(ctxStack: CanvasCtxStack, ev: w.RedirectEvent, world: w.World) {
+	if (ev.sound) {
+		world.ui.sounds.push({
+			id: `${ev.projectileId}-redirected`,
+			sound: `${ev.sound}-redirected`,
+			pos: ev.pos,
 		});
 	}
 }
@@ -887,51 +887,40 @@ function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, spell: Pro
 	}
 }
 
-function renderSupernova(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {
-	if (!projectile.detonate) {
+function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, reticule: RenderReticule) {
+	// After reached cursor
+	const remainingTicks = Math.max(0, projectile.expireTick - world.tick);
+	const proportion = remainingTicks / reticule.ticks;
+	if (proportion > 1) {
 		return;
 	}
 
-	if (projectile.destroyed) {
-		world.ui.trails.push({
-			type: "circle",
-			max: 30,
-			initialTick: world.tick,
-			pos: vector.clone(projectile.body.getPosition()),
-			fillStyle: 'white',
-			radius: projectile.detonate.radius,
-		});
-	} else if (world.tick < projectile.detonate.detonateTick) {
-		renderRay(ctxStack, projectile, world, false);
-	} else {
-		const pos = projectile.body.getPosition();
-		const proportion = 1.0 - (world.tick - projectile.detonate.detonateTick) / projectile.detonate.waitTicks;
+	const pos = projectile.body.getPosition();
 
-		const animationLength = 11;
-		const numSegments = 5;
-		const arcFraction = 0.5;
+	const animationLength = 11;
+	const numSegments = 5;
+	const arcFraction = 0.5;
 
-		const angleOffset = ((world.tick % animationLength) / animationLength) * 2 * Math.PI;
-		const arcAngle = arcFraction * 2 * Math.PI / numSegments;
+	const angleOffset = ((world.tick % animationLength) / animationLength) * 2 * Math.PI;
+	const arcAngle = arcFraction * 2 * Math.PI / numSegments;
 
-		foreground(ctxStack, ctx => {
-			ctx.save();
+	foreground(ctxStack, ctx => {
+		ctx.save();
 
-			ctx.strokeStyle = projectile.color;
-			ctx.lineWidth = 3 * Pixel;
+		ctx.strokeStyle = projectile.color;
+		ctx.lineWidth = 3 * Pixel;
 
-			const perSegment = 2 * Math.PI / numSegments;
-			for (let i = 0; i < numSegments; ++i) {
-				const startAngle = angleOffset + i * perSegment;
-				const endAngle = startAngle + arcAngle;
-				ctx.beginPath();
-				ctx.arc(pos.x, pos.y, projectile.detonate.radius * proportion, startAngle, endAngle);
-				ctx.stroke();
-			}
+		const perSegment = 2 * Math.PI / numSegments;
+		for (let i = 0; i < numSegments; ++i) {
+			const startAngle = angleOffset + i * perSegment;
+			const endAngle = startAngle + arcAngle;
+			ctx.beginPath();
+			ctx.arc(pos.x, pos.y, reticule.radius * proportion, startAngle, endAngle);
+			ctx.stroke();
+		}
 
-			ctx.restore();
-		});
-	}
+		ctx.restore();
+	});
 }
 
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World) {

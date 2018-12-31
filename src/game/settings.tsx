@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { TicksPerSecond, Categories } from './constants';
+import { TicksPerSecond, Categories, Pixel } from './constants';
 import { Icons } from './icons';
 import { Sounds } from './sounds';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
@@ -311,7 +311,10 @@ const fireball: Spell = {
 
         sound: "fireball",
         soundHit: "standard",
-        render: "projectile",
+        renderers: [
+            { type: "projectile" },
+            { type: "ray" },
+        ],
         trailTicks: 30,
     },
 };
@@ -336,12 +339,14 @@ const flamestrike: Spell = {
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         categories: Categories.Projectile,
+        expireAfterCursorTicks: 0,
 
         detonate: {
             damage: 12.5,
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
+            renderTicks: 10,
         },
 
         partialDamage: {
@@ -350,7 +355,10 @@ const flamestrike: Spell = {
         },
 
         sound: "flamestrike",
-        render: "projectile",
+        renderers: [
+            { type: "projectile" },
+            { type: "ray" },
+        ],
         trailTicks: 30,
     },
 };
@@ -384,7 +392,10 @@ const triplet: Spell = {
 
         sound: "triplet",
         soundHit: "standard",
-        render: "projectile",
+        renderers: [
+            { type: "projectile" },
+            { type: "ray" },
+        ],
         trailTicks: 10,
     },
 };
@@ -415,7 +426,9 @@ const firespray: Spell = {
         maxTicks: 0.25 * TicksPerSecond,
         damage: 2.5,
 
-        render: "ray",
+        renderers: [
+            { type: "ray", intermediatePoints: true },
+        ],
         trailTicks: 30,
     },
 };
@@ -444,7 +457,9 @@ const meteor: Spell = {
         expireOn: Categories.Obstacle,
 
         sound: "meteor",
-        render: "ball",
+        renderers: [
+            { type: "projectile" },
+        ],
     },
 };
 const kamehameha: Spell = {
@@ -484,7 +499,9 @@ const kamehameha: Spell = {
         categories: Categories.Projectile | Categories.Massive,
 
         sound: "kamehameha",
-        render: "ray",
+        renderers: [
+            { type: "ray", intermediatePoints: true },
+        ],
     },
 };
 const lightning: Spell = {
@@ -511,7 +528,9 @@ const lightning: Spell = {
         damage: 0,
 
         sound: "lightning",
-        render: "ray",
+        renderers: [
+            { type: "ray", intermediatePoints: true },
+        ],
         trailTicks: 30,
     },
 };
@@ -545,7 +564,10 @@ const homing: Spell = {
 
         sound: "homing",
         soundHit: "standard",
-        render: "projectile",
+        renderers: [
+            { type: "projectile" },
+            { type: "ray" },
+        ],
     },
 };
 const boomerang: Spell = {
@@ -582,7 +604,10 @@ const boomerang: Spell = {
 
         sound: "boomerang",
         soundHit: "standard",
-        render: "projectile",
+        renderers: [
+            { type: "projectile" },
+            { type: "ray" },
+        ],
     },
 };
 
@@ -619,11 +644,13 @@ const whip: Spell = {
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0002,
-            maxRange: true,
+            renderTicks: 10,
         },
 
         sound: "whip",
-        render: "link",
+        renderers: [
+            { type: "link", width: Pixel * 5 },
+        ],
         trailTicks: 1,
     },
 };
@@ -668,7 +695,9 @@ const link: Spell = {
         trailTicks: 1,
 
         sound: "link",
-        render: "link",
+        renderers: [
+            { type: "link", width: Pixel * 5 },
+        ],
     },
 };
 const bouncer: Spell = {
@@ -699,7 +728,9 @@ const bouncer: Spell = {
         },
 
         sound: "bouncer",
-        render: "ray",
+        renderers: [
+            { type: "ray", intermediatePoints: true },
+        ],
         trailTicks: 1.0 * TicksPerSecond,
     },
 };
@@ -729,7 +760,9 @@ const drain: Spell = {
             atCursor: true,
         },
 
-        render: "ray",
+        renderers: [
+            { type: "ray", intermediatePoints: true },
+        ],
         trailTicks: 0.5 * TicksPerSecond,
     },
 };
@@ -771,7 +804,9 @@ const gravity: Spell = {
         },
 
         sound: "gravity",
-        render: "gravity",
+        renderers: [
+            { type: "swirl" },
+        ],
         trailTicks: 0.25 * TicksPerSecond,
     },
 };
@@ -796,17 +831,26 @@ const supernova: Spell = {
         damage: 0,
         collideWith: Categories.None,
         expireOn: Categories.None,
+        expireAfterCursorTicks: 0.5 * TicksPerSecond,
 
+        redirect: {
+            targetType: "cursor",
+            atCursor: true,
+            newSpeed: 0,
+        },
         detonate: {
-            waitTicks: 0.5 * TicksPerSecond,
             damage: 0,
             radius: 0.05,
             minImpulse: 0.0002,
             maxImpulse: 0.0005,
+            renderTicks: 30,
         },
 
         sound: "supernova",
-        render: "supernova",
+        renderers: [
+            { type: "ray" },
+            { type: "reticule", ticks: 0.5 * TicksPerSecond, radius: 0.05 },
+        ],
         trailTicks: 30,
     },
 };

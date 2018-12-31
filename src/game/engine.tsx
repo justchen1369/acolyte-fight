@@ -375,21 +375,16 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 			newSpeed: projectileTemplate.redirect.newSpeed,
 		} as w.RedirectParameters,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate && {
-			damage: projectileTemplate.detonate.damage,
-			outerDamage: projectileTemplate.detonate.outerDamage !== undefined ? projectileTemplate.detonate.outerDamage : projectileTemplate.detonate.damage,
-			lifeSteal: projectileTemplate.detonate.lifeSteal,
-			radius: projectileTemplate.detonate.radius,
-			minImpulse: projectileTemplate.detonate.minImpulse,
-			maxImpulse: projectileTemplate.detonate.maxImpulse,
-			detonateTick: world.tick + ticksToDetonate(projectileTemplate, vector.length(diff), vector.length(velocity)),
-			waitTicks: projectileTemplate.detonate.waitTicks || 0,
-		} as w.DetonateParameters,
+		detonate: projectileTemplate.detonate,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
 		createTick: world.tick,
-		expireTick: world.tick + projectileTemplate.maxTicks,
+		expireTick:
+			world.tick + Math.min(
+				projectileTemplate.maxTicks,
+				projectileTemplate.expireAfterCursorTicks !== undefined ? ticksToCursor + projectileTemplate.expireAfterCursorTicks : NeverTicks,
+			),
 		minTicks: projectileTemplate.minTicks || 0,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
@@ -398,7 +393,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
 
-		render: projectileTemplate.render,
+		renderers: projectileTemplate.renderers,
 		color: projectileTemplate.color,
 		selfColor: projectileTemplate.selfColor,
 		radius: projectileTemplate.radius,
@@ -415,23 +410,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
-	if (projectile.redirect) {
-		console.log("redirect", projectile.redirect);
-	}
-
 	return projectile;
-}
-
-function ticksToDetonate(projectileTemplate: ProjectileTemplate, distance: number, speed: number) {
-	if (!projectileTemplate.detonate) {
-		return 0;
-	}
-
-	let ticks = projectileTemplate.maxTicks - (projectileTemplate.detonate.waitTicks || 0);
-	if (!projectileTemplate.detonate.maxRange) {
-		ticks = Math.min(ticks, Math.floor(TicksPerSecond * distance / speed));
-	}
-	return ticks;
 }
 
 // Simulator
@@ -1311,8 +1290,6 @@ function redirect(world: w.World) {
 			return;
 		}
 
-		console.log("redirecting", obj);
-
 		const target = findHomingTarget(obj.redirect.targetType, obj, world);
 		if (!target) {
 			obj.redirect = null;
@@ -1329,6 +1306,14 @@ function redirect(world: w.World) {
 		if (obj.redirect.newSpeed !== undefined) {
 			obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), obj.redirect.newSpeed));
 		}
+
+		// Generate event (for sounds)
+		world.ui.events.push({
+			type: "redirect",
+			projectileId: obj.id,
+			sound: obj.sound,
+			pos: vector.clone(obj.body.getPosition()),
+		});
 
 		// Clear redirect flags so we don't repeat this
 		obj.redirect = null;
@@ -1461,21 +1446,12 @@ function decayObstacles(world: w.World) {
 }
 
 function detonate(world: w.World) {
-	const Hero = world.settings.Hero;
-
 	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.detonate)) {
+		if (!(obj.category === "projectile" && obj.detonate && world.tick === obj.expireTick)) {
 			return;
 		}
 
-		if (world.tick === obj.detonate.detonateTick) {
-			obj.body.setLinearVelocity(vector.zero());
-		}
-
-		if (world.tick === obj.detonate.detonateTick + obj.detonate.waitTicks) {
-			detonateProjectile(obj, world);
-			destroyObject(world, obj);
-		}
+		detonateProjectile(obj, world);
 	});
 }
 
@@ -1518,7 +1494,11 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		sound: projectile.sound,
 		pos: vector.clone(projectile.body.getPosition()),
 		radius: projectile.detonate.radius,
+		explosionTicks: projectile.detonate.renderTicks,
 	});
+
+	// Don't allow for repeats
+	projectile.detonate = null;
 }
 
 function applyLavaDamage(world: w.World) {

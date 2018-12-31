@@ -204,21 +204,22 @@ declare interface ProjectileTemplate extends DamagePacket {
 	redirect?: RedirectParametersTemplate;
 	link?: LinkParameters;
 	gravity?: GravityParameters; // Trap a hero
-	detonate?: DetonateParametersTemplate; // Explode at target
+	detonate?: DetonateParameters; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
 	minTicks?: number; // The minimum number of ticks that a projectile will live for. The main purpose of this is to work around a quirk in the physics engine where if projectiles doesn't live for more than 1 tick, it doesn't affect the physics.
 	maxTicks: number; // The maximum number of ticks that a projectile will live for. The maximum range can be determined by speed * maxTicks / TicksPerSecond.
 	categories?: number; // Collision flags: What flags this object has
-    collideWith?: number; // Collision flags: Which other objects to collide with
+	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
+	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
     trailTicks: number; // How long is the trail? (Visual effect only)
 
     color: string; // Color of the projectile
     selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
-	render: string; // Which render function to use
+	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
 }
@@ -258,7 +259,7 @@ declare interface RedirectParametersTemplate {
 	newSpeed?: number; // Change speed to this when redirected
 }
 
-declare interface DetonateParametersTemplate extends DamagePacket {
+declare interface DetonateParameters extends DamagePacket {
 	outerDamage?: number;
 
 	radius: number; // The radius of the explosion
@@ -266,8 +267,42 @@ declare interface DetonateParametersTemplate extends DamagePacket {
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
 
-	maxRange?: boolean; // Explode as maximum range, not where the user clicked
-	waitTicks?: number; // Don't explode straight away
+	renderTicks: number; // Length of explosion
+}
+
+declare type RenderParams =
+	RenderRay
+	| RenderProjectile
+	| RenderSwirl
+	| RenderLink
+	| RenderReticule
+
+declare interface RenderParamsBase {
+	type: string;
+}
+
+declare interface RenderRay extends RenderParamsBase {
+	type: "ray";
+	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
+}
+
+declare interface RenderProjectile extends RenderParamsBase {
+	type: "projectile";
+}
+
+declare interface RenderSwirl extends RenderParamsBase {
+	type: "swirl";
+}
+
+declare interface RenderLink extends RenderParamsBase {
+	type: "link";
+	width: number;
+}
+
+declare interface RenderReticule extends RenderParamsBase {
+	type: "reticule";
+	ticks: number;
+	radius: number;
 }
 
 declare interface ScourgeSpell extends SpellBase {

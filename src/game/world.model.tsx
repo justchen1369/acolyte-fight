@@ -466,7 +466,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	maxTicks: number;
 	expireOn: number;
 
-	render: string;
+	renderers: RenderParams[];
 	sound?: string;
 	soundHit?: string;
     radius: number;
@@ -496,15 +496,6 @@ export interface RedirectParameters {
 	newSpeed?: number;
 }
 
-export interface DetonateParameters extends DamagePacket {
-	outerDamage: number;
-	radius: number;
-	minImpulse: number;
-	maxImpulse: number;
-	detonateTick: number;
-	waitTicks: number;
-}
-
 export type WorldObject =
 	Hero
 	| Shield
@@ -516,6 +507,7 @@ export type WorldEvent =
 	| ScourgeEvent
 	| LifeStealEvent
 	| TeleportEvent
+	| RedirectEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -527,6 +519,7 @@ export interface DetonateEvent extends WorldEventBase {
 	sound?: string;
 	pos: pl.Vec2;
 	radius: number;
+	explosionTicks: number;
 }
 
 export interface ScourgeEvent extends WorldEventBase {
@@ -548,6 +541,13 @@ export interface TeleportEvent extends WorldEventBase {
 	toPos: pl.Vec2;
 	heroId: string;
 	sound?: string;
+}
+
+export interface RedirectEvent extends WorldEventBase {
+	type: "redirect";
+	projectileId: string;
+	sound?: string;
+	pos: pl.Vec2;
 }
 
 export interface Action {
