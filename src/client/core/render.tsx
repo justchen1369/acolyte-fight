@@ -1418,7 +1418,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
 	let isHovered = world.ui.hoverSpellId === spell.id;
-	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
+	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell) / constants.TicksPerSecond;
 
 	if (isSelected) {
 		button.color = '#f0f0f0';

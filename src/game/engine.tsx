@@ -292,8 +292,15 @@ function addHero(world: w.World, heroId: string) {
 	return hero;
 }
 
-export function cooldownRemaining(world: w.World, hero: w.Hero, spell: string) {
-	let next = hero.cooldowns[spell] || 0;
+export function cooldownRemaining(world: w.World, hero: w.Hero, spell: Spell) {
+	if (hero.retractorIds.has(spell.id)) {
+		return 0;
+	}
+	return calculateCooldown(world, hero, spell.id);
+}
+
+function calculateCooldown(world: w.World, hero: w.Hero, slot: string) {
+	let next = hero.cooldowns[slot] || 0;
 	return Math.max(0, next - world.tick);
 }
 
@@ -437,11 +444,26 @@ function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[]
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
+	const newBehaviours = new Array<w.Behaviour>();
 
 	handleOccurences(world);
 	handleActions(world);
 
-	behaviours(world);
+	newBehaviours.push(...world.behaviours.filter(behaviour => {
+		const obj = world.objects.get(behaviour.objId);
+		if (!obj) {
+			return false;
+		} if (world.tick < behaviour.afterTick) {
+			return true;
+		} else if (behaviour.type === "homing" && obj.category === "projectile") {
+			return homingForce(world, obj, behaviour);
+		} else if (behaviour.type === "redirect" && obj.category === "projectile") {
+			return redirect(world, obj, behaviour);
+		} else {
+			return true;
+		}
+	}));
+
 	linkForce(world);
 	gravityForce(world);
 	updateKnockback(world);
@@ -460,33 +482,12 @@ export function tick(world: w.World) {
 	decayMitigation(world);
 	decayThrust(world);
 	decayObstacles(world);
+	clearRetractorCooldown(world);
 	applyLavaDamage(world);
 	shrink(world);
 
 	reap(world);
-}
 
-function behaviours(world: w.World) {
-	const newBehaviours = new Array<w.Behaviour>();
-	world.behaviours.forEach(behaviour => {
-		const obj = world.objects.get(behaviour.objId);
-		if (!obj) {
-			return;
-		}
-
-		let keep = false;
-		if (world.tick < behaviour.afterTick) {
-			keep = true;
-		} else if (behaviour.type === "homing" && obj.category === "projectile") {
-			keep = homingForce(world, obj, behaviour);
-		} else if (behaviour.type === "redirect" && obj.category === "projectile") {
-			keep = redirect(world, obj, behaviour);
-		}
-
-		if (keep) {
-			newBehaviours.push(behaviour);
-		}
-	});
 	world.behaviours = newBehaviours;
 }
 
@@ -526,6 +527,18 @@ function removePassthrough(world: w.World) {
 function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 	const distance = vector.distance(hero.body.getPosition(), projectile.body.getPosition());
 	return distance > hero.radius + projectile.radius + hero.moveSpeedPerSecond / TicksPerSecond;
+}
+
+function clearRetractorCooldown(world: w.World) {
+	world.objects.forEach(hero => {
+		if (hero.category === "hero" && hero.retractorIds.size > 0) {
+			hero.retractorIds.forEach((retractorId, spellId) => {
+				if (!world.objects.has(retractorId)) {
+					hero.retractorIds.delete(spellId); // Yes you can delete while iterating in ES6
+				}
+			});
+		}
+	});
 }
 
 function handleOccurences(world: w.World) {
@@ -837,7 +850,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.movementProportion = 1.0;
 
 		if (spell.cooldown) {
-			const cooldown = cooldownRemaining(world, hero, spell.id);
+			const cooldown = cooldownRemaining(world, hero, spell);
 			if (cooldown > 0) {
 				if (cooldown > constants.MaxCooldownWait) {
 					// Just cancel spells if they're too far off cooldown
@@ -1779,14 +1792,17 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
 	if (!action.target) { return true; }
 
-	let retractor = world.objects.get(hero.retractorIds.get(spell.id));
-	if (retractor && retractor.category === "projectile") {
-		retractor.target = action.target;
-		applyProjectileBehaviours(spell.retractBehaviours, retractor, world);
+	const retractorId = hero.retractorIds.get(spell.id);
+	if (retractorId) {
+		const retractor = world.objects.get(retractorId);
+		if (retractor && retractor.category === "projectile") {
+			retractor.target = action.target;
+			applyProjectileBehaviours(spell.retractBehaviours, retractor, world);
+			hero.retractorIds.delete(spell.id);
+		}
 	} else {
-		retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
+		const retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
 		hero.retractorIds.set(spell.id, retractor.id);
-		setCooldown(world, hero, spell.id, spell.retractCooldownTicks);
 	}
 
 	return true;

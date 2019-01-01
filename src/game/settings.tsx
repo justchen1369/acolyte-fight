@@ -448,7 +448,7 @@ const retractor: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 1 * TicksPerSecond,
+    cooldown: 20 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -460,7 +460,7 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        density: 0.001,
+        density: 1,
         radius: 0.005,
         speed: 0.3,
         fixedSpeed: false,
