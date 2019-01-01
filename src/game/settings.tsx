@@ -441,7 +441,7 @@ const boomerang: Spell = {
 const retractor: Spell = {
     id: 'retractor',
     name: 'Refract',
-    description: "Refract around corners by casting a second time. Damage increases with time, so aim far away and refract back to do maximum damage.",
+    description: "Refract can turn corners - cast a second time to redirect the spell. Damage increases with distance travelled, so take an indirect path to do maximum damage.",
     action: "retractor",
 
     color: '#00ff7f',
