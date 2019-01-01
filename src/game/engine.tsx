@@ -18,7 +18,7 @@ export interface ResolvedKeyBindings {
 type DiscriminateBehaviour<T extends w.Behaviour['type']> = Extract<w.Behaviour, {type: T}>
 
 type BehaviourHandlers = {
-  [P in w.Behaviour['type']]: (behaviour: DiscriminateBehaviour<P>, world: w.World) => boolean
+  [P in w.Behaviour['type']]?: (behaviour: DiscriminateBehaviour<P>, world: w.World) => boolean
 };
 
 // Reset planck.js constants
@@ -422,6 +422,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 	templates.forEach(template => {
 		if (template.type === "homing") {
 			instantiateHoming(template, projectile, world);
+		} else if (template.type === "detonate") {
+			instantiateDetonate(template, projectile, world);
 		}
 	});
 }
@@ -450,6 +452,13 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 
 }
 
+function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectile, world: w.World) {
+	world.behaviours.push({
+		type: "detonate",
+		projectileId: projectile.id,
+	});
+}
+
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
@@ -469,7 +478,9 @@ export function tick(world: w.World) {
 	shields(world);
 	physicsStep(world);
 
-	detonate(world); // Detonate before objects switch owners so its predictable who owns the detonate
+	handleBehaviours(world, newBehaviours, {
+		detonate, // Detonate before objects switch owners so its predictable who owns the detonate
+	});
 
 	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
 		handleContact(world, contact);
@@ -1494,14 +1505,14 @@ function decayObstacles(world: w.World) {
 	});
 }
 
-function detonate(world: w.World) {
-	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.detonate && world.tick === obj.expireTick)) {
-			return;
-		}
-
+function detonate(detonate: w.DetonateBehaviour, world: w.World) {
+	const obj = world.objects.get(detonate.projectileId);
+	if (obj.category === "projectile" && obj.detonate && world.tick === obj.expireTick) {
 		detonateProjectile(obj, world);
-	});
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function detonateProjectile(projectile: w.Projectile, world: w.World) {

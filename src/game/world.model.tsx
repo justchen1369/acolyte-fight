@@ -481,6 +481,7 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	HomingBehaviour
+	| DetonateBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -499,6 +500,12 @@ export interface HomingBehaviour extends BehaviourBase {
 
 	redirect?: boolean;
 	newSpeed?: number;
+}
+
+export interface DetonateBehaviour extends BehaviourBase {
+	type: "detonate";
+
+	projectileId: string;
 }
 
 export type WorldObject =

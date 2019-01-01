@@ -215,8 +215,8 @@ declare interface ProjectileTemplate extends DamagePacket {
 
     bounce?: BounceParameters;
 	link?: LinkParameters;
+	detonate?: DetonateParameters;
 	gravity?: GravityParameters; // Trap a hero
-	detonate?: DetonateParameters; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
 	behaviours?: BehaviourTemplate[],
@@ -252,6 +252,7 @@ declare interface BounceParameters {
 
 declare type BehaviourTemplate =
 	HomingTemplate
+	| DetonateTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
@@ -285,6 +286,12 @@ declare interface DetonateParameters extends DamagePacket {
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
 
 	renderTicks: number; // Length of explosion
+}
+
+// Use this behaviour to detonate on expiry
+// Without this, will only detonate on hit
+declare interface DetonateTemplate extends BehaviourTemplateBase {
+	type: "detonate";
 }
 
 declare type RenderParams =

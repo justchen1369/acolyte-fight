@@ -201,6 +201,10 @@ const flamestrike: Spell = {
             ticks: 0.5 * TicksPerSecond,
         },
 
+        behaviours: [
+            { type: "detonate" },
+        ],
+
         sound: "flamestrike",
         renderers: [
             { type: "projectile", color: '#ff4400', ticks: 30 },
@@ -528,6 +532,10 @@ const whip: Spell = {
             renderTicks: 10,
         },
 
+        behaviours: [
+            { type: "detonate" },
+        ],
+
         sound: "whip",
         renderers: [
             {
@@ -736,6 +744,7 @@ const supernova: Spell = {
                 newSpeed: 0,
                 redirect: true,
             },
+            { type: "detonate" },
         ],
         detonate: {
             damage: 0,
