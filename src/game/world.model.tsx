@@ -482,6 +482,7 @@ export type Behaviour =
 	| DetonateBehaviour
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
+	| LinkBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -516,6 +517,11 @@ export interface RetractorBehaviour extends BehaviourBase {
 export interface RemovePassthroughBehaviour extends BehaviourBase {
 	type: "removePassthrough";
 	projectileId: string;
+}
+
+export interface LinkBehaviour extends BehaviourBase {
+	type: "linkForce";
+	heroId: string;
 }
 
 export type WorldObject =

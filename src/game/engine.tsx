@@ -469,9 +469,9 @@ export function tick(world: w.World) {
 
 	handleBehaviours(world, newBehaviours, {
 		homing,
+		linkForce,
 	});
 
-	linkForce(world);
 	gravityForce(world);
 	updateKnockback(world);
 
@@ -1272,6 +1272,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
 	};
+	world.behaviours.push({ type: "linkForce", heroId: owner.id });
 }
 
 function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
@@ -1390,42 +1391,43 @@ function homing(homing: w.HomingBehaviour, world: w.World) {
 	}
 }
 
-function linkForce(world: w.World) {
-	world.objects.forEach(owner => {
-		if (!(owner.category === "hero" && owner.link)) {
-			return;
-		}
+function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
+	const owner = world.objects.get(behaviour.heroId);
+	if (!(owner && owner.category === "hero" && owner.link)) {
+		return false;
+	}
 
-		if (world.tick >= owner.link.expireTick) {
-			owner.link = null;
-			return;
-		}
+	if (world.tick >= owner.link.expireTick) {
+		owner.link = null;
+		return false;
+	}
 
-		const target = world.objects.get(owner.link.targetId);
-		if (!(owner && target)) {
-			return;
-		}
+	const target = world.objects.get(owner.link.targetId);
+	if (!(owner && target)) {
+		owner.link = null;
+		return false;
+	}
 
-		const minDistance = owner.link.minDistance;
-		const maxDistance = owner.link.maxDistance;
+	const minDistance = owner.link.minDistance;
+	const maxDistance = owner.link.maxDistance;
 
-		const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
-		const distance = vector.length(diff);
-		const strength = owner.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
-		if (strength <= 0) {
-			return;
-		}
+	const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
+	const distance = vector.length(diff);
+	const strength = owner.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
+	if (strength <= 0) {
+		return true;
+	}
 
-		owner.body.applyLinearImpulse(
-			vector.relengthen(diff, strength * owner.body.getMass()),
-			owner.body.getWorldPoint(vector.zero()), true);
+	owner.body.applyLinearImpulse(
+		vector.relengthen(diff, strength * owner.body.getMass()),
+		owner.body.getWorldPoint(vector.zero()), true);
 
-		if (target.category === "hero") {
-			target.body.applyLinearImpulse(
-				vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
-				target.body.getWorldPoint(vector.zero()), true);
-		}
-	});
+	if (target.category === "hero") {
+		target.body.applyLinearImpulse(
+			vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
+			target.body.getWorldPoint(vector.zero()), true);
+	}
+	return true;
 }
 
 function shields(world: w.World) {
@@ -1509,7 +1511,11 @@ function decayThrust(world: w.World) {
 
 function detonate(detonate: w.DetonateBehaviour, world: w.World) {
 	const obj = world.objects.get(detonate.projectileId);
-	if (obj.category === "projectile" && obj.detonate && world.tick === obj.expireTick) {
+	if (!(obj && obj.category === "projectile" && obj.detonate)) {
+		return false;
+	}
+
+	if (world.tick === obj.expireTick) {
 		detonateProjectile(obj, world);
 		return false;
 	} else {
