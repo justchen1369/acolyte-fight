@@ -441,14 +441,14 @@ const boomerang: Spell = {
 const retractor: Spell = {
     id: 'retractor',
     name: 'Refract',
-    description: "Cast Refract twice quickly in succession - first to launch, second to redirect it. Shoot it around corners and catch enemies no matter where they are hiding.",
+    description: "Refract around corners by casting a second time. Damage increases with time, so aim far away and refract back to do maximum damage.",
     action: "retractor",
 
-    color: '#ffcc00',
+    color: '#eebe00',
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -460,14 +460,19 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        density: 1,
+        density: 10,
         radius: 0.005,
         speed: 0.3,
         fixedSpeed: false,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 10,
+        damage: 15,
         collideWith: Categories.All,
-        expireOn: Categories.All ^ Categories.Projectile,
+        expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
+
+        partialDamage: {
+            initialMultiplier: 0.25,
+            ticks: 1 * TicksPerSecond,
+        },
 
         sound: "retractor",
         soundHit: "standard",
