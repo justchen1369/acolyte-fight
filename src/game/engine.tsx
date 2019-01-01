@@ -367,7 +367,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate,
+		detonate: projectileTemplate.detonate ? { ...projectileTemplate.detonate } : null, // Have to clone, because scaleDamagePacket mutates
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
