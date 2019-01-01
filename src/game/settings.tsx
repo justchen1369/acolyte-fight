@@ -453,8 +453,9 @@ const retractor: Spell = {
     projectile: {
         density: 1,
         radius: 0.003,
-        speed: 0.4,
-        maxTicks: 2.0 * TicksPerSecond,
+        speed: 0.25,
+        fixedSpeed: false,
+        maxTicks: 3.0 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
 
@@ -463,6 +464,13 @@ const retractor: Spell = {
                 type: "redirect",
                 targetType: "self",
                 afterTicks: 60,
+                newSpeed: 0,
+            },
+            {
+                type: "redirect",
+                targetType: "self",
+                afterTicks: 120,
+                newSpeed: 1.0,
             },
         ],
 
@@ -656,7 +664,8 @@ const gravity: Spell = {
 
         behaviours: [
             {
-                type: "speedChange",
+                type: "redirect",
+                targetType: "cursor",
                 atCursor: true,
                 newSpeed: 0,
             },
@@ -691,7 +700,8 @@ const supernova: Spell = {
 
         behaviours: [
             {
-                type: "speedChange",
+                type: "redirect",
+                targetType: "cursor",
                 atCursor: true,
                 newSpeed: 0,
             },

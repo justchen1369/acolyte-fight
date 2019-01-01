@@ -481,7 +481,6 @@ export namespace HomingTargets {
 export type Behaviour =
 	HomingParameters
 	| RedirectParameters
-	| SpeedChangeParameters
 
 export interface BehaviourBase {
 	objId: string;
@@ -500,11 +499,7 @@ export interface HomingParameters extends BehaviourBase {
 export interface RedirectParameters extends BehaviourBase {
 	type: "redirect";
 	targetType: HomingType;
-}
-
-export interface SpeedChangeParameters extends BehaviourBase {
-	type: "speedChange";
-	newSpeed: number;
+	newSpeed?: number;
 }
 
 export type WorldObject =

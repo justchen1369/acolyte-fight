@@ -391,38 +391,34 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
-	projectileTemplate.behaviours.forEach(behaviourTemplate => {
-		const afterTick = world.tick + Math.max(
-			(behaviourTemplate.afterTicks || 0),
-			behaviourTemplate.atCursor ? ticksToCursor : 0,
-		);
+	if (projectileTemplate.behaviours) {
+		projectileTemplate.behaviours.forEach(behaviourTemplate => {
+			const afterTick = world.tick + Math.max(
+				(behaviourTemplate.afterTicks || 0),
+				behaviourTemplate.atCursor ? ticksToCursor : 0,
+			);
 
-		if (behaviourTemplate.type === "homing") {
-			world.behaviours.push({
-				type: "homing",
-				objId: id,
-				afterTick,
-				turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
-				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
-				minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
-				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-			});
-		} else if (behaviourTemplate.type === "redirect") {
-			world.behaviours.push({
-				type: "redirect",
-				objId: id,
-				afterTick,
-				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-			});
-		} else if (behaviourTemplate.type === "speedChange") {
-			world.behaviours.push({
-				type: "speedChange",
-				objId: id,
-				afterTick,
-				newSpeed: behaviourTemplate.newSpeed,
-			});
-		}
-	});
+			if (behaviourTemplate.type === "homing") {
+				world.behaviours.push({
+					type: "homing",
+					objId: id,
+					afterTick,
+					turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
+					maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
+					minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
+					targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+				});
+			} else if (behaviourTemplate.type === "redirect") {
+				world.behaviours.push({
+					type: "redirect",
+					objId: id,
+					afterTick,
+					targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+					newSpeed: behaviourTemplate.newSpeed,
+				});
+			}
+		});
+	}
 
 	return projectile;
 }
@@ -474,8 +470,6 @@ function behaviours(world: w.World) {
 			keep = homingForce(world, obj, behaviour);
 		} else if (behaviour.type === "redirect" && obj.category === "projectile") {
 			keep = redirect(world, obj, behaviour);
-		} else if (behaviour.type === "speedChange" && obj.category === "projectile") {
-			keep = speedChange(world, obj, behaviour);
 		}
 
 		if (keep) {
@@ -1326,7 +1320,10 @@ function redirect(world: w.World, obj: w.Projectile, redirect: w.RedirectParamet
 
 	// Redirect directly towards target
 	const currentVelocity = obj.body.getLinearVelocity();
-	obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
+	const currentSpeed = vector.length(currentVelocity);
+	const newSpeed = redirect.newSpeed !== undefined ? redirect.newSpeed : currentSpeed;
+	const newVelocity = vector.relengthen(diff, newSpeed);
+	obj.body.setLinearVelocity(newVelocity);
 
 	// Generate event (for sounds)
 	world.ui.events.push({
@@ -1337,14 +1334,6 @@ function redirect(world: w.World, obj: w.Projectile, redirect: w.RedirectParamet
 	});
 
 	// Clear redirect flags so we don't repeat this
-	return false;
-}
-
-function speedChange(world: w.World, obj: w.Projectile, speedChange: w.SpeedChangeParameters) {
-	// Update speed
-	obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), speedChange.newSpeed));
-
-	// Don't repeat the speed change
 	return false;
 }
 

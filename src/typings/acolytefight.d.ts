@@ -239,7 +239,6 @@ declare interface BounceParameters {
 declare type BehaviourParamsTemplate =
 	HomingParametersTemplate
 	| RedirectParametersTemplate
-	| SpeedChangeTemplate;
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
@@ -263,10 +262,6 @@ declare interface HomingParametersTemplate extends BehaviourParamsBase {
 declare interface RedirectParametersTemplate extends BehaviourParamsBase {
 	type: "redirect";
 	targetType?: HomingType; // Whether to redirect towards "self", "enemy" or "cursor". Defaults to "enemy".
-}
-
-declare interface SpeedChangeTemplate extends BehaviourParamsBase {
-	type: "speedChange";
 	newSpeed?: number;
 }
 
