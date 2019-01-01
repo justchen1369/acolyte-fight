@@ -15,6 +15,12 @@ export interface ResolvedKeyBindings {
 	spellsToKeys: Map<string, string>;
 }
 
+type DiscriminateBehaviour<T extends w.Behaviour['type']> = Extract<w.Behaviour, {type: T}>
+
+type BehaviourHandlers = {
+  [P in w.Behaviour['type']]: (behaviour: DiscriminateBehaviour<P>, world: w.World) => boolean
+};
+
 // Reset planck.js constants
 {
 	const settings = (pl as any).internal.Settings;
@@ -410,32 +416,26 @@ function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[]
 	}
 
 	behaviourTemplates.forEach(behaviourTemplate => {
-		let waitTicks = behaviourTemplate.afterTicks || 0;
-		if (behaviourTemplate.atCursor) {
-			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
-			const speed = vector.length(projectile.body.getLinearVelocity());
-			const ticksToCursor = Math.floor(TicksPerSecond * distanceToCursor / speed);
-			waitTicks = Math.max(waitTicks, ticksToCursor);
-		}
-		const afterTick = world.tick + waitTicks;
-
 		if (behaviourTemplate.type === "homing") {
+			let waitTicks = behaviourTemplate.afterTicks || 0;
+			if (behaviourTemplate.atCursor) {
+				const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
+				const speed = vector.length(projectile.body.getLinearVelocity());
+				const ticksToCursor = Math.floor(TicksPerSecond * distanceToCursor / speed);
+				waitTicks = Math.max(waitTicks, ticksToCursor);
+			}
+			const afterTick = world.tick + waitTicks;
+
 			world.behaviours.push({
 				type: "homing",
 				objId: projectile.id,
 				afterTick,
-				turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
+				turnRate: behaviourTemplate.revolutionsPerSecond !== undefined ? behaviourTemplate.revolutionsPerSecond * 2 * Math.PI : Infinity,
 				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
 				minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
 				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-			});
-		} else if (behaviourTemplate.type === "redirect") {
-			world.behaviours.push({
-				type: "redirect",
-				objId: projectile.id,
-				afterTick,
-				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
 				newSpeed: behaviourTemplate.newSpeed,
+				redirect: behaviourTemplate.redirect,
 			});
 		}
 	});
@@ -449,20 +449,9 @@ export function tick(world: w.World) {
 	handleOccurences(world);
 	handleActions(world);
 
-	newBehaviours.push(...world.behaviours.filter(behaviour => {
-		const obj = world.objects.get(behaviour.objId);
-		if (!obj) {
-			return false;
-		} if (world.tick < behaviour.afterTick) {
-			return true;
-		} else if (behaviour.type === "homing" && obj.category === "projectile") {
-			return homingForce(world, obj, behaviour);
-		} else if (behaviour.type === "redirect" && obj.category === "projectile") {
-			return redirect(world, obj, behaviour);
-		} else {
-			return true;
-		}
-	}));
+	handleBehaviours(world, newBehaviours, {
+		homing,
+	});
 
 	linkForce(world);
 	gravityForce(world);
@@ -489,6 +478,19 @@ export function tick(world: w.World) {
 	reap(world);
 
 	world.behaviours = newBehaviours;
+}
+
+function handleBehaviours(world: w.World, newBehaviours: w.Behaviour[], handlers: BehaviourHandlers) {
+	world.behaviours.forEach(behaviour => {
+		const handler = handlers[behaviour.type];
+		if (handler) {
+			const keep = (handler as any)(behaviour, world);
+
+			if (keep) {
+				newBehaviours.push(behaviour);
+			}
+		}
+	});
 }
 
 function physicsStep(world: w.World) {
@@ -1313,10 +1315,19 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 	return target;
 }
 
-function homingForce(world: w.World, obj: w.Projectile, homing: w.HomingParameters) {
+function homing(homing: w.HomingParameters, world: w.World) {
+	if (world.tick < homing.afterTick) {
+		return true;
+	}
+
+	const obj = world.objects.get(homing.objId);
+	if (!(obj && obj.category === "projectile")) {
+		return false;
+	}
+
 	const target = findHomingTarget(homing.targetType, obj, world);
 	if (!target) {
-		return false; // Cancel homing in future ticks
+		return false;
 	}
 
 	const diff = vector.diff(target, obj.body.getPosition());
@@ -1332,42 +1343,21 @@ function homingForce(world: w.World, obj: w.Projectile, homing: w.HomingParamete
 	const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
 
 	const currentSpeed = vector.length(currentVelocity);
-	const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
+	const newSpeed = homing.newSpeed !== undefined ? homing.newSpeed : currentSpeed;
+	const newVelocity = vector.multiply(vector.fromAngle(newAngle), newSpeed);
 
-	obj.body.setLinearVelocity(newVelocity);
-	return true;
-}
-
-function redirect(world: w.World, obj: w.Projectile, redirect: w.RedirectParameters) {
-	const target = findHomingTarget(redirect.targetType, obj, world);
-	if (!target) {
-		return false; // Cancel redirection in future ticks
-	}
-
-	const diff = vector.diff(target, obj.body.getPosition());
-
-	// Redirect directly towards target
-	const currentVelocity = obj.body.getLinearVelocity();
-	const currentSpeed = vector.length(currentVelocity);
-	const newSpeed = redirect.newSpeed !== undefined ? redirect.newSpeed : currentSpeed;
-	const newVelocity = vector.relengthen(diff, newSpeed);
 	obj.body.setLinearVelocity(newVelocity);
 
 	// Change the projectile's intended speed so it doesn't get corrected away from the change
-	if (redirect.newSpeed !== undefined) {
-		obj.speed = redirect.newSpeed;
+	if (homing.newSpeed !== undefined) {
+		obj.speed = homing.newSpeed;
 	}
 
-	// Generate event (for sounds)
-	world.ui.events.push({
-		type: "redirect",
-		projectileId: obj.id,
-		sound: obj.sound,
-		pos: vector.clone(obj.body.getPosition()),
-	});
-
-	// Clear redirect flags so we don't repeat this
-	return false;
+	if (homing.redirect) {
+		return false; // Only want to do this once, cancel immediately
+	} else {
+		return true;
+	}
 }
 
 function linkForce(world: w.World) {

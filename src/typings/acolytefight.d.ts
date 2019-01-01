@@ -252,31 +252,28 @@ declare interface BounceParameters {
 
 declare type BehaviourParamsTemplate =
 	HomingParametersTemplate
-	| RedirectParametersTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
 declare interface BehaviourParamsBase {
 	type: string;
-
-	afterTicks?: number; // Redirect after this many ticks
-	atCursor?: boolean; // Redirect when projectile reaches cursor
 }
 
 declare interface HomingParametersTemplate extends BehaviourParamsBase {
 	type: "homing";
+
+	afterTicks?: number; // Redirect after this many ticks
+	atCursor?: boolean; // Redirect when projectile reaches cursor
+
 	targetType?: HomingType; // Whether to home towards "self", "enemy" or "cursor". Defaults to "enemy".
 
-	revolutionsPerSecond: number; // The maximum turn rate of the homing projectile
+	revolutionsPerSecond?: number; // The maximum turn rate of the homing projectile. Defaults to infinity
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
 
 	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
-}
 
-declare interface RedirectParametersTemplate extends BehaviourParamsBase {
-	type: "redirect";
-	targetType?: HomingType; // Whether to redirect towards "self", "enemy" or "cursor". Defaults to "enemy".
-	newSpeed?: number;
+	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
+	redirect?: boolean; // If true, this homing will only redirect the projectile one time
 }
 
 declare interface DetonateParameters extends DamagePacket {

@@ -455,9 +455,10 @@ const retractor: Spell = {
     retractCooldownTicks: 0,
     retractBehaviours: [
         {
-            type: "redirect",
+            type: "homing",
             targetType: "cursor",
             newSpeed: 0.3,
+            redirect: true,
         },
     ],
 
@@ -575,9 +576,10 @@ const link: Spell = {
 
         behaviours: [
             {
-                type: "redirect",
+                type: "homing",
                 afterTicks: 1.0 * TicksPerSecond,
                 targetType: HomingTargets.self,
+                redirect: true,
             },
         ],
 
@@ -641,9 +643,10 @@ const drain: Spell = {
 
         behaviours: [
             {
-                type: "redirect",
+                type: "homing",
                 targetType: "enemy",
                 atCursor: true,
+                redirect: true,
             },
         ],
 
@@ -683,10 +686,11 @@ const gravity: Spell = {
 
         behaviours: [
             {
-                type: "redirect",
+                type: "homing",
                 targetType: "cursor",
                 atCursor: true,
                 newSpeed: 0,
+                redirect: true,
             },
         ],
 
@@ -719,16 +723,18 @@ const supernova: Spell = {
 
         behaviours: [ // Either one of the following will stop the projectile
             {
-                type: "redirect",
+                type: "homing",
                 targetType: "cursor",
                 atCursor: true,
                 newSpeed: 0,
+                redirect: true,
             },
             {
-                type: "redirect",
+                type: "homing",
                 targetType: "cursor",
                 afterTicks: 0.75 * TicksPerSecond,
                 newSpeed: 0,
+                redirect: true,
             },
         ],
         detonate: {

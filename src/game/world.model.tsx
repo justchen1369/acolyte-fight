@@ -481,25 +481,23 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	HomingParameters
-	| RedirectParameters
 
 export interface BehaviourBase {
-	objId: string;
-	afterTick: number;
 	type: string;
 }
 
 export interface HomingParameters extends BehaviourBase {
 	type: "homing";
+	targetType: HomingType;
+
+	objId: string;
+	afterTick: number;
+
 	turnRate: number;
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
-	targetType: HomingType;
-}
 
-export interface RedirectParameters extends BehaviourBase {
-	type: "redirect";
-	targetType: HomingType;
+	redirect?: boolean;
 	newSpeed?: number;
 }
 
@@ -514,7 +512,6 @@ export type WorldEvent =
 	| ScourgeEvent
 	| LifeStealEvent
 	| TeleportEvent
-	| RedirectEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -548,13 +545,6 @@ export interface TeleportEvent extends WorldEventBase {
 	toPos: pl.Vec2;
 	heroId: string;
 	sound?: string;
-}
-
-export interface RedirectEvent extends WorldEventBase {
-	type: "redirect";
-	projectileId: string;
-	sound?: string;
-	pos: pl.Vec2;
 }
 
 export interface Action {
