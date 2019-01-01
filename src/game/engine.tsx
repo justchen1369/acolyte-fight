@@ -880,6 +880,9 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 
 	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
+		if (spell.knockbackCancel.cooldownTicks !== undefined) {
+			setCooldown(world, hero, spell.id, spell.knockbackCancel.cooldownTicks);
+		}
 		hero.casting.stage = w.CastStage.Complete;
 	}
 

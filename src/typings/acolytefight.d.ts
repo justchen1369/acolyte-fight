@@ -152,11 +152,15 @@ declare interface SpellBase {
     cooldown: number;
     interruptible?: boolean; // Whether this spell can be interrupted by moving.
     movementCancel?: boolean; // Whether moving cancels the spell.
-    knockbackCancel?: boolean; // If this spell is being channelled, whether knockback cancels it.
+    knockbackCancel?: KnockbackCancelParams; // If this spell is being channelled, whether knockback cancels it.
 
     icon?: string;
 
     color: string; // The colour of the button for this spell (not the projectile)
+}
+
+declare interface KnockbackCancelParams {
+	cooldownTicks?: number; // If cancelled by knockback, set cooldown to this value. This can be used to allow the spell to be re-cast quickly if interrupted.
 }
 
 declare interface MoveSpell extends SpellBase {
