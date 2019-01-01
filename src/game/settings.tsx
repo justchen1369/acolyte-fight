@@ -450,7 +450,7 @@ const retractor: Spell = {
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 16 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -466,7 +466,7 @@ const retractor: Spell = {
         radius: 0.005,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
-        damage: 15,
+        damage: 20,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
@@ -504,7 +504,7 @@ const whip: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     chargeTicks: 8,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     projectile: {
         density: 5,
@@ -520,7 +520,7 @@ const whip: Spell = {
 
         detonate: {
             damage: 15,
-            outerDamage: 2.5,
+            outerDamage: 5,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0003,
@@ -597,7 +597,7 @@ const bouncer: Spell = {
     icon: "divert",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 8 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     projectile: {
         density: 2,
