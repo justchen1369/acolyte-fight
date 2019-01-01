@@ -404,6 +404,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
+	world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
@@ -486,12 +487,12 @@ export function tick(world: w.World) {
 	}
 
 	applySpeedLimit(world);
-	removePassthrough(world);
 	decayMitigation(world);
 	decayThrust(world);
 
 	handleBehaviours(world, newBehaviours, {
 		retractor,
+		removePassthrough,
 	});
 
 	applyLavaDamage(world);
@@ -534,18 +535,21 @@ function applySpeedLimit(world: w.World) {
 	});
 }
 
-function removePassthrough(world: w.World) {
-	world.objects.forEach(projectile => {
-		if (projectile.category === "projectile" && projectile.passthrough) {
-			// Projectiles will passthrough their owner until they are clear of their owner - this is so they don't die on spawn because the hero is walking in the same direction as the spawning projectile.
-			// Also allows meteor to be shot further back and so is more likely to push back another hero if they are at point blank range.
-			const hero = world.objects.get(projectile.owner);
-			if (!hero || (hero.category === "hero" && projectileClearedHero(projectile, hero))) {
-				updateGroupIndex(projectile.body.getFixtureList(), 0);
-				projectile.passthrough = false;
-			}
-		}
-	});
+function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.World) {
+	const projectile = world.objects.get(passthrough.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	} 
+
+	// Projectiles will passthrough their owner until they are clear of their owner - this is so they don't die on spawn because the hero is walking in the same direction as the spawning projectile.
+	// Also allows meteor to be shot further back and so is more likely to push back another hero if they are at point blank range.
+	const hero = world.objects.get(projectile.owner);
+	if (!hero || (hero.category === "hero" && projectileClearedHero(projectile, hero))) {
+		updateGroupIndex(projectile.body.getFixtureList(), 0);
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {

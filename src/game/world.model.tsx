@@ -438,7 +438,6 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 
 	owner: string;
 	body: pl.Body;
-	passthrough: boolean;
 	collideWith: number;
 	hit?: number;
 	speed: number;
@@ -482,6 +481,7 @@ export type Behaviour =
 	HomingBehaviour
 	| DetonateBehaviour
 	| RetractorBehaviour
+	| RemovePassthroughBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -511,6 +511,11 @@ export interface RetractorBehaviour extends BehaviourBase {
 	type: "retractor";
 	heroId: string;
 	spellId: string;
+}
+
+export interface RemovePassthroughBehaviour extends BehaviourBase {
+	type: "removePassthrough";
+	projectileId: string;
 }
 
 export type WorldObject =
