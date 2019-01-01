@@ -185,6 +185,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 
 	world.objects.set(shield.id, shield);
 	hero.shieldIds.add(shield.id);
+	world.behaviours.push({ type: "reflectFollow", shieldId: shield.id });
 
 	return shield;
 }
@@ -472,11 +473,11 @@ export function tick(world: w.World) {
 		homing,
 		linkForce,
 		gravityForce,
+		reflectFollow,
 	});
 
 	updateKnockback(world);
 
-	shields(world);
 	physicsStep(world);
 
 	handleBehaviours(behaviours, world, {
@@ -1430,17 +1431,20 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	return true;
 }
 
-function shields(world: w.World) {
-	world.objects.forEach(shield => {
-		if (shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
-			const hero = world.objects.get(shield.owner);
-			if (hero) {
-				shield.body.setPosition(vector.clone(hero.body.getPosition()));
-			} else {
-				shield.expireTick = world.tick;
-			}
+function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
+	const shield = world.objects.get(behaviour.shieldId);
+	if (shield && shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
+		const hero = world.objects.get(shield.owner);
+		if (hero) {
+			shield.body.setPosition(vector.clone(hero.body.getPosition()));
+			return true;
+		} else {
+			shield.expireTick = world.tick;
+			return false;
 		}
-	});
+	} else {
+		return false;
+	}
 }
 
 function updateKnockback(world: w.World) {

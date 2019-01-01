@@ -484,6 +484,7 @@ export type Behaviour =
 	| RemovePassthroughBehaviour
 	| LinkBehaviour
 	| GravityBehaviour
+	| ReflectFollowBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -528,6 +529,11 @@ export interface LinkBehaviour extends BehaviourBase {
 export interface GravityBehaviour extends BehaviourBase {
 	type: "gravityForce";
 	heroId: string;
+}
+
+export interface ReflectFollowBehaviour extends BehaviourBase {
+	type: "reflectFollow";
+	shieldId: string;
 }
 
 export type WorldObject =
