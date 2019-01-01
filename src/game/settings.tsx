@@ -440,12 +440,12 @@ const boomerang: Spell = {
 };
 const retractor: Spell = {
     id: 'retractor',
-    name: 'Retractor',
-    description: "To the enemy and then back to you.",
+    name: 'Refract',
+    description: "Cast Refract twice quickly in succession - first to launch, second to redirect it. Shoot it around corners and catch enemies no matter where they are hiding.",
     action: "retractor",
 
-    color: '#ff00ff',
-    icon: "boomerangSun",
+    color: '#ffcc00',
+    icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 20 * TicksPerSecond,
@@ -702,11 +702,17 @@ const supernova: Spell = {
         expireOn: Categories.None,
         expireAfterCursorTicks: 0.5 * TicksPerSecond,
 
-        behaviours: [
+        behaviours: [ // Either one of the following will stop the projectile
             {
                 type: "redirect",
                 targetType: "cursor",
                 atCursor: true,
+                newSpeed: 0,
+            },
+            {
+                type: "redirect",
+                targetType: "cursor",
+                afterTicks: 0.75 * TicksPerSecond,
                 newSpeed: 0,
             },
         ],
