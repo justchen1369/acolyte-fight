@@ -39,7 +39,7 @@ class SpellStats extends React.Component<Props, State> {
             return null;
         }
 
-        if (spell.action === "projectile") {
+        if (spell.action === "projectile" || spell.action === "retractor") {
             const damage = this.calculateProjectileDamage(spell.projectile);
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>

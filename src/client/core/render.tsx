@@ -845,7 +845,8 @@ function rgColor(proportion: number) {
 }
 
 function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
-	renderGravityAt(ctxStack, projectile.body.getPosition(), world, swirl);
+	const color = projectileColor(swirl, projectile, world);
+	renderGravityAt(ctxStack, projectile.body.getPosition(), world, swirl, color);
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -866,7 +867,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 }
 
-function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl) {
+function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl, color?: string) {
 	const animationLength = swirl.loopTicks;
 	const numParticles = swirl.numParticles;
 
@@ -879,7 +880,7 @@ function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.W
 			radius: swirl.particleRadius,
 			initialTick: world.tick,
 			max: swirl.ticks, 
-			fillStyle: swirl.color,
+			fillStyle: color || swirl.color,
 		});
 	}
 }

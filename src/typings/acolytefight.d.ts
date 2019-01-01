@@ -319,6 +319,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	type: "swirl";
 	radius: number;
 	color: string;
+	selfColor?: boolean;
 	ticks: number; // How long is the trail?
 
 	loopTicks: number; // How long for the swirl to do one full rotation?

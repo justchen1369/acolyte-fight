@@ -444,7 +444,7 @@ const retractor: Spell = {
     description: "Refract around corners by casting a second time. Damage increases with time, so aim far away and refract back to do maximum damage.",
     action: "retractor",
 
-    color: '#ffcc00',
+    color: '#00ff7f',
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
@@ -463,9 +463,8 @@ const retractor: Spell = {
         density: 10,
         radius: 0.005,
         speed: 0.3,
-        fixedSpeed: false,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 15,
+        damage: 10,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
@@ -479,15 +478,16 @@ const retractor: Spell = {
         renderers: [
             {
                 type: "swirl",
-                color: '#ffcc00',
+                color: '#00ff7f',
+                selfColor: true,
                 ticks: 30,
                 radius: 0.009,
                 particleRadius: 0.001,
                 numParticles: 2,
                 loopTicks: 15,
             },
-            { type: "projectile", color: '#ffcc00', ticks: 15 },
-            { type: "ray", color: '#ffcc00', ticks: 15 },
+            { type: "projectile", color: '#00ff7f', ticks: 15 },
+            { type: "ray", color: '#00ff7f', ticks: 15 },
         ],
     },
 };
