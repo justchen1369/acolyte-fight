@@ -442,7 +442,7 @@ const retractor: Spell = {
     id: 'retractor',
     name: 'Retractor',
     description: "To the enemy and then back to you.",
-    action: "projectile",
+    action: "retractor",
 
     color: '#ff00ff',
     icon: "boomerangSun",
@@ -450,15 +450,24 @@ const retractor: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 1 * TicksPerSecond,
 
+    retractCooldownTicks: 0,
+    retractBehaviours: [
+        {
+            type: "redirect",
+            targetType: "cursor",
+            newSpeed: 0.3,
+        },
+    ],
+
     projectile: {
         density: 0.001,
-        radius: 0.0025,
-        speed: 0.5,
+        radius: 0.005,
+        speed: 0.3,
         fixedSpeed: false,
-        maxTicks: 3.0 * TicksPerSecond,
+        maxTicks: 2.0 * TicksPerSecond,
         damage: 10,
-        collideWith: Categories.Hero | Categories.Shield,
-        expireOn: Categories.All,
+        collideWith: Categories.All,
+        expireOn: Categories.All ^ Categories.Projectile,
 
         behaviours: [
             {
@@ -466,12 +475,6 @@ const retractor: Spell = {
                 targetType: "cursor",
                 atCursor: true,
                 newSpeed: 0,
-            },
-            {
-                type: "redirect",
-                targetType: "self",
-                afterTicks: 120,
-                newSpeed: 2.0,
             },
         ],
 
@@ -482,12 +485,13 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#ffcc00',
                 ticks: 30,
-                radius: 0.007,
+                radius: 0.009,
                 particleRadius: 0.001,
                 numParticles: 2,
-                loopTicks: 30,
+                loopTicks: 15,
             },
-            { type: "ray", color: '#ffcc00', ticks: 30 },
+            { type: "projectile", color: '#ffcc00', ticks: 15 },
+            { type: "ray", color: '#ffcc00', ticks: 15 },
         ],
     },
 };

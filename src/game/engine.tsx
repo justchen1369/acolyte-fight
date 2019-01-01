@@ -284,6 +284,7 @@ function addHero(world: w.World, heroId: string) {
 		spellsToKeys: new Map<string, string>(),
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
+		retractorIds: new Map<string, string>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
@@ -391,36 +392,46 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
-	if (projectileTemplate.behaviours) {
-		projectileTemplate.behaviours.forEach(behaviourTemplate => {
-			const afterTick = world.tick + Math.max(
-				(behaviourTemplate.afterTicks || 0),
-				behaviourTemplate.atCursor ? ticksToCursor : 0,
-			);
-
-			if (behaviourTemplate.type === "homing") {
-				world.behaviours.push({
-					type: "homing",
-					objId: id,
-					afterTick,
-					turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
-					maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
-					minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
-					targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-				});
-			} else if (behaviourTemplate.type === "redirect") {
-				world.behaviours.push({
-					type: "redirect",
-					objId: id,
-					afterTick,
-					targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-					newSpeed: behaviourTemplate.newSpeed,
-				});
-			}
-		});
-	}
+	applyProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
+}
+
+function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[], projectile: w.Projectile, world: w.World) {
+	if (!behaviourTemplates) {
+		return;
+	}
+
+	behaviourTemplates.forEach(behaviourTemplate => {
+		let waitTicks = behaviourTemplate.afterTicks || 0;
+		if (behaviourTemplate.atCursor) {
+			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
+			const speed = vector.length(projectile.body.getLinearVelocity());
+			const ticksToCursor = Math.floor(TicksPerSecond * distanceToCursor / speed);
+			waitTicks = Math.max(waitTicks, ticksToCursor);
+		}
+		const afterTick = world.tick + waitTicks;
+
+		if (behaviourTemplate.type === "homing") {
+			world.behaviours.push({
+				type: "homing",
+				objId: projectile.id,
+				afterTick,
+				turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
+				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
+				minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
+				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+			});
+		} else if (behaviourTemplate.type === "redirect") {
+			world.behaviours.push({
+				type: "redirect",
+				objId: projectile.id,
+				afterTick,
+				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+				newSpeed: behaviourTemplate.newSpeed,
+			});
+		}
+	});
 }
 
 // Simulator
@@ -963,6 +974,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "stop": return true; // Do nothing
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
+		case "retractor": return spawnRetractorAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
 		case "thrust": return thrustAction(world, hero, action, spell);
@@ -1762,6 +1774,22 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
 	}
 	return currentLength >= spell.lengthTicks;
+}
+
+function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
+	if (!action.target) { return true; }
+
+	let retractor = world.objects.get(hero.retractorIds.get(spell.id));
+	if (retractor && retractor.category === "projectile") {
+		retractor.target = action.target;
+		applyProjectileBehaviours(spell.retractBehaviours, retractor, world);
+	} else {
+		retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
+		hero.retractorIds.set(spell.id, retractor.id);
+		setCooldown(world, hero, spell.id, spell.retractCooldownTicks);
+	}
+
+	return true;
 }
 
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {

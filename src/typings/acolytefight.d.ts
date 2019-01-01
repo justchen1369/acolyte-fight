@@ -126,6 +126,7 @@ declare type Spell =
 	| RetargetSpell
 	| ProjectileSpell
 	| ReflectSpell
+	| RetractorSpell
 	| SpraySpell
 	| ScourgeSpell
 	| TeleportSpell
@@ -186,6 +187,15 @@ declare interface SpraySpell extends SpellBase {
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
+}
+
+declare interface RetractorSpell extends SpellBase {
+	action: "retractor";
+	
+	projectile: ProjectileTemplate;
+
+	retractCooldownTicks: number; // Must wait this many ticks before retracting
+	retractBehaviours: BehaviourParamsTemplate[]; // Add these behaviours to the projectile when retracted
 }
 
 declare interface ProjectileTemplate extends DamagePacket {
