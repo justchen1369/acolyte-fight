@@ -311,19 +311,19 @@ const kamehameha: Spell = {
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
     chargeTicks: 0.75 * TicksPerSecond,
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     revsPerTickWhileCharging: 0.005,
     revsPerTickWhileChannelling: 0.00005,
 
     knockbackCancel: {
-        cooldownTicks: 3 * TicksPerSecond,
+        cooldownTicks: 1 * TicksPerSecond,
     },
     movementCancel: true,
     interruptible: true,
     jitterRatio: 0.0,
 
     intervalTicks: 0.1 * TicksPerSecond,
-    lengthTicks: 5 * TicksPerSecond,
+    lengthTicks: 3 * TicksPerSecond,
 
     projectile: {
         density: 0.0001,
@@ -519,11 +519,11 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 20,
-            outerDamage: 5,
+            damage: 15,
+            outerDamage: 2.5,
             radius: 0.025,
             minImpulse: 0.0001,
-            maxImpulse: 0.0002,
+            maxImpulse: 0.0003,
             renderTicks: 10,
         },
 
