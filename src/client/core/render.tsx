@@ -360,8 +360,6 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderLifeStealReturn(ctxStack, ev, world);
 	} else if (ev.type === "teleport") {
 		renderTeleport(ctxStack, ev, world);
-	} else if (ev.type === "redirect") {
-		renderRedirect(ctxStack, ev, world);
 	} else {
 		return;
 	}
@@ -411,16 +409,6 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 			id: `${ev.heroId}-teleport-arriving`,
 			sound: `${ev.sound}-arriving`,
 			pos: ev.toPos,
-		});
-	}
-}
-
-function renderRedirect(ctxStack: CanvasCtxStack, ev: w.RedirectEvent, world: w.World) {
-	if (ev.sound) {
-		world.ui.sounds.push({
-			id: `${ev.projectileId}-redirected`,
-			sound: `${ev.sound}-redirected`,
-			pos: ev.pos,
 		});
 	}
 }
