@@ -215,7 +215,7 @@ const triplet: Spell = {
     action: "spray",
     sound: "triplet",
 
-    color: '#ff0044',
+    color: '#ff0088',
     icon: "tripleScratches",
 
     maxAngleDiffInRevs: 0,
@@ -237,8 +237,8 @@ const triplet: Spell = {
         sound: "triplet",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#ff0044', ticks: 10 },
-            { type: "ray", color: '#ff0044', ticks: 10 },
+            { type: "projectile", color: '#ff0088', ticks: 10 },
+            { type: "ray", color: '#ff0088', ticks: 10 },
         ],
     },
 };
