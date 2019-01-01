@@ -462,15 +462,15 @@ const retractor: Spell = {
     projectile: {
         density: 10,
         radius: 0.005,
-        speed: 0.3,
-        maxTicks: 2.0 * TicksPerSecond,
-        damage: 10,
+        speed: 0.25,
+        maxTicks: 4.0 * TicksPerSecond,
+        damage: 15,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         partialDamage: {
-            initialMultiplier: 0.25,
-            ticks: 1 * TicksPerSecond,
+            initialMultiplier: 0.1,
+            ticks: 2 * TicksPerSecond,
         },
 
         sound: "retractor",
@@ -527,6 +527,15 @@ const whip: Spell = {
 
         sound: "whip",
         renderers: [
+            {
+                type: "swirl",
+                color: '#66fff3',
+                ticks: 30,
+                radius: 0.009,
+                particleRadius: 0.001,
+                numParticles: 2,
+                loopTicks: 15,
+            },
             { type: "link", color: '#66fff3', width: Pixel * 5 },
         ],
     },

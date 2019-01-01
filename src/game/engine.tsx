@@ -1350,6 +1350,11 @@ function redirect(world: w.World, obj: w.Projectile, redirect: w.RedirectParamet
 	const newVelocity = vector.relengthen(diff, newSpeed);
 	obj.body.setLinearVelocity(newVelocity);
 
+	// Change the projectile's intended speed so it doesn't get corrected away from the change
+	if (redirect.newSpeed !== undefined) {
+		obj.speed = redirect.newSpeed;
+	}
+
 	// Generate event (for sounds)
 	world.ui.events.push({
 		type: "redirect",
