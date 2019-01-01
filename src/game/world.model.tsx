@@ -490,7 +490,7 @@ export interface HomingParameters extends BehaviourBase {
 	type: "homing";
 	targetType: HomingType;
 
-	objId: string;
+	projectileId: string;
 	afterTick: number;
 
 	turnRate: number;

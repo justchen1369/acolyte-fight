@@ -428,7 +428,7 @@ function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[]
 
 			world.behaviours.push({
 				type: "homing",
-				objId: projectile.id,
+				projectileId: projectile.id,
 				afterTick,
 				turnRate: behaviourTemplate.revolutionsPerSecond !== undefined ? behaviourTemplate.revolutionsPerSecond * 2 * Math.PI : Infinity,
 				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
@@ -1320,7 +1320,7 @@ function homing(homing: w.HomingParameters, world: w.World) {
 		return true;
 	}
 
-	const obj = world.objects.get(homing.objId);
+	const obj = world.objects.get(homing.projectileId);
 	if (!(obj && obj.category === "projectile")) {
 		return false;
 	}
