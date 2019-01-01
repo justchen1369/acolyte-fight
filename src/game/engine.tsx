@@ -405,7 +405,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
-	applyProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
+	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
 }
@@ -414,35 +414,40 @@ function ticksTo(distance: number, speed: number) {
 	return Math.floor(TicksPerSecond * distance / speed);
 }
 
-function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[], projectile: w.Projectile, world: w.World) {
-	if (!behaviourTemplates) {
+function instantiateProjectileBehaviours(templates: BehaviourParamsTemplate[], projectile: w.Projectile, world: w.World) {
+	if (!templates) {
 		return;
 	}
 
-	behaviourTemplates.forEach(behaviourTemplate => {
-		if (behaviourTemplate.type === "homing") {
-			let waitTicks = behaviourTemplate.afterTicks || 0;
-			if (behaviourTemplate.atCursor) {
-				const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
-				const speed = vector.length(projectile.body.getLinearVelocity());
-				const ticksToCursor = ticksTo(distanceToCursor, speed);
-				waitTicks = Math.max(waitTicks, ticksToCursor);
-			}
-			const afterTick = world.tick + waitTicks;
-
-			world.behaviours.push({
-				type: "homing",
-				projectileId: projectile.id,
-				afterTick,
-				turnRate: behaviourTemplate.revolutionsPerSecond !== undefined ? behaviourTemplate.revolutionsPerSecond * 2 * Math.PI : Infinity,
-				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
-				minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
-				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
-				newSpeed: behaviourTemplate.newSpeed,
-				redirect: behaviourTemplate.redirect,
-			});
+	templates.forEach(template => {
+		if (template.type === "homing") {
+			instantiateHoming(template, projectile, world);
 		}
 	});
+}
+
+function instantiateHoming(template: HomingParametersTemplate, projectile: w.Projectile, world: w.World) {
+	let waitTicks = template.afterTicks || 0;
+	if (template.atCursor) {
+		const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
+		const speed = vector.length(projectile.body.getLinearVelocity());
+		const ticksToCursor = ticksTo(distanceToCursor, speed);
+		waitTicks = Math.max(waitTicks, ticksToCursor);
+	}
+	const afterTick = world.tick + waitTicks;
+
+	world.behaviours.push({
+		type: "homing",
+		projectileId: projectile.id,
+		afterTick,
+		turnRate: template.revolutionsPerSecond !== undefined ? template.revolutionsPerSecond * 2 * Math.PI : Infinity,
+		maxTurnProportion: template.maxTurnProportion !== undefined ? template.maxTurnProportion : 1.0,
+		minDistanceToTarget: template.minDistanceToTarget || 0,
+		targetType: template.targetType || w.HomingTargets.enemy,
+		newSpeed: template.newSpeed,
+		redirect: template.redirect,
+	});
+
 }
 
 // Simulator
@@ -1803,7 +1808,7 @@ function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, sp
 		const retractor = world.objects.get(retractorId);
 		if (retractor && retractor.category === "projectile") {
 			retractor.target = action.target;
-			applyProjectileBehaviours(spell.retractBehaviours, retractor, world);
+			instantiateProjectileBehaviours(spell.retractBehaviours, retractor, world);
 			hero.retractorIds.delete(spell.id);
 		}
 	} else {
