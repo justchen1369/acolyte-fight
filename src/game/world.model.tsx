@@ -483,6 +483,7 @@ export type Behaviour =
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
 	| LinkBehaviour
+	| GravityBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -521,6 +522,11 @@ export interface RemovePassthroughBehaviour extends BehaviourBase {
 
 export interface LinkBehaviour extends BehaviourBase {
 	type: "linkForce";
+	heroId: string;
+}
+
+export interface GravityBehaviour extends BehaviourBase {
+	type: "gravityForce";
 	heroId: string;
 }
 

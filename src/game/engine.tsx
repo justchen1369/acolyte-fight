@@ -462,23 +462,24 @@ function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectil
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
-	const newBehaviours = new Array<w.Behaviour>();
+	const behaviours = world.behaviours;
+	world.behaviours = []; // Replace now so if any behaviours added during tick loop, they will be kept until the next one
 
 	handleOccurences(world);
 	handleActions(world);
 
-	handleBehaviours(world, newBehaviours, {
+	handleBehaviours(behaviours, world, {
 		homing,
 		linkForce,
+		gravityForce,
 	});
 
-	gravityForce(world);
 	updateKnockback(world);
 
 	shields(world);
 	physicsStep(world);
 
-	handleBehaviours(world, newBehaviours, {
+	handleBehaviours(behaviours, world, {
 		detonate, // Detonate before objects switch owners so its predictable who owns the detonate
 	});
 
@@ -490,7 +491,7 @@ export function tick(world: w.World) {
 	decayMitigation(world);
 	decayThrust(world);
 
-	handleBehaviours(world, newBehaviours, {
+	handleBehaviours(behaviours, world, {
 		retractor,
 		removePassthrough,
 	});
@@ -499,18 +500,16 @@ export function tick(world: w.World) {
 	shrink(world);
 
 	reap(world);
-
-	world.behaviours = newBehaviours;
 }
 
-function handleBehaviours(world: w.World, newBehaviours: w.Behaviour[], handlers: BehaviourHandlers) {
-	world.behaviours.forEach(behaviour => {
+function handleBehaviours(behaviours: w.Behaviour[], world: w.World, handlers: BehaviourHandlers) {
+	behaviours.forEach(behaviour => {
 		const handler = handlers[behaviour.type];
 		if (handler) {
 			const keep = (handler as any)(behaviour, world);
 
 			if (keep) {
-				newBehaviours.push(behaviour);
+				world.behaviours.push(behaviour);
 			}
 		}
 	});
@@ -1251,6 +1250,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 		radius: projectile.gravity.radius,
 		power: projectile.gravity.power,
 	};
+	world.behaviours.push({ type: "gravityForce", heroId: target.id });
 }
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
@@ -1303,29 +1303,29 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	projectile.alreadyHit.delete(nextTarget.id);
 }
 
-function gravityForce(world: w.World) {
-	world.objects.forEach(hero => {
-		if (!(hero.category === "hero" && hero.gravity)) {
-			return;
-		}
-		if (world.tick >= hero.gravity.expireTick) {
-			hero.gravity = null;
-			return;
-		}
+function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero" && hero.gravity)) {
+		return false;
+	}
+	if (world.tick >= hero.gravity.expireTick) {
+		hero.gravity = null;
+		return false;
+	}
 
-		const towardsOrb = vector.diff(hero.gravity.location, hero.body.getPosition());
-		const distanceTo = vector.length(towardsOrb);
-		if (distanceTo >= hero.gravity.radius) {
-			hero.gravity = null;
-			return;
-		}
+	const towardsOrb = vector.diff(hero.gravity.location, hero.body.getPosition());
+	const distanceTo = vector.length(towardsOrb);
+	if (distanceTo >= hero.gravity.radius) {
+		hero.gravity = null;
+		return false;
+	}
 
-		const proportion = Math.pow(1.0 - distanceTo / hero.gravity.radius, hero.gravity.power);
-		const strength = hero.gravity.strength * proportion;
+	const proportion = Math.pow(1.0 - distanceTo / hero.gravity.radius, hero.gravity.power);
+	const strength = hero.gravity.strength * proportion;
 
-		const impulse = vector.multiply(vector.unit(towardsOrb), strength);
-		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
-	});
+	const impulse = vector.multiply(vector.unit(towardsOrb), strength);
+	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+	return true;
 }
 
 function findHomingTarget(targetType: HomingType, projectile: w.Projectile, world: w.World) {
