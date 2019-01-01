@@ -485,6 +485,8 @@ export type Behaviour =
 	| LinkBehaviour
 	| GravityBehaviour
 	| ReflectFollowBehaviour
+	| ThrustBounceBehaviour
+	| ThrustDecayBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -534,6 +536,16 @@ export interface GravityBehaviour extends BehaviourBase {
 export interface ReflectFollowBehaviour extends BehaviourBase {
 	type: "reflectFollow";
 	shieldId: string;
+}
+
+export interface ThrustBounceBehaviour extends BehaviourBase {
+	type: "thrustBounce";
+	heroId: string;
+}
+
+export interface ThrustDecayBehaviour extends BehaviourBase {
+	type: "thrustDecay";
+	heroId: string;
 }
 
 export type WorldObject =

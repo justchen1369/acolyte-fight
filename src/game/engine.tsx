@@ -474,9 +474,8 @@ export function tick(world: w.World) {
 		linkForce,
 		gravityForce,
 		reflectFollow,
+		thrustBounce,
 	});
-
-	updateKnockback(world);
 
 	physicsStep(world);
 
@@ -490,11 +489,11 @@ export function tick(world: w.World) {
 
 	applySpeedLimit(world);
 	decayMitigation(world);
-	decayThrust(world);
 
 	handleBehaviours(behaviours, world, {
 		retractor,
 		removePassthrough,
+		thrustDecay,
 	});
 
 	applyLavaDamage(world);
@@ -1447,16 +1446,19 @@ function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
 	}
 }
 
-function updateKnockback(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			if (hero.thrust) {
-				updateMaskBits(hero.body.getFixtureList(), Categories.All);
-			} else {
-				updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
-			}
-		}
-	});
+function thrustBounce(behaviour: w.ThrustBounceBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	if (hero.thrust) {
+		updateMaskBits(hero.body.getFixtureList(), Categories.All);
+		return true;
+	} else {
+		updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
+		return false;
+	}
 }
 
 function updateMaskBits(fixture: pl.Fixture, newMaskBits: number) {
@@ -1501,16 +1503,20 @@ function decayMitigation(world: w.World) {
 	});
 }
 
-function decayThrust(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero" && hero.thrust) {
-			--hero.thrust.ticks;
-			if (hero.thrust.ticks <= 0) {
-				hero.body.setLinearVelocity(vector.zero());
-				hero.thrust = null;
-			}
-		}
-	});
+function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero" && hero.thrust)) {
+		return false;
+	}
+
+	--hero.thrust.ticks;
+	if (hero.thrust.ticks <= 0) {
+		hero.body.setLinearVelocity(vector.zero());
+		hero.thrust = null;
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function detonate(detonate: w.DetonateBehaviour, world: w.World) {
@@ -1931,6 +1937,9 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
+
+		world.behaviours.push({ type: "thrustBounce", heroId: hero.id });
+		world.behaviours.push({ type: "thrustDecay", heroId: hero.id });
 	}
 
 	if (hero.thrust) {
