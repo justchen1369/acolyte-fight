@@ -463,13 +463,11 @@ function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectil
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
-	const behaviours = world.behaviours;
-	world.behaviours = []; // Replace now so if any behaviours added during tick loop, they will be kept until the next one
 
 	handleOccurences(world);
 	handleActions(world);
 
-	handleBehaviours(behaviours, world, {
+	handleBehaviours(world, {
 		homing,
 		linkForce,
 		gravityForce,
@@ -479,7 +477,7 @@ export function tick(world: w.World) {
 
 	physicsStep(world);
 
-	handleBehaviours(behaviours, world, {
+	handleBehaviours(world, {
 		detonate, // Detonate before objects switch owners so its predictable who owns the detonate
 	});
 
@@ -490,7 +488,7 @@ export function tick(world: w.World) {
 	applySpeedLimit(world);
 	decayMitigation(world);
 
-	handleBehaviours(behaviours, world, {
+	handleBehaviours(world, {
 		retractor,
 		removePassthrough,
 		thrustDecay,
@@ -502,17 +500,21 @@ export function tick(world: w.World) {
 	reap(world);
 }
 
-function handleBehaviours(behaviours: w.Behaviour[], world: w.World, handlers: BehaviourHandlers) {
-	behaviours.forEach(behaviour => {
+function handleBehaviours(world: w.World, handlers: BehaviourHandlers) {
+	const done = new Set<w.Behaviour>();
+	world.behaviours.forEach(behaviour => {
 		const handler = handlers[behaviour.type];
 		if (handler) {
 			const keep = (handler as any)(behaviour, world);
-
-			if (keep) {
-				world.behaviours.push(behaviour);
+			if (!keep) {
+				done.add(behaviour);
 			}
 		}
 	});
+
+	if (done.size > 0) {
+		world.behaviours = world.behaviours.filter(b => !done.has(b));
+	}
 }
 
 function physicsStep(world: w.World) {
