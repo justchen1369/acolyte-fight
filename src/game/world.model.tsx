@@ -304,7 +304,6 @@ export interface Obstacle extends WorldObjectBase {
 	health: number;
 	createTick: number;
 	growthTicks: number;
-	damagePerTick: number;
 	extent: number;
 	points: pl.Vec2[];
 

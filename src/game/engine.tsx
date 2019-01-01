@@ -136,7 +136,6 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		maxHealth: Obstacle.Health,
 		createTick: world.tick,
 		growthTicks: 0,
-		damagePerTick: 0,
 	};
 
 	// Obstacles start immovable
@@ -490,7 +489,6 @@ export function tick(world: w.World) {
 	removePassthrough(world);
 	decayMitigation(world);
 	decayThrust(world);
-	decayObstacles(world);
 	clearRetractorCooldown(world);
 	applyLavaDamage(world);
 	shrink(world);
@@ -1493,14 +1491,6 @@ function decayThrust(world: w.World) {
 				hero.body.setLinearVelocity(vector.zero());
 				hero.thrust = null;
 			}
-		}
-	});
-}
-
-function decayObstacles(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.category === "obstacle" && obj.damagePerTick) {
-			obj.health -= obj.damagePerTick;
 		}
 	});
 }
