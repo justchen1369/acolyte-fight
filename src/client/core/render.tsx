@@ -845,10 +845,6 @@ function rgColor(proportion: number) {
 }
 
 function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
-	if (!projectile.gravity) {
-		return;
-	}
-
 	renderGravityAt(ctxStack, projectile.body.getPosition(), world, swirl);
 }
 

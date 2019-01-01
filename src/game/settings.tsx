@@ -448,37 +448,46 @@ const retractor: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 1 * TicksPerSecond,
 
     projectile: {
-        density: 1,
-        radius: 0.003,
-        speed: 0.25,
+        density: 0.001,
+        radius: 0.0025,
+        speed: 0.5,
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         damage: 10,
-        expireOn: Categories.Hero | Categories.Massive,
+        collideWith: Categories.Hero | Categories.Shield,
+        expireOn: Categories.All,
 
         behaviours: [
             {
                 type: "redirect",
-                targetType: "self",
-                afterTicks: 60,
+                targetType: "cursor",
+                atCursor: true,
                 newSpeed: 0,
             },
             {
                 type: "redirect",
                 targetType: "self",
                 afterTicks: 120,
-                newSpeed: 1.0,
+                newSpeed: 2.0,
             },
         ],
 
         sound: "retractor",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 60 },
-            { type: "ray", color: '#ff00ff', selfColor: true, ticks: 60  },
+            {
+                type: "swirl",
+                color: '#ffcc00',
+                ticks: 30,
+                radius: 0.007,
+                particleRadius: 0.001,
+                numParticles: 2,
+                loopTicks: 30,
+            },
+            { type: "ray", color: '#ffcc00', ticks: 30 },
         ],
     },
 };

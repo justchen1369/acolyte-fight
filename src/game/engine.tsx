@@ -1492,8 +1492,10 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 					other.body.getWorldPoint(vector.zero()),
 					true);
 
+				const innerDamage = projectile.detonate.damage;
+				const outerDamage = projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage;
 				const packet = scaleForPartialDamage(world, projectile, {
-					damage: proportion * projectile.detonate.damage + (1 - proportion) * projectile.detonate.outerDamage,
+					damage: proportion * innerDamage + (1 - proportion) * outerDamage,
 					lifeSteal: projectile.detonate.lifeSteal,
 				});
 				if (other.category === "hero") {
