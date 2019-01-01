@@ -469,15 +469,6 @@ const retractor: Spell = {
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Projectile,
 
-        behaviours: [
-            {
-                type: "redirect",
-                targetType: "cursor",
-                atCursor: true,
-                newSpeed: 0,
-            },
-        ],
-
         sound: "retractor",
         soundHit: "standard",
         renderers: [
