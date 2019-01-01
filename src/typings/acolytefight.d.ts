@@ -200,12 +200,12 @@ declare interface ProjectileTemplate extends DamagePacket {
 	strafe?: boolean; // if true, the projectile will move with the hero's movement
 
     bounce?: BounceParameters;
-	homing?: HomingParametersTemplate;
-	redirect?: RedirectParametersTemplate;
 	link?: LinkParameters;
 	gravity?: GravityParameters; // Trap a hero
 	detonate?: DetonateParameters; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
+
+	behaviours?: BehaviourParamsTemplate[],
 
 	minTicks?: number; // The minimum number of ticks that a projectile will live for. The main purpose of this is to work around a quirk in the physics engine where if projectiles doesn't live for more than 1 tick, it doesn't affect the physics.
 	maxTicks: number; // The maximum number of ticks that a projectile will live for. The maximum range can be determined by speed * maxTicks / TicksPerSecond.
@@ -236,9 +236,22 @@ declare interface BounceParameters {
     damageFactor: number; // Used to decay the bouncer from repeated hits. 0.9 means it loses 10% damage each time.
 }
 
+declare type BehaviourParamsTemplate =
+	HomingParametersTemplate
+	| RedirectParametersTemplate
+	| SpeedChangeTemplate;
+
 declare type HomingType = "self" | "enemy" | "cursor";
 
-declare interface HomingParametersTemplate {
+declare interface BehaviourParamsBase {
+	type: string;
+
+	afterTicks?: number; // Redirect after this many ticks
+	atCursor?: boolean; // Redirect when projectile reaches cursor
+}
+
+declare interface HomingParametersTemplate extends BehaviourParamsBase {
+	type: "homing";
 	targetType?: HomingType; // Whether to home towards "self", "enemy" or "cursor". Defaults to "enemy".
 
 	revolutionsPerSecond: number; // The maximum turn rate of the homing projectile
@@ -247,12 +260,14 @@ declare interface HomingParametersTemplate {
 	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
 }
 
-declare interface RedirectParametersTemplate {
+declare interface RedirectParametersTemplate extends BehaviourParamsBase {
+	type: "redirect";
 	targetType?: HomingType; // Whether to redirect towards "self", "enemy" or "cursor". Defaults to "enemy".
+}
 
-	afterTicks?: number; // Redirect after this many ticks
-	atCursor?: boolean; // Redirect when projectile reaches cursor
-	newSpeed?: number; // Change speed to this when redirected
+declare interface SpeedChangeTemplate extends BehaviourParamsBase {
+	type: "speedChange";
+	newSpeed?: number;
 }
 
 declare interface DetonateParameters extends DamagePacket {

@@ -665,7 +665,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 	if (spell.action === "projectile" || spell.action === "spray") {
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
 	} else if (spell.action === "teleport" || spell.action === "thrust") {
-		range = world.settings.Hero.MaxDashRange;
+		range = spell.range;
 	} else if (spell.action === "scourge" || spell.action === "shield") {
 		range = spell.radius;
 	} else if (spell.action === "wall") {

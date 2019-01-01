@@ -42,6 +42,7 @@ export interface World {
 	winTick?: number;
 
 	objects: Map<string, WorldObject>,
+	behaviours: Behaviour[],
 
 	physics: pl.World;
 
@@ -452,8 +453,6 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	partialDamage?: PartialDamageParameters;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
-	homing?: HomingParameters;
-	redirect?: RedirectParameters;
 	link?: LinkParameters;
 	detonate?: DetonateParameters;
 	lifeSteal: number;
@@ -479,17 +478,33 @@ export namespace HomingTargets {
 	export const cursor = "cursor";
 }
 
-export interface HomingParameters {
+export type Behaviour =
+	HomingParameters
+	| RedirectParameters
+	| SpeedChangeParameters
+
+export interface BehaviourBase {
+	objId: string;
+	afterTick: number;
+	type: string;
+}
+
+export interface HomingParameters extends BehaviourBase {
+	type: "homing";
 	turnRate: number;
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
 	targetType: HomingType;
 }
 
-export interface RedirectParameters {
+export interface RedirectParameters extends BehaviourBase {
+	type: "redirect";
 	targetType: HomingType;
-	afterTick: number;
-	newSpeed?: number;
+}
+
+export interface SpeedChangeParameters extends BehaviourBase {
+	type: "speedChange";
+	newSpeed: number;
 }
 
 export type WorldObject =

@@ -48,6 +48,7 @@ export function initialWorld(mod: Object): w.World {
 		winner: null,
 
 		objects: new Map(),
+		behaviours: [],
 		physics: pl.World(),
 		actions: new Map(),
 		radius: settings.World.InitialRadius,
@@ -357,22 +358,6 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		partialDamage: projectileTemplate.partialDamage,
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
-
-		homing: projectileTemplate.homing && {
-			turnRate: projectileTemplate.homing.revolutionsPerSecond * 2 * Math.PI,
-			maxTurnProportion: projectileTemplate.homing.maxTurnProportion !== undefined ? projectileTemplate.homing.maxTurnProportion : 1.0,
-			minDistanceToTarget: projectileTemplate.homing.minDistanceToTarget || 0,
-			targetType: projectileTemplate.homing.targetType || w.HomingTargets.enemy,
-		} as w.HomingParameters,
-		redirect: projectileTemplate.redirect && {
-			targetType: projectileTemplate.redirect.targetType || w.HomingTargets.enemy,
-			afterTick:
-				world.tick + Math.min(
-					(projectileTemplate.redirect.afterTicks || NeverTicks),
-					projectileTemplate.redirect.atCursor ? ticksToCursor : NeverTicks,
-				),
-			newSpeed: projectileTemplate.redirect.newSpeed,
-		} as w.RedirectParameters,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate,
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
@@ -406,6 +391,39 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		hero.strafeIds.add(projectile.id);
 	}
 
+	projectileTemplate.behaviours.forEach(behaviourTemplate => {
+		const afterTick = world.tick + Math.max(
+			(behaviourTemplate.afterTicks || 0),
+			behaviourTemplate.atCursor ? ticksToCursor : 0,
+		);
+
+		if (behaviourTemplate.type === "homing") {
+			world.behaviours.push({
+				type: "homing",
+				objId: id,
+				afterTick,
+				turnRate: behaviourTemplate.revolutionsPerSecond * 2 * Math.PI,
+				maxTurnProportion: behaviourTemplate.maxTurnProportion !== undefined ? behaviourTemplate.maxTurnProportion : 1.0,
+				minDistanceToTarget: behaviourTemplate.minDistanceToTarget || 0,
+				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+			});
+		} else if (behaviourTemplate.type === "redirect") {
+			world.behaviours.push({
+				type: "redirect",
+				objId: id,
+				afterTick,
+				targetType: behaviourTemplate.targetType || w.HomingTargets.enemy,
+			});
+		} else if (behaviourTemplate.type === "speedChange") {
+			world.behaviours.push({
+				type: "speedChange",
+				objId: id,
+				afterTick,
+				newSpeed: behaviourTemplate.newSpeed,
+			});
+		}
+	});
+
 	return projectile;
 }
 
@@ -416,8 +434,7 @@ export function tick(world: w.World) {
 	handleOccurences(world);
 	handleActions(world);
 
-	homingForce(world);
-	redirect(world);
+	behaviours(world);
 	linkForce(world);
 	gravityForce(world);
 	updateKnockback(world);
@@ -440,6 +457,32 @@ export function tick(world: w.World) {
 	shrink(world);
 
 	reap(world);
+}
+
+function behaviours(world: w.World) {
+	const newBehaviours = new Array<w.Behaviour>();
+	world.behaviours.forEach(behaviour => {
+		const obj = world.objects.get(behaviour.objId);
+		if (!obj) {
+			return;
+		}
+
+		let keep = false;
+		if (world.tick < behaviour.afterTick) {
+			keep = true;
+		} else if (behaviour.type === "homing" && obj.category === "projectile") {
+			keep = homingForce(world, obj, behaviour);
+		} else if (behaviour.type === "redirect" && obj.category === "projectile") {
+			keep = redirect(world, obj, behaviour);
+		} else if (behaviour.type === "speedChange" && obj.category === "projectile") {
+			keep = speedChange(world, obj, behaviour);
+		}
+
+		if (keep) {
+			newBehaviours.push(behaviour);
+		}
+	});
+	world.behaviours = newBehaviours;
 }
 
 function physicsStep(world: w.World) {
@@ -1248,71 +1291,61 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 	return target;
 }
 
-function homingForce(world: w.World) {
-	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.homing)) {
-			return;
-		}
+function homingForce(world: w.World, obj: w.Projectile, homing: w.HomingParameters) {
+	const target = findHomingTarget(homing.targetType, obj, world);
+	if (!target) {
+		return false; // Cancel homing in future ticks
+	}
 
-		const target = findHomingTarget(obj.homing.targetType, obj, world);
-		if (!target) {
-			obj.homing = null;
-			return;
-		}
+	const diff = vector.diff(target, obj.body.getPosition());
 
-		const diff = vector.diff(target, obj.body.getPosition());
+	// Home to target
+	const currentVelocity = obj.body.getLinearVelocity();
 
-		// Home to target
-		const currentVelocity = obj.body.getLinearVelocity();
+	const currentAngle = vector.angle(currentVelocity);
+	const idealAngle = vector.angle(diff);
 
-		const currentAngle = vector.angle(currentVelocity);
-		const idealAngle = vector.angle(diff);
+	const maxTurnRate = homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
+	const turnRate = Math.min(homing.turnRate, maxTurnRate);
+	const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
 
-		const maxTurnRate = obj.homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
-		const turnRate = Math.min(obj.homing.turnRate, maxTurnRate);
-		const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
+	const currentSpeed = vector.length(currentVelocity);
+	const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
 
-		const currentSpeed = vector.length(currentVelocity);
-		const newVelocity = vector.multiply(vector.fromAngle(newAngle), currentSpeed);
-
-		obj.body.setLinearVelocity(newVelocity);
-	});
+	obj.body.setLinearVelocity(newVelocity);
+	return true;
 }
 
-function redirect(world: w.World) {
-	world.objects.forEach(obj => {
-		if (!(obj.category === "projectile" && obj.redirect && world.tick >= obj.redirect.afterTick)) {
-			return;
-		}
+function redirect(world: w.World, obj: w.Projectile, redirect: w.RedirectParameters) {
+	const target = findHomingTarget(redirect.targetType, obj, world);
+	if (!target) {
+		return false; // Cancel redirection in future ticks
+	}
 
-		const target = findHomingTarget(obj.redirect.targetType, obj, world);
-		if (!target) {
-			obj.redirect = null;
-			return;
-		}
+	const diff = vector.diff(target, obj.body.getPosition());
 
-		const diff = vector.diff(target, obj.body.getPosition());
+	// Redirect directly towards target
+	const currentVelocity = obj.body.getLinearVelocity();
+	obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
 
-		// Redirect directly towards target
-		const currentVelocity = obj.body.getLinearVelocity();
-		obj.body.setLinearVelocity(vector.redirect(currentVelocity, diff));
-
-		// Update speed
-		if (obj.redirect.newSpeed !== undefined) {
-			obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), obj.redirect.newSpeed));
-		}
-
-		// Generate event (for sounds)
-		world.ui.events.push({
-			type: "redirect",
-			projectileId: obj.id,
-			sound: obj.sound,
-			pos: vector.clone(obj.body.getPosition()),
-		});
-
-		// Clear redirect flags so we don't repeat this
-		obj.redirect = null;
+	// Generate event (for sounds)
+	world.ui.events.push({
+		type: "redirect",
+		projectileId: obj.id,
+		sound: obj.sound,
+		pos: vector.clone(obj.body.getPosition()),
 	});
+
+	// Clear redirect flags so we don't repeat this
+	return false;
+}
+
+function speedChange(world: w.World, obj: w.Projectile, speedChange: w.SpeedChangeParameters) {
+	// Update speed
+	obj.body.setLinearVelocity(vector.relengthen(obj.body.getLinearVelocity(), speedChange.newSpeed));
+
+	// Don't repeat the speed change
+	return false;
 }
 
 function linkForce(world: w.World) {

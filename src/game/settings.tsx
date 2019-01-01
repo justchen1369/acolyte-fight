@@ -62,7 +62,7 @@ const Choices: ChoiceSettings = {
 		"s": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike", "triplet"],
 		"w": ["gravity", "link", "lightning"],
-		"e": ["homing", "boomerang"],
+		"e": ["homing", "boomerang", "retractor"],
 		"r": ["kamehameha", "meteor", "supernova"],
 		"d": ["firespray", "bouncer", "whip"],
 		"f": ["scourge"],
@@ -384,10 +384,13 @@ const homing: Spell = {
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
-        homing: {
-            revolutionsPerSecond: 1,
-            maxTurnProportion: 0.05,
-        },
+        behaviours: [
+            {
+                type: "homing",
+                revolutionsPerSecond: 1,
+                maxTurnProportion: 0.05,
+            },
+        ],
 
         sound: "homing",
         soundHit: "standard",
@@ -417,14 +420,53 @@ const boomerang: Spell = {
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
 
-        homing: {
-            revolutionsPerSecond: 0.02,
-            maxTurnProportion: 0.05,
-            minDistanceToTarget: 0.075,
-            targetType: HomingTargets.self,
-        },
+        behaviours: [
+            {
+                type: "homing",
+                revolutionsPerSecond: 0.02,
+                maxTurnProportion: 0.05,
+                minDistanceToTarget: 0.075,
+                targetType: HomingTargets.self,
+            },
+        ],
 
         sound: "boomerang",
+        soundHit: "standard",
+        renderers: [
+            { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 60 },
+            { type: "ray", color: '#ff00ff', selfColor: true, ticks: 60  },
+        ],
+    },
+};
+const retractor: Spell = {
+    id: 'retractor',
+    name: 'Retractor',
+    description: "To the enemy and then back to you.",
+    action: "projectile",
+
+    color: '#ff00ff',
+    icon: "boomerangSun",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 10 * TicksPerSecond,
+
+    projectile: {
+        density: 1,
+        radius: 0.003,
+        speed: 0.4,
+        maxTicks: 2.0 * TicksPerSecond,
+        damage: 10,
+        expireOn: Categories.Hero | Categories.Massive,
+
+        behaviours: [
+            {
+                type: "redirect",
+                targetType: "self",
+                afterTicks: 60,
+            },
+        ],
+
+        sound: "retractor",
         soundHit: "standard",
         renderers: [
             { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 60 },
@@ -504,10 +546,13 @@ const link: Spell = {
             lifeSteal: 0.5,
         },
 
-        redirect: {
-            afterTicks: 1.0 * TicksPerSecond,
-            targetType: HomingTargets.self,
-        },
+        behaviours: [
+            {
+                type: "redirect",
+                afterTicks: 1.0 * TicksPerSecond,
+                targetType: HomingTargets.self,
+            },
+        ],
 
         sound: "link",
         renderers: [
@@ -566,10 +611,14 @@ const drain: Spell = {
         maxTicks: 2.0 * TicksPerSecond,
         damage: 5,
         lifeSteal: 1.0,
-        redirect: {
-            targetType: "enemy",
-            atCursor: true,
-        },
+
+        behaviours: [
+            {
+                type: "redirect",
+                targetType: "enemy",
+                atCursor: true,
+            },
+        ],
 
         renderers: [
             { type: "ray", intermediatePoints: true, color: '#22ee88', ticks: 30 },
@@ -605,11 +654,13 @@ const gravity: Spell = {
             power: 1,
         },
 
-        redirect: {
-            targetType: HomingTargets.cursor,
-            atCursor: true,
-            newSpeed: 0,
-        },
+        behaviours: [
+            {
+                type: "speedChange",
+                atCursor: true,
+                newSpeed: 0,
+            },
+        ],
 
         sound: "gravity",
         renderers: [
@@ -638,11 +689,13 @@ const supernova: Spell = {
         expireOn: Categories.None,
         expireAfterCursorTicks: 0.5 * TicksPerSecond,
 
-        redirect: {
-            targetType: "cursor",
-            atCursor: true,
-            newSpeed: 0,
-        },
+        behaviours: [
+            {
+                type: "speedChange",
+                atCursor: true,
+                newSpeed: 0,
+            },
+        ],
         detonate: {
             damage: 0,
             radius: 0.05,
@@ -781,6 +834,7 @@ const Spells = {
     lightning,
     homing,
     boomerang,
+    retractor,
     whip,
     bouncer,
     drain,
