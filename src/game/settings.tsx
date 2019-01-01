@@ -585,7 +585,7 @@ const link: Spell = {
         behaviours: [
             {
                 type: "homing",
-                afterTicks: 1.0 * TicksPerSecond,
+                trigger: { afterTicks: 1.0 * TicksPerSecond },
                 targetType: HomingTargets.self,
                 redirect: true,
             },
@@ -653,7 +653,7 @@ const drain: Spell = {
             {
                 type: "homing",
                 targetType: "enemy",
-                atCursor: true,
+                trigger: { atCursor: true },
                 redirect: true,
             },
         ],
@@ -696,7 +696,7 @@ const gravity: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                atCursor: true,
+                trigger: { atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
@@ -733,14 +733,14 @@ const supernova: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                atCursor: true,
+                trigger: { atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "homing",
                 targetType: "cursor",
-                afterTicks: 0.75 * TicksPerSecond,
+                trigger: { afterTicks: 0.75 * TicksPerSecond },
                 newSpeed: 0,
                 redirect: true,
             },

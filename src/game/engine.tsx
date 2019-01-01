@@ -421,43 +421,53 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 	}
 
 	templates.forEach(template => {
+		let behaviour: w.Behaviour = null;
 		if (template.type === "homing") {
-			instantiateHoming(template, projectile, world);
+			behaviour = instantiateHoming(template, projectile, world);
 		} else if (template.type === "detonate") {
-			instantiateDetonate(template, projectile, world);
+			behaviour = instantiateDetonate(template, projectile, world);
+		}
+
+		const trigger = template.trigger;
+		if (!trigger) {
+			world.behaviours.push(behaviour);
+		} else if(trigger.afterTicks) {
+			world.behaviours.push({
+				type: "delayBehaviour",
+				afterTick: world.tick + (trigger.afterTicks || 0),
+				delayed: behaviour,
+			});
+		} else if (trigger.atCursor) {
+			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
+			const speed = vector.length(projectile.body.getLinearVelocity());
+			const ticksToCursor = ticksTo(distanceToCursor, speed);
+
+			world.behaviours.push({
+				type: "delayBehaviour",
+				afterTick: world.tick + ticksToCursor,
+				delayed: behaviour,
+			});
+		} else {
+			throw "Unknown behaviour trigger: " + trigger;
 		}
 	});
 }
 
-function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, world: w.World) {
-	let waitTicks = template.afterTicks || 0;
-	if (template.atCursor) {
-		const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
-		const speed = vector.length(projectile.body.getLinearVelocity());
-		const ticksToCursor = ticksTo(distanceToCursor, speed);
-		waitTicks = Math.max(waitTicks, ticksToCursor);
-	}
-	const afterTick = world.tick + waitTicks;
-
-	world.behaviours.push({
+function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, world: w.World): w.HomingBehaviour {
+	return {
 		type: "homing",
 		projectileId: projectile.id,
-		afterTick,
 		turnRate: template.revolutionsPerSecond !== undefined ? template.revolutionsPerSecond * 2 * Math.PI : Infinity,
 		maxTurnProportion: template.maxTurnProportion !== undefined ? template.maxTurnProportion : 1.0,
 		minDistanceToTarget: template.minDistanceToTarget || 0,
 		targetType: template.targetType || w.HomingTargets.enemy,
 		newSpeed: template.newSpeed,
 		redirect: template.redirect,
-	});
-
+	};
 }
 
-function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectile, world: w.World) {
-	world.behaviours.push({
-		type: "detonate",
-		projectileId: projectile.id,
-	});
+function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectile, world: w.World): w.DetonateBehaviour {
+	return { type: "detonate", projectileId: projectile.id };
 }
 
 // Simulator
@@ -468,6 +478,7 @@ export function tick(world: w.World) {
 	handleActions(world);
 
 	handleBehaviours(world, {
+		delayBehaviour,
 		homing,
 		linkForce,
 		gravityForce,
@@ -514,6 +525,15 @@ function handleBehaviours(world: w.World, handlers: BehaviourHandlers) {
 
 	if (done.size > 0) {
 		world.behaviours = world.behaviours.filter(b => !done.has(b));
+	}
+}
+
+function delayBehaviour(behaviour: w.DelayBehaviour, world: w.World) {
+	if (world.tick >= behaviour.afterTick) {
+		world.behaviours.push(behaviour.delayed);
+		return false;
+	} else {
+		return true;
 	}
 }
 
@@ -1349,10 +1369,6 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 }
 
 function homing(homing: w.HomingBehaviour, world: w.World) {
-	if (world.tick < homing.afterTick) {
-		return true;
-	}
-
 	const obj = world.objects.get(homing.projectileId);
 	if (!(obj && obj.category === "projectile")) {
 		return false;

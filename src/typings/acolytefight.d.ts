@@ -258,13 +258,16 @@ declare type HomingType = "self" | "enemy" | "cursor";
 
 declare interface BehaviourTemplateBase {
 	type: string;
+	trigger?: BehaviourTrigger;
+}
+
+declare interface BehaviourTrigger {
+	afterTicks?: number; // After this many ticks
+	atCursor?: boolean; // When projectile reaches cursor
 }
 
 declare interface HomingTemplate extends BehaviourTemplateBase {
 	type: "homing";
-
-	afterTicks?: number; // Redirect after this many ticks
-	atCursor?: boolean; // Redirect when projectile reaches cursor
 
 	targetType?: HomingType; // Whether to home towards "self", "enemy" or "cursor". Defaults to "enemy".
 

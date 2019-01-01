@@ -478,7 +478,8 @@ export namespace HomingTargets {
 }
 
 export type Behaviour =
-	HomingBehaviour
+	DelayBehaviour
+	| HomingBehaviour
 	| DetonateBehaviour
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
@@ -492,12 +493,17 @@ export interface BehaviourBase {
 	type: string;
 }
 
+export interface DelayBehaviour extends BehaviourBase {
+	type: "delayBehaviour";
+	afterTick: number;
+	delayed: Behaviour;
+}
+
 export interface HomingBehaviour extends BehaviourBase {
 	type: "homing";
 	targetType: HomingType;
 
 	projectileId: string;
-	afterTick: number;
 
 	turnRate: number;
 	maxTurnProportion: number;
