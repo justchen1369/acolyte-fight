@@ -1774,6 +1774,10 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
+	if (currentLength >= spell.lengthTicks) {
+		return true;
+	}
+
 	if (currentLength % spell.intervalTicks === 0) {
 		const pos = hero.body.getPosition();
 
@@ -1794,7 +1798,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
 	}
-	return currentLength >= spell.lengthTicks;
+	return false;
 }
 
 function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
