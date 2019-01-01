@@ -350,7 +350,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	} as pl.FixtureDef);
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && x.id !== hero.id);
-	const ticksToCursor = Math.floor(TicksPerSecond * vector.length(diff) / vector.length(velocity))
+	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
 
 	let projectile = {
 		id,
@@ -410,6 +410,10 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	return projectile;
 }
 
+function ticksTo(distance: number, speed: number) {
+	return Math.floor(TicksPerSecond * distance / speed);
+}
+
 function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[], projectile: w.Projectile, world: w.World) {
 	if (!behaviourTemplates) {
 		return;
@@ -421,7 +425,7 @@ function applyProjectileBehaviours(behaviourTemplates: BehaviourParamsTemplate[]
 			if (behaviourTemplate.atCursor) {
 				const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
 				const speed = vector.length(projectile.body.getLinearVelocity());
-				const ticksToCursor = Math.floor(TicksPerSecond * distanceToCursor / speed);
+				const ticksToCursor = ticksTo(distanceToCursor, speed);
 				waitTicks = Math.max(waitTicks, ticksToCursor);
 			}
 			const afterTick = world.tick + waitTicks;
