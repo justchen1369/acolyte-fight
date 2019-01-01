@@ -444,7 +444,7 @@ const retractor: Spell = {
     description: "Refract around corners by casting a second time. Damage increases with time, so aim far away and refract back to do maximum damage.",
     action: "retractor",
 
-    color: '#eebe00',
+    color: '#ffcc00',
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
@@ -691,7 +691,7 @@ const supernova: Spell = {
     description: "A delayed explosion to knock back your enemies. Knockback is higher at the center of the blast.",
     action: "projectile",
 
-    color: '#ffaa00',
+    color: '#ff9a00',
     icon: "crownedExplosion",
 
     maxAngleDiffInRevs: 0.01,
@@ -731,8 +731,8 @@ const supernova: Spell = {
 
         sound: "supernova",
         renderers: [
-            { type: "ray", color: '#ffaa00', ticks: 30 },
-            { type: "reticule", color: '#ffaa00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
+            { type: "ray", color: '#ff9a00', ticks: 30 },
+            { type: "reticule", color: '#ff9a00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
         ],
     },
 };
