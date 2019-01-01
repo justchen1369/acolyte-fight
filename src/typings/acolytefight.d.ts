@@ -199,7 +199,7 @@ declare interface RetractorSpell extends SpellBase {
 	projectile: ProjectileTemplate;
 
 	retractCooldownTicks: number; // Must wait this many ticks before retracting
-	retractBehaviours: BehaviourParamsTemplate[]; // Add these behaviours to the projectile when retracted
+	retractBehaviours: BehaviourTemplate[]; // Add these behaviours to the projectile when retracted
 }
 
 declare interface ProjectileTemplate extends DamagePacket {
@@ -219,7 +219,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	detonate?: DetonateParameters; // Explode at target
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
-	behaviours?: BehaviourParamsTemplate[],
+	behaviours?: BehaviourTemplate[],
 
 	minTicks?: number; // The minimum number of ticks that a projectile will live for. The main purpose of this is to work around a quirk in the physics engine where if projectiles doesn't live for more than 1 tick, it doesn't affect the physics.
 	maxTicks: number; // The maximum number of ticks that a projectile will live for. The maximum range can be determined by speed * maxTicks / TicksPerSecond.
@@ -250,16 +250,16 @@ declare interface BounceParameters {
     damageFactor: number; // Used to decay the bouncer from repeated hits. 0.9 means it loses 10% damage each time.
 }
 
-declare type BehaviourParamsTemplate =
-	HomingParametersTemplate
+declare type BehaviourTemplate =
+	HomingTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
-declare interface BehaviourParamsBase {
+declare interface BehaviourTemplateBase {
 	type: string;
 }
 
-declare interface HomingParametersTemplate extends BehaviourParamsBase {
+declare interface HomingTemplate extends BehaviourTemplateBase {
 	type: "homing";
 
 	afterTicks?: number; // Redirect after this many ticks

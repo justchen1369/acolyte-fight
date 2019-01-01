@@ -414,7 +414,7 @@ function ticksTo(distance: number, speed: number) {
 	return Math.floor(TicksPerSecond * distance / speed);
 }
 
-function instantiateProjectileBehaviours(templates: BehaviourParamsTemplate[], projectile: w.Projectile, world: w.World) {
+function instantiateProjectileBehaviours(templates: BehaviourTemplate[], projectile: w.Projectile, world: w.World) {
 	if (!templates) {
 		return;
 	}
@@ -426,7 +426,7 @@ function instantiateProjectileBehaviours(templates: BehaviourParamsTemplate[], p
 	});
 }
 
-function instantiateHoming(template: HomingParametersTemplate, projectile: w.Projectile, world: w.World) {
+function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, world: w.World) {
 	let waitTicks = template.afterTicks || 0;
 	if (template.atCursor) {
 		const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
@@ -1324,7 +1324,7 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 	return target;
 }
 
-function homing(homing: w.HomingParameters, world: w.World) {
+function homing(homing: w.HomingBehaviour, world: w.World) {
 	if (world.tick < homing.afterTick) {
 		return true;
 	}

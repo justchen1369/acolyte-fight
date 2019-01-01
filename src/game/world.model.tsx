@@ -480,13 +480,13 @@ export namespace HomingTargets {
 }
 
 export type Behaviour =
-	HomingParameters
+	HomingBehaviour
 
 export interface BehaviourBase {
 	type: string;
 }
 
-export interface HomingParameters extends BehaviourBase {
+export interface HomingBehaviour extends BehaviourBase {
 	type: "homing";
 	targetType: HomingType;
 
