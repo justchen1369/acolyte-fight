@@ -479,7 +479,6 @@ const retractor: Spell = {
             {
                 type: "swirl",
                 color: '#00ff7f',
-                selfColor: true,
                 ticks: 30,
                 radius: 0.009,
                 particleRadius: 0.001,
@@ -498,7 +497,7 @@ const whip: Spell = {
     description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
-    color: '#44ff44',
+    color: '#66fff3',
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
@@ -528,7 +527,7 @@ const whip: Spell = {
 
         sound: "whip",
         renderers: [
-            { type: "link", color: '#44ff44', width: Pixel * 5 },
+            { type: "link", color: '#66fff3', width: Pixel * 5 },
         ],
     },
 };

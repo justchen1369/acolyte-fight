@@ -363,6 +363,38 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "retractor": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 2,
+                "attack": 0.25,
+                "decay": 1.5,
+                "highPass": 1400,
+                "lowPass": 1403,
+                "wave": "brown-noise"
+            },
+            {
+                "stopTime": 2,
+                "attack": 0.5,
+                "decay": 1.5,
+                "startFreq": 900,
+                "stopFreq": 900,
+                "lowPass": 200,
+                "modStartFreq": 1900,
+                "modStopFreq": 1900,
+                "modStartStrength": 300,
+                "modStopStrength": 300,
+                "tremoloFreq": 8,
+                "tremoloStrength": 0.3,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
     "kamehameha-charging": {
         start: [
             {
