@@ -489,7 +489,11 @@ export function tick(world: w.World) {
 	removePassthrough(world);
 	decayMitigation(world);
 	decayThrust(world);
-	clearRetractorCooldown(world);
+
+	handleBehaviours(world, newBehaviours, {
+		retractor,
+	});
+
 	applyLavaDamage(world);
 	shrink(world);
 
@@ -549,16 +553,20 @@ function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 	return distance > hero.radius + projectile.radius + hero.moveSpeedPerSecond / TicksPerSecond;
 }
 
-function clearRetractorCooldown(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero" && hero.retractorIds.size > 0) {
-			hero.retractorIds.forEach((retractorId, spellId) => {
-				if (!world.objects.has(retractorId)) {
-					hero.retractorIds.delete(spellId); // Yes you can delete while iterating in ES6
-				}
-			});
-		}
-	});
+function retractor(behaviour: w.RetractorBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	const retractorId = hero.retractorIds.get(behaviour.spellId);
+	if (world.objects.has(retractorId)) {
+		return true; // Keep watching until retractor disappears
+	} else {
+		// Retractor expired, can't call it back anymore
+		hero.retractorIds.delete(behaviour.spellId);
+		return false;
+	}
 }
 
 function handleOccurences(world: w.World) {
@@ -1010,7 +1018,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "stop": return true; // Do nothing
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
-		case "retractor": return spawnRetractorAction(world, hero, action, spell);
+		case "retractor": return retractorAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
 		case "thrust": return thrustAction(world, hero, action, spell);
@@ -1801,7 +1809,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return false;
 }
 
-function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
+function retractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
 	if (!action.target) { return true; }
 
 	const retractorId = hero.retractorIds.get(spell.id);
@@ -1815,6 +1823,11 @@ function spawnRetractorAction(world: w.World, hero: w.Hero, action: w.Action, sp
 	} else {
 		const retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
 		hero.retractorIds.set(spell.id, retractor.id);
+		world.behaviours.push({
+			type: "retractor",
+			heroId: hero.id,
+			spellId: spell.id,
+		});
 	}
 
 	return true;

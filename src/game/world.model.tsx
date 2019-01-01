@@ -481,6 +481,7 @@ export namespace HomingTargets {
 export type Behaviour =
 	HomingBehaviour
 	| DetonateBehaviour
+	| RetractorBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -503,8 +504,13 @@ export interface HomingBehaviour extends BehaviourBase {
 
 export interface DetonateBehaviour extends BehaviourBase {
 	type: "detonate";
-
 	projectileId: string;
+}
+
+export interface RetractorBehaviour extends BehaviourBase {
+	type: "retractor";
+	heroId: string;
+	spellId: string;
 }
 
 export type WorldObject =
