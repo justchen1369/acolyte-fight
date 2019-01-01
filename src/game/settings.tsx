@@ -312,7 +312,7 @@ const kamehameha: Spell = {
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
     chargeTicks: 0.75 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
-    revsPerTickWhileCharging: 0.005,
+    revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
     knockbackCancel: {
