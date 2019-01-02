@@ -58,7 +58,7 @@ const Choices: ChoiceSettings = {
         { btn: "f", weight: 0.5 },
     ],
 	Options: {
-		"a": ["thrust", "teleport"],
+		"a": ["thrust", "teleport", "swap"],
 		"s": ["shield", "icewall", "drain"],
 		"q": ["fireball", "flamestrike", "triplet"],
 		"w": ["gravity", "link", "lightning"],
@@ -200,10 +200,6 @@ const flamestrike: Spell = {
             initialMultiplier: 0.5,
             ticks: 0.5 * TicksPerSecond,
         },
-
-        behaviours: [
-            { type: "detonate" },
-        ],
 
         sound: "flamestrike",
         renderers: [
@@ -504,15 +500,15 @@ const whip: Spell = {
     description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
-    color: '#66fff3',
+    color: '#ffe339',
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 8,
+    chargeTicks: 15,
     cooldown: 10 * TicksPerSecond,
 
     projectile: {
-        density: 5,
+        density: 2,
         radius: 0.001,
         speed: 0.7,
         maxTicks: 6,
@@ -524,7 +520,7 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 15,
+            damage: 20,
             outerDamage: 5,
             radius: 0.025,
             minImpulse: 0.0001,
@@ -532,22 +528,18 @@ const whip: Spell = {
             renderTicks: 10,
         },
 
-        behaviours: [
-            { type: "detonate" },
-        ],
-
         sound: "whip",
         renderers: [
             {
                 type: "swirl",
-                color: '#66fff3',
+                color: '#fffcb1',
                 ticks: 30,
                 radius: 0.009,
                 particleRadius: 0.001,
                 numParticles: 2,
                 loopTicks: 15,
             },
-            { type: "link", color: '#66fff3', width: Pixel * 5 },
+            { type: "link", color: '#fffcb1', width: Pixel * 5 },
         ],
     },
 };
@@ -744,7 +736,6 @@ const supernova: Spell = {
                 newSpeed: 0,
                 redirect: true,
             },
-            { type: "detonate" },
         ],
         detonate: {
             damage: 0,
@@ -867,6 +858,47 @@ const thrust: Spell = {
     action: "thrust",
     sound: "thrust",
 };
+const swap: Spell = {
+    id: 'swap',
+    name: 'Swap',
+    description: "Swap positions with your enemy, or teleport... if you fail to hit your enemy.",
+    action: "projectile",
+
+    color: '#23e3ff',
+    icon: "bodySwapping",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 10 * TicksPerSecond,
+
+    projectile: {
+        density: 0.001,
+        radius: 0.005,
+        speed: 0.6,
+        maxTicks: 0.75 * TicksPerSecond,
+        damage: 0,
+        categories: Categories.Projectile,
+        collideWith: Categories.All ^ Categories.Projectile,
+        expireOn: Categories.All ^ Categories.Shield,
+        expireAfterCursorTicks: 0,
+        shieldTakesOwnership: false,
+
+        swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
+
+        sound: "whip",
+        renderers: [
+            {
+                type: "swirl",
+                color: '#75e7ff',
+                ticks: 30,
+                radius: 0.01,
+                particleRadius: 0.001,
+                numParticles: 2,
+                loopTicks: 15,
+            },
+            { type: "link", color: '#75e7ff', width: Pixel * 5 },
+        ],
+    },
+};
 
 const Spells = {
     move,
@@ -894,6 +926,7 @@ const Spells = {
     supernova,
     teleport,
     thrust,
+    swap,
 };
 
 const Render: RenderSettings = {

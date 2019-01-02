@@ -455,6 +455,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	link?: LinkParameters;
 	detonate?: DetonateParameters;
 	lifeSteal: number;
+	swapWith?: number;
 	shieldTakesOwnership: boolean;
 
 	createTick: number;

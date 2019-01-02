@@ -108,6 +108,8 @@ function recovery(state, hero, cooldowns) {
         spellId = "teleport";
     } else if (cooldowns["thrust"] === 0) {
         spellId = "thrust";
+    } else if (cooldowns["swap"] === 0) {
+        spellId = "swap";
     }
 
     if (spellId) {
@@ -158,6 +160,9 @@ function validAttack(state, hero, opponent, spell) {
 
     var distance = vectorDistance(hero.pos, opponent.pos);
     if (spell.action === "projectile" || spell.action === "spray") {
+        if (spell.projectile.swapWith) { // Swap doesn't work as an attack
+            return false;
+        }
         if (opponentShielded && !spell.projectile.detonate) { // Detonate spells can penetrate shields, nothing else can
             return false;
         }

@@ -375,6 +375,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate ? { ...projectileTemplate.detonate } : null, // Have to clone, because scaleDamagePacket mutates
 		lifeSteal: projectileTemplate.lifeSteal || 0.0,
+		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
 		createTick: world.tick,
@@ -404,6 +405,9 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	if (projectile.strafe) {
 		hero.strafeIds.add(projectile.id);
 	}
+	if (projectile.detonate) {
+		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
+	}
 
 	world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
@@ -424,8 +428,6 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		let behaviour: w.Behaviour = null;
 		if (template.type === "homing") {
 			behaviour = instantiateHoming(template, projectile, world);
-		} else if (template.type === "detonate") {
-			behaviour = instantiateDetonate(template, projectile, world);
 		}
 
 		const trigger = template.trigger;
@@ -464,10 +466,6 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		newSpeed: template.newSpeed,
 		redirect: template.redirect,
 	};
-}
-
-function instantiateDetonate(template: DetonateTemplate, projectile: w.Projectile, world: w.World): w.DetonateBehaviour {
-	return { type: "detonate", projectileId: projectile.id };
 }
 
 // Simulator
@@ -1145,6 +1143,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 
 	if (expireOn(world, projectile, obstacle)) {
 		detonateProjectile(projectile, world);
+		applySwap(projectile, obstacle, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -1152,6 +1151,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
 	if (expireOn(world, projectile, other)) {
 		detonateProjectile(projectile, world);
+		applySwap(projectile, other, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -1171,6 +1171,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
+		applySwap(projectile, shield, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -1189,6 +1190,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		});
 		applyDamage(hero, packet, projectile.owner, world);
 		linkTo(projectile, hero, world);
+		applySwap(projectile, hero, world);
 		projectile.hit = world.tick;
 	}
 
@@ -1273,6 +1275,34 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 		power: projectile.gravity.power,
 	};
 	world.behaviours.push({ type: "gravityForce", heroId: target.id });
+}
+
+function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
+	if (!projectile.swapWith) {
+		return;
+	}
+
+	const owner = world.objects.get(projectile.owner);
+	if (!(owner && owner.category === "hero")) {
+		return;
+	}
+
+	if (target && (target.categories & projectile.swapWith) > 0 && world.tick >= world.startTick) {
+		const ownerPos = vector.clone(owner.body.getPosition());
+		const targetPos = vector.clone(target.body.getPosition());
+
+		owner.body.setPosition(targetPos);
+		target.body.setPosition(ownerPos);
+	} else {
+		owner.body.setPosition(projectile.body.getPosition());
+	}
+
+	// You only swap once
+	projectile.swapWith = 0;
+}
+
+function swapOnExpiry(projectile: w.Projectile, world: w.World) {
+	applySwap(projectile, null, world);
 }
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
@@ -1636,6 +1666,7 @@ function reap(world: w.World) {
 			}
 		} else if (obj.category === "projectile") {
 			if (world.tick >= obj.expireTick) {
+				swapOnExpiry(obj, world);
 				destroyObject(world, obj);
 			}
 		} else if (obj.category === "obstacle") {
