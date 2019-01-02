@@ -598,18 +598,18 @@ export interface Action {
 	target: pl.Vec2;
 }
 
-export type Trail = CircleTrail | LineTrail;
+export type Trail = CircleTrail | LineTrail | RippleTrail;
 
 export interface TrailBase {
 	initialTick: number;
 	max: number;
-	fillStyle: string;
 }
 
 export interface CircleTrail extends TrailBase {
 	type: "circle";
 	pos: pl.Vec2;
 	radius: number;
+	fillStyle: string;
 }
 
 export interface LineTrail extends TrailBase {
@@ -617,6 +617,15 @@ export interface LineTrail extends TrailBase {
 	from: pl.Vec2;
 	to: pl.Vec2;
 	width: number;
+	fillStyle: string;
+}
+
+export interface RippleTrail extends TrailBase {
+	type: "ripple";
+	pos: pl.Vec2;
+	initialRadius: number;
+	finalRadius: number;
+	fillStyle: string;
 }
 
 export interface AudioElement {

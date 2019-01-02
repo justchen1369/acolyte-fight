@@ -383,6 +383,19 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 }
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
+	const Hero = world.settings.Hero;
+	if (ev.heroId === world.ui.myHeroId) {
+		world.ui.trails.push({
+			type: "ripple",
+			max: 15,
+			initialTick: world.tick,
+			pos: ev.toPos,
+			fillStyle: 'white',
+			initialRadius: Hero.Radius,
+			finalRadius: Hero.Radius * 4,
+		});
+	}
+
 	if (ev.sound) {
 		world.ui.sounds.push({
 			id: `${ev.heroId}-teleport-arriving`,
@@ -986,6 +999,13 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			ctx.beginPath();
 			ctx.arc(trail.pos.x, trail.pos.y, proportion * trail.radius, 0, 2 * Math.PI);
 			ctx.fill();
+		} else if (trail.type === "ripple") {
+			const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
+			ctx.globalAlpha = proportion;
+			ctx.lineWidth = proportion * trail.initialRadius / 2;
+			ctx.beginPath();
+			ctx.arc(trail.pos.x, trail.pos.y, radius, 0, 2 * Math.PI);
+			ctx.stroke();
 		} else if (trail.type === "line") {
 			if (isEdge) {
 				// Edge doesn't render lines if they are shorter than the line width, so render them ourselves.
