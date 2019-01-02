@@ -1,11 +1,12 @@
 import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
+import * as db from './db.model';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
-import * as constants from '../game/constants';
 import * as settings from '../game/settings';
+import { getFirestore } from './dbStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
@@ -80,16 +81,17 @@ export function cleanupOldRooms(maxAgeUnusedHours: number) {
     });
 }
 
-export function updateDefaultModIfNecessary() {
+export async function updateDefaultModIfNecessary() {
     const store = getStore();
     let room = store.rooms.get(m.DefaultRoomId);
     const currentInterval = truncateToUpdateInterval(moment());
     if (!room || truncateToUpdateInterval(room.created) !== currentInterval) {
+        const mod = await getOrCreateGlobalMod(`m-${currentInterval}`);
         const room: g.Room = {
             id: m.DefaultRoomId,
             created: moment(),
             accessed: moment(),
-            mod: generateMod(),
+            mod,
             isCustom: false,
         };
         store.rooms.set(room.id, room);
@@ -102,6 +104,26 @@ export function updateDefaultModIfNecessary() {
 function truncateToUpdateInterval(moment: moment.Moment): number {
     const interval = UpdateModMinutes * 60;
     return Math.floor(moment.unix() / interval) * interval;
+}
+
+async function getOrCreateGlobalMod(intervalId: string): Promise<ModTree> {
+    const firestore = getFirestore();
+
+    const candidateMod = generateMod();
+    const candidateJson = JSON.stringify(candidateMod);
+
+    const json = await firestore.runTransaction(async (t) => {
+        const doc = await t.get(firestore.collection('mods').doc(intervalId));
+
+        let data = doc.data() as db.GlobalMod;
+        if (!data) {
+            data = { json: candidateJson };
+            t.set(doc.ref, data);
+        }
+
+        return data.json;
+    });
+    return JSON.parse(json);
 }
 
 function generateMod(): ModTree {

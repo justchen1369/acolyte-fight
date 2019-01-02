@@ -7,6 +7,10 @@ export namespace Collections {
     export const Game = 'game';
 }
 
+export interface GlobalMod {
+    json: string;
+}
+
 export interface RatingDecaySingleton {
     updated: Firestore.Timestamp;
 }
