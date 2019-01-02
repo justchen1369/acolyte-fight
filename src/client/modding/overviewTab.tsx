@@ -8,13 +8,14 @@ import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
 import * as StoreProvider from '../storeProvider';
 import EditorPage from './editorPage';
+import CodeEditor from './codeEditor';
 import PreviewButton from './previewButton';
 
 const FileSaver = require('../../lib/file-saver');
 
 const stringifyMod = Reselect.createSelector(
     (mod: Object) => mod,
-    (mod: Object) => JSON.stringify(mod, null, "\t"),
+    (mod: Object) => mod ? JSON.stringify(mod, null, "\t") : null,
 );
 
 interface Props {
@@ -25,6 +26,8 @@ interface Props {
     playerName: string;
 }
 interface State {
+    code: string;
+    codeError: string;
     selectedFile: File;
     loadFromFileError: string;
 }
@@ -44,6 +47,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            code: stringifyMod(props.currentMod),
+            codeError: null,
             selectedFile: null,
             loadFromFileError: null,
         };
@@ -53,6 +58,12 @@ class OverviewTab extends React.PureComponent<Props, State> {
         if (!this.props.codeTree && Object.keys(this.props.roomMod).length > 0) {
             // Room is modded, load the settings from there when launching the mod editor
             StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
+        }
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+        if (newProps.currentMod != this.props.currentMod) {
+            this.setState({ code: stringifyMod(newProps.currentMod) });
         }
     }
 
@@ -75,7 +86,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     private renderCurrentState() {
         if (this.props.codeTree) {
             if (this.props.currentMod) {
-                return this.renderCurrentMod(this.props.currentMod);
+                return this.renderCurrentMod();
             } else {
                 return this.renderCurrentModError();
             }
@@ -85,7 +96,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 
     private renderEmptyMod() {
-        return <div>
+        return <div className="modding-overview">
             <p>
                 Mods allow you to change the rules of the game for your party.
                 This feature is experimental and will be subject to a lot of change!
@@ -108,16 +119,17 @@ class OverviewTab extends React.PureComponent<Props, State> {
         </div>
     }
 
-    private renderCurrentMod(currentMod: Object) {
-        return <div>
+    private renderCurrentMod() {
+        return <div className="modding-overview">
             <p>
                 The mod below is currently active.
                 You will automatically be matched to other players who currently have the same mod activated.
                 Explore the tabs (above) to edit this mod.
             </p>
-            <textarea className="mod-json" value={stringifyMod(this.props.currentMod)} readOnly />
+            <CodeEditor code={this.state.code} onChange={(code) => this.onCodeChange(code)} />
+            {this.state.codeError && <div className="error">{this.state.codeError}</div>}
             <div className="button-row">
-                <div className="btn" onClick={() => this.onSaveModFile(currentMod)}>Save to File</div>
+                <div className="btn" onClick={() => this.onSaveModFile(this.props.currentMod, this.state.code)}>Save to File</div>
                 <PreviewButton>Preview</PreviewButton>
             </div>
             {this.renderDiscard()}
@@ -126,7 +138,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 
     private renderCurrentModError() {
-        return <div>
+        return <div className="modding-overview">
             <p className="error">Your mod currently has errors - check the other tabs (above) to fix them.</p>
             {this.renderDiscard()}
             {this.renderReference()}
@@ -139,6 +151,18 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <p>Discard the current mod and revert back to default settings.</p>
             <div className="btn" onClick={() => this.onDiscardMod()}>Discard</div>
         </>
+    }
+
+    private onCodeChange(code: string) {
+        this.setState({ code, codeError: null });
+        try {
+            const mod = JSON.parse(code);
+            const codeTree = convert.modToCode(mod);
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
+        } catch (exception) {
+            console.error(exception);
+            this.setState({ codeError: `${exception}` });
+        }
     }
 
     private onCreateMod() {
@@ -193,10 +217,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
         StoreProvider.dispatch({ type: "updateCodeTree", codeTree: null });
     }
 
-    private onSaveModFile(currentMod: ModTree) {
+    private onSaveModFile(currentMod: ModTree, json: string) {
         if (currentMod) {
-            const json = JSON.stringify(currentMod, null, "\t");
-
             let filename = (currentMod.Mod && currentMod.Mod.name) || "acolytefight.mod";
             if (!/\.json$/.test(filename)) {
                 filename += ".json";

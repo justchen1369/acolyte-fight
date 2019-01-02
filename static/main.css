@@ -1395,6 +1395,10 @@ textarea.ai-js {
     align-items: center;
 }
 
+.modding-overview .code-area {
+    min-height: 20em;
+}
+
 .code-area {
     display: flex;
     flex-direction: column;
