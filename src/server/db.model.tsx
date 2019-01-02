@@ -5,6 +5,7 @@ export namespace Collections {
     export const User = 'user';
     export const UserRatingHistory = 'ratingHistory';
     export const Game = 'game';
+    export const GlobalMod = 'mod';
 }
 
 export interface GlobalMod {

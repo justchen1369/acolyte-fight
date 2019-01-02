@@ -113,7 +113,7 @@ async function getOrCreateGlobalMod(intervalId: string): Promise<ModTree> {
     const candidateJson = JSON.stringify(candidateMod);
 
     const json = await firestore.runTransaction(async (t) => {
-        const doc = await t.get(firestore.collection('mods').doc(intervalId));
+        const doc = await t.get(firestore.collection(db.Collections.GlobalMod).doc(intervalId));
 
         let data = doc.data() as db.GlobalMod;
         if (!data) {
