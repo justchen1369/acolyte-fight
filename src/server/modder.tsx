@@ -9,7 +9,7 @@ import * as settings from '../game/settings';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
-const UpdateModHours = 1;
+const UpdateModMinutes = 30;
 const CustomRoomPrefix = "c-";
 
 const roomUpdateListeners = new Array<RoomUpdateListener>();
@@ -100,7 +100,7 @@ export function updateDefaultModIfNecessary() {
 }
 
 function truncateToUpdateInterval(moment: moment.Moment): number {
-    const interval = UpdateModHours * 60 * 60 * 1000;
+    const interval = UpdateModMinutes * 60;
     return Math.floor(moment.unix() / interval) * interval;
 }
 

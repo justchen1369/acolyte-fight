@@ -86,6 +86,7 @@ function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 	socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
+	socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
 }
 function onDisconnectMsg() {
 	StoreProvider.dispatch({ type: "disconnected" });
