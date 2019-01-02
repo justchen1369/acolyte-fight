@@ -787,6 +787,7 @@ const mines: Spell = {
             maxImpulse: 0.0001,
             renderTicks: 15,
         },
+        detonatable: true,
 
         behaviours: [
             {
@@ -820,17 +821,20 @@ const scourge: Spell = {
     description: "After a short charging time, unleash a melee-range explosion that will send your enemies flying. Be careful though, this spell is so powerful it costs you some health too.",
     untargeted: true,
 
-    radius: Hero.Radius * 4,
+    detonate: {
+        damage: 20,
+        radius: Hero.Radius * 4,
+        minImpulse: 0.0002,
+        maxImpulse: 0.0005,
+        renderTicks: 30,
+    },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     interruptible: true,
     movementCancel: true,
-    damage: 20,
     selfDamage: 10,
     minSelfHealth: 1,
     damageScaling: false,
-    minImpulse: 0.0002,
-    maxImpulse: 0.0005,
 
     icon: "deadlyStrike",
 

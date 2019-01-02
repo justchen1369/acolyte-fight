@@ -352,9 +352,7 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
-	if (ev.type === "scourge") {
-		renderScourge(ctxStack, ev, world);
-	} else if (ev.type === "detonate") {
+	if (ev.type === "detonate") {
 		renderDetonate(ctxStack, ev, world);
 	} else if (ev.type === "lifeSteal") {
 		renderLifeStealReturn(ctxStack, ev, world);
@@ -362,25 +360,6 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderTeleport(ctxStack, ev, world);
 	} else {
 		return;
-	}
-}
-
-function renderScourge(ctxStack: CanvasCtxStack, ev: w.ScourgeEvent, world: w.World) {
-	world.ui.trails.push({
-		type: "circle",
-		max: 30,
-		initialTick: world.tick,
-		pos: ev.pos,
-		fillStyle: 'white',
-		radius: ev.radius,
-	});
-
-	if (ev.sound) {
-		world.ui.sounds.push({
-			id: `${ev.heroId}-detonating`,
-			sound: `${ev.sound}-detonating`,
-			pos: ev.pos,
-		});
 	}
 }
 
@@ -396,7 +375,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 
 	if (ev.sound) {
 		world.ui.sounds.push({
-			id: `${ev.projectileId}-detonating`,
+			id: `${ev.sourceId}-detonating`,
 			sound: `${ev.sound}-detonating`,
 			pos: ev.pos,
 		});
@@ -654,7 +633,9 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
 	} else if (spell.action === "teleport" || spell.action === "thrust") {
 		range = spell.range;
-	} else if (spell.action === "scourge" || spell.action === "shield") {
+	} else if (spell.action === "scourge") {
+		range = spell.detonate.radius;
+	} else if(spell.action === "shield") {
 		range = spell.radius;
 	} else if (spell.action === "wall") {
 		range = spell.maxRange;

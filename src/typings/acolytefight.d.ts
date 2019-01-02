@@ -228,6 +228,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
+	detonatable?: boolean; // Whether to expire the projectile if it is caught within a detonation
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
 	renderers: RenderParams[]; // Which render function to use
@@ -349,15 +350,11 @@ declare interface RenderReticule extends RenderParamsBase {
 declare interface ScourgeSpell extends SpellBase {
     action: "scourge";
 
-    damage: number;
 	selfDamage: number;
 	minSelfHealth: number;
 	damageScaling?: boolean;
 
-    radius: number;
-
-    minImpulse: number;
-    maxImpulse: number;
+	detonate: DetonateParameters;
 
     trailTicks: number;
 }

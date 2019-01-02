@@ -388,6 +388,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
+		detonatable: projectileTemplate.detonatable,
 
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
@@ -1614,46 +1615,67 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 	}
 
 	// Apply damage
-	world.objects.forEach(other => {
-		if (other.category === "hero" || other.category === "obstacle") {
-			const diff = vector.diff(other.body.getPosition(), projectile.body.getPosition());
-			const distance = vector.length(diff);
-			const extent = other.category === "hero" ? other.radius : other.extent;
-			const explosionRadius = projectile.detonate.radius + extent; // +extent because only need to touch the edge
-			if (other.id !== projectile.owner && distance <= explosionRadius) {
-				const proportion = 1.0 - (distance / explosionRadius);
-				const magnitude = projectile.detonate.minImpulse + proportion * (projectile.detonate.maxImpulse - projectile.detonate.minImpulse);
-				other.body.applyLinearImpulse(
-					vector.relengthen(diff, magnitude),
-					other.body.getWorldPoint(vector.zero()),
-					true);
+	const damageMultiplier = calculatePartialDamageMultiplier(world, projectile);
+	const detonate = {
+		...projectile.detonate,
+		damage: projectile.detonate.damage * damageMultiplier,
+		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * damageMultiplier,
+	};
+	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.sound);
 
-				const innerDamage = projectile.detonate.damage;
-				const outerDamage = projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage;
-				const packet = scaleForPartialDamage(world, projectile, {
-					damage: proportion * innerDamage + (1 - proportion) * outerDamage,
-					lifeSteal: projectile.detonate.lifeSteal,
-				});
-				if (other.category === "hero") {
-					applyDamage(other, packet, projectile.owner, world);
-				} else {
-					applyDamageToObstacle(other, packet, world);
-				}
+	// Don't allow for repeats
+	projectile.detonate = null;
+}
+
+function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, sound: string = null) {
+	world.objects.forEach(other => {
+		if (!(other.category === "hero" || other.category === "obstacle" || other.category === "projectile")) {
+			return;
+		}
+
+		const diff = vector.diff(other.body.getPosition(), epicenter);
+		const extent = other.category === "obstacle" ? other.extent : other.radius;
+		const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
+
+		const distance = vector.length(diff);
+		if (!(other.id !== owner && distance <= explosionRadius)) {
+			return;
+		}
+
+		if (other.category === "hero" || other.category === "obstacle") {
+			const proportion = 1.0 - (distance / explosionRadius);
+			const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
+			other.body.applyLinearImpulse(
+				vector.relengthen(diff, magnitude),
+				other.body.getWorldPoint(vector.zero()),
+				true);
+
+			const innerDamage = detonate.damage;
+			const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
+			const packet: DamagePacket = {
+				damage: proportion * innerDamage + (1 - proportion) * outerDamage,
+				lifeSteal: detonate.lifeSteal,
+			};
+			if (other.category === "hero") {
+				applyDamage(other, packet, owner, world);
+			} else {
+				applyDamageToObstacle(other, packet, world);
+			}
+		} else if (other.category === "projectile") {
+			if (other.detonatable) {
+				other.expireTick = world.tick;
 			}
 		}
 	});
 
 	world.ui.events.push({
 		type: "detonate",
-		projectileId: projectile.id,
-		sound: projectile.sound,
-		pos: vector.clone(projectile.body.getPosition()),
-		radius: projectile.detonate.radius,
-		explosionTicks: projectile.detonate.renderTicks,
+		sourceId,
+		sound: sound,
+		pos: vector.clone(epicenter),
+		radius: detonate.radius,
+		explosionTicks: detonate.renderTicks,
 	});
-
-	// Don't allow for repeats
-	projectile.detonate = null;
 }
 
 function applyLavaDamage(world: w.World) {
@@ -1693,6 +1715,7 @@ function reap(world: w.World) {
 			}
 		} else if (obj.category === "projectile") {
 			if (world.tick >= obj.expireTick) {
+				detonateProjectile(obj, world);
 				swapOnExpiry(obj, world);
 				destroyObject(world, obj);
 			}
@@ -2030,40 +2053,18 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
-	const damagePacket: DamagePacket = { damage: spell.damage };
-	scaleDamagePacket(damagePacket, hero, spell.damageScaling)
-
 	const selfPacket: DamagePacket = { damage: Math.max(0, Math.min(hero.health - spell.minSelfHealth, spell.selfDamage)) };
 	applyDamage(hero, selfPacket, hero.id, world);
 
-	let heroPos = hero.body.getPosition();
-	world.objects.forEach(obj => {
-		if (obj.category !== "hero" || obj.id === hero.id) { return; }
+	const detonate: DetonateParameters = {
+		...spell.detonate,
+	};
+	scaleDamagePacket(detonate, hero, spell.damageScaling)
 
-		let objPos = obj.body.getPosition();
-		let diff = vector.diff(objPos, heroPos);
-		let proportion = 1.0 - (vector.length(diff) / (spell.radius + obj.radius)); // +HeroRadius because only need to touch the edge
-		if (proportion <= 0.0) { return; } 
-
-		if (obj.category === "hero") {
-			applyDamage(obj, damagePacket, hero.id, world);
-		}
-
-		let magnitude = spell.minImpulse + proportion * (spell.maxImpulse - spell.minImpulse);
-		let impulse = vector.multiply(vector.unit(diff), magnitude);
-		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
-	});
+	detonateAt(hero.body.getPosition(), hero.id, detonate, world, hero.id, spell.sound);
 
 	// Remove the link so that the hit player can go flying
 	hero.link = null;
-
-	world.ui.events.push({
-		heroId: hero.id,
-		pos: hero.body.getPosition(),
-		type: "scourge",
-		sound: spell.sound,
-		radius: spell.radius,
-	});
 
 	return true;
 }

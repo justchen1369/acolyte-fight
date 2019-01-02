@@ -463,6 +463,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	minTicks: number;
 	maxTicks: number;
 	expireOn: number;
+	detonatable?: boolean;
 
 	renderers: RenderParams[];
 	sound?: string;
@@ -563,7 +564,6 @@ export type WorldObject =
 
 export type WorldEvent =
 	DetonateEvent
-	| ScourgeEvent
 	| LifeStealEvent
 	| TeleportEvent
 
@@ -573,19 +573,11 @@ export interface WorldEventBase {
 
 export interface DetonateEvent extends WorldEventBase {
 	type: "detonate";
-	projectileId: string;
+	sourceId: string;
 	sound?: string;
 	pos: pl.Vec2;
 	radius: number;
 	explosionTicks: number;
-}
-
-export interface ScourgeEvent extends WorldEventBase {
-	type: "scourge";
-	pos: pl.Vec2;
-	heroId: string;
-	sound?: string;
-	radius: number;
 }
 
 export interface LifeStealEvent extends WorldEventBase {
