@@ -1,3 +1,4 @@
+import * as m from '../game/messages.model';
 import * as engine from '../game/engine';
 
 export function calculateSegment(version: string, roomId: string, partyId: string, isPrivate: boolean, allowBots: boolean) {
@@ -6,5 +7,5 @@ export function calculateSegment(version: string, roomId: string, partyId: strin
 }
 
 export function publicSegment(allowBots: boolean = false) {
-	return calculateSegment(engine.version(), null, null, false, allowBots);
+	return calculateSegment(engine.version(), m.DefaultRoomId, null, false, allowBots);
 }
