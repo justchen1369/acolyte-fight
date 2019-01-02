@@ -21,7 +21,6 @@ class SpellEditor extends React.PureComponent<Props, State> {
     render() {
         return <EditorPage expand={true}>
             <SectionEditor sectionKey="spells" addRemovePrefix="spell">
-                <PreviewButton>Preview Mod</PreviewButton>
             </SectionEditor>
         </EditorPage>
     }

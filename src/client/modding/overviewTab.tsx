@@ -124,13 +124,12 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <p>
                 The mod below is currently active.
                 You will automatically be matched to other players who currently have the same mod activated.
-                Explore the tabs (above) to edit this mod.
+                Explore the tabs (above) to edit this mod. Click "Preview Mod" (top right) to play this mod by yourself.
             </p>
             <CodeEditor code={this.state.code} onChange={(code) => this.onCodeChange(code)} />
             {this.state.codeError && <div className="error">{this.state.codeError}</div>}
             <div className="button-row">
                 <div className="btn" onClick={() => this.onSaveModFile(this.props.currentMod, this.state.code)}>Save to File</div>
-                <PreviewButton>Preview</PreviewButton>
             </div>
             {this.renderDiscard()}
             {this.renderReference()}

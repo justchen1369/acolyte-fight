@@ -12,6 +12,7 @@ import * as StoreProvider from '../storeProvider';
 import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
 import PageLink from '../nav/pageLink';
+import PreviewButton from './previewButton';
 
 interface Props {
     codeTree: e.CodeTree;
@@ -62,6 +63,7 @@ class ModBar extends React.PureComponent<Props, State> {
             <PageLink page="modding-maps" error={"maps" in this.props.errors}>Maps</PageLink>
             <PageLink page="modding-constants" error={"constants" in this.props.errors}>Constants</PageLink>
             <div className="spacer">{this.props.children}</div>
+            <PreviewButton>Preview Mod</PreviewButton>
         </CustomBar>
     }
 

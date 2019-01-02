@@ -21,7 +21,6 @@ class ConstantEditor extends React.PureComponent<Props, State> {
     render() {
         return <EditorPage expand={true}>
             <SectionEditor sectionKey="constants">
-                <PreviewButton>Preview Mod</PreviewButton>
             </SectionEditor>
         </EditorPage>
     }
