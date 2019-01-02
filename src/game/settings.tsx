@@ -755,13 +755,13 @@ const supernova: Spell = {
 
 const mines: Spell = {
     id: 'mines',
-    name: 'Mines',
-    description: "Mines",
+    name: 'Energy Mines',
+    description: "Mark out your territory with some energy mines.",
     action: "spray",
     sound: "mines",
 
-    color: '#ff0044',
-    icon: "bubblingBeam",
+    color: '#ff009c',
+    icon: "mineExplosion",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
@@ -779,6 +779,7 @@ const mines: Spell = {
         damage: 0,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
+        expireOn: Categories.All,
 
         detonate: {
             damage: 2.5,
@@ -789,6 +790,8 @@ const mines: Spell = {
         },
         detonatable: true,
         shieldTakesOwnership: false,
+
+        damageScaling: false,
 
         behaviours: [
             {
@@ -802,8 +805,8 @@ const mines: Spell = {
 
         sound: "mines",
         renderers: [
-            { type: "projectile", color: '#ff0044', ticks: 1, selfColor: true },
-            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 3, selfColor: true },
+            { type: "projectile", color: '#ff009c', ticks: 1, selfColor: true },
+            { type: "ray", intermediatePoints: true, color: '#ff009c', ticks: 3, selfColor: true },
         ],
     },
 };

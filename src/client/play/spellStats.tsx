@@ -48,8 +48,9 @@ class SpellStats extends React.Component<Props, State> {
         } else if (spell.action === "spray") {
             const hits = spell.lengthTicks / spell.intervalTicks;
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
+            const overTime = spell.lengthTicks >= 60 ? ` over ${formatTime(spell.lengthTicks)} s` : "";
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)} over {formatTime(spell.lengthTicks)} s</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)}{overTime}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "scourge") {
