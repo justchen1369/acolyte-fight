@@ -65,7 +65,7 @@ const Choices: ChoiceSettings = {
 		"e": ["homing", "boomerang", "retractor"],
 		"r": ["kamehameha", "meteor", "supernova"],
 		"d": ["firespray", "bouncer", "whip"],
-		"f": ["scourge"],
+		"f": ["scourge", "mines"],
 	},
 	Defaults: {
 		"a": "thrust",
@@ -752,6 +752,68 @@ const supernova: Spell = {
         ],
     },
 };
+
+const mines: Spell = {
+    id: 'mines',
+    name: 'Mines',
+    description: "Mines",
+    action: "spray",
+    sound: "firespray",
+
+    color: '#ff0044',
+    icon: "bubblingBeam",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 10 * TicksPerSecond,
+
+    intervalTicks: 1,
+    lengthTicks: 7,
+
+    jitterRatio: 1.0,
+
+    projectile: {
+        density: 1,
+        radius: 0.004,
+        speed: 0.5,
+        maxTicks: 7.5 * TicksPerSecond,
+        damage: 0,
+
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+
+        detonate: {
+            damage: 2.5,
+            radius: 0.015,
+            minImpulse: 0.0001,
+            maxImpulse: 0.0001,
+            renderTicks: 15,
+        },
+
+        behaviours: [
+            {
+                type: "homing",
+                targetType: "cursor",
+                trigger: { afterTicks: 4 },
+                newSpeed: 0,
+                redirect: true,
+            },
+        ],
+
+        renderers: [
+            { type: "projectile", color: '#ff0044', ticks: 1 },
+            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 5 },
+            {
+                type: "swirl",
+                color: '#ff0044',
+                ticks: 30,
+                radius: 0.01,
+                particleRadius: 0.001,
+                numParticles: 1,
+                loopTicks: 15,
+            },
+        ],
+    },
+};
+
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
@@ -924,6 +986,7 @@ const Spells = {
     scourge,
     shield,
     supernova,
+    mines,
     teleport,
     thrust,
     swap,
