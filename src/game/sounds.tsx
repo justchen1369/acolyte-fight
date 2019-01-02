@@ -747,6 +747,58 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "mines-channelling": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.17,
+                "attack": 0.05,
+                "decay": 0.05,
+                "startFreq": 6000,
+                "stopFreq": 6400,
+                "modStartFreq": 30,
+                "modStopFreq": 30,
+                "modStartStrength": 3000,
+                "modStopStrength": 12588,
+                "tremoloFreq": 30,
+                "tremoloStrength": 0.1,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.33,
+                    1.5
+                ]
+            }
+        ]
+    },
+    "mines-detonating": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 1,
+                "attack": 0.01,
+                "decay": 0.95,
+                "startFreq": 50,
+                "stopFreq": 0.01,
+                "lowPass": 300,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.1,
+                    1.2,
+                    1.3,
+                    1.4,
+                    1.5,
+                    1.6,
+                    1.7,
+                    1.8,
+                    1.9,
+                    2
+                ]
+            }
+        ]
+    },
     "standard-hit": {
         cutoffEarly: false,
         start: [

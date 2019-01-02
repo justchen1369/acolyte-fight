@@ -758,7 +758,7 @@ const mines: Spell = {
     name: 'Mines',
     description: "Mines",
     action: "spray",
-    sound: "firespray",
+    sound: "mines",
 
     color: '#ff0044',
     icon: "bubblingBeam",
@@ -778,7 +778,7 @@ const mines: Spell = {
         maxTicks: 7.5 * TicksPerSecond,
         damage: 0,
 
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
 
         detonate: {
             damage: 2.5,
@@ -788,6 +788,7 @@ const mines: Spell = {
             renderTicks: 15,
         },
         detonatable: true,
+        shieldTakesOwnership: false,
 
         behaviours: [
             {
@@ -799,9 +800,10 @@ const mines: Spell = {
             },
         ],
 
+        sound: "mines",
         renderers: [
             { type: "projectile", color: '#ff0044', ticks: 1, selfColor: true },
-            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 5, selfColor: true },
+            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 3, selfColor: true },
         ],
     },
 };
