@@ -500,7 +500,7 @@ const whip: Spell = {
     description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
-    color: '#ffe339',
+    color: '#39fffa',
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,

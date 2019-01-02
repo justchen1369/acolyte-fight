@@ -28,6 +28,7 @@ export const Sounds: Sounds = {
         ],
     },
     "teleport-arriving": {
+        cutoffEarly: false,
         start: [
             {
                 stopTime: 0.25,
@@ -85,6 +86,7 @@ export const Sounds: Sounds = {
         ],
     },
     "shield-hit": {
+        cutoffEarly: false,
         start: [
             {
                 volume: 0.5,
@@ -129,6 +131,7 @@ export const Sounds: Sounds = {
         ],
     },
     "icewall-hit": {
+        cutoffEarly: false,
         start: [
             {
                 volume: 0.5,
