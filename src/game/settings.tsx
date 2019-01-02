@@ -923,7 +923,7 @@ const thrust: Spell = {
 const swap: Spell = {
     id: 'swap',
     name: 'Swap',
-    description: "Swap positions with your enemy, or teleport... if you fail to hit your enemy.",
+    description: "Swap positions with an enemy, obstacle or meteor. Teleports if you miss.",
     action: "projectile",
 
     color: '#23e3ff',
