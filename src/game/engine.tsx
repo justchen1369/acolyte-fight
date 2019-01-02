@@ -866,7 +866,7 @@ export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFi
 
 		const validOptions = Choices.Options[key];
 		if (!(validOptions.indexOf(spellId) >= 0)) {
-			spellId = Choices.Defaults[key];
+			spellId = validOptions[0];
 		}
 
 		keysToSpells.set(key, spellId);

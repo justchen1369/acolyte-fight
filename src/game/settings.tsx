@@ -67,16 +67,6 @@ const Choices: ChoiceSettings = {
 		"d": ["firespray", "bouncer", "whip"],
 		"f": ["scourge", "mines"],
 	},
-	Defaults: {
-		"a": "thrust",
-		"s": "shield",
-		"q": "fireball",
-		"w": "gravity",
-		"e": "homing",
-		"r": "kamehameha",
-		"d": "firespray",
-		"f": "scourge",
-    },
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,
         [(SpecialKeys.Retarget)]: Actions.Retarget,

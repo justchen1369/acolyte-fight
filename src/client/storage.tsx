@@ -93,7 +93,7 @@ export function getOrCreatePlayerName(): string {
 }
 
 export function getKeyBindingsOrDefaults() {
-    const keyBindings = loadKeyBindingConfig() || DefaultSettings.Choices.Defaults;
+    const keyBindings = loadKeyBindingConfig() || {};
     saveKeyBindingConfig(keyBindings);
     return keyBindings;
 }

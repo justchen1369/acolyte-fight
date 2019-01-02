@@ -18,7 +18,7 @@ export const getRebindingLookup = Reselect.createSelector(
 			lookup.set(initialKey, newKey);
         }
         
-        Object.keys(DefaultSettings.Choices.Defaults).forEach(key => {
+        Object.keys(DefaultSettings.Choices.Options).forEach(key => {
             if (key && !lookup.has(key) && !rebindings[key]) {
                 lookup.set(key, key);
             }

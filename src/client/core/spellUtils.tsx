@@ -11,7 +11,7 @@ export function resolveSpellForKey(key: string, keyBindings: KeyBindings, settin
 
     let chosenId = keyBindings[key];
     if (!(options.indexOf(chosenId) >= 0)) {
-        chosenId = settings.Choices.Defaults[key];
+        chosenId = options[0];
     }
     const chosen = settings.Spells[chosenId];
     return chosen;
