@@ -1293,8 +1293,35 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 
 		owner.body.setPosition(targetPos);
 		target.body.setPosition(ownerPos);
+
+		world.ui.events.push({
+			type: "teleport",
+			sound: projectile.sound,
+			fromPos: ownerPos,
+			toPos: targetPos,
+			heroId: owner.id,
+		});
+
+		if (target.category === "hero") {
+			world.ui.events.push({
+				type: "teleport",
+				sound: projectile.sound,
+				fromPos: targetPos,
+				toPos: ownerPos,
+				heroId: target.id,
+			});
+		}
 	} else {
+		const initialPos = vector.clone(owner.body.getPosition());
 		owner.body.setPosition(projectile.body.getPosition());
+
+		world.ui.events.push({
+			type: "teleport",
+			sound: projectile.sound,
+			fromPos: initialPos,
+			toPos: vector.clone(owner.body.getPosition()),
+			heroId: owner.id,
+		});
 	}
 
 	// You only swap once
