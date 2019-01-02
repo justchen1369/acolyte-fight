@@ -10,7 +10,6 @@ import { getFirestore } from './dbStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
-const UpdateModMinutes = 30;
 const CustomRoomPrefix = "c-";
 
 const roomUpdateListeners = new Array<RoomUpdateListener>();
@@ -102,7 +101,7 @@ export async function updateDefaultModIfNecessary() {
 }
 
 function truncateToUpdateInterval(moment: moment.Moment): number {
-    const interval = UpdateModMinutes * 60;
+    const interval = m.UpdateModMinutes * 60;
     return Math.floor(moment.unix() / interval) * interval;
 }
 
