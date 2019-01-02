@@ -884,7 +884,7 @@ const swap: Spell = {
 
         swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
 
-        sound: "whip",
+        sound: "swap",
         renderers: [
             {
                 type: "swirl",

@@ -41,6 +41,30 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "swap": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.75,
+                "attack": 0.05,
+                "decay": 0.7,
+                "startFreq": 4800,
+                "stopFreq": 7200,
+                "modStartFreq": 30,
+                "modStopFreq": 30,
+                "modStartStrength": 3600,
+                "modStopStrength": 4200,
+                "tremoloFreq": 5,
+                "tremoloStrength": 0.05,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.33,
+                    1.5
+                ]
+            }
+        ]
+    },
     "shield": {
         start: [
             {
