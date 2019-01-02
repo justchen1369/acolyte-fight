@@ -342,6 +342,7 @@ export interface Hero extends WorldObjectBase {
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
+	saber?: SaberState;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
@@ -428,6 +429,17 @@ export interface GravityState {
 	power: number;
 }
 
+export interface SaberState {
+	createTick: number;
+	expireTick: number;
+	angle: number;
+	length: number;
+	revsToImpulseMultiplier: number;
+	trailTicks: number;
+
+	uiAngleHistory: number[]; // Oldest first, not guaranteed to be synced across clients
+}
+
 export interface Cooldowns {
 	[spellId: string]: number;
 }
@@ -490,6 +502,7 @@ export type Behaviour =
 	| ReflectFollowBehaviour
 	| ThrustBounceBehaviour
 	| ThrustDecayBehaviour
+	| SaberBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -553,6 +566,11 @@ export interface ThrustBounceBehaviour extends BehaviourBase {
 
 export interface ThrustDecayBehaviour extends BehaviourBase {
 	type: "thrustDecay";
+	heroId: string;
+}
+
+export interface SaberBehaviour extends BehaviourBase {
+	type: "saberSwing";
 	heroId: string;
 }
 

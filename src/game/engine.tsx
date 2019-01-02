@@ -502,6 +502,7 @@ export function tick(world: w.World) {
 		retractor,
 		removePassthrough,
 		thrustDecay,
+		saberSwing,
 	});
 
 	applyLavaDamage(world);
@@ -1043,6 +1044,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
+		case "saber": return saberAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
 		case "thrust": return thrustAction(world, hero, action, spell);
@@ -2050,6 +2052,71 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	}
 
 	return !hero.thrust;
+}
+
+function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
+	hero.saber = {
+		createTick: world.tick,
+		expireTick: world.tick + spell.ticks,
+		angle: vector.angle(vector.diff(action.target, hero.body.getPosition())),
+		length: spell.length,
+		revsToImpulseMultiplier: spell.revsToImpulseMultiplier,
+		trailTicks: spell.trailTicks,
+		uiAngleHistory: [],
+	};
+
+	world.behaviours.push({ type: "saberSwing", heroId: hero.id });
+
+	return true;
+}
+
+function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero" && hero.saber)) {
+		return false;
+	}
+
+	if (world.tick >= hero.saber.expireTick) {
+		hero.saber = null;
+		return false;
+	}
+
+	const previousAngle = hero.saber.angle;
+	const newAngle = vector.angle(vector.diff(hero.target, hero.body.getPosition()));
+	if (previousAngle === newAngle) {
+		return true; // Nothing to do
+	}
+
+	const saberAngleDelta = vector.angleDelta(previousAngle, newAngle);
+	const magnitude = Math.abs(saberAngleDelta / 2 * Math.PI) * hero.saber.revsToImpulseMultiplier;
+
+	world.objects.forEach(obj => {
+		if (obj.id === hero.id || !shouldCollide(hero, obj)) {
+			return;
+		}
+
+		const diff = vector.diff(obj.body.getPosition(), hero.body.getPosition());
+		const distance = vector.length(diff);
+		if (distance > hero.saber.length) {
+			// Too far away
+			return;
+		}
+
+		const objAngle = vector.angle(diff);
+		const objAngleDelta = Math.abs(vector.angleDelta(objAngle, newAngle));
+		if (!(Math.sign(objAngleDelta) === Math.sign(saberAngleDelta)
+			&& Math.abs(objAngleDelta) <= Math.abs(saberAngleDelta))) {
+			// Not caught within the swing
+			return;
+		}
+
+		const impulse = vector.relengthen(diff, magnitude);
+		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
+	});
+
+	hero.saber.angle = newAngle;
+
+	return true;
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {

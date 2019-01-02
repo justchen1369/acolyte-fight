@@ -519,6 +519,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	renderRangeIndicator(ctxStack, hero, world);
 	renderHeroCharacter(ctxStack, hero, world);
 	renderHeroBars(ctxStack, hero, world);
+	renderSaber(ctxStack, hero, world);
 
 	foreground(ctxStack, ctx => ctx.restore());
 
@@ -710,6 +711,27 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 
 		ctx.restore();
 	}
+}
+
+function renderSaber(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const saber = hero.saber;
+	if (!saber) {
+		return;
+	}
+
+	const tip = vector.relengthen(vector.fromAngle(saber.angle), saber.length);
+
+	foreground(ctxStack, ctx => {
+		const color = '#00ccff';
+		ctx.fillStyle = color;
+		ctx.strokeStyle = color;
+		ctx.lineWidth = 0.01;
+
+		ctx.beginPath();
+		ctx.moveTo(0, 0);
+		ctx.lineTo(tip.x, tip.y);
+		ctx.stroke();
+	});
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {

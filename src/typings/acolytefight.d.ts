@@ -126,6 +126,7 @@ declare type Spell =
 	| ProjectileSpell
 	| ReflectSpell
 	| RetractorSpell
+	| SaberSpell
 	| SpraySpell
 	| ScourgeSpell
 	| TeleportSpell
@@ -344,6 +345,17 @@ declare interface RenderReticule extends RenderParamsBase {
 	color: string;
 	ticks: number;
 	radius: number;
+}
+
+declare interface SaberSpell extends SpellBase {
+	action: "saber";
+
+	takeOwnership: boolean;
+	revsToImpulseMultiplier: number;
+	length: number;
+
+	ticks: number;
+	trailTicks: number;
 }
 
 declare interface ScourgeSpell extends SpellBase {

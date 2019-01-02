@@ -59,7 +59,7 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		"a": ["thrust", "teleport", "swap"],
-		"s": ["shield", "icewall", "drain"],
+		"s": ["shield", "icewall", "drain", "saber"],
 		"q": ["fireball", "flamestrike", "triplet"],
 		"w": ["gravity", "link", "lightning"],
 		"e": ["homing", "boomerang", "retractor"],
@@ -801,6 +801,27 @@ const mines: Spell = {
     },
 };
 
+const saber: Spell = {
+    id: 'saber',
+    name: 'Lightsaber',
+    description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
+
+	takeOwnership: true,
+	revsToImpulseMultiplier: 0.0001,
+	length: 0.04,
+
+    cooldown: 20 * TicksPerSecond,
+
+    icon: "deadlyStrike",
+
+    ticks: 2.5 * TicksPerSecond,
+    trailTicks: 30,
+    color: '#ffcc00',
+
+    sound: "scourge",
+    action: "saber",
+};
+
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
@@ -973,6 +994,7 @@ const Spells = {
     bouncer,
     drain,
     icewall,
+    saber,
     scourge,
     shield,
     supernova,

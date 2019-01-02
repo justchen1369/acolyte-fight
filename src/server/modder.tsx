@@ -126,11 +126,12 @@ async function getOrCreateGlobalMod(intervalId: string): Promise<ModTree> {
 }
 
 function generateMod(): ModTree {
+    return {};
+    /*
     const SpellsPerKey = 3;
 
     const initialOptions = settings.DefaultSettings.Choices.Options;
     const newOptions: KeyBindingOptions = {};
-    const defaultOptions: KeyBindings = {};
 
     for (const key in initialOptions) {
         const initialSpells = initialOptions[key];
@@ -139,13 +140,12 @@ function generateMod(): ModTree {
         const newSpells = _(_.range(0, initialSpells.length)).shuffle().take(SpellsPerKey).sort().map(x => initialSpells[x]).value();
 
         newOptions[key] = newSpells;
-        defaultOptions[key] = newSpells[0];
     }
 
     return {
         Choices: {
             Options: newOptions,
-            Defaults: defaultOptions,
         },
     };
+    */
 }
