@@ -17,6 +17,7 @@ import * as options from './options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
+import * as rooms from './core/rooms';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
 import * as storage from './storage';
@@ -47,6 +48,7 @@ export async function initialize() {
     sockets.listeners.onGameMsg = stats.onGameMsg;
     sockets.listeners.onHeroMsg = matches.onHeroMsg;
     sockets.listeners.onPartyMsg = parties.onPartyMsg;
+    sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
 
     start();
@@ -121,7 +123,12 @@ async function start() {
         alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
 
         await sockets.connectToServer(query.server)
-        await parties.joinPartyAsync(query.party)
+        if (query.party) {
+            await parties.joinPartyAsync(query.party);
+        } else {
+            await rooms.joinRoomAsync(rooms.DefaultRoom);
+            await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
+        }
 
         try {
             if (query.hash === "#join") {

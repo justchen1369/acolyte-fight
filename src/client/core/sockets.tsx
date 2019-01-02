@@ -14,6 +14,7 @@ export let listeners: Listeners = {
 	onPartyMsg: () => { },
 	onGameMsg: () => { },
 	onHeroMsg: () => { },
+	onRoomMsg: () => { },
 };
 
 export interface Listeners {
@@ -21,6 +22,7 @@ export interface Listeners {
 	onPartyMsg: (msg: m.PartyMsg) => void;
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
+	onRoomMsg: (msg: m.RoomUpdateMsg) => void;
 }
 
 export function connect(socketUrl: string, authToken: string, onConnect: (socket: SocketIOClient.Socket) => void) {

@@ -20,6 +20,7 @@ import * as discord from './discord';
 import * as facebook from './facebook';
 import * as kongregate from './kongregate';
 import * as gameStorage from './gameStorage';
+import * as modder from './modder';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
 import * as statsStorage from './statsStorage';
@@ -51,6 +52,7 @@ discord.init(discordSecret);
 facebook.init(facebookSecret);
 kongregate.init(kongregateSecret);
 gameStorage.initStorage(replaysBasePath);
+modder.init();
 percentiles.init();
 if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
@@ -102,7 +104,7 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(() => {
-	serverStore.cleanupOldRooms(1);
+	modder.cleanupOldRooms(1);
 	statsStorage.cleanupGames(7);
 	statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP);
 }, cleanupIntervalMinutes * 60 * 1000);
@@ -113,6 +115,8 @@ setInterval(() => {
 	if (status.numPlayers > 0) {
 		logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
 	}
+
+	modder.updateDefaultModIfNecessary();
 }, 60 * 1000);
 
 http.on('close', () => {

@@ -19,24 +19,3 @@ let store: g.ServerStore = {
 export function getStore() {
     return store;
 }
-
-export function cleanupOldRooms(maxAgeUnusedHours: number) {
-    const now = moment();
-
-    const idsToCleanup = new Array<string>();
-    store.rooms.forEach(room => {
-        const ageInHours = moment(now).diff(room.accessed, 'hours', true);
-        if (ageInHours > maxAgeUnusedHours) {
-            idsToCleanup.push(room.id);
-        }
-    });
-
-    if (idsToCleanup.length === 0) {
-        return;
-    }
-
-    logger.info(`Cleaning up ${idsToCleanup.length} old rooms`); 
-    idsToCleanup.forEach(id => {
-        store.rooms.delete(id);
-    });
-}

@@ -1,18 +1,15 @@
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as ai from './ai';
-import * as engine from '../../game/engine';
-import * as matches from './matches';
 import * as modder from '../../game/modder';
+import * as sockets from './sockets';
 import * as settings from '../../game/settings';
-import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
-import { notify } from './notifications';
 import { readFileAsync } from './fileUtils';
 import { socket } from './sockets';
-import { isMobile } from './userAgent';
+
+export const DefaultRoom = m.DefaultRoomId;
 
 export function createRoomFromFileAsync(file: File) {
     return readFileAsync(file)
@@ -51,7 +48,6 @@ export function joinRoomAsync(roomId: string): Promise<string> {
 	const store = StoreProvider.getState();
 	if (store.room.id !== roomId) {
         if (roomId) {
-            console.log("Joining room", roomId);
             return getRoomAsync(roomId).then(response => joinRoomFrom(response));
         } else {
             leaveRoom();
@@ -62,7 +58,8 @@ export function joinRoomAsync(roomId: string): Promise<string> {
 	}
 }
 
-export function joinRoomFrom(response: m.JoinRoomResponse) {
+export function joinRoomFrom(response: m.RoomUpdateMsg) {
+    console.log("Joining room", response.roomId, response.mod);
     const mod = response.mod || {};
     StoreProvider.dispatch({
         type: "updateRoom",
@@ -73,6 +70,13 @@ export function joinRoomFrom(response: m.JoinRoomResponse) {
         }
     });
     return response.roomId;
+}
+
+export function onRoomMsg(msg: m.RoomUpdateMsg) {
+    const store = StoreProvider.getState();
+    if (store.room.id === msg.roomId) {
+        joinRoomFrom(msg);
+    }
 }
 
 export function leaveRoom() {
@@ -89,4 +93,9 @@ export function leaveRoom() {
         settings: settings.DefaultSettings,
 	};
 	StoreProvider.dispatch({ type: "updateRoom", room });
+}
+
+
+export function isModded(room: s.RoomState) {
+    return room.id && room.id !== DefaultRoom;
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as convert from './convert';
 import * as editing from './editing';
@@ -20,6 +21,7 @@ const stringifyMod = Reselect.createSelector(
 
 interface Props {
     codeTree: e.CodeTree;
+    roomId: string;
     roomMod: ModTree;
     currentMod: ModTree;
     errors: e.ErrorTree;
@@ -36,6 +38,7 @@ function stateToProps(state: s.State): Props {
     const modResult = editing.codeToMod(state.codeTree);
     return {
         playerName: state.playerName,
+        roomId: state.room.id,
         roomMod: state.room.mod,
         codeTree: state.codeTree,
         currentMod: modResult.mod,
@@ -55,7 +58,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 
     componentWillMount() {
-        if (!this.props.codeTree && Object.keys(this.props.roomMod).length > 0) {
+        if (!this.props.codeTree && this.props.roomId !== m.DefaultRoomId && Object.keys(this.props.roomMod).length > 0) {
             // Room is modded, load the settings from there when launching the mod editor
             StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
         }

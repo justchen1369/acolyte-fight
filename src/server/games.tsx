@@ -10,6 +10,7 @@ import * as auth from './auth';
 import * as segments from './segments';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as modder from './modder';
 import * as results from './results';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
@@ -207,28 +208,6 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 	if (data.heroId === player.heroId || game.bots.get(data.heroId) === socketId) {
 		queueAction(game, data);
 	}
-}
-
-export function initRoom(mod: Object, authToken: string): g.Room {
-	const store = getStore();
-
-	// Same settings -> same room
-	const id = crypto.createHash('md5').update(JSON.stringify({mod})).digest('hex');
-	let room = store.rooms.get(id);
-	if (!room) {
-		room = {
-			id,
-			created: moment(),
-			accessed: moment(),
-			mod,
-		};
-		store.rooms.set(room.id, room);
-
-        logger.info(`Room ${room.id} created by user ${authToken} mod ${JSON.stringify(mod).substr(0, 1000)}`);
-	} else {
-        logger.info(`Room ${room.id} joined by user ${authToken}`);
-	}
-	return room;
 }
 
 export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, locked: boolean = false, layoutId: string = null) {

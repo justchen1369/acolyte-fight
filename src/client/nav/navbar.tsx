@@ -5,6 +5,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
 import * as pages from '../core/pages';
+import * as rooms from '../core/rooms';
 import * as url from '../url';
 import { isMobile } from '../core/userAgent';
 import LoginButton from './loginButton';
@@ -28,7 +29,7 @@ function stateToProps(state: s.State): Props {
         page: state.current.page,
         userId: state.userId,
         isUsingAI: !!state.aiCode,
-        isModded: Object.keys(state.room.mod).length > 0,
+        isModded: rooms.isModded(state.room),
         inParty: !!state.party,
     };
 }

@@ -14,6 +14,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as modder from './modder';
 import * as parties from './parties';
 import socketClient from 'socket.io-client';
 
@@ -27,6 +28,7 @@ export function attachToSocket(_io: SocketIO.Server) {
     io.on('connection', onConnection);
 	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
+	modder.attachRoomUpdateListener(emitRoomUpdate);
 }
 
 function onConnection(socket: SocketIO.Socket) {
@@ -136,6 +138,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 		upstream.on('tick', (data: any) => socket.emit('tick', data));
 		upstream.on('party', (data: any) => socket.emit('party', data));
 		upstream.on('game', (data: any) => socket.emit('game', data));
+		upstream.on('room', (data: any) => socket.emit('room', data));
 		upstream.on('disconnect', () => {
 			// Only disconnect if we've actually connected before
 			if (!attached) { return; }
@@ -177,7 +180,7 @@ function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cre
 		return;
 	}
 
-	const room = games.initRoom(data.mod, authToken);
+	const room = modder.initRoom(data.mod, authToken);
 	const result: m.CreateRoomResponse = {
 		success: true,
 		roomId: room.id,
@@ -403,8 +406,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
 
-	const roomId = data.room;
-	const room = roomId ? store.rooms.get(roomId) : null;
+	const room = store.rooms.get(data.room) || null;
 
 	Promise.resolve().then(() => {
 		if (data.gameId) {
@@ -620,4 +622,12 @@ function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 			emitTo.emit('game', result);
 		}
 	}
+}
+
+function emitRoomUpdate(room: g.Room) {
+	const msg: m.RoomUpdateMsg = {
+		roomId: room.id,
+		mod: room.mod,
+	};
+	io.emit('room', msg);
 }

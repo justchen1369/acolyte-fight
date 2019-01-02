@@ -3,6 +3,8 @@ import * as c from './world.model';
 export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
 
+export const DefaultRoomId = "r-default";
+
 export namespace GameCategory {
     export const PvP = "PvP";
     export const PvAI = "PvAI";
@@ -187,13 +189,16 @@ export interface JoinRoomRequest {
     roomId: string;
 }
 
-export interface JoinRoomResponse {
+export interface JoinRoomResponse extends RoomUpdateMsg {
     success: true;
-    roomId: string;
-    mod: Object;
 }
 
 export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
+
+export interface RoomUpdateMsg {
+    roomId: string;
+    mod: ModTree;
+}
 
 export interface HeroMsg {
     gameId: string;

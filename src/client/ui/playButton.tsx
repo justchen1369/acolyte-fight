@@ -6,6 +6,7 @@ import * as options from '../options';
 import * as ai from '../core/ai';
 import * as matches from '../core/matches';
 import * as parties from '../core/parties';
+import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
 
@@ -28,7 +29,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         again: ownProps.again || false,
         party: state.party,
         selfId: state.socketId,
-        isModded: Object.keys(state.room.mod).length > 0,
+        isModded: rooms.isModded(state.room),
         playingAsAI: ai.playingAsAI(state),
     };
 }

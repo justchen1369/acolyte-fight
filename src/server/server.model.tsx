@@ -94,7 +94,8 @@ export interface Room {
     id: string;
     created: moment.Moment;
     accessed: moment.Moment;
-    mod: Object;
+    mod: ModTree;
+    isCustom: boolean;
 }
 
 export interface Party extends PartyStatus {
