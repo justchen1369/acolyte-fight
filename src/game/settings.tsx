@@ -800,17 +800,8 @@ const mines: Spell = {
         ],
 
         renderers: [
-            { type: "projectile", color: '#ff0044', ticks: 1 },
-            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 5 },
-            {
-                type: "swirl",
-                color: '#ff0044',
-                ticks: 30,
-                radius: 0.01,
-                particleRadius: 0.001,
-                numParticles: 1,
-                loopTicks: 15,
-            },
+            { type: "projectile", color: '#ff0044', ticks: 1, selfColor: true },
+            { type: "ray", intermediatePoints: true, color: '#ff0044', ticks: 5, selfColor: true },
         ],
     },
 };
