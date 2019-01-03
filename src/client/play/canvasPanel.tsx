@@ -461,8 +461,9 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private handleLongProcessIfNecessary() {
         if (this.actionSurface) {
+            const world = this.props.world;
             const pressLength = Date.now() - this.actionSurface.time;
-            if (pressLength >= LongPressMilliseconds) {
+            if (pressLength >= LongPressMilliseconds && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
                 const btn = this.actionSurface.activeKey;
                 this.actionSurface.time += 1e9; // Don't repeat the long press
                 this.handleCustomizeBtn(btn);
@@ -471,10 +472,7 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private handleCustomizeBtn(customizingBtn: string) {
-        const world = this.props.world;
-        if (engine.allowSpellChoosing(world, world.ui.myHeroId)) {
-            StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
-        }
+        StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
     }
 
     private gameKeyDown(e: KeyboardEvent) {

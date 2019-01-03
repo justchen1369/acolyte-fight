@@ -50,19 +50,19 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (!this.props.allowSpellChoosing) {
-            return null;
-        }
-
         const btn = this.props.btn;
         if (btn && !keyboardUtils.isSpecialKey(btn)) {
             return this.renderCustomizeBtn(btn);
-        } else if (isMobile && this.props.hoverBtn && this.props.hoverSpellId) {
-            return this.renderMobileHint(this.props.hoverBtn, this.props.hoverSpellId);
-        } else if (!isMobile && this.props.hoverBtn) {
-            return this.renderDesktopHint();
-        } else if (this.props.gameStarted) {
-            return this.renderChangeSpellHint();
+        } else if (this.props.allowSpellChoosing) {
+            if (isMobile && this.props.hoverBtn && this.props.hoverSpellId) {
+                return this.renderMobileHint(this.props.hoverBtn, this.props.hoverSpellId);
+            } else if (!isMobile && this.props.hoverBtn) {
+                return this.renderDesktopHint();
+            } else if (this.props.gameStarted) {
+                return this.renderChangeSpellHint();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -72,7 +72,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         if (isMobile) {
             return null; // No hint for mobile
         } else {
-            return <div className="customize-hint">Right-click a button below to change spells</div>
+            return <div className="customize-hint after-game-over">Right-click a button below to change spells</div>
         }
     }
 
@@ -94,6 +94,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private renderCustomizeBtn(btn: string) {
         return <div className="spell-config-container" onClick={() => this.close()} onContextMenu={ev => ev.preventDefault()}>
             <div className="spell-config">
+                {this.props.gameStarted && <div className="in-progress-warning">Game in progress - change will apply to the next game</div>}
                 <SpellBtnConfig btn={btn} onChosen={(keyBindings) => this.onChosen(keyBindings)} settings={this.props.settings} />
                 <div className="accept-row">
                     {!this.props.wheelOnRight && <div className="spacer" />}
