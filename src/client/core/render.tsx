@@ -551,7 +551,16 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		if (hitAge < HeroColors.DamageFlashTicks) {
 			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * (1 - hitAge / HeroColors.DamageFlashTicks)).string();
 		}
-		ctx.fillStyle = fillColor;
+
+		if (ctxStack.rtx) {
+			const gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
+			gradient.addColorStop(0, fillColor);
+			gradient.addColorStop(1, Color(fillColor).darken(0.3).string());
+			ctx.fillStyle = gradient;
+		} else {
+			ctx.fillStyle = fillColor;
+		}
+
 		ctx.beginPath();
 		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
 		ctx.fill();
