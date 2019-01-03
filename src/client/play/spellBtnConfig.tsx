@@ -68,7 +68,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
                         attr={{
                             className: spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen",
                             title: spellUtils.spellName(spell),
-                            onClick: () => this.onChoose(key, spell.id),
+                            onMouseDown: () => this.onChoose(key, spell.id),
                             onMouseEnter: () => this.onMouseHoverSpell(spell.id),
                             onMouseLeave: () => this.onMouseLeaveSpell(),
                         }}
