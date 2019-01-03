@@ -38,6 +38,7 @@ export class SpellIcon extends React.Component<Props, State> {
 
         return <canvas
             {...attr}
+            style={{ width: this.props.size, height: this.props.size }}
             className={className}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={this.props.size}

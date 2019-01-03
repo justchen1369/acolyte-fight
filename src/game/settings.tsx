@@ -819,7 +819,7 @@ const saber: Spell = {
 
     cooldown: 20 * TicksPerSecond,
 
-    icon: "deadlyStrike",
+    icon: "waveStrike",
 
     maxTicks: 5 * TicksPerSecond,
 
