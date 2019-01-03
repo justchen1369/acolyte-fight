@@ -1,5 +1,6 @@
 export const Layouts: Layouts = {
     "double": {
+        "numPoints": 4,
         obstacles: [
             {
                 numObstacles: 2,
@@ -20,6 +21,8 @@ export const Layouts: Layouts = {
         ],
     },
     "snowflake": {
+        "numPoints": 6,
+        "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
             {
                 "numObstacles": 4,
@@ -40,6 +43,7 @@ export const Layouts: Layouts = {
         ]
     },
     "inside5": {
+			"numPoints": 5,
         obstacles: [
             {
                 numObstacles: 5,
@@ -52,6 +56,7 @@ export const Layouts: Layouts = {
         ],
     },
     "single": {
+        "numPoints": 3,
         "obstacles": [
             {
                 "numObstacles": 1,
@@ -92,7 +97,7 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0.5,
-                "health": 10
+                "health": 20
             },
             {
                 "numObstacles": 5,
@@ -102,7 +107,9 @@ export const Layouts: Layouts = {
                 "extent": 0.02,
                 "orientationAngleOffsetInRevs": 0.5
             }
-        ]
+        ],
+        "numPoints": 5,
+        "angleOffsetInRevs": 0.1
     },
     "triplet": {
         obstacles: [
@@ -115,6 +122,8 @@ export const Layouts: Layouts = {
                 orientationAngleOffsetInRevs: 0.5,
             },
         ],
+        "numPoints": 3,
+        "angleOffsetInRevs": 0.16666667,
     },
     "surrounded": {
         obstacles: [
@@ -129,6 +138,7 @@ export const Layouts: Layouts = {
         ],
     },
     "tripletSwirl": {
+        "numPoints": 6,
         "obstacles": [
             {
                 "numObstacles": 3,

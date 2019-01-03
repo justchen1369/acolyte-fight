@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
-import pl from 'planck-js';
+import pl, { World } from 'planck-js';
 import * as Immutable from 'immutable';
 import * as colorWheel from './colorWheel';
 import * as constants from './constants';
@@ -58,6 +58,7 @@ export function initialWorld(mod: Object): w.World {
 		physics: pl.World(),
 		actions: new Map(),
 		radius: settings.World.InitialRadius,
+		mapRadiusMultiplier: 1.0,
 
 		nextPositionId: 0,
 		nextObjectId: 0,
@@ -686,7 +687,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
 
-	const Obstacle = world.settings.Obstacle;
+	const World = world.settings.World;
 	const Layouts = world.settings.Layouts;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
@@ -694,6 +695,22 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	if (!layout) {
 		const layouts = Object.keys(Layouts).map(key => Layouts[key]).filter(x => !!x);
 		layout = layouts[world.seed % layouts.length];
+	}
+	
+	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? (1.0 + 1 / layout.numPoints) : 1.0);
+	if (radiusMultiplier) {
+		world.radius = World.InitialRadius * radiusMultiplier;
+		world.mapRadiusMultiplier = radiusMultiplier;
+	}
+
+	if (layout.numPoints) {
+		const angleOffsetInRevs = layout.angleOffsetInRevs || 0;
+		const points = new Array<pl.Vec2>();
+		for (let i = 0; i < layout.numPoints; ++i) {
+			const angle = (angleOffsetInRevs + i / layout.numPoints) * (2 * Math.PI);
+			points.push(vector.fromAngle(angle));
+		}
+		world.mapPoints = points;
 	}
 
 	layout.obstacles.forEach(obstacleTemplate => {
@@ -1769,18 +1786,44 @@ function getExtent(obj: w.WorldObject) {
 function applyLavaDamage(world: w.World) {
 	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
 	const damagePacket: DamagePacket = { damage: lavaDamagePerTick, isLava: true };
-	const mapCenter = pl.Vec2(0.5, 0.5);
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.radius > world.radius) {
+			if (!isInsideMap(obj, world)) {
 				applyDamage(obj, damagePacket, null, world);
 			}
 		} else if (obj.category === "obstacle") {
-			if (vector.distance(obj.body.getPosition(), mapCenter) + obj.extent > world.radius) {
+			if (!isInsideMap(obj, world)) {
 				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
 	});
+}
+
+function isInsideMap(obj: w.WorldObject, world: w.World) {
+	if (world.radius <= 0) {
+		return false;
+	}
+
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	const diff = vector.diff(obj.body.getPosition(), mapCenter);
+	const extent = getExtent(obj);
+
+	if (world.mapPoints) {
+		const scaledDiff = vector.multiply(diff, 1 / world.radius);
+		const scaledExtent = extent / world.radius;
+		for (let i = 0; i < world.mapPoints.length; ++i) {
+			const a = world.mapPoints[i];
+			const b = world.mapPoints[(i + 1) % world.mapPoints.length];
+			if (!vector.insideLine(scaledDiff, scaledExtent, a, b)) {
+				return false;
+			}
+		}
+		return true;
+	} else {
+		return vector.length(diff) < world.radius + extent;
+	}
+
+	return true;
 }
 
 function shrink(world: w.World) {
@@ -1788,7 +1831,7 @@ function shrink(world: w.World) {
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;
 		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
-		world.radius = World.InitialRadius * Math.pow(proportion, World.ShrinkPower);
+		world.radius = World.InitialRadius * world.mapRadiusMultiplier * Math.pow(proportion, World.ShrinkPower);
 	}
 }
 

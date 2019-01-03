@@ -46,6 +46,8 @@ export interface World {
 
 	physics: pl.World;
 
+	mapPoints?: pl.Vec2[];
+	mapRadiusMultiplier: number;
 	radius: number;
 
 	occurrences: Occurrence[];

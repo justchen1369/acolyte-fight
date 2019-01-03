@@ -411,14 +411,15 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.translate(0.5, 0.5);
 
 	ctx.lineWidth = Pixel * 5;
-	ctx.strokeStyle = HeroColors.WorldColor;
+
+	let color: string;
 	if (world.winner) {
-		const color = heroColor(world.winner, world);
-		ctx.fillStyle = color;
-		ctx.globalAlpha = 0.5;
+		color = Color(heroColor(world.winner, world)).darken(0.5).string();
 	} else {
-		ctx.fillStyle = HeroColors.WorldColor;
+		color = HeroColors.WorldColor;
 	}
+	ctx.fillStyle = color;
+	ctx.strokeStyle = Color(color).lighten(0.3).string();
 
 	let radius = world.radius;
 	if (isEdge) {
@@ -426,10 +427,24 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 		// Force it to draw perfect circles by snapping to a minimum precision.
 		radius = Math.floor(world.radius / Pixel) * Pixel;
 	}
+
+	ctx.scale(radius, radius);
+
 	ctx.beginPath();
-	ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+
+	const points = world.mapPoints;
+	if (points) {
+		ctx.moveTo(points[0].x, points[0].y);
+		for (let i = 1; i < world.mapPoints.length; ++i) {
+			ctx.lineTo(points[i].x, points[i].y);
+		}
+	} else {
+		ctx.arc(0, 0, 1, 0, 2 * Math.PI);
+	}
+	ctx.closePath();
 
 	ctx.fill();
+	ctx.stroke();
 
 	ctx.restore();
 }
