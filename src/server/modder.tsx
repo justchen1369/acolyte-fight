@@ -19,6 +19,18 @@ export interface RoomUpdateListener {
 }
 
 export function init() {
+    // Create an initial default room
+    const store = getStore();
+    const room: g.Room = {
+        id: m.DefaultRoomId,
+        created: moment(),
+        accessed: moment(),
+        mod: {},
+        isCustom: false,
+    };
+    store.rooms.set(room.id, room);
+
+    // Update default room
     updateDefaultModIfNecessary();
 }
 
