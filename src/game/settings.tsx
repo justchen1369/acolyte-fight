@@ -300,7 +300,7 @@ const kamehameha: Spell = {
     icon: "glowingHands",
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
-    chargeTicks: 0.75 * TicksPerSecond,
+    chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
@@ -487,7 +487,7 @@ const retractor: Spell = {
 const whip: Spell = {
     id: 'whip',
     name: 'Electrolash',
-    description: "Shock your enemies with the epicenter for maximum damage and knockback. The whip has a fixed length, so stay close, but not too close.",
+    description: "Shock your enemies for damage and lifesteal. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
     color: '#39fffa',
@@ -510,8 +510,9 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 20,
-            outerDamage: 5,
+            damage: 10,
+            outerDamage: 2.5,
+            lifeSteal: 1.0,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0003,
