@@ -808,7 +808,7 @@ const saber: Spell = {
 
     takesOwnership: true,
     blocksTeleporters: false,
-    speedMultiplier: 1.1,
+    speedMultiplier: 1.25,
     maxSpeed: 1.0,
 
     width: Pixel,
@@ -824,7 +824,7 @@ const saber: Spell = {
     maxTicks: 0.5 * TicksPerSecond,
 
     categories: Categories.Shield,
-    collidesWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
+    collidesWith: Categories.Hero | Categories.Projectile,
 
     trailTicks: 30,
     color: '#00ccff',
