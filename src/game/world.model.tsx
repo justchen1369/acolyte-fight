@@ -622,7 +622,7 @@ export interface Action {
 	target: pl.Vec2;
 }
 
-export type Trail = CircleTrail | LineTrail | RippleTrail;
+export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail;
 
 export interface TrailBase {
 	initialTick: number;
@@ -649,6 +649,17 @@ export interface RippleTrail extends TrailBase {
 	pos: pl.Vec2;
 	initialRadius: number;
 	finalRadius: number;
+	fillStyle: string;
+}
+
+export interface ArcTrail extends TrailBase {
+	type: "arc";
+	pos: pl.Vec2;
+	minRadius: number;
+	maxRadius: number;
+	fromAngle: number;
+	toAngle: number;
+	antiClockwise: boolean;
 	fillStyle: string;
 }
 

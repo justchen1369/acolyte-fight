@@ -763,7 +763,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 	if (shield.type === "saber") {
 		// Do this before we apply the angle transformation because it's easier
-		renderSaberTrail(ctxStack, shield);
+		renderSaberTrail(ctxStack, shield, world);
 	}
 
 	foreground(ctxStack, ctx => ctx.rotate(angle));
@@ -797,26 +797,24 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	foreground(ctxStack, ctx => ctx.restore());
 }
 
-function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber) {
+function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.World) {
 	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
 	const newAngle = saber.body.getAngle();
 
 	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
+	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
-	foreground(ctxStack, ctx => {
-		const color = '#00ccff';
-		ctx.fillStyle = color;
-		ctx.strokeStyle = color;
-		ctx.lineWidth = 0.001;
-
-		const anticlockwise = vector.angleDelta(previousAngle, newAngle) < 0;
-
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(previousTip.x, previousTip.y);
-		ctx.arc(0, 0, saber.length, previousAngle, newAngle, anticlockwise);
-		ctx.closePath();
-		ctx.fill();
+	world.ui.trails.push({
+		type: "arc",
+		initialTick: world.tick,
+		max: saber.trailTicks,
+		pos: saber.body.getPosition(),
+		minRadius: world.settings.Hero.Radius,
+		maxRadius: saber.length,
+		fromAngle: previousAngle,
+		toAngle: newAngle,
+		antiClockwise,
+		fillStyle: saber.color,
 	});
 
 	saber.uiPreviousAngle = newAngle;
@@ -1047,6 +1045,15 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			ctx.beginPath();
 			ctx.arc(trail.pos.x, trail.pos.y, radius, 0, 2 * Math.PI);
 			ctx.stroke();
+		} else if (trail.type === "arc") {
+			ctx.globalAlpha = proportion;
+
+			ctx.beginPath();
+			ctx.arc(trail.pos.x, trail.pos.y, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise);
+			ctx.arc(trail.pos.x, trail.pos.y, trail.minRadius, trail.toAngle, trail.fromAngle, !trail.antiClockwise);
+			ctx.closePath();
+			ctx.fill();
+
 		} else if (trail.type === "line") {
 			if (isEdge) {
 				// Edge doesn't render lines if they are shorter than the line width, so render them ourselves.

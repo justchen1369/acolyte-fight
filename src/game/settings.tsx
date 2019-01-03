@@ -826,7 +826,7 @@ const saber: Spell = {
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
 
-    trailTicks: 30,
+    trailTicks: 5,
     color: '#00ccff',
 
     sound: "scourge",
