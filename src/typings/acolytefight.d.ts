@@ -95,6 +95,8 @@ declare interface ObstacleTemplate {
 	numPoints: number;
 	extent: number; // aka radius but for a polygon
 	orientationAngleOffsetInRevs: number;
+
+	health?: number;
 }
 
 declare interface ObstacleSettings {

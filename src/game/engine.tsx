@@ -105,7 +105,7 @@ function polygon(numPoints: number, extent: number) {
 	return points;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], extent: number) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: ObstacleTemplate) {
 	const Obstacle = world.settings.Obstacle;
 
 	const obstacleId = "obstacle" + (world.nextObjectId++);
@@ -124,16 +124,17 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		filterMaskBits: Categories.All,
 	});
 
+	const health = template.health || Obstacle.Health;
 	const obstacle: w.Obstacle = {
 		id: obstacleId,
 		category: "obstacle",
 		categories: Categories.Obstacle,
 		type: "polygon",
 		body,
-		extent,
+		extent: template.extent,
 		points,
-		health: Obstacle.Health,
-		maxHealth: Obstacle.Health,
+		health,
+		maxHealth: health,
 		createTick: world.tick,
 		growthTicks: 0,
 	};
@@ -685,6 +686,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
 
+	const Obstacle = world.settings.Obstacle;
 	const Layouts = world.settings.Layouts;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
@@ -704,7 +706,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), obstacleTemplate.layoutRadius));
 
 			const orientationAngle = baseAngle + layoutAngleOffset + orientationAngleOffset;
-			addObstacle(world, position, orientationAngle, points, obstacleTemplate.extent);
+			addObstacle(world, position, orientationAngle, points, obstacleTemplate);
 		}
 	});
 }

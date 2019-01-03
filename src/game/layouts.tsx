@@ -91,7 +91,8 @@ export const Layouts: Layouts = {
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
                 "extent": 0.01,
-                "orientationAngleOffsetInRevs": 0.5
+                "orientationAngleOffsetInRevs": 0.5,
+                "health": 10
             },
             {
                 "numObstacles": 5,
@@ -143,7 +144,8 @@ export const Layouts: Layouts = {
                 "layoutAngleOffsetInRevs": 0.28,
                 "numPoints": 3,
                 "extent": 0.01,
-                "orientationAngleOffsetInRevs": 0.125
+                "orientationAngleOffsetInRevs": 0.125,
+                "health": 20
             },
             {
                 "numObstacles": 3,
@@ -151,7 +153,8 @@ export const Layouts: Layouts = {
                 "layoutAngleOffsetInRevs": 0.23,
                 "numPoints": 3,
                 "extent": 0.015,
-                "orientationAngleOffsetInRevs": 0.125
+                "orientationAngleOffsetInRevs": 0.125,
+                "health": 20
             },
             {
                 "numObstacles": 3,
