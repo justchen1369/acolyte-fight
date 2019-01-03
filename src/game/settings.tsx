@@ -817,11 +817,11 @@ const saber: Spell = {
     movementProportionWhileChannelling: 0.1,
     interruptible: true,
 
-    cooldown: 1 * TicksPerSecond,
+    cooldown: 20 * TicksPerSecond,
 
     icon: "deadlyStrike",
 
-    maxTicks: 0.5 * TicksPerSecond,
+    maxTicks: 5 * TicksPerSecond,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
