@@ -826,7 +826,7 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 2.5 * TicksPerSecond,
+    maxTicks: 2 * TicksPerSecond,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
