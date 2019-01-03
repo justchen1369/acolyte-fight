@@ -393,8 +393,8 @@ export interface Saber extends ShieldBase {
 
 	points: pl.Vec2[];
 
-	revsForMaxImpulse: number;
-	maxImpulse: number;
+	speedMultiplier: number;
+	maxSpeed: number;
 
 	trailTicks: number;
 	uiPreviousAngle: number;

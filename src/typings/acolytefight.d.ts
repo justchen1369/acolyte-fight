@@ -388,8 +388,8 @@ declare interface WallSpell extends ShieldSpell {
 declare interface SaberSpell extends ShieldSpell {
 	action: "saber";
 
-	revsForMaxImpulse: number; // Proportion of a a full circle that the player must swing to create maximum impulse
-	maxImpulse: number;
+	speedMultiplier: number; // Accelerate object to the speed of the swing multiplied by this factor
+	maxSpeed: number; // The maximum speed the saber can accelerate another object to
 
 	length: number;
 	width: number;

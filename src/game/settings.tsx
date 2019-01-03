@@ -806,10 +806,10 @@ const saber: Spell = {
     name: 'Lightsaber',
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
 
-    takesOwnership: false,
+    takesOwnership: true,
     blocksTeleporters: false,
-    revsForMaxImpulse: 0.5,
-    maxImpulse: 0.0005,
+    speedMultiplier: 1.1,
+    maxSpeed: 1.0,
 
     width: Pixel,
     length: 0.1,
@@ -821,7 +821,7 @@ const saber: Spell = {
 
     icon: "deadlyStrike",
 
-    maxTicks: 1 * TicksPerSecond,
+    maxTicks: 0.5 * TicksPerSecond,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,

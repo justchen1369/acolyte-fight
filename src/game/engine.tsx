@@ -277,8 +277,8 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		angle,
 		width: spell.width,
 		length: spell.length,
-		revsForMaxImpulse: spell.revsForMaxImpulse,
-		maxImpulse: spell.maxImpulse,
+		speedMultiplier: spell.speedMultiplier,
+		maxSpeed: spell.maxSpeed,
 		trailTicks: spell.trailTicks,
 		uiPreviousAngle: null,
 	};
@@ -2182,13 +2182,11 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
 	const newTip = vector.multiply(vector.fromAngle(newAngle), saber.length);
 
-	const revs = Math.abs(saberAngleDelta) / (2 * Math.PI);
-	const proportion = Math.max(1, revs / saber.revsForMaxImpulse);
-	const magnitude = proportion * saber.maxImpulse;
-	const impulse = vector.relengthen(vector.diff(newTip, previousTip), magnitude);
+	const swingVelocity = vector.truncate(vector.multiply(vector.diff(newTip, previousTip), TicksPerSecond * saber.speedMultiplier), saber.maxSpeed);
+	const swingSpeed = vector.length(swingVelocity);
 
 	world.objects.forEach(obj => {
-		if (obj.id === hero.id || !(obj.category === "hero" || obj.category === "projectile")) {
+		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && obj.detonatable))) {
 			return;
 		}
 
@@ -2206,24 +2204,21 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			return;
 		}
 
-		if (obj.category === "projectile") {
-			if (shouldCollideWithCategory(obj, Categories.Shield)) { // TODO: Replace with just collidesWith
-				let velocity = obj.body.getLinearVelocity();
-				velocity = vector.redirect(velocity, impulse);
-				obj.body.setLinearVelocity(velocity);
+		const currentSpeed = vector.length(obj.body.getLinearVelocity());
+		if (currentSpeed < swingSpeed) {
+			obj.body.setLinearVelocity(swingVelocity);
+		}
 
-				if (saber.takesOwnership && obj.owner !== hero.id && obj.shieldTakesOwnership) {
-					// Redirect back to owner
-					obj.targetId = obj.owner;
-					obj.owner = hero.id;
-				}
+		if (obj.category === "projectile") {
+			if (saber.takesOwnership && obj.owner !== hero.id && obj.shieldTakesOwnership) {
+				// Redirect back to owner
+				obj.targetId = obj.owner;
+				obj.owner = hero.id;
 			}
 
 			if (obj.detonatable) {
 				obj.expireTick = world.tick;
 			}
-		} else {
-			obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
 		}
 	});
 
