@@ -806,15 +806,17 @@ const saber: Spell = {
     name: 'Lightsaber',
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
 
-	takeOwnership: true,
+	takeOwnership: false,
 	revsToImpulseMultiplier: 0.0001,
-	length: 0.04,
+    length: 0.1,
+    movementProportionWhileChannelling: 0.1,
+    interruptible: true,
 
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 2 * TicksPerSecond,
 
     icon: "deadlyStrike",
 
-    ticks: 2.5 * TicksPerSecond,
+    ticks: 1 * TicksPerSecond,
     trailTicks: 30,
     color: '#ffcc00',
 

@@ -1636,7 +1636,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		}
 
 		const diff = vector.diff(other.body.getPosition(), epicenter);
-		const extent = other.category === "obstacle" ? other.extent : other.radius;
+		const extent = getExtent(other);
 		const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
 		const distance = vector.length(diff);
@@ -1678,6 +1678,25 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		radius: detonate.radius,
 		explosionTicks: detonate.renderTicks,
 	});
+}
+
+function getExtent(obj: w.WorldObject) {
+	if (obj.category === "obstacle") {
+		return obj.extent;
+	} else if (obj.category === "hero" || obj.category === "projectile") {
+		return obj.radius;
+	} else if (obj.category === "shield") {
+		const shield = obj;
+		if (shield.type === "reflect") {
+			return shield.radius;
+		} else if (shield.type === "wall") {
+			return shield.extent;
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
 }
 
 function applyLavaDamage(world: w.World) {
@@ -2011,6 +2030,10 @@ function shouldCollide(a: w.WorldObject, b: w.WorldObject) {
 	}
 }
 
+function shouldCollideWithCategory(a: w.WorldObject, categories: number) {
+	return a && !!(a.body.getFixtureList().getFilterMaskBits() & categories);
+}
+
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
 	const Hero = world.settings.Hero;
 	if (!action.target) { return true; }
@@ -2055,19 +2078,24 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 }
 
 function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
-	hero.saber = {
-		createTick: world.tick,
-		expireTick: world.tick + spell.ticks,
-		angle: vector.angle(vector.diff(action.target, hero.body.getPosition())),
-		length: spell.length,
-		revsToImpulseMultiplier: spell.revsToImpulseMultiplier,
-		trailTicks: spell.trailTicks,
-		uiAngleHistory: [],
-	};
+	const saberTick = world.tick - hero.casting.channellingStartTick;
+	if (saberTick === 0) {
+		hero.saber = {
+			spellId: spell.id,
+			angle: vector.angle(vector.diff(action.target, hero.body.getPosition())),
+			length: spell.length,
+			revsToImpulseMultiplier: spell.revsToImpulseMultiplier,
+			takesOwnership: spell.takeOwnership,
+			trailTicks: spell.trailTicks,
+			uiPreviousAngle: null,
+		};
 
-	world.behaviours.push({ type: "saberSwing", heroId: hero.id });
-
-	return true;
+		world.behaviours.push({ type: "saberSwing", heroId: hero.id });
+	}
+	if (saberTick >= spell.ticks) {
+		hero.saber = null;
+	}
+	return !hero.saber;
 }
 
 function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
@@ -2076,42 +2104,66 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		return false;
 	}
 
-	if (world.tick >= hero.saber.expireTick) {
+	if (!(hero.casting && hero.casting.action.type === hero.saber.spellId)) {
+		// Cancelled
 		hero.saber = null;
 		return false;
 	}
 
+	const heroPos = hero.body.getPosition();
+
 	const previousAngle = hero.saber.angle;
-	const newAngle = vector.angle(vector.diff(hero.target, hero.body.getPosition()));
+	const newAngle = vector.angle(vector.diff(hero.target, heroPos));
 	if (previousAngle === newAngle) {
 		return true; // Nothing to do
 	}
 
 	const saberAngleDelta = vector.angleDelta(previousAngle, newAngle);
 	const magnitude = Math.abs(saberAngleDelta / 2 * Math.PI) * hero.saber.revsToImpulseMultiplier;
+	const antiClockwise = saberAngleDelta >= 0;
+
+	const previousTip = vector.multiply(vector.fromAngle(previousAngle), hero.saber.length);
+	const newTip = vector.multiply(vector.fromAngle(newAngle), hero.saber.length);
 
 	world.objects.forEach(obj => {
-		if (obj.id === hero.id || !shouldCollide(hero, obj)) {
+		if (obj.id === hero.id || !(obj.category === "hero" || obj.category === "projectile")) {
 			return;
 		}
 
-		const diff = vector.diff(obj.body.getPosition(), hero.body.getPosition());
+		const objPos = obj.body.getPosition();
+		const diff = vector.diff(objPos, heroPos);
 		const distance = vector.length(diff);
-		if (distance > hero.saber.length) {
-			// Too far away
+		const extent = getExtent(obj);
+		if (distance > hero.saber.length + extent) {
 			return;
 		}
 
-		const objAngle = vector.angle(diff);
-		const objAngleDelta = Math.abs(vector.angleDelta(objAngle, newAngle));
-		if (!(Math.sign(objAngleDelta) === Math.sign(saberAngleDelta)
-			&& Math.abs(objAngleDelta) <= Math.abs(saberAngleDelta))) {
-			// Not caught within the swing
+		const insidePrevious = vector.insideLine(diff, extent, vector.zero(), previousTip, antiClockwise);
+		const insideNew = vector.insideLine(diff, extent, newTip, vector.zero(), antiClockwise);
+		if (!(insidePrevious && insideNew)) {
 			return;
 		}
 
-		const impulse = vector.relengthen(diff, magnitude);
-		obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
+		if (obj.category === "hero") {
+			const impulse = vector.relengthen(diff, magnitude);
+			obj.body.applyLinearImpulse(impulse, obj.body.getWorldPoint(vector.zero()), true);
+		} else if (obj.category === "projectile") {
+			if (shouldCollideWithCategory(obj, Categories.Shield)) {
+				let velocity = obj.body.getLinearVelocity();
+				velocity = vector.redirect(velocity, diff);
+				obj.body.setLinearVelocity(velocity);
+
+				if (hero.saber.takesOwnership && obj.owner !== hero.id && obj.shieldTakesOwnership) {
+					// Redirect back to owner
+					obj.targetId = obj.owner;
+					obj.owner = hero.id;
+				}
+			}
+
+			if (obj.detonatable) {
+				obj.expireTick = world.tick;
+			}
+		}
 	});
 
 	hero.saber.angle = newAngle;

@@ -430,14 +430,14 @@ export interface GravityState {
 }
 
 export interface SaberState {
-	createTick: number;
-	expireTick: number;
+	spellId: string;
 	angle: number;
 	length: number;
 	revsToImpulseMultiplier: number;
+	takesOwnership: boolean;
 	trailTicks: number;
 
-	uiAngleHistory: number[]; // Oldest first, not guaranteed to be synced across clients
+	uiPreviousAngle: number; // Oldest first, not guaranteed to be synced across clients
 }
 
 export interface Cooldowns {

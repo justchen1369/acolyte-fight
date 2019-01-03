@@ -121,3 +121,12 @@ export function average(points: pl.Vec2[]) {
 
 	return count ? pl.Vec2(totalX / count, totalY / count) : zero();
 }
+
+export function insideLine(obj: pl.Vec2, objSize: number, lineStart: pl.Vec2, lineEnd: pl.Vec2, antiClockwise: boolean = true) {
+	let outside = rotateRight(unit(diff(lineEnd, lineStart)));
+	if (!antiClockwise) {
+		outside = negate(outside);
+	}
+	const distanceToLine = dot(diff(obj, lineStart), outside);
+	return distanceToLine <= objSize;
+}

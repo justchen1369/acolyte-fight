@@ -517,9 +517,9 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
 	renderRangeIndicator(ctxStack, hero, world);
+	renderSaber(ctxStack, hero, world);
 	renderHeroCharacter(ctxStack, hero, world);
 	renderHeroBars(ctxStack, hero, world);
-	renderSaber(ctxStack, hero, world);
 
 	foreground(ctxStack, ctx => ctx.restore());
 
@@ -719,19 +719,28 @@ function renderSaber(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	const tip = vector.relengthen(vector.fromAngle(saber.angle), saber.length);
+	const previousAngle = saber.uiPreviousAngle || saber.angle;
+	const newAngle = saber.angle;
+
+	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
 
 	foreground(ctxStack, ctx => {
 		const color = '#00ccff';
 		ctx.fillStyle = color;
 		ctx.strokeStyle = color;
-		ctx.lineWidth = 0.01;
+		ctx.lineWidth = 0.001;
+
+		const anticlockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
 		ctx.beginPath();
 		ctx.moveTo(0, 0);
-		ctx.lineTo(tip.x, tip.y);
-		ctx.stroke();
+		ctx.lineTo(previousTip.x, previousTip.y);
+		ctx.arc(0, 0, saber.length, previousAngle, newAngle, anticlockwise);
+		ctx.closePath();
+		ctx.fill();
 	});
+
+	saber.uiPreviousAngle = saber.angle;
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
