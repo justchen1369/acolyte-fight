@@ -181,6 +181,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		owner: hero.id,
 		radius: spell.radius,
 		color: spell.color,
+		glow: spell.glow,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -223,6 +224,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		extent,
 		color: spell.color,
 		selfColor: spell.selfPassthrough,
+		glow: spell.glow,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -272,6 +274,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		owner: hero.id,
 		points,
 		color: spell.color,
+		glow: spell.glow,
 
 		spellId: spell.id,
 		width: spell.width,

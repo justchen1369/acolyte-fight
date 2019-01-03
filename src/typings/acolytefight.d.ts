@@ -314,13 +314,15 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	type: "ray";
 	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 
-    ticks: number; // How long is the trail?
+	ticks: number; // How long is the trail?
+	glow?: boolean;
 }
 
 declare interface RenderProjectile extends RenderParamsBase, ProjectileColorParams {
 	type: "projectile";
 
     ticks: number; // How long is the trail?
+	glow?: boolean;
 }
 
 declare interface RenderSwirl extends RenderParamsBase {
@@ -334,12 +336,15 @@ declare interface RenderSwirl extends RenderParamsBase {
 
 	numParticles: number;
 	particleRadius: number;
+
+	glow?: boolean;
 }
 
 declare interface RenderLink extends RenderParamsBase {
 	type: "link";
 	color: string;
 	width: number;
+	glow?: boolean;
 }
 
 declare interface RenderReticule extends RenderParamsBase {
@@ -347,6 +352,7 @@ declare interface RenderReticule extends RenderParamsBase {
 	color: string;
 	ticks: number;
 	radius: number;
+	glow?: boolean;
 }
 
 declare interface ScourgeSpell extends SpellBase {
@@ -370,6 +376,7 @@ declare interface ShieldSpell extends SpellBase {
 declare interface ReflectSpell extends ShieldSpell {
     action: "shield";
     radius: number;
+	glow?: boolean;
 }
 
 declare interface WallSpell extends ShieldSpell {
@@ -385,6 +392,8 @@ declare interface WallSpell extends ShieldSpell {
 
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
+
+	glow?: boolean;
 }
 
 declare interface SaberSpell extends ShieldSpell {
@@ -402,6 +411,7 @@ declare interface SaberSpell extends ShieldSpell {
 	collidesWith: number;
 
 	trailTicks: number;
+	glow?: boolean;
 }
 
 declare interface DashSpell extends SpellBase {

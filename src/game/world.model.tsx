@@ -368,7 +368,7 @@ export interface ShieldBase extends WorldObjectBase {
 	color: string;
 	selfColor?: boolean;
 	hitTick?: number;
-
+	glow?: boolean;
 }
 
 export interface Reflect extends ShieldBase {
@@ -627,6 +627,7 @@ export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail;
 export interface TrailBase {
 	initialTick: number;
 	max: number;
+	glow?: boolean;
 }
 
 export interface CircleTrail extends TrailBase {

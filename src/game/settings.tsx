@@ -90,6 +90,8 @@ const renderGravity: RenderSwirl = {
 
     numParticles: 3,
     particleRadius: 0.02 / 3,
+
+    glow: true,
 };
 
 const move: MoveSpell = {
@@ -152,8 +154,8 @@ const fireball: Spell = {
         sound: "fireball",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#ff8800', ticks: 30 },
-            { type: "ray", color: '#ff8800', ticks: 30  },
+            { type: "projectile", color: '#ff8800', ticks: 30, glow: false },
+            { type: "ray", color: '#ff8800', ticks: 30, glow: false },
         ],
     },
 };
@@ -193,8 +195,8 @@ const flamestrike: Spell = {
 
         sound: "flamestrike",
         renderers: [
-            { type: "projectile", color: '#ff4400', ticks: 30 },
-            { type: "ray", color: '#ff4400', ticks: 30 },
+            { type: "projectile", color: '#ff4400', ticks: 30, glow: false },
+            { type: "ray", color: '#ff4400', ticks: 30, glow: false },
         ],
     },
 };
@@ -227,8 +229,8 @@ const triplet: Spell = {
         sound: "triplet",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#ff0088', ticks: 10 },
-            { type: "ray", color: '#ff0088', ticks: 10 },
+            { type: "projectile", color: '#ff0088', ticks: 10, glow: false },
+            { type: "ray", color: '#ff0088', ticks: 10, glow: false },
         ],
     },
 };
@@ -285,7 +287,7 @@ const meteor: Spell = {
 
         sound: "meteor",
         renderers: [
-            { type: "projectile", color: '#ff0000', ticks: 15 },
+            { type: "projectile", color: '#ff0000', ticks: 15, glow: false },
         ],
     },
 };
@@ -327,7 +329,7 @@ const kamehameha: Spell = {
 
         sound: "kamehameha",
         renderers: [
-            { type: "ray", intermediatePoints: true, color: '#ffffff', ticks: 60 },
+            { type: "ray", intermediatePoints: true, color: '#ffffff', ticks: 60, glow: true },
         ],
     },
 };
@@ -388,8 +390,8 @@ const homing: Spell = {
         sound: "homing",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#44ffcc', ticks: 30 },
-            { type: "ray", color: '#44ffcc', ticks: 30 },
+            { type: "projectile", color: '#44ffcc', ticks: 30, glow: false },
+            { type: "ray", color: '#44ffcc', ticks: 30, glow: false },
         ],
     },
 };
@@ -480,7 +482,7 @@ const retractor: Spell = {
                 loopTicks: 15,
             },
             { type: "projectile", color: '#00ff7f', ticks: 15 },
-            { type: "ray", color: '#00ff7f', ticks: 15 },
+            { type: "ray", color: '#00ff7f', ticks: 15, glow: true },
         ],
     },
 };
@@ -530,6 +532,7 @@ const whip: Spell = {
                 particleRadius: 0.001,
                 numParticles: 2,
                 loopTicks: 15,
+                glow: false,
             },
             { type: "link", color: '#fffcb1', width: Pixel * 5 },
         ],
@@ -643,7 +646,7 @@ const drain: Spell = {
         ],
 
         renderers: [
-            { type: "ray", intermediatePoints: true, color: '#22ee88', ticks: 30 },
+            { type: "ray", intermediatePoints: true, color: '#22ee88', ticks: 30, glow: false },
         ],
     },
 };
@@ -797,7 +800,7 @@ const mines: Spell = {
 
         sound: "mines",
         renderers: [
-            { type: "projectile", color: '#ff009c', ticks: 1, selfColor: true },
+            { type: "projectile", color: '#ff009c', ticks: 1, selfColor: true, glow: true },
             { type: "ray", intermediatePoints: true, color: '#ff009c', ticks: 3, selfColor: true },
         ],
     },
@@ -830,6 +833,7 @@ const saber: Spell = {
 
     trailTicks: 5,
     color: '#00ccff',
+    glow: false,
 
     sound: "saber",
     action: "saber",
@@ -980,6 +984,7 @@ const swap: Spell = {
                 particleRadius: 0.001,
                 numParticles: 2,
                 loopTicks: 15,
+                glow: false,
             },
             { type: "link", color: '#75e7ff', width: Pixel * 5 },
         ],

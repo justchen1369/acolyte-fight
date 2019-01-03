@@ -149,8 +149,8 @@ function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D)
 	func(contextStack.ui);
 }
 
-function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
-	if (contextStack.rtx) {
+function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void, glow: boolean = true) {
+	if (glow && contextStack.rtx) {
 		func(contextStack.glows);
 	}
 	func(contextStack.canvas);
@@ -444,6 +444,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 
 	const proportion = obstacle.health / obstacle.maxHealth;
 
+	const glow = false;
 	foreground(ctxStack, ctx => {
 		ctx.save();
 		
@@ -499,7 +500,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		}
 
 		ctx.restore();
-	});
+	}, glow);
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -716,6 +717,8 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const MaxAlpha = 0.75;
 	const MinAlpha = 0.10;
 
+	const glow = shield.glow;
+
 	const ticksRemaining = shield.expireTick - world.tick;
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
@@ -792,7 +795,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			ctx.fill();
 		}
 		ctx.fill();
-	});
+	}, glow);
 
 	foreground(ctxStack, ctx => ctx.restore());
 }
@@ -814,6 +817,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 		toAngle: newAngle,
 		antiClockwise,
 		fillStyle: saber.color,
+		glow: saber.glow,
 	});
 
 	saber.uiPreviousAngle = newAngle;
@@ -912,6 +916,7 @@ function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.W
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle: color || swirl.color,
+			glow: swirl.glow || false,
 		});
 	}
 }
@@ -933,6 +938,7 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	const angleOffset = ((world.tick % animationLength) / animationLength) * 2 * Math.PI;
 	const arcAngle = arcFraction * 2 * Math.PI / numSegments;
 
+	const glow = reticule.glow || false;
 	foreground(ctxStack, ctx => {
 		ctx.save();
 
@@ -949,7 +955,7 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 		}
 
 		ctx.restore();
-	});
+	}, glow);
 }
 
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
@@ -960,6 +966,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
+	const glow = render.glow || false;
 	foreground(ctxStack, ctx => {
 		ctx.lineWidth = render.width;
 		ctx.strokeStyle = render.color;
@@ -970,7 +977,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		ctx.moveTo(from.x, from.y);
 		ctx.lineTo(to.x, to.y);
 		ctx.stroke();
-	});
+	}, glow);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -987,6 +994,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
 				width: multiplier * projectile.radius * 2,
+				glow: render.glow || false,
 			} as w.LineTrail);
 		}
 
@@ -1015,6 +1023,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 		pos: vector.clone(projectile.body.getPosition()),
 		fillStyle: projectileColor(render, projectile, world),
 		radius: multiplier * projectile.radius,
+		glow: render.glow || false,
 	} as w.CircleTrail);
 }
 
@@ -1087,7 +1096,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 
 		ctx.restore();
-	});
+	}, trail.glow);
 
 	return false;
 }
