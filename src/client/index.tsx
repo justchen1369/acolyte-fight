@@ -11,6 +11,7 @@ import * as w from '../game/world.model';
 import * as ai from './core/ai';
 import * as audio from './core/audio';
 import * as cloud from './core/cloud';
+import * as loader from './core/loader';
 import * as matches from './core/matches';
 import * as notifications from './core/notifications';
 import * as options from './options';
@@ -51,9 +52,6 @@ export async function initialize() {
     sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
 
-    start();
-    render();
-
     window.onpopstate = (ev) => {
         const elems: s.PathElements = ev.state;
         if (elems) {
@@ -61,9 +59,12 @@ export async function initialize() {
         }
     }
 
-    loginAsync();
     ai.startTimers();
     notifications.startTimers();
+
+    loader.setLoadedPromise(start());
+
+    render();
 
     storage.cleanupGameStats();
 }
@@ -89,7 +90,7 @@ async function loginAsync() {
     if (userId) {
         tracker.setUserId(userId);
         await parties.updatePartyAsync();
-        await rankings.retrieveUserStatsAsync(userId);
+        rankings.retrieveUserStatsAsync(userId); // Don't bother awaiting this
     }
 }
 
@@ -116,40 +117,45 @@ async function start() {
         StoreProvider.dispatch({ type: "updatePlayerName", playerName: a.playerName });
     }
 
-    sockets.connect(base, a.authToken, async (socket) => {
-        if (alreadyConnected) {
-            return;
-        }
-        alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
+    await new Promise<void>(resolve => {
+        sockets.connect(base, a.authToken, async (socket) => {
+            if (alreadyConnected) {
+                return;
+            }
+            alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
 
-        await sockets.connectToServer(query.server)
-        if (query.party) {
-            await parties.joinPartyAsync(query.party);
-        } else {
-            await rooms.joinRoomAsync(rooms.DefaultRoom);
-            await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
-        }
-
-        try {
-            if (query.hash === "#join") {
-                // Return to the home page when we exit
-                StoreProvider.dispatch({ type: "updatePage", page: "" });
-                await matches.joinNewGame({ observeGameId: query.gameId });
-            } else if (query.hash === "#watch" || query.page === "watch") {
-                await matches.watchLiveGame();
+            await sockets.connectToServer(query.server)
+            if (query.party) {
+                await parties.joinPartyAsync(query.party);
             } else {
-                pages.go(query);
+                await rooms.joinRoomAsync(rooms.DefaultRoom);
+                await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
             }
-        } catch(error) {
-            console.error(error)
-            socket.disconnect();
-            StoreProvider.dispatch({ type: "disconnected" });
 
-            if (query.party || query.server) {
-                // Failed to join party/server, try without server
-                window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
+            await loginAsync();
+
+            try {
+                if (query.hash === "#join") {
+                    // Return to the home page when we exit
+                    StoreProvider.dispatch({ type: "updatePage", page: "" });
+                    await matches.joinNewGame({ observeGameId: query.gameId });
+                } else if (query.hash === "#watch" || query.page === "watch") {
+                    await matches.watchLiveGame();
+                } else {
+                    pages.go(query);
+                }
+            } catch(error) {
+                console.error(error)
+                socket.disconnect();
+                StoreProvider.dispatch({ type: "disconnected" });
+
+                if (query.party || query.server) {
+                    // Failed to join party/server, try without server
+                    window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
+                }
             }
-        }
+            resolve();
+        });
     });
 }
 

@@ -9,6 +9,7 @@ import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
+import { loaded } from '../core/loader';
 
 interface OwnProps {
     again?: boolean;
@@ -93,6 +94,8 @@ class PlayButton extends React.Component<Props, State> {
         }
 
         await options.getProvider().commercialBreak();
+
+        await loaded();
 
         matches.joinNewGame({});
     }
