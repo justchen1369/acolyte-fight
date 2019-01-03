@@ -241,7 +241,7 @@ const firespray: Spell = {
     icon: "bubblingBeam",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     intervalTicks: 2,
     lengthTicks: 20,
@@ -364,7 +364,7 @@ const homing: Spell = {
     color: '#44ffcc',
     icon: "boltSaw",
 
-    cooldown: 18 * TicksPerSecond,
+    cooldown: 15 * TicksPerSecond,
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
@@ -401,7 +401,7 @@ const boomerang: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     projectile: {
         density: 1,
@@ -439,7 +439,7 @@ const retractor: Spell = {
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 16 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -501,7 +501,7 @@ const whip: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     chargeTicks: 15,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 2,
