@@ -516,7 +516,7 @@ const whip: Spell = {
             lifeSteal: 1.0,
             radius: 0.025,
             minImpulse: 0.0001,
-            maxImpulse: 0.0003,
+            maxImpulse: 0.0001,
             renderTicks: 10,
         },
 
@@ -775,7 +775,7 @@ const mines: Spell = {
         detonatable: true,
 
         detonate: {
-            damage: 2.5,
+            damage: 4,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
