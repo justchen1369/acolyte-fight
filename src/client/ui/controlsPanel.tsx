@@ -10,7 +10,7 @@ import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 
-namespace Sounds {
+namespace Toggle {
     export const On = "on";
     export const Off = "off";
 }
@@ -39,6 +39,7 @@ interface ControlState {
     singleTapKey: string;
     doubleTapKey: string;
     actionWheelSide: string;
+    targetingIndicator: string;
     sounds: string;
 }
 interface State extends ControlState {
@@ -64,7 +65,8 @@ function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): 
         singleTapKey: rebindings[w.SpecialKeys.SingleTap],
         doubleTapKey: rebindings[w.SpecialKeys.DoubleTap],
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
-        sounds: options.mute ? Sounds.Off : Sounds.On,
+        targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
+        sounds: options.mute ? Toggle.Off : Toggle.On,
     };
 }
 
@@ -162,11 +164,18 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
+            <div className="row">
+                <span className="label">Targeting Indicator</span>
+                <select className="value" value={this.state.targetingIndicator} onChange={ev => this.onTargetingIndicatorSelected(ev.target.value)}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
             {<div className="row">
                 <span className="label">Sound</span>
                 <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
-                    <option value={Sounds.On}>On</option>
-                    <option value={Sounds.Off}>Off</option>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
                 </select>
             </div>}
             {this.state.changed && <div style={{ textAlign: "center", marginTop: 8 }}>
@@ -221,6 +230,11 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
+    private onTargetingIndicatorSelected(targetingIndicator: string) {
+        this.setState({ targetingIndicator, changed: true, saved: false });
+        this.saveStateDebounced();
+    }
+
     private onSoundsSelected(sounds: string) {
         this.setState({ sounds, changed: true, saved: false });
         this.saveStateDebounced();
@@ -246,7 +260,8 @@ class ControlsPanel extends React.Component<Props, State> {
         {
             const options = { ...this.props.options };
             options.wheelOnRight = state.actionWheelSide === Side.Right;
-            options.mute = state.sounds === Sounds.Off;
+            options.mute = state.sounds === Toggle.Off;
+            options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

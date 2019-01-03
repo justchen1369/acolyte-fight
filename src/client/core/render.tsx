@@ -32,6 +32,7 @@ export interface CanvasCtxStack {
 }
 
 export interface RenderOptions {
+	targetingIndicator: boolean;
 	wheelOnRight: boolean;
 	mute: boolean;
 	keysToSpells: Map<string, string>;
@@ -170,6 +171,10 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
 	renderMap(ctxStack.background, world);
+
+	if (options.targetingIndicator) {
+		renderTargetingIndicator(ctxStack, world);
+	}
 
 	world.objects.forEach(obj => renderObject(ctxStack, obj, world, options));
 	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
@@ -530,6 +535,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const radius = Hero.Radius;
 
 	foreground(ctxStack, ctx => ctx.save());
+
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
 	renderRangeIndicator(ctxStack, hero, world);
@@ -539,6 +545,46 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	foreground(ctxStack, ctx => ctx.restore());
 
 	playHeroSounds(hero, world);
+}
+
+function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
+	const MaxAlpha = 0.5;
+
+	const hero = world.objects.get(world.ui.myHeroId);
+	if (!(hero && hero.category === "hero")) {
+		return;
+	}
+
+	const ctx = ctxStack.canvas;
+	ctx.save();
+
+	const pos = hero.body.getPosition();
+	const target = world.ui.nextTarget;
+	if (!(pos && target)) {
+		return;
+	}
+
+	const diff = vector.diff(target, pos);
+	const guide = vector.relengthen(diff, 0.5);
+	const proportion = Math.min(1, vector.length(diff) / 0.5);
+
+	ctx.translate(pos.x, pos.y);
+
+	ctx.lineWidth = hero.radius / 2;
+
+	const gradient = ctx.createLinearGradient(0, 0, guide.x, guide.y);
+	gradient.addColorStop(0, Color("black").alpha(MaxAlpha * proportion).string());
+	gradient.addColorStop(1, Color("black").alpha(0).string());
+	ctx.strokeStyle = gradient;
+
+	ctx.setLineDash([ Pixel * 25, Pixel * 5 ]);
+
+	ctx.beginPath();
+	ctx.moveTo(0, 0);
+	ctx.lineTo(guide.x, guide.y);
+	ctx.stroke();
+
+	ctx.restore();
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {

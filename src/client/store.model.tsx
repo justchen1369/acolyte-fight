@@ -35,6 +35,7 @@ export interface State {
 
 export interface GameOptions {
     wheelOnRight?: boolean;
+    noTargetingIndicator?: boolean;
     mute?: boolean;
 }
 
