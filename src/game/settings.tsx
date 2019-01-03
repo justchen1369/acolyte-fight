@@ -307,6 +307,7 @@ const kamehameha: Spell = {
 
     knockbackCancel: {
         cooldownTicks: 1 * TicksPerSecond,
+        maxChannelingTicks: 1 * TicksPerSecond,
     },
     movementCancel: true,
     interruptible: true,

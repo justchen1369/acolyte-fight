@@ -161,6 +161,7 @@ declare interface SpellBase {
 
 declare interface KnockbackCancelParams {
 	cooldownTicks?: number; // If cancelled by knockback, set cooldown to this value. This can be used to allow the spell to be re-cast quickly if interrupted.
+	maxChannelingTicks?: number; // Only apply the cooldown reset if have been channelling for less than this time.
 }
 
 declare interface MoveSpell extends SpellBase {

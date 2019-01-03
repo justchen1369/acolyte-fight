@@ -993,7 +993,9 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 
 	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
-		if (spell.knockbackCancel.cooldownTicks !== undefined) {
+		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
+		const maxChannellingTicks = spell.knockbackCancel.maxChannelingTicks ? spell.knockbackCancel.maxChannelingTicks : Infinity;
+		if (spell.knockbackCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
 			setCooldown(world, hero, spell.id, spell.knockbackCancel.cooldownTicks);
 		}
 		hero.casting.stage = w.CastStage.Complete;
