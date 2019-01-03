@@ -422,6 +422,33 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "retractor-detonating": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 2,
+                "attack": 0.01,
+                "decay": 1.95,
+                "startFreq": 100,
+                "stopFreq": 0.01,
+                "lowPass": 300,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.1,
+                    1.2,
+                    1.3,
+                    1.4,
+                    1.5,
+                    1.6,
+                    1.7,
+                    1.8,
+                    1.9,
+                    2
+                ]
+            }
+        ]
+    },
     "kamehameha-charging": {
         start: [
             {

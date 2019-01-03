@@ -162,7 +162,7 @@ const fireball: Spell = {
 const flamestrike: Spell = {
     id: 'flamestrike',
     name: 'Fireboom',
-    description: "It's slower than fireball - harder to aim, but does more damage at longer ranges. At short range, does the same amount of damage as fireball.",
+    description: "It's slower than fireball - harder to aim, but does more damage. Takes 0.5 seconds to grow to full damage, so keep a little bit of distance for maximum effect.",
     action: "projectile",
 
     color: '#ff4400',
@@ -456,11 +456,11 @@ const retractor: Spell = {
     ],
 
     projectile: {
+        damage: 0,
         density: 10,
         radius: 0.005,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
-        damage: 20,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
@@ -469,8 +469,15 @@ const retractor: Spell = {
             ticks: 2 * TicksPerSecond,
         },
 
+        detonate: {
+            damage: 20,
+            radius: 0.025,
+            minImpulse: 0.00005,
+            maxImpulse: 0.00005,
+            renderTicks: 10,
+        },
+
         sound: "retractor",
-        soundHit: "standard",
         renderers: [
             {
                 type: "swirl",
