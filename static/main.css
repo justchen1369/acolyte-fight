@@ -1281,6 +1281,10 @@ textarea.ai-js {
     color: #444;
 }
 
+.home .party-list .settings-icon {
+    margin-left: 0.25em;
+}
+
 .party-list .party-member {
     display: inline-block;
     background: #444;
