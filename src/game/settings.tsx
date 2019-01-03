@@ -812,7 +812,7 @@ const saber: Spell = {
     maxSpeed: 1.0,
 
     width: Pixel,
-    length: 0.1,
+    length: 0.075,
 
     movementProportionWhileChannelling: 0.5,
     interruptible: true,
