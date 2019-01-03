@@ -28,8 +28,9 @@ class SpellConfig extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const keys = this.props.settings.Choices.Keys.filter(x => !!x).map(x => x.btn);
         return <div className="spell-config">
-            {Object.keys(this.props.settings.Choices.Options).map(key => <SpellBtnConfig key={key} btn={key} rebinding={true} settings={this.props.settings} />)}
+            {keys.map(key => <SpellBtnConfig key={key} btn={key} rebinding={true} settings={this.props.settings} />)}
         </div>;
     }
 }
