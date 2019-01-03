@@ -555,7 +555,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		if (ctxStack.rtx) {
 			const gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
 			gradient.addColorStop(0, fillColor);
-			gradient.addColorStop(1, Color(fillColor).darken(0.3).string());
+			gradient.addColorStop(1, Color(fillColor).darken(0.2).string());
 			ctx.fillStyle = gradient;
 		} else {
 			ctx.fillStyle = fillColor;
