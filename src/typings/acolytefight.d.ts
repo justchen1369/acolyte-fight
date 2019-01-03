@@ -18,6 +18,7 @@ Collision category flags (categories, expireOn and collideWith):
 * Obstacle = 0x8
 * Shield = 0x10
 * Solid = 0x20 // all projectiles except Fireball are solid
+* Destructible = 0x40 // will be hit by detonate, e.g. energy mines
 * None = 0
 
 */
@@ -228,7 +229,6 @@ declare interface ProjectileTemplate extends DamagePacket {
 	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
-	detonatable?: boolean; // Whether to expire the projectile if it is caught within a detonation
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
 	renderers: RenderParams[]; // Which render function to use
@@ -347,17 +347,6 @@ declare interface RenderReticule extends RenderParamsBase {
 	radius: number;
 }
 
-declare interface SaberSpell extends SpellBase {
-	action: "saber";
-
-	takeOwnership: boolean;
-	revsToImpulseMultiplier: number;
-	length: number;
-
-	ticks: number;
-	trailTicks: number;
-}
-
 declare interface ScourgeSpell extends SpellBase {
     action: "scourge";
 
@@ -394,6 +383,23 @@ declare interface WallSpell extends ShieldSpell {
 
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
+}
+
+declare interface SaberSpell extends ShieldSpell {
+	action: "saber";
+
+	revsForMaxImpulse: number; // Proportion of a a full circle that the player must swing to create maximum impulse
+	maxImpulse: number;
+
+	length: number;
+	width: number;
+
+	maxTicks: number;
+
+	categories: number;
+	collidesWith: number;
+
+	trailTicks: number;
 }
 
 declare interface DashSpell extends SpellBase {

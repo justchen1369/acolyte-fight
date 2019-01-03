@@ -768,6 +768,7 @@ const mines: Spell = {
         maxTicks: 7.5 * TicksPerSecond,
         damage: 0,
 
+        categories: Categories.Projectile | Categories.Solid | Categories.Destructible,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
         expireOn: Categories.All,
 
@@ -778,7 +779,6 @@ const mines: Spell = {
             maxImpulse: 0.0001,
             renderTicks: 15,
         },
-        detonatable: true,
         shieldTakesOwnership: false,
 
         damageScaling: false,
@@ -806,19 +806,28 @@ const saber: Spell = {
     name: 'Lightsaber',
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
 
-	takeOwnership: false,
-	revsToImpulseMultiplier: 0.0001,
+    takesOwnership: false,
+    blocksTeleporters: false,
+    revsForMaxImpulse: 0.5,
+    maxImpulse: 0.0005,
+
+    width: Pixel,
     length: 0.1,
+
     movementProportionWhileChannelling: 0.1,
     interruptible: true,
 
-    cooldown: 2 * TicksPerSecond,
+    cooldown: 1 * TicksPerSecond,
 
     icon: "deadlyStrike",
 
-    ticks: 1 * TicksPerSecond,
+    maxTicks: 1 * TicksPerSecond,
+
+    categories: Categories.Shield,
+    collidesWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
+
     trailTicks: 30,
-    color: '#ffcc00',
+    color: '#00ccff',
 
     sound: "scourge",
     action: "saber",

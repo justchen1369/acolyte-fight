@@ -342,7 +342,6 @@ export interface Hero extends WorldObjectBase {
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
-	saber?: SaberState;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
@@ -383,7 +382,26 @@ export interface Wall extends ShieldBase {
 	points: pl.Vec2[];
 }
 
-export type Shield = Reflect | Wall;
+export interface Saber extends ShieldBase {
+	type: "saber";
+
+	spellId: string;
+
+	angle: number;
+	length: number;
+	width: number;
+
+	points: pl.Vec2[];
+
+	revsForMaxImpulse: number;
+	maxImpulse: number;
+
+	trailTicks: number;
+	uiPreviousAngle: number;
+}
+
+
+export type Shield = Reflect | Wall | Saber;
 
 export interface CastState {
 	action: Action;
@@ -429,17 +447,6 @@ export interface GravityState {
 	power: number;
 }
 
-export interface SaberState {
-	spellId: string;
-	angle: number;
-	length: number;
-	revsToImpulseMultiplier: number;
-	takesOwnership: boolean;
-	trailTicks: number;
-
-	uiPreviousAngle: number; // Oldest first, not guaranteed to be synced across clients
-}
-
 export interface Cooldowns {
 	[spellId: string]: number;
 }
@@ -475,7 +482,6 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	minTicks: number;
 	maxTicks: number;
 	expireOn: number;
-	detonatable?: boolean;
 
 	renderers: RenderParams[];
 	sound?: string;
@@ -571,7 +577,7 @@ export interface ThrustDecayBehaviour extends BehaviourBase {
 
 export interface SaberBehaviour extends BehaviourBase {
 	type: "saberSwing";
-	heroId: string;
+	shieldId: string;
 }
 
 export type WorldObject =
