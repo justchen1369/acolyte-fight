@@ -467,7 +467,10 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
 	}
 
-	world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
+	if (!projectileTemplate.selfPassthrough) {
+		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
+	}
+
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
