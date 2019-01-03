@@ -666,5 +666,6 @@ export interface ArcTrail extends TrailBase {
 export interface AudioElement {
     id: string;
     sound: string;
-    pos: pl.Vec2;
+	pos: pl.Vec2;
+	intensity?: number;
 }

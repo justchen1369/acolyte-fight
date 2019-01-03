@@ -693,6 +693,57 @@ export const Sounds: Sounds = {
             }
         ],
     },
+    "saber": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 5,
+                "attack": 0.15,
+                "decay": 0.5,
+                "startFreq": 15.3,
+                "stopFreq": 15.3,
+                "modStartFreq": 5,
+                "modStopFreq": 4,
+                "modStartStrength": 1,
+                "modStopStrength": 1,
+                "lowPass": 100,
+                "highPass": 40,
+                "tremoloFreq": 7,
+                "tremoloStrength": 0.2,
+                "wave": "square",
+                "ratios": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                ]
+            }
+        ]
+    },
+    "saber-hit": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "volume": 0.5,
+                "stopTime": 0.5,
+                "attack": 0.1,
+                "decay": 0.4,
+                "startFreq": 100,
+                "stopFreq": 100,
+                "lowPass": 100,
+                "highPass": 40,
+                "modStartFreq": 200,
+                "modStopFreq": 200,
+                "modStartStrength": 100,
+                "modStopStrength": 100,
+                "wave": "sine",
+                "ratios": [
+                    1
+                ]
+            }
+        ]
+    },
     "whip": {
         "start": [
             {

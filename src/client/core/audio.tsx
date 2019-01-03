@@ -23,6 +23,7 @@ class AudioSource {
     id: string;
     private sound: Sound;
 
+    private intensity = 1;
     private repeatWhen = 0;
     private following = new Array<AudioRef>();
 
@@ -58,19 +59,33 @@ class AudioSource {
         this.following = keep;
     }
 
-    stop() {
-        const t = env.ctx.currentTime;
+    intensify(intensity: number) {
+        if (intensity > this.intensity) {
+            this.intensity = intensity;
+        } else {
+            const alpha = (this.sound.intensityUpdateFactor || 0.01);
+            this.intensity = intensity * alpha + this.intensity * (1 - alpha);
+        }
+        this.changeVolume(this.intensity, this.sound.intensityDelay || 0.05);
+    }
 
+    stop() {
         // Stop sounds
         const cutoffEarly = this.sound.cutoffEarly === undefined ? true : this.sound.cutoffEarly;
         if (cutoffEarly) {
-            const decay = this.sound.cutoffSeconds || 0.05;
-            for (const follow of this.following) {
-                const current = follow.volume.gain.value;
-                follow.volume.gain.cancelScheduledValues(t);
-                follow.volume.gain.setValueAtTime(current, t);
-                follow.volume.gain.linearRampToValueAtTime(0, t + decay);
-            }
+            this.changeVolume(0, this.sound.cutoffSeconds);
+        }
+    }
+
+    private changeVolume(newVolume: number, delay: number = 0.05) {
+        delay = delay || 0.05;
+
+        const t = env.ctx.currentTime;
+        for (const follow of this.following) {
+            const current = follow.volume.gain.value;
+            follow.volume.gain.cancelScheduledValues(t);
+            follow.volume.gain.setValueAtTime(current, t);
+            follow.volume.gain.linearRampToValueAtTime(newVolume, t + delay);
         }
     }
 
@@ -141,6 +156,10 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
             source.sustain(elem.pos);
             keep.set(source.id, source);
         }
+
+        if (source && elem.intensity !== undefined) {
+            source.intensify(elem.intensity);
+        }
     }
 
     // Stop expired sound sources
@@ -173,7 +192,8 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): Au
     let next: AudioNode = env.next;
 
     const panner = next = createPannerNode(pos, env, next);
-    const volume = next = createAttackDecayNode(bite, env, next);
+    const volume = next = createVolumeNode(env, next);
+    next = createAttackDecayNode(bite, env, next);
     next = createTremoloNode(bite, env, next);
     next = createHighPassNode(bite, env, next);
     next = createLowPassNode(bite, env, next);
@@ -195,6 +215,14 @@ function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, next: AudioNode) 
     pan.setOrientation(0, 0, 1);
     pan.connect(next);
     return pan;
+}
+
+function createVolumeNode(env: AudioEnvironment, next: AudioNode) {
+	const volume = env.ctx.createGain();
+	volume.gain.setValueAtTime(1, env.ctx.currentTime);
+
+	volume.connect(next);
+    return volume;
 }
 
 function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {

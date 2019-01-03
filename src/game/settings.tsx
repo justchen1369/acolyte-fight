@@ -829,7 +829,7 @@ const saber: Spell = {
     trailTicks: 5,
     color: '#00ccff',
 
-    sound: "scourge",
+    sound: "saber",
     action: "saber",
 };
 

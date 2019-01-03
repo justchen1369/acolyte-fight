@@ -801,7 +801,6 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
 	const newAngle = saber.body.getAngle();
 
-	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
 	world.ui.trails.push({
@@ -818,6 +817,17 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 	});
 
 	saber.uiPreviousAngle = newAngle;
+
+	if (saber.sound) {
+		const intensity = Math.min(1, 10 * Math.abs(vector.angleDelta(previousAngle, newAngle)) / (2 * Math.PI));
+		const tip = vector.multiply(vector.fromAngle(newAngle), saber.length);
+		world.ui.sounds.push({
+			id: saber.id,
+			sound: saber.sound,
+			pos: tip,
+			intensity,
+		});
+	}
 }
 
 function playShieldSounds(obj: w.Shield, world: w.World) {

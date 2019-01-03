@@ -2187,6 +2187,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const swingVelocity = vector.truncate(vector.multiply(vector.diff(newTip, previousTip), TicksPerSecond * saber.speedMultiplier), saber.maxSpeed);
 	const swingSpeed = vector.length(swingVelocity);
 
+	let hit = false
 	world.objects.forEach(obj => {
 		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && obj.detonatable))) {
 			return;
@@ -2222,7 +2223,13 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 				obj.expireTick = world.tick;
 			}
 		}
+
+		hit = true;
 	});
+
+	if (hit) {
+		saber.hitTick = world.tick;
+	}
 
 	saber.body.setPosition(vector.clone(heroPos));
 	saber.body.setAngle(newAngle);

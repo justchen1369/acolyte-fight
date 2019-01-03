@@ -470,11 +470,15 @@ interface Sounds {
 
 interface Sound {
 	start?: SoundBite[];
-
 	sustain?: SoundBite[];
+
 	repeatIntervalSeconds?: number;
 	cutoffSeconds?: number; // If this sound is stopped early, ramp volume to zero over this many seconds
 	cutoffEarly?: boolean; // Whether to cutoff the sound early if the action is cancelled (e.g. if the spell stops charging). Defaults to true.
+
+	intensityUpdateFactor?: number; // The rate at which the volume is adjusted to match intensity
+	intensityDelay?: number; // The speed at which the volume changes to the new intensity
+
 }
 
 interface SoundBite {
