@@ -125,6 +125,8 @@ async function start() {
             alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
 
             await sockets.connectToServer(query.server)
+            pages.changePage(query.page, query.profileId);
+
             if (query.party) {
                 await parties.joinPartyAsync(query.party);
             } else {
@@ -141,8 +143,8 @@ async function start() {
                     await matches.joinNewGame({ observeGameId: query.gameId });
                 } else if (query.hash === "#watch" || query.page === "watch") {
                     await matches.watchLiveGame();
-                } else {
-                    pages.go(query);
+                } else if (query.gameId) {
+                    matches.joinNewGame({ observeGameId: query.gameId });
                 }
             } catch(error) {
                 console.error(error)
