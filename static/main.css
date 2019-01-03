@@ -842,7 +842,7 @@ h2 {
     display: flex;
     margin-bottom: 30px;
     background: #333;
-    height: 200px;
+    height: 250px;
     align-items: center;
 
     box-shadow: 5px 5px 5px black;
@@ -931,7 +931,6 @@ h2 {
 
 .spell-config .key-options {
     margin-left: 20px;
-    max-height: 200px;
 
     flex-grow: 0;
     flex-shrink: 0;
