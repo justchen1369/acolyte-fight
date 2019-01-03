@@ -266,7 +266,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
-		growthTicks: 0,
+		growthTicks: 5,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,

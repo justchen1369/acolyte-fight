@@ -754,19 +754,21 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	}
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
+	foreground(ctxStack, ctx => {
+		if (world.tick - shield.createTick < shield.growthTicks) {
+			const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
+			ctx.scale(growthProportion, growthProportion);
+		}
+	});
+
 	if (shield.type === "saber") {
-		// Do this before we apply the angle transformation
+		// Do this before we apply the angle transformation because it's easier
 		renderSaberTrail(ctxStack, shield);
 	}
 
 	foreground(ctxStack, ctx => ctx.rotate(angle));
 
 	foreground(ctxStack, ctx => {
-		if (world.tick - shield.createTick < shield.growthTicks) {
-			const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
-			ctx.scale(growthProportion, growthProportion);
-		}
-
 		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
 		ctx.fillStyle = color;
 		ctx.lineWidth = Pixel * 3;
