@@ -787,7 +787,7 @@ const mines: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 4 },
+                trigger: { afterTicks: 6 },
                 newSpeed: 0,
                 redirect: true,
             },
@@ -814,7 +814,7 @@ const saber: Spell = {
     width: Pixel,
     length: 0.1,
 
-    movementProportionWhileChannelling: 0.1,
+    movementProportionWhileChannelling: 0.5,
     interruptible: true,
 
     cooldown: 20 * TicksPerSecond,
