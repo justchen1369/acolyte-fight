@@ -534,7 +534,7 @@ const whip: Spell = {
                 loopTicks: 15,
                 glow: false,
             },
-            { type: "link", color: '#fffcb1', width: Pixel * 5 },
+            { type: "link", color: '#fffcb1', width: Pixel * 5, glow: true },
         ],
     },
 };
@@ -986,7 +986,7 @@ const swap: Spell = {
                 loopTicks: 15,
                 glow: false,
             },
-            { type: "link", color: '#75e7ff', width: Pixel * 5 },
+            { type: "link", color: '#75e7ff', width: Pixel * 5, glow: true },
         ],
     },
 };
