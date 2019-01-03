@@ -46,26 +46,22 @@ const Obstacle: ObstacleSettings = {
 
 const Choices: ChoiceSettings = {
 	Keys: [
-        { btn: "a", weight: 0.5 },
-        { btn: "s", weight: 0.75 },
+        { btn: "a", weight: 0.75 },
         null,
         { btn: "q", weight: 1 },
         { btn: "w", weight: 1 },
         { btn: "e", weight: 1 },
         { btn: "r", weight: 1 },
 		null,
-        { btn: "d", weight: 0.75 },
-        { btn: "f", weight: 0.5 },
+        { btn: "f", weight: 0.75 },
     ],
 	Options: {
 		"a": ["thrust", "teleport", "swap"],
-		"s": ["shield", "icewall", "drain", "saber"],
 		"q": ["fireball", "flamestrike", "triplet"],
-		"w": ["gravity", "link", "lightning"],
-		"e": ["homing", "boomerang", "retractor"],
-		"r": ["kamehameha", "meteor", "supernova"],
-		"d": ["firespray", "bouncer", "whip"],
-		"f": ["scourge", "mines"],
+		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
+		"e": ["shield", "icewall", "drain", "saber", "meteor"],
+		"r": ["kamehameha", "bouncer", "retractor", "supernova"],
+		"f": ["scourge", "firespray", "mines", "whip"],
 	},
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,
