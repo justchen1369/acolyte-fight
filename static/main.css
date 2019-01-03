@@ -1405,6 +1405,10 @@ textarea.ai-js {
     min-height: 20em;
 }
 
+.mod-readonly .code-area {
+    min-height: 20em;
+}
+
 .code-area {
     display: flex;
     flex-direction: column;

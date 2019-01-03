@@ -2,6 +2,7 @@ import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
+import CodeEditor from './codeEditor';
 import ModBar from './modBar';
 import NavBar from '../nav/navbar';
 
@@ -57,12 +58,12 @@ class EditorPage extends React.PureComponent<Props, State> {
     private renderReadonly() {
         return <div className="content-container">
             <NavBar />
-            <div className="page">
+            <div className="page mod-readonly">
                 <h1>Modding</h1>
                 <p>Modding allows you to change the rules of the game.</p>
                 {Object.keys(this.props.mod).length > 0 && <p>
                     Currently, the following modifications will affect your games:
-                    <textarea className="mod-json">{JSON.stringify(this.props.mod, null, "\t")}</textarea>
+                    <CodeEditor code={JSON.stringify(this.props.mod, null, "\t")} />
                 </p>}
                 <p>Only the party leader can change the mod.</p>
             </div>

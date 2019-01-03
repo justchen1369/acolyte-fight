@@ -3,7 +3,7 @@ import CodeFlask from 'codeflask';
 
 interface Props {
     code: string;
-    onChange: (code: string) => void;
+    onChange?: (code: string) => void;
 }
 
 export class CodeEditor extends React.PureComponent<Props> {
@@ -39,9 +39,10 @@ export class CodeEditor extends React.PureComponent<Props> {
         if (this.el) {
             this.editor = new CodeFlask(this.el, {
                 language: "javascript",
+                readonly: !this.props.onChange,
             });
             this.editor.updateCode(this.code);
-            this.editor.onUpdate(code => this.onChange(code));
+            this.editor.onUpdate(code => this.onChange && this.onChange(code));
         }
     }
 
