@@ -300,7 +300,7 @@ const kamehameha: Spell = {
     icon: "glowingHands",
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
-    chargeTicks: 0.5 * TicksPerSecond,
+    chargeTicks: 0.625 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
@@ -811,7 +811,7 @@ const saber: Spell = {
     takesOwnership: true,
     blocksTeleporters: false,
     speedMultiplier: 1.25,
-    maxSpeed: 1.0,
+    maxSpeed: 0.75,
 
     width: Pixel,
     length: 0.075,
@@ -823,7 +823,7 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 2.5 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
