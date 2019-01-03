@@ -58,10 +58,8 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
                 return this.renderMobileHint(this.props.hoverBtn, this.props.hoverSpellId);
             } else if (!isMobile && this.props.hoverBtn) {
                 return this.renderDesktopHint();
-            } else if (this.props.gameStarted) {
-                return this.renderChangeSpellHint();
             } else {
-                return null;
+                return this.renderChangeSpellHint();
             }
         } else {
             return null;
