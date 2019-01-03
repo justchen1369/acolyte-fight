@@ -274,7 +274,6 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		color: spell.color,
 
 		spellId: spell.id,
-		angle,
 		width: spell.width,
 		length: spell.length,
 		speedMultiplier: spell.speedMultiplier,
@@ -2170,7 +2169,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 	const heroPos = hero.body.getPosition();
 
-	const previousAngle = saber.angle;
+	const previousAngle = saber.body.getAngle();
 	const newAngle = vector.angle(vector.diff(hero.target, heroPos));
 	if (previousAngle === newAngle) {
 		return true; // Nothing to do
@@ -2223,7 +2222,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	});
 
 	saber.body.setPosition(vector.clone(heroPos));
-	saber.angle = newAngle;
+	saber.body.setAngle(newAngle);
 
 	return true;
 }

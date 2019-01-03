@@ -389,7 +389,7 @@ declare interface SaberSpell extends ShieldSpell {
 	action: "saber";
 
 	speedMultiplier: number; // Accelerate object to the speed of the swing multiplied by this factor
-	maxSpeed: number; // The maximum speed the saber can accelerate another object to
+	maxSpeed: number; // The maximum speed the saber can accelerate an object to
 
 	length: number;
 	width: number;

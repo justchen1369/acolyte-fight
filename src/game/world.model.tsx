@@ -387,7 +387,6 @@ export interface Saber extends ShieldBase {
 
 	spellId: string;
 
-	angle: number;
 	length: number;
 	width: number;
 

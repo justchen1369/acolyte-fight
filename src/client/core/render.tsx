@@ -730,19 +730,28 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 	foreground(ctxStack, ctx => ctx.save());
 
-	let body: pl.Body;
-	if (shield.type === "reflect" || shield.type === "saber") {
+	let pos: pl.Vec2;
+	let angle: number;
+	if (shield.type === "reflect") {
 		const hero = world.objects.get(shield.owner);
 		if (!hero) {
 			return;
 		}
-		body = hero.body;
+		pos = hero.body.getPosition();
+		angle = hero.body.getAngle();
 	} else if (shield.type === "wall") {
-		body = shield.body;
+		pos = shield.body.getPosition();
+		angle = shield.body.getAngle();
+	} else if (shield.type === "saber") {
+		const hero = world.objects.get(shield.owner);
+		if (!hero) {
+			return;
+		}
+		pos = hero.body.getPosition();
+		angle = shield.body.getAngle();
 	} else {
 		return;
 	}
-	const pos = body.getPosition();
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
 	if (shield.type === "saber") {
@@ -750,7 +759,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		renderSaberTrail(ctxStack, shield);
 	}
 
-	foreground(ctxStack, ctx => ctx.rotate(body.getAngle()));
+	foreground(ctxStack, ctx => ctx.rotate(angle));
 
 	foreground(ctxStack, ctx => {
 		if (world.tick - shield.createTick < shield.growthTicks) {
@@ -787,8 +796,8 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 }
 
 function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber) {
-	const previousAngle = saber.uiPreviousAngle || saber.angle;
-	const newAngle = saber.angle;
+	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
+	const newAngle = saber.body.getAngle();
 
 	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
 
@@ -808,7 +817,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber) {
 		ctx.fill();
 	});
 
-	saber.uiPreviousAngle = saber.angle;
+	saber.uiPreviousAngle = newAngle;
 }
 
 function playShieldSounds(obj: w.Shield, world: w.World) {
