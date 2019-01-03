@@ -155,7 +155,7 @@ a:hover, a:active {
     box-shadow: 3px 3px 3px #0c0c0c;
     text-shadow: 1px 1px 1px black;
     border-radius: 3px;
-    background: #00ccff;
+    background: linear-gradient(to bottom, #00ccff, #00ccff 95%, #0088bb 95%, #0088bb);
     padding: 10px 40px;
 }
 
