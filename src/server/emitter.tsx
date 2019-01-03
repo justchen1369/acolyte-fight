@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import uniqid from 'uniqid';
@@ -246,12 +247,12 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		return;
 	}
 
-	const newStatus: Partial<g.PartyStatus> = {
+	const newStatus: Partial<g.PartyStatus> = _.omitBy({
 		roomId: data.roomId,
 		isPrivate: data.isPrivate,
 		isLocked: data.isLocked,
 		initialObserver: data.initialObserver,
-	};
+	}, x => x === undefined);
 	parties.updatePartyStatus(party, newStatus);
 
 	const result: m.PartySettingsResponseMsg = {
