@@ -768,9 +768,9 @@ const mines: Spell = {
         maxTicks: 7.5 * TicksPerSecond,
         damage: 0,
 
-        categories: Categories.Projectile | Categories.Solid | Categories.Destructible,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
         expireOn: Categories.All,
+        detonatable: true,
 
         detonate: {
             damage: 2.5,

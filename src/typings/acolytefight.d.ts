@@ -17,8 +17,7 @@ Collision category flags (categories, expireOn and collideWith):
 * Massive = 0x4
 * Obstacle = 0x8
 * Shield = 0x10
-* Solid = 0x20 // all projectiles except Fireball are solid
-* Destructible = 0x40 // will be hit by detonate, e.g. energy mines
+* Blocker = 0x20 // all projectiles except Fireball/Fireboom are solid
 * None = 0
 
 */
@@ -228,6 +227,7 @@ declare interface ProjectileTemplate extends DamagePacket {
 	categories?: number; // Collision flags: What flags this object has
 	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
+	detonatable?: boolean; // Whether this projectile is destroyed by a detonate (like a Supernova)
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 

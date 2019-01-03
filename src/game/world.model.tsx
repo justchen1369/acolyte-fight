@@ -482,6 +482,7 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	minTicks: number;
 	maxTicks: number;
 	expireOn: number;
+	detonatable?: boolean;
 
 	renderers: RenderParams[];
 	sound?: string;

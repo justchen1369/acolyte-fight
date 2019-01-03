@@ -388,7 +388,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
-	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Solid) : projectileTemplate.categories;
+	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
 	let body = world.physics.createBody({
@@ -446,6 +446,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
+		detonatable: projectileTemplate.detonatable,
 
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
@@ -1721,7 +1722,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				applyDamageToObstacle(other, packet, world);
 			}
 		} else if (other.category === "projectile") {
-			if ((other.categories & Categories.Destructible) > 0) {
+			if (other.detonatable) {
 				other.expireTick = world.tick;
 			}
 		}
@@ -2218,7 +2219,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 				}
 			}
 
-			if ((obj.categories & Categories.Destructible) > 0) {
+			if (obj.detonatable) {
 				obj.expireTick = world.tick;
 			}
 		} else {
