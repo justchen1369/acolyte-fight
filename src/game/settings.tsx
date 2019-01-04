@@ -454,7 +454,7 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         density: 10,
-        radius: 0.005,
+        radius: 0.0075,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
         collideWith: Categories.All,
@@ -462,7 +462,7 @@ const retractor: Spell = {
 
         partialDamage: {
             initialMultiplier: 0.1,
-            ticks: 2 * TicksPerSecond,
+            ticks: 3 * TicksPerSecond,
         },
 
         detonate: {
