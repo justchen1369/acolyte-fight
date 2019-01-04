@@ -500,7 +500,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 7,
+    chargeTicks: 15,
     cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
@@ -1046,7 +1046,7 @@ const voidRush: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
 
     buffs: [
         {
