@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
+import msgpackParser from 'socket.io-msgpack-parser';
 import uniqid from 'uniqid';
 import * as auth from './auth';
 import * as segments from './segments';
@@ -101,14 +102,16 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 		callback({ success: true, server: location.server, region: location.region, socketId: socket.id });
 	} else {
 		const server = sanitizeHostname(data.server);
-		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, {
+		const config: SocketIOClient.ConnectOpts  = {
 			forceNew: true,
 			transportOptions: {
 				polling: {
 					extraHeaders: { [m.AuthHeader]: authToken }
 				}
 			},
-		});
+		};
+		(config as any).parser = msgpackParser;
+		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, config);
 
 		let attached = false;
 		upstream.on('connect', () => {
