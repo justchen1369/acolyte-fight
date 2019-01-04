@@ -516,8 +516,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 5,
-            lifeSteal: 1,
+            damage: 7.5,
+            lifeSteal: 0.5,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
