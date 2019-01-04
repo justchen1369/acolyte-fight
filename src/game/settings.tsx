@@ -516,8 +516,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 10,
-            lifeSteal: 0.25,
+            damage: 5,
+            lifeSteal: 1,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
@@ -1054,7 +1054,7 @@ const voidRush: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     buffs: [
         {
@@ -1071,7 +1071,7 @@ const voidRush: Spell = {
     ],
 
     icon: "sprint",
-    color: '#ff00ff',
+    color: '#8800ff',
     action: "buff",
 };
 
