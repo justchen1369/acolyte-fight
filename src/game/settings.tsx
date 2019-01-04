@@ -921,8 +921,7 @@ const teleport: Spell = {
 
     range: 0.25,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 12 * TicksPerSecond,
-    chargeTicks: 6,
+    cooldown: 10 * TicksPerSecond,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
 
@@ -961,7 +960,7 @@ const swap: Spell = {
     icon: "bodySwapping",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
 
     projectile: {
         density: 0.001,
