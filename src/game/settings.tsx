@@ -609,7 +609,6 @@ const bouncer: Spell = {
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
         bounce: {
-            damageFactor: 1,
         },
 
         sound: "bouncer",
@@ -791,7 +790,6 @@ const halo: Spell = {
         ],
 
         bounce: {
-            damageFactor: 1,
         },
 
         sound: "halo",

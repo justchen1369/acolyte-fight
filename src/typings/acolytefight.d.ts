@@ -263,7 +263,6 @@ declare interface GravityParameters {
 }
 
 declare interface BounceParameters {
-    damageFactor: number; // Used to decay the bouncer from repeated hits. 0.9 means it loses 10% damage each time.
 }
 
 declare type BehaviourTemplate =

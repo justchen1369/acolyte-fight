@@ -1469,11 +1469,6 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 		return;
 	}
 
-	// Decay damage whenever hitting something
-	if (hitId !== projectile.owner) {
-		projectile.damageTemplate.damage *= projectile.bounce.damageFactor || 1.0;
-	}
-
 	// Always bounce between owner and another target
 	let nextTarget: w.WorldObject =
 		hitId === projectile.owner
