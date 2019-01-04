@@ -361,6 +361,7 @@ function addHero(world: w.World, heroId: string) {
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
+	world.behaviours.push({ type: "expireOnHeroHit", heroId: hero.id });
 
 	return hero;
 }
@@ -483,6 +484,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	}
 
+	world.behaviours.push();
+
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
@@ -576,6 +579,7 @@ export function tick(world: w.World) {
 		removePassthrough,
 		thrustDecay,
 		expireBuffs,
+		expireOnHeroHit,
 	});
 
 	applyLavaDamage(world);
@@ -1709,6 +1713,28 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
 		}
 	});
+
+	return true;
+}
+
+function expireOnHeroHit(behaviour: w.ExpireOnHeroHitBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	if ((hero.damagedTick || 0) > (behaviour.lastHitTick || 0)) {
+		behaviour.lastHitTick = hero.damagedTick;
+
+		for (const projectileId of hero.strafeIds) {
+			const projectile = world.objects.get(projectileId);
+			if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
+				projectile.expireTick = world.tick;
+
+				break; // Only expire one
+			}
+		}
+	}
 
 	return true;
 }

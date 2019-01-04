@@ -512,7 +512,7 @@ const whip: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.None,
-        strafe: true,
+        strafe: {},
         shieldTakesOwnership: false,
 
         detonate: {
@@ -556,7 +556,7 @@ const link: Spell = {
         density: 1,
         radius: 0.005,
         speed: 0.25,
-        strafe: true,
+        strafe: {},
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
@@ -753,7 +753,7 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Build up to 3 charges of your halo, then touch your enemy to burn them. Watch out, your charges are easily destroyed by explosions, so keep dodging!",
+    description: "Build up to 3 charges of your halo, then touch your enemy to burn them. Watch out, you lose a charge every time you are hit, so keep dodging!",
     action: "projectile",
 
     color: '#ffe33b',
@@ -772,7 +772,7 @@ const halo: Spell = {
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
         shieldTakesOwnership: true,
-        strafe: true,
+        strafe: { expireOnHeroHit: true },
         damageScaling: false,
         destructible: {
             detonate: true,

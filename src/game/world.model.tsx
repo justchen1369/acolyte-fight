@@ -485,7 +485,7 @@ export interface Projectile extends WorldObjectBase {
 	hit?: number;
 	speed: number;
 	fixedSpeed: boolean;
-	strafe?: boolean;
+	strafe?: StrafeParameters;
 
 	target: pl.Vec2;
 	targetId: string | null;
@@ -542,6 +542,7 @@ export type Behaviour =
 	| ThrustDecayBehaviour
 	| SaberBehaviour
 	| ExpireBuffsBehaviour
+	| ExpireOnHeroHitBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -616,6 +617,12 @@ export interface SaberBehaviour extends BehaviourBase {
 export interface ExpireBuffsBehaviour extends BehaviourBase {
 	type: "expireBuffs";
 	heroId: string;
+}
+
+export interface ExpireOnHeroHitBehaviour extends BehaviourBase {
+	type: "expireOnHeroHit";
+	heroId: string;
+	lastHitTick?: number;
 }
 
 export type WorldObject =

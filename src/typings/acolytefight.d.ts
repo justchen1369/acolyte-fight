@@ -218,7 +218,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
     radius: number;
 	speed: number;
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
-	strafe?: boolean; // if true, the projectile will move with the hero's movement
+	strafe?: StrafeParameters; // if true, the projectile will move with the hero's movement
 	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number
 
     bounce?: BounceParameters;
@@ -243,6 +243,10 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
+}
+
+declare interface StrafeParameters {
+	expireOnHeroHit?: boolean; // Whether to lose one of thse projectiles every time the hero is hit
 }
 
 declare interface DestructibleParameters {
