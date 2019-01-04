@@ -281,6 +281,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		spellId: spell.id,
 		width: spell.width,
 		length: spell.length,
+		shiftMultiplier: spell.shiftMultiplier,
 		speedMultiplier: spell.speedMultiplier,
 		maxSpeed: spell.maxSpeed,
 		trailTicks: spell.trailTicks,
@@ -2234,8 +2235,11 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
 	const newTip = vector.multiply(vector.fromAngle(newAngle), saber.length);
 
-	const swingVelocity = vector.truncate(vector.multiply(vector.diff(newTip, previousTip), TicksPerSecond * saber.speedMultiplier), saber.maxSpeed);
+	const swing = vector.diff(newTip, previousTip);
+	const swingVelocity = vector.truncate(vector.multiply(swing, TicksPerSecond * saber.speedMultiplier), saber.maxSpeed);
 	const swingSpeed = vector.length(swingVelocity);
+
+	const shift = vector.multiply(swing, Math.max(0, saber.shiftMultiplier));
 
 	let hit = false
 	world.objects.forEach(obj => {
@@ -2256,6 +2260,8 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		if (!(insidePrevious && insideNew)) {
 			return;
 		}
+
+		obj.body.setPosition(vector.plus(obj.body.getPosition(), shift));
 
 		const currentSpeed = vector.length(obj.body.getLinearVelocity());
 		if (currentSpeed < swingSpeed) {

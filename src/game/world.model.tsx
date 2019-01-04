@@ -394,6 +394,7 @@ export interface Saber extends ShieldBase {
 
 	points: pl.Vec2[];
 
+	shiftMultiplier: number;
 	speedMultiplier: number;
 	maxSpeed: number;
 
