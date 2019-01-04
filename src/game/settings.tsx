@@ -57,10 +57,10 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		"a": ["thrust", "teleport", "swap", "voidRush"],
-		"q": ["fireball", "flamestrike", "triplet", "whip"],
+		"q": ["fireball", "flamestrike", "triplet", "retractor", "whip"],
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
 		"e": ["shield", "icewall", "drain", "saber", "meteor"],
-		"r": ["kamehameha", "bouncer", "retractor", "supernova"],
+		"r": ["kamehameha", "bouncer", "supernova"],
 		"f": ["scourge", "firespray", "mines", "halo"],
 	},
     Special: {
@@ -439,7 +439,7 @@ const retractor: Spell = {
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 3 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -454,19 +454,19 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         density: 10,
-        radius: 0.0075,
+        radius: 0.007,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         partialDamage: {
-            initialMultiplier: 0.1,
+            initialMultiplier: 0.01,
             ticks: 3 * TicksPerSecond,
         },
 
         detonate: {
-            damage: 30,
+            damage: 20,
             radius: 0.025,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
