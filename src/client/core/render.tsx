@@ -427,11 +427,11 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.fillStyle = color;
 	ctx.strokeStyle = Color(color).lighten(0.3).string();
 
-	let radius = world.radius;
+	let radius = world.radius * world.mapRadiusMultiplier;
 	if (isEdge) {
 		// Edge has a weird oscillation of Y-axis scaling for certain fractions of radius.
 		// Force it to draw perfect circles by snapping to a minimum precision.
-		radius = Math.floor(world.radius / Pixel) * Pixel;
+		radius = Math.floor(radius / Pixel) * Pixel;
 	}
 
 	ctx.scale(radius, radius);

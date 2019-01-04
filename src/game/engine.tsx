@@ -707,7 +707,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	
 	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? (1.0 + 1 / layout.numPoints) : 1.0);
 	if (radiusMultiplier) {
-		world.radius = World.InitialRadius * radiusMultiplier;
 		world.mapRadiusMultiplier = radiusMultiplier;
 	}
 
@@ -1872,9 +1871,10 @@ function isInsideMap(obj: w.WorldObject, world: w.World) {
 	const diff = vector.diff(obj.body.getPosition(), mapCenter);
 	const extent = getExtent(obj);
 
+	const polygonRadius = world.mapRadiusMultiplier * world.radius;
 	if (world.mapPoints) {
-		const scaledDiff = vector.multiply(diff, 1 / world.radius);
-		const scaledExtent = extent / world.radius;
+		const scaledDiff = vector.multiply(diff, 1 / polygonRadius);
+		const scaledExtent = extent / polygonRadius;
 		for (let i = 0; i < world.mapPoints.length; ++i) {
 			const a = world.mapPoints[i];
 			const b = world.mapPoints[(i + 1) % world.mapPoints.length];
@@ -1884,7 +1884,7 @@ function isInsideMap(obj: w.WorldObject, world: w.World) {
 		}
 		return true;
 	} else {
-		return vector.length(diff) < world.radius + extent;
+		return vector.length(diff) < polygonRadius + extent;
 	}
 
 	return true;
@@ -1895,7 +1895,7 @@ function shrink(world: w.World) {
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;
 		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
-		world.radius = World.InitialRadius * world.mapRadiusMultiplier * Math.pow(proportion, World.ShrinkPower);
+		world.radius = World.InitialRadius * Math.pow(proportion, World.ShrinkPower);
 	}
 }
 
