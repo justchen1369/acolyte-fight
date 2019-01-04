@@ -57,11 +57,11 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		"a": ["thrust", "teleport", "swap"],
-		"q": ["fireball", "flamestrike", "triplet"],
+		"q": ["fireball", "flamestrike", "triplet", "whip"],
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
 		"e": ["shield", "icewall", "drain", "saber", "meteor"],
 		"r": ["kamehameha", "bouncer", "retractor", "supernova"],
-		"f": ["scourge", "firespray", "mines", "whip"],
+		"f": ["scourge", "firespray", "mines"],
 	},
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,
@@ -501,7 +501,7 @@ const whip: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     chargeTicks: 15,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
         density: 2,
@@ -517,7 +517,6 @@ const whip: Spell = {
 
         detonate: {
             damage: 10,
-            outerDamage: 2.5,
             lifeSteal: 1.0,
             radius: 0.025,
             minImpulse: 0.0001,
