@@ -753,20 +753,20 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Cast this often to build up to 3 charges in your halo, then stand next to your enemy to burn them. Watch out, your charges are easily destroyed by explosions, so keep dodging!",
+    description: "Build up to 3 charges of your halo, then touch your enemy to burn them. Watch out, your charges are easily destroyed by explosions, so keep dodging!",
     action: "projectile",
 
     color: '#ffe33b',
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     projectile: {
         density: 1,
         radius: 0.002,
         speed: 0.3,
-        maxTicks: 20.0 * TicksPerSecond,
+        maxTicks: 40.0 * TicksPerSecond,
         damage: 4,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
