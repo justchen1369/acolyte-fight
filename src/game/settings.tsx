@@ -1007,7 +1007,7 @@ const swap: Spell = {
     icon: "bodySwapping",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     projectile: {
         density: 0.001,
