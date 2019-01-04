@@ -871,6 +871,7 @@ const saber: Spell = {
     shiftMultiplier: 0.25,
     speedMultiplier: 1.25,
     maxSpeed: 0.75,
+    maxTurnRatePerTickInRevs: 0.1,
 
     width: Pixel,
     length: 0.075,

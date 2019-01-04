@@ -396,6 +396,8 @@ export interface Saber extends ShieldBase {
 	speedMultiplier: number;
 	maxSpeed: number;
 
+	turnRate: number;
+
 	trailTicks: number;
 	uiPreviousAngle: number;
 }

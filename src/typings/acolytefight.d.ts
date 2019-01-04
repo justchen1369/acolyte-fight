@@ -440,6 +440,7 @@ declare interface SaberSpell extends ShieldSpell {
 	shiftMultiplier: number; // Move object by this proportion of the swing (ensures it doesn't get caught in the swing next tick and ends up sticking to the saber)
 	speedMultiplier: number; // Accelerate object to the speed of the swing multiplied by this factor
 	maxSpeed: number; // The maximum speed the saber can accelerate an object to
+	maxTurnRatePerTickInRevs: number; // THe maximum speed the saber can be swung
 
 	length: number;
 	width: number;

@@ -284,6 +284,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		shiftMultiplier: spell.shiftMultiplier,
 		speedMultiplier: spell.speedMultiplier,
 		maxSpeed: spell.maxSpeed,
+		turnRate: spell.maxTurnRatePerTickInRevs * (2 * Math.PI),
 		trailTicks: spell.trailTicks,
 		uiPreviousAngle: null,
 	};
@@ -2298,7 +2299,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const heroPos = hero.body.getPosition();
 
 	const previousAngle = saber.body.getAngle();
-	const newAngle = vector.angle(vector.diff(hero.target, heroPos));
+	const newAngle = vector.turnTowards(previousAngle, vector.angle(vector.diff(hero.target, heroPos)), saber.turnRate);
 	if (previousAngle === newAngle) {
 		return true; // Nothing to do
 	}
