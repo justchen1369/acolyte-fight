@@ -140,7 +140,7 @@ const fireball: Spell = {
     cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
-        density: 10,
+        density: 15,
         radius: 0.003,
         speed: 0.5,
         maxTicks: 1 * TicksPerSecond,
