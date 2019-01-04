@@ -209,7 +209,7 @@ declare interface RetractorSpell extends SpellBase {
 	retractBehaviours: BehaviourTemplate[]; // Add these behaviours to the projectile when retracted
 }
 
-declare interface ProjectileTemplate extends DamagePacket {
+declare interface ProjectileTemplate extends DamagePacketTemplate {
 	damage: number;
 	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
 	partialDamage?: PartialDamageParameters;
@@ -294,7 +294,7 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
 }
 
-declare interface DetonateParameters extends DamagePacket {
+declare interface DetonateParameters extends DamagePacketTemplate {
 	outerDamage?: number;
 
 	radius: number; // The radius of the explosion
@@ -399,7 +399,6 @@ declare interface ScourgeSpell extends SpellBase {
 
 	selfDamage: number;
 	minSelfHealth: number;
-	damageScaling?: boolean;
 
 	detonate: DetonateParameters;
 
@@ -467,9 +466,9 @@ declare interface ThrustSpell extends DashSpell {
 
 	range: number;
 	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
-	damage: number;
-	damageScaling?: boolean;
 	speed: number;
+
+	damageTemplate: DamagePacketTemplate;
 }
 
 declare interface KeyBindingOptions {
@@ -488,8 +487,9 @@ declare interface LinkParameters {
 	maxDistance: number;
 }
 
-declare interface DamagePacket {
+declare interface DamagePacketTemplate {
 	damage: number;
+	damageScaling?: boolean;
 	lifeSteal?: number;
 	isLava?: boolean;
 }
@@ -593,9 +593,6 @@ declare interface ProjectileContract extends WorldObjectContract {
 	spellId: string;
 
 	radius: number;
-
-	damage: number;
-	lifeSteal: number; // The fraction (between 0 and 1) of damage which will be return to the owner as health if this projectile hits someone.
 }
 
 declare interface CastingContract {

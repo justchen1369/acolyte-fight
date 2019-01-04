@@ -191,8 +191,6 @@ function worldToState(world: w.World): WorldContract {
                 ownerId: obj.owner,
                 spellId: obj.type,
                 radius: obj.radius,
-                damage: obj.damage,
-                lifeSteal: obj.lifeSteal
             };
         } else if (obj.category === "obstacle") {
             contract.obstacles[obj.id] = {

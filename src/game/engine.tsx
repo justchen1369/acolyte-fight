@@ -434,13 +434,17 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		targetId: targetObj ? targetObj.id : null,
 		alreadyHit: new Set<string>(),
 
-		damage: projectileTemplate.damage,
+		damageTemplate: {
+			damage: projectileTemplate.damage,
+			damageScaling: projectileTemplate.damageScaling,
+			lifeSteal: projectileTemplate.lifeSteal,
+		},
 		partialDamage: projectileTemplate.partialDamage,
+
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate ? { ...projectileTemplate.detonate } : null, // Have to clone, because scaleDamagePacket mutates
-		lifeSteal: projectileTemplate.lifeSteal || 0.0,
+		detonate: projectileTemplate.detonate,
 		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
@@ -464,9 +468,6 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		uiPath: [vector.clone(position)],
 	} as w.Projectile;
-
-	scaleDamagePacket(projectile, hero, projectileTemplate.damageScaling);
-	scaleDamagePacket(projectile.detonate, hero, projectileTemplate.damageScaling);
 
 	world.objects.set(id, projectile);
 	if (projectile.strafe) {
@@ -1209,7 +1210,8 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	if (hero.thrust) {
 		if (!hero.thrust.alreadyHit.has(other.id)) {
 			hero.thrust.alreadyHit.add(other.id);
-			applyDamage(other, hero.thrust, hero.id, world);
+			const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
+			applyDamage(other, damagePacket, world);
 		}
 	}
 }
@@ -1224,7 +1226,8 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (hero.thrust) {
-		applyDamageToObstacle(obstacle, hero.thrust, world);
+		const packet = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
+		applyDamageToObstacle(obstacle, packet, world);
 		hero.thrust.nullified = true;
 	}
 }
@@ -1232,7 +1235,9 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	if (!projectile.alreadyHit.has(obstacle.id)) {
 		projectile.alreadyHit.add(obstacle.id);
-		applyDamageToObstacle(obstacle, projectile, world);
+		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
+		packet = scaleForPartialDamage(world, projectile, packet);
+		applyDamageToObstacle(obstacle, packet, world);
 	}
 
 	if (expireOn(world, projectile, obstacle)) {
@@ -1278,11 +1283,9 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
 		projectile.alreadyHit.add(hero.id);
 
-		const packet: DamagePacket = scaleForPartialDamage(world, projectile, {
-			damage: projectile.damage,
-			lifeSteal: projectile.lifeSteal,
-		});
-		applyDamage(hero, packet, projectile.owner, world);
+		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
+		packet = scaleForPartialDamage(world, projectile, packet);
+		applyDamage(hero, packet, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
 		projectile.hit = world.tick;
@@ -1310,7 +1313,7 @@ export function calculatePartialDamageMultiplier(world: w.World, projectile: w.P
 	}
 }
 
-function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet: DamagePacket): DamagePacket {
+function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet: w.DamagePacket): w.DamagePacket {
 	const multiplier = calculatePartialDamageMultiplier(world, projectile);
 	if (multiplier < 1) {
 		return {
@@ -1455,7 +1458,7 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 
 	// Decay damage whenever hitting something
 	if (hitId !== projectile.owner) {
-		projectile.damage *= projectile.bounce.damageFactor || 1.0;
+		projectile.damageTemplate.damage *= projectile.bounce.damageFactor || 1.0;
 	}
 
 	// Always bounce between owner and another target
@@ -1737,6 +1740,10 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 }
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, sound: string = null) {
+	const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
+	const innerDamagePacket = instantiateDamage(detonate, owner, world);
+	const outerDamagePacket = instantiateDamage({ ...detonate, damage: outerDamage }, owner, world); 
+
 	world.objects.forEach(other => {
 		if (!(other.category === "hero" || other.category === "obstacle" || other.category === "projectile")) {
 			return;
@@ -1759,14 +1766,12 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				other.body.getWorldPoint(vector.zero()),
 				true);
 
-			const innerDamage = detonate.damage;
-			const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
-			const packet: DamagePacket = {
-				damage: proportion * innerDamage + (1 - proportion) * outerDamage,
-				lifeSteal: detonate.lifeSteal,
+			const packet: w.DamagePacket = {
+				...innerDamagePacket,
+				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
 			};
 			if (other.category === "hero") {
-				applyDamage(other, packet, owner, world);
+				applyDamage(other, packet, world);
 			} else {
 				applyDamageToObstacle(other, packet, world);
 			}
@@ -1820,7 +1825,12 @@ function getExtent(obj: w.WorldObject) {
 
 function applyLavaDamage(world: w.World) {
 	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
-	const damagePacket: DamagePacket = { damage: lavaDamagePerTick, isLava: true };
+	const damagePacket: w.DamagePacket = {
+		damage: lavaDamagePerTick,
+		lifeSteal: 0,
+		fromHeroId: null,
+		isLava: true,
+	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (!isInsideMap(obj, world)) {
@@ -1835,7 +1845,7 @@ function applyLavaDamage(world: w.World) {
 						...damagePacket,
 						damage: damagePacket.damage * damageMultiplier,
 					};
-					applyDamage(obj, heroDamagePacket, null, world);
+					applyDamage(obj, heroDamagePacket, world);
 				}
 			}
 		} else if (obj.category === "obstacle") {
@@ -2221,13 +2231,12 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		const ticks = Math.min(maxTicks, ticksToTarget);
 
 		let thrust: w.ThrustState = {
-			damage: spell.damage,
+			damageTemplate: spell.damageTemplate,
 			velocity,
 			ticks,
 			nullified: false,
 			alreadyHit: new Set<string>(),
 		} as w.ThrustState;
-		scaleDamagePacket(thrust, hero, spell.damageScaling);
 
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
@@ -2353,15 +2362,10 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 }
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
-	const selfPacket: DamagePacket = { damage: Math.max(0, Math.min(hero.health - spell.minSelfHealth, spell.selfDamage)) };
-	applyDamage(hero, selfPacket, hero.id, world);
+	// Self damage
+	hero.health = Math.max(spell.minSelfHealth, hero.health - spell.selfDamage);
 
-	const detonate: DetonateParameters = {
-		...spell.detonate,
-	};
-	scaleDamagePacket(detonate, hero, spell.damageScaling)
-
-	detonateAt(hero.body.getPosition(), hero.id, detonate, world, hero.id, spell.sound);
+	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.sound);
 
 	// Remove the link so that the hit player can go flying
 	hero.link = null;
@@ -2421,26 +2425,39 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	}
 }
 
-function scaleDamagePacket(packet: DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {
-	if (!packet) {
-		return;
+function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {
+	const Hero = world.settings.Hero;
+
+	if (!template) {
+		return null;
 	}
 
-	let scaleFactor = 1.0;
-	if (fromHero && damageScaling) {
-		const fromHeroHealth = fromHero ? fromHero.health : 0; // Dead hero has 0 health
-		scaleFactor += Math.pow(1.0 - fromHeroHealth / fromHero.maxHealth, fromHero.additionalDamagePower) * fromHero.additionalDamageMultiplier;
-	}
-	packet.damage *= scaleFactor;
+	let damage = template.damage;
+	let lifeSteal = template.lifeSteal;
 
-	if (fromHero && fromHero.link && !packet.lifeSteal) {
-		packet.lifeSteal = fromHero.link.lifeSteal;
+	const fromHero = world.objects.get(fromHeroId);
+	const damageScaling = template.damageScaling !== undefined ? template.damageScaling : true;
+	if (damageScaling && fromHeroId) { // Only scale damage from heroes (not the environment), even if they're dead
+		let proportion = (fromHero && fromHero.category === "hero") ? (fromHero.health / fromHero.maxHealth) : 0;
+		const scaleFactor = 1 + Math.pow(1.0 - proportion, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
+		damage *= scaleFactor;
 	}
+
+	if (fromHero && fromHero.category === "hero" && fromHero.link && !lifeSteal) {
+		lifeSteal = fromHero.link.lifeSteal;
+	}
+
+	return {
+		damage,
+		lifeSteal,
+		fromHeroId,
+	};
 }
 
-function applyDamage(toHero: w.Hero, packet: DamagePacket, fromHeroId: string, world: w.World) {
+function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
-	if (!toHero) { return; }
+	if (!(toHero && packet)) { return; }
+	const fromHeroId = packet.fromHeroId;
 
 	// Register hit
 	if (packet.damage > 0) {
@@ -2513,7 +2530,7 @@ function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, worl
 	return damage;
 }
 
-function applyDamageToObstacle(obstacle: w.Obstacle, packet: DamagePacket, world: w.World) {
+function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, world: w.World) {
 	// Register hit
 	if (packet.damage > 0) {
 		if (packet.isLava) {

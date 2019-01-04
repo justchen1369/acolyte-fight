@@ -833,6 +833,7 @@ const mines: Spell = {
 
         detonate: {
             damage: 4,
+            damageScaling: false,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
@@ -902,6 +903,7 @@ const scourge: Spell = {
 
     detonate: {
         damage: 20,
+        damageScaling: false,
         radius: Hero.Radius * 4,
         minImpulse: 0.0002,
         maxImpulse: 0.0005,
@@ -913,7 +915,6 @@ const scourge: Spell = {
     movementCancel: true,
     selfDamage: 10,
     minSelfHealth: 1,
-    damageScaling: false,
 
     icon: "deadlyStrike",
 
@@ -993,7 +994,9 @@ const thrust: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 12 * TicksPerSecond,
 
-    damage: 1,
+    damageTemplate: {
+        damage: 0,
+    },
     speed: 1.0,
     bounceTicks: 10,
 

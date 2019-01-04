@@ -329,9 +329,6 @@ export interface Hero extends WorldObjectBase {
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
 
-	additionalDamagePower: number;
-	additionalDamageMultiplier: number;
-
 	moveTo?: pl.Vec2;
 	target?: pl.Vec2;
 	casting: CastState | null;
@@ -433,8 +430,8 @@ export interface LinkState {
 	expireTick: number;
 }
 
-export interface ThrustState extends DamagePacket {
-	damage: number;
+export interface ThrustState {
+	damageTemplate: DamagePacketTemplate;
 	velocity: pl.Vec2;
 	ticks: number;
 	nullified: boolean;
@@ -476,7 +473,7 @@ export interface Cooldowns {
 	[spellId: string]: number;
 }
 
-export interface Projectile extends WorldObjectBase, DamagePacket {
+export interface Projectile extends WorldObjectBase {
 	category: "projectile";
 	type: string;
 
@@ -492,13 +489,12 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
 	targetId: string | null;
 	alreadyHit: Set<string>;
 
-	damage: number;
+	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
 	link?: LinkParameters;
 	detonate?: DetonateParameters;
-	lifeSteal: number;
 	swapWith?: number;
 	shieldTakesOwnership: boolean;
 
@@ -515,6 +511,13 @@ export interface Projectile extends WorldObjectBase, DamagePacket {
     radius: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
+}
+
+export interface DamagePacket {
+	fromHeroId: string;
+	damage: number;
+	lifeSteal: number;
+	isLava?: boolean;
 }
 
 export namespace HomingTargets {
