@@ -869,7 +869,7 @@ const saber: Spell = {
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
     speedMultiplier: 1.25,
-    maxSpeed: 0.5,
+    maxSpeed: 0.75,
 
     width: Pixel,
     length: 0.075,
@@ -1067,8 +1067,8 @@ const voidRush: Spell = {
         },
     ],
 
-    icon: "fireDash",
-    color: '#ff00cc',
+    icon: "sprint",
+    color: '#ff00ff',
     action: "buff",
 };
 
