@@ -128,6 +128,7 @@ declare type Spell =
 	MoveSpell
 	| StopSpell
 	| RetargetSpell
+	| BuffSpell
 	| ProjectileSpell
 	| ReflectSpell
 	| RetractorSpell
@@ -359,6 +360,33 @@ declare interface RenderReticule extends RenderParamsBase {
 	ticks: number;
 	radius: number;
 	glow?: boolean;
+}
+
+declare type BuffTemplate =
+	MovementBuffTemplate
+	| LavaImmunityBuffTemplate
+
+declare interface BuffTemplateBase {
+	type: string;
+	maxTicks: number;
+}
+
+declare interface MovementBuffTemplate extends BuffTemplateBase {
+	type: "movement";
+	movementProportion: number;
+}
+
+declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
+	type: "lavaImmunity";
+	damageProportion: number;
+	color?: string;
+	sound?: string;
+}
+
+declare interface BuffSpell extends SpellBase {
+    action: "buff";
+
+	buffs: BuffTemplate[];
 }
 
 declare interface ScourgeSpell extends SpellBase {

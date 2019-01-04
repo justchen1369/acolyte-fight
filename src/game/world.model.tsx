@@ -344,6 +344,7 @@ export interface Hero extends WorldObjectBase {
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
+	buffs: Map<string, Buff>;
 
 	killerHeroId: string | null;
 	assistHeroId: string | null;
@@ -449,6 +450,28 @@ export interface GravityState {
 	power: number;
 }
 
+export type Buff =
+	MovementBuff
+	| LavaImmunityBuff;
+
+export interface BuffBase {
+	id: string;
+	type: string;
+	expireTick: number;
+}
+
+export interface MovementBuff extends BuffBase {
+	type: "movement";
+	movementProportion: number;
+}
+
+export interface LavaImmunityBuff extends BuffBase {
+	type: "lavaImmunity";
+	damageProportion: number;
+	sound?: string;
+	maxTicks: number;
+}
+
 export interface Cooldowns {
 	[spellId: string]: number;
 }
@@ -512,6 +535,7 @@ export type Behaviour =
 	| ThrustBounceBehaviour
 	| ThrustDecayBehaviour
 	| SaberBehaviour
+	| ExpireBuffsBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -581,6 +605,11 @@ export interface ThrustDecayBehaviour extends BehaviourBase {
 export interface SaberBehaviour extends BehaviourBase {
 	type: "saberSwing";
 	shieldId: string;
+}
+
+export interface ExpireBuffsBehaviour extends BehaviourBase {
+	type: "expireBuffs";
+	heroId: string;
 }
 
 export type WorldObject =

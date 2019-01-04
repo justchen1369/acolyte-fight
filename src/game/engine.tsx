@@ -354,9 +354,12 @@ function addHero(world: w.World, heroId: string) {
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
 		retractorIds: new Map<string, string>(),
+		buffs: new Map<string, w.Buff>(),
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
+
+	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
 
 	return hero;
 }
@@ -569,6 +572,7 @@ export function tick(world: w.World) {
 		retractor,
 		removePassthrough,
 		thrustDecay,
+		expireBuffs,
 	});
 
 	applyLavaDamage(world);
@@ -927,8 +931,9 @@ function handleActions(world: w.World) {
 
 		performHeroActions(world, hero, action);
 
-		if (!hero.casting || hero.casting.movementProportion > 0) {
-			moveTowards(world, hero, hero.moveTo, (hero.casting && hero.casting.movementProportion) || 1.0);
+		const movementProportion = calculateMovementProportion(hero, world);
+		if (movementProportion > 0) {
+			moveTowards(world, hero, hero.moveTo, movementProportion);
 		}
 	});
 	world.actions = nextActions;
@@ -1126,6 +1131,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
 		case "stop": return true; // Do nothing
+		case "buff": return spawnBuffsAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
@@ -1683,6 +1689,21 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 	}
 }
 
+function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	hero.buffs.forEach((buff, id) => {
+		if (world.tick >= buff.expireTick) {
+			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
+		}
+	});
+
+	return true;
+}
+
 function detonate(detonate: w.DetonateBehaviour, world: w.World) {
 	const obj = world.objects.get(detonate.projectileId);
 	if (!(obj && obj.category === "projectile" && obj.detonate)) {
@@ -1791,7 +1812,19 @@ function applyLavaDamage(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (!isInsideMap(obj, world)) {
-				applyDamage(obj, damagePacket, null, world);
+				let damageMultiplier = 1.0;
+				obj.buffs.forEach(buff => {
+					if (buff.type === "lavaImmunity") {
+						damageMultiplier *= buff.damageProportion;
+					}
+				});
+				if (damageMultiplier >= 0) {
+					const heroDamagePacket = {
+						...damagePacket,
+						damage: damagePacket.damage * damageMultiplier,
+					};
+					applyDamage(obj, heroDamagePacket, null, world);
+				}
 			}
 		} else if (obj.category === "obstacle") {
 			if (!isInsideMap(obj, world)) {
@@ -1992,6 +2025,19 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 
 	object.destroyed = true;
 	world.ui.destroyed.push(object);
+}
+
+function calculateMovementProportion(hero: w.Hero, world: w.World): number {
+	let multiplier = 1.0;
+	if (hero.casting) {
+		multiplier *= hero.casting.movementProportion || 0.0;
+	}
+	hero.buffs.forEach(buff => {
+		if (buff.type === "movement") {
+			multiplier *= buff.movementProportion;
+		}
+	});
+	return multiplier;
 }
 
 function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {
@@ -2333,6 +2379,34 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: WallS
 function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: ReflectSpell) {
 	addShield(world, hero, spell);
 	return true;
+}
+
+function spawnBuffsAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
+	spell.buffs.forEach(template => {
+		const id = `${spell.id}/${template.type}`;
+		instantiateBuff(id, template, hero, world);
+	});
+	return true;
+}
+
+function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World) {
+	if (template.type === "movement") {
+		hero.buffs.set(id, {
+			id,
+			type: "movement",
+			movementProportion: template.movementProportion,
+			expireTick: world.tick + template.maxTicks,
+		});
+	} else if (template.type === "lavaImmunity") {
+		hero.buffs.set(id, {
+			id,
+			type: "lavaImmunity",
+			damageProportion: template.damageProportion,
+			expireTick: world.tick + template.maxTicks,
+			sound: template.sound,
+			maxTicks: template.maxTicks,
+		});
+	}
 }
 
 function scaleDamagePacket(packet: DamagePacket, fromHero: w.Hero, damageScaling: boolean = true) {

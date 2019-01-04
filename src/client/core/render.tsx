@@ -540,6 +540,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
 
 	renderRangeIndicator(ctxStack, hero, world);
+	renderBuffs(ctxStack, hero, world); // Do this before applying translation
 	renderHeroCharacter(ctxStack, hero, world);
 	renderHeroBars(ctxStack, hero, world);
 
@@ -586,6 +587,49 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	ctx.stroke();
 
 	ctx.restore();
+}
+
+function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	hero.buffs.forEach(buff => {
+		if (buff.type === "lavaImmunity") {
+			renderLavaImmunity(ctxStack, buff, hero, world);
+		}
+	});
+}
+
+function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
+	const numPoints = 8;
+	const proportion = (buff.expireTick - world.tick) / buff.maxTicks;
+
+	const pos = vector.clone(hero.body.getPosition());
+
+	foreground(ctxStack, ctx => {
+		ctx.fillStyle = Color("#fff").alpha(0.25 * proportion).string();
+
+		ctx.beginPath();
+
+		const radius = 2 * hero.radius;
+		for (let i = 0; i < numPoints; ++i) {
+			const angle = (i / numPoints) * (2 * Math.PI);
+			const point = vector.multiply(vector.fromAngle(angle), radius);
+			if (i === 0) {
+				ctx.moveTo(point.x, point.y);
+			} else {
+				ctx.lineTo(point.x, point.y);
+			}
+		}
+		ctx.closePath();
+
+		ctx.fill();
+	});
+
+	if (buff.sound) {
+		world.ui.sounds.push({
+			id: `buff-${buff.id}`,
+			sound: `${buff.sound}-${buff.type}`,
+			pos,
+		});
+	}
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {

@@ -56,7 +56,7 @@ const Choices: ChoiceSettings = {
         { btn: "f", weight: 0.75 },
     ],
 	Options: {
-		"a": ["thrust", "teleport", "swap"],
+		"a": ["thrust", "teleport", "swap", "voidRush"],
 		"q": ["fireball", "flamestrike", "triplet", "whip"],
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
 		"e": ["shield", "icewall", "drain", "saber", "meteor"],
@@ -1039,6 +1039,33 @@ const swap: Spell = {
         ],
     },
 };
+const voidRush: Spell = {
+    id: 'voidRush',
+    name: 'Void Rush',
+    description: "For 3 seconds, increase movement speed 30%, and also become immune to damage from the void.",
+
+    untargeted: true,
+    maxAngleDiffInRevs: 1.0,
+    cooldown: 10 * TicksPerSecond,
+
+    buffs: [
+        {
+            type: "movement",
+            movementProportion: 1.3,
+            maxTicks: 3 * TicksPerSecond,
+        },
+        {
+            type: "lavaImmunity",
+            damageProportion: 0,
+            maxTicks: 3 * TicksPerSecond,
+            sound: "voidRush",
+        },
+    ],
+
+    icon: "fireDash",
+    color: '#ff00cc',
+    action: "buff",
+};
 
 const Spells = {
     move,
@@ -1070,6 +1097,7 @@ const Spells = {
     teleport,
     thrust,
     swap,
+    voidRush,
 };
 
 const Render: RenderSettings = {
