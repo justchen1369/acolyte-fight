@@ -312,7 +312,8 @@ declare interface RenderParamsBase {
 
 declare interface ProjectileColorParams {
     color: string; // Color of the projectile
-    selfColor?: boolean; // What color should the projectile look like to the owner? So they can tell it is theirs.
+	selfColor?: boolean; // Give the projectile the owner's colour, so they can tell it's theirs
+	ownerColor?: boolean; //
 }
 
 declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {

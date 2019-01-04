@@ -1447,20 +1447,21 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 		return;
 	}
 
+	// Decay damage whenever hitting something
+	if (hitId !== projectile.owner) {
+		projectile.damage *= projectile.bounce.damageFactor || 1.0;
+	}
+
 	// Always bounce between owner and another target
 	let nextTarget: w.WorldObject =
-		projectile.targetId === projectile.owner
-		? findNearest(
-			world.objects,
-			projectile.body.getPosition(),
-			x => x.category === "hero" && x.id !== hitId)
+		hitId === projectile.owner
+		? findNearest(world.objects, projectile.body.getPosition(), x => x.category === "hero" && x.id !== projectile.owner)
 		: world.objects.get(projectile.owner);
 	if (!nextTarget) {
 		return;
 	}
 
 	projectile.targetId = nextTarget.id;
-	projectile.damage *= projectile.bounce.damageFactor || 1.0;
 
 	let currentSpeed = vector.length(projectile.body.getLinearVelocity());
 	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));

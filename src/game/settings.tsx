@@ -61,7 +61,7 @@ const Choices: ChoiceSettings = {
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
 		"e": ["shield", "icewall", "drain", "saber", "meteor"],
 		"r": ["kamehameha", "bouncer", "retractor", "supernova"],
-		"f": ["scourge", "firespray", "mines"],
+		"f": ["scourge", "firespray", "mines", "halo"],
 	},
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,
@@ -750,6 +750,54 @@ const supernova: Spell = {
     },
 };
 
+const halo: Spell = {
+    id: 'halo',
+    name: 'Halo',
+    description: "Cast this often to build up to 4 charges in your halo, then stand next to your enemy to burn them. Watch out, your charges are easily destroyed by explosions, so keep dodging!",
+    action: "projectile",
+
+    color: '#ffe33b',
+    icon: "angelOutfit",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 4 * TicksPerSecond,
+
+    projectile: {
+        density: 1,
+        radius: 0.002,
+        speed: 0.3,
+        maxTicks: 20.0 * TicksPerSecond,
+        damage: 4,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
+        expireOn: Categories.Massive,
+        selfPassthrough: false,
+        strafe: true,
+        shieldTakesOwnership: false,
+        damageScaling: false,
+        detonatable: true,
+
+        behaviours: [
+            {
+                type: "homing",
+                revolutionsPerSecond: 1,
+                maxTurnProportion: 0.09,
+                minDistanceToTarget: 0.02,
+                targetType: HomingTargets.self,
+            },
+        ],
+
+        bounce: {
+            damageFactor: 0.95,
+        },
+
+        sound: "halo",
+        soundHit: "halo",
+        renderers: [
+            { type: "ray", color: '#ccc', selfColor: true, ownerColor: true, ticks: 15 },
+        ],
+    },
+};
+
 const mines: Spell = {
     id: 'mines',
     name: 'Energy Mines',
@@ -1018,6 +1066,7 @@ const Spells = {
     scourge,
     shield,
     supernova,
+    halo,
     mines,
     teleport,
     thrust,

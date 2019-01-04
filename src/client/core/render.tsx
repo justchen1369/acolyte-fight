@@ -347,13 +347,14 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 	const pos = owner.body.getPosition();
 
 	world.ui.trails.push({
-		type: 'circle',
+		type: 'ripple',
 		initialTick: world.tick,
 		max: 0.25 * constants.TicksPerSecond,
 		pos: vector.clone(pos),
 		fillStyle: HeroColors.HealColor,
-		radius: world.settings.Hero.Radius * 1.5,
-	} as w.CircleTrail);
+		initialRadius: world.settings.Hero.Radius,
+		finalRadius: world.settings.Hero.Radius * 2,
+	});
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
@@ -1100,9 +1101,16 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 function projectileColor(render: ProjectileColorParams, projectile: w.Projectile, world: w.World) {
 	if (render.selfColor && projectile.owner === world.ui.myHeroId) {
 		return HeroColors.MyHeroColor;
-	} else {
-		return render.color;
 	}
+
+	if (render.ownerColor) {
+		const player = world.players.get(projectile.owner);
+		if (player) {
+			return player.uiColor;
+		}
+	}
+
+	return render.color;
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {

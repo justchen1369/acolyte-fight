@@ -825,6 +825,69 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "halo": {
+        "start": [
+            {
+                "stopTime": 0.3,
+                "attack": 0.01,
+                "decay": 0.29,
+                "startFreq": 9000,
+                "stopFreq": 11500,
+                "wave": "sawtooth",
+                "ratios": [
+                    1,
+                    1.167,
+                    1.33,
+                    1.78,
+                    2,
+                    2.25
+                ]
+            }
+        ]
+    },
+    "halo-hit": {
+        "start": [
+            {
+                "stopTime": 0.3,
+                "attack": 0.001,
+                "decay": 0.29,
+                "startFreq": 7000,
+                "stopFreq": 6800,
+                "wave": "sawtooth",
+                "ratios": [
+                    1,
+                    1.167,
+                    1.33,
+                    1.78,
+                    2,
+                    2.25
+                ]
+            },
+            {
+                "volume": 0.25,
+                "stopTime": 1,
+                "attack": 0.01,
+                "decay": 0.7,
+                "startFreq": 150,
+                "stopFreq": 0.001,
+                "lowPass": 300,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.1,
+                    1.2,
+                    1.3,
+                    1.4,
+                    1.5,
+                    1.6,
+                    1.7,
+                    1.8,
+                    1.9,
+                    2
+                ]
+            }
+        ]
+    },
     "mines-channelling": {
         "cutoffEarly": false,
         "start": [
