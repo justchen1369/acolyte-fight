@@ -219,6 +219,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	speed: number;
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	strafe?: boolean; // if true, the projectile will move with the hero's movement
+	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number
 
     bounce?: BounceParameters;
 	link?: LinkParameters;

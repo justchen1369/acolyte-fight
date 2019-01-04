@@ -604,11 +604,12 @@ const bouncer: Spell = {
         speed: 1.5,
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
+        hitInterval: 6,
         damage: 4,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
         bounce: {
-            damageFactor: 0.95,
+            damageFactor: 1,
         },
 
         sound: "bouncer",
@@ -767,6 +768,7 @@ const halo: Spell = {
         radius: 0.002,
         speed: 0.3,
         maxTicks: 40.0 * TicksPerSecond,
+        hitInterval: 6,
         damage: 4,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
@@ -789,7 +791,7 @@ const halo: Spell = {
         ],
 
         bounce: {
-            damageFactor: 0.95,
+            damageFactor: 1,
         },
 
         sound: "halo",

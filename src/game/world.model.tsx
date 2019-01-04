@@ -487,7 +487,8 @@ export interface Projectile extends WorldObjectBase {
 
 	target: pl.Vec2;
 	targetId: string | null;
-	alreadyHit: Set<string>;
+	hitInterval?: number;
+	hitTick: Map<string, number>; // object id -> tick
 
 	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;

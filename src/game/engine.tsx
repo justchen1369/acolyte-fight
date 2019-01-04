@@ -432,7 +432,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
-		alreadyHit: new Set<string>(),
+		hitTick: new Map<string, number>(),
+		hitInterval: projectileTemplate.hitInterval,
 
 		damageTemplate: {
 			damage: projectileTemplate.damage,
@@ -1233,8 +1234,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
-	if (!projectile.alreadyHit.has(obstacle.id)) {
-		projectile.alreadyHit.add(obstacle.id);
+	if (takeHit(projectile, obstacle.id, world)) {
 		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 		packet = scaleForPartialDamage(world, projectile, packet);
 		applyDamageToObstacle(obstacle, packet, world);
@@ -1280,9 +1280,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		return;
 	}
 
-	if (hero.id !== projectile.owner && !projectile.alreadyHit.has(hero.id)) {
-		projectile.alreadyHit.add(hero.id);
-
+	if (hero.id !== projectile.owner && takeHit(projectile, hero.id, world)) {
 		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 		packet = scaleForPartialDamage(world, projectile, packet);
 		applyDamage(hero, packet, world);
@@ -1323,6 +1321,21 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 	} else {
 		return packet;
 	}
+}
+
+function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
+	const hitTick = projectile.hitTick.get(hitId);
+	if (hitTick) {
+		if (projectile.hitInterval) {
+			if (world.tick - hitTick < projectile.hitInterval) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	projectile.hitTick.set(hitId, world.tick);
+	return true;
 }
 
 function isHeroShielded(hero: w.Hero, world: w.World) {
@@ -1476,8 +1489,6 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
 	let newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
-
-	projectile.alreadyHit.delete(nextTarget.id);
 }
 
 function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
