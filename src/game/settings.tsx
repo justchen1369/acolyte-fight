@@ -772,7 +772,6 @@ const halo: Spell = {
         expireOn: Categories.Massive,
         selfPassthrough: false,
         strafe: true,
-        shieldTakesOwnership: false,
         damageScaling: false,
         detonatable: true,
 
