@@ -269,7 +269,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 100,
@@ -299,7 +299,7 @@ const kamehameha: Spell = {
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
     chargeTicks: 0.625 * TicksPerSecond,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
@@ -339,7 +339,7 @@ const lightning: Spell = {
     icon: "lightningHelix",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
@@ -364,7 +364,7 @@ const homing: Spell = {
     color: '#44ffcc',
     icon: "boltSaw",
 
-    cooldown: 15 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
@@ -401,7 +401,7 @@ const boomerang: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 1,
@@ -439,7 +439,7 @@ const retractor: Spell = {
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 3 * TicksPerSecond,
+    cooldown: 1.5 * TicksPerSecond,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -550,7 +550,7 @@ const link: Spell = {
     icon: "andromedaChain",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 1,
@@ -596,7 +596,7 @@ const bouncer: Spell = {
     icon: "divert",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 2,
@@ -626,7 +626,7 @@ const drain: Spell = {
     icon: "energyBreath",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 2.5 * TicksPerSecond,
 
     projectile: {
         sound: "drain",
@@ -663,14 +663,14 @@ const gravity: Spell = {
     sound: "gravity",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 8 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
         density: 0.0001,
         radius: 0.02,
         speed: 0.3,
-        maxTicks: 8.0 * TicksPerSecond,
+        maxTicks: 5.0 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Massive,
 
@@ -706,7 +706,7 @@ const supernova: Spell = {
     icon: "crownedExplosion",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 5,
@@ -760,18 +760,18 @@ const halo: Spell = {
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     projectile: {
         density: 1,
         radius: 0.002,
         speed: 0.3,
-        maxTicks: 40.0 * TicksPerSecond,
+        maxTicks: 20.0 * TicksPerSecond,
         hitInterval: 10,
         damage: 4,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
-        shieldTakesOwnership: false,
+        shieldTakesOwnership: true,
         strafe: true,
         damageScaling: false,
         destructible: {
@@ -811,7 +811,7 @@ const mines: Spell = {
     icon: "mineExplosion",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
 
     intervalTicks: 1,
     lengthTicks: 7,
@@ -822,7 +822,7 @@ const mines: Spell = {
         density: 1,
         radius: 0.004,
         speed: 0.5,
-        maxTicks: 7.5 * TicksPerSecond,
+        maxTicks: 4.5 * TicksPerSecond,
         damage: 0,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
@@ -879,7 +879,7 @@ const saber: Spell = {
     movementProportionWhileChannelling: 0.5,
     interruptible: true,
 
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
 
     icon: "waveStrike",
 
@@ -932,7 +932,7 @@ const shield: Spell = {
     untargeted: true,
 
     maxTicks: 2.5 * TicksPerSecond,
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     radius: Hero.Radius * 2,
     takesOwnership: true,
     blocksTeleporters: false,
@@ -952,7 +952,7 @@ const icewall: Spell = {
     maxRange: 0.25,
     maxTicks: 1.25 * TicksPerSecond,
     growthTicks: 5,
-    cooldown: 20 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     takesOwnership: true,
     blocksTeleporters: true,
 
@@ -975,7 +975,7 @@ const teleport: Spell = {
 
     range: 0.25,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
 
@@ -993,7 +993,7 @@ const thrust: Spell = {
 
     range: 0.25,
     maxAngleDiffInRevs: 0.01,
-    cooldown: 12 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
 
     damageTemplate: {
         damage: 0,
@@ -1016,7 +1016,7 @@ const swap: Spell = {
     icon: "bodySwapping",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
 
     projectile: {
         density: 0.001,
@@ -1055,18 +1055,18 @@ const voidRush: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
 
     buffs: [
         {
             type: "movement",
             movementProportion: 1.3,
-            maxTicks: 3 * TicksPerSecond,
+            maxTicks: 2 * TicksPerSecond,
         },
         {
             type: "lavaImmunity",
             damageProportion: 0,
-            maxTicks: 3 * TicksPerSecond,
+            maxTicks: 2 * TicksPerSecond,
             sound: "voidRush",
         },
     ],
