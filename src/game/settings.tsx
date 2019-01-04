@@ -517,7 +517,7 @@ const whip: Spell = {
 
         detonate: {
             damage: 10,
-            lifeSteal: 1.0,
+            lifeSteal: 0.25,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
@@ -770,10 +770,13 @@ const halo: Spell = {
         damage: 4,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
-        selfPassthrough: false,
+        shieldTakesOwnership: false,
         strafe: true,
         damageScaling: false,
-        detonatable: true,
+        destructible: {
+            detonate: true,
+            noSelfDestruct: true,
+        },
 
         behaviours: [
             {
@@ -824,7 +827,9 @@ const mines: Spell = {
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
         expireOn: Categories.All,
-        detonatable: true,
+        destructible: {
+            detonate: true,
+        },
 
         detonate: {
             damage: 4,

@@ -235,13 +235,18 @@ declare interface ProjectileTemplate extends DamagePacket {
 	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
 	selfPassthrough?: boolean; // Whether the projectile just passes through its owner
-	detonatable?: boolean; // Whether this projectile is destroyed by a detonate (like a Supernova)
+	destructible?: DestructibleParameters; // Whether this projectile is destroyed by a detonate (like a Supernova)
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
 	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
+}
+
+declare interface DestructibleParameters {
+	detonate: boolean;
+	noSelfDestruct?: boolean;
 }
 
 declare interface PartialDamageParameters {

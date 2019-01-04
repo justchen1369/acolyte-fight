@@ -454,7 +454,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
-		detonatable: projectileTemplate.detonatable,
+		destructible: projectileTemplate.destructible,
 
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
@@ -1771,7 +1771,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				applyDamageToObstacle(other, packet, world);
 			}
 		} else if (other.category === "projectile") {
-			if (other.detonatable) {
+			if (destructibleBy(other, owner)) {
 				other.expireTick = world.tick;
 			}
 		}
@@ -1785,6 +1785,18 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		radius: detonate.radius,
 		explosionTicks: detonate.renderTicks,
 	});
+}
+
+function destructibleBy(projectile: w.Projectile, detonatorHeroId: string) {
+	if (projectile.destructible) {
+		if (projectile.destructible.noSelfDestruct && projectile.owner === detonatorHeroId) {
+			return false;
+		} else {
+			return true;
+		}
+	} else {
+		return false;
+	}
 }
 
 function getExtent(obj: w.WorldObject) {
@@ -2290,7 +2302,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 	let hit = false
 	world.objects.forEach(obj => {
-		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && obj.detonatable))) {
+		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && destructibleBy(obj, hero.id)))) {
 			return;
 		}
 
@@ -2322,7 +2334,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 				obj.owner = hero.id;
 			}
 
-			if (obj.detonatable) {
+			if (destructibleBy(obj, hero.id)) {
 				obj.expireTick = world.tick;
 			}
 		}
