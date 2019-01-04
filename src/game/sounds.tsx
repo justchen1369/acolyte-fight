@@ -66,6 +66,24 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "voidRush-lavaImmunity": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 3,
+                "attack": 0.25,
+                "decay": 2.9,
+                "startFreq": 60,
+                "stopFreq": 60,
+                "highPass": 40,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
     "shield": {
         start: [
             {
