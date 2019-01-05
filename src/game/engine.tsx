@@ -2209,6 +2209,7 @@ function retractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: 
 	if (retractorId) {
 		const retractor = world.objects.get(retractorId);
 		if (retractor && retractor.category === "projectile") {
+			retractor.owner = hero.id; // Take back ownership, if it was lost to a shield
 			retractor.target = action.target;
 			instantiateProjectileBehaviours(spell.retractBehaviours, retractor, world);
 			hero.retractorIds.delete(spell.id);
