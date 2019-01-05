@@ -1174,7 +1174,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
-		case "stop": return true; // Do nothing
+		case "stop": return stopAction(world, hero, action, spell); // Do nothing
 		case "buff": return spawnBuffsAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
@@ -2161,6 +2161,11 @@ function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProp
 
 	const done = vector.distance(current, target) < constants.Pixel;
 	hero.moveTo = done ? null : target;
+}
+
+function stopAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
+	// hero.moveTo = null; // Just cancel the spell but not the movement
+	return true;
 }
 
 function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ProjectileSpell) {

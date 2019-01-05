@@ -497,6 +497,10 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private keyToSpellId(key: string): string {
+        return this.keyToNonSpecialKey(key) || this.keyToSpecialKey(key);
+    }
+
+    private keyToSpecialKey(key: string): string {
         const world = this.props.world;
 
         if (!key) { return null; }
@@ -505,6 +509,14 @@ class CanvasPanel extends React.Component<Props, State> {
         if (specialSpellId) {
             return specialSpellId;
         }
+
+        return null;
+    }
+
+    private keyToNonSpecialKey(key: string): string {
+        const world = this.props.world;
+
+        if (!key) { return null; }
 
         const hero = world.objects.get(world.ui.myHeroId);
         const keysToSpells = (hero && hero.category === "hero") ? hero.keysToSpells : this.resolveKeys(this.props).keysToSpells;

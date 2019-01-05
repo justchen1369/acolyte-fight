@@ -67,6 +67,7 @@ const Choices: ChoiceSettings = {
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,
         [(SpecialKeys.Retarget)]: Actions.Retarget,
+        "s": Actions.Stop,
     },
 }
 
