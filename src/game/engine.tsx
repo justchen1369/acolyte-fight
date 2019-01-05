@@ -775,9 +775,32 @@ function handleTexting(ev: w.Texting, world: w.World) {
 function handleClosing(ev: w.Closing, world: w.World) {
 	world.startTick = ev.startTick;
 
-	world.objects.forEach(obstacle => { // Obstacles movable now
+	// Obstacles movable now
+	world.objects.forEach(obstacle => {
 		if (obstacle.category === "obstacle") {
 			obstacle.body.resetMassData();
+		}
+	});
+
+	// Clear any stockpiled halos
+	world.objects.forEach(hero => {
+		if (!(hero && hero.category === "hero")) {
+			return;
+		}
+
+		const halos = new Array<w.Projectile>();
+		for (const projectileId of hero.strafeIds) {
+			const projectile = world.objects.get(projectileId);
+			if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
+				halos.push(projectile);
+			}
+		}
+
+		if (halos.length > 1) {
+			halos.pop(); // Clear all except last halo
+			halos.forEach(halo => {
+				halo.expireTick = world.tick;
+			});
 		}
 	});
 
