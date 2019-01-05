@@ -348,6 +348,7 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
+		throttleUntilTick: 0,
 		killerHeroId: null,
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
@@ -1028,6 +1029,20 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 				}
 				return;
 			}
+		}
+
+		hero.casting.movementProportion = 0.0;
+		++hero.casting.stage;
+	}
+
+	if (hero.casting.stage === w.CastStage.Throttle) {
+		hero.casting.movementProportion = 1.0;
+
+		if (spell.throttle) {
+			if (world.tick < hero.throttleUntilTick) {
+				return;
+			}
+			hero.throttleUntilTick = world.tick + world.settings.Hero.ThrottleTicks;
 		}
 
 		hero.casting.movementProportion = 0.0;

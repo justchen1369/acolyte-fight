@@ -14,6 +14,7 @@ const Hero: HeroSettings = {
     Damping: 3,
 
     DamageMitigationTicks: 90,
+    ThrottleTicks: 15,
 
     AdditionalDamageMultiplier: 2.0,
     AdditionalDamagePower: 1.0,
@@ -138,6 +139,7 @@ const fireball: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 15,
@@ -166,6 +168,7 @@ const flamestrike: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 5,
@@ -208,6 +211,7 @@ const triplet: Spell = {
 
     maxAngleDiffInRevs: 0,
     cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
 
     intervalTicks: 1,
     lengthTicks: 3,
@@ -242,6 +246,7 @@ const firespray: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
+    throttle: true,
 
     intervalTicks: 2,
     lengthTicks: 20,
@@ -270,6 +275,7 @@ const meteor: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 100,
@@ -300,6 +306,7 @@ const kamehameha: Spell = {
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
     chargeTicks: 0.625 * TicksPerSecond,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
@@ -340,6 +347,7 @@ const lightning: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
@@ -365,6 +373,7 @@ const homing: Spell = {
     icon: "boltSaw",
 
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
@@ -402,6 +411,7 @@ const boomerang: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 1,
@@ -440,6 +450,7 @@ const retractor: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
 
     retractCooldownTicks: 0,
     retractBehaviours: [
@@ -502,6 +513,7 @@ const whip: Spell = {
     maxAngleDiffInRevs: 0.01,
     chargeTicks: 5,
     cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 2,
@@ -551,6 +563,7 @@ const link: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: false,
 
     projectile: {
         density: 1,
@@ -597,6 +610,7 @@ const bouncer: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 2,
@@ -627,6 +641,7 @@ const drain: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         sound: "drain",
@@ -664,6 +679,7 @@ const gravity: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
@@ -707,6 +723,7 @@ const supernova: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 5,
@@ -761,6 +778,7 @@ const halo: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
+    throttle: true,
 
     projectile: {
         density: 1,
@@ -812,6 +830,7 @@ const mines: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
+    throttle: true,
 
     intervalTicks: 1,
     lengthTicks: 7,
@@ -880,6 +899,7 @@ const saber: Spell = {
     interruptible: true,
 
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
 
     icon: "waveStrike",
 
@@ -912,6 +932,7 @@ const scourge: Spell = {
     },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
+    throttle: false,
     interruptible: true,
     movementCancel: true,
     selfDamage: 10,
@@ -933,6 +954,7 @@ const shield: Spell = {
 
     maxTicks: 2.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
     radius: Hero.Radius * 2,
     takesOwnership: true,
     blocksTeleporters: false,
@@ -953,6 +975,7 @@ const icewall: Spell = {
     maxTicks: 1.25 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
     takesOwnership: true,
     blocksTeleporters: true,
 
@@ -976,6 +999,7 @@ const teleport: Spell = {
     range: 0.25,
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
     movementProportionWhileCharging: 1.0,
     interruptible: false,
 
@@ -994,6 +1018,7 @@ const thrust: Spell = {
     range: 0.25,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
 
     damageTemplate: {
         damage: 0,
@@ -1017,6 +1042,7 @@ const swap: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
 
     projectile: {
         density: 0.001,
@@ -1056,6 +1082,7 @@ const voidRush: Spell = {
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
+    throttle: false,
 
     buffs: [
         {

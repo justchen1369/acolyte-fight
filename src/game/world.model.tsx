@@ -24,10 +24,11 @@ export namespace SpecialKeys {
 
 export namespace CastStage {
 	export const Cooldown = 1;
-	export const Orientating = 2;
-	export const Charging = 3;
-	export const Channelling = 4;
-	export const Complete = 5;
+	export const Throttle = 2;
+	export const Orientating = 3;
+	export const Charging = 4;
+	export const Channelling = 5;
+	export const Complete = 6;
 }
 
 export interface World {
@@ -333,6 +334,7 @@ export interface Hero extends WorldObjectBase {
 	target?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
+	throttleUntilTick: number;
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone

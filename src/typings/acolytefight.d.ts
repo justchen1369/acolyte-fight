@@ -55,6 +55,8 @@ declare interface HeroSettings {
 	
 	DamageMitigationTicks: number; // Within these many ticks, damage does not stack between multiple players
 
+	ThrottleTicks: number; // Within these many ticks, disallow multiple spells to be cast by the same hero
+
     AdditionalDamageMultiplier: number; // Damage scaling
     AdditionalDamagePower: number;
 
@@ -149,6 +151,7 @@ declare interface SpellBase {
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
+	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
