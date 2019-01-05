@@ -1055,6 +1055,7 @@ const swap: Spell = {
         expireOn: Categories.All, // Expire on a shield, don't bounce off it
         expireAfterCursorTicks: 0,
         shieldTakesOwnership: false,
+        selfPassthrough: true,
 
         swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
 
