@@ -500,14 +500,14 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 15,
+    chargeTicks: 5,
     cooldown: 1.5 * TicksPerSecond,
 
     projectile: {
         density: 2,
         radius: 0.001,
         speed: 0.7,
-        maxTicks: 6,
+        maxTicks: 5,
         damage: 0,
         categories: Categories.Projectile,
         collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
@@ -516,8 +516,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 7.5,
-            lifeSteal: 0.5,
+            damage: 10,
+            lifeSteal: 1,
             radius: 0.025,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
