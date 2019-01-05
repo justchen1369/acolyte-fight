@@ -372,7 +372,7 @@ const homing: Spell = {
     color: '#44ffcc',
     icon: "boltSaw",
 
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 9 * TicksPerSecond,
     throttle: true,
     maxAngleDiffInRevs: 0.01,
 
@@ -380,7 +380,7 @@ const homing: Spell = {
         density: 25,
         radius: 0.003,
         speed: 0.15,
-        maxTicks: 4 * TicksPerSecond,
+        maxTicks: 5 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
