@@ -219,7 +219,7 @@ const triplet: Spell = {
         radius: 0.002,
         speed: 0.3,
         maxTicks: 100,
-        damage: 3.75,
+        damage: 3,
         categories: Categories.Projectile,
 
         sound: "triplet",
