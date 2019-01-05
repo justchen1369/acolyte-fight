@@ -1366,10 +1366,12 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 }
 
 function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
+	console.log("Hit", projectile.type, hitId, world.tick);
 	const hitTick = projectile.hitTick.get(hitId);
 	if (hitTick) {
 		if (projectile.hitInterval) {
 			if (world.tick - hitTick < projectile.hitInterval) {
+				console.log("Hit cancelled", projectile.type, hitId, world.tick);
 				return false;
 			}
 		} else {
