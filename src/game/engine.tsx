@@ -2436,7 +2436,9 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
 	// Self damage
-	hero.health = Math.max(spell.minSelfHealth, hero.health - spell.selfDamage);
+	const selfDamage = Math.min(spell.selfDamage, Math.max(0, hero.health - spell.minSelfHealth));
+	const selfPacket = instantiateDamage({ damage: selfDamage }, hero.id, world);
+	applyDamage(hero, selfPacket, world);
 
 	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.sound);
 
