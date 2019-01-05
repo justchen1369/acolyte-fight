@@ -2163,7 +2163,7 @@ function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProp
 	hero.moveTo = done ? null : target;
 }
 
-function stopAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
+function stopAction(world: w.World, hero: w.Hero, action: w.Action, spell: StopSpell) {
 	// hero.moveTo = null; // Just cancel the spell but not the movement
 	return true;
 }
