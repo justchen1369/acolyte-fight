@@ -6,6 +6,7 @@ import * as s from '../store.model';
 import { SpellIcon } from '../controls/spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
+import * as parties from '../core/parties';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
@@ -36,7 +37,12 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-const cloudUploadDebounced = _.debounce(() => cloud.uploadSettings(), 500);
+const uploadSettingsDebounced = _.debounce(() => uploadSettings(), 500);
+
+function uploadSettings() {
+    parties.updatePartyAsync();
+    cloud.uploadSettings();
+}
 
 class SpellKeyConfig extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -101,7 +107,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
 
         StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
         Storage.saveKeyBindingConfig(config);
-        cloudUploadDebounced();
+        uploadSettingsDebounced();
 
         this.setState({ saved: true, hovering: null });
 
