@@ -1026,7 +1026,7 @@ const swap: Spell = {
         damage: 0,
         categories: Categories.Projectile,
         collideWith: Categories.All ^ Categories.Projectile,
-        expireOn: Categories.All ^ Categories.Shield,
+        expireOn: Categories.All, // Expire on a shield, don't bounce off it
         expireAfterCursorTicks: 0,
         shieldTakesOwnership: false,
 
