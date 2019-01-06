@@ -1347,7 +1347,11 @@ export function calculatePartialDamageMultiplier(world: w.World, projectile: w.P
 	const partialDamage = projectile.partialDamage;
 	const lifetime = world.tick - projectile.createTick;
 	if (partialDamage && lifetime < partialDamage.ticks) {
-		return partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * (lifetime / partialDamage.ticks);
+		if (partialDamage.immediate) {
+			return partialDamage.initialMultiplier;
+		} else {
+			return partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * (lifetime / partialDamage.ticks);
+		}
 	} else {
 		return 1;
 	}

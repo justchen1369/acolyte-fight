@@ -404,7 +404,7 @@ const homing: Spell = {
 const boomerang: Spell = {
     id: 'boomerang',
     name: 'Orbiter',
-    description: "Around and around you. Keep your enemies at a safe distance.",
+    description: "Around and around you. Keep following your enemies at orbital distance until it hits.",
     action: "projectile",
 
     color: '#ff00ff',
@@ -852,8 +852,9 @@ const mines: Spell = {
         },
 
         partialDamage: {
-            initialMultiplier: 0.001,
+            initialMultiplier: 0.5,
             ticks: 6,
+            immediate: true,
         },
 
         detonate: {
