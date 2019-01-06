@@ -1770,7 +1770,7 @@ function expireOnHeroHit(behaviour: w.ExpireOnHeroHitBehaviour, world: w.World) 
 	const hitTick = hero.hitTick || 0;
 	const previousHitTick = behaviour.lastHitTick || 0;
 	if (hitTick > previousHitTick) {
-		behaviour.lastHitTick = hero.damagedTick;
+		behaviour.lastHitTick = hero.hitTick;
 
 		for (const projectileId of hero.strafeIds) {
 			const projectile = world.objects.get(projectileId);
