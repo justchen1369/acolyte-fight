@@ -60,7 +60,7 @@ const Choices: ChoiceSettings = {
 		"a": ["thrust", "teleport", "swap", "voidRush"],
 		"q": ["fireball", "flamestrike", "triplet", "retractor", "whip"],
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
-		"e": ["shield", "icewall", "drain", "saber", "meteor"],
+		"e": ["saber", "shield", "icewall", "drain", "meteor"],
 		"r": ["kamehameha", "bouncer", "supernova"],
 		"f": ["scourge", "firespray", "mines", "halo"],
 	},
@@ -512,7 +512,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 5,
+    chargeTicks: 15,
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
@@ -530,11 +530,11 @@ const whip: Spell = {
 
         detonate: {
             damage: 7.5,
-            outerDamage: 3.75,
+            outerDamage: 7.5,
             lifeSteal: 1,
-            radius: 0.025,
-            minImpulse: 0.0001,
-            maxImpulse: 0.00005,
+            radius: 0.0125,
+            minImpulse: 0.0002,
+            maxImpulse: 0.0002,
             renderTicks: 10,
         },
 

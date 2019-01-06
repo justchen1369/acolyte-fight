@@ -1766,8 +1766,6 @@ function expireOnHeroHit(hero: w.Hero, world: w.World) {
 		const projectile = world.objects.get(projectileId);
 		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
 			projectile.expireTick = world.tick;
-
-			break; // Only expire one
 		}
 	}
 
