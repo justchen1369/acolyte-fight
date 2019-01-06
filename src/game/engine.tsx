@@ -449,6 +449,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
 		detonate: projectileTemplate.detonate,
+		buffs: projectileTemplate.buffs,
 		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
 
@@ -1326,6 +1327,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 		packet = scaleForPartialDamage(world, projectile, packet);
 		applyDamage(hero, packet, world);
+		applyBuffs(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
 		projectile.hit = world.tick;
@@ -1370,12 +1372,10 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 }
 
 function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
-	console.log("Hit", projectile.type, hitId, world.tick);
 	const hitTick = projectile.hitTick.get(hitId);
 	if (hitTick) {
 		if (projectile.hitInterval) {
 			if (world.tick - hitTick < projectile.hitInterval) {
-				console.log("Hit cancelled", projectile.type, hitId, world.tick);
 				return false;
 			}
 		} else {
@@ -1488,6 +1488,16 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 
 function swapOnExpiry(projectile: w.Projectile, world: w.World) {
 	applySwap(projectile, null, world);
+}
+
+function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
+	if (!projectile.buffs) {
+		return;
+	}
+
+	projectile.buffs.forEach(template => {
+		instantiateBuff(projectile.id, template, hero, world);
+	});
 }
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {

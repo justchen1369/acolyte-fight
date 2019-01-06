@@ -231,6 +231,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	swapWith?: number; // Category flags of what types of objects to swap with
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
 
+	buffs?: BuffTemplate[];
 	behaviours?: BehaviourTemplate[],
 
 	minTicks?: number; // The minimum number of ticks that a projectile will live for. The main purpose of this is to work around a quirk in the physics engine where if projectiles doesn't live for more than 1 tick, it doesn't affect the physics.

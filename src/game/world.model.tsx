@@ -503,6 +503,7 @@ export interface Projectile extends WorldObjectBase {
 	gravity?: GravityParameters;
 	link?: LinkParameters;
 	detonate?: DetonateParameters;
+	buffs?: BuffTemplate[];
 	swapWith?: number;
 	shieldTakesOwnership: boolean;
 
