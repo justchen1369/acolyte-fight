@@ -530,10 +530,11 @@ const whip: Spell = {
 
         detonate: {
             damage: 7.5,
+            outerDamage: 3.75,
             lifeSteal: 1,
             radius: 0.025,
             minImpulse: 0.0001,
-            maxImpulse: 0.0001,
+            maxImpulse: 0.00005,
             renderTicks: 10,
         },
 
