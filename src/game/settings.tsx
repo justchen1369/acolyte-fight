@@ -417,7 +417,7 @@ const boomerang: Spell = {
     projectile: {
         density: 1,
         radius: 0.003,
-        speed: 0.4,
+        speed: 0.6,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
@@ -425,8 +425,8 @@ const boomerang: Spell = {
         behaviours: [
             {
                 type: "homing",
-                revolutionsPerSecond: 0.02,
-                maxTurnProportion: 0.05,
+                revolutionsPerSecond: 1,
+                maxTurnProportion: 0.075,
                 minDistanceToTarget: 0.075,
                 targetType: HomingTargets.self,
             },
