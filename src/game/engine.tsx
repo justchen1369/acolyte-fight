@@ -1767,7 +1767,9 @@ function expireOnHeroHit(behaviour: w.ExpireOnHeroHitBehaviour, world: w.World) 
 		return false;
 	}
 
-	if ((hero.damagedTick || 0) > (behaviour.lastHitTick || 0)) {
+	const hitTick = hero.hitTick || 0;
+	const previousHitTick = behaviour.lastHitTick || 0;
+	if (hitTick > previousHitTick) {
 		behaviour.lastHitTick = hero.damagedTick;
 
 		for (const projectileId of hero.strafeIds) {
@@ -2545,6 +2547,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	const fromHeroId = packet.fromHeroId;
 
 	// Register hit
+	toHero.hitTick = world.tick;
 	if (packet.damage > 0) {
 		if (packet.isLava) {
 			toHero.lavaTick = world.tick;

@@ -778,7 +778,7 @@ const halo: Spell = {
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {

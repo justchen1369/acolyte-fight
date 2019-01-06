@@ -324,6 +324,7 @@ export interface Hero extends WorldObjectBase {
 	radius: number;
 	moveSpeedPerSecond: number;
 	revolutionsPerTick: number;
+	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
 
@@ -484,7 +485,9 @@ export interface Projectile extends WorldObjectBase {
 	owner: string;
 	body: pl.Body;
 	collideWith: number;
+	collidedTick?: number;
 	hit?: number;
+
 	speed: number;
 	fixedSpeed: boolean;
 	strafe?: StrafeParameters;
