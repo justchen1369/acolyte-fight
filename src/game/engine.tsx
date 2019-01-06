@@ -775,36 +775,26 @@ function handleTexting(ev: w.Texting, world: w.World) {
 }
 
 function handleClosing(ev: w.Closing, world: w.World) {
+	const isNew = ev.startTick < world.startTick; // This message gets sent twice, don't respond to it multiple times
 	world.startTick = ev.startTick;
 
-	// Obstacles movable now
-	world.objects.forEach(obstacle => {
-		if (obstacle.category === "obstacle") {
-			obstacle.body.resetMassData();
-		}
-	});
-
-	// Clear any stockpiled halos
-	world.objects.forEach(hero => {
-		if (!(hero && hero.category === "hero")) {
-			return;
-		}
-
-		const halos = new Array<w.Projectile>();
-		for (const projectileId of hero.strafeIds) {
-			const projectile = world.objects.get(projectileId);
-			if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
-				halos.push(projectile);
+	if (isNew) {
+		// Obstacles movable now
+		world.objects.forEach(obstacle => {
+			if (obstacle.category === "obstacle") {
+				obstacle.body.resetMassData();
 			}
-		}
+		});
 
-		if (halos.length > 1) {
-			halos.pop(); // Clear all except last halo
-			halos.forEach(halo => {
-				halo.expireTick = world.tick;
-			});
-		}
-	});
+		// Clear any stockpiled halos
+		world.objects.forEach(projectile => {
+			if (projectile.category !== "projectile") {
+				return;
+			}
+
+			projectile.expireTick = Math.min(projectile.expireTick, ev.startTick);
+		});
+	}
 
 	if (world.tick >= world.startTick) {
 		// Close any customising dialogs as they cannot be used anymore now the game has started
