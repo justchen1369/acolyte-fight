@@ -1003,7 +1003,7 @@ const teleport: Spell = {
     id: 'teleport',
     description: "Teleport to a nearby location. Get close, or get away.",
 
-    range: 0.45,
+    range: 0.25,
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
