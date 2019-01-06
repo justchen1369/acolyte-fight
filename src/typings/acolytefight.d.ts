@@ -260,7 +260,7 @@ declare interface DestructibleParameters {
 declare interface PartialDamageParameters {
 	initialMultiplier: number; // Initially, the projectile initially does this multiplier
 	ticks: number; // The projectile grows to full damage when it reaches this lifetime
-	immediate?: boolean; // Grow from initial to full damage at ticks in one step, rather than linear growth
+	step?: boolean; // Grow from initial to full damage at ticks in one step, rather than linear growth
 }
 
 declare interface GravityParameters {

@@ -854,7 +854,7 @@ const mines: Spell = {
         partialDamage: {
             initialMultiplier: 0.5,
             ticks: 6,
-            immediate: true,
+            step: true,
         },
 
         detonate: {
