@@ -848,7 +848,6 @@ const mines: Spell = {
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
         expireOn: Categories.All,
-        selfPassthrough: true,
         destructible: {
             detonate: true,
         },
