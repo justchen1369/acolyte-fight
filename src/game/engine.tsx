@@ -362,7 +362,6 @@ function addHero(world: w.World, heroId: string) {
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
-	world.behaviours.push({ type: "expireOnHeroHit", heroId: hero.id });
 
 	return hero;
 }
@@ -581,7 +580,6 @@ export function tick(world: w.World) {
 		removePassthrough,
 		thrustDecay,
 		expireBuffs,
-		expireOnHeroHit,
 	});
 
 	applyLavaDamage(world);
@@ -1246,6 +1244,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			hero.thrust.alreadyHit.add(other.id);
 			const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 			applyDamage(other, damagePacket, world);
+			expireOnHeroHit(other, world);
 		}
 	}
 }
@@ -1320,6 +1319,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		applyBuffs(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
+		expireOnHeroHit(hero, world);
 		projectile.hit = world.tick;
 	}
 
@@ -1761,24 +1761,13 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 	return true;
 }
 
-function expireOnHeroHit(behaviour: w.ExpireOnHeroHitBehaviour, world: w.World) {
-	const hero = world.objects.get(behaviour.heroId);
-	if (!(hero && hero.category === "hero")) {
-		return false;
-	}
+function expireOnHeroHit(hero: w.Hero, world: w.World) {
+	for (const projectileId of hero.strafeIds) {
+		const projectile = world.objects.get(projectileId);
+		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
+			projectile.expireTick = world.tick;
 
-	const hitTick = hero.hitTick || 0;
-	const previousHitTick = behaviour.lastHitTick || 0;
-	if (hitTick > previousHitTick) {
-		behaviour.lastHitTick = hero.hitTick;
-
-		for (const projectileId of hero.strafeIds) {
-			const projectile = world.objects.get(projectileId);
-			if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
-				projectile.expireTick = world.tick;
-
-				break; // Only expire one
-			}
+			break; // Only expire one
 		}
 	}
 
@@ -1924,6 +1913,7 @@ function applyLavaDamage(world: w.World) {
 						damage: damagePacket.damage * damageMultiplier,
 					};
 					applyDamage(obj, heroDamagePacket, world);
+					expireOnHeroHit(obj, world);
 				}
 			}
 		} else if (obj.category === "obstacle") {
