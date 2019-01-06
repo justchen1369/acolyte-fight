@@ -823,7 +823,7 @@ const halo: Spell = {
 const mines: Spell = {
     id: 'mines',
     name: 'Slowing Mines',
-    description: "Mark out your territory with mines which slow by 50% for 1 second. If the mines hit before they reach their mine positions, they will only do 50% damage.",
+    description: "Mark out your territory with mines which slow by 50% for 1.5 seconds. If the mines hit before they reach their mine positions, they will only do 50% damage.",
     action: "spray",
     sound: "mines",
 
@@ -875,7 +875,7 @@ const mines: Spell = {
             {
                 type: "movement",
                 movementProportion: 0.5,
-                maxTicks: 1 * TicksPerSecond,
+                maxTicks: 1.5 * TicksPerSecond,
             },
         ],
 
