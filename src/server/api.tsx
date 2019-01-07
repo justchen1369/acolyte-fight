@@ -263,8 +263,8 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
 		allowBots: replay.allowBots,
 		live: false,
 		history: replay.history,
-		numPlayersPublic: 0,
-		numPlayersInSegment: 0,
+		numPlayersPublic: null,
+		numPlayersInSegment: null,
     };
     res.send(response);
 }

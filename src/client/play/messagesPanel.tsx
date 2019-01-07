@@ -150,6 +150,10 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
+        if (notification.numPlayersPublic === null || notification.numPlayersPublic === undefined) {
+            return null;
+        }
+
         const a = options.getProvider();
         return <div key={key} className="row">
             <div>
