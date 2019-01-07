@@ -43,7 +43,8 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
     const request: m.GameListRequest = {
         ids: gameIds,
     };
-    const origin = url.getOrigin(server);
+    const region = url.getRegion(server);
+    const origin = url.getOrigin(region);
     const res = await fetch(`${origin}/api/games`, {
         headers: {
             ...credentials.headers(),
@@ -63,7 +64,8 @@ export async function watch(gameId: string, server: string) {
 }
 
 async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
-    const origin = url.getOrigin(server);
+    const region = url.getRegion(server);
+    const origin = url.getOrigin(region);
     const res = await fetch(`${origin}/api/games/${gameId}`, {
         ...credentials.headers(),
         credentials: 'same-origin',
