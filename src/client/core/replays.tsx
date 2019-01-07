@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
+import * as credentials from './credentials';
 import * as matches from './matches';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
@@ -45,6 +46,8 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
     const origin = url.getOrigin(server);
     const res = await fetch(`${origin}/api/games`, {
         headers: {
+            ...credentials.headers(),
+            credentials: 'same-origin',
             "Content-Type": "application/json",
         },
         method: "POST",
@@ -61,7 +64,10 @@ export async function watch(gameId: string, server: string) {
 
 async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
     const origin = url.getOrigin(server);
-    const res = await fetch(`${origin}/api/games/${gameId}`);
+    const res = await fetch(`${origin}/api/games/${gameId}`, {
+        ...credentials.headers(),
+        credentials: 'same-origin',
+    });
     const response: m.HeroMsg = await res.json();
     return response;
 }
