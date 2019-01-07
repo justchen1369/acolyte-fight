@@ -9,7 +9,11 @@ import * as url from '../url';
 export async function checkForReplays(gameStats: d.GameStats[]) {
     const gamesByServer = _.groupBy(gameStats, (x: d.GameStats) => (x.server || ""));
     for (let server in gamesByServer) {
-        await checkForReplaysOnServer(gamesByServer[server].map(x => x.id), server);
+        try {
+            await checkForReplaysOnServer(gamesByServer[server].map(x => x.id), server);
+        } catch (error) {
+            console.error("Failed to load replays from server", server, error);
+        }
     }
 }
 
@@ -60,7 +64,11 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
 
 export async function watch(gameId: string, server: string) {
     const replay = await getReplay(gameId, server);
-    matches.watchReplayFromObject(replay);
+    if (replay) {
+        matches.watchReplayFromObject(replay);
+    } else {
+        throw "Replay not found";
+    }
 }
 
 async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
@@ -70,6 +78,10 @@ async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
         ...credentials.headers(),
         credentials: 'same-origin',
     });
-    const response: m.HeroMsg = await res.json();
-    return response;
+    if (res.status === 200) {
+        const response: m.HeroMsg = await res.json();
+        return response;
+    } else {
+        return null;
+    }
 }
