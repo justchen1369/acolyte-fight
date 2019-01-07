@@ -5,6 +5,7 @@ import * as SocketIO from 'socket.io-client';
 import * as StoreProvider from '../storeProvider';
 import { notify } from './notifications';
 
+let alreadyConnected = false;
 let serverInstanceId: string = null;
 
 export let socket: SocketIOClient.Socket = null;
@@ -25,7 +26,13 @@ export interface Listeners {
 	onRoomMsg: (msg: m.RoomUpdateMsg) => void;
 }
 
-export function connect(socketUrl: string, authToken: string, onConnect: (socket: SocketIOClient.Socket) => void) {
+export function connect(
+	socketUrl: string,
+	authToken: string,
+	onConnect: (socket: SocketIOClient.Socket) => void,
+	onReconnect: (socket: SocketIOClient.Socket) => void,
+	onDisconnect: () => void) {
+
 	const config: SocketIOClient.ConnectOpts = {};
 	(config as any).parser = msgpackParser;
 
@@ -38,7 +45,7 @@ export function connect(socketUrl: string, authToken: string, onConnect: (socket
 	}
 	socket = SocketIO.default(socketUrl, config);
 
-	attachToSocket(socket, () => onConnect(socket));
+	attachToSocket(socket, () => onConnect(socket), () => onReconnect(socket), onDisconnect);
 }
 
 
@@ -62,7 +69,7 @@ export function connectToServer(server: string): Promise<void> {
 	}
 }
 
-function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
+function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void, onReconnect: () => void, onDisconnect: () => void) {
 	socket = _socket;
 	socket.on('connect', () => {
 		console.log("Connected as socket " + socket.id);
@@ -70,17 +77,25 @@ function attachToSocket(_socket: SocketIOClient.Socket, onConnect: () => void) {
 			const newInstanceId = response.instanceId;
 			if (serverInstanceId && serverInstanceId !== newInstanceId) {
 				// The server has restarted, we need to reload because there might be a new release
+				console.log("Server instance changed, forcing disconnect", serverInstanceId, newInstanceId);
 				onDisconnectMsg();
+
 			} else {
 				StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
 				serverInstanceId = newInstanceId;
-				onConnect();
+
+				if (alreadyConnected) {
+					onReconnect();
+				} else {
+					alreadyConnected = true;
+					onConnect();
+				}
 			}
 		});
 	});
 	socket.on('disconnect', () => {
 		console.log("Disconnected");
-		onDisconnectMsg();
+		onDisconnect();
 	});
 	socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
 	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));

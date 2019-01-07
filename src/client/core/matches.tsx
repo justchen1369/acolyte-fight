@@ -13,30 +13,34 @@ import { notify } from './notifications';
 import { socket } from './sockets';
 
 export interface JoinParams {
-	observeGameId?: string;
+	gameId?: string;
+	observe?: boolean;
 	live?: boolean;
 	layoutId?: string;
 	roomId?: string;
 	locked?: boolean;
+	reconnectKey?: string;
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
 		const live = opts.live || false;
-		const observe = live || !!opts.observeGameId;
+		const observe = opts.observe || false;
 		const locked = opts.locked || false;
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
-			leaveCurrentGame(false);
+			if (!opts.reconnectKey) {
+				leaveCurrentGame(false);
+			}
 
 			const msg: m.JoinMsg = {
-				gameId: opts.observeGameId || null,
+				gameId: opts.gameId || null,
 				name: store.playerName,
 				keyBindings: store.keyBindings,
 				room: opts.roomId || store.room.id,
 				layoutId: opts.layoutId || null,
-				isBot: ai.playingAsAI(store) && !opts.observeGameId,
+				isBot: ai.playingAsAI(store) && !opts.gameId,
 				isMobile,
 				observe,
 				live,
@@ -53,8 +57,8 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 			});
 		} else {
 			// New server? Reload the client, just in case the version has changed.
-			if (opts.observeGameId) {
-				window.location.href = url.getPath({ ...store.current, gameId: opts.observeGameId, server: null });
+			if (opts.gameId) {
+				window.location.href = url.getPath({ ...store.current, gameId: opts.gameId, server: null });
 			} else {
 				const hash = live ? "watch" : "join";
 				window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
@@ -67,6 +71,17 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 
 export async function watchLiveGame() {
 	return await joinNewGame({ live: true });
+}
+
+export async function reconnectToGame() {
+	const store = StoreProvider.getState();
+	const world = store.world;
+	if (world.ui.myGameId && world.ui.myHeroId && world.ui.reconnectKey) {
+		await joinNewGame({
+			gameId: world.ui.myGameId,
+			reconnectKey: world.ui.reconnectKey,
+		});
+	}
 }
 
 export function addBotToCurrentGame() {
@@ -126,12 +141,22 @@ export function replays(ids: string[]): Promise<string[]> {
 }
 
 export function onHeroMsg(data: m.HeroMsg) {
-	leaveCurrentGame(false);
+	const store = StoreProvider.getState();
 
-	const world = engine.initialWorld(data.mod);
+	let world: w.World;
+	if (store.world.ui.myGameId === data.gameId) {
+		// Reconnect to game
+		console.log("Reconnecting to game", data.gameId);
+		world = store.world;
+	} else {
+		leaveCurrentGame(false);
+		world = engine.initialWorld(data.mod);
+	}
+
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;
+	world.ui.reconnectKey = data.reconnectKey;
 
 	ticker.reset(data.history, data.live);
 

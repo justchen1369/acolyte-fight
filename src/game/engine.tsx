@@ -72,6 +72,7 @@ export function initialWorld(mod: Object): w.World {
 			myGameId: null,
 			myHeroId: null,
 			myPartyId: null,
+			reconnectKey: null,
 			renderedTick: null,
 			playedTick: -1,
 			destroyed: [],

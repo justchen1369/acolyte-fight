@@ -141,6 +141,7 @@ export interface JoinMsg {
     live: boolean;
     locked: boolean;
     version: string;
+    reconnectKey?: string;
 }
 
 export interface JoinResponse {
@@ -204,6 +205,8 @@ export interface RoomUpdateMsg {
 export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
+    reconnectKey: string | null; // Use this to reconnect to the same hero ID
+
     isPrivate: boolean;
     partyId: string;
     room: string | null;

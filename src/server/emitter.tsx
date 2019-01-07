@@ -372,7 +372,7 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 		const assignments = games.assignPartyToGames(party);
 		parties.onPartyStarted(party, assignments);
 		assignments.forEach(assignment => {
-			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId);
+			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId, assignment.reconnectKey);
 		});
 	}
 
@@ -402,6 +402,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& optional(data.isMobile, "boolean")
 		&& optional(data.locked, "boolean")
 		&& optional(data.observe, "boolean")
+		&& optional(data.reconnectKey, "string")
 	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
@@ -439,9 +440,10 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		return null as g.Replay;
 	}).then(game => {
 		if (game) {
-			let heroId = null;
+			let heroId: string = null;
+			let reconnectKey: string = null;
 			if (!data.observe && store.activeGames.has(game.id)) {
-				heroId = games.joinGame(game as g.Game, {
+				const joinResult = games.joinGame(game as g.Game, {
 					name: playerName,
 					keyBindings: data.keyBindings,
 					isBot: data.isBot,
@@ -449,10 +451,15 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 					authToken,
 					socketId: socket.id,
 					version: data.version,
+					reconnectKey: data.reconnectKey,
 				});
+				if (joinResult) {
+					heroId = joinResult.heroId;
+					reconnectKey = joinResult.reconnectKey;
+				}
 			}
 
-			emitHero(socket.id, game, heroId, data.live);
+			emitHero(socket.id, game, heroId, reconnectKey, data.live);
 
 			if (heroId) {
 				const botLog = data.isBot ? " (bot)" : "";
@@ -553,7 +560,7 @@ function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameLi
 	callback({ success: true, ids: availableIds });
 }
 
-function emitHero(socketId: string, game: g.Replay, heroId: string, live: boolean = false) {
+function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey: string, live: boolean = false) {
 	const socket = io.sockets.connected[socketId];
 	if (!socket) {
 		return;
@@ -567,6 +574,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, live: boolea
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
+		reconnectKey,
 		isPrivate: game.segment !== publicSegment,
 		partyId: game.partyId,
 		room: game.roomId,

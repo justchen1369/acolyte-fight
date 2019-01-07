@@ -66,6 +66,7 @@ export interface Game extends Replay {
 
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
+    reconnectKeys: Map<string, string>; // key -> heroId
     playerNames: string[];
     userIds: Set<string>;
     socketIds: Set<string>;
@@ -123,6 +124,7 @@ export interface JoinParameters {
     isBot: boolean;
     isMobile: boolean;
     version: string;
+    reconnectKey?: string;
 }
 
 export interface PartyMemberStatus {
@@ -134,7 +136,8 @@ export interface PartyMemberStatus {
 export interface PartyGameAssignment {
 	partyMember: PartyMember;
 	game: Game;
-	heroId: string;
+    heroId: string;
+    reconnectKey: string;
 }
 
 export interface PlayerCounts {

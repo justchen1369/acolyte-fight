@@ -80,6 +80,7 @@ export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
 	myPartyId: string | null;
+	reconnectKey: string | null;
 
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;

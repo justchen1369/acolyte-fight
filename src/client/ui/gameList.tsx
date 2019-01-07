@@ -234,7 +234,7 @@ class GameList extends React.Component<Props, State> {
     private onWatchGameClicked(ev: React.MouseEvent, game: GameRow) {
         ev.preventDefault();
 
-        matches.joinNewGame({ observeGameId: game.id });
+        matches.joinNewGame({ gameId: game.id, observe: true });
     }
 }
 

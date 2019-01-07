@@ -31,8 +31,6 @@ import * as userAgent from './core/userAgent';
 import { base } from './url';
 import Root from './ui/root';
 
-let alreadyConnected = false;
-
 export async function initialize() {
     await loadDependencies();
 
@@ -119,13 +117,8 @@ async function start() {
 
     await new Promise<void>(resolve => {
         sockets.connect(base, a.authToken, async (socket) => {
-            if (alreadyConnected) {
-                return;
-            }
-            alreadyConnected = true; // Only allow the first connection - reconnect might be due to a server update so need to restart
-
+            // on connect
             await sockets.connectToServer(query.server)
-            pages.changePage(query.page, query.profileId);
 
             if (query.party) {
                 await parties.joinPartyAsync(query.party);
@@ -140,11 +133,11 @@ async function start() {
                 if (query.hash === "#join") {
                     // Return to the home page when we exit
                     StoreProvider.dispatch({ type: "updatePage", page: "" });
-                    await matches.joinNewGame({ observeGameId: query.gameId });
+                    await matches.joinNewGame({ });
                 } else if (query.hash === "#watch" || query.page === "watch") {
                     await matches.watchLiveGame();
                 } else if (query.gameId) {
-                    matches.joinNewGame({ observeGameId: query.gameId });
+                    matches.joinNewGame({ gameId: query.gameId, observe: true });
                 }
             } catch(error) {
                 console.error(error)
@@ -157,6 +150,15 @@ async function start() {
                 }
             }
             resolve();
+        },
+        async (socket) => {
+            // Reconnect
+            await sockets.connectToServer(query.server);
+            await matches.reconnectToGame();
+        },
+        async () => {
+            // Disconnect
+            parties.leavePartyAsync(); // Don't await, it'll probably never return
         });
     });
 }
