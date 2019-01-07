@@ -70,7 +70,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 }
 
 export async function watchLiveGame() {
-	return await joinNewGame({ live: true });
+	return await joinNewGame({ observe: true, live: true });
 }
 
 export async function reconnectToGame() {
