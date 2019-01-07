@@ -69,24 +69,25 @@ export const Layouts: Layouts = {
         ]
     },
     "pepper": {
-        obstacles: [
+        "obstacles": [
             {
-                numObstacles: 5,
-                layoutRadius: 0.32,
-                layoutAngleOffsetInRevs: 0,
-                numPoints: 4,
-                extent: 0.015,
-                orientationAngleOffsetInRevs: 0.5 * (1 / 4),
+                "numObstacles": 5,
+                "layoutRadius": 0.32,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.025,
+                "orientationAngleOffsetInRevs": 0.125
             },
             {
-                numObstacles: 5,
-                layoutRadius: 0.15,
-                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
-                numPoints: 4,
-                extent: 0.015,
-                orientationAngleOffsetInRevs: 0.5 * (1 / 4),
-            },
+                "numObstacles": 5,
+                "layoutRadius": 0.15,
+                "layoutAngleOffsetInRevs": 0.1,
+                "numPoints": 4,
+                "extent": 0.015,
+                "orientationAngleOffsetInRevs": 0.125
+            }
         ],
+        "numPoints": 5
     },
     "innerStar": {
         "obstacles": [
@@ -126,16 +127,32 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.16666667,
     },
     "surrounded": {
-        obstacles: [
+        "obstacles": [
             {
-                numObstacles: 15,
-                layoutRadius: 0.35,
-                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
-                numPoints: 3,
-                extent: 0.015,
-                orientationAngleOffsetInRevs: 0.5,
+                "numObstacles": 15,
+                "layoutRadius": 0.35,
+                "layoutAngleOffsetInRevs": 0.1,
+                "numPoints": 3,
+                "extent": 0.015,
+                "orientationAngleOffsetInRevs": 0.5
             },
-        ],
+            {
+                "numObstacles": 6,
+                "layoutRadius": 0.15,
+                "layoutAngleOffsetInRevs": 0.2666667,
+                "numPoints": 4,
+                "extent": 0.005,
+                "orientationAngleOffsetInRevs": 0.5
+            },
+            {
+                "numObstacles": 1,
+                "layoutRadius": 0,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.01,
+                "orientationAngleOffsetInRevs": 0.5
+            }
+        ]
     },
     "tripletSwirl": {
         "numPoints": 6,
