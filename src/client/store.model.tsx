@@ -30,7 +30,7 @@ export interface State {
 
     profile: m.GetProfileResponse;
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
-    hasReplayLookup: Map<string, boolean>; // gameId -> hasReplay
+    hasReplayLookup: Map<string, string>; // gameId -> url to replay data
 }
 
 export interface GameOptions {
@@ -258,7 +258,7 @@ export interface UpdateGameStatsAction {
 
 export interface UpdateHasReplayAction {
     type: "updateHasReplay";
-    hasReplayLookup: Map<string, boolean>;
+    hasReplayLookup: Map<string, string>;
 }
 
 export interface UpdateCodeTreeAction {

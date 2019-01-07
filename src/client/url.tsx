@@ -13,6 +13,21 @@ export function getOrigin(region: string) {
     }
 }
 
+export function getRegion(server: string) {
+    if (server) {
+        // Live
+        const match = /^([A-Za-z0-9]+)\-/.exec(server);
+        if (match) {
+            return match[1];
+        } else {
+            return null;
+        }
+    } else {
+        // Dev
+        return null;
+    }
+}
+
 export function parseLocation(location: Location): s.PathElements {
     let path: string = null;
     let page: string = null;

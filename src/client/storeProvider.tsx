@@ -39,7 +39,7 @@ function initialState(): s.State {
         items: [],
         profile: null,
         allGameStats: new Map<string, d.GameStats>(),
-        hasReplayLookup: new Map<string, boolean>(),
+        hasReplayLookup: new Map<string, string>(),
     };
 }
 
@@ -210,7 +210,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         }
         return { ...state, allGameStats };
     } else if (action.type === "updateHasReplay") {
-        const hasReplayLookup = new Map<string, boolean>(state.hasReplayLookup);
+        const hasReplayLookup = new Map<string, string>(state.hasReplayLookup);
         action.hasReplayLookup.forEach((hasReplay, gameId) => {
             hasReplayLookup.set(gameId, hasReplay);
         });

@@ -13,6 +13,7 @@ import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
 import * as games from './games';
+import * as gameStorage from './gameStorage';
 import * as kongregate from './kongregate';
 import * as loadMetrics from './loadMetrics';
 import * as percentiles from './percentiles';
@@ -209,6 +210,65 @@ async function onLogoutAsync(req: express.Request, res: express.Response): Promi
     }
     res.send("OK");
 }
+
+export function onListGames(req: express.Request, res: express.Response) {
+    onListGamesAsync(req, res).catch(error => handleError(error, res));
+}
+
+async function onListGamesAsync(req: express.Request, res: express.Response): Promise<void> {
+    const input = req.body as m.GameListRequest;
+    if (!(required(input, "object")
+		&& required(input.ids, "object") && Array.isArray(input.ids) && input.ids.every(id => required(id, "string")))) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+	const store = getStore();
+	const availableIds = input.ids.filter(id => store.activeGames.has(id) || gameStorage.hasGame(id));
+
+    const response: m.GameListResponse = {
+        success: true,
+        ids: availableIds,
+    };
+    res.send(response);
+}
+
+export function onGetGame(req: express.Request, res: express.Response) {
+    onGetGameAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetGameAsync(req: express.Request, res: express.Response): Promise<void> {
+    const gameId: string = req.params.gameId;
+    if (!(
+        required(gameId, "string")
+    )) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    const replay = await gameStorage.loadGame(gameId);
+    if (!replay) {
+        res.status(404).send("Not found");
+        return;
+    }
+
+    const response: m.HeroMsg = {
+		gameId: replay.id,
+		heroId: null,
+		reconnectKey: null,
+		isPrivate: replay.isPrivate,
+		partyId: replay.partyId,
+		room: replay.roomId,
+		mod: replay.mod,
+		allowBots: replay.allowBots,
+		live: false,
+		history: replay.history,
+		numPlayersPublic: 0,
+		numPlayersInSegment: 0,
+    };
+    res.send(response);
+}
+
 
 export function onGetGameStats(req: express.Request, res: express.Response) {
     onGetGameStatsAsync(req, res).catch(error => handleError(error, res));

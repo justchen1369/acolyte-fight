@@ -7,10 +7,10 @@ import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
+import * as replays from '../core/replays';
 import * as stats from '../core/stats';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
@@ -49,7 +49,7 @@ interface OwnProps {
 interface Props extends OwnProps {
     current: s.PathElements;
     region: string;
-    hasReplayLookup: Map<string, boolean>;
+    hasReplayLookup: Map<string, string>;
 }
 interface State {
     error: string;
@@ -131,25 +131,11 @@ class GameList extends React.Component<Props, State> {
             error: null,
         };
 
-        this.checkForReplays(props.allGameStats.map(gameStats => gameStats.id));
+        replays.checkForReplays(props.allGameStats);
     }
 
     componentWillReceiveProps(newProps: Props) {
-        this.checkForReplays(newProps.allGameStats.map(gameStats => gameStats.id));
-    }
-
-    private async checkForReplays(gameIds: string[]) {
-        const gameIdsToCheck = _.difference(gameIds, [...this.props.hasReplayLookup.keys()]);
-        if (gameIdsToCheck.length === 0) {
-            return;
-        }
-
-        const replayIds = new Set<string>(await matches.replays(gameIdsToCheck));
-        const hasReplayLookup = new Map<string, boolean>(this.props.hasReplayLookup);
-        for (const gameId of gameIdsToCheck) {
-            hasReplayLookup.set(gameId, replayIds.has(gameId));
-        }
-        StoreProvider.dispatch({ type: "updateHasReplay", hasReplayLookup });
+        replays.checkForReplays(newProps.allGameStats);
     }
 
     render() {
@@ -221,7 +207,8 @@ class GameList extends React.Component<Props, State> {
     }
 
     private gameUrl(game: GameRow): string {
-        const origin = url.getOrigin(this.props.region);
+        const region = url.getRegion(game.server) || this.props.region;
+        const origin = url.getOrigin(region);
         const path = url.getPath({
             gameId: game.id,
             party: null,
@@ -234,7 +221,7 @@ class GameList extends React.Component<Props, State> {
     private onWatchGameClicked(ev: React.MouseEvent, game: GameRow) {
         ev.preventDefault();
 
-        matches.joinNewGame({ gameId: game.id, observe: true });
+        replays.watch(game.id, game.server);
     }
 }
 
