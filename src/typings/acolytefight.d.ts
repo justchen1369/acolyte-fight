@@ -276,6 +276,7 @@ declare interface BounceParameters {
 
 declare type BehaviourTemplate =
 	HomingTemplate
+	| UpdateCollideWithTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
@@ -301,6 +302,13 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
+}
+
+declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
+	type: "updateCollideWith";
+
+	afterTicks: number;
+	collideWith: number;
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {

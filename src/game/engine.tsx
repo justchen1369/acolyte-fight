@@ -506,6 +506,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		let behaviour: w.Behaviour = null;
 		if (template.type === "homing") {
 			behaviour = instantiateHoming(template, projectile, world);
+		} else if (template.type === "updateCollideWith") {
+			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
 		}
 
 		const trigger = template.trigger;
@@ -546,6 +548,15 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 	};
 }
 
+function instantiateUpdateProjectileFilter(template: UpdateCollideWithTemplate, projectile: w.Projectile, world: w.World): w.UpdateCollideWithBehaviour {
+	return {
+		type: "updateCollideWith",
+		projectileId: projectile.id,
+		afterTick: world.tick + template.afterTicks,
+		collideWith: template.collideWith,
+	};
+}
+
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
@@ -561,6 +572,7 @@ export function tick(world: w.World) {
 		reflectFollow,
 		saberSwing,
 		thrustBounce,
+		updateCollideWith,
 	});
 
 	physicsStep(world);
@@ -649,6 +661,21 @@ function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.W
 	} else {
 		return true;
 	}
+}
+
+function updateCollideWith(behaviour: w.UpdateCollideWithBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	} 
+
+	if (world.tick < behaviour.afterTick) {
+		return true;
+	}
+
+	projectile.collideWith = behaviour.collideWith;
+	updateMaskBits(projectile.body.getFixtureList(), behaviour.collideWith);
+	return false;
 }
 
 function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {

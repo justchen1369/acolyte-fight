@@ -847,7 +847,7 @@ const mines: Spell = {
         maxTicks: 4.5 * TicksPerSecond,
         damage: 0,
 
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // no shield, intentionally
+        collideWith: Categories.Obstacle | Categories.Massive | Categories.Shield, // Don't hit heroes but bounce off shields at this point
         expireOn: Categories.All,
         destructible: {
             detonate: true,
@@ -886,6 +886,11 @@ const mines: Spell = {
                 trigger: { afterTicks: 6 },
                 newSpeed: 0,
                 redirect: true,
+            },
+            {
+                type: "updateCollideWith",
+                afterTicks: 6,
+                collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Hit heroes not shields here
             },
         ],
 

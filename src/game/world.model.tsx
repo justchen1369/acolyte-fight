@@ -543,6 +543,7 @@ export type Behaviour =
 	| DetonateBehaviour
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
+	| UpdateCollideWithBehaviour
 	| LinkBehaviour
 	| GravityBehaviour
 	| ReflectFollowBehaviour
@@ -589,6 +590,13 @@ export interface RetractorBehaviour extends BehaviourBase {
 export interface RemovePassthroughBehaviour extends BehaviourBase {
 	type: "removePassthrough";
 	projectileId: string;
+}
+
+export interface UpdateCollideWithBehaviour extends BehaviourBase {
+	type: "updateCollideWith";
+	projectileId: string;
+	collideWith: number;
+	afterTick: number;
 }
 
 export interface LinkBehaviour extends BehaviourBase {
