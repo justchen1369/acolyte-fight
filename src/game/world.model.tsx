@@ -144,6 +144,7 @@ export interface Player {
 	isSharedBot: boolean; // Not synced across clients
 	isBot: boolean;
 	isMobile: boolean;
+	dead?: boolean;
 }
 
 export interface ButtonRenderState {

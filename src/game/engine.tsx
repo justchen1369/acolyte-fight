@@ -811,6 +811,11 @@ function handleBotting(ev: w.Botting, world: w.World) {
 
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
+		if (alreadyDead(ev.heroId, world)) {
+			console.log("Cannot revive dead player", ev.heroId);
+			return;
+		}
+
 		hero = addHero(world, ev.heroId);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
@@ -839,6 +844,11 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
+		if (alreadyDead(ev.heroId, world)) {
+			console.log("Cannot revive dead player", ev.heroId);
+			return;
+		}
+
 		hero = addHero(world, ev.heroId);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
@@ -1991,6 +2001,11 @@ function reap(world: w.World) {
 	}
 }
 
+function alreadyDead(heroId: string, world: w.World) {
+	const existingPlayer = world.players.get(heroId);
+	return existingPlayer && existingPlayer.dead;
+}
+
 function notifyWin(world: w.World) {
 	if (world.winner) {
 		return;
@@ -2086,6 +2101,7 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	if (!killed) {
 		return;
 	}
+	killed.dead = true;
 
 	const myHeroId = world.ui.myHeroId;
 
