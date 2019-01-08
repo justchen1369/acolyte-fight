@@ -848,7 +848,7 @@ const mines: Spell = {
         damage: 0,
 
         collideWith: Categories.Obstacle | Categories.Massive | Categories.Shield, // Don't hit heroes but bounce off shields at this point
-        expireOn: Categories.All,
+        expireOn: Categories.All ^ Categories.Shield,
         destructible: {
             detonate: true,
         },
