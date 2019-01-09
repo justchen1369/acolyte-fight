@@ -66,8 +66,9 @@ export function onExternalStatus(req: express.Request, res: express.Response) {
 }
 
 export function handlePreflightRequest(req: express.Request, res: express.Response) {
+    const requestedHeaders = (req.header("Access-Control-Allow-Headers") || "").split(",").map(x => x.trim());
     var headers: http.OutgoingHttpHeaders = {
-        'Access-Control-Allow-Headers': [m.AuthHeader],
+        'Access-Control-Allow-Headers': [...requestedHeaders, m.AuthHeader],
         'Access-Control-Allow-Origin': req.headers.origin || "*",
         'Access-Control-Allow-Credentials': 'true',
     };
