@@ -99,7 +99,7 @@ export function startCurrentGame() {
 	const world = store.world;
 
 	if (world.ui.myGameId && world.ui.myHeroId) {
-		sockets.sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Stop, target: vector.zero() });
+		ticker.sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Stop, target: vector.zero() });
 	}
 }
 

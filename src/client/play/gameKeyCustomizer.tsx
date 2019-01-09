@@ -10,7 +10,7 @@ import * as StoreProvider from '../storeProvider';
 import SpellBtnConfig from './spellBtnConfig';
 
 import { isMobile } from '../core/userAgent';
-import { sendKeyBindings } from '../core/sockets';
+import { sendKeyBindings } from '../core/ticker';
 
 interface Props {
     btn: string;

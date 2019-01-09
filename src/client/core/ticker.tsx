@@ -183,3 +183,49 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 		}
 	});
 }
+
+export function sendAction(gameId: string, heroId: string, action: w.Action) {
+	const Precision = 0.001;
+
+	if (!(gameId && heroId)) {
+		return;
+	}
+
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
+		actionType: m.ActionType.GameAction,
+		spellId: action.type,
+		targetX: Math.round(action.target.x / Precision) * Precision,
+		targetY: Math.round(action.target.y / Precision) * Precision,
+	}
+	send(actionMsg);
+}
+
+export function sendTextMessage(gameId: string, heroId: string, text: string) {
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
+		actionType: m.ActionType.Text,
+		text,
+	};
+	send(actionMsg);
+}
+
+export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings) {
+	if (!(gameId && heroId)) {
+		return;
+	}
+
+	const actionMsg: m.ActionMsg = {
+		gameId,
+		heroId,
+		actionType: m.ActionType.Spells,
+		keyBindings,
+	}
+	send(actionMsg);
+}
+
+function send(msg: m.ActionMsg) {
+	sockets.getSocket().emit('action', msg);
+}

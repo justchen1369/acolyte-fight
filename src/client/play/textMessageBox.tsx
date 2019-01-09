@@ -5,7 +5,7 @@ import * as s from '../store.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
-import * as sockets from '../core/sockets';
+import * as ticker from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
 interface Props {
@@ -78,7 +78,7 @@ class TextMessageBox extends React.Component<Props, State> {
         ev.stopPropagation();
         if (ev.keyCode === 13) {
             if (this.state.text && this.state.text.length > 0) {
-                sockets.sendTextMessage(this.props.myGameId, this.props.myHeroId, this.state.text);
+                ticker.sendTextMessage(this.props.myGameId, this.props.myHeroId, this.state.text);
             }
             this.blur();
         } else if (ev.keyCode === 27) {

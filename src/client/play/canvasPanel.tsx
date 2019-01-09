@@ -13,7 +13,7 @@ import * as w from '../../game/world.model';
 
 import { TicksPerSecond, Pixel } from '../../game/constants';
 import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../core/render';
-import { sendAction } from '../core/sockets';
+import { sendAction } from '../core/ticker';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 

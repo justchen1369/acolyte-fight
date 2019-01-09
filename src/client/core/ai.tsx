@@ -4,7 +4,7 @@ import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
-import { sendAction } from './sockets';
+import { sendAction } from './ticker';
 
 const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
