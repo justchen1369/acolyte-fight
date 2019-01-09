@@ -10,7 +10,7 @@ import * as pages from '../core/pages';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from '../ui/playButton';
-import TextMessageBox from '../ui/textMessageBox';
+import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
 import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
