@@ -1098,7 +1098,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
 	let previous: pl.Vec2 = null;
 
-	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
+	const multiplier = render.noPartialRadius ? 1 : engine.calculatePartialDamageMultiplier(world, projectile);
 	for (let pos of getRenderPoints(projectile.uiPath, render.intermediatePoints)) {
 		if (previous) {
 			world.ui.trails.push({
@@ -1130,7 +1130,7 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 }
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
-	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
+	const multiplier = render.noPartialRadius ? 1 : engine.calculatePartialDamageMultiplier(world, projectile);
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
