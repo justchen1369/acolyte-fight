@@ -14,7 +14,6 @@ const RetestCount = 3;
 const RetestDelayMilliseconds = 1000;
 
 const RegionUrls = [
-    regions.getOrigin("au"),
     regions.getOrigin("eu"),
     regions.getOrigin("us"),
     regions.getOrigin("sg"),
@@ -120,10 +119,11 @@ class RegionList extends React.Component<Props, State> {
             ev.preventDefault();
 
             try {
+                console.log("Changing region...", region.url);
                 await regions.connectToServer(region.url);
             } catch (exception) {
                 console.error("Failed to connect to region", region.url);
-                // window.location.href = region.url;
+                window.location.href = region.url;
             }
         }
     }
