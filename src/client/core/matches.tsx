@@ -60,9 +60,8 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 			if (opts.gameId) {
 				window.location.href = url.getPath({ ...store.current, gameId: opts.gameId, server: null });
 			} else {
-				const hash = live ? "watch" : "join";
-				window.location.href = url.getPath({ ...store.current, gameId: null, server: null, hash });
-				window.location.reload(); // to get the hash respected
+				const page = live ? "watch" : "join";
+				window.location.href = url.getPath({ ...store.current, page, gameId: null, server: null, hash: null });
 			}
 			resolve(true);
 		}

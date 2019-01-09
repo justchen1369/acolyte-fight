@@ -130,7 +130,7 @@ async function start() {
     await loginAsync();
 
     try {
-        if (query.hash === "#join") {
+        if (query.hash === "#join" || query.page === "join") {
             // Return to the home page when we exit
             StoreProvider.dispatch({ type: "updatePage", page: "" });
             await matches.joinNewGame({ });

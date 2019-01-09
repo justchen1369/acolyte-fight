@@ -65,6 +65,7 @@ function reducer(state: s.State, action: s.Action): s.State {
 	    return {
             ...state,
             socketId: null,
+            server: null, // Don't reconnect to existing server since it's shutting down
         };
     } else if (action.type === "disconnected") {
 	    return {
