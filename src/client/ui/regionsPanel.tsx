@@ -9,8 +9,8 @@ import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as regions from '../core/regions';
 
-const RetestCount = 5;
-const RetestDelayMilliseconds = 100;
+const RetestCount = 3;
+const RetestDelayMilliseconds = 1000;
 
 const RegionUrls = [
     regions.getOrigin("eu"),
