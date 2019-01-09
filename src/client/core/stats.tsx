@@ -8,7 +8,7 @@ import * as notifications from './notifications';
 import * as sockets from './sockets';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
-import { socket } from './sockets';
+import { getSocket } from './sockets';
 import { TicksPerSecond } from '../../game/constants';
 
 let alreadyLoadedGameStats = false;
@@ -118,7 +118,7 @@ export async function save(world: w.World, server: string): Promise<d.GameStats>
     const gameStats = gameStatsFromWorld(world, server);
     if (gameStats) {
         if (world.winner) { // Don't confuse server with wrong stats if left early
-            socket.emit('score', gameStatsToMessage(gameStats));
+            getSocket().emit('score', gameStatsToMessage(gameStats));
         }
         await storage.saveGameStats(gameStats);
 

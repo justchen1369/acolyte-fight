@@ -8,7 +8,7 @@ import { notify } from './notifications';
 let alreadyConnected = false;
 let serverInstanceId: string = null;
 
-export let socket: SocketIOClient.Socket = null;
+let socket: SocketIOClient.Socket = null;
 
 export let listeners: Listeners = {
 	onTickMsg: () => { },
@@ -24,6 +24,10 @@ export interface Listeners {
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
 	onRoomMsg: (msg: m.RoomUpdateMsg) => void;
+}
+
+export function getSocket() {
+	return socket;
 }
 
 export function connect(

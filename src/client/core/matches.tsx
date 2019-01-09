@@ -10,7 +10,7 @@ import * as url from '../url';
 import * as vector from '../../game/vector';
 import { isMobile } from './userAgent';
 import { notify } from './notifications';
-import { socket } from './sockets';
+import { getSocket } from './sockets';
 
 export interface JoinParams {
 	gameId?: string;
@@ -47,7 +47,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				locked,
 				version: engine.version(),
 			};
-			socket.emit('join', msg, (response: m.JoinResponseMsg) => {
+			getSocket().emit('join', msg, (response: m.JoinResponseMsg) => {
 				if (response.success) {
 					resolve(true);
 				} else {
@@ -90,7 +90,7 @@ export function addBotToCurrentGame() {
 
 	if (world.ui.myGameId && world.ui.myHeroId) {
 		const botMsg: m.BotMsg = { gameId: world.ui.myGameId };
-		socket.emit('bot', botMsg);
+		getSocket().emit('bot', botMsg);
 	}
 }
 
@@ -117,7 +117,7 @@ export function leaveCurrentGame(close: boolean = true) {
 
 	if (world.ui.myGameId) {
 		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
-		socket.emit('leave', leaveMsg);
+		getSocket().emit('leave', leaveMsg);
 		if (close) {
 			StoreProvider.dispatch({ type: "leaveMatch" });
 		}

@@ -7,7 +7,7 @@ import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import { readFileAsync } from './fileUtils';
-import { socket } from './sockets';
+import { getSocket } from './sockets';
 
 export const DefaultRoom = m.DefaultRoomId;
 
@@ -21,7 +21,7 @@ export function createRoomAsync(mod: Object) {
     console.log("Creating room", mod);
 	return new Promise<string>((resolve, reject) => {
 		let msg: m.CreateRoomRequest = { mod };
-		socket.emit('room.create', msg, (response: m.CreateRoomResponseMsg) => {
+		getSocket().emit('room.create', msg, (response: m.CreateRoomResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -34,7 +34,7 @@ export function createRoomAsync(mod: Object) {
 export function getRoomAsync(roomId: string): Promise<m.JoinRoomResponse> {
     return new Promise<m.JoinRoomResponse>((resolve, reject) => {
         let msg: m.JoinRoomRequest = { roomId };
-        socket.emit('room', msg, (response: m.JoinRoomResponseMsg) => {
+        getSocket().emit('room', msg, (response: m.JoinRoomResponseMsg) => {
             if (response.success === false) {
                 reject(response.error);
             } else {

@@ -7,7 +7,7 @@ import * as rooms from './rooms';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
-import { socket } from './sockets';
+import { getSocket } from './sockets';
 import { isMobile } from './userAgent';
 
 export function createPartyAsync(): Promise<void> {
@@ -21,7 +21,7 @@ export function createPartyAsync(): Promise<void> {
 			isMobile,
 			version: engine.version(),
 		};
-		socket.emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
+		getSocket().emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -45,7 +45,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				isMobile,
 				version: engine.version(),
 			};
-			socket.emit('party', msg, (_response: m.PartyResponseMsg) => {
+			getSocket().emit('party', msg, (_response: m.PartyResponseMsg) => {
 				if (_response.success === false) {
 					reject(_response.error);
 				} else {
@@ -134,7 +134,7 @@ export function tournamentPartyAsync(): Promise<void> {
 
 function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	return new Promise<void>((resolve, reject) => {
-		socket.emit('party.settings', request, (response: m.PartySettingsResponseMsg) => {
+		getSocket().emit('party.settings', request, (response: m.PartySettingsResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -160,7 +160,7 @@ export function updatePartyAsync(): Promise<void> {
 			isMobile,
 			version: engine.version(),
 		};
-		socket.emit('party', msg, (response: m.PartyResponseMsg) => {
+		getSocket().emit('party', msg, (response: m.PartyResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -208,7 +208,7 @@ export async function updateReadyStatusAsync(isReady: boolean): Promise<void> {
 
 async function updatePartyStatusAsync(request: m.PartyStatusRequest): Promise<void> {
 	return new Promise<void>((resolve, reject) => {
-		socket.emit('party.status', request, (response: m.PartyStatusResponseMsg) => {
+		getSocket().emit('party.status', request, (response: m.PartyStatusResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
@@ -228,7 +228,7 @@ export function leavePartyAsync(): Promise<void> {
 
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyStatusRequest = { partyId: store.party.id, kick: true };
-		socket.emit('party.status', msg, (response: m.PartyStatusResponseMsg) => {
+		getSocket().emit('party.status', msg, (response: m.PartyStatusResponseMsg) => {
 			if (response.success === false) {
 				reject(response.error);
 			} else {
