@@ -121,6 +121,7 @@ class RegionList extends React.Component<Props, State> {
             try {
                 console.log("Changing region...", region.url);
                 await regions.connectToServer(region.url);
+                pages.changePage("");
             } catch (exception) {
                 console.error("Failed to connect to region", region.url);
                 window.location.href = region.url;
