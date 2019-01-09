@@ -49,6 +49,8 @@ export async function initialize() {
     sockets.listeners.onPartyMsg = parties.onPartyMsg;
     sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
+    sockets.listeners.onReconnect = onReconnect;
+    sockets.listeners.onDisconnect = onDisconnect;
 
     window.onpopstate = (ev) => {
         const elems: s.PathElements = ev.state;
@@ -150,17 +152,21 @@ async function start() {
                 }
             }
             resolve();
-        },
-        async (socket) => {
-            // Reconnect
-            await sockets.connectToServer(query.server);
-            await matches.reconnectToGame();
-        },
-        async () => {
-            // Disconnect
-            parties.leavePartyAsync(); // Don't await, it'll probably never return
         });
     });
+}
+
+async function onReconnect(socket: SocketIOClient.Socket) {
+    const store = StoreProvider.getState();
+    if (store.server) {
+        await sockets.connectToServer(store.server);
+    }
+
+    await matches.reconnectToGame();
+}
+
+async function onDisconnect() {
+    parties.leavePartyAsync(); // Don't await, it'll probably never return
 }
 
 function render() {
