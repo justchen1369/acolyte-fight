@@ -106,6 +106,7 @@ export function connect(
 		socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 		socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
 		socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
+		socket.on('shutdown', (msg: any) => onServerPreparingToShutdown());
 	});
 }
 
@@ -128,6 +129,11 @@ export function proxy(socket: SocketIOClient.Socket, server: string): Promise<vo
 	} else {
 		return Promise.resolve();
 	}
+}
+
+function onServerPreparingToShutdown() {
+	console.log("Server preparing to shutdown");
+	StoreProvider.dispatch({ type: "serverPreparingToShutdown" });
 }
 
 function onServerRestarted() {

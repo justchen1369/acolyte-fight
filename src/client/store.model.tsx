@@ -84,6 +84,7 @@ export interface PathElements {
 
 export type Action =
     DisconnectedAction
+    | ServerPreparingToShutdownAction
     | UpdateAdsAction
     | UpdateUserIdAction
     | LogoutAction
@@ -122,6 +123,10 @@ export interface JoinMatchAction {
 
 export interface LeaveMatchAction {
     type: "leaveMatch";
+}
+
+export interface ServerPreparingToShutdownAction {
+    type: "serverPreparingToShutdown";
 }
 
 export interface DisconnectedAction {

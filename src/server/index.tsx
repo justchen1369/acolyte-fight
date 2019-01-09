@@ -17,6 +17,7 @@ import { setLocation } from './mirroring';
 import { logger } from './logging';
 import * as dbStorage from './dbStorage';
 import * as discord from './discord';
+import * as emitter from './emitter';
 import * as facebook from './facebook';
 import * as kongregate from './kongregate';
 import * as gameStorage from './gameStorage';
@@ -129,6 +130,7 @@ http.on('close', () => {
 
 process.on('SIGTERM', () => {
 	logger.info("Received shutdown command");
+	emitter.shutdown();
 	http.close();
 });
 

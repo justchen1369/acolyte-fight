@@ -20,6 +20,7 @@ import * as modder from './modder';
 import * as parties from './parties';
 import socketClient from 'socket.io-client';
 
+let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
 
 let io: SocketIO.Server = null;
@@ -33,10 +34,25 @@ export function attachToSocket(_io: SocketIO.Server) {
 	modder.attachRoomUpdateListener(emitRoomUpdate);
 }
 
+export function shutdown() {
+	shuttingDown = true;
+
+	if (io) {
+		io.emit('shutdown', {});
+	}
+}
+
 function onConnection(socket: SocketIO.Socket) {
     const authToken = getAuthTokenFromSocket(socket);
-
 	logger.info(`socket ${socket.id} connected - user ${authToken}`);
+
+	if (shuttingDown) {
+		logger.info(`socket ${socket.id} disconnecting now - shutting down`);
+		socket.disconnect();
+		return;
+	}
+
+
     ++getStore().numConnections;
     
     games.onConnect(socket.id, authToken);

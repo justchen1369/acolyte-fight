@@ -61,7 +61,12 @@ function initialRebindingsNew(): KeyBindings {
 
 
 function reducer(state: s.State, action: s.Action): s.State {
-    if (action.type === "disconnected") {
+    if (action.type === "serverPreparingToShutdown") {
+	    return {
+            ...state,
+            socketId: null,
+        };
+    } else if (action.type === "disconnected") {
 	    return {
             ...state,
             socketId: null,
