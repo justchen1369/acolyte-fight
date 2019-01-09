@@ -1949,7 +1949,6 @@ function applyLavaDamage(world: w.World) {
 						damage: damagePacket.damage * damageMultiplier,
 					};
 					applyDamage(obj, heroDamagePacket, world);
-					expireOnHeroHit(obj, world);
 				}
 			}
 		} else if (obj.category === "obstacle") {
