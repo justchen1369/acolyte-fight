@@ -6,6 +6,7 @@ import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as options from '../options';
 import * as pages from '../core/pages';
 import * as regions from '../core/regions';
 
@@ -112,13 +113,17 @@ class RegionList extends React.Component<Props, State> {
     }
 
     private async onRegionClick(ev: React.MouseEvent, region: Region) {
-        ev.preventDefault();
+        const a = options.getProvider();
 
-        try {
-            await regions.connectToServer(region.url);
-        } catch (exception) {
-            console.error("Failed to connect to region", region.url);
-            window.location.href = region.url;
+        if (a.noExternalLinks) {
+            ev.preventDefault();
+
+            try {
+                await regions.connectToServer(region.url);
+            } catch (exception) {
+                console.error("Failed to connect to region", region.url);
+                window.location.href = region.url;
+            }
         }
     }
 }

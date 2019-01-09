@@ -160,7 +160,7 @@ class MessagesPanel extends React.Component<Props, State> {
                 {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}
                 {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
             </div>
-            {!a.noExternalLinks && this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
+            {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
             {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
         </div>
     }

@@ -61,7 +61,7 @@ class NavBar extends React.Component<Props, State> {
         const a = options.getProvider();
         const horizontal = <>
             {!a.noScrolling && <PageLink page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>}
-            {!a.noExternalLinks && <PageLink page="regions"><i className="fas fa-globe-americas" title="Regions" /></PageLink>}
+            {<PageLink page="regions"><i className="fas fa-globe-americas" title="Regions" /></PageLink>}
             {this.props.isModded && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></PageLink>}
             {this.props.isUsingAI && <PageLink page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></PageLink>}
             {this.props.inParty && <PageLink page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></PageLink>}
@@ -74,7 +74,7 @@ class NavBar extends React.Component<Props, State> {
             <PageLink page=""><i className="icon fas fa-home" /> Home</PageLink>
             {!a.noScrolling && <PageLink page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</PageLink>}
             <PageLink page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
-            {!a.noExternalLinks && <PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
+            {<PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
             {!a.noExternalLinks && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
             {!a.noScrolling && <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>}
             <div className="spacer" />
