@@ -68,6 +68,7 @@ const http = createServer(app, httpsKeyPath, httpsCertPath);
 const io = socketLib(http, {
 	handlePreflightRequest: api.handlePreflightRequest,
 	parser: msgpackParser,
+	origins: '*:*',
 } as any); // needs to be as any because handlePreflightRequest not documented
 
 app.use(express.json());

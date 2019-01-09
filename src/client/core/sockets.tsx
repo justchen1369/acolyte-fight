@@ -5,7 +5,7 @@ import * as SocketIO from 'socket.io-client';
 import * as StoreProvider from '../storeProvider';
 import { notify } from './notifications';
 
-let socket: SocketIOClient.Socket = null;
+let currentSocket: SocketIOClient.Socket = null;
 
 export let listeners: Listeners = {
 	onTickMsg: () => { },
@@ -28,68 +28,89 @@ export interface Listeners {
 }
 
 export function getSocket() {
-	return socket;
+	return currentSocket;
 }
 
 export function connect(
 	socketUrl: string,
-	authToken: string,
-	onConnect: (socket: SocketIOClient.Socket) => void) {
+	authToken: string): Promise<SocketIOClient.Socket> {
 
-	const config: SocketIOClient.ConnectOpts = {};
-	(config as any).parser = msgpackParser;
+	return new Promise<SocketIOClient.Socket>((resolve, reject) => {
+		const config: SocketIOClient.ConnectOpts = {
+		};
+		(config as any).parser = msgpackParser;
 
-	if (authToken) {
-        config.transportOptions = {
-            polling: {
-                extraHeaders: { [m.AuthHeader]: authToken }
-            },
-        };
-	}
-	socket = SocketIO.default(socketUrl, config);
+		if (authToken) {
+			config.transportOptions = {
+				polling: {
+					extraHeaders: { [m.AuthHeader]: authToken }
+				},
+			};
+		}
+		const socket = SocketIO.default(socketUrl, config);
 
-	let alreadyConnected = false;
-	let serverInstanceId: string = null;
+		let alreadyConnected = false;
+		let serverInstanceId: string = null;
 
-	socket.on('connect', () => {
-		console.log("Connected as socket " + socket.id);
-		socket.emit('instance', {} as m.ServerInstanceRequest, (response: m.ServerInstanceResponse) => {
-			const newInstanceId = response.instanceId;
-			if (serverInstanceId && serverInstanceId !== newInstanceId) {
-				// The server has restarted, we need to reload because there might be a new release
-				console.log("Server instance changed, forcing disconnect", serverInstanceId, newInstanceId);
-				onServerRestarted();
-
-			} else {
-				StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
-				serverInstanceId = newInstanceId;
-
-				if (alreadyConnected) {
-					listeners.onReconnect(socket);
+		socket.on('connect', () => {
+			console.log("Connected as socket " + socket.id);
+			socket.emit('instance', {} as m.ServerInstanceRequest, (response: m.ServerInstanceResponse) => {
+				const newInstanceId = response.instanceId;
+				if (serverInstanceId && serverInstanceId !== newInstanceId) {
+					// The server has restarted, we need to reload because there might be a new release
+					console.log("Server instance changed, forcing disconnect", serverInstanceId, newInstanceId);
+					onServerRestarted();
+					reject();
 				} else {
-					alreadyConnected = true;
-					onConnect(socket);
+					StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
+					serverInstanceId = newInstanceId;
+
+					if (alreadyConnected) {
+						listeners.onReconnect(socket);
+					} else {
+						alreadyConnected = true;
+						currentSocket = socket; // The socket is ready, make it used globally
+						resolve(socket);
+					}
 				}
+			});
+		});
+		socket.on('connect_error', (error: any) => {
+			if (!alreadyConnected) {
+				console.log("Socket connect error", error);
+				reject(error);
 			}
 		});
-	});
-	socket.on('disconnect', (reason: string) => {
-		if (reason === 'io server disconnect') {
-			onServerRestarted();
-		}
+		socket.on('connect_timeout', (timeout: any) => {
+			if (!alreadyConnected) {
+				console.log("Socket connect timeout", timeout);
+				reject(timeout);
+			}
+		});
+		socket.on('disconnect', (reason: string) => {
+			console.log("Disconnected", reason);
 
-		console.log("Disconnected");
-		listeners.onDisconnect();
+			if (reason === 'io server disconnect') {
+				onServerRestarted(); // no reconnect when the server itself has restarted
+			}
+
+			if (!alreadyConnected) {
+				socket.close();
+				reject("Failed to establish initial connection with server");
+			}
+
+			listeners.onDisconnect();
+		});
+		socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
+		socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
+		socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
+		socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
+		socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
 	});
-	socket.on('tick', (msg: m.TickMsg) => listeners.onTickMsg(msg));
-	socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
-	socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
-	socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
-	socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
 }
 
 
-export function connectToServer(server: string): Promise<void> {
+export function proxy(socket: SocketIOClient.Socket, server: string): Promise<void> {
 	if (server) {
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.ProxyRequestMsg = { server };
@@ -158,5 +179,5 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 }
 
 function send(msg: m.ActionMsg) {
-	socket.emit('action', msg);
+	getSocket().emit('action', msg);
 }

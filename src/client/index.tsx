@@ -117,49 +117,45 @@ async function start() {
         StoreProvider.dispatch({ type: "updatePlayerName", playerName: a.playerName });
     }
 
-    await new Promise<void>(resolve => {
-        sockets.connect(base, a.authToken, async (socket) => {
-            // on connect
-            await sockets.connectToServer(query.server)
+    const socket = await sockets.connect(base, a.authToken);
+    await sockets.proxy(socket, query.server)
 
-            if (query.party) {
-                await parties.joinPartyAsync(query.party);
-            } else {
-                await rooms.joinRoomAsync(rooms.DefaultRoom);
-                await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
-            }
+    if (query.party) {
+        await parties.joinPartyAsync(query.party);
+    } else {
+        await rooms.joinRoomAsync(rooms.DefaultRoom);
+        await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
+    }
 
-            await loginAsync();
+    await loginAsync();
 
-            try {
-                if (query.hash === "#join") {
-                    // Return to the home page when we exit
-                    StoreProvider.dispatch({ type: "updatePage", page: "" });
-                    await matches.joinNewGame({ });
-                } else if (query.hash === "#watch" || query.page === "watch") {
-                    await matches.watchLiveGame();
-                } else if (query.gameId) {
-                    matches.joinNewGame({ gameId: query.gameId, observe: true });
-                }
-            } catch(error) {
-                console.error(error)
-                socket.disconnect();
-                StoreProvider.dispatch({ type: "disconnected" });
+    try {
+        if (query.hash === "#join") {
+            // Return to the home page when we exit
+            StoreProvider.dispatch({ type: "updatePage", page: "" });
+            await matches.joinNewGame({ });
+        } else if (query.hash === "#watch" || query.page === "watch") {
+            await matches.watchLiveGame();
+        } else if (query.gameId) {
+            matches.joinNewGame({ gameId: query.gameId, observe: true });
+        }
+    } catch(error) {
+        console.error(error)
+        socket.disconnect();
+        StoreProvider.dispatch({ type: "disconnected" });
 
-                if (query.party || query.server) {
-                    // Failed to join party/server, try without server
-                    window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
-                }
-            }
-            resolve();
-        });
-    });
+        if (query.party || query.server) {
+            // Failed to join party/server, try without server
+            window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
+        }
+    }
+
 }
 
 async function onReconnect(socket: SocketIOClient.Socket) {
     const store = StoreProvider.getState();
     if (store.server) {
-        await sockets.connectToServer(store.server);
+        await sockets.proxy(socket, store.server);
     }
 
     await matches.reconnectToGame();

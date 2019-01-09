@@ -6,6 +6,7 @@ import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
+import * as pages from '../core/pages';
 import * as regions from '../core/regions';
 
 const RetestCount = 5;
@@ -105,9 +106,20 @@ class RegionList extends React.Component<Props, State> {
             {this.state.regions.size === 0 && <div className="loading">Loading regions...</div>}
             {this.state.error && <div className="error">{this.state.error}</div>}
             {this.state.regions.valueSeq().map(region => <div className="region" key={region.name}>
-                <a href={region.url} className="region-name">Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
+                <a href={region.url} onClick={(ev) => this.onRegionClick(ev, region)} className="region-name">Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
             </div>).toArray()}
         </div>;
+    }
+
+    private async onRegionClick(ev: React.MouseEvent, region: Region) {
+        ev.preventDefault();
+
+        try {
+            await regions.connectToServer(region.url);
+        } catch (exception) {
+            console.error("Failed to connect to region", region.url);
+            window.location.href = region.url;
+        }
     }
 }
 

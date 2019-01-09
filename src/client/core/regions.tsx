@@ -1,3 +1,6 @@
+import * as options from '../options';
+import * as sockets from './sockets';
+
 export function getOrigin(region: string) {
     if (region) {
         // Live
@@ -21,4 +24,11 @@ export function getRegion(server: string) {
         // Dev
         return null;
     }
+}
+
+export async function connectToServer(url: string) {
+    const a = options.getProvider();
+    console.log("Reconnecting to ", url);
+    await sockets.connect(url, a.authToken);
+    console.log("Successfully connected to ", url);
 }
