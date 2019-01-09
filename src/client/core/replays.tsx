@@ -3,6 +3,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as credentials from './credentials';
 import * as matches from './matches';
+import * as regions from './regions';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
@@ -28,7 +29,7 @@ async function checkForReplaysOnServer(gameIds: string[], server: string) {
     const replayIds = new Set<string>(await listReplays(gameIdsToCheck, server));
     const newReplayLookup = new Map<string, string>();
 
-    const origin = url.getOrigin(server);
+    const origin = regions.getOrigin(server);
     for (const gameId of gameIdsToCheck) {
         let replayUrl: string;
         if (replayIds.has(gameId)) {
@@ -47,8 +48,8 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
     const request: m.GameListRequest = {
         ids: gameIds,
     };
-    const region = url.getRegion(server);
-    const origin = url.getOrigin(region);
+    const region = regions.getRegion(server);
+    const origin = regions.getOrigin(region);
     const res = await fetch(`${origin}/api/games`, {
         headers: {
             ...credentials.headers(),
@@ -72,8 +73,8 @@ export async function watch(gameId: string, server: string) {
 }
 
 async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
-    const region = url.getRegion(server);
-    const origin = url.getOrigin(region);
+    const region = regions.getRegion(server);
+    const origin = regions.getOrigin(region);
     const res = await fetch(`${origin}/api/games/${gameId}`, {
         ...credentials.headers(),
         credentials: 'same-origin',

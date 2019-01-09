@@ -10,6 +10,7 @@ import * as s from '../store.model';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
+import * as regions from '../core/regions';
 import * as replays from '../core/replays';
 import * as stats from '../core/stats';
 import * as StoreProvider from '../storeProvider';
@@ -207,8 +208,8 @@ class GameList extends React.Component<Props, State> {
     }
 
     private gameUrl(game: GameRow): string {
-        const region = url.getRegion(game.server) || this.props.region;
-        const origin = url.getOrigin(region);
+        const region = regions.getRegion(game.server) || this.props.region;
+        const origin = regions.getOrigin(region);
         const path = url.getPath({
             gameId: game.id,
             party: null,

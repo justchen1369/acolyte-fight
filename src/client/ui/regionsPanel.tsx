@@ -6,16 +6,15 @@ import * as Reselect from 'reselect';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as storage from '../storage';
-import * as url from '../url';
+import * as regions from '../core/regions';
 
 const RetestCount = 5;
 const RetestDelayMilliseconds = 100;
 
 const RegionUrls = [
-    url.getOrigin("eu"),
-    url.getOrigin("us"),
-    url.getOrigin("sg"),
+    regions.getOrigin("eu"),
+    regions.getOrigin("us"),
+    regions.getOrigin("sg"),
 ];
 
 interface Region {

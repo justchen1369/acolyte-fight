@@ -6,6 +6,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
+import * as regions from '../core/regions';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
 import PartyGameList from './partyGameList';
@@ -75,7 +76,7 @@ export class PartyPanel extends React.Component<Props, State> {
             return this.renderNoParty();
         }
 
-        const origin = url.getOrigin(party.region);
+        const origin = regions.getOrigin(party.region);
         return <div>
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
