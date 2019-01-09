@@ -824,8 +824,8 @@ const halo: Spell = {
 
 const mines: Spell = {
     id: 'mines',
-    name: 'Slowing Mines',
-    description: "Mark out your territory with mines which slow by 50% for 1.5 seconds.",
+    name: 'Energy Mines',
+    description: "Mark out your territory with some Energy Mines. The mines do zero damage if they hit during deploying.",
     action: "spray",
     sound: "mines",
 
