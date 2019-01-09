@@ -848,14 +848,14 @@ const mines: Spell = {
         maxTicks: 4.5 * TicksPerSecond,
         damage: 0,
 
-        collideWith: Categories.Obstacle | Categories.Massive | Categories.Shield, // Don't hit heroes but bounce off shields at this point
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         expireOn: Categories.All ^ Categories.Shield,
         destructible: {
             detonate: true,
         },
 
         partialDamage: {
-            initialMultiplier: 0.25,
+            initialMultiplier: 0.001,
             ticks: 6,
             step: true,
         },
@@ -872,14 +872,6 @@ const mines: Spell = {
 
         damageScaling: false,
 
-        buffs: [
-            {
-                type: "movement",
-                movementProportion: 0.5,
-                maxTicks: 1.5 * TicksPerSecond,
-            },
-        ],
-
         behaviours: [
             {
                 type: "homing",
@@ -887,11 +879,6 @@ const mines: Spell = {
                 trigger: { afterTicks: 6 },
                 newSpeed: 0,
                 redirect: true,
-            },
-            {
-                type: "updateCollideWith",
-                afterTicks: 6,
-                collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Hit heroes not shields here
             },
         ],
 
