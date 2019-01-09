@@ -434,7 +434,6 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
 
         // Calculate rating deltas
         for (const player of knownPlayers) {
-            const loggedIn = loggedInUsers.has(player.userId);
             const initialRating = initialRatings.get(player.userId);
             const userRating = userRatings.get(player.userId);
             if (initialRating.numGames >= constants.Placements.MinGames) {
@@ -477,9 +476,22 @@ function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, player
     for (let i = 0; i < userIds.length; ++i) {
         const userId = userIds[i];
         const finalRating = finalRatings[i][0];
+        const mean = finalRating.mu * GlickoMultiplier;
+        const rd = finalRating.sigma * GlickoMultiplier;
+
         const userRating = allRatings.get(userId);
-        userRating.rating = finalRating.mu * GlickoMultiplier;
-        userRating.rd = finalRating.sigma * GlickoMultiplier;
+        const isWinner = i === 0;
+        if (isWinner) {
+            const previousLowerBound = calculateLowerBound(userRating.rating, userRating.rd);
+            const newLowerBound = calculateLowerBound(mean, rd);
+            if (newLowerBound < previousLowerBound) {
+                // Don't let the winner lose points
+                continue;
+            }
+        }
+
+        userRating.rating = mean;
+        userRating.rd = rd;
     }
 }
 
