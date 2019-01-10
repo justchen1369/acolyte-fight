@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import fetch from 'node-fetch';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import express from 'express';
