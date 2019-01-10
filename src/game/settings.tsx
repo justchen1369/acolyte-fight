@@ -791,7 +791,7 @@ const halo: Spell = {
         damage: 4,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
-        expireOn: Categories.Massive | Categories.Shield,
+        expireOn: Categories.None,
         selfPassthrough: true,
         shieldTakesOwnership: false,
         strafe: { expireOnHeroHit: true },
