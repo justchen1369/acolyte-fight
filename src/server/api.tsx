@@ -16,6 +16,7 @@ import * as games from './games';
 import * as gameStorage from './gameStorage';
 import * as kongregate from './kongregate';
 import * as loadMetrics from './loadMetrics';
+import * as mirroring from './mirroring';
 import * as percentiles from './percentiles';
 import * as sanitize from '../game/sanitize';
 import * as statsStorage from './statsStorage';
@@ -253,26 +254,65 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
     }
 
     const replay = await gameStorage.loadGame(gameId);
-    if (!replay) {
-        res.status(404).send("Not found");
-        return;
+    if (replay) {
+        // Found game locally
+        const response: m.HeroMsg = {
+            gameId: replay.id,
+            heroId: null,
+            reconnectKey: null,
+            isPrivate: replay.isPrivate,
+            partyId: replay.partyId,
+            room: replay.roomId,
+            mod: replay.mod,
+            allowBots: replay.allowBots,
+            live: false,
+            history: replay.history,
+            numPlayersPublic: null,
+            numPlayersInSegment: null,
+        };
+        res.send(response);
+    } else {
+        const game = await retrieveGameRemotely(gameId);
+        if (game) {
+            res.send(game);
+        } else {
+            res.status(404).send("Not found");
+        }
+    }
+}
+
+async function retrieveGameRemotely(gameId: string): Promise<m.HeroMsg> {
+    if (!mirroring.isMirrored()) {
+        return null;
     }
 
-    const response: m.HeroMsg = {
-		gameId: replay.id,
-		heroId: null,
-		reconnectKey: null,
-		isPrivate: replay.isPrivate,
-		partyId: replay.partyId,
-		room: replay.roomId,
-		mod: replay.mod,
-		allowBots: replay.allowBots,
-		live: false,
-		history: replay.history,
-		numPlayersPublic: null,
-		numPlayersInSegment: null,
-    };
-    res.send(response);
+    const game = await statsStorage.loadGame(gameId);
+    if (!game) {
+        return null;
+    }
+
+    const location = mirroring.getLocation();
+    if (game.server === location.server) {
+        // Already checked this server, it's me
+        return null;
+    }
+
+    try {
+        const fetchResponse = await fetch(mirroring.getUpstreamUrl(game.server));
+        if (fetchResponse.status === 200) {
+            const replay: m.HeroMsg = await fetchResponse.json();
+            return replay;
+        } else if (fetchResponse.status === 404) {
+            return null;
+        } else {
+            const error = await fetchResponse.text();
+            logger.info(`Retrieve remote replay failed ${fetchResponse.status}: ${error}`);
+            return null;
+        }
+    } catch (exception) {
+        logger.info(`Exception retrieving remote replay: ${exception}`);
+        return null;
+    }
 }
 
 

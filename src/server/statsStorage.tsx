@@ -162,6 +162,17 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
     };
 }
 
+export async function loadGame(gameId: string) {
+    const firestore = getFirestore();
+    const gameDoc = await firestore.collection(Collections.Game).doc(gameId).get();
+    if (gameDoc.exists) {
+        const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
+        return game;
+    } else {
+        return null;
+    }
+}
+
 export async function loadGamesForUser(userId: string, after: number | null, before: number | null, limit: number) {
     const firestore = getFirestore();
     let query = firestore.collection(Collections.Game).where('userIds', 'array-contains', userId).orderBy("unixTimestamp", "desc").limit(limit);

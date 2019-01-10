@@ -45,3 +45,7 @@ function extractRegion(server: string) {
         return null;
     }
 }
+
+export function getUpstreamUrl(server: string) {
+    return `https://${server}${location.upstreamSuffix}`;
+}

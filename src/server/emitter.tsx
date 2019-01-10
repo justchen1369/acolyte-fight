@@ -8,7 +8,7 @@ import * as segments from './segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
-import { getLocation, sanitizeHostname } from './mirroring';
+import { getLocation, sanitizeHostname, getUpstreamUrl } from './mirroring';
 import { logger } from './logging';
 import { required, optional } from './schema';
 import * as PlayerName from '../game/sanitize';
@@ -127,7 +127,7 @@ function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyReq
 			},
 		};
 		(config as any).parser = msgpackParser;
-		const upstream = socketClient(`http://${server}${location.upstreamSuffix}`, config);
+		const upstream = socketClient(getUpstreamUrl(server), config);
 
 		let attached = false;
 		upstream.on('connect', () => {
