@@ -21,7 +21,7 @@ export namespace Matchmaking {
 	export const WaitForMorePeriod = 10 * TicksPerSecond;
 	export const JoinPeriod = 3 * TicksPerSecond;
 	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
-	export const MaxPlayers = 5;
+	export const MaxPlayers = 7;
 	export const TargetGameSize = 3;
 	export const BotName = "AcolyteBot";
 }
@@ -60,6 +60,17 @@ export namespace HeroColors {
 		"#d0c16b",
 		"#56b5bf",
 		"#6d89cc",
+		"#b9cc64",
+		"#cea85c",
+		"#54b7a2",
+		"#a97fc1",
+		"#a85e83",
+		"#d6be68",
+		"#94af5d",
+		"#c18859",
+		"#af5d7a",
+		"#9b5daf",
+		"#609380",
 	];
 
 	export const LavaFlashInterval = 20;
