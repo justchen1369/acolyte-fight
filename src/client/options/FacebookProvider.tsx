@@ -7,6 +7,7 @@ export class FacebookProvider implements s.OptionsProvider {
     noLogin = true;
     noExternalLinks = true;
     noDiscordAd = true;
+    noPartyLink = true;
     noMenu = true;
     noAdvanced = true;
 

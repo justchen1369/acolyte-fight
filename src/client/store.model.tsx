@@ -300,6 +300,7 @@ export interface OptionsProvider {
     noMenu?: boolean;
     noAdvanced?: boolean;
     noDiscordAd?: boolean;
+    noPartyLink?: boolean;
 
     playerName?: string;
     authToken?: string;

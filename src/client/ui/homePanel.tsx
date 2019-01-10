@@ -56,7 +56,7 @@ class HomePanel extends React.Component<Props, State> {
                     <PlayButton />
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
-                {!a.noExternalLinks && <PartyList />}
+                {!a.noPartyLink && <PartyList />}
                 <div className="spacer" />
                 {!a.noScrolling && <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
