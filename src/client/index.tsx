@@ -18,6 +18,7 @@ import * as options from './options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
 import * as rankings from './core/rankings';
+import * as replays from './core/replays';
 import * as rooms from './core/rooms';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
@@ -137,7 +138,7 @@ async function start() {
         } else if (query.hash === "#watch" || query.page === "watch") {
             await matches.watchLiveGame();
         } else if (query.gameId) {
-            matches.joinNewGame({ gameId: query.gameId, observe: true });
+            replays.watch(query.gameId);
         }
     } catch(error) {
         console.error(error)

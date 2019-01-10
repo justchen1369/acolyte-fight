@@ -131,7 +131,6 @@ function reducer(state: s.State, action: s.Action): s.State {
             current: {
                 ...state.current,
                 gameId: action.world.ui.myGameId,
-                server: state.server,
             },
         };
     } else if (action.type === "leaveMatch") {
@@ -142,7 +141,6 @@ function reducer(state: s.State, action: s.Action): s.State {
             current: {
                 ...state.current,
                 gameId: null,
-                server: null,
             },
         };
     } else if (action.type === "updateNotifications") {

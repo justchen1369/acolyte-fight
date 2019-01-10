@@ -208,12 +208,10 @@ class GameList extends React.Component<Props, State> {
     }
 
     private gameUrl(game: GameRow): string {
-        const region = regions.getRegion(game.server) || this.props.region;
-        const origin = regions.getOrigin(region);
         const path = url.getPath({
             gameId: game.id,
             party: null,
-            server: game.server,
+            server: null,
             page: null,
         });
         return origin + path;

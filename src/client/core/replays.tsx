@@ -63,7 +63,7 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
     return response.ids;
 }
 
-export async function watch(gameId: string, server: string) {
+export async function watch(gameId: string, server: string = null) {
     const replay = await getReplay(gameId, server);
     if (replay) {
         matches.watchReplayFromObject(replay);
@@ -72,10 +72,14 @@ export async function watch(gameId: string, server: string) {
     }
 }
 
-async function getReplay(gameId: string, server: string): Promise<m.HeroMsg> {
-    const region = regions.getRegion(server);
-    const origin = regions.getOrigin(region);
-    const res = await fetch(`${origin}/api/games/${gameId}`, {
+async function getReplay(gameId: string, server: string = null): Promise<m.HeroMsg> {
+    let prefix = '';
+    if (server) {
+        const region = regions.getRegion(server);
+        const origin = regions.getOrigin(region);
+        prefix = `${origin}/`;
+    }
+    const res = await fetch(`${prefix}api/games/${gameId}`, {
         ...credentials.headers(),
         credentials: 'same-origin',
     });
