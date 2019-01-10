@@ -299,7 +299,7 @@ async function retrieveGameRemotely(gameId: string): Promise<m.HeroMsg> {
     }
 
     try {
-        const fetchResponse = await fetch(mirroring.getUpstreamUrl(game.server));
+        const fetchResponse = await fetch(mirroring.getUpstreamUrl(game.server) + `/api/games/${gameId}`);
         if (fetchResponse.status === 200) {
             const replay: m.HeroMsg = await fetchResponse.json();
             return replay;
