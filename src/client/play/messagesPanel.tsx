@@ -111,7 +111,7 @@ class MessagesPanel extends React.Component<Props, State> {
         });
 
         if (finished) {
-            if (!options.getProvider().noExternalLinks) {
+            if (!options.getProvider().noDiscordAd) {
                 rows.push(<div key="advert-row" className="row advert-row">
                     <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
                     <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>

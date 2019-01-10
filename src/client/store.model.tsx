@@ -299,6 +299,7 @@ export interface OptionsProvider {
     noScrolling?: boolean;
     noMenu?: boolean;
     noAdvanced?: boolean;
+    noDiscordAd?: boolean;
 
     playerName?: string;
     authToken?: string;
