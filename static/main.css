@@ -434,11 +434,16 @@ i.clickable:hover, i.clickable:active {
     bottom: 0px;
     left: 0px;
     font-size: 75%;
-    background-color: #333;
-    padding: 10px 20px;
 }
 
-.more-io-games:hover {
+.more-io-games a {
+    display: inline-block;
+    background-color: #333;
+    padding: 10px 10px;
+    margin-right: 10px;
+}
+
+.more-io-games a:hover {
     background-color: #555;
 }
 
