@@ -644,7 +644,7 @@ const drain: Spell = {
     icon: "energyBreath",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 4 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -964,7 +964,7 @@ const shield: Spell = {
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
     untargeted: true,
 
-    maxTicks: 2.5 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     radius: Hero.Radius * 2,
