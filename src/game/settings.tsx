@@ -787,7 +787,7 @@ const halo: Spell = {
     projectile: {
         density: 1,
         radius: 0.002,
-        speed: 0.3,
+        speed: 0.5,
         maxTicks: 20.0 * TicksPerSecond,
         hitInterval: 15,
         damage: 4,
@@ -807,7 +807,7 @@ const halo: Spell = {
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
-                maxTurnProportion: 0.09,
+                maxTurnProportion: 0.15,
                 minDistanceToTarget: 0.02,
                 targetType: HomingTargets.self,
             },
