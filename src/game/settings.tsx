@@ -282,11 +282,13 @@ const meteor: Spell = {
         density: 100,
         radius: 0.03,
         speed: 0.2,
+        restitution: 0,
         minTicks: 1,
         maxTicks: 5 * TicksPerSecond,
         damage: 0,
         categories: Categories.Projectile | Categories.Massive,
-        expireOn: Categories.Obstacle,
+        collideWith: Categories.All ^ Categories.Shield, // Pass through shields
+        expireOn: Categories.None,
 
         sound: "meteor",
         renderers: [

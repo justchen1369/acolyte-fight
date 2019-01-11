@@ -415,7 +415,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
 		density: projectileTemplate.density,
-		restitution: 1.0,
+		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 	} as pl.FixtureDef);
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && x.id !== hero.id);
