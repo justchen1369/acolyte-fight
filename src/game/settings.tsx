@@ -1090,11 +1090,11 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 3 seconds, increase movement speed 30%, and also become immune to damage from the void.",
+    description: "For 2 seconds, increase movement speed 30%, and also become immune to damage from the void.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
 
     buffs: [
