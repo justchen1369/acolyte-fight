@@ -827,7 +827,7 @@ const halo: Spell = {
 const mines: Spell = {
     id: 'mines',
     name: 'Energy Mines',
-    description: "Mark out your territory with some Energy Mines. The mines do zero damage if they hit during deploying.",
+    description: "Mark out your territory with some Energy Mines. The mines do zero damage if they hit during deploying, but still knockback.",
     action: "spray",
     sound: "mines",
 
