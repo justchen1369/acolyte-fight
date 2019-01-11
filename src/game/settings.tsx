@@ -467,7 +467,7 @@ const retractor: Spell = {
 
     projectile: {
         damage: 0,
-        density: 10,
+        density: 1,
         radius: 0.007,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
@@ -644,7 +644,7 @@ const drain: Spell = {
     icon: "energyBreath",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 4 * TicksPerSecond,
     throttle: true,
 
     projectile: {
