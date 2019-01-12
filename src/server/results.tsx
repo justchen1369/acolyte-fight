@@ -20,12 +20,7 @@ export function calculateResult(game: g.Game) {
 }
 
 function findStats(game: g.Game): m.GameStatsMsg {
-    if (game.scores.size <= 1) { // Only store multiplayer games because people can fake stats otherwise
-        return null;
-    }
-
-
-    const corroborateThreshold = game.scores.size; // Unaninmous agreement
+    const corroborateThreshold = Math.max(1, Math.ceil(game.scores.size / 2)); // Need majority to corroborate
     const candidates = new Map<string, CandidateHash>();
     for (const gameStats of game.scores.values()) {
         const hash = hashStats(gameStats);

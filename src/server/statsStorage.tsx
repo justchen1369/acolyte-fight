@@ -387,7 +387,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
     const knownPlayers = gameStats.players.filter(p => !!p.userId);
     if (!(knownPlayers.length >= 2)) {
         // Only rank known players
-        return {};
+        return null;
     }
 
     const ratingDeltas = await firestore.runTransaction(async (transaction) => {
@@ -526,7 +526,9 @@ export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise
     try {
         if (gameStats && game.segment === categories.publicSegment()) { // Private games don't count towards ranking
             const ratingDeltas = await updateRatingsIfNecessary(gameStats);
-            applyRatingDeltas(gameStats, ratingDeltas);
+            if (ratingDeltas) {
+                applyRatingDeltas(gameStats, ratingDeltas);
+            }
             await saveGameStats(gameStats);
             return gameStats;
         } else {
