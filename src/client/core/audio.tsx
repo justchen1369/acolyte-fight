@@ -119,7 +119,6 @@ export function init() {
 
         const compressor = ctx.createDynamicsCompressor();
         compressor.connect(next);
-        compressor.attack.value = 0;
         next = compressor;
 
         const masterVolume = ctx.createGain();
