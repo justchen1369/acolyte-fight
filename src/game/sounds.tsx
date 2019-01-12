@@ -530,7 +530,7 @@ export const Sounds: Sounds = {
 
                 wave: "square",
 
-                ratios: [1, 2, 2.16, 4, 4.16, 8, 16],
+                ratios: [1, 2.16, 4.16, 8, 16],
             },
         ],
     },
