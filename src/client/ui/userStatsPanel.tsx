@@ -27,7 +27,7 @@ interface Props extends OwnProps {
     playerName: string;
     loggedIn: boolean;
     myUserId: string;
-    ratingSystem: string;
+    system: string;
 }
 
 interface State {
@@ -44,7 +44,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
-        ratingSystem: state.options.ratingSystem,
+        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -82,7 +82,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     }
 
                     if (profile.userId === this.props.myUserId) {
-                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings);
+                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings, this.props.system);
                         if (profile.userId === this.state.profileId) {
                             this.setState({ pointsToNextLeague });
                         }
@@ -136,10 +136,10 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
         const isMe = profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
-        const leagueName = rankings.getLeagueName(rating.percentile);
+        const system = this.props.system;
+        const leagueName = system === m.RatingSystem.Glicko ? rankings.getLeagueName(rating.percentile) : rankings.getLeagueName(rating.acoPercentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
 
-        const aco = this.props.ratingSystem === m.RatingSystem.Aco;
         return <div>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
                 <div className="stats-card">
@@ -147,12 +147,22 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{constants.Placements.MinGames - rating.numGames}</div>
                 </div>
             </div>}
-            {isPlaced && <div className="stats-card-row">
+            {isPlaced && system === m.RatingSystem.Glicko && <div className="stats-card-row">
                 <div className="stats-card" title={`${rating.rd.toFixed(0)} rating deviation`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.lowerBound.toFixed(0)}</div>
                 </div>
                 <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
+                    <div className="label">League</div>
+                    <div className="value">{leagueName}</div>
+                </div>
+            </div>}
+            {isPlaced && system === m.RatingSystem.Aco && <div className="stats-card-row">
+                <div className="stats-card">
+                    <div className="label">Rating</div>
+                    <div className="value">{rating.acoExposure.toFixed(0)}</div>
+                </div>
+                <div className="stats-card" title={`${rating.acoPercentile.toFixed(1)} percentile`}>
                     <div className="label">League</div>
                     <div className="value">{leagueName}</div>
                 </div>

@@ -240,6 +240,7 @@ export interface RatingAdjustmentNotification {
 	type: "ratingAdjustment";
 	gameId: string;
 	ratingDelta: number;
+	acoDelta: number;
 	category: string;
 }
 

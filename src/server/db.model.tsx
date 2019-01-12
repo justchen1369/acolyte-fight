@@ -84,5 +84,6 @@ export interface PlayerStats {
     ticks: number;
     rank: number;
     ratingDelta?: number;
+    acoDelta?: number;
 }
 

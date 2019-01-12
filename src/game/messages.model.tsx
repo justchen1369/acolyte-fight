@@ -366,6 +366,7 @@ export interface PlayerStatsMsg {
     rank: number;
     ticks: number;
     ratingDelta?: number;
+    acoDelta?: number;
 }
 
 
@@ -380,9 +381,15 @@ export interface GetLeaderboardResponse {
 export interface LeaderboardPlayer {
     userId: string;
     name: string;
+    
     rating: number;
     rd: number;
     lowerBound: number;
+
+    aco: number;
+    acoGames: number;
+    acoExposure: number;
+
     numGames: number;
 
     winRate: number;
@@ -413,6 +420,7 @@ export interface UserRating {
     aco: number;
     acoGames: number;
     acoExposure: number;
+    acoPercentile: number;
 
     numGames: number;
     damagePerGame: number;

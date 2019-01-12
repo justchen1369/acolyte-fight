@@ -22,6 +22,7 @@ interface Props extends OwnProps {
     current: s.PathElements;
     myUserId: string;
     loggedIn: boolean;
+    system: string;
 }
 
 interface State {
@@ -37,6 +38,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         current: state.current,
         myUserId: state.userId,
         loggedIn: state.loggedIn,
+        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -64,7 +66,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
         if (category !== this.state.category) {
             this.setState({ category, leaderboard: null, error: null });
             try {
-                const leaderboard = await rankings.retrieveLeaderboardAsync(category);
+                const leaderboard = await rankings.retrieveLeaderboardAsync(category, this.props.system);
                 if (category === this.state.category) {
                     this.setState({ leaderboard });
                 }
@@ -111,8 +113,10 @@ class LeaderboardPanel extends React.Component<Props, State> {
             return null;
         }
 
+        const system = this.props.system;
+
         const title = [
-            `${player.rd.toFixed(0)} ratings deviation`,
+            system === m.RatingSystem.Aco ? `${player.aco.toFixed(0)} skill points` : `${player.rd.toFixed(0)} ratings deviation`,
             `${(player.winRate * 100).toFixed(0)}% win rate`,
             `${player.killsPerGame.toFixed(1)} kills per game`,
             `${player.damagePerGame.toFixed(1)} damage per game`,
@@ -120,7 +124,7 @@ class LeaderboardPanel extends React.Component<Props, State> {
         return <div key={player.userId} className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
             <span className="position">{position}</span>
             {this.renderPlayerName(player)}
-            <span className="win-count">{Math.round(player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
+            <span className="win-count">{Math.round(system === m.RatingSystem.Aco ? player.acoExposure : player.lowerBound)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
     }
 
@@ -141,9 +145,15 @@ class LeaderboardPanel extends React.Component<Props, State> {
         const result: m.LeaderboardPlayer = {
             userId: profile.userId,
             name: profile.name,
+
             rating: userRating.rating,
             rd: userRating.rd,
             lowerBound: userRating.lowerBound,
+
+            aco: userRating.aco,
+            acoGames: userRating.acoGames,
+            acoExposure: userRating.acoExposure,
+
             numGames: userRating.numGames,
             winRate: userRating.winRate,
             killsPerGame: userRating.killsPerGame,

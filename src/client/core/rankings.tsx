@@ -34,6 +34,10 @@ export const leagues = [
     { name: "Wood", minPercentile: constants.Placements.Wood },
 ];
 
+export function systemOrDefault(system: string) {
+    return system || m.RatingSystem.Glicko;
+}
+
 export function onNotification(notifs: w.Notification[]) {
     for (const notif of notifs) {
         if (notif.type === "ratingAdjustment") {
@@ -61,6 +65,7 @@ function adjustRating(adjustment: w.RatingAdjustmentNotification) {
             [adjustment.category]: {
                 ...rating,
                 lowerBound: rating.lowerBound + adjustment.ratingDelta,
+                acoExposure: rating.acoExposure + adjustment.acoDelta,
             },
         }
     };
@@ -110,7 +115,7 @@ export async function retrieveUserStatsAsync(profileId: string) {
     }
 }
 
-export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLookup): Promise<PointsToNextLeagueLookup> {
+export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLookup, system: string): Promise<PointsToNextLeagueLookup> {
     const categories = [m.GameCategory.PvP];
     const lookup: PointsToNextLeagueLookup = {};
 
@@ -124,17 +129,17 @@ export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLooku
             continue;
         }
 
-        const ratingLB = userRating.lowerBound;
-        const percentile = userRating.percentile;
-        if (ratingLB && percentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(ratingLB, percentile, category);
+        const exposure = system === m.RatingSystem.Aco ? userRating.acoExposure : userRating.lowerBound;
+        const percentile = system === m.RatingSystem.Aco ? userRating.acoPercentile : userRating.percentile;
+        if (exposure && percentile >= 0) {
+            lookup[category] = await calculatePointsUntilNextLeague(exposure, percentile, category, system);
         }
     }
     return lookup;
 }
 
-async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
-    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
+async function retrieveRatingAtPercentile(category: string, system: string, percentile: number): Promise<number> {
+    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&system=${encodeURIComponent(system)}&percentile=${percentile}`, {
         headers: credentials.headers(),
         credentials: 'same-origin',
     });
@@ -146,25 +151,25 @@ async function retrieveRatingAtPercentile(category: string, percentile: number):
     }
 }
 
-async function calculatePointsUntilNextLeague(ratingLB: number, percentile: number, category: string): Promise<PointsToNextLeague> {
+async function calculatePointsUntilNextLeague(exposure: number, percentile: number, category: string, system: string): Promise<PointsToNextLeague> {
     const nextLeague = calculateNextLeague(percentile);
     if (!nextLeague) {
         return null;
     }
 
-    const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
+    const minRating = await retrieveRatingAtPercentile(category, system, Math.ceil(nextLeague.minPercentile));
     if (minRating) {
         return {
             name: nextLeague.name,
-            pointsRemaining: minRating - ratingLB,
+            pointsRemaining: minRating - exposure,
         };
     } else {
         return null;
     }
 }
 
-export async function retrieveLeaderboardAsync(category: string) {
-    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}`, {
+export async function retrieveLeaderboardAsync(category: string, system: string) {
+    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}&system=${encodeURIComponent(system)}`, {
         headers: credentials.headers(),
         credentials: 'same-origin'
     });

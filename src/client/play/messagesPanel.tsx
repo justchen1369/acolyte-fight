@@ -2,11 +2,13 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
+import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
+import * as rankings from '../core/rankings';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from '../ui/playButton';
@@ -274,8 +276,10 @@ class MessagesPanel extends React.Component<Props, State> {
 
     private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
         if (notification.gameId === this.props.myGameId) {
+            const system = rankings.systemOrDefault(this.props.options.ratingSystem);
+            const delta = system === m.RatingSystem.Glicko ? notification.ratingDelta : notification.acoDelta;
             return <div key={key} className="row rating-notification">
-                <span>Your rating has changed: {this.renderRatingAdjustment(notification.ratingDelta)}. </span>
+                <span>Your rating has changed: {this.renderRatingAdjustment(delta)}. </span>
                 <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to see more.</span>
             </div>
         } else {

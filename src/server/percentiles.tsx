@@ -14,6 +14,8 @@ import { Collections } from './db.model';
 import { FixedIntegerArray } from './fixedIntegerArray';
 import { logger } from './logging';
 
+const ratingSystems = [m.RatingSystem.Glicko, m.RatingSystem.Aco];
+
 interface DbFrequenciesResult {
     frequencies: Map<string, FixedIntegerArray>;
     numUsers: number;
@@ -27,12 +29,16 @@ export async function init() {
     refreshCumulativeFrequenciesLoop();
 }
 
-export function estimatePercentile(ratingLB: number, category: string): number {
-    return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(category));
+function cacheKey(category: string, system: string) {
+    return `${category}.${system}`;
 }
 
-export function estimateRatingAtPercentile(category: string, percentile: number): number {
-    const distribution = distributionCache.get(category);
+export function estimatePercentile(ratingLB: number, category: string, system: string): number {
+    return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(cacheKey(category, system)));
+}
+
+export function estimateRatingAtPercentile(category: string, system: string, percentile: number): number {
+    const distribution = distributionCache.get(cacheKey(category, system));
     if (!distribution) {
         return 0;
     }
@@ -52,8 +58,8 @@ async function refreshCumulativeFrequenciesLoop() {
     numUsersCache = result.numUsers;
     cumulativeFrequenciesCache = calculateCumulativeFrequency(result.frequencies);
 
-    for (const category of cumulativeFrequenciesCache.keys()) {
-        distributionCache.set(category, calculateDistribution(cumulativeFrequenciesCache.get(category)));
+    for (const key of cumulativeFrequenciesCache.keys()) {
+        distributionCache.set(key, calculateDistribution(cumulativeFrequenciesCache.get(key)));
     }
 
     logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
@@ -120,28 +126,34 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
                 continue;
             }
 
-            const lowerBound = userRating.lowerBound;
-            const bin = Math.ceil(lowerBound);
+            for (const system of ratingSystems) {
+                const value = system === m.RatingSystem.Aco ? userRating.acoExposure : userRating.lowerBound;
+                if (!value) {
+                    continue;
+                }
+                const bin = Math.ceil(value);
 
-            let frequency = frequencies.get(category);
-            if (!frequency) {
-                frequency = [];
-                frequencies.set(category, frequency);
+                const key = cacheKey(category, system);
+                let frequency = frequencies.get(key);
+                if (!frequency) {
+                    frequency = [];
+                    frequencies.set(key, frequency);
+                }
+                frequency[bin] = (frequency[bin] || 0) + 1;
             }
-            frequency[bin] = (frequency[bin] || 0) + 1;
         }
     });
 
     const frequenciesFixed = new Map<string, FixedIntegerArray>();
-    frequencies.forEach((frequency, category) => {
-        frequenciesFixed.set(category, new FixedIntegerArray(frequency));
+    frequencies.forEach((frequency, key) => {
+        frequenciesFixed.set(key, new FixedIntegerArray(frequency));
     });
     return { frequencies: frequenciesFixed, numUsers };
 }
 
 function calculateCumulativeFrequency(frequencies: Map<string, FixedIntegerArray>): Map<string, FixedIntegerArray> {
     const cumulativeFrequencies = new Map<string, FixedIntegerArray>();
-    frequencies.forEach((frequency, category) => {
+    frequencies.forEach((frequency, key) => {
         const cumulativeFrequency = new Array<number>();
 
         let total = 0;
@@ -150,7 +162,7 @@ function calculateCumulativeFrequency(frequencies: Map<string, FixedIntegerArray
             cumulativeFrequency.push(total);
         }
 
-        cumulativeFrequencies.set(category, new FixedIntegerArray(cumulativeFrequency));
+        cumulativeFrequencies.set(key, new FixedIntegerArray(cumulativeFrequency));
     });
 
     return cumulativeFrequencies;

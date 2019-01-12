@@ -5,6 +5,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as notifications from './notifications';
+import * as rankings from './rankings';
 import * as sockets from './sockets';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
@@ -32,11 +33,12 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
 
     // Notify
     const self = gameStats.players[gameStats.self];
-    if (self && self.ratingDelta) {
+    if (self && (self.ratingDelta || self.acoDelta)) {
         notifications.notify({
             type: "ratingAdjustment",
             gameId: gameStats.id,
             ratingDelta: self.ratingDelta,
+            acoDelta: self.acoDelta,
             category: gameStats.category,
         });
     }
@@ -94,6 +96,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             rank: p.rank,
             ticks: p.ticks,
             ratingDelta: p.ratingDelta,
+            acoDelta: p.acoDelta,
         };
 
         if (p.userId === userId) {

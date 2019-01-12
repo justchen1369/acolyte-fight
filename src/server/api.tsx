@@ -348,12 +348,12 @@ export function onGetRatingAtPercentile(req: express.Request, res: express.Respo
 }
 
 export async function onGetRatingAtPercentileAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.category && req.query.percentile)) {
+    if (!(req.query.category && req.query.system && req.query.percentile)) {
         res.status(400).send("Bad request");
         return;
     }
 
-    const rating = percentiles.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
+    const rating = percentiles.estimateRatingAtPercentile(req.query.category, req.query.system, parseInt(req.query.percentile));
     const response: m.GetRatingAtPercentileResponse = { rating };
     res.send(response);
 }
@@ -499,14 +499,15 @@ export function onGetLeaderboard(req: express.Request, res: express.Response) {
 }
 
 export async function onGetLeaderboardAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.category)) {
+    if (!(req.query.category && req.query.system)) {
         res.status(400).send("Bad request");
         return;
     }
 
     const category = req.query.category;
+    const system = req.query.system;
 
-    const leaderboardBuffer = await statsStorage.getLeaderboard(category);
+    const leaderboardBuffer = await statsStorage.getLeaderboard(category, system);
     res.send(leaderboardBuffer);
 }
 

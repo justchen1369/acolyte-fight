@@ -30,12 +30,17 @@ const MaxActivityGames = 100;
 const TrueSkill = new ts.TrueSkill();
 const GlickoMultiplier = 200 / TrueSkill.beta; // In Glicko the beta (difference required for 76% win probability) is 200
 
+interface UpdateRatingsResult {
+    glickoDeltas: RatingDeltas;
+    acoDeltas: RatingDeltas;
+}
 interface RatingDeltas {
     [userId: string]: number;
 }
 
 interface LeaderboardCacheItem {
     leaderboardBuffer: Buffer; // m.GetLeaderboardResponse
+    system: string;
     expiry: number; // unix timestamp
 }
 
@@ -101,6 +106,9 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
     if (p.ratingDelta) {
         result.ratingDelta = p.ratingDelta;
     }
+    if (p.acoDelta) {
+        result.acoDelta = p.acoDelta;
+    }
 
     return result;
 }
@@ -137,6 +145,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         ticks: player.ticks || 0, // Might not be present in old data
         rank: player.rank || 0, // Might not be present in old data
         ratingDelta: player.ratingDelta,
+        acoDelta: player.acoDelta,
     };
 }
 
@@ -172,7 +181,8 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
                 aco: rating.aco,
                 acoGames: rating.acoGames,
                 acoExposure,
-                percentile: percentiles.estimatePercentile(lowerBound, category),
+                percentile: percentiles.estimatePercentile(lowerBound, category, m.RatingSystem.Glicko),
+                acoPercentile: percentiles.estimatePercentile(acoExposure, category, m.RatingSystem.Aco),
             };
         }
     }
@@ -253,24 +263,31 @@ export async function cleanupGames(maxAgeDays: number) {
     }
 }
 
-export async function getLeaderboard(category: string): Promise<Buffer> {
-    const cached = leaderboardCache.get(category);
+function leaderboardCacheKey(category: string, system: string) {
+    return `${category}.${system}`;
+}
+
+export async function getLeaderboard(category: string, system: string): Promise<Buffer> {
+    const cached = leaderboardCache.get(leaderboardCacheKey(category, system));
     if (cached && moment().unix() < cached.expiry) {
         return cached.leaderboardBuffer;
     } else {
-        const leaderboard = await retrieveLeaderboard(category);
+        const leaderboard = await retrieveLeaderboard(category, system);
         const leaderboardBuffer = msgpack.encode(leaderboard);
         leaderboardCache.set(category, {
             leaderboardBuffer,
+            system,
             expiry: moment().add(1, 'minute').unix(),
         });
         return leaderboardBuffer;
     }
 }
 
-export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
+export async function retrieveLeaderboard(category: string, system: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
-    const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').limit(MaxLeaderboardLength);
+
+    const field = system === m.RatingSystem.Aco ? "acoExposure" : "lowerBound";
+    const query = firestore.collection('user').orderBy(`ratings.${category}.${field}`, 'desc').limit(MaxLeaderboardLength);
     
     const now = Date.now();
 
@@ -279,8 +296,9 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
     while (result.length < MaxLeaderboardLength) {
         let chunk;
         if (result.length > 0) {
-            const lowest = result[result.length - 1].lowerBound;
-            chunk = query.where(`ratings.${category}.lowerBound`, '<=', lowest);
+            const lowestPlayer = result[result.length - 1];
+            const lowest = (lowestPlayer as any)[field] as number;
+            chunk = query.where(`ratings.${category}.${field}`, '<=', lowest);
         } else {
             chunk = query;
         }
@@ -311,9 +329,15 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
             result.push({
                 userId: doc.id,
                 name: user.settings && user.settings.name || doc.id,
+
                 rating: ratings.rating,
                 rd: ratings.rd,
                 lowerBound: ratings.lowerBound,
+
+                aco: ratings.aco,
+                acoExposure: ratings.acoExposure,
+                acoGames: ratings.acoGames,
+
                 numGames: ratings.numGames,
                 winRate: ratings.winRate,
                 killsPerGame: ratings.killsPerGame,
@@ -338,7 +362,7 @@ function calculateMaxLeaderboardAgeInDays(numGames: number) {
     return Math.min(365, numGames / 10);
 }
 
-export async function decayLeaderboardIfNecessary(category: string): Promise<void> {
+export async function decayGlickoLeaderboardIfNecessary(category: string): Promise<void> {
     const numDecaysPerDay = 24 / constants.Placements.RdDecayIntervalHours;
     const decayPerInterval = constants.Placements.RdDecayPerDay / numDecaysPerDay;
     const intervalMilliseconds = constants.Placements.RdDecayIntervalHours * 60 * 60 * 1000;
@@ -359,16 +383,16 @@ export async function decayLeaderboardIfNecessary(category: string): Promise<voi
     });
 
     if (shouldUpdate) {
-        await decayLeaderboard(category, decayPerInterval);
+        await decayGlickoLeaderboard(category, decayPerInterval);
     }
 }
 
-async function decayLeaderboard(category: string, decay: number): Promise<void> {
+async function decayGlickoLeaderboard(category: string, decay: number): Promise<void> {
     const start = Date.now();
     const firestore = getFirestore();
 
     // Find lowest rating to be on leaderboard
-    const response = await retrieveLeaderboard(category);
+    const response = await retrieveLeaderboard(category, m.RatingSystem.Glicko);
     if (response.leaderboard.length === 0) {
         return;
     }
@@ -457,7 +481,7 @@ export async function getProfile(userId: string): Promise<m.GetProfileResponse> 
     return profile;
 }
 
-async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<RatingDeltas> {
+async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<UpdateRatingsResult> {
     const firestore = getFirestore();
 
     const category = gameStats.category;
@@ -469,7 +493,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
 
     const unix = gameStats.unixTimestamp || moment().unix();
 
-    const ratingDeltas = await firestore.runTransaction(async (transaction) => {
+    const result = await firestore.runTransaction(async (transaction) => {
         // Load initial data
         const docs = await transaction.getAll(...knownPlayers.map(p => firestore.collection(Collections.User).doc(p.userId)));
 
@@ -574,10 +598,11 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
             }
         }
 
-        return glickoDeltas;
+        const result: UpdateRatingsResult = { glickoDeltas, acoDeltas };
+        return result;
     });
 
-    return ratingDeltas;
+    return result;
 }
 
 function unixDateFromTimestamp(unixTimestamp: number): number {
@@ -693,9 +718,9 @@ function calculateAcoExposure(aco: number, acoGames: number) {
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
     try {
         if (gameStats && game.segment === categories.publicSegment()) { // Private games don't count towards ranking
-            const ratingDeltas = await updateRatingsIfNecessary(gameStats);
-            if (ratingDeltas) {
-                applyRatingDeltas(gameStats, ratingDeltas);
+            const updateResult = await updateRatingsIfNecessary(gameStats);
+            if (updateResult) {
+                applyRatingDeltas(gameStats, updateResult);
             }
             await saveGameStats(gameStats);
             return gameStats;
@@ -709,10 +734,13 @@ export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise
     }
 }
 
-function applyRatingDeltas(gameStats: m.GameStatsMsg, ratingDeltas: RatingDeltas) {
+function applyRatingDeltas(gameStats: m.GameStatsMsg, updateResult: UpdateRatingsResult) {
     for (const player of gameStats.players) {
-        if (player.userId in ratingDeltas) {
-            player.ratingDelta = ratingDeltas[player.userId];
+        if (player.userId in updateResult.glickoDeltas) {
+            player.ratingDelta = updateResult.glickoDeltas[player.userId];
+        }
+        if (player.userId in updateResult.acoDeltas) {
+            player.acoDelta = updateResult.acoDeltas[player.userId];
         }
     }
 }
