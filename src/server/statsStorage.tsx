@@ -154,8 +154,8 @@ function dbToUserRating(user: db.User, category: string): g.UserRating {
     const userRating = user && user.ratings && user.ratings[category]
     if (userRating) {
         Object.assign(result, userRating);
-        if (!userRating.aco && userRating.lowerBound) {
-            result.aco = userRating.lowerBound; // Seed aco with Glicko
+        if (!userRating.aco && userRating.rating && userRating.rd) {
+            result.aco = calculateGlickoLowerBound(userRating.rating, userRating.rd); // Seed aco with Glicko
         }
     }
     return result;
