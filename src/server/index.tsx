@@ -111,8 +111,10 @@ setInterval(() => {
 	modder.cleanupOldRooms(1);
 	statsStorage.cleanupGames(7);
 	statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP);
+	statsStorage.decayAco();
 }, cleanupIntervalMinutes * 60 * 1000);
-statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP); // TODO - remove this (testing only)
+statsStorage.decayLeaderboardIfNecessary(m.GameCategory.PvP);
+statsStorage.decayAco();
 
 setInterval(() => {
 	const status = api.getInternalStatus();

@@ -4,6 +4,7 @@ import * as m from '../game/messages.model';
 export namespace Collections {
     export const User = 'user';
     export const UserRatingHistory = 'ratingHistory';
+    export const AcoDecay = 'acoDecay';
     export const Game = 'game';
     export const GlobalMod = 'mod';
 }
@@ -36,6 +37,9 @@ export interface UserRating {
     rating: number;
     rd: number;
     lowerBound?: number;
+    acoExposure?: number;
+    aco?: number;
+    acoGames?: number;
     numGames: number;
     killsPerGame: number;
     damagePerGame: number;
@@ -45,6 +49,16 @@ export interface UserRating {
 export interface UserRatingHistoryItem {
     unixDate: number;
     ratings: UserRatingLookup;
+}
+
+export interface AcoDecayKey {
+    userId: string;
+    category: string;
+    unixCeiling: number;
+}
+export interface AcoDecay extends AcoDecayKey {
+    acoDelta: number;
+    acoGamesDelta: number;
 }
 
 export interface Game {

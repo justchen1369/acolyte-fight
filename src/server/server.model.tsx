@@ -40,6 +40,10 @@ export interface UserRatingLookup {
 export interface UserRating {
     rating: number;
     rd: number;
+
+    aco: number;
+    acoGames: number;
+
     numGames: number;
     killsPerGame: number;
     damagePerGame: number;

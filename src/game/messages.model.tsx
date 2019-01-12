@@ -403,6 +403,7 @@ export interface UserRating {
     rating: number;
     rd: number;
     lowerBound: number;
+    acoExposure: number;
     numGames: number;
     damagePerGame: number;
     killsPerGame: number;
