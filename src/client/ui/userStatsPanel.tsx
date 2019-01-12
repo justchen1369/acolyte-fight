@@ -158,7 +158,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                 </div>
             </div>}
             {isPlaced && system === m.RatingSystem.Aco && <div className="stats-card-row">
-                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points`}>
+                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} activity bonus`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>
                 </div>

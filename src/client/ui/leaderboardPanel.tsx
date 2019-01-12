@@ -116,11 +116,13 @@ class LeaderboardPanel extends React.Component<Props, State> {
         const system = this.props.system;
 
         const title = [
-            system === m.RatingSystem.Aco ? `${player.aco.toFixed(0)} skill points` : `${player.rd.toFixed(0)} ratings deviation`,
+            system === m.RatingSystem.Aco && `${player.aco.toFixed(0)} skill points`,
+            system === m.RatingSystem.Aco && `+${(player.acoExposure - player.aco).toFixed(0)} activity bonus`,
+            system === m.RatingSystem.Glicko && `${player.rd.toFixed(0)} ratings deviation`,
             `${(player.winRate * 100).toFixed(0)}% win rate`,
             `${player.killsPerGame.toFixed(1)} kills per game`,
             `${player.damagePerGame.toFixed(1)} damage per game`,
-        ].join(', ');
+        ].filter(x => !!x).join(', ');
         return <div key={player.userId} className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
             <span className="position">{position}</span>
             {this.renderPlayerName(player)}
