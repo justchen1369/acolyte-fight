@@ -45,27 +45,45 @@ export class TitleSection extends React.Component<Props, State> {
             <p className="share"><a href="http://reddit.com/r/acolytefight" target="_blank"><i className="fab fa-reddit-square" /><span>r/acolytefight</span></a></p>
             <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
             <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
-            <h1>FAQ</h1>
-            <h2>When does the game start?</h2>
+            <h1>How does the rating system work?</h1>
             <p>
-                The game starts whenever you want it to - just start casting some spells.
-                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
+                The rating system is designed to measure your skill accurately, and is based on <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank">Elo</a>.
+                The rating system awards and deducts points until it reaches an equilibrium between your relative win rates and the magnitude of awards/deductions.
             </p>
-            <h2>How can I play this game on my phone?</h2>
-            <p>The game already works on mobile, just go to <a href="http://acolytefight.io" target="_blank">acolytefight.io</a> and click Play.</p>
+            <ul>
+                <li>You gain the most points by defeating players above your rating, and you gain few points for defeating players below your rating.</li>
+                <li>You lose the most points when defeated by players similar to your rating. The system is designed so you won't lose many points if defeated by someone significantly above or below your skill level.</li>
+                <li>There is an activity bonus. You gain +3 for every game played, up to 100 games. This bonus only lasts for 7 days. So keep playing to max out your activity bonus!</li>
+            </ul>
+            <h2>How are the leagues calculated?</h2>
             <p>
-                To make the game more accessible, add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
-                On iPhone - tap the Share button, click Add to Home Screen.
-                On Android - tap the triple dot menu button, click Add to Home Screen.
+                These are the leagues and the minimum percentiles:
             </p>
-            <h2>How are the ratings calculated?</h2>
+            <ul>
+                <li>Grandmaster: {constants.Placements.Grandmaster} percentile</li>
+                <li>Master: {constants.Placements.Master} percentile</li>
+                <li>Diamond {constants.Placements.Diamond} percentile</li>
+                <li>Platinum: {constants.Placements.Platinum} percentile</li>
+                <li>Gold: {constants.Placements.Gold} percentile</li>
+                <li>Silver: {constants.Placements.Silver} percentile</li>
+                <li>Bronze: {constants.Placements.Bronze} percentile</li>
+                <li>Wood: {constants.Placements.Wood} percentile</li>
+            </ul>
+            <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
+            <h2>What factors are considered?</h2>
             <p>
-                The ratings are calculated according to the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system" target="_blank">Glicko-2 rating system</a>.
                 You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
+            </p>
+            <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
+            <p>
+                No other factors are considered in the rating - kills do not matter, damage does not matter - the game is to be the last one standing
+                and that is how it is rated. A lot of other games have experimented with performance-based rankings and
+                found the ratings no longer measured skill accurately,
+                as everyone was incentivised to somewhat ignore the primary objective in favour of performance metrics.
             </p>
             <h2>Why do I lose so many more points for losing and gain so few points for winning?</h2>
             <p>
-                All ELO rating systems work like this.
+                All Elo rating systems work like this.
                 If you win 10 times more than you lose against a particular player,
                 than for each loss, you will lose 10x more points, against that particular player.
                 This creates equilibrium.
@@ -80,27 +98,18 @@ export class TitleSection extends React.Component<Props, State> {
                 If you are a Master repeatedly beating newbies,
                 at some point you will rank up so high that you stop gaining any points from them.
             </p>
-            <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
+            <h1>FAQ</h1>
+            <h2>When does the game start?</h2>
             <p>
-                No other factors are considered in the rating - kills do not matter, damage does not matter - the game is to be the last one standing
-                and that is how it is rated. A lot of other games have experimented with performance-based rankings and
-                found the ratings no longer measured skill accurately,
-                as everyone was incentivised to somewhat ignore the primary objective in favour of performance metrics.
-                Recently Overwatch and Heroes of the Storm removed performance-based rankings for that reason.
+                The game starts whenever you want it to - just start casting some spells.
+                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
             </p>
-            <h2>How are the leagues calculated?</h2>
+            <h2>How can I play this game on my phone?</h2>
+            <p>The game already works on mobile, just go to <a href="http://acolytefight.io" target="_blank">acolytefight.io</a> and click Play.</p>
             <p>
-                These are the leagues and the minimum percentiles:
-                <ul>
-                    <li>Grandmaster: {constants.Placements.Grandmaster} percentile</li>
-                    <li>Master: {constants.Placements.Master} percentile</li>
-                    <li>Diamond {constants.Placements.Diamond} percentile</li>
-                    <li>Platinum: {constants.Placements.Platinum} percentile</li>
-                    <li>Gold: {constants.Placements.Gold} percentile</li>
-                    <li>Silver: {constants.Placements.Silver} percentile</li>
-                    <li>Bronze: {constants.Placements.Bronze} percentile</li>
-                    <li>Wood: {constants.Placements.Wood} percentile</li>
-                </ul>
+                To make the game more accessible, add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
+                On iPhone - tap the Share button, click Add to Home Screen.
+                On Android - tap the triple dot menu button, click Add to Home Screen.
             </p>
             <h2>How long are replays stored for?</h2>
             <p>
