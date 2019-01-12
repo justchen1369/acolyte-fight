@@ -115,7 +115,6 @@ setInterval(() => {
 }, cleanupIntervalMinutes * 60 * 1000);
 statsStorage.decayGlickoLeaderboardIfNecessary(m.GameCategory.PvP);
 statsStorage.decayAco();
-statsStorage.fixAco();
 
 setInterval(() => {
 	const status = api.getInternalStatus();

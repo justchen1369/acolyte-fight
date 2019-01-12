@@ -437,36 +437,6 @@ async function decayUser(userId: string, category: string, decay: number): Promi
     });
 }
 
-export async function fixAco() {
-    const firestore = getFirestore();
-    const category = m.GameCategory.PvP;
-    const query = firestore.collection(Collections.User);
-
-    let numAffected = 0;
-    await dbStorage.stream(query, async (doc) => {
-        const user = doc.data() as db.User;
-        if (!(user && user.ratings && user.ratings[category])) {
-            return;
-        }
-
-        const userRating = dbToUserRating(user, category);
-        if (!(userRating.rating && userRating.rd)) {
-            return;
-        }
-        userRating.aco = calculateGlickoLowerBound(userRating.rating, userRating.rd);
-
-        const loggedIn = userStorage.dbUserLoggedIn(user);
-        const dbUserRating = userRatingToDb(userRating, loggedIn);
-
-        doc.ref.update({
-            ratings: { [category]: dbUserRating },
-        });
-
-        ++numAffected;
-    });
-
-    logger.info(`Fixed ${numAffected} aco ratings`);}
-
 export async function decayAco() {
     const firestore = getFirestore();
     const unix = moment().unix() - AcoDecayLength;
