@@ -1,5 +1,6 @@
 import * as pl from 'planck-js';
 import * as w from '../../game/world.model';
+import { TicksPerSecond } from '../../game/constants';
 
 const Z = -0.1;
 const RefDistance = 0.1;
@@ -54,7 +55,13 @@ class AudioSource {
             }
 
             keep.push(follow);
-            follow.panner.setPosition(pos.x, pos.y, Z);
+            if (follow.panner.positionX && follow.panner.positionY) {
+                const when = t + 1 / TicksPerSecond;
+                follow.panner.positionX.linearRampToValueAtTime(pos.x, when);
+                follow.panner.positionY.linearRampToValueAtTime(pos.y, when);
+            } else {
+                follow.panner.setPosition(pos.x, pos.y, Z);
+            }
         }
         this.following = keep;
     }
@@ -215,7 +222,8 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): Au
 
 function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, next: AudioNode) {
     const pan = env.ctx.createPanner();
-    pan.panningModel = 'HRTF';
+    pan.panningModel = 'equalpower';
+    pan.distanceModel = 'inverse';
     pan.refDistance = RefDistance;
     pan.setPosition(pos.x, pos.y, Z);
     pan.setOrientation(0, 0, 1);
