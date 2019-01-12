@@ -22,6 +22,10 @@ export interface PointsToNextLeague {
 export interface PointsToNextLeagueLookup {
     [category: string]: PointsToNextLeague;
 }
+export interface Rating {
+    exposure: number;
+    percentile: number;
+}
 
 export const leagues = [
     { name: "Grandmaster", minPercentile: constants.Placements.Grandmaster },
@@ -36,6 +40,20 @@ export const leagues = [
 
 export function systemOrDefault(system: string) {
     return system || m.RatingSystem.Glicko;
+}
+
+export function getRating(userRating: m.UserRating, system: string): Rating {
+    if (system === m.RatingSystem.Aco) {
+        return {
+            exposure: userRating.acoExposure,
+            percentile: userRating.acoPercentile,
+        };
+    } else {
+        return {
+            exposure: userRating.lowerBound,
+            percentile: userRating.percentile,
+        };
+    }
 }
 
 export function onNotification(notifs: w.Notification[]) {
@@ -129,10 +147,9 @@ export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLooku
             continue;
         }
 
-        const exposure = system === m.RatingSystem.Aco ? userRating.acoExposure : userRating.lowerBound;
-        const percentile = system === m.RatingSystem.Aco ? userRating.acoPercentile : userRating.percentile;
-        if (exposure && percentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(exposure, percentile, category, system);
+        const values = getRating(userRating, system); 
+        if (values.exposure && values.percentile >= 0) {
+            lookup[category] = await calculatePointsUntilNextLeague(values.exposure, values.percentile, category, system);
         }
     }
     return lookup;

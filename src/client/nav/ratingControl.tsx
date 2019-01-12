@@ -12,12 +12,14 @@ import PageLink from './pageLink';
 interface Props {
     userId: string;
     profile: m.GetProfileResponse;
+    system: string;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         userId: state.userId,
         profile: state.profile,
+        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -37,10 +39,10 @@ class RatingControl extends React.Component<Props> {
         }
     }
 
-    private renderRank(rating: m.UserRating) {
+    private renderRank(rating: rankings.Rating) {
         const league = rankings.getLeagueName(rating.percentile);
         return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
-            <b>{league}</b> {rating.lowerBound.toFixed(0)}
+            <b>{league}</b> {rating.exposure.toFixed(0)}
         </PageLink>
     }
 
@@ -51,11 +53,16 @@ class RatingControl extends React.Component<Props> {
         }
 
         const rating = profile.ratings[m.GameCategory.PvP];
-        if (!(rating && rating.lowerBound && rating.percentile >= 0 && rating.numGames >= constants.Placements.MinGames)) {
+        if (!(rating && rating.numGames >= constants.Placements.MinGames)) {
             return null;
         }
 
-        return rating;
+        const values: rankings.Rating = rankings.getRating(rating, this.props.system);
+        if (!(values.exposure && values.percentile >= 0)) {
+            return null;
+        }
+
+        return values;
     }
 }
 
