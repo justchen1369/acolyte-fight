@@ -7,8 +7,8 @@ import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
-    Radius: 0.015,
-    Density: 0.5,
+    Radius: 0.0125,
+    Density: 0.72,
 
     AngularDamping: 1,
     Damping: 3,
