@@ -20,7 +20,8 @@ export function calculateResult(game: g.Game) {
 }
 
 function findStats(game: g.Game): m.GameStatsMsg {
-    const corroborateThreshold = Math.max(1, Math.ceil(game.scores.size / 2)); // Need majority to corroborate
+    const Majority = 0.51;
+    const corroborateThreshold = Math.max(1, Math.ceil(game.scores.size * Majority));
     const candidates = new Map<string, CandidateHash>();
     for (const gameStats of game.scores.values()) {
         const hash = hashStats(gameStats);

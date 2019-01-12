@@ -191,7 +191,7 @@ function acoDecayKey(userId: string, category: string, unix: number): db.AcoDeca
 }
 
 function acoDecayUnixCeiling(unix: number) {
-    const unixCeiling = Math.ceil(unix / AcoDecayInterval);
+    const unixCeiling = Math.ceil(unix / AcoDecayInterval) * AcoDecayInterval;
     return unixCeiling;
 }
 
@@ -425,16 +425,21 @@ export async function decayAco() {
             }
             const dbUser = userDoc.data() as db.User;
 
+            // Calculate decay
             const rating = dbToUserRating(dbUser, decay.category);
             rating.aco -= decay.acoDelta;
             rating.acoGames -= decay.acoGamesDelta;
 
+            // Save decay
             const loggedIn = userStorage.dbUserLoggedIn(dbUser);
             const dbUserRating = userRatingToDb(rating, loggedIn);
             const delta: Partial<db.User> = {
                 ratings: { [decay.category]: dbUserRating },
             };
             transaction.update(userDoc.ref, delta);
+
+            // Don't apply this decay again
+            transaction.delete(decayDoc.ref);
         });
 
         ++numAffected;
@@ -490,8 +495,10 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
         );
         const initialDecays = new Map<string, db.AcoDecay>();
         for (const doc of decayDocs) {
-            const data = doc.data() as db.AcoDecay;
-            initialDecays.set(data.userId, data);
+            if (doc.exists) {
+                const data = doc.data() as db.AcoDecay;
+                initialDecays.set(data.userId, data);
+            }
         }
 
         // Calculate changes
@@ -529,23 +536,31 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
             }
         }
 
-        // Calculate rating deltas
+        // Calculate glicko deltas
         for (const player of knownPlayers) {
             const initialRating = initialRatings.get(player.userId);
             const userRating = userRatings.get(player.userId);
 
             glickoDeltas[player.userId] = calculateGlickoLowerBound(userRating.rating, userRating.rd) - calculateGlickoLowerBound(initialRating.rating, initialRating.rd);
-            acoDeltas[player.userId] = calculateAcoExposure(userRating.aco, userRating.acoGames) - calculateAcoExposure(userRating.aco, userRating.acoGames);
         }
 
-        // Assign aco decays
+        // Calculate aco deltas
         for (const player of knownPlayers) {
+            const initialRating = initialRatings.get(player.userId);
+            const userRating = userRatings.get(player.userId);
+
+            // Update aco decay
             const decay = initialDecays.get(player.userId) || initAcoDecay(player.userId, category, unix);
-            decay.acoDelta += acoDeltas[player.userId] || 0;
-            ++decay.acoGamesDelta;
+
+            decay.acoDelta += userRating.aco - initialRating.aco;
+            decay.acoGamesDelta += userRating.acoGames - initialRating.acoGames;
 
             const key = acoDecayKeyString(decay);
             transaction.set(firestore.collection(Collections.AcoDecay).doc(key), decay);
+
+            // Output delta
+            const exposureDelta = calculateAcoExposure(userRating.aco, userRating.acoGames) - calculateAcoExposure(initialRating.aco, initialRating.acoGames);
+            acoDeltas[player.userId] = exposureDelta;
         }
 
         // Don't report deltas on players who haven't placed
@@ -613,12 +628,14 @@ function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, player
 
 function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
     const deltas = players.map(_ => 0);
+    let numPlayers = 0;
     for (let i = 0; i < players.length; ++i) {
         const self = players[i];
         const selfRating = allRatings.get(self.userId);
         if (!selfRating) {
             continue;
         }
+        ++numPlayers;
 
         let delta = 0;
         for (let j = 0; j < players.length; ++j) {
@@ -638,6 +655,17 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
 
         deltas[i] = delta;
     }
+
+    for (let i = 0; i < players.length; ++i) {
+        const self = players[i];
+        const selfRating = allRatings.get(self.userId);
+        if (!selfRating) {
+            continue;
+        }
+
+        selfRating.aco += deltas[i];
+        ++selfRating.acoGames;
+    }
 }
 
 function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
@@ -646,7 +674,6 @@ function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, i
     userRating.killsPerGame = incrementAverage(userRating.killsPerGame, previousGames, player.kills);
     userRating.winRate = incrementAverage(userRating.winRate, previousGames, isWinner ? 1 : 0);
     ++userRating.numGames;
-    ++userRating.acoGames;
 }
 
 function incrementAverage(current: number, count: number, newValue: number) {
