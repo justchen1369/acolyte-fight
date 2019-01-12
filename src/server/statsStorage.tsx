@@ -465,7 +465,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Rati
         return null;
     }
 
-    const unix = moment(gameStats.unixTimestamp).unix();
+    const unix = gameStats.unixTimestamp || moment().unix();
 
     const ratingDeltas = await firestore.runTransaction(async (transaction) => {
         // Load initial data
