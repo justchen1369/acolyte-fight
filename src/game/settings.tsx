@@ -418,7 +418,7 @@ const boomerang: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.003,
+        radius: 0.002,
         speed: 0.6,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
@@ -774,7 +774,7 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Build up to 3 charges of your halo, then touch your enemy to burn them. Watch out, you lose a charge every time you are hit, so keep dodging!",
+    description: "Build up to 3 charges of your halo, then touch your enemy to lifesteal. Watch out, you lose your halo every time you are hit, so keep dodging!",
     action: "projectile",
 
     color: '#ffe33b',
