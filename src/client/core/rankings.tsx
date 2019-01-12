@@ -39,7 +39,7 @@ export const leagues = [
 ];
 
 export function systemOrDefault(system: string) {
-    return system || m.RatingSystem.Glicko;
+    return system || m.RatingSystem.Aco;
 }
 
 export function getRating(userRating: m.UserRating, system: string): Rating {
