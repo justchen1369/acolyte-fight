@@ -58,7 +58,7 @@ export class TitleSection extends React.Component<Props, State> {
                 On iPhone - tap the Share button, click Add to Home Screen.
                 On Android - tap the triple dot menu button, click Add to Home Screen.
             </p>
-            <h2>How is the ratings calculated?</h2>
+            <h2>How are the ratings calculated?</h2>
             <p>
                 The ratings are calculated according to the <a href="https://en.wikipedia.org/wiki/Glicko_rating_system" target="_blank">Glicko-2 rating system</a>.
                 You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
