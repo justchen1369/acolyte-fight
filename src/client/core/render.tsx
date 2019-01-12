@@ -551,6 +551,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const MaxAlpha = 0.5;
+	const CrossWidth = 0.05;
 
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (!(hero && hero.category === "hero")) {
@@ -570,6 +571,13 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const guide = vector.relengthen(diff, 0.5);
 	const proportion = Math.min(1, vector.length(diff) / 0.5);
 
+	const radius = vector.length(diff);
+	const angle = vector.angle(diff);
+	const circumference = 2 * Math.PI * radius;
+	const angularProportion = CrossWidth / circumference;
+	const startAngle = angle - (Math.PI * angularProportion);
+	const endAngle = angle + (Math.PI * angularProportion);
+
 	ctx.translate(pos.x, pos.y);
 
 	ctx.lineWidth = hero.radius / 2;
@@ -579,8 +587,13 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	gradient.addColorStop(1, Color("black").alpha(0).string());
 	ctx.strokeStyle = gradient;
 
-	ctx.setLineDash([ Pixel * 25, Pixel * 5 ]);
+	// Render cross
+	ctx.beginPath();
+	ctx.arc(0, 0, radius, startAngle, endAngle);
+	ctx.stroke();
 
+	// Render line to target
+	ctx.setLineDash([ Pixel * 25, Pixel * 5 ]);
 	ctx.beginPath();
 	ctx.moveTo(0, 0);
 	ctx.lineTo(guide.x, guide.y);
