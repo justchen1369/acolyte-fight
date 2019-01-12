@@ -22,6 +22,11 @@ export namespace GameCategory {
     ];
 }
 
+export namespace RatingSystem {
+    export const Glicko = "glicko";
+    export const Aco = "aco";
+}
+
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";
@@ -403,12 +408,16 @@ export interface UserRating {
     rating: number;
     rd: number;
     lowerBound: number;
+    percentile: number;
+
+    aco: number;
+    acoGames: number;
     acoExposure: number;
+
     numGames: number;
     damagePerGame: number;
     killsPerGame: number;
     winRate: number;
-    percentile: number;
 }
 
 export interface FacebookLoginRequest {

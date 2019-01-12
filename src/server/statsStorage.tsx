@@ -169,6 +169,8 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
                 rating: rating.rating,
                 rd: rating.rd,
                 lowerBound,
+                aco: rating.aco,
+                acoGames: rating.acoGames,
                 acoExposure,
                 percentile: percentiles.estimatePercentile(lowerBound, category),
             };

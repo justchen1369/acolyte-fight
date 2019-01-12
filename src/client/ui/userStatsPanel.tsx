@@ -27,6 +27,7 @@ interface Props extends OwnProps {
     playerName: string;
     loggedIn: boolean;
     myUserId: string;
+    ratingSystem: string;
 }
 
 interface State {
@@ -43,6 +44,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
+        ratingSystem: state.options.ratingSystem,
     };
 }
 
@@ -136,6 +138,8 @@ class UserStatsPanel extends React.Component<Props, State> {
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = rankings.getLeagueName(rating.percentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
+
+        const aco = this.props.ratingSystem === m.RatingSystem.Aco;
         return <div>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
                 <div className="stats-card">
