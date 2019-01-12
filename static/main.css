@@ -629,6 +629,10 @@ i.clickable:hover, i.clickable:active {
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
 }
 
+.wheel-on-left #messages-panel .help-box {
+    background: linear-gradient(to left, #111, rgba(0,0,0,0));
+}
+
 @media (min-width: 1000px) {
     #messages-panel .help-box {
         font-size: 150%;
@@ -660,6 +664,10 @@ i.clickable:hover, i.clickable:active {
     margin-top: 1em;
     padding: 0.5em;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
+}
+
+.wheel-on-left #messages-panel .winner {
+    background: linear-gradient(to left, #111, rgba(0,0,0,0));
 }
 
 #messages-panel .winner-row {

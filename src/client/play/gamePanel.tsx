@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -23,6 +24,7 @@ interface Props {
     party: s.PartyState;
     connected: boolean;
     exitable: boolean;
+    wheelOnRight: boolean;
 }
 interface State {
 }
@@ -33,6 +35,7 @@ function stateToProps(state: s.State): Props {
         party: state.party,
         connected: !!state.socketId,
         exitable: matches.worldInterruptible(state.world),
+        wheelOnRight: state.options.wheelOnRight,
     };
 }
 
@@ -46,8 +49,14 @@ class GamePanel extends React.Component<Props, State> {
     render() {
         const a = options.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;
+        const className = classNames({
+            'mobile': isMobile,
+            'desktop': !isMobile,
+            'wheel-on-left': isMobile && !this.props.wheelOnRight,
+            'wheel-on-right': isMobile && this.props.wheelOnRight,
+        });
         return (
-            <div id="game-panel" className={isMobile ? "mobile" : "desktop"}>
+            <div id="game-panel" className={className}>
                 <CanvasPanel />
                 <InfoPanel />
                 <MessagesPanel />
