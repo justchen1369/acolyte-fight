@@ -112,7 +112,13 @@ export function init() {
 
         const compressor = ctx.createDynamicsCompressor();
         compressor.connect(next);
+        compressor.attack.value = 0;
         next = compressor;
+
+        const masterVolume = ctx.createGain();
+        masterVolume.connect(next);
+        masterVolume.gain.value = 0.5;
+        next = masterVolume;
 
         env = {
             ctx,
@@ -233,10 +239,16 @@ function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, next: Aud
     const decay = bite.decay || 0.03;
     const maxVolume = bite.volume || 1;
 
-	const volume = env.ctx.createGain();
+    const maxStartTime = t + startTime + attack;
+    const maxStopTime = Math.max(maxStartTime, t + stopTime - decay);
+
+    const volume = env.ctx.createGain();
+    volume.gain.value = 0;
 	volume.gain.setValueAtTime(0, t + startTime);
-	volume.gain.linearRampToValueAtTime(maxVolume, t + startTime + attack);
-	volume.gain.linearRampToValueAtTime(maxVolume, t + stopTime - decay);
+    volume.gain.linearRampToValueAtTime(maxVolume, maxStartTime);
+    if (maxStopTime > maxStartTime) {
+        volume.gain.linearRampToValueAtTime(maxVolume, maxStopTime);
+    }
 	volume.gain.linearRampToValueAtTime(0, t + stopTime);
 
 	volume.connect(next);
@@ -255,7 +267,7 @@ function createTremoloNode(bite: SoundBite, env: AudioEnvironment, next: AudioNo
     const stopTime = bite.stopTime;
 
     const tremoloGain = ctx.createGain();
-    tremoloGain.gain.setValueAtTime(1 - strength, 0);
+    tremoloGain.gain.value = 1 - strength;
     tremoloGain.connect(next);
 
     const oscGain = ctx.createGain();
@@ -263,7 +275,7 @@ function createTremoloNode(bite: SoundBite, env: AudioEnvironment, next: AudioNo
     oscGain.connect(tremoloGain.gain);
 
     const tremoloOsc = ctx.createOscillator();
-    tremoloOsc.frequency.setValueAtTime(freq, 0);
+    tremoloOsc.frequency.value = freq;
     tremoloOsc.start(ctx.currentTime + startTime);
     tremoloOsc.stop(ctx.currentTime + stopTime);
     tremoloOsc.connect(oscGain);
@@ -330,6 +342,7 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
 			const osc = ctx.createOscillator();
 			osc.type = bite.wave;
 
+            osc.frequency.value = ratio * startFreq;
 			osc.frequency.setValueAtTime(ratio * startFreq, t + startTime);
 			osc.frequency.exponentialRampToValueAtTime(ratio * stopFreq, t + stopTime);
 
@@ -357,8 +370,12 @@ function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment) {
         const modGain = ctx.createGain();
 
         mod.type = bite.wave as OscillatorType;
+
+        mod.frequency.value = bite.modStartFreq;
         mod.frequency.setValueAtTime(bite.modStartFreq, t + startTime);
         mod.frequency.exponentialRampToValueAtTime(bite.modStopFreq, t + stopTime);
+
+        modGain.gain.value = bite.modStartStrength;
         modGain.gain.setValueAtTime(bite.modStartStrength, t + startTime);
         modGain.gain.linearRampToValueAtTime(bite.modStopStrength, t + stopTime);
 
