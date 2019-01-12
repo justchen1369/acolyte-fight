@@ -154,6 +154,9 @@ function dbToUserRating(user: db.User, category: string): g.UserRating {
     const userRating = user && user.ratings && user.ratings[category]
     if (userRating) {
         Object.assign(result, userRating);
+        if (!userRating.aco && userRating.lowerBound) {
+            result.aco = userRating.lowerBound; // Seed aco with Glicko
+        }
     }
     return result;
 }
@@ -422,16 +425,14 @@ async function decayUser(userId: string, category: string, decay: number): Promi
             return;
         }
 
-        const userRating = user.ratings[category];
-        if (!userRating.lowerBound) {
-            return;
-        }
-
+        const userRating = dbToUserRating(user, category);
         userRating.rd = Math.min(constants.Placements.InitialRd, userRating.rd + decay);
-        userRating.lowerBound = calculateGlickoLowerBound(userRating.rating, userRating.rd);
+
+        const loggedIn = userStorage.dbUserLoggedIn(user);
+        const dbUserRating = userRatingToDb(userRating, loggedIn);
 
         await t.update(doc.ref, {
-            ratings: { [category]: userRating },
+            ratings: { [category]: dbUserRating },
         });
     });
 }
@@ -453,7 +454,7 @@ export async function decayAco() {
 
             // Calculate decay
             const rating = dbToUserRating(dbUser, decay.category);
-            rating.aco -= decay.acoDelta;
+            // rating.aco -= decay.acoDelta; // Don't decay the rating, just the bonus
             rating.acoGames -= decay.acoGamesDelta;
 
             // Save decay
