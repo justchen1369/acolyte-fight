@@ -47,6 +47,7 @@ interface ControlState {
 interface State extends ControlState {
     changed: boolean;
     saved: boolean;
+    advanced: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -95,6 +96,7 @@ class ControlsPanel extends React.Component<Props, State> {
             ...controlConfigToState(props.rebindings, props.options),
             changed: false,
             saved: true,
+            advanced: false,
         };
     }
 
@@ -103,7 +105,7 @@ class ControlsPanel extends React.Component<Props, State> {
     }
 
     render() {
-        return <div className="controls-panel">
+        return <div className="controls-panel" onClick={ev => this.onClick(ev)}>
             {!isMobile && <div className="row">
                 <span className="label">Move with</span>
                 <select className="value" value={this.state.moveWith} onChange={ev => this.onMoveWithSelected(ev.target.value)}>
@@ -174,7 +176,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <div className="row">
+            {this.state.advanced && <div className="row">
                 <span className="label">Rating system</span>
                 <select
                     className="value"
@@ -186,7 +188,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={RatingSystem.Glicko}>Glicko</option>
                     <option value={RatingSystem.Aco}>Aco</option>
                 </select>
-            </div>
+            </div>}
             {<div className="row">
                 <span className="label">Sound</span>
                 <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
@@ -259,6 +261,12 @@ class ControlsPanel extends React.Component<Props, State> {
     private onSoundsSelected(sounds: string) {
         this.setState({ sounds, changed: true, saved: false });
         this.saveStateDebounced();
+    }
+
+    private onClick(ev: React.MouseEvent) {
+        if (ev.altKey && ev.shiftKey) {
+            this.setState({ advanced: true });
+        }
     }
 
     private saveState() {
