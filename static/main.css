@@ -10,6 +10,12 @@ body {
     margin: 0;
 }
 
+@media (max-width: 1024px) {
+    body {
+        font-size: 12pt;
+    }
+}
+
 @media (max-width: 768px) {
     body {
         font-size: 10pt;
@@ -34,13 +40,13 @@ body.game {
 }
 
 body .page {
-    max-width: 1000px;
+    max-width: 1024px;
     margin-left: auto;
     margin-right: auto;
     margin-bottom: 300px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     body .page {
         margin-left: 4px;
         margin-right: 4px;
@@ -1011,6 +1017,8 @@ h2 {
 
 .stats-card-row {
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
     display: flex;
     flex-direction: row;
 }
