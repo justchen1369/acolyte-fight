@@ -96,7 +96,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
-                "extent": 0.01,
+                "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0.5,
                 "health": 20
             },
