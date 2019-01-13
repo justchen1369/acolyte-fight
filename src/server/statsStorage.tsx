@@ -449,9 +449,16 @@ export async function decayAco() {
     const query = firestore.collection(Collections.AcoDecay).where('unixCeiling', '<=', unix);
 
     let numAffected = 0;
-    await dbStorage.stream(query, async (decayDoc) => {
-        const decay = decayDoc.data() as db.AcoDecay;
+    await dbStorage.stream(query, async (oldDecayDoc) => {
         await firestore.runTransaction(async (transaction) => {
+            // Re-retrieve the decay so that we lock it in a transaction and don't decay twice
+            const newDecayDoc = await transaction.get(firestore.collection(Collections.AcoDecay).doc(oldDecayDoc.id));
+            if (!newDecayDoc.exists) {
+                return;
+            }
+
+            const decay = newDecayDoc.data() as db.AcoDecay;
+
             const userDoc = await transaction.get(firestore.collection(Collections.User).doc(decay.userId));
             if (!userDoc.exists) {
                 return;
@@ -472,7 +479,7 @@ export async function decayAco() {
             transaction.update(userDoc.ref, delta);
 
             // Don't apply this decay again
-            transaction.delete(decayDoc.ref);
+            transaction.delete(oldDecayDoc.ref);
         });
 
         ++numAffected;
