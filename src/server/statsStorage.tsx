@@ -190,10 +190,16 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
         }
     }
 
+    let bindings: KeyBindings = {};
+    if (data.settings && data.settings.buttons) {
+        bindings = data.settings.buttons;
+    }
+
     return {
         userId,
         name: data.settings && data.settings.name || userId,
         ratings,
+        bindings,
     };
 }
 

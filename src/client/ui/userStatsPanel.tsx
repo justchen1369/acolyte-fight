@@ -16,11 +16,14 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
+import BuildPanel from './buildPanel';
+
 interface OwnProps {
     profileId: string;
     category: string;
     showRanking?: boolean;
     showWinRates?: boolean;
+    showBuild?: boolean;
 }
 interface Props extends OwnProps {
     myProfile: m.GetProfileResponse;
@@ -126,8 +129,9 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
-        return <div>
+        return <div className="user-stats-panel">
             <h1>{profile.name}</h1>
+            {this.props.showBuild && <BuildPanel bindings={profile.bindings} />}
             {this.props.showRanking && this.renderRankingStats(profile, rating)}
             {this.props.showWinRates && this.renderWinRateStats(rating)}
         </div>
@@ -194,7 +198,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     }
 
     private renderNoRating(profile: m.GetProfileResponse) {
-        return <div>
+        return <div className="user-stats-panel">
             <h1>{profile.name}</h1>
             {this.props.category === m.GameCategory.PvP && <div className="stats-card-row">
                 <div className="stats-card">

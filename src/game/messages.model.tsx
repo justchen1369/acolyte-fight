@@ -405,6 +405,7 @@ export interface GetProfileResponse {
     userId: string;
     name: string;
     ratings: UserRatingLookup;
+    bindings: KeyBindings;
 }
 
 export interface UserRatingLookup {

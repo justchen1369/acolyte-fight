@@ -1,3 +1,4 @@
+import Color from 'color';
 import * as React from 'react';
 import * as icons from '../core/icons';
 import { renderIconButton } from '../core/renderIcon';
@@ -7,6 +8,7 @@ interface Props {
     color: string;
     size: number;
     hoverWash?: boolean;
+    hoverHighlight?: boolean;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
 }
@@ -80,6 +82,9 @@ export class SpellIcon extends React.Component<Props, State> {
             let color = this.props.color;
             if (this.props.hoverWash && !this.state.hovering) {
                 color = "#888";
+            }
+            if (this.props.hoverHighlight && this.state.hovering) {
+                color = Color(color).mix(Color("white"), 0.5).string();
             }
 
             ctx.clearRect(0, 0, rect.width, rect.height);
