@@ -1075,6 +1075,10 @@ const swap: Spell = {
 
         swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
 
+        behaviours: [
+            { type: "expireOnOwnerDeath" },
+        ],
+
         sound: "swap",
         renderers: [
             {
