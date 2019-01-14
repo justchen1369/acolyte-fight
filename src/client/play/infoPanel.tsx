@@ -52,7 +52,7 @@ class InfoPanel extends React.Component<Props, State> {
                         <span className="player-list-num-players">{this.props.activePlayers.size} players</span>
                     )}
                 </div>
-                {!this.props.waitingForPlayers && <div className="player-list">
+                {this.props.activePlayers.size > 0 && <div className="player-list">
                     {this.renderPlayerList()}
                 </div>}
                 {this.renderButtons()}
