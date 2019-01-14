@@ -2568,13 +2568,16 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		damage *= scaleFactor;
 	}
 
+	let lifeStealTargetHeroId: string = null;
 	if (fromHero && fromHero.category === "hero" && fromHero.link && !lifeSteal) {
 		lifeSteal = fromHero.link.lifeSteal;
+		lifeStealTargetHeroId = fromHero.link.targetId;
 	}
 
 	return {
 		damage,
 		lifeSteal,
+		lifeStealTargetHeroId,
 		fromHeroId,
 	};
 }
@@ -2606,7 +2609,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHeroId && packet.lifeSteal) {
+	if (fromHeroId && packet.lifeSteal && (!packet.lifeStealTargetHeroId || packet.lifeStealTargetHeroId === toHero.id)) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);

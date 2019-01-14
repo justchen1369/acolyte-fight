@@ -529,6 +529,7 @@ export interface DamagePacket {
 	fromHeroId: string;
 	damage: number;
 	lifeSteal: number;
+	lifeStealTargetHeroId?: string;
 	isLava?: boolean;
 }
 
