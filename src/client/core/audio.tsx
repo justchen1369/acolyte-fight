@@ -1,5 +1,6 @@
 import * as pl from 'planck-js';
 import * as w from '../../game/world.model';
+import { isMobile } from './userAgent';
 import { TicksPerSecond } from '../../game/constants';
 
 const Z = -0.1;
@@ -202,15 +203,22 @@ function generateBrownNoise(ctx: AudioContext) {
 
 function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): AudioRef {
     let next: AudioNode = env.next;
+    const nodes = new Array<AudioNode>();
 
-    const panner = next = createPannerNode(pos, env, next);
-    const volume = next = createVolumeNode(env, next);
-    next = createAttackDecayNode(bite, env, next);
-    next = createTremoloNode(bite, env, next);
-    next = createHighPassNode(bite, env, next);
-    next = createLowPassNode(bite, env, next);
+    const panner = createPannerNode(pos, env, nodes, next);
+    if (!isMobile) { // Only connect panner on desktop
+        next = panner;
+    }
 
-    createSource(bite, env, next);
+    const volume = next = createVolumeNode(env, nodes, next);
+    next = createAttackDecayNode(bite, env, nodes, next);
+    next = createTremoloNode(bite, env, nodes, next);
+    next = createHighPassNode(bite, env, nodes, next);
+    next = createLowPassNode(bite, env, nodes, next);
+
+    createSource(bite, env, nodes, next, () => {
+        nodes.forEach(node => node.disconnect());
+    });
 
     return {
         panner,
@@ -219,26 +227,28 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): Au
     };
 }
 
-function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, next: AudioNode) {
+function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     const pan = env.ctx.createPanner();
-    pan.panningModel = 'equalpower';
+    pan.panningModel = 'HRTF';
     pan.distanceModel = 'inverse';
     pan.refDistance = RefDistance;
     pan.setPosition(pos.x, pos.y, Z);
     pan.setOrientation(0, 0, 1);
     pan.connect(next);
+    nodes.push(pan);
     return pan;
 }
 
-function createVolumeNode(env: AudioEnvironment, next: AudioNode) {
+function createVolumeNode(env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
 	const volume = env.ctx.createGain();
 	volume.gain.setValueAtTime(1, env.ctx.currentTime);
 
-	volume.connect(next);
+    volume.connect(next);
+    nodes.push(volume);
     return volume;
 }
 
-function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
+function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     const t = env.ctx.currentTime;
     const startTime = bite.startTime || 0;
     const stopTime = bite.stopTime;
@@ -258,11 +268,12 @@ function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, next: Aud
     }
 	volume.gain.linearRampToValueAtTime(0, t + stopTime);
 
-	volume.connect(next);
+    volume.connect(next);
+    nodes.push(volume);
     return volume;
 }
 
-function createTremoloNode(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
+function createTremoloNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!(bite.tremoloFreq && bite.tremoloStrength)) {
         return next;
     }
@@ -287,10 +298,14 @@ function createTremoloNode(bite: SoundBite, env: AudioEnvironment, next: AudioNo
     tremoloOsc.stop(ctx.currentTime + stopTime);
     tremoloOsc.connect(oscGain);
 
+    nodes.push(tremoloGain);
+    nodes.push(oscGain);
+    nodes.push(tremoloOsc);
+
     return tremoloGain;
 }
 
-function createHighPassNode(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
+function createHighPassNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!bite.highPass) {
         return next;
     }
@@ -300,10 +315,11 @@ function createHighPassNode(bite: SoundBite, env: AudioEnvironment, next: AudioN
     highPass.frequency.value = bite.highPass;
     highPass.connect(next);
 
+    nodes.push(highPass);
     return highPass;
 }
 
-function createLowPassNode(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
+function createLowPassNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!bite.lowPass) {
         return next;
     }
@@ -313,17 +329,19 @@ function createLowPassNode(bite: SoundBite, env: AudioEnvironment, next: AudioNo
     lowPass.frequency.value = bite.lowPass;
     lowPass.connect(next);
 
+    nodes.push(lowPass);
     return lowPass;
 }
 
-function createNormalizer(divisor: number, env: AudioEnvironment, next: AudioNode) {
+function createNormalizer(divisor: number, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
     const normalizer = env.ctx.createGain();
     normalizer.gain.value = 1 / divisor;
     normalizer.connect(next);
+    nodes.push(normalizer);
     return normalizer;
 }
 
-function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
+function createSource(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode, onEnded: () => void) {
     const ctx = env.ctx;
     const t = ctx.currentTime;
 
@@ -335,16 +353,20 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
 		noise.buffer = env.brownNoise;
 
 		noise.start(t + startTime);
-		noise.stop(t + stopTime);
-		noise.connect(next);
+        noise.stop(t + stopTime);
+        nodes.push(noise);
+        noise.connect(next);
+
+        noise.onended = onEnded;
 	} else {
         const ratios = bite.ratios || [1];
         const startFreq = bite.startFreq || 440;
         const stopFreq = bite.stopFreq || 440;
 
-        const frequencyModulator = createFrequencyModulator(bite, env);
-        next = createNormalizer(ratios.length, env, next); // Ensure volume is the same regardless of number of oscillators
+        const frequencyModulator = createFrequencyModulator(bite, env, nodes);
+        next = createNormalizer(ratios.length, env, nodes, next); // Ensure volume is the same regardless of number of oscillators
 
+        let ended = false;
 		for (const ratio of ratios) {
 			const osc = ctx.createOscillator();
 			osc.type = bite.wave;
@@ -356,7 +378,14 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
 			osc.start(t + startTime);
 			osc.stop(t + stopTime);
 
+            nodes.push(osc);
             osc.connect(next);
+            osc.onended = () => {
+                if (!ended) {
+                    ended = true;
+                    onEnded();
+                }
+            };
             
             if (frequencyModulator) {
                 frequencyModulator.connect(osc.frequency);
@@ -365,7 +394,7 @@ function createSource(bite: SoundBite, env: AudioEnvironment, next: AudioNode) {
     }
 }
 
-function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment) {
+function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[]) {
     const ctx = env.ctx;
     const t = ctx.currentTime;
 
@@ -390,6 +419,9 @@ function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment) {
 
         mod.start(t + startTime);
         mod.stop(t + stopTime);
+
+        nodes.push(mod);
+        nodes.push(modGain);
 
         return modGain;
     } else {
