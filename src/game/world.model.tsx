@@ -515,6 +515,7 @@ export interface Projectile extends WorldObjectBase {
 	minTicks: number;
 	maxTicks: number;
 	expireOn: number;
+	expireOnSelf: boolean;
 	destructible?: DestructibleParameters;
 
 	renderers: RenderParams[];

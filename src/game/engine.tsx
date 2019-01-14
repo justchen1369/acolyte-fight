@@ -463,6 +463,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
+		expireOnSelf: projectileTemplate.expireOnSelf !== undefined ? projectileTemplate.expireOnSelf : true,
 		destructible: projectileTemplate.destructible,
 
 		sound: projectileTemplate.sound,
@@ -1426,7 +1427,11 @@ function isHeroShielded(hero: w.Hero, world: w.World) {
 }
 
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
-	return (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
+	let expire = (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
+	if (expire && projectile.owner === other.id && !projectile.expireOnSelf) {
+		expire = false;
+	}
+	return expire;
 }
 
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {

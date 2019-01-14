@@ -423,6 +423,7 @@ const boomerang: Spell = {
         maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
+        expireOnSelf: false,
 
         behaviours: [
             {
