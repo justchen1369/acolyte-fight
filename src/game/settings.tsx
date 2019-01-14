@@ -1090,7 +1090,7 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 2 seconds, increase movement speed 30%, and also become immune to damage from the void.",
+    description: "For 2.5 seconds, increase movement speed 50%, and also become immune to damage from the void.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -1101,12 +1101,12 @@ const voidRush: Spell = {
         {
             type: "movement",
             movementProportion: 1.3,
-            maxTicks: 2 * TicksPerSecond,
+            maxTicks: 2.5 * TicksPerSecond,
         },
         {
             type: "lavaImmunity",
             damageProportion: 0,
-            maxTicks: 2 * TicksPerSecond,
+            maxTicks: 2.5 * TicksPerSecond,
             sound: "voidRush",
         },
     ],
