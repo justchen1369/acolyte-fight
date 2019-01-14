@@ -51,6 +51,7 @@ export namespace HeroColors {
 
 	export const MyHeroColor = '#00ccff';
 	export const BotColor = '#cccccc';
+	export const AnonymousColor = '#eee';
 	export const InactiveColor = '#666666';
 	export const HealColor = '#22ee88';
 	export const Colors = [
