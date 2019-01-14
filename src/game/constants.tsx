@@ -65,13 +65,6 @@ export namespace HeroColors {
 		"#cea85c",
 		"#54b7a2",
 		"#a97fc1",
-		"#a85e83",
-		"#d6be68",
-		"#94af5d",
-		"#c18859",
-		"#af5d7a",
-		"#9b5daf",
-		"#609380",
 	];
 
 	export const LavaFlashInterval = 20;
