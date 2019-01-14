@@ -1,22 +1,37 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import { anonymize } from './anonymizer';
 import { HeroColors } from '../../game/constants';
 
-interface Props {
+interface OwnProps {
     player: w.Player;
-    myHeroId: string;
     colorOverride?: string;
 }
+interface Props extends OwnProps {
+    myHeroId: string;
+    anonymous: boolean;
+}
 
-export class PlayerName extends React.PureComponent<Props> {
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        myHeroId: state.world.ui.myHeroId,
+        anonymous: anonymize(ownProps.player, state.world),
+    };
+}
+
+class PlayerName extends React.PureComponent<Props> {
     render() {
         const player = this.props.player;
         
         let color;
         if (this.props.colorOverride) {
             color = this.props.colorOverride;
+        } else if (this.props.anonymous) {
+            color = HeroColors.AnonymousColor;
         } else if (player.heroId === this.props.myHeroId) {
             color = HeroColors.MyHeroColor;
         } else {
@@ -37,3 +52,5 @@ export class PlayerName extends React.PureComponent<Props> {
         </span>;
     }
 }
+
+export default ReactRedux.connect(stateToProps)(PlayerName);

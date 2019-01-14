@@ -12,9 +12,9 @@ import * as rankings from '../core/rankings';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from '../ui/playButton';
+import PlayerName from './playerNameComponent';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
-import { PlayerName } from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
 
 interface Props {
@@ -24,6 +24,7 @@ interface Props {
     myGameId: string;
     myHeroId: string;
     isDead: boolean;
+    isStarted: boolean;
     isFinished: boolean;
     buttonBar: w.ButtonConfig;
     rebindings: KeyBindings;
@@ -43,6 +44,7 @@ function stateToProps(state: s.State): Props {
         myGameId: state.world.ui.myGameId,
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
+        isStarted: state.world.tick >= state.world.startTick,
         isFinished: state.world.activePlayers.size === 0,
         buttonBar: state.world.ui.buttonBar,
         rebindings: state.rebindings,
@@ -84,7 +86,7 @@ class MessagesPanel extends React.Component<Props, State> {
         let finished = false;
 
         let actionRow: JSX.Element = this.renderHelp("help");
-        if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
+        if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead && this.props.isStarted) {
             actionRow = this.renderDead("dead", this.props.myGameId);
             finished = true;
         } else if (this.props.isFinished) {
@@ -131,7 +133,7 @@ class MessagesPanel extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderNotification(key: string, notification: w.Notification) {
+    private renderNotification(key: string, notification: w.Notification): JSX.Element {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "text": return this.renderTextNotification(key, notification);
@@ -222,7 +224,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderTextNotification(key: string, notification: w.TextNotification) {
-        return <div key={key} className="row text-row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} />: <span className="text-message">{notification.text}</span></div>
+        return <div key={key} className="row text-row"><PlayerName player={notification.player} />: <span className="text-message">{notification.text}</span></div>
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
@@ -235,16 +237,17 @@ class MessagesPanel extends React.Component<Props, State> {
         }
     }
 
-    private renderJoinNotification(key: string, notification: w.JoinNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
+    private renderJoinNotification(key: string, notification: w.JoinNotification): JSX.Element {
+        // Don't render anything for joining
+        return null;
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> left</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} /> left</div>
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
@@ -252,22 +255,14 @@ class MessagesPanel extends React.Component<Props, State> {
             return null;
         }
 
-        if (notification.killer) {
-            return <div key={key} className="row">
-                {notification.killer && <span key="killer"><PlayerName player={notification.killer} myHeroId={this.props.myHeroId} /> killed </span>}
-                {notification.killed && <span key="killed"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> </span>}
-                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} myHeroId={this.props.myHeroId} /> </span>}
-            </div>
-        } else {
-            return <div key={key} className="row"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> died</div>
-        }
+        return <div key={key} className="row"><PlayerName player={notification.killed} /> died</div>
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
         return <div key={key} className="winner">
-            <div className="winner-row"><PlayerName player={notification.winner} myHeroId={this.props.myHeroId} /> is the winner!</div>
-            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)})</div>
-            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} myHeroId={this.props.myHeroId} /> ({notification.mostKillsCount} kills)</div>
+            <div className="winner-row"><PlayerName player={notification.winner} /> is the winner!</div>
+            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)})</div>
+            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 {this.renderAgainButton()}
             </div>
