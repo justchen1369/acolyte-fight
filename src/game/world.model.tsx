@@ -554,6 +554,7 @@ export type Behaviour =
 	| ThrustDecayBehaviour
 	| SaberBehaviour
 	| ExpireBuffsBehaviour
+	| ExpireOnOwnerDeathBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -635,6 +636,11 @@ export interface SaberBehaviour extends BehaviourBase {
 export interface ExpireBuffsBehaviour extends BehaviourBase {
 	type: "expireBuffs";
 	heroId: string;
+}
+
+export interface ExpireOnOwnerDeathBehaviour extends BehaviourBase {
+	type: "expireOnOwnerDeath";
+	projectileId: string;
 }
 
 export type WorldObject =

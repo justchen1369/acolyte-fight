@@ -596,6 +596,9 @@ const link: Spell = {
                 targetType: HomingTargets.self,
                 redirect: true,
             },
+            {
+                type: "expireOnOwnerDeath",
+            },
         ],
 
         sound: "link",

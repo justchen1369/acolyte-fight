@@ -509,6 +509,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateHoming(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
+		} else if (template.type === "expireOnOwnerDeath") {
+			behaviour = instantiateExpireOnOwnerDeath(template, projectile, world);
 		}
 
 		const trigger = template.trigger;
@@ -558,6 +560,13 @@ function instantiateUpdateProjectileFilter(template: UpdateCollideWithTemplate, 
 	};
 }
 
+function instantiateExpireOnOwnerDeath(template: ExpireOnOwnerDeathTemplate, projectile: w.Projectile, world: w.World): w.ExpireOnOwnerDeathBehaviour {
+	return {
+		type: "expireOnOwnerDeath",
+		projectileId: projectile.id,
+	};
+}
+
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
@@ -594,6 +603,7 @@ export function tick(world: w.World) {
 		removePassthrough,
 		thrustDecay,
 		expireBuffs,
+		expireOnOwnerDeath,
 	});
 
 	applyLavaDamage(world);
@@ -1810,6 +1820,21 @@ function expireOnHeroHit(hero: w.Hero, world: w.World) {
 		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
 			projectile.expireTick = world.tick;
 		}
+	}
+
+	return true;
+}
+
+function expireOnOwnerDeath(behaviour: w.ExpireOnOwnerDeathBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	const hero = world.objects.get(projectile.owner);
+	if (!(hero && hero.category === "hero")) {
+		projectile.expireTick = world.tick;
+		return false;
 	}
 
 	return true;

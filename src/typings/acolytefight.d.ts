@@ -279,6 +279,7 @@ declare interface BounceParameters {
 declare type BehaviourTemplate =
 	HomingTemplate
 	| UpdateCollideWithTemplate
+	| ExpireOnOwnerDeathTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
@@ -311,6 +312,10 @@ declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
 
 	afterTicks: number;
 	collideWith: number;
+}
+
+declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {
+	type: "expireOnOwnerDeath";
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {
