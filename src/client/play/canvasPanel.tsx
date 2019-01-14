@@ -20,7 +20,6 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
-const LongPressMilliseconds = 250;
 const MaxSlowFrames = 10;
 const FpsThreshold = 0.9;
 
@@ -461,18 +460,6 @@ class CanvasPanel extends React.Component<Props, State> {
         return vector.towards(center, target, maxRadius);
     }
 
-    private handleLongProcessIfNecessary() {
-        if (this.actionSurface) {
-            const world = this.props.world;
-            const pressLength = Date.now() - this.actionSurface.time;
-            if (pressLength >= LongPressMilliseconds && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
-                const btn = this.actionSurface.activeKey;
-                this.actionSurface.time += 1e9; // Don't repeat the long press
-                this.handleCustomizeBtn(btn);
-            }
-        }
-    }
-
     private handleCustomizeBtn(customizingBtn: string) {
         StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
     }
@@ -559,7 +546,6 @@ class CanvasPanel extends React.Component<Props, State> {
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
             });
-            this.handleLongProcessIfNecessary();
         }
     }
 }
