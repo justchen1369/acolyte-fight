@@ -918,12 +918,15 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 			alreadyUsedColors.add(player.uiColor);	
 		}
 	});	
- 	let uiColor: string = null;
+	let uiColor: string = null;
+
+	/* // Don't allow players to be identified by colour
 	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
 		uiColor = colorWheel.takeColor(preferredColor)
 	} else {
 		uiColor = colorWheel.takeColor(null);
 	}
+	*/
 
 	if (!uiColor || alreadyUsedColors.has(uiColor)) {
 		for (let i = 0; i < HeroColors.Colors.length; ++i) {	
