@@ -1502,7 +1502,7 @@ function calculateButtonBarRegion(rect: ClientRect, totalSize: number, scaleFact
 }
 
 function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options: RenderOptions): w.ButtonWheelConfig {
-	const WheelAngleOffset = Math.PI / 2;
+	const WheelAngleOffset = (2 * Math.PI) * (1.75 / 6);
 
 	const hitSectors = new Map<string, w.HitSector>();
 
