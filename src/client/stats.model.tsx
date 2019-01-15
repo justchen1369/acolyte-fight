@@ -5,6 +5,7 @@ export interface GameStats {
     timestamp: string;
     self: string; // user hash
     winner?: string; // User hash
+    winners?: string[]; // user hashes
     lengthSeconds?: number;
     players: PlayerStatsLookup;
     server?: string;
@@ -17,6 +18,7 @@ export interface PlayerStatsLookup {
 export interface PlayerStats {
     userId?: string;
     userHash: string;
+    teamId?: string;
     name: string;
     kills: number;
     damage: number;

@@ -4,6 +4,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as engine from '../../game/engine';
 import * as notifications from './notifications';
 import * as rankings from './rankings';
 import * as sockets from './sockets';
@@ -65,6 +66,7 @@ function gameStatsToMessage(gameStats: d.GameStats): m.GameStatsMsg {
         category: gameStats.category,
         unixTimestamp: moment(gameStats.timestamp).unix(),
         winner: gameStats.winner,
+        winners: gameStats.winners,
         lengthSeconds: gameStats.lengthSeconds,
         players: Object.keys(gameStats.players).map(userHash => playerStatsToMessage(gameStats.players[userHash])),
         server: gameStats.server,
@@ -75,6 +77,7 @@ function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
     return {
         userId: playerStats.userId,
         userHash: playerStats.userHash,
+        teamId: playerStats.teamId,
         name: playerStats.name,
         kills: playerStats.kills,
         damage: playerStats.damage,
@@ -90,6 +93,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
         players[p.userHash] = {
             userId: p.userId,
             userHash: p.userHash,
+            teamId: p.teamId,
             name: p.name,
             damage: p.damage,
             kills: p.kills,
@@ -111,6 +115,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
         timestamp: moment.unix(msg.unixTimestamp).toISOString(),
         self,
         winner: msg.winner,
+        winners: msg.winners,
         lengthSeconds: msg.lengthSeconds,
         players,
         server: msg.server,
@@ -149,7 +154,8 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         if (player) {
             if (player.userHash) {
                 ++numHumans;
-                players.push(playerStatsFromScore(player, score));
+                const teamId = engine.getTeam(player.heroId, world);
+                players.push(playerStatsFromScore(player, teamId, score));
             } else {
                 ++numAI;
             }
@@ -190,16 +196,18 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
         players: _.keyBy(players, p => p.userHash),
         self: selfPlayer.userHash,
         winner: winningPlayer ? winningPlayer.userHash : undefined,
+        winners: world.winners ? world.winners.map(heroId => world.players.get(heroId).userHash) : undefined,
         lengthSeconds: world.winTick >= 0 ? Math.round(world.winTick / TicksPerSecond) : undefined,
         server,
     };
     return stats;
 }
 
-function playerStatsFromScore(player: w.Player, score: w.HeroScore): d.PlayerStats {
+function playerStatsFromScore(player: w.Player, teamId: string, score: w.HeroScore): d.PlayerStats {
     return {
         userId: player.userId,
         userHash: player.userHash,
+        teamId,
         name: player.name,
         kills: score.kills,
         damage: Math.round(score.damage),

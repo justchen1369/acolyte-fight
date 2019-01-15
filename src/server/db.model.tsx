@@ -70,6 +70,7 @@ export interface Game {
 export interface GameStats {
     category: string;
     winner: string; // userHash
+    winners?: string[]; // user hashes
     winnerUserId?: string;
     lengthSeconds: number;
     players: PlayerStats[];
@@ -78,6 +79,7 @@ export interface GameStats {
 export interface PlayerStats {
     userId?: string;
     userHash: string;
+    teamId?: string;
     name: string;
     kills: number;
     damage: number;

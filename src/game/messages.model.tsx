@@ -354,6 +354,7 @@ export interface GameStatsMsg {
     category: string;
     unixTimestamp: number;
     winner: string; // userHash
+    winners: string[]; // user hashes
     lengthSeconds: number;
     players: PlayerStatsMsg[];
     server: string;
@@ -361,6 +362,7 @@ export interface GameStatsMsg {
 export interface PlayerStatsMsg {
     userId?: string;
     userHash: string;
+    teamId?: string;
     name: string;
     kills: number;
     damage: number;

@@ -129,7 +129,8 @@ function dbToGameStats(gameId: string, data: db.Game): m.GameStatsMsg {
 		category: data.stats.category,
 		lengthSeconds: data.stats.lengthSeconds,
 		unixTimestamp: data.unixTimestamp,
-		winner: data.stats.winner,
+        winner: data.stats.winner,
+        winners: data.stats.winners || [data.stats.winner],
         players: data.stats.players.map(dbToPlayer),
 		server: data.stats.server,
     }
@@ -139,6 +140,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
     return {
         userId: player.userId,
         userHash: player.userHash,
+        teamId: player.teamId,
         name: player.name,
         damage: player.damage,
         kills: player.kills,
@@ -669,14 +671,12 @@ function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, player
 
 function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
     const deltas = players.map(_ => 0);
-    let numPlayers = 0;
     for (let i = 0; i < players.length; ++i) {
         const self = players[i];
         const selfRating = allRatings.get(self.userId);
         if (!selfRating) {
             continue;
         }
-        ++numPlayers;
 
         let delta = 0;
         for (let j = 0; j < players.length; ++j) {
@@ -685,6 +685,10 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             }
 
             const other = players[j];
+            if (self.teamId && other.teamId && self.teamId === other.teamId) {
+                continue; // Can't beat players on same team
+            }
+
             const otherRating = allRatings.get(other.userId);
             if (!otherRating) {
                 continue;

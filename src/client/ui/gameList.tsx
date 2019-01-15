@@ -78,7 +78,7 @@ function convertGame(stats: d.GameStats): GameRow {
             userId: player.userId,
             userHash: player.userHash,
             games: 1,
-            wins: player.userHash === stats.winner ? 1 : 0,
+            wins: (player.userHash === stats.winner || (stats.winners && stats.winners.some(winner => player.userHash === winner))) ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
             ratingDelta: player.ratingDelta || 0,

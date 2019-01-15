@@ -516,10 +516,12 @@ function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
 		&& required(data.gameId, "string")
 		&& required(data.lengthSeconds, "number")
 		&& required(data.winner, "string")
+		&& required(data.winners, "object") && data.winners.every(winner => required(winner, "string"))
 		&& required(data.players, "object")
 		&& data.players.every(p =>
 			optional(p.userId, "string")
 			&& required(p.userHash, "string")
+			&& required(p.teamId, "string")
 			&& required(p.name, "string")
 			&& required(p.damage, "number")
 			&& required(p.kills, "number")
