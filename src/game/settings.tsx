@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { TicksPerSecond, Categories, Pixel } from './constants';
+import { TicksPerSecond, Categories, Pixel, Alliances } from './constants';
 import { Icons } from './icons';
 import { Layouts } from './layouts';
 import { Sounds } from './sounds';
@@ -423,7 +423,7 @@ const boomerang: Spell = {
         maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
         expireOn: Categories.Hero | Categories.Massive,
-        expireOnSelf: false,
+        expireAgainstHeroes: Alliances.Enemy,
 
         behaviours: [
             {
@@ -797,8 +797,10 @@ const halo: Spell = {
         damage: 4,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
-        expireOn: Categories.None,
-        selfPassthrough: true,
+        expireOn: Categories.Massive,
+        expireAgainstHeroes: Alliances.Enemy | Alliances.Neutral,
+        expireAgainstObjects: Alliances.Enemy | Alliances.Neutral,
+        selfPassthrough: false,
         shieldTakesOwnership: false,
         strafe: { expireOnHeroHit: true },
         damageScaling: false,

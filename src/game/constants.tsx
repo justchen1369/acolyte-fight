@@ -17,6 +17,16 @@ export namespace Categories {
 	export const None = 0;
 }
 
+export namespace Alliances {
+	export const All = 0xFFFF;
+	export const None = 0;
+
+	export const Self = 0x01;
+	export const Ally = 0x02;
+	export const Enemy = 0x04;
+	export const Neutral = 0x08;
+}
+
 export namespace Matchmaking {
 	export const WaitForMorePeriod = 10 * TicksPerSecond;
 	export const JoinPeriod = 3 * TicksPerSecond;

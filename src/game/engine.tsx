@@ -8,7 +8,7 @@ import * as vector from './vector';
 import * as w from './world.model';
 import { modToSettings } from './modder';
 
-import { Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
+import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
@@ -463,7 +463,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
-		expireOnSelf: projectileTemplate.expireOnSelf !== undefined ? projectileTemplate.expireOnSelf : true,
+		expireAgainstHeroes: projectileTemplate.expireAgainstHeroes !== undefined ? projectileTemplate.expireAgainstHeroes : constants.Alliances.All,
+		expireAgainstObjects: projectileTemplate.expireAgainstObjects !== undefined ? projectileTemplate.expireAgainstObjects : constants.Alliances.All,
 		destructible: projectileTemplate.destructible,
 
 		sound: projectileTemplate.sound,
@@ -1437,11 +1438,32 @@ function isHeroShielded(hero: w.Hero, world: w.World) {
 }
 
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
-	let expire = (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
-	if (expire && projectile.owner === other.id && !projectile.expireOnSelf) {
-		expire = false;
+	const expireOn = (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
+	if (!expireOn) { return false; }
+
+	if (other.category === "hero") {
+		const alliance = calculateAlliance(projectile.owner, other.id, world);
+		if (!(projectile.expireAgainstHeroes & alliance)) {
+			return false;
+		}
+	} else if (other.category === "projectile" || other.category === "shield") {
+		const alliance = calculateAlliance(projectile.owner, other.owner, world);
+		if (!(projectile.expireAgainstObjects & alliance)) {
+			return false;
+		}
 	}
-	return expire;
+
+	return true;
+}
+
+function calculateAlliance(fromHeroId: string, toHeroId: string, world: w.World) {
+	if (!toHeroId) {
+		return Alliances.Neutral;
+	} else if (fromHeroId === toHeroId) {
+		return Alliances.Self;
+	} else {
+		return Alliances.Enemy;
+	}
 }
 
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {

@@ -240,7 +240,8 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	categories?: number; // Collision flags: What flags this object has
 	collideWith?: number; // Collision flags: Which other objects to collide with
 	expireOn?: number; // Collision flags: The projectile will expire if it hits any of these objects
-	expireOnSelf?: boolean; // Whether to expire when colliding with owner
+	expireAgainstHeroes?: number; // Alliance flags: Whether to expire against enemies only, etc
+	expireAgainstObjects?: number; // Alliance flags: Whether to expire against enemies only, etc
 	selfPassthrough?: boolean; // Whether the projectile just passes through its owner
 	destructible?: DestructibleParameters; // Whether this projectile is destroyed by a detonate (like a Supernova)
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
