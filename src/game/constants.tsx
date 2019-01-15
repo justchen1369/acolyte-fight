@@ -25,6 +25,9 @@ export namespace Alliances {
 	export const Ally = 0x02;
 	export const Enemy = 0x04;
 	export const Neutral = 0x08;
+
+	export const Friendly = Self | Ally;
+	export const NotFriendly = Enemy | Neutral;
 }
 
 export namespace Matchmaking {
