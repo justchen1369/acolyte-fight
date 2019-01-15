@@ -53,6 +53,7 @@ export function initialWorld(mod: Object): w.World {
 		teams: Immutable.Map<string, string>(), // hero ID -> team ID
 		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
+		winners: null,
 
 		objects: new Map(),
 		behaviours: [],
@@ -836,7 +837,9 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	}
 
 	if (world.tick >= world.startTick) {
-		// assignTeams(world);
+		if (ev.numTeams > 1) {
+			assignTeams(ev.numTeams, world);
+		}
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started
 		world.ui.customizingBtn = null;
@@ -848,20 +851,18 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	});
 }
 
-function assignTeams(world: w.World) {
-	const NumTeams = 2;
-
+function assignTeams(numTeams: number, world: w.World) {
 	let nextTeamIndex = 0;
 	world.objects.forEach(hero => {
 		if (!(hero && hero.category === "hero")) {
 			return;
 		}
 
-		const teamIndex = (nextTeamIndex++) % NumTeams;
+		const teamIndex = (nextTeamIndex++) % numTeams;
 		world.teams = world.teams.set(hero.id, `team${teamIndex}`);
 
 		const player = world.players.get(hero.id);
-		player.uiColor = constants.HeroColors.Colors[teamIndex];
+		player.uiColor = constants.HeroColors.TeamColors[teamIndex % constants.HeroColors.TeamColors.length];
 	});
 }
 
@@ -1493,13 +1494,15 @@ export function calculateAlliance(fromHeroId: string, toHeroId: string, world: w
 		return Alliances.Self;
 	}
 
-	const fromTeam = world.teams.get(fromHeroId);
-	const toTeam = world.teams.get(toHeroId);
-	if (fromTeam && toTeam && fromTeam === toTeam) {
+	if (getTeam(fromHeroId, world) === getTeam(toHeroId, world)) {
 		return Alliances.Ally;
 	} else {
 		return Alliances.Enemy;
 	}
+}
+
+export function getTeam(heroId: string, world: w.World) {
+	return world.teams.get(heroId) || heroId;
 }
 
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
@@ -2128,13 +2131,7 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	let numAlive = 0;
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			++numAlive;
-		}
-	});
-	if (numAlive > 1) {
+	if (!isGameFinished(world)) {
 		return;
 	}
 
@@ -2201,6 +2198,7 @@ function notifyWin(world: w.World) {
 	}
 
 	world.winner = bestScore.heroId;
+	world.winners = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
 	world.winTick = world.tick;
 	world.ui.notifications.push({
 		type: "win",
@@ -2211,6 +2209,23 @@ function notifyWin(world: w.World) {
 		mostKills: world.players.get(mostKills.heroId),
 		mostKillsCount: mostKills.kills,
 	});
+}
+
+function isGameFinished(world: w.World) {
+	const heroes = [...world.objects.values()].filter(x => x.category === "hero") as w.Hero[];
+	if (heroes.length === 0) {
+		return true;
+	}
+
+	const firstTeamId = getTeam(heroes[0].id, world);
+	for (let i = 1; i < heroes.length; ++i) {
+		if (getTeam(heroes[i].id, world) !== firstTeamId) {
+			// Multiple teams are alive, no winner
+			return false;
+		}
+	}
+
+	return true;
 }
 
 function notifyKill(hero: w.Hero, world: w.World) {

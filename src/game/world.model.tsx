@@ -40,7 +40,8 @@ export interface World {
 	players: Immutable.Map<string, Player>; // heroId -> Player
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
 	teams: Immutable.Map<string, string>; // heroId -> teamId
-	winner: string | null;
+	winner: string | null; // heroId
+	winners: string[] | null;
 	winTick?: number;
 
 	objects: Map<string, WorldObject>,
@@ -269,6 +270,7 @@ export interface Closing {
 	type: "closing";
 	startTick: number;
 	ticksUntilClose: number;
+	numTeams?: number;
 }
 
 export interface Joining {

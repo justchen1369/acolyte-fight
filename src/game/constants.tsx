@@ -67,6 +67,7 @@ export namespace HeroColors {
 	export const BotColor = '#cccccc';
 	export const InactiveColor = '#666666';
 	export const HealColor = '#22ee88';
+
 	export const Colors = [
 		"#cb8fc1",
 		"#7db37d",
@@ -79,6 +80,12 @@ export namespace HeroColors {
 		"#cea85c",
 		"#54b7a2",
 		"#a97fc1",
+	];
+
+	export const TeamColors = [
+		"#cb8fc1",
+		"#cc7c88",
+		"#d0c16b",
 	];
 
 	export const LavaFlashInterval = 20;
