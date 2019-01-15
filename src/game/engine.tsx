@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import Color from 'color';
 import moment from 'moment';
 import pl, { World } from 'planck-js';
 import * as Immutable from 'immutable';
@@ -838,11 +839,9 @@ function handleClosing(ev: w.Closing, world: w.World) {
 
 	let teamSizes: number[] = null;
 	if (world.tick >= world.startTick) {
-		if (ev.numTeams > 1) {
-			assignTeams(ev.numTeams, world);
-
-			const teams = _.groupBy(world.teams.valueSeq().toArray(), x => x);
-			teamSizes = Object.keys(teams).map(teamId => teams[teamId].length);
+		const teams = assignTeams(ev.numTeams, world);
+		if (teams) {
+			teamSizes = teams.map(x => x.length);
 		}
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started
@@ -856,19 +855,28 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	});
 }
 
-function assignTeams(numTeams: number, world: w.World) {
-	let nextTeamIndex = 0;
-	world.objects.forEach(hero => {
-		if (!(hero && hero.category === "hero")) {
-			return;
+function assignTeams(numTeams: number, world: w.World): string[][] {
+	if (numTeams <= 1) {
+		return null;
+	}
+
+	const heroIds = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
+	const perTeam = Math.ceil(heroIds.length / numTeams);
+	const teams = _.chunk(heroIds, perTeam);
+	for (let i = 0; i < teams.length; ++i) {
+		const team = teams[i];
+		const teamId = `team${i}`;
+		const teamColor = Color(team.some(heroId => heroId === world.ui.myHeroId) ? HeroColors.AllyColor : HeroColors.TeamColors[i]);
+
+		for (let j = 0; j < team.length; ++j) {
+			const heroId = team[j];
+			world.teams = world.teams.set(heroId, teamId);
+
+			const player = world.players.get(heroId);
+			player.uiColor = teamColor.hue(teamColor.hue() - 15 * j).darken(0.1 * j).string();
 		}
-
-		const teamIndex = (nextTeamIndex++) % numTeams;
-		world.teams = world.teams.set(hero.id, `team${teamIndex}`);
-
-		const player = world.players.get(hero.id);
-		player.uiColor = constants.HeroColors.TeamColors[teamIndex % constants.HeroColors.TeamColors.length];
-	});
+	}
+	return teams;
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {

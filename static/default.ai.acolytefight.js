@@ -33,7 +33,7 @@ onmessage = function (e) {
 function handleInput(state, heroId, cooldowns) {
     var hero = state.heroes[heroId];
     var strongest = findStrongest(state.heroes, heroId, AllianceEnemy);
-    var closest = findClosest(state.heroes, heroId, AllianceAlly | AllianceEnemy);
+    var closest = findClosest(state.heroes, heroId, AllianceEnemy);
     if (!(hero && strongest && closest)) {
         // Either we're dead, or everyone else is, nothing to do
         return;
@@ -200,7 +200,7 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
 
 function move(state, hero, opponent) {
     var offset = vectorNegate(vectorDiff(opponent.pos, center)); // Move to the opposite side of the arena
-    var targetDistance = state.radius / 2; // Halfway between the center and the edge
+    var targetDistance = state.radius * 0.33; // Closer to center than edge (for polygonal maps)
     var target = vectorPlus(center, vectorRelengthen(offset, targetDistance));
 
     var distanceToTarget = vectorDistance(hero.pos, target);
