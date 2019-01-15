@@ -1292,8 +1292,13 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	if (hero.thrust) {
 		if (!hero.thrust.alreadyHit.has(other.id)) {
 			hero.thrust.alreadyHit.add(other.id);
-			const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
-			applyDamage(other, damagePacket, world);
+
+			const alliance = calculateAlliance(hero.id, other.id, world);
+			if ((alliance && Alliances.NotFriendly) >= 0) {
+				const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
+				applyDamage(other, damagePacket, world);
+			}
+
 			expireOnHeroHit(other, world);
 		}
 	}
@@ -1362,10 +1367,15 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		return;
 	}
 
+	const alliance = calculateAlliance(projectile.owner, hero.id, world);
+
 	if (hero.id !== projectile.owner && takeHit(projectile, hero.id, world)) {
-		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
-		packet = scaleForPartialDamage(world, projectile, packet);
-		applyDamage(hero, packet, world);
+		if ((alliance & Alliances.NotFriendly) >= 0) { // Don't damage allies
+			let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
+			packet = scaleForPartialDamage(world, projectile, packet);
+			applyDamage(hero, packet, world);
+		}
+
 		applyBuffs(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
@@ -1926,7 +1936,10 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
 			};
 			if (other.category === "hero") {
-				applyDamage(other, packet, world);
+				const alliance = calculateAlliance(owner, other.id, world);
+				if ((alliance & Alliances.NotFriendly) >= 0) {
+					applyDamage(other, packet, world);
+				}
 			} else {
 				applyDamageToObstacle(other, packet, world);
 			}
