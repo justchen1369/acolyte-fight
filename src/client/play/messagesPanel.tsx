@@ -228,7 +228,9 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
             if (notification.teamSizes) {
-                return <div key={key} className="row game-started">Team game! {notification.teamSizes.join('v')}</div>
+                return <div key={key} className="splash-container">
+                    <div className="splash">{notification.teamSizes.join('v')}</div>
+                </div>
             } else {
                 return <div key={key} className="row game-started">Game started</div>
             }

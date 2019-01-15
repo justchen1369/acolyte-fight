@@ -589,6 +589,38 @@ i.clickable:hover, i.clickable:active {
     padding: 4px;
 }
 
+.splash-container {
+    position: fixed;
+
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    align-content: center;
+
+    animation-name: splash-out;
+    animation-duration: 1s;
+    animation-fill-mode: both;
+}
+
+.splash {
+    text-align: center;
+    width: 100%;
+    font-size: 50vh;
+    font-weight: bold;
+}
+
+@keyframes splash-out {
+    from { opacity: 1.0 }
+    to { opacity: 0.0 }
+}
+
 #messages-panel {
     position: absolute;
     margin: 8;
