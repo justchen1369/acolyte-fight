@@ -623,7 +623,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
 		waitPeriod = 0;
-		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players (" + (numTeams || 1) + " teams) after " + game.tick + " ticks");
 	}
 
 	if (waitPeriod !== null) {
