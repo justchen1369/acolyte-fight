@@ -141,6 +141,7 @@ export interface Player {
 	heroId: string;
 	userId?: string;
 	userHash: string | null;
+	partyHash?: string;
 	name: string;
 	uiColor: string; // Not synced across clients
 	isSharedBot: boolean; // Not synced across clients
@@ -278,6 +279,7 @@ export interface Joining {
 	type: "join";
 	userId?: string;
 	userHash: string | null;
+	partyHash?: string;
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;

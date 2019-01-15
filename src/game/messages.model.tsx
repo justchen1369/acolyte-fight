@@ -90,6 +90,7 @@ export interface JoinActionMsg extends ActionMsgBase {
     actionType: "join";
     userId: string | null;
     userHash: string | null;
+    partyHash?: string;
     playerName: string;
     keyBindings: KeyBindings;
     isBot: boolean;

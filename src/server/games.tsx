@@ -281,6 +281,8 @@ export function assignPartyToGames(party: g.Party) {
 	const assignments = new Array<g.PartyGameAssignment>();
 	const store = getStore();
 
+
+	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
 	const allowBots = [...party.active.values()].some(p => p.isBot);
 	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready && !p.isObserver));
@@ -299,7 +301,8 @@ export function assignPartyToGames(party: g.Party) {
 		// Assume all party members on same engine version
 		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, allowBots, group.length);
 		for (const member of group) {
-			const joinResult = joinGame(game, member);
+			const joinParams: g.JoinParameters = { ...member, partyHash };
+			const joinResult = joinGame(game, joinParams);
 			assignments.push({ partyMember: member, game, ...joinResult });
 		}
 	}
@@ -527,6 +530,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 			actionType: "join",
 			userId,
 			userHash,
+			partyHash: params.partyHash,
 			playerName: params.name,
 			keyBindings: params.keyBindings,
 			isBot: params.isBot,

@@ -3,6 +3,7 @@ import Color from 'color';
 import moment from 'moment';
 import pl, { World } from 'planck-js';
 import * as Immutable from 'immutable';
+import * as arrayUtils from '../utils/arrayUtils';
 import * as colorWheel from './colorWheel';
 import * as constants from './constants';
 import * as vector from './vector';
@@ -860,7 +861,14 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 		return null;
 	}
 
-	const heroIds = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
+	let heroIds = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
+
+	const partyStart = heroIds.findIndex(heroId => !!world.players.get(heroId).partyHash);
+	if (partyStart >= 0) {
+		// Start allocating teams from the party. This will stick the party together if possible.
+		heroIds = arrayUtils.rotate(heroIds, partyStart);
+	}
+
 	const perTeam = Math.ceil(heroIds.length / numTeams);
 	const teams = _.chunk(heroIds, perTeam);
 	for (let i = 0; i < teams.length; ++i) {
@@ -933,6 +941,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		heroId: hero.id,
 		userId: ev.userId,
 		userHash: ev.userHash,
+		partyHash: ev.partyHash,
 		name: ev.playerName,
 		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : chooseNewPlayerColor(ev.preferredColor, world),
 		isBot: ev.isBot,

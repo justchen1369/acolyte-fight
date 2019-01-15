@@ -146,6 +146,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				heroId: actionData.heroId,
 				userId: actionData.userId,
 				userHash: actionData.userHash,
+				partyHash: actionData.partyHash,
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
 				preferredColor: preferredColors.get(actionData.userHash),
