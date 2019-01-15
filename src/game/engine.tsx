@@ -884,6 +884,10 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 			player.uiColor = teamColor.hue(teamColor.hue() - 15 * j).darken(0.1 * j).string();
 		}
 	}
+
+	world.teams.forEach((teamId, heroId) => {
+		console.log("Team", teamId, heroId);
+	});
 	return teams;
 }
 
@@ -1337,7 +1341,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			hero.thrust.alreadyHit.add(other.id);
 
 			const alliance = calculateAlliance(hero.id, other.id, world);
-			if ((alliance && Alliances.NotFriendly) >= 0) {
+			if ((alliance && Alliances.NotFriendly) > 0) {
 				const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 				applyDamage(other, damagePacket, world);
 			}
@@ -1413,7 +1417,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	const alliance = calculateAlliance(projectile.owner, hero.id, world);
 
 	if (hero.id !== projectile.owner && takeHit(projectile, hero.id, world)) {
-		if ((alliance & Alliances.NotFriendly) >= 0) { // Don't damage allies
+		if ((alliance & Alliances.NotFriendly) > 0) { // Don't damage allies
 			let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 			packet = scaleForPartialDamage(world, projectile, packet);
 			applyDamage(hero, packet, world);
@@ -1988,7 +1992,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			};
 			if (other.category === "hero") {
 				const alliance = calculateAlliance(owner, other.id, world);
-				if ((alliance & Alliances.NotFriendly) >= 0) {
+				if ((alliance & Alliances.NotFriendly) > 0) {
 					applyDamage(other, packet, world);
 				}
 			} else {
