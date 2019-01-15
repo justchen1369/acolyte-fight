@@ -639,9 +639,3 @@ function calculateJoinPeriod(segment: string, numHumans: number): number {
 function systemHeroId(actionType: string) {
 	return "_" + actionType;
 }
-
-function mapMap<K, V, Out>(map : Map<K, V>, func: (v: V) => Out) {
-	let result = new Array<Out>();
-	map.forEach(value => result.push(func(value)));
-	return result;
-}
