@@ -84,9 +84,8 @@ export namespace HeroColors {
 
 	export const TeamColors = [
 		"#cb8fc1",
-		"#cc7c88",
 		"#d0c16b",
-		"#b9cc64",
+		"#7db37d",
 		"#cea85c",
 		"#54b7a2",
 		"#a97fc1",
