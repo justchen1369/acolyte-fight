@@ -2191,7 +2191,7 @@ function notifyWin(world: w.World) {
 	}
 
 	const winningTeamId = getTeam(bestScore.heroId, world);
-	scores = _.sortBy(scores, (x) => x.heroId === winningTeamId ? 0 : 1); // This does a stable sort
+	scores = _.sortBy(scores, (x) => getTeam(x.heroId, world) === winningTeamId ? 0 : 1); // This does a stable sort
 
 	for (let i = 0; i < scores.length; ++i) {
 		scores[i].rank = i + constants.Placements.Rank1;
