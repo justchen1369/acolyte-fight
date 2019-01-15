@@ -605,7 +605,7 @@ i.clickable:hover, i.clickable:active {
     align-content: center;
 
     animation-name: splash-out;
-    animation-duration: 1s;
+    animation-duration: 2s;
     animation-fill-mode: both;
 }
 
