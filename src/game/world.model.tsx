@@ -220,6 +220,7 @@ export interface NewGameNotification {
 export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
+	teamSizes?: number[];
 }
 
 export interface WinNotification {

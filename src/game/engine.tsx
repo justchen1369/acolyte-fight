@@ -836,9 +836,13 @@ function handleClosing(ev: w.Closing, world: w.World) {
 		});
 	}
 
+	let teamSizes: number[] = null;
 	if (world.tick >= world.startTick) {
 		if (ev.numTeams > 1) {
 			assignTeams(ev.numTeams, world);
+
+			const teams = _.groupBy(world.teams.valueSeq().toArray(), x => x);
+			teamSizes = Object.keys(teams).map(teamId => teams[teamId].length);
 		}
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started
@@ -848,6 +852,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	world.ui.notifications.push({
 		type: "closing",
 		ticksUntilClose: ev.ticksUntilClose,
+		teamSizes,
 	});
 }
 

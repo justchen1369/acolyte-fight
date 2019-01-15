@@ -595,6 +595,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	let waitPeriod: number = null;
+	let numTeams: number = null;
 
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
@@ -609,6 +610,12 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	if (game.tick >= game.closeTick) {
+		if (numPlayers === 4) {
+			numTeams = 2;
+		} else if (numPlayers === 6) {
+			numTeams = 3;
+		}
+
 		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
 		waitPeriod = 0;
@@ -622,6 +629,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 			actionType: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
 			waitPeriod,
+			numTeams,
 		});
 	}
 }
