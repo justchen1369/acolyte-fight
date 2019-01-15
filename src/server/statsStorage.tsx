@@ -76,6 +76,7 @@ function gameStatsToDb(data: m.GameStatsMsg): db.Game {
             category: data.category,
             lengthSeconds: data.lengthSeconds,
             winner: data.winner,
+            winners: data.winners,
             players: data.players.map(playerToDb),
             server: data.server,
         }
@@ -92,6 +93,7 @@ function gameStatsToDb(data: m.GameStatsMsg): db.Game {
 function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
     const result: db.PlayerStats = {
         userHash: p.userHash,
+        teamId: p.teamId,
         name: p.name,
         damage: p.damage,
         kills: p.kills,
