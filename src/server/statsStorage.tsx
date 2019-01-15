@@ -672,6 +672,12 @@ function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, player
 }
 
 function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
+    if (players.length <= 0) {
+        return;
+    }
+
+    const winningTeamId = players[0].teamId || players[0].userHash;
+
     const deltas = players.map(_ => 0);
     for (let i = 0; i < players.length; ++i) {
         const self = players[i];
@@ -680,6 +686,8 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             continue;
         }
 
+        const selfTeamId = self.teamId || self.userHash;
+
         let delta = 0;
         for (let j = 0; j < players.length; ++j) {
             if (i == j) {
@@ -687,7 +695,8 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             }
 
             const other = players[j];
-            if (self.teamId && other.teamId && self.teamId === other.teamId) {
+            const otherTeamId = other.teamId || other.userHash;
+            if (selfTeamId === otherTeamId) {
                 continue; // Can't beat players on same team
             }
 
@@ -709,8 +718,14 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
         if (!selfRating) {
             continue;
         }
+        const selfTeamId = self.teamId || self.userHash;
 
-        selfRating.aco += deltas[i];
+        let delta = deltas[i];
+        if (selfTeamId === winningTeamId) {
+            delta = Math.max(0, delta);
+        }
+
+        selfRating.aco += delta;
         ++selfRating.acoGames;
     }
 }

@@ -2190,9 +2190,6 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	const winningTeamId = getTeam(bestScore.heroId, world);
-	scores = _.sortBy(scores, (x) => getTeam(x.heroId, world) === winningTeamId ? 0 : 1); // This does a stable sort
-
 	for (let i = 0; i < scores.length; ++i) {
 		scores[i].rank = i + constants.Placements.Rank1;
 	}
@@ -2227,6 +2224,7 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
+	const winningTeamId = getTeam(bestScore.heroId, world);
 	world.winner = bestScore.heroId;
 	world.winners = scores.filter(x => getTeam(x.heroId, world) === winningTeamId).map(x => x.heroId);
 	world.winTick = world.tick;
