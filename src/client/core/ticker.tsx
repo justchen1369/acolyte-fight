@@ -138,6 +138,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				type: "closing",
 				startTick: actionData.closeTick,
 				ticksUntilClose: actionData.waitPeriod,
+				numTeams: actionData.numTeams,
 			});
 		} else if (actionData.actionType === m.ActionType.Join) {
 			world.occurrences.push({

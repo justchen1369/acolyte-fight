@@ -109,6 +109,7 @@ export interface CloseGameMsg extends ActionMsgBase {
     actionType: "close";
     closeTick: number;
     waitPeriod: number;
+    numTeams?: number;
 }
 
 export interface GameActionMsg extends ActionMsgBase {

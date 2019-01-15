@@ -54,7 +54,7 @@ export class PokiProvider implements s.OptionsProvider {
                 this.gameplayStop();
             }
 
-            if (n.type === "win" && n.winner.heroId === n.myHeroId) {
+            if (n.type === "win" && n.winners.some(player => player.heroId === n.myHeroId)) {
                 this.sdk.happyTime();
             }
         }

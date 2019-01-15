@@ -2198,12 +2198,12 @@ function notifyWin(world: w.World) {
 	}
 
 	world.winner = bestScore.heroId;
-	world.winners = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
+	world.winners = scores.filter(x => x === bestScore || world.objects.has(x.heroId)).map(x => x.heroId);
 	world.winTick = world.tick;
 	world.ui.notifications.push({
 		type: "win",
 		myHeroId: world.ui.myHeroId,
-		winner: world.players.get(bestScore.heroId),
+		winners: world.winners.map(heroId => world.players.get(heroId)),
 		mostDamage: world.players.get(mostDamage.heroId),
 		mostDamageAmount: mostDamage.damage,
 		mostKills: world.players.get(mostKills.heroId),

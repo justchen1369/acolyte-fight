@@ -1,27 +1,31 @@
 import * as _ from 'lodash';
 import * as React from 'react';
+import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import { HeroColors } from '../../game/constants';
+import { heroColor } from '../core/render';
 
-interface Props {
+interface OwnProps {
     player: w.Player;
-    myHeroId: string;
     colorOverride?: string;
 }
 
-export class PlayerName extends React.PureComponent<Props> {
+interface Props extends OwnProps {
+    heroColor: string;
+}
+
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        heroColor: heroColor(ownProps.player.heroId, state.world),
+    };
+}
+
+class PlayerName extends React.PureComponent<Props> {
     render() {
         const player = this.props.player;
         
-        let color;
-        if (this.props.colorOverride) {
-            color = this.props.colorOverride;
-        } else if (player.heroId === this.props.myHeroId) {
-            color = HeroColors.MyHeroColor;
-        } else {
-            color = player.uiColor;
-        }
+        const color = this.props.colorOverride || this.props.heroColor;
 
         let title = player.name;
         if (player.isBot) {
@@ -37,3 +41,5 @@ export class PlayerName extends React.PureComponent<Props> {
         </span>;
     }
 }
+
+export default ReactRedux.connect(stateToProps)(PlayerName);

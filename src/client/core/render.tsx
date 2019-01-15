@@ -980,7 +980,7 @@ function playShieldSounds(obj: w.Shield, world: w.World) {
 	}
 }
 
-function heroColor(heroId: string, world: w.World) {
+export function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
 	if (!world.ui.myHeroId) {
 		return player.uiColor;
@@ -1167,10 +1167,7 @@ function projectileColor(render: ProjectileColorParams, projectile: w.Projectile
 	}
 
 	if (render.ownerColor) {
-		const player = world.players.get(projectile.owner);
-		if (player) {
-			return player.uiColor;
-		}
+		return heroColor(projectile.owner, world);
 	}
 
 	return render.color;

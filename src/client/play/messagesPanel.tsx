@@ -14,7 +14,7 @@ import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from '../ui/playButton';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
-import { PlayerName } from './playerNameComponent';
+import PlayerName from './playerNameComponent';
 import { worldInterruptible } from '../core/matches';
 
 interface Props {
@@ -222,7 +222,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderTextNotification(key: string, notification: w.TextNotification) {
-        return <div key={key} className="row text-row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} />: <span className="text-message">{notification.text}</span></div>
+        return <div key={key} className="row text-row"><PlayerName player={notification.player} />: <span className="text-message">{notification.text}</span></div>
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
@@ -236,15 +236,15 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderJoinNotification(key: string, notification: w.JoinNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> joined</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>
     }
 
     private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} myHeroId={this.props.myHeroId} /> left</div>
+        return <div key={key} className="row"><PlayerName player={notification.player} /> left</div>
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
@@ -254,24 +254,48 @@ class MessagesPanel extends React.Component<Props, State> {
 
         if (notification.killer) {
             return <div key={key} className="row">
-                {notification.killer && <span key="killer"><PlayerName player={notification.killer} myHeroId={this.props.myHeroId} /> killed </span>}
-                {notification.killed && <span key="killed"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> </span>}
-                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} myHeroId={this.props.myHeroId} /> </span>}
+                {notification.killer && <span key="killer"><PlayerName player={notification.killer} /> killed </span>}
+                {notification.killed && <span key="killed"><PlayerName player={notification.killed} /> </span>}
+                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} /> </span>}
             </div>
         } else {
-            return <div key={key} className="row"><PlayerName player={notification.killed} myHeroId={this.props.myHeroId} /> died</div>
+            return <div key={key} className="row"><PlayerName player={notification.killed} /> died</div>
         }
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
         return <div key={key} className="winner">
-            <div className="winner-row"><PlayerName player={notification.winner} myHeroId={this.props.myHeroId} /> is the winner!</div>
-            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} myHeroId={this.props.myHeroId} /> ({notification.mostDamageAmount.toFixed(0)})</div>
-            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} myHeroId={this.props.myHeroId} /> ({notification.mostKillsCount} kills)</div>
+            {this.renderWinnerRow(notification.winners)}
+            <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)})</div>
+            <div className="award-row">Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills)</div>
             <div className="action-row">
                 {this.renderAgainButton()}
             </div>
         </div>;
+    }
+
+    private renderWinnerRow(winners: w.Player[]) {
+        if (!(winners && winners.length > 0)) {
+            return null;
+        } else if (winners.length === 1) {
+            return <div className="winner-row"><PlayerName player={winners[0]} /> is the winner!</div>
+        } else {
+            const elems = new Array<React.ReactNode>();
+            for (let i = 0; i < winners.length; ++i) {
+                const winner = winners[i];
+                const isFirst = i === 0;
+                const isLast = i === winners.length - 1;
+                if (!isFirst) {
+                    if (isLast) {
+                        elems.push(" & ");
+                    } else {
+                        elems.push(", ");
+                    }
+                }
+                elems.push(<PlayerName player={winner} />);
+            }
+            return <div className="winner-row"> {elems} win!</div>
+        }
     }
 
     private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
