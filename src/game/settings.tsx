@@ -1104,7 +1104,7 @@ const voidRush: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: false,
 
     buffs: [
