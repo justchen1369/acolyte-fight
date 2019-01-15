@@ -50,6 +50,7 @@ export function initialWorld(mod: Object): w.World {
 		occurrences: new Array<w.Occurrence>(),
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
+		teams: Immutable.Map<string, string>(), // hero ID -> team ID
 		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
 
@@ -835,6 +836,8 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	}
 
 	if (world.tick >= world.startTick) {
+		// assignTeams(world);
+
 		// Close any customising dialogs as they cannot be used anymore now the game has started
 		world.ui.customizingBtn = null;
 	}
@@ -842,6 +845,23 @@ function handleClosing(ev: w.Closing, world: w.World) {
 	world.ui.notifications.push({
 		type: "closing",
 		ticksUntilClose: ev.ticksUntilClose,
+	});
+}
+
+function assignTeams(world: w.World) {
+	const NumTeams = 2;
+
+	let nextTeamIndex = 0;
+	world.objects.forEach(hero => {
+		if (!(hero && hero.category === "hero")) {
+			return;
+		}
+
+		const teamIndex = (nextTeamIndex++) % NumTeams;
+		world.teams = world.teams.set(hero.id, `team${teamIndex}`);
+
+		const player = world.players.get(hero.id);
+		player.uiColor = constants.HeroColors.Colors[teamIndex];
 	});
 }
 
@@ -1466,11 +1486,17 @@ function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject
 	return true;
 }
 
-function calculateAlliance(fromHeroId: string, toHeroId: string, world: w.World) {
-	if (!toHeroId) {
+export function calculateAlliance(fromHeroId: string, toHeroId: string, world: w.World) {
+	if (!(fromHeroId && toHeroId)) {
 		return Alliances.Neutral;
 	} else if (fromHeroId === toHeroId) {
 		return Alliances.Self;
+	}
+
+	const fromTeam = world.teams.get(fromHeroId);
+	const toTeam = world.teams.get(toHeroId);
+	if (fromTeam && toTeam && fromTeam === toTeam) {
+		return Alliances.Ally;
 	} else {
 		return Alliances.Enemy;
 	}

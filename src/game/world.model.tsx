@@ -39,6 +39,7 @@ export interface World {
 	activePlayers: Immutable.Set<string>; // Set<heroId: string>
 	players: Immutable.Map<string, Player>; // heroId -> Player
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
+	teams: Immutable.Map<string, string>; // heroId -> teamId
 	winner: string | null;
 	winTick?: number;
 

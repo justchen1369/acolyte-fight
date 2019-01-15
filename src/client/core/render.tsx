@@ -9,7 +9,7 @@ import * as icons from './icons';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
+import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
@@ -982,8 +982,14 @@ function playShieldSounds(obj: w.Shield, world: w.World) {
 
 function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
+	if (!world.ui.myHeroId) {
+		return player.uiColor;
+	}
+
 	if (heroId === world.ui.myHeroId) {
 		return HeroColors.MyHeroColor;
+	} else if (engine.calculateAlliance(world.ui.myHeroId, heroId, world) & Alliances.Ally) {
+		return HeroColors.AllyColor;
 	} else {
 		return player.uiColor;
 	}

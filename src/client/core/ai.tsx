@@ -127,7 +127,7 @@ class AiWorker {
         const stateMsg: StateMsgContract = {
             type: "state",
             heroId: this.heroId,
-            state: worldToState(world),
+            state: worldToState(world, this.heroId),
             cooldowns,
         };
         this.worker.postMessage(JSON.stringify(stateMsg));
@@ -157,7 +157,7 @@ class AiWorker {
     }
 }
 
-function worldToState(world: w.World): WorldContract {
+function worldToState(world: w.World, myHeroId: string): WorldContract {
     const contract: WorldContract = {
         tick: world.tick,
         prestarted: engine.hasGamePrestarted(world),
@@ -170,8 +170,10 @@ function worldToState(world: w.World): WorldContract {
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
+            const alliance = engine.calculateAlliance(myHeroId, obj.id, world);
             contract.heroes[obj.id] = {
                 id: obj.id,
+                alliance,
                 radius: obj.radius,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),

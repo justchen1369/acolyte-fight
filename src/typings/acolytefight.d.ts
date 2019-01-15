@@ -608,6 +608,7 @@ declare interface WorldObjectContract {
 }
 
 declare interface HeroContract extends WorldObjectContract {
+	alliance: number;
 	health: number; // The current health of the hero (out of 100)
 	heading: Vec2; // A unit vector representing the direction the Hero is currently facing
 	radius: number; // The radius of the hero

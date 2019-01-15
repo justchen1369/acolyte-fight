@@ -63,6 +63,7 @@ export namespace HeroColors {
 	export const WorldColor = '#333333';
 
 	export const MyHeroColor = '#00ccff';
+	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';
 	export const InactiveColor = '#666666';
 	export const HealColor = '#22ee88';

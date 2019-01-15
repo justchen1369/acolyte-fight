@@ -1,9 +1,13 @@
 var settings = null;
+
 var center = { x: 0.5, y: 0.5 };
 var missRadius = 0.05;
 var reactionTimeMilliseconds = 200;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
+var AllianceSelf = 0x01;
+var AllianceAlly = 0x02;
+var AllianceEnemy = 0x04;
 
 var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain spells
     shield: 500,
@@ -28,8 +32,8 @@ onmessage = function (e) {
 
 function handleInput(state, heroId, cooldowns) {
     var hero = state.heroes[heroId];
-    var strongest = findStrongest(state.heroes, heroId);
-    var closest = findClosest(state.heroes, heroId);
+    var strongest = findStrongest(state.heroes, heroId, AllianceEnemy);
+    var closest = findClosest(state.heroes, heroId, AllianceAlly | AllianceEnemy);
     if (!(hero && strongest && closest)) {
         // Either we're dead, or everyone else is, nothing to do
         return;
@@ -54,7 +58,7 @@ function handleInput(state, heroId, cooldowns) {
     }
 }
 
-function findClosest(heroes, myHeroId) {
+function findClosest(heroes, myHeroId, allianceFlags) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -64,7 +68,7 @@ function findClosest(heroes, myHeroId) {
     var closestDistance = Infinity;
     for (var heroId in heroes) {
         var hero = heroes[heroId];
-        if (hero.id !== myHeroId) {
+        if (hero.alliance & allianceFlags) {
             var distance = vectorDistance(hero.pos, myHero.pos);
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -75,7 +79,7 @@ function findClosest(heroes, myHeroId) {
     return closest;
 }
 
-function findStrongest(heroes, myHeroId) {
+function findStrongest(heroes, myHeroId, allianceFlags) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -85,7 +89,7 @@ function findStrongest(heroes, myHeroId) {
     var mostHealth = 0;
     for (var heroId in heroes) {
         var hero = heroes[heroId];
-        if (hero.id !== myHeroId) {
+        if (hero.alliance & allianceFlags) {
             if (hero.health > mostHealth) {
                 mostHealth = hero.health;
                 choice = hero;
