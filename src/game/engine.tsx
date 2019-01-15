@@ -2161,7 +2161,7 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	const scores = world.scores.valueSeq().toArray();
+	let scores = world.scores.valueSeq().toArray();
 	scores.sort((a, b) => {
 		const deathA = a.deathTick || Infinity;
 		const deathB = b.deathTick || Infinity;
@@ -2189,6 +2189,10 @@ function notifyWin(world: w.World) {
 	if (!bestScore) {
 		return;
 	}
+
+	const winningTeamId = getTeam(bestScore.heroId, world);
+	scores = _.sortBy(scores, (x) => x.heroId === winningTeamId ? 0 : 1); // This does a stable sort
+
 	for (let i = 0; i < scores.length; ++i) {
 		scores[i].rank = i + constants.Placements.Rank1;
 	}
@@ -2224,7 +2228,7 @@ function notifyWin(world: w.World) {
 	}
 
 	world.winner = bestScore.heroId;
-	world.winners = scores.filter(x => x === bestScore || world.objects.has(x.heroId)).map(x => x.heroId);
+	world.winners = scores.filter(x => getTeam(x.heroId, world) === winningTeamId).map(x => x.heroId);
 	world.winTick = world.tick;
 	world.ui.notifications.push({
 		type: "win",
