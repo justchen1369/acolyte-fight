@@ -737,8 +737,11 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             let delta = playerDelta.delta;
 
             // Cannot lose or gain too much from team mode
-            delta = Math.min(smallestGain, delta);
-            delta = Math.max(smallestLoss, delta);
+            if (delta > 0) {
+                delta = Math.min(smallestGain, delta);
+            } else if (delta < 0) {
+                delta = Math.max(smallestLoss, delta);
+            }
 
             if (playerDelta.teamId === winningTeamId) {
                 // Cannot lose at all if winning team
