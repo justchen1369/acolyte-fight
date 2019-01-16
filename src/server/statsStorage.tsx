@@ -681,24 +681,23 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
         return;
     }
 
-    const winningTeamId = players[0].teamId || players[0].userHash;
-
     const ratedPlayers = players.filter(p => allRatings.has(p.userId));
-    const highestRankPerTeam =
-        _.chain(ratedPlayers)
-        .groupBy(p => p.teamId || p.userHash)
-        .mapValues(players => _.min(players.map(p => p.rank)))
-        .value()
+    if (ratedPlayers.length === 0) {
+        return;
+    }
+
+    const teams = _.groupBy(ratedPlayers, p => p.teamId || p.userHash);
+
+    const winningTeamId = players[0].teamId || players[0].userHash;
+    const numPlayersPerTeam = _.chain(teams).map(team => team.length).max().value();
+    const highestRankPerTeam = _.mapValues(teams, players => _.min(players.map(p => p.rank)));
     const averageRatingPerTeam =
-        _.chain(ratedPlayers)
-        .groupBy(p => p.teamId || p.userHash)
+        _.chain(teams)
         .mapValues((players, teamId) => players.filter(p => !!p.userId).map(p => allRatings.get(p.userId).aco))
         .mapValues((ratings) => calculateAverageRating(ratings))
         .value()
-    const sortedPlayers =
-        _.chain(ratedPlayers)
-        .sortBy(p => highestRankPerTeam[p.teamId || p.userHash])
-        .value()
+
+    const sortedPlayers = _.sortBy(ratedPlayers, p => highestRankPerTeam[p.teamId || p.userHash]);
 
     const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
     for (let i = 0; i < sortedPlayers.length; ++i) {
@@ -722,6 +721,11 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
             delta += Aco.adjustment(selfAco, otherAco, score);
+        }
+
+        if (numPlayersPerTeam > 1) {
+            // Team games count for less points because you can't control them directly
+            delta /= numPlayersPerTeam;
         }
 
         if (selfTeamId === winningTeamId) {
