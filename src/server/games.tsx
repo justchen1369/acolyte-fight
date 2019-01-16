@@ -621,10 +621,8 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (game.tick >= game.closeTick) {
 		if (game.bots.size === 0 && [...game.active.values()].every(x => !!x.userId)) {
 			// Everyone must be logged in to activate team mode
-			if (numPlayers === 4) {
-				numTeams = 2;
-			} else if (numPlayers === 6) {
-				numTeams = 3;
+			if (numPlayers >= 4 && (numPlayers % 2) === 0) {
+				numTeams = numPlayers / 2;
 			}
 		}
 
