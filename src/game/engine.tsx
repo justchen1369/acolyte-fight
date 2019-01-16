@@ -861,16 +861,37 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 		return null;
 	}
 
-	let heroIds = [...world.objects.values()].filter(x => x.category === "hero").map(x => x.id);
+	const perTeam = Math.ceil(world.players.size / numTeams);
+	const teams = new Array<string[]>();
 
-	const partyStart = heroIds.findIndex(heroId => !!world.players.get(heroId).partyHash);
-	if (partyStart >= 0) {
-		// Start allocating teams from the party. This will stick the party together if possible.
-		heroIds = arrayUtils.rotate(heroIds, partyStart);
+	// assign people in parties first. do it this weird way to ensure a stable sort on all machines
+	const players = _.reverse(_.sortBy(world.players.valueSeq().toArray(), p => p.partyHash));
+	for (const player of players) {
+		let team: string[] = null;
+		for (const t of teams) {
+			if (t.length >= perTeam) {
+				continue;
+			}
+			const partyHash = world.players.get(t[0]).partyHash;
+			if (partyHash === player.partyHash) {
+				// Find the first team with the same party as me (even if I'm in no party)
+				team = t;
+				break;
+			}
+		}
+		if (!team && teams.length < numTeams) {
+			// Start a new team
+			team = [];
+			teams.push(team);
+		}
+		if (!team) {
+			// Add myself to the smallest team
+			team = _.minBy(teams, t => t.length);
+		}
+
+		team.push(player.heroId);
 	}
 
-	const perTeam = Math.ceil(heroIds.length / numTeams);
-	const teams = _.chunk(heroIds, perTeam);
 	for (let i = 0; i < teams.length; ++i) {
 		const team = teams[i];
 		const teamId = `team${i}`;
