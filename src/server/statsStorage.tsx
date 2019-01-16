@@ -37,6 +37,11 @@ interface UpdateRatingsResult {
 interface RatingDeltas {
     [userId: string]: number;
 }
+interface PlayerDelta {
+    userId: string;
+    teamId: string;
+    delta: number;
+}
 
 interface LeaderboardCacheItem {
     leaderboardBuffer: Buffer; // m.GetLeaderboardResponse
@@ -678,7 +683,7 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
 
     const winningTeamId = players[0].teamId || players[0].userHash;
 
-    const deltas = players.map(_ => 0);
+    const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
     for (let i = 0; i < players.length; ++i) {
         const self = players[i];
         const selfRating = allRatings.get(self.userId);
@@ -709,24 +714,40 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             delta += Aco.adjustment(selfRating.aco, otherRating.aco, score);
         }
 
-        deltas[i] = delta;
+        deltas.set(self.userId, {
+            userId: self.userId,
+            teamId: selfTeamId,
+            delta,
+        });
     }
 
-    for (let i = 0; i < players.length; ++i) {
-        const self = players[i];
-        const selfRating = allRatings.get(self.userId);
-        if (!selfRating) {
-            continue;
-        }
-        const selfTeamId = self.teamId || self.userHash;
+    const teams = _.groupBy([...deltas.values()], x => x.teamId);
+    for (const teamId in teams) {
+        const teamDeltas = teams[teamId];
 
-        let delta = deltas[i];
-        if (selfTeamId === winningTeamId) {
-            delta = Math.max(0, delta);
-        }
+        let smallestGain = _.min(teamDeltas.map(p => p.delta).filter(delta => delta > 0)) || 0;
+        let smallestLoss = _.max(teamDeltas.map(p => p.delta).filter(delta => delta < 0)) || 0;
 
-        selfRating.aco += delta;
-        ++selfRating.acoGames;
+        for (const playerDelta of teamDeltas) {
+            const selfRating = allRatings.get(playerDelta.userId);
+            if (!selfRating) {
+                continue;
+            }
+
+            let delta = playerDelta.delta;
+
+            // Cannot lose or gain too much from team mode
+            delta = Math.min(smallestGain, delta);
+            delta = Math.max(smallestLoss, delta);
+
+            if (playerDelta.teamId === winningTeamId) {
+                // Cannot lose at all if winning team
+                delta = Math.max(0, delta);
+            }
+
+            selfRating.aco += delta;
+            ++selfRating.acoGames;
+        }
     }
 }
 
