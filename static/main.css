@@ -621,6 +621,12 @@ i.clickable:hover, i.clickable:active {
     to { opacity: 0.0 }
 }
 
+@media (max-width: 1024px) {
+    .splash {
+        font-size: 300%;
+    }
+}
+
 #messages-panel {
     position: absolute;
     margin: 8;
@@ -671,7 +677,7 @@ i.clickable:hover, i.clickable:active {
     background: linear-gradient(to left, #111, rgba(0,0,0,0));
 }
 
-@media (min-width: 1000px) {
+@media (min-width: 1024px) {
     #messages-panel .help-box {
         font-size: 150%;
     }
