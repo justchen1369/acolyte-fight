@@ -91,7 +91,8 @@ export interface Game extends Replay {
 export interface Player {
     socketId: string;
     partyId: string;
-	heroId: string;
+    heroId: string;
+    userId?: string;
     name: string;
 }
 

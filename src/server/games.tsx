@@ -524,18 +524,23 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
 		game.userIds.add(userId);
 		game.socketIds.add(params.socketId);
-		queueAction(game, {
-			gameId: game.id,
-			heroId,
-			actionType: "join",
-			userId,
-			userHash,
-			partyHash: params.partyHash,
-			playerName: params.name,
-			keyBindings: params.keyBindings,
-			isBot: params.isBot,
-			isMobile: params.isMobile,
-		 });
+
+		const player = game.active.get(params.socketId);
+		if (player) {
+			player.userId = userId;
+			queueAction(game, {
+				gameId: game.id,
+				heroId,
+				actionType: "join",
+				userId,
+				userHash,
+				partyHash: params.partyHash,
+				playerName: params.name,
+				keyBindings: params.keyBindings,
+				isBot: params.isBot,
+				isMobile: params.isMobile,
+			});
+		}
 	});
 
 	// Update counts
@@ -614,10 +619,13 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	if (game.tick >= game.closeTick) {
-		if (numPlayers === 4) {
-			numTeams = 2;
-		} else if (numPlayers === 6) {
-			numTeams = 3;
+		if (game.bots.size === 0 && [...game.active.values()].every(x => !!x.userId)) {
+			// Everyone must be logged in to activate team mode
+			if (numPlayers === 4) {
+				numTeams = 2;
+			} else if (numPlayers === 6) {
+				numTeams = 3;
+			}
 		}
 
 		getStore().joinableGames.delete(game.id);
