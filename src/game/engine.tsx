@@ -422,7 +422,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 	} as pl.FixtureDef);
 
-	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && x.id !== hero.id);
+	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(hero.id, x.id, world) & Alliances.Enemy));
 	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
 
 	let projectile = {
