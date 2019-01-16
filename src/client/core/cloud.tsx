@@ -166,6 +166,7 @@ export async function downloadGameStats(): Promise<void> {
     let newestLoaded = until;
     const allGameStats = await fetchGameStats(userId, constants.MaxGamesToKeep, until);
     for (const gameStats of allGameStats) {
+        console.log("Stats", gameStats);
         await storage.saveGameStats(gameStats);
 
         const timestamp = moment(gameStats.timestamp);
