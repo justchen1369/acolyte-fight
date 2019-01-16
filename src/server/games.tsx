@@ -210,13 +210,23 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		return;
 	}
 
-	if (data.heroId === player.heroId || game.bots.get(data.heroId) === socketId) {
+	if (data.heroId === player.heroId || takeBotControl(game, data.heroId, socketId)) {
 		queueAction(game, data);
 
 		if (data.actionType === "text") {
 			logger.info("Game [" + game.id + "]: " + player.name + " says: " + data.text);
 		}
 	}
+}
+
+export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
+	const controllerId = game.bots.get(heroId);
+	if (controllerId) {
+		return socketId === controllerId;
+	}
+
+	game.bots.set(heroId, socketId);
+	return true;
 }
 
 export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, locked: boolean = false, layoutId: string = null) {
@@ -411,7 +421,7 @@ function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string)
 	// Assign to first active player
 	const newPlayer = [...game.active.values()][0];
 	botsToReassign.forEach(heroId => {
-		game.bots.set(heroId, newPlayer.socketId);
+		game.bots.set(heroId, null);
 	});
 }
 
@@ -562,7 +572,7 @@ export function addBot(game: g.Game) {
 
 	// Nominate first player as simulator
 	const player = [...game.active.values()][0];
-	game.bots.set(heroId, player.socketId);
+	game.bots.set(heroId, null);
 
 	const keyBindings = randomKeyBindings(game);
 	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
