@@ -683,35 +683,50 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
 
     const winningTeamId = players[0].teamId || players[0].userHash;
 
-    const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
-    for (let i = 0; i < players.length; ++i) {
-        const self = players[i];
-        const selfRating = allRatings.get(self.userId);
-        if (!selfRating) {
-            continue;
-        }
+    const ratedPlayers = players.filter(p => allRatings.has(p.userId));
+    const highestRankPerTeam =
+        _.chain(ratedPlayers)
+        .groupBy(p => p.teamId || p.userHash)
+        .mapValues(players => _.min(players.map(p => p.rank)))
+        .value()
+    const averageRatingPerTeam =
+        _.chain(ratedPlayers)
+        .groupBy(p => p.teamId || p.userHash)
+        .mapValues((players, teamId) => players.filter(p => !!p.userId).map(p => allRatings.get(p.userId).aco))
+        .mapValues((ratings) => calculateAverageRating(ratings))
+        .value()
+    const sortedPlayers =
+        _.chain(ratedPlayers)
+        .sortBy(p => highestRankPerTeam[p.teamId || p.userHash])
+        .value()
 
+    const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
+    for (let i = 0; i < sortedPlayers.length; ++i) {
+        const self = sortedPlayers[i];
         const selfTeamId = self.teamId || self.userHash;
+        const selfAco = averageRatingPerTeam[selfTeamId];
 
         let delta = 0;
-        for (let j = 0; j < players.length; ++j) {
+        for (let j = 0; j < sortedPlayers.length; ++j) {
             if (i == j) {
                 continue;
             }
 
-            const other = players[j];
+            const other = sortedPlayers[j];
             const otherTeamId = other.teamId || other.userHash;
             if (selfTeamId === otherTeamId) {
                 continue; // Can't beat players on same team
             }
 
-            const otherRating = allRatings.get(other.userId);
-            if (!otherRating) {
-                continue;
-            }
+            const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            delta += Aco.adjustment(selfRating.aco, otherRating.aco, score);
+            delta += Aco.adjustment(selfAco, otherAco, score);
+        }
+
+        if (selfTeamId === winningTeamId) {
+            // Cannot lose at all if winning team
+            delta = Math.max(0, delta);
         }
 
         deltas.set(self.userId, {
@@ -721,37 +736,23 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
         });
     }
 
-    const teams = _.groupBy([...deltas.values()], x => x.teamId);
-    for (const teamId in teams) {
-        const teamDeltas = teams[teamId];
-
-        let smallestGain = _.min(teamDeltas.map(p => p.delta).filter(delta => delta > 0)) || 0;
-        let smallestLoss = _.max(teamDeltas.map(p => p.delta).filter(delta => delta < 0)) || 0;
-
-        for (const playerDelta of teamDeltas) {
-            const selfRating = allRatings.get(playerDelta.userId);
-            if (!selfRating) {
-                continue;
-            }
-
-            let delta = playerDelta.delta;
-
-            // Cannot lose or gain too much from team mode
-            if (delta > 0) {
-                delta = Math.min(smallestGain, delta);
-            } else if (delta < 0) {
-                delta = Math.max(smallestLoss, delta);
-            }
-
-            if (playerDelta.teamId === winningTeamId) {
-                // Cannot lose at all if winning team
-                delta = Math.max(0, delta);
-            }
-
-            selfRating.aco += delta;
-            ++selfRating.acoGames;
+    for (const playerDelta of deltas.values()) {
+        const selfRating = allRatings.get(playerDelta.userId);
+        if (!selfRating) {
+            continue;
         }
+
+        selfRating.aco += playerDelta.delta;
+        ++selfRating.acoGames;
     }
+}
+
+function calculateAverageRating(ratings: number[]) {
+    let product = 1;
+    for (const rating of ratings) {
+        product *= rating;
+    }
+    return Math.pow(product, 1 / ratings.length);
 }
 
 function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
