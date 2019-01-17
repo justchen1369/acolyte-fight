@@ -225,8 +225,12 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 		return socketId === controllerId;
 	}
 
-	game.bots.set(heroId, socketId);
-	return true;
+	if (game.active.has(socketId)) {
+		game.bots.set(heroId, socketId);
+		return true;
+	} else {
+		return false;
+	}
 }
 
 export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, locked: boolean = false, layoutId: string = null) {
