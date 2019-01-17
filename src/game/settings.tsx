@@ -143,7 +143,7 @@ const fireball: Spell = {
     throttle: true,
 
     projectile: {
-        density: 15,
+        density: 12.5,
         radius: 0.003,
         speed: 0.6,
         maxTicks: 1 * TicksPerSecond,
@@ -182,7 +182,7 @@ const flamestrike: Spell = {
 
         detonate: {
             damage: 12.5,
-            radius: 0.025,
+            radius: 0.03,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
             renderTicks: 10,
