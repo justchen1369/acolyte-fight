@@ -1365,9 +1365,9 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			if ((alliance && Alliances.NotFriendly) > 0) {
 				const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 				applyDamage(other, damagePacket, world);
+	
+				expireOnHeroHit(other, world);
 			}
-
-			expireOnHeroHit(other, world);
 		}
 	}
 }
@@ -1438,16 +1438,17 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	const alliance = calculateAlliance(projectile.owner, hero.id, world);
 
 	if (hero.id !== projectile.owner && takeHit(projectile, hero.id, world)) {
+		applyBuffs(projectile, hero, world);
+		linkTo(projectile, hero, world);
+		applySwap(projectile, hero, world);
+
 		if ((alliance & Alliances.NotFriendly) > 0) { // Don't damage allies
 			let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 			packet = scaleForPartialDamage(world, projectile, packet);
 			applyDamage(hero, packet, world);
-		}
 
-		applyBuffs(projectile, hero, world);
-		linkTo(projectile, hero, world);
-		applySwap(projectile, hero, world);
-		expireOnHeroHit(hero, world);
+			expireOnHeroHit(hero, world);
+		}
 		projectile.hit = world.tick;
 	}
 
