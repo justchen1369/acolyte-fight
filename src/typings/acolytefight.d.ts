@@ -257,8 +257,7 @@ declare interface StrafeParameters {
 }
 
 declare interface DestructibleParameters {
-	detonate: boolean;
-	noSelfDestruct?: boolean;
+	against?: number; // who can destroy this projectile?
 }
 
 declare interface PartialDamageParameters {

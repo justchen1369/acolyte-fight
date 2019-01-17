@@ -805,8 +805,7 @@ const halo: Spell = {
         strafe: { expireOnHeroHit: true },
         damageScaling: false,
         destructible: {
-            detonate: true,
-            noSelfDestruct: true,
+            against: Alliances.NotFriendly,
         },
 
         behaviours: [
@@ -859,7 +858,6 @@ const mines: Spell = {
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         expireOn: Categories.All ^ Categories.Shield,
         destructible: {
-            detonate: true,
         },
 
         partialDamage: {

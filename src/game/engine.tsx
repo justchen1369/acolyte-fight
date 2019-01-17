@@ -469,7 +469,9 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 		expireAgainstHeroes: projectileTemplate.expireAgainstHeroes !== undefined ? projectileTemplate.expireAgainstHeroes : constants.Alliances.All,
 		expireAgainstObjects: projectileTemplate.expireAgainstObjects !== undefined ? projectileTemplate.expireAgainstObjects : constants.Alliances.All,
-		destructible: projectileTemplate.destructible,
+		destructible: projectileTemplate.destructible && {
+			against: projectileTemplate.destructible.against !== undefined ? projectileTemplate.destructible.against : constants.Alliances.All,
+		},
 
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
@@ -2021,7 +2023,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				applyDamageToObstacle(other, packet, world);
 			}
 		} else if (other.category === "projectile") {
-			if (destructibleBy(other, owner)) {
+			if (destructibleBy(other, owner, world)) {
 				other.expireTick = world.tick;
 			}
 		}
@@ -2037,13 +2039,9 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 	});
 }
 
-function destructibleBy(projectile: w.Projectile, detonatorHeroId: string) {
+function destructibleBy(projectile: w.Projectile, detonatorHeroId: string, world: w.World) {
 	if (projectile.destructible) {
-		if (projectile.destructible.noSelfDestruct && projectile.owner === detonatorHeroId) {
-			return false;
-		} else {
-			return true;
-		}
+		return (calculateAlliance(projectile.owner, detonatorHeroId, world) & projectile.destructible.against) > 0;
 	} else {
 		return false;
 	}
@@ -2583,7 +2581,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 	let hit = false
 	world.objects.forEach(obj => {
-		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && destructibleBy(obj, hero.id)))) {
+		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && destructibleBy(obj, hero.id, world)))) {
 			return;
 		}
 
@@ -2615,7 +2613,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 				obj.owner = hero.id;
 			}
 
-			if (destructibleBy(obj, hero.id)) {
+			if (destructibleBy(obj, hero.id, world)) {
 				obj.expireTick = world.tick;
 			}
 		}
