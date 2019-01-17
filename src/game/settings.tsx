@@ -145,7 +145,7 @@ const fireball: Spell = {
     projectile: {
         density: 15,
         radius: 0.003,
-        speed: 0.5,
+        speed: 0.6,
         maxTicks: 1 * TicksPerSecond,
         damage: 7.5,
         categories: Categories.Projectile,
