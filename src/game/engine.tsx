@@ -398,8 +398,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
 
-	const offset = Math.max(0, world.settings.Hero.Radius - projectileTemplate.radius); // Larger projectiles spawn more inside the hero to ensure they still work at point blank range
-	const position = vector.plus(hero.body.getPosition(), vector.multiply(direction, offset));
+	const position = vector.clone(hero.body.getPosition());
 	const velocity = vector.multiply(direction, projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
