@@ -988,7 +988,9 @@ const icewall: Spell = {
     description: "Create a wall that reflects projectiles and blocks other heroes. You can pass through your own forcefield, but other heroes cannot, even if they are using teleport.",
 
     maxRange: 0.25,
-    maxTicks: 1 * TicksPerSecond,
+    chargeTicks: 0.25 * TicksPerSecond,
+    movementProportionWhileCharging: 1.0,
+    maxTicks: 1.25 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
