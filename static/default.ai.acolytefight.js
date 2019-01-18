@@ -129,6 +129,9 @@ function deflect(state, hero, cooldowns, projectile) {
     } else if (cooldowns["icewall"] === 0) {
         var target = vectorMidpoint(hero.pos, projectile.pos);
         return { spellId: "icewall", target };
+    } else if (cooldowns["saber"] === 0) {
+        var target = vectorMidpoint(hero.pos, projectile.pos);
+        return { spellId: "saber", target };
     } else {
         return null;
     }
@@ -194,7 +197,12 @@ function jitter(target, missRadius) {
 
 function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - ensure we are focusing the enemy, otherwise we will miss
     if (hero.casting) {
-        return { spellId: "retarget", target: opponent.pos };
+        if (hero.casting.spellId === "saber") {
+            // Don't focus the lightsaber, just swish it around
+            return { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) };
+        } else {
+            return { spellId: "retarget", target: opponent.pos };
+        }
     } else {
         return null;
     }
@@ -295,4 +303,8 @@ function vectorDot(a, b) {
 function vectorMidpoint(a, b) {
     var diff = vectorDiff(b, a);
     return vectorPlus(a, vectorMultiply(diff, 0.5));
+}
+
+function vectorRotateRight(vec) {
+	return { x: vec.y, y: -vec.x };
 }
