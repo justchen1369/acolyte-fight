@@ -904,7 +904,7 @@ const saber: Spell = {
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
-    speedMultiplier: 1.25,
+    speedMultiplier: 2,
     maxSpeed: 0.75,
     maxTurnRatePerTickInRevs: 0.1,
 
