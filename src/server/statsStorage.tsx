@@ -24,8 +24,6 @@ const MaxLeaderboardLength = 100;
 const Aco = new aco.Aco(10, 0.25);
 const AcoDecayLength = 7 * 24 * 60 * 60;
 const AcoDecayInterval = 1 * 60 * 60;
-const ActivityBonusPerGame = 3;
-const MaxActivityGames = 100;
 
 const TrueSkill = new ts.TrueSkill();
 const GlickoMultiplier = 200 / TrueSkill.beta; // In Glicko the beta (difference required for 76% win probability) is 200
@@ -776,7 +774,7 @@ function calculateGlickoLowerBound(rating: number, rd: number) {
 }
 
 function calculateAcoExposure(aco: number, acoGames: number) {
-    return aco + ActivityBonusPerGame * Math.min(MaxActivityGames, acoGames);
+    return aco + constants.Placements.ActivityBonusPerGame * Math.min(constants.Placements.MaxActivityGames, acoGames);
 }
 
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {

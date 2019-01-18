@@ -127,7 +127,14 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
             }
 
             for (const system of ratingSystems) {
-                const value = system === m.RatingSystem.Aco ? userRating.acoExposure : userRating.lowerBound;
+                let value: number = null;
+                if (system === m.RatingSystem.Aco) {
+                    if (userRating.aco) {
+                        value = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
+                    }
+                } else if (system === m.RatingSystem.Glicko) {
+                    value = userRating.lowerBound;
+                }
                 if (!value) {
                     continue;
                 }
