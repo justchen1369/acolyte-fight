@@ -4564,10 +4564,10 @@ pkg-dir@^3.0.0:
   dependencies:
     find-up "^3.0.0"
 
-planck-js@^0.1.44:
-  version "0.1.45"
-  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.1.45.tgz#0ec462108dd3e457e6f907c841be1466a0184a51"
-  integrity sha512-4Z3iZfpRULMoJYbzPxRiPtqqJ1nKt9g14OeHq93d7z4hHwalO12WTVLOomv7uT7S7X06h04sa5CFRrsjuEnY6g==
+planck-js@^0.3.0-rc.2:
+  version "0.3.0-rc.2"
+  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.0-rc.2.tgz#49424ccc2ec029eadd7b2d8117c9e861beffb6ea"
+  integrity sha512-bPpuOQl8I0LzRcDXQzP63qGaEBA4XRVANVxQiwhiViZvtax6pVZpMxOTHdEFx50l340W4P1Oz7jYGUdU6c9WfQ==
 
 posix-character-classes@^0.1.0:
   version "0.1.1"
