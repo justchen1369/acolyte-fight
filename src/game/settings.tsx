@@ -886,6 +886,10 @@ const mines: Spell = {
                 newSpeed: 0,
                 redirect: true,
             },
+            {
+                type: "expireOnOwnerRetreat",
+                maxDistance: 0.15,
+            },
         ],
 
         sound: "mines",

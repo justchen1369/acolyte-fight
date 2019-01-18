@@ -562,6 +562,7 @@ export type Behaviour =
 	| SaberBehaviour
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
+	| ExpireOnOwnerRetreatBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -648,6 +649,13 @@ export interface ExpireBuffsBehaviour extends BehaviourBase {
 export interface ExpireOnOwnerDeathBehaviour extends BehaviourBase {
 	type: "expireOnOwnerDeath";
 	projectileId: string;
+}
+
+export interface ExpireOnOwnerRetreatBehaviour extends BehaviourBase {
+	type: "expireOnOwnerRetreat";
+	projectileId: string;
+	anchorPoint: pl.Vec2;
+	maxDistance: number;
 }
 
 export type WorldObject =

@@ -517,7 +517,10 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
 		} else if (template.type === "expireOnOwnerDeath") {
 			behaviour = instantiateExpireOnOwnerDeath(template, projectile, world);
+		} else if (template.type === "expireOnOwnerRetreat") {
+			behaviour = instantiateExpireOnOwnerRetreat(template, projectile, world);
 		}
+
 
 		const trigger = template.trigger;
 		if (!trigger) {
@@ -573,6 +576,22 @@ function instantiateExpireOnOwnerDeath(template: ExpireOnOwnerDeathTemplate, pro
 	};
 }
 
+function instantiateExpireOnOwnerRetreat(template: ExpireOnOwnerRetreatTemplate, projectile: w.Projectile, world: w.World): w.ExpireOnOwnerRetreatBehaviour {
+	let anchorPoint = pl.Vec2(0.5, 0.5);
+
+	const owner = world.objects.get(projectile.owner);
+	if (owner && owner.category === "hero") {
+		anchorPoint = vector.clone(owner.body.getPosition());
+	}
+
+	return {
+		type: "expireOnOwnerRetreat",
+		projectileId: projectile.id,
+		maxDistance: template.maxDistance,
+		anchorPoint,
+	};
+}
+
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
@@ -610,6 +629,7 @@ export function tick(world: w.World) {
 		thrustDecay,
 		expireBuffs,
 		expireOnOwnerDeath,
+		expireOnOwnerRetreat,
 	});
 
 	applyLavaDamage(world);
@@ -1943,6 +1963,21 @@ function expireOnOwnerDeath(behaviour: w.ExpireOnOwnerDeathBehaviour, world: w.W
 
 	const hero = world.objects.get(projectile.owner);
 	if (!(hero && hero.category === "hero")) {
+		projectile.expireTick = world.tick;
+		return false;
+	}
+
+	return true;
+}
+
+function expireOnOwnerRetreat(behaviour: w.ExpireOnOwnerRetreatBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	const hero = world.objects.get(projectile.owner);
+	if (!(hero && hero.category === "hero" && vector.distance(hero.body.getPosition(), projectile.body.getPosition()) <= behaviour.maxDistance)) {
 		projectile.expireTick = world.tick;
 		return false;
 	}

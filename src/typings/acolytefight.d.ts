@@ -280,6 +280,7 @@ declare type BehaviourTemplate =
 	HomingTemplate
 	| UpdateCollideWithTemplate
 	| ExpireOnOwnerDeathTemplate
+	| ExpireOnOwnerRetreatTemplate
 
 declare type HomingType = "self" | "enemy" | "cursor";
 
@@ -316,6 +317,11 @@ declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
 
 declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {
 	type: "expireOnOwnerDeath";
+}
+
+declare interface ExpireOnOwnerRetreatTemplate extends BehaviourTemplateBase {
+	type: "expireOnOwnerRetreat";
+	maxDistance: number;
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {
