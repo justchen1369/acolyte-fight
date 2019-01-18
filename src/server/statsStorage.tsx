@@ -703,7 +703,8 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
         const selfTeamId = self.teamId || self.userHash;
         const selfAco = averageRatingPerTeam[selfTeamId];
 
-        let delta = 0;
+        let deltaGain = 0;
+        let deltaLoss = 0;
         for (let j = 0; j < sortedPlayers.length; ++j) {
             if (i == j) {
                 continue;
@@ -718,8 +719,15 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            delta += Aco.adjustment(selfAco, otherAco, score);
+            const deltaAdjustment = Aco.adjustment(selfAco, otherAco, score);
+            if (deltaAdjustment >= 0) {
+                deltaGain = Math.max(deltaGain, deltaAdjustment);
+            } else {
+                deltaLoss = Math.min(deltaLoss, deltaAdjustment);
+            }
         }
+
+        let delta = deltaGain + deltaLoss;
 
         if (numPlayersPerTeam > 1) {
             // Team games count for less points because you can't control them directly

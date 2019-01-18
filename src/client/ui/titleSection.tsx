@@ -55,6 +55,20 @@ export class TitleSection extends React.Component<Props, State> {
                 <li>You lose the most points when defeated by players similar to your rating. The system is designed so you won't lose many points if defeated by someone significantly above or below your skill level.</li>
                 <li>There is an activity bonus. You gain +3 for every game played, up to 100 games. This bonus only lasts for 7 days. So keep playing to max out your activity bonus!</li>
             </ul>
+            <h2>How do I get rated against multiple players in one game?</h2>
+            <p>
+                You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
+                In a game with more than 2 people:
+            </p>
+            <ul>
+                <li>You only gain from the individual player who adds the most points.</li>
+                <li>You only lose from the individual player who subtracts the most points.</li>
+            </ul>
+            <p>
+                That means if there are 4 players in the game, and you are in last place,
+                you only lose points for being below the player most similar to your skill level.
+                This is to discourage "noob hunting". There is nothing to be gained from defeating the newbies first.
+            </p>
             <h2>How are the leagues calculated?</h2>
             <p>
                 These are the leagues and the minimum percentiles:
@@ -70,10 +84,6 @@ export class TitleSection extends React.Component<Props, State> {
                 <li>Wood: {constants.Placements.Wood} percentile</li>
             </ul>
             <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
-            <h2>What factors are considered?</h2>
-            <p>
-                You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
-            </p>
             <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
             <p>
                 No other factors are considered in the rating - kills do not matter, damage does not matter - the game is to be the last one standing
