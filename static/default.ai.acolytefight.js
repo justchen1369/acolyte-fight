@@ -114,6 +114,8 @@ function recovery(state, hero, cooldowns) {
         spellId = "thrust";
     } else if (cooldowns["swap"] === 0) {
         spellId = "swap";
+    } else if (cooldowns["voidRush"] === 0) {
+        spellId = "voidRush";
     }
 
     if (spellId) {
