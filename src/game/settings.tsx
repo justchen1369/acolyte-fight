@@ -888,7 +888,7 @@ const mines: Spell = {
             },
             {
                 type: "expireOnOwnerRetreat",
-                maxDistance: 0.15,
+                maxDistance: 0.1,
             },
         ],
 
