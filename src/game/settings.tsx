@@ -97,7 +97,7 @@ const move: MoveSpell = {
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 0.25,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     cooldown: 0,
     action: "move",
     cancelChanneling: false,
@@ -107,7 +107,7 @@ const go: MoveSpell = {
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 0.25,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     cooldown: 0,
     action: "move",
     cancelChanneling: true,
@@ -117,7 +117,7 @@ const retarget: Spell = {
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 1.0,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     cooldown: 0,
     action: "retarget",
 };
@@ -126,7 +126,7 @@ const stop: Spell = {
     description: "",
     color: 'white',
     maxAngleDiffInRevs: 1.0,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     cooldown: 0,
     action: "stop",
 };
@@ -318,7 +318,7 @@ const kamehameha: Spell = {
         maxChannelingTicks: 1 * TicksPerSecond,
     },
     movementCancel: true,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     jitterRatio: 0.0,
 
     intervalTicks: 0.1 * TicksPerSecond,
@@ -916,7 +916,7 @@ const saber: Spell = {
     length: 0.075,
 
     movementProportionWhileChannelling: 0.5,
-    interruptible: true,
+    interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,
     throttle: false,
@@ -953,7 +953,7 @@ const scourge: Spell = {
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
-    interruptible: true,
+    interruptibleAfterTicks: 0,
     movementCancel: true,
     selfDamage: 10,
     minSelfHealth: 1,
@@ -1023,7 +1023,7 @@ const teleport: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     movementProportionWhileCharging: 1.0,
-    interruptible: false,
+    interruptibleAfterTicks: 0,
 
     icon: "teleport",
 

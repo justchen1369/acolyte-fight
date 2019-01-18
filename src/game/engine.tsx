@@ -1138,7 +1138,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		return; // Nothing to do
 	}
 	const spell = world.settings.Spells[action.type];
-	const uninterruptible = !spell.interruptible;
+	const uninterruptible = _.isNil(spell.interruptibleAfterTicks) || spell.interruptibleAfterTicks > 0;
 
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
@@ -1239,6 +1239,11 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
 		}
+
+		// Update interruptibility
+		hero.casting.uninterruptible =
+			_.isNil(spell.interruptibleAfterTicks)
+			|| (world.tick - hero.casting.channellingStartTick) < spell.interruptibleAfterTicks;
 
 		// Orientate during channelling
 		hero.body.setAngularVelocity(0); // Don't allow a spray to go everywhere if hit creates angular momentum

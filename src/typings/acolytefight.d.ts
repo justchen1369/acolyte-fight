@@ -157,9 +157,8 @@ declare interface SpellBase {
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
 	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging
 	revsPerTickWhileChannelling?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while channelling
-	numCharges?: number;
     cooldown: number;
-    interruptible?: boolean; // Whether this spell can be interrupted by moving.
+    interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
     movementCancel?: boolean; // Whether moving cancels the spell.
     knockbackCancel?: KnockbackCancelParams; // If this spell is being channelled, whether knockback cancels it.
 
