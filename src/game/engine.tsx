@@ -1438,7 +1438,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		shield.hitTick = world.tick;
 	}
 
-	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership) { // Stop double redirections cancelling out
+	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership && (calculateAlliance(shield.owner, projectile.owner, world) & Alliances.Enemy) > 0) { // Stop double redirections cancelling out
 		// Redirect back to owner
 		projectile.targetId = projectile.owner;
 		projectile.owner = shield.owner;
@@ -2641,7 +2641,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		}
 
 		if (obj.category === "projectile") {
-			if (saber.takesOwnership && obj.owner !== hero.id && obj.shieldTakesOwnership) {
+			if (saber.takesOwnership && obj.shieldTakesOwnership && (calculateAlliance(saber.owner, obj.owner, world) & Alliances.Enemy) > 0) {
 				// Redirect back to owner
 				obj.targetId = obj.owner;
 				obj.owner = hero.id;
