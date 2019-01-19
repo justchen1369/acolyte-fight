@@ -21,7 +21,7 @@ import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
 
-const Aco = new aco.Aco(25, 1);
+const Aco = new aco.Aco(10, 0.25);
 const AcoDecayLength = 7 * 24 * 60 * 60;
 const AcoDecayInterval = 1 * 60 * 60;
 
