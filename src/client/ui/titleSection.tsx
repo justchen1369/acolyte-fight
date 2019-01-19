@@ -61,13 +61,13 @@ export class TitleSection extends React.Component<Props, State> {
                 In a game with more than 2 people:
             </p>
             <ul>
-                <li>You only gain from the individual player who adds the most points.</li>
-                <li>You only lose from the individual player who subtracts the most points.</li>
+                <li>You only gain from the individual player who adds the most points. This is the person with the highest rating who you defeated..</li>
+                <li>You only lose from the individual player who subtracts the most points. This is the person with the most similar rating to yours who defeated you.</li>
             </ul>
             <p>
                 That means if there are 4 players in the game, and you are in last place,
                 you only lose points for being below the player most similar to your skill level.
-                This is to discourage "noob hunting". There is nothing to be gained from defeating the newbies first.
+                This is to discourage "noob hunting". There is nothing to be gained from defeating the newbies first when there are people more similar to your skill level in the same game.
             </p>
             <h2>How are the leagues calculated?</h2>
             <p>
