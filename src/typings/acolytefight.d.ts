@@ -497,6 +497,7 @@ declare interface ThrustSpell extends DashSpell {
     action: "thrust";
 
 	range: number;
+	radiusMultiplier: number;
 	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
 	speed: number;
 

@@ -646,7 +646,6 @@ function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, 
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const Hero = world.settings.Hero;
 	const ctx = ctxStack.canvas;
 
 	const player = world.players.get(hero.id);
@@ -656,7 +655,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 	}
 
 	const angle = hero.body.getAngle();
-	const radius = Hero.Radius;
+	const radius = hero.radius;
 
 	// Fill
 	{
@@ -805,7 +804,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 	const Hero = world.settings.Hero;
 	const ctx = ctxStack.canvas;
 
-	const radius = Hero.Radius;
+	const radius = hero.radius;
 
 	// Health bar
 	const ticksUntilStart = Math.max(0, world.startTick - world.tick);
@@ -999,12 +998,8 @@ function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion
 	barPath(ctx, radius, proportion, HealthBar.Margin, HealthBar.Height, world);
 }
 
-function dashBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, world: w.World) {
-	barPath(ctx, radius, proportion, DashIndicator.Margin, DashIndicator.Height, world);
-}
-
 function barPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, margin: number, height: number, world: w.World) {
-	const barRadius = HealthBar.HeroRadiusFraction * world.settings.Hero.Radius;
+	const barRadius = HealthBar.HeroRadiusFraction * radius;
 	ctx.rect(-barRadius, -radius - height - margin, barRadius * 2 * proportion, height);
 }
 

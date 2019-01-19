@@ -10,7 +10,7 @@ declare module "planck-js" {
         }
 
         interface Body {
-            createFixture(shape: Shape, fixtureDef: FixtureDef): void;
+            createFixture(shape: Shape, fixtureDef: FixtureDef): Fixture;
             destroyFixture(fixture: Fixture): void;
             isBullet(): boolean;
             setBullet(bullet: boolean): void;

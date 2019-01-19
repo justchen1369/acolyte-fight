@@ -1038,6 +1038,7 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
 
     range: 0.25,
+    radiusMultiplier: 1.5,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,

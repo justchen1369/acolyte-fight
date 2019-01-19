@@ -450,6 +450,9 @@ export interface ThrustState {
 	ticks: number;
 	nullified: boolean;
 	alreadyHit: Set<string>;
+
+	initialRadius: number;
+	fixture: pl.Fixture;
 }
 
 export interface GravityState {
@@ -629,6 +632,7 @@ export interface ReflectFollowBehaviour extends BehaviourBase {
 export interface ThrustBounceBehaviour extends BehaviourBase {
 	type: "thrustBounce";
 	heroId: string;
+	bounceTicks: number;
 }
 
 export interface ThrustDecayBehaviour extends BehaviourBase {

@@ -1861,21 +1861,6 @@ function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
 	}
 }
 
-function thrustBounce(behaviour: w.ThrustBounceBehaviour, world: w.World) {
-	const hero = world.objects.get(behaviour.heroId);
-	if (!(hero && hero.category === "hero")) {
-		return false;
-	}
-
-	if (hero.thrust) {
-		updateMaskBits(hero.body.getFixtureList(), Categories.All);
-		return true;
-	} else {
-		updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
-		return false;
-	}
-}
-
 function updateMaskBits(fixture: pl.Fixture, newMaskBits: number) {
 	if (fixture.getFilterMaskBits() !== newMaskBits) {
 		fixture.setFilterData({
@@ -1916,22 +1901,6 @@ function decayMitigation(world: w.World) {
 			hero.damageSourceHistory = newHistory;
 		}
 	});
-}
-
-function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
-	const hero = world.objects.get(behaviour.heroId);
-	if (!(hero && hero.category === "hero" && hero.thrust)) {
-		return false;
-	}
-
-	--hero.thrust.ticks;
-	if (hero.thrust.ticks <= 0) {
-		hero.body.setLinearVelocity(vector.zero());
-		hero.thrust = null;
-		return false;
-	} else {
-		return true;
-	}
 }
 
 function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
@@ -2524,7 +2493,6 @@ function shouldCollideWithCategory(a: w.WorldObject, categories: number) {
 }
 
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
-	const Hero = world.settings.Hero;
 	if (!action.target) { return true; }
 
 	if (world.tick == hero.casting.channellingStartTick) {
@@ -2539,18 +2507,27 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		const ticks = Math.min(maxTicks, ticksToTarget);
 
+		const thrustRadius = hero.radius * spell.radiusMultiplier;
+		const fixture = hero.body.createFixture(pl.Circle(thrustRadius), {
+			density: 0,
+			filterCategoryBits: Categories.Hero,
+			filterMaskBits: Categories.All,
+		});
 		let thrust: w.ThrustState = {
 			damageTemplate: spell.damageTemplate,
 			velocity,
 			ticks,
 			nullified: false,
 			alreadyHit: new Set<string>(),
-		} as w.ThrustState;
+			initialRadius: hero.radius,
+			fixture,
+		};
 
+		hero.radius = thrustRadius;
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
 
-		world.behaviours.push({ type: "thrustBounce", heroId: hero.id });
+		world.behaviours.push({ type: "thrustBounce", heroId: hero.id, bounceTicks: spell.bounceTicks });
 		world.behaviours.push({ type: "thrustDecay", heroId: hero.id });
 	}
 
@@ -2564,6 +2541,49 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 	return !hero.thrust;
 }
+
+function thrustBounce(behaviour: w.ThrustBounceBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	if (hero.thrust) {
+		updateMaskBits(hero.body.getFixtureList(), Categories.All);
+
+		if (hero.thrust.nullified) {
+			hero.thrust.ticks = Math.min(behaviour.bounceTicks, hero.thrust.ticks);
+		} else {
+			hero.body.setLinearVelocity(hero.thrust.velocity);
+		}
+
+		return true;
+	} else {
+		updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
+		return false;
+	}
+}
+
+function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero" && hero.thrust)) {
+		return false;
+	}
+
+	--hero.thrust.ticks;
+	if (hero.thrust.ticks <= 0) {
+		hero.body.setLinearVelocity(vector.zero());
+		hero.radius = hero.thrust.initialRadius;
+
+		hero.body.destroyFixture(hero.thrust.fixture);
+		hero.thrust = null;
+		return false;
+	} else {
+
+		return true;
+	}
+}
+
 
 function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
 	const saberTick = world.tick - hero.casting.channellingStartTick;
