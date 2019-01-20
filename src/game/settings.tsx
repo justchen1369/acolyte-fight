@@ -286,8 +286,9 @@ const meteor: Spell = {
         minTicks: 1,
         maxTicks: 5 * TicksPerSecond,
         damage: 0,
+        shieldTakesOwnership: false,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All ^ Categories.Shield, // Pass through shields
+        collideWith: Categories.All,
         expireOn: Categories.None,
 
         sound: "meteor",
