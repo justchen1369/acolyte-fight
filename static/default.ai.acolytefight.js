@@ -238,8 +238,8 @@ function dodge(state, hero, cooldowns) {
         }
 
         var timeToCollision = vectorLength(diff) / distancePerTimeStep;
-        if (timeToCollision <= 0) {
-            // Not coming towards us
+        if (timeToCollision <= 0 || timeToCollision >= 30) {
+            // Not coming towards us or too far away
             continue;
         }
 
