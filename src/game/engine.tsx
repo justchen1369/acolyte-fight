@@ -2676,6 +2676,8 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			if (destructibleBy(obj, hero.id, world)) {
 				obj.expireTick = world.tick;
 			}
+		} else if (obj.category === "hero") {
+			expireOnHeroHit(obj, world);
 		}
 
 		hit = true;
