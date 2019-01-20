@@ -288,7 +288,7 @@ const meteor: Spell = {
         damage: 0,
         shieldTakesOwnership: false,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All,
+        collideWith: Categories.All ^ Categories.Shield, // Shields have no effect on Meteor
         expireOn: Categories.None,
 
         sound: "meteor",
