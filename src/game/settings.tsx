@@ -801,7 +801,7 @@ const halo: Spell = {
         expireOn: Categories.Massive,
         expireAgainstHeroes: Alliances.NotFriendly,
         expireAgainstObjects: Alliances.NotFriendly,
-        selfPassthrough: false,
+        selfPassthrough: true,
         shieldTakesOwnership: false,
         strafe: { expireOnHeroHit: true },
         damageScaling: false,
@@ -818,9 +818,6 @@ const halo: Spell = {
                 targetType: HomingTargets.self,
             },
         ],
-
-        bounce: {
-        },
 
         sound: "halo",
         soundHit: "halo",
