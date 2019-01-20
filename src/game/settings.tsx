@@ -507,7 +507,7 @@ const retractor: Spell = {
 
 const whip: Spell = {
     id: 'whip',
-    name: 'Electrolash',
+    name: 'Electroshock',
     description: "Shock your enemies for damage and lifesteal. The whip has a fixed length, so stay close, but not too close.",
     action: "projectile",
 
