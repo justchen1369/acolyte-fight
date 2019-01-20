@@ -550,6 +550,12 @@ i.clickable:hover, i.clickable:active {
     margin-right: 4px;
 }
 
+.player-list .team-title {
+    margin-top: 1em;
+    font-weight: bold;
+    font-size: 120%;
+}
+
 #info-panel .play-vs-ai-btn {
     margin-top: 10px;
 }

@@ -228,9 +228,13 @@ class MessagesPanel extends React.Component<Props, State> {
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
             if (notification.teamSizes) {
-                return <div key={key} className="splash-container">
-                    <div className="splash">{notification.teamSizes.join('v')}</div>
-                </div>
+                const vString = notification.teamSizes.join('v');
+                return <>
+                    <div key={`${key}-splash`} className="splash-container">
+                        <div className="splash">{vString}</div>
+                    </div>
+                    <div key={key} className="row game-started">Team game! Your allies are blue. Defeat your enemies together!</div>
+                </>
             } else {
                 return <div key={key} className="row game-started">Game started</div>
             }
@@ -298,7 +302,7 @@ class MessagesPanel extends React.Component<Props, State> {
                         elems.push(", ");
                     }
                 }
-                elems.push(<PlayerName player={winner} />);
+                elems.push(<PlayerName key={winner.heroId} player={winner} />);
             }
             return <div className="winner-row"> {elems} win!</div>
         }
