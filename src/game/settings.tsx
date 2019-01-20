@@ -29,7 +29,7 @@ const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutRadius: 0.25,
 
-    LavaDamagePerSecond: 10,
+    LavaDamagePerSecond: 12.5,
     SecondsToShrink: 90,
     ShrinkPower: 1,
     InitialShieldSeconds: 1.0,
@@ -1018,10 +1018,11 @@ const teleport: Spell = {
     id: 'teleport',
     description: "Teleport to a nearby location. Get close, or get away.",
 
-    range: 0.45,
+    range: 0.3,
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
     interruptibleAfterTicks: 0,
 
