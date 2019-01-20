@@ -2026,6 +2026,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				const alliance = calculateAlliance(owner, other.id, world);
 				if ((alliance & Alliances.NotFriendly) > 0) {
 					applyDamage(other, packet, world);
+					expireOnHeroHit(other, world);
 				}
 			} else {
 				applyDamageToObstacle(other, packet, world);
