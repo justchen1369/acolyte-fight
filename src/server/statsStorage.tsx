@@ -21,8 +21,8 @@ import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
 
-const Aco = new aco.Aco(25, 0.8);
-const AcoDecayLength = 7 * 24 * 60 * 60;
+const Aco = new aco.Aco(constants.Placements.AcoK, constants.Placements.AcoPower);
+const AcoDecayLength = constants.Placements.AcoDecayLengthDays;
 const AcoDecayInterval = 1 * 60 * 60;
 
 const TrueSkill = new ts.TrueSkill();
