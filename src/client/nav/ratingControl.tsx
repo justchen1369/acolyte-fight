@@ -12,14 +12,12 @@ import PageLink from './pageLink';
 interface Props {
     userId: string;
     profile: m.GetProfileResponse;
-    system: string;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         userId: state.userId,
         profile: state.profile,
-        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -57,7 +55,7 @@ class RatingControl extends React.Component<Props> {
             return null;
         }
 
-        const values: rankings.Rating = rankings.getRating(rating, this.props.system);
+        const values: rankings.Rating = rankings.getRating(rating);
         if (!(values.exposure && values.percentile >= 0)) {
             return null;
         }

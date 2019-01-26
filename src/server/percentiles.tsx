@@ -14,8 +14,6 @@ import { Collections } from './db.model';
 import { FixedIntegerArray } from './fixedIntegerArray';
 import { logger } from './logging';
 
-const ratingSystems = [m.RatingSystem.Glicko, m.RatingSystem.Aco];
-
 interface DbFrequenciesResult {
     frequencies: Map<string, FixedIntegerArray>;
     numUsers: number;
@@ -29,16 +27,16 @@ export async function init() {
     refreshCumulativeFrequenciesLoop();
 }
 
-function cacheKey(category: string, system: string) {
-    return `${category}.${system}`;
+function cacheKey(category: string) {
+    return `${category}`;
 }
 
-export function estimatePercentile(ratingLB: number, category: string, system: string): number {
-    return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(cacheKey(category, system)));
+export function estimatePercentile(ratingLB: number, category: string): number {
+    return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(cacheKey(category)));
 }
 
-export function estimateRatingAtPercentile(category: string, system: string, percentile: number): number {
-    const distribution = distributionCache.get(cacheKey(category, system));
+export function estimateRatingAtPercentile(category: string, percentile: number): number {
+    const distribution = distributionCache.get(cacheKey(category));
     if (!distribution) {
         return 0;
     }
@@ -126,28 +124,24 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
                 continue;
             }
 
-            for (const system of ratingSystems) {
-                let value: number = null;
-                if (system === m.RatingSystem.Aco) {
-                    if (userRating.aco) {
-                        value = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
-                    }
-                } else if (system === m.RatingSystem.Glicko) {
-                    value = userRating.lowerBound;
-                }
-                if (!value) {
-                    continue;
-                }
-                const bin = Math.ceil(value);
-
-                const key = cacheKey(category, system);
-                let frequency = frequencies.get(key);
-                if (!frequency) {
-                    frequency = [];
-                    frequencies.set(key, frequency);
-                }
-                frequency[bin] = (frequency[bin] || 0) + 1;
+            let value: number = null;
+            if (userRating.aco) {
+                value = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
             }
+
+            if (!value) {
+                continue;
+            }
+
+            const bin = Math.ceil(value);
+
+            const key = cacheKey(category);
+            let frequency = frequencies.get(key);
+            if (!frequency) {
+                frequency = [];
+                frequencies.set(key, frequency);
+            }
+            frequency[bin] = (frequency[bin] || 0) + 1;
         }
     });
 

@@ -30,7 +30,6 @@ interface Props extends OwnProps {
     playerName: string;
     loggedIn: boolean;
     myUserId: string;
-    system: string;
 }
 
 interface State {
@@ -47,7 +46,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
-        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -85,7 +83,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     }
 
                     if (profile.userId === this.props.myUserId) {
-                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings, this.props.system);
+                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings);
                         if (profile.userId === this.state.profileId) {
                             this.setState({ pointsToNextLeague });
                         }
@@ -140,8 +138,7 @@ class UserStatsPanel extends React.Component<Props, State> {
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
         const isMe = profile.userId === this.props.myUserId;
         const isPlaced = rating.numGames >= constants.Placements.MinGames;
-        const system = this.props.system;
-        const leagueName = system === m.RatingSystem.Glicko ? rankings.getLeagueName(rating.percentile) : rankings.getLeagueName(rating.acoPercentile);
+        const leagueName = rankings.getLeagueName(rating.acoPercentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
 
         return <div>
@@ -151,17 +148,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{constants.Placements.MinGames - rating.numGames}</div>
                 </div>
             </div>}
-            {isPlaced && system === m.RatingSystem.Glicko && <div className="stats-card-row">
-                <div className="stats-card" title={`${rating.rd.toFixed(0)} rating deviation`}>
-                    <div className="label">Rating</div>
-                    <div className="value">{rating.lowerBound.toFixed(0)}</div>
-                </div>
-                <div className="stats-card" title={`${rating.percentile.toFixed(1)} percentile`}>
-                    <div className="label">League</div>
-                    <div className="value">{leagueName}</div>
-                </div>
-            </div>}
-            {isPlaced && system === m.RatingSystem.Aco && <div className="stats-card-row">
+            {isPlaced && <div className="stats-card-row">
                 <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} activity bonus`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>

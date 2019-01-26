@@ -38,22 +38,11 @@ export const leagues = [
     { name: "Wood", minPercentile: constants.Placements.Wood },
 ];
 
-export function systemOrDefault(system: string) {
-    return system || m.RatingSystem.Aco;
-}
-
-export function getRating(userRating: m.UserRating, system: string): Rating {
-    if (system === m.RatingSystem.Aco) {
-        return {
-            exposure: userRating.acoExposure,
-            percentile: userRating.acoPercentile,
-        };
-    } else {
-        return {
-            exposure: userRating.lowerBound,
-            percentile: userRating.percentile,
-        };
-    }
+export function getRating(userRating: m.UserRating): Rating {
+    return {
+        exposure: userRating.acoExposure,
+        percentile: userRating.acoPercentile,
+    };
 }
 
 export function onNotification(notifs: w.Notification[]) {
@@ -82,7 +71,6 @@ function adjustRating(adjustment: w.RatingAdjustmentNotification) {
             ...state.profile.ratings,
             [adjustment.category]: {
                 ...rating,
-                lowerBound: rating.lowerBound + adjustment.ratingDelta,
                 acoExposure: rating.acoExposure + adjustment.acoDelta,
             },
         }
@@ -133,7 +121,7 @@ export async function retrieveUserStatsAsync(profileId: string) {
     }
 }
 
-export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLookup, system: string): Promise<PointsToNextLeagueLookup> {
+export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLookup): Promise<PointsToNextLeagueLookup> {
     const categories = [m.GameCategory.PvP];
     const lookup: PointsToNextLeagueLookup = {};
 
@@ -147,16 +135,16 @@ export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLooku
             continue;
         }
 
-        const values = getRating(userRating, system); 
+        const values = getRating(userRating); 
         if (values.exposure && values.percentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(values.exposure, values.percentile, category, system);
+            lookup[category] = await calculatePointsUntilNextLeague(values.exposure, values.percentile, category);
         }
     }
     return lookup;
 }
 
-async function retrieveRatingAtPercentile(category: string, system: string, percentile: number): Promise<number> {
-    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&system=${encodeURIComponent(system)}&percentile=${percentile}`, {
+async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
+    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
         headers: credentials.headers(),
         credentials: 'same-origin',
     });
@@ -168,13 +156,13 @@ async function retrieveRatingAtPercentile(category: string, system: string, perc
     }
 }
 
-async function calculatePointsUntilNextLeague(exposure: number, percentile: number, category: string, system: string): Promise<PointsToNextLeague> {
+async function calculatePointsUntilNextLeague(exposure: number, percentile: number, category: string): Promise<PointsToNextLeague> {
     const nextLeague = calculateNextLeague(percentile);
     if (!nextLeague) {
         return null;
     }
 
-    const minRating = await retrieveRatingAtPercentile(category, system, Math.ceil(nextLeague.minPercentile));
+    const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
     if (minRating) {
         return {
             name: nextLeague.name,
@@ -185,8 +173,8 @@ async function calculatePointsUntilNextLeague(exposure: number, percentile: numb
     }
 }
 
-export async function retrieveLeaderboardAsync(category: string, system: string) {
-    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}&system=${encodeURIComponent(system)}`, {
+export async function retrieveLeaderboardAsync(category: string) {
+    const res = await fetch(`${url.base}/api/leaderboard?category=${encodeURIComponent(category)}`, {
         headers: credentials.headers(),
         credentials: 'same-origin'
     });

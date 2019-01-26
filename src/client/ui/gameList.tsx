@@ -41,7 +41,6 @@ interface PlayerStats extends Stats {
     name: string;
     userId?: string;
     userHash: string;
-    ratingDelta: number;
     acoDelta: number;
 }
 
@@ -53,7 +52,6 @@ interface Props extends OwnProps {
     current: s.PathElements;
     region: string;
     hasReplayLookup: Map<string, string>;
-    system: string;
 }
 interface State {
     error: string;
@@ -81,7 +79,6 @@ function convertGame(stats: d.GameStats): GameRow {
             wins: (player.userHash === stats.winner || (stats.winners && stats.winners.some(winner => player.userHash === winner))) ? 1 : 0,
             kills: player.kills,
             damage: player.damage,
-            ratingDelta: player.ratingDelta || 0,
             acoDelta: player.acoDelta || 0,
         };
 
@@ -115,7 +112,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         current: state.current,
         hasReplayLookup: state.hasReplayLookup,
         region: state.region,
-        system: rankings.systemOrDefault(state.options.ratingSystem),
     };
 }
 
@@ -165,7 +161,6 @@ class GameList extends React.Component<Props, State> {
     private renderRow(game: GameRow): JSX.Element {
         const self = game.players.get(game.self);
         const hasReplay = this.props.hasReplayLookup.get(game.id);
-        const system = this.props.system;
         return <div key={game.id} className="game-card">
             <div className="game-info">
                 <div className="label">
@@ -175,7 +170,7 @@ class GameList extends React.Component<Props, State> {
                 <div className="player-list">{joinWithComma([...game.players.values()].map(player => this.renderPlayer(player)))}</div>
             </div>
             <div className="spacer" />
-            <div title="Rating adjustment">{self && this.renderRatingDelta(system === m.RatingSystem.Aco ? self.acoDelta : self.ratingDelta)}</div>
+            <div title="Rating adjustment">{self && this.renderRatingDelta(self.acoDelta)}</div>
         </div>
     }
 

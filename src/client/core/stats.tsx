@@ -34,11 +34,10 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
 
     // Notify
     const self = gameStats.players[gameStats.self];
-    if (self && (self.ratingDelta || self.acoDelta)) {
+    if (self && self.acoDelta) {
         notifications.notify({
             type: "ratingAdjustment",
             gameId: gameStats.id,
-            ratingDelta: self.ratingDelta,
             acoDelta: self.acoDelta,
             category: gameStats.category,
         });
@@ -99,7 +98,6 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             kills: p.kills,
             rank: p.rank,
             ticks: p.ticks,
-            ratingDelta: p.ratingDelta,
             acoDelta: p.acoDelta,
         };
 

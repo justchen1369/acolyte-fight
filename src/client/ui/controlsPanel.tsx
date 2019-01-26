@@ -9,7 +9,6 @@ import * as spellUtils from '../core/spellUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
-import { RatingSystem } from '../../game/messages.model';
 
 namespace Toggle {
     export const On = "on";
@@ -42,7 +41,6 @@ interface ControlState {
     actionWheelSide: string;
     targetingIndicator: string;
     sounds: string;
-    ratingSystem: string;
 }
 interface State extends ControlState {
     changed: boolean;
@@ -70,7 +68,6 @@ function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): 
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
-        ratingSystem: options.ratingSystem,
     };
 }
 
@@ -176,19 +173,6 @@ class ControlsPanel extends React.Component<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            {this.state.advanced && <div className="row">
-                <span className="label">Rating system</span>
-                <select
-                    className="value"
-                    value={formatOption(this.state.ratingSystem)}
-                    onChange={ev => this.onRatingSystemSelected(parseOption(ev.target.value))}
-                    >
-
-                    <option value={formatOption(null)}>Default</option>
-                    <option value={RatingSystem.Glicko}>Glicko</option>
-                    <option value={RatingSystem.Aco}>Aco</option>
-                </select>
-            </div>}
             {<div className="row">
                 <span className="label">Sound</span>
                 <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
@@ -253,11 +237,6 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
-    private onRatingSystemSelected(ratingSystem: string) {
-        this.setState({ ratingSystem, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
     private onSoundsSelected(sounds: string) {
         this.setState({ sounds, changed: true, saved: false });
         this.saveStateDebounced();
@@ -291,7 +270,6 @@ class ControlsPanel extends React.Component<Props, State> {
             options.wheelOnRight = state.actionWheelSide === Side.Right;
             options.mute = state.sounds === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
-            options.ratingSystem = state.ratingSystem;
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

@@ -34,9 +34,6 @@ export interface UserRatingLookup {
     [category: string]: UserRating;
 }
 export interface UserRating {
-    rating: number;
-    rd: number;
-    lowerBound?: number;
     acoExposure?: number;
     aco?: number;
     acoGames?: number;
@@ -85,7 +82,6 @@ export interface PlayerStats {
     damage: number;
     ticks: number;
     rank: number;
-    ratingDelta?: number;
     acoDelta?: number;
 }
 

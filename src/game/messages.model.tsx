@@ -22,11 +22,6 @@ export namespace GameCategory {
     ];
 }
 
-export namespace RatingSystem {
-    export const Glicko = "glicko";
-    export const Aco = "aco";
-}
-
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";
@@ -369,7 +364,6 @@ export interface PlayerStatsMsg {
     damage: number;
     rank: number;
     ticks: number;
-    ratingDelta?: number;
     acoDelta?: number;
 }
 
@@ -385,10 +379,6 @@ export interface GetLeaderboardResponse {
 export interface LeaderboardPlayer {
     userId: string;
     name: string;
-    
-    rating: number;
-    rd: number;
-    lowerBound: number;
 
     aco: number;
     acoGames: number;
@@ -417,11 +407,6 @@ export interface UserRatingLookup {
 }
 
 export interface UserRating {
-    rating: number;
-    rd: number;
-    lowerBound: number;
-    percentile: number;
-
     aco: number;
     acoGames: number;
     acoExposure: number;

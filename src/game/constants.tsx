@@ -43,9 +43,7 @@ export namespace Placements {
 	export const Rank1 = 1;
 	export const MinGames = 5;
 	export const VerificationGames = 5;
-	export const InitialRating = 1700;
 
-	export const InitialRd = 350;
 	export const InitialAco = 1000;
 	export const ActivityBonusPerGame = 3;
 	export const MaxActivityGames = 100;

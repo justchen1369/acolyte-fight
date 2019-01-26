@@ -2,7 +2,6 @@ import _ from 'lodash';
 import glicko from 'glicko2';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
-import * as ts from 'ts-trueskill';
 import * as Firestore from '@google-cloud/firestore';
 import * as aco from './aco';
 import * as categories from './segments';
@@ -25,11 +24,7 @@ const Aco = new aco.Aco(constants.Placements.AcoK, constants.Placements.AcoPower
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays;
 const AcoDecayInterval = 1 * 60 * 60;
 
-const TrueSkill = new ts.TrueSkill();
-const GlickoMultiplier = 200 / TrueSkill.beta; // In Glicko the beta (difference required for 76% win probability) is 200
-
 interface UpdateRatingsResult {
-    glickoDeltas: RatingDeltas;
     acoDeltas: RatingDeltas;
 }
 interface RatingDeltas {
@@ -43,7 +38,6 @@ interface PlayerDelta {
 
 interface LeaderboardCacheItem {
     leaderboardBuffer: Buffer; // m.GetLeaderboardResponse
-    system: string;
     expiry: number; // unix timestamp
 }
 
@@ -55,8 +49,6 @@ function initialRating(): g.UserRating {
         killsPerGame: 0,
         damagePerGame: 0,
         winRate: 0,
-        rating: constants.Placements.InitialRating,
-        rd: constants.Placements.InitialRd,
         aco: constants.Placements.InitialAco,
         acoGames: 0,
     };
@@ -108,9 +100,6 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
         // Don't store userId in database unless it is actually set
         result.userId = p.userId;
     }
-    if (p.ratingDelta) {
-        result.ratingDelta = p.ratingDelta;
-    }
     if (p.acoDelta) {
         result.acoDelta = p.acoDelta;
     }
@@ -122,7 +111,6 @@ function userRatingToDb(userRating: g.UserRating, loggedIn: boolean): db.UserRat
     const dbUserRating: db.UserRating = { ...userRating };
     if (loggedIn && userRating.numGames >= constants.Placements.MinGames) {
         dbUserRating.acoExposure = calculateAcoExposure(userRating.aco, userRating.acoGames);
-        dbUserRating.lowerBound = calculateGlickoLowerBound(userRating.rating, userRating.rd);
     }
     return dbUserRating;
 }
@@ -151,7 +139,6 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         kills: player.kills,
         ticks: player.ticks || 0, // Might not be present in old data
         rank: player.rank || 0, // Might not be present in old data
-        ratingDelta: player.ratingDelta,
         acoDelta: player.acoDelta,
     };
 }
@@ -161,9 +148,6 @@ function dbToUserRating(user: db.User, category: string): g.UserRating {
     const userRating = user && user.ratings && user.ratings[category]
     if (userRating) {
         Object.assign(result, userRating);
-        if (!userRating.aco && userRating.rating && userRating.rd) {
-            result.aco = calculateGlickoLowerBound(userRating.rating, userRating.rd); // Seed aco with Glicko
-        }
     }
     return result;
 }
@@ -178,21 +162,16 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
     if (data.ratings) {
         for (const category in data.ratings) {
             const rating = dbToUserRating(data, category);
-            const lowerBound = calculateGlickoLowerBound(rating.rating, rating.rd);
             const acoExposure = calculateAcoExposure(rating.aco, rating.acoGames);
             ratings[category] = {
                 numGames: rating.numGames,
                 damagePerGame: rating.damagePerGame,
                 killsPerGame: rating.killsPerGame,
                 winRate: rating.winRate,
-                rating: rating.rating,
-                rd: rating.rd,
-                lowerBound,
                 aco: rating.aco,
                 acoGames: rating.acoGames,
                 acoExposure,
-                percentile: percentiles.estimatePercentile(lowerBound, category, m.RatingSystem.Glicko),
-                acoPercentile: percentiles.estimatePercentile(acoExposure, category, m.RatingSystem.Aco),
+                acoPercentile: percentiles.estimatePercentile(acoExposure, category),
             };
         }
     }
@@ -279,31 +258,29 @@ export async function cleanupGames(maxAgeDays: number) {
     }
 }
 
-function leaderboardCacheKey(category: string, system: string) {
-    return `${category}.${system}`;
+function leaderboardCacheKey(category: string) {
+    return `${category}`;
 }
 
-export async function getLeaderboard(category: string, system: string): Promise<Buffer> {
-    const cached = leaderboardCache.get(leaderboardCacheKey(category, system));
+export async function getLeaderboard(category: string): Promise<Buffer> {
+    const cached = leaderboardCache.get(leaderboardCacheKey(category));
     if (cached && moment().unix() < cached.expiry) {
         return cached.leaderboardBuffer;
     } else {
-        const leaderboard = await retrieveLeaderboard(category, system);
+        const leaderboard = await retrieveLeaderboard(category);
         const leaderboardBuffer = msgpack.encode(leaderboard);
         leaderboardCache.set(category, {
             leaderboardBuffer,
-            system,
             expiry: moment().add(1, 'minute').unix(),
         });
         return leaderboardBuffer;
     }
 }
 
-export async function retrieveLeaderboard(category: string, system: string): Promise<m.GetLeaderboardResponse> {
+export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
 
-    const field = system === m.RatingSystem.Aco ? "acoExposure" : "lowerBound";
-    const query = firestore.collection('user').orderBy(`ratings.${category}.${field}`, 'desc').limit(MaxLeaderboardLength);
+    const query = firestore.collection('user').orderBy(`ratings.${category}.acoExposure`, 'desc').limit(MaxLeaderboardLength);
     
     const now = Date.now();
 
@@ -313,8 +290,8 @@ export async function retrieveLeaderboard(category: string, system: string): Pro
         let chunk;
         if (result.length > 0) {
             const lowestPlayer = result[result.length - 1];
-            const lowest = (lowestPlayer as any)[field] as number;
-            chunk = query.where(`ratings.${category}.${field}`, '<=', lowest);
+            const lowest = lowestPlayer.acoExposure;
+            chunk = query.where(`ratings.${category}.acoExposure`, '<=', lowest);
         } else {
             chunk = query;
         }
@@ -346,10 +323,6 @@ export async function retrieveLeaderboard(category: string, system: string): Pro
                 userId: doc.id,
                 name: user.settings && user.settings.name || doc.id,
 
-                rating: ratings.rating,
-                rd: ratings.rd,
-                lowerBound: ratings.lowerBound,
-
                 aco: ratings.aco,
                 acoExposure: ratings.acoExposure,
                 acoGames: ratings.acoGames,
@@ -376,78 +349,6 @@ export async function retrieveLeaderboard(category: string, system: string): Pro
 
 function calculateMaxLeaderboardAgeInDays(numGames: number) {
     return Math.min(365, numGames / 10);
-}
-
-export async function decayGlickoLeaderboardIfNecessary(category: string): Promise<void> {
-    const numDecaysPerDay = 24 / constants.Placements.RdDecayIntervalHours;
-    const decayPerInterval = constants.Placements.RdDecayPerDay / numDecaysPerDay;
-    const intervalMilliseconds = constants.Placements.RdDecayIntervalHours * 60 * 60 * 1000;
-
-    const firestore = getFirestore();
-    const shouldUpdate = await firestore.runTransaction(async (t) => {
-        const doc = await t.get(firestore.collection('ratingDecay').doc('singleton'));
-        const data = doc.data() as db.RatingDecaySingleton;
-        if (!data || Date.now() >= data.updated.toMillis() + intervalMilliseconds) {
-            const newData: db.RatingDecaySingleton = {
-                updated: Firestore.FieldValue.serverTimestamp() as any,
-            };
-            t.set(doc.ref, newData);
-            return true;
-        } else {
-            return false;
-        }
-    });
-
-    if (shouldUpdate) {
-        await decayGlickoLeaderboard(category, decayPerInterval);
-    }
-}
-
-async function decayGlickoLeaderboard(category: string, decay: number): Promise<void> {
-    const start = Date.now();
-    const firestore = getFirestore();
-
-    // Find lowest rating to be on leaderboard
-    const response = await retrieveLeaderboard(category, m.RatingSystem.Glicko);
-    if (response.leaderboard.length === 0) {
-        return;
-    }
-    const tailProfile = response.leaderboard[response.leaderboard.length - 1];
-    const cutoff = tailProfile.lowerBound;
-
-    // Decay all users (logged in or not) who are above the cutoff
-    let numUsers = 0;
-    const promises = new Array<Promise<void>>();
-    const query = firestore.collection('user').orderBy(`ratings.${category}.lowerBound`, 'desc').where(`ratings.${category}.lowerBound`, '>=', cutoff);
-    await dbStorage.stream(query, doc => {
-        ++numUsers;
-        promises.push(decayUser(doc.id, category, decay));
-    });
-    await Promise.all(promises);
-
-    const elapsed = Date.now() - start;
-    logger.info(`Decayed ${numUsers} by ${decay} rd in ${elapsed.toFixed(0)} ms`);
-}
-
-async function decayUser(userId: string, category: string, decay: number): Promise<void> {
-    const firestore = getFirestore();
-    await firestore.runTransaction(async (t) => {
-        const doc = await t.get(firestore.collection('user').doc(userId));
-        const user = doc.data() as db.User;
-        if (!(user && user.ratings && user.ratings[category])) {
-            return;
-        }
-
-        const userRating = dbToUserRating(user, category);
-        userRating.rd = Math.min(constants.Placements.InitialRd, userRating.rd + decay);
-
-        const loggedIn = userStorage.dbUserLoggedIn(user);
-        const dbUserRating = userRatingToDb(userRating, loggedIn);
-
-        await t.update(doc.ref, {
-            ratings: { [category]: dbUserRating },
-        });
-    });
 }
 
 export async function decayAco() {
@@ -549,7 +450,6 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
         }
 
         // Calculate changes
-        calculateNewGlickoRatings(userRatings, knownPlayers);
         calculateNewAcoRatings(userRatings, knownPlayers);
 
         for (const player of knownPlayers) {
@@ -559,7 +459,6 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
         }
 
         // Perform update
-        const glickoDeltas: RatingDeltas = {};
         const acoDeltas: RatingDeltas = {};
         for (const doc of docs) {
             const loggedIn = loggedInUsers.has(doc.id);
@@ -581,14 +480,6 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
                 const historyId = moment.unix(unixDate).format("YYYY-MM-DD");
                 transaction.set(doc.ref.collection(Collections.UserRatingHistory).doc(historyId), historyItem);
             }
-        }
-
-        // Calculate glicko deltas
-        for (const player of knownPlayers) {
-            const initialRating = initialRatings.get(player.userId);
-            const userRating = userRatings.get(player.userId);
-
-            glickoDeltas[player.userId] = calculateGlickoLowerBound(userRating.rating, userRating.rd) - calculateGlickoLowerBound(initialRating.rating, initialRating.rd);
         }
 
         // Calculate aco deltas
@@ -614,12 +505,11 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
         for (const player of knownPlayers) {
             const initialRating = initialRatings.get(player.userId);
             if (initialRating.numGames < constants.Placements.MinGames) {
-                delete glickoDeltas[player.userId];
                 delete acoDeltas[player.userId];
             }
         }
 
-        const result: UpdateRatingsResult = { glickoDeltas, acoDeltas };
+        const result: UpdateRatingsResult = { acoDeltas };
         return result;
     });
 
@@ -629,49 +519,6 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
 function unixDateFromTimestamp(unixTimestamp: number): number {
     const SecondsPerDay = 86400;
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
-}
-
-function calculateNewGlickoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
-    // Create initial rankings
-    const userIds = new Array<string>();
-    const initialRatings = new Array<ts.Rating>();
-    const ranks = new Array<number>();
-    for (const player of players) {
-        const rating = allRatings.get(player.userId);
-        if (!rating) {
-            continue;
-        }
-
-        userIds.push(player.userId);
-        initialRatings.push(TrueSkill.createRating(rating.rating / GlickoMultiplier, rating.rd / GlickoMultiplier));
-        ranks.push(player.rank);
-    }
-
-    // Update rankings
-    const teams = initialRatings.map(r => [r]);
-    const finalRatings: ts.Rating[][] = TrueSkill.rate(teams, ranks);
-
-    // Save results
-    for (let i = 0; i < userIds.length; ++i) {
-        const userId = userIds[i];
-        const finalRating = finalRatings[i][0];
-        const mean = finalRating.mu * GlickoMultiplier;
-        const rd = finalRating.sigma * GlickoMultiplier;
-
-        const userRating = allRatings.get(userId);
-        const isWinner = i === 0;
-        if (isWinner) {
-            const previousLowerBound = calculateGlickoLowerBound(userRating.rating, userRating.rd);
-            const newLowerBound = calculateGlickoLowerBound(mean, rd);
-            if (newLowerBound < previousLowerBound) {
-                // Don't let the winner lose points
-                continue;
-            }
-        }
-
-        userRating.rating = mean;
-        userRating.rd = rd;
-    }
 }
 
 function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
@@ -777,10 +624,6 @@ function incrementAverage(current: number, count: number, newValue: number) {
     return (current * count + newValue) / (count + 1);
 }
 
-function calculateGlickoLowerBound(rating: number, rd: number) {
-    return rating - 2 * rd;
-}
-
 function calculateAcoExposure(aco: number, acoGames: number) {
     return aco + constants.Placements.ActivityBonusPerGame * Math.min(constants.Placements.MaxActivityGames, acoGames);
 }
@@ -806,9 +649,6 @@ export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise
 
 function applyRatingDeltas(gameStats: m.GameStatsMsg, updateResult: UpdateRatingsResult) {
     for (const player of gameStats.players) {
-        if (player.userId in updateResult.glickoDeltas) {
-            player.ratingDelta = updateResult.glickoDeltas[player.userId];
-        }
         if (player.userId in updateResult.acoDeltas) {
             player.acoDelta = updateResult.acoDeltas[player.userId];
         }
