@@ -665,7 +665,8 @@ function delayBehaviour(behaviour: w.DelayBehaviour, world: w.World) {
 }
 
 function physicsStep(world: w.World) {
-	world.physics.step(1.0 / TicksPerSecond);
+	const granularity = 1000;
+	world.physics.step(Math.floor(granularity / TicksPerSecond) / granularity);
 }
 
 function applySpeedLimit(world: w.World) {
