@@ -127,7 +127,7 @@ class GameRow extends React.PureComponent<Props, State> {
             <div className="adjustment-label">
                 <div className="adjustment-label-title">{change.delta >= 0 ? "Won vs" : "Lost vs"} {others.join(", ")}</div>
                 {change.delta >= 0 && <div className="adjustment-label-subtitle">Would have lost {mathUtils.deltaPrecision(-change.delta * odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
-                {change.delta < 0 && <div className="adjustment-label-subtitle">Would have gained {mathUtils.deltaPrecision(-change.delta * odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
+                {change.delta < 0 && <div className="adjustment-label-subtitle">Would have gained {mathUtils.deltaPrecision(-change.delta / odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
             </div>
             <div className="spacer" />
             {this.renderRatingDelta(change.delta)}
