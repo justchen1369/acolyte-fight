@@ -9,7 +9,7 @@ import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as stats from '../core/stats';
 import * as url from '../url';
-import GameList from './gameList';
+import GameList from '../profiles/gameList';
 
 const MaxReplaysToDisplay = 100;
 

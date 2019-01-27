@@ -1233,11 +1233,18 @@ h2 {
 }
 
 .game-list .game-card {
-    display: flex;
     position: relative;
     background: #333;
     box-shadow: 5px 5px 5px black;
     margin-bottom: 1em;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.game-list .game-card .game-summary {
+    display: flex;
+    flex-direction: row;
     align-items: center;
 }
 
@@ -1284,13 +1291,57 @@ h2 {
 }
 
 .game-list .rating-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     position: relative;
+}
+
+.game-list .expander {
+    font-size: 300%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.game-list .game-card:hover .expander {
+    opacity: 1;
 }
 
 .game-list .rating {
     margin: 20px;
     font-size: 200%;
     font-weight: bold;
+}
+
+.game-list .game-card .game-detail {
+    background: #222;
+    display: flex;
+    flex-direction: column;
+}
+
+.game-list .game-card .adjustment-detail {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.game-list .game-card .adjustment-detail:hover {
+    background: #333;
+}
+
+.game-list .game-card .adjustment-label {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+
+.game-list .game-card .adjustment-label .adjustment-label-title {
+    font-weight: bold;
+}
+
+.game-list .game-card .adjustment-label .adjustment-label-subtitle {
+    color: #ccc;
+    font-size: 75%;
 }
 
 .rating-increase {

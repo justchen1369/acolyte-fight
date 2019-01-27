@@ -4,6 +4,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as notifications from './notifications';
 import * as rankings from './rankings';
@@ -38,6 +39,7 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
         notifications.notify({
             type: "ratingAdjustment",
             gameId: gameStats.id,
+            initialNumGames: self.initialNumGames,
             acoDelta: self.acoDelta,
             category: gameStats.category,
         });
@@ -98,6 +100,14 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             kills: p.kills,
             rank: p.rank,
             ticks: p.ticks,
+
+            initialNumGames: p.initialNumGames,
+
+            initialAco: p.initialAco,
+            initialAcoGames: p.initialAcoGames,
+            initialAcoExposure: p.initialAcoExposure,
+
+            acoChanges: p.acoChanges,
             acoDelta: p.acoDelta,
         };
 

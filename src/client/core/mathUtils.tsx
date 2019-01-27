@@ -10,3 +10,11 @@ export function deltaPrecision(ratingDelta: number): string {
     }
     return text;
 }
+
+export function oddsPrecision(odds: number): string {
+    if (odds < 10) {
+        return odds.toFixed(1);
+    } else {
+        return odds.toFixed(0);
+    }
+}

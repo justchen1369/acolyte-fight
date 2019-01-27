@@ -5,7 +5,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as pages from '../core/pages';
 import * as url from '../url';
-import AccountPanel from './accountPanel';
+import AccountPanel from '../profiles/accountPanel';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
 import SpellBtnConfig from './spellConfig';

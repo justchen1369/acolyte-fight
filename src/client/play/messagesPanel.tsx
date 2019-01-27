@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as constants from '../../game/constants';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
@@ -309,7 +310,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
-        if (notification.gameId === this.props.myGameId) {
+        if (notification.gameId === this.props.myGameId && notification.initialNumGames >= constants.Placements.MinGames) {
             const delta = notification.acoDelta;
             return <div key={key} className="row rating-notification">
                 <span>Your rating has changed: {this.renderRatingAdjustment(delta)}. </span>

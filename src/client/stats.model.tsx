@@ -24,5 +24,19 @@ export interface PlayerStats {
     damage: number;
     rank: number;
     ticks: number;
+    
+    initialNumGames?: number;
+
+    initialAco?: number;
+    initialAcoGames?: number;
+    initialAcoExposure?: number;
+
     acoDelta?: number;
+    acoChanges?: AcoChangeMsg[];
+}
+
+export interface AcoChangeMsg {
+    otherTeamId: string;
+    delta: number;
+    e: number;
 }

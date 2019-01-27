@@ -21,19 +21,29 @@ import { logger } from './logging';
 const MaxLeaderboardLength = 100;
 
 const Aco = new aco.Aco(constants.Placements.AcoK, constants.Placements.AcoPower);
-const AcoDecayLength = constants.Placements.AcoDecayLengthDays;
+const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 1 * 60 * 60;
 
 interface UpdateRatingsResult {
-    acoDeltas: RatingDeltas;
+    [userId: string]: PlayerRatingUpdate;
 }
-interface RatingDeltas {
-    [userId: string]: number;
+
+interface PlayerRatingUpdate {
+    initialNumGames: number;
+
+    initialAco: number;
+    initialAcoGames: number;
+    initialAcoExposure: number;
+
+    acoChanges: m.AcoChangeMsg[];
+
+    acoDelta: number;
 }
+
 interface PlayerDelta {
     userId: string;
     teamId: string;
-    delta: number;
+    changes: m.AcoChangeMsg[];
 }
 
 interface LeaderboardCacheItem {
@@ -94,17 +104,23 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
         kills: p.kills,
         ticks: p.ticks,
         rank: p.rank,
+
+        initialNumGames: p.initialNumGames,
+
+        initialAco: p.initialAco,
+        initialAcoExposure: p.initialAcoExposure,
+        initialAcoGames: p.initialAcoGames,
+
+        acoChanges: p.acoChanges,
+        acoDelta: p.acoDelta,
     };
 
     if (p.userId) {
         // Don't store userId in database unless it is actually set
         result.userId = p.userId;
     }
-    if (p.acoDelta) {
-        result.acoDelta = p.acoDelta;
-    }
 
-    return result;
+    return _.omitBy(result, _.isUndefined) as db.PlayerStats;
 }
 
 function userRatingToDb(userRating: g.UserRating, loggedIn: boolean): db.UserRating {
@@ -139,6 +155,11 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         kills: player.kills,
         ticks: player.ticks || 0, // Might not be present in old data
         rank: player.rank || 0, // Might not be present in old data
+        initialNumGames: player.initialNumGames,
+        initialAco: player.initialAco,
+        initialAcoGames: player.initialAcoGames,
+        initialAcoExposure: player.initialAcoExposure,
+        acoChanges: player.acoChanges,
         acoDelta: player.acoDelta,
     };
 }
@@ -450,16 +471,42 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
         }
 
         // Calculate changes
-        calculateNewAcoRatings(userRatings, knownPlayers);
+        const deltas = calculateNewAcoRatings(userRatings, knownPlayers);
 
+        // Apply changes
+        const result: UpdateRatingsResult = {};
+        for (const playerDelta of deltas.values()) {
+            const initialRating = initialRatings.get(playerDelta.userId);
+            const selfRating = userRatings.get(playerDelta.userId);
+            if (!selfRating) {
+                continue;
+            }
+
+            const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+            for (const change of playerDelta.changes) {
+                selfRating.aco += change.delta;
+            }
+            ++selfRating.acoGames;
+            const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+
+            result[playerDelta.userId] = {
+                initialNumGames: initialRating.numGames,
+                initialAco: initialRating.aco,
+                initialAcoGames: initialRating.acoGames,
+                initialAcoExposure: initialExposure,
+                acoChanges: playerDelta.changes,
+                acoDelta: finalExposure - initialExposure,
+            };
+        }
+
+        // Update stats
         for (const player of knownPlayers) {
             const userRating = userRatings.get(player.userId);
             const isWinner = player.rank === constants.Placements.Rank1;
             calculateNewStats(userRating, player, isWinner);
         }
 
-        // Perform update
-        const acoDeltas: RatingDeltas = {};
+        // Write update
         for (const doc of docs) {
             const loggedIn = loggedInUsers.has(doc.id);
             const dbUserRating = userRatingToDb(userRatings.get(doc.id), loggedIn);
@@ -482,7 +529,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
             }
         }
 
-        // Calculate aco deltas
+        // Prepare for decay
         for (const player of knownPlayers) {
             const initialRating = initialRatings.get(player.userId);
             const userRating = userRatings.get(player.userId);
@@ -495,21 +542,8 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
 
             const key = acoDecayKeyString(decay);
             transaction.set(firestore.collection(Collections.AcoDecay).doc(key), decay);
-
-            // Output delta
-            const exposureDelta = calculateAcoExposure(userRating.aco, userRating.acoGames) - calculateAcoExposure(initialRating.aco, initialRating.acoGames);
-            acoDeltas[player.userId] = exposureDelta;
         }
 
-        // Don't report deltas on players who haven't placed
-        for (const player of knownPlayers) {
-            const initialRating = initialRatings.get(player.userId);
-            if (initialRating.numGames < constants.Placements.MinGames) {
-                delete acoDeltas[player.userId];
-            }
-        }
-
-        const result: UpdateRatingsResult = { acoDeltas };
         return result;
     });
 
@@ -521,19 +555,20 @@ function unixDateFromTimestamp(unixTimestamp: number): number {
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
-function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]) {
+function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]): Map<string, PlayerDelta> {
+    const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
+
     if (players.length <= 0) {
-        return;
+        return deltas;
     }
 
     const ratedPlayers = players.filter(p => allRatings.has(p.userId));
     if (ratedPlayers.length === 0) {
-        return;
+        return deltas;
     }
 
     const teams = _.groupBy(ratedPlayers, p => p.teamId || p.userHash);
 
-    const winningTeamId = players[0].teamId || players[0].userHash;
     const numPlayersPerTeam = _.chain(teams).map(team => team.length).max().value();
     const highestRankPerTeam = _.mapValues(teams, players => _.min(players.map(p => p.rank)));
     const averageRatingPerTeam =
@@ -544,14 +579,16 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
 
     const sortedPlayers = _.sortBy(ratedPlayers, p => highestRankPerTeam[p.teamId || p.userHash]);
 
-    const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
+    // Team games count for less points because you can't control them directly
+    const multiplier = numPlayersPerTeam > 1 ? (1 / numPlayersPerTeam) : 1;
+
     for (let i = 0; i < sortedPlayers.length; ++i) {
         const self = sortedPlayers[i];
         const selfTeamId = self.teamId || self.userHash;
         const selfAco = averageRatingPerTeam[selfTeamId];
 
-        let deltaGain = 0;
-        let deltaLoss = 0;
+        let deltaGain: m.AcoChangeMsg = null;
+        let deltaLoss: m.AcoChangeMsg = null;
         for (let j = 0; j < sortedPlayers.length; ++j) {
             if (i == j) {
                 continue;
@@ -566,42 +603,29 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
             const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            const deltaAdjustment = Aco.adjustment(selfAco, otherAco, score);
-            if (deltaAdjustment >= 0) {
-                deltaGain = Math.max(deltaGain, deltaAdjustment);
+            const adjustment = Aco.adjustment(selfAco, otherAco, score, multiplier);
+            const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
+            if (change.delta >= 0) {
+                if (!deltaGain || deltaGain.delta < change.delta) { // Largest gain
+                    deltaGain = change;
+                }
             } else {
-                deltaLoss = Math.min(deltaLoss, deltaAdjustment);
+                if (!deltaLoss || deltaLoss.delta > change.delta) { // Largest loss
+                    deltaLoss = change;
+                }
             }
         }
 
-        let delta = deltaGain + deltaLoss;
-
-        if (numPlayersPerTeam > 1) {
-            // Team games count for less points because you can't control them directly
-            delta /= numPlayersPerTeam;
+        const changes = new Array<m.AcoChangeMsg>();
+        if (deltaGain) {
+            changes.push(deltaGain);
         }
-
-        if (selfTeamId === winningTeamId) {
-            // Cannot lose at all if winning team
-            delta = Math.max(0, delta);
+        if (deltaLoss) {
+            changes.push(deltaLoss);
         }
-
-        deltas.set(self.userId, {
-            userId: self.userId,
-            teamId: selfTeamId,
-            delta,
-        });
+        deltas.set(self.userId, { userId: self.userId, teamId: selfTeamId, changes });
     }
-
-    for (const playerDelta of deltas.values()) {
-        const selfRating = allRatings.get(playerDelta.userId);
-        if (!selfRating) {
-            continue;
-        }
-
-        selfRating.aco += playerDelta.delta;
-        ++selfRating.acoGames;
-    }
+    return deltas;
 }
 
 function calculateAverageRating(ratings: number[]) {
@@ -649,8 +673,16 @@ export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise
 
 function applyRatingDeltas(gameStats: m.GameStatsMsg, updateResult: UpdateRatingsResult) {
     for (const player of gameStats.players) {
-        if (player.userId in updateResult.acoDeltas) {
-            player.acoDelta = updateResult.acoDeltas[player.userId];
+        const update = updateResult[player.userId]; 
+        if (update) {
+            player.initialNumGames = update.initialNumGames;
+
+            player.initialAco = update.initialAco;
+            player.initialAcoGames = update.initialAcoGames;
+            player.initialAcoExposure = update.initialAcoExposure;
+
+            player.acoDelta = update.acoDelta;
+            player.acoChanges = update.acoChanges;
         }
     }
 }

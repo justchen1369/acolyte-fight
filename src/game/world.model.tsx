@@ -243,6 +243,7 @@ export interface DisconnectedNotification {
 export interface RatingAdjustmentNotification {
 	type: "ratingAdjustment";
 	gameId: string;
+	initialNumGames: number;
 	acoDelta: number;
 	category: string;
 }
