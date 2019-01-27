@@ -128,8 +128,13 @@ http.on('close', () => {
 	process.exit();
 });
 
+process.on('SIGINT', () => {
+	logger.info("Received SIGINT");
+	emitter.shutdown();
+});
+
 process.on('SIGTERM', () => {
-	logger.info("Received shutdown command");
+	logger.info("Received SIGTERM");
 	emitter.shutdown();
 	http.close();
 });
