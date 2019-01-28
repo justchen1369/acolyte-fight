@@ -135,6 +135,7 @@ export async function save(world: w.World, server: string): Promise<d.GameStats>
     if (gameStats) {
         if (world.winner) { // Don't confuse server with wrong stats if left early
             getSocket().emit('score', gameStatsToMessage(gameStats));
+            console.log("Game completed", gameStats);
         }
 
         if (!world.ui.saved) { // Game is saved twice, once at win, once at leaving, don't double count it

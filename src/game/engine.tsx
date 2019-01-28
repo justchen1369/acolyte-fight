@@ -44,6 +44,12 @@ export function version() {
 export function initialWorld(mod: Object): w.World {
 	const settings = modToSettings(mod);
 
+	const def: pl.WorldDef = {
+		allowSleep: false,
+		positionIterations: 8,
+		velocityIterations: 3,
+	};
+
 	let world: w.World = {
 		seed: null,
 		tick: 0,
@@ -59,7 +65,7 @@ export function initialWorld(mod: Object): w.World {
 
 		objects: new Map(),
 		behaviours: [],
-		physics: pl.World(),
+		physics: pl.World(def),
 		actions: new Map(),
 		radius: settings.World.InitialRadius,
 		mapRadiusMultiplier: 1.0,
@@ -2298,6 +2304,7 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	const killer = hero.killerHeroId && world.players.get(hero.killerHeroId) || null;
 	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
 	world.ui.notifications.push({ type: "kill", myHeroId, killed, killer, assist });
+	console.log(`${killed.heroId} ${killed.name} killed at ${world.tick}`);
 
 	if (!world.winner) {
 		if (hero) {

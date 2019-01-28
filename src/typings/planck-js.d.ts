@@ -1,5 +1,16 @@
 declare module "planck-js" {
     namespace PlanckJs {
+        interface WorldDef {
+            gravity?: Vec2;
+            allowSleep?: boolean;
+            warmStarting?: boolean;
+            continuousPhysics?: boolean;
+            subStepping?: boolean;
+            blockSolve?: boolean;
+            velocityIterations?: number;
+            positionIterations?: number;
+        }
+
         interface World {
             createBody(bodyDef: BodyDef): Body;
             destroyBody(body: Body): void;
@@ -113,7 +124,7 @@ declare module "planck-js" {
         function Circle(radius: number): Circle;
         function Polygon(points: Vec2[]): Polygon;
         function Vec2(x: number, y: number): Vec2;
-        function World(): World;
+        function World(def?: WorldDef): World;
     }
 
     export = PlanckJs;
