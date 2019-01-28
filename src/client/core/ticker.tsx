@@ -104,6 +104,11 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 
 		applyTickActions(tickData, world, preferredColors);
 		engine.tick(world);
+
+		/*
+		const hash = engine.hash(world);
+		console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
+		*/
 	}
 	render(world, canvasStack, renderOptions);
 

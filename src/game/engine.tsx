@@ -2900,3 +2900,14 @@ export function initScore(heroId: string): w.HeroScore {
 		rank: null,
 	};
 }
+
+export function hash(world: w.World): number {
+	let result = 0;
+	world.objects.forEach(obj => {
+		const pos = obj.body.getPosition();
+		result ^= Math.round(pos.x / 0.001);
+		result ^= Math.round(pos.y / 0.001) << 7;
+		result = (result << 1) | (result >> 30);
+	});
+	return result;
+}
