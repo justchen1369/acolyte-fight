@@ -7,6 +7,54 @@ import { logger } from './logging';
 
 let basePath: string = null;
 
+function readFile(path: string): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+        fs.readFile(path, (err, data) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(data);
+            }
+        });
+    });
+}
+
+function writeFile(path: string, data: Buffer): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+        fs.writeFile(path, data, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+function gzip(data: Buffer): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+        zlib.gzip(data, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
+
+function gunzip(data: Buffer): Promise<Buffer> {
+    return new Promise<Buffer>((resolve, reject) => {
+        zlib.gunzip(data, (err, result) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
+
 export function initStorage(_basePath: string) {
     if (!fs.existsSync(_basePath)) {
         fs.mkdirSync(_basePath);
@@ -19,51 +67,36 @@ export function hasGame(id: string): boolean {
     return store.storedGameIds.has(id);
 }
 
-export function loadGame(id: string): Promise<g.Replay> {
-    const store = getStore();
-    if (!store.storedGameIds.has(id)) {
+export async function loadGame(id: string): Promise<g.Replay> {
+    try {
+        const compressed = await readFile(gamePath(id));
+        const encoded = await gunzip(compressed);
+        const replay = msgpack.decode(encoded) as g.Replay;
+        return replay;
+    } catch (error) {
+        // Replay does not exist
+        console.error(`Failed to read replay ${id}: ${error}`);
         return null;
     }
-
-    return new Promise<g.Replay>((resolve, reject) => {
-        fs.readFile(gamePath(id), (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                zlib.gunzip(data, (err2, data2) => {
-                    if (err2) {
-                        reject(err2);
-                    } else {
-                        const replay = msgpack.decode(data2) as g.Replay;
-                        resolve(replay);
-                    }
-                });
-            }
-        })
-    });
 }
 
-export function saveGame(game: g.Game) {
-    if (!game) {
-        return;
-    }
-
-    const replay = extractReplay(game);
-    const buffer = msgpack.encode(replay);
-    zlib.gzip(buffer, (err, result) => {
-        if (err) {
-            console.error("Unable to compress replay", game.id, err);
-        } else {
-            fs.writeFile(gamePath(game.id), result, (error) => {
-                if (error) {
-                    console.error(`Error writing ${game.id} to file: ${error}`);
-                } else {
-                    const store = getStore();
-                    store.storedGameIds.add(game.id);
-                }
-            });
+export async function saveGame(game: g.Game) {
+    try {
+        if (!game) {
+            return;
         }
-    });
+
+        const replay = extractReplay(game);
+        const encoded = msgpack.encode(replay);
+        const compressed = await gzip(encoded);
+        await writeFile(gamePath(game.id), compressed);
+
+        const store = getStore();
+        store.storedGameIds.add(game.id);
+
+    } catch (error) {
+        console.error(`Error writing ${game.id} to file: ${error}`);
+    }
 }
 
 function gamePath(id: string) {

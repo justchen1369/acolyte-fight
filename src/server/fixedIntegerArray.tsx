@@ -5,7 +5,7 @@ export class FixedIntegerArray {
     private buffer: Buffer;
 
     constructor(values: number[]) {
-        const buffer = new Buffer(values.length * BytesPerInt);
+        const buffer = Buffer.alloc(values.length * BytesPerInt);
         for (let i = 0; i < values.length; ++i) {
             const value = values[i];
             buffer.writeInt32LE(value, i * BytesPerInt);
