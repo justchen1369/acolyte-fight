@@ -2905,8 +2905,13 @@ export function hash(world: w.World): number {
 	let result = 0;
 	world.objects.forEach(obj => {
 		const pos = obj.body.getPosition();
+		const angle = obj.body.getAngle();
+		const velocity = obj.body.getLinearVelocity();
 		result ^= Math.round(pos.x / 0.001);
-		result ^= Math.round(pos.y / 0.001) << 7;
+		result ^= Math.round(pos.y / 0.001) << 3;
+		result ^= Math.round(velocity.x / 0.001) << 5;
+		result ^= Math.round(velocity.y / 0.001) << 7;
+		result ^= Math.round(angle / 0.001) << 11;
 		result = (result << 1) | (result >> 30);
 	});
 	return result;
