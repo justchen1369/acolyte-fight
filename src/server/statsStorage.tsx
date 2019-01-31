@@ -369,7 +369,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
 }
 
 function calculateMaxLeaderboardAgeInDays(numGames: number) {
-    return Math.min(365, numGames / 10);
+    return Math.min(30, numGames / 10);
 }
 
 export async function decayAco() {
