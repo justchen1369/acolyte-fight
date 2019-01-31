@@ -149,7 +149,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                 </div>
             </div>}
             {isPlaced && <div className="stats-card-row">
-                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} activity bonus`}>
+                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} ${constants.Placements.AcoDecayLengthDays}-day activity bonus (${rating.acoGames} recent games)`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>
                 </div>
