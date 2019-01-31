@@ -55,12 +55,10 @@ export class ProfilePanel extends React.Component<Props, State> {
                 <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to share stats across devices</p>
             </div>}
             <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} showBuild={true} />
-            <div>
-                <h1>Replays</h1>
-                {isMe
-                    ? <RecentGamesList category={category} />
-                    : <ProfileGameList profileId={profileId} category={category} /> }
-            </div>
+            <h1>Replays</h1>
+            {isMe
+                ? <RecentGamesList category={category} />
+                : <ProfileGameList profileId={profileId} category={category} /> }
         </div>
     }
 }
