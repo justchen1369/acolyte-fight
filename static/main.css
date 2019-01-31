@@ -1081,7 +1081,8 @@ h2 {
 
 .points-to-next-league {
     text-align: center;
-    margin-bottom: 50px;
+    margin-top: 0.25em;
+    margin-bottom: 1em;
 }
 
 .stats-card-row {

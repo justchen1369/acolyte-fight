@@ -1,18 +1,13 @@
 import _ from 'lodash';
-import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
-import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
-import * as cloud from '../core/cloud';
-import * as matches from '../core/matches';
 import * as rankings from '../core/rankings';
-import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
@@ -149,7 +144,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                 </div>
             </div>}
             {isPlaced && <div className="stats-card-row">
-                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} ${constants.Placements.AcoDecayLengthDays}-day activity bonus (${rating.acoGames} recent games)`}>
+                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} activity bonus (${rating.acoGames} recent games)`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>
                 </div>
@@ -158,9 +153,12 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {isMe && isPlaced && nextLeague && <p className="points-to-next-league">
-                You are currently in the <b>{leagueName}</b> league. +{Math.ceil(nextLeague.pointsRemaining)} points until you are promoted into the {nextLeague.name} league.
-            </p>}
+            {isMe && isPlaced && nextLeague && <div className="points-to-next-league">
+                You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(nextLeague.pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
+            </div>}
+            {isMe && isPlaced && <div className="points-to-next-league">
+                Your <b>activity bonus</b> from {rating.acoGames}/{constants.Placements.MaxActivityGames} games over the past {constants.Placements.AcoDecayLengthDays} days: <b>+{rating.acoGames * constants.Placements.ActivityBonusPerGame}</b> points.
+            </div>}
         </div>
     }
 
