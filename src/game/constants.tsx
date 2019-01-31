@@ -51,7 +51,7 @@ export namespace Placements {
 	export const AcoK = 25;
 	export const AcoPower = 0.8;
 
-	export const AcoDecayLengthDays = 7;
+	export const AcoDecayLengthDays = 21;
 
 	export const RdDecayPerDay = 1.5;
 	export const RdDecayIntervalHours = 8;
