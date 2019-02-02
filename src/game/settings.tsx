@@ -841,7 +841,7 @@ const halo: Spell = {
         soundHit: "halo",
         renderers: [
             { type: "ray", color: '#ccc', selfColor: true, ownerColor: true, ticks: 15 },
-            { type: "strike", color: '#ccc', ticks: 30, growth: 2, glow: true, numParticles: 3 },
+            { type: "strike", color: '#ccc', selfColor: true, ownerColor: true, ticks: 30, growth: 2, glow: true, numParticles: 3 },
         ],
     },
 };
