@@ -341,6 +341,11 @@ i.clickable:hover, i.clickable:active {
     font-weight: normal;
 }
 
+.navbar .nav-item-unranked-toggle {
+    background: #181818;
+    font-weight: normal;
+}
+
 .spacer {
     flex-grow: 1;
 }

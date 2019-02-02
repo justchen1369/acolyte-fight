@@ -9,6 +9,7 @@ interface Props {
     badge?: boolean;
     disabled?: boolean;
     selected?: boolean;
+    title?: string;
     error?: boolean;
     onClick?: (ev: React.MouseEvent) => void;
 }
@@ -27,7 +28,7 @@ class CustomItem extends React.Component<Props> {
         }
         const className = classNames(classSelectors);
 
-        return <a className={className} href={this.props.href || "#"} onClick={(ev) => this.onNavClick(ev)}>
+        return <a className={className} href={this.props.href || "#"} title={this.props.title} onClick={(ev) => this.onNavClick(ev)}>
             <span className="nav-item-label">
                 {this.props.children}
                 {this.props.badge && <i className="badge fas fa-circle" />}

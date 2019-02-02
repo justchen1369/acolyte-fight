@@ -11,12 +11,14 @@ import AccountPanel from './accountPanel';
 import CategorySelector from './categorySelector';
 import ProfileGameList from './profileGameList';
 import RecentGamesList from './recentGameList';
+import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
 
 interface Props {
     current: s.PathElements;
     myUserId: string;
     loggedIn: boolean;
+    unranked: boolean;
 }
 interface State {
     category: string;
@@ -27,6 +29,7 @@ function stateToProps(state: s.State): Props {
         current: state.current,
         myUserId: state.userId,
         loggedIn: state.loggedIn,
+        unranked: state.options.unranked,
     };
 }
 
@@ -54,7 +57,15 @@ export class ProfilePanel extends React.Component<Props, State> {
                 <h1>Your Stats</h1>
                 <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to share stats across devices</p>
             </div>}
-            <UserStatsPanel profileId={profileId} category={category} showRanking={true} showWinRates={true} showBuild={true} />
+            <UserStatsPanel
+                profileId={profileId}
+                category={category}
+                showNumGames={isMe ? this.props.unranked : false}
+                showRanking={isMe ? !this.props.unranked : true}
+                showWinRates={isMe ? !this.props.unranked : true}
+                showBuild={true}
+                />
+            {isMe && <UnrankedTogglePanel />}
             <h1>Replays</h1>
             {isMe
                 ? <RecentGamesList category={category} />

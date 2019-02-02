@@ -16,6 +16,7 @@ import BuildPanel from './buildPanel';
 interface OwnProps {
     profileId: string;
     category: string;
+    showNumGames?: boolean;
     showRanking?: boolean;
     showWinRates?: boolean;
     showBuild?: boolean;
@@ -125,9 +126,21 @@ class UserStatsPanel extends React.Component<Props, State> {
         return <div className="user-stats-panel">
             <h1>{profile.name}</h1>
             {this.props.showBuild && <BuildPanel bindings={profile.bindings} />}
+            {this.props.showNumGames && this.renderNumGames(rating)}
             {this.props.showRanking && this.renderRankingStats(profile, rating)}
             {this.props.showWinRates && this.renderWinRateStats(rating)}
         </div>
+    }
+
+    private renderNumGames(rating: m.UserRating) {
+        return <div>
+            <div className="stats-card-row">
+                <div className="stats-card">
+                    <div className="label">Games played</div>
+                    <div className="value">{rating.numGames}</div>
+                </div>
+            </div>
+        </div>;
     }
 
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {

@@ -37,6 +37,7 @@ export interface GameOptions {
     wheelOnRight?: boolean;
     noTargetingIndicator?: boolean;
     mute?: boolean;
+    unranked?: boolean;
 }
 
 export interface NotificationItem {

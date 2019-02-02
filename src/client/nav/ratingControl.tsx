@@ -1,27 +1,33 @@
-import classNames from 'classnames';
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as cloud from '../core/cloud';
 import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
+import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
+import HrefItem from './hrefItem';
 import PageLink from './pageLink';
 
 interface Props {
     userId: string;
     profile: m.GetProfileResponse;
+    unranked: boolean;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         userId: state.userId,
         profile: state.profile,
+        unranked: state.options.unranked,
     };
 }
 
 class RatingControl extends React.Component<Props> {
+    private uploadSettingsDebounced = _.debounce(() => cloud.uploadSettings(), 200);
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -31,10 +37,39 @@ class RatingControl extends React.Component<Props> {
     render() {
         const rating = this.getRating();
         if (rating) {
-            return this.renderRank(rating);
+            if (this.props.unranked) {
+                return this.renderUnrankedToggle();
+            } else {
+                return <>
+                    {this.renderRankedToggle()}
+                    {this.renderRank(rating)}
+                </>
+            }
         } else {
             return null;
         }
+    }
+
+    private renderUnrankedToggle() {
+        return <HrefItem
+            shrink={true}
+            key="unranked-toggle"
+            className="nav-item-unranked-toggle"
+            title="Switch to Ranked Mode"
+            onClick={ev => this.onUnrankedToggleClick(ev)}>
+            <i className="fas fa-gamepad" style={{ marginRight: 4 }} /> Unranked Mode
+        </HrefItem>
+    }
+
+    private renderRankedToggle() {
+        return <HrefItem
+            shrink={true}
+            key="unranked-toggle"
+            className="nav-item-unranked-toggle"
+            title="Switch to Unranked Mode"
+            onClick={ev => this.onUnrankedToggleClick(ev)}>
+            <i className="fas fa-trophy-alt" />
+        </HrefItem>
     }
 
     private renderRank(rating: rankings.Rating) {
@@ -61,6 +96,17 @@ class RatingControl extends React.Component<Props> {
         }
 
         return values;
+    }
+
+    private onUnrankedToggleClick(ev: React.MouseEvent) {
+        ev.preventDefault();
+        StoreProvider.dispatch({
+            type: "updateOptions",
+            options: {
+                unranked: !this.props.unranked,
+            },
+        });
+        this.uploadSettingsDebounced();
     }
 }
 
