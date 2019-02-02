@@ -432,7 +432,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 }
 
 function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
-	if (!(ev.objectId === world.ui.myHeroId || ev.owner === world.ui.myHeroId)) {
+	if (world.ui.myHeroId && !(ev.objectId === world.ui.myHeroId || ev.owner === world.ui.myHeroId)) {
 		return;
 	}
 
