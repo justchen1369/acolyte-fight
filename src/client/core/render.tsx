@@ -463,7 +463,8 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
 		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(proportion).string();
 	} else {
-		color = HeroColors.WorldColor;
+		const proportion = vector.length(shake) / HeroColors.ShakeDistance;
+		color = Color(HeroColors.WorldColor).lighten(HeroColors.ShakeGlowFactor * proportion).string();
 	}
 	ctx.fillStyle = color;
 	ctx.strokeStyle = Color(color).lighten(0.3).string();
