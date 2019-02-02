@@ -686,7 +686,9 @@ const drain: Spell = {
         ],
 
         renderers: [
-            { type: "ray", intermediatePoints: true, color: '#22ee88', ticks: 30, glow: false },
+            { type: "projectile", color: '#22ee88', ticks: 15, glow: false },
+            { type: "ray", color: '#22ee88', ticks: 15, glow: false },
+            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, color: '#22ee88', ticks: 45, glow: false },
             { type: "strike", ticks: 15, growth: 4, glow: true },
         ],
     },
