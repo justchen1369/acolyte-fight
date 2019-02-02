@@ -1186,7 +1186,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	});
 
 	// Particles
-	if (strike.color && strike.numParticles) {
+	if (ctxStack.rtx && strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
 			const direction = vector.fromAngle(2 * Math.PI * Math.random());
 			const speed = Math.random() * vector.dot(direction, projectile.body.getLinearVelocity()); // can be negative

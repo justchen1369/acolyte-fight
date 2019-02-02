@@ -452,7 +452,7 @@ const boomerang: Spell = {
             { type: "ray", color: '#ff00ff', selfColor: true, ticks: 10 },
             { type: "projectile", color: '#ff00ff', selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
             { type: "ray", color: '#ff00ff', selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
-            { type: "strike", color: '#ff00ff', selfColor: true, ticks: 10, glow: true, numParticles: 5 },
+            { type: "strike", color: '#ff00ff', selfColor: true, ticks: 15, glow: true, numParticles: 5 },
         ],
     },
 };
@@ -568,6 +568,7 @@ const whip: Spell = {
                 glow: false,
             },
             { type: "link", color: '#fffcb1', width: Pixel * 5, glow: true },
+            { type: "strike", color: '#fffcb1', ticks: 30, glow: true, numParticles: 7 },
         ],
     },
 };
@@ -840,7 +841,7 @@ const halo: Spell = {
         soundHit: "halo",
         renderers: [
             { type: "ray", color: '#ccc', selfColor: true, ownerColor: true, ticks: 15 },
-            { type: "strike", color: '#ccc', ticks: 30, growth: 2, glow: true , numParticles: 3 },
+            { type: "strike", color: '#ccc', ticks: 30, growth: 2, glow: true, numParticles: 3 },
         ],
     },
 };
@@ -1116,6 +1117,7 @@ const swap: Spell = {
                 glow: false,
             },
             { type: "link", color: '#75e7ff', width: Pixel * 5, glow: true },
+            { type: "strike", color: '#75e7ff', ticks: 15, numParticles: 9 },
         ],
     },
 };
