@@ -533,7 +533,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	}
 
 	const pos = hero.body.getPosition();
-	const radius = Hero.Radius;
 
 	foreground(ctxStack, ctx => ctx.save());
 
@@ -654,20 +653,25 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		color = HeroColors.InactiveColor;
 	}
 
+
+	const damageAge = hero.damagedTick ? world.tick - hero.damagedTick : Infinity;
+	const lavaAge = hero.lavaTick ? world.tick - (Math.floor(hero.lavaTick / HeroColors.LavaFlashInterval) * HeroColors.LavaFlashInterval) : Infinity;
+	const hitAge = Math.min(lavaAge, damageAge);
+	const flash = Math.max(0, (1 - hitAge / HeroColors.DamageFlashTicks));
+
 	const angle = hero.body.getAngle();
-	const radius = hero.radius;
+	let radius = hero.radius;
+	if (flash > 0) {
+		radius += HeroColors.DamageGrowFactor * radius * flash;
+	}
 
 	// Fill
 	{
 		ctx.save();
 
-		const damageAge = hero.damagedTick ? world.tick - hero.damagedTick : Infinity;
-		const lavaAge = hero.lavaTick ? world.tick - (Math.floor(hero.lavaTick / HeroColors.LavaFlashInterval) * HeroColors.LavaFlashInterval) : Infinity;
-		const hitAge = Math.min(lavaAge, damageAge);
-
 		let fillColor = color;
-		if (hitAge < HeroColors.DamageFlashTicks) {
-			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * (1 - hitAge / HeroColors.DamageFlashTicks)).string();
+		if (flash > 0) {
+			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * flash).string();
 		}
 
 		if (ctxStack.rtx) {

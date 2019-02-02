@@ -100,6 +100,7 @@ export namespace HeroColors {
 
 	export const LavaFlashInterval = 20;
 
+	export const DamageGrowFactor = 0.25;
 	export const DamageGlowFactor = 1.0;
 	export const DamageFlashTicks = 10;
 
