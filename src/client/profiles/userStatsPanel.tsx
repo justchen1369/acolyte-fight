@@ -136,6 +136,7 @@ class UserStatsPanel extends React.Component<Props, State> {
         const leagueName = rankings.getLeagueName(rating.acoPercentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
 
+        const activityBonus = rating.acoExposure - rating.aco;
         return <div>
             {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
                 <div className="stats-card">
@@ -144,7 +145,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                 </div>
             </div>}
             {isPlaced && <div className="stats-card-row">
-                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${(rating.acoExposure - rating.aco).toFixed(0)} activity bonus (${rating.acoGames} recent games)`}>
+                <div className="stats-card" title={`${rating.aco.toFixed(0)} skill points, +${activityBonus.toFixed(0)} activity bonus (${rating.acoGames} recent games)`}>
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>
                 </div>
@@ -157,7 +158,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                 You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(nextLeague.pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
             </div>}
             {isMe && isPlaced && <div className="points-to-next-league">
-                Your <b>activity bonus</b> from {rating.acoGames}/{constants.Placements.MaxActivityGames} games over the past {constants.Placements.AcoDecayLengthDays} days: <b>+{rating.acoGames * constants.Placements.ActivityBonusPerGame}</b> points.
+                Your <b>activity bonus</b> from {rating.acoGames}/{constants.Placements.MaxActivityGames} games over the past {constants.Placements.AcoDecayLengthDays} days: <b>+{activityBonus.toFixed(0)}</b> points.
             </div>}
         </div>
     }
