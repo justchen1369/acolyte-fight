@@ -944,6 +944,12 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
+	const highlight: w.TrailHighlight = saber.hitTick && {
+		fromTick: saber.hitTick,
+		maxTicks: saber.trailTicks,
+		glow: true,
+	};
+
 	world.ui.trails.push({
 		type: "arc",
 		initialTick: world.tick,
@@ -956,6 +962,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 		antiClockwise,
 		fillStyle: saber.color,
 		glow: saber.glow,
+		highlight,
 	});
 
 	saber.uiPreviousAngle = newAngle;
