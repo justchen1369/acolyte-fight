@@ -650,7 +650,7 @@ const bouncer: Spell = {
         sound: "bouncer",
         renderers: [
             { type: "ray", intermediatePoints: true, color: '#88ee22', selfColor: true, ticks: 60 },
-            { type: "strike", ticks: 3, glow: true },
+            { type: "strike", ticks: 3, glow: true, growth: 1 },
         ],
     },
 };
