@@ -441,11 +441,18 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 		maxTicks: HeroColors.ShakeTicks,
 		direction: vector.relengthen(ev.direction, HeroColors.ShakeDistance),
 	};
-	if (world.tick >= shake.fromTick + shake.maxTicks) {
-		return; // Too late
+	if (world.tick < shake.fromTick + shake.maxTicks) {
+		world.ui.shakes.push(shake);
 	}
 
-	world.ui.shakes.push(shake);
+	const highlight: w.MapHighlight = {
+		fromTick: ev.tick,
+		maxTicks: HeroColors.ShakeTicks,
+		color: ev.color || '#ffffff',
+	};
+	if (world.tick < highlight.fromTick + highlight.maxTicks) {
+		world.ui.highlights.push(highlight);
+	}
 }
 
 function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
@@ -463,8 +470,13 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
 		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(proportion).string();
 	} else {
-		const proportion = vector.length(shake) / HeroColors.ShakeDistance;
-		color = Color(HeroColors.WorldColor).lighten(HeroColors.ShakeGlowFactor * proportion).string();
+		color = Color(HeroColors.WorldColor).string();
+
+		const highlight = takeHighlights(world);
+		if (highlight) {
+			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
+			color = Color(color).mix(Color(highlight.color), HeroColors.ShakeGlowFactor * proportion).string();
+		}
 	}
 	ctx.fillStyle = color;
 	ctx.strokeStyle = Color(color).lighten(0.3).string();
@@ -511,6 +523,21 @@ function takeShakes(world: w.World) {
 	});
 	world.ui.shakes = keep;
 	return offset;
+}
+
+function takeHighlights(world: w.World): w.MapHighlight {
+	if (world.ui.highlights.length === 0) {
+		return null;
+	}
+
+	const highlight = world.ui.highlights[world.ui.highlights.length - 1];
+	if (world.tick < highlight.fromTick + highlight.maxTicks) {
+		world.ui.highlights = [highlight];
+		return highlight;
+	} else {
+		world.ui.highlights = [];
+		return null;
+	}
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
@@ -1293,7 +1320,7 @@ function projectileColor(render: ProjectileColorParams, projectile: w.Projectile
 		return heroColor(projectile.owner, world);
 	}
 
-	return render.color;
+	return render.color || projectile.color;
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {

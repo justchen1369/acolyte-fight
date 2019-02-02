@@ -93,6 +93,7 @@ export interface UIState {
 	destroyed: WorldObject[];
 	events: WorldEvent[];
 	shakes: Shake[];
+	highlights: MapHighlight[];
 
 	trails: Trail[];
 	notifications: Notification[];
@@ -530,6 +531,7 @@ export interface Projectile extends WorldObjectBase {
 	expireAgainstObjects: number;
 	destructible?: DestructibleParameters;
 
+	color: string;
 	renderers: RenderParams[];
 	sound?: string;
 	soundHit?: string;
@@ -710,11 +712,18 @@ export interface PushEvent extends WorldEventBase {
 	owner: string;
 	objectId: string;
 	direction: pl.Vec2;
+	color?: string;
 }
 
 export interface Action {
 	type: string;
 	target: pl.Vec2;
+}
+
+export interface MapHighlight {
+	color: string;
+	fromTick: number;
+	maxTicks: number;
 }
 
 export interface Shake {

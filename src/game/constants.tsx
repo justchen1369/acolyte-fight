@@ -71,9 +71,9 @@ export namespace HeroColors {
 	export const WorldAnimateWinTicks = 15;
 	export const WorldWinGrowth = 0.1;
 
-	export const ShakeDistance = 0.02;
+	export const ShakeDistance = 0.01;
 	export const ShakeTicks = 10;
-	export const ShakeGlowFactor = 0.3;
+	export const ShakeGlowFactor = 0.025;
 
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';

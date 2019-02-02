@@ -85,6 +85,7 @@ export function initialWorld(mod: Object): w.World {
 			playedTick: -1,
 			destroyed: [],
 			shakes: [],
+			highlights: [],
 			events: new Array<w.WorldEvent>(),
 			trails: [],
 			sounds: [],
@@ -480,6 +481,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		sound: projectileTemplate.sound,
 		soundHit: projectileTemplate.soundHit,
 
+		color: projectileTemplate.color,
 		renderers: projectileTemplate.renderers,
 		radius: projectileTemplate.radius,
 
@@ -1506,12 +1508,14 @@ function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 		// The projectile normally just ricocheted in a weird direction, so correct the direction
 		direction = vector.diff(projectile.body.getPosition(), owner.body.getPosition());
 	}
+
 	const push: w.PushEvent = {
 		type: "push",
 		tick: world.tick,
 		owner: projectile.owner,
 		objectId: hero.id,
 		direction,
+		color: projectile.color,
 	};
 	world.ui.events.push(push);
 }
@@ -2015,13 +2019,13 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		damage: projectile.detonate.damage * damageMultiplier,
 		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * damageMultiplier,
 	};
-	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.sound);
+	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.color, projectile.sound);
 
 	// Don't allow for repeats
 	projectile.detonate = null;
 }
 
-function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, sound: string = null) {
+function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, sound: string = null) {
 	const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
 	const innerDamagePacket = instantiateDamage(detonate, owner, world);
 	const outerDamagePacket = instantiateDamage({ ...detonate, damage: outerDamage }, owner, world); 
@@ -2045,7 +2049,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
 			const direction = vector.relengthen(diff, magnitude);
 			other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-			world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, direction });
+			world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
 
 			const packet: w.DamagePacket = {
 				...innerDamagePacket,
@@ -2737,7 +2741,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	};
 	applyDamage(hero, selfPacket, world);
 
-	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.sound);
+	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.color, spell.sound);
 
 	// Remove the link so that the hit player can go flying
 	hero.link = null;

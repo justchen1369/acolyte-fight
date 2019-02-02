@@ -246,6 +246,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
 	shieldTakesOwnership?: boolean; // If the projectile hits a shield, does it switch owner?
 
+	color: string;
 	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
@@ -347,9 +348,9 @@ declare interface RenderParamsBase {
 }
 
 declare interface ProjectileColorParams {
-    color: string; // Color of the projectile
+    color?: string; // Override the color of the projectile
 	selfColor?: boolean; // Give the projectile the owner's colour, so they can tell it's theirs
-	ownerColor?: boolean; //
+	ownerColor?: boolean; // Whether to color the same as the owner for other people
 }
 
 declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
