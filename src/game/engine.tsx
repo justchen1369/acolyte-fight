@@ -1500,12 +1500,18 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 }
 
 function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
+	let direction = projectile.body.getLinearVelocity();
+	const owner = world.objects.get(projectile.owner);
+	if (owner && owner.category === "hero") {
+		// The projectile normally just ricocheted in a weird direction, so correct the direction
+		direction = vector.diff(projectile.body.getPosition(), owner.body.getPosition());
+	}
 	const push: w.PushEvent = {
 		type: "push",
 		tick: world.tick,
 		owner: projectile.owner,
 		objectId: hero.id,
-		direction: projectile.body.getLinearVelocity(),
+		direction,
 	};
 	world.ui.events.push(push);
 }
