@@ -92,6 +92,7 @@ export interface UIState {
 
 	destroyed: WorldObject[];
 	events: WorldEvent[];
+	shakes: Shake[];
 
 	trails: Trail[];
 	notifications: Notification[];
@@ -536,6 +537,7 @@ export interface Projectile extends WorldObjectBase {
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
 	uiHighlight?: TrailHighlight;
+	uiShake?: Shake;
 }
 
 export interface DamagePacket {
@@ -674,9 +676,11 @@ export type WorldEvent =
 	DetonateEvent
 	| LifeStealEvent
 	| TeleportEvent
+	| PushEvent
 
 export interface WorldEventBase {
 	type: string;
+	tick: number;
 }
 
 export interface DetonateEvent extends WorldEventBase {
@@ -701,9 +705,21 @@ export interface TeleportEvent extends WorldEventBase {
 	sound?: string;
 }
 
+export interface PushEvent extends WorldEventBase {
+	type: "push";
+	objectId: string;
+	direction: pl.Vec2;
+}
+
 export interface Action {
 	type: string;
 	target: pl.Vec2;
+}
+
+export interface Shake {
+	direction: pl.Vec2;
+	fromTick: number;
+	maxTicks: number;
 }
 
 export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail;

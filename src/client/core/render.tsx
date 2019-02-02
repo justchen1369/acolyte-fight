@@ -313,6 +313,8 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 			renderReticule(ctxStack, obj, world, render);
 		} else if (render.type === "strike") {
 			renderStrike(ctxStack, obj, world, render);
+		} else if (render.type === "shake") {
+			renderShake(ctxStack, obj, world, render);
 		}
 	});
 
@@ -341,6 +343,12 @@ function playSpellSounds(obj: w.Projectile, world: w.World) {
 }
 
 function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, world: w.World) {
+	const MaxTicks = 15;
+
+	if (world.tick >= ev.tick + MaxTicks) {
+		return; // Too late
+	}
+
 	let owner = world.objects.get(ev.owner);
 	if (!owner) {
 		return;
@@ -350,8 +358,8 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 
 	world.ui.trails.push({
 		type: 'ripple',
-		initialTick: world.tick,
-		max: 0.25 * constants.TicksPerSecond,
+		initialTick: ev.tick,
+		max: MaxTicks,
 		pos: vector.clone(pos),
 		fillStyle: HeroColors.HealColor,
 		initialRadius: world.settings.Hero.Radius,
@@ -366,16 +374,22 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderLifeStealReturn(ctxStack, ev, world);
 	} else if (ev.type === "teleport") {
 		renderTeleport(ctxStack, ev, world);
+	} else if (ev.type === "push") {
+		renderPush(ctxStack, ev, world);
 	} else {
 		return;
 	}
 }
 
 function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.World) {
+	if (world.tick >= ev.tick + ev.explosionTicks) {
+		return; // Too late
+	}
+
 	world.ui.trails.push({
 		type: "circle",
 		max: ev.explosionTicks,
-		initialTick: world.tick,
+		initialTick: ev.tick,
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
@@ -392,11 +406,17 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
 	const Hero = world.settings.Hero;
+	const MaxTicks = 15;
+
+	if (world.tick >= ev.tick + MaxTicks) {
+		return; // Too late
+	}
+
 	if (ev.heroId === world.ui.myHeroId) {
 		world.ui.trails.push({
 			type: "ripple",
-			max: 15,
-			initialTick: world.tick,
+			max: MaxTicks,
+			initialTick: ev.tick,
 			pos: ev.toPos,
 			fillStyle: 'white',
 			initialRadius: Hero.Radius,
@@ -413,10 +433,28 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 	}
 }
 
+function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
+	if (ev.objectId !== world.ui.myHeroId) {
+		return;
+	}
+
+	const shake: w.Shake = {
+		fromTick: ev.tick,
+		maxTicks: HeroColors.ShakeTicks,
+		direction: vector.relengthen(ev.direction, HeroColors.ShakeDistance),
+	};
+	if (world.tick >= shake.fromTick + shake.maxTicks) {
+		return; // Too late
+	}
+
+	world.ui.shakes.push(shake);
+}
+
 function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.save();
 
-	ctx.translate(0.5, 0.5);
+	const shake = takeShakes(world);
+	ctx.translate(0.5 + shake.x, 0.5 + shake.y);
 
 	ctx.lineWidth = Pixel * 5;
 
@@ -456,6 +494,22 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.stroke();
 
 	ctx.restore();
+}
+
+function takeShakes(world: w.World) {
+	let offset = vector.zero();
+	const keep = new Array<w.Shake>();
+	world.ui.shakes.forEach(shake => {
+		const proportion = Math.min(1, Math.max(0, 1 - (world.tick - shake.fromTick) / shake.maxTicks));
+		if (proportion > 0) {
+			keep.push(shake);
+
+			const magnitude = Math.pow(proportion, 2) * Math.cos(5 * proportion * 2 * Math.PI);
+			offset = vector.plus(offset, vector.multiply(shake.direction, magnitude));
+		}
+	});
+	world.ui.shakes = keep;
+	return offset;
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
@@ -1125,6 +1179,29 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				trail.highlight = highlight;
 			}
 		});
+	}
+}
+
+function renderShake(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderShake) {
+	if (!projectile.hitTick) {
+		return;
+	}
+
+	const hitMe = projectile.hitTickLookup.get(world.ui.myHeroId);
+	if (!hitMe) {
+		return;
+	}
+
+	const shakeTick = projectile.uiShake ? projectile.uiShake.fromTick : 0;
+	if (hitMe > shakeTick && projectile.uiPath.length >= 2) {
+		const direction = vector.relengthen(vector.diff(projectile.uiPath[1], projectile.uiPath[0]), HeroColors.ShakeDistance);
+		const shake: w.Shake = {
+			fromTick: hitMe,
+			maxTicks: HeroColors.ShakeTicks,
+			direction,
+		};
+		projectile.uiShake = shake;
+		world.ui.shakes.push(shake);
 	}
 }
 

@@ -84,6 +84,7 @@ export function initialWorld(mod: Object): w.World {
 			renderedTick: null,
 			playedTick: -1,
 			destroyed: [],
+			shakes: [],
 			events: new Array<w.WorldEvent>(),
 			trails: [],
 			sounds: [],
@@ -1640,6 +1641,7 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 
 		world.ui.events.push({
 			type: "teleport",
+			tick: world.tick,
 			sound: projectile.sound,
 			fromPos: ownerPos,
 			toPos: targetPos,
@@ -1649,6 +1651,7 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 		if (target.category === "hero") {
 			world.ui.events.push({
 				type: "teleport",
+				tick: world.tick,
 				sound: projectile.sound,
 				fromPos: targetPos,
 				toPos: ownerPos,
@@ -1661,6 +1664,7 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 
 		world.ui.events.push({
 			type: "teleport",
+			tick: world.tick,
 			sound: projectile.sound,
 			fromPos: initialPos,
 			toPos: vector.clone(owner.body.getPosition()),
@@ -2021,10 +2025,9 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		if (other.category === "hero" || other.category === "obstacle") {
 			const proportion = 1.0 - (distance / explosionRadius);
 			const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
-			other.body.applyLinearImpulse(
-				vector.relengthen(diff, magnitude),
-				other.body.getWorldPoint(vector.zero()),
-				true);
+			const direction = vector.relengthen(diff, magnitude);
+			other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
+			world.ui.events.push({ type: "push", tick: world.tick, objectId: other.id, direction });
 
 			const packet: w.DamagePacket = {
 				...innerDamagePacket,
@@ -2048,6 +2051,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 
 	world.ui.events.push({
 		type: "detonate",
+		tick: world.tick,
 		sourceId,
 		sound: sound,
 		pos: vector.clone(epicenter),
@@ -2458,6 +2462,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 
 	world.ui.events.push({
 		type: "teleport",
+		tick: world.tick,
 		fromPos: vector.clone(currentPosition),
 		toPos: vector.clone(newPosition),
 		heroId: hero.id,
@@ -2673,6 +2678,8 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		const currentSpeed = vector.length(obj.body.getLinearVelocity());
 		if (currentSpeed < swingSpeed) {
 			obj.body.setLinearVelocity(swingVelocity);
+
+			world.ui.events.push({ type: "push", tick: world.tick, objectId: obj.id, direction: swingVelocity });
 		}
 
 		if (obj.category === "projectile") {
@@ -2835,7 +2842,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 		const fromHero = world.objects.get(fromHeroId);
 		if (fromHero && fromHero.category === "hero") {
 			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
-			world.ui.events.push({ type: "lifeSteal", owner: fromHero.id });
+			world.ui.events.push({ type: "lifeSteal", tick: world.tick, owner: fromHero.id });
 		}
 	}
 
