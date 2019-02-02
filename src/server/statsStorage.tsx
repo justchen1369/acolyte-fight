@@ -60,6 +60,7 @@ function initialRating(): g.UserRating {
         damagePerGame: 0,
         winRate: 0,
         aco: constants.Placements.InitialAco,
+        acoUnranked: constants.Placements.InitialAco,
         acoGames: 0,
     };
 }
@@ -424,7 +425,7 @@ export async function getProfile(userId: string): Promise<m.GetProfileResponse> 
     return profile;
 }
 
-async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<UpdateRatingsResult> {
+async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLookup: Map<string, boolean>): Promise<UpdateRatingsResult> {
     const firestore = getFirestore();
 
     const category = gameStats.category;
@@ -471,39 +472,54 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
         }
 
         // Calculate changes
-        const deltas = calculateNewAcoRatings(userRatings, knownPlayers);
+        const ratingValues = new Map<string, number>();
+        userRatings.forEach((userRating, userId) => {
+            const isRanked = isRankedLookup.get(userId);
+            ratingValues.set(userId, isRanked ? userRating.aco : userRating.acoUnranked);
+        });
+        const deltas = calculateNewAcoRatings(ratingValues, knownPlayers);
 
         // Apply changes
         const result: UpdateRatingsResult = {};
         for (const playerDelta of deltas.values()) {
+            const isRanked = isRankedLookup.get(playerDelta.userId);
             const initialRating = initialRatings.get(playerDelta.userId);
             const selfRating = userRatings.get(playerDelta.userId);
             if (!selfRating) {
                 continue;
             }
 
-            const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
-            for (const change of playerDelta.changes) {
-                selfRating.aco += change.delta;
-            }
-            ++selfRating.acoGames;
-            const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+            if (isRanked) {
+                const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+                for (const change of playerDelta.changes) {
+                    selfRating.aco += change.delta;
+                }
+                ++selfRating.acoGames;
+                const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
 
-            result[playerDelta.userId] = {
-                initialNumGames: initialRating.numGames,
-                initialAco: initialRating.aco,
-                initialAcoGames: initialRating.acoGames,
-                initialAcoExposure: initialExposure,
-                acoChanges: playerDelta.changes,
-                acoDelta: finalExposure - initialExposure,
-            };
+                result[playerDelta.userId] = {
+                    initialNumGames: initialRating.numGames,
+                    initialAco: initialRating.aco,
+                    initialAcoGames: initialRating.acoGames,
+                    initialAcoExposure: initialExposure,
+                    acoChanges: playerDelta.changes,
+                    acoDelta: finalExposure - initialExposure,
+                };
+            } else {
+                for (const change of playerDelta.changes) {
+                    selfRating.acoUnranked += change.delta;
+                }
+            }
         }
 
         // Update stats
         for (const player of knownPlayers) {
-            const userRating = userRatings.get(player.userId);
-            const isWinner = player.rank === constants.Placements.Rank1;
-            calculateNewStats(userRating, player, isWinner);
+            const isRanked = isRankedLookup.get(player.userId);
+            if (isRanked) {
+                const userRating = userRatings.get(player.userId);
+                const isWinner = player.rank === constants.Placements.Rank1;
+                calculateNewStats(userRating, player, isWinner);
+            }
         }
 
         // Increment num games
@@ -545,8 +561,10 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
             decay.acoDelta += userRating.aco - initialRating.aco;
             decay.acoGamesDelta += userRating.acoGames - initialRating.acoGames;
 
-            const key = acoDecayKeyString(decay);
-            transaction.set(firestore.collection(Collections.AcoDecay).doc(key), decay);
+            if (decay.acoDelta || decay.acoGamesDelta) {
+                const key = acoDecayKeyString(decay);
+                transaction.set(firestore.collection(Collections.AcoDecay).doc(key), decay);
+            }
         }
 
         return result;
@@ -560,14 +578,14 @@ function unixDateFromTimestamp(unixTimestamp: number): number {
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
-function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: m.PlayerStatsMsg[]): Map<string, PlayerDelta> {
+function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[]): Map<string, PlayerDelta> {
     const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
 
     if (players.length <= 0) {
         return deltas;
     }
 
-    const ratedPlayers = players.filter(p => allRatings.has(p.userId));
+    const ratedPlayers = players.filter(p => ratingValues.has(p.userId));
     if (ratedPlayers.length === 0) {
         return deltas;
     }
@@ -578,7 +596,7 @@ function calculateNewAcoRatings(allRatings: Map<string, g.UserRating>, players: 
     const highestRankPerTeam = _.mapValues(teams, players => _.min(players.map(p => p.rank)));
     const averageRatingPerTeam =
         _.chain(teams)
-        .mapValues((players, teamId) => players.filter(p => !!p.userId).map(p => allRatings.get(p.userId).aco))
+        .mapValues((players, teamId) => players.filter(p => !!p.userId).map(p => ratingValues.get(p.userId)))
         .mapValues((ratings) => calculateAverageRating(ratings))
         .value()
 
@@ -659,7 +677,7 @@ function calculateAcoExposure(aco: number, acoGames: number) {
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
     try {
         if (gameStats && game.segment === categories.publicSegment()) { // Private games don't count towards ranking
-            const updateResult = await updateRatingsIfNecessary(gameStats);
+            const updateResult = await updateRatingsIfNecessary(gameStats, game.isRankedLookup);
             if (updateResult) {
                 applyRatingDeltas(gameStats, updateResult);
             }

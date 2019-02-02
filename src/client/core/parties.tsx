@@ -19,6 +19,7 @@ export function createPartyAsync(): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
+			unranked: store.options.unranked || false,
 			version: engine.version(),
 		};
 		getSocket().emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
@@ -43,6 +44,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				keyBindings: store.keyBindings,
 				isBot: ai.playingAsAI(store),
 				isMobile,
+				unranked: store.options.unranked || false,
 				version: engine.version(),
 			};
 			getSocket().emit('party', msg, (_response: m.PartyResponseMsg) => {
@@ -158,6 +160,7 @@ export function updatePartyAsync(): Promise<void> {
 			keyBindings: store.keyBindings,
 			isBot: ai.playingAsAI(store),
 			isMobile,
+			unranked: store.options.unranked,
 			version: engine.version(),
 		};
 		getSocket().emit('party', msg, (response: m.PartyResponseMsg) => {

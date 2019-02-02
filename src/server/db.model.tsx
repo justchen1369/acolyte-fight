@@ -37,6 +37,7 @@ export interface UserRating {
     acoExposure?: number;
     aco?: number;
     acoGames?: number;
+    acoUnranked?: number;
     numGames: number;
     killsPerGame: number;
     damagePerGame: number;

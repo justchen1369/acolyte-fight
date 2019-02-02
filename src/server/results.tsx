@@ -44,7 +44,7 @@ function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
     const requiredCategory = calculateGameCategory(game);
     return (!requiredCategory || gameStats.category === requiredCategory)
         && gameStats.players.some(p => p.userHash === gameStats.winner)
-        && gameStats.players.every(p => !p.userId || game.userIds.has(p.userId))
+        && gameStats.players.every(p => !p.userId || game.isRankedLookup.has(p.userId))
         && gameStats.partyId === game.partyId;
 }
 

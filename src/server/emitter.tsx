@@ -214,6 +214,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		&& optional(data.roomId, "string")
 		&& required(data.playerName, "string")
 		&& required(data.keyBindings, "object")
+		&& optional(data.unranked, "boolean")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
 	)) {
@@ -228,6 +229,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
+		unranked: data.unranked,
 		version: data.version,
 	};
 
@@ -291,6 +293,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		&& required(data.playerName, "string")
 		&& required(data.keyBindings, "object")
 		&& optional(data.joining, "boolean")
+		&& optional(data.unranked, "boolean")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
 	)) {
@@ -325,6 +328,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		keyBindings: data.keyBindings,
 		isBot: data.isBot,
 		isMobile: data.isMobile,
+		unranked: data.unranked,
 		version: data.version,
 	};
 	parties.createOrUpdatePartyMember(party, partyMember);
@@ -416,6 +420,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& optional(data.gameId, "string")
 		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
+		&& optional(data.unranked, "boolean")
 		&& optional(data.locked, "boolean")
 		&& optional(data.observe, "boolean")
 		&& optional(data.reconnectKey, "string")
@@ -465,6 +470,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 					isBot: data.isBot,
 					isMobile: data.isMobile,
 					authToken,
+					unranked: data.unranked,
 					socketId: socket.id,
 					version: data.version,
 					reconnectKey: data.reconnectKey,

@@ -40,6 +40,7 @@ export interface UserRatingLookup {
 export interface UserRating {
     aco: number;
     acoGames: number;
+    acoUnranked: number;
 
     numGames: number;
     killsPerGame: number;
@@ -69,7 +70,7 @@ export interface Game extends Replay {
     bots: Map<string, string>; // heroId -> socketId
     reconnectKeys: Map<string, string>; // key -> heroId
     playerNames: string[];
-    userIds: Set<string>;
+    isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
 
     tick: number;
@@ -91,6 +92,7 @@ export interface Player {
     heroId: string;
     userId?: string;
     name: string;
+    unranked: boolean;
 }
 
 export interface Room {
@@ -126,6 +128,7 @@ export interface JoinParameters {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    unranked: boolean;
     version: string;
     reconnectKey?: string;
 }

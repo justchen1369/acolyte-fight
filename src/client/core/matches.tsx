@@ -42,6 +42,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				layoutId: opts.layoutId || null,
 				isBot: ai.playingAsAI(store) && !opts.gameId,
 				isMobile,
+				unranked: store.options.unranked || false,
 				observe,
 				live,
 				locked,

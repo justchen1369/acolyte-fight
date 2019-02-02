@@ -143,6 +143,7 @@ export interface JoinMsg {
     live: boolean;
     locked: boolean;
     version: string;
+    unranked: boolean;
     reconnectKey?: string;
 }
 
@@ -229,6 +230,7 @@ export interface CreatePartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    unranked: boolean;
     version: string;
 }
 export interface CreatePartyResponse {
@@ -247,6 +249,7 @@ export interface PartyRequest {
     keyBindings: KeyBindings;
     isBot: boolean;
     isMobile: boolean;
+    unranked: boolean;
     version: string;
 }
 export interface PartyResponse extends PartyMsg {

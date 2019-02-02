@@ -251,7 +251,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		bots: new Map<string, string>(),
 		reconnectKeys: new Map<string, string>(),
 		playerNames: new Array<string>(),
-		userIds: new Set<string>(),
+		isRankedLookup: new Map<string, boolean>(),
 		socketIds: new Set<string>(),
 		numPlayers: 0,
 		winTick: null,
@@ -527,6 +527,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		heroId,
 		partyId: null,
 		name: params.name,
+		unranked: params.unranked,
 	});
 	game.bots.delete(heroId);
 	game.playerNames.push(params.name);
@@ -536,7 +537,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 
 	const userHash = params.authToken ? auth.getUserHashFromAuthToken(params.authToken) : null;
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
-		game.userIds.add(userId);
+		game.isRankedLookup.set(userId, !params.unranked);
 		game.socketIds.add(params.socketId);
 
 		const player = game.active.get(params.socketId);
