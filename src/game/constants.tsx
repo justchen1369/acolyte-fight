@@ -68,6 +68,7 @@ export namespace Placements {
 
 export namespace HeroColors {
 	export const WorldColor = '#333333';
+	export const WorldWinGlowTicks = 30;
 
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';

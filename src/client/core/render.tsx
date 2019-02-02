@@ -422,7 +422,8 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 
 	let color: string;
 	if (world.winner) {
-		color = Color(heroColor(world.winner, world)).darken(0.5).string();
+		const glowProportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / HeroColors.WorldWinGlowTicks);
+		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(glowProportion).string();
 	} else {
 		color = HeroColors.WorldColor;
 	}
