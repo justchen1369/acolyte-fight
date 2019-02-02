@@ -664,7 +664,7 @@ const bouncer: Spell = {
         color: '#88ee22',
         renderers: [
             { type: "ray", intermediatePoints: true, selfColor: true, ticks: 60 },
-            { type: "strike", selfColor: true, ticks: 30, glow: true, growth: 1, numParticles: 2 },
+            { type: "strike", selfColor: true, ticks: 15, glow: true, growth: 1, numParticles: 2 },
         ],
     },
 };
