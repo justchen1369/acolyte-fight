@@ -465,6 +465,9 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 
 	const proportion = obstacle.health / obstacle.maxHealth;
 
+	const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
+	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+
 	const glow = false;
 	foreground(ctxStack, ctx => {
 		ctx.save();
@@ -476,6 +479,10 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 			const growthProportion = (world.tick - obstacle.createTick) / obstacle.growthTicks;
 			ctx.scale(growthProportion, growthProportion);
 		}
+		if (flash > 0) {
+			const growth = 1 + HeroColors.ObstacleGrowFactor * flash;
+			ctx.scale(growth, growth);
+		}
 
 		ctx.lineWidth = Pixel * 3;
 
@@ -484,11 +491,9 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		ctx.strokeStyle = 'white'; // hsl(red, saturation, (0.5 + 0.5 * proportion));
 
 		if (ctx === ctxStack.canvas) {
-			const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
-
 			let lighten = 0;
-			if (hitAge < HeroColors.ObstacleFlashTicks) {
-				lighten = HeroColors.ObstacleGlowFactor * (1 - hitAge / HeroColors.ObstacleFlashTicks);
+			if (flash > 0) {
+				lighten = HeroColors.ObstacleGlowFactor * flash;
 			}
 
 			if (options.rtx) {

@@ -109,6 +109,7 @@ export namespace HeroColors {
 
 	export const ObstacleGlowFactor = 1.0;
 	export const ObstacleFlashTicks = 6;
+	export const ObstacleGrowFactor = 0.25;
 
 	export const RangeIndicatorWidth = Pixel * 2;
 };
