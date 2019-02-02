@@ -506,6 +506,11 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg): Promise<Upda
             calculateNewStats(userRating, player, isWinner);
         }
 
+        // Increment num games
+        userRatings.forEach(userRating => {
+            ++userRating.numGames;
+        });
+
         // Write update
         for (const doc of docs) {
             const loggedIn = loggedInUsers.has(doc.id);
@@ -641,7 +646,6 @@ function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, i
     userRating.damagePerGame = incrementAverage(userRating.damagePerGame, previousGames, player.damage);
     userRating.killsPerGame = incrementAverage(userRating.killsPerGame, previousGames, player.kills);
     userRating.winRate = incrementAverage(userRating.winRate, previousGames, isWinner ? 1 : 0);
-    ++userRating.numGames;
 }
 
 function incrementAverage(current: number, count: number, newValue: number) {
