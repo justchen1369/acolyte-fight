@@ -67,13 +67,13 @@ export namespace Placements {
 }
 
 export namespace HeroColors {
-	export const WorldColor = '#333333';
+	export const WorldColor = '#222';
 	export const WorldAnimateWinTicks = 15;
 	export const WorldWinGrowth = 0.1;
 
-	export const ShakeDistance = 0.007;
+	export const ShakeDistance = 0.02;
 	export const ShakeTicks = 10;
-	export const ShakeGlowFactor = 0.07;
+	export const ShakeGlowFactor = 0.3;
 
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
@@ -113,7 +113,6 @@ export namespace HeroColors {
 	export const ShieldGlowFactor = 0.3;
 	export const ShieldFlashTicks = 3;
 
-	export const ObstacleGlowFactor = 1.0;
 	export const ObstacleFlashTicks = 6;
 	export const ObstacleGrowFactor = 0.25;
 

@@ -526,6 +526,11 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
+	let color = Color(hsl(0, 1.0 - proportion, 0.5)).string();
+	if (flash > 0) {
+		color = Color(color).lighten(flash).string();
+	}
+
 	const glow = false;
 	foreground(ctxStack, ctx => {
 		ctx.save();
@@ -542,25 +547,18 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 			ctx.scale(growth, growth);
 		}
 
-		ctx.lineWidth = Pixel * 3;
+		ctx.lineWidth = Pixel * 5;
 
-		const red = 0;
-		const saturation = 1.0 - proportion;
-		ctx.strokeStyle = 'white'; // hsl(red, saturation, (0.5 + 0.5 * proportion));
+		ctx.strokeStyle = Color(color).lighten(0.4).string();
 
 		if (ctx === ctxStack.canvas) {
-			let lighten = 0;
-			if (flash > 0) {
-				lighten = HeroColors.ObstacleGlowFactor * flash;
-			}
-
 			if (options.rtx) {
 				const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
-				gradient.addColorStop(0, hsl(red, saturation, lighten + (1 - lighten) * 0.5));
-				gradient.addColorStop(1, hsl(red, saturation, lighten + (1 - lighten) * 0.4));
+				gradient.addColorStop(0, color);
+				gradient.addColorStop(1, Color(color).alpha(0.25).string());
 				ctx.fillStyle = gradient;
 			} else {
-				ctx.fillStyle = hsl(red, saturation, lighten + (1 - lighten) * 0.5);
+				ctx.fillStyle = color;
 			}
 		} else {
 			ctx.fillStyle = 'white';
@@ -740,7 +738,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		if (ctxStack.rtx) {
 			const gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
 			gradient.addColorStop(0, fillColor);
-			gradient.addColorStop(1, Color(fillColor).darken(0.2).string());
+			gradient.addColorStop(1, Color(fillColor).darken(0.5).string());
 			ctx.fillStyle = gradient;
 		} else {
 			ctx.fillStyle = fillColor;
