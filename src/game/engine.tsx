@@ -442,7 +442,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
-		hitTick: new Map<string, number>(),
+		hitTickLookup: new Map<string, number>(),
 		hitInterval: projectileTemplate.hitInterval,
 
 		damageTemplate: {
@@ -1434,6 +1434,8 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
+	takeHit(projectile, other.id, world); // Make the projectile glow
+
 	if (expireOn(world, projectile, other)) {
 		detonateProjectile(projectile, world);
 		applySwap(projectile, other, world);
@@ -1522,7 +1524,7 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 }
 
 function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
-	const hitTick = projectile.hitTick.get(hitId);
+	const hitTick = projectile.hitTickLookup.get(hitId);
 	if (hitTick) {
 		if (projectile.hitInterval) {
 			if (world.tick - hitTick < projectile.hitInterval) {
@@ -1532,7 +1534,8 @@ function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
 			return false;
 		}
 	}
-	projectile.hitTick.set(hitId, world.tick);
+	projectile.hitTickLookup.set(hitId, world.tick);
+	projectile.hitTick = world.tick;
 	return true;
 }
 

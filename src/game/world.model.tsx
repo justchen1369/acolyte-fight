@@ -507,7 +507,8 @@ export interface Projectile extends WorldObjectBase {
 	target: pl.Vec2;
 	targetId: string | null;
 	hitInterval?: number;
-	hitTick: Map<string, number>; // object id -> tick
+	hitTick?: number;
+	hitTickLookup: Map<string, number>; // object id -> tick
 
 	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;
@@ -534,6 +535,7 @@ export interface Projectile extends WorldObjectBase {
     radius: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
+	uiHighlight?: TrailHighlight;
 }
 
 export interface DamagePacket {
@@ -710,6 +712,15 @@ export interface TrailBase {
 	initialTick: number;
 	max: number;
 	glow?: boolean;
+	highlight?: TrailHighlight;
+	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
+}
+
+export interface TrailHighlight {
+	fromTick: number;
+	maxTicks: number;
+	glow?: boolean;
+	growth?: number;
 }
 
 export interface CircleTrail extends TrailBase {

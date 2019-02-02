@@ -340,6 +340,7 @@ declare type RenderParams =
 	| RenderSwirl
 	| RenderLink
 	| RenderReticule
+	| RenderStrike
 
 declare interface RenderParamsBase {
 	type: string;
@@ -398,6 +399,13 @@ declare interface RenderReticule extends RenderParamsBase {
 	ticks: number;
 	radius: number;
 	glow?: boolean;
+}
+
+declare interface RenderStrike extends RenderParamsBase {
+	type: "strike";
+	ticks: number;
+	glow?: boolean;
+	growth?: number;
 }
 
 declare type BuffTemplate =

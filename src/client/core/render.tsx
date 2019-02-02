@@ -311,6 +311,8 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 			renderGravity(ctxStack, obj, world, render);
 		} else if (render.type === "reticule") {
 			renderReticule(ctxStack, obj, world, render);
+		} else if (render.type === "strike") {
+			renderStrike(ctxStack, obj, world, render);
 		}
 	});
 
@@ -1096,6 +1098,28 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	}, glow);
 }
 
+function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, strike: RenderStrike) {
+	if (!projectile.hitTick) {
+		return;
+	}
+
+	const highlightTick = projectile.uiHighlight ? projectile.uiHighlight.fromTick : 0;
+	if (projectile.hitTick > highlightTick) {
+		const highlight: w.TrailHighlight = {
+			fromTick: projectile.hitTick,
+			maxTicks: strike.ticks,
+			glow: strike.glow,
+			growth: strike.growth,
+		};
+		projectile.uiHighlight = highlight;
+		world.ui.trails.forEach(trail => {
+			if (trail.tag === projectile.id) {
+				trail.highlight = highlight;
+			}
+		});
+	}
+}
+
 function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
 	if (owner && owner.category == "hero") {
@@ -1133,6 +1157,8 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				fillStyle: projectileColor(render, projectile, world),
 				width: multiplier * projectile.radius * 2,
 				glow: render.glow || false,
+				highlight: projectile.uiHighlight,
+				tag: projectile.id,
 			} as w.LineTrail);
 		}
 
@@ -1161,6 +1187,8 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 		fillStyle: projectileColor(render, projectile, world),
 		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 		glow: render.glow || false,
+		highlight: projectile.uiHighlight,
+		tag: projectile.id,
 	} as w.CircleTrail);
 }
 
@@ -1192,6 +1220,22 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	}
 
 	const proportion = 1.0 * remaining / trail.max;
+	let scale = 1;
+
+	let color = trail.fillStyle;
+	if (trail.highlight) {
+		const highlightProportion = Math.max(0, 1 - ((world.tick - trail.highlight.fromTick) / trail.highlight.maxTicks));
+		if (highlightProportion > 0) {
+			if (trail.highlight.glow) {
+				color = Color(color).lighten(highlightProportion).string();
+			}
+			if (trail.highlight.growth) {
+				scale = 1 + trail.highlight.growth * highlightProportion;
+			}
+		} else {
+			trail.highlight = null; // highlight expired
+		}
+	}
 
 	foreground(ctxStack, ctx => {
 		ctx.save(); 
@@ -1199,12 +1243,13 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		if (ctx === ctxStack.glows) {
 			ctx.globalAlpha = proportion;
 		}
-		ctx.fillStyle = trail.fillStyle;
-		ctx.strokeStyle = trail.fillStyle;
+
+		ctx.fillStyle = color;
+		ctx.strokeStyle = color;
 
 		if (trail.type === "circle") {
 			ctx.beginPath();
-			ctx.arc(trail.pos.x, trail.pos.y, proportion * trail.radius, 0, 2 * Math.PI);
+			ctx.arc(trail.pos.x, trail.pos.y, scale * proportion * trail.radius, 0, 2 * Math.PI);
 			ctx.fill();
 		} else if (trail.type === "ripple") {
 			const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
@@ -1226,7 +1271,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			if (isEdge) {
 				// Edge doesn't render lines if they are shorter than the line width, so render them ourselves.
 				const axis = vector.diff(trail.to, trail.from);
-				const cross = vector.relengthen(vector.rotateRight(axis), proportion * trail.width / 2);
+				const cross = vector.relengthen(vector.rotateRight(axis), scale * proportion * trail.width / 2);
 
 				ctx.beginPath();
 				ctx.moveTo(trail.from.x + cross.x, trail.from.y + cross.y);
@@ -1236,7 +1281,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 				ctx.closePath();
 				ctx.fill();
 			} else {
-				ctx.lineWidth = proportion * trail.width;
+				ctx.lineWidth = scale * proportion * trail.width;
 				ctx.beginPath();
 				ctx.moveTo(trail.from.x, trail.from.y);
 				ctx.lineTo(trail.to.x, trail.to.y);
