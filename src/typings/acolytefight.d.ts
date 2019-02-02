@@ -401,11 +401,12 @@ declare interface RenderReticule extends RenderParamsBase {
 	glow?: boolean;
 }
 
-declare interface RenderStrike extends RenderParamsBase {
+declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	type: "strike";
 	ticks: number;
 	glow?: boolean;
 	growth?: number;
+	numParticles?: number;
 }
 
 declare type BuffTemplate =

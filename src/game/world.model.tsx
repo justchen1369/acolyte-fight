@@ -743,6 +743,7 @@ export interface TrailHighlight {
 export interface CircleTrail extends TrailBase {
 	type: "circle";
 	pos: pl.Vec2;
+	velocity?: pl.Vec2;
 	radius: number;
 	fillStyle: string;
 }

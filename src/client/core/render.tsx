@@ -1167,19 +1167,42 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	}
 
 	const highlightTick = projectile.uiHighlight ? projectile.uiHighlight.fromTick : 0;
-	if (projectile.hitTick > highlightTick) {
-		const highlight: w.TrailHighlight = {
-			fromTick: projectile.hitTick,
-			maxTicks: strike.ticks,
-			glow: strike.glow,
-			growth: strike.growth,
-		};
-		projectile.uiHighlight = highlight;
-		world.ui.trails.forEach(trail => {
-			if (trail.tag === projectile.id) {
-				trail.highlight = highlight;
-			}
-		});
+	if (projectile.hitTick <= highlightTick) {
+		return;
+	}
+
+	// Highlight
+	const highlight: w.TrailHighlight = {
+		fromTick: projectile.hitTick,
+		maxTicks: strike.ticks,
+		glow: strike.glow,
+		growth: strike.growth,
+	};
+	projectile.uiHighlight = highlight;
+	world.ui.trails.forEach(trail => {
+		if (trail.tag === projectile.id) {
+			trail.highlight = highlight;
+		}
+	});
+
+	// Particles
+	if (strike.color && strike.numParticles) {
+		for (let i = 0; i < strike.numParticles; ++i) {
+			const direction = vector.fromAngle(2 * Math.PI * Math.random());
+			const speed = Math.random() * vector.dot(direction, projectile.body.getLinearVelocity()); // can be negative
+			const velocity = vector.multiply(direction, speed);
+			world.ui.trails.push({
+				type: "circle",
+				initialTick: projectile.hitTick,
+				max: strike.ticks,
+				pos: projectile.body.getPosition(),
+				velocity,
+				radius: projectile.radius,
+				fillStyle: projectileColor(strike, projectile, world),
+				highlight,
+				tag: projectile.id,
+			});
+		}
 	}
 }
 
@@ -1311,8 +1334,14 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		ctx.strokeStyle = color;
 
 		if (trail.type === "circle") {
+			let pos = trail.pos;
+			if (trail.velocity) {
+				const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
+				pos = vector.plus(pos, vector.multiply(trail.velocity, time));
+			}
+
 			ctx.beginPath();
-			ctx.arc(trail.pos.x, trail.pos.y, scale * proportion * trail.radius, 0, 2 * Math.PI);
+			ctx.arc(pos.x, pos.y, scale * proportion * trail.radius, 0, 2 * Math.PI);
 			ctx.fill();
 		} else if (trail.type === "ripple") {
 			const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
