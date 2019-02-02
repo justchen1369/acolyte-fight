@@ -1112,7 +1112,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
 	let previous: pl.Vec2 = null;
 
-	const multiplier = render.noPartialRadius ? 1 : engine.calculatePartialDamageMultiplier(world, projectile);
+	const multiplier = projectileRadiusMultiplier(projectile, world, render);
 	for (let pos of getRenderPoints(projectile.uiPath, render.intermediatePoints)) {
 		if (previous) {
 			world.ui.trails.push({
@@ -1144,16 +1144,23 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 }
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
-	const multiplier = render.noPartialRadius ? 1 : engine.calculatePartialDamageMultiplier(world, projectile);
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
 		max: render.ticks,
 		pos: vector.clone(projectile.body.getPosition()),
 		fillStyle: projectileColor(render, projectile, world),
-		radius: multiplier * projectile.radius,
+		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 		glow: render.glow || false,
 	} as w.CircleTrail);
+}
+
+function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay): number {
+	let multiplier = render.radiusMultiplier || 1;
+	if (!render.noPartialRadius) {
+		multiplier *= engine.calculatePartialDamageMultiplier(world, projectile);
+	}
+	return multiplier;
 }
 
 function projectileColor(render: ProjectileColorParams, projectile: w.Projectile, world: w.World) {

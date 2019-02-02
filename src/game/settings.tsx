@@ -419,7 +419,7 @@ const boomerang: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.002,
+        radius: 0.004,
         speed: 0.5,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 10,
@@ -439,8 +439,10 @@ const boomerang: Spell = {
         sound: "boomerang",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 60 },
-            { type: "ray", color: '#ff00ff', selfColor: true, ticks: 60  },
+            { type: "projectile", color: '#ff00ff', selfColor: true, ticks: 10 },
+            { type: "ray", color: '#ff00ff', selfColor: true, ticks: 10 },
+            { type: "projectile", color: '#ff00ff', selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
+            { type: "ray", color: '#ff00ff', selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
         ],
     },
 };
