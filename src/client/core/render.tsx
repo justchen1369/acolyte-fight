@@ -456,10 +456,12 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 
 	ctx.lineWidth = Pixel * 5;
 
+	let scale = 1;
 	let color: string;
 	if (world.winner) {
-		const glowProportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / HeroColors.WorldWinGlowTicks);
-		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(glowProportion).string();
+		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / HeroColors.WorldAnimateWinTicks);
+		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
+		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(proportion).string();
 	} else {
 		color = HeroColors.WorldColor;
 	}
@@ -473,7 +475,7 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 		radius = Math.floor(radius / Pixel) * Pixel;
 	}
 
-	ctx.scale(radius, radius);
+	ctx.scale(radius * scale, radius * scale);
 
 	ctx.beginPath();
 
