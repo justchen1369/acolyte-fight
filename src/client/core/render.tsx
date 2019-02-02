@@ -576,7 +576,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 
 		ctx.lineWidth = Pixel * 5;
 
-		ctx.strokeStyle = Color(color).lighten(0.4).string();
+		ctx.strokeStyle = Color(color).lighten(0.6).string();
 
 		if (ctx === ctxStack.canvas) {
 			if (options.rtx) {
