@@ -707,6 +707,7 @@ export interface TeleportEvent extends WorldEventBase {
 
 export interface PushEvent extends WorldEventBase {
 	type: "push";
+	owner: string;
 	objectId: string;
 	direction: pl.Vec2;
 }

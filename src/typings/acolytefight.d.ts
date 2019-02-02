@@ -341,7 +341,6 @@ declare type RenderParams =
 	| RenderLink
 	| RenderReticule
 	| RenderStrike
-	| RenderShake
 
 declare interface RenderParamsBase {
 	type: string;
@@ -407,10 +406,6 @@ declare interface RenderStrike extends RenderParamsBase {
 	ticks: number;
 	glow?: boolean;
 	growth?: number;
-}
-
-declare interface RenderShake extends RenderParamsBase {
-	type: "shake";
 }
 
 declare type BuffTemplate =

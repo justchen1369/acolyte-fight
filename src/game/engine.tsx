@@ -1481,6 +1481,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			packet = scaleForPartialDamage(world, projectile, packet);
 			applyDamage(hero, packet, world);
 
+			emitPush(projectile, hero, world);
 			expireOnHeroHit(hero, world);
 		}
 		projectile.hit = world.tick;
@@ -1496,6 +1497,17 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		detonateProjectile(projectile, world);
 		destroyObject(world, projectile);
 	}
+}
+
+function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
+	const push: w.PushEvent = {
+		type: "push",
+		tick: world.tick,
+		owner: projectile.owner,
+		objectId: hero.id,
+		direction: projectile.body.getLinearVelocity(),
+	};
+	world.ui.events.push(push);
 }
 
 export function calculatePartialDamageMultiplier(world: w.World, projectile: w.Projectile): number {
@@ -2027,7 +2039,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
 			const direction = vector.relengthen(diff, magnitude);
 			other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-			world.ui.events.push({ type: "push", tick: world.tick, objectId: other.id, direction });
+			world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, direction });
 
 			const packet: w.DamagePacket = {
 				...innerDamagePacket,
@@ -2679,7 +2691,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		if (currentSpeed < swingSpeed) {
 			obj.body.setLinearVelocity(swingVelocity);
 
-			world.ui.events.push({ type: "push", tick: world.tick, objectId: obj.id, direction: swingVelocity });
+			world.ui.events.push({ type: "push", tick: world.tick, owner: hero.id, objectId: obj.id, direction: swingVelocity });
 		}
 
 		if (obj.category === "projectile") {
