@@ -55,7 +55,7 @@ class RatingControl extends React.Component<Props> {
             shrink={true}
             key="unranked-toggle"
             className="nav-item-unranked-toggle"
-            title="Switch to Ranked Mode"
+            title="You are currently in unranked mode - you will not gain or lose rating points. Click to switch to Ranked Mode"
             onClick={ev => this.onUnrankedToggleClick(ev)}>
             <i className="fas fa-gamepad" style={{ marginRight: 4 }} /> Unranked Mode
         </HrefItem>
