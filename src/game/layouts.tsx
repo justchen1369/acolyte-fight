@@ -1,24 +1,24 @@
 export const Layouts: Layouts = {
     "double": {
         "numPoints": 4,
-        obstacles: [
+        "obstacles": [
             {
-                numObstacles: 2,
-                layoutRadius: 0.07,
-                layoutAngleOffsetInRevs: 0.125,
-                numPoints: 4,
-                extent: 0.015 * 1.5,
-                orientationAngleOffsetInRevs: 0.125,
+                "numObstacles": 2,
+                "layoutRadius": 0.07,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.017,
+                "orientationAngleOffsetInRevs": 0.125
             },
             {
-                numObstacles: 4,
-                layoutRadius: 0.33,
-                layoutAngleOffsetInRevs: 0,
-                numPoints: 4,
-                extent: 0.015 * 1,
-                orientationAngleOffsetInRevs: 0,
-            },
-        ],
+                "numObstacles": 4,
+                "layoutRadius": 0.33,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.007,
+                "orientationAngleOffsetInRevs": 0
+            }
+        ]
     },
     "snowflake": {
         "numPoints": 6,
@@ -29,7 +29,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.015,
+                "extent": 0.012,
                 "orientationAngleOffsetInRevs": 0
             },
             {
@@ -37,23 +37,23 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.08333333333,
                 "numPoints": 4,
-                "extent": 0.01,
+                "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0
             }
         ]
     },
     "inside5": {
-			"numPoints": 5,
-        obstacles: [
+        "numPoints": 5,
+        "obstacles": [
             {
-                numObstacles: 5,
-                layoutRadius: 0.15,
-                layoutAngleOffsetInRevs: 0.5 * (1 / 5),
-                numPoints: 3,
-                extent: 0.015,
-                orientationAngleOffsetInRevs: 0.5,
-            },
-        ],
+                "numObstacles": 5,
+                "layoutRadius": 0.15,
+                "layoutAngleOffsetInRevs": 0.1,
+                "numPoints": 3,
+                "extent": 0.01,
+                "orientationAngleOffsetInRevs": 0.5
+            }
+        ]
     },
     "single": {
         "numPoints": 3,
@@ -63,7 +63,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 3,
-                "extent": 0.025,
+                "extent": 0.017,
                 "orientationAngleOffsetInRevs": 0
             }
         ]
@@ -74,16 +74,16 @@ export const Layouts: Layouts = {
                 "numObstacles": 5,
                 "layoutRadius": 0.32,
                 "layoutAngleOffsetInRevs": 0,
-                "numPoints": 4,
-                "extent": 0.025,
-                "orientationAngleOffsetInRevs": 0.125
+                "numPoints": 3,
+                "extent": 0.017,
+                "orientationAngleOffsetInRevs": 0.1666667
             },
             {
                 "numObstacles": 5,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
-                "extent": 0.015,
+                "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0.125
             }
         ],
@@ -96,7 +96,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
-                "extent": 0.0075,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0.5,
                 "health": 20
             },
@@ -105,7 +105,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.32,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
-                "extent": 0.02,
+                "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             }
         ],
@@ -162,7 +162,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.32,
                 "numPoints": 3,
-                "extent": 0.005,
+                "extent": 0.00375,
                 "orientationAngleOffsetInRevs": 0.125
             },
             {
@@ -170,7 +170,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.14,
                 "layoutAngleOffsetInRevs": 0.28,
                 "numPoints": 3,
-                "extent": 0.01,
+                "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0.125,
                 "health": 20
             },
@@ -179,7 +179,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.22,
                 "layoutAngleOffsetInRevs": 0.23,
                 "numPoints": 3,
-                "extent": 0.015,
+                "extent": 0.01125,
                 "orientationAngleOffsetInRevs": 0.125,
                 "health": 20
             },
