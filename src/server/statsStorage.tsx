@@ -170,6 +170,9 @@ function dbToUserRating(user: db.User, category: string): g.UserRating {
     const userRating = user && user.ratings && user.ratings[category]
     if (userRating) {
         Object.assign(result, userRating);
+        if (userRating.aco && !userRating.acoUnranked) {
+            result.acoUnranked = userRating.aco; // Seed unranked with ranked score
+        }
     }
     return result;
 }
@@ -493,6 +496,11 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                 const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
                 for (const change of playerDelta.changes) {
                     selfRating.aco += change.delta;
+
+                    if (selfRating.acoUnranked <= selfRating.aco) {
+                        // Don't allow the unranked rating to get too low because then it can be used to destroy other people's rankings
+                        selfRating.acoUnranked += change.delta;
+                    }
                 }
                 ++selfRating.acoGames;
                 const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
