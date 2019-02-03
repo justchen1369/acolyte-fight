@@ -69,7 +69,7 @@ export namespace Placements {
 export namespace HeroColors {
 	export const WorldColor = '#222';
 	export const WorldAnimateWinTicks = 15;
-	export const WorldWinGrowth = 0.1;
+	export const WorldWinGrowth = 0.05;
 
 	export const ShakeDistance = 0.0025;
 	export const ShakeTicks = 10;
