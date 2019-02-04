@@ -41,22 +41,26 @@ class SpellStats extends React.Component<Props, State> {
 
         if (spell.action === "projectile" || spell.action === "retractor") {
             const damage = this.calculateProjectileDamage(spell.projectile);
+            const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>
+                {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "spray") {
             const hits = spell.lengthTicks / spell.intervalTicks;
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
             const overTime = spell.lengthTicks >= 60 ? ` over ${formatTime(spell.lengthTicks)} s` : "";
+            const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)}{overTime}</span>
+                {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.detonate.damage}{spell.detonate.damage > 0 && this.renderScaling(spell.detonate.damageScaling)}</span>
-                <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />{spell.selfDamage}</span>
+                <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />-{spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else {
@@ -78,6 +82,15 @@ class SpellStats extends React.Component<Props, State> {
 
     private calculateProjectileDamage(projectile: ProjectileTemplate) {
         return projectile.damage + (projectile.detonate ? projectile.detonate.damage : 0);
+    }
+
+    private calculateProjectileLifeSteal(projectile: ProjectileTemplate) {
+        if (projectile.link) {
+            return projectile.link.lifeSteal;
+        } else {
+            const lifeSteal = Math.max((projectile.lifeSteal || 0), (projectile.detonate ? (projectile.detonate.lifeSteal || 0) : 0));
+            return lifeSteal > 0 ? lifeSteal : null;
+        }
     }
 }
 

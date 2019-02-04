@@ -2820,9 +2820,13 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	}
 
 	let lifeStealTargetHeroId: string = null;
-	if (fromHero && fromHero.category === "hero" && fromHero.link && !lifeSteal) {
-		lifeSteal = fromHero.link.lifeSteal;
-		lifeStealTargetHeroId = fromHero.link.targetId;
+	if (fromHero && fromHero.category === "hero" && fromHero.link) {
+		if (lifeSteal) {
+			lifeSteal = Math.max(lifeSteal, fromHero.link.lifeSteal);
+		} else {
+			lifeSteal = fromHero.link.lifeSteal;
+			lifeStealTargetHeroId = fromHero.link.targetId;
+		}
 	}
 
 	return {
