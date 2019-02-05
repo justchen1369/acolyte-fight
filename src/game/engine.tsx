@@ -2166,8 +2166,6 @@ function isInsideMap(obj: w.WorldObject, world: w.World) {
 	} else {
 		return vector.length(diff) < polygonRadius - extent;
 	}
-
-	return true;
 }
 
 function shrink(world: w.World) {
