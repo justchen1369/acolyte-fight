@@ -955,7 +955,14 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		color = Color(color).lighten(HeroColors.ShieldGlowFactor * flash).string();
 	}
 
-	let scale: number = 1 + HeroColors.ShieldGrowFactor * flash;
+	let scale: number = 1;
+	if (flash > 0) {
+		scale += HeroColors.ShieldGrowFactor * flash;
+	}
+	if (world.tick - shield.createTick < shield.growthTicks) {
+		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
+		scale *= growthProportion;
+	}
 
 	foreground(ctxStack, ctx => ctx.save());
 
@@ -981,22 +988,12 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	} else {
 		return;
 	}
-	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
-	foreground(ctxStack, ctx => ctx.scale(scale, scale));
 
 	foreground(ctxStack, ctx => {
-		if (world.tick - shield.createTick < shield.growthTicks) {
-			const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
-			ctx.scale(growthProportion, growthProportion);
-		}
+		ctx.translate(pos.x, pos.y)
+		ctx.rotate(angle);
+		ctx.scale(scale, scale);
 	});
-
-	if (shield.type === "saber") {
-		// Do this before we apply the angle transformation because it's easier
-		renderSaberTrail(ctxStack, shield, world);
-	}
-
-	foreground(ctxStack, ctx => ctx.rotate(angle));
 
 	foreground(ctxStack, ctx => {
 		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
@@ -1025,9 +1022,13 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	}, glow);
 
 	foreground(ctxStack, ctx => ctx.restore());
+
+	if (shield.type === "saber") {
+		renderSaberTrail(shield, world);
+	}
 }
 
-function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.World) {
+function renderSaberTrail(saber: w.Saber, world: w.World) {
 	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
 	const newAngle = saber.body.getAngle();
 
