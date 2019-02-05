@@ -110,7 +110,7 @@ export namespace HeroColors {
 	export const DamageGlowFactor = 1.0;
 	export const DamageFlashTicks = 10;
 
-	export const ShieldGlowFactor = 0.3;
+	export const ShieldGlowFactor = 1.0;
 	export const ShieldFlashTicks = 3;
 
 	export const ObstacleFlashTicks = 6;
