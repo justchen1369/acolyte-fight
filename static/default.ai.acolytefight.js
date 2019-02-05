@@ -100,9 +100,7 @@ function findStrongest(heroes, myHeroId, allianceFlags) {
 }
 
 function recovery(state, hero, cooldowns) {
-    var offset = vectorDiff(hero.pos, center);
-    var length = vectorLength(offset);
-    if (length < state.radius || state.radius <= 0) {
+    if (hero.inside || state.radius <= 0) {
         // No need to recover
         return null;
     }
@@ -116,6 +114,8 @@ function recovery(state, hero, cooldowns) {
         spellId = "swap";
     } else if (cooldowns["voidRush"] === 0) {
         spellId = "voidRush";
+    } else {
+        spellId = "move";
     }
 
     if (spellId) {

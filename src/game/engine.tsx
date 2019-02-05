@@ -2143,7 +2143,7 @@ function applyLavaDamage(world: w.World) {
 	});
 }
 
-function isInsideMap(obj: w.WorldObject, world: w.World) {
+export function isInsideMap(obj: w.WorldObject, world: w.World) {
 	if (world.radius <= 0) {
 		return false;
 	}
