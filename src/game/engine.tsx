@@ -1449,7 +1449,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
 	const myProjectile = shield.owner === projectile.owner;
 
-	if (projectile.owner !== shield.owner) {
+	if (takeHit(projectile, shield.id, world) && projectile.owner !== shield.owner) {
 		shield.hitTick = world.tick;
 	}
 
@@ -1473,7 +1473,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 
 	const alliance = calculateAlliance(projectile.owner, hero.id, world);
 
-	if (hero.id !== projectile.owner && takeHit(projectile, hero.id, world)) {
+	if (takeHit(projectile, hero.id, world) && hero.id !== projectile.owner) {
 		applyBuffs(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
