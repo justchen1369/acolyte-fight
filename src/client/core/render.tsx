@@ -942,13 +942,20 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
 
-	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color;
+	let flash = 0;
 	if (shield.hitTick >= 0) {
 		const hitAge = world.tick - shield.hitTick;
 		if (hitAge < HeroColors.ShieldFlashTicks) {
-			color = Color(color).lighten(HeroColors.ShieldGlowFactor * (1 - hitAge / HeroColors.ShieldFlashTicks)).string();
+			flash = (1 - hitAge / HeroColors.ShieldFlashTicks);
 		}
 	}
+
+	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color;
+	if (flash > 0) {
+		color = Color(color).lighten(HeroColors.ShieldGlowFactor * flash).string();
+	}
+
+	let scale: number = 1 + HeroColors.ShieldGrowFactor * flash;
 
 	foreground(ctxStack, ctx => ctx.save());
 
@@ -975,6 +982,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		return;
 	}
 	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
+	foreground(ctxStack, ctx => ctx.scale(scale, scale));
 
 	foreground(ctxStack, ctx => {
 		if (world.tick - shield.createTick < shield.growthTicks) {
