@@ -29,7 +29,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.012,
+                "extent": 0.017,
                 "orientationAngleOffsetInRevs": 0
             },
             {
@@ -50,7 +50,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 3,
-                "extent": 0.01,
+                "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             }
         ]
@@ -105,7 +105,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.32,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
-                "extent": 0.015,
+                "extent": 0.02,
                 "orientationAngleOffsetInRevs": 0.5
             }
         ],
