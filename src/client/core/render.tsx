@@ -50,8 +50,8 @@ export function resetRenderState(world: w.World) {
 	world.ui.buttonBar = null;
 }
 
-export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, rect: ClientRect) {
-	const viewRect = calculateViewRects(rect);
+export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, rect: ClientRect, wheelOnRight: boolean) {
+	const viewRect = calculateViewRects(rect, wheelOnRight);
 	const worldPoint = worldPointFromViewRect(interfacePoint, viewRect);
 	return worldPoint;
 }
@@ -62,15 +62,52 @@ export function worldPointFromViewRect(interfacePoint: pl.Vec2, viewRect: Client
 	return worldPoint;
 }
 
-function calculateViewRects(rect: ClientRect): ClientRect {
-	return {
-		left: 0,
-		right: rect.width,
-		width: rect.width,
-		top: 0,
-		bottom: rect.height,
-		height: rect.height,
-	};
+function calculateViewRects(rect: ClientRect, wheelOnRight: boolean): ClientRect {
+	if (isMobile) {
+		if (rect.height >= rect.width) {
+			// Portrait
+			return {
+				left: 0,
+				right: rect.width,
+				width: rect.width,
+				top: 0,
+				bottom: rect.height,
+				height: rect.height,
+			};
+		} else {
+			// Landscape - move map out of wheel space
+			const wheelSize = calculateButtonWheelSize(rect);
+			const width = Math.max(rect.height, rect.width - wheelSize);
+			if (wheelOnRight) {
+				return {
+					left: 0,
+					right: width,
+					width: width,
+					top: 0,
+					bottom: rect.height,
+					height: rect.height,
+				};
+			} else {
+				return {
+					left: rect.width - width,
+					right: rect.width,
+					width: width,
+					top: 0,
+					bottom: rect.height,
+					height: rect.height,
+				};
+			}
+		}
+	} else {
+		return {
+			left: 0,
+			right: rect.width,
+			width: rect.width,
+			top: 0,
+			bottom: rect.height,
+			height: rect.height,
+		};
+	}
 }
 
 function calculateWorldRect(viewRect: ClientRect): ClientRect {
@@ -90,7 +127,7 @@ function calculateWorldRect(viewRect: ClientRect): ClientRect {
 
 export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
 	const rect = canvasStack.canvas.getBoundingClientRect();
-	const viewRect = calculateViewRects(rect);
+	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect);
 
 	// Cursor always gets rerendered
@@ -1751,12 +1788,7 @@ function invertSector(input: w.HitSector): w.HitSector {
 }
 
 function calculateButtonWheelRegion(rect: ClientRect, options: RenderOptions): ClientRect {
-	const maxSize = ButtonBar.Size * 3;
-
-	let size = Math.min(
-		(rect.width - ButtonBar.Margin) / 2, // Half width
-		(rect.height - ButtonBar.Margin * 2)); // Or whole height
-	size = Math.max(0, Math.min(maxSize, size));
+	const size = calculateButtonWheelSize(rect);
 
 	let left;
 	let right;
@@ -1774,6 +1806,17 @@ function calculateButtonWheelRegion(rect: ClientRect, options: RenderOptions): C
 	const height = size;
 
 	return { left, top, right, bottom, width, height };
+}
+
+function calculateButtonWheelSize(rect: ClientRect) {
+	const maxSize = ButtonBar.Size * 3;
+
+	let size = Math.min(
+		(rect.width - ButtonBar.Margin) / 2, // Half width
+		(rect.height - ButtonBar.Margin * 2)); // Or whole height
+	size = Math.max(0, Math.min(maxSize, size));
+
+	return size;
 }
 
 function buttonStateChanged(previous: w.ButtonRenderState, current: w.ButtonRenderState) {

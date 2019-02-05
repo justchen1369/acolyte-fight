@@ -238,7 +238,7 @@ class CanvasPanel extends React.Component<Props, State> {
     private pointInfo(touchId: string, elem: HTMLCanvasElement, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
         const rect = elem.getBoundingClientRect();
         const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
-        const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect);
+        const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect, this.props.wheelOnRight);
 
         return {
             touchId,
