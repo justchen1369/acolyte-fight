@@ -1450,7 +1450,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shield: w.Shield) {
 	const myProjectile = shield.owner === projectile.owner;
 
-	if (takeHit(projectile, shield.id, world) && projectile.owner !== shield.owner) {
+	if (projectile.owner !== shield.owner && takeHit(projectile, shield.id, world)) {
 		shield.hitTick = world.tick;
 	}
 
