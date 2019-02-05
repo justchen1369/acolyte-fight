@@ -1033,11 +1033,23 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
-	const highlight: w.TrailHighlight = saber.hitTick && {
-		fromTick: saber.hitTick,
-		maxTicks: saber.trailTicks,
-		glow: true,
-	};
+
+	const highlightTick = saber.uiHighlight ? saber.uiHighlight.fromTick : 0;
+	if (saber.hitTick > highlightTick) {
+		// Highlight
+		const highlight: w.TrailHighlight = {
+			fromTick: saber.hitTick,
+			maxTicks: saber.trailTicks,
+			glow: true,
+		};
+		saber.uiHighlight = highlight;
+
+		world.ui.trails.forEach(trail => {
+			if (trail.tag === saber.id) {
+				trail.highlight = highlight;
+			}
+		});
+	}
 
 	world.ui.trails.push({
 		type: "arc",
@@ -1051,7 +1063,8 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 		antiClockwise,
 		fillStyle: saber.color,
 		glow: saber.glow,
-		highlight,
+		highlight: saber.uiHighlight,
+		tag: saber.id,
 	});
 
 	saber.uiPreviousAngle = newAngle;

@@ -413,6 +413,7 @@ export interface Saber extends ShieldBase {
 	turnRate: number;
 
 	trailTicks: number;
+	uiHighlight?: TrailHighlight;
 	uiPreviousAngle: number;
 }
 
