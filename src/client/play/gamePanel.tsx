@@ -62,7 +62,7 @@ class GamePanel extends React.Component<Props, State> {
                 <MessagesPanel />
                 <SpellInfoPanel />
                 {allowExit && <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
-                    <i className="fa fa-chevron-left" /> Back to Home{!a.noScrolling && <span className="return-home-subtext"> (spell selection, replays and more)</span>}
+                    <i className="fa fa-chevron-left" /> Back to Home{!isMobile && !a.noScrolling && <span className="return-home-subtext"> (spell selection, replays and more)</span>}
                 </span>}
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
