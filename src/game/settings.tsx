@@ -31,7 +31,8 @@ const World: WorldSettings = {
 
     LavaDamagePerSecond: 12.5,
     SecondsToShrink: 90,
-    ShrinkPower: 1,
+    ShrinkPowerMinPlayers: 1.5,
+    ShrinkPowerMaxPlayers: 1,
     InitialShieldSeconds: 1.0,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,

@@ -2175,7 +2175,10 @@ function shrink(world: w.World) {
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;
 		const proportion = Math.max(0, 1.0 - seconds / World.SecondsToShrink);
-		world.radius = World.InitialRadius * Math.pow(proportion, World.ShrinkPower);
+
+		const powerAlpha = Math.min(1, world.players.size / Matchmaking.MaxPlayers);
+		const power = powerAlpha * World.ShrinkPowerMaxPlayers + (1 - powerAlpha) * World.ShrinkPowerMinPlayers;
+		world.radius = World.InitialRadius * Math.pow(proportion, power);
 	}
 }
 

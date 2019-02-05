@@ -72,7 +72,8 @@ declare interface WorldSettings {
 
 	LavaDamagePerSecond: number;
 	SecondsToShrink: number;
-	ShrinkPower: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
+	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
+	ShrinkPowerMaxPlayers: number;
 	InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
 	
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
