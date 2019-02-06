@@ -66,11 +66,11 @@ class TextMessageBox extends React.Component<Props, State> {
 
     private renderHint() {
         if (this.state.focus) {
-            return <div className="hint">Send message</div>;
+            return <div className="hint"><i className="fas fa-comment" /> Send message</div>;
         } else if (isMobile) {
-            return <div className="hint"><i className="fas fa-comment" /> chat</div>;
+            return <div className="hint"><i className="fas fa-comment" /> Chat</div>;
         } else {
-            return <div className="hint">Press <span className="hint-enter-key">ENTER</span> to chat</div>;
+            return <div className="hint"><i className="fas fa-comment" /> Press <span className="hint-enter-key">ENTER</span> to chat</div>;
         }
     }
 
