@@ -192,7 +192,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 }
 
 export function sendAction(gameId: string, heroId: string, action: w.Action) {
-	const Precision = 0.001;
+	const Precision = 1.0 / 1024;
 
 	if (!(gameId && heroId)) {
 		return;
