@@ -116,6 +116,8 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	if (notifications.length > 0) {
 		notify(...notifications);
 	}
+
+	sendSnapshot(world);
 }
 
 export function onTickMsg(data: m.TickMsg) {
@@ -187,8 +189,52 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				heroId: actionData.heroId,
 				keyBindings: actionData.keyBindings,
 			});
+		} else if (actionData.actionType === m.ActionType.Sync) {
+			const heroLookup = new Map<string, w.HeroSnapshot>();
+			actionData.heroes.forEach(snapshot => {
+				heroLookup.set(snapshot.heroId, {
+					health: snapshot.health,
+					pos: pl.Vec2(snapshot.posX, snapshot.posY),
+				});
+			});
+			world.occurrences.push({
+				type: "sync",
+				tick: actionData.tick,
+				heroLookup,
+			});
 		}
 	});
+}
+
+function sendSnapshot(world: w.World) {
+	if (!(world.ui.myGameId && world.ui.myHeroId && world.snapshots.length > 0)) {
+		return;
+	}
+
+	const snapshot = world.snapshots[world.snapshots.length - 1];
+	if (snapshot.tick <= world.ui.sentSnapshotTick) {
+		return;
+	}
+	world.ui.sentSnapshotTick = snapshot.tick;
+
+	const heroes = new Array<m.HeroSyncMsg>();
+	snapshot.heroLookup.forEach((heroSnapshot, heroId) => {
+		heroes.push({
+			heroId,
+			health: heroSnapshot.health,
+			posX: heroSnapshot.pos.x,
+			posY: heroSnapshot.pos.y,
+		});
+	});
+
+	const syncMsg: m.SyncMsg = {
+		actionType: m.ActionType.Sync,
+		gameId: world.ui.myGameId,
+		heroId: world.ui.myHeroId,
+		tick: snapshot.tick,
+		heroes,
+	};
+	send(syncMsg);
 }
 
 export function sendAction(gameId: string, heroId: string, action: w.Action) {

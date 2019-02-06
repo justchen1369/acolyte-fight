@@ -194,6 +194,16 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		) || (
 			data.actionType === "spells"
 			&& required(data.keyBindings, "object")
+		) || (
+			data.actionType === m.ActionType.Sync
+			&& required(data.tick, "number")
+			&& required(data.heroes, "object") && data.heroes instanceof Array
+			&& data.heroes.every(snapshot => 
+				required(snapshot, "object")
+				&& required(snapshot.heroId, "string")
+				&& required(snapshot.health, "number")
+				&& required(snapshot.posX, "number")
+				&& required(snapshot.posY, "number"))
 		)
 	)) {
 		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
@@ -255,6 +265,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		socketIds: new Set<string>(),
 		numPlayers: 0,
 		winTick: null,
+		syncTick: 0,
 		scores: new Map<string, m.GameStatsMsg>(),
 		tick: 0,
 		activeTick: 0,
@@ -339,6 +350,12 @@ function formatHeroId(index: number): string {
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
 	if (actionData.actionType === "text") {
 		game.messages.push(actionData);
+		return;
+	} else if (actionData.actionType === m.ActionType.Sync) {
+		if (game.syncTick < actionData.tick) {
+			game.syncTick = actionData.tick;
+			game.actions.set(systemHeroId(m.ActionType.Sync), actionData);
+		}
 		return;
 	}
 

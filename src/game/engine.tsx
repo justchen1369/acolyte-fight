@@ -11,6 +11,7 @@ import * as w from './world.model';
 import { modToSettings } from './modder';
 
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
+import { DocumentSnapshot } from '@google-cloud/firestore';
 
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
@@ -54,6 +55,7 @@ export function initialWorld(mod: Object): w.World {
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
 		occurrences: new Array<w.Occurrence>(),
+		snapshots: [],
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
 		teams: Immutable.Map<string, string>(), // hero ID -> team ID
@@ -82,6 +84,7 @@ export function initialWorld(mod: Object): w.World {
 			myPartyId: null,
 			reconnectKey: null,
 			renderedTick: null,
+			sentSnapshotTick: 0,
 			playedTick: -1,
 			destroyed: [],
 			shakes: [],
@@ -643,6 +646,7 @@ export function tick(world: w.World) {
 	shrink(world);
 
 	reap(world);
+	captureSnapshot(world);
 }
 
 function handleBehaviours(world: w.World, handlers: BehaviourHandlers) {
@@ -760,6 +764,8 @@ function handleOccurences(world: w.World) {
 			handleTexting(ev, world);
 		} else if (ev.type === "spells") {
 			handleSpellChoosing(ev, world);
+		} else if (ev.type === "sync") {
+			handleSync(ev, world);
 		}
 	});
 	world.occurrences = [];
@@ -820,6 +826,47 @@ export function allowSpellChoosing(world: w.World, heroId: string) {
 		// Cannot choose spells if observing
 		return false;
 	}
+}
+
+function handleSync(ev: w.Syncing, world: w.World) {
+	const mySnapshot = dequeueSnapshot(ev.tick, world);
+	const theirSnapshot: w.Snapshot = ev;
+
+	for (const heroId of theirSnapshot.heroLookup.keys()) {
+		const myHeroSnapshot = mySnapshot.heroLookup.get(heroId);
+		const theirHeroSnapshot = theirSnapshot.heroLookup.get(heroId);
+
+		const hero = world.objects.get(heroId);
+		if (!(hero && hero.category === "hero")) {
+			// Cannot sync non-existent hero
+			continue;
+		}
+
+		if (myHeroSnapshot && !theirHeroSnapshot) {
+			// Sync hero death
+			hero.health = 0;
+		} else if (!(myHeroSnapshot && theirHeroSnapshot)) {
+			// Dead in my version but not in theirs, can't sync this
+		} else {
+			const healthDiff = theirHeroSnapshot.health - myHeroSnapshot.health;
+			hero.health = Math.min(hero.maxHealth, hero.health + healthDiff);
+
+			const posDiff = vector.diff(theirHeroSnapshot.pos, myHeroSnapshot.pos);
+			let position = hero.body.getPosition();
+			position = vector.plus(position, posDiff);
+			hero.body.setPosition(position);
+		}
+	}
+}
+
+function dequeueSnapshot(tick: number, world: w.World) {
+	while (world.snapshots.length > 0) {
+		const snapshot = world.snapshots.shift();
+		if (snapshot.tick === tick) {
+			return snapshot;
+		}
+	}
+	return null;
 }
 
 function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
@@ -2210,6 +2257,26 @@ function reap(world: w.World) {
 	if (heroKilled) {
 		notifyWin(world);
 	}
+}
+
+function captureSnapshot(world: w.World) {
+	if (!(world.tick > 0 && world.tick % constants.SnapshotTicks === 0)) {
+		return;
+	}
+
+	const snapshot: w.Snapshot = {
+		tick: world.tick,
+		heroLookup: new Map<string, w.HeroSnapshot>(),
+	};
+	world.objects.forEach(hero => {
+		if (hero.category === "hero") {
+			snapshot.heroLookup.set(hero.id, {
+				pos: vector.clone(hero.body.getPosition()),
+				health: hero.health,
+			});
+		}
+	});
+	world.snapshots.push(snapshot);
 }
 
 function alreadyDead(heroId: string, world: w.World) {

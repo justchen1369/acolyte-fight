@@ -54,6 +54,7 @@ export interface World {
 	radius: number;
 
 	occurrences: Occurrence[];
+	snapshots: Snapshot[];
 	actions: Map<string, Action>,
 
 	nextPositionId: number;
@@ -89,6 +90,7 @@ export interface UIState {
 	hoverSpellId?: string;
 	renderedTick: number | null;
 	playedTick: number;
+	sentSnapshotTick: number;
 
 	destroyed: WorldObject[];
 	events: WorldEvent[];
@@ -250,7 +252,15 @@ export interface RatingAdjustmentNotification {
 	category: string;
 }
 
-export type Occurrence = Closing | Botting | Joining | Leaving | EnvironmentSeed | Texting | ChoosingSpells;
+export type Occurrence =
+	Closing
+	| Botting
+	| Joining
+	| Leaving
+	| EnvironmentSeed
+	| Texting
+	| ChoosingSpells
+	| Syncing
 
 export interface EnvironmentSeed {
 	type: "environment";
@@ -299,6 +309,20 @@ export interface Botting {
 export interface Leaving {
 	type: "leave";
 	heroId: string;
+}
+
+export interface Syncing extends Snapshot {
+	type: "sync";
+}
+
+export interface Snapshot {
+	tick: number;
+	heroLookup: Map<string, HeroSnapshot>;
+}
+
+export interface HeroSnapshot {
+	pos: pl.Vec2;
+	health: number;
 }
 
 export interface WorldObjectBase {

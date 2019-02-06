@@ -31,6 +31,7 @@ export namespace ActionType {
 	export const CloseGame = "close";
     export const Text = "text";
     export const Spells = "spells";
+    export const Sync = "sync";
 }
 
 export interface GetUserSettingsRequest {
@@ -68,6 +69,7 @@ export type ActionMsg =
     | GameActionMsg
     | TextMsg
     | SpellsMsg
+    | SyncMsg
 
 export interface ActionMsgBase {
     actionType: string;
@@ -123,6 +125,19 @@ export interface TextMsg extends ActionMsgBase {
 export interface SpellsMsg extends ActionMsgBase {
     actionType: "spells";
     keyBindings: KeyBindings;
+}
+
+export interface SyncMsg extends ActionMsgBase {
+    actionType: "sync";
+    tick: number;
+    heroes: HeroSyncMsg[];
+}
+
+export interface HeroSyncMsg {
+    heroId: string;
+    posX: number;
+    posY: number;
+    health: number;
 }
 
 export interface TickMsg {

@@ -1,6 +1,7 @@
 export const TicksPerSecond = 60;
 export const TicksPerTurn = 2;
 export const MaxIdleTicks = 30 * TicksPerSecond;
+export const SnapshotTicks = 10;
 export const MaxCooldownWait = 0;
 export const MaxTextMessageLength = 255;
 export const MaxGamesToKeep = 50;
