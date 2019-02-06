@@ -10,6 +10,7 @@ import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
 interface Props {
+    myUserId: string;
     unranked: boolean;
 }
 interface State {
@@ -17,6 +18,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        myUserId: state.userId,
         unranked: state.options.unranked,
     };
 }
@@ -31,7 +33,11 @@ export class UnrankedTogglePanel extends React.Component<Props, State> {
     }
 
     render() {
-        return this.props.unranked ? this.renderUnranked() : this.renderRanked();
+        if (this.props.myUserId) {
+            return this.props.unranked ? this.renderUnranked() : this.renderRanked();
+        } else {
+            return null;
+        }
     }
 
     private renderUnranked() {
