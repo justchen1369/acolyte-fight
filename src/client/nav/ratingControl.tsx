@@ -4,12 +4,14 @@ import * as ReactRedux from 'react-redux';
 import * as cloud from '../core/cloud';
 import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
+import * as pages from '../core/pages';
 import * as s from '../store.model';
 import * as rankings from '../core/rankings';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import HrefItem from './hrefItem';
 import PageLink from './pageLink';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     userId: string;
@@ -52,18 +54,16 @@ class RatingControl extends React.Component<Props> {
 
     private renderUnrankedToggle() {
         return <HrefItem
-            shrink={true}
             key="unranked-toggle"
             className="nav-item-unranked-toggle"
             title="You are currently in unranked mode - you will not gain or lose rating points. Click to switch to Ranked Mode"
             onClick={ev => this.onUnrankedToggleClick(ev)}>
-            <i className="fas fa-gamepad" style={{ marginRight: 4 }} /> Unranked Mode
+            <i className="fas fa-gamepad" style={{ marginRight: 4 }} /><span className="shrink"> Unranked Mode</span>
         </HrefItem>
     }
 
     private renderRankedToggle() {
         return <HrefItem
-            shrink={true}
             key="unranked-toggle"
             className="nav-item-unranked-toggle"
             title="Switch to Unranked Mode"
@@ -100,13 +100,17 @@ class RatingControl extends React.Component<Props> {
 
     private onUnrankedToggleClick(ev: React.MouseEvent) {
         ev.preventDefault();
-        StoreProvider.dispatch({
-            type: "updateOptions",
-            options: {
-                unranked: !this.props.unranked,
-            },
-        });
-        this.uploadSettingsDebounced();
+        if (isMobile) { // Can't display tooltips on mobile so take them to the relevant page instead
+            pages.changePage("profile", this.props.userId);
+        } else {
+            StoreProvider.dispatch({
+                type: "updateOptions",
+                options: {
+                    unranked: !this.props.unranked,
+                },
+            });
+            this.uploadSettingsDebounced();
+        }
     }
 }
 

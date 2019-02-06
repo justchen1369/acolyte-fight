@@ -36,17 +36,17 @@ export class UnrankedTogglePanel extends React.Component<Props, State> {
 
     private renderUnranked() {
         return <div>
-            <h2>Unranked Mode <i className="fas fa-gamepad" /></h2>
+            <h2><i className="fas fa-gamepad" /> Unranked Mode</h2>
             <p>You are currently playing unranked. Play for fun, not points! You will not lose or gain points on the rating system.</p>
-            <div className="btn" onClick={() => this.onToggleClick()}>Switch to Ranked Mode</div>
+            <div className="btn" onClick={() => this.onToggleClick()}>Switch to <i className="fas fa-trophy-alt" /> Ranked Mode</div>
         </div>
     }
 
     private renderRanked() {
         return <div>
-            <h2>Ranked Mode <i className="fas fa-trophy-alt" /></h2>
+            <h2><i className="fas fa-trophy-alt" /> Ranked Mode</h2>
             <p>You are currently playing ranked. You will gain and lose points on the rating system.</p>
-            <div className="btn" onClick={() => this.onToggleClick()}>Switch to Unranked Mode</div>
+            <div className="btn" onClick={() => this.onToggleClick()}>Switch to <i className="fas fa-gamepad" /> Unranked Mode</div>
         </div>
     }
 
