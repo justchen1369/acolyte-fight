@@ -4,6 +4,17 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as categories from './segments';
 
+interface HashValues {
+    gameId: string;
+    players: PlayerValues[];
+}
+
+interface PlayerValues {
+    userId?: string;
+    userHash: string;
+    rank: number;
+}
+
 interface CandidateHash {
     gameStats: m.GameStatsMsg;
     hash: string;
@@ -50,8 +61,20 @@ function validateGameStats(gameStats: m.GameStatsMsg, game: g.Game) {
 
 
 function hashStats(gameStats: m.GameStatsMsg): string {
-    return crypto.createHash('md5').update(msgpack.encode(gameStats)).digest('hex');
+    const values = extractValues(gameStats);
+    return crypto.createHash('md5').update(msgpack.encode(values)).digest('hex');
 } 
+
+function extractValues(gameStats: m.GameStatsMsg): HashValues {
+    return {
+        gameId: gameStats.gameId,
+        players: gameStats.players.map(player => ({
+            userId: player.userId,
+            userHash: player.userHash,
+            rank: player.rank,
+        })),
+    };
+}
 
 function calculateGameCategory(game: g.Game) {
     if (game.segment === categories.publicSegment()) {
