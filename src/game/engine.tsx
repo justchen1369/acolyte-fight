@@ -1417,11 +1417,10 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 }
 
 function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
-	shield.hitTick = world.tick;
-
 	if (hero.thrust) {
 		// Thrust into shield means the hero bounces off
 		hero.thrust.nullified = true;
+		shield.hitTick = world.tick;
 	}
 }
 
