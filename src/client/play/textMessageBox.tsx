@@ -46,18 +46,12 @@ class TextMessageBox extends React.Component<Props, State> {
     }
 
     render() {
-        if (isMobile) {
-            return null;
-        }
         if (!(this.props.myGameId && this.props.myHeroId)) {
             return null;
         }
 
-        return <div className="text-message-container">
-            {!(this.state.text && this.state.text.length > 0) && (
-                this.state.focus
-                ? <div className="hint">Send message</div>
-                : <div className="hint">Press <span className="hint-enter-key">ENTER</span> to chat</div>)}
+        return <div className="text-message-container" onClick={() => this.onTextMessageContainerClick()}>
+            {!(this.state.text && this.state.text.length > 0) && this.renderHint()}
             <input
                 ref={(textbox) => this.textMessageBox = textbox}
                 className="text-message-box"
@@ -68,6 +62,20 @@ class TextMessageBox extends React.Component<Props, State> {
                 onKeyDown={(ev) => this.onKeyDown(ev)}
             />
         </div>;
+    }
+
+    private renderHint() {
+        if (this.state.focus) {
+            return <div className="hint">Send message</div>;
+        } else if (isMobile) {
+            return <div className="hint"><i className="fas fa-comment" /> chat</div>;
+        } else {
+            return <div className="hint">Press <span className="hint-enter-key">ENTER</span> to chat</div>;
+        }
+    }
+
+    private onTextMessageContainerClick() {
+        this.focus();
     }
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {

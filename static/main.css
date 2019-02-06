@@ -571,8 +571,13 @@ i.clickable:hover, i.clickable:active {
     border: transparent 1px solid;
 }
 
-.text-message-container:hover {
-    border: #888 1px solid;
+.mobile .text-message-container {
+    pointer-events: all;
+    cursor: pointer;
+
+    position: fixed;
+    top: 50px;
+    left: 1em;
 }
 
 .text-message-container .hint {
