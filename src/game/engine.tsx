@@ -2593,10 +2593,6 @@ function shouldCollide(a: w.WorldObject, b: w.WorldObject) {
 	}
 }
 
-function shouldCollideWithCategory(a: w.WorldObject, categories: number) {
-	return a && !!(a.body.getFixtureList().getFilterMaskBits() & categories);
-}
-
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
 	if (!action.target) { return true; }
 
