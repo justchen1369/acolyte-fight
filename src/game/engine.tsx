@@ -11,7 +11,6 @@ import * as w from './world.model';
 import { modToSettings } from './modder';
 
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
-import { DocumentSnapshot } from '@google-cloud/firestore';
 
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
