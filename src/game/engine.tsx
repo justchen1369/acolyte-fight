@@ -1788,7 +1788,10 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	// Always bounce between owner and another target
 	let nextTarget: w.WorldObject =
 		hitId === projectile.owner
-		? findNearest(world.objects, projectile.body.getPosition(), x => x.category === "hero" && x.id !== projectile.owner)
+		? findNearest(
+			world.objects,
+			projectile.body.getPosition(),
+			x => x.category === "hero" && x.id !== projectile.owner && (calculateAlliance(projectile.owner, x.id, world) & Alliances.NotFriendly) > 0)
 		: world.objects.get(projectile.owner);
 	if (!nextTarget) {
 		return;
