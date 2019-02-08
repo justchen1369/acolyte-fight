@@ -336,7 +336,7 @@ export interface WorldObjectBase {
 	category: string;
 	categories: number;
 	body: pl.Body;
-	destroyed?: boolean;
+	destroyedTick?: number;
 	blocksTeleporters?: boolean;
 }
 

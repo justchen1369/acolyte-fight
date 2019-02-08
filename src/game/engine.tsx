@@ -2428,7 +2428,7 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 	world.objects.delete(object.id);
 	world.physics.destroyBody(object.body);
 
-	object.destroyed = true;
+	object.destroyedTick = world.tick;
 	world.ui.destroyed.push(object);
 }
 

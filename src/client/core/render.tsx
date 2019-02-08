@@ -14,6 +14,7 @@ import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
 const MaxSoundAgeInTicks = constants.TicksPerSecond;
+const MaxDestroyedTicks = constants.TicksPerSecond;
 
 export interface CanvasStack {
 	background: HTMLCanvasElement;
@@ -293,7 +294,9 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 }
 
 function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
-	if (obj.category === "hero") {
+	if (world.tick - obj.destroyedTick >= MaxDestroyedTicks) {
+		// Don't render, too old
+	} else if (obj.category === "hero") {
 		renderHeroDeath(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
@@ -578,7 +581,7 @@ function takeHighlights(world: w.World): w.MapHighlight {
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
-	if (obstacle.destroyed) {
+	if (obstacle.destroyedTick) {
 		return;
 	}
 
@@ -653,7 +656,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const Hero = world.settings.Hero;
 	const ctx = ctxStack.canvas;
 
-	if (hero.destroyed) {
+	if (hero.destroyedTick) {
 		return;
 	}
 
