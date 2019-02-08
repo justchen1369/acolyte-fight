@@ -140,7 +140,7 @@ export function findExistingGame(version: string, room: g.Room | null, partyId: 
 	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
-	const candidates = [...store.activeGames.values()].filter(x => x.segment === segment);
+	const candidates = [...store.activeGames.values()].filter(x => x.segment === segment && isGameRunning(x));
 	if (candidates.length === 0) {
 		return null;
 	}
