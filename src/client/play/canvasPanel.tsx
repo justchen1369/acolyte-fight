@@ -21,7 +21,7 @@ const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const LongPressMilliseconds = 500;
-const MaxSlowFrames = 10;
+const MaxSlowFrames = 30;
 const FpsThreshold = 0.9;
 
 interface Props {
