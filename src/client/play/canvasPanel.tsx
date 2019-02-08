@@ -23,6 +23,7 @@ const DoubleTapPixels = 100;
 const LongPressMilliseconds = 500;
 const MaxSlowFrames = 30;
 const FpsThreshold = 0.9;
+const MaxTouchSurfaceSizeInPixels = 320;
 
 interface Props {
     world: w.World;
@@ -35,6 +36,7 @@ interface Props {
 interface State {
     width: number;
     height: number;
+    touchMultiplier: number;
     rtx: boolean;
 }
 
@@ -164,6 +166,7 @@ class CanvasPanel extends React.Component<Props, State> {
         this.state = {
             width: 0,
             height: 0,
+            touchMultiplier: 1,
             rtx: !isMobile,
         };
 
@@ -385,7 +388,9 @@ class CanvasPanel extends React.Component<Props, State> {
                 }
             } else if (this.currentTouch === null || this.currentTouch.id === p.touchId) {
                 if (this.targetSurface) {
-                    world.ui.nextTarget = vector.plus(this.targetSurface.startWorldPoint, vector.diff(p.worldPoint, this.targetSurface.startTargetPoint));
+                    world.ui.nextTarget = vector.plus(
+                        this.targetSurface.startWorldPoint,
+                        vector.multiply(vector.diff(p.worldPoint, this.targetSurface.startTargetPoint), this.state.touchMultiplier));
                 } else {
                     world.ui.nextTarget = p.worldPoint;
                 }
@@ -542,9 +547,14 @@ class CanvasPanel extends React.Component<Props, State> {
     private fullScreenCanvas() {
         const world = this.props.world;
         resetRenderState(world);
+
+        const screenSize = Math.min(document.body.clientWidth, document.body.clientHeight);
+        const touchSize = Math.max(1, Math.min(MaxTouchSurfaceSizeInPixels, screenSize));
+        const touchMultiplier = screenSize / touchSize;
         this.setState({
             width: document.body.clientWidth,
             height: document.body.clientHeight,
+            touchMultiplier,
         });
     }
 
