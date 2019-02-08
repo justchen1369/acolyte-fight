@@ -918,6 +918,11 @@ function handleClosing(ev: w.Closing, world: w.World) {
 		const teams = assignTeams(ev.numTeams, world);
 		if (teams) {
 			teamSizes = teams.map(x => x.length);
+
+			world.ui.notifications.push({
+				type: "teams",
+				teamSizes,
+			});
 		}
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started

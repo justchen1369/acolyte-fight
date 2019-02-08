@@ -137,6 +137,7 @@ class MessagesPanel extends React.Component<Props, State> {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "text": return this.renderTextNotification(key, notification);
             case "new": return this.renderNewGameNotification(key, notification);
+            case "teams": return this.renderTeamsNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
             case "bot": return this.renderBotNotification(key, notification);
@@ -226,16 +227,21 @@ class MessagesPanel extends React.Component<Props, State> {
         return <div key={key} className="row text-row"><PlayerName player={notification.player} />: <span className="text-message">{notification.text}</span></div>
     }
 
+    private renderTeamsNotification(key: string, notification: w.TeamsNotification) {
+        if (notification.teamSizes) {
+            const vString = notification.teamSizes.join('v');
+            return <div key={key} className="splash-container">
+                <div className="splash">{vString}</div>
+            </div>
+        } else {
+            return null;
+        }
+    }
+
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
             if (notification.teamSizes) {
-                const vString = notification.teamSizes.join('v');
-                return <>
-                    <div key={`${key}-splash`} className="splash-container">
-                        <div className="splash">{vString}</div>
-                    </div>
-                    <div key={key} className="row game-started">Team game! Your allies are blue. Defeat your enemies together!</div>
-                </>
+                return <div key={key} className="row game-started">Team game! Your allies are blue. Defeat your enemies together!</div>
             } else {
                 return <div key={key} className="row game-started">Game started</div>
             }

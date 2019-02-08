@@ -6,13 +6,15 @@ export interface NotificationListener {
     (newNotifications: w.Notification[]): void;
 }
 
+const ExpireInterval = 1000;
 const ExpiryMilliseconds = 15000;
+const TeamsSplashMilliseconds = 2000;
 
 const listeners = new Array<NotificationListener>();
 let nextNotificationId = 0;
 
 export function startTimers() {
-    setInterval(notificationCleanup, ExpiryMilliseconds);
+    setInterval(notificationCleanup, ExpireInterval);
 }
 
 export function attachListener(listener: NotificationListener) {
@@ -43,6 +45,7 @@ function calculateExpiryMilliseconds(notification: w.Notification): number {
     switch (notification.type) {
         case "win": return 1e9;
         case "disconnected": return 1e9;
+        case "teams": return TeamsSplashMilliseconds;
         default: return ExpiryMilliseconds;
     }
 }

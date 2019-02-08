@@ -170,6 +170,7 @@ export type Notification =
 	| LeaveNotification 
 	| KillNotification 
 	| NewGameNotification
+	| TeamsNotification
 	| CloseGameNotification
 	| WinNotification
 	| DisconnectedNotification
@@ -225,6 +226,11 @@ export interface NewGameNotification {
 export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
+	teamSizes?: number[];
+}
+
+export interface TeamsNotification {
+	type: "teams";
 	teamSizes?: number[];
 }
 
