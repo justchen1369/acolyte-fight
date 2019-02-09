@@ -140,7 +140,7 @@ declare type Spell =
 	| ScourgeSpell
 	| TeleportSpell
 	| ThrustSpell
-	| WallSpell;
+	| WallSpell
 
 declare interface SpellBase {
 	id: string;
@@ -415,10 +415,14 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 declare type BuffTemplate =
 	MovementBuffTemplate
 	| LavaImmunityBuffTemplate
+	| VanishTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
 	maxTicks: number;
+	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
+	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
+	sound?: string;
 }
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
@@ -431,6 +435,10 @@ declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
 	damageProportion: number;
 	color?: string;
 	sound?: string;
+}
+
+declare interface VanishTemplate extends BuffTemplateBase {
+	type: "vanish";
 }
 
 declare interface BuffSpell extends SpellBase {
@@ -499,15 +507,12 @@ declare interface SaberSpell extends ShieldSpell {
 	glow?: boolean;
 }
 
-declare interface DashSpell extends SpellBase {
-}
-
-declare interface TeleportSpell extends DashSpell {
+declare interface TeleportSpell extends SpellBase {
 	action: "teleport";
 	range: number;
 }
 
-declare interface ThrustSpell extends DashSpell {
+declare interface ThrustSpell extends SpellBase {
     action: "thrust";
 
 	range: number;

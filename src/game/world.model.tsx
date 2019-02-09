@@ -385,6 +385,7 @@ export interface Hero extends WorldObjectBase {
 	link?: LinkState;
 	thrust?: ThrustState;
 	gravity?: GravityState;
+	invisible?: VanishBuff;
 	buffs: Map<string, Buff>;
 
 	killerHeroId: string | null;
@@ -392,6 +393,8 @@ export interface Hero extends WorldObjectBase {
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
+
+	uiDestroyedBuffs: Buff[];
 }
 
 export interface DamageSourceHistoryItem {
@@ -499,12 +502,18 @@ export interface GravityState {
 
 export type Buff =
 	MovementBuff
-	| LavaImmunityBuff;
+	| LavaImmunityBuff
+	| VanishBuff
 
 export interface BuffBase {
 	id: string;
 	type: string;
+	destroyedTick?: number;
+	maxTicks: number;
 	expireTick: number;
+	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
+	hitTick?: number; // If the hero gets hit, remove the buff
+	sound?: string;
 }
 
 export interface MovementBuff extends BuffBase {
@@ -515,8 +524,11 @@ export interface MovementBuff extends BuffBase {
 export interface LavaImmunityBuff extends BuffBase {
 	type: "lavaImmunity";
 	damageProportion: number;
-	sound?: string;
-	maxTicks: number;
+}
+
+export interface VanishBuff extends BuffBase {
+	type: "vanish";
+	initialPos: pl.Vec2;
 }
 
 export interface Cooldowns {

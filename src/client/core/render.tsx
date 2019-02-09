@@ -13,7 +13,6 @@ import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, Hero
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
-const MaxSoundAgeInTicks = constants.TicksPerSecond;
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
 export interface CanvasStack {
@@ -167,7 +166,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 function playSounds(world: w.World, options: RenderOptions) {
 	if (options.mute
 		|| world.tick <= world.ui.playedTick // Already played this tick
-		|| (world.tick - world.ui.playedTick) > MaxSoundAgeInTicks) { // We've lagged or entered a game late, don't replay all the sounds because it just causes WebAudio to hang
+		|| (world.tick - world.ui.playedTick) > MaxDestroyedTicks) { // We've lagged or entered a game late, don't replay all the sounds because it just causes WebAudio to hang
 
 		// Play nothing
 	} else {
@@ -450,17 +449,15 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 		return; // Too late
 	}
 
-	if (ev.heroId === world.ui.myHeroId) {
-		world.ui.trails.push({
-			type: "ripple",
-			max: MaxTicks,
-			initialTick: ev.tick,
-			pos: ev.toPos,
-			fillStyle: 'white',
-			initialRadius: Hero.Radius,
-			finalRadius: Hero.Radius * 4,
-		});
-	}
+	world.ui.trails.push({
+		type: "ripple",
+		max: MaxTicks,
+		initialTick: ev.tick,
+		pos: ev.toPos,
+		fillStyle: 'white',
+		initialRadius: Hero.Radius,
+		finalRadius: Hero.Radius * 4,
+	});
 
 	if (ev.sound) {
 		world.ui.sounds.push({
@@ -653,9 +650,6 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const Hero = world.settings.Hero;
-	const ctx = ctxStack.canvas;
-
 	if (hero.destroyedTick) {
 		return;
 	}
@@ -668,8 +662,18 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	renderRangeIndicator(ctxStack, hero, world);
 	renderBuffs(ctxStack, hero, world); // Do this before applying translation
-	renderHeroCharacter(ctxStack, hero, world);
-	renderHeroBars(ctxStack, hero, world);
+
+	if (engine.isHeroInvisible(hero)) {
+		if (world.ui.myHeroId && (engine.calculateAlliance(hero.id, world.ui.myHeroId, world) & Alliances.Enemy) > 0) {
+			// Enemy - render nothing
+		} else {
+			// Self or observer - render placeholder
+			renderHeroInvisible(ctxStack, hero, world);
+		}
+	} else {
+		renderHeroCharacter(ctxStack, hero, world);
+		renderHeroBars(ctxStack, hero, world);
+	}
 
 	foreground(ctxStack, ctx => ctx.restore());
 
@@ -734,14 +738,39 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		if (buff.type === "lavaImmunity") {
 			renderLavaImmunity(ctxStack, buff, hero, world);
 		}
+
+		if (buff.sound) {
+			world.ui.sounds.push({
+				id: `buff-${buff.id}`,
+				sound: `${buff.sound}`,
+				pos: vector.clone(hero.body.getPosition()),
+			});
+		}
 	});
+
+	hero.uiDestroyedBuffs.forEach(buff => {
+		if ((world.tick - buff.destroyedTick) >= MaxDestroyedTicks) {
+			return;
+		}
+
+		if (buff.type === "vanish") {
+			renderVanishReappear(ctxStack, buff, hero, world);
+		}
+
+		if (buff.sound) {
+			world.ui.sounds.push({
+				id: `buff-${buff.id}-expired`,
+				sound: `${buff.sound}-expired`,
+				pos: vector.clone(hero.body.getPosition()),
+			});
+		}
+	});
+	hero.uiDestroyedBuffs = [];
 }
 
 function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
 	const numPoints = 8;
 	const proportion = (buff.expireTick - world.tick) / buff.maxTicks;
-
-	const pos = vector.clone(hero.body.getPosition());
 
 	foreground(ctxStack, ctx => {
 		ctx.fillStyle = Color("#fff").alpha(0.25 * proportion).string();
@@ -762,14 +791,25 @@ function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, 
 
 		ctx.fill();
 	});
+}
 
-	if (buff.sound) {
-		world.ui.sounds.push({
-			id: `buff-${buff.id}`,
-			sound: `${buff.sound}-${buff.type}`,
-			pos,
-		});
+function renderVanishReappear(ctxStack: CanvasCtxStack, buff: w.VanishBuff, hero: w.Hero, world: w.World) {
+	const Hero = world.settings.Hero;
+	const MaxTicks = 15;
+
+	if (world.tick >= buff.destroyedTick + MaxTicks) {
+		return; // Too late
 	}
+
+	world.ui.trails.push({
+		type: "ripple",
+		max: MaxTicks,
+		initialTick: buff.destroyedTick,
+		pos: vector.clone(hero.body.getPosition()),
+		fillStyle: 'white',
+		initialRadius: Hero.Radius,
+		finalRadius: Hero.Radius * 4,
+	});
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -862,6 +902,27 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 
 		ctx.restore();
 	}
+}
+
+function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const ctx = ctxStack.canvas;
+
+	const color = '#111';
+	ctx.fillStyle = color;
+
+	ctx.beginPath();
+	ctx.arc(0, 0, hero.radius, 0, 2 * Math.PI);
+	ctx.fill();
+
+	world.ui.trails.push({
+		type: 'ripple',
+		initialTick: world.tick,
+		max: 5,
+		pos: vector.clone(hero.body.getPosition()),
+		fillStyle: color,
+		initialRadius: hero.radius,
+		finalRadius: hero.radius * 1.5,
+	});
 }
 
 function playHeroSounds(hero: w.Hero, world: w.World) {

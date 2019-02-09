@@ -370,6 +370,7 @@ function addHero(world: w.World, heroId: string) {
 		strafeIds: new Set<string>(),
 		retractorIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
+		uiDestroyedBuffs: [],
 	} as w.Hero;
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
@@ -1368,7 +1369,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
 		case "stop": return stopAction(world, hero, action, spell); // Do nothing
-		case "buff": return spawnBuffsAction(world, hero, action, spell);
+		case "buff": return buffAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
@@ -1628,6 +1629,13 @@ function isHeroShielded(hero: w.Hero, world: w.World) {
 		}
 	}
 	return false;
+}
+
+export function isHeroInvisible(hero: w.Hero): w.VanishBuff {
+	if (hero.invisible && hero.invisible.destroyedTick) {
+		hero.invisible = null;
+	}
+	return hero.invisible;
 }
 
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
@@ -2004,12 +2012,25 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 	}
 
 	hero.buffs.forEach((buff, id) => {
-		if (world.tick >= buff.expireTick) {
+		if (isBuffExpired(buff, hero, world)) {
+			buff.destroyedTick = world.tick;
 			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
+			hero.uiDestroyedBuffs.push(buff);
 		}
 	});
 
 	return true;
+}
+
+function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
+	if (world.tick >= buff.expireTick) {
+		return true;
+	} else if (buff.hitTick && hero.hitTick > buff.hitTick) {
+		return true;
+	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
+		return true;
+	}
+	return false;
 }
 
 function expireOnHeroHit(hero: w.Hero, world: w.World) {
@@ -2850,31 +2871,40 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 	return true;
 }
 
-function spawnBuffsAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
-	spell.buffs.forEach(template => {
-		const id = `${spell.id}/${template.type}`;
-		instantiateBuff(id, template, hero, world);
-	});
-	return true;
+function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
+	if (world.tick == hero.casting.channellingStartTick) {
+		spell.buffs.forEach(template => {
+			const id = `${spell.id}/${template.type}`;
+			instantiateBuff(id, template, hero, world, spell.id);
+		});
+	}
+	return ![...hero.buffs.values()].some(b => b.channellingSpellId === spell.id);
 }
 
-function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World) {
+function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, channellingSpellId: string = null) {
+	const base = {
+		expireTick: world.tick + template.maxTicks,
+		sound: template.sound,
+		maxTicks: template.maxTicks,
+		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
+		channellingSpellId: template.channelling && channellingSpellId,
+	};
 	if (template.type === "movement") {
 		hero.buffs.set(id, {
-			id,
-			type: "movement",
+			...base, id, type: "movement",
 			movementProportion: template.movementProportion,
-			expireTick: world.tick + template.maxTicks,
 		});
 	} else if (template.type === "lavaImmunity") {
 		hero.buffs.set(id, {
-			id,
-			type: "lavaImmunity",
+			...base, id, type: "lavaImmunity",
 			damageProportion: template.damageProportion,
-			expireTick: world.tick + template.maxTicks,
-			sound: template.sound,
-			maxTicks: template.maxTicks,
 		});
+	} else if (template.type === "vanish") {
+		hero.invisible = {
+			...base, id, type: "vanish",
+			initialPos: vector.clone(hero.body.getPosition()),
+		};
+		hero.buffs.set(id, hero.invisible);
 	}
 }
 

@@ -84,6 +84,18 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "vanish": {
+        "start": [
+            {
+                "stopTime": 1.25,
+                "attack": 0.25,
+                "decay": 1,
+                "highPass": 980,
+                "lowPass": 1000,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "shield": {
         start: [
             {

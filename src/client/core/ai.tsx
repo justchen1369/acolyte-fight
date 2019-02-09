@@ -171,11 +171,12 @@ function worldToState(world: w.World, myHeroId: string): WorldContract {
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
             const alliance = engine.calculateAlliance(myHeroId, obj.id, world);
+            const invisible = engine.isHeroInvisible(obj);
             contract.heroes[obj.id] = {
                 id: obj.id,
                 alliance,
                 radius: obj.radius,
-                pos: obj.body.getPosition(),
+                pos: invisible ? invisible.initialPos : obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
                 inside: engine.isInsideMap(obj, world),

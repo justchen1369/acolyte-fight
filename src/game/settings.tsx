@@ -58,7 +58,7 @@ const Choices: ChoiceSettings = {
         { btn: "f", weight: 0.75 },
     ],
 	Options: {
-		"a": ["thrust", "teleport", "swap", "voidRush"],
+		"a": ["thrust", "teleport", "swap", "voidRush", "vanish"],
 		"q": ["fireball", "flamestrike", "triplet", "retractor", "whip"],
 		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
 		"e": ["saber", "shield", "icewall", "drain", "meteor"],
@@ -1161,12 +1161,37 @@ const voidRush: Spell = {
             type: "lavaImmunity",
             damageProportion: 0,
             maxTicks: 2.5 * TicksPerSecond,
-            sound: "voidRush",
+            sound: "voidRush-lavaImmunity",
         },
     ],
 
     icon: "sprint",
     color: '#8800ff',
+    action: "buff",
+};
+const vanish: Spell = {
+    id: 'vanish',
+    name: 'Vanish',
+    description: "Vanish from sight for 2 seconds, and also increase movement speed 75%.",
+
+    untargeted: true,
+    maxAngleDiffInRevs: 1.0,
+    cooldown: 10 * TicksPerSecond,
+    throttle: false,
+    movementProportionWhileChannelling: 1.75,
+    interruptibleAfterTicks: 15,
+
+    buffs: [
+        {
+            type: "vanish",
+            maxTicks: 2 * TicksPerSecond,
+            channelling: true,
+            sound: "vanish",
+        },
+    ],
+
+    icon: "hidden",
+    color: '#00aaff',
     action: "buff",
 };
 
@@ -1201,6 +1226,7 @@ const Spells = {
     thrust,
     swap,
     voidRush,
+    vanish,
 };
 
 const Render: RenderSettings = {
