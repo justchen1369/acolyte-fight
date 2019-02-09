@@ -1418,11 +1418,16 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 }
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
+	let ticks = render.ticks;
+	if (render.rtx && !ctxStack.rtx) {
+		ticks = 1;
+	}
+
 	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
-		max: render.ticks,
+		max: ticks,
 		pos: vector.clone(projectile.body.getPosition()),
 		velocity,
 		fillStyle: projectileColor(render, projectile, world),
