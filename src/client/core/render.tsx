@@ -772,7 +772,7 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
 	const remainingTicks = buff.expireTick - world.tick;
 	const proportion = remainingTicks / buff.maxTicks;
-	const color = Color("#fff").alpha(0.25 * proportion).string();
+	const color = Color(heroColor(hero.id, world)).alpha(proportion).string();
 
 	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
 	const velocity = particleVelocity(thrust);
