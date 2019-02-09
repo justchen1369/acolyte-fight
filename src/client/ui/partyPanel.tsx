@@ -63,7 +63,6 @@ export class PartyPanel extends React.Component<Props, State> {
         return <div>
             <p>
                 Play together with friends as a party. Forming a party ensures that you and your friends are matched to the same game.
-                If there are more than {constants.Matchmaking.MaxPlayers} players in the party, the party will be split across multiple games.
             </p>
             <p><span className={this.state.loading ? "btn btn-disabled" : "btn"} onClick={() => parties.createPartyAsync()}>Create Party</span></p>
         </div>
