@@ -383,6 +383,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "ray", intermediatePoints: true, ticks: 30 },
+            { type: "projectile", ticks: 30, smoke: 0.05, fade: "#000" },
             { type: "strike", ticks: 30, glow: true },
         ],
     },
@@ -669,7 +670,8 @@ const bouncer: Spell = {
         color: '#88ee22',
         renderers: [
             { type: "ray", intermediatePoints: true, selfColor: true, ticks: 60 },
-            { type: "strike", selfColor: true, ticks: 15, glow: true, growth: 1, numParticles: 2 },
+            { type: "projectile", selfColor: true, ticks: 60, smoke: 0.05, fade: "#000" },
+            { type: "strike", selfColor: true, ticks: 15, glow: true, growth: 1 },
         ],
     },
 };
