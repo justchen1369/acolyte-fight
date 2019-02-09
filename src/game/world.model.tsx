@@ -512,6 +512,7 @@ export interface BuffBase {
 	type: string;
 	destroyedTick?: number;
 	maxTicks: number;
+	initialTick: number;
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
 	hitTick?: number; // If the hero gets hit, remove the buff

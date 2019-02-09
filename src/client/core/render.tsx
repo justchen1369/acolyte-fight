@@ -769,28 +769,31 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 }
 
 function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
-	const numPoints = 8;
-	const proportion = (buff.expireTick - world.tick) / buff.maxTicks;
+	const TrailSpeed = hero.moveSpeedPerSecond;
 
-	foreground(ctxStack, ctx => {
-		ctx.fillStyle = Color("#fff").alpha(0.25 * proportion).string();
+	const remainingTicks = buff.expireTick - world.tick;
+	const proportion = remainingTicks / buff.maxTicks;
+	const color = Color("#fff").alpha(0.25 * proportion).string();
 
-		ctx.beginPath();
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -TrailSpeed);
+	const velocity = particleVelocity(thrust);
 
-		const radius = 2 * hero.radius;
-		for (let i = 0; i < numPoints; ++i) {
-			const angle = (i / numPoints) * (2 * Math.PI);
-			const point = vector.multiply(vector.fromAngle(angle), radius);
-			if (i === 0) {
-				ctx.moveTo(point.x, point.y);
-			} else {
-				ctx.lineTo(point.x, point.y);
-			}
-		}
-		ctx.closePath();
-
-		ctx.fill();
+	world.ui.trails.push({
+		type: "circle",
+		pos: vector.clone(hero.body.getPosition()),
+		velocity,
+		radius: hero.radius * proportion,
+		initialTick: world.tick,
+		max: 60,
+		fillStyle: color,
 	});
+}
+
+function particleVelocity(primaryVelocity: pl.Vec2) {
+	const direction = vector.fromAngle(2 * Math.PI * Math.random());
+	const speed = Math.random() * vector.dot(direction, primaryVelocity); // can be negative
+	const velocity = vector.multiply(direction, speed);
+	return velocity;
 }
 
 function renderVanishReappear(ctxStack: CanvasCtxStack, buff: w.VanishBuff, hero: w.Hero, world: w.World) {
@@ -1336,9 +1339,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	// Particles
 	if (strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
-			const direction = vector.fromAngle(2 * Math.PI * Math.random());
-			const speed = Math.random() * vector.dot(direction, projectile.body.getLinearVelocity()); // can be negative
-			const velocity = vector.multiply(direction, speed);
+			const velocity = particleVelocity(projectile.body.getLinearVelocity());
 			world.ui.trails.push({
 				type: "circle",
 				initialTick: projectile.hitTick,

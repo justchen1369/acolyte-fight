@@ -2924,6 +2924,7 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffS
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, channellingSpellId: string = null) {
 	const base = {
+		initialTick: world.tick,
 		expireTick: world.tick + template.maxTicks,
 		sound: template.sound,
 		maxTicks: template.maxTicks,
