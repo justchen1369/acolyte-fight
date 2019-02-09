@@ -203,7 +203,7 @@ const flamestrike: Spell = {
         sound: "flamestrike",
         color: '#ff4400', 
         renderers: [
-            { type: "projectile", ticks: 30, smoke: 0.5 },
+            { type: "projectile", ticks: 30, smoke: 0.5, fade: "#000" },
             { type: "ray", ticks: 30, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 3 },
         ],
