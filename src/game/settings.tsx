@@ -203,7 +203,7 @@ const flamestrike: Spell = {
         sound: "flamestrike",
         color: '#ff4400', 
         renderers: [
-            { type: "projectile", ticks: 30, glow: false },
+            { type: "projectile", ticks: 30, smoke: 0.5 },
             { type: "ray", ticks: 30, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 3 },
         ],
@@ -527,7 +527,7 @@ const retractor: Spell = {
                 numParticles: 2,
                 loopTicks: 15,
             },
-            { type: "projectile", ticks: 15 },
+            { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 15, glow: true },
             { type: "strike", ticks: 15, glow: true, numParticles: 9 },
         ],

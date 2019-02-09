@@ -796,6 +796,10 @@ export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail;
 export interface TrailBase {
 	initialTick: number;
 	max: number;
+
+	fillStyle: string;
+	fade?: string;
+
 	glow?: boolean;
 	highlight?: TrailHighlight;
 	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
@@ -813,7 +817,6 @@ export interface CircleTrail extends TrailBase {
 	pos: pl.Vec2;
 	velocity?: pl.Vec2;
 	radius: number;
-	fillStyle: string;
 }
 
 export interface LineTrail extends TrailBase {
@@ -821,7 +824,6 @@ export interface LineTrail extends TrailBase {
 	from: pl.Vec2;
 	to: pl.Vec2;
 	width: number;
-	fillStyle: string;
 }
 
 export interface RippleTrail extends TrailBase {
@@ -829,7 +831,6 @@ export interface RippleTrail extends TrailBase {
 	pos: pl.Vec2;
 	initialRadius: number;
 	finalRadius: number;
-	fillStyle: string;
 }
 
 export interface ArcTrail extends TrailBase {
@@ -840,7 +841,6 @@ export interface ArcTrail extends TrailBase {
 	fromAngle: number;
 	toAngle: number;
 	antiClockwise: boolean;
-	fillStyle: string;
 }
 
 export interface AudioElement {

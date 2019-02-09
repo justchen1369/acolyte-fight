@@ -1407,12 +1407,15 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 }
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
+	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
 	world.ui.trails.push({
 		type: 'circle',
 		initialTick: world.tick,
 		max: render.ticks,
 		pos: vector.clone(projectile.body.getPosition()),
+		velocity,
 		fillStyle: projectileColor(render, projectile, world),
+		fade: render.fade,
 		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 		glow: render.glow || false,
 		highlight: projectile.uiHighlight,
@@ -1451,6 +1454,9 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let scale = 1;
 
 	let color = trail.fillStyle;
+	if (trail.fade) {
+		color = Color(color).mix(Color(trail.fade), 1 - proportion).string();
+	}
 	if (trail.highlight) {
 		const highlightProportion = Math.max(0, 1 - ((world.tick - trail.highlight.fromTick) / trail.highlight.maxTicks));
 		if (highlightProportion > 0) {

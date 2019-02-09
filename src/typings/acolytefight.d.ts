@@ -374,7 +374,9 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 declare interface RenderProjectile extends RenderParamsBase, ProjectileColorParams {
 	type: "projectile";
 
-    ticks: number; // How long is the trail?
+	ticks: number; // How long is the trail?
+	fade?: string;
+	smoke?: number;
 	glow?: boolean;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
