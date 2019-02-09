@@ -82,6 +82,7 @@ declare module "planck-js" {
             filterGroupIndex?: number;
             density?: number;
             restitution?: number;
+            isSensor?: boolean;
         }
 
         interface Filter {

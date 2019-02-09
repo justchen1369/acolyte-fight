@@ -427,6 +427,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		filterMaskBits: collideWith,
 		density: projectileTemplate.density,
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
+		isSensor: projectileTemplate.sensor,
 	} as pl.FixtureDef);
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(hero.id, x.id, world) & Alliances.Enemy));
@@ -1386,9 +1387,12 @@ function handleContact(world: w.World, contact: pl.Contact) {
 		return;
 	}
 
-	let objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
-	let objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
-	const collisionPoint = vector.average(contact.getWorldManifold().points);
+	const objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
+	const objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
+
+	const manifold = contact.getWorldManifold(); // If no collision manifold, this is a sensor
+	const collisionPoint = manifold ? vector.average(manifold.points) : null;
+
 	if (objA && objB) {
 		handleCollision(world, objA, objB, collisionPoint);
 		handleCollision(world, objB, objA, collisionPoint);
@@ -1397,7 +1401,9 @@ function handleContact(world: w.World, contact: pl.Contact) {
 
 function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
 	if (object.category === "projectile") {
-		object.uiPath.push(collisionPoint);
+		if (collisionPoint) {
+			object.uiPath.push(collisionPoint);
+		}
 
 		if (hit.category === "hero") {
 			handleProjectileHitHero(world, object, hit);
