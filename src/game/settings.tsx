@@ -159,7 +159,7 @@ const fireball: Spell = {
         soundHit: "standard",
         color: '#ff8800',
         renderers: [
-            { type: "projectile", ticks: 30, glow: false },
+            { type: "projectile", ticks: 30, smoke: 0.25, fade: "#000" },
             { type: "ray", ticks: 30, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 5 },
         ],
@@ -240,7 +240,7 @@ const triplet: Spell = {
         soundHit: "standard",
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 10, glow: false },
+            { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 10, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
         ],
@@ -308,7 +308,7 @@ const meteor: Spell = {
         sound: "meteor",
         color: '#ff0000',
         renderers: [
-            { type: "projectile", ticks: 15, glow: false },
+            { type: "projectile", ticks: 15, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 15, glow: true, growth: 0.1 },
         ],
     },
@@ -419,8 +419,8 @@ const homing: Spell = {
         soundHit: "standard",
         color: '#44ffcc',
         renderers: [
-            { type: "projectile", ticks: 30, glow: false },
-            { type: "ray", ticks: 30, glow: false },
+            { type: "projectile", ticks: 30, smoke: 0.5, fade: "#000" },
+            { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10 },
         ],
     },
@@ -464,7 +464,7 @@ const boomerang: Spell = {
         renderers: [
             { type: "projectile", selfColor: true, ticks: 10 },
             { type: "ray", selfColor: true, ticks: 10 },
-            { type: "projectile", selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
+            { type: "projectile", selfColor: true, radiusMultiplier: 0.25, ticks: 60, smoke: 0.2, fade: "#000" },
             { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
             { type: "strike", selfColor: true, ticks: 15, glow: true, numParticles: 5 },
         ],
@@ -706,7 +706,7 @@ const drain: Spell = {
 
         color: '#22ee88',
         renderers: [
-            { type: "projectile", ticks: 15, glow: false },
+            { type: "projectile", ticks: 45, smoke: 0.5, fade: "#000" },
             { type: "ray", ticks: 15, glow: false },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, glow: false },
             { type: "strike", ticks: 30, growth: 4, glow: true, numParticles: 4 },
