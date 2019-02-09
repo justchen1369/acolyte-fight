@@ -810,6 +810,7 @@ const supernova: Spell = {
         color: '#ff9a00',
         renderers: [
             { type: "ray", ticks: 30 },
+            { type: "projectile", ticks: 30, smoke: 0.5 },
             { type: "reticule", color: '#ff9a00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
         ],
     },
