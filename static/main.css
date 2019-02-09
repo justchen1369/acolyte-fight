@@ -1036,7 +1036,8 @@ h2 {
 }
 
 .spell-config .spell-icon-secondary {
-    opacity: 0.75;
+    opacity: 0.5;
+    border: 2px #555 solid;
 }
 
 .spell-config .spell-icon-chosen {

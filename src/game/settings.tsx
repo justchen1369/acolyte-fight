@@ -77,7 +77,8 @@ const Choices: ChoiceSettings = {
             ["gravity"],
             ["link"],
             ["lightning"],
-            ["homing", "boomerang"],
+            ["homing"],
+            ["boomerang"],
         ],
 		"e": [
             ["saber"],
