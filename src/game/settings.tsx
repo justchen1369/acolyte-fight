@@ -159,7 +159,7 @@ const fireball: Spell = {
         soundHit: "standard",
         color: '#ff8800',
         renderers: [
-            { type: "projectile", ticks: 30, smoke: 0.1, fade: "#333", rtx: true },
+            { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 30, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 5 },
         ],
@@ -383,7 +383,6 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "ray", intermediatePoints: true, ticks: 30 },
-            { type: "projectile", ticks: 30, smoke: 0.025, fade: "#333", rtx: true },
             { type: "strike", ticks: 30, glow: true },
         ],
     },
@@ -420,7 +419,7 @@ const homing: Spell = {
         soundHit: "standard",
         color: '#44ffcc',
         renderers: [
-            { type: "projectile", ticks: 30, smoke: 0.5, fade: "#333", rtx: true },
+            { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10 },
         ],
@@ -465,7 +464,6 @@ const boomerang: Spell = {
         renderers: [
             { type: "projectile", selfColor: true, ticks: 10 },
             { type: "ray", selfColor: true, ticks: 10 },
-            { type: "projectile", selfColor: true, radiusMultiplier: 0.25, ticks: 60, smoke: 0.1, fade: "#333", rtx: true },
             { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
             { type: "strike", selfColor: true, ticks: 15, glow: true, numParticles: 5 },
         ],
@@ -670,7 +668,6 @@ const bouncer: Spell = {
         color: '#88ee22',
         renderers: [
             { type: "ray", intermediatePoints: true, selfColor: true, ticks: 60 },
-            { type: "projectile", selfColor: true, ticks: 60, smoke: 0.05, fade: "#333", rtx: true },
             { type: "strike", selfColor: true, ticks: 15, glow: true, growth: 1 },
         ],
     },
@@ -708,7 +705,7 @@ const drain: Spell = {
 
         color: '#22ee88',
         renderers: [
-            { type: "projectile", ticks: 45, smoke: 0.25, fade: "#333", rtx: true },
+            { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 15, glow: false },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, glow: false },
             { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4 },
@@ -812,7 +809,6 @@ const supernova: Spell = {
         color: '#ff9a00',
         renderers: [
             { type: "ray", ticks: 30 },
-            { type: "projectile", ticks: 30, smoke: 0.5 },
             { type: "reticule", color: '#ff9a00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
         ],
     },
