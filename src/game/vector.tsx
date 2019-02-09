@@ -88,14 +88,14 @@ export function angleDelta(currentAngle: number, targetAngle: number) {
 	const Precision = 0.001;
 
 	let delta = targetAngle - currentAngle;
-	if (delta > Math.PI) {
+	while (delta > Math.PI) {
 		delta -= 2 * Math.PI;
 	}
-	if (delta < -Math.PI) {
+	while (delta < -Math.PI) {
 		delta += 2 * Math.PI;
 	}
 
-	if (Math.PI - Math.abs(delta) < Precision) {
+	if (Math.abs(Math.PI - delta) < Precision) {
 		// break ties consistently on all machines
 		delta = Math.PI;
 	}
