@@ -1176,19 +1176,19 @@ const voidRush: Spell = {
 const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
-    description: "Vanish from sight for 2 seconds, and also increase movement speed 50%.",
+    description: "Vanish from sight for 1.5 seconds, and also increase movement speed 75%.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    movementProportionWhileChannelling: 1.5,
+    movementProportionWhileChannelling: 1.75,
     interruptibleAfterTicks: 15,
 
     buffs: [
         {
             type: "vanish",
-            maxTicks: 2 * TicksPerSecond,
+            maxTicks: 1.5 * TicksPerSecond,
             channelling: true,
             sound: "vanish",
         },
