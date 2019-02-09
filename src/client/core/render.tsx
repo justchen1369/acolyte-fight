@@ -277,7 +277,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		}
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
-			if (target) {
+			if (target && obj.link.render) {
 				renderLinkBetween(ctxStack, obj, target, obj.link.render);
 			}
 		}
@@ -1248,8 +1248,10 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 
 	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
-	const swirl = world.settings.Render.gravity;
-	renderGravityAt(ctxStack, hero.gravity.location, world, swirl);
+	const swirl = hero.gravity.render;
+	if (swirl) {
+		renderGravityAt(ctxStack, hero.gravity.location, world, swirl);
+	}
 
 	if (spell.sound) {
 		world.ui.sounds.push({

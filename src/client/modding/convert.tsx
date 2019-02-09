@@ -70,7 +70,6 @@ function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
         obstacle: stringify(settings.Obstacle),
         hero: stringify(settings.Hero),
         choices: stringify(settings.Choices),
-        render: stringify(settings.Render),
     };
 }
 
@@ -90,7 +89,6 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         Obstacle: codeToConstants(codeTree, "obstacle", errorTree),
         Hero: codeToConstants(codeTree, "hero", errorTree),
         Choices: codeToConstants(codeTree, "choices", errorTree),
-        Render: codeToConstants(codeTree, "render", errorTree),
     };
     if (Object.keys(errorTree).length > 0) {
         throw new e.ParseException(errorTree);

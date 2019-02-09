@@ -1746,6 +1746,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 		strength: projectile.gravity.impulsePerTick,
 		radius: projectile.gravity.radius,
 		power: projectile.gravity.power,
+		render: projectile.gravity.render,
 	};
 	world.behaviours.push({ type: "gravityForce", heroId: target.id });
 }

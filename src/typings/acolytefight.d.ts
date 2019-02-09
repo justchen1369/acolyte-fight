@@ -32,7 +32,6 @@ declare interface AcolyteFightSettings {
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
 	Icons: IconLookup;
-	Render: RenderSettings;
 }
 
 declare type ModTree = {
@@ -279,6 +278,7 @@ declare interface GravityParameters {
 	impulsePerTick: number; // Force to apply each tick to a trapped hero (pre-scaling)
 	radius: number; // Scale factor: The force scales to zero at this radius
 	power: number; // Scale factor: The power curve to apply to the scaling
+	render?: RenderSwirl; // What to render when a hero is caught in gravity
 }
 
 declare interface BounceParameters {
@@ -555,10 +555,6 @@ declare interface DamagePacketTemplate {
 	damageScaling?: boolean;
 	lifeSteal?: number;
 	isLava?: boolean;
-}
-
-declare interface RenderSettings {
-	gravity: RenderSwirl;
 }
 
 declare interface Vec2 {

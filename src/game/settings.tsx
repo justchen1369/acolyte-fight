@@ -105,21 +105,6 @@ const Choices: ChoiceSettings = {
     },
 }
 
-const renderGravity: RenderSwirl = {
-    type: "swirl",
-
-    color: '#0ace00',
-    radius: 0.02,
-    ticks: 0.25 * TicksPerSecond,
-
-    loopTicks: 20,
-
-    numParticles: 3,
-    particleRadius: 0.02 / 3,
-
-    glow: true,
-};
-
 const move: MoveSpell = {
     id: Actions.Move,
     description: "",
@@ -745,6 +730,22 @@ const drain: Spell = {
         ],
     },
 };
+
+const renderGravity: RenderSwirl = {
+    type: "swirl",
+
+    color: '#0ace00',
+    radius: 0.02,
+    ticks: 0.25 * TicksPerSecond,
+
+    loopTicks: 20,
+
+    numParticles: 3,
+    particleRadius: 0.02 / 3,
+
+    glow: true,
+
+};
 const gravity: Spell = {
     id: 'gravity',
     name: 'Ensnare',
@@ -773,6 +774,7 @@ const gravity: Spell = {
             ticks: 2.0 * TicksPerSecond,
             radius: 0.05,
             power: 1,
+            render: renderGravity,
         },
 
         behaviours: [
@@ -1264,10 +1266,6 @@ const Spells = {
     vanish,
 };
 
-const Render: RenderSettings = {
-    gravity: renderGravity,
-};
-
 export const Mod: ModSettings = {
     name: null,
     author: null,
@@ -1284,5 +1282,4 @@ export const DefaultSettings: AcolyteFightSettings = {
     Layouts,
     Sounds,
     Icons,
-    Render,
 };

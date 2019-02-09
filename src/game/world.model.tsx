@@ -502,6 +502,7 @@ export interface GravityState {
 	strength: number;
 	radius: number;
 	power: number;
+	render?: RenderSwirl;
 }
 
 export type Buff =
