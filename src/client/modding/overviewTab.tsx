@@ -21,6 +21,7 @@ const stringifyMod = Reselect.createSelector(
 
 interface Props {
     codeTree: e.CodeTree;
+    party: boolean;
     roomId: string;
     roomMod: ModTree;
     currentMod: ModTree;
@@ -38,6 +39,7 @@ function stateToProps(state: s.State): Props {
     const modResult = editing.codeToMod(state.codeTree);
     return {
         playerName: state.playerName,
+        party: !!state.party,
         roomId: state.room.id,
         roomMod: state.room.mod,
         codeTree: state.codeTree,
@@ -129,6 +131,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 You will automatically be matched to other players who currently have the same mod activated.
                 Explore the tabs (above) to edit this mod. Click "Preview Mod" (top right) to play this mod by yourself.
             </p>
+            {this.props.party ? <p>The mod has been activated for all your party members too.</p> : <p>Create a party to play this mod with friends.</p>}
             <CodeEditor code={this.state.code} onChange={(code) => this.onCodeChange(code)} />
             {this.state.codeError && <div className="error">{this.state.codeError}</div>}
             <div className="button-row">
