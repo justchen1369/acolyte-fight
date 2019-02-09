@@ -311,16 +311,18 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 	const Speed = 0.1;
 
 	const pos = vector.clone(hero.body.getPosition());
-	const baseVelocity = hero.body.getLinearVelocity();
 
 	for (let i = 0; i < NumParticles; ++i) {
+		const baseVelocity = particleVelocity(hero.body.getLinearVelocity());
 		const expireVelocity = vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), Math.random() * Speed);
+		const velocity = vector.plus(baseVelocity, expireVelocity);
+
 		world.ui.trails.push({
 			type: "circle",
 			max: MaxTicks,
 			initialTick: world.tick,
 			pos,
-			velocity: vector.plus(baseVelocity, expireVelocity),
+			velocity,
 			fillStyle: "white",
 			radius: hero.radius,
 		});

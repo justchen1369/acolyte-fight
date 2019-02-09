@@ -709,7 +709,7 @@ const drain: Spell = {
             { type: "projectile", ticks: 45, smoke: 0.5, fade: "#000" },
             { type: "ray", ticks: 15, glow: false },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, glow: false },
-            { type: "strike", ticks: 30, growth: 4, glow: true, numParticles: 4 },
+            { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4 },
         ],
     },
 };
@@ -1064,7 +1064,6 @@ const teleport: Spell = {
     throttle: false,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
-    interruptibleAfterTicks: 0,
 
     icon: "teleport",
 
