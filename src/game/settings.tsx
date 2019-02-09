@@ -1160,7 +1160,7 @@ const voidRush: Spell = {
     buffs: [
         {
             type: "movement",
-            movementProportion: 1.3,
+            movementProportion: 1.5,
             maxTicks: 2.5 * TicksPerSecond,
         },
         {
