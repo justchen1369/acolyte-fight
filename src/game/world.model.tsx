@@ -364,7 +364,9 @@ export interface Hero extends WorldObjectBase {
 	body: pl.Body;
 	radius: number;
 	moveSpeedPerSecond: number;
+	maxSpeed: number;
 	revolutionsPerTick: number;
+
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;

@@ -361,6 +361,7 @@ function addHero(world: w.World, heroId: string) {
 		additionalDamageMultiplier: Hero.AdditionalDamageMultiplier,
 		additionalDamagePower: Hero.AdditionalDamagePower,
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
+		maxSpeed: Hero.MaxSpeed,
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
@@ -695,6 +696,12 @@ function applySpeedLimit(world: w.World) {
 			if (Math.abs(diff) > world.settings.World.ProjectileSpeedMaxError) {
 				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
 				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, newSpeed));
+			}
+		} else if (obj.category === "hero" && obj.maxSpeed) {
+			const currentVelocity = obj.body.getLinearVelocity();
+			const currentSpeed = vector.length(currentVelocity);
+			if (currentSpeed > obj.maxSpeed) {
+				obj.body.setLinearVelocity(vector.truncate(currentVelocity, obj.maxSpeed));
 			}
 		}
 	});

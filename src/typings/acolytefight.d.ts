@@ -46,7 +46,8 @@ declare interface ModSettings {
 }
 
 declare interface HeroSettings {
-    MoveSpeedPerSecond: number;
+	MoveSpeedPerSecond: number;
+	MaxSpeed: number; // Limit speed - corrects some physics engine errors which can speed up the hero and eject them from the map uncontrollably
     Radius: number;
     Density: number;
 
