@@ -383,7 +383,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "ray", intermediatePoints: true, ticks: 30 },
-            { type: "strike", ticks: 30, glow: true },
+            { type: "strike", ticks: 30, glow: true, numParticles: 3 },
         ],
     },
 };
