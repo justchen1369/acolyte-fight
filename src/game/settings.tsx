@@ -7,7 +7,7 @@ import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
-    MaxSpeed: 3.0,
+    MaxSpeed: 1.0,
     Radius: 0.0125,
     Density: 0.72,
 
