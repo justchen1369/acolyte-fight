@@ -1105,7 +1105,7 @@ const thrust: Spell = {
     name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
 
-    range: 0.25,
+    range: 0.3,
     radiusMultiplier: 1.5,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
@@ -1175,7 +1175,7 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 2.5 seconds, increase movement speed 50%, and also become immune to damage from the void.",
+    description: "For 2.5 seconds, increase movement speed 75%, and also become immune to damage from the void.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -1185,7 +1185,7 @@ const voidRush: Spell = {
     buffs: [
         {
             type: "movement",
-            movementProportion: 1.5,
+            movementProportion: 1.75,
             maxTicks: 2.5 * TicksPerSecond,
         },
         {
