@@ -541,6 +541,9 @@ declare interface KeyBindings {
 }
 
 declare interface LinkParameters {
+	selfFactor?: number; // How much should the link pull the hero
+	targetFactor?: number; // How much should the link pull the target
+
 	impulsePerTick: number;
 	lifeSteal: number;
 	linkTicks: number;

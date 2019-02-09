@@ -1834,6 +1834,8 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		targetId: target.id,
 		minDistance: projectile.link.minDistance,
 		maxDistance: projectile.link.maxDistance,
+		selfFactor: projectile.link.selfFactor !== undefined ? projectile.link.selfFactor : 1,
+		targetFactor: projectile.link.targetFactor !== undefined ? projectile.link.targetFactor : 1,
 		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,

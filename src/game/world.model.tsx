@@ -474,6 +474,9 @@ export interface CastState {
 export interface LinkState {
 	targetId: string | null;
 
+	selfFactor: number;
+	targetFactor: number;
+
 	strength: number;
 	minDistance: number;
 	maxDistance: number;
