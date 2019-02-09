@@ -159,7 +159,7 @@ const fireball: Spell = {
         soundHit: "standard",
         color: '#ff8800',
         renderers: [
-            { type: "projectile", ticks: 30, smoke: 0.25, fade: "#000" },
+            { type: "projectile", ticks: 30, smoke: 0.15, fade: "#333" },
             { type: "ray", ticks: 30, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 5 },
         ],
@@ -383,7 +383,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "ray", intermediatePoints: true, ticks: 30 },
-            { type: "strike", ticks: 30, glow: true, numParticles: 3 },
+            { type: "strike", ticks: 30, glow: true },
         ],
     },
 };
