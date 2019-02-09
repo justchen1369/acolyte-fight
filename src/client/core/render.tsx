@@ -306,16 +306,24 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 }
 
 function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const ticks = 15;
+	const NumParticles = 10;
+	const MaxTicks = 30;
+	const Speed = 0.1;
+
 	const pos = vector.clone(hero.body.getPosition());
-	world.ui.trails.push({
-		type: "circle",
-		max: ticks,
-		initialTick: world.tick,
-		pos,
-		fillStyle: 'white',
-		radius: world.settings.Hero.Radius * 1.5,
-	});
+	const color = heroColor(hero.id, world);
+
+	for (let i = 0; i < NumParticles; ++i) {
+		world.ui.trails.push({
+			type: "circle",
+			max: MaxTicks,
+			initialTick: world.tick,
+			pos,
+			velocity: vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), Math.random() * Speed),
+			fillStyle: "white",
+			radius: hero.radius,
+		});
+	}
 
 	world.ui.sounds.push({
 		id: `${hero.id}-death`,
