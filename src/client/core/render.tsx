@@ -663,12 +663,13 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	renderRangeIndicator(ctxStack, hero, world);
 	renderBuffs(ctxStack, hero, world); // Do this before applying translation
 
-	if (engine.isHeroInvisible(hero)) {
+	const invisible = engine.isHeroInvisible(hero);
+	if (invisible) {
 		if (world.ui.myHeroId && (engine.calculateAlliance(hero.id, world.ui.myHeroId, world) & Alliances.Enemy) > 0) {
 			// Enemy - render nothing
 		} else {
 			// Self or observer - render placeholder
-			renderHeroInvisible(ctxStack, hero, world);
+			renderHeroInvisible(ctxStack, hero, invisible, world);
 		}
 	} else {
 		renderHeroCharacter(ctxStack, hero, world);
@@ -769,13 +770,11 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 }
 
 function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
-	const TrailSpeed = hero.moveSpeedPerSecond;
-
 	const remainingTicks = buff.expireTick - world.tick;
 	const proportion = remainingTicks / buff.maxTicks;
 	const color = Color("#fff").alpha(0.25 * proportion).string();
 
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -TrailSpeed);
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
 	const velocity = particleVelocity(thrust);
 
 	world.ui.trails.push({
@@ -907,24 +906,18 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 	}
 }
 
-function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const ctx = ctxStack.canvas;
-
-	const color = '#111';
-	ctx.fillStyle = color;
-
-	ctx.beginPath();
-	ctx.arc(0, 0, hero.radius, 0, 2 * Math.PI);
-	ctx.fill();
+function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, invisible: w.VanishBuff, world: w.World) {
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(thrust);
 
 	world.ui.trails.push({
-		type: 'ripple',
+		type: 'circle',
 		initialTick: world.tick,
-		max: 5,
+		max: 60,
 		pos: vector.clone(hero.body.getPosition()),
-		fillStyle: color,
-		initialRadius: hero.radius,
-		finalRadius: hero.radius * 1.5,
+		fillStyle: "#111",
+		radius: hero.radius,
+		velocity,
 	});
 }
 
