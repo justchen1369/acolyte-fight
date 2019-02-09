@@ -4,6 +4,8 @@ import * as s from '../store.model';
 import * as convert from './convert';
 import * as matches from '../core/matches';
 import * as modder from '../../game/modder';
+import * as pages from '../core/pages';
+import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
@@ -29,6 +31,20 @@ export async function previewMod(mod: ModTree, layoutId: string = null) {
         const roomId = await rooms.createRoomAsync(mod)
         await matches.joinNewGame({ layoutId, roomId, locked: true });
     }
+}
+
+export async function exitEditor(mod: ModTree, nextPage: string = "") {
+    let roomId: string = null;
+    if (mod) {
+        roomId = await rooms.createRoomAsync(mod);
+    } else {
+        roomId = rooms.DefaultRoom;
+    }
+
+    await rooms.joinRoomAsync(roomId);
+    await parties.movePartyAsync(roomId);
+    await pages.changePage(nextPage);
+    StoreProvider.dispatch({ type: "updateHash", hash: null });
 }
 
 export const codeToSettings = Reselect.createSelector(

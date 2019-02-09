@@ -2,13 +2,14 @@ import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as w from '../../game/world.model';
 import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as regions from '../core/regions';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
+import Link from '../controls/link';
 import PartyGameList from './partyGameList';
 import PartyMemberControl from './partyMemberControl';
 
@@ -81,6 +82,8 @@ export class PartyPanel extends React.Component<Props, State> {
             <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
             <p><input className="share-url" type="text" value={origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
             <p><span className="btn" onClick={() => this.onLeaveParty()}>Leave Party</span></p>
+            {this.props.party.members.length >= constants.Matchmaking.MaxPlayers && <p>If you party is larger than {constants.Matchmaking.MaxPlayers} players, the party will be split across multiple games.</p>}
+            {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             {this.renderPartyMode(self.isLeader)}
             <h1>Players</h1>
             <div className="party-list">
