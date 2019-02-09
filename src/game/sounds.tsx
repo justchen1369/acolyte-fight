@@ -70,17 +70,26 @@ export const Sounds: Sounds = {
         "start": [
             {
                 "volume": 0.25,
-                "stopTime": 3,
+                "stopTime": 2.5,
                 "attack": 0.25,
-                "decay": 2.9,
+                "decay": 2.25,
                 "startFreq": 60,
-                "stopFreq": 60,
+                "stopFreq": 70,
                 "highPass": 40,
                 "wave": "sine",
                 "ratios": [
                     1,
                     1.5
                 ]
+            },
+            {
+                "volume": 0.25,
+                "stopTime": 2.5,
+                "attack": 0.25,
+                "decay": 2.25,
+                "highPass": 980,
+                "lowPass": 1000,
+                "wave": "brown-noise"
             }
         ]
     },
