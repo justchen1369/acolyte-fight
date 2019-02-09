@@ -110,6 +110,11 @@ declare interface ObstacleSettings {
 	AngularDamping: number;
 	LinearDamping: number;
 	Density: number;
+
+	// These values control how quickly obstacles return to their initial positions before the game starts
+	ReturnProportion: number;
+	ReturnMinSpeed: number;
+	ReturnTurnRate: number;
 }
 
 declare interface ChoiceSettings {

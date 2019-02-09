@@ -43,7 +43,10 @@ const Obstacle: ObstacleSettings = {
 	Health: 50,
 	AngularDamping: 5,
 	LinearDamping: 2,
-	Density: 100.0,
+    Density: 100.0,
+    ReturnProportion: 0.04,
+    ReturnMinSpeed: 0.02,
+    ReturnTurnRate: 0.002,
 }
 
 const Choices: ChoiceSettings = {

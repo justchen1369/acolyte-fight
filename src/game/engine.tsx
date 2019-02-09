@@ -154,13 +154,16 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	};
 
 	// Obstacles start immovable
-	if (world.tick < world.startTick) {
-		body.setMassData({
-			mass: 1e6,
-			I: 0,
-			center: vector.zero(),
-		});
-	}
+	world.behaviours.push({
+		type: "fixate",
+		untilGameStarted: true,
+		objId: obstacleId,
+		pos: position,
+		angle,
+		proportion: Obstacle.ReturnProportion,
+		speed: Obstacle.ReturnMinSpeed,
+		turnRate: Obstacle.ReturnTurnRate * 2 * Math.PI,
+	});
 
 	world.objects.set(obstacle.id, obstacle);
 	return obstacle;
@@ -636,6 +639,7 @@ export function tick(world: w.World) {
 
 	handleBehaviours(world, {
 		retractor,
+		fixate,
 		removePassthrough,
 		thrustDecay,
 		expireBuffs,
@@ -694,6 +698,36 @@ function applySpeedLimit(world: w.World) {
 			}
 		}
 	});
+}
+
+function fixate(behaviour: w.FixateBehaviour, world: w.World) {
+	if (behaviour.untilGameStarted && world.tick >= world.startTick) {
+		return true;
+	}
+
+	const obj = world.objects.get(behaviour.objId);
+	if (!obj) {
+		return false;
+	}
+
+	// Correct position
+	{
+		const pos = obj.body.getPosition();
+		const diff = vector.diff(behaviour.pos, pos);
+		const step = vector.truncate(diff, Math.max(behaviour.speed / TicksPerSecond, behaviour.proportion * vector.length(diff)));
+		obj.body.setPosition(vector.plus(pos, step));
+	}
+
+
+	// Correct angle
+	{
+		const angle = obj.body.getAngle();
+		const diff = vector.angleDelta(angle, behaviour.angle);
+		const maxStep = Math.max(behaviour.proportion * Math.abs(diff), behaviour.turnRate);
+		obj.body.setAngle(vector.turnTowards(angle, behaviour.angle, maxStep));
+	}
+
+	return true;
 }
 
 function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.World) {

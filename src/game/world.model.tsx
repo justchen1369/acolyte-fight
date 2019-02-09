@@ -601,6 +601,7 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	DelayBehaviour
+	| FixateBehaviour
 	| HomingBehaviour
 	| DetonateBehaviour
 	| RetractorBehaviour
@@ -624,6 +625,18 @@ export interface DelayBehaviour extends BehaviourBase {
 	type: "delayBehaviour";
 	afterTick: number;
 	delayed: Behaviour;
+}
+
+export interface FixateBehaviour extends BehaviourBase {
+	type: "fixate";
+	untilGameStarted?: boolean;
+
+	objId: string;
+	pos: pl.Vec2;
+	angle: number;
+	proportion: number;
+	speed: number;
+	turnRate: number;
 }
 
 export interface HomingBehaviour extends BehaviourBase {
