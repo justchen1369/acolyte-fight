@@ -37,7 +37,9 @@
     },
     "Choices": {
         "Options": {
-            "f": ["scourge", "cluster"]
+            "f": [
+                ["cluster"]
+            ]
         }
     }
 }

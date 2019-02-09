@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import { Motion, spring, SpringHelperConfig } from 'react-motion';
 import * as cloud from '../core/cloud';
 import * as s from '../store.model';
 import { SpellIcon } from '../controls/spellIcon';
@@ -37,6 +39,11 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
+const springConfig: SpringHelperConfig = {
+    stiffness: 300,
+    damping: 30,
+};
+
 const uploadSettingsDebounced = _.debounce(() => uploadSettings(), 500);
 
 function uploadSettings() {
@@ -54,43 +61,91 @@ class SpellKeyConfig extends React.Component<Props, State> {
     }
 
     render() {
-        const key = this.props.btn;
+        const btn = this.props.btn;
         const Choices = this.props.settings.Choices;
         const Spells = this.props.settings.Spells;
 
-        const options = Choices.Options[key];
-        const chosen = spellUtils.resolveSpellForKey(key, this.props.config, this.props.settings);
+        const options = Choices.Options[btn];
+        const chosen = spellUtils.resolveSpellForKey(btn, this.props.config, this.props.settings);
         const hovering = Spells[this.state.hovering];
 
-        const isRightClick = keyboardUtils.isSpecialKey(key);
+        const isRightClick = keyboardUtils.isSpecialKey(btn);
         return <div className="key" onClick={ev => ev.stopPropagation()}>
             <div className="key-options">
-                {options.map(spellId => Spells[spellId]).map(spell =>
-                    <SpellIcon
-                        key={spell.id}
-                        icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
-                        color={spell.color}
-                        size={48}
-                        attr={{
-                            className: spell.id === chosen.id ? "spell-icon-chosen" : "spell-icon-not-chosen",
-                            title: spellUtils.spellName(spell),
-                            onMouseDown: () => this.onChoose(key, spell.id),
-                            onTouchStart: () => this.onChoose(key, spell.id),
-                            onMouseEnter: () => this.onMouseHoverSpell(spell.id),
-                            onMouseLeave: () => this.onMouseLeaveSpell(),
-                        }}
-                        hoverWash={spell.id !== chosen.id} />)}
+                {options.map(row => this.renderOptionsRow(row, chosen.id))}
             </div>
             <div className="key-detail-container">
                 <div className="key-detail">
                     <div className="spell-name">{spellUtils.spellName(hovering ? hovering : chosen)}</div>
                     <div className="description">{hovering ? hovering.description : chosen.description}</div>
-                    {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : key.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
+                    {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : btn.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
             </div>
-            {!isMobile && this.props.rebinding && <KeyControl initialKey={key} />}
+            {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;
+    }
+
+    private renderOptionsRow(row: string[], chosenId: string) {
+        const spells = row.map(spellId => this.props.settings.Spells[spellId]);
+
+        let chosenIndex = row.indexOf(chosenId);
+        if (chosenIndex === -1) {
+            chosenIndex = 0;
+        }
+
+        return <div className="key-options-row">
+            {spells.map((spell, index) => this.renderSpellIcon(spell, chosenId, index - chosenIndex))}
+        </div>
+    }
+
+    private renderSpellIcon(spell: Spell, chosenId: string, index: number) {
+        const MaxSize = 48;
+        const SmallSize = 48;
+        const Margin = 4;
+
+        let left = index * (Margin + SmallSize);
+        let size = index === 0 ? MaxSize : SmallSize;
+        if (index > 0) {
+            left += MaxSize - SmallSize; // shift past the primary selection
+        }
+        let top = (MaxSize - size) / 2;
+
+        const btn = this.props.btn;
+        const chosen = spell.id === chosenId;
+        const hovering = this.state.hovering === spell.id;
+        const className = classNames({
+            "spell-icon-chosen": chosen,
+            "spell-icon-not-chosen": !chosen,
+            "spell-icon-secondary": index !== 0 && !hovering,
+        });
+
+        let color: string;
+        if (chosenId === spell.id || this.state.hovering === spell.id) {
+            color = spell.color;
+        } else if (index === 0) {
+            color = "#888";
+        } else {
+            color = "#444";
+        }
+
+        return <Motion style={{size: spring(size, springConfig), left: spring(left, springConfig), top: spring(top, springConfig)}}>
+            {style => <SpellIcon
+                key={spell.id}
+                icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
+                color={color}
+                size={style.size}
+                attr={{
+                    className,
+                    title: spellUtils.spellName(spell),
+                    onMouseDown: () => this.onChoose(btn, spell.id),
+                    onTouchStart: () => this.onChoose(btn, spell.id),
+                    onMouseEnter: () => this.onMouseHoverSpell(spell.id),
+                    onMouseLeave: () => this.onMouseLeaveSpell(),
+                }}
+                style={style}
+                />}
+        </Motion>
     }
 
     private onMouseHoverSpell(hovering: string) {

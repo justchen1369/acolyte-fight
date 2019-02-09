@@ -987,7 +987,7 @@ h2 {
 
 
 .spell-config .key-detail {
-    margin-left: 50px;
+    margin-left: 0px;
     margin-right: 50px;
 }
 
@@ -1013,27 +1013,38 @@ h2 {
 
 .spell-config .key-options {
     margin-left: 20px;
+    width: 120px;
 
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: 0;
+    align-items: center;
+}
+
+.spell-config .key-options-row {
+    position: relative;
+    height: 56px;
 }
 
 .spell-config .spell-icon {
-    margin: 4px;
+    position: absolute;
+    top: 0;
+
     cursor: pointer;
-    border: none;
-    border: 3px #333 solid;
+    border: 2px #333 solid;
     box-sizing: border-box;
     box-shadow: 2px 2px 3px #222;
 }
 
+.spell-config .spell-icon-secondary {
+    opacity: 0.75;
+}
+
 .spell-config .spell-icon-chosen {
-    border: 3px #222 solid;
+    border: 2px #222 solid;
 }
 
 .spell-config .spell-icon:hover {
-    border: 3px white solid;
+    border: 2px white solid;
 }
 
 @media (max-width: 768px) {

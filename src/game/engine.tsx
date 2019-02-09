@@ -1213,7 +1213,7 @@ export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFi
 	for (var key in Choices.Options) {
 		let spellId = keyBindings[key];
 
-		const validOptions = Choices.Options[key];
+		const validOptions = _.flatten(Choices.Options[key]);
 		if (!(validOptions.indexOf(spellId) >= 0)) {
 			spellId = validOptions[0];
 		}

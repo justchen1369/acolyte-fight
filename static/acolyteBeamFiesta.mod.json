@@ -27,14 +27,14 @@
 		],
 		"Options": {
 			"s": [
-				"shield",
-				"icewall"
+				["shield"],
+				["icewall"]
 			],
 			"q": [],
 			"w": [],
 			"e": [],
 			"r": [
-				"kamehameha"
+				["kamehameha"]
 			],
 			"d": []
 		},

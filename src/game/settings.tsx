@@ -62,12 +62,40 @@ const Choices: ChoiceSettings = {
         { btn: "f", weight: 0.75 },
     ],
 	Options: {
-		"a": ["thrust", "teleport", "swap", "voidRush", "vanish"],
-		"q": ["fireball", "flamestrike", "triplet", "retractor", "whip"],
-		"w": ["gravity", "link", "lightning", "homing", "boomerang"],
-		"e": ["saber", "shield", "icewall", "drain", "meteor"],
-		"r": ["kamehameha", "bouncer", "supernova"],
-		"f": ["scourge", "firespray", "mines", "halo"],
+		"a": [
+            ["thrust"],
+            ["teleport", "swap"],
+            ["voidRush", "vanish"],
+        ],
+		"q": [
+            ["fireball", "flamestrike"],
+            ["triplet"],
+            ["retractor"],
+            ["whip"],
+        ],
+		"w": [
+            ["gravity"],
+            ["link"],
+            ["lightning"],
+            ["homing", "boomerang"],
+        ],
+		"e": [
+            ["saber"],
+            ["shield", "icewall"],
+            ["drain"],
+            ["meteor"],
+        ],
+		"r": [
+            ["kamehameha"],
+            ["bouncer"],
+            ["supernova"],
+        ],
+		"f": [
+            ["scourge"],
+            ["firespray"],
+            ["mines"],
+            ["halo"],
+        ],
 	},
     Special: {
         [(SpecialKeys.Move)]: Actions.Move,

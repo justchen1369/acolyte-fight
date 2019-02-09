@@ -606,7 +606,7 @@ function randomKeyBindings(game: g.Game): KeyBindings {
 	const keyBindings: KeyBindings = {};
 	const allOptions = DefaultSettings.Choices.Options
 	for (const key in allOptions) {
-		const options = allOptions[key];
+		const options = _.flatten(allOptions[key]);
 		if (options.length > 1) {
 			keyBindings[key] = options[Math.floor(Math.random() * options.length)];
 		}

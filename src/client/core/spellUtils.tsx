@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export function spellName(spell: Spell) {
     return spell.name || capitalize(spell.id);
 }
@@ -7,7 +9,7 @@ function capitalize(str: string) {
 }
 
 export function resolveSpellForKey(key: string, keyBindings: KeyBindings, settings: AcolyteFightSettings): Spell {
-    const options = settings.Choices.Options[key];
+    const options = _.flatten(settings.Choices.Options[key]);
 
     let chosenId = keyBindings[key];
     if (!(options.indexOf(chosenId) >= 0)) {

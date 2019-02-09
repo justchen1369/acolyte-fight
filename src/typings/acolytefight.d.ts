@@ -533,7 +533,7 @@ declare interface ThrustSpell extends SpellBase {
 }
 
 declare interface KeyBindingOptions {
-    [key: string]: string[];
+    [key: string]: string[][];
 }
 
 declare interface KeyBindings {

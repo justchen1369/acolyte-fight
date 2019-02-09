@@ -7,10 +7,10 @@ interface Props {
     icon: Path2D;
     color: string;
     size: number;
-    hoverWash?: boolean;
     hoverHighlight?: boolean;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
+    style?: any;
 }
 
 interface State {
@@ -30,6 +30,7 @@ export class SpellIcon extends React.Component<Props, State> {
 
     render() {
         const attr = this.props.attr || {};
+        const style = this.props.style || {};
 
         let className = "spell-icon";
         if (attr.className) {
@@ -40,7 +41,7 @@ export class SpellIcon extends React.Component<Props, State> {
 
         return <canvas
             {...attr}
-            style={{ width: this.props.size, height: this.props.size }}
+            style={{ width: this.props.size, height: this.props.size, ...style }}
             className={className}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
             width={this.props.size}
@@ -80,9 +81,6 @@ export class SpellIcon extends React.Component<Props, State> {
             const rect = this.elem.getBoundingClientRect();
 
             let color = this.props.color;
-            if (this.props.hoverWash && !this.state.hovering) {
-                color = "#888";
-            }
             if (this.props.hoverHighlight && this.state.hovering) {
                 color = Color(color).mix(Color("white"), 0.5).string();
             }
