@@ -480,6 +480,8 @@ export interface LinkState {
 
 	lifeSteal: number;
 	expireTick: number;
+
+	render: RenderLink;
 }
 
 export interface ThrustState {

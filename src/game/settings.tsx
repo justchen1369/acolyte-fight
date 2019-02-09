@@ -105,12 +105,6 @@ const Choices: ChoiceSettings = {
     },
 }
 
-const renderLink: RenderLink = {
-    type: "link",
-    color: '#4444ff',
-    width: 5 * Pixel,
-};
-
 const renderGravity: RenderSwirl = {
     type: "swirl",
 
@@ -646,6 +640,12 @@ const link: Spell = {
             maxDistance: 0.25,
             linkTicks: 2.0 * TicksPerSecond,
             lifeSteal: 0.5,
+
+            render: {
+                type: "link",
+                color: '#4444ff',
+                width: 5 * Pixel,
+            },
         },
 
         behaviours: [
@@ -664,7 +664,11 @@ const link: Spell = {
         color: '#4444ff',
         renderers: [
             { type: "projectile", ticks: 1 },
-            renderLink,
+            {
+                type: "link",
+                color: '#4444ff',
+                width: 5 * Pixel,
+            },
         ],
     },
 };
@@ -1261,7 +1265,6 @@ const Spells = {
 };
 
 const Render: RenderSettings = {
-    link: renderLink,
     gravity: renderGravity,
 };
 

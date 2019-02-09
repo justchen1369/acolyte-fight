@@ -546,6 +546,8 @@ declare interface LinkParameters {
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;
+
+	render?: RenderLink;
 }
 
 declare interface DamagePacketTemplate {
@@ -556,7 +558,6 @@ declare interface DamagePacketTemplate {
 }
 
 declare interface RenderSettings {
-	link: RenderLink;
 	gravity: RenderSwirl;
 }
 

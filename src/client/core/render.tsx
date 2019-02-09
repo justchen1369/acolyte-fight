@@ -278,7 +278,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		if (obj.link) {
 			const target = world.objects.get(obj.link.targetId);
 			if (target) {
-				renderLinkBetween(ctxStack, obj, target, world.settings.Render.link);
+				renderLinkBetween(ctxStack, obj, target, obj.link.render);
 			}
 		}
 	} else if (obj.category === "shield") {

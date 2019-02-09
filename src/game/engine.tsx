@@ -1836,6 +1836,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		strength: projectile.link.impulsePerTick,
 		lifeSteal: projectile.link.lifeSteal,
 		expireTick: world.tick + projectile.link.linkTicks,
+		render: projectile.link.render,
 	};
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
 }
