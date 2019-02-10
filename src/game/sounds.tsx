@@ -320,6 +320,28 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "grapple": {
+        "start": [
+            {
+                "stopTime": 1.25,
+                "attack": 1,
+                "decay": 0.25,
+                "startFreq": 200,
+                "stopFreq": 200,
+                "lowPass": 200,
+                "tremoloFreq": 16,
+                "tremoloStrength": 0.2,
+                "wave": "square",
+                "ratios": [
+                    1,
+                    2,
+                    4,
+                    8,
+                    16
+                ]
+            }
+        ]
+    },
     "gravity": {
         start: [
             {

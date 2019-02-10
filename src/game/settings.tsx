@@ -711,7 +711,7 @@ const grapple: Spell = {
             },
         ],
 
-        sound: "link",
+        sound: "grapple",
         color: '#33ffee',
         renderers: [
             { type: "projectile", ticks: 1 },
