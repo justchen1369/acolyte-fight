@@ -74,7 +74,7 @@ const Choices: ChoiceSettings = {
             ["whip"],
         ],
 		"w": [
-            ["gravity"],
+            ["gravity", "whirlwind"],
             ["link", "grapple"],
             ["lightning"],
             ["homing"],
@@ -860,6 +860,7 @@ const gravity: Spell = {
         speed: 0.3,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 0,
+        noHit: true,
         collideWith: Categories.Hero | Categories.Massive,
 
         gravity: {
@@ -884,6 +885,63 @@ const gravity: Spell = {
         color: '#0ace00',
         renderers: [
             renderGravity,
+        ],
+    },
+};
+const whirlwind: Spell = {
+    id: 'whirlwind',
+    name: 'Whirlwind',
+    description: "Catch enemies in your whirlwind and slow them down!",
+    action: "projectile",
+
+    color: '#0088ff',
+    icon: "whirlwind",
+    sound: "gravity",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
+    chargeTicks: 0.1 * TicksPerSecond,
+
+    projectile: {
+        density: 0.0001,
+        radius: 0.05,
+        speed: 0.15,
+        maxTicks: 5.0 * TicksPerSecond,
+        damage: 0,
+        noHit: true,
+        collideWith: Categories.Hero,
+        expireOn: Categories.None,
+        sensor: true,
+
+        hitInterval: 15,
+        buffs: [
+            {
+                against: Alliances.NotFriendly,
+                type: "movement",
+                movementProportion: 0.5,
+                maxTicks: 15,
+            },
+        ],
+
+        sound: "whirlwind",
+        color: "rgba(192, 192, 192, 0.05)",
+        renderers: [
+            {
+                type: "swirl",
+
+                color: "rgba(128, 160, 255, 0.02)",
+                radius: 0.02,
+                ticks: 30,
+
+                loopTicks: 13,
+
+                numParticles: 2,
+                particleRadius: 0.03,
+
+                smoke: 1.2,
+                fade: "#333",
+            },
         ],
     },
 };
@@ -1337,6 +1395,7 @@ const Spells = {
     meteor,
     meteorite,
     gravity,
+    whirlwind,
     link,
     grapple,
     kamehameha,

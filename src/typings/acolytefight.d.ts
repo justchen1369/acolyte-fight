@@ -395,6 +395,8 @@ declare interface RenderSwirl extends RenderParamsBase {
 	numParticles: number;
 	particleRadius: number;
 
+	smoke?: number;
+	fade?: string;
 	glow?: boolean;
 }
 
@@ -428,6 +430,7 @@ declare type BuffTemplate =
 
 declare interface BuffTemplateBase {
 	type: string;
+	against?: number; // Which alliances to apply this buff to
 	maxTicks: number;
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
@@ -560,6 +563,7 @@ declare interface DamagePacketTemplate {
 	damageScaling?: boolean;
 	lifeSteal?: number;
 	isLava?: boolean;
+	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping
 }
 
 declare interface Vec2 {

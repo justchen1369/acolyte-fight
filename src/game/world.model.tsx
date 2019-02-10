@@ -600,6 +600,7 @@ export interface DamagePacket {
 	lifeSteal: number;
 	lifeStealTargetHeroId?: string;
 	isLava?: boolean;
+	noHit?: boolean;
 }
 
 export namespace HomingTargets {

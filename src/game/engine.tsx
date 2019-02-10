@@ -459,6 +459,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 			damage: projectileTemplate.damage,
 			damageScaling: projectileTemplate.damageScaling,
 			lifeSteal: projectileTemplate.lifeSteal,
+			noHit: projectileTemplate.noHit,
 		},
 		partialDamage: projectileTemplate.partialDamage,
 
@@ -1817,7 +1818,10 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 	}
 
 	projectile.buffs.forEach(template => {
-		instantiateBuff(projectile.id, template, hero, world);
+		const against = template.against !== undefined ? template.against : Categories.All;
+		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
+			instantiateBuff(projectile.id, template, hero, world);
+		}
 	});
 }
 
@@ -2991,6 +2995,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		lifeSteal,
 		lifeStealTargetHeroId,
 		fromHeroId,
+		noHit: template.noHit,
 	};
 }
 
@@ -3000,12 +3005,14 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	const fromHeroId = packet.fromHeroId;
 
 	// Register hit
-	toHero.hitTick = world.tick;
-	if (packet.damage > 0) {
-		if (packet.isLava) {
-			toHero.lavaTick = world.tick;
-		} else {
-			toHero.damagedTick = world.tick;
+	if (!packet.noHit) {
+		toHero.hitTick = world.tick;
+		if (packet.damage > 0) {
+			if (packet.isLava) {
+				toHero.lavaTick = world.tick;
+			} else {
+				toHero.damagedTick = world.tick;
+			}
 		}
 	}
 

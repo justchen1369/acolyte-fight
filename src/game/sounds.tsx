@@ -382,6 +382,19 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "whirlwind": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 5,
+                "attack": 1,
+                "decay": 4,
+                "highPass": 180,
+                "lowPass": 300,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "homing": {
         start: [
             {

@@ -358,7 +358,7 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 		} else if (render.type === "link") {
 			renderLink(ctxStack, obj, world, render);
 		} else if (render.type === "swirl") {
-			renderGravity(ctxStack, obj, world, render);
+			renderSwirl(ctxStack, obj, world, render);
 		} else if (render.type === "reticule") {
 			renderReticule(ctxStack, obj, world, render);
 		} else if (render.type === "strike") {
@@ -1261,9 +1261,9 @@ function rgColor(proportion: number) {
 	return hsl(hue, 1.0, 0.5);
 }
 
-function renderGravity(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
+function renderSwirl(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
 	const color = projectileColor(swirl, projectile, world);
-	renderGravityAt(ctxStack, projectile.body.getPosition(), world, swirl, color);
+	renderSwirlAt(ctxStack, projectile.body.getPosition(), world, swirl, color, projectile.body.getLinearVelocity());
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -1274,7 +1274,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
 	const swirl = hero.gravity.render;
 	if (swirl) {
-		renderGravityAt(ctxStack, hero.gravity.location, world, swirl);
+		renderSwirlAt(ctxStack, hero.gravity.location, world, swirl);
 	}
 
 	if (spell.sound) {
@@ -1286,21 +1286,24 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 }
 
-function renderGravityAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl, color?: string) {
+function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl, color?: string, baseVelocity?: pl.Vec2) {
 	const animationLength = swirl.loopTicks;
 	const numParticles = swirl.numParticles;
 
 	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
+	const velocity = swirl.smoke ? particleVelocity(vector.multiply(baseVelocity, -swirl.smoke)) : null;
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		world.ui.trails.push({
 			type: "circle",
 			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), swirl.radius)),
+			velocity,
 			radius: swirl.particleRadius,
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle: color || swirl.color,
 			glow: swirl.glow || false,
+			fade: swirl.fade,
 		});
 	}
 }
