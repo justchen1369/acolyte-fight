@@ -611,6 +611,52 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "meteorite": {
+        "start": [
+            {
+                "stopTime": 1,
+                "attack": 0.1,
+                "decay": 0.9,
+                "startFreq": 20,
+                "stopFreq": 1,
+                "highPass": 150,
+                "lowPass": 300,
+                "wave": "square",
+                "ratios": [
+                    1,
+                    2,
+                    3,
+                    4,
+                    5,
+                    6,
+                    7,
+                    8
+                ]
+            }
+        ],
+        "sustain": [
+            {
+                "stopTime": 2,
+                "attack": 0.5,
+                "decay": 1,
+                "startFreq": 1,
+                "stopFreq": 10,
+                "highPass": 150,
+                "lowPass": 200,
+                "wave": "square",
+                "ratios": [
+                    1,
+                    1.5,
+                    2,
+                    2.1,
+                    2.16,
+                    3.5,
+                    6.7,
+                    8.2
+                ]
+            }
+        ]
+    },
     "supernova": {
         start: [
             {

@@ -84,7 +84,7 @@ const Choices: ChoiceSettings = {
             ["saber"],
             ["shield", "icewall"],
             ["drain"],
-            ["meteor"],
+            ["meteor", "meteorite"],
         ],
 		"r": [
             ["kamehameha"],
@@ -318,6 +318,40 @@ const meteor: Spell = {
         renderers: [
             { type: "projectile", ticks: 15, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 15, glow: true, growth: 0.1 },
+        ],
+    },
+};
+const meteorite: Spell = {
+    id: 'meteorite',
+    description: "Send a little meteorite towards your enemies!",
+    action: "projectile",
+
+    color: '#ff0066',
+    icon: "fragmentedMeteor",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
+
+    projectile: {
+        density: 100,
+        radius: 0.015,
+        speed: 0.3,
+        restitution: 0,
+        minTicks: 1,
+        maxTicks: 2 * TicksPerSecond,
+        hitInterval: 120,
+        damage: 0,
+        shieldTakesOwnership: false,
+        categories: Categories.Projectile | Categories.Massive,
+        collideWith: Categories.All,
+        expireOn: Categories.None,
+
+        sound: "meteorite",
+        color: '#ff0066',
+        renderers: [
+            { type: "projectile", ticks: 10, smoke: 0.5, fade: "#333" },
+            { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
     },
 };
@@ -1308,6 +1342,7 @@ const Spells = {
     firespray,
     triplet,
     meteor,
+    meteorite,
     gravity,
     link,
     grapple,
