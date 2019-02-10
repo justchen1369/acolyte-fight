@@ -931,7 +931,7 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Whirlwind',
-    description: "Enemies caught in your whirlwind will take 50% more damage from you.",
+    description: "Enemies caught in your whirlwind will take 50% more damage from you for 2 seconds.",
     action: "projectile",
 
     color: '#8800ff',
