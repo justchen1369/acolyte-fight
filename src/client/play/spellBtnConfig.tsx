@@ -72,7 +72,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
         const isRightClick = keyboardUtils.isSpecialKey(btn);
         return <div className="key" onClick={ev => ev.stopPropagation()}>
             <div className="key-options">
-                {options.map(row => this.renderOptionsRow(row, chosen.id))}
+                {options.map((row, index) => this.renderOptionsRow(index, row, chosen.id))}
             </div>
             <div className="key-detail-container">
                 <div className="key-detail">
@@ -86,7 +86,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderOptionsRow(row: string[], chosenId: string) {
+    private renderOptionsRow(rowIndex: number, row: string[], chosenId: string) {
         const spells = row.map(spellId => this.props.settings.Spells[spellId]);
 
         let chosenIndex = row.indexOf(chosenId);
@@ -94,7 +94,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
             chosenIndex = 0;
         }
 
-        return <div className="key-options-row">
+        return <div key={rowIndex} className="key-options-row">
             {spells.map((spell, index) => this.renderSpellIcon(spell, chosenId, index - chosenIndex))}
         </div>
     }
@@ -129,7 +129,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
             color = "#444";
         }
 
-        return <Motion style={{size: spring(size, springConfig), left: spring(left, springConfig), top: spring(top, springConfig)}}>
+        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), top: spring(top, springConfig)}}>
             {style => <SpellIcon
                 key={spell.id}
                 icon={icons.getIcon(spell.icon, this.props.settings.Icons)}

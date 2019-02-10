@@ -22,6 +22,7 @@ interface Props {
     hoverSpellId: string;
     wheelOnRight: boolean;
     config: KeyBindings;
+    rebindingLookup: Map<string, string>;
     settings: AcolyteFightSettings;
 }
 interface State {
@@ -38,6 +39,7 @@ function stateToProps(state: s.State): Props {
         hoverSpellId: state.world.ui.hoverSpellId,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
+        rebindingLookup: keyboardUtils.getRebindingLookup(state.rebindings),
         settings: state.world.settings,
     };
 }
@@ -86,7 +88,13 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderDesktopHint() {
-        return <div className="customize-hint">Right-click to change</div>;
+        let keyboardShortcutHint: string = null;
+        if (this.props.hoverBtn) {
+            const btn = this.props.rebindingLookup.get(this.props.hoverBtn) || this.props.hoverBtn;
+            keyboardShortcutHint = ` (Shift+${btn.toUpperCase()})`;
+        }
+
+        return <div className="customize-hint">Right-click to change{keyboardShortcutHint}</div>;
     }
 
     private renderCustomizeBtn(btn: string) {

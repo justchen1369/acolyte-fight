@@ -118,39 +118,39 @@ async function start() {
         StoreProvider.dispatch({ type: "updatePlayerName", playerName: a.playerName });
     }
 
-    const socket = await sockets.connect(base, a.authToken);
-    await sockets.proxy(socket, query.server)
+    try {
+        const socket = await sockets.connect(base, a.authToken);
+        await sockets.proxy(socket, query.server)
 
-    if (query.party) {
-        await parties.joinPartyAsync(query.party);
-    } else {
-        await rooms.joinRoomAsync(rooms.DefaultRoom);
-        await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
+        if (query.party) {
+            await parties.joinPartyAsync(query.party);
+        } else {
+            await rooms.joinRoomAsync(rooms.DefaultRoom);
+            await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
+        }
+    } catch(error) {
+        console.error(error)
     }
 
-    await loginAsync();
+    try {
+        await loginAsync();
+    } catch (error) {
+        console.error(error);
+    }
 
     try {
         if (query.hash === "#join" || query.page === "join") {
             // Return to the home page when we exit
             StoreProvider.dispatch({ type: "updatePage", page: "" });
-            await matches.joinNewGame({ });
+            await matches.joinNewGame({});
         } else if (query.hash === "#watch" || query.page === "watch") {
             await matches.watchLiveGame();
         } else if (query.gameId) {
-            replays.watch(query.gameId);
+            await replays.watch(query.gameId);
         }
-    } catch(error) {
-        console.error(error)
-        socket.disconnect();
-        StoreProvider.dispatch({ type: "disconnected" });
-
-        if (query.party || query.server) {
-            // Failed to join party/server, try without server
-            window.location.href = url.getPath({ ...query, party: null, server: null, hash: null });
-        }
+    } catch (error) {
+        console.error(error);
     }
-
 }
 
 async function onReconnect(socket: SocketIOClient.Socket) {
