@@ -75,7 +75,7 @@ const Choices: ChoiceSettings = {
         ],
 		"w": [
             ["gravity"],
-            ["link"],
+            ["link", "grapple"],
             ["lightning"],
             ["homing"],
             ["boomerang"],
@@ -620,6 +620,7 @@ const link: Spell = {
         shieldTakesOwnership: false,
 
         link: {
+            linkWith: Categories.Hero,
             impulsePerTick: 1.0 / TicksPerSecond,
             minDistance: Hero.Radius * 2,
             maxDistance: 0.25,
@@ -657,6 +658,72 @@ const link: Spell = {
         ],
     },
 };
+const grapple: Spell = {
+    id: 'grapple',
+    description: "Pull yourself towards an enemy or obstacle. Enemies caught by the grapple will be slowed for 1.5 seconds.",
+    action: "projectile",
+
+    color: '#33ffee',
+    icon: "grapple",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: false,
+
+    projectile: {
+        density: 1,
+        radius: 0.005,
+        speed: 0.4,
+        maxTicks: 1.25 * TicksPerSecond,
+        damage: 0,
+        collideWith: Categories.All ^ Categories.Projectile,
+        expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
+        shieldTakesOwnership: false,
+
+        link: {
+            linkWith: Categories.Hero | Categories.Obstacle,
+            selfFactor: 1,
+            targetFactor: 0,
+            impulsePerTick: 2.0 / TicksPerSecond,
+            minDistance: 0.05,
+            maxDistance: 0.25,
+            linkTicks: 0.5 * TicksPerSecond,
+            lifeSteal: 0,
+
+            render: {
+                type: "link",
+                color: '#33ffee',
+                width: 5 * Pixel,
+            },
+        },
+
+        buffs: [
+            {
+                type: "movement",
+                maxTicks: 1.5 * TicksPerSecond,
+                movementProportion: 0.25,
+            }
+        ],
+
+        behaviours: [
+            {
+                type: "expireOnOwnerDeath",
+            },
+        ],
+
+        sound: "link",
+        color: '#33ffee',
+        renderers: [
+            { type: "projectile", ticks: 1 },
+            {
+                type: "link",
+                color: '#33ffee',
+                width: 3 * Pixel,
+            },
+        ],
+    },
+};
+
 const bouncer: Spell = {
     id: 'bouncer',
     description: "The more times this bounces, the more damage this does. Get in close and keep it bouncing.",
@@ -1244,6 +1311,7 @@ const Spells = {
     meteor,
     gravity,
     link,
+    grapple,
     kamehameha,
     lightning,
     homing,

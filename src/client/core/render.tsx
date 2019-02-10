@@ -747,7 +747,9 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 
 function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	hero.buffs.forEach(buff => {
-		if (buff.type === "lavaImmunity") {
+		if (buff.type === "movement") {
+			renderMovementBuff(ctxStack, buff, hero, world);
+		} else if (buff.type === "lavaImmunity") {
 			renderLavaImmunity(ctxStack, buff, hero, world);
 		}
 
@@ -795,6 +797,28 @@ function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, 
 		radius: hero.radius * proportion,
 		initialTick: world.tick,
 		max: 60,
+		fillStyle: color,
+	});
+}
+
+function renderMovementBuff(ctxStack: CanvasCtxStack, buff: w.MovementBuff, hero: w.Hero, world: w.World) {
+	if (buff.movementProportion >= 1) {
+		// Only render slows
+		return;
+	}
+
+	const color = Color("#888").alpha(0.5).string();
+
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(thrust);
+
+	world.ui.trails.push({
+		type: "circle",
+		pos: vector.clone(hero.body.getPosition()),
+		velocity,
+		radius: 0.5 * hero.radius,
+		initialTick: world.tick,
+		max: 15,
 		fillStyle: color,
 	});
 }

@@ -541,6 +541,8 @@ declare interface KeyBindings {
 }
 
 declare interface LinkParameters {
+	linkWith: number; // Categories of object to link to
+
 	selfFactor?: number; // How much should the link pull the hero
 	targetFactor?: number; // How much should the link pull the target
 

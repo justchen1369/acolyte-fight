@@ -1526,6 +1526,8 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 		packet = scaleForPartialDamage(world, projectile, packet);
 		applyDamageToObstacle(obstacle, packet, world);
+
+		linkTo(projectile, obstacle, world);
 	}
 
 	if (expireOn(world, projectile, obstacle)) {
@@ -1826,7 +1828,9 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	projectile.expireTick = world.tick;
 
 	const owner = world.objects.get(projectile.owner);
-	if (!(target && owner && owner.category === "hero")) {
+	if (!(
+		target && ((target.categories & projectile.link.linkWith) > 0)
+		&& owner && owner.category === "hero")) {
 		return;
 	}
 
