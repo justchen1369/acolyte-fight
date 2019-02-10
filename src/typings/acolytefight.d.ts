@@ -482,6 +482,7 @@ declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
 	ownerOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
+	targetOnly?: boolean;
 	color?: string;
 }
 

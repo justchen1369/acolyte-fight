@@ -3005,10 +3005,17 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			stack: template.stack,
 		});
 	} else if (template.type === "armor") {
+		let fromHeroId: string = null;
+		if (template.ownerOnly) {
+			fromHeroId = config.fromHeroId;
+		} else if (template.targetOnly) {
+			fromHeroId = config.toHeroId;
+		}
+
 		hero.buffs.set(id, {
 			...base, id, type: "armor",
 			proportion: template.proportion,
-			fromHeroId: template.ownerOnly ? config.fromHeroId : null,
+			fromHeroId,
 		});
 	}
 }

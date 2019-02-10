@@ -718,10 +718,10 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Pull yourself towards an enemy or obstacle. All your attacks gain lifesteal for the duration of the link.",
+    description: "Pull yourself towards an enemy or obstacle. When your grapple attaches to an enemy, you will be invulnerable to all damage from them for 2 seconds.",
     action: "projectile",
 
-    color: '#22eedd',
+    color: '#ff2200',
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
@@ -730,9 +730,9 @@ const grapple: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.005,
+        radius: 0.003,
         speed: 0.4,
-        maxTicks: 1.25 * TicksPerSecond,
+        maxTicks: 0.75 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -749,18 +749,25 @@ const grapple: Spell = {
 
             render: {
                 type: "link",
-                color: '#33ffee',
+                color: '#ff2200',
                 width: 5 * Pixel,
             },
         },
 
         buffs: [
             {
-                type: "lifeSteal",
+                type: "armor",
                 owner: true,
                 targetOnly: true,
-                lifeSteal: 0.5,
+                proportion: -1,
                 maxTicks: 2 * TicksPerSecond,
+                render: {
+                    color: "#ff2200",
+                    decay: true,
+                    ticks: 15,
+                    emissionRadius: 0.25 * Hero.Radius,
+                    particleRadius: Hero.Radius,
+                },
             },
         ],
 
@@ -771,12 +778,12 @@ const grapple: Spell = {
         ],
 
         sound: "grapple",
-        color: '#33ffee',
+        color: '#ff2200',
         renderers: [
             { type: "projectile", ticks: 1 },
             {
                 type: "link",
-                color: '#33ffee',
+                color: '#ff2200',
                 width: 3 * Pixel,
             },
         ],
