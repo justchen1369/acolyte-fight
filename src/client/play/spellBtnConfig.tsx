@@ -109,7 +109,6 @@ class SpellKeyConfig extends React.Component<Props, State> {
         if (index > 0) {
             left += MaxSize - SmallSize; // shift past the primary selection
         }
-        let top = (MaxSize - size) / 2;
 
         const btn = this.props.btn;
         const chosen = spell.id === chosenId;
@@ -129,12 +128,13 @@ class SpellKeyConfig extends React.Component<Props, State> {
             color = "#444";
         }
 
-        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), top: spring(top, springConfig)}}>
+        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig)}}>
             {style => <SpellIcon
                 key={spell.id}
                 icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
                 color={color}
                 size={style.size}
+                height={MaxSize}
                 attr={{
                     className,
                     title: spellUtils.spellName(spell),

@@ -7,6 +7,8 @@ interface Props {
     icon: Path2D;
     color: string;
     size: number;
+    width?: number;
+    height?: number;
     hoverHighlight?: boolean;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
@@ -31,6 +33,8 @@ export class SpellIcon extends React.Component<Props, State> {
     render() {
         const attr = this.props.attr || {};
         const style = this.props.style || {};
+        const width = this.props.width || this.props.size;
+        const height = this.props.height || this.props.size;
 
         let className = "spell-icon";
         if (attr.className) {
@@ -41,11 +45,11 @@ export class SpellIcon extends React.Component<Props, State> {
 
         return <canvas
             {...attr}
-            style={{ width: this.props.size, height: this.props.size, ...style }}
+            style={{ width, height, ...style }}
             className={className}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
-            width={this.props.size}
-            height={this.props.size}
+            width={width}
+            height={height}
             onMouseEnter={(ev) => this.onMouseEnter(ev)}
             onMouseLeave={(ev) => this.onMouseLeave(ev)}
         />
@@ -85,8 +89,20 @@ export class SpellIcon extends React.Component<Props, State> {
                 color = Color(color).mix(Color("white"), 0.5).string();
             }
 
-            ctx.clearRect(0, 0, rect.width, rect.height);
+            const left = (rect.width - this.props.size) / 2;
+            const top = (rect.height - this.props.size) / 2;
+
+            ctx.save();
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.rect(0, 0, rect.width, rect.height);
+            ctx.fill();
+
+            ctx.translate(left, top);
+
             renderIconButton(ctx, icon, color, 0.9, this.props.size);
+            ctx.restore();
         }
     }
 }
