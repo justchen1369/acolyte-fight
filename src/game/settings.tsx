@@ -918,7 +918,7 @@ const whirlwind: Spell = {
     description: "Catch enemies in your whirlwind and slow them down!",
     action: "projectile",
 
-    color: '#0088ff',
+    color: '#8800ff',
     icon: "whirlwind",
     sound: "gravity",
 
@@ -930,31 +930,31 @@ const whirlwind: Spell = {
     projectile: {
         density: 0.0001,
         radius: 0.05,
-        speed: 0.15,
-        maxTicks: 5.0 * TicksPerSecond,
+        speed: 0.25,
+        maxTicks: 3.0 * TicksPerSecond,
         damage: 0,
         noHit: true,
         collideWith: Categories.Hero,
         expireOn: Categories.None,
         sensor: true,
 
-        hitInterval: 15,
+        hitInterval: 2 * TicksPerSecond,
         buffs: [
             {
                 against: Alliances.NotFriendly,
                 type: "movement",
-                movementProportion: 0.5,
-                maxTicks: 15,
+                movementProportion: 0.25,
+                maxTicks: 2 * TicksPerSecond,
             },
         ],
 
         sound: "whirlwind",
-        color: "rgba(192, 192, 192, 0.05)",
+        color: "#8800ff",
         renderers: [
             {
                 type: "swirl",
 
-                color: "rgba(128, 160, 255, 0.02)",
+                color: "rgba(160, 128, 255, 0.02)",
                 radius: 0.02,
                 ticks: 30,
 
@@ -964,7 +964,7 @@ const whirlwind: Spell = {
                 particleRadius: 0.03,
 
                 smoke: 1.2,
-                fade: "#333",
+                fade: "#436",
             },
         ],
     },
