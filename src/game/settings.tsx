@@ -259,7 +259,12 @@ const triplet: Spell = {
                 hitInterval: 0.25 * TicksPerSecond,
                 packet: { damage: 2.5 / 12, noHit: true },
                 maxTicks: 3 * TicksPerSecond,
-                color: "rgba(255, 0, 128, 0.1)",
+                render: {
+                    color: "rgba(255, 0, 128, 0.1)",
+                    ticks: 15,
+                    emissionRadius: Hero.Radius,
+                    particleRadius: 0.5 * Hero.Radius,
+                },
             },
         ],
     },
@@ -945,6 +950,12 @@ const whirlwind: Spell = {
                 type: "movement",
                 movementProportion: 0.25,
                 maxTicks: 2 * TicksPerSecond,
+                render: {
+                    color: "#888",
+                    ticks: 15,
+                    emissionRadius: 0,
+                    particleRadius: 0.5 * Hero.Radius,
+                },
             },
         ],
 
@@ -1374,6 +1385,14 @@ const voidRush: Spell = {
             damageProportion: 0,
             maxTicks: 2.5 * TicksPerSecond,
             sound: "voidRush-lavaImmunity",
+            render: {
+                color: "#8800ff",
+                heroColor: true,
+                decay: true,
+                ticks: 60,
+                emissionRadius: 0,
+                particleRadius: Hero.Radius,
+            },
         },
     ],
 

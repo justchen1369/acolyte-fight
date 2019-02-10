@@ -523,6 +523,8 @@ export interface BuffBase {
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
 	hitTick?: number; // If the hero gets hit, remove the buff
+
+	render?: RenderBuff;
 	sound?: string;
 }
 
@@ -553,7 +555,6 @@ export interface BurnBuff extends BuffBase {
 	packet: DamagePacketTemplate;
 	fromHeroId: string;
 	stack?: string;
-	color?: string;
 }
 
 export interface Cooldowns {

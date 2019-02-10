@@ -747,12 +747,8 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 
 function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	hero.buffs.forEach(buff => {
-		if (buff.type === "movement") {
-			renderMovementBuff(ctxStack, buff, hero, world);
-		} else if (buff.type === "lavaImmunity") {
-			renderLavaImmunity(ctxStack, buff, hero, world);
-		} else if (buff.type === "burn") {
-			renderBurn(ctxStack, buff, hero, world);
+		if (buff.render) {
+			renderBuffSmoke(ctxStack, buff.render, buff, hero, world);
 		}
 
 		if (buff.sound) {
@@ -784,6 +780,38 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	hero.uiDestroyedBuffs = [];
 }
 
+function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, world: w.World) {
+	let color = render.color;
+	if (render.heroColor) {
+		color = heroColor(hero.id, world);
+	}
+
+	let proportion = 1.0;
+	if (render.decay) {
+		const remainingTicks = Math.max(0, buff.expireTick - world.tick);
+		proportion = remainingTicks / buff.maxTicks;
+		color = Color(color).alpha(proportion).string();
+	}
+
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(thrust);
+
+	let pos = vector.clone(hero.body.getPosition());
+	if (render.emissionRadius) {
+		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadius));
+	}
+
+	world.ui.trails.push({
+		type: "circle",
+		pos,
+		velocity,
+		radius: render.particleRadius * proportion,
+		initialTick: world.tick,
+		max: render.ticks,
+		fillStyle: color,
+	});
+}
+
 function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
 	const remainingTicks = buff.expireTick - world.tick;
 	const proportion = remainingTicks / buff.maxTicks;
@@ -799,53 +827,6 @@ function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, 
 		radius: hero.radius * proportion,
 		initialTick: world.tick,
 		max: 60,
-		fillStyle: color,
-	});
-}
-
-function renderMovementBuff(ctxStack: CanvasCtxStack, buff: w.MovementBuff, hero: w.Hero, world: w.World) {
-	if (buff.movementProportion >= 1) {
-		// Only render slows
-		return;
-	}
-
-	const color = Color("#888").alpha(0.5).string();
-
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
-
-	world.ui.trails.push({
-		type: "circle",
-		pos: vector.clone(hero.body.getPosition()),
-		velocity,
-		radius: 0.5 * hero.radius,
-		initialTick: world.tick,
-		max: 15,
-		fillStyle: color,
-	});
-}
-
-function renderBurn(ctxStack: CanvasCtxStack, buff: w.BurnBuff, hero: w.Hero, world: w.World) {
-	if (!buff.color) {
-		return;
-	}
-
-	const color = buff.color;
-
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
-
-	const pos = vector.plus(
-		hero.body.getPosition(),
-		vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), hero.radius));
-
-	world.ui.trails.push({
-		type: "circle",
-		pos,
-		velocity,
-		radius: 0.5 * hero.radius,
-		initialTick: world.tick,
-		max: 15,
 		fillStyle: color,
 	});
 }

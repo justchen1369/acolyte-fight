@@ -436,7 +436,17 @@ declare interface BuffTemplateBase {
 	maxTicks: number;
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
+	render?: RenderBuff;
 	sound?: string;
+}
+
+declare interface RenderBuff {
+	color: string;
+	heroColor?: boolean;
+	decay?: boolean;
+	emissionRadius?: number;
+	particleRadius: number;
+	ticks: number;
 }
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
@@ -447,8 +457,6 @@ declare interface MovementBuffTemplate extends BuffTemplateBase {
 declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
 	type: "lavaImmunity";
 	damageProportion: number;
-	color?: string;
-	sound?: string;
 }
 
 declare interface VanishTemplate extends BuffTemplateBase {
@@ -465,6 +473,11 @@ declare interface BurnTemplate extends BuffTemplateBase {
 	hitInterval: number;
 	packet: DamagePacketTemplate;
 	stack?: string;
+}
+
+declare interface ArmorTemplate extends BuffTemplateBase {
+	type: "armor";
+	damageMultiplier: number;
 	color?: string;
 }
 

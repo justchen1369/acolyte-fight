@@ -2948,6 +2948,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	const base = {
 		initialTick: world.tick,
 		expireTick: world.tick + template.maxTicks,
+		render: template.render,
 		sound: template.sound,
 		maxTicks: template.maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
@@ -2994,7 +2995,6 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			hitInterval: template.hitInterval,
 			packet: { ...template.packet },
 			stack: template.stack,
-			color: template.color,
 		});
 	}
 }
