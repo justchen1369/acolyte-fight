@@ -429,6 +429,7 @@ declare type BuffTemplate =
 	| VanishTemplate
 	| LinkLifestealTemplate
 	| BurnTemplate
+	| ArmorTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
@@ -477,7 +478,8 @@ declare interface BurnTemplate extends BuffTemplateBase {
 
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
-	damageMultiplier: number;
+	proportion: number; // Positive increases damage received, negative negates damage received
+	heroSpecific?: boolean; // Armor only applies to damage received from a particular player
 	color?: string;
 }
 

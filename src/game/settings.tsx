@@ -920,7 +920,7 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Whirlwind',
-    description: "Catch enemies in your whirlwind and slow them down!",
+    description: "Enemies caught in your whirlwind will take 50% more damage from you.",
     action: "projectile",
 
     color: '#8800ff',
@@ -943,17 +943,17 @@ const whirlwind: Spell = {
         expireOn: Categories.None,
         sensor: true,
 
-        hitInterval: 2 * TicksPerSecond,
         buffs: [
             {
                 against: Alliances.NotFriendly,
-                type: "movement",
-                movementProportion: 0.25,
+                type: "armor",
+                proportion: 0.5,
+                heroSpecific: true,
                 maxTicks: 2 * TicksPerSecond,
                 render: {
-                    color: "#888",
+                    color: "rgba(160, 128, 255, 0.5)",
                     ticks: 15,
-                    emissionRadius: 0,
+                    emissionRadius: Hero.Radius,
                     particleRadius: 0.5 * Hero.Radius,
                 },
             },

@@ -513,6 +513,7 @@ export type Buff =
 	| VanishBuff
 	| LifeStealBuff
 	| BurnBuff
+	| ArmorBuff
 
 export interface BuffBase {
 	id: string;
@@ -555,6 +556,12 @@ export interface BurnBuff extends BuffBase {
 	packet: DamagePacketTemplate;
 	fromHeroId: string;
 	stack?: string;
+}
+
+export interface ArmorBuff extends BuffBase {
+	type: "armor";
+	fromHeroId?: string;
+	proportion: number;
 }
 
 export interface Cooldowns {

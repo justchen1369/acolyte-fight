@@ -2996,6 +2996,12 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			packet: { ...template.packet },
 			stack: template.stack,
 		});
+	} else if (template.type === "armor") {
+		hero.buffs.set(id, {
+			...base, id, type: "armor",
+			proportion: template.proportion,
+			fromHeroId: template.heroSpecific ? config.fromHeroId : null,
+		});
 	}
 }
 
@@ -3080,6 +3086,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 
 	// Apply damage
 	let amount = Math.max(0, packet.damage);
+	amount = applyArmor(fromHeroId, toHero, amount);
 	amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	amount = Math.min(amount, toHero.health);
 	toHero.health -= amount;
@@ -3104,6 +3111,17 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 			toHero.killerHeroId = fromHeroId;
 		}
 	}
+}
+
+function applyArmor(fromHeroId: string, hero: w.Hero, damage: number) {
+	let totalModifier = 0;
+	hero.buffs.forEach(buff => {
+		if (buff.type === "armor" && (!buff.fromHeroId || fromHeroId === buff.fromHeroId)) {
+			const modifier = damage * buff.proportion;
+			totalModifier += modifier;
+		}
+	});
+	return damage + totalModifier;
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {
