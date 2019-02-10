@@ -932,13 +932,13 @@ const gravity: Spell = {
 };
 const whirlwind: Spell = {
     id: 'whirlwind',
-    name: 'Whirlwind',
-    description: "Enemies caught in your whirlwind will take 50% more damage from you for 2 seconds.",
+    name: 'Corrosive Storm',
+    description: "Enemies caught in your storm will take 50% more damage from you for 2 seconds.",
     action: "projectile",
 
     color: '#8800ff',
     icon: "whirlwind",
-    sound: "gravity",
+    sound: "whirlwind",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
@@ -949,7 +949,7 @@ const whirlwind: Spell = {
         density: 0.0001,
         radius: 0.05,
         speed: 0.25,
-        maxTicks: 3.0 * TicksPerSecond,
+        maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
         noHit: true,
         collideWith: Categories.Hero,
