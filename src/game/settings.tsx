@@ -684,7 +684,9 @@ const link: Spell = {
 
         buffs: [
             {
-                type: "linkLifesteal",
+                type: "lifeSteal",
+                owner: true,
+                targetOnly: true,
                 lifeSteal: 0.5,
                 maxTicks: 2 * TicksPerSecond,
             },
@@ -754,7 +756,9 @@ const grapple: Spell = {
 
         buffs: [
             {
-                type: "linkLifesteal",
+                type: "lifeSteal",
+                owner: true,
+                targetOnly: true,
                 lifeSteal: 0.5,
                 maxTicks: 2 * TicksPerSecond,
             },
@@ -948,7 +952,7 @@ const whirlwind: Spell = {
                 against: Alliances.NotFriendly,
                 type: "armor",
                 proportion: 0.5,
-                heroSpecific: true,
+                ownerOnly: true,
                 maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "rgba(160, 128, 255, 0.5)",

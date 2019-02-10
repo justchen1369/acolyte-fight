@@ -96,7 +96,7 @@ class SpellStats extends React.Component<Props, State> {
         let lifeSteal = Math.max((projectile.lifeSteal || 0), (projectile.detonate ? (projectile.detonate.lifeSteal || 0) : 0));
         if (projectile.buffs) {
             projectile.buffs.forEach(buff => {
-                if (buff.type === "linkLifesteal") {
+                if (buff.type === "lifeSteal") {
                     lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
                 }
             });

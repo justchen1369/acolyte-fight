@@ -14,6 +14,7 @@ import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from '
 
 interface BuffContext {
 	fromHeroId?: string;
+	toHeroId?: string;
 	channellingSpellId?: string;
 }
 
@@ -1824,11 +1825,21 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 		return;
 	}
 
+	let owner: w.Hero;
+	{
+		const candidate = world.objects.get(projectile.owner);
+		if (candidate && candidate.category === "hero") {
+			owner = candidate;
+		}
+	}
+
 	projectile.buffs.forEach(template => {
 		const against = template.against !== undefined ? template.against : Categories.All;
 		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
-			instantiateBuff(projectile.id, template, hero, world, {
+			const receiver = template.owner ? owner : hero;
+			instantiateBuff(projectile.id, template, receiver, world, {
 				fromHeroId: projectile.owner,
+				toHeroId: hero.id,
 			});
 		}
 	});
@@ -2970,15 +2981,12 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			initialPos: vector.clone(hero.body.getPosition()),
 		};
 		hero.buffs.set(id, hero.invisible);
-	} else if (template.type === "linkLifesteal") {
-		const owner = world.objects.get(config.fromHeroId);
-		if (owner && owner.category === "hero") {
-			owner.buffs.set(id, {
-				...base, id, type: "lifeSteal",
-				lifeSteal: template.lifeSteal,
-				lifeStealTargetId: hero.id,
-			});
-		}
+	} else if (template.type === "lifeSteal") {
+		hero.buffs.set(id, {
+			...base, id, type: "lifeSteal",
+			lifeSteal: template.lifeSteal,
+			lifeStealTargetId: template.targetOnly ? config.toHeroId : null,
+		});
 	} else if (template.type === "burn") {
 		if (template.stack) {
 			// Extend existing stacks
@@ -3000,7 +3008,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.buffs.set(id, {
 			...base, id, type: "armor",
 			proportion: template.proportion,
-			fromHeroId: template.heroSpecific ? config.fromHeroId : null,
+			fromHeroId: template.ownerOnly ? config.fromHeroId : null,
 		});
 	}
 }

@@ -427,12 +427,13 @@ declare type BuffTemplate =
 	MovementBuffTemplate
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
-	| LinkLifestealTemplate
+	| LifestealTemplate
 	| BurnTemplate
 	| ArmorTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
+	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	against?: number; // Which alliances to apply this buff to
 	maxTicks: number;
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
@@ -464,9 +465,10 @@ declare interface VanishTemplate extends BuffTemplateBase {
 	type: "vanish";
 }
 
-declare interface LinkLifestealTemplate extends BuffTemplateBase {
-	type: "linkLifesteal";
+declare interface LifestealTemplate extends BuffTemplateBase {
+	type: "lifeSteal";
 	lifeSteal: number;
+	targetOnly?: boolean;
 }
 
 declare interface BurnTemplate extends BuffTemplateBase {
@@ -479,7 +481,7 @@ declare interface BurnTemplate extends BuffTemplateBase {
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
-	heroSpecific?: boolean; // Armor only applies to damage received from a particular player
+	ownerOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
 	color?: string;
 }
 
