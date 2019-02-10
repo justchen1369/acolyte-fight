@@ -494,10 +494,14 @@ class CanvasPanel extends React.Component<Props, State> {
         }
 
         const key = this.rebind(keyboardUtils.readKey(e));
-        const spellType = this.keyToSpellId(key);
-        const spell = world.settings.Spells[spellType];
-        if (spell && world.ui.nextTarget) {
-            sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
+        if (e.ctrlKey || e.altKey || e.shiftKey) {
+            this.handleCustomizeBtn(key);
+        } else {
+            const spellType = this.keyToSpellId(key);
+            const spell = world.settings.Spells[spellType];
+            if (spell && world.ui.nextTarget) {
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
+            }
         }
     }
 
