@@ -101,7 +101,7 @@ class SpellKeyConfig extends React.Component<Props, State> {
 
     private renderSpellIcon(spell: Spell, chosenId: string, index: number) {
         const MaxSize = 48;
-        const SmallSize = 48;
+        const SmallSize = 32;
         const Margin = 4;
 
         let left = index * (Margin + SmallSize);
