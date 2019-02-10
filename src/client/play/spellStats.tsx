@@ -81,7 +81,15 @@ class SpellStats extends React.Component<Props, State> {
     }
 
     private calculateProjectileDamage(projectile: ProjectileTemplate) {
-        return projectile.damage + (projectile.detonate ? projectile.detonate.damage : 0);
+        let damage = projectile.damage + (projectile.detonate ? projectile.detonate.damage : 0);
+        if (projectile.buffs) {
+            projectile.buffs.forEach(buff => {
+                if (buff.type === "burn") {
+                    damage += buff.packet.damage * (buff.maxTicks / buff.hitInterval);
+                }
+            });
+        }
+        return damage;
     }
 
     private calculateProjectileLifeSteal(projectile: ProjectileTemplate) {

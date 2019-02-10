@@ -751,6 +751,8 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			renderMovementBuff(ctxStack, buff, hero, world);
 		} else if (buff.type === "lavaImmunity") {
 			renderLavaImmunity(ctxStack, buff, hero, world);
+		} else if (buff.type === "burn") {
+			renderBurn(ctxStack, buff, hero, world);
 		}
 
 		if (buff.sound) {
@@ -815,6 +817,31 @@ function renderMovementBuff(ctxStack: CanvasCtxStack, buff: w.MovementBuff, hero
 	world.ui.trails.push({
 		type: "circle",
 		pos: vector.clone(hero.body.getPosition()),
+		velocity,
+		radius: 0.5 * hero.radius,
+		initialTick: world.tick,
+		max: 15,
+		fillStyle: color,
+	});
+}
+
+function renderBurn(ctxStack: CanvasCtxStack, buff: w.BurnBuff, hero: w.Hero, world: w.World) {
+	if (!buff.color) {
+		return;
+	}
+
+	const color = buff.color;
+
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(thrust);
+
+	const pos = vector.plus(
+		hero.body.getPosition(),
+		vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), hero.radius));
+
+	world.ui.trails.push({
+		type: "circle",
+		pos,
 		velocity,
 		radius: 0.5 * hero.radius,
 		initialTick: world.tick,

@@ -512,6 +512,7 @@ export type Buff =
 	| LavaImmunityBuff
 	| VanishBuff
 	| LifeStealBuff
+	| BurnBuff
 
 export interface BuffBase {
 	id: string;
@@ -544,6 +545,15 @@ export interface LifeStealBuff extends BuffBase {
 	type: "lifeSteal";
 	lifeSteal: number;
 	lifeStealTargetId?: string;
+}
+
+export interface BurnBuff extends BuffBase {
+	type: "burn";
+	hitInterval: number;
+	packet: DamagePacketTemplate;
+	fromHeroId: string;
+	stack?: string;
+	color?: string;
 }
 
 export interface Cooldowns {
@@ -629,6 +639,7 @@ export type Behaviour =
 	| ThrustBounceBehaviour
 	| ThrustDecayBehaviour
 	| SaberBehaviour
+	| BurnBehaviour
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
 	| ExpireOnOwnerRetreatBehaviour
@@ -721,6 +732,11 @@ export interface ThrustDecayBehaviour extends BehaviourBase {
 export interface SaberBehaviour extends BehaviourBase {
 	type: "saberSwing";
 	shieldId: string;
+}
+
+export interface BurnBehaviour extends BehaviourBase {
+	type: "burn";
+	heroId: string;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

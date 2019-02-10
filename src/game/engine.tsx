@@ -385,6 +385,7 @@ function addHero(world: w.World, heroId: string) {
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
 	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
+	world.behaviours.push({ type: "burn", heroId: hero.id });
 
 	return hero;
 }
@@ -647,6 +648,7 @@ export function tick(world: w.World) {
 	handleBehaviours(world, {
 		retractor,
 		fixate,
+		burn,
 		removePassthrough,
 		thrustDecay,
 		expireBuffs,
@@ -2976,7 +2978,41 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 				lifeStealTargetId: hero.id,
 			});
 		}
+	} else if (template.type === "burn") {
+		if (template.stack) {
+			// Extend existing stacks
+			hero.buffs.forEach(buff => {
+				if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
+					buff.expireTick = base.expireTick;
+				}
+			});
+		}
+
+		hero.buffs.set(id, {
+			...base, id, type: "burn",
+			fromHeroId: config.fromHeroId,
+			hitInterval: template.hitInterval,
+			packet: { ...template.packet },
+			stack: template.stack,
+			color: template.color,
+		});
 	}
+}
+
+function burn(burn: w.BurnBehaviour, world: w.World) {
+	const hero = world.objects.get(burn.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	hero.buffs.forEach(buff => {
+		if (buff.type === "burn" && world.tick % buff.hitInterval === 0) {
+			const packet = instantiateDamage(buff.packet, buff.fromHeroId, world);
+			applyDamage(hero, packet, world);
+		}
+	});
+
+	return true;
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {

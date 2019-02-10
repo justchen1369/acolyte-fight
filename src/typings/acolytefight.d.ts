@@ -428,6 +428,7 @@ declare type BuffTemplate =
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LinkLifestealTemplate
+	| BurnTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
@@ -457,6 +458,14 @@ declare interface VanishTemplate extends BuffTemplateBase {
 declare interface LinkLifestealTemplate extends BuffTemplateBase {
 	type: "linkLifesteal";
 	lifeSteal: number;
+}
+
+declare interface BurnTemplate extends BuffTemplateBase {
+	type: "burn";
+	hitInterval: number;
+	packet: DamagePacketTemplate;
+	stack?: string;
+	color?: string;
 }
 
 declare interface BuffSpell extends SpellBase {

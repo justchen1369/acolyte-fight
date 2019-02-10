@@ -220,7 +220,7 @@ const flamestrike: Spell = {
 const triplet: Spell = {
     id: 'triplet',
     name: 'Trifire',
-    description: "Shoots 3 bolts of fire. Easy to hit, but also easy to do 1/3 damage.",
+    description: "Each bolt of trifire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Trifire to keep the fire going.",
     action: "spray",
     sound: "triplet",
 
@@ -237,11 +237,11 @@ const triplet: Spell = {
     jitterRatio: 0.1,
 
     projectile: {
-        density: 5,
+        density: 1,
         radius: 0.002,
         speed: 0.3,
         maxTicks: 100,
-        damage: 3,
+        damage: 0,
         categories: Categories.Projectile,
 
         sound: "triplet",
@@ -251,6 +251,16 @@ const triplet: Spell = {
             { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 10, glow: false },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
+        ],
+
+        buffs: [
+            {
+                type: "burn",
+                hitInterval: 0.25 * TicksPerSecond,
+                packet: { damage: 2.5 / 12, noHit: true },
+                maxTicks: 3 * TicksPerSecond,
+                color: "rgba(255, 0, 128, 0.1)",
+            },
         ],
     },
 };
