@@ -481,7 +481,6 @@ export interface LinkState {
 	minDistance: number;
 	maxDistance: number;
 
-	lifeSteal: number;
 	expireTick: number;
 
 	render: RenderLink;
@@ -512,6 +511,7 @@ export type Buff =
 	MovementBuff
 	| LavaImmunityBuff
 	| VanishBuff
+	| LifeStealBuff
 
 export interface BuffBase {
 	id: string;
@@ -538,6 +538,12 @@ export interface LavaImmunityBuff extends BuffBase {
 export interface VanishBuff extends BuffBase {
 	type: "vanish";
 	initialPos: pl.Vec2;
+}
+
+export interface LifeStealBuff extends BuffBase {
+	type: "lifeSteal";
+	lifeSteal: number;
+	lifeStealTargetId?: string;
 }
 
 export interface Cooldowns {

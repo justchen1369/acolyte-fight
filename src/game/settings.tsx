@@ -659,7 +659,6 @@ const link: Spell = {
             minDistance: Hero.Radius * 2,
             maxDistance: 0.25,
             linkTicks: 2.0 * TicksPerSecond,
-            lifeSteal: 0.5,
 
             render: {
                 type: "link",
@@ -667,6 +666,14 @@ const link: Spell = {
                 width: 5 * Pixel,
             },
         },
+
+        buffs: [
+            {
+                type: "linkLifesteal",
+                lifeSteal: 0.5,
+                maxTicks: 2 * TicksPerSecond,
+            },
+        ],
 
         behaviours: [
             {
@@ -721,8 +728,7 @@ const grapple: Spell = {
             impulsePerTick: 3.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 1 * TicksPerSecond,
-            lifeSteal: 0.5,
+            linkTicks: 0.5 * TicksPerSecond,
 
             render: {
                 type: "link",
@@ -730,6 +736,14 @@ const grapple: Spell = {
                 width: 5 * Pixel,
             },
         },
+
+        buffs: [
+            {
+                type: "linkLifesteal",
+                lifeSteal: 0.5,
+                maxTicks: 2 * TicksPerSecond,
+            },
+        ],
 
         behaviours: [
             {

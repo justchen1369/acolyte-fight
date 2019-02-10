@@ -12,6 +12,11 @@ import { modToSettings } from './modder';
 
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
+interface BuffContext {
+	fromHeroId?: string;
+	channellingSpellId?: string;
+}
+
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -1820,7 +1825,9 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 	projectile.buffs.forEach(template => {
 		const against = template.against !== undefined ? template.against : Categories.All;
 		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
-			instantiateBuff(projectile.id, template, hero, world);
+			instantiateBuff(projectile.id, template, hero, world, {
+				fromHeroId: projectile.owner,
+			});
 		}
 	});
 }
@@ -1845,7 +1852,6 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		selfFactor: projectile.link.selfFactor !== undefined ? projectile.link.selfFactor : 1,
 		targetFactor: projectile.link.targetFactor !== undefined ? projectile.link.targetFactor : 1,
 		strength: projectile.link.impulsePerTick,
-		lifeSteal: projectile.link.lifeSteal !== undefined ? projectile.link.lifeSteal : 0,
 		expireTick: world.tick + projectile.link.linkTicks,
 		render: projectile.link.render,
 	};
@@ -2928,20 +2934,22 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffS
 	if (world.tick == hero.casting.channellingStartTick) {
 		spell.buffs.forEach(template => {
 			const id = `${spell.id}/${template.type}`;
-			instantiateBuff(id, template, hero, world, spell.id);
+			instantiateBuff(id, template, hero, world, {
+				channellingSpellId: spell.id,
+			});
 		});
 	}
 	return ![...hero.buffs.values()].some(b => b.channellingSpellId === spell.id);
 }
 
-function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, channellingSpellId: string = null) {
+function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const base = {
 		initialTick: world.tick,
 		expireTick: world.tick + template.maxTicks,
 		sound: template.sound,
 		maxTicks: template.maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
-		channellingSpellId: template.channelling && channellingSpellId,
+		channellingSpellId: template.channelling && config.channellingSpellId,
 	};
 	if (template.type === "movement") {
 		hero.buffs.set(id, {
@@ -2959,6 +2967,15 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			initialPos: vector.clone(hero.body.getPosition()),
 		};
 		hero.buffs.set(id, hero.invisible);
+	} else if (template.type === "linkLifesteal") {
+		const owner = world.objects.get(config.fromHeroId);
+		if (owner && owner.category === "hero") {
+			owner.buffs.set(id, {
+				...base, id, type: "lifeSteal",
+				lifeSteal: template.lifeSteal,
+				lifeStealTargetId: hero.id,
+			});
+		}
 	}
 }
 
@@ -2981,13 +2998,17 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	}
 
 	let lifeStealTargetHeroId: string = null;
-	if (fromHero && fromHero.category === "hero" && fromHero.link) {
-		if (lifeSteal) {
-			lifeSteal = Math.max(lifeSteal, fromHero.link.lifeSteal);
-		} else {
-			lifeSteal = fromHero.link.lifeSteal;
-			lifeStealTargetHeroId = fromHero.link.targetId;
-		}
+	if (fromHero && fromHero.category === "hero") {
+		fromHero.buffs.forEach(buff => {
+			if (buff.type === "lifeSteal") {
+				if (lifeSteal) {
+					lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
+				} else {
+					lifeSteal = buff.lifeSteal;
+					lifeStealTargetHeroId = buff.lifeStealTargetId;
+				}
+			}
+		});
 	}
 
 	return {

@@ -85,12 +85,16 @@ class SpellStats extends React.Component<Props, State> {
     }
 
     private calculateProjectileLifeSteal(projectile: ProjectileTemplate) {
-        if (projectile.link) {
-            return projectile.link.lifeSteal;
-        } else {
-            const lifeSteal = Math.max((projectile.lifeSteal || 0), (projectile.detonate ? (projectile.detonate.lifeSteal || 0) : 0));
-            return lifeSteal > 0 ? lifeSteal : null;
+        let lifeSteal = Math.max((projectile.lifeSteal || 0), (projectile.detonate ? (projectile.detonate.lifeSteal || 0) : 0));
+        if (projectile.buffs) {
+            projectile.buffs.forEach(buff => {
+                if (buff.type === "linkLifesteal") {
+                    lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
+                }
+            });
         }
+
+        return lifeSteal > 0 ? lifeSteal : null;
     }
 }
 

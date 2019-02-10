@@ -427,6 +427,7 @@ declare type BuffTemplate =
 	MovementBuffTemplate
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
+	| LinkLifestealTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
@@ -451,6 +452,11 @@ declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
 
 declare interface VanishTemplate extends BuffTemplateBase {
 	type: "vanish";
+}
+
+declare interface LinkLifestealTemplate extends BuffTemplateBase {
+	type: "linkLifesteal";
+	lifeSteal: number;
 }
 
 declare interface BuffSpell extends SpellBase {
@@ -550,7 +556,6 @@ declare interface LinkParameters {
 	targetFactor?: number; // How much should the link pull the target
 
 	impulsePerTick: number;
-	lifeSteal?: number;
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;
