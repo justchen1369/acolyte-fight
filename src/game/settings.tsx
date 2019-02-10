@@ -694,7 +694,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Pull yourself towards an enemy or obstacle. Enemies caught by the grapple will be slowed for 1.5 seconds.",
+    description: "Pull yourself towards an enemy or obstacle. All your attacks gain lifesteal for the duration of the link.",
     action: "projectile",
 
     color: '#22eedd',
@@ -721,7 +721,8 @@ const grapple: Spell = {
             impulsePerTick: 2.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 0.5 * TicksPerSecond,
+            linkTicks: 1 * TicksPerSecond,
+            lifeSteal: 0.5,
 
             render: {
                 type: "link",
@@ -729,14 +730,6 @@ const grapple: Spell = {
                 width: 5 * Pixel,
             },
         },
-
-        buffs: [
-            {
-                type: "movement",
-                maxTicks: 1.5 * TicksPerSecond,
-                movementProportion: 0.25,
-            }
-        ],
 
         behaviours: [
             {
