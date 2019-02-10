@@ -663,7 +663,7 @@ const grapple: Spell = {
     description: "Pull yourself towards an enemy or obstacle. Enemies caught by the grapple will be slowed for 1.5 seconds.",
     action: "projectile",
 
-    color: '#33ffee',
+    color: '#22eedd',
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
