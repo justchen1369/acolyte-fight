@@ -948,8 +948,8 @@ const whirlwind: Spell = {
     projectile: {
         density: 0.0001,
         radius: 0.05,
-        speed: 0.25,
-        maxTicks: 2.0 * TicksPerSecond,
+        speed: 0.15,
+        maxTicks: 3.0 * TicksPerSecond,
         damage: 0,
         noHit: true,
         collideWith: Categories.Hero,
