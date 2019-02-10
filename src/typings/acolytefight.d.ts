@@ -547,7 +547,7 @@ declare interface LinkParameters {
 	targetFactor?: number; // How much should the link pull the target
 
 	impulsePerTick: number;
-	lifeSteal: number;
+	lifeSteal?: number;
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;

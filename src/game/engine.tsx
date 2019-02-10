@@ -1841,7 +1841,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		selfFactor: projectile.link.selfFactor !== undefined ? projectile.link.selfFactor : 1,
 		targetFactor: projectile.link.targetFactor !== undefined ? projectile.link.targetFactor : 1,
 		strength: projectile.link.impulsePerTick,
-		lifeSteal: projectile.link.lifeSteal,
+		lifeSteal: projectile.link.lifeSteal !== undefined ? projectile.link.lifeSteal : 0,
 		expireTick: world.tick + projectile.link.linkTicks,
 		render: projectile.link.render,
 	};
