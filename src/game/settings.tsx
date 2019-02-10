@@ -738,6 +738,8 @@ const grapple: Spell = {
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         shieldTakesOwnership: false,
 
+        strafe: {},
+
         link: {
             linkWith: Categories.Hero | Categories.Obstacle,
             selfFactor: 1,
