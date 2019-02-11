@@ -718,7 +718,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Pull yourself towards an enemy or obstacle. When your grapple attaches to an enemy, you will be invulnerable to all damage from them for 2 seconds.",
+    description: "Attach yourself to an enemy or obstacle for 3 seconds.",
     action: "projectile",
 
     color: '#ff2200',
@@ -730,15 +730,13 @@ const grapple: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.003,
-        speed: 0.4,
+        radius: 0.005,
+        speed: 0.6,
         maxTicks: 1 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         shieldTakesOwnership: false,
-
-        strafe: {},
 
         link: {
             linkWith: Categories.Hero | Categories.Obstacle,
@@ -747,7 +745,9 @@ const grapple: Spell = {
             impulsePerTick: 3.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 0.5 * TicksPerSecond,
+            linkTicks: 3 * TicksPerSecond,
+            linkTicksHero: 1 * TicksPerSecond,
+            movementProportion: 2,
 
             render: {
                 type: "link",
@@ -756,26 +756,16 @@ const grapple: Spell = {
             },
         },
 
-        buffs: [
-            {
-                type: "armor",
-                owner: true,
-                targetOnly: true,
-                proportion: -1,
-                maxTicks: 2 * TicksPerSecond,
-                render: {
-                    color: "#ff2200",
-                    decay: true,
-                    ticks: 15,
-                    emissionRadius: 0.25 * Hero.Radius,
-                    particleRadius: Hero.Radius,
-                },
-            },
+        behaviours: [
+            { type: "expireOnOwnerDeath" },
         ],
 
-        behaviours: [
+        buffs: [
             {
-                type: "expireOnOwnerDeath",
+                type: "movement",
+                owner: true,
+                movementProportion: 2,
+                maxTicks: 4 * TicksPerSecond,
             },
         ],
 

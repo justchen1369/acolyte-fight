@@ -1839,14 +1839,7 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	let owner: w.Hero;
-	{
-		const candidate = world.objects.get(projectile.owner);
-		if (candidate && candidate.category === "hero") {
-			owner = candidate;
-		}
-	}
-
+	const owner: w.Hero = world.objects.get(projectile.owner) as w.Hero;
 	projectile.buffs.forEach(template => {
 		const against = template.against !== undefined ? template.against : Categories.All;
 		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
@@ -1861,27 +1854,34 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 }
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
-	if (!projectile.link) {
+	const link = projectile.link;
+	if (!link) {
 		return;
 	}
 	projectile.expireTick = world.tick;
 
 	const owner = world.objects.get(projectile.owner);
 	if (!(
-		target && ((target.categories & projectile.link.linkWith) > 0)
+		target && ((target.categories & link.linkWith) > 0)
 		&& owner && owner.category === "hero")) {
 		return;
 	}
 
+	let maxTicks = link.linkTicks;
+	if (link.linkTicksHero && target.category === "hero") {
+		maxTicks = link.linkTicksHero;
+	}
+
 	owner.link = {
 		targetId: target.id,
-		minDistance: projectile.link.minDistance,
-		maxDistance: projectile.link.maxDistance,
-		selfFactor: projectile.link.selfFactor !== undefined ? projectile.link.selfFactor : 1,
-		targetFactor: projectile.link.targetFactor !== undefined ? projectile.link.targetFactor : 1,
-		strength: projectile.link.impulsePerTick,
-		expireTick: world.tick + projectile.link.linkTicks,
-		render: projectile.link.render,
+		minDistance: link.minDistance,
+		maxDistance: link.maxDistance,
+		selfFactor: link.selfFactor !== undefined ? link.selfFactor : 1,
+		targetFactor: link.targetFactor !== undefined ? link.targetFactor : 1,
+		strength: link.impulsePerTick,
+		movementProportion: link.movementProportion !== undefined ? link.movementProportion : 1,
+		expireTick: world.tick + maxTicks,
+		render: link.render,
 	};
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
 }
@@ -2590,6 +2590,9 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 	let multiplier = 1.0;
 	if (hero.casting) {
 		multiplier *= hero.casting.movementProportion || 0.0;
+	}
+	if (hero.link) {
+		multiplier *= hero.link.movementProportion;
 	}
 	hero.buffs.forEach(buff => {
 		if (buff.type === "movement") {

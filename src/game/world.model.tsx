@@ -483,6 +483,8 @@ export interface LinkState {
 
 	expireTick: number;
 
+	movementProportion: number;
+
 	render: RenderLink;
 }
 

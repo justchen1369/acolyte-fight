@@ -596,8 +596,11 @@ declare interface LinkParameters {
 
 	impulsePerTick: number;
 	linkTicks: number;
+	linkTicksHero?: number;
 	minDistance: number;
 	maxDistance: number;
+
+	movementProportion?: number; // Speed up/slow down movement while link is attached
 
 	render?: RenderLink;
 }
