@@ -396,6 +396,8 @@ function addHero(world: w.World, heroId: string) {
 export function cooldownRemaining(world: w.World, hero: w.Hero, spell: Spell) {
 	if (hero.retractorIds.has(spell.id)) {
 		return 0;
+	} else if (hero.link && hero.link.unlinkSpellId === spell.id) {
+		return 0;
 	}
 	return calculateCooldown(world, hero, spell.id);
 }
@@ -1444,6 +1446,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "buff": return buffAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
+		case "link": return linkAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
 		case "saber": return saberAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
@@ -1868,6 +1871,8 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	}
 	projectile.expireTick = world.tick;
 
+	const spell = world.settings.Spells[projectile.type] as LinkSpell;
+
 	const owner = world.objects.get(projectile.owner);
 	if (!(
 		target && ((target.categories & link.linkWith) > 0)
@@ -1886,6 +1891,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		movementProportion: link.movementProportion !== undefined ? link.movementProportion : 1,
 		expireTick: world.tick + maxTicks,
 		render: link.render,
+		unlinkSpellId: spell.unlinkable ? spell.id : null,
 	};
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
 }
@@ -2067,14 +2073,15 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	}
 
 	owner.body.applyLinearImpulse(
-		vector.relengthen(diff, strength * owner.body.getMass()),
+		vector.relengthen(diff, owner.link.selfFactor * strength * owner.body.getMass()),
 		owner.body.getWorldPoint(vector.zero()), true);
 
 	if (target.category === "hero") {
 		target.body.applyLinearImpulse(
-			vector.relengthen(vector.negate(diff), strength * target.body.getMass()),
+			vector.relengthen(vector.negate(diff), owner.link.targetFactor * strength * target.body.getMass()),
 			target.body.getWorldPoint(vector.zero()), true);
 	}
+
 	return true;
 }
 
@@ -2676,6 +2683,39 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		addProjectile(world, hero, newTarget, spell, spell.projectile);
 	}
 	return false;
+}
+
+function linkAction(world: w.World, hero: w.Hero, action: w.Action, spell: LinkSpell) {
+	if (!action.target) { return true; }
+
+	const retractorId = hero.retractorIds.get(spell.id);
+	if (spell.unlinkable) {
+		if (hero.link) {
+			// Link attached, detach it
+			hero.link = null;
+			return true;
+		} else if (retractorId) {
+			// Link in flight, expire it
+			const retractor = world.objects.get(retractorId);
+			if (retractor && retractor.category === "projectile") {
+				retractor.expireTick = world.tick;
+			}
+			return true;
+		}
+	}
+
+	const retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
+
+	if (spell.unlinkable) {
+		hero.retractorIds.set(spell.id, retractor.id);
+		world.behaviours.push({
+			type: "retractor",
+			heroId: hero.id,
+			spellId: spell.id,
+		});
+	}
+
+	return true;
 }
 
 function retractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {

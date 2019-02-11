@@ -482,6 +482,7 @@ export interface LinkState {
 	maxDistance: number;
 
 	expireTick: number;
+	unlinkSpellId?: string;
 
 	movementProportion: number;
 

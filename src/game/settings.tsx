@@ -648,7 +648,7 @@ const whip: Spell = {
 const link: Spell = {
     id: 'link',
     description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
-    action: "projectile",
+    action: "link",
 
     color: '#0000ff',
     icon: "andromedaChain",
@@ -718,8 +718,8 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to an enemy or obstacle and gain a 3x movement speed boost.",
-    action: "projectile",
+    description: "Attach yourself to an enemy or obstacle and gain a 3x movement speed boost. Throw your enemies into the void, or swing around obstacles while attacking and dodging at super speed!",
+    action: "link",
 
     color: '#ff2200',
     icon: "grapple",
@@ -727,6 +727,8 @@ const grapple: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
     throttle: false,
+
+    unlinkable: true,
 
     projectile: {
         density: 1,
@@ -741,11 +743,11 @@ const grapple: Spell = {
         link: {
             linkWith: Categories.Hero | Categories.Obstacle,
             selfFactor: 1,
-            targetFactor: 0,
+            targetFactor: 10,
             impulsePerTick: 1.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.1,
-            linkTicks: 2 * TicksPerSecond,
+            linkTicks: 3 * TicksPerSecond,
             movementProportion: 3,
 
             render: {
