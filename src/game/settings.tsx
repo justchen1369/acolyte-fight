@@ -918,7 +918,7 @@ const whirlwind: Spell = {
     action: "projectile",
 
     color: '#44ffff',
-    icon: "whirlwind",
+    icon: "snowflake1",
     sound: "whirlwind",
 
     maxAngleDiffInRevs: 0.01,
