@@ -14,6 +14,10 @@ body {
     body {
         font-size: 12pt;
     }
+
+    .large-screen-nav-item {
+        display: none !important;
+    }
 }
 
 @media (max-width: 768px) {

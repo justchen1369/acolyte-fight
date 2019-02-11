@@ -78,7 +78,7 @@ class NavBar extends React.Component<Props, State> {
             {!a.noPartyLink && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
             {!a.noScrolling && <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>}
             <div className="spacer" />
-            {!a.noAdvanced && !isMobile && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}
+            {!a.noAdvanced && <PageLink className="large-screen-nav-item" page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}
             {!a.noExternalLinks && <PageLink page="about"><i className="icon fas fa-info-circle" /> About</PageLink>}
         </>;
         return <CustomBar vertical={vertical}>{horizontal}</CustomBar>
