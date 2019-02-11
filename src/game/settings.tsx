@@ -732,7 +732,7 @@ const grapple: Spell = {
         density: 1,
         radius: 0.005,
         speed: 0.6,
-        maxTicks: 1 * TicksPerSecond,
+        maxTicks: 0.4 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
