@@ -949,9 +949,9 @@ const whirlwind: Spell = {
     projectile: {
         density: 0.0001,
         radius: 0.05,
-        speed: 0.15,
+        speed: 0.1,
         maxTicks: 4.0 * TicksPerSecond,
-        damage: 5,
+        damage: 10,
         damageScaling: false,
         partialDamage: {
             initialMultiplier: 0.1,
@@ -961,12 +961,12 @@ const whirlwind: Spell = {
         expireOn: Categories.None,
         sensor: true,
 
-        hitInterval: 10,
+        hitInterval: 20,
         buffs: [
             {
                 type: "movement",
                 movementProportion: 0.5,
-                maxTicks: 10,
+                maxTicks: 20,
             },
         ],
 
@@ -988,7 +988,7 @@ const whirlwind: Spell = {
                 smoke: 1.2,
                 fade: "#436",
             },
-            { type: "strike", ticks: 10, glow: true },
+            { type: "strike", ticks: 20, glow: true, growth: 0.2 },
         ],
     },
 };
