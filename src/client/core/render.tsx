@@ -40,8 +40,11 @@ export interface RenderOptions {
 	rtx: boolean;
 }
 
-interface ButtonInput {
-	buttonRenderState: { [btn: string]: w.ButtonRenderState };
+interface SwirlContext {
+	color?: string;
+	baseVelocity?: pl.Vec2;
+	tag?: string;
+	multiplier?: number;
 }
 
 // Rendering
@@ -1270,8 +1273,13 @@ function rgColor(proportion: number) {
 }
 
 function renderSwirl(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, swirl: RenderSwirl) {
-	const color = projectileColor(swirl, projectile, world);
-	renderSwirlAt(ctxStack, projectile.body.getPosition(), world, swirl, color, projectile.body.getLinearVelocity());
+	const multiplier = engine.calculatePartialDamageMultiplier(world, projectile);
+	renderSwirlAt(ctxStack, projectile.body.getPosition(), world, swirl, {
+		color: projectileColor(swirl, projectile, world),
+		baseVelocity: projectile.body.getLinearVelocity(),
+		tag: projectile.id,
+		multiplier,
+	});
 }
 
 function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -1282,7 +1290,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	const spell = world.settings.Spells[hero.gravity.spellId] as ProjectileSpell;
 	const swirl = hero.gravity.render;
 	if (swirl) {
-		renderSwirlAt(ctxStack, hero.gravity.location, world, swirl);
+		renderSwirlAt(ctxStack, hero.gravity.location, world, swirl, {});
 	}
 
 	if (spell.sound) {
@@ -1294,24 +1302,27 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 }
 
-function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl, color?: string, baseVelocity?: pl.Vec2) {
+function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.World, swirl: RenderSwirl, context: SwirlContext) {
 	const animationLength = swirl.loopTicks;
 	const numParticles = swirl.numParticles;
 
 	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
-	const velocity = swirl.smoke ? particleVelocity(vector.multiply(baseVelocity, -swirl.smoke)) : null;
+	const velocity = swirl.smoke ? particleVelocity(vector.multiply(context.baseVelocity, -swirl.smoke)) : null;
+	
+	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		world.ui.trails.push({
 			type: "circle",
-			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), swirl.radius)),
+			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), multiplier * swirl.radius)),
 			velocity,
-			radius: swirl.particleRadius,
+			radius: multiplier * swirl.particleRadius,
 			initialTick: world.tick,
 			max: swirl.ticks, 
-			fillStyle: color || swirl.color,
+			fillStyle: context.color || swirl.color,
 			glow: swirl.glow || false,
 			fade: swirl.fade,
+			tag: context.tag,
 		});
 	}
 }

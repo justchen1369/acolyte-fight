@@ -74,7 +74,7 @@ const Choices: ChoiceSettings = {
             ["whip"],
         ],
 		"w": [
-            ["gravity", "whirlwind"],
+            ["gravity"],
             ["link", "grapple"],
             ["lightning"],
             ["homing"],
@@ -90,6 +90,7 @@ const Choices: ChoiceSettings = {
             ["kamehameha"],
             ["bouncer"],
             ["supernova"],
+            ["whirlwind"],
         ],
 		"f": [
             ["scourge"],
@@ -933,7 +934,7 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Corrosive Storm',
-    description: "Enemies caught in your storm will take 50% more damage from you for 2 seconds.",
+    description: "Enemies caught in your storm will take massive damage and be slowed.",
     action: "projectile",
 
     color: '#8800ff',
@@ -949,26 +950,23 @@ const whirlwind: Spell = {
         density: 0.0001,
         radius: 0.05,
         speed: 0.15,
-        maxTicks: 3.0 * TicksPerSecond,
-        damage: 0,
-        noHit: true,
+        maxTicks: 4.0 * TicksPerSecond,
+        damage: 5,
+        damageScaling: false,
+        partialDamage: {
+            initialMultiplier: 0.1,
+            ticks: 30,
+        },
         collideWith: Categories.Hero,
         expireOn: Categories.None,
         sensor: true,
 
+        hitInterval: 10,
         buffs: [
             {
-                against: Alliances.NotFriendly,
-                type: "armor",
-                proportion: 0.5,
-                ownerOnly: true,
-                maxTicks: 2 * TicksPerSecond,
-                render: {
-                    color: "rgba(160, 128, 255, 0.5)",
-                    ticks: 15,
-                    emissionRadius: Hero.Radius,
-                    particleRadius: 0.5 * Hero.Radius,
-                },
+                type: "movement",
+                movementProportion: 0.5,
+                maxTicks: 10,
             },
         ],
 
@@ -990,6 +988,7 @@ const whirlwind: Spell = {
                 smoke: 1.2,
                 fade: "#436",
             },
+            { type: "strike", ticks: 10, glow: true },
         ],
     },
 };
