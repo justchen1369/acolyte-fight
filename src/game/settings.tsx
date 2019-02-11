@@ -742,11 +742,11 @@ const grapple: Spell = {
             linkWith: Categories.Hero | Categories.Obstacle,
             selfFactor: 1,
             targetFactor: 0,
-            impulsePerTick: 3.0 / TicksPerSecond,
+            impulsePerTick: 1.0 / TicksPerSecond,
             minDistance: 0.05,
-            maxDistance: 0.25,
+            maxDistance: 0.15,
             linkTicks: 3 * TicksPerSecond,
-            linkTicksHero: 1 * TicksPerSecond,
+            linkTicksHero: 2 * TicksPerSecond,
             movementProportion: 3,
 
             render: {
