@@ -746,7 +746,6 @@ const grapple: Spell = {
             minDistance: 0.05,
             maxDistance: 0.15,
             linkTicks: 3 * TicksPerSecond,
-            linkTicksHero: 2 * TicksPerSecond,
             movementProportion: 3,
 
             render: {

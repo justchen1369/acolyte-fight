@@ -597,7 +597,6 @@ declare interface LinkParameters {
 
 	impulsePerTick: number;
 	linkTicks: number;
-	linkTicksHero?: number;
 	minDistance: number;
 	maxDistance: number;
 

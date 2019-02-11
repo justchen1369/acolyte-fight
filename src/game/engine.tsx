@@ -1875,11 +1875,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		return;
 	}
 
-	let maxTicks = link.linkTicks;
-	if (link.linkTicksHero && target.category === "hero") {
-		maxTicks = link.linkTicksHero;
-	}
-
+	const maxTicks = link.linkTicks;
 	owner.link = {
 		targetId: target.id,
 		minDistance: link.minDistance,
