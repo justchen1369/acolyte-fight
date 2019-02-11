@@ -718,7 +718,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to an enemy or obstacle and gain a 2x movement speed boost.",
+    description: "Attach yourself to an enemy or obstacle and gain a 3x movement speed boost.",
     action: "projectile",
 
     color: '#ff2200',
@@ -913,11 +913,11 @@ const gravity: Spell = {
 };
 const whirlwind: Spell = {
     id: 'whirlwind',
-    name: 'Corrosive Storm',
-    description: "Enemies caught in your storm will be slowed and take 2x damage for 2 seconds.",
+    name: 'Freezing Breath',
+    description: "Enemies caught in your freezing breath will be slowed for 2 seconds.",
     action: "projectile",
 
-    color: '#8800ff',
+    color: '#44ffff',
     icon: "whirlwind",
     sound: "whirlwind",
 
@@ -952,31 +952,25 @@ const whirlwind: Spell = {
 
         buffs: [
             {
-                type: "armor",
-                proportion: 1,
-                ownerOnly: true,
+                type: "movement",
+                movementProportion: 0.5,
                 maxTicks: 2 * TicksPerSecond,
                 render: {
-                    color: "rgba(160, 128, 255, 0.5)",
+                    color: "rgba(64, 255, 255, 0.5)",
                     emissionRadius: Hero.Radius,
                     particleRadius: 0.5 * Hero.Radius,
                     ticks: 10,
                 },
             },
-            {
-                type: "movement",
-                movementProportion: 0.5,
-                maxTicks: 2 * TicksPerSecond,
-            },
         ],
 
         sound: "whirlwind",
-        color: "#8800ff",
+        color: "#44ffff",
         renderers: [
             {
                 type: "swirl",
 
-                color: "rgba(160, 128, 255, 0.02)",
+                color: "rgba(64, 255, 255, 0.25)",
                 radius: 0.01,
                 ticks: 20,
 
@@ -986,7 +980,7 @@ const whirlwind: Spell = {
                 particleRadius: 0.02,
 
                 smoke: 1.3,
-                fade: "#436",
+                fade: "#144",
             },
             { type: "strike", ticks: 20, glow: true, growth: 0.1 },
         ],
