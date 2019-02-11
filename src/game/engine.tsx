@@ -1431,6 +1431,11 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
+	// Unlink, if necessary
+	if (world.tick === hero.casting.channellingStartTick && spell.unlink) {
+		hero.link = null;
+	}
+
 	switch (spell.action) {
 		case "stop": return stopAction(world, hero, action, spell); // Do nothing
 		case "buff": return buffAction(world, hero, action, spell);
@@ -2970,9 +2975,6 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	applyDamage(hero, selfPacket, world);
 
 	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.color, spell.sound);
-
-	// Remove the link so that the hit player can go flying
-	hero.link = null;
 
 	return true;
 }

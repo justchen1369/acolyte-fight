@@ -157,6 +157,7 @@ declare interface SpellBase {
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
+	unlink?: boolean;
 	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time

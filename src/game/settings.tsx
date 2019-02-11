@@ -718,7 +718,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to an enemy or obstacle for 3 seconds.",
+    description: "Attach yourself to an enemy or obstacle and gain a 2x movement speed boost.",
     action: "projectile",
 
     color: '#ff2200',
@@ -745,7 +745,7 @@ const grapple: Spell = {
             impulsePerTick: 3.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 3 * TicksPerSecond,
+            linkTicks: 2 * TicksPerSecond,
             linkTicksHero: 1 * TicksPerSecond,
             movementProportion: 2,
 
@@ -1235,6 +1235,7 @@ const scourge: Spell = {
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
+    unlink: true,
     interruptibleAfterTicks: 0,
     movementCancel: true,
     selfDamage: 10,
@@ -1304,6 +1305,7 @@ const teleport: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    unlink: true,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
 
@@ -1348,6 +1350,7 @@ const swap: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    unlink: true,
 
     projectile: {
         density: 0.001,
@@ -1395,6 +1398,7 @@ const voidRush: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    unlink: true,
 
     buffs: [
         {
@@ -1431,6 +1435,7 @@ const vanish: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    unlink: true,
     movementProportionWhileChannelling: 1.75,
     interruptibleAfterTicks: 15,
 
