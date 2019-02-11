@@ -648,6 +648,7 @@ export type Behaviour =
 	| ThrustDecayBehaviour
 	| SaberBehaviour
 	| BurnBehaviour
+	| AttractBehaviour
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
 	| ExpireOnOwnerRetreatBehaviour
@@ -745,6 +746,19 @@ export interface SaberBehaviour extends BehaviourBase {
 export interface BurnBehaviour extends BehaviourBase {
 	type: "burn";
 	heroId: string;
+}
+
+export interface AttractBehaviour extends BehaviourBase {
+	type: "attract";
+	objectId: string;
+	owner: string;
+
+	against: number;
+	collideLike: number;
+	categories: number;
+	notCategories: number;
+	radius: number;
+	accelerationPerTick: number;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

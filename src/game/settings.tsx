@@ -74,7 +74,7 @@ const Choices: ChoiceSettings = {
             ["whip"],
         ],
 		"w": [
-            ["gravity"],
+            ["gravity", "whirlwind"],
             ["link", "grapple"],
             ["lightning"],
             ["homing"],
@@ -90,7 +90,6 @@ const Choices: ChoiceSettings = {
             ["kamehameha"],
             ["bouncer"],
             ["supernova"],
-            ["whirlwind"],
         ],
 		"f": [
             ["scourge"],
@@ -934,7 +933,7 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Corrosive Storm',
-    description: "Enemies caught in your storm will take massive damage and be slowed.",
+    description: "Enemies caught in your storm will be slowed and take 2x damage for 2 seconds.",
     action: "projectile",
 
     color: '#8800ff',
@@ -947,26 +946,46 @@ const whirlwind: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
+        categories: Categories.Massive,
         density: 0.0001,
-        radius: 0.05,
-        speed: 0.1,
-        maxTicks: 4.0 * TicksPerSecond,
-        damage: 10,
+        radius: 0.03,
+        speed: 0.15,
+        maxTicks: 2 * TicksPerSecond,
+        damage: 0,
         damageScaling: false,
-        partialDamage: {
-            initialMultiplier: 0.1,
-            ticks: 30,
-        },
         collideWith: Categories.Hero,
         expireOn: Categories.None,
         sensor: true,
 
-        hitInterval: 20,
+        hitInterval: 15,
+        behaviours: [
+            {
+                type: "attract",
+                collideLike: Categories.Hero,
+                against: Alliances.Enemy,
+                categories: Categories.Projectile,
+                notCategories: Categories.Massive,
+                radius: 0.04,
+                accelerationPerTick: 0.1,
+            },
+        ],
+
         buffs: [
             {
+                type: "armor",
+                proportion: 2,
+                maxTicks: 2 * TicksPerSecond,
+                render: {
+                    color: "rgba(160, 128, 255, 0.5)",
+                    emissionRadius: Hero.Radius,
+                    particleRadius: 0.5 * Hero.Radius,
+                    ticks: 10,
+                },
+            },
+            {
                 type: "movement",
-                movementProportion: 0.5,
-                maxTicks: 20,
+                movementProportion: 0.75,
+                maxTicks: 2 * TicksPerSecond,
             },
         ],
 
@@ -977,18 +996,18 @@ const whirlwind: Spell = {
                 type: "swirl",
 
                 color: "rgba(160, 128, 255, 0.02)",
-                radius: 0.02,
-                ticks: 30,
+                radius: 0.01,
+                ticks: 20,
 
                 loopTicks: 13,
 
                 numParticles: 2,
-                particleRadius: 0.03,
+                particleRadius: 0.02,
 
-                smoke: 1.2,
+                smoke: 1.3,
                 fade: "#436",
             },
-            { type: "strike", ticks: 20, glow: true, growth: 0.2 },
+            { type: "strike", ticks: 20, glow: true, growth: 0.1 },
         ],
     },
 };

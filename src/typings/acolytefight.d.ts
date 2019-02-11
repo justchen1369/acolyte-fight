@@ -286,6 +286,7 @@ declare interface BounceParameters {
 
 declare type BehaviourTemplate =
 	HomingTemplate
+	| AttractTemplate
 	| UpdateCollideWithTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
@@ -314,6 +315,17 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
+}
+
+declare interface AttractTemplate extends BehaviourTemplateBase {
+	type: "attract";
+
+	against?: number; // Which alliances to attract
+	collideLike: number; // Only attract other objects which would collide with this. e.g. collide with them like we're a hero
+	categories: number; // What types of objects to attract
+	notCategories?: number; // What types of objects to not attract
+	radius: number; // Maximum range of attraction
+	accelerationPerTick: number; // Acceleration per tick
 }
 
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {

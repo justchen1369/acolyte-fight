@@ -516,8 +516,6 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	}
 
-	world.behaviours.push();
-
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
@@ -536,6 +534,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		let behaviour: w.Behaviour = null;
 		if (template.type === "homing") {
 			behaviour = instantiateHoming(template, projectile, world);
+		} else if (template.type === "attract") {
+			behaviour = instantiateAttract(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
 		} else if (template.type === "expireOnOwnerDeath") {
@@ -543,7 +543,6 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		} else if (template.type === "expireOnOwnerRetreat") {
 			behaviour = instantiateExpireOnOwnerRetreat(template, projectile, world);
 		}
-
 
 		const trigger = template.trigger;
 		if (!trigger) {
@@ -580,6 +579,20 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		targetType: template.targetType || w.HomingTargets.enemy,
 		newSpeed: template.newSpeed,
 		redirect: template.redirect,
+	};
+}
+
+function instantiateAttract(template: AttractTemplate, projectile: w.Projectile, world: w.World): w.AttractBehaviour {
+	return {
+		type: "attract",
+		objectId: projectile.id,
+		owner: projectile.owner,
+		against: template.against !== undefined ? template.against : Alliances.All,
+		collideLike: template.collideLike,
+		categories: template.categories !== undefined ? template.categories : Categories.All,
+		notCategories: template.notCategories !== undefined ? template.notCategories : Categories.None,
+		radius: template.radius,
+		accelerationPerTick: template.accelerationPerTick,
 	};
 }
 
@@ -627,6 +640,7 @@ export function tick(world: w.World) {
 		homing,
 		linkForce,
 		gravityForce,
+		attract,
 		reflectFollow,
 		saberSwing,
 		thrustBounce,
@@ -1836,8 +1850,9 @@ function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 	projectile.buffs.forEach(template => {
 		const against = template.against !== undefined ? template.against : Categories.All;
 		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
+			const id = `${projectile.type}-${template.type}`;
 			const receiver = template.owner ? owner : hero;
-			instantiateBuff(projectile.id, template, receiver, world, {
+			instantiateBuff(id, template, receiver, world, {
 				fromHeroId: projectile.owner,
 				toHeroId: hero.id,
 			});
@@ -1918,6 +1933,46 @@ function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
 
 	const impulse = vector.multiply(vector.unit(towardsOrb), strength);
 	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+	return true;
+}
+
+function attract(attraction: w.AttractBehaviour, world: w.World) {
+	const orb = world.objects.get(attraction.objectId);
+	if (!(orb)) {
+		return false;
+	}
+
+	const epicenter = orb.body.getPosition();
+
+	world.objects.forEach(obj => {
+		if (!((obj.categories & attraction.categories) > 0 && (obj.categories & attraction.notCategories) === 0)) {
+			return;
+		}
+
+		if (obj.category === "hero") {
+			if (!(calculateAlliance(attraction.owner, obj.id, world) & attraction.against)) {
+				return;
+			}
+		} else if (obj.category === "projectile") {
+			if (!(obj.collideWith & attraction.collideLike)) {
+				return;
+			} else if (!(calculateAlliance(attraction.owner, obj.owner, world) & attraction.against)) {
+				return;
+			}
+		}
+
+		const towardsOrb = vector.diff(epicenter, obj.body.getPosition());
+		const distanceTo = vector.length(towardsOrb);
+		if (distanceTo >= attraction.radius) {
+			return;
+		}
+
+		const acceleration = vector.relengthen(towardsOrb, attraction.accelerationPerTick);
+
+		let velocity = obj.body.getLinearVelocity();
+		velocity = vector.plus(velocity, acceleration);
+		obj.body.setLinearVelocity(velocity);
+	});
 	return true;
 }
 

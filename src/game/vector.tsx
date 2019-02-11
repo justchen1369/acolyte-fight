@@ -111,6 +111,13 @@ export function turnTowards(currentAngle: number, targetAngle: number, turnRate:
 	return newAngle;
 }
 
+export function redirectTowards(vec: pl.Vec2, targetVec: pl.Vec2, turnRate: number) {
+	const currentAngle = angle(vec);
+	const targetAngle = angle(targetVec);
+	const newAngle = turnTowards(currentAngle, targetAngle, turnRate);
+	return redirect(vec, fromAngle(newAngle));
+}
+
 export function turnVectorBy(currentVector: pl.Vec2, deltaAngle: number) {
 	const currentAngle = angle(currentVector);
 	const newAngle = currentAngle + deltaAngle;
