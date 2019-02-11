@@ -718,7 +718,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to an enemy or obstacle and gain a 3x movement speed boost. Throw your enemies into the void, or swing around obstacles while attacking and dodging at super speed!",
+    description: "Attach yourself to an enemy or obstacle and gain a 3x movement speed boost. Swing and throw your enemies into the void, or swing around obstacles while attacking and dodging at super speed!",
     action: "link",
 
     color: '#ff2200',
