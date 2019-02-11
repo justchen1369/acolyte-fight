@@ -1311,6 +1311,7 @@ const thrust: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    unlink: true,
 
     damageTemplate: {
         damage: 0,
