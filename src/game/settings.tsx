@@ -973,7 +973,8 @@ const whirlwind: Spell = {
         buffs: [
             {
                 type: "armor",
-                proportion: 2,
+                proportion: 1,
+                ownerOnly: true,
                 maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "rgba(160, 128, 255, 0.5)",
@@ -984,7 +985,7 @@ const whirlwind: Spell = {
             },
             {
                 type: "movement",
-                movementProportion: 0.75,
+                movementProportion: 0.5,
                 maxTicks: 2 * TicksPerSecond,
             },
         ],
