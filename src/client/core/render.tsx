@@ -804,32 +804,14 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadius));
 	}
 
-	world.ui.trails.push({
+	// Buffs on the bottom
+	world.ui.trails.unshift({
 		type: "circle",
 		pos,
 		velocity,
 		radius: render.particleRadius * proportion,
 		initialTick: world.tick,
 		max: render.ticks,
-		fillStyle: color,
-	});
-}
-
-function renderLavaImmunity(ctxStack: CanvasCtxStack, buff: w.LavaImmunityBuff, hero: w.Hero, world: w.World) {
-	const remainingTicks = buff.expireTick - world.tick;
-	const proportion = remainingTicks / buff.maxTicks;
-	const color = Color(heroColor(hero.id, world)).alpha(proportion).string();
-
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
-
-	world.ui.trails.push({
-		type: "circle",
-		pos: vector.clone(hero.body.getPosition()),
-		velocity,
-		radius: hero.radius * proportion,
-		initialTick: world.tick,
-		max: 60,
 		fillStyle: color,
 	});
 }
