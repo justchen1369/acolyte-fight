@@ -745,7 +745,7 @@ const grapple: Spell = {
             impulsePerTick: 3.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 2 * TicksPerSecond,
+            linkTicks: 3 * TicksPerSecond,
             linkTicksHero: 1 * TicksPerSecond,
             movementProportion: 2,
 
@@ -758,15 +758,6 @@ const grapple: Spell = {
 
         behaviours: [
             { type: "expireOnOwnerDeath" },
-        ],
-
-        buffs: [
-            {
-                type: "movement",
-                owner: true,
-                movementProportion: 2,
-                maxTicks: 4 * TicksPerSecond,
-            },
         ],
 
         sound: "grapple",
