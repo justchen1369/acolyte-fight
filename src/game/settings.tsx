@@ -952,10 +952,9 @@ const whirlwind: Spell = {
             {
                 type: "attract",
                 collideLike: Categories.Hero,
-                against: Alliances.Enemy,
                 categories: Categories.Projectile,
                 notCategories: Categories.Massive,
-                radius: 0.04,
+                radius: 0.03,
                 accelerationPerTick: 0.1,
             },
         ],
@@ -1136,6 +1135,7 @@ const mines: Spell = {
         maxTicks: 4.5 * TicksPerSecond,
         damage: 0,
 
+        categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         expireOn: Categories.All ^ Categories.Shield,
         destructible: {
