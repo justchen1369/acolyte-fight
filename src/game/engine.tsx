@@ -793,8 +793,9 @@ function updateCollideWith(behaviour: w.UpdateCollideWithBehaviour, world: w.Wor
 }
 
 function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
+	const NumTicksCleared = 3;
 	const distance = vector.distance(hero.body.getPosition(), projectile.body.getPosition());
-	return distance > hero.radius + projectile.radius + (hero.moveSpeedPerSecond / TicksPerSecond) + constants.Pixel;
+	return distance > hero.radius + projectile.radius + (NumTicksCleared * hero.moveSpeedPerSecond / TicksPerSecond) + constants.Pixel;
 }
 
 function retractor(behaviour: w.RetractorBehaviour, world: w.World) {
