@@ -608,11 +608,7 @@ function randomKeyBindings(game: g.Game): KeyBindings {
 	for (const key in allOptions) {
 		const options = _.flatten(allOptions[key]);
 		if (options.length > 1) {
-			if (options.some(x => x === "whirlwind")) {
-				keyBindings[key] = "whirlwind";
-			} else {
-				keyBindings[key] = options[Math.floor(Math.random() * options.length)];
-			}
+			keyBindings[key] = options[Math.floor(Math.random() * options.length)];
 		}
 	}
 	return keyBindings;
