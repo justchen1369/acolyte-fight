@@ -50,7 +50,7 @@ export namespace Placements {
 	export const MaxActivityGames = 100;
 
 	export const AcoK = 10;
-	export const AcoPower = 0.25;
+	export const AcoPower = 0.5;
 
 	export const AcoDecayLengthDays = 21;
 
