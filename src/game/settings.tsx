@@ -728,8 +728,6 @@ const grapple: Spell = {
     cooldown: 7.5 * TicksPerSecond,
     throttle: false,
 
-    unlinkable: true,
-
     projectile: {
         density: 1,
         radius: 0.005,
