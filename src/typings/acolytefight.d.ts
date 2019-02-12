@@ -138,7 +138,6 @@ declare type Spell =
 	| RetargetSpell
 	| BuffSpell
 	| ProjectileSpell
-	| LinkSpell
 	| ReflectSpell
 	| RetractorSpell
 	| SaberSpell
@@ -208,13 +207,6 @@ declare interface SpraySpell extends SpellBase {
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
-}
-
-declare interface LinkSpell extends SpellBase {
-    action: "link";
-
-	projectile: ProjectileTemplate;
-	unlinkable?: boolean;
 }
 
 declare interface RetractorSpell extends SpellBase {
