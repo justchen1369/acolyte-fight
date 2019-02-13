@@ -1360,6 +1360,7 @@ const teleport: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     unlink: true,
+    debuff: true,
     chargeTicks: 6,
     movementProportionWhileCharging: 1.0,
 
@@ -1381,6 +1382,7 @@ const thrust: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     unlink: true,
+    debuff: true,
 
     damageTemplate: {
         damage: 0,
@@ -1426,6 +1428,14 @@ const swap: Spell = {
             { type: "expireOnOwnerDeath" },
         ],
 
+        buffs: [
+            {
+                type: "debuff",
+                owner: true,
+                maxTicks: 1,
+            },
+        ],
+
         sound: "swap",
         color: '#75e7ff',
         renderers: [
@@ -1454,6 +1464,7 @@ const voidRush: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     unlink: true,
+    debuff: true,
 
     buffs: [
         {
@@ -1491,6 +1502,7 @@ const vanish: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     unlink: true,
+    debuff: true,
     movementProportionWhileChannelling: 1.75,
     interruptibleAfterTicks: 15,
 

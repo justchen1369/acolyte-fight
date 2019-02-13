@@ -1438,10 +1438,7 @@ function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveS
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
-	// Unlink, if necessary
-	if (world.tick === hero.casting.channellingStartTick && spell.unlink) {
-		hero.link = null;
-	}
+	spellPreactions(world, hero, action, spell);
 
 	switch (spell.action) {
 		case "stop": return stopAction(world, hero, action, spell); // Do nothing
@@ -1456,6 +1453,18 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "wall": return wallAction(world, hero, action, spell);
 		case "shield": return shieldAction(world, hero, action, spell);
 		default: return true;
+	}
+}
+
+function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
+	if (world.tick === hero.casting.channellingStartTick) {
+		if (spell.unlink) {
+			hero.link = null;
+		}
+
+		if (spell.debuff) {
+			hero.buffs.clear();
+		}
 	}
 }
 
@@ -3046,7 +3055,9 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		channellingSpellId: template.channelling && config.channellingSpellId,
 		numStacks: 1,
 	};
-	if (template.type === "movement") {
+	if (template.type === "debuff") {
+		hero.buffs.clear();
+	} else if (template.type === "movement") {
 		hero.buffs.set(id, {
 			...base, id, type: "movement",
 			movementProportion: template.movementProportion,

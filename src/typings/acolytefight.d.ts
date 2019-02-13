@@ -157,7 +157,8 @@ declare interface SpellBase {
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
-	unlink?: boolean;
+	unlink?: boolean; // When this spell is cast, remove any links
+	debuff?: boolean; // When this spell is cast, remove all buffs
 	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
@@ -436,7 +437,8 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 }
 
 declare type BuffTemplate =
-	MovementBuffTemplate
+	DebuffTemplate
+	| MovementBuffTemplate
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
@@ -462,6 +464,10 @@ declare interface RenderBuff {
 	emissionRadius?: number;
 	particleRadius: number;
 	ticks: number;
+}
+
+declare interface DebuffTemplate extends BuffTemplateBase {
+	type: "debuff";
 }
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
