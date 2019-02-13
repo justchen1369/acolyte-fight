@@ -220,7 +220,7 @@ const flamestrike: Spell = {
 const triplet: Spell = {
     id: 'triplet',
     name: 'Trifire',
-    description: "Each bolt of Trifire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Trifire to keep the fire going.",
+    description: "Each bolt of Trifire will add another stack of continuous burning damage. Keep hitting your enemy with Trifire to keep the damage going forever.",
     action: "spray",
     sound: "triplet",
 
@@ -257,12 +257,12 @@ const triplet: Spell = {
             {
                 type: "burn",
                 stack: "fire",
-                hitInterval: 0.25 * TicksPerSecond,
-                packet: { damage: 2.5 / 12, noHit: true },
-                maxTicks: 3 * TicksPerSecond,
+                hitInterval: TicksPerSecond / 4,
+                packet: { damage: 7.5 / 3 / 2 / 4, noHit: true }, // 3 projectiles, 2 seconds, 4 times per second
+                maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
-                    alpha: 0.1,
+                    alpha: 0.15 / 3, // 3 projectiles
                     ticks: 15,
                     emissionRadius: Hero.Radius,
                     particleRadius: 0.5 * Hero.Radius,
@@ -274,7 +274,7 @@ const triplet: Spell = {
 const difire: Spell = {
     id: 'difire',
     name: 'Difire',
-    description: "Each bolt of Difire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Difire to keep the fire going.",
+    description: "Each bolt of Difire will add another stack of continuous burning damage. Keep hitting your enemy with Difire to keep the damage going forever.",
     action: "spray",
 
     color: '#ff0088',
@@ -326,11 +326,11 @@ const difire: Spell = {
                 type: "burn",
                 stack: "fire",
                 hitInterval: TicksPerSecond / 4,
-                packet: { damage: 7.5 / 2 / 3 / 4, noHit: true }, // 2 projectiles, 3 seconds, 4 times per second
-                maxTicks: 3 * TicksPerSecond,
+                packet: { damage: 7.5 / 2 / 2 / 4, noHit: true }, // 2 projectiles, 2 seconds, 4 times per second
+                maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
-                    alpha: 0.1,
+                    alpha: 0.15 / 2, // 2 projectiles
                     ticks: 15,
                     emissionRadius: Hero.Radius,
                     particleRadius: 0.5 * Hero.Radius,
