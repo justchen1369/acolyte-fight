@@ -603,7 +603,6 @@ declare interface LinkParameters {
 	movementProportion?: number; // Speed up/slow down movement while link is attached
 
 	render?: RenderLink;
-	unlinkable?: boolean;
 }
 
 declare interface DamagePacketTemplate {
