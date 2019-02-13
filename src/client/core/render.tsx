@@ -789,11 +789,17 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		color = heroColor(hero.id, world);
 	}
 
+	let alpha = Math.min(1, buff.numStacks * (render.alpha !== undefined ? render.alpha : 1.0));
+
 	let proportion = 1.0;
 	if (render.decay) {
 		const remainingTicks = Math.max(0, buff.expireTick - world.tick);
 		proportion = remainingTicks / buff.maxTicks;
-		color = Color(color).alpha(proportion).string();
+		alpha *= proportion;
+	}
+
+	if (alpha < 1) {
+		color = Color(color).alpha(alpha).string();
 	}
 
 	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);

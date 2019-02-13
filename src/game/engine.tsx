@@ -18,6 +18,10 @@ interface BuffContext {
 	channellingSpellId?: string;
 }
 
+interface ProjectileConfig {
+	directionTarget?: pl.Vec2;
+}
+
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -409,13 +413,13 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate) {
+function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
 	const NeverTicks = 1e6;
 
 	let id = spell.id + (world.nextObjectId++);
 
 	const from = hero.body.getPosition();
-	let direction = vector.unit(vector.diff(target, from));
+	let direction = vector.unit(vector.diff(config.directionTarget || target, from));
 	if (direction.x === 0 && direction.y === 0) {
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
@@ -1587,14 +1591,28 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 
 	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership && (calculateAlliance(shield.owner, projectile.owner, world) & Alliances.Enemy) > 0) { // Stop double redirections cancelling out
 		// Redirect back to owner
-		projectile.targetId = projectile.owner;
-		projectile.owner = shield.owner;
+		swapOwnership(projectile, shield.owner, world);
 	}
 
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
 		applySwap(projectile, shield, world);
 		destroyObject(world, projectile);
+	}
+}
+
+function swapOwnership(projectile: w.Projectile, newOwner: string, world: w.World) {
+	projectile.targetId = projectile.owner;
+	projectile.owner = newOwner;
+
+	const fixture = projectile.body.getFixtureList();
+	if (fixture.getFilterGroupIndex() < 0) {
+		const hero = world.objects.get(newOwner);
+		if (hero && hero.category === "hero") {
+			updateGroupIndex(fixture, hero.filterGroupIndex);
+		} else {
+			updateGroupIndex(fixture, 0);
+		}
 	}
 }
 
@@ -2659,22 +2677,25 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (currentLength % spell.intervalTicks === 0) {
 		const pos = hero.body.getPosition();
 
-		let target = action.target;
+		let directionTarget = action.target;
 		if (spell.revsPerTickWhileChannelling > 0) {
-			target = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
+			directionTarget = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
 		}
 
-		const diff = vector.diff(target, pos);
+		const diff = vector.diff(directionTarget, pos);
 		const currentAngle = vector.angle(diff);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
 		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
-		const newAngle = currentAngle + 2 * Math.PI * projectileIndex / numProjectiles;
+		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
+		const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
 		const jitterRadius = vector.length(diff) * spell.jitterRatio;
-		const newTarget = vector.plus(target, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
+		directionTarget = vector.plus(directionTarget, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
 
-		addProjectile(world, hero, newTarget, spell, spell.projectile);
+		addProjectile(world, hero, action.target, spell, spell.projectile, {
+			directionTarget,
+		});
 	}
 	return false;
 }
@@ -2940,8 +2961,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		if (obj.category === "projectile") {
 			if (saber.takesOwnership && obj.shieldTakesOwnership && (calculateAlliance(saber.owner, obj.owner, world) & Alliances.Enemy) > 0) {
 				// Redirect back to owner
-				obj.targetId = obj.owner;
-				obj.owner = hero.id;
+				swapOwnership(obj, shield.owner, world);
 			}
 
 			if (destructibleBy(obj, hero.id, world)) {
@@ -3024,6 +3044,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		maxTicks: template.maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.channellingSpellId,
+		numStacks: 1,
 	};
 	if (template.type === "movement") {
 		hero.buffs.set(id, {
@@ -3048,22 +3069,29 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			lifeStealTargetId: template.targetOnly ? config.toHeroId : null,
 		});
 	} else if (template.type === "burn") {
+		let stacked = false;
 		if (template.stack) {
 			// Extend existing stacks
 			hero.buffs.forEach(buff => {
 				if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
 					buff.expireTick = base.expireTick;
+					buff.packet.damage += template.packet.damage;
+					++buff.numStacks;
+
+					stacked = true;
 				}
 			});
 		}
 
-		hero.buffs.set(id, {
-			...base, id, type: "burn",
-			fromHeroId: config.fromHeroId,
-			hitInterval: template.hitInterval,
-			packet: { ...template.packet },
-			stack: template.stack,
-		});
+		if (!stacked) {
+			hero.buffs.set(id, {
+				...base, id, type: "burn",
+				fromHeroId: config.fromHeroId,
+				hitInterval: template.hitInterval,
+				packet: { ...template.packet },
+				stack: template.stack,
+			});
+		}
 	} else if (template.type === "armor") {
 		let fromHeroId: string = null;
 		if (template.ownerOnly) {

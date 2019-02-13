@@ -526,6 +526,7 @@ export interface BuffBase {
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
 	hitTick?: number; // If the hero gets hit, remove the buff
+	numStacks: number;
 
 	render?: RenderBuff;
 	sound?: string;

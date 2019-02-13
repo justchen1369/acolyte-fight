@@ -69,7 +69,7 @@ const Choices: ChoiceSettings = {
         ],
 		"q": [
             ["fireball", "flamestrike"],
-            ["triplet"],
+            ["triplet", "difire"],
             ["retractor"],
             ["whip"],
         ],
@@ -220,7 +220,7 @@ const flamestrike: Spell = {
 const triplet: Spell = {
     id: 'triplet',
     name: 'Trifire',
-    description: "Each bolt of trifire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Trifire to keep the fire going.",
+    description: "Each bolt of Trifire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Trifire to keep the fire going.",
     action: "spray",
     sound: "triplet",
 
@@ -256,11 +256,81 @@ const triplet: Spell = {
         buffs: [
             {
                 type: "burn",
+                stack: "fire",
                 hitInterval: 0.25 * TicksPerSecond,
                 packet: { damage: 2.5 / 12, noHit: true },
                 maxTicks: 3 * TicksPerSecond,
                 render: {
-                    color: "rgba(255, 0, 128, 0.1)",
+                    color: "#ff0088",
+                    alpha: 0.1,
+                    ticks: 15,
+                    emissionRadius: Hero.Radius,
+                    particleRadius: 0.5 * Hero.Radius,
+                },
+            },
+        ],
+    },
+};
+const difire: Spell = {
+    id: 'difire',
+    name: 'Difire',
+    description: "Each bolt of Difire adds another stack of burn damage. An enemy can have unlimited stacks, but you need to keep hitting them with Difire to keep the fire going.",
+    action: "spray",
+
+    color: '#ff0088',
+    icon: "crossedSlashes",
+    sound: "triplet",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
+    interruptibleAfterTicks: 0,
+
+    movementProportionWhileChannelling: 1.0,
+    revsPerTickWhileChannelling: 1.0,
+
+    intervalTicks: 1,
+    lengthTicks: 2,
+
+    jitterRatio: 1.0,
+
+    projectile: {
+        density: 1,
+        radius: 0.002,
+        speed: 0.3,
+        maxTicks: 100,
+        damage: 0,
+        selfPassthrough: true,
+
+        sound: "triplet",
+        soundHit: "standard",
+
+        behaviours: [
+            {
+                type: "homing",
+                targetType: "cursor",
+                trigger: { afterTicks: 4 },
+                redirect: true,
+            },
+        ],
+
+        color: '#ff0088',
+        renderers: [
+            { type: "projectile", ticks: 1 },
+            { type: "ray", ticks: 10 },
+            { type: "strike", ticks: 10, glow: true, numParticles: 1 },
+        ],
+
+        buffs: [
+            {
+                type: "burn",
+                stack: "fire",
+                hitInterval: TicksPerSecond / 4,
+                packet: { damage: 7.5 / 2 / 3 / 4, noHit: true }, // 2 projectiles, 3 seconds, 4 times per second
+                maxTicks: 3 * TicksPerSecond,
+                render: {
+                    color: "#ff0088",
+                    alpha: 0.1,
                     ticks: 15,
                     emissionRadius: Hero.Radius,
                     particleRadius: 0.5 * Hero.Radius,
@@ -1447,6 +1517,7 @@ const Spells = {
     flamestrike,
     firespray,
     triplet,
+    difire,
     meteor,
     meteorite,
     gravity,

@@ -201,12 +201,11 @@ declare interface ProjectileSpell extends SpellBase {
 declare interface SpraySpell extends SpellBase {
     action: "spray";
 
-    projectile: ProjectileTemplate;
+	projectile: ProjectileTemplate;
 
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
-
-	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 45 degrees either side. Weird units, I know.
+	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 90 degrees either side. Weird units, I know.
 }
 
 declare interface RetractorSpell extends SpellBase {
@@ -457,6 +456,7 @@ declare interface BuffTemplateBase {
 
 declare interface RenderBuff {
 	color: string;
+	alpha?: number;
 	heroColor?: boolean;
 	decay?: boolean;
 	emissionRadius?: number;
