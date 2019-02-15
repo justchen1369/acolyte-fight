@@ -370,6 +370,7 @@ export interface Hero extends WorldObjectBase {
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
+	cleanseTick?: number;
 
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
@@ -481,6 +482,7 @@ export interface LinkState {
 	minDistance: number;
 	maxDistance: number;
 
+	initialTick: number;
 	expireTick: number;
 
 	movementProportion: number;
@@ -501,6 +503,7 @@ export interface ThrustState {
 
 export interface GravityState {
 	spellId: string;
+	initialTick: number;
 	expireTick: number;
 	location: pl.Vec2;
 	strength: number;

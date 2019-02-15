@@ -1463,7 +1463,7 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 		}
 
 		if (spell.debuff) {
-			hero.buffs.clear();
+			hero.cleanseTick = world.tick;
 		}
 	}
 }
@@ -1801,6 +1801,7 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 
 	target.gravity = {
 		spellId: projectile.type,
+		initialTick: world.tick,
 		expireTick: world.tick + projectile.gravity.ticks,
 		location: vector.clone(projectile.body.getPosition()),
 		strength: projectile.gravity.impulsePerTick,
@@ -1916,6 +1917,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		targetFactor: link.targetFactor !== undefined ? link.targetFactor : 1,
 		strength: link.impulsePerTick,
 		movementProportion: link.movementProportion !== undefined ? link.movementProportion : 1,
+		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		render: link.render,
 	};
@@ -1952,7 +1954,7 @@ function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
 	if (!(hero && hero.category === "hero" && hero.gravity)) {
 		return false;
 	}
-	if (world.tick >= hero.gravity.expireTick) {
+	if (world.tick >= hero.gravity.expireTick || (hero.cleanseTick && hero.gravity.initialTick < hero.cleanseTick)) {
 		hero.gravity = null;
 		return false;
 	}
@@ -2088,6 +2090,11 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 		return false;
 	}
 
+	if (target.category === "hero" && target.cleanseTick && owner.link.initialTick < target.cleanseTick) {
+		owner.link = null;
+		return false;
+	}
+
 	const minDistance = owner.link.minDistance;
 	const maxDistance = owner.link.maxDistance;
 
@@ -2188,6 +2195,8 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 
 function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 	if (world.tick >= buff.expireTick) {
+		return true;
+	} else if (hero.cleanseTick && buff.initialTick < hero.cleanseTick) {
 		return true;
 	} else if (buff.hitTick && hero.hitTick > buff.hitTick) {
 		return true;
@@ -3061,7 +3070,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		numStacks: 1,
 	};
 	if (template.type === "debuff") {
-		hero.buffs.clear();
+		hero.cleanseTick = world.tick;
 	} else if (template.type === "movement") {
 		hero.buffs.set(id, {
 			...base, id, type: "movement",
