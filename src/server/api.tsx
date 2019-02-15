@@ -254,7 +254,8 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
         return;
     }
 
-    const replay = await gameStorage.loadGame(gameId);
+    const store = getStore();
+    const replay = store.activeGames.get(gameId) || await gameStorage.loadGame(gameId);
     if (replay) {
         // Found game locally
         const response: m.HeroMsg = {
