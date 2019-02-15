@@ -297,7 +297,7 @@ const difire: Spell = {
     projectile: {
         density: 1,
         radius: 0.002,
-        speed: 0.1,
+        speed: 0.3,
         maxTicks: 100,
         damage: 0,
         selfPassthrough: true,
@@ -309,7 +309,7 @@ const difire: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 15 },
+                trigger: { afterTicks: 5 },
                 redirect: true,
                 newSpeed: 0.5,
             },
