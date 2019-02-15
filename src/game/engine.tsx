@@ -1866,23 +1866,28 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 }
 
 function swapOnExpiry(projectile: w.Projectile, world: w.World) {
+	applyBuffs(projectile, null, world);
 	applySwap(projectile, null, world);
 }
 
-function applyBuffs(projectile: w.Projectile, hero: w.Hero, world: w.World) {
+function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
 	if (!projectile.buffs) {
 		return;
 	}
 
 	const owner: w.Hero = world.objects.get(projectile.owner) as w.Hero;
 	projectile.buffs.forEach(template => {
+		const receiver = template.owner ? owner : target;
+		if (!receiver) {
+			return;
+		}
+
 		const against = template.against !== undefined ? template.against : Categories.All;
-		if ((calculateAlliance(projectile.owner, hero.id, world) & against) > 0) {
+		if ((calculateAlliance(projectile.owner, receiver.id, world) & against) > 0) {
 			const id = `${projectile.type}-${template.type}`;
-			const receiver = template.owner ? owner : hero;
 			instantiateBuff(id, template, receiver, world, {
 				fromHeroId: projectile.owner,
-				toHeroId: hero.id,
+				toHeroId: target && target.id,
 			});
 		}
 	});
