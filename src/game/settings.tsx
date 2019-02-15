@@ -258,8 +258,8 @@ const triplet: Spell = {
                 type: "burn",
                 stack: "fire",
                 hitInterval: TicksPerSecond / 4,
-                packet: { damage: 7.5 / 3 / 2 / 4, noHit: true }, // 3 projectiles, 2 seconds, 4 times per second
-                maxTicks: 2 * TicksPerSecond,
+                packet: { damage: 7.5 / 3 / 3 / 4, noHit: true }, // 3 projectiles, 3 seconds, 4 times per second
+                maxTicks: 3 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 3, // 3 projectiles
@@ -297,7 +297,7 @@ const difire: Spell = {
     projectile: {
         density: 1,
         radius: 0.002,
-        speed: 0.3,
+        speed: 0.1,
         maxTicks: 100,
         damage: 0,
         selfPassthrough: true,
@@ -309,8 +309,9 @@ const difire: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 4 },
+                trigger: { afterTicks: 15 },
                 redirect: true,
+                newSpeed: 0.5,
             },
         ],
 
@@ -318,7 +319,7 @@ const difire: Spell = {
         renderers: [
             { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 10 },
-            { type: "strike", ticks: 10, glow: true, numParticles: 1 },
+            { type: "strike", ticks: 10, glow: true, numParticles: 2 },
         ],
 
         buffs: [
@@ -326,8 +327,8 @@ const difire: Spell = {
                 type: "burn",
                 stack: "fire",
                 hitInterval: TicksPerSecond / 4,
-                packet: { damage: 7.5 / 2 / 2 / 4, noHit: true }, // 2 projectiles, 2 seconds, 4 times per second
-                maxTicks: 2 * TicksPerSecond,
+                packet: { damage: 7.5 / 2 / 3 / 4, noHit: true }, // 2 projectiles, 3 seconds, 4 times per second
+                maxTicks: 3 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 2, // 2 projectiles
