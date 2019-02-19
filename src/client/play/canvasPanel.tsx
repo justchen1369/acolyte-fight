@@ -12,7 +12,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond, Pixel } from '../../game/constants';
-import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../core/render';
+import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../graphics/render';
 import { sendAction } from '../core/ticker';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
@@ -151,6 +151,7 @@ class CanvasPanel extends React.Component<Props, State> {
         background: null,
         glows: null,
         canvas: null,
+        gl: null,
         ui: null,
         cursor: null,
     };
@@ -199,6 +200,7 @@ class CanvasPanel extends React.Component<Props, State> {
                 <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} style={{ display: this.state.rtx ? "block" : "none" }} />
                 <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
+                <canvas id="gl" ref={c => this.canvasStack.gl = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="ui" ref={c => this.canvasStack.ui = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="cursor" ref={c => {
                     this.canvasStack.cursor = c;

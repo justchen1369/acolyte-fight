@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import { heroColor } from '../core/render';
+import { heroColor } from '../graphics/render';
 
 interface OwnProps {
     player: w.Player;

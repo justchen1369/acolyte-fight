@@ -1,11 +1,11 @@
 import Color from 'color';
 import * as pl from 'planck-js';
 import * as Reselect from 'reselect';
-import * as audio from './audio';
+import * as audio from '../core/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
-import * as keyboardUtils from './keyboardUtils';
-import * as icons from './icons';
+import * as keyboardUtils from '../core/keyboardUtils';
+import * as icons from '../core/icons';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
@@ -19,6 +19,7 @@ export interface CanvasStack {
 	background: HTMLCanvasElement;
 	glows: HTMLCanvasElement;
 	canvas: HTMLCanvasElement;
+	gl: HTMLCanvasElement;
 	ui: HTMLCanvasElement;
 	cursor: HTMLCanvasElement;
 }
@@ -27,6 +28,7 @@ export interface CanvasCtxStack {
 	background: CanvasRenderingContext2D;
 	glows: CanvasRenderingContext2D;
 	canvas: CanvasRenderingContext2D;
+	gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
 	rtx: boolean;
 }
@@ -146,6 +148,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		background: canvasStack.background.getContext('2d', { alpha: false }),
 		glows: canvasStack.glows.getContext('2d', { alpha: true }),
 		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
+		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
 	} as CanvasCtxStack;

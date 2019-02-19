@@ -1,7 +1,7 @@
 import Color from 'color';
 import * as React from 'react';
 import * as icons from '../core/icons';
-import { renderIconButton } from '../core/renderIcon';
+import { renderIconButton } from '../graphics/renderIcon';
 
 interface Props {
     icon: Path2D;

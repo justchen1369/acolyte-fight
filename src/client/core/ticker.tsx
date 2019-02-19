@@ -4,7 +4,7 @@ import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
-import { render, CanvasStack, RenderOptions } from './render';
+import { render, CanvasStack, RenderOptions } from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
