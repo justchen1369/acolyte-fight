@@ -314,9 +314,10 @@ function antiAliasRadius(radius: number, feather: number): number {
 }
 
 function antiAliasFade(color: Color, radius: number) {
-    const fade = 1 - Math.min(1, radius / Pixel);
-    if (fade > 0) {
-        color = color.fade(fade);
+    if (radius < Pixel) {
+        const fade = 1 - Math.sqrt(radius / Pixel);
+        return color.fade(fade);
+    } else {
+        return color;
     }
-    return color;
 }
