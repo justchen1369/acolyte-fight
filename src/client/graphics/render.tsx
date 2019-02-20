@@ -1516,9 +1516,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		glx.circle(ctxStack, pos, 0, radius, Color(color));
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
-		const antiAlias = Pixel;
-		const fade = 1 - Math.min(1, lineWidth / Pixel);
-		glx.line(ctxStack, trail.from, trail.to, Math.max(0, lineWidth - antiAlias / 2), Color(color).fade(fade), antiAlias);
+		glx.line(ctxStack, trail.from, trail.to, lineWidth, Color(color));
 	} else if (trail.type === "ripple") {
 		const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
 		const lineWidth = proportion * trail.initialRadius / 2;

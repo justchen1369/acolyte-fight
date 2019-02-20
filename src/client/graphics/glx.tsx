@@ -160,7 +160,10 @@ function initGl(gl: WebGLRenderingContext): GlContext {
 	};
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather: number = 0) {
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather: number = Pixel) {
+    color = antiAliasFade(color, maxRadius);
+    maxRadius = antiAliasRadius(maxRadius, feather);
+
 	const extent = maxRadius + feather;
 	const topLeft: r.Vertex = {
 		pos: pl.Vec2(pos.x - extent, pos.y - extent),
@@ -204,7 +207,10 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: numb
 	ctxStack.vertices.push(bottomRight);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, width: number, color: Color, feather: number = 0) {
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, width: number, color: Color, feather: number = Pixel) {
+    color = antiAliasFade(color, width);
+    width = antiAliasRadius(width, feather);
+
 	const normal = vector.rotateRight(vector.unit(vector.diff(to, from)));
 
 	const halfWidth = width / 2;
@@ -252,7 +258,10 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, wid
 	ctxStack.vertices.push(to2);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather: number = 0) {
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather: number = Pixel) {
+    color = antiAliasFade(color, maxRadius);
+    maxRadius = antiAliasRadius(maxRadius, feather);
+
     const extent = Math.sqrt(2) * (maxRadius + feather); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center: r.Vertex = {
@@ -298,4 +307,16 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
         ctxStack.vertices.push(vertices[i]);
         ctxStack.vertices.push(vertices[i + 1]);
     }
+}
+
+function antiAliasRadius(radius: number, feather: number): number {
+    return Math.max(0, radius - feather / 2);
+}
+
+function antiAliasFade(color: Color, radius: number) {
+    const fade = 1 - Math.min(1, radius / Pixel);
+    if (fade > 0) {
+        color = color.fade(fade);
+    }
+    return color;
 }
