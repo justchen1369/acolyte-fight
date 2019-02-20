@@ -1,46 +1,22 @@
 import Color from 'color';
 import * as pl from 'planck-js';
-import * as Reselect from 'reselect';
 import * as audio from '../core/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
+import * as glx from './glx';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
 import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
+import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
 import { renderIconButton, renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
+export { CanvasStack, RenderOptions } from './render.model';
+
 const MaxDestroyedTicks = constants.TicksPerSecond;
-
-export interface CanvasStack {
-	background: HTMLCanvasElement;
-	glows: HTMLCanvasElement;
-	canvas: HTMLCanvasElement;
-	gl: HTMLCanvasElement;
-	ui: HTMLCanvasElement;
-	cursor: HTMLCanvasElement;
-}
-
-export interface CanvasCtxStack {
-	background: CanvasRenderingContext2D;
-	glows: CanvasRenderingContext2D;
-	canvas: CanvasRenderingContext2D;
-	gl: WebGLRenderingContext;
-	ui: CanvasRenderingContext2D;
-	rtx: boolean;
-}
-
-export interface RenderOptions {
-	targetingIndicator: boolean;
-	wheelOnRight: boolean;
-	mute: boolean;
-	keysToSpells: Map<string, string>;
-	rebindings: KeyBindings;
-	rtx: boolean;
-}
 
 interface SwirlContext {
 	color?: string;
@@ -144,14 +120,15 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	// Everything also always gets rendered (used to wait for changes)
 	world.ui.renderedTick = world.tick;
 
-	let ctxStack = {
+	const ctxStack: CanvasCtxStack = {
 		background: canvasStack.background.getContext('2d', { alpha: false }),
 		glows: canvasStack.glows.getContext('2d', { alpha: true }),
 		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
 		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
-	} as CanvasCtxStack;
+		vertices: [],
+	};
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
 		throw "Error getting context";
 	}
@@ -161,6 +138,8 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	renderWorld(ctxStack, world, worldRect, options);
 	renderInterface(ctxStack.ui, world, rect, options);
 	all(ctxStack, ctx => ctx.restore());
+
+	glx.renderGl(ctxStack.gl, ctxStack.vertices, worldRect, rect);
 
 	playSounds(world, options);
 
@@ -1526,6 +1505,32 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 	}
 
+	if (trail.type === "circle") {
+		let pos = trail.pos;
+		if (trail.velocity) {
+			const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
+			pos = vector.plus(pos, vector.multiply(trail.velocity, time));
+		}
+
+		const radius = scale * proportion * trail.radius;
+		glx.circle(ctxStack, pos, 0, radius, Color(color));
+	} else if (trail.type === "line") {
+		const lineWidth = scale * proportion * trail.width;
+		const antiAlias = Pixel;
+		const fade = 1 - Math.min(1, lineWidth / Pixel);
+		glx.line(ctxStack, trail.from, trail.to, Math.max(0, lineWidth - antiAlias / 2), Color(color).fade(fade), antiAlias);
+	} else if (trail.type === "ripple") {
+		const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
+		const lineWidth = proportion * trail.initialRadius / 2;
+		
+		const minRadius = Math.max(0, radius - lineWidth / 2);
+		const maxRadius = radius + lineWidth / 2;
+		glx.circle(ctxStack, trail.pos, minRadius, maxRadius, Color(color).alpha(proportion));
+	} else if (trail.type === "arc") {
+		glx.arc(ctxStack, trail.pos, trail.minRadius, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion));
+	}
+
+	/*
 	foreground(ctxStack, ctx => {
 		ctx.save(); 
 
@@ -1586,6 +1591,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		ctx.restore();
 	}, trail.glow);
+	*/
 
 	return false;
 }
