@@ -53,7 +53,7 @@ export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldR
 		2 * (worldRect.left / Math.max(1, rect.width)) - 1,
 		2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 	]));
-	gl.uniform1fv(context.pixelUniformLocation, new Float32Array([Pixel]));
+	gl.uniform1fv(context.pixelUniformLocation, new Float32Array([1 / Math.max(1, Math.min(worldRect.width, worldRect.height))]));
 
 	// Position
 	gl.enableVertexAttribArray(context.posAttribLocation);

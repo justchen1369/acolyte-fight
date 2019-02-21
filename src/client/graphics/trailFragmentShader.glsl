@@ -22,8 +22,7 @@ void main() {
 
 	if (outside > 0.0) {
 		// Antialias
-		float alias = maxRadius < u_pixel ? maxRadius : outside; // If smaller than a single pixel, just fade entire pixel rather than have rounding artifacts
-		float fade = 1.0 - smoothstep(0.0, u_pixel, alias);
+		float fade = 1.0 - smoothstep(0.0, u_pixel, outside);
 
 		if (feather > 0.0) {
 			// Gaussian blur
