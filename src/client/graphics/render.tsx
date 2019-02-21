@@ -428,7 +428,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
-		glow: 0.5,
+		glow: 0.2,
 	});
 
 	if (ev.sound) {
