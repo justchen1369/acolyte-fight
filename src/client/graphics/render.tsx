@@ -311,6 +311,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			velocity,
 			fillStyle: "white",
 			radius: hero.radius,
+			glow: 0.1,
 		});
 	}
 
@@ -427,6 +428,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
+		glow: 0.5,
 	});
 
 	if (ev.sound) {
