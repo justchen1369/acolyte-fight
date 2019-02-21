@@ -6,6 +6,7 @@ import * as engine from '../../game/engine';
 import * as glx from './glx';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
+import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
@@ -1132,7 +1133,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			ctx.fill();
 		}
 		ctx.fill();
-	}, glow);
+	}, !!glow);
 
 	foreground(ctxStack, ctx => ctx.restore());
 
@@ -1290,7 +1291,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle: context.color || swirl.color,
-			glow: swirl.glow || false,
+			glow: swirl.glow,
 			fade: swirl.fade,
 			tag: context.tag,
 		});
@@ -1413,7 +1414,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
 				width: multiplier * projectile.radius * 2,
-				glow: render.glow || false,
+				glow: render.glow,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			} as w.LineTrail);
@@ -1505,9 +1506,12 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 	}
 
-	let feather: number = 0;
+	let feather: r.FeatherConfig = null;
 	if (trail.glow) {
-		feather = 5 * Pixel;
+		feather = {
+			sigma: 4 * Pixel,
+			alpha: trail.glow,
+		};
 	}
 
 	if (trail.type === "circle") {

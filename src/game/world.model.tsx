@@ -418,7 +418,7 @@ export interface ShieldBase extends WorldObjectBase {
 	color: string;
 	selfColor?: boolean;
 	hitTick?: number;
-	glow?: boolean;
+	glow?: number;
 }
 
 export interface Reflect extends ShieldBase {
@@ -857,7 +857,7 @@ export interface TrailBase {
 	fillStyle: string;
 	fade?: string;
 
-	glow?: boolean;
+	glow?: number;
 	highlight?: TrailHighlight;
 	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
 }

@@ -7,11 +7,11 @@ uniform float u_pixel;
 attribute vec2 a_pos;
 attribute vec2 a_rel;
 attribute vec4 a_color;
-attribute vec3 a_shape;
+attribute vec4 a_shape;
 
 varying vec2 v_rel;
 varying vec4 v_color;
-varying vec3 v_shape;
+varying vec4 v_shape;
 
 vec2 flipVertical = vec2(1, -1);
 
@@ -22,7 +22,8 @@ void main() {
 	float minRadius = a_shape.x;
 	float maxRadius = max(minRadius, a_shape.y - u_pixel / 2.0); // for anti-aliasing
 	float feather = a_shape.z;
-	v_shape = vec3(minRadius, maxRadius, feather);
+	float featherAlpha = a_shape.w;
+	v_shape = vec4(minRadius, maxRadius, feather, featherAlpha);
 
 	vec4 color = a_color;
 	v_color = color;

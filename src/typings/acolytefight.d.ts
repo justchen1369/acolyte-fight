@@ -379,7 +379,7 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 
 	ticks: number; // How long is the trail?
-	glow?: boolean;
+	glow?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -391,7 +391,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	rtx?: boolean;
 	fade?: string;
 	smoke?: number;
-	glow?: boolean;
+	glow?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -410,7 +410,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 
 	smoke?: number;
 	fade?: string;
-	glow?: boolean;
+	glow?: number;
 }
 
 declare interface RenderLink extends RenderParamsBase {
@@ -531,7 +531,7 @@ declare interface ShieldSpell extends SpellBase {
 declare interface ReflectSpell extends ShieldSpell {
     action: "shield";
     radius: number;
-	glow?: boolean;
+	glow?: number;
 }
 
 declare interface WallSpell extends ShieldSpell {
@@ -548,7 +548,7 @@ declare interface WallSpell extends ShieldSpell {
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
 
-	glow?: boolean;
+	glow?: number;
 }
 
 declare interface SaberSpell extends ShieldSpell {
@@ -568,7 +568,7 @@ declare interface SaberSpell extends ShieldSpell {
 	collidesWith: number;
 
 	trailTicks: number;
-	glow?: boolean;
+	glow?: number;
 }
 
 declare interface TeleportSpell extends SpellBase {

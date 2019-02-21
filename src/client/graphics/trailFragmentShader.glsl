@@ -4,7 +4,7 @@ uniform float u_pixel;
 
 varying vec2 v_rel;
 varying vec4 v_color;
-varying vec3 v_shape;
+varying vec4 v_shape;
 
 void main() {
 	vec4 color = vec4(v_color);
@@ -12,6 +12,7 @@ void main() {
 	float minRadius = v_shape.x;
 	float maxRadius = v_shape.y;
 	float feather = v_shape.z;
+	float featherAlpha = v_shape.w;
 
 	float radius = sqrt(dot(v_rel, v_rel));
 	float outside = max(
@@ -19,8 +20,16 @@ void main() {
 		max(0.0, minRadius - radius)
 	);
 
-	// Antialias
-	color.w *= 1.0 - smoothstep(0.0, u_pixel, outside);
+	if (outside > 0.0) {
+		float fade = 1.0 - smoothstep(0.0, u_pixel, outside); // Antialias
+
+		if (feather > 0.0) {
+			// Gaussian blur
+			fade = max(fade, featherAlpha * exp(-(outside * outside) / (2.0 * feather * feather)));
+		}
+
+		color.w *= fade;
+	}
 
 	gl_FragColor = color;
 }

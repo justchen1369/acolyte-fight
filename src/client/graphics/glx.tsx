@@ -5,6 +5,7 @@ import * as vector from '../../game/vector';
 
 import { Pixel } from '../../game/constants';
 
+const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur reaches close to zero
 const trailFragmentShader = require('./trailFragmentShader.glsl');
 const trailVertexShader = require('./trailVertexShader.glsl');
 
@@ -76,7 +77,7 @@ export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldR
 	gl.enableVertexAttribArray(context.shapeAttribLocation);
 	gl.bindBuffer(gl.ARRAY_BUFFER, context.shapeBuffer);
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexShapes(vertices)), gl.STATIC_DRAW);
-	gl.vertexAttribPointer(context.shapeAttribLocation, 3, gl.FLOAT, false, 0, 0)
+	gl.vertexAttribPointer(context.shapeAttribLocation, 4, gl.FLOAT, false, 0, 0)
 
     if (vertices.length > 0) {
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
@@ -110,23 +111,19 @@ function* vertexShapes(vertices: r.Vertex[]) {
 	for (const vertex of vertices) {
 		yield vertex.minRadius;
 		yield vertex.maxRadius;
-		yield vertex.feather;
+
+		if (vertex.feather) {
+			yield vertex.feather.sigma;
+			yield vertex.feather.alpha;
+		} else {
+			yield 0.0;
+			yield 0.0;
+		}
 	}
 }
 
 function initGl(gl: WebGLRenderingContext): GlContext {
-	const vertexShader = gl.createShader(gl.VERTEX_SHADER);
-	gl.shaderSource(vertexShader, trailVertexShader);
-	gl.compileShader(vertexShader);
-
-	const fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-	gl.shaderSource(fragmentShader, trailFragmentShader);
-	gl.compileShader(fragmentShader);
-
-	const program = gl.createProgram();
-	gl.attachShader(program, vertexShader);
-	gl.attachShader(program, fragmentShader);
-	gl.linkProgram(program);
+	const program = compileProgram(gl, trailVertexShader, trailFragmentShader);
 
 	// Setup buffers
 	const translateUniformLocation = gl.getUniformLocation(program, "u_translate");
@@ -165,8 +162,38 @@ function initGl(gl: WebGLRenderingContext): GlContext {
 	};
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather: number = 0) {
-	const extent = maxRadius + feather;
+function compileProgram(gl: WebGLRenderingContext, vertexShaderCode: string, fragmentShaderCode: string) {
+	const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
+	const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);
+
+	const program = gl.createProgram();
+	gl.attachShader(program, vertexShader);
+	gl.attachShader(program, fragmentShader);
+	gl.linkProgram(program);
+
+	return program;
+
+}
+
+function compileShader(gl: WebGLRenderingContext, type: number, code: string) {
+	const shader = gl.createShader(type);
+	gl.shaderSource(shader, code);
+	gl.compileShader(shader);
+
+	var success = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+	if (success) {
+		return shader;
+	}
+
+	const error = gl.getShaderInfoLog(shader);
+	console.error("Error compiling shader", type, code, error);
+	gl.deleteShader(shader);
+
+	throw "Error compiling shader";
+}
+
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather?: r.FeatherConfig) {
+	const extent = maxRadius + featherRadius(feather);
 	const topLeft: r.Vertex = {
 		pos: pl.Vec2(pos.x - extent, pos.y - extent),
 		rel: pl.Vec2(-extent, -extent),
@@ -209,10 +236,10 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: numb
 	ctxStack.vertices.push(bottomRight);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather: number = 0) {
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather?: r.FeatherConfig) {
 	const normal = vector.rotateRight(vector.unit(vector.diff(to, from)));
 
-	const extent = halfWidth + feather;
+	const extent = halfWidth + featherRadius(feather);
 
 	const from1: r.Vertex = {
 		pos: pl.Vec2(from.x - extent * normal.x, from.y - extent * normal.y),
@@ -256,8 +283,8 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, hal
 	ctxStack.vertices.push(to2);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather: number = 0) {
-    const extent = Math.sqrt(2) * (maxRadius + feather); // sqrt(2) ensures the triangle always fully enclosees the arc
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather?: r.FeatherConfig) {
+    const extent = Math.sqrt(2) * (maxRadius + featherRadius(feather)); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center: r.Vertex = {
 		pos,
@@ -278,7 +305,7 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
             color,
             minRadius,
             maxRadius,
-            feather,
+			feather,
         });
 
         const direction = (antiClockwise ? -1 : 1);
@@ -302,4 +329,8 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
         ctxStack.vertices.push(vertices[i]);
         ctxStack.vertices.push(vertices[i + 1]);
     }
+}
+
+function featherRadius(feather: r.FeatherConfig) {
+	return feather ? feather.sigma * FeatherFactor : 0.0;
 }

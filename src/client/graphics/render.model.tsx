@@ -36,5 +36,10 @@ export interface Vertex {
 	color: Color;
 	minRadius: number;
 	maxRadius: number;
-	feather: number;
+	feather: FeatherConfig;
+}
+
+export interface FeatherConfig {
+	sigma: number;
+	alpha: number;
 }
