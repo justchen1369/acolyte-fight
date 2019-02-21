@@ -18,13 +18,6 @@ vec2 flipVertical = vec2(1, -1);
 void main() {
 	gl_Position = vec4(flipVertical * (a_pos * u_scale + u_translate), 0, 1);
 	v_rel = a_rel;
-
-	float minRadius = a_shape.x;
-	float maxRadius = max(minRadius, a_shape.y); // for anti-aliasing
-	float feather = a_shape.z;
-	float featherAlpha = a_shape.w;
-	v_shape = vec4(minRadius, maxRadius, feather, featherAlpha);
-
-	vec4 color = a_color;
-	v_color = color;
+	v_shape = a_shape;
+	v_color = a_color;
 }
