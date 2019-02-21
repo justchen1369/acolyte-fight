@@ -12,7 +12,9 @@ interface GlContext {
 	program: WebGLProgram;
 
 	translateUniformLocation: WebGLUniformLocation;
-	scaleUniformLocation: WebGLUniformLocation;
+    scaleUniformLocation: WebGLUniformLocation;
+    
+    pixelUniformLocation: WebGLUniformLocation;
 
 	posAttribLocation: number;
 	posBuffer: WebGLBuffer;
@@ -50,6 +52,7 @@ export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldR
 		2 * (worldRect.left / Math.max(1, rect.width)) - 1,
 		2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 	]));
+	gl.uniform1fv(context.pixelUniformLocation, new Float32Array([Pixel]));
 
 	// Position
 	gl.enableVertexAttribArray(context.posAttribLocation);
@@ -128,6 +131,7 @@ function initGl(gl: WebGLRenderingContext): GlContext {
 	// Setup buffers
 	const translateUniformLocation = gl.getUniformLocation(program, "u_translate");
 	const scaleUniformLocation = gl.getUniformLocation(program, "u_scale");
+	const pixelUniformLocation = gl.getUniformLocation(program, "u_pixel");
 
 	const posAttribLocation = gl.getAttribLocation(program, "a_pos");
 	const posBuffer = gl.createBuffer();
@@ -148,7 +152,8 @@ function initGl(gl: WebGLRenderingContext): GlContext {
 	return {
 		program,
 		translateUniformLocation,
-		scaleUniformLocation,
+        scaleUniformLocation,
+        pixelUniformLocation,
 		posAttribLocation,
 		posBuffer,
 		relAttribLocation,
@@ -160,10 +165,7 @@ function initGl(gl: WebGLRenderingContext): GlContext {
 	};
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather: number = Pixel) {
-    color = antiAliasFade(color, maxRadius);
-    maxRadius = antiAliasRadius(maxRadius, feather);
-
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather: number = 0) {
 	const extent = maxRadius + feather;
 	const topLeft: r.Vertex = {
 		pos: pl.Vec2(pos.x - extent, pos.y - extent),
@@ -207,13 +209,9 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: numb
 	ctxStack.vertices.push(bottomRight);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, width: number, color: Color, feather: number = Pixel) {
-    color = antiAliasFade(color, width);
-    width = antiAliasRadius(width, feather);
-
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather: number = 0) {
 	const normal = vector.rotateRight(vector.unit(vector.diff(to, from)));
 
-	const halfWidth = width / 2;
 	const extent = halfWidth + feather;
 
 	const from1: r.Vertex = {
@@ -258,10 +256,7 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, wid
 	ctxStack.vertices.push(to2);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather: number = Pixel) {
-    color = antiAliasFade(color, maxRadius);
-    maxRadius = antiAliasRadius(maxRadius, feather);
-
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather: number = 0) {
     const extent = Math.sqrt(2) * (maxRadius + feather); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center: r.Vertex = {
@@ -306,18 +301,5 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
         ctxStack.vertices.push(center);
         ctxStack.vertices.push(vertices[i]);
         ctxStack.vertices.push(vertices[i + 1]);
-    }
-}
-
-function antiAliasRadius(radius: number, feather: number): number {
-    return Math.max(0, radius - feather / 2);
-}
-
-function antiAliasFade(color: Color, radius: number) {
-    if (radius < Pixel) {
-        const fade = 1 - Math.sqrt(radius / Pixel);
-        return color.fade(fade);
-    } else {
-        return color;
     }
 }

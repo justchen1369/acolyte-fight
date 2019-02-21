@@ -1505,6 +1505,11 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 	}
 
+	let feather: number = 0;
+	if (trail.glow) {
+		feather = 5 * Pixel;
+	}
+
 	if (trail.type === "circle") {
 		let pos = trail.pos;
 		if (trail.velocity) {
@@ -1513,19 +1518,21 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 
 		const radius = scale * proportion * trail.radius;
-		glx.circle(ctxStack, pos, 0, radius, Color(color));
+
+		glx.circle(ctxStack, pos, 0, radius, Color(color), feather);
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
-		glx.line(ctxStack, trail.from, trail.to, lineWidth, Color(color));
+
+		glx.line(ctxStack, trail.from, trail.to, lineWidth / 2, Color(color), feather);
 	} else if (trail.type === "ripple") {
 		const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
 		const lineWidth = proportion * trail.initialRadius / 2;
 		
 		const minRadius = Math.max(0, radius - lineWidth / 2);
 		const maxRadius = radius + lineWidth / 2;
-		glx.circle(ctxStack, trail.pos, minRadius, maxRadius, Color(color).alpha(proportion));
+		glx.circle(ctxStack, trail.pos, minRadius, maxRadius, Color(color).alpha(proportion), feather);
 	} else if (trail.type === "arc") {
-		glx.arc(ctxStack, trail.pos, trail.minRadius, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion));
+		glx.arc(ctxStack, trail.pos, trail.minRadius, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion), feather);
 	}
 
 	/*
