@@ -256,6 +256,7 @@ const triplet: Spell = {
         buffs: [
             {
                 type: "burn",
+                against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 4,
                 packet: { damage: 7.5 / 3 / 3 / 4, noHit: true }, // 3 projectiles, 3 seconds, 4 times per second
@@ -325,6 +326,7 @@ const difire: Spell = {
         buffs: [
             {
                 type: "burn",
+                against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 4,
                 packet: { damage: 7.5 / 2 / 3 / 4, noHit: true }, // 2 projectiles, 3 seconds, 4 times per second
