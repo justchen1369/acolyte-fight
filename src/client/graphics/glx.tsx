@@ -86,49 +86,6 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 	};
 
 	runProgram(gl, context.trails, uniforms);
-
-	/*
-	gl.useProgram(context.program);
-
-	// World rect
-	gl.uniform2fv(context.scaleUniformLocation, new Float32Array([
-		2 * (worldRect.width / Math.max(1, rect.width)),
-		2 * (worldRect.height / Math.max(1, rect.height)),
-	]));
-	gl.uniform2fv(context.translateUniformLocation, new Float32Array([
-		2 * (worldRect.left / Math.max(1, rect.width)) - 1,
-		2 * (worldRect.top / Math.max(1, rect.height)) - 1,
-	]));
-	gl.uniform1fv(context.pixelUniformLocation, new Float32Array([1 / Math.max(1, Math.min(worldRect.width, worldRect.height))]));
-
-	// Position
-	gl.enableVertexAttribArray(context.posAttribLocation);
-	gl.bindBuffer(gl.ARRAY_BUFFER, context.posBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions(vertices)), gl.STATIC_DRAW);
-	gl.vertexAttribPointer(context.posAttribLocation, 2, gl.FLOAT, false, 0, 0)
-
-	// Rel
-	gl.enableVertexAttribArray(context.relAttribLocation);
-	gl.bindBuffer(gl.ARRAY_BUFFER, context.relBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexRels(vertices)), gl.STATIC_DRAW);
-	gl.vertexAttribPointer(context.relAttribLocation, 2, gl.FLOAT, false, 0, 0)
-
-	// Color
-	gl.enableVertexAttribArray(context.colorAttribLocation);
-	gl.bindBuffer(gl.ARRAY_BUFFER, context.colorBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColors(vertices)), gl.STATIC_DRAW);
-	gl.vertexAttribPointer(context.colorAttribLocation, 4, gl.FLOAT, false, 0, 0)
-
-	// Shape
-	gl.enableVertexAttribArray(context.shapeAttribLocation);
-	gl.bindBuffer(gl.ARRAY_BUFFER, context.shapeBuffer);
-	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexShapes(vertices)), gl.STATIC_DRAW);
-	gl.vertexAttribPointer(context.shapeAttribLocation, 4, gl.FLOAT, false, 0, 0)
-
-    if (vertices.length > 0) {
-        gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-	}
-	*/
 }
 
 function runProgram(gl: WebGLRenderingContext, draw: Draw, uniformData: UniformData) {
@@ -172,46 +129,6 @@ function setUniform(gl: WebGLRenderingContext, uniform: UniformInfo, data: numbe
 		throw `Unable to handle uniform of type ${uniform.type} and size ${uniform.size}`;
 	}
 }
-
-/*
-function* vertexPositions(vertices: r.Vertex[]) {
-	for (const vertex of vertices) {
-		yield vertex.pos.x;
-		yield vertex.pos.y;
-	}
-}
-
-function* vertexRels(vertices: r.Vertex[]) {
-	for (const vertex of vertices) {
-		yield vertex.rel.x;
-		yield vertex.rel.y;
-	}
-}
-
-function* vertexColors(vertices: r.Vertex[]) {
-	for (const vertex of vertices) {
-		yield vertex.color.red() / 255;
-		yield vertex.color.green() / 255;
-		yield vertex.color.blue() / 255;
-		yield vertex.color.alpha();
-	}
-}
-
-function* vertexShapes(vertices: r.Vertex[]) {
-	for (const vertex of vertices) {
-		yield vertex.minRadius;
-		yield vertex.maxRadius;
-
-		if (vertex.feather) {
-			yield vertex.feather.sigma;
-			yield vertex.feather.alpha;
-		} else {
-			yield 0.0;
-			yield 0.0;
-		}
-	}
-}
-*/
 
 export function initGl(ctxStack: r.CanvasCtxStack): GlContext {
 	const gl = ctxStack.gl;
