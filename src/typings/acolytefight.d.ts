@@ -417,7 +417,7 @@ declare interface RenderLink extends RenderParamsBase {
 	type: "link";
 	color: string;
 	width: number;
-	glow?: boolean;
+	glow?: number;
 }
 
 declare interface RenderReticule extends RenderParamsBase {

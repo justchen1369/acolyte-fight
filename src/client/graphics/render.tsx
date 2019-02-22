@@ -1388,18 +1388,17 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
-	const glow = render.glow || false;
-	foreground(ctxStack, ctx => {
-		ctx.lineWidth = render.width;
-		ctx.strokeStyle = render.color;
+	let feather: r.FeatherConfig = null;
+	if (render.glow) {
+		feather = {
+			sigma: HeroColors.GlowRadius,
+			alpha: render.glow,
+		};
+	}
 
-		const from = owner.body.getPosition();
-		const to = target.body.getPosition();
-		ctx.beginPath();
-		ctx.moveTo(from.x, from.y);
-		ctx.lineTo(to.x, to.y);
-		ctx.stroke();
-	}, glow);
+	const from = owner.body.getPosition();
+	const to = target.body.getPosition();
+	glx.line(ctxStack, from, to, render.width / 2, Color(render.color), feather);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -1511,7 +1510,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let feather: r.FeatherConfig = null;
 	if (trail.glow) {
 		feather = {
-			sigma: 4 * Pixel,
+			sigma: HeroColors.GlowRadius,
 			alpha: trail.glow,
 		};
 	}
@@ -1540,69 +1539,6 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	} else if (trail.type === "arc") {
 		glx.arc(ctxStack, trail.pos, trail.minRadius, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion), feather);
 	}
-
-	/*
-	foreground(ctxStack, ctx => {
-		ctx.save(); 
-
-		if (ctx === ctxStack.glows) {
-			ctx.globalAlpha = proportion;
-		}
-
-		ctx.fillStyle = color;
-		ctx.strokeStyle = color;
-
-		if (trail.type === "circle") {
-			let pos = trail.pos;
-			if (trail.velocity) {
-				const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
-				pos = vector.plus(pos, vector.multiply(trail.velocity, time));
-			}
-
-			ctx.beginPath();
-			ctx.arc(pos.x, pos.y, scale * proportion * trail.radius, 0, 2 * Math.PI);
-			ctx.fill();
-		} else if (trail.type === "ripple") {
-			const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
-			ctx.globalAlpha = proportion;
-			ctx.lineWidth = proportion * trail.initialRadius / 2;
-			ctx.beginPath();
-			ctx.arc(trail.pos.x, trail.pos.y, radius, 0, 2 * Math.PI);
-			ctx.stroke();
-		} else if (trail.type === "arc") {
-			ctx.globalAlpha = proportion;
-
-			ctx.beginPath();
-			ctx.arc(trail.pos.x, trail.pos.y, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise);
-			ctx.arc(trail.pos.x, trail.pos.y, trail.minRadius, trail.toAngle, trail.fromAngle, !trail.antiClockwise);
-			ctx.closePath();
-			ctx.fill();
-
-		} else if (trail.type === "line") {
-			if (isEdge) {
-				// Edge doesn't render lines if they are shorter than the line width, so render them ourselves.
-				const axis = vector.diff(trail.to, trail.from);
-				const cross = vector.relengthen(vector.rotateRight(axis), scale * proportion * trail.width / 2);
-
-				ctx.beginPath();
-				ctx.moveTo(trail.from.x + cross.x, trail.from.y + cross.y);
-				ctx.lineTo(trail.to.x + cross.x, trail.to.y + cross.y);
-				ctx.lineTo(trail.to.x - cross.x, trail.to.y - cross.y);
-				ctx.lineTo(trail.from.x - cross.x, trail.from.y - cross.y);
-				ctx.closePath();
-				ctx.fill();
-			} else {
-				ctx.lineWidth = scale * proportion * trail.width;
-				ctx.beginPath();
-				ctx.moveTo(trail.from.x, trail.from.y);
-				ctx.lineTo(trail.to.x, trail.to.y);
-				ctx.stroke();
-			}
-		}
-
-		ctx.restore();
-	}, trail.glow);
-	*/
 
 	return false;
 }
