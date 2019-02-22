@@ -388,7 +388,6 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	type: "projectile";
 
 	ticks: number; // How long is the trail?
-	rtx?: boolean;
 	fade?: string;
 	smoke?: number;
 	glow?: number;
