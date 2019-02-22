@@ -2826,6 +2826,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 			density: 0,
 			filterCategoryBits: Categories.Hero,
 			filterMaskBits: Categories.All,
+			filterGroupIndex: hero.filterGroupIndex,
 		});
 		let thrust: w.ThrustState = {
 			damageTemplate: spell.damageTemplate,
