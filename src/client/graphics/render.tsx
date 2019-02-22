@@ -128,11 +128,12 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
-		vertices: [],
 	};
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
 		throw "Error getting context";
 	}
+
+	glx.initGl(ctxStack);
 
 	all(ctxStack, ctx => ctx.save());
 	clearCanvas(ctxStack, rect);
@@ -140,7 +141,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	renderInterface(ctxStack.ui, world, rect, options);
 	all(ctxStack, ctx => ctx.restore());
 
-	glx.renderGl(ctxStack.gl, ctxStack.vertices, worldRect, rect);
+	glx.renderGl(ctxStack, worldRect, rect);
 
 	playSounds(world, options);
 
@@ -1388,7 +1389,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
-	let feather: r.FeatherConfig = null;
+	let feather: glx.FeatherConfig = null;
 	if (render.glow) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
@@ -1503,7 +1504,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 	}
 
-	let feather: r.FeatherConfig = null;
+	let feather: glx.FeatherConfig = null;
 	if (trail.glow) {
 		feather = {
 			sigma: HeroColors.GlowRadius,

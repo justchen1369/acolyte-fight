@@ -9,39 +9,85 @@ const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur
 const trailFragmentShader = require('./trailFragmentShader.glsl');
 const trailVertexShader = require('./trailVertexShader.glsl');
 
-interface GlContext {
-	program: WebGLProgram;
-
-	translateUniformLocation: WebGLUniformLocation;
-    scaleUniformLocation: WebGLUniformLocation;
-    
-    pixelUniformLocation: WebGLUniformLocation;
-
-	posAttribLocation: number;
-	posBuffer: WebGLBuffer;
-
-	relAttribLocation: number;
-	relBuffer: WebGLBuffer;
-
-	colorAttribLocation: number;
-	colorBuffer: WebGLBuffer;
-
-	shapeAttribLocation: number;
-	shapeBuffer: WebGLBuffer;
+export interface FeatherConfig {
+	sigma: number;
+	alpha: number;
 }
 
-export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldRect: ClientRect, rect: ClientRect) {
-	let context: GlContext = (gl as any).context;
-	if (!context) {
-		context = initGl(gl);
-		(gl as any).context = context;
-	}
+interface GlContext {
+	gl: WebGLRenderingContext;
+	trails: DrawTrails;
+}
+
+interface Draw {
+	program: WebGLProgram;
+	uniforms: { [key: string]: UniformInfo };
+	attribs: { [key: string]: AttribInfo };
+	numVertices: number;
+}
+
+interface DrawTrails extends Draw {
+	uniforms: {
+		u_scale: UniformInfo;
+		u_translate: UniformInfo;
+		u_pixel: UniformInfo;
+	};
+	attribs: {
+		a_pos: AttribInfo;
+		a_rel: AttribInfo;
+		a_color: AttribInfo;
+		a_shape: AttribInfo;
+	};
+}
+
+interface UniformInfo {
+	loc: WebGLUniformLocation;
+	size: number; // e.g. 2
+	type: number; // e.g. gl.FLOAT
+}
+
+interface AttribInfo {
+	loc: number;
+	buffer: WebGLBuffer;
+	size: number; // e.g. vec2 -> 2
+	type: number; // e.g. gl.FLOAT
+
+	data: number[];
+}
+
+interface UniformData {
+	[key: string]: number[];
+}
+
+interface CurveShape {
+	minRadius: number;
+	maxRadius: number;
+	feather?: FeatherConfig;
+}
+
+export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect) {
+	let context: GlContext = initGl(ctxStack);
+	const gl = context.gl;
 
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
 	gl.clearColor(0, 0, 0, 0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
+	const uniforms: UniformData = {
+		u_scale: [
+			2 * (worldRect.width / Math.max(1, rect.width)),
+			2 * (worldRect.height / Math.max(1, rect.height)),
+		],
+		u_translate: [
+			2 * (worldRect.left / Math.max(1, rect.width)) - 1,
+			2 * (worldRect.top / Math.max(1, rect.height)) - 1,
+		],
+		u_pixel: [1 / Math.max(1, Math.min(worldRect.width, worldRect.height))],
+	};
+
+	runProgram(gl, context.trails, uniforms);
+
+	/*
 	gl.useProgram(context.program);
 
 	// World rect
@@ -81,9 +127,53 @@ export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldR
 
     if (vertices.length > 0) {
         gl.drawArrays(gl.TRIANGLES, 0, vertices.length);
-    }
+	}
+	*/
 }
 
+function runProgram(gl: WebGLRenderingContext, draw: Draw, uniformData: UniformData) {
+	if (!draw.numVertices) {
+		// Nothing to draw
+		return;
+	}
+
+	gl.useProgram(draw.program);
+	for (const uniformName in draw.uniforms) {
+		const uniform = draw.uniforms[uniformName];
+		setUniform(gl, uniform, uniformData[uniformName]);
+	}
+	for (const attribName in draw.attribs) {
+		const attrib = draw.attribs[attribName];
+		gl.enableVertexAttribArray(attrib.loc);
+		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(attrib.data), gl.STATIC_DRAW);
+		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
+
+		attrib.data = [];
+	}
+	gl.drawArrays(gl.TRIANGLES, 0, draw.numVertices);
+	draw.numVertices = 0;
+}
+
+function setUniform(gl: WebGLRenderingContext, uniform: UniformInfo, data: number[]) {
+	if (uniform.type === gl.FLOAT) {
+		if (uniform.size === 1) {
+			gl.uniform1fv(uniform.loc, new Float32Array(data));
+		} else if (uniform.size === 2) {
+			gl.uniform2fv(uniform.loc, new Float32Array(data));
+		} else if (uniform.size === 3) {
+			gl.uniform3fv(uniform.loc, new Float32Array(data));
+		} else if (uniform.size === 4) {
+			gl.uniform4fv(uniform.loc, new Float32Array(data));
+		} else {
+			throw `Unable to handle uniform of type ${uniform.type} and size ${uniform.size}`;
+		}
+	} else {
+		throw `Unable to handle uniform of type ${uniform.type} and size ${uniform.size}`;
+	}
+}
+
+/*
 function* vertexPositions(vertices: r.Vertex[]) {
 	for (const vertex of vertices) {
 		yield vertex.pos.x;
@@ -121,44 +211,84 @@ function* vertexShapes(vertices: r.Vertex[]) {
 		}
 	}
 }
+*/
 
-function initGl(gl: WebGLRenderingContext): GlContext {
-	const program = compileProgram(gl, trailVertexShader, trailFragmentShader);
+export function initGl(ctxStack: r.CanvasCtxStack): GlContext {
+	const gl = ctxStack.gl;
+	if (!gl) {
+		throw "WebGL unavailable";
+	}
 
-	// Setup buffers
-	const translateUniformLocation = gl.getUniformLocation(program, "u_translate");
-	const scaleUniformLocation = gl.getUniformLocation(program, "u_scale");
-	const pixelUniformLocation = gl.getUniformLocation(program, "u_pixel");
+	let context: GlContext = (gl as any).context;
+	if (!context) {
+		context = initContext(gl);
+		(gl as any).context = context;
+	}
+	return context;
+}
 
-	const posAttribLocation = gl.getAttribLocation(program, "a_pos");
-	const posBuffer = gl.createBuffer();
-
-	const relAttribLocation = gl.getAttribLocation(program, "a_rel");
-	const relBuffer = gl.createBuffer();
-
-	const colorAttribLocation = gl.getAttribLocation(program, "a_color");
-	const colorBuffer = gl.createBuffer();
-
-	const shapeAttribLocation = gl.getAttribLocation(program, "a_shape");
-	const shapeBuffer = gl.createBuffer();
-
-	// Enable settings
+function initContext(gl: WebGLRenderingContext): GlContext {
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 	return {
+		gl,
+		trails: initTrails(gl),
+	};
+}
+
+function initTrails(gl: WebGLRenderingContext): DrawTrails {
+	const program = compileProgram(gl, trailVertexShader, trailFragmentShader);
+	return {
 		program,
-		translateUniformLocation,
-        scaleUniformLocation,
-        pixelUniformLocation,
-		posAttribLocation,
-		posBuffer,
-		relAttribLocation,
-		relBuffer,
-		colorAttribLocation,
-		colorBuffer,
-		shapeAttribLocation,
-		shapeBuffer,
+		uniforms: {
+			u_translate: {
+				loc: gl.getUniformLocation(program, "u_translate"),
+				type: gl.FLOAT,
+				size: 2,
+			},
+			u_scale: {
+				loc: gl.getUniformLocation(program, "u_scale"),
+				type: gl.FLOAT,
+				size: 2,
+			},
+			u_pixel: {
+				loc: gl.getUniformLocation(program, "u_pixel"),
+				type: gl.FLOAT,
+				size: 1,
+			},
+		},
+		attribs: {
+			a_pos: {
+				loc: gl.getAttribLocation(program, "a_pos"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 2,
+				data: [],
+			},
+			a_rel: {
+				loc: gl.getAttribLocation(program, "a_rel"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 2,
+				data: [],
+			},
+			a_color: {
+				loc: gl.getAttribLocation(program, "a_color"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 4,
+				data: [],
+			},
+			a_shape: {
+				loc: gl.getAttribLocation(program, "a_shape"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 4,
+				data: [],
+			},
+		},
+		numVertices: 0,
 	};
 }
 
@@ -192,121 +322,102 @@ function compileShader(gl: WebGLRenderingContext, type: number, code: string) {
 	throw "Error compiling shader";
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather?: r.FeatherConfig) {
-	const extent = maxRadius + featherRadius(feather);
-	const topLeft: r.Vertex = {
-		pos: pl.Vec2(pos.x - extent, pos.y - extent),
-		rel: pl.Vec2(-extent, -extent),
-		color,
-		minRadius,
-		maxRadius,
-		feather,
-	};
-	const topRight: r.Vertex = {
-		pos: pl.Vec2(pos.x + extent, pos.y - extent),
-		rel: pl.Vec2(extent, -extent),
-		color,
-		minRadius,
-		maxRadius,
-		feather,
-	};
-	const bottomLeft: r.Vertex = {
-		pos: pl.Vec2(pos.x - extent, pos.y + extent),
-		rel: pl.Vec2(-extent, extent),
-		color,
-		minRadius,
-		maxRadius,
-		feather,
-	};
-	const bottomRight: r.Vertex = {
-		pos: pl.Vec2(pos.x + extent, pos.y + extent),
-		rel: pl.Vec2(extent, extent),
-		color,
-		minRadius,
-		maxRadius,
-		feather,
-	};
-
-	ctxStack.vertices.push(topLeft);
-	ctxStack.vertices.push(bottomLeft);
-	ctxStack.vertices.push(topRight);
-
-	ctxStack.vertices.push(topRight);
-	ctxStack.vertices.push(bottomLeft);
-	ctxStack.vertices.push(bottomRight);
+function appendVec2(data: number[], vec: pl.Vec2) {
+	data.push(vec.x, vec.y);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather?: r.FeatherConfig) {
-	const normal = vector.rotateRight(vector.unit(vector.diff(to, from)));
+function appendColor(data: number[], color: Color) {
+	data.push(color.red() / 255, color.green() / 255, color.blue() / 255, color.alpha());
+}
+
+function appendCurveShape(data: number[], curve: CurveShape) {
+	data.push(curve.minRadius, curve.maxRadius);
+
+	if (curve.feather) {
+		data.push(curve.feather.sigma, curve.feather.alpha);
+	} else {
+		data.push(0, 0);
+	}
+}
+
+function appendTrail(trails: DrawTrails, pos: pl.Vec2, rel: pl.Vec2, color: Color, curve: CurveShape) {
+	appendVec2(trails.attribs.a_pos.data, vector.plus(pos, rel));
+	appendVec2(trails.attribs.a_rel.data, rel);
+	appendColor(trails.attribs.a_color.data, color);
+	appendCurveShape(trails.attribs.a_shape.data, curve);
+	++trails.numVertices;
+}
+
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather?: FeatherConfig) {
+	const context = initGl(ctxStack);
+
+	const extent = maxRadius + featherRadius(feather);
+	const quad = [
+		pl.Vec2(-extent, -extent),
+		pl.Vec2(-extent, extent),
+		pl.Vec2(extent, extent),
+		pl.Vec2(extent, -extent),
+	];
+
+	const curve: CurveShape = {
+		minRadius,
+		maxRadius,
+		feather,
+	};
+
+	const trails = context.trails;
+
+	appendTrail(trails, pos, quad[0], color, curve);
+	appendTrail(trails, pos, quad[1], color, curve);
+	appendTrail(trails, pos, quad[2], color, curve);
+
+	appendTrail(trails, pos, quad[2], color, curve);
+	appendTrail(trails, pos, quad[3], color, curve);
+	appendTrail(trails, pos, quad[0], color, curve);
+}
+
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather?: FeatherConfig) {
+	const context = initGl(ctxStack);
 
 	const extent = halfWidth + featherRadius(feather);
+	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
+	const up = vector.negate(down);
 
-	const from1: r.Vertex = {
-		pos: pl.Vec2(from.x - extent * normal.x, from.y - extent * normal.y),
-		rel: pl.Vec2(-extent, 0),
-		color,
-		minRadius: 0,
-		maxRadius: halfWidth,
-		feather,
-	};
-	const from2: r.Vertex = {
-		pos: pl.Vec2(from.x + extent * normal.x, from.y + extent * normal.y),
-		rel: pl.Vec2(extent, 0),
-		color,
-		minRadius: 0,
-		maxRadius: halfWidth,
-		feather,
-	};
-	const to1: r.Vertex = {
-		pos: pl.Vec2(to.x - extent * normal.x, to.y - extent * normal.y),
-		rel: pl.Vec2(-extent, 0),
-		color,
-		minRadius: 0,
-		maxRadius: halfWidth,
-		feather,
-	};
-	const to2: r.Vertex = {
-		pos: pl.Vec2(to.x + extent * normal.x, to.y + extent * normal.y),
-		rel: pl.Vec2(extent, 0),
-		color,
+	const curve: CurveShape = {
 		minRadius: 0,
 		maxRadius: halfWidth,
 		feather,
 	};
 
-	ctxStack.vertices.push(to1);
-	ctxStack.vertices.push(from1);
-	ctxStack.vertices.push(from2);
+	const trails = context.trails;
 
-	ctxStack.vertices.push(to1);
-	ctxStack.vertices.push(from2);
-	ctxStack.vertices.push(to2);
+	appendTrail(trails, from, up, color, curve);
+	appendTrail(trails, from, down, color, curve);
+	appendTrail(trails, to, up, color, curve);
+
+	appendTrail(trails, to, up, color, curve);
+	appendTrail(trails, from, down, color, curve);
+	appendTrail(trails, to, down, color, curve);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather?: r.FeatherConfig) {
-    const extent = Math.sqrt(2) * (maxRadius + featherRadius(feather)); // sqrt(2) ensures the triangle always fully enclosees the arc
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather?: FeatherConfig) {
+	const context = initGl(ctxStack);
 
-	const center: r.Vertex = {
-		pos,
-		rel: pl.Vec2(0, 0),
-		color,
+	const curve: CurveShape = {
 		minRadius,
 		maxRadius,
 		feather,
-    };
-    const vertices = new Array<r.Vertex>();
+	};
+
+    const extent = Math.sqrt(2) * (maxRadius + featherRadius(feather)); // sqrt(2) ensures the triangle always fully enclosees the arc
+
+	const center = vector.zero();
+	const rels = new Array<pl.Vec2>();
 
     let currentAngle = angle1;
     for (let i = 0; i < 4; ++i) { // Maximum 4 right angle rotations
-        const rel = vector.multiply(vector.fromAngle(currentAngle), extent);
-        vertices.push({
-            pos: vector.plus(pos, rel),
-            rel,
-            color,
-            minRadius,
-            maxRadius,
-			feather,
-        });
+		const rel = vector.multiply(vector.fromAngle(currentAngle), extent);
+		rels.push(rel);
 
         const direction = (antiClockwise ? -1 : 1);
         const step = direction * Math.PI / 2;
@@ -324,13 +435,14 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
         currentAngle = nextAngle;
     }
 
-    for (let i = 0; i < vertices.length - 1; ++i) {
-        ctxStack.vertices.push(center);
-        ctxStack.vertices.push(vertices[i]);
-        ctxStack.vertices.push(vertices[i + 1]);
+	const trails = context.trails;
+    for (let i = 0; i < rels.length - 1; ++i) {
+		appendTrail(trails, pos, center, color, curve);
+		appendTrail(trails, pos, rels[i], color, curve);
+		appendTrail(trails, pos, rels[i + 1], color, curve);
     }
 }
 
-function featherRadius(feather: r.FeatherConfig) {
+function featherRadius(feather: FeatherConfig) {
 	return feather ? feather.sigma * FeatherFactor : 0.0;
 }

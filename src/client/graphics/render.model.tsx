@@ -16,9 +16,7 @@ export interface CanvasCtxStack {
 	canvas: CanvasRenderingContext2D;
     gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
-    rtx: boolean;
-
-	vertices: Vertex[];
+	rtx: boolean;
 }
 
 export interface RenderOptions {
@@ -28,18 +26,4 @@ export interface RenderOptions {
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
 	rtx: boolean;
-}
-
-export interface Vertex {
-	pos: pl.Vec2;
-	rel: pl.Vec2;
-	color: Color;
-	minRadius: number;
-	maxRadius: number;
-	feather: FeatherConfig;
-}
-
-export interface FeatherConfig {
-	sigma: number;
-	alpha: number;
 }
