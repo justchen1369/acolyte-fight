@@ -37,7 +37,7 @@ export function renderGl(gl: WebGLRenderingContext, vertices: r.Vertex[], worldR
 		(gl as any).context = context;
 	}
 
-	gl.viewport(0, 0, rect.width, rect.height);
+	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
 	gl.clearColor(0, 0, 0, 0);
 	gl.clear(gl.COLOR_BUFFER_BIT);
