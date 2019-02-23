@@ -1393,7 +1393,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 	const fill: r.Fill = {
 		minRadius: 0,
 		maxRadius: render.width / 2,
-		feather: render.glow ? {
+		feather: (render.glow && ctxStack.rtx) ? {
 			sigma: HeroColors.GlowRadius,
 			alpha: render.glow,
 		} : null,
@@ -1507,7 +1507,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (trail.glow) {
+	if (trail.glow && ctxStack.rtx) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
 			alpha: trail.glow,
