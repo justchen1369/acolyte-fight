@@ -170,7 +170,7 @@ function validAttack(state, hero, opponent, spell) {
     var opponentShielded = !!opponent.shieldTicksRemaining;
 
     var distance = vectorDistance(hero.pos, opponent.pos);
-    if (spell.action === "projectile" || spell.action === "spray") {
+    if (spell.action === "projectile" || spell.action === "spray" || spell.action === "retractor" || spell.action === "focus") {
         if (spell.projectile.swapWith) { // Swap doesn't work as an attack
             return false;
         }
