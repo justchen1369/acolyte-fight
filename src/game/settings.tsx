@@ -1486,7 +1486,6 @@ const voidRush: Spell = {
             render: {
                 color: "#8800ff",
                 heroColor: true,
-                decay: true,
                 ticks: 60,
                 emissionRadius: 0,
                 particleRadius: Hero.Radius,
