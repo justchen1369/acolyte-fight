@@ -683,13 +683,13 @@ const rocket: Spell = {
         density: 1,
         radius: 0.0035,
         speed: 0.18,
-        maxTicks: 4.0 * TicksPerSecond,
+        maxTicks: 3.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         partialDamage: {
             initialMultiplier: 0.5,
-            ticks: 1 * TicksPerSecond,
+            ticks: 1.5 * TicksPerSecond,
         },
 
         detonate: {
