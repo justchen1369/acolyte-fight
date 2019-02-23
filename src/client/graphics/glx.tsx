@@ -29,6 +29,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 			2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 		],
 		u_pixel: [ctxStack.pixel],
+		u_rtx: [ctxStack.rtx ? 1 : 0],
 	};
 
 	runProgram(gl, context.trails, uniforms, ctxStack.data.trails);
@@ -65,6 +66,18 @@ function setUniform(gl: WebGLRenderingContext, uniform: r.UniformInfo, data: num
 			gl.uniform3fv(uniform.loc, new Float32Array(data));
 		} else if (uniform.size === 4) {
 			gl.uniform4fv(uniform.loc, new Float32Array(data));
+		} else {
+			throw `Unable to handle uniform of type ${uniform.type} and size ${uniform.size}`;
+		}
+	} else if (uniform.type === gl.INT) {
+		if (uniform.size === 1) {
+			gl.uniform1iv(uniform.loc, new Int32Array(data));
+		} else if (uniform.size === 2) {
+			gl.uniform2iv(uniform.loc, new Int32Array(data));
+		} else if (uniform.size === 3) {
+			gl.uniform3iv(uniform.loc, new Int32Array(data));
+		} else if (uniform.size === 4) {
+			gl.uniform4iv(uniform.loc, new Int32Array(data));
 		} else {
 			throw `Unable to handle uniform of type ${uniform.type} and size ${uniform.size}`;
 		}

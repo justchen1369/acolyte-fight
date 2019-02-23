@@ -42,7 +42,7 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				loc: gl.getUniformLocation(program, "u_pixel"),
 				type: gl.FLOAT,
 				size: 1,
-			},
+            },
 		},
 		attribs: {
 			a_pos: {
