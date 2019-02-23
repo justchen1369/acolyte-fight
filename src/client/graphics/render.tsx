@@ -593,63 +593,33 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
-	let color = Color(hsl(0, 1.0 - proportion, 0.5)).string();
+	let color = Color(hsl(0, 1.0 - proportion, 0.5));
 	if (flash > 0) {
-		color = Color(color).lighten(flash).string();
+		color = Color(color).lighten(flash);
 	}
 
-	const glow = false;
-	foreground(ctxStack, ctx => {
-		ctx.save();
-		
-		ctx.translate(pos.x, pos.y);
-		ctx.rotate(body.getAngle());
 
-		if (world.tick - obstacle.createTick < obstacle.growthTicks) {
-			const growthProportion = (world.tick - obstacle.createTick) / obstacle.growthTicks;
-			ctx.scale(growthProportion, growthProportion);
-		}
-		if (flash > 0) {
-			const growth = 1 + HeroColors.ObstacleGrowFactor * flash;
-			ctx.scale(growth, growth);
-		}
+	let scale = 1;
+	if (world.tick - obstacle.createTick < obstacle.growthTicks) {
+		// "Grow in" animation
+		scale *= (world.tick - obstacle.createTick) / obstacle.growthTicks;
+	}
+	if (flash > 0) {
+		// Hit animation
+		scale *= 1 + HeroColors.ObstacleGrowFactor * flash;
+	}
 
-		ctx.lineWidth = Pixel * 5;
+	const strokeStyle = Color(color).lighten(0.6);
+	const strokeProportion = 0.5;
 
-		ctx.strokeStyle = Color(color).lighten(0.6).string();
-
-		if (ctx === ctxStack.canvas) {
-			if (options.rtx) {
-				const gradient = ctx.createLinearGradient(-obstacle.extent, -obstacle.extent, obstacle.extent, obstacle.extent);
-				gradient.addColorStop(0, color);
-				gradient.addColorStop(1, Color(color).alpha(0.25).string());
-				ctx.fillStyle = gradient;
-			} else {
-				ctx.fillStyle = color;
-			}
-		} else {
-			ctx.fillStyle = 'white';
-		}
-		ctx.beginPath();
-
-		const points = obstacle.points;
-		for (let i = 0; i < points.length; ++i) {
-			const point = points[i % points.length];
-			if (i === 0) {
-				ctx.moveTo(point.x, point.y);
-			}
-			ctx.lineTo(point.x, point.y);
-		}
-
-		ctx.closePath();
-		ctx.fill();
-
-		if (ctx === ctxStack.canvas) {
-			ctx.stroke();
-		}
-
-		ctx.restore();
-	}, glow);
+	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, strokeStyle, {
+		minRadius: 0,
+		maxRadius: scale * obstacle.extent,
+	});
+	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, color, {
+		minRadius: 0,
+		maxRadius: scale * obstacle.extent,
+	});
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
