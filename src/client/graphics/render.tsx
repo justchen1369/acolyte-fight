@@ -540,33 +540,6 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 			maxRadius: scale * radius * strokeProportion,
 		});
 	}
-
-	/*
-	if (isEdge) {
-		// Edge has a weird oscillation of Y-axis scaling for certain fractions of radius.
-		// Force it to draw perfect circles by snapping to a minimum precision.
-		radius = Math.floor(radius / Pixel) * Pixel;
-	}
-	ctx.scale(radius * scale, radius * scale);
-
-	ctx.beginPath();
-
-	const points = world.mapPoints;
-	if (points) {
-		ctx.moveTo(points[0].x, points[0].y);
-		for (let i = 1; i < world.mapPoints.length; ++i) {
-			ctx.lineTo(points[i].x, points[i].y);
-		}
-	} else {
-		ctx.arc(0, 0, 1, 0, 2 * Math.PI);
-	}
-	ctx.closePath();
-
-	ctx.fill();
-	ctx.stroke();
-
-	ctx.restore();
-	*/
 }
 
 function takeShakes(world: w.World) {
