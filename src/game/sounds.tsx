@@ -523,6 +523,65 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "rocket": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 2,
+                "attack": 0.25,
+                "decay": 1.5,
+                "highPass": 2100,
+                "lowPass": 2103,
+                "wave": "brown-noise"
+            },
+            {
+                "stopTime": 2,
+                "attack": 0.5,
+                "decay": 1.5,
+                "startFreq": 900,
+                "stopFreq": 900,
+                "lowPass": 200,
+                "modStartFreq": 2100,
+                "modStopFreq": 2100,
+                "modStartStrength": 100,
+                "modStopStrength": 100,
+                "tremoloFreq": 11,
+                "tremoloStrength": 0.3,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
+    "rocket-detonating": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 2,
+                "attack": 0.01,
+                "decay": 1.95,
+                "startFreq": 100,
+                "stopFreq": 0.01,
+                "lowPass": 300,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.1,
+                    1.2,
+                    1.3,
+                    1.4,
+                    1.5,
+                    1.6,
+                    1.7,
+                    1.8,
+                    1.9,
+                    2
+                ]
+            }
+        ]
+    },
     "kamehameha-charging": {
         start: [
             {

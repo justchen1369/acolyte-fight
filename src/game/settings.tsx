@@ -714,7 +714,7 @@ const rocket: Spell = {
             { type: "expireOnChannellingEnd" },
         ],
 
-        sound: "retractor",
+        sound: "rocket",
         color: '#ff9a00',
         renderers: [
             { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.04, minRadius: 0.035, usePartialDamageMultiplier: true },
