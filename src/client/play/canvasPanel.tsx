@@ -193,14 +193,20 @@ class CanvasPanel extends React.Component<Props, State> {
     render() {
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
-                <canvas id="gl" ref={c => this.canvasStack.gl = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="ui" ref={c => {
-                    this.canvasStack.ui = c;
-                    if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
-                        c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
-                        c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
-                    }
-                }} className="game" width={this.state.width} height={this.state.height} 
+                <canvas
+                    id="gl" ref={c => this.canvasStack.gl = c} className="game"
+                    width={this.state.width * window.devicePixelRatio} height={this.state.height * window.devicePixelRatio}
+                    style={{ width: this.state.width, height: this.state.height }} />
+                <canvas
+                    id="ui"
+                    ref={c => {
+                        this.canvasStack.ui = c;
+                        if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
+                            c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
+                            c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
+                        }
+                    }}
+                    className="game" width={this.state.width} height={this.state.height} 
                     onMouseDown={(ev) => this.touchStartHandler(this.takeMousePoint(ev))}
                     onMouseEnter={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
                     onMouseMove={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
