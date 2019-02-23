@@ -1185,22 +1185,26 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 }
 
 function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, reticule: RenderReticule) {
-	// After reached cursor
 	const remainingTicks = Math.max(0, projectile.expireTick - world.tick);
-	const proportion = remainingTicks / reticule.ticks;
-	if (proportion > 1) {
+	if (reticule.remainingTicks && remainingTicks > reticule.remainingTicks) {
+		// Only display when under remainingTicks
 		return;
+	}
+
+	let proportion = 1;
+	if (reticule.shrinkTicks) {
+		proportion *= Math.min(1, remainingTicks / reticule.shrinkTicks);
+	}
+	if (reticule.usePartialDamageMultiplier) {
+		proportion *= engine.calculatePartialDamageMultiplier(world, projectile);
 	}
 
 	const pos = projectile.body.getPosition();
 
-	const lineWidth = 2 * ctxStack.pixel;
-
-	const radius = reticule.radius * proportion;
 	glx.circle(ctxStack, pos, {
 		color: parseColor(reticule.color),
-		minRadius: radius - lineWidth,
-		maxRadius: radius,
+		minRadius: reticule.minRadius * proportion,
+		maxRadius: reticule.radius * proportion,
 	});
 }
 

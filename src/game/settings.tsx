@@ -70,7 +70,7 @@ const Choices: ChoiceSettings = {
 		"q": [
             ["fireball", "flamestrike"],
             ["triplet", "difire"],
-            ["retractor", "rocket"],
+            ["retractor"],
             ["whip"],
         ],
 		"w": [
@@ -89,7 +89,7 @@ const Choices: ChoiceSettings = {
 		"r": [
             ["kamehameha"],
             ["bouncer"],
-            ["supernova"],
+            ["supernova", "rocket"],
         ],
 		"f": [
             ["scourge"],
@@ -664,15 +664,15 @@ const retractor: Spell = {
 };
 const rocket: Spell = {
     id: 'rocket',
-    name: 'Rocket',
-    description: "Launch a guided rocket towards your enemy - move your cursor to turn the rocket. You are unable to move during rocket guidance as it takes full concentration. If anyone hits you, you lose control, and the rocket explodes.",
+    name: 'Spirit Missile',
+    description: "You can control the spirit missile while it is in-flight, but you cannot move while doing this, as it takes all your concentration. If you get hit, you lose control and the spirit missile detonates. Cast Spirit Missile again to detonate it.",
     action: "focus",
 
-    color: '#00ffaa',
-    icon: "returnArrow",
+    color: '#ff8855',
+    icon: "mightyForce",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 1.5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     interruptibleAfterTicks: 0,
@@ -681,22 +681,23 @@ const rocket: Spell = {
     projectile: {
         damage: 0,
         density: 1,
-        radius: 0.0035,
+        radius: 0.005,
         speed: 0.15,
-        maxTicks: 3.0 * TicksPerSecond,
+        maxTicks: 1.5 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
 
         partialDamage: {
             initialMultiplier: 0.5,
-            ticks: 1.5 * TicksPerSecond,
+            ticks: 1 * TicksPerSecond,
+            affectRadius: true,
         },
 
         detonate: {
-            damage: 15,
-            radius: 0.01,
-            minImpulse: 0.00005,
-            maxImpulse: 0.00005,
+            damage: 0,
+            radius: 0.04,
+            minImpulse: 0.00035,
+            maxImpulse: 0.0005,
             renderTicks: 10,
         },
 
@@ -714,19 +715,10 @@ const rocket: Spell = {
         ],
 
         sound: "retractor",
-        color: '#00ffaa',
+        color: '#ff9a00',
         renderers: [
-            {
-                type: "swirl",
-                color: '#00ffaa',
-                ticks: 30,
-                radius: 0.007,
-                particleRadius: 0.001,
-                numParticles: 2,
-                loopTicks: 30,
-            },
-            { type: "projectile", ticks: 1, glow: 0.1 },
-            { type: "ray", ticks: 20, glow: 0.1 },
+            { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.04, minRadius: 0.035, usePartialDamageMultiplier: true },
+            { type: "projectile", ticks: 5, glow: 0.1, smoke: 0.5, ownerColor: true },
             { type: "strike", ticks: 20, glow: true, numParticles: 9 },
         ],
     },
@@ -1182,7 +1174,14 @@ const supernova: Spell = {
         color: '#ff9a00',
         renderers: [
             { type: "ray", ticks: 30 },
-            { type: "reticule", color: '#ff9a00', ticks: 0.5 * TicksPerSecond, radius: 0.05 },
+            {
+                type: "reticule",
+                color: '#ff9a00',
+                minRadius: 0.049,
+                remainingTicks: 0.5 * TicksPerSecond,
+                shrinkTicks: 0.5 * TicksPerSecond,
+                radius: 0.05,
+            },
         ],
     },
 };

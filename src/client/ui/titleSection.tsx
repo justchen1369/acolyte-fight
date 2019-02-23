@@ -136,6 +136,7 @@ export class TitleSection extends React.Component<Props, State> {
                     <li><a href="http://piqnt.com/planck.js/" target="_blank">Planck.js</a> created by Erin Catto and Ali Shakiba and used under zlib license.</li>
                     <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
                     <li>Icons created by <a href="https://opengameart.org/content/95-game-icons" target="_blank">sbed</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
+                    <li>Icons created by <a href="http://delapouite.com/" target="_blank">Delapouite</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
                     <li>RPG Awesome font used under <a href="https://github.com/nagoshiashumari/Rpg-Awesome" target="_blank">CC 3.0, SIL and MIT license</a>.</li>
                     <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
                 </ul>

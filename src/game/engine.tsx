@@ -2317,11 +2317,14 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 	}
 
 	// Apply damage
-	const damageMultiplier = calculatePartialDamageMultiplier(world, projectile);
-	const detonate = {
+	const multiplier = calculatePartialDamageMultiplier(world, projectile);
+	const detonate: DetonateParameters = {
 		...projectile.detonate,
-		damage: projectile.detonate.damage * damageMultiplier,
-		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * damageMultiplier,
+		damage: projectile.detonate.damage * multiplier,
+		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * multiplier,
+		minImpulse: projectile.detonate.minImpulse * multiplier,
+		maxImpulse: projectile.detonate.maxImpulse * multiplier,
+		radius: (projectile.partialDamage && projectile.partialDamage.affectRadius) ? (projectile.detonate.radius * multiplier) : projectile.detonate.radius,
 	};
 	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.color, projectile.sound);
 
