@@ -610,7 +610,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	}
 
 	const strokeStyle = Color(color).lighten(0.6);
-	const strokeProportion = 0.5;
+	const strokeProportion = 0.4;
 
 	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, strokeStyle, {
 		minRadius: 0,
