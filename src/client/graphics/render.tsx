@@ -1389,7 +1389,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
-	let feather: glx.FeatherConfig = null;
+	let feather: r.FeatherConfig = null;
 	if (render.glow) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
@@ -1504,7 +1504,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		}
 	}
 
-	let feather: glx.FeatherConfig = null;
+	let feather: r.FeatherConfig = null;
 	if (trail.glow) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
