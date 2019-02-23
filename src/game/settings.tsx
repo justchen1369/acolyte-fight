@@ -751,6 +751,7 @@ const link: Spell = {
                 type: "link",
                 color: '#4444ff',
                 width: 5 * Pixel,
+                glow: 0.1,
             },
         },
 
@@ -784,6 +785,7 @@ const link: Spell = {
                 type: "link",
                 color: '#4444ff',
                 width: 5 * Pixel,
+                glow: 0.1,
             },
         ],
     },
@@ -824,6 +826,7 @@ const grapple: Spell = {
                 type: "link",
                 color: '#ff2200',
                 width: 5 * Pixel,
+                glow: 0.1,
             },
         },
 
@@ -839,6 +842,7 @@ const grapple: Spell = {
                 type: "link",
                 color: '#ff2200',
                 width: 3 * Pixel,
+                glow: 0.1,
             },
         ],
     },
