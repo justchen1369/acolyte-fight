@@ -14,7 +14,7 @@ void main() {
 	float feather = v_shape.z;
 	float featherAlpha = v_shape.w;
 
-	float radius = sqrt(dot(v_rel, v_rel));
+	float radius = length(v_rel);
 	float outside = max(
 		max(0.0, radius - maxRadius),
 		max(0.0, minRadius - radius)
