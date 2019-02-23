@@ -84,7 +84,7 @@ function appendCurveShape(data: number[], curve: r.CurveShape) {
 
 function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, color: Color, curve: r.CurveShape) {
     const trails = ctxStack.data.trails;
-	shaders.appendVec2(trails.attribs.a_pos, vector.plus(pos, rel));
+	shaders.appendVec2(trails.attribs.a_pos, pos);
 	shaders.appendVec2(trails.attribs.a_rel, rel);
 	shaders.appendColor(trails.attribs.a_color, color);
 	appendCurveShape(trails.attribs.a_shape, curve);

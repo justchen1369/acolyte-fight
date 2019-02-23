@@ -16,7 +16,7 @@ varying vec4 v_shape;
 vec2 flipVertical = vec2(1, -1);
 
 void main() {
-	gl_Position = vec4(flipVertical * (a_pos * u_scale + u_translate), 0, 1);
+	gl_Position = vec4(flipVertical * ((a_pos + a_rel) * u_scale + u_translate), 0, 1);
 	v_rel = a_rel;
 	v_shape = a_shape;
 	v_color = a_color;
