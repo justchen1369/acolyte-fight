@@ -890,16 +890,12 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
-		ctx.save();
-
-		ctx.globalAlpha = hero.casting.proportion;
-		ctx.strokeStyle = hero.casting.color;
-		ctx.lineWidth = ChargingIndicator.Width;
-		ctx.beginPath();
-		ctx.arc(0, 0, radius + ChargingIndicator.Margin, 0, 2 * Math.PI);
-		ctx.stroke();
-
-		ctx.restore();
+		const strokeColor = Color(hero.casting.color).alpha(hero.casting.proportion);
+		const strokeRadius = radius + ChargingIndicator.Margin;
+		glx.circle(ctxStack, pos, strokeColor, {
+			minRadius: strokeRadius - ChargingIndicator.Width / 2,
+			maxRadius: strokeRadius + ChargingIndicator.Width / 2,
+		});
 	}
 }
 
