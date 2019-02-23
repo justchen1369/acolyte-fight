@@ -150,7 +150,6 @@ class CanvasPanel extends React.Component<Props, State> {
     private canvasStack: CanvasStack = {
         gl: null,
         ui: null,
-        cursor: null,
     };
 
     private resolveKeys = Reselect.createSelector(
@@ -195,9 +194,8 @@ class CanvasPanel extends React.Component<Props, State> {
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
                 <canvas id="gl" ref={c => this.canvasStack.gl = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="ui" ref={c => this.canvasStack.ui = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="cursor" ref={c => {
-                    this.canvasStack.cursor = c;
+                <canvas id="ui" ref={c => {
+                    this.canvasStack.ui = c;
                     if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
                         c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
                         c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });

@@ -4,7 +4,6 @@ import * as pl from 'planck-js';
 export interface CanvasStack {
 	gl: HTMLCanvasElement;
 	ui: HTMLCanvasElement;
-	cursor: HTMLCanvasElement;
 }
 
 export interface CanvasCtxStack {

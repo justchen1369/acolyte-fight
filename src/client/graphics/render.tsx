@@ -113,12 +113,6 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const worldRect = calculateWorldRect(viewRect);
 	const pixel = 1 / Math.max(1, Math.min(worldRect.width, worldRect.height));
 
-	// Cursor always gets rerendered
-	{
-		const cursorCtx = canvasStack.cursor.getContext('2d', { alpha: true });
-		renderCursor(cursorCtx, world, rect, worldRect);
-	}
-
 	// Everything also always gets rendered (used to wait for changes)
 	world.ui.renderedTick = world.tick;
 
@@ -136,6 +130,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	glx.initGl(ctxStack);
 
 	renderWorld(ctxStack, world, worldRect, options);
+	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
 
 	glx.renderGl(ctxStack, worldRect, rect);
@@ -185,42 +180,24 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	world.ui.trails = newTrails;
 }
 
-function renderCursor(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, worldRect: ClientRect) {
+function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
+	const CrossHairSize = world.settings.Hero.Radius;
+
 	if (!isMobile) {
 		return;
 	}
 
-	ctx.clearRect(0, 0, rect.width, rect.height);
-
-	ctx.save();
-	ctx.translate(worldRect.left, worldRect.top);
-	ctx.scale(worldRect.width, worldRect.height);
-
-	renderTarget(ctx, world.ui.nextTarget, world);
-
-	ctx.restore();
-}
-
-function renderTarget(ctx: CanvasRenderingContext2D, target: pl.Vec2, world: w.World) {
-	const CrossHairSize = world.settings.Hero.Radius;
+	const target = world.ui.nextTarget;
 	if (!target) {
 		return;
 	}
 
-	ctx.save();
-	ctx.translate(target.x, target.y);
-
-	ctx.strokeStyle = "white";
-	ctx.lineWidth = Pixel * 3;
-
-	ctx.beginPath();
-	ctx.moveTo(0, -CrossHairSize);
-	ctx.lineTo(0, CrossHairSize);
-	ctx.moveTo(-CrossHairSize, 0);
-	ctx.lineTo(CrossHairSize, 0);
-	ctx.stroke();
-
-	ctx.restore();
+	const fill: r.Fill = {
+		color: Color("#fff"),
+		maxRadius: 1 * ctxStack.pixel,
+	};
+	glx.line(ctxStack, pl.Vec2(target.x, target.y - CrossHairSize), pl.Vec2(target.x, target.y + CrossHairSize), fill);
+	glx.line(ctxStack, pl.Vec2(target.x - CrossHairSize, target.y), pl.Vec2(target.x + CrossHairSize, target.y), fill);
 }
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
