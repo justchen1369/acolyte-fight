@@ -909,8 +909,6 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		return;
 	}
 
-	const ctx = ctxStack.canvas;
-
 	let range = null;
 
 	const spell = world.settings.Spells[world.ui.hoverSpellId];
@@ -931,6 +929,34 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 	}
 
 	if (range) {
+		const pos = hero.body.getPosition();
+
+		const color = Color(spell.color);
+		const fill = color.alpha(0.25);
+
+		// fill
+		glx.circle(ctxStack, pos, fill, {
+			minRadius: 0,
+			maxRadius: range,
+		});
+
+		// Stroke
+		const strokeWidth = ctxStack.pixel * 2;
+		const stroke = color.alpha(0.5);
+		const numSegments = 10;
+
+		const perSegment = 2 * Math.PI / numSegments;
+		const arcAngle = 0.75 * perSegment;
+		for (let i = 0; i < numSegments; ++i) {
+			const startAngle = i * perSegment;
+			const endAngle = startAngle + arcAngle;
+			glx.arc(ctxStack, pos, startAngle, endAngle, false, stroke, {
+				minRadius: range - strokeWidth,
+				maxRadius: range,
+			});
+		}
+
+	/*
 		ctx.save();
 
 		ctx.globalAlpha = 0.25;
@@ -941,6 +967,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		ctx.arc(0, 0, range, 0, 2 * Math.PI);
 		ctx.stroke();
 		ctx.restore();
+		*/
 	}
 }
 
