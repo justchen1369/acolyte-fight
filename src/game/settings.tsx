@@ -854,7 +854,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to things and gain a 3x movement speed boost. Swing around while attacking and dodging at super speed! Tip: Use this on obstacles, not other Acolytes, as you get the same speed boost either way.",
+    description: "Attach yourself to things and gain a 2x movement speed boost. Swing around while attacking and dodging at super speed! Tip: Use this on obstacles, not other Acolytes, as you get the same speed boost either way.",
     action: "projectile",
 
     color: '#ff2200',
