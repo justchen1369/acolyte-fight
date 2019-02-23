@@ -72,27 +72,27 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	};
 }
 
-function appendCurveShape(data: number[], curve: r.CurveShape) {
-	data.push(curve.minRadius, curve.maxRadius);
+function appendCurveShape(data: number[], fill: r.Fill) {
+	data.push(fill.minRadius, fill.maxRadius);
 
-	if (curve.feather) {
-		data.push(curve.feather.sigma, curve.feather.alpha);
+	if (fill.feather) {
+		data.push(fill.feather.sigma, fill.feather.alpha);
 	} else {
 		data.push(0, 0);
 	}
 }
 
-function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, color: Color, curve: r.CurveShape) {
+function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, color: Color, fill: r.Fill) {
     const trails = ctxStack.data.trails;
 	shaders.appendVec2(trails.attribs.a_pos, pos);
 	shaders.appendVec2(trails.attribs.a_rel, rel);
 	shaders.appendColor(trails.attribs.a_color, color);
-	appendCurveShape(trails.attribs.a_shape, curve);
+	appendCurveShape(trails.attribs.a_shape, fill);
 	++trails.numVertices;
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, curve: r.CurveShape) {
-	const extent = calculateExtent(curve);
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, fill: r.Fill) {
+	const extent = calculateExtent(fill);
 	const quad = [
 		pl.Vec2(-extent, -extent),
 		pl.Vec2(-extent, extent),
@@ -100,31 +100,31 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, c
 		pl.Vec2(extent, -extent),
 	];
 
-	appendTrail(ctxStack, pos, quad[0], color, curve);
-	appendTrail(ctxStack, pos, quad[1], color, curve);
-	appendTrail(ctxStack, pos, quad[2], color, curve);
+	appendTrail(ctxStack, pos, quad[0], color, fill);
+	appendTrail(ctxStack, pos, quad[1], color, fill);
+	appendTrail(ctxStack, pos, quad[2], color, fill);
 
-	appendTrail(ctxStack, pos, quad[2], color, curve);
-	appendTrail(ctxStack, pos, quad[3], color, curve);
-	appendTrail(ctxStack, pos, quad[0], color, curve);
+	appendTrail(ctxStack, pos, quad[2], color, fill);
+	appendTrail(ctxStack, pos, quad[3], color, fill);
+	appendTrail(ctxStack, pos, quad[0], color, fill);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, color: Color, curve: r.CurveShape) {
-	const extent = calculateExtent(curve);
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, color: Color, fill: r.Fill) {
+	const extent = calculateExtent(fill);
 	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
 
-	appendTrail(ctxStack, from, up, color, curve);
-	appendTrail(ctxStack, from, down, color, curve);
-	appendTrail(ctxStack, to, up, color, curve);
+	appendTrail(ctxStack, from, up, color, fill);
+	appendTrail(ctxStack, from, down, color, fill);
+	appendTrail(ctxStack, to, up, color, fill);
 
-	appendTrail(ctxStack, to, up, color, curve);
-	appendTrail(ctxStack, from, down, color, curve);
-	appendTrail(ctxStack, to, down, color, curve);
+	appendTrail(ctxStack, to, up, color, fill);
+	appendTrail(ctxStack, from, down, color, fill);
+	appendTrail(ctxStack, to, down, color, fill);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, color: Color, curve: r.CurveShape) {
-    const extent = Math.sqrt(2) * calculateExtent(curve); // sqrt(2) ensures the triangle always fully enclosees the arc
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, color: Color, fill: r.Fill) {
+    const extent = Math.sqrt(2) * calculateExtent(fill); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center = vector.zero();
 	const rels = new Array<pl.Vec2>();
@@ -151,16 +151,16 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
     }
 
     for (let i = 0; i < rels.length - 1; ++i) {
-		appendTrail(ctxStack, pos, center, color, curve);
-		appendTrail(ctxStack, pos, rels[i], color, curve);
-		appendTrail(ctxStack, pos, rels[i + 1], color, curve);
+		appendTrail(ctxStack, pos, center, color, fill);
+		appendTrail(ctxStack, pos, rels[i], color, fill);
+		appendTrail(ctxStack, pos, rels[i + 1], color, fill);
     }
 }
 
-function calculateExtent(curve: r.CurveShape) {
-    let extent = curve.maxRadius;
-    if (curve.feather) {
-        extent += curve.feather.sigma * FeatherFactor;
+function calculateExtent(fill: r.Fill) {
+    let extent = fill.maxRadius;
+    if (fill.feather) {
+        extent += fill.feather.sigma * FeatherFactor;
     }
     return extent;
 }

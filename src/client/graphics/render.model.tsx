@@ -100,7 +100,7 @@ export interface DrawTrails extends Draw {
 	};
 }
 
-export interface CurveShape {
+export interface Fill {
 	minRadius: number;
 	maxRadius: number;
 	feather?: FeatherConfig;

@@ -1390,7 +1390,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
-	const curve: r.CurveShape = {
+	const fill: r.Fill = {
 		minRadius: 0,
 		maxRadius: render.width / 2,
 		feather: render.glow ? {
@@ -1401,7 +1401,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
-	glx.line(ctxStack, from, to, Color(render.color), curve);
+	glx.line(ctxStack, from, to, Color(render.color), fill);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
