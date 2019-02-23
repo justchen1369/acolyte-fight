@@ -862,14 +862,23 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 	let range = null;
 
 	const spell = world.settings.Spells[world.ui.hoverSpellId];
-	if (spell.action === "projectile" || spell.action === "spray") {
+	if (spell.action === "projectile" || spell.action === "spray" || spell.action === "focus" || spell.action === "retractor") {
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
+		if (spell.projectile.behaviours) {
+			spell.projectile.behaviours.forEach(b => {
+				if (b.type === "homing" && b.targetType === "self" && b.minDistanceToTarget > 0) {
+					range = 2 * b.minDistanceToTarget; // Fudge factor of 2x
+				}
+			});
+		}
 	} else if (spell.action === "teleport" || spell.action === "thrust") {
 		range = spell.range;
 	} else if (spell.action === "scourge") {
 		range = spell.detonate.radius;
-	} else if(spell.action === "shield") {
+	} else if (spell.action === "shield") {
 		range = spell.radius;
+	} else if (spell.action === "saber") {
+		range = spell.length;
 	} else if (spell.action === "wall") {
 		range = spell.maxRange;
 	}
