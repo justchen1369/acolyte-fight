@@ -613,7 +613,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const MaxAlpha = 0.5;
-	const CrossWidth = 0.05;
+	const CrossWidth = 0.1;
 
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (!(hero && hero.category === "hero")) {
