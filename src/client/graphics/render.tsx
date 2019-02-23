@@ -735,7 +735,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		type: "circle",
 		pos,
 		velocity,
-		radius: render.particleRadius * proportion,
+		radius: render.particleRadius,
 		initialTick: world.tick,
 		max: render.ticks,
 		fillStyle: color,
