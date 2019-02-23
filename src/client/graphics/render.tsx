@@ -388,27 +388,57 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
 	const Hero = world.settings.Hero;
-	const MaxTicks = 15;
+	const MaxTicks = 30;
 
-	if (world.tick >= ev.tick + MaxTicks) {
+	if (ev.fromPos) {
+		renderJumpSmoke(ctxStack, ev.fromPos, world, ev.tick);
+	}
+
+	if (ev.toPos) {
+		renderJumpSmoke(ctxStack, ev.toPos, world, ev.tick);
+
+		if (ev.heroId === world.ui.myHeroId) {
+			// Clearly indicate yourself
+			world.ui.trails.push({
+				type: "ripple",
+				max: MaxTicks,
+				initialTick: ev.tick,
+				pos: ev.toPos,
+				fillStyle: 'white',
+				initialRadius: Hero.Radius,
+				finalRadius: Hero.Radius * 4,
+			});
+		}
+
+		if (ev.sound) {
+			world.ui.sounds.push({
+				id: `${ev.heroId}-teleport-arriving`,
+				sound: `${ev.sound}-arriving`,
+				pos: ev.toPos,
+			});
+		}
+	}
+}
+
+function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World, initialTick: number = world.tick) {
+	const Hero = world.settings.Hero;
+	const MaxTicks = 15;
+	const NumParticles = 10;
+	const MaxSpeed = 0.05;
+
+	if (world.tick >= initialTick + MaxTicks) {
 		return; // Too late
 	}
 
-	world.ui.trails.push({
-		type: "ripple",
-		max: MaxTicks,
-		initialTick: ev.tick,
-		pos: ev.toPos,
-		fillStyle: 'white',
-		initialRadius: Hero.Radius,
-		finalRadius: Hero.Radius * 4,
-	});
-
-	if (ev.sound) {
-		world.ui.sounds.push({
-			id: `${ev.heroId}-teleport-arriving`,
-			sound: `${ev.sound}-arriving`,
-			pos: ev.toPos,
+	for (let i = 0; i < NumParticles; ++i) {
+		world.ui.trails.unshift({ // Smoke at bottom
+			type: "circle",
+			pos,
+			velocity: vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), MaxSpeed * Math.random()),
+			radius: Hero.Radius,
+			initialTick: initialTick,
+			max: MaxTicks,
+			fillStyle: "#fff",
 		});
 	}
 }
@@ -662,10 +692,6 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			return;
 		}
 
-		if (buff.type === "vanish") {
-			renderVanishReappear(ctxStack, buff, hero, world);
-		}
-
 		if (buff.sound) {
 			world.ui.sounds.push({
 				id: `buff-${buff.id}-expired`,
@@ -721,25 +747,6 @@ function particleVelocity(primaryVelocity: pl.Vec2) {
 	const speed = Math.random() * vector.dot(direction, primaryVelocity); // can be negative
 	const velocity = vector.multiply(direction, speed);
 	return velocity;
-}
-
-function renderVanishReappear(ctxStack: CanvasCtxStack, buff: w.VanishBuff, hero: w.Hero, world: w.World) {
-	const Hero = world.settings.Hero;
-	const MaxTicks = 15;
-
-	if (world.tick >= buff.destroyedTick + MaxTicks) {
-		return; // Too late
-	}
-
-	world.ui.trails.push({
-		type: "ripple",
-		max: MaxTicks,
-		initialTick: buff.destroyedTick,
-		pos: vector.clone(hero.body.getPosition()),
-		fillStyle: 'white',
-		initialRadius: Hero.Radius,
-		finalRadius: Hero.Radius * 4,
-	});
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {

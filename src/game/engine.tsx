@@ -2758,7 +2758,7 @@ function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: T
 		availableRange,
 		shieldCollisionLimit(hero, action.target, world));
 
-	const currentPosition = hero.body.getPosition();
+	const currentPosition = vector.clone(hero.body.getPosition());
 	const newPosition = vector.towards(currentPosition, action.target, rangeLimit);
 
 	hero.body.setPosition(newPosition);
