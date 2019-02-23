@@ -16,7 +16,7 @@ import { parseColor } from './colorParser';
 import { renderIconOnly } from './renderIcon';
 import { isMobile, isEdge } from '../core/userAgent';
 
-export { CanvasStack, RenderOptions } from './render.model';
+export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
@@ -777,7 +777,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 			fillColor = fillColor.lighten(HeroColors.DamageGlowFactor * flash);
 		}
 		let gradient: r.Gradient = null;
-		if (ctxStack.rtx) {
+		if (ctxStack.rtx >= r.GraphicsLevel.Normal) {
 			gradient = {
 				from: vector.plus(pos, pl.Vec2(-radius, -radius)),
 				fromColor: fillColor,
@@ -988,7 +988,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (shield.glow && ctxStack.rtx) {
+	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
 			alpha: shield.glow,
@@ -1251,7 +1251,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	});
 
 	// Particles
-	if (strike.numParticles) {
+	if (strike.numParticles && ctxStack.rtx >= r.GraphicsLevel.Low) {
 		for (let i = 0; i < strike.numParticles; ++i) {
 			const velocity = particleVelocity(projectile.body.getLinearVelocity());
 			world.ui.trails.push({
@@ -1280,7 +1280,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 	const fill: r.Fill = {
 		color: parseColor(render.color),
 		maxRadius: render.width / 2,
-		feather: (render.glow && ctxStack.rtx) ? {
+		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.High) ? {
 			sigma: HeroColors.GlowRadius,
 			alpha: render.glow,
 		} : null,
@@ -1394,7 +1394,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (trail.glow && ctxStack.rtx) {
+	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
 		feather = {
 			sigma: HeroColors.GlowRadius,
 			alpha: trail.glow,

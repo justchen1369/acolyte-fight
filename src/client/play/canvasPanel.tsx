@@ -12,7 +12,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond, Pixel } from '../../game/constants';
-import { CanvasStack, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../graphics/render';
+import { CanvasStack, GraphicsLevel, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../graphics/render';
 import { sendAction } from '../core/ticker';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
@@ -22,6 +22,7 @@ const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const LongPressMilliseconds = 500;
 const MaxSlowFrames = 30;
+const SlowFrameWaitInterval = 60;
 const FpsThreshold = 0.9;
 const MaxTouchSurfaceSizeInPixels = 320;
 
@@ -37,7 +38,7 @@ interface State {
     width: number;
     height: number;
     touchMultiplier: number;
-    rtx: boolean;
+    rtx: number;
 }
 
 interface PointInfo {
@@ -70,7 +71,7 @@ class AnimationLoop {
     private isRunning = false;
 
     private slow: () => void;
-    private notifiedSlow = false;
+    private numWaitFrames = 0;
     private timeOfLastFrame = 0;
 
     private numSlowFrames = 0;
@@ -95,7 +96,9 @@ class AnimationLoop {
 
         const timeOfThisFrame = Date.now();
         const renderingMilliseconds = timeOfThisFrame - this.timeOfLastFrame;
-        if (renderingMilliseconds < 1000) {
+        if (this.numWaitFrames > 0) {
+            --this.numWaitFrames;
+        } else if (renderingMilliseconds < 1000) {
             const targetMilliseconds = 1000 / TicksPerSecond;
             const isSlow = renderingMilliseconds > targetMilliseconds / FpsThreshold;
             if (isSlow) {
@@ -104,8 +107,9 @@ class AnimationLoop {
                 this.numSlowFrames = 0;
             }
 
-            if (!this.notifiedSlow && this.numSlowFrames >= MaxSlowFrames) {
-                this.notifiedSlow = true;
+            if (this.numSlowFrames >= MaxSlowFrames) {
+                this.numSlowFrames = 0;
+                this.numWaitFrames = SlowFrameWaitInterval;
                 this.slow();
             }
         }
@@ -144,7 +148,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private animationLoop = new AnimationLoop(
         () => this.frame(),
-        () => this.setState({ rtx: false }),
+        () => this.reduceGraphics(),
     );
 
     private canvasStack: CanvasStack = {
@@ -164,7 +168,7 @@ class CanvasPanel extends React.Component<Props, State> {
             width: 0,
             height: 0,
             touchMultiplier: 1,
-            rtx: true,
+            rtx: GraphicsLevel.Ultimate,
         };
 
         this.leftClickKey = props.rebindings[w.SpecialKeys.LeftClick];
@@ -190,13 +194,26 @@ class CanvasPanel extends React.Component<Props, State> {
         window.removeEventListener('keydown', this.keyDownListener);
     }
 
+    reduceGraphics() {
+        if (this.state.rtx > GraphicsLevel.Minimum) {
+            const newLevel = this.state.rtx - 1;
+            this.setState({ rtx: newLevel });
+            console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
+        }
+    }
+
     render() {
-        const retinaMultiplier = this.state.rtx ? window.devicePixelRatio : 1;
+        let retinaMultiplier: number;
+        if (this.state.rtx >= GraphicsLevel.Ultimate) {
+            retinaMultiplier = window.devicePixelRatio;
+        } else {
+            retinaMultiplier = 1;
+        }
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
                 <canvas
                     id="gl" ref={c => this.canvasStack.gl = c} className="game"
-                    width={this.state.width * retinaMultiplier} height={this.state.height * retinaMultiplier}
+                    width={Math.round(this.state.width * retinaMultiplier)} height={Math.round(this.state.height * retinaMultiplier)}
                     style={{ width: this.state.width, height: this.state.height }} />
                 <canvas
                     id="ui"

@@ -1,6 +1,14 @@
 import Color from 'color';
 import * as pl from 'planck-js';
 
+export namespace GraphicsLevel {
+	export const Ultimate = 4;
+	export const High = 3;
+	export const Normal = 2;
+	export const Low = 1;
+	export const Minimum = 0;
+}
+
 export interface CanvasStack {
 	gl: HTMLCanvasElement;
 	ui: HTMLCanvasElement;
@@ -9,7 +17,7 @@ export interface CanvasStack {
 export interface CanvasCtxStack {
     gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
-	rtx: boolean;
+	rtx: number;
 
 	pixel: number;
 	data: DrawDataLookup;
@@ -21,7 +29,7 @@ export interface RenderOptions {
 	mute: boolean;
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
-	rtx: boolean;
+	rtx: number;
 }
 
 export interface GlContext {
@@ -30,6 +38,7 @@ export interface GlContext {
 }
 
 export interface Draw {
+	name: string;
 	program: WebGLProgram;
 	uniforms: { [key: string]: UniformInfo };
 	attribs: { [key: string]: AttribInfo };
@@ -50,6 +59,7 @@ export interface AttribInfo {
 
 export interface DrawDataLookup {
 	trails: DrawTrailsData;
+	[program: string]: DrawData;
 }
 
 export interface DrawData {

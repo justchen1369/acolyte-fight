@@ -26,6 +26,7 @@ export function initData(): r.DrawTrailsData {
 export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	const program = shaders.compileProgram(gl, trailVertexShader, trailFragmentShader);
 	return {
+		name: "trails",
 		program,
 		uniforms: {
 			u_translate: {

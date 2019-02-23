@@ -29,30 +29,36 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 			2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 		],
 		u_pixel: [ctxStack.pixel],
-		u_rtx: [ctxStack.rtx ? 1 : 0],
+		u_rtx: [ctxStack.rtx],
 	};
 
-	runProgram(gl, context.trails, uniforms, ctxStack.data.trails);
+	runProgram(context, context.trails, uniforms, ctxStack.data.trails);
 }
 
-function runProgram(gl: WebGLRenderingContext, draw: r.Draw, uniformData: r.UniformData, data: r.DrawData) {
+function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.UniformData, data: r.DrawData) {
 	if (!data.numVertices) {
 		// Nothing to draw
 		return;
 	}
 
+	const gl = context.gl;
 	gl.useProgram(draw.program);
+
+	const localUniformData = data.uniforms;
 	for (const uniformName in draw.uniforms) {
 		const uniform = draw.uniforms[uniformName];
-		setUniform(gl, uniform, uniformData[uniformName]);
+		setUniform(gl, uniform, localUniformData[uniformName] || globalUniformData[uniformName]);
 	}
+
 	for (const attribName in draw.attribs) {
 		const attrib = draw.attribs[attribName];
+		gl.bindAttribLocation(draw.program, 0, attribName);
 		gl.enableVertexAttribArray(attrib.loc);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.attribs[attribName]), gl.STATIC_DRAW);
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
 	}
+
 	gl.drawArrays(gl.TRIANGLES, 0, data.numVertices);
 }
 
