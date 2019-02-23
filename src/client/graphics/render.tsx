@@ -112,7 +112,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect);
-	const pixel = 1 / Math.max(1, Math.min(worldRect.width, worldRect.height));
+	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
 
 	// Everything also always gets rendered (used to wait for changes)
 	world.ui.renderedTick = world.tick;
