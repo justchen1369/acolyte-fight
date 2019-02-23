@@ -955,19 +955,6 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 				maxRadius: range,
 			});
 		}
-
-	/*
-		ctx.save();
-
-		ctx.globalAlpha = 0.25;
-		ctx.strokeStyle = spell.color;
-		ctx.lineWidth = HeroColors.RangeIndicatorWidth;
-		ctx.setLineDash([ Pixel * 5, Pixel * 5 ]);
-		ctx.beginPath();
-		ctx.arc(0, 0, range, 0, 2 * Math.PI);
-		ctx.stroke();
-		ctx.restore();
-		*/
 	}
 }
 
