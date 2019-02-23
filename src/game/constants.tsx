@@ -123,8 +123,8 @@ export namespace HeroColors {
 };
 
 export namespace HealthBar {
-	export const HeroRadiusFraction = 0.9;
-	export const Height = Pixel * 3;
+	export const HeroRadiusFraction = 0.95;
+	export const Height = Pixel * 2;
 	export const Margin = Pixel * 2;
 }
 export namespace ChargingIndicator {

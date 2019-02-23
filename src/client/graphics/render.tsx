@@ -838,7 +838,6 @@ function renderVanishReappear(ctxStack: CanvasCtxStack, buff: w.VanishBuff, hero
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const ctx = ctxStack.canvas;
 	const pos = hero.body.getPosition();
 
 	const player = world.players.get(hero.id);
@@ -984,7 +983,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 
 function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const Hero = world.settings.Hero;
-	const ctx = ctxStack.canvas;
+	const pos = hero.body.getPosition();
 
 	const radius = hero.radius;
 
@@ -1004,21 +1003,22 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 			color = color.lighten(0.75 + 0.25 * startProportion);
 		}
 
-		ctx.save();
+		const barY = pos.y - radius - HealthBar.Height - HealthBar.Margin;
+		const barHalfWidth = HealthBar.HeroRadiusFraction * radius;
+		const barHalfHeight = HealthBar.Height / 2;
 
-		ctx.lineWidth = Pixel * 2;
-		ctx.strokeStyle = '#111';
-		ctx.fillStyle = '#111';
-		ctx.beginPath();
-		healthBarPath(ctx, radius, 1.0, world);
-		ctx.fill();
+		const barLeft = pl.Vec2(pos.x - barHalfWidth, barY);
+		const barMid = pl.Vec2(barLeft.x + healthProportion * 2 * barHalfWidth, barY);
+		const barRight = pl.Vec2(pos.x + barHalfWidth, barY);
 
-		ctx.fillStyle = color.string();
-		ctx.beginPath();
-		healthBarPath(ctx, radius, healthProportion, world);
-		ctx.fill();
-
-		ctx.restore();
+		glx.line(ctxStack, barLeft, barRight, Color("#111"), {
+			minRadius: 0,
+			maxRadius: barHalfHeight,
+		});
+		glx.line(ctxStack, barLeft, barMid, color, {
+			minRadius: 0,
+			maxRadius: barHalfHeight,
+		});
 	}
 }
 
