@@ -148,9 +148,6 @@ class CanvasPanel extends React.Component<Props, State> {
     );
 
     private canvasStack: CanvasStack = {
-        background: null,
-        glows: null,
-        canvas: null,
         gl: null,
         ui: null,
         cursor: null,
@@ -197,9 +194,6 @@ class CanvasPanel extends React.Component<Props, State> {
     render() {
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
-                <canvas id="background" ref={c => this.canvasStack.background = c} className="game" width={this.state.width} height={this.state.height} />
-                <canvas id="glows" ref={c => this.canvasStack.glows = c} className="game" width={this.state.width} height={this.state.height} style={{ display: this.state.rtx ? "block" : "none" }} />
-                <canvas id="canvas" ref={c => this.canvasStack.canvas = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="gl" ref={c => this.canvasStack.gl = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="ui" ref={c => this.canvasStack.ui = c} className="game" width={this.state.width} height={this.state.height} />
                 <canvas id="cursor" ref={c => {
@@ -567,7 +561,7 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private frame() {
-        if (this.canvasStack.background && this.canvasStack.canvas && this.canvasStack.glows && this.canvasStack.ui) {
+        if (this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
                 rtx: this.state.rtx,

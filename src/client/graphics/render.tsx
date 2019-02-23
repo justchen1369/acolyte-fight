@@ -108,7 +108,7 @@ function calculateWorldRect(viewRect: ClientRect): ClientRect {
 }
 
 export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
-	const rect = canvasStack.canvas.getBoundingClientRect();
+	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect);
 	const pixel = 1 / Math.max(1, Math.min(worldRect.width, worldRect.height));
@@ -123,26 +123,20 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	world.ui.renderedTick = world.tick;
 
 	const ctxStack: CanvasCtxStack = {
-		background: canvasStack.background.getContext('2d', { alpha: false }),
-		glows: canvasStack.glows.getContext('2d', { alpha: true }),
-		canvas: canvasStack.canvas.getContext('2d', { alpha: true }),
-		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
+		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
 		pixel,
 		data: glx.initData(),
 	};
-	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
+	if (!(ctxStack.gl && ctxStack.ui)) {
 		throw "Error getting context";
 	}
 
 	glx.initGl(ctxStack);
 
-	all(ctxStack, ctx => ctx.save());
-	clearCanvas(ctxStack, rect);
 	renderWorld(ctxStack, world, worldRect, options);
 	renderInterface(ctxStack.ui, world, rect, options);
-	all(ctxStack, ctx => ctx.restore());
 
 	glx.renderGl(ctxStack, worldRect, rect);
 
@@ -168,35 +162,7 @@ function playSounds(world: w.World, options: RenderOptions) {
 	world.ui.playedTick = world.tick; // Always update this so if user unmutes they don't classified as get sound lag
 }
 
-function all(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void) {
-	func(contextStack.background);
-	if (contextStack.rtx) {
-		func(contextStack.glows);
-	}
-	func(contextStack.canvas);
-	func(contextStack.ui);
-}
-
-function foreground(contextStack: CanvasCtxStack, func: (ctx: CanvasRenderingContext2D) => void, glow: boolean = true) {
-	if (glow && contextStack.rtx) {
-		func(contextStack.glows);
-	}
-	func(contextStack.canvas);
-}
-
-function clearCanvas(ctxStack: CanvasCtxStack, rect: ClientRect) {
-	ctxStack.background.fillStyle = 'black';
-	ctxStack.background.fillRect(0, 0, rect.width, rect.height);
-
-	ctxStack.glows.clearRect(0, 0, rect.width, rect.height);
-	ctxStack.canvas.clearRect(0, 0, rect.width, rect.height);
-}
-
 function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: ClientRect, options: RenderOptions) {
-	all(ctxStack, ctx => ctx.save());
-	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
-	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
-
 	renderMap(ctxStack, world);
 
 	if (options.targetingIndicator) {
@@ -217,8 +183,6 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 		}
 	});
 	world.ui.trails = newTrails;
-
-	all(ctxStack, ctx => ctx.restore());
 }
 
 function renderCursor(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, worldRect: ClientRect) {
@@ -622,10 +586,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	const pos = hero.body.getPosition();
 
-	foreground(ctxStack, ctx => ctx.save());
-
-	foreground(ctxStack, ctx => ctx.translate(pos.x, pos.y));
-
 	renderRangeIndicator(ctxStack, hero, world);
 	renderBuffs(ctxStack, hero, world); // Do this before applying translation
 
@@ -641,8 +601,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		renderHeroCharacter(ctxStack, hero, world);
 		renderHeroBars(ctxStack, hero, world);
 	}
-
-	foreground(ctxStack, ctx => ctx.restore());
 
 	playHeroSounds(hero, world);
 }
