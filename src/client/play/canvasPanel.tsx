@@ -164,7 +164,7 @@ class CanvasPanel extends React.Component<Props, State> {
             width: 0,
             height: 0,
             touchMultiplier: 1,
-            rtx: !isMobile,
+            rtx: true,
         };
 
         this.leftClickKey = props.rebindings[w.SpecialKeys.LeftClick];
