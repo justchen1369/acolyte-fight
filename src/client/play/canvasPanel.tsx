@@ -191,11 +191,12 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     render() {
+        const retinaMultiplier = this.state.rtx ? window.devicePixelRatio : 1;
         return (
             <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
                 <canvas
                     id="gl" ref={c => this.canvasStack.gl = c} className="game"
-                    width={this.state.width * window.devicePixelRatio} height={this.state.height * window.devicePixelRatio}
+                    width={this.state.width * retinaMultiplier} height={this.state.height * retinaMultiplier}
                     style={{ width: this.state.width, height: this.state.height }} />
                 <canvas
                     id="ui"
