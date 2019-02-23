@@ -3,7 +3,7 @@ import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as trails from './trails';
 
-export { circle, line, arc } from './trails';
+export { circle, line, arc, convex } from './trails';
 
 export function initData(): r.DrawDataLookup {
 	return {
@@ -28,7 +28,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 			2 * (worldRect.left / Math.max(1, rect.width)) - 1,
 			2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 		],
-		u_pixel: [1 / Math.max(1, Math.min(worldRect.width, worldRect.height))],
+		u_pixel: [ctxStack.pixel],
 	};
 
 	runProgram(gl, context.trails, uniforms, ctxStack.data.trails);

@@ -111,6 +111,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const rect = canvasStack.canvas.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect);
+	const pixel = 1 / Math.max(1, Math.min(worldRect.width, worldRect.height));
 
 	// Cursor always gets rerendered
 	{
@@ -128,6 +129,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
+		pixel,
 		data: glx.initData(),
 	};
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
@@ -837,6 +839,7 @@ function renderVanishReappear(ctxStack: CanvasCtxStack, buff: w.VanishBuff, hero
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const ctx = ctxStack.canvas;
+	const pos = hero.body.getPosition();
 
 	const player = world.players.get(hero.id);
 	let color = heroColor(hero.id, world);
@@ -858,58 +861,31 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 
 	// Fill
 	{
-		ctx.save();
-
-		let fillColor = color;
+		let fillColor = Color(color);
 		if (flash > 0) {
-			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * flash).string();
+			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * flash);
 		}
-
-		if (ctxStack.rtx) {
-			const gradient = ctx.createLinearGradient(-radius, -radius, radius, radius);
-			gradient.addColorStop(0, fillColor);
-			gradient.addColorStop(1, Color(fillColor).darken(0.5).string());
-			ctx.fillStyle = gradient;
-		} else {
-			ctx.fillStyle = fillColor;
-		}
-
-		ctx.beginPath();
-		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-		ctx.fill();
-
-		ctx.restore();
+		glx.circle(ctxStack, pos, fillColor, {
+			minRadius: 0,
+			maxRadius: radius,
+		});
 	}
 
 	// Orientation
 	{
-		ctx.save();
-
-		ctx.beginPath();
-		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
-		ctx.clip();
-
-		ctx.rotate(angle);
-		ctx.scale(radius, radius);
-
-		ctx.fillStyle = "white";
-		ctx.strokeStyle = "black";
-		ctx.lineWidth = Pixel;
-
-		ctx.globalAlpha = 0.5;
-
-		ctx.beginPath();
-		ctx.moveTo(0, 0);
-		ctx.lineTo(-1, 1);
-		ctx.lineTo(0, 1);
-		ctx.lineTo(0.5, 0);
-		ctx.lineTo(0, -1);
-		ctx.lineTo(-1, -1);
-		ctx.closePath();
-		ctx.fill();
-		ctx.stroke();
-
-		ctx.restore();
+		const points = [
+			pl.Vec2(0, 0),
+			pl.Vec2(-1, 1),
+			pl.Vec2(0, 1),
+			pl.Vec2(0.5, 0),
+			pl.Vec2(0, -1),
+			pl.Vec2(-1, -1),
+		];
+		let fillColor = Color("#fff").alpha(0.5);
+		glx.convex(ctxStack, pos, points, angle, radius, fillColor, {
+			minRadius: 0,
+			maxRadius: radius,
+		});
 	}
 
 	// Charging

@@ -18,6 +18,7 @@ export interface CanvasCtxStack {
 	ui: CanvasRenderingContext2D;
 	rtx: boolean;
 
+	pixel: number;
 	data: DrawDataLookup;
 }
 

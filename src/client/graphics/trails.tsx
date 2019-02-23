@@ -3,6 +3,7 @@ import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as shaders from './shaders';
 import * as vector from '../../game/vector';
+import { Pixel } from '../../game/constants';
 
 const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur reaches close to zero
 const trailFragmentShader = require('./trailFragmentShader.glsl');
@@ -92,7 +93,7 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, col
 }
 
 export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, fill: r.Fill) {
-	const extent = calculateExtent(fill);
+	const extent = calculateExtent(ctxStack, fill);
 	const quad = [
 		pl.Vec2(-extent, -extent),
 		pl.Vec2(-extent, extent),
@@ -110,7 +111,7 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, f
 }
 
 export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, color: Color, fill: r.Fill) {
-	const extent = calculateExtent(fill);
+	const extent = calculateExtent(ctxStack, fill);
 	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
 
@@ -124,7 +125,7 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, col
 }
 
 export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, color: Color, fill: r.Fill) {
-    const extent = Math.sqrt(2) * calculateExtent(fill); // sqrt(2) ensures the triangle always fully enclosees the arc
+    const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center = vector.zero();
 	const rels = new Array<pl.Vec2>();
@@ -157,8 +158,25 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
     }
 }
 
-function calculateExtent(fill: r.Fill) {
-    let extent = fill.maxRadius;
+export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, color: Color, fill: r.Fill) {
+	const center = vector.zero();
+
+    for (let i = 0; i < points.length; ++i) {
+        const a = vector.multiply(vector.turnVectorBy(points[i], rotate), scale);
+        const b = vector.multiply(vector.turnVectorBy(points[(i + 1) % points.length], rotate), scale);
+        if ((a.x === center.x && a.y === center.x) || (b.x === center.y && b.y === center.y)) {
+            // This will just draw zero-space triangles, so don't bother
+            continue;
+        }
+
+		appendTrail(ctxStack, pos, center, color, fill);
+		appendTrail(ctxStack, pos, a, color, fill);
+		appendTrail(ctxStack, pos, b, color, fill);
+    }
+}
+
+function calculateExtent(ctxStack: r.CanvasCtxStack, fill: r.Fill) {
+    let extent = fill.maxRadius + ctxStack.pixel;
     if (fill.feather) {
         extent += fill.feather.sigma * FeatherFactor;
     }
