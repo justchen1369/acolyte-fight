@@ -1899,7 +1899,6 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	if (!link) {
 		return;
 	}
-	projectile.expireTick = world.tick;
 
 	const owner = world.objects.get(projectile.owner);
 	if (!(
@@ -1907,6 +1906,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		&& owner && owner.category === "hero")) {
 		return;
 	}
+	projectile.expireTick = world.tick;
 
 	const maxTicks = link.linkTicks;
 	owner.link = {
