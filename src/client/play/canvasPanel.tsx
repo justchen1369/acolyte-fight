@@ -472,6 +472,10 @@ class CanvasPanel extends React.Component<Props, State> {
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
         const pos = hero.body.getPosition();
         const center = pl.Vec2(0.5, 0.5);
+        if (world.ui.hoverSpellId) {
+            return pos;
+        }
+
         const maxRadius = Math.max(0, world.radius * world.mapRadiusMultiplier - hero.radius - Pixel);
         if (vector.distance(pos, center) <= maxRadius) {
             return target;
