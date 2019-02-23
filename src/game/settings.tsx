@@ -665,7 +665,7 @@ const retractor: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You can control the spirit missile while it is in-flight, but you cannot move while doing this, as it takes all your concentration. If you get hit, you lose control and the spirit missile detonates. Cast Spirit Missile again to detonate it.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. If you get hit, you lose control and Spirit Missile detonates. You can cast Spirit Missile again to detonate it at exactly the right moment.",
     action: "focus",
 
     color: '#ff8855',
@@ -696,8 +696,8 @@ const rocket: Spell = {
         detonate: {
             damage: 0,
             radius: 0.04,
-            minImpulse: 0.00035,
-            maxImpulse: 0.0005,
+            minImpulse: 0.0002,
+            maxImpulse: 0.0004,
             renderTicks: 10,
         },
 
