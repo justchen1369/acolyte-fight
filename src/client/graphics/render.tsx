@@ -887,19 +887,11 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		// Stroke
 		const strokeWidth = ctxStack.pixel * 2;
 		const stroke = color.alpha(0.25);
-		const numSegments = 10;
-
-		const perSegment = 2 * Math.PI / numSegments;
-		const arcAngle = 0.75 * perSegment;
-		for (let i = 0; i < numSegments; ++i) {
-			const startAngle = i * perSegment;
-			const endAngle = startAngle + arcAngle;
-			glx.arc(ctxStack, pos, startAngle, endAngle, false, {
-				color: stroke,
-				minRadius: range - strokeWidth,
-				maxRadius: range,
-			});
-		}
+		glx.circle(ctxStack, pos, {
+			color: stroke,
+			minRadius: range - strokeWidth,
+			maxRadius: range,
+		});
 	}
 }
 
