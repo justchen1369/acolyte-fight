@@ -1320,6 +1320,7 @@ const shield: Spell = {
     icon: "shieldReflect",
 
     color: '#3366ff',
+    glow: 0.25,
 
     action: "shield",
     sound: "shield",
@@ -1348,6 +1349,7 @@ const icewall: Spell = {
     icon: "woodenFence",
 
     color: '#0088ff',
+    glow: 0.25,
 
     action: "wall",
     sound: "icewall",

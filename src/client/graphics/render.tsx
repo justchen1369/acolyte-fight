@@ -1040,10 +1040,11 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		}
 	}
 
-	let color = (shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color;
+	let color = Color((shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color);
 	if (flash > 0) {
-		color = Color(color).lighten(HeroColors.ShieldGlowFactor * flash).string();
+		color = color.lighten(HeroColors.ShieldGlowFactor * flash);
 	}
+	color = color.alpha((MaxAlpha - MinAlpha) * proportion + MinAlpha);
 
 	let scale: number = 1;
 	if (flash > 0) {
@@ -1054,66 +1055,50 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		scale *= growthProportion;
 	}
 
-	foreground(ctxStack, ctx => ctx.save());
+	let feather: r.FeatherConfig = null;
+	if (shield.glow && ctxStack.rtx) {
+		feather = {
+			sigma: HeroColors.GlowRadius,
+			alpha: shield.glow,
+		};
+	}
 
-	let pos: pl.Vec2;
-	let angle: number;
 	if (shield.type === "reflect") {
 		const hero = world.objects.get(shield.owner);
 		if (!hero) {
 			return;
 		}
-		pos = hero.body.getPosition();
-		angle = hero.body.getAngle();
+		const pos = hero.body.getPosition();
+
+		glx.circle(ctxStack, pos, color, {
+			minRadius: 0,
+			maxRadius: shield.radius * scale,
+			feather,
+		});
 	} else if (shield.type === "wall") {
-		pos = shield.body.getPosition();
-		angle = shield.body.getAngle();
+		const pos = shield.body.getPosition();
+		const angle = shield.body.getAngle();
+
+		glx.convex(ctxStack, pos, shield.points, angle, scale, color, {
+			minRadius: 0,
+			maxRadius: shield.extent * scale,
+			feather,
+		});
 	} else if (shield.type === "saber") {
 		const hero = world.objects.get(shield.owner);
 		if (!hero) {
 			return;
 		}
-		pos = hero.body.getPosition();
-		angle = shield.body.getAngle();
-	} else {
-		return;
-	}
+		const pos = hero.body.getPosition();
+		const angle = shield.body.getAngle();
 
-	foreground(ctxStack, ctx => {
-		ctx.translate(pos.x, pos.y)
-		ctx.rotate(angle);
-		ctx.scale(scale, scale);
-	});
+		const tip = vector.plus(pos, vector.multiply(vector.fromAngle(angle), shield.length));
+		glx.line(ctxStack, pos, tip, color, {
+			minRadius: 0,
+			maxRadius: shield.width,
+			feather,
+		});
 
-	foreground(ctxStack, ctx => {
-		ctx.globalAlpha = (MaxAlpha - MinAlpha) * proportion + MinAlpha;
-		ctx.fillStyle = color;
-		ctx.lineWidth = Pixel * 3;
-
-		ctx.beginPath();
-		if (shield.type === "reflect") {
-			ctx.arc(0, 0, shield.radius, 0, 2 * Math.PI);
-		} else {
-			ctx.beginPath();
-
-			const points = shield.points;
-			for (let i = 0; i < points.length; ++i) {
-				const point = points[i % points.length];
-				if (i === 0) {
-					ctx.moveTo(point.x, point.y);
-				}
-				ctx.lineTo(point.x, point.y);
-			}
-
-			ctx.closePath();
-			ctx.fill();
-		}
-		ctx.fill();
-	}, !!glow);
-
-	foreground(ctxStack, ctx => ctx.restore());
-
-	if (shield.type === "saber") {
 		renderSaberTrail(shield, world);
 	}
 }

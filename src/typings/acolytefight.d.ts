@@ -525,12 +525,12 @@ declare interface ShieldSpell extends SpellBase {
 	maxTicks: number;
 	takesOwnership: boolean;
 	blocksTeleporters: boolean;
+	glow?: number;
 }
 
 declare interface ReflectSpell extends ShieldSpell {
     action: "shield";
     radius: number;
-	glow?: number;
 }
 
 declare interface WallSpell extends ShieldSpell {
@@ -546,8 +546,6 @@ declare interface WallSpell extends ShieldSpell {
 
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
-
-	glow?: number;
 }
 
 declare interface SaberSpell extends ShieldSpell {
@@ -567,7 +565,6 @@ declare interface SaberSpell extends ShieldSpell {
 	collidesWith: number;
 
 	trailTicks: number;
-	glow?: number;
 }
 
 declare interface TeleportSpell extends SpellBase {

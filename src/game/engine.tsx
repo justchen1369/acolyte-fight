@@ -3037,7 +3037,7 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: WallS
 	const angle = 0.5 * Math.PI + vector.angle(diff);
 
 	const position = vector.plus(hero.body.getPosition(), diff);
-	addWall(world, hero, spell, position, angle, points, Math.min(halfWidth, halfLength));
+	addWall(world, hero, spell, position, angle, points, Math.max(halfWidth, halfLength));
 
 	return true;
 }
