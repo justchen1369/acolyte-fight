@@ -801,7 +801,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 			pl.Vec2(0, -1),
 			pl.Vec2(-1, -1),
 		];
-		let glyphColor = style.mix(parseColor('#fff'), 0.4);
+		let glyphColor = style.mix(parseColor('#fff'), 0.5);
 		glx.convex(ctxStack, pos, points, angle, radius, {
 			color: glyphColor,
 			maxRadius: radius,
