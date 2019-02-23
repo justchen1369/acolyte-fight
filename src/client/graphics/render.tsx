@@ -1193,27 +1193,14 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 
 	const pos = projectile.body.getPosition();
 
-	const animationLength = 11;
-	const numSegments = 5;
-	const arcFraction = 0.5;
-
-	const angleOffset = ((world.tick % animationLength) / animationLength) * 2 * Math.PI;
-	const arcAngle = arcFraction * 2 * Math.PI / numSegments;
-
 	const lineWidth = 2 * ctxStack.pixel;
 
 	const radius = reticule.radius * proportion;
-
-	const perSegment = 2 * Math.PI / numSegments;
-	for (let i = 0; i < numSegments; ++i) {
-		const startAngle = angleOffset + i * perSegment;
-		const endAngle = startAngle + arcAngle;
-		glx.arc(ctxStack, pos, startAngle, endAngle, false, {
-			color: parseColor(reticule.color),
-			minRadius: radius - lineWidth,
-			maxRadius: radius,
-		});
-	}
+	glx.circle(ctxStack, pos, {
+		color: parseColor(reticule.color),
+		minRadius: radius - lineWidth,
+		maxRadius: radius,
+	});
 }
 
 function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, strike: RenderStrike) {
