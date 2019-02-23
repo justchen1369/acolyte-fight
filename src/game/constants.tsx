@@ -73,8 +73,8 @@ export namespace HeroColors {
 	export const WorldWinGrowth = 0.05;
 	export const GlowRadius = 4 * Pixel;
 
-	export const ShakeDistance = 0.0025;
-	export const ShakeTicks = 10;
+	export const ShakeDistance = 0.02;
+	export const ShakeTicks = 3;
 	export const ShakeGlowFactor = 0.01;
 
 	export const MyHeroColor = '#00ccff';

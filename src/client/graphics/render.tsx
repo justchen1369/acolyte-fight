@@ -444,7 +444,7 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World,
 }
 
 function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
-	if (world.ui.myHeroId && !(ev.objectId === world.ui.myHeroId || ev.owner === world.ui.myHeroId)) {
+	if (world.ui.myHeroId && !(ev.owner === world.ui.myHeroId)) {
 		return;
 	}
 
