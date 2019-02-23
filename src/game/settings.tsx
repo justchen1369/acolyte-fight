@@ -693,7 +693,7 @@ const rocket: Spell = {
         },
 
         detonate: {
-            damage: 15,
+            damage: 20,
             radius: 0.03,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
