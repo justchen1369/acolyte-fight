@@ -4,15 +4,15 @@ uniform float u_pixel;
 
 varying vec2 v_rel;
 varying vec4 v_color;
-varying vec4 v_shape;
+varying vec4 v_fill;
 
 void main() {
 	vec4 color = vec4(v_color);
 
-	float minRadius = v_shape.x;
-	float maxRadius = v_shape.y;
-	float feather = v_shape.z;
-	float featherAlpha = v_shape.w;
+	float minRadius = v_fill.x;
+	float maxRadius = v_fill.y;
+	float feather = v_fill.z;
+	float featherAlpha = v_fill.w;
 
 	float radius = length(v_rel);
 	float outside = max(

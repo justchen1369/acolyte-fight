@@ -16,7 +16,7 @@ export function initData(): r.DrawTrailsData {
             a_pos: [],
             a_rel: [],
             a_color: [],
-            a_shape: [],
+            a_fill: [],
         },
         numVertices: 0,
     };
@@ -62,8 +62,8 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				type: gl.FLOAT,
 				size: 4,
 			},
-			a_shape: {
-				loc: gl.getAttribLocation(program, "a_shape"),
+			a_fill: {
+				loc: gl.getAttribLocation(program, "a_fill"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 4,
@@ -87,7 +87,7 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, col
 	shaders.appendVec2(trails.attribs.a_pos, pos);
 	shaders.appendVec2(trails.attribs.a_rel, rel);
 	shaders.appendColor(trails.attribs.a_color, color);
-	appendCurveShape(trails.attribs.a_shape, fill);
+	appendCurveShape(trails.attribs.a_fill, fill);
 	++trails.numVertices;
 }
 

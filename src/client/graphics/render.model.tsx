@@ -69,7 +69,7 @@ export interface DrawTrailsData extends DrawData {
 		a_pos: number[];
 		a_rel: number[];
 		a_color: number[];
-		a_shape: number[];
+		a_fill: number[];
 	};
 }
 
@@ -96,7 +96,7 @@ export interface DrawTrails extends Draw {
 		a_pos: AttribInfo;
 		a_rel: AttribInfo;
 		a_color: AttribInfo;
-		a_shape: AttribInfo;
+		a_fill: AttribInfo;
 	};
 }
 
