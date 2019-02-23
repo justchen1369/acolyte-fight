@@ -814,8 +814,18 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		if (flash > 0) {
 			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * flash);
 		}
+		let gradient: r.Gradient = null;
+		if (ctxStack.rtx) {
+			gradient = {
+				from: vector.plus(pos, pl.Vec2(-radius, -radius)),
+				fromColor: fillColor,
+				to: vector.plus(pos, pl.Vec2(radius, radius)),
+				toColor: fillColor.darken(0.5),
+			};
+		}
 		glx.circle(ctxStack, pos, {
 			color: fillColor,
+			gradient,
 			maxRadius: radius,
 		});
 	}
