@@ -327,6 +327,7 @@ declare interface AttractTemplate extends BehaviourTemplateBase {
 	notCategories?: number; // What types of objects to not attract
 	radius: number; // Maximum range of attraction
 	accelerationPerTick: number; // Acceleration per tick
+	maxSpeed?: number; // Slow down anything caught in the attraction
 }
 
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {

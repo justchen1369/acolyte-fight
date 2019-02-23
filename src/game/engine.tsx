@@ -600,6 +600,7 @@ function instantiateAttract(template: AttractTemplate, projectile: w.Projectile,
 		notCategories: template.notCategories !== undefined ? template.notCategories : Categories.None,
 		radius: template.radius,
 		accelerationPerTick: template.accelerationPerTick,
+		maxSpeed: template.maxSpeed,
 	};
 }
 
@@ -2010,6 +2011,11 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 
 		let velocity = obj.body.getLinearVelocity();
 		velocity = vector.plus(velocity, acceleration);
+
+		if (attraction.maxSpeed) {
+			velocity = vector.truncate(velocity, attraction.maxSpeed);
+		}
+
 		obj.body.setLinearVelocity(velocity);
 	});
 	return true;

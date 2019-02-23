@@ -765,6 +765,7 @@ export interface AttractBehaviour extends BehaviourBase {
 	notCategories: number;
 	radius: number;
 	accelerationPerTick: number;
+	maxSpeed?: number;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {
