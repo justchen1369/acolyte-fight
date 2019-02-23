@@ -522,21 +522,21 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 
 	const points = world.mapPoints;
 	if (points) {
-		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale, strokeStyle, {
-			minRadius: 0,
+		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale, {
+			color: strokeStyle,
 			maxRadius: scale * radius,
 		});
-		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale * strokeProportion, color, {
-			minRadius: 0,
+		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale * strokeProportion, {
+			color,
 			maxRadius: scale * radius,
 		});
 	} else {
-		glx.circle(ctxStack, pos, strokeStyle, {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color: strokeStyle,
 			maxRadius: scale * radius,
 		});
-		glx.circle(ctxStack, pos, color, {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color,
 			maxRadius: scale * radius * strokeProportion,
 		});
 	}
@@ -605,12 +605,12 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const strokeStyle = Color(color).lighten(0.6);
 	const strokeProportion = 0.4;
 
-	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, strokeStyle, {
-		minRadius: 0,
+	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, {
+		color: strokeStyle,
 		maxRadius: scale * obstacle.extent,
 	});
-	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, color, {
-		minRadius: 0,
+	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, {
+		color,
 		maxRadius: scale * obstacle.extent,
 	});
 }
@@ -656,9 +656,6 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	const ctx = ctxStack.canvas;
-	ctx.save();
-
 	const pos = hero.body.getPosition();
 	const target = world.ui.nextTarget;
 	if (!(pos && target)) {
@@ -666,8 +663,9 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	}
 
 	const diff = vector.diff(target, pos);
-	const guide = vector.relengthen(diff, 0.5);
-	const proportion = Math.min(1, vector.length(diff) / 0.5);
+	const guideLength = 0.5;
+	const guideDirection = vector.unit(diff);
+	const proportion = Math.min(1, vector.length(diff) / guideLength);
 
 	const radius = vector.length(diff);
 	const angle = vector.angle(diff);
@@ -676,6 +674,38 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const startAngle = angle - (Math.PI * angularProportion);
 	const endAngle = angle + (Math.PI * angularProportion);
 
+	const lineWidth = hero.radius / 2;
+
+	const gradient: r.Gradient = {
+		from: pos,
+		fromColor: Color("#000").alpha(MaxAlpha * proportion),
+		to: vector.plus(pos, vector.multiply(guideDirection, guideLength)),
+		toColor: Color("#000").alpha(0),
+	};
+
+	// Render cross
+	glx.arc(ctxStack, pos, startAngle, endAngle, false, {
+		gradient,
+		minRadius: radius - lineWidth,
+		maxRadius: radius,
+	});
+
+	// Render line to target
+	const perSegment = 40 * ctxStack.pixel;
+	const dashLength = 35 * ctxStack.pixel;
+	const numSegments = Math.ceil(guideLength / perSegment);
+
+	for (let i = 0; i < numSegments; ++i) {
+		const from = vector.plus(pos, vector.multiply(guideDirection, i * perSegment));
+		const to = vector.plus(from, vector.multiply(guideDirection, dashLength));
+
+		glx.line(ctxStack, from, to, {
+			gradient,
+			maxRadius: lineWidth / 2,
+		});
+	}
+
+	/*
 	ctx.translate(pos.x, pos.y);
 
 	ctx.lineWidth = hero.radius / 2;
@@ -696,8 +726,7 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	ctx.moveTo(0, 0);
 	ctx.lineTo(guide.x, guide.y);
 	ctx.stroke();
-
-	ctx.restore();
+	*/
 }
 
 function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -827,8 +856,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		if (flash > 0) {
 			fillColor = Color(fillColor).lighten(HeroColors.DamageGlowFactor * flash);
 		}
-		glx.circle(ctxStack, pos, fillColor, {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color: fillColor,
 			maxRadius: radius,
 		});
 	}
@@ -844,8 +873,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 			pl.Vec2(-1, -1),
 		];
 		let fillColor = Color("#fff").alpha(0.5);
-		glx.convex(ctxStack, pos, points, angle, radius, fillColor, {
-			minRadius: 0,
+		glx.convex(ctxStack, pos, points, angle, radius, {
+			color: fillColor,
 			maxRadius: radius,
 		});
 	}
@@ -854,7 +883,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		const strokeColor = Color(hero.casting.color).alpha(hero.casting.proportion);
 		const strokeRadius = radius + ChargingIndicator.Margin;
-		glx.circle(ctxStack, pos, strokeColor, {
+		glx.circle(ctxStack, pos, {
+			color: strokeColor,
 			minRadius: strokeRadius - ChargingIndicator.Width / 2,
 			maxRadius: strokeRadius + ChargingIndicator.Width / 2,
 		});
@@ -935,8 +965,8 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		const fill = color.alpha(0.25);
 
 		// fill
-		glx.circle(ctxStack, pos, fill, {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color: fill,
 			maxRadius: range,
 		});
 
@@ -950,7 +980,8 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		for (let i = 0; i < numSegments; ++i) {
 			const startAngle = i * perSegment;
 			const endAngle = startAngle + arcAngle;
-			glx.arc(ctxStack, pos, startAngle, endAngle, false, stroke, {
+			glx.arc(ctxStack, pos, startAngle, endAngle, false, {
+				color: stroke,
 				minRadius: range - strokeWidth,
 				maxRadius: range,
 			});
@@ -988,12 +1019,12 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) 
 		const barMid = pl.Vec2(barLeft.x + healthProportion * 2 * barHalfWidth, barY);
 		const barRight = pl.Vec2(pos.x + barHalfWidth, barY);
 
-		glx.line(ctxStack, barLeft, barRight, Color("#111"), {
-			minRadius: 0,
+		glx.line(ctxStack, barLeft, barRight, {
+			color: Color("#111"),
 			maxRadius: barHalfHeight,
 		});
-		glx.line(ctxStack, barLeft, barMid, color, {
-			minRadius: 0,
+		glx.line(ctxStack, barLeft, barMid, {
+			color,
 			maxRadius: barHalfHeight,
 		});
 	}
@@ -1047,8 +1078,8 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		}
 		const pos = hero.body.getPosition();
 
-		glx.circle(ctxStack, pos, color, {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color,
 			maxRadius: shield.radius * scale,
 			feather,
 		});
@@ -1056,22 +1087,24 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = shield.body.getPosition();
 		const angle = shield.body.getAngle();
 
-		glx.convex(ctxStack, pos, shield.points, angle, scale, color, {
+		glx.convex(ctxStack, pos, shield.points, angle, scale, {
+			color,
 			minRadius: 0,
 			maxRadius: shield.extent * scale,
 			feather,
 		});
 	} else if (shield.type === "saber") {
 		const hero = world.objects.get(shield.owner);
-		if (!hero) {
+		if (!(hero && hero.category === "hero")) {
 			return;
 		}
 		const pos = hero.body.getPosition();
 		const angle = shield.body.getAngle();
 
 		const tip = vector.plus(pos, vector.multiply(vector.fromAngle(angle), shield.length));
-		glx.line(ctxStack, pos, tip, color, {
-			minRadius: 0,
+		glx.line(ctxStack, pos, tip, {
+			color,
+			minRadius: hero.radius,
 			maxRadius: shield.width,
 			feather,
 		});
@@ -1261,7 +1294,8 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	for (let i = 0; i < numSegments; ++i) {
 		const startAngle = angleOffset + i * perSegment;
 		const endAngle = startAngle + arcAngle;
-		glx.arc(ctxStack, pos, startAngle, endAngle, false, Color(reticule.color), {
+		glx.arc(ctxStack, pos, startAngle, endAngle, false, {
+			color: Color(reticule.color),
 			minRadius: radius - lineWidth,
 			maxRadius: radius,
 		});
@@ -1320,7 +1354,7 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
 	const fill: r.Fill = {
-		minRadius: 0,
+		color: Color(render.color),
 		maxRadius: render.width / 2,
 		feather: (render.glow && ctxStack.rtx) ? {
 			sigma: HeroColors.GlowRadius,
@@ -1330,7 +1364,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
-	glx.line(ctxStack, from, to, Color(render.color), fill);
+	glx.line(ctxStack, from, to, fill);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -1417,15 +1451,15 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	const proportion = 1.0 * remaining / trail.max;
 	let scale = 1;
 
-	let color = trail.fillStyle;
+	let color = Color(trail.fillStyle);
 	if (trail.fade) {
-		color = Color(color).mix(Color(trail.fade), 1 - proportion).string();
+		color = Color(color).mix(Color(trail.fade), 1 - proportion);
 	}
 	if (trail.highlight) {
 		const highlightProportion = Math.max(0, 1 - ((world.tick - trail.highlight.fromTick) / trail.highlight.maxTicks));
 		if (highlightProportion > 0) {
 			if (trail.highlight.glow) {
-				color = Color(color).lighten(highlightProportion).string();
+				color = Color(color).lighten(highlightProportion);
 			}
 			if (trail.highlight.growth) {
 				scale = 1 + trail.highlight.growth * highlightProportion;
@@ -1452,15 +1486,16 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const radius = scale * proportion * trail.radius;
 
-		glx.circle(ctxStack, pos, Color(color), {
-			minRadius: 0,
+		glx.circle(ctxStack, pos, {
+			color,
 			maxRadius: radius,
 			feather,
 		});
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
 
-		glx.line(ctxStack, trail.from, trail.to, Color(color), {
+		glx.line(ctxStack, trail.from, trail.to, {
+			color,
 			minRadius: 0,
 			maxRadius: lineWidth / 2,
 			feather,
@@ -1471,13 +1506,15 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		
 		const minRadius = Math.max(0, radius - lineWidth / 2);
 		const maxRadius = radius + lineWidth / 2;
-		glx.circle(ctxStack, trail.pos, Color(color).alpha(proportion), {
+		glx.circle(ctxStack, trail.pos, {
+			color: color.alpha(proportion),
 			minRadius,
 			maxRadius,
 			feather,
 		});
 	} else if (trail.type === "arc") {
-		glx.arc(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion), {
+		glx.arc(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, {
+			color: color.alpha(proportion),
 			minRadius: trail.minRadius,
 			maxRadius: trail.maxRadius,
 			feather: feather,

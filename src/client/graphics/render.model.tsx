@@ -101,8 +101,18 @@ export interface DrawTrails extends Draw {
 	};
 }
 
+export interface Gradient {
+	from: pl.Vec2;
+	fromColor: Color;
+	to: pl.Vec2;
+	toColor: Color;
+}
+
 export interface Fill {
-	minRadius: number;
+	color?: Color;
+	gradient?: Gradient;
+
+	minRadius?: number;
 	maxRadius: number;
 	feather?: FeatherConfig;
 }
