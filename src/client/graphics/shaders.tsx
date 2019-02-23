@@ -2,19 +2,6 @@ import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
 
-export function getContext(ctxStack: r.CanvasCtxStack): r.GlContext {
-	const gl = ctxStack.gl;
-	if (!gl) {
-		throw "WebGL unavailable";
-	}
-
-	let context: r.GlContext = (gl as any).context;
-	if (!context) {
-        throw "GL renderer uninitialised";
-	}
-	return context;
-}
-
 export function compileProgram(gl: WebGLRenderingContext, vertexShaderCode: string, fragmentShaderCode: string) {
 	const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
 	const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);

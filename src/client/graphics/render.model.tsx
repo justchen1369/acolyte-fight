@@ -17,6 +17,8 @@ export interface CanvasCtxStack {
     gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
 	rtx: boolean;
+
+	data: DrawDataLookup;
 }
 
 export interface RenderOptions {
@@ -37,7 +39,6 @@ export interface Draw {
 	program: WebGLProgram;
 	uniforms: { [key: string]: UniformInfo };
 	attribs: { [key: string]: AttribInfo };
-	numVertices: number;
 }
 
 export interface UniformInfo {
@@ -51,11 +52,32 @@ export interface AttribInfo {
 	buffer: WebGLBuffer;
 	size: number; // e.g. vec2 -> 2
 	type: number; // e.g. gl.FLOAT
+}
 
-	data: number[];
+export interface DrawDataLookup {
+	trails: DrawTrailsData;
+}
+
+export interface DrawData {
+	uniforms: UniformData;
+	attribs: AttributeData;
+	numVertices: number;
+}
+
+export interface DrawTrailsData extends DrawData {
+	attribs: {
+		a_pos: number[];
+		a_rel: number[];
+		a_color: number[];
+		a_shape: number[];
+	};
 }
 
 export interface UniformData {
+	[key: string]: number[];
+}
+
+export interface AttributeData {
 	[key: string]: number[];
 }
 

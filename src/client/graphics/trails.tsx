@@ -8,6 +8,20 @@ const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur
 const trailFragmentShader = require('./trailFragmentShader.glsl');
 const trailVertexShader = require('./trailVertexShader.glsl');
 
+export function initData(): r.DrawTrailsData {
+    return {
+        uniforms: {
+        },
+        attribs: {
+            a_pos: [],
+            a_rel: [],
+            a_color: [],
+            a_shape: [],
+        },
+        numVertices: 0,
+    };
+}
+
 export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	const program = shaders.compileProgram(gl, trailVertexShader, trailFragmentShader);
 	return {
@@ -35,31 +49,26 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
-				data: [],
 			},
 			a_rel: {
 				loc: gl.getAttribLocation(program, "a_rel"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
-				data: [],
 			},
 			a_color: {
 				loc: gl.getAttribLocation(program, "a_color"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 4,
-				data: [],
 			},
 			a_shape: {
 				loc: gl.getAttribLocation(program, "a_shape"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 4,
-				data: [],
 			},
 		},
-		numVertices: 0,
 	};
 }
 
@@ -73,17 +82,16 @@ function appendCurveShape(data: number[], curve: r.CurveShape) {
 	}
 }
 
-function appendTrail(trails: r.DrawTrails, pos: pl.Vec2, rel: pl.Vec2, color: Color, curve: r.CurveShape) {
-	shaders.appendVec2(trails.attribs.a_pos.data, vector.plus(pos, rel));
-	shaders.appendVec2(trails.attribs.a_rel.data, rel);
-	shaders.appendColor(trails.attribs.a_color.data, color);
-	appendCurveShape(trails.attribs.a_shape.data, curve);
+function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, color: Color, curve: r.CurveShape) {
+    const trails = ctxStack.data.trails;
+	shaders.appendVec2(trails.attribs.a_pos, vector.plus(pos, rel));
+	shaders.appendVec2(trails.attribs.a_rel, rel);
+	shaders.appendColor(trails.attribs.a_color, color);
+	appendCurveShape(trails.attribs.a_shape, curve);
 	++trails.numVertices;
 }
 
 export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather?: r.FeatherConfig) {
-	const context = shaders.getContext(ctxStack);
-
 	const extent = maxRadius + featherRadius(feather);
 	const quad = [
 		pl.Vec2(-extent, -extent),
@@ -98,20 +106,16 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: numb
 		feather,
 	};
 
-	const trails = context.trails;
+	appendTrail(ctxStack, pos, quad[0], color, curve);
+	appendTrail(ctxStack, pos, quad[1], color, curve);
+	appendTrail(ctxStack, pos, quad[2], color, curve);
 
-	appendTrail(trails, pos, quad[0], color, curve);
-	appendTrail(trails, pos, quad[1], color, curve);
-	appendTrail(trails, pos, quad[2], color, curve);
-
-	appendTrail(trails, pos, quad[2], color, curve);
-	appendTrail(trails, pos, quad[3], color, curve);
-	appendTrail(trails, pos, quad[0], color, curve);
+	appendTrail(ctxStack, pos, quad[2], color, curve);
+	appendTrail(ctxStack, pos, quad[3], color, curve);
+	appendTrail(ctxStack, pos, quad[0], color, curve);
 }
 
 export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather?: r.FeatherConfig) {
-	const context = shaders.getContext(ctxStack);
-
 	const extent = halfWidth + featherRadius(feather);
 	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
@@ -122,20 +126,16 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, hal
 		feather,
 	};
 
-	const trails = context.trails;
+	appendTrail(ctxStack, from, up, color, curve);
+	appendTrail(ctxStack, from, down, color, curve);
+	appendTrail(ctxStack, to, up, color, curve);
 
-	appendTrail(trails, from, up, color, curve);
-	appendTrail(trails, from, down, color, curve);
-	appendTrail(trails, to, up, color, curve);
-
-	appendTrail(trails, to, up, color, curve);
-	appendTrail(trails, from, down, color, curve);
-	appendTrail(trails, to, down, color, curve);
+	appendTrail(ctxStack, to, up, color, curve);
+	appendTrail(ctxStack, from, down, color, curve);
+	appendTrail(ctxStack, to, down, color, curve);
 }
 
 export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather?: r.FeatherConfig) {
-	const context = shaders.getContext(ctxStack);
-
 	const curve: r.CurveShape = {
 		minRadius,
 		maxRadius,
@@ -168,11 +168,10 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
         currentAngle = nextAngle;
     }
 
-	const trails = context.trails;
     for (let i = 0; i < rels.length - 1; ++i) {
-		appendTrail(trails, pos, center, color, curve);
-		appendTrail(trails, pos, rels[i], color, curve);
-		appendTrail(trails, pos, rels[i + 1], color, curve);
+		appendTrail(ctxStack, pos, center, color, curve);
+		appendTrail(ctxStack, pos, rels[i], color, curve);
+		appendTrail(ctxStack, pos, rels[i + 1], color, curve);
     }
 }
 

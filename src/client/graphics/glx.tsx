@@ -5,6 +5,12 @@ import * as trails from './trails';
 
 export { circle, line, arc } from './trails';
 
+export function initData(): r.DrawDataLookup {
+	return {
+		trails: trails.initData(),
+	};
+}
+
 export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect) {
 	let context: r.GlContext = initGl(ctxStack);
 	const gl = context.gl;
@@ -25,11 +31,11 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 		u_pixel: [1 / Math.max(1, Math.min(worldRect.width, worldRect.height))],
 	};
 
-	runProgram(gl, context.trails, uniforms);
+	runProgram(gl, context.trails, uniforms, ctxStack.data.trails);
 }
 
-function runProgram(gl: WebGLRenderingContext, draw: r.Draw, uniformData: r.UniformData) {
-	if (!draw.numVertices) {
+function runProgram(gl: WebGLRenderingContext, draw: r.Draw, uniformData: r.UniformData, data: r.DrawData) {
+	if (!data.numVertices) {
 		// Nothing to draw
 		return;
 	}
@@ -43,13 +49,10 @@ function runProgram(gl: WebGLRenderingContext, draw: r.Draw, uniformData: r.Unif
 		const attrib = draw.attribs[attribName];
 		gl.enableVertexAttribArray(attrib.loc);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(attrib.data), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.attribs[attribName]), gl.STATIC_DRAW);
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
-
-		attrib.data = [];
 	}
-	gl.drawArrays(gl.TRIANGLES, 0, draw.numVertices);
-	draw.numVertices = 0;
+	gl.drawArrays(gl.TRIANGLES, 0, data.numVertices);
 }
 
 function setUniform(gl: WebGLRenderingContext, uniform: r.UniformInfo, data: number[]) {

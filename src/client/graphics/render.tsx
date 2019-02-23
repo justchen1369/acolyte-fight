@@ -128,6 +128,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		gl: canvasStack.gl.getContext('webgl', { alpha: true }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
+		data: glx.initData(),
 	};
 	if (!(ctxStack.background && ctxStack.glows && ctxStack.canvas && ctxStack.ui)) {
 		throw "Error getting context";
