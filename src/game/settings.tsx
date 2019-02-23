@@ -687,11 +687,6 @@ const rocket: Spell = {
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
-        partialDamage: {
-            initialMultiplier: 0.5,
-            ticks: 0.5 * TicksPerSecond,
-        },
-
         detonate: {
             damage: 7.5,
             radius: 0.03,
