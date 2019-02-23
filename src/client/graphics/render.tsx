@@ -197,7 +197,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	all(ctxStack, ctx => ctx.translate(worldRect.left, worldRect.top));
 	all(ctxStack, ctx => ctx.scale(worldRect.width, worldRect.height));
 
-	renderMap(ctxStack.background, world);
+	renderMap(ctxStack, world);
 
 	if (options.targetingIndicator) {
 		renderTargetingIndicator(ctxStack, world);
@@ -495,39 +495,58 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 	}
 }
 
-function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
-	ctx.save();
-
+function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 	const shake = takeShakes(world);
-	ctx.translate(0.5 + shake.x, 0.5 + shake.y);
-
-	ctx.lineWidth = Pixel * 5;
+	const pos = pl.Vec2(0.5 + shake.x, 0.5 + shake.y);
 
 	let scale = 1;
-	let color: string;
+	let color: Color;
 	if (world.winner) {
 		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / HeroColors.WorldAnimateWinTicks);
 		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
-		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(proportion).string();
+		color = Color(heroColor(world.winner, world)).darken(0.5).lighten(proportion);
 	} else {
-		color = Color(HeroColors.WorldColor).string();
+		color = Color(HeroColors.WorldColor);
 
 		const highlight = takeHighlights(world);
 		if (highlight) {
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
-			color = Color(color).mix(Color(highlight.color), HeroColors.ShakeGlowFactor * proportion).string();
+			color = Color(color).mix(Color(highlight.color), HeroColors.ShakeGlowFactor * proportion);
 		}
 	}
-	ctx.fillStyle = color;
-	ctx.strokeStyle = Color(color).lighten(0.3).string();
+
+	const strokeStyle = Color(color).lighten(0.3);
+	const strokeProportion = 0.99;
 
 	let radius = world.radius * world.mapRadiusMultiplier;
+
+	const points = world.mapPoints;
+	if (points) {
+		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale, strokeStyle, {
+			minRadius: 0,
+			maxRadius: scale * radius,
+		});
+		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale * strokeProportion, color, {
+			minRadius: 0,
+			maxRadius: scale * radius,
+		});
+	} else {
+		glx.circle(ctxStack, pos, strokeStyle, {
+			minRadius: 0,
+			maxRadius: scale * radius,
+		});
+		glx.circle(ctxStack, pos, color, {
+			minRadius: 0,
+			maxRadius: scale * radius * strokeProportion,
+		});
+	}
+
+	/*
 	if (isEdge) {
 		// Edge has a weird oscillation of Y-axis scaling for certain fractions of radius.
 		// Force it to draw perfect circles by snapping to a minimum precision.
 		radius = Math.floor(radius / Pixel) * Pixel;
 	}
-
 	ctx.scale(radius * scale, radius * scale);
 
 	ctx.beginPath();
@@ -547,6 +566,7 @@ function renderMap(ctx: CanvasRenderingContext2D, world: w.World) {
 	ctx.stroke();
 
 	ctx.restore();
+	*/
 }
 
 function takeShakes(world: w.World) {
