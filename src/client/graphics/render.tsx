@@ -655,19 +655,10 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	});
 
 	// Render line to target
-	const perSegment = 40 * ctxStack.pixel;
-	const dashLength = 35 * ctxStack.pixel;
-	const numSegments = Math.ceil(guideLength / perSegment);
-
-	for (let i = 0; i < numSegments; ++i) {
-		const from = vector.plus(pos, vector.multiply(guideDirection, i * perSegment));
-		const to = vector.plus(from, vector.multiply(guideDirection, dashLength));
-
-		glx.line(ctxStack, from, to, {
-			gradient,
-			maxRadius: lineWidth / 2,
-		});
-	}
+	glx.line(ctxStack, pos, vector.plus(pos, vector.multiply(guideDirection, guideLength)), {
+		gradient,
+		maxRadius: lineWidth / 2,
+	});
 }
 
 function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
