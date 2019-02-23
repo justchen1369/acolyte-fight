@@ -1490,6 +1490,7 @@ const voidRush: Spell = {
                 ticks: 60,
                 emissionRadius: 0,
                 particleRadius: Hero.Radius,
+                decay: true,
             },
         },
     ],
