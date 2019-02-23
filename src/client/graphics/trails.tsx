@@ -44,6 +44,11 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				type: gl.FLOAT,
 				size: 1,
             },
+			u_rtx: {
+				loc: gl.getUniformLocation(program, "u_rtx"),
+				type: gl.INT,
+				size: 1,
+            },
 		},
 		attribs: {
 			a_pos: {

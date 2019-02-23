@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform float u_pixel;
+uniform int u_rtx;
 
 varying vec2 v_rel;
 varying vec4 v_color;
@@ -30,6 +31,10 @@ void main() {
 		}
 
 		color.w *= fade;
+
+		if (fade == 0.0) {
+			discard;
+		}
 	}
 
 	gl_FragColor = color;

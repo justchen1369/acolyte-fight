@@ -95,6 +95,7 @@ export interface DrawTrails extends Draw {
 		u_scale: UniformInfo;
 		u_translate: UniformInfo;
 		u_pixel: UniformInfo;
+		u_rtx: UniformInfo;
 	};
 	attribs: {
 		a_pos: AttribInfo;

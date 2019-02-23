@@ -592,8 +592,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	const pos = hero.body.getPosition();
-
 	renderRangeIndicator(ctxStack, hero, world);
 	renderBuffs(ctxStack, hero, world); // Do this before applying translation
 
@@ -770,23 +768,24 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		radius += HeroColors.DamageGrowFactor * radius * flash;
 	}
 
+	let style = parseColor(color);
+	if (flash > 0) {
+		style = style.lighten(HeroColors.DamageGlowFactor * flash);
+	}
+
 	// Fill
 	{
-		let fillColor = parseColor(color);
-		if (flash > 0) {
-			fillColor = fillColor.lighten(HeroColors.DamageGlowFactor * flash);
-		}
 		let gradient: r.Gradient = null;
 		if (ctxStack.rtx >= r.GraphicsLevel.Normal) {
 			gradient = {
 				from: vector.plus(pos, pl.Vec2(-radius, -radius)),
-				fromColor: fillColor,
+				fromColor: style,
 				to: vector.plus(pos, pl.Vec2(radius, radius)),
-				toColor: fillColor.darken(0.5),
+				toColor: style.darken(0.5),
 			};
 		}
 		glx.circle(ctxStack, pos, {
-			color: fillColor,
+			color: style.darken(0.25),
 			gradient,
 			maxRadius: radius,
 		});
@@ -802,9 +801,9 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 			pl.Vec2(0, -1),
 			pl.Vec2(-1, -1),
 		];
-		let fillColor = parseColor("#fff").alpha(0.5);
+		let glyphColor = style.mix(parseColor('#fff'), 0.4);
 		glx.convex(ctxStack, pos, points, angle, radius, {
-			color: fillColor,
+			color: glyphColor,
 			maxRadius: radius,
 		});
 	}
@@ -1251,7 +1250,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	});
 
 	// Particles
-	if (strike.numParticles && ctxStack.rtx >= r.GraphicsLevel.Low) {
+	if (strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
 			const velocity = particleVelocity(projectile.body.getLinearVelocity());
 			world.ui.trails.push({
