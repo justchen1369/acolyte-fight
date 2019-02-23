@@ -55,8 +55,9 @@ export function initialWorld(mod: Object): w.World {
 	const settings = modToSettings(mod);
 
 	const def: pl.WorldDef = {
-		positionIterations: 3,
+		positionIterations: 2,
 		velocityIterations: 3,
+		warmStarting: true,
 		allowSleep: false,
 	};
 
