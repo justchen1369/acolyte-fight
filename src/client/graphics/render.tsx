@@ -887,15 +887,9 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		const color = parseColor(spell.color);
 		const fill = color.alpha(0.25);
 
-		// fill
-		glx.circle(ctxStack, pos, {
-			color: fill,
-			maxRadius: range,
-		});
-
 		// Stroke
 		const strokeWidth = ctxStack.pixel * 2;
-		const stroke = color.alpha(0.5);
+		const stroke = color.alpha(0.25);
 		const numSegments = 10;
 
 		const perSegment = 2 * Math.PI / numSegments;
