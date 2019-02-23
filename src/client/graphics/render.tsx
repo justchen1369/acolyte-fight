@@ -1390,17 +1390,18 @@ function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
-	let feather: r.FeatherConfig = null;
-	if (render.glow) {
-		feather = {
+	const curve: r.CurveShape = {
+		minRadius: 0,
+		maxRadius: render.width / 2,
+		feather: render.glow ? {
 			sigma: HeroColors.GlowRadius,
 			alpha: render.glow,
-		};
-	}
+		} : null,
+	};
 
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
-	glx.line(ctxStack, from, to, render.width / 2, Color(render.color), feather);
+	glx.line(ctxStack, from, to, Color(render.color), curve);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -1522,20 +1523,36 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const radius = scale * proportion * trail.radius;
 
-		glx.circle(ctxStack, pos, 0, radius, Color(color), feather);
+		glx.circle(ctxStack, pos, Color(color), {
+			minRadius: 0,
+			maxRadius: radius,
+			feather,
+		});
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
 
-		glx.line(ctxStack, trail.from, trail.to, lineWidth / 2, Color(color), feather);
+		glx.line(ctxStack, trail.from, trail.to, Color(color), {
+			minRadius: 0,
+			maxRadius: lineWidth / 2,
+			feather,
+		});
 	} else if (trail.type === "ripple") {
 		const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
 		const lineWidth = proportion * trail.initialRadius / 2;
 		
 		const minRadius = Math.max(0, radius - lineWidth / 2);
 		const maxRadius = radius + lineWidth / 2;
-		glx.circle(ctxStack, trail.pos, minRadius, maxRadius, Color(color).alpha(proportion), feather);
+		glx.circle(ctxStack, trail.pos, Color(color).alpha(proportion), {
+			minRadius,
+			maxRadius,
+			feather,
+		});
 	} else if (trail.type === "arc") {
-		glx.arc(ctxStack, trail.pos, trail.minRadius, trail.maxRadius, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion), feather);
+		glx.arc(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, Color(color).alpha(proportion), {
+			minRadius: trail.minRadius,
+			maxRadius: trail.maxRadius,
+			feather: feather,
+		});
 	}
 
 	return false;

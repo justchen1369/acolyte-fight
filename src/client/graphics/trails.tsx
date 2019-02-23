@@ -91,20 +91,14 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, col
 	++trails.numVertices;
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, color: Color, feather?: r.FeatherConfig) {
-	const extent = maxRadius + featherRadius(feather);
+export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, color: Color, curve: r.CurveShape) {
+	const extent = calculateExtent(curve);
 	const quad = [
 		pl.Vec2(-extent, -extent),
 		pl.Vec2(-extent, extent),
 		pl.Vec2(extent, extent),
 		pl.Vec2(extent, -extent),
 	];
-
-	const curve: r.CurveShape = {
-		minRadius,
-		maxRadius,
-		feather,
-	};
 
 	appendTrail(ctxStack, pos, quad[0], color, curve);
 	appendTrail(ctxStack, pos, quad[1], color, curve);
@@ -115,16 +109,10 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: numb
 	appendTrail(ctxStack, pos, quad[0], color, curve);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, halfWidth: number, color: Color, feather?: r.FeatherConfig) {
-	const extent = halfWidth + featherRadius(feather);
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, color: Color, curve: r.CurveShape) {
+	const extent = calculateExtent(curve);
 	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
-
-	const curve: r.CurveShape = {
-		minRadius: 0,
-		maxRadius: halfWidth,
-		feather,
-	};
 
 	appendTrail(ctxStack, from, up, color, curve);
 	appendTrail(ctxStack, from, down, color, curve);
@@ -135,14 +123,8 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, hal
 	appendTrail(ctxStack, to, down, color, curve);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number, maxRadius: number, angle1: number, angle2: number, antiClockwise: boolean, color: Color, feather?: r.FeatherConfig) {
-	const curve: r.CurveShape = {
-		minRadius,
-		maxRadius,
-		feather,
-	};
-
-    const extent = Math.sqrt(2) * (maxRadius + featherRadius(feather)); // sqrt(2) ensures the triangle always fully enclosees the arc
+export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, color: Color, curve: r.CurveShape) {
+    const extent = Math.sqrt(2) * calculateExtent(curve); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center = vector.zero();
 	const rels = new Array<pl.Vec2>();
@@ -175,6 +157,10 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, minRadius: number,
     }
 }
 
-function featherRadius(feather: r.FeatherConfig) {
-	return feather ? feather.sigma * FeatherFactor : 0.0;
+function calculateExtent(curve: r.CurveShape) {
+    let extent = curve.maxRadius;
+    if (curve.feather) {
+        extent += curve.feather.sigma * FeatherFactor;
+    }
+    return extent;
 }
