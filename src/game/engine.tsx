@@ -386,6 +386,7 @@ function addHero(world: w.World, heroId: string) {
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
 		retractorIds: new Map<string, string>(),
+		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
 		uiDestroyedBuffs: [],
 	} as w.Hero;
@@ -549,6 +550,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateExpireOnOwnerDeath(template, projectile, world);
 		} else if (template.type === "expireOnOwnerRetreat") {
 			behaviour = instantiateExpireOnOwnerRetreat(template, projectile, world);
+		} else if (template.type === "expireOnChannellingEnd") {
+			behaviour = instantiateExpireOnChannellingEnd(template, projectile, world);
 		}
 
 		const trigger = template.trigger;
@@ -636,6 +639,13 @@ function instantiateExpireOnOwnerRetreat(template: ExpireOnOwnerRetreatTemplate,
 	};
 }
 
+function instantiateExpireOnChannellingEnd(template: ExpireOnChannellingEndTemplate, projectile: w.Projectile, world: w.World): w.ExpireOnChannellingEndBehaviour {
+	return {
+		type: "expireOnChannellingEnd",
+		projectileId: projectile.id,
+	};
+}
+
 // Simulator
 export function tick(world: w.World) {
 	++world.tick;
@@ -677,6 +687,7 @@ export function tick(world: w.World) {
 		expireBuffs,
 		expireOnOwnerDeath,
 		expireOnOwnerRetreat,
+		expireOnChannellingEnd,
 	});
 
 	applyLavaDamage(world);
@@ -1448,6 +1459,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
+		case "focus": return focusAction(world, hero, action, spell);
 		case "saber": return saberAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
 		case "teleport": return teleportAction(world, hero, action, spell);
@@ -1466,6 +1478,15 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 
 		if (spell.debuff) {
 			hero.cleanseTick = world.tick;
+		}
+
+		if (spell.buffs) {
+			spell.buffs.forEach(template => {
+				const id = `${spell.id}/${template.type}`;
+				instantiateBuff(id, template, hero, world, {
+					channellingSpellId: spell.id,
+				});
+			});
 		}
 	}
 }
@@ -2024,9 +2045,9 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 function findHomingTarget(targetType: HomingType, projectile: w.Projectile, world: w.World) {
 	let target: pl.Vec2 = null;
 	if (targetType === w.HomingTargets.self) {
-		const targetObj = world.objects.get(projectile.owner);
-		if (targetObj) {
-			target = targetObj.body.getPosition();
+		const owner = world.objects.get(projectile.owner);
+		if (owner) {
+			target = owner.body.getPosition();
 		}
 	} else if (targetType === w.HomingTargets.enemy) {
 		const targetObj = world.objects.get(projectile.targetId);
@@ -2035,6 +2056,13 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 		}
 	} else if (targetType === w.HomingTargets.cursor) {
 		target = projectile.target;
+	} else if (targetType === w.HomingTargets.follow) {
+		target = projectile.target;
+
+		const owner = world.objects.get(projectile.owner);
+		if (owner && owner.category === "hero" && owner.target) {
+			target = owner.target;
+		}
 	}
 	return target;
 }
@@ -2247,6 +2275,21 @@ function expireOnOwnerRetreat(behaviour: w.ExpireOnOwnerRetreatBehaviour, world:
 
 	const hero = world.objects.get(projectile.owner);
 	if (!(hero && hero.category === "hero" && vector.distance(hero.body.getPosition(), projectile.body.getPosition()) <= behaviour.maxDistance)) {
+		projectile.expireTick = world.tick;
+		return false;
+	}
+
+	return true;
+}
+
+function expireOnChannellingEnd(behaviour: w.ExpireOnChannellingEndBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	const hero = world.objects.get(projectile.owner);
+	if (!(hero && hero.category === "hero" && hero.casting && hero.casting.action.type === projectile.type)) {
 		projectile.expireTick = world.tick;
 		return false;
 	}
@@ -2755,6 +2798,30 @@ function retractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: 
 	return true;
 }
 
+function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: FocusSpell) {
+	if (!action.target) { return true; }
+
+	if (world.tick == hero.casting.channellingStartTick) {
+		const focus = addProjectile(world, hero, action.target, spell, spell.projectile);
+		hero.focusIds.set(spell.id, focus.id);
+	}
+
+	let done = true;
+
+	const focusId = hero.focusIds.get(spell.id);
+	if (focusId) {
+		const focus = world.objects.get(focusId);
+		done = !(focus && focus.category === "projectile");
+	}
+
+	if (!done) {
+		// Keep resetting the cooldown until focus complete
+		setCooldown(world, hero, spell.id, spell.cooldown);
+	}
+
+	return done;
+}
+
 function teleportAction(world: w.World, hero: w.Hero, action: w.Action, spell: TeleportSpell) {
 	const Hero = world.settings.Hero;
 	if (!action.target) { return true; }
@@ -3054,15 +3121,7 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 	return true;
 }
 
-function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
-	if (world.tick == hero.casting.channellingStartTick) {
-		spell.buffs.forEach(template => {
-			const id = `${spell.id}/${template.type}`;
-			instantiateBuff(id, template, hero, world, {
-				channellingSpellId: spell.id,
-			});
-		});
-	}
+function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
 	return ![...hero.buffs.values()].some(b => b.channellingSpellId === spell.id);
 }
 

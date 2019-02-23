@@ -70,7 +70,7 @@ const Choices: ChoiceSettings = {
 		"q": [
             ["fireball", "flamestrike"],
             ["triplet", "difire"],
-            ["retractor"],
+            ["retractor", "rocket"],
             ["whip"],
         ],
 		"w": [
@@ -662,6 +662,76 @@ const retractor: Spell = {
         ],
     },
 };
+const rocket: Spell = {
+    id: 'rocket',
+    name: 'Rocket',
+    description: "Launch a guided rocket towards your enemy - move your cursor to turn the rocket. You are unable to move during rocket guidance as it takes full concentration. If anyone hits you, you lose control, and the rocket explodes.",
+    action: "focus",
+
+    color: '#00ffaa',
+    icon: "returnArrow",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
+
+    interruptibleAfterTicks: 0,
+    movementProportionWhileChannelling: 0.05,
+
+    projectile: {
+        damage: 0,
+        density: 1,
+        radius: 0.0035,
+        speed: 0.18,
+        maxTicks: 4.0 * TicksPerSecond,
+        collideWith: Categories.All,
+        expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
+
+        partialDamage: {
+            initialMultiplier: 0.5,
+            ticks: 0.5 * TicksPerSecond,
+        },
+
+        detonate: {
+            damage: 7.5,
+            radius: 0.03,
+            minImpulse: 0.00005,
+            maxImpulse: 0.00005,
+            renderTicks: 10,
+        },
+
+        strafe: {
+            expireOnHeroHit: true,
+        },
+
+        behaviours: [
+            {
+                type: "homing",
+                targetType: "follow",
+                revolutionsPerSecond: 0.01,
+            },
+            { type: "expireOnChannellingEnd" },
+        ],
+
+        sound: "retractor",
+        color: '#00ffaa',
+        renderers: [
+            {
+                type: "swirl",
+                color: '#00ffaa',
+                ticks: 30,
+                radius: 0.007,
+                particleRadius: 0.001,
+                numParticles: 2,
+                loopTicks: 30,
+            },
+            { type: "projectile", ticks: 1, glow: 0.1 },
+            { type: "ray", ticks: 20, glow: 0.1 },
+            { type: "strike", ticks: 20, glow: true, numParticles: 9 },
+        ],
+    },
+};
+
 
 const whip: Spell = {
     id: 'whip',
@@ -1548,6 +1618,7 @@ const Spells = {
     homing,
     boomerang,
     retractor,
+    rocket,
     whip,
     bouncer,
     drain,

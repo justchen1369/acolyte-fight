@@ -140,6 +140,7 @@ declare type Spell =
 	| ProjectileSpell
 	| ReflectSpell
 	| RetractorSpell
+	| FocusSpell
 	| SaberSpell
 	| SpraySpell
 	| ScourgeSpell
@@ -168,7 +169,9 @@ declare interface SpellBase {
     cooldown: number;
     interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
     movementCancel?: boolean; // Whether moving cancels the spell.
-    knockbackCancel?: KnockbackCancelParams; // If this spell is being channelled, whether knockback cancels it.
+	knockbackCancel?: KnockbackCancelParams; // If this spell is being channelled, whether knockback cancels it.
+	
+	buffs?: BuffTemplate[]
 
     icon?: string;
 
@@ -216,6 +219,12 @@ declare interface RetractorSpell extends SpellBase {
 
 	retractCooldownTicks: number; // Must wait this many ticks before retracting
 	retractBehaviours: BehaviourTemplate[]; // Add these behaviours to the projectile when retracted
+}
+
+declare interface FocusSpell extends SpellBase {
+	action: "focus";
+	
+	projectile: ProjectileTemplate;
 }
 
 declare interface ProjectileTemplate extends DamagePacketTemplate {
@@ -291,8 +300,13 @@ declare type BehaviourTemplate =
 	| UpdateCollideWithTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
+	| ExpireOnChannellingEndTemplate
 
-declare type HomingType = "self" | "enemy" | "cursor";
+declare type HomingType =
+	"self" // Home towards the owner (e.g. for self-orbiting projectiles)
+	| "enemy" // Home towards the enemy
+	| "cursor" // Home towards where the user initially clicked when they shot this projectile
+	| "follow" // Home towards where the user's mouse is right now
 
 declare interface BehaviourTemplateBase {
 	type: string;
@@ -307,7 +321,7 @@ declare interface BehaviourTrigger {
 declare interface HomingTemplate extends BehaviourTemplateBase {
 	type: "homing";
 
-	targetType?: HomingType; // Whether to home towards "self", "enemy" or "cursor". Defaults to "enemy".
+	targetType?: HomingType; // Whether to home towards "self", "enemy", "cursor" or "follow". Defaults to "enemy".
 
 	revolutionsPerSecond?: number; // The maximum turn rate of the homing projectile. Defaults to infinity
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
@@ -344,6 +358,9 @@ declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {
 declare interface ExpireOnOwnerRetreatTemplate extends BehaviourTemplateBase {
 	type: "expireOnOwnerRetreat";
 	maxDistance: number;
+}
+declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
+	type: "expireOnChannellingEnd";
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {

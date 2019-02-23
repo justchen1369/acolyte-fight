@@ -384,6 +384,7 @@ export interface Hero extends WorldObjectBase {
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	retractorIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
+	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 
 	link?: LinkState;
 	thrust?: ThrustState;
@@ -637,6 +638,7 @@ export namespace HomingTargets {
 	export const enemy = "enemy";
 	export const self = "self";
 	export const cursor = "cursor";
+	export const follow = "follow";
 }
 
 export type Behaviour =
@@ -658,6 +660,7 @@ export type Behaviour =
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
 	| ExpireOnOwnerRetreatBehaviour
+	| ExpireOnChannellingEndBehaviour
 
 export interface BehaviourBase {
 	type: string;
@@ -783,6 +786,11 @@ export interface ExpireOnOwnerRetreatBehaviour extends BehaviourBase {
 	projectileId: string;
 	anchorPoint: pl.Vec2;
 	maxDistance: number;
+}
+
+export interface ExpireOnChannellingEndBehaviour extends BehaviourBase {
+	type: "expireOnChannellingEnd";
+	projectileId: string;
 }
 
 export type WorldObject =
