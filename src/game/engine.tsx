@@ -2352,23 +2352,29 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 
 		if (other.category === "hero" || other.category === "obstacle") {
 			const proportion = 1.0 - (distance / explosionRadius);
-			const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
-			const direction = vector.relengthen(diff, magnitude);
-			other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-			world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
 
 			const packet: w.DamagePacket = {
 				...innerDamagePacket,
 				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
 			};
+			let applyKnockback = false;
 			if (other.category === "hero") {
 				const alliance = calculateAlliance(owner, other.id, world);
 				if ((alliance & Alliances.NotFriendly) > 0) {
 					applyDamage(other, packet, world);
 					expireOnHeroHit(other, world);
+					applyKnockback = true;
 				}
 			} else {
 				applyDamageToObstacle(other, packet, world);
+				applyKnockback = true;
+			}
+
+			if (applyKnockback) {
+				const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
+				const direction = vector.relengthen(diff, magnitude);
+				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
+				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
 			}
 		} else if (other.category === "projectile") {
 			if (destructibleBy(other, owner, world)) {
