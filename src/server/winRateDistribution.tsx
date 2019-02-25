@@ -57,7 +57,7 @@ export async function calculateWinRateDistribution() {
 
                 ++bucket.numGames;
                 bucket.weightedGames += weight;
-                if (winner >= loser) {
+                if (winner.aco >= loser.aco) {
                     ++bucket.numExpected;
                     bucket.weightedExpected += weight;
                 }
