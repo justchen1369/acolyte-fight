@@ -13,7 +13,7 @@ export async function calculateWinRateDistribution() {
     const buckets = new Array<Bucket>();
 
     await statsStorage.loadAllGames(game => {
-        if (game.players.some(p => !!p.teamId)) {
+        if (game.winners && game.winners.length > 1) {
             return; // Ignore team games
         }
 
@@ -26,11 +26,11 @@ export async function calculateWinRateDistribution() {
                 const diff = winner - loser;
                 const distance = Math.abs(diff);
 
-                const index = distance / BucketRange;
+                const index = Math.floor(distance / BucketRange);
                 let bucket = buckets[index];
                 if (!bucket) {
-                    bucket = {
-                        distance,
+                    bucket = buckets[index] = {
+                        distance: index * BucketRange,
                         numGames: 0,
                         numExpected: 0,
                     };
@@ -45,5 +45,5 @@ export async function calculateWinRateDistribution() {
         }
     });
 
-    return buckets;
+    return buckets.filter(b => !!b);
 }
