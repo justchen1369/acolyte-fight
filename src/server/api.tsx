@@ -22,6 +22,7 @@ import * as percentiles from './percentiles';
 import * as sanitize from '../game/sanitize';
 import * as statsStorage from './statsStorage';
 import * as userStorage from './userStorage';
+import * as winRateDistribution from './winRateDistribution';
 
 import { getAuthToken } from './auth';
 import { getLocation } from './mirroring';
@@ -513,4 +514,18 @@ export async function onGetLeaderboardAsync(req: express.Request, res: express.R
 
 function isLinkedAuthToken(authToken: string) {
     return facebook.isFacebookAuthToken(authToken) || kongregate.isKongregateAuthToken(authToken);
+}
+
+export function onGetWinRateDistribution(req: express.Request, res: express.Response) {
+    onGetWinRateDistributionAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetWinRateDistributionAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    const distribution = await winRateDistribution.calculateWinRateDistribution();
+    res.send(distribution);
 }

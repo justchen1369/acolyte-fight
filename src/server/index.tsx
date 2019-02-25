@@ -99,6 +99,7 @@ app.get('/api/ratingAtPercentile', (req, res) => api.onGetRatingAtPercentile(req
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));
 app.post('/api/settings', (req, res) => api.onUpdateUserSettings(req, res));
+app.get('/api/winRateDistribution', (req, res) => api.onGetWinRateDistribution(req, res));
 app.get('/login', (req, res) => api.onDiscordLogin(req, res));
 app.get('/status', (req, res) => api.onExternalStatus(req, res));
 app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));

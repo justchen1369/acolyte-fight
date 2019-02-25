@@ -29,6 +29,8 @@ interface UpdateRatingsResult {
 }
 
 interface PlayerRatingUpdate {
+    isRanked: boolean;
+
     initialNumGames: number;
 
     initialAco: number;
@@ -259,6 +261,16 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
     });
 
     return games;
+}
+
+export async function loadAllGames(callback: (game: m.GameStatsMsg) => void) {
+    const firestore = getFirestore();
+    let query = firestore.collection(Collections.Game);
+
+    await dbStorage.stream(query, gameDoc => {
+        const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
+        callback(game);
+    });
 }
 
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
@@ -506,6 +518,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                 const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
 
                 result[playerDelta.userId] = {
+                    isRanked,
                     initialNumGames: initialRating.numGames,
                     initialAco: initialRating.aco,
                     initialAcoGames: initialRating.acoGames,
@@ -517,6 +530,16 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                 for (const change of playerDelta.changes) {
                     selfRating.acoUnranked += change.delta;
                 }
+
+                result[playerDelta.userId] = {
+                    isRanked,
+                    initialNumGames: initialRating.numGames,
+                    initialAco: initialRating.aco,
+                    initialAcoGames: null,
+                    initialAcoExposure: null,
+                    acoChanges: [],
+                    acoDelta: null,
+                };
             }
         }
 
@@ -705,14 +728,19 @@ function applyRatingDeltas(gameStats: m.GameStatsMsg, updateResult: UpdateRating
     for (const player of gameStats.players) {
         const update = updateResult[player.userId]; 
         if (update) {
-            player.initialNumGames = update.initialNumGames;
+            if (update.isRanked) {
+                player.initialNumGames = update.initialNumGames;
 
-            player.initialAco = update.initialAco;
-            player.initialAcoGames = update.initialAcoGames;
-            player.initialAcoExposure = update.initialAcoExposure;
+                player.initialAco = update.initialAco;
+                player.initialAcoGames = update.initialAcoGames;
+                player.initialAcoExposure = update.initialAcoExposure;
 
-            player.acoDelta = update.acoDelta;
-            player.acoChanges = update.acoChanges;
+                player.acoDelta = update.acoDelta;
+                player.acoChanges = update.acoChanges;
+            } else {
+                player.initialNumGames = update.initialNumGames;
+                player.initialAco = update.initialAco;
+            }
         }
     }
 }
