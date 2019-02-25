@@ -534,7 +534,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                 result[playerDelta.userId] = {
                     isRanked,
                     initialNumGames: initialRating.numGames,
-                    initialAco: initialRating.aco,
+                    initialAco: initialRating.acoUnranked,
                     initialAcoGames: null,
                     initialAcoExposure: null,
                     acoChanges: [],
