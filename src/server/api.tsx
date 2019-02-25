@@ -527,5 +527,26 @@ export async function onGetWinRateDistributionAsync(req: express.Request, res: e
     }
 
     const distribution = await winRateDistribution.calculateWinRateDistribution();
-    res.send(distribution);
+    if (req.header('content-type') === "application/json") {
+        res.send(distribution);
+    } else {
+        res.send(jsonToCsv(distribution));
+    }
+}
+
+function jsonToCsv(array: any[]) {
+    if (array.length === 0) {
+        return "";
+    }
+
+    const rows = new Array<string>();
+
+    const keys = Object.keys(array[0]);
+    rows.push(keys.join(","));
+
+    for (const obj of array) {
+        rows.push(keys.map(k => `${obj[k]}`).join(","));
+    }
+
+    return rows.join("\n");
 }
