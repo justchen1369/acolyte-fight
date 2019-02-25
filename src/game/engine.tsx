@@ -2330,10 +2330,14 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		...projectile.detonate,
 		damage: projectile.detonate.damage * multiplier,
 		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * multiplier,
-		minImpulse: projectile.detonate.minImpulse * multiplier,
-		maxImpulse: projectile.detonate.maxImpulse * multiplier,
-		radius: (projectile.partialDamage && projectile.partialDamage.affectRadius) ? (projectile.detonate.radius * multiplier) : projectile.detonate.radius,
 	};
+
+	const partialDetonate = detonate.partialScaling !== undefined ? detonate.partialScaling : true;
+	if (partialDetonate) {
+		detonate.minImpulse = projectile.detonate.minImpulse * multiplier;
+		detonate.maxImpulse = projectile.detonate.maxImpulse * multiplier;
+		detonate.radius = projectile.detonate.radius * multiplier;
+	}
 	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.color, projectile.sound);
 
 	// Don't allow for repeats

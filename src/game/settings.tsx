@@ -690,11 +690,11 @@ const rocket: Spell = {
         partialDamage: {
             initialMultiplier: 0.5,
             ticks: 1 * TicksPerSecond,
-            affectRadius: true,
         },
 
         detonate: {
             damage: 0,
+            partialScaling: true,
             radius: 0.04,
             minImpulse: 0.0003,
             maxImpulse: 0.0004,
@@ -1259,7 +1259,7 @@ const mines: Spell = {
     jitterRatio: 1.0,
 
     projectile: {
-        density: 10,
+        density: 1,
         radius: 0.004,
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
@@ -1281,6 +1281,7 @@ const mines: Spell = {
         detonate: {
             damage: 4,
             damageScaling: false,
+            partialScaling: false,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,

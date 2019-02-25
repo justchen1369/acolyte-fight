@@ -280,7 +280,6 @@ declare interface DestructibleParameters {
 declare interface PartialDamageParameters {
 	initialMultiplier: number; // Initially, the projectile initially does this multiplier
 	ticks: number; // The projectile grows to full damage when it reaches this lifetime
-	affectRadius?: boolean; // Whether to affect the detonate radius as well
 	step?: boolean; // Grow from initial to full damage at ticks in one step, rather than linear growth
 }
 
@@ -632,6 +631,7 @@ declare interface LinkParameters {
 declare interface DamagePacketTemplate {
 	damage: number;
 	damageScaling?: boolean;
+	partialScaling?: boolean; // Whether to be affected by PartialDamageParameters
 	lifeSteal?: number;
 	isLava?: boolean;
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping
