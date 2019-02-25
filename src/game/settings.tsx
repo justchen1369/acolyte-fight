@@ -1259,7 +1259,7 @@ const mines: Spell = {
     jitterRatio: 1.0,
 
     projectile: {
-        density: 1,
+        density: 10,
         radius: 0.004,
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
