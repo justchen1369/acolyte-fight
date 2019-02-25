@@ -1263,6 +1263,7 @@ const mines: Spell = {
         radius: 0.004,
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
+        minTicks: 1, // Ensure mines knockback on their first tick
         damage: 0,
 
         categories: Categories.Projectile,
