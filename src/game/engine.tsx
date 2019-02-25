@@ -2537,12 +2537,14 @@ function captureSnapshot(world: w.World) {
 		return;
 	}
 
+	const obstacles = world.tick % constants.ObstacleSnapshotTicks === 0;
+
 	const snapshot: w.Snapshot = {
 		tick: world.tick,
 		objectLookup: new Map<string, w.ObjectSnapshot>(),
 	};
 	world.objects.forEach(obj => {
-		if (obj.category === "hero" || obj.category === "obstacle") {
+		if (obj.category === "hero" || (obstacles && obj.category === "obstacle")) {
 			const objSnapshot: w.ObjectSnapshot = {
 				pos: vector.clone(obj.body.getPosition()),
 				health: obj.health,
