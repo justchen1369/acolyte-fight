@@ -323,12 +323,13 @@ export interface Syncing extends Snapshot {
 
 export interface Snapshot {
 	tick: number;
-	heroLookup: Map<string, HeroSnapshot>;
+	objectLookup: Map<string, ObjectSnapshot>;
 }
 
-export interface HeroSnapshot {
+export interface ObjectSnapshot {
 	pos: pl.Vec2;
-	health: number;
+	angle?: number;
+	health?: number;
 }
 
 export interface WorldObjectBase {

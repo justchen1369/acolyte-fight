@@ -916,29 +916,38 @@ function handleSync(ev: w.Syncing, world: w.World) {
 	const mySnapshot = dequeueSnapshot(ev.tick, world);
 	const theirSnapshot: w.Snapshot = ev;
 
-	for (const heroId of theirSnapshot.heroLookup.keys()) {
-		const myHeroSnapshot = mySnapshot.heroLookup.get(heroId);
-		const theirHeroSnapshot = theirSnapshot.heroLookup.get(heroId);
+	for (const objId of theirSnapshot.objectLookup.keys()) {
+		const myHeroSnapshot = mySnapshot.objectLookup.get(objId);
+		const theirHeroSnapshot = theirSnapshot.objectLookup.get(objId);
 
-		const hero = world.objects.get(heroId);
-		if (!(hero && hero.category === "hero")) {
+		const obj = world.objects.get(objId);
+		if (!(obj)) {
 			// Cannot sync non-existent hero
 			continue;
 		}
 
 		if (myHeroSnapshot && !theirHeroSnapshot) {
-			// Sync hero death
-			hero.health = 0;
+			// Sync death
+			if (obj.category === "hero" || obj.category === "obstacle") {
+				obj.health = 0;
+			}
 		} else if (!(myHeroSnapshot && theirHeroSnapshot)) {
 			// Dead in my version but not in theirs, can't sync this
 		} else {
-			const healthDiff = theirHeroSnapshot.health - myHeroSnapshot.health;
-			hero.health = Math.min(hero.maxHealth, hero.health + healthDiff);
+			if ((obj.category === "hero" || obj.category === "obstacle") &&
+				(myHeroSnapshot.health !== undefined && theirHeroSnapshot.health !== undefined)) {
+				const healthDiff = theirHeroSnapshot.health - myHeroSnapshot.health;
+				obj.health = Math.min(obj.maxHealth, obj.health + healthDiff);
+			}
+			if (myHeroSnapshot.angle !== undefined && theirHeroSnapshot.angle !== undefined) {
+				const angleDiff = theirHeroSnapshot.angle - myHeroSnapshot.angle;
+				obj.body.setAngle(obj.body.getAngle() + angleDiff);
+			}
 
 			const posDiff = vector.diff(theirHeroSnapshot.pos, myHeroSnapshot.pos);
-			let position = hero.body.getPosition();
+			let position = obj.body.getPosition();
 			position = vector.plus(position, posDiff);
-			hero.body.setPosition(position);
+			obj.body.setPosition(position);
 		}
 	}
 }
@@ -2530,14 +2539,18 @@ function captureSnapshot(world: w.World) {
 
 	const snapshot: w.Snapshot = {
 		tick: world.tick,
-		heroLookup: new Map<string, w.HeroSnapshot>(),
+		objectLookup: new Map<string, w.ObjectSnapshot>(),
 	};
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			snapshot.heroLookup.set(hero.id, {
-				pos: vector.clone(hero.body.getPosition()),
-				health: hero.health,
-			});
+	world.objects.forEach(obj => {
+		if (obj.category === "hero" || obj.category === "obstacle") {
+			const objSnapshot: w.ObjectSnapshot = {
+				pos: vector.clone(obj.body.getPosition()),
+				health: obj.health,
+			};
+			if (obj.category === "obstacle") {
+				objSnapshot.angle = obj.body.getAngle();
+			}
+			snapshot.objectLookup.set(obj.id, objSnapshot);
 		}
 	});
 	world.snapshots.push(snapshot);

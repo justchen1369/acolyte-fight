@@ -190,7 +190,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				keyBindings: actionData.keyBindings,
 			});
 		} else if (actionData.actionType === m.ActionType.Sync) {
-			const heroLookup = new Map<string, w.HeroSnapshot>();
+			const heroLookup = new Map<string, w.ObjectSnapshot>();
 			actionData.heroes.forEach(snapshot => {
 				heroLookup.set(snapshot.heroId, {
 					health: snapshot.health,
@@ -200,7 +200,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 			world.occurrences.push({
 				type: "sync",
 				tick: actionData.tick,
-				heroLookup,
+				objectLookup: heroLookup,
 			});
 		}
 	});
@@ -218,7 +218,7 @@ function sendSnapshot(world: w.World) {
 	world.ui.sentSnapshotTick = snapshot.tick;
 
 	const heroes = new Array<m.HeroSyncMsg>();
-	snapshot.heroLookup.forEach((heroSnapshot, heroId) => {
+	snapshot.objectLookup.forEach((heroSnapshot, heroId) => {
 		heroes.push({
 			heroId,
 			health: heroSnapshot.health,
