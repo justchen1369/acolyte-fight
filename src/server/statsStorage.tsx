@@ -20,7 +20,7 @@ import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
 
-const Aco = new aco.Aco(constants.Placements.AcoK, constants.Placements.AcoR, constants.Placements.AcoPower);
+const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 1 * 60 * 60;
 

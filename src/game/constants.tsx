@@ -50,10 +50,6 @@ export namespace Placements {
 	export const ActivityBonusPerGame = 3;
 	export const MaxActivityGames = 100;
 
-	export const AcoK = 10;
-	export const AcoR = 800;
-	export const AcoPower = 1;
-
 	export const AcoDecayLengthDays = 21;
 
 	export const RdDecayPerDay = 1.5;
