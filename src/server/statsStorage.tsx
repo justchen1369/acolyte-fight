@@ -23,7 +23,6 @@ const MaxLeaderboardLength = 100;
 const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
-const AcoDeflateInterval = 8 * 60 * 60;
 
 interface UpdateRatingsResult {
     [userId: string]: PlayerRatingUpdate;
@@ -353,7 +352,12 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
                 return;
             }
 
-            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.acoGames) * 24 * 60 * 60 * 1000;
+            if (!ratings.acoGames) {
+                // Require the player to have played a ranked game recently
+                return;
+            }
+
+            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.numGames) * 24 * 60 * 60 * 1000;
             const age = now - user.accessed.toMillis();
             if (age > maxAge) {
                 return;
@@ -387,8 +391,8 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
     return { leaderboard: result };
 }
 
-function calculateMaxLeaderboardAgeInDays(acoGames: number) {
-    return Math.min(30, acoGames);
+function calculateMaxLeaderboardAgeInDays(numGames: number) {
+    return Math.min(30, numGames / 10);
 }
 
 export async function deflateAcoIfNecessary(category: string) {
