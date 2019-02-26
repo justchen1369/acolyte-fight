@@ -388,7 +388,7 @@ function calculateMaxLeaderboardAgeInDays(acoGames: number) {
     return Math.min(30, acoGames);
 }
 
-export async function decayAco() {
+export async function decrementAco() {
     const firestore = getFirestore();
     const unix = moment().unix() - AcoDecayLength;
     const query = firestore.collection(Collections.AcoDecay).where('unixCeiling', '<=', unix);

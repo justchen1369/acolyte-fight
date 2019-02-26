@@ -110,10 +110,12 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
-setInterval(() => {
+setInterval(async () => {
 	modder.cleanupOldRooms(1);
-	statsStorage.cleanupGames(7);
+	await statsStorage.cleanupGames(7);
+	await statsStorage.decrementAco();
 }, cleanupIntervalMinutes * 60 * 1000);
+statsStorage.decrementAco(); // don't await
 
 setInterval(() => {
 	const status = api.getInternalStatus();
