@@ -335,11 +335,12 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
             chunk = query;
         }
 
-        let addedAny = false;
+        let sawAny = false;
         await dbStorage.stream(chunk, doc => {
             if (seen.has(doc.id)) {
                 return;
             }
+            sawAny = true;
             seen.add(doc.id);
 
             const user = doc.data() as db.User;
@@ -357,7 +358,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
                 return;
             }
 
-            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.numGames) * 24 * 60 * 60 * 1000;
+            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.acoGames) * 24 * 60 * 60 * 1000;
             const age = now - user.accessed.toMillis();
             if (age > maxAge) {
                 return;
@@ -376,10 +377,10 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
                 killsPerGame: ratings.killsPerGame,
                 damagePerGame: ratings.damagePerGame,
             });
-            addedAny = true;
+            sawAny = true;
         });
 
-        if (!addedAny) {
+        if (!sawAny) {
             break;
         }
     }
@@ -391,8 +392,8 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
     return { leaderboard: result };
 }
 
-function calculateMaxLeaderboardAgeInDays(numGames: number) {
-    return Math.min(30, numGames / 10);
+function calculateMaxLeaderboardAgeInDays(acoGames: number) {
+    return Math.min(30, acoGames);
 }
 
 export async function deflateAcoIfNecessary(category: string) {
