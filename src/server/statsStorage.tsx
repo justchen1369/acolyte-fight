@@ -22,7 +22,7 @@ const MaxLeaderboardLength = 100;
 
 const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
-const AcoDecayInterval = 1 * 60 * 60;
+const AcoDecayInterval = 8 * 60 * 60;
 
 interface UpdateRatingsResult {
     [userId: string]: PlayerRatingUpdate;
