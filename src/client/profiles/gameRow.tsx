@@ -104,18 +104,29 @@ class GameRow extends React.PureComponent<Props, State> {
 
     private renderRatingChange(change: m.AcoChangeMsg) {
         const game = this.props.game;
-        const others = [...game.players.values()].filter(p => p.teamId === change.otherTeamId).map(p => p.name);
+        if (change.otherTeamId && change.e) {
+            const others = [...game.players.values()].filter(p => p.teamId === change.otherTeamId).map(p => p.name);
 
-        const odds = (1 / (1 - change.e)) - 1;
-        return <div className="adjustment-detail">
-            <div className="adjustment-label">
-                <div className="adjustment-label-title">{change.delta >= 0 ? "Won vs" : "Lost vs"} {others.join(", ")}</div>
-                {change.delta >= 0 && <div className="adjustment-label-subtitle">Would have lost {mathUtils.deltaPrecision(-change.delta * odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
-                {change.delta < 0 && <div className="adjustment-label-subtitle">Would have gained {mathUtils.deltaPrecision(-change.delta / odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
+            const odds = (1 / (1 - change.e)) - 1;
+            return <div className="adjustment-detail">
+                <div className="adjustment-label">
+                    <div className="adjustment-label-title">{change.delta >= 0 ? "Won vs" : "Lost vs"} {others.join(", ")}</div>
+                    {change.delta >= 0 && <div className="adjustment-label-subtitle">Would have lost {mathUtils.deltaPrecision(-change.delta * odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
+                    {change.delta < 0 && <div className="adjustment-label-subtitle">Would have gained {mathUtils.deltaPrecision(-change.delta / odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
+                </div>
+                <div className="spacer" />
+                {this.renderRatingDelta(change.delta)}
             </div>
-            <div className="spacer" />
-            {this.renderRatingDelta(change.delta)}
-        </div>
+        } else {
+            return <div className="adjustment-detail">
+                <div className="adjustment-label">
+                    <div className="adjustment-label-title">Activity bonus</div>
+                    <div className="adjustment-label-subtitle">Up to +{constants.Placements.AcoDeflatePerDay} per day, if on leaderboard</div>
+                </div>
+                <div className="spacer" />
+                {this.renderRatingDelta(change.delta)}
+            </div>
+        }
     }
 
     private gameUrl(game: p.GameRow): string {

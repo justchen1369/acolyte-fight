@@ -102,7 +102,7 @@ export interface PlayerStats {
 }
 
 export interface AcoChangeMsg {
-    otherTeamId: string;
+    otherTeamId?: string;
     delta: number;
-    e: number;
+    e?: number;
 }

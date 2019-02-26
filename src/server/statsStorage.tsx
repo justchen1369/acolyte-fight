@@ -36,6 +36,7 @@ interface PlayerRatingUpdate {
 
     initialAco: number;
     initialAcoGames: number;
+    initialAcoDeflate: number;
     initialAcoExposure: number;
 
     acoChanges: m.AcoChangeMsg[];
@@ -446,50 +447,6 @@ async function deflateAco(category: string, decayPerInterval: number) {
     }
 
     logger.info(`Deflated ${numAffected} aco ratings`);
-
-    /*
-    const unix = moment().unix() - AcoDecayLength;
-    const query = firestore.collection(Collections.AcoDecay).where('unixCeiling', '<=', unix);
-
-    let numAffected = 0;
-    await dbStorage.stream(query, async (oldDecayDoc) => {
-        ++numAffected;
-
-        await firestore.runTransaction(async (transaction) => {
-            // Re-retrieve the decay so that we lock it in a transaction and don't decay twice
-            const newDecayDoc = await transaction.get(firestore.collection(Collections.AcoDecay).doc(oldDecayDoc.id));
-            if (!newDecayDoc.exists) {
-                return;
-            }
-
-            const decay = newDecayDoc.data() as db.AcoDecay;
-
-            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(decay.userId));
-            if (!userDoc.exists) {
-                return;
-            }
-            const dbUser = userDoc.data() as db.User;
-
-            // Calculate decay
-            const rating = dbToUserRating(dbUser, decay.category);
-            // rating.aco -= decay.acoDelta; // Don't decay the rating, just the bonus
-            rating.acoGames -= decay.acoGamesDelta;
-
-            // Save decay
-            const loggedIn = userStorage.dbUserLoggedIn(dbUser);
-            const dbUserRating = userRatingToDb(rating, loggedIn);
-            const delta: Partial<db.User> = {
-                ratings: { [decay.category]: dbUserRating },
-            };
-            transaction.update(userDoc.ref, delta);
-
-            // Don't apply this decay again
-            transaction.delete(oldDecayDoc.ref);
-        });
-    });
-
-    logger.info(`Decayed ${numAffected} aco ratings`);
-    */
 }
 
 export async function decrementAco() {
@@ -643,7 +600,10 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
             }
 
             if (isRanked) {
+                const changes = [...playerDelta.changes];
+
                 const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
+
                 for (const change of playerDelta.changes) {
                     selfRating.aco += change.delta;
 
@@ -652,7 +612,16 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                         selfRating.acoUnranked += change.delta;
                     }
                 }
+
+                if (selfRating.acoDeflate > 0) {
+                    const inflate = Math.min(selfRating.acoDeflate, constants.Placements.AcoInflatePerGame);
+                    selfRating.acoDeflate -= inflate;
+
+                    changes.push({ delta: inflate });
+                }
+
                 ++selfRating.acoGames;
+
                 const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
 
                 result[playerDelta.userId] = {
@@ -660,8 +629,9 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                     initialNumGames: initialRating.numGames,
                     initialAco: initialRating.aco,
                     initialAcoGames: initialRating.acoGames,
+                    initialAcoDeflate: initialRating.acoDeflate,
                     initialAcoExposure: initialExposure,
-                    acoChanges: playerDelta.changes,
+                    acoChanges: changes,
                     acoDelta: finalExposure - initialExposure,
                 };
             } else {
@@ -673,6 +643,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                     isRanked,
                     initialNumGames: initialRating.numGames,
                     initialAco: initialRating.acoUnranked,
+                    initialAcoDeflate: null,
                     initialAcoGames: null,
                     initialAcoExposure: null,
                     acoChanges: [],

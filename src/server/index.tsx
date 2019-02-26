@@ -114,8 +114,10 @@ setInterval(async () => {
 	modder.cleanupOldRooms(1);
 	await statsStorage.cleanupGames(7);
 	await statsStorage.decrementAco();
+	await statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP);
 }, cleanupIntervalMinutes * 60 * 1000);
 statsStorage.decrementAco(); // don't await
+statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP); // don't await
 
 setInterval(() => {
 	const status = api.getInternalStatus();
