@@ -325,12 +325,11 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
 
     const seen = new Set<string>();
     let result = new Array<m.LeaderboardPlayer>();
+    let next: number = null;
     while (result.length < MaxLeaderboardLength) {
         let chunk;
-        if (result.length > 0) {
-            const lowestPlayer = result[result.length - 1];
-            const lowest = lowestPlayer.acoExposure;
-            chunk = query.where(`ratings.${category}.acoExposure`, '<=', lowest);
+        if (next !== null) {
+            chunk = query.where(`ratings.${category}.acoExposure`, '<=', next);
         } else {
             chunk = query;
         }
@@ -344,16 +343,15 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
             seen.add(doc.id);
 
             const user = doc.data() as db.User;
-            if (!(user && user.accessed && user.ratings && user.ratings[category])) {
+
+            if (!(user && user.ratings && user.ratings[category])) {
                 return;
             }
 
             const ratings = user.ratings[category];
-            if (!ratings.numGames) {
-                return;
-            }
+            next = ratings.acoExposure; // Set the marker for the next iteration
 
-            if (!ratings.acoGames) {
+            if (!(ratings.numGames && ratings.acoGames && user.accessed)) {
                 // Require the player to have played a ranked game recently
                 return;
             }
