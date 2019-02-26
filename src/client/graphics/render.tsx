@@ -357,6 +357,8 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderTeleport(ctxStack, ev, world);
 	} else if (ev.type === "push") {
 		renderPush(ctxStack, ev, world);
+	} else if (ev.type === "vanish") {
+		renderVanish(ctxStack, ev, world);
 	} else {
 		return;
 	}
@@ -384,6 +386,32 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 			pos: ev.pos,
 		});
 	}
+}
+
+function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.World) {
+	const NumParticles = 10;
+
+	const hero = world.objects.get(ev.heroId);
+	if (hero && hero.category === "hero" && (world.tick - ev.tick) < constants.TicksPerSecond) {
+		for (let i = 0; i < NumParticles; ++i) {
+			renderVanishSmoke(ctxStack, hero, world, ev.pos);
+		}
+	}
+}
+
+function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, pos?: pl.Vec2) {
+	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(thrust);
+
+	world.ui.trails.push({
+		type: 'circle',
+		initialTick: world.tick,
+		max: 60,
+		pos: pos || vector.clone(hero.body.getPosition()),
+		fillStyle: "#111",
+		radius: hero.radius,
+		velocity,
+	});
 }
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
@@ -813,18 +841,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 }
 
 function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, invisible: w.VanishBuff, world: w.World) {
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
-
-	world.ui.trails.push({
-		type: 'circle',
-		initialTick: world.tick,
-		max: 60,
-		pos: vector.clone(hero.body.getPosition()),
-		fillStyle: "#111",
-		radius: hero.radius,
-		velocity,
-	});
+	renderVanishSmoke(ctxStack, hero, world);
 }
 
 function playHeroSounds(hero: w.Hero, world: w.World) {

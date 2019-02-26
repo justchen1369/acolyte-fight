@@ -805,6 +805,7 @@ export type WorldEvent =
 	| LifeStealEvent
 	| TeleportEvent
 	| PushEvent
+	| VanishEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -831,6 +832,13 @@ export interface TeleportEvent extends WorldEventBase {
 	toPos: pl.Vec2;
 	heroId: string;
 	sound?: string;
+}
+
+export interface VanishEvent extends WorldEventBase {
+	type: "vanish";
+	heroId: string;
+	pos: pl.Vec2;
+	appear: boolean;
 }
 
 export interface PushEvent extends WorldEventBase {

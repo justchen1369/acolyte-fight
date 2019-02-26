@@ -2230,6 +2230,10 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 			buff.destroyedTick = world.tick;
 			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
 			hero.uiDestroyedBuffs.push(buff);
+
+			if (buff.type === "vanish") {
+				world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: true });
+			}
 		}
 	});
 
@@ -3181,6 +3185,8 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			initialPos: vector.clone(hero.body.getPosition()),
 		};
 		hero.buffs.set(id, hero.invisible);
+
+		world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: false });
 	} else if (template.type === "lifeSteal") {
 		hero.buffs.set(id, {
 			...base, id, type: "lifeSteal",
