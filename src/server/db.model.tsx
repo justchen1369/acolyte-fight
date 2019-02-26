@@ -1,10 +1,13 @@
 import * as Firestore from '@google-cloud/firestore';
 import * as m from '../game/messages.model';
 
+export const Singleton = 'singleton';
+
 export namespace Collections {
     export const User = 'user';
     export const UserRatingHistory = 'ratingHistory';
     export const AcoDecay = 'acoDecay';
+    export const RatingDecay = 'ratingDecay';
     export const Game = 'game';
     export const GlobalMod = 'mod';
 }
@@ -38,6 +41,7 @@ export interface UserRating {
     aco?: number;
     acoGames?: number;
     acoUnranked?: number;
+    acoDeflate?: number;
     numGames: number;
     killsPerGame: number;
     damagePerGame: number;
@@ -57,6 +61,10 @@ export interface AcoDecayKey {
 export interface AcoDecay extends AcoDecayKey {
     acoDelta: number;
     acoGamesDelta: number;
+}
+
+export interface AcoDeflate {
+    updated: Firestore.Timestamp;
 }
 
 export interface Game {

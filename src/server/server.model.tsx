@@ -41,6 +41,7 @@ export interface UserRating {
     aco: number;
     acoGames: number;
     acoUnranked: number;
+    acoDeflate: number;
 
     numGames: number;
     killsPerGame: number;

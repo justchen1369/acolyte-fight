@@ -14,7 +14,7 @@ import * as mirroring from './mirroring';
 import * as percentiles from './percentiles';
 import * as userStorage from './userStorage';
 import * as s from './server.model';
-import { Collections } from './db.model';
+import { Collections, Singleton } from './db.model';
 import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 
@@ -23,6 +23,7 @@ const MaxLeaderboardLength = 100;
 const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
+const AcoDeflateInterval = 8 * 60 * 60;
 
 interface UpdateRatingsResult {
     [userId: string]: PlayerRatingUpdate;
@@ -64,6 +65,7 @@ function initialRating(): g.UserRating {
         aco: constants.Placements.InitialAco,
         acoUnranked: constants.Placements.InitialAco,
         acoGames: 0,
+        acoDeflate: 0,
     };
 }
 
@@ -129,7 +131,7 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
 function userRatingToDb(userRating: g.UserRating, loggedIn: boolean): db.UserRating {
     const dbUserRating: db.UserRating = { ...userRating };
     if (loggedIn && userRating.numGames >= constants.Placements.MinGames) {
-        dbUserRating.acoExposure = calculateAcoExposure(userRating.aco, userRating.acoGames);
+        dbUserRating.acoExposure = calculateAcoExposure(userRating.aco, userRating.acoGames, userRating.acoDeflate);
     }
     return dbUserRating;
 }
@@ -189,7 +191,7 @@ function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
     if (data.ratings) {
         for (const category in data.ratings) {
             const rating = dbToUserRating(data, category);
-            const acoExposure = calculateAcoExposure(rating.aco, rating.acoGames);
+            const acoExposure = calculateAcoExposure(rating.aco, rating.acoGames, rating.acoDeflate);
             ratings[category] = {
                 numGames: rating.numGames,
                 damagePerGame: rating.damagePerGame,
@@ -388,6 +390,108 @@ function calculateMaxLeaderboardAgeInDays(acoGames: number) {
     return Math.min(30, acoGames);
 }
 
+export async function deflateAcoIfNecessary(category: string) {
+    const numDecaysPerDay = 24 / constants.Placements.AcoDeflateIntervalHours;
+    const decayPerInterval = constants.Placements.AcoDeflatePerDay / numDecaysPerDay;
+    const intervalMilliseconds = constants.Placements.AcoDeflateIntervalHours * 60 * 60 * 1000;
+
+    const firestore = getFirestore();
+    const shouldUpdate = await firestore.runTransaction(async (t) => {
+        const doc = await t.get(firestore.collection(Collections.RatingDecay).doc(Singleton));
+        const data = doc.data() as db.RatingDecaySingleton;
+        if (!data || Date.now() >= data.updated.toMillis() + intervalMilliseconds) {
+            const newData: db.RatingDecaySingleton = {
+                updated: Firestore.FieldValue.serverTimestamp() as any,
+            };
+            t.set(doc.ref, newData);
+            return true;
+        } else {
+            return false;
+        }
+    });
+
+    if (shouldUpdate) {
+        await deflateAco(category, decayPerInterval);
+    }
+}
+
+async function deflateAco(category: string, decayPerInterval: number) {
+    const firestore = getFirestore();
+
+    let numAffected = 0;
+    const leaderboardResponse = await retrieveLeaderboard(category);
+    for (const player of leaderboardResponse.leaderboard) {
+        ++numAffected;
+
+        await firestore.runTransaction(async (transaction) => {
+            // Re-retrieve the user so that we lock it in a transaction
+            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(player.userId));
+            if (!userDoc.exists) {
+                return;
+            }
+            const dbUser = userDoc.data() as db.User;
+
+            // Retrieve rating
+            const rating = dbToUserRating(dbUser, category);
+            rating.acoDeflate = Math.min(constants.Placements.AcoMaxDeflate, rating.acoDeflate + decayPerInterval);
+
+            // Re-save rating
+            const loggedIn = userStorage.dbUserLoggedIn(dbUser);
+            const dbUserRating = userRatingToDb(rating, loggedIn);
+            const delta: Partial<db.User> = {
+                ratings: { [category]: dbUserRating },
+            };
+            transaction.update(userDoc.ref, delta);
+        });
+    }
+
+    logger.info(`Deflated ${numAffected} aco ratings`);
+
+    /*
+    const unix = moment().unix() - AcoDecayLength;
+    const query = firestore.collection(Collections.AcoDecay).where('unixCeiling', '<=', unix);
+
+    let numAffected = 0;
+    await dbStorage.stream(query, async (oldDecayDoc) => {
+        ++numAffected;
+
+        await firestore.runTransaction(async (transaction) => {
+            // Re-retrieve the decay so that we lock it in a transaction and don't decay twice
+            const newDecayDoc = await transaction.get(firestore.collection(Collections.AcoDecay).doc(oldDecayDoc.id));
+            if (!newDecayDoc.exists) {
+                return;
+            }
+
+            const decay = newDecayDoc.data() as db.AcoDecay;
+
+            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(decay.userId));
+            if (!userDoc.exists) {
+                return;
+            }
+            const dbUser = userDoc.data() as db.User;
+
+            // Calculate decay
+            const rating = dbToUserRating(dbUser, decay.category);
+            // rating.aco -= decay.acoDelta; // Don't decay the rating, just the bonus
+            rating.acoGames -= decay.acoGamesDelta;
+
+            // Save decay
+            const loggedIn = userStorage.dbUserLoggedIn(dbUser);
+            const dbUserRating = userRatingToDb(rating, loggedIn);
+            const delta: Partial<db.User> = {
+                ratings: { [decay.category]: dbUserRating },
+            };
+            transaction.update(userDoc.ref, delta);
+
+            // Don't apply this decay again
+            transaction.delete(oldDecayDoc.ref);
+        });
+    });
+
+    logger.info(`Decayed ${numAffected} aco ratings`);
+    */
+}
+
 export async function decrementAco() {
     const firestore = getFirestore();
     const unix = moment().unix() - AcoDecayLength;
@@ -539,7 +643,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
             }
 
             if (isRanked) {
-                const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+                const initialExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
                 for (const change of playerDelta.changes) {
                     selfRating.aco += change.delta;
 
@@ -549,7 +653,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
                     }
                 }
                 ++selfRating.acoGames;
-                const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames);
+                const finalExposure = calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
 
                 result[playerDelta.userId] = {
                     isRanked,
@@ -735,9 +839,9 @@ function incrementAverage(current: number, count: number, newValue: number) {
     return (current * count + newValue) / (count + 1);
 }
 
-function calculateAcoExposure(aco: number, acoGames: number) {
+function calculateAcoExposure(aco: number, acoGames: number, acoDeflate: number) {
     // Force maximum activity bonus always (we're not using it anymore)
-    return aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
+    return aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames - acoDeflate;
 }
 
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
