@@ -702,7 +702,8 @@ function incrementAverage(current: number, count: number, newValue: number) {
 }
 
 function calculateAcoExposure(aco: number, acoGames: number) {
-    return aco + constants.Placements.ActivityBonusPerGame * Math.min(constants.Placements.MaxActivityGames, acoGames);
+    // Force maximum activity bonus always (we're not using it anymore)
+    return aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
 }
 
 export async function saveGame(game: g.Game, gameStats: m.GameStatsMsg): Promise<m.GameStatsMsg> {
