@@ -393,6 +393,7 @@ function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.Worl
 
 	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category === "hero" && (world.tick - ev.tick) < constants.TicksPerSecond) {
+		const pos = ev.appear ? vector.clone(hero.body.getPosition()) : ev.pos; // when disappearing, don't reveal the current location if we're a few frames behind
 		for (let i = 0; i < NumParticles; ++i) {
 			renderVanishSmoke(ctxStack, hero, world, ev.pos);
 		}
