@@ -500,12 +500,15 @@ export async function reevaluteAco() {
     const query = firestore.collection(Collections.User);
 
     let numAffected = 0;
-    await dbStorage.stream(query, async (oldUserDoc) => {
-        ++numAffected;
+    const userIds = new Array<string>();
+    await dbStorage.stream(query, async (doc) => {
+        userIds.push(doc.id);
+    });
 
+    for (const userId of userIds) {
         await firestore.runTransaction(async (transaction) => {
             // Re-retrieve the user so that we lock it in a transaction
-            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(oldUserDoc.id));
+            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(userId));
             if (!userDoc.exists) {
                 return;
             }
@@ -522,9 +525,14 @@ export async function reevaluteAco() {
             };
             transaction.update(userDoc.ref, delta);
         });
-    });
 
-    logger.info(`Re-evaluated ${numAffected} aco ratings`);
+        ++numAffected;
+        if (numAffected % 100 === 0) {
+            logger.info(`Re-evaluated ${numAffected} aco ratings`);
+        }
+    }
+
+    logger.info(`Completed re-evaluation of ${numAffected} aco ratings`);
     return numAffected;
 }
 
