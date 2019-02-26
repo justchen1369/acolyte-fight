@@ -1,9 +1,11 @@
 export class Aco {
     k: number;
+    r: number;
     power: number;
 
-    constructor(k: number, power: number) {
+    constructor(k: number, power: number, r: number) {
         this.k = k;
+        this.r = r;
         this.power = power;
     }
 
