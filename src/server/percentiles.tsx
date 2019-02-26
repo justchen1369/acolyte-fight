@@ -50,6 +50,12 @@ export function estimateNumUsers(): number {
 }
 
 async function refreshCumulativeFrequenciesLoop() {
+    await refreshCumulativeFrequencies();
+    const delayMilliseconds = calculateNextRefresh(numUsersCache);
+    setTimeout(() => refreshCumulativeFrequenciesLoop(), delayMilliseconds);
+}
+
+export async function refreshCumulativeFrequencies() {
     const start = Date.now();
 
     const result = await calculateFrequencies();
@@ -61,10 +67,6 @@ async function refreshCumulativeFrequenciesLoop() {
     }
 
     logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
-
-    const delayMilliseconds = calculateNextRefresh(numUsersCache);
-
-    setTimeout(() => refreshCumulativeFrequenciesLoop(), delayMilliseconds);
 }
 
 function calculateNextRefresh(numUsers: number) {

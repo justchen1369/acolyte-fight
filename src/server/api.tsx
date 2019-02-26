@@ -564,3 +564,17 @@ export async function onReevaluateAcoAsync(req: express.Request, res: express.Re
     const numAffected = await statsStorage.reevaluteAco();
     res.send(`${numAffected} rows affected`);
 }
+
+export function onRecalculateDistributions(req: express.Request, res: express.Response) {
+    onRecalculateDistributionsAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onRecalculateDistributionsAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    await percentiles.refreshCumulativeFrequencies();
+    res.send('OK');
+}
