@@ -464,6 +464,7 @@ export async function reevaluteAco() {
     });
 
     logger.info(`Re-evaluated ${numAffected} aco ratings`);
+    return numAffected;
 }
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
