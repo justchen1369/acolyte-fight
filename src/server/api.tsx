@@ -550,3 +550,17 @@ function jsonToCsv(array: any[]) {
 
     return rows.join("\n");
 }
+
+export function onReevaluateAco(req: express.Request, res: express.Response) {
+    onReevaluateAcoAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onReevaluateAcoAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
+        res.status(403).send("Forbidden");
+        return;
+    }
+
+    const numAffected = await statsStorage.reevaluteAco();
+    res.send(`${numAffected} rows affected`);
+}

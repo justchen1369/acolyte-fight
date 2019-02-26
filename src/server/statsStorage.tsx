@@ -350,7 +350,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
                 return;
             }
 
-            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.numGames) * 24 * 60 * 60 * 1000;
+            const maxAge = calculateMaxLeaderboardAgeInDays(ratings.acoGames) * 24 * 60 * 60 * 1000;
             const age = now - user.accessed.toMillis();
             if (age > maxAge) {
                 return;
@@ -384,8 +384,8 @@ export async function retrieveLeaderboard(category: string): Promise<m.GetLeader
     return { leaderboard: result };
 }
 
-function calculateMaxLeaderboardAgeInDays(numGames: number) {
-    return Math.min(30, numGames / 10);
+function calculateMaxLeaderboardAgeInDays(acoGames: number) {
+    return Math.min(30, acoGames);
 }
 
 export async function decayAco() {
@@ -395,6 +395,8 @@ export async function decayAco() {
 
     let numAffected = 0;
     await dbStorage.stream(query, async (oldDecayDoc) => {
+        ++numAffected;
+
         await firestore.runTransaction(async (transaction) => {
             // Re-retrieve the decay so that we lock it in a transaction and don't decay twice
             const newDecayDoc = await transaction.get(firestore.collection(Collections.AcoDecay).doc(oldDecayDoc.id));
@@ -426,11 +428,42 @@ export async function decayAco() {
             // Don't apply this decay again
             transaction.delete(oldDecayDoc.ref);
         });
-
-        ++numAffected;
     });
 
     logger.info(`Decayed ${numAffected} aco ratings`);
+}
+
+export async function reevaluteAco() {
+    const firestore = getFirestore();
+    const category = m.GameCategory.PvP;
+    const query = firestore.collection(Collections.User);
+
+    let numAffected = 0;
+    await dbStorage.stream(query, async (oldUserDoc) => {
+        ++numAffected;
+
+        await firestore.runTransaction(async (transaction) => {
+            // Re-retrieve the user so that we lock it in a transaction
+            const userDoc = await transaction.get(firestore.collection(Collections.User).doc(oldUserDoc.id));
+            if (!userDoc.exists) {
+                return;
+            }
+            const dbUser = userDoc.data() as db.User;
+
+            // Retrieve rating
+            const rating = dbToUserRating(dbUser, category);
+
+            // Re-save rating
+            const loggedIn = userStorage.dbUserLoggedIn(dbUser);
+            const dbUserRating = userRatingToDb(rating, loggedIn);
+            const delta: Partial<db.User> = {
+                ratings: { [category]: dbUserRating },
+            };
+            transaction.update(userDoc.ref, delta);
+        });
+    });
+
+    logger.info(`Re-evaluated ${numAffected} aco ratings`);
 }
 
 export async function getProfile(userId: string): Promise<m.GetProfileResponse> {

@@ -111,9 +111,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 setInterval(() => {
 	modder.cleanupOldRooms(1);
 	statsStorage.cleanupGames(7);
-	statsStorage.decayAco();
 }, cleanupIntervalMinutes * 60 * 1000);
-statsStorage.decayAco();
 
 setInterval(() => {
 	const status = api.getInternalStatus();
