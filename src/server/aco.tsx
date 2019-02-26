@@ -1,4 +1,4 @@
-const EloWinRateCap = 0.76;
+const EloWinRateCap = 0.5; // Effectively disable Elo
 const EloR = 400;
 const AcoK = 10;
 const AcoR = 800;
