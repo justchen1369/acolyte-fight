@@ -112,8 +112,6 @@ class LeaderboardPanel extends React.Component<Props, State> {
         }
 
         const title = [
-            `${player.aco.toFixed(0)} skill points`,
-            `+${(player.acoExposure - player.aco).toFixed(0)} activity bonus`,
             `${(player.winRate * 100).toFixed(0)}% win rate`,
             `${player.killsPerGame.toFixed(1)} kills per game`,
             `${player.damagePerGame.toFixed(1)} damage per game`,

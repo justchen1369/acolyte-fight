@@ -53,7 +53,6 @@ export class TitleSection extends React.Component<Props, State> {
             <ul>
                 <li>You gain the most points by defeating players above your rating, and you gain few points for defeating players below your rating.</li>
                 <li>You lose the most points when defeated by players similar to your rating. The system is designed so you won't lose many points if defeated by someone significantly above or below your skill level.</li>
-                <li>There is an activity bonus. You gain +{constants.Placements.ActivityBonusPerGame} for every game played, up to {constants.Placements.MaxActivityGames} games. This bonus only lasts for {constants.Placements.AcoDecayLengthDays} days. So keep playing to max out your activity bonus!</li>
             </ul>
             <h2>How do I get rated against multiple players in one game?</h2>
             <p>

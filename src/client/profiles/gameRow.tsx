@@ -98,24 +98,8 @@ class GameRow extends React.PureComponent<Props, State> {
 
     private renderGameDetail(self: p.PlayerStats) {
         return <div className="game-detail">
-            {this.renderActivityGain(self)}
             {self.acoChanges.map(change => this.renderRatingChange(change))}
         </div>
-    }
-
-    private renderActivityGain(self: p.PlayerStats) {
-        if (self.initialAcoGames < constants.Placements.MaxActivityGames) {
-            return <div className="adjustment-detail">
-                <div className="adjustment-label">
-                    <div className="adjustment-label-title">Activity bonus {self.initialAcoGames + 1}/{constants.Placements.MaxActivityGames}</div>
-                    <div className="adjustment-label-subtitle">Expires after {constants.Placements.AcoDecayLengthDays} days</div>
-                </div>
-                <div className="spacer" />
-                {this.renderRatingDelta(constants.Placements.ActivityBonusPerGame)}
-            </div>
-        } else {
-            return null;
-        }
     }
 
     private renderRatingChange(change: m.AcoChangeMsg) {

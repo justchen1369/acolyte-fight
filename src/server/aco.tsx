@@ -17,7 +17,7 @@ export class Aco {
         const learnRate = Math.pow(1 - winRate, AcoPower) * weight;
         const delta = AcoK * (score - winRate) * learnRate;
 
-        return { delta, e: eloWinRate, learnRate };
+        return { delta, e: winRate, learnRate };
     }
 }
 
