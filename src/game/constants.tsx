@@ -52,8 +52,8 @@ export namespace Placements {
 
 	export const AcoDecayLengthDays = 21;
 
-	export const AcoDeflatePerDay = 3;
-	export const AcoDeflateIntervalHours = 8;
+	export const AcoDeflatePerDay = 5;
+	export const AcoDeflateIntervalHours = 6;
 	export const AcoMaxDeflate = 100;
 
 	export const Grandmaster = 98;
