@@ -114,9 +114,6 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const worldRect = calculateWorldRect(viewRect);
 	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
 
-	// Everything also always gets rendered (used to wait for changes)
-	world.ui.renderedTick = world.tick;
-
 	const ctxStack: CanvasCtxStack = {
 		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
@@ -141,6 +138,8 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	world.ui.destroyed = [];
 	world.ui.events = [];
 	world.ui.sounds = [];
+
+	world.ui.renderedTick = world.tick;
 }
 
 function playSounds(world: w.World, options: RenderOptions) {
@@ -249,7 +248,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 		const expireVelocity = vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), Math.random() * Speed);
 		const velocity = vector.plus(baseVelocity, expireVelocity);
 
-		world.ui.trails.push({
+		pushTrail({
 			type: "circle",
 			max: MaxTicks,
 			initialTick: world.tick,
@@ -258,7 +257,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			fillStyle: "white",
 			radius: hero.radius,
 			glow: 0.1,
-		});
+		}, world);
 	}
 
 	world.ui.sounds.push({
@@ -270,14 +269,14 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 
 function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World) {
 	const ticks = 15;
-	world.ui.trails.push({
+	pushTrail({
 		type: "circle",
 		max: ticks,
 		initialTick: world.tick,
 		pos: obstacle.body.getPosition(),
 		fillStyle: 'white',
 		radius: obstacle.extent,
-	});
+	}, world);
 }
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
@@ -337,7 +336,7 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 
 	const pos = owner.body.getPosition();
 
-	world.ui.trails.push({
+	pushTrail({
 		type: 'ripple',
 		initialTick: ev.tick,
 		max: MaxTicks,
@@ -345,7 +344,7 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 		fillStyle: HeroColors.HealColor,
 		initialRadius: world.settings.Hero.Radius,
 		finalRadius: world.settings.Hero.Radius * 2,
-	});
+	}, world);
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
@@ -369,7 +368,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		return; // Too late
 	}
 
-	world.ui.trails.push({
+	pushTrail({
 		type: "circle",
 		max: ev.explosionTicks,
 		initialTick: ev.tick,
@@ -377,7 +376,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		fillStyle: 'white',
 		radius: ev.radius,
 		glow: 0.2,
-	});
+	}, world);
 
 	if (ev.sound) {
 		world.ui.sounds.push({
@@ -404,7 +403,7 @@ function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
 	const velocity = particleVelocity(thrust);
 
-	world.ui.trails.push({
+	pushTrail({
 		type: 'circle',
 		initialTick: world.tick,
 		max: 60,
@@ -412,7 +411,7 @@ function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 		fillStyle: "#111",
 		radius: hero.radius,
 		velocity,
-	});
+	}, world);
 }
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
@@ -428,7 +427,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 
 		if (ev.heroId === world.ui.myHeroId) {
 			// Clearly indicate yourself
-			world.ui.trails.push({
+			pushTrail({
 				type: "ripple",
 				max: MaxTicks,
 				initialTick: ev.tick,
@@ -436,7 +435,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 				fillStyle: 'white',
 				initialRadius: Hero.Radius,
 				finalRadius: Hero.Radius * 4,
-			});
+			}, world);
 		}
 
 		if (ev.sound) {
@@ -1071,7 +1070,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 		});
 	}
 
-	world.ui.trails.push({
+	pushTrail({
 		type: "arc",
 		initialTick: world.tick,
 		max: saber.trailTicks,
@@ -1085,7 +1084,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 		glow: saber.glow,
 		highlight: saber.uiHighlight,
 		tag: saber.id,
-	});
+	}, world);
 
 	saber.uiPreviousAngle = newAngle;
 
@@ -1188,7 +1187,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
-		world.ui.trails.push({
+		pushTrail({
 			type: "circle",
 			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), multiplier * swirl.radius)),
 			velocity,
@@ -1199,7 +1198,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			glow: swirl.glow,
 			fade: swirl.fade,
 			tag: context.tag,
-		});
+		}, world);
 	}
 }
 
@@ -1255,7 +1254,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	if (strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
 			const velocity = particleVelocity(projectile.body.getLinearVelocity());
-			world.ui.trails.push({
+			pushTrail({
 				type: "circle",
 				initialTick: projectile.hitTick,
 				max: strike.ticks,
@@ -1265,7 +1264,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				fillStyle: projectileColor(strike, projectile, world),
 				highlight,
 				tag: projectile.id,
-			});
+			}, world);
 		}
 	}
 }
@@ -1298,7 +1297,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 	const multiplier = projectileRadiusMultiplier(projectile, world, render);
 	for (let pos of getRenderPoints(projectile.uiPath, render.intermediatePoints)) {
 		if (previous) {
-			world.ui.trails.push({
+			pushTrail({
 				type: 'line',
 				initialTick: world.tick,
 				max: render.ticks, 
@@ -1309,7 +1308,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				glow: render.glow,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
-			} as w.LineTrail);
+			}, world);
 		}
 
 		previous = pos;
@@ -1331,7 +1330,7 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
 	let ticks = render.ticks;
 	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
-	world.ui.trails.push({
+	pushTrail({
 		type: 'circle',
 		initialTick: world.tick,
 		max: ticks,
@@ -1340,10 +1339,10 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 		fillStyle: projectileColor(render, projectile, world),
 		fade: render.fade,
 		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
-		glow: render.glow || false,
+		glow: render.glow,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
-	} as w.CircleTrail);
+	}, world);
 }
 
 function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay): number {
@@ -1969,4 +1968,12 @@ function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: nu
 
 function hsl(h: number, sProportion: number, lProportion: number): string {
 	return 'hsl(' + h.toFixed(0) + ', ' + (100 * sProportion).toFixed(2) + '%, ' + (100 * lProportion).toFixed(2) + '%)';
+}
+
+function pushTrail(trail: w.Trail, world: w.World) {
+	if (world.ui.renderedTick === world.tick) {
+		// If network hangs and we keep re-rendering the same frame, don't need to add another trail to a tick when it already has one
+		return;
+	}
+	world.ui.trails.push(trail);
 }
