@@ -112,7 +112,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(async () => {
 	await statsStorage.updateWinRateDistribution(m.GameCategory.PvP);
-}, 24 * 60 * 60 * 1000); // slow-changing data
+}, 8 * 60 * 60 * 1000); // slow-changing data
 statsStorage.updateWinRateDistribution(m.GameCategory.PvP); // don't await
 
 setInterval(async () => {
