@@ -111,13 +111,18 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 setInterval(async () => {
+	await statsStorage.updateWinRateDistribution(m.GameCategory.PvP);
+}, 24 * 60 * 60 * 1000); // slow-changing data
+statsStorage.updateWinRateDistribution(m.GameCategory.PvP); // don't await
+
+setInterval(async () => {
 	modder.cleanupOldRooms(1);
 	await statsStorage.cleanupGames(7);
 	await statsStorage.decrementAco();
 	await statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP);
 }, cleanupIntervalMinutes * 60 * 1000);
-statsStorage.decrementAco(); // don't await
 statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP); // don't await
+statsStorage.decrementAco(); // don't await
 
 setInterval(() => {
 	const status = api.getInternalStatus();

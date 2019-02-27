@@ -20,9 +20,16 @@ import { logger } from './logging';
 
 const MaxLeaderboardLength = 100;
 
-const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
+
+const AcoK = 10;
+const AcoR = 800;
+const AcoPower = 1;
+const AcoNumGamesConfidence = 1000;
+
+const Aco = new aco.Aco(AcoK, AcoR, AcoPower, AcoNumGamesConfidence);
+const winRates = new Map<string, aco.ActualWinRate[]>();
 
 export interface WinRateBucket {
     minDiff: number;
@@ -315,12 +322,23 @@ export async function cleanupGames(maxAgeDays: number) {
     }
 }
 
+export async function updateWinRateDistribution(category: string) {
+    const distribution = await calculateWinRateDistribution(category);
+    const dataPoints: aco.ActualWinRate[] = distribution.map(p => ({
+        midpoint: (p.maxDiff + p.minDiff) / 2,
+        winRate: p.weightedExpected / p.weightedGames,
+        numGames: p.numGames,
+    }));
+    winRates.set(category, dataPoints);
+}
+
 export async function calculateWinRateDistribution(category: string) {
     const BucketRange = 50;
-    const buckets = new Array<WinRateBucket>();
 
+    const start = Date.now();
+    const buckets = new Array<WinRateBucket>();
     await loadAllGames(category, game => {
-        if (!game.partyId) {
+        if (game.partyId) {
             return; // Ignore private games
         }
 
@@ -367,6 +385,8 @@ export async function calculateWinRateDistribution(category: string) {
             }
         }
     });
+    const elapsed = Date.now() - start;
+    logger.info(`Calculated win rate distribution in ${elapsed} ms: ${buckets.map(b => b.weightedExpected / b.weightedGames).join(' ')}`);
 
     return buckets.filter(b => !!b);
 }
@@ -672,7 +692,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
             const isRanked = isRankedLookup.get(userId);
             ratingValues.set(userId, isRanked ? userRating.aco : userRating.acoUnranked);
         });
-        const deltas = calculateNewAcoRatings(ratingValues, knownPlayers);
+        const deltas = calculateNewAcoRatings(ratingValues, knownPlayers, category);
 
         // Apply changes
         const result: UpdateRatingsResult = {};
@@ -803,7 +823,7 @@ function unixDateFromTimestamp(unixTimestamp: number): number {
     return Math.floor(unixTimestamp / SecondsPerDay) * SecondsPerDay;
 }
 
-function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[]): Map<string, PlayerDelta> {
+function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[], category: string): Map<string, PlayerDelta> {
     const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
 
     if (players.length <= 0) {
@@ -851,7 +871,9 @@ function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.Pl
             const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            const adjustment = Aco.adjustment(selfAco, otherAco, score, multiplier);
+            const diff = Aco.calculateDiff(selfAco, otherAco);
+            const winRate = Aco.estimateWinRate(diff, winRates.get(category) || []);
+            const adjustment = Aco.adjustment(winRate, score, multiplier);
             const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
             if (change.delta >= 0) {
                 if (!deltaGain || deltaGain.delta < change.delta) { // Largest gain
