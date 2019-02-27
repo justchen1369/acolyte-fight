@@ -133,10 +133,6 @@ class LeaderboardPanel extends React.Component<Props, State> {
             return null;
         }
 
-        if (userRating.numGames < constants.Placements.MinGames) {
-            return null;
-        }
-
         const result: m.LeaderboardPlayer = {
             userId: profile.userId,
             name: profile.name,

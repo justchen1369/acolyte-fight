@@ -145,19 +145,12 @@ class UserStatsPanel extends React.Component<Props, State> {
 
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
         const isMe = profile.userId === this.props.myUserId;
-        const isPlaced = rating.numGames >= constants.Placements.MinGames;
         const leagueName = rankings.getLeagueName(rating.acoPercentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
 
         const activityBonus = rating.acoExposure - rating.aco;
         return <div>
-            {rating.numGames < constants.Placements.MinGames && <div className="stats-card-row">
-                <div className="stats-card">
-                    <div className="label">Placement matches remaining</div>
-                    <div className="value">{constants.Placements.MinGames - rating.numGames}</div>
-                </div>
-            </div>}
-            {isPlaced && <div className="stats-card-row">
+            {<div className="stats-card-row">
                 <div className="stats-card">
                     <div className="label">Rating</div>
                     <div className="value">{rating.acoExposure.toFixed(0)}</div>
@@ -167,7 +160,7 @@ class UserStatsPanel extends React.Component<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {isMe && isPlaced && nextLeague && <div className="points-to-next-league">
+            {isMe && nextLeague && <div className="points-to-next-league">
                 You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(nextLeague.pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
             </div>}
         </div>

@@ -72,10 +72,10 @@ class RatingControl extends React.Component<Props> {
         </HrefItem>
     }
 
-    private renderRank(rating: rankings.Rating) {
-        const league = rankings.getLeagueName(rating.percentile);
+    private renderRank(rating: m.UserRating) {
+        const league = rankings.getLeagueName(rating.acoPercentile);
         return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
-            <b>{league}</b> {rating.exposure.toFixed(0)}
+            <b>{league}</b> {rating.acoExposure.toFixed(0)}
         </PageLink>
     }
 
@@ -86,16 +86,15 @@ class RatingControl extends React.Component<Props> {
         }
 
         const rating = profile.ratings[m.GameCategory.PvP];
-        if (!(rating && rating.numGames >= constants.Placements.MinGames)) {
+        if (!rating) {
             return null;
         }
 
-        const values: rankings.Rating = rankings.getRating(rating);
-        if (!(values.exposure && values.percentile >= 0)) {
+        if (!(rating.acoExposure && rating.acoPercentile >= 0)) {
             return null;
         }
 
-        return values;
+        return rating;
     }
 
     private onUnrankedToggleClick(ev: React.MouseEvent) {

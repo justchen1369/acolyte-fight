@@ -22,10 +22,6 @@ export interface PointsToNextLeague {
 export interface PointsToNextLeagueLookup {
     [category: string]: PointsToNextLeague;
 }
-export interface Rating {
-    exposure: number;
-    percentile: number;
-}
 
 export const leagues = [
     { name: "Grandmaster", minPercentile: constants.Placements.Grandmaster },
@@ -37,13 +33,6 @@ export const leagues = [
     { name: "Bronze", minPercentile: constants.Placements.Bronze },
     { name: "Wood", minPercentile: constants.Placements.Wood },
 ];
-
-export function getRating(userRating: m.UserRating): Rating {
-    return {
-        exposure: userRating.acoExposure,
-        percentile: userRating.acoPercentile,
-    };
-}
 
 export function onNotification(notifs: w.Notification[]) {
     for (const notif of notifs) {

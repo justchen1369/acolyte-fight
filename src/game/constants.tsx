@@ -43,7 +43,7 @@ export namespace Matchmaking {
 
 export namespace Placements {
 	export const Rank1 = 1;
-	export const MinGames = 5;
+	export const MinGames = 10;
 	export const VerificationGames = 5;
 
 	export const InitialAco = 1000;

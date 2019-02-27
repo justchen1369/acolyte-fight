@@ -316,7 +316,7 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
-        if (!this.props.options.unranked && notification.gameId === this.props.myGameId && notification.initialNumGames >= constants.Placements.MinGames) {
+        if (!this.props.options.unranked && notification.gameId === this.props.myGameId) {
             const delta = notification.acoDelta;
             return <div key={key} className="row rating-notification">
                 <span>Your rating has changed: {this.renderRatingAdjustment(delta)}. </span>

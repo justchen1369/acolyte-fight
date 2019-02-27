@@ -65,7 +65,7 @@ class GameRow extends React.PureComponent<Props, State> {
         const game = this.props.game;
         const self = game.players.get(game.self);
         const hasReplay = this.props.hasReplayLookup.get(game.id);
-        const hasRating = self && self.acoDelta && !(self.initialNumGames < constants.Placements.MinGames);
+        const hasRating = self && self.acoDelta;
         const canExpand = hasRating && self.acoChanges.length > 0;
         return <div key={game.id} className="game-card" onClick={() => this.onToggleExpand()}>
             <div className="game-summary">
