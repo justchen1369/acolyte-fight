@@ -388,7 +388,7 @@ export async function calculateWinRateDistribution(category: string) {
     const elapsed = Date.now() - start;
     logger.info(`Calculated win rate distribution in ${elapsed} ms: ${buckets.map(b => b.weightedExpected / b.weightedGames).join(' ')}`);
 
-    return buckets.filter(b => !!b);
+    return _.orderBy(buckets.filter(b => !!b), b => b.minDiff);
 }
 
 function leaderboardCacheKey(category: string) {
