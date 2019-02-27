@@ -38,6 +38,7 @@ export class Aco {
         return selfRating - otherRating;
     }
 
+    // IMPORTANT: dataPoints must be sorted!
     estimateWinRate(diff: number, dataPoints: ActualWinRate[]) {
         const acoWinRate = calculateEloWinRate(diff, this.r)
 
@@ -94,61 +95,6 @@ export class Aco {
             const alpha = (absDiff - below.midpoint) / (above.midpoint - below.midpoint);
             return {
                 midpoint: absDiff,
-                winRate: above.winRate * alpha + below.winRate * (1 - alpha),
-                numGames: above.numGames * alpha + below.numGames * (1 - alpha),
-            };
-        }
-    }
-}
-
-export class WinRateCalculator {
-    private dataPoints: ActualWinRate[];
-    private r: number;
-    private numGamesConfidence: number;
-
-    constructor(dataPoints: ActualWinRate[], r: number, numGamesConfidence: number) {
-        this.dataPoints = dataPoints;
-        this.r = r;
-        this.numGamesConfidence = numGamesConfidence;
-    }
-
-    estimate(diff: number) {
-        const acoWinRate = calculateEloWinRate(diff, this.r)
-
-        let winRate = acoWinRate;
-
-        const actualWinRate = this.calculateActualWinRateIfPossible(diff);
-        if (actualWinRate) {
-            const alpha = Math.exp(-actualWinRate.numGames / this.numGamesConfidence);
-            winRate = acoWinRate * alpha + actualWinRate.winRate * (1 - alpha);
-        }
-
-        return winRate;
-    }
-
-    private calculateActualWinRateIfPossible(diff: number): ActualWinRate | null {
-        let below: ActualWinRate = { midpoint: 0, winRate: 0.5, numGames: 0 };
-        let above: ActualWinRate = null;
-
-        for (const point of this.dataPoints) {
-            if (point.midpoint <= diff) {
-                below = point;
-            }
-            if (point.midpoint >= diff) {
-                above = point;
-                break; // Stop immediately so we keep the lowest point above
-            }
-        }
-
-        if (!(above && below)) {
-            return null;
-        } else if (above.midpoint === below.midpoint) {
-            return below;
-        } else {
-            // Linearly interpolate
-            const alpha = (diff - below.midpoint) / (above.midpoint - below.midpoint);
-            return {
-                midpoint: diff,
                 winRate: above.winRate * alpha + below.winRate * (1 - alpha),
                 numGames: above.numGames * alpha + below.numGames * (1 - alpha),
             };
