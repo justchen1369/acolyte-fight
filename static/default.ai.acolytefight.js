@@ -232,6 +232,11 @@ function dodge(state, hero, cooldowns) {
             continue;
         }
 
+        if (projectile.spellId === "halo") {
+            // Halo is never coming for us, it orbits around its owner
+            continue;
+        }
+
         var diff = vectorDiff(hero.pos, projectile.pos);
         var distancePerTimeStep = vectorDot(projectile.velocity, vectorUnit(diff));
         if (distancePerTimeStep <= 0) {
