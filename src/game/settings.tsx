@@ -683,7 +683,7 @@ const rocket: Spell = {
         density: 1,
         radius: 0.005,
         speed: 0.15,
-        maxTicks: 1.5 * TicksPerSecond,
+        maxTicks: 3 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
 
@@ -709,7 +709,7 @@ const rocket: Spell = {
             {
                 type: "homing",
                 targetType: "follow",
-                revolutionsPerSecond: 0.01,
+                revolutionsPerSecond: 0.0075,
             },
             { type: "expireOnChannellingEnd" },
         ],
