@@ -36,6 +36,18 @@ class RatingControl extends React.Component<Props> {
         }
     }
 
+    componentWillMount() {
+        if (this.props.userId && !this.props.profile) {
+            rankings.retrieveUserStatsAsync(this.props.userId); // Don't await
+        }
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+        if (newProps.userId && !newProps.profile) {
+            rankings.retrieveUserStatsAsync(this.props.userId); // Don't await
+        }
+    }
+
     render() {
         const rating = this.getRating();
         if (rating) {
@@ -53,13 +65,18 @@ class RatingControl extends React.Component<Props> {
     }
 
     private renderUnrankedToggle() {
-        return <HrefItem
-            key="unranked-toggle"
-            className="nav-item-unranked-toggle"
-            title="You are currently in unranked mode - you will not gain or lose rating points. Click to switch to Ranked Mode"
-            onClick={ev => this.onUnrankedToggleClick(ev)}>
-            <i className="fas fa-gamepad" style={{ marginRight: 4 }} /><span className="shrink"> Unranked Mode</span>
-        </HrefItem>
+        return <>
+            <HrefItem
+                key="unranked-toggle"
+                className="nav-item-unranked-toggle"
+                title="You are currently in unranked mode - you will not gain or lose rating points. Click to switch to Ranked Mode"
+                onClick={ev => this.onUnrankedToggleClick(ev)}>
+                <i className="fas fa-gamepad" />
+            </HrefItem>
+            <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
+                Unranked Mode
+            </PageLink>
+        </>
     }
 
     private renderRankedToggle() {

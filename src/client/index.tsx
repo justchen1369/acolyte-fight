@@ -91,7 +91,6 @@ async function loginAsync() {
     if (userId) {
         tracker.setUserId(userId);
         await parties.updatePartyAsync();
-        rankings.retrieveUserStatsAsync(userId); // Don't bother awaiting this
     }
 }
 

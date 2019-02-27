@@ -6,7 +6,7 @@ import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as credentials from './credentials';
-import * as notifications from './notifications';
+import * as rankings from './rankings';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
@@ -27,7 +27,8 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
 
     const numGames = await storage.getNumGames();
     if (numGames >= constants.Placements.VerificationGames) {
-        downloadSettings();
+        // Login anonymously
+        await downloadSettings();
     }
 }
 
@@ -72,6 +73,9 @@ export async function downloadSettings(): Promise<string> {
         }
 
         if (json.options) {
+            if (json.options.unranked === undefined) {
+                json.options.unranked = false; // Old users default to ranked (new users default to unranked)
+            }
             StoreProvider.dispatch({ type: "updateOptions", options: json.options });
         } else {
             upload = true;

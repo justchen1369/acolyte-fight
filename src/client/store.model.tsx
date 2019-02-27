@@ -14,7 +14,7 @@ export interface State {
     playerName: string;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
-    options: GameOptions;
+    options: m.GameOptions;
 
     aiCode: string;
 
@@ -31,13 +31,6 @@ export interface State {
     profile: m.GetProfileResponse;
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
     hasReplayLookup: Map<string, string>; // gameId -> url to replay data
-}
-
-export interface GameOptions {
-    wheelOnRight?: boolean;
-    noTargetingIndicator?: boolean;
-    mute?: boolean;
-    unranked?: boolean;
 }
 
 export interface NotificationItem {
@@ -161,7 +154,7 @@ export interface UpdateKeyBindingsAction {
 
 export interface UpdateOptionsAction {
     type: "updateOptions";
-    options: Partial<GameOptions>;
+    options: Partial<m.GameOptions>;
 }
 
 export interface UpdateUrlAction {

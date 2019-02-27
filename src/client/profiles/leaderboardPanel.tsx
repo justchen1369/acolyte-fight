@@ -13,6 +13,7 @@ import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
 import Link from '../controls/link';
+import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
 
 interface OwnProps {
@@ -22,6 +23,7 @@ interface Props extends OwnProps {
     current: s.PathElements;
     myUserId: string;
     loggedIn: boolean;
+    unranked: boolean;
 }
 
 interface State {
@@ -37,6 +39,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         current: state.current,
         myUserId: state.userId,
         loggedIn: state.loggedIn,
+        unranked: state.options.unranked,
     };
 }
 
@@ -95,10 +98,12 @@ class LeaderboardPanel extends React.Component<Props, State> {
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
-            <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
-            <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
+            {!!this.props.myUserId && <UnrankedTogglePanel />}
+            {!this.props.unranked && <>
+                <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
+                <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
+            </>}
             <h1>Leaderboard</h1>
-            {!a.noLogin && !this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to see your ranking on the leaderboard</p>}
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
                 {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}

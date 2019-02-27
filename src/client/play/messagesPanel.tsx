@@ -28,7 +28,7 @@ interface Props {
     isFinished: boolean;
     buttonBar: w.ButtonConfig;
     rebindings: KeyBindings;
-    options: s.GameOptions;
+    options: m.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
 }

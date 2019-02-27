@@ -2,6 +2,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as keyboardUtils from '../core/keyboardUtils';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as cloud from '../core/cloud';
@@ -29,7 +30,7 @@ interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
     settings: AcolyteFightSettings;
-    options: s.GameOptions;
+    options: m.GameOptions;
 }
 
 interface ControlState {
@@ -57,7 +58,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-function controlConfigToState(rebindings: KeyBindings, options: s.GameOptions): ControlState {
+function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): ControlState {
     const moveWith = rebindings[w.SpecialKeys.Hover] === w.SpecialKeys.Move ? MoveWith.FollowCursor : MoveWith.Click;
     return {
         moveWith,
