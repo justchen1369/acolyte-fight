@@ -24,6 +24,21 @@ const Aco = new aco.Aco();
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
 
+export interface WinRateBucket {
+    distance: number;
+
+    numGames: number;
+    numExpected: number;
+
+    weightedGames: number;
+    weightedExpected: number;
+}
+
+interface WinRateItem {
+    aco: number;
+    numGames: number;
+}
+
 interface UpdateRatingsResult {
     [userId: string]: PlayerRatingUpdate;
 }
@@ -265,13 +280,15 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
     return games;
 }
 
-export async function loadAllGames(callback: (game: m.GameStatsMsg) => void) {
+export async function loadAllGames(category: string, callback: (game: m.GameStatsMsg) => void) {
     const firestore = getFirestore();
     let query = firestore.collection(Collections.Game);
 
     await dbStorage.stream(query, gameDoc => {
         const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
-        callback(game);
+        if (game.category === category) {
+            callback(game);
+        }
     });
 }
 
@@ -295,6 +312,61 @@ export async function cleanupGames(maxAgeDays: number) {
     if (numDeleted > 0) {
         logger.info(`Deleted ${numDeleted} games from database`);
     }
+}
+
+export async function calculateWinRateDistribution(category: string) {
+    const BucketRange = 50;
+    const buckets = new Array<WinRateBucket>();
+
+    await loadAllGames(category, game => {
+        if (!game.partyId) {
+            return; // Ignore private games
+        }
+
+        if (game.winners && game.winners.length > 1) {
+            return; // Ignore team games
+        }
+
+        const ratings = _.orderBy(game.players.filter(p => p.initialAco && p.initialNumGames && p.rank), p => p.rank).map(p => {
+            const result: WinRateItem = {
+                aco: p.initialAco,
+                numGames: p.initialNumGames,
+            };
+            return result;
+        });
+        for (let i = 0; i < ratings.length; ++i) {
+            for (let j = i + 1; j < ratings.length; ++j) {
+                const winner = ratings[i];
+                const loser = ratings[j];
+
+                const weight = Math.log(1 + Math.min(winner.numGames, loser.numGames) / constants.Placements.MinGames);
+
+                const diff = winner.aco - loser.aco;
+                const distance = Math.abs(diff);
+
+                const index = Math.floor(distance / BucketRange);
+                let bucket = buckets[index];
+                if (!bucket) {
+                    bucket = buckets[index] = {
+                        distance: index * BucketRange,
+                        numGames: 0,
+                        numExpected: 0,
+                        weightedExpected: 0,
+                        weightedGames: 0,
+                    };
+                }
+
+                ++bucket.numGames;
+                bucket.weightedGames += weight;
+                if (winner.aco >= loser.aco) {
+                    ++bucket.numExpected;
+                    bucket.weightedExpected += weight;
+                }
+            }
+        }
+    });
+
+    return buckets.filter(b => !!b);
 }
 
 function leaderboardCacheKey(category: string) {

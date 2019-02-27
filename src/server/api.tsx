@@ -22,7 +22,6 @@ import * as percentiles from './percentiles';
 import * as sanitize from '../game/sanitize';
 import * as statsStorage from './statsStorage';
 import * as userStorage from './userStorage';
-import * as winRateDistribution from './winRateDistribution';
 
 import { getAuthToken } from './auth';
 import { getLocation } from './mirroring';
@@ -526,7 +525,7 @@ export async function onGetWinRateDistributionAsync(req: express.Request, res: e
         return;
     }
 
-    const distribution = await winRateDistribution.calculateWinRateDistribution();
+    const distribution = await statsStorage.calculateWinRateDistribution(m.GameCategory.PvP);
     if (req.header('content-type') === "application/json") {
         res.send(distribution);
     } else {
