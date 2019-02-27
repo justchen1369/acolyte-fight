@@ -48,12 +48,16 @@ export class TitleSection extends React.Component<Props, State> {
             <h1>How does the rating system work?</h1>
             <p>
                 The rating system is designed to measure your skill accurately, and is based on <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank">Elo</a>.
-                The rating system awards and deducts points until it reaches an equilibrium between your relative win rates and the magnitude of awards/deductions.
+                The rating system looks at all games played in the past 7 days, and awards you points based on how your performance compares to other similar players of your rating.
+                For example, the rating might understand that when an 1800 player fights a 1300 player, on average they win 76% of the time.
+                If you win more often than that, then on average, you will move up.
             </p>
-            <ul>
-                <li>You gain the most points by defeating players above your rating, and you gain few points for defeating players below your rating.</li>
-                <li>You lose the most points when defeated by players similar to your rating. The system is designed so you won't lose many points if defeated by someone significantly above or below your skill level.</li>
-            </ul>
+            <p>
+                If you manage to get on the leaderboard (top 100), then your rating will decay by {constants.Placements.AcoDeflatePerDay} points per day.
+                However, there is also an activity bonus of up to {constants.Placements.AcoDeflatePerDay} points per day,
+                so if you play at least {constants.Placements.AcoDeflatePerDay} games a day, your rating will not decay at all.
+                This is to encourage high-ranked players to defend their title.
+            </p>
             <h2>How do I get rated against multiple players in one game?</h2>
             <p>
                 You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
