@@ -2061,6 +2061,14 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 		const targetObj = world.objects.get(projectile.targetId);
 		if (targetObj) {
 			target = targetObj.body.getPosition();
+
+			// Handle invisible target
+			if (targetObj.category === "hero") {
+				const invisible = isHeroInvisible(targetObj);
+				if (invisible) {
+					target = invisible.initialPos;
+				}
+			}
 		}
 	} else if (targetType === w.HomingTargets.cursor) {
 		target = projectile.target;
