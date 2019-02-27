@@ -124,9 +124,8 @@ export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLooku
             continue;
         }
 
-        const values = getRating(userRating); 
-        if (values.exposure && values.percentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(values.exposure, values.percentile, category);
+        if (userRating.acoExposure && userRating.acoPercentile >= 0) {
+            lookup[category] = await calculatePointsUntilNextLeague(userRating.acoExposure, userRating.acoPercentile, category);
         }
     }
     return lookup;
