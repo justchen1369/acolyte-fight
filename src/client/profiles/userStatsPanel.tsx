@@ -148,7 +148,6 @@ class UserStatsPanel extends React.Component<Props, State> {
         const leagueName = rankings.getLeagueName(rating.acoPercentile);
         const nextLeague = this.state.pointsToNextLeague[this.props.category];
 
-        const activityBonus = rating.acoExposure - rating.aco;
         return <div>
             {<div className="stats-card-row">
                 <div className="stats-card">
