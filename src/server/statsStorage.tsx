@@ -25,7 +25,8 @@ const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
 
 export interface WinRateBucket {
-    distance: number;
+    minDiff: number;
+    maxDiff: number;
 
     numGames: number;
     numExpected: number;
@@ -348,7 +349,8 @@ export async function calculateWinRateDistribution(category: string) {
                 let bucket = buckets[index];
                 if (!bucket) {
                     bucket = buckets[index] = {
-                        distance: index * BucketRange,
+                        minDiff: index * BucketRange,
+                        maxDiff: (index + 1) * BucketRange,
                         numGames: 0,
                         numExpected: 0,
                         weightedExpected: 0,
