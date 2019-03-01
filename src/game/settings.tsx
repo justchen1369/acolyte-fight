@@ -617,7 +617,7 @@ const retractor: Spell = {
         {
             type: "homing",
             targetType: "cursor",
-            newSpeed: 0.5,
+            newSpeed: 0.4,
             redirect: true,
         },
     ],
@@ -752,8 +752,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 12.5,
-            outerDamage: 12.5,
+            damage: 10,
+            outerDamage: 10,
             lifeSteal: 1,
             radius: 0.0125,
             minImpulse: 0.0002,
