@@ -1966,7 +1966,7 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 		? findNearest(
 			world.objects,
 			projectile.body.getPosition(),
-			x => x.category === "hero" && x.id !== projectile.owner && (calculateAlliance(projectile.owner, x.id, world) & Alliances.NotFriendly) > 0)
+			x => x.category === "hero" && x.id !== projectile.owner && (calculateAlliance(projectile.owner, x.id, world) & Alliances.NotFriendly) > 0 && !isHeroInvisible(x))
 		: world.objects.get(projectile.owner);
 	if (!nextTarget) {
 		return;
