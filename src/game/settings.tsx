@@ -617,7 +617,7 @@ const retractor: Spell = {
         {
             type: "homing",
             targetType: "cursor",
-            newSpeed: 0.5,
+            newSpeed: 0.4,
             redirect: true,
         },
     ],
