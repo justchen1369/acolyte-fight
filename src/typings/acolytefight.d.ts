@@ -367,6 +367,7 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 	outerDamage?: number;
 
 	radius: number; // The radius of the explosion
+	partialRadius?: boolean; // Whether to let the radius be affected by PartialDamageParameters
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
@@ -631,7 +632,6 @@ declare interface LinkParameters {
 declare interface DamagePacketTemplate {
 	damage: number;
 	damageScaling?: boolean;
-	partialScaling?: boolean; // Whether to be affected by PartialDamageParameters
 	lifeSteal?: number;
 	isLava?: boolean;
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping

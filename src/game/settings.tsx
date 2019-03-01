@@ -694,7 +694,7 @@ const rocket: Spell = {
 
         detonate: {
             damage: 0,
-            partialScaling: true,
+            partialRadius: true,
             radius: 0.035,
             minImpulse: 0.0003,
             maxImpulse: 0.0004,
@@ -1281,7 +1281,7 @@ const mines: Spell = {
         detonate: {
             damage: 4,
             damageScaling: false,
-            partialScaling: false,
+            partialRadius: false,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,

@@ -2344,8 +2344,8 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * multiplier,
 	};
 
-	const partialDetonate = detonate.partialScaling !== undefined ? detonate.partialScaling : true;
-	if (partialDetonate) {
+	const partialRadius = detonate.partialRadius !== undefined ? detonate.partialRadius : false;
+	if (partialRadius) {
 		detonate.minImpulse = projectile.detonate.minImpulse * multiplier;
 		detonate.maxImpulse = projectile.detonate.maxImpulse * multiplier;
 		detonate.radius = projectile.detonate.radius * multiplier;
