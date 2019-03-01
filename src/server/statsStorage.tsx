@@ -23,7 +23,7 @@ const MaxLeaderboardLength = 100;
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
 
-const AcoK = 30;
+const AcoK = 10;
 const AcoR = 800;
 const AcoPower = 1;
 const AcoNumGamesConfidence = 1000;
