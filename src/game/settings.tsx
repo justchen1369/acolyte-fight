@@ -823,7 +823,7 @@ const link: Spell = {
                 type: "lifeSteal",
                 owner: true,
                 targetOnly: true,
-                lifeSteal: 0.5,
+                lifeSteal: 1,
                 maxTicks: 2 * TicksPerSecond,
             },
         ],
