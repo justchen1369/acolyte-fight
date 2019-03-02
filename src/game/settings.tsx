@@ -882,7 +882,7 @@ const grapple: Spell = {
             impulsePerTick: 1.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.15,
-            linkTicks: 3 * TicksPerSecond,
+            linkTicks: 2 * TicksPerSecond,
             movementProportion: 2,
 
             render: {
