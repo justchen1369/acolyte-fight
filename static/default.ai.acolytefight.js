@@ -2,7 +2,7 @@ var settings = null;
 
 var center = { x: 0.5, y: 0.5 };
 var missRadius = 0.05;
-var dodgeMinRadius = 0.05;
+var dodgeMinRadius = 0.03;
 var reactionTimeMilliseconds = 200;
 var delayMilliseconds = 2000;
 var delayJitterMilliseconds = 500;
@@ -253,7 +253,7 @@ function dodge(state, hero, cooldowns) {
 
         var collisionPoint = vectorPlus(projectile.pos, vectorMultiply(projectile.velocity, timeToCollision));
         var distanceToCollision = vectorDistance(collisionPoint, hero.pos);
-        if (distanceToCollision > Math.max(dodgeMinRadius, projectile.radius + hero.radius)) {
+        if (distanceToCollision > Math.max(dodgeMinRadius, projectile.radius) + hero.radius) {
             // Won't hit us
         }
 
