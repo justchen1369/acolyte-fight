@@ -793,7 +793,7 @@ const link: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.005,
+        radius: 0.0075,
         speed: 0.4,
         strafe: {},
         maxTicks: 2.0 * TicksPerSecond,
