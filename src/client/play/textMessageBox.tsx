@@ -8,6 +8,8 @@ import * as constants from '../../game/constants';
 import * as ticker from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
+const MaxCharsPerSecond = 10;
+
 interface Props {
     myGameId: string;
     myHeroId: string;
@@ -15,6 +17,7 @@ interface Props {
 interface State {
     text: string;
     focus: boolean;
+    error: string;
 }
 
 function stateToProps(state: s.State): Props {
@@ -27,12 +30,15 @@ function stateToProps(state: s.State): Props {
 class TextMessageBox extends React.Component<Props, State> {
     private keyDownListener = this.onWindowKeyDown.bind(this);
     private textMessageBox: HTMLInputElement = null;
+    private previousSendMs = 0;
+    private previousMessage = "";
 
     constructor(props: Props) {
         super(props);
         this.state = {
             text: "",
             focus: false,
+            error: null,
         };
     }
 
@@ -61,6 +67,7 @@ class TextMessageBox extends React.Component<Props, State> {
                 onChange={ev => this.onChange(ev)}
                 onKeyDown={(ev) => this.onKeyDown(ev)}
             />
+            {this.state.error && <div className="error">{this.state.error}</div>}
         </div>;
     }
 
@@ -86,12 +93,27 @@ class TextMessageBox extends React.Component<Props, State> {
         ev.stopPropagation();
         if (ev.keyCode === 13) {
             if (this.state.text && this.state.text.length > 0) {
-                ticker.sendTextMessage(this.props.myGameId, this.props.myHeroId, this.state.text);
+                if (this.state.text === this.previousMessage) {
+                    this.blur("Duplicate message");
+                } else if (this.isTooMany(this.state.text.length)) {
+                    this.blur("Too many messages, try again");
+                } else {
+                    ticker.sendTextMessage(this.props.myGameId, this.props.myHeroId, this.state.text);
+                    this.previousMessage = this.state.text;
+                    this.previousSendMs = Date.now();
+                    this.blur();
+                }
+            } else {
+                this.blur();
             }
-            this.blur();
         } else if (ev.keyCode === 27) {
             this.blur();
         }
+    }
+
+    private isTooMany(length: number) {
+        const next = this.previousSendMs + 1000 * (length / MaxCharsPerSecond);
+        return next > Date.now();
     }
 
     private onWindowKeyDown(ev: KeyboardEvent) {
@@ -107,8 +129,12 @@ class TextMessageBox extends React.Component<Props, State> {
         }
     }
     
-    private blur() {
-        this.setState({ text: "", focus: false });
+    private blur(error: string = null) {
+        this.setState({
+            text: error ? this.state.text : "",
+            focus: false,
+            error,
+        });
         if (this.textMessageBox) {
             this.textMessageBox.blur();
         }

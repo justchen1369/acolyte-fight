@@ -609,6 +609,10 @@ i.clickable:hover, i.clickable:active {
     padding: 4px;
 }
 
+.text-message-container .error {
+    font-size: 75%;
+}
+
 .splash-container {
     position: fixed;
 
