@@ -686,6 +686,7 @@ const rocket: Spell = {
         maxTicks: 2.25 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
+        shieldTakesOwnership: false,
 
         partialDamage: {
             initialMultiplier: 0.5,
