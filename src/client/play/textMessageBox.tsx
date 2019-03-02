@@ -51,6 +51,15 @@ class TextMessageBox extends React.Component<Props, State> {
         window.removeEventListener('keydown', this.keyDownListener);
     }
 
+    componentWillReceiveProps(newProps: Props) {
+        if (newProps.myGameId !== this.props.myGameId) {
+            // New game, reset state
+            this.setState({ text: "", error: null });
+            this.previousMessage = "";
+            this.previousSendMs = 0;
+        }
+    }
+
     render() {
         if (!(this.props.myGameId && this.props.myHeroId)) {
             return null;
