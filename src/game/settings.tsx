@@ -632,7 +632,7 @@ const retractor: Spell = {
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         partialDamage: {
-            initialMultiplier: 0.01,
+            initialMultiplier: 0.1,
             ticks: 3 * TicksPerSecond,
         },
 
