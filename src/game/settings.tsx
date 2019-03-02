@@ -418,7 +418,7 @@ const meteorite: Spell = {
     icon: "fragmentedMeteor",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -432,7 +432,7 @@ const meteorite: Spell = {
         damage: 0,
         shieldTakesOwnership: false,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All ^ Categories.Shield,
+        collideWith: Categories.All,
         expireOn: Categories.None,
 
         sound: "meteorite",
