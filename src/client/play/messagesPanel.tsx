@@ -271,7 +271,6 @@ class MessagesPanel extends React.Component<Props, State> {
             return <div key={key} className="row">
                 {notification.killer && <span key="killer"><PlayerName player={notification.killer} /> killed </span>}
                 {notification.killed && <span key="killed"><PlayerName player={notification.killed} /> </span>}
-                {notification.assist && <span key="assist">assist <PlayerName player={notification.assist} /> </span>}
             </div>
         } else {
             return <div key={key} className="row"><PlayerName player={notification.killed} /> died</div>
