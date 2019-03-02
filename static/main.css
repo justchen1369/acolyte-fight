@@ -655,6 +655,16 @@ i.clickable:hover, i.clickable:active {
     pointer-events: none;
 }
 
+#messages-panel .messages-panel-rows {
+    max-height: 33vh;
+    max-width: 50vh;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
 #messages-panel .row {
     color: #ccc;
 

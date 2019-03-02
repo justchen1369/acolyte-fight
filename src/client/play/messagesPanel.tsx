@@ -9,7 +9,6 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
-import * as rankings from '../core/rankings';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import PlayButton from '../ui/playButton';
@@ -122,12 +121,11 @@ class MessagesPanel extends React.Component<Props, State> {
             }
         }
 
-        if (actionRow) {
-            rows.push(actionRow);
-        }
-
         return <div id="messages-panel" style={{ left, right, bottom }}>
-            {rows}
+            <div className="messages-panel-rows">
+                {rows}
+            </div>
+            {actionRow}
             <TextMessageBox />
         </div>;
     }

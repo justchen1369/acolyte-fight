@@ -4,7 +4,7 @@ export const MaxIdleTicks = 30 * TicksPerSecond;
 export const SnapshotTicks = 10;
 export const ObstacleSnapshotTicks = 30;
 export const MaxCooldownWait = 0;
-export const MaxTextMessageLength = 255;
+export const MaxTextMessageLength = 64;
 export const MaxGamesToKeep = 50;
 export const Pixel = 0.001;
 
