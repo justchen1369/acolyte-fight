@@ -461,7 +461,7 @@ const kamehameha: Spell = {
     revsPerTickWhileChannelling: 0.00005,
 
     knockbackCancel: {
-        cooldownTicks: 1 * TicksPerSecond,
+        cooldownTicks: 0.5 * TicksPerSecond,
         maxChannelingTicks: 1 * TicksPerSecond,
     },
     movementCancel: true,
@@ -794,20 +794,23 @@ const link: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.0075,
-        speed: 0.4,
+        radius: 0.005,
+        speed: 0.25,
         strafe: {},
+        restitution: 0,
         maxTicks: 2.0 * TicksPerSecond,
         damage: 0,
-        collideWith: Categories.All ^ Categories.Projectile,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
         shieldTakesOwnership: false,
 
         link: {
             linkWith: Categories.Hero,
             impulsePerTick: 1.0 / TicksPerSecond,
-            minDistance: Hero.Radius * 2,
-            maxDistance: 0.25,
+            selfFactor: 0,
+            targetFactor: 1,
+            minDistance: 0.025,
+            maxDistance: 0.1,
             linkTicks: 2.0 * TicksPerSecond,
 
             render: {
@@ -823,7 +826,7 @@ const link: Spell = {
                 type: "lifeSteal",
                 owner: true,
                 targetOnly: true,
-                lifeSteal: 1,
+                lifeSteal: 0.5,
                 maxTicks: 2 * TicksPerSecond,
             },
         ],
@@ -831,8 +834,9 @@ const link: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 1.0 * TicksPerSecond },
+                trigger: { afterTicks: 1.25 * TicksPerSecond },
                 targetType: HomingTargets.self,
+                newSpeed: 0.5,
                 redirect: true,
             },
             {
