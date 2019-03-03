@@ -2395,7 +2395,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				applyKnockback = true;
 			}
 
-			if (applyKnockback) {
+			if (applyKnockback && detonate.maxImpulse) {
 				const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
 				const direction = vector.relengthen(diff, magnitude);
 				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);

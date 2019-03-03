@@ -624,7 +624,7 @@ const retractor: Spell = {
 
     projectile: {
         damage: 0,
-        density: 1,
+        density: 3,
         radius: 0.007,
         speed: 0.25,
         maxTicks: 4.0 * TicksPerSecond,
@@ -639,8 +639,8 @@ const retractor: Spell = {
         detonate: {
             damage: 25,
             radius: 0.025,
-            minImpulse: 0.00005,
-            maxImpulse: 0.00005,
+            minImpulse: 0,
+            maxImpulse: 0,
             renderTicks: 10,
         },
 
