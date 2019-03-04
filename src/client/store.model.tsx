@@ -46,6 +46,8 @@ export interface PartyState {
     roomId: string;
     isPrivate: boolean;
     isLocked: boolean;
+    initialObserver: boolean;
+    waitForPlayers: boolean;
     members: PartyMemberState[];
 }
 
@@ -195,6 +197,8 @@ export interface UpdatePartyAction {
     members: PartyMemberState[];
     isPrivate: boolean;
     isLocked: boolean;
+    initialObserver: boolean;
+    waitForPlayers: boolean;
 }
 
 export interface UpdateObservingPartyAction {

@@ -298,6 +298,7 @@ export interface PartySettingsRequest {
     roomId?: string;
     isPrivate?: boolean;
     isLocked?: boolean;
+    waitForPlayers?: boolean;
 
     initialObserver?: boolean;
 }
@@ -306,6 +307,7 @@ export interface PartySettingsResponse {
     partyId: string;
     roomId: string;
     isPrivate: boolean;
+    waitForPlayers: boolean;
 }
 export type PartySettingsResponseMsg = PartySettingsResponse | ErrorResponseMsg;
 
@@ -316,6 +318,8 @@ export interface PartyMsg {
     members: PartyMemberMsg[];
     isPrivate: boolean;
     isLocked: boolean;
+    initialObserver: boolean;
+    waitForPlayers: boolean;
 }
 
 export interface PartyMemberMsg {

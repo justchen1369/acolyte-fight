@@ -32,7 +32,8 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 		modified: moment(),
 		roomId,
 		active: new Map<string, g.PartyMember>(),
-		isPrivate: false,
+        isPrivate: false,
+        waitForPlayers: false,
         isLocked: false,
         initialObserver: false,
 	};
@@ -77,7 +78,7 @@ export function isAuthorizedToAdmin(party: g.Party, initiatorId: string) {
 
 export function updatePartyStatus(party: g.Party, status: Partial<g.PartyStatus>) {
     Object.assign(party, status);
-    logger.info(`Party ${party.id} changed to room=${party.roomId} isPrivate=${party.isPrivate} isLocked=${party.isLocked} initialObserver=${party.initialObserver}`);
+    logger.info(`Party ${party.id} changed to room=${party.roomId} isPrivate=${party.isPrivate} waitForPlayers=${party.waitForPlayers} isLocked=${party.isLocked} initialObserver=${party.initialObserver}`);
 }
 
 export function createOrUpdatePartyMember(party: g.Party, newSettings: g.JoinParameters) {
@@ -111,13 +112,14 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 }
 
 export function isPartyReady(party: g.Party): boolean {
-    if (party.isPrivate) {
+    if (party.isPrivate && !party.waitForPlayers) {
         // Start private party games immediately
         return [...party.active.values()].some(p => p.ready && !p.isObserver);
     } else {
-        const relevant = [...party.active.values()].filter(p => p.isLeader || !p.isObserver)
+        const relevant = [...party.active.values()].filter(p => !p.isObserver)
+        const leaders = [...party.active.values()].filter(p => p.isLeader)
         const required = games.apportionPerGame(relevant.length);
-        return relevant.length > 0 && relevant.filter(p => p.ready).length >= required;
+        return relevant.length > 0 && relevant.filter(p => p.ready).length >= required && leaders.every(l => l.ready);
     }
 }
 

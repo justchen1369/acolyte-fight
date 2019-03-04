@@ -67,6 +67,8 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 					members: response.members,
 					isPrivate: response.isPrivate,
 					isLocked: response.isLocked,
+					initialObserver: response.initialObserver,
+					waitForPlayers: response.waitForPlayers,
 				},
 			});
 			return joinCurrentPartyRoomAsync();
@@ -100,6 +102,7 @@ export function publicPartyAsync(): Promise<void> {
 		isPrivate: false,
 		isLocked: false,
 		initialObserver: false,
+		waitForPlayers: true,
 	};
 	return updatePartySettingsAsync(msg);
 }
@@ -115,26 +118,12 @@ export function privatePartyAsync(): Promise<void> {
 		isPrivate: true,
 		isLocked: false,
 		initialObserver: false,
+		waitForPlayers: false,
 	};
 	return updatePartySettingsAsync(msg);
 }
 
-export function tournamentPartyAsync(): Promise<void> {
-	const store = StoreProvider.getState();
-	if (!store.party) {
-		return Promise.resolve();
-	}
-
-	let msg: m.PartySettingsRequest = {
-		partyId: store.party.id,
-		isPrivate: true,
-		isLocked: true,
-		initialObserver: true,
-	};
-	return updatePartySettingsAsync(msg);
-}
-
-function updatePartySettingsAsync(request: m.PartySettingsRequest) {
+export function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	return new Promise<void>((resolve, reject) => {
 		getSocket().emit('party.settings', request, (response: m.PartySettingsResponseMsg) => {
 			if (response.success === false) {
@@ -255,6 +244,8 @@ export async function onPartyMsg(msg: m.PartyMsg) {
 			members: msg.members,
 			isPrivate: msg.isPrivate,
 			isLocked: msg.isLocked,
+			waitForPlayers: msg.waitForPlayers,
+			initialObserver: msg.initialObserver,
 		});
 		await joinCurrentPartyRoomAsync();
 	} else {

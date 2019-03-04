@@ -916,6 +916,12 @@ h2 {
     font-size: 170%;
 }
 
+h3 {
+    margin-top: 1em;
+    margin-bottom: 0px;
+    font-size: 130%;
+}
+
 .spell-stats {
     font-size: 80%;
     color: #aaa;

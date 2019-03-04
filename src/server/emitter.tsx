@@ -252,6 +252,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		&& required(data.partyId, "string")
 		&& optional(data.isPrivate, "boolean")
 		&& optional(data.isLocked, "boolean")
+		&& optional(data.waitForPlayers, "boolean")
 		&& optional(data.roomId, "string")
 		&& optional(data.initialObserver, "boolean")
 	)) {
@@ -272,6 +273,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		roomId: data.roomId,
 		isPrivate: data.isPrivate,
 		isLocked: data.isLocked,
+		waitForPlayers: data.waitForPlayers,
 		initialObserver: data.initialObserver,
 	}, x => x === undefined);
 	parties.updatePartyStatus(party, newStatus);
@@ -281,6 +283,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		partyId: party.id,
 		roomId: party.roomId,
 		isPrivate: party.isPrivate,
+		waitForPlayers: party.waitForPlayers,
 	};
 	callback(result);
 
@@ -623,6 +626,8 @@ function partyToMsg(party: g.Party): m.PartyMsg {
 		members: partyMembersToContract(party),
 		isPrivate: party.isPrivate,
 		isLocked: party.isLocked,
+		initialObserver: party.initialObserver,
+		waitForPlayers: party.waitForPlayers,
 	};
 	return msg;
 }

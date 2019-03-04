@@ -170,6 +170,8 @@ function reducer(state: s.State, action: s.Action): s.State {
                     members: action.members,
                     isPrivate: action.isPrivate,
                     isLocked: action.isLocked,
+                    initialObserver: action.initialObserver,
+                    waitForPlayers: action.waitForPlayers,
                 },
             };
         } else {

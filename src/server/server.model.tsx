@@ -116,6 +116,7 @@ export interface Party extends PartyStatus {
 export interface PartyStatus {
     roomId: string;
     isPrivate: boolean;
+    waitForPlayers: boolean;
     isLocked: boolean;
     initialObserver: boolean;
 }
