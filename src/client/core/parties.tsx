@@ -91,38 +91,6 @@ export function movePartyAsync(roomId: string | null): Promise<void> {
 	return updatePartySettingsAsync(msg);
 }
 
-export function publicPartyAsync(): Promise<void> {
-	const store = StoreProvider.getState();
-	if (!store.party) {
-		return Promise.resolve();
-	}
-
-	let msg: m.PartySettingsRequest = {
-		partyId: store.party.id,
-		isPrivate: false,
-		isLocked: false,
-		initialObserver: false,
-		waitForPlayers: true,
-	};
-	return updatePartySettingsAsync(msg);
-}
-
-export function privatePartyAsync(): Promise<void> {
-	const store = StoreProvider.getState();
-	if (!store.party) {
-		return Promise.resolve();
-	}
-
-	let msg: m.PartySettingsRequest = {
-		partyId: store.party.id,
-		isPrivate: true,
-		isLocked: false,
-		initialObserver: false,
-		waitForPlayers: false,
-	};
-	return updatePartySettingsAsync(msg);
-}
-
 export function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	return new Promise<void>((resolve, reject) => {
 		getSocket().emit('party.settings', request, (response: m.PartySettingsResponseMsg) => {
