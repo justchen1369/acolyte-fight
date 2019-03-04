@@ -86,8 +86,8 @@ export class PartyPanel extends React.Component<Props, State> {
             {this.props.party.members.length >= constants.Matchmaking.MaxPlayers && <p>If you party is larger than {constants.Matchmaking.MaxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             {this.renderPartyMode(self.isLeader)}
-            {self.isLeader && party.isPrivate && this.renderAdvancedIndicator()}
-            {self.isLeader && party.isPrivate && this.state.advanced && this.renderAdvancedSettings()}
+            {self.isLeader && this.renderAdvancedIndicator()}
+            {self.isLeader && this.state.advanced && this.renderAdvancedSettings()}
             <h1>Players</h1>
             <div className="party-list">
                 {party.members.map(m => <PartyMemberControl
@@ -131,27 +131,33 @@ export class PartyPanel extends React.Component<Props, State> {
     private renderAdvancedSettings() {
         const party = this.props.party;
         return <div>
-            <h3>Who can play?</h3>
-            <PartyMode selected={!party.isLocked} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, isLocked: false })} >
-                <span className="party-mode-label"><b>Everyone</b>: all players can freely change between playing and observing.</span>
-            </PartyMode>
-            <PartyMode selected={party.isLocked} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, isLocked: true })} >
-                <span className="party-mode-label"><b>Leader decides</b>: only the party leader can decide who plays and observes.</span>
-            </PartyMode>
-            <h3>Default to playing or observing?</h3>
-            <PartyMode selected={!party.initialObserver} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, initialObserver: false })} >
-                <span className="party-mode-label"><b>Playing</b>: players who join the party begin as players.</span>
-            </PartyMode>
-            <PartyMode selected={party.initialObserver} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, initialObserver: true })} >
-                <span className="party-mode-label"><b>Observing</b>: players who join the party begin as observers.</span>
-            </PartyMode>
-            <h3>When to start games?</h3>
-            <PartyMode selected={!party.waitForPlayers} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, waitForPlayers: false })} >
-                <span className="party-mode-label"><b>Start immediately</b>: players join the game immediately. If they start playing, other players may have to wait until the next game.</span>
-            </PartyMode>
-            <PartyMode selected={party.waitForPlayers} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, waitForPlayers: true })} >
-                <span className="party-mode-label"><b>Wait for all players</b>: wait until all players are ready before adding them to the game. Useful for tournaments.</span>
-            </PartyMode>
+            <>
+                <h3>Who can play?</h3>
+                <PartyMode selected={!party.isLocked} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, isLocked: false })} >
+                    <span className="party-mode-label"><b>Everyone</b>: all players can freely change between playing and observing.</span>
+                </PartyMode>
+                <PartyMode selected={party.isLocked} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, isLocked: true })} >
+                    <span className="party-mode-label"><b>Leader decides</b>: only the party leader can decide who plays and observes.</span>
+                </PartyMode>
+            </>
+            <>
+                <h3>Default to playing or observing?</h3>
+                <PartyMode selected={!party.initialObserver} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, initialObserver: false })} >
+                    <span className="party-mode-label"><b>Playing</b>: players who join the party begin as players.</span>
+                </PartyMode>
+                <PartyMode selected={party.initialObserver} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, initialObserver: true })} >
+                    <span className="party-mode-label"><b>Observing</b>: players who join the party begin as observers.</span>
+                </PartyMode>
+                </>
+            {party.isPrivate && <>
+                <h3>When to start games?</h3>
+                <PartyMode selected={!party.waitForPlayers} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, waitForPlayers: false })} >
+                    <span className="party-mode-label"><b>Start immediately</b>: players join the game immediately. If they start playing, other players may have to wait until the next game.</span>
+                </PartyMode>
+                <PartyMode selected={party.waitForPlayers} onClick={() => parties.updatePartySettingsAsync({ partyId: party.id, waitForPlayers: true })} >
+                    <span className="party-mode-label"><b>Wait for all players</b>: wait until all players are ready before adding them to the game. Useful for tournaments.</span>
+                </PartyMode>
+            </>}
         </div>
     }
 
