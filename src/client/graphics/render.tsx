@@ -1832,8 +1832,10 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	if (isSelected) {
 		button.color = '#f0f0f0';
+	} else if (remainingInSeconds > 0.3) {
+		button.color = '#444';
 	} else if (remainingInSeconds > 0) {
-		button.color = '#444444';
+		button.color = Math.round(remainingInSeconds / 0.1) % 2 === 0 ? '#222' : '#eee';
 	}
 
 	if (isHovered) {
