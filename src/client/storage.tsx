@@ -105,9 +105,7 @@ export function getRebindingsOrDefaults(defaults: KeyBindings) {
 }
 
 export function getOptionsOrDefaults(): m.GameOptions {
-    const options: m.GameOptions = loadOptions() || {
-        unranked: true,
-    };
+    const options: m.GameOptions = loadOptions() || {};
     saveOptions(options);
     return options;
 }

@@ -73,9 +73,6 @@ export async function downloadSettings(): Promise<string> {
         }
 
         if (json.options) {
-            if (json.options.unranked === undefined) {
-                json.options.unranked = false; // Old users default to ranked (new users default to unranked)
-            }
             StoreProvider.dispatch({ type: "updateOptions", options: json.options });
         } else {
             upload = true;
