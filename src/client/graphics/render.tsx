@@ -883,8 +883,12 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
 		if (spell.projectile.behaviours) {
 			spell.projectile.behaviours.forEach(b => {
-				if (b.type === "homing" && b.targetType === "self" && b.minDistanceToTarget > 0) {
-					range = 2 * b.minDistanceToTarget; // Fudge factor of 2x
+				if (b.type === "homing") {
+					if (b.targetType === "self" && b.minDistanceToTarget > 0) {
+						range = 2 * b.minDistanceToTarget; // Fudge factor of 2x
+					} else if (b.newSpeed === 0 && b.trigger && b.trigger.afterTicks) {
+						range = spell.projectile.speed * b.trigger.afterTicks / constants.TicksPerSecond;
+					}
 				}
 			});
 		}
@@ -898,6 +902,14 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 		range = spell.length;
 	} else if (spell.action === "wall") {
 		range = spell.maxRange;
+	} else if (spell.action === "buff") {
+		spell.buffs.forEach(buff => {
+			if (buff.type === "movement") {
+				range = buff.movementProportion * hero.moveSpeedPerSecond * buff.maxTicks / constants.TicksPerSecond;
+			} else if (buff.type === "vanish") {
+				range = spell.movementProportionWhileChannelling * hero.moveSpeedPerSecond * buff.maxTicks / constants.TicksPerSecond;
+			}
+		});
 	}
 
 	if (range > 0.5) {
