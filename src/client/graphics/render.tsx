@@ -1576,6 +1576,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 			color: spell.id === hoverSpellId ? "#555555" : "#444444",
 			icon: spell.icon,
 			cooldownText: null,
+			emphasis: 1,
 		};
 		buttonStateLookup.set(key.btn, btnState);
 	}
@@ -1823,6 +1824,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 		color: spell.color,
 		icon: spell.icon,
 		cooldownText: null,
+		emphasis: 1,
 	};
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
@@ -1831,10 +1833,15 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	if (isSelected) {
 		button.color = '#f0f0f0';
-	} else if (remainingInSeconds > 0.3) {
-		button.color = '#444';
+	} else if (remainingInSeconds > 1) {
+		button.color = '#222';
+		button.emphasis = 0.7;
+	} else if (remainingInSeconds > 0.2) {
+		button.color = '#777';
+	} else if (remainingInSeconds > 0.1) {
+		button.color = '#111';
 	} else if (remainingInSeconds > 0) {
-		button.color = Math.round(remainingInSeconds / 0.1) % 2 === 0 ? '#222' : '#eee';
+		button.color = '#eee';
 	}
 
 	if (isHovered) {
@@ -1852,6 +1859,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
 	const size = buttonRegion.width; // assume square
+	const emphasis = buttonState.emphasis;
 	if (buttonState) {
 		ctx.save();
 		ctx.textAlign = 'center';
@@ -1864,14 +1872,14 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
 		ctx.clip();
 
-		renderIconOnly(ctx, icons.getIcon(buttonState.icon, iconLookup), 0.6, size);
+		renderIconOnly(ctx, icons.getIcon(buttonState.icon, iconLookup), emphasis * 0.6, size);
 
 		if (buttonState.cooldownText) {
 			// Cooldown
 			let cooldownText = buttonState.cooldownText
 
 			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2);
+			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2, emphasis);
 		} else {
 			const key = buttonState.key;
 			if (key && !keyboardUtils.isSpecialKey(key)) {
@@ -1880,7 +1888,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
 				ctx.font = 'bold ' + (size / 2 - 1) + 'px sans-serif';
 
-				renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4);
+				renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4, emphasis);
 
 				ctx.restore();
 			}
@@ -1895,6 +1903,8 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
 function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
 	outerRadius = innerRadius + (0.5 + 0.5 * sector.weight) * (outerRadius - innerRadius);
+
+	const emphasis = buttonState.emphasis;
 
 	ctx.save();
 
@@ -1944,7 +1954,7 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'middle';
 			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
-			renderTextWithShadow(ctx, cooldownText, 0, 0);
+			renderTextWithShadow(ctx, cooldownText, 0, 0, emphasis);
 
 			ctx.restore();
 		}
@@ -1955,13 +1965,13 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 	ctx.restore();
 }
 
-function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: number, y: number) {
+function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, emphasis: number = 1) {
 	ctx.save();
 
 	ctx.fillStyle = 'black';
 	ctx.fillText(text, x + 1, y + 1);
 
-	ctx.fillStyle = 'white';
+	ctx.fillStyle = Color('#fff').darken(1 - emphasis).string();
 	ctx.fillText(text, x, y);
 
 	ctx.restore();

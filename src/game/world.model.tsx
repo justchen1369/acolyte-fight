@@ -159,6 +159,7 @@ export interface ButtonRenderState {
 	color: string;
 	icon: string;
 	cooldownText: string;
+	emphasis: number;
 }
 
 export type Notification =
