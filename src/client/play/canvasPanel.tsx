@@ -472,7 +472,8 @@ class CanvasPanel extends React.Component<Props, State> {
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
         const pos = hero.body.getPosition();
         const center = pl.Vec2(0.5, 0.5);
-        if (world.ui.hoverSpellId) {
+        if (world.ui.hoverSpellId && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
+            // User is choosing a spell now, don't move them
             return pos;
         }
 
