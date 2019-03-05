@@ -330,20 +330,19 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 	}
 
 	let owner = world.objects.get(ev.owner);
-	if (!owner) {
+	if (!(owner && owner.category === "hero")) {
 		return;
 	}
 
 	const pos = owner.body.getPosition();
-
 	pushTrail({
 		type: 'ripple',
 		initialTick: ev.tick,
 		max: MaxTicks,
 		pos: vector.clone(pos),
 		fillStyle: HeroColors.HealColor,
-		initialRadius: world.settings.Hero.Radius,
-		finalRadius: world.settings.Hero.Radius * 2,
+		initialRadius: owner.radius * 1,
+		finalRadius: owner.radius * 1.5,
 	}, world);
 }
 
@@ -1431,7 +1430,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		const minRadius = Math.max(0, radius - lineWidth / 2);
 		const maxRadius = radius + lineWidth / 2;
 		glx.circle(ctxStack, trail.pos, {
-			color: color.alpha(proportion),
+			color: color.alpha(color.alpha() * proportion),
 			minRadius,
 			maxRadius,
 			feather,
