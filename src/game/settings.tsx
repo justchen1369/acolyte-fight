@@ -30,7 +30,7 @@ const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutRadius: 0.25,
 
-    LavaDamagePerSecond: 14,
+    LavaDamagePerSecond: 13.75,
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
     ShrinkPowerMaxPlayers: 1,
