@@ -30,7 +30,7 @@ const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutRadius: 0.25,
 
-    LavaDamagePerSecond: 15,
+    LavaDamagePerSecond: 14,
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
     ShrinkPowerMaxPlayers: 1,
@@ -160,7 +160,7 @@ const fireball: Spell = {
         radius: 0.003,
         speed: 0.6,
         maxTicks: 1 * TicksPerSecond,
-        damage: 9,
+        damage: 10,
         lifeSteal: 0.2,
         categories: Categories.Projectile,
 
@@ -198,7 +198,7 @@ const flamestrike: Spell = {
         expireAfterCursorTicks: 0,
 
         detonate: {
-            damage: 15,
+            damage: 20,
             lifeSteal: 0.2,
             radius: 0.03,
             minImpulse: 0.00005,
@@ -263,7 +263,7 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 9 / 3 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 3 projectiles, 2 seconds, 3 times per second
+                packet: { damage: 10 / 3 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 3 projectiles, 2 seconds, 3 times per second
                 maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -334,7 +334,7 @@ const difire: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 9 / 2 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 2 projectiles, 2 seconds, 3 times per second
+                packet: { damage: 10 / 2 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 2 projectiles, 2 seconds, 3 times per second
                 maxTicks: 2 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -371,7 +371,7 @@ const firespray: Spell = {
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
-        damage: 3.5,
+        damage: 3.3,
         damageScaling: false,
 
         color: '#ff0044',
@@ -540,7 +540,7 @@ const homing: Spell = {
         radius: 0.003,
         speed: 0.15,
         maxTicks: 5 * TicksPerSecond,
-        damage: 12,
+        damage: 15,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         behaviours: [
@@ -579,7 +579,7 @@ const boomerang: Spell = {
         radius: 0.004,
         speed: 0.5,
         maxTicks: 5.0 * TicksPerSecond,
-        damage: 12,
+        damage: 15,
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
         hitInterval: 15, // So repeated hits to obstacles work
@@ -644,7 +644,7 @@ const retractor: Spell = {
         },
 
         detonate: {
-            damage: 30,
+            damage: 33,
             lifeSteal: 0.2,
             radius: 0.025,
             minImpulse: 0,
@@ -761,8 +761,8 @@ const whip: Spell = {
         shieldTakesOwnership: false,
 
         detonate: {
-            damage: 15,
-            outerDamage: 15,
+            damage: 16,
+            outerDamage: 16,
             lifeSteal: 1,
             radius: 0.0125,
             minImpulse: 0.0002,
@@ -942,7 +942,7 @@ const bouncer: Spell = {
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         hitInterval: 15,
-        damage: 4.8,
+        damage: 5,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
         bounce: {
@@ -975,7 +975,7 @@ const drain: Spell = {
         radius: 0.002,
         speed: 0.2,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 6,
+        damage: 7,
         lifeSteal: 1.0,
 
         behaviours: [
@@ -1218,7 +1218,7 @@ const halo: Spell = {
         speed: 0.5,
         maxTicks: 20.0 * TicksPerSecond,
         hitInterval: 15,
-        damage: 4.8,
+        damage: 5,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
@@ -1292,7 +1292,7 @@ const mines: Spell = {
         },
 
         detonate: {
-            damage: 5,
+            damage: 5.25,
             damageScaling: false,
             partialRadius: false,
             radius: 0.015,
@@ -1369,7 +1369,7 @@ const scourge: Spell = {
     untargeted: true,
 
     detonate: {
-        damage: 24,
+        damage: 26,
         damageScaling: false,
         radius: Hero.Radius * 4,
         minImpulse: 0.0002,
@@ -1382,7 +1382,7 @@ const scourge: Spell = {
     unlink: true,
     interruptibleAfterTicks: 0,
     movementCancel: true,
-    selfDamage: 12,
+    selfDamage: 13,
     minSelfHealth: 1,
 
     icon: "deadlyStrike",
