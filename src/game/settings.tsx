@@ -1369,7 +1369,7 @@ const scourge: Spell = {
     untargeted: true,
 
     detonate: {
-        damage: 26,
+        damage: 25,
         damageScaling: false,
         radius: Hero.Radius * 4,
         minImpulse: 0.0002,
@@ -1382,7 +1382,7 @@ const scourge: Spell = {
     unlink: true,
     interruptibleAfterTicks: 0,
     movementCancel: true,
-    selfDamage: 13,
+    selfDamage: 12.5,
     minSelfHealth: 1,
 
     icon: "deadlyStrike",
