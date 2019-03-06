@@ -17,7 +17,7 @@ const Hero: HeroSettings = {
     DamageMitigationTicks: 90,
     ThrottleTicks: 15,
 
-    AdditionalDamageMultiplier: 2.0,
+    AdditionalDamageMultiplier: 1.5,
     AdditionalDamagePower: 1.0,
 
     MaxHealth: 100,
@@ -371,7 +371,8 @@ const firespray: Spell = {
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
-        damage: 3,
+        damage: 3.5,
+        damageScaling: false,
 
         color: '#ff0044',
         renderers: [
@@ -1217,7 +1218,7 @@ const halo: Spell = {
         speed: 0.5,
         maxTicks: 20.0 * TicksPerSecond,
         hitInterval: 15,
-        damage: 5,
+        damage: 4.8,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
