@@ -1561,12 +1561,12 @@ const voidRush: Spell = {
         {
             type: "movement",
             movementProportion: 1.75,
-            maxTicks: 3 * TicksPerSecond,
+            maxTicks: 2.5 * TicksPerSecond,
         },
         {
             type: "lavaImmunity",
             damageProportion: 0,
-            maxTicks: 3 * TicksPerSecond,
+            maxTicks: 2.5 * TicksPerSecond,
             sound: "voidRush-lavaImmunity",
             render: {
                 color: "#8800ff",
