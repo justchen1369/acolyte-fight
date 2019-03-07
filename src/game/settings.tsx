@@ -198,7 +198,7 @@ const flamestrike: Spell = {
         expireAfterCursorTicks: 0,
 
         detonate: {
-            damage: 20,
+            damage: 17,
             lifeSteal: 0.2,
             radius: 0.03,
             minImpulse: 0.00005,
