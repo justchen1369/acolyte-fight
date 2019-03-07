@@ -1106,6 +1106,7 @@ const whirlwind: Spell = {
                 type: "movement",
                 movementProportion: 0.5,
                 maxTicks: 2 * TicksPerSecond,
+                against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 0.5)",
                     emissionRadius: Hero.Radius,
