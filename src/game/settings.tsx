@@ -1350,7 +1350,7 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 2 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
@@ -1422,7 +1422,7 @@ const icewall: Spell = {
     maxRange: 0.25,
     chargeTicks: 0.25 * TicksPerSecond,
     movementProportionWhileCharging: 1.0,
-    maxTicks: 1.25 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
