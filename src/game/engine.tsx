@@ -2790,7 +2790,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		const pos = hero.body.getPosition();
 
 		let directionTarget = action.target;
-		if (spell.revsPerTickWhileChannelling > 0) {
+		if (spell.revsPerTickWhileChannelling > 0 || (directionTarget.x === pos.x && directionTarget.y === pos.y)) {
 			directionTarget = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
 		}
 
