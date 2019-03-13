@@ -67,6 +67,10 @@ export function getPath(elems: s.PathElements) {
     let params = [];
     if (elems.gameId) {
         params.push("g=" + elems.gameId);
+
+        if (elems.page === "record") {
+            pathElements = [elems.page];
+        }
     } else if (elems.profileId) {
         params.push("p=" + elems.profileId);
         pathElements = ["profile"];

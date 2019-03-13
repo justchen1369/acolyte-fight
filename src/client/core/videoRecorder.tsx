@@ -59,6 +59,10 @@ export class VideoRecorder {
     }
 
     async stop(): Promise<void> {
+        if (!this.started) {
+            return; // Nothing to stop
+        }
+
         if (this.stopped) {
             return;
         } else {
