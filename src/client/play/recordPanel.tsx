@@ -115,8 +115,14 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private onExitClicked() {
-        matches.leaveCurrentGame(true);
-        pages.changePage("");
+        StoreProvider.dispatch({
+            type: "updateUrl",
+            current: {
+                ...this.props.current,
+                page: "",
+                recordId: null,
+            },
+        });
     }
 
     private fullScreenCanvas() {
@@ -131,7 +137,7 @@ class CanvasPanel extends React.Component<Props, State> {
     private async execute(token: CancellationToken) {
         try {
             const current = this.props.current;
-            const replay = await replays.getReplay(current.gameId, current.server);
+            const replay = await replays.getReplay(current.recordId, current.server);
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
             FileSaver.saveAs(blob, `acolytefight-${replay.gameId}.webm`);

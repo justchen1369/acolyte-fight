@@ -70,6 +70,7 @@ export interface PathElements {
     path?: string;
     page?: string;
     gameId?: string;
+    recordId?: string;
     party?: string;
     server?: string;
     hash?: string;

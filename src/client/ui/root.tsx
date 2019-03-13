@@ -50,17 +50,19 @@ class Root extends React.Component<Props> {
     render() {
         if (this.props.myGameId) {
             return this.renderGame();
+        } else if (this.props.current.recordId) {
+            return this.renderRecord();
         } else {
             return this.renderPage();
         }
     }
 
     private renderGame() {
-        if (this.props.current.page === "record") {
-            return <RecordPanel />;
-        } else {
-            return <GamePanel />;
-        }
+        return <GamePanel />;
+    }
+
+    private renderRecord() {
+        return <RecordPanel />;
     }
 
     private renderPage() {
