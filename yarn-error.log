@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add twgl
+  /usr/local/bin/node /usr/local/bin/yarn add webm-writer @types/webm-writer
 
 PATH: 
   /Users/rayhidayat/Downloads/google-cloud-sdk/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/twgl: Not found
+  Error: https://registry.yarnpkg.com/@types%2fwebm-writer: Not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:65894:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:129018:22)
       at Request.emit (events.js:182:13)

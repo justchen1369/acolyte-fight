@@ -183,6 +183,10 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
 	const CrossHairSize = world.settings.Hero.Radius;
 
+	if (!world.ui.myHeroId) {
+		return;
+	}
+
 	if (!isMobile) {
 		return;
 	}

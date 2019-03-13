@@ -2,10 +2,10 @@ import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as processor from './processor';
 import * as stats from './stats';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
-import * as sockets from './sockets';
 import * as url from '../url';
 import * as vector from '../../game/vector';
 import { isMobile } from './userAgent';
@@ -141,13 +141,8 @@ export function onHeroMsg(data: m.HeroMsg) {
 		world = store.world;
 	} else {
 		leaveCurrentGame(false);
-		world = engine.initialWorld(data.mod);
+		world = processor.initialWorld(data);
 	}
-
-	world.ui.myGameId = data.gameId;
-	world.ui.myHeroId = data.heroId;
-	world.ui.myPartyId = data.partyId;
-	world.ui.reconnectKey = data.reconnectKey;
 
 	ticker.reset(data.history, data.live);
 

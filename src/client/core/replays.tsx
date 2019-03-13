@@ -72,7 +72,7 @@ export async function watch(gameId: string, server: string = null) {
     }
 }
 
-async function getReplay(gameId: string, server: string = null): Promise<m.HeroMsg> {
+export async function getReplay(gameId: string, server: string = null): Promise<m.HeroMsg> {
     let prefix = '';
     if (server) {
         const region = regions.getRegion(server);

@@ -2,6 +2,7 @@ import pl from 'planck-js';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
+import * as processor from './processor';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
 import { render, CanvasStack, RenderOptions } from '../graphics/render';
@@ -27,7 +28,7 @@ export function reset(history: m.TickMsg[], live: boolean) {
 		tickQueue = [];
 		incomingQueue = [...history];
 
-		while (incomingQueue.length > 0 && !isStartGameTick(incomingQueue[0])) {
+		while (incomingQueue.length > 0 && !processor.isStartGameTick(incomingQueue[0])) {
 			tickQueue.push(incomingQueue.shift());
 		}
 	}
@@ -37,15 +38,6 @@ export function setPreferredColor(userHash: string, color: string) {
 	preferredColors.set(userHash, color);
 }
 
-function isStartGameTick(tickData: m.TickMsg) {
-	let result = false;
-	tickData.actions.forEach(actionData => {
-		if (actionData.actionType === m.ActionType.CloseGame) {
-			result = true;
-		}
-	});
-	return result;
-}
 
 
 function incomingLoop(minFramesToProcess: number) {
@@ -102,8 +94,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 			continue; // Received the same tick multiple times, skip over it
 		}
 
-		applyTickActions(tickData, world, preferredColors);
-		engine.tick(world);
+		processor.applyTick(tickData, world, preferredColors);
 
 		/*
 		const hash = engine.hash(world);
@@ -125,85 +116,6 @@ export function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
 	}
-}
-
-function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: Map<string, string>) {
-	if (tickData.gameId !== world.ui.myGameId) {
-		return;
-	}
-
-	tickData.actions.forEach(actionData => {
-		if (actionData.gameId !== world.ui.myGameId) {
-			// Skip this action
-		} else if (actionData.actionType === m.ActionType.GameAction) {
-			world.actions.set(actionData.heroId, {
-				type: actionData.spellId,
-				target: pl.Vec2(actionData.targetX, actionData.targetY),
-			});
-		} else if (actionData.actionType === m.ActionType.CloseGame) {
-			world.occurrences.push({
-				type: "closing",
-				startTick: actionData.closeTick,
-				ticksUntilClose: actionData.waitPeriod,
-				numTeams: actionData.numTeams,
-			});
-		} else if (actionData.actionType === m.ActionType.Join) {
-			world.occurrences.push({
-				type: "join",
-				heroId: actionData.heroId,
-				userId: actionData.userId,
-				userHash: actionData.userHash,
-				partyHash: actionData.partyHash,
-				playerName: actionData.playerName || "Acolyte",
-				keyBindings: actionData.keyBindings,
-				preferredColor: preferredColors.get(actionData.userHash),
-				isBot: actionData.isBot,
-				isMobile: actionData.isMobile,
-			});
-		} else if (actionData.actionType === m.ActionType.Bot) {
-			world.occurrences.push({
-				type: "botting",
-				heroId: actionData.heroId,
-				keyBindings: actionData.keyBindings,
-			});
-		} else if (actionData.actionType === m.ActionType.Leave) {
-			world.occurrences.push({
-				type: "leave",
-				heroId: actionData.heroId,
-			});
-		} else if (actionData.actionType === m.ActionType.Environment) {
-			world.occurrences.push({
-				type: "environment",
-				seed: actionData.seed,
-				layoutId: actionData.layoutId,
-			});
-		} else if (actionData.actionType === m.ActionType.Text) {
-			world.occurrences.push({
-				type: "text",
-				heroId: actionData.heroId,
-				text: actionData.text,
-			});
-		} else if (actionData.actionType === m.ActionType.Spells) {
-			world.occurrences.push({
-				type: "spells",
-				heroId: actionData.heroId,
-				keyBindings: actionData.keyBindings,
-			});
-		} else if (actionData.actionType === m.ActionType.Sync) {
-			const heroLookup = new Map<string, w.ObjectSnapshot>();
-			actionData.heroes.forEach(snapshot => {
-				heroLookup.set(snapshot.heroId, {
-					health: snapshot.health,
-					pos: pl.Vec2(snapshot.posX, snapshot.posY),
-				});
-			});
-			world.occurrences.push({
-				type: "sync",
-				tick: actionData.tick,
-				objectLookup: heroLookup,
-			});
-		}
-	});
 }
 
 function sendSnapshot(world: w.World) {

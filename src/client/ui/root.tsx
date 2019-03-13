@@ -4,7 +4,7 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import AccountPanel from '../profiles/accountPanel';
+
 import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
 import GamePanel from '../play/gamePanel';
@@ -13,6 +13,7 @@ import LeaderboardPanel from '../profiles/leaderboardPanel';
 import PartyPanel from './partyPanel';
 import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from '../profiles/profilePanel';
+import RecordPanel from '../play/recordPanel';
 import SettingsPanel from './settingsPanel';
 import TitleSection from './titleSection';
 import NavBar from '../nav/navbar';
@@ -55,7 +56,11 @@ class Root extends React.Component<Props> {
     }
 
     private renderGame() {
-        return <GamePanel />;
+        if (this.props.current.page === "record") {
+            return <RecordPanel />;
+        } else {
+            return <GamePanel />;
+        }
     }
 
     private renderPage() {
