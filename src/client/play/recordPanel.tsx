@@ -137,6 +137,10 @@ class CanvasPanel extends React.Component<Props, State> {
     private async execute(token: CancellationToken) {
         try {
             const current = this.props.current;
+            if (!current.recordId) {
+                return;
+            }
+
             const replay = await replays.getReplay(current.recordId, current.server);
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
