@@ -185,7 +185,7 @@ class CanvasPanel extends React.Component<Props, State> {
 
         if (token.cancelled) { throw token; }
 
-        const videoRecorder = new VideoRecorder(canvasStack.gl);
+        const videoRecorder = new VideoRecorder(canvasStack.gl); // Firefox cannot start capturing stream until Canvas has had getContext called on it
         try {
             await videoRecorder.start();
             console.log("Recording started...", replay.gameId);
