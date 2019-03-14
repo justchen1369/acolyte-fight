@@ -11,8 +11,9 @@ interface BlobEvent {
 }
 
 declare class MediaRecorder {
-    constructor(stream: MediaStream, opts: MediaRecorderOpts);
+    static isTypeSupported(mimeType: string): boolean;
 
+    constructor(stream: MediaStream, opts: MediaRecorderOpts);
     start(): void;
     stop(): void;
 
@@ -31,8 +32,14 @@ export class VideoRecorder {
     private stopped = false;
 
     constructor(canvas: HTMLCanvasElement) {
-        const canvasSource = canvas as any as CanvasSource;
-        this.stream = canvasSource.captureStream();
+        try {
+            const canvasSource = canvas as any as CanvasSource;
+            this.stream = canvasSource.captureStream();
+        } catch (exception) {
+            console.error(exception);
+            throw `Unable to capture video stream ${exception}`;
+        }
+
         this.recorder = new MediaRecorder(this.stream, {
             mimeType: 'video/webm',
         });

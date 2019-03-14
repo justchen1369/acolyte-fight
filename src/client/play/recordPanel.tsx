@@ -175,18 +175,18 @@ class CanvasPanel extends React.Component<Props, State> {
         if (token.cancelled) { throw token; }
 
         console.log("Initialising recording...", replay.gameId);
+        const remaining = [...replay.history];
+        const world: w.World = processor.initialWorld(replay);
+
+        while (remaining.length > 0 && !processor.isStartGameTick(remaining[0])) {
+            processor.applyTick(remaining.shift(), world);
+        }
+        this.renderFrame(world, canvasStack);
+
+        if (token.cancelled) { throw token; }
+
         const videoRecorder = new VideoRecorder(canvasStack.gl);
         try {
-            const remaining = [...replay.history];
-            const world: w.World = processor.initialWorld(replay);
-
-            while (remaining.length > 0 && !processor.isStartGameTick(remaining[0])) {
-                processor.applyTick(remaining.shift(), world);
-            }
-            this.renderFrame(world, canvasStack);
-
-            if (token.cancelled) { throw token; }
-
             await videoRecorder.start();
             console.log("Recording started...", replay.gameId);
 
