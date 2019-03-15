@@ -25,24 +25,25 @@ declare class MediaRecorder {
     onerror: (e: any) => void;
 }
 
+export function recordCanvas(canvas: HTMLCanvasElement) {
+    try {
+        const canvasSource = canvas as any as CanvasSource;
+        return canvasSource.captureStream();
+    } catch (exception) {
+        console.error(exception);
+        throw `Unable to capture video stream ${exception}`;
+    }
+}
+
 export class VideoRecorder {
-    private stream: MediaStream;
     private recorder: MediaRecorder;
     private chunks = new Array<BlobPart>();
 
     private started = false;
     private stopped = false;
 
-    constructor(canvas: HTMLCanvasElement) {
-        try {
-            const canvasSource = canvas as any as CanvasSource;
-            this.stream = canvasSource.captureStream();
-        } catch (exception) {
-            console.error(exception);
-            throw `Unable to capture video stream ${exception}`;
-        }
-
-        this.recorder = new MediaRecorder(this.stream, {
+    constructor(stream: MediaStream) {
+        this.recorder = new MediaRecorder(stream, {
             mimeType: 'video/webm',
         });
         this.recorder.ondataavailable = (e) => {

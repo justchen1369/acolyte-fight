@@ -10,7 +10,9 @@ let sources = new Map<string, AudioSource>();
 
 interface AudioEnvironment {
     ctx: AudioContext;
+    final: AudioNode;
     next: AudioNode;
+    recordingDestination: MediaStreamAudioDestinationNode;
     brownNoise: AudioBuffer;
     locked: boolean;
 }
@@ -119,6 +121,7 @@ export function init() {
         let next: AudioNode = ctx.destination;
 
         const compressor = ctx.createDynamicsCompressor();
+        const final = compressor;
         compressor.connect(next);
         next = compressor;
 
@@ -129,8 +132,10 @@ export function init() {
 
         env = {
             ctx,
+            final,
             next,
             brownNoise,
+            recordingDestination: null,
             locked: true,
         };
     }
@@ -142,6 +147,24 @@ export function unlock() {
         if (env.ctx.state === "suspended") {
             env.ctx.resume();
         }
+    }
+}
+
+export function record() {
+    if (env.recordingDestination) {
+        return env.recordingDestination.stream;
+    }
+
+    const recordingDest = env.ctx.createMediaStreamDestination();
+    env.final.connect(recordingDest);
+    env.recordingDestination = recordingDest;
+    return recordingDest.stream;
+}
+
+export function unrecord() {
+    if (env.recordingDestination) {
+        env.final.disconnect(env.recordingDestination);
+        env.recordingDestination = null;
     }
 }
 

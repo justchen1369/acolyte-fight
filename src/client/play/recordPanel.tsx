@@ -2,6 +2,7 @@ import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 
+import * as audio from '../core/audio';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as processor from '../core/processor';
@@ -31,6 +32,7 @@ interface CancellationToken {
 interface Props {
     recordId: string;
     server: string;
+    mute: boolean;
 }
 interface State {
     top: number;
@@ -47,6 +49,7 @@ function stateToProps(state: s.State): Props {
     return {
         recordId: state.current.recordId,
         server: state.current.server,
+        mute: state.options.mute,
     };
 }
 
@@ -204,7 +207,16 @@ class CanvasPanel extends React.Component<Props, State> {
 
         if (token.cancelled) { throw token; }
 
-        const videoRecorder = new VideoRecorder(canvasStack.gl); // Firefox cannot start capturing stream until Canvas has had getContext called on it
+        // Firefox cannot start capturing stream until Canvas has had getContext called on it, so do this here
+        const videoStream = recording.recordCanvas(canvasStack.gl);
+        let stream = videoStream;
+
+        if (!this.props.mute) {
+            const audioStream = audio.record();
+            stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
+        }
+
+        const videoRecorder = new VideoRecorder(stream);
         try {
             await videoRecorder.start();
             console.log("Recording started...", replay.gameId);
@@ -236,6 +248,8 @@ class CanvasPanel extends React.Component<Props, State> {
         } finally {
             console.log("Recording finished.", replay.gameId);
             await videoRecorder.stop();
+
+            audio.unrecord();
         }
 
         return videoRecorder.blob();
@@ -247,7 +261,7 @@ class CanvasPanel extends React.Component<Props, State> {
             rtx: GraphicsLevel.Ultimate,
             wheelOnRight: false,
             targetingIndicator: false,
-            mute: true,
+            mute: this.props.mute,
             keysToSpells: new Map<string, string>(),
             rebindings: {},
         });
