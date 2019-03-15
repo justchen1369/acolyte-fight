@@ -5,6 +5,7 @@ import * as ReactRedux from 'react-redux';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as processor from '../core/processor';
+import * as recording from '../core/recording';
 import * as replays from '../core/replays';
 import * as StoreProvider from '../storeProvider';
 import * as m from '../../game/messages.model';
@@ -13,7 +14,7 @@ import * as w from '../../game/world.model';
 
 import { TicksPerSecond } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
-import { VideoRecorder } from '../core/videoRecorder';
+import { VideoRecorder } from '../core/recording';
 
 import UrlListener from '../controls/urlListener';
 
@@ -52,8 +53,7 @@ function delay(milliseconds: number = TickInterval): Promise<void> {
 
 function nextFrame(): Promise<void> {
     return new Promise<void>(resolve => {
-        // Not using requestAnimationFrame because frame must be rendered for the video, even if window is minimised
-        setTimeout(resolve, TickInterval);
+        window.requestAnimationFrame(() => resolve());
     });
 }
 
@@ -115,14 +115,7 @@ class CanvasPanel extends React.Component<Props, State> {
     }
 
     private onExitClicked() {
-        StoreProvider.dispatch({
-            type: "updateUrl",
-            current: {
-                ...this.props.current,
-                page: "",
-                recordId: null,
-            },
-        });
+        recording.leaveRecording();
     }
 
     private fullScreenCanvas() {
@@ -194,7 +187,7 @@ class CanvasPanel extends React.Component<Props, State> {
             let index = 0;
             while (remaining.length > 0) {
                 const target = Math.floor((Date.now() - epoch) / TickInterval);
-                if (index < target) {
+                while (index < target) {
                     processor.applyTick(remaining.shift(), world);
                     ++index;
                 }

@@ -84,6 +84,7 @@ export interface UIState {
 	myHeroId: string | null;
 	myPartyId: string | null;
 	reconnectKey: string | null;
+	live: boolean;
 
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;

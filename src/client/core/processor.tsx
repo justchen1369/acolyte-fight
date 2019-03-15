@@ -10,6 +10,7 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;
 	world.ui.reconnectKey = data.reconnectKey;
+	world.ui.live = data.live;
 
 	return world;
 

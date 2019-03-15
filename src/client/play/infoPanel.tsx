@@ -8,6 +8,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as matches from '../core/matches';
+import * as recording from '../core/recording';
 import * as StoreProvider from '../storeProvider';
 import InfoPanelPlayer from './infoPanelPlayer';
 
@@ -18,12 +19,14 @@ interface Team {
 }
 
 interface Props {
+    gameId: string;
     myHeroId: string;
     activePlayers: Immutable.Set<string>;
     players: Immutable.Map<string, w.Player>;
     teams: Team[];
     started: boolean;
     waitingForPlayers: boolean;
+    live: boolean;
     mute?: boolean;
 }
 interface State {
@@ -32,12 +35,14 @@ interface State {
 function stateToProps(state: s.State): Props {
     const world = state.world;
     return {
+        gameId: world.ui.myGameId,
         myHeroId: world.ui.myHeroId,
         activePlayers: world.activePlayers,
         players: world.players,
         teams: calculateTeams(state),
         started: engine.hasGamePrestarted(world),
         waitingForPlayers: world.tick < world.startTick,
+        live: world.ui.live,
         mute: state.options && state.options.mute,
     };
 }
@@ -78,7 +83,7 @@ class InfoPanel extends React.Component<Props, State> {
                         <span className="player-list-num-players">{this.props.activePlayers.size} players</span>
                     )}
                 </div>
-                {this.props.activePlayers.size > 0 && <div className="player-list">
+                {<div className="player-list">
                     {this.renderPlayerList()}
                 </div>}
                 {this.renderButtons()}
@@ -87,17 +92,26 @@ class InfoPanel extends React.Component<Props, State> {
     }
 
     private renderButtons() {
-        if (!this.props.myHeroId) {
-            return null;
-        }
-
-        if (!this.props.started && this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
-            return <div className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</div>;
-        } else if (this.props.waitingForPlayers && this.props.players.size < Matchmaking.TargetGameSize) {
-            return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
+        if (this.props.myHeroId) {
+            if (!this.props.started && this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
+                return <div className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</div>;
+            } else if (this.props.waitingForPlayers && this.props.players.size < Matchmaking.TargetGameSize) {
+                return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
+            } else {
+                return null;
+            }
         } else {
-            return null;
+            if (!this.props.live || this.props.activePlayers.size === 0) {
+                return <div className="btn play-vs-ai-btn" onClick={() => this.onRecordClick()}>Save as Video <i className="fas fa-download" /></div>
+            } else {
+                return null;
+            }
         }
+    }
+
+    private onRecordClick() {
+        matches.leaveCurrentGame(true);
+        recording.enterRecording(this.props.gameId);
     }
 
     private renderPlayerList() {

@@ -1,3 +1,5 @@
+import * as StoreProvider from '../storeProvider';
+
 interface CanvasSource {
     captureStream(): MediaStream;
 }
@@ -88,5 +90,37 @@ export class VideoRecorder {
 
     blob(): Blob {
         return new Blob(this.chunks);
+    }
+}
+
+export function isRecordingSupported() {
+    return !!(window as any).MediaRecorder;
+}
+
+export function enterRecording(recordId: string, server: string = null) {
+    const state = StoreProvider.getState();
+    if (recordId) {
+        StoreProvider.dispatch({
+            type: "updateUrl",
+            current: {
+                ...state.current,
+                recordId,
+                server,
+            },
+        });
+    }
+}
+
+export function leaveRecording() {
+    const state = StoreProvider.getState();
+    if (state.current.recordId) {
+        StoreProvider.dispatch({
+            type: "updateUrl",
+            current: {
+                ...state.current,
+                recordId: null,
+                server: null,
+            },
+        });
     }
 }

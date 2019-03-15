@@ -94,6 +94,7 @@ export function initialWorld(mod: Object): w.World {
 			myHeroId: null,
 			myPartyId: null,
 			reconnectKey: null,
+			live: false,
 			renderedTick: null,
 			sentSnapshotTick: 0,
 			playedTick: -1,
