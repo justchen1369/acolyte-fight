@@ -594,6 +594,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 	}
 
 	socket.join(game.id);
+	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
 
 	const publicSegment = segments.publicSegment();
 	const numPlayersPublic = games.calculateRoomStats(publicSegment);
@@ -601,6 +602,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
+		userHash,
 		reconnectKey,
 		isPrivate: game.segment !== publicSegment,
 		partyId: game.partyId,

@@ -199,6 +199,7 @@ class CanvasPanel extends React.Component<Props, State> {
         console.log("Initialising recording...", replay.gameId);
         const remaining = [...replay.history];
         const world: w.World = processor.initialWorld(replay);
+        console.log("Replay started...", world.ui.myGameId, world.ui.myUserHash);
 
         while (remaining.length > 0 && !processor.isStartGameTick(remaining[0])) {
             processor.applyTick(remaining.shift(), world);

@@ -227,6 +227,7 @@ export interface HeroMsg {
     gameId: string;
     heroId: string | null; // null means observer
     reconnectKey: string | null; // Use this to reconnect to the same hero ID
+    userHash: string | null;
 
     isPrivate: boolean;
     partyId: string;

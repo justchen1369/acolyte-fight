@@ -93,6 +93,7 @@ export function initialWorld(mod: Object): w.World {
 			myGameId: null,
 			myHeroId: null,
 			myPartyId: null,
+			myUserHash: null,
 			reconnectKey: null,
 			live: false,
 			renderedTick: null,

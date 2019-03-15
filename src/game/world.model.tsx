@@ -83,6 +83,7 @@ export interface UIState {
 	myGameId: string | null;
 	myHeroId: string | null;
 	myPartyId: string | null;
+	myUserHash: string | null;
 	reconnectKey: string | null;
 	live: boolean;
 

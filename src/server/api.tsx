@@ -254,6 +254,8 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
         return;
     }
 
+    const userHash = auth.getUserHashFromAuthToken(auth.getAuthToken(req));
+
     const store = getStore();
     const replay = store.activeGames.get(gameId) || await gameStorage.loadGame(gameId);
     if (replay) {
@@ -262,6 +264,7 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
             gameId: replay.id,
             heroId: null,
             reconnectKey: null,
+            userHash,
             isPrivate: replay.isPrivate,
             partyId: replay.partyId,
             room: replay.roomId,
