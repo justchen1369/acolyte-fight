@@ -29,20 +29,24 @@ interface CancellationToken {
 }
 
 interface Props {
-    current: s.PathElements;
+    recordId: string;
+    server: string;
 }
 interface State {
     top: number;
     left: number;
     size: number;
 
+    progress: number;
+    blob: Blob;
     complete: boolean;
     error: string;
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        current: state.current,
+        recordId: state.current.recordId,
+        server: state.current.server,
     };
 }
 
@@ -73,6 +77,8 @@ class CanvasPanel extends React.Component<Props, State> {
             top: 0,
             left: 0,
             size: 0,
+            progress: 0,
+            blob: null,
             complete: false,
             error: null,
         };
@@ -111,9 +117,25 @@ class CanvasPanel extends React.Component<Props, State> {
                         width={Size} height={Size}
                         style={style} />
                 </div>
+                <div className="recording-status-panel">
+                    {!this.state.complete && <div className="recording-status"><span className="recording">Recording video {(100 * this.state.progress).toFixed(0)}%</span> - do not switch tabs or minimise this window</div>}
+                    {this.state.blob && <div className="recording-status">Recording complete - <a href="#" onClick={(ev) => this.onDownloadClicked(ev)}>click here to download your video if it has not already</a></div>}
+                    {this.state.error && <div className="error">{this.state.error}</div>}
+                </div>
                 <UrlListener />
             </div>
         );
+    }
+
+    private onDownloadClicked(ev: React.MouseEvent) {
+        ev.preventDefault();
+        this.download();
+    }
+
+    private download() {
+        if (this.state.blob) {
+            FileSaver.saveAs(this.state.blob, `acolytefight-${this.props.recordId}.webm`);
+        }
     }
 
     private onExitClicked() {
@@ -131,17 +153,17 @@ class CanvasPanel extends React.Component<Props, State> {
 
     private async execute(token: CancellationToken) {
         try {
-            const current = this.props.current;
-            if (!current.recordId) {
+            if (!this.props.recordId) {
                 return;
             }
 
-            const replay = await replays.getReplay(current.recordId, current.server);
+            const replay = await replays.getReplay(this.props.recordId, this.props.server);
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
-            FileSaver.saveAs(blob, `acolytefight-${replay.gameId}.webm`);
 
-            this.setState({ complete: true });
+            this.setState({ blob, complete: true });
+
+            this.download(); // Requires blob to be set in the state
         } catch (exception) {
             if (exception !== token) {
                 console.error(exception);
@@ -187,6 +209,7 @@ class CanvasPanel extends React.Component<Props, State> {
             await videoRecorder.start();
             console.log("Recording started...", replay.gameId);
 
+            const numFrames = remaining.length;
             const epoch = Date.now();
             let index = 0;
             while (remaining.length > 0) {
@@ -195,8 +218,13 @@ class CanvasPanel extends React.Component<Props, State> {
                     processor.applyTick(remaining.shift(), world);
                     ++index;
                 }
-
                 this.renderFrame(world, canvasStack);
+
+                const progress = 1 - (remaining.length / numFrames);
+                if (progress >= this.state.progress + 0.01) {
+                    this.setState({ progress });
+                }
+
                 if (world.winner && (world.tick - world.winTick) >= AfterSeconds * TicksPerSecond) {
                     // Game is complete
                     break;

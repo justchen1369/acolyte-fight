@@ -776,6 +776,25 @@ i.clickable:hover, i.clickable:active {
     margin-left: 0.25em;
 }
 
+.recording-status-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    margin: 8;
+}
+
+.recording {
+    font-weight: bold;
+    color: red;
+    animation: recording-animation alternate 0.5s infinite;
+}
+
+@keyframes recording-animation {
+    0% { opacity: 1; }
+    75% { opacity: 1; }
+    100% { opacity: 0.75; }
+}
+
 #spell-info-panel {
     position: absolute;
     right: 0;
