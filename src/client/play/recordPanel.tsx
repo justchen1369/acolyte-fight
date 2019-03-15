@@ -36,6 +36,7 @@ interface State {
     left: number;
     size: number;
 
+    complete: boolean;
     error: string;
 }
 
@@ -72,6 +73,7 @@ class CanvasPanel extends React.Component<Props, State> {
             top: 0,
             left: 0,
             size: 0,
+            complete: false,
             error: null,
         };
     }
@@ -97,7 +99,7 @@ class CanvasPanel extends React.Component<Props, State> {
         return (
             <div id="game-panel">
                 <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
-                    <i className="fa fa-chevron-left" /> Cancel
+                    <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
                 </span>
                 <div id="canvas-container">
                     <canvas
@@ -138,6 +140,8 @@ class CanvasPanel extends React.Component<Props, State> {
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
             FileSaver.saveAs(blob, `acolytefight-${replay.gameId}.webm`);
+
+            this.setState({ complete: true });
         } catch (exception) {
             if (exception !== token) {
                 console.error(exception);

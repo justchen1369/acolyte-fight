@@ -101,7 +101,7 @@ class InfoPanel extends React.Component<Props, State> {
                 return null;
             }
         } else {
-            if (!this.props.live || this.props.activePlayers.size === 0) {
+            if ((!this.props.live || this.props.activePlayers.size === 0) && recording.isRecordingSupported()) {
                 return <div className="btn play-vs-ai-btn" onClick={() => this.onRecordClick()}>Save as Video <i className="fas fa-download" /></div>
             } else {
                 return null;
