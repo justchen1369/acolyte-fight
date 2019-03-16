@@ -1091,6 +1091,14 @@ const gravity: Spell = {
             render: renderGravity,
         },
 
+        buffs: [
+            {
+                type: "cooldown",
+                maxTicks: 1,
+                minCooldown: 0.5 * TicksPerSecond,
+            },
+        ],
+
         behaviours: [
             {
                 type: "homing",

@@ -514,7 +514,7 @@ declare interface LifestealTemplate extends BuffTemplateBase {
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
 	type: "cooldown";
-	spellId: string;
+	spellId?: string;
 	minCooldown?: number;
 	maxCooldown?: number;
 	color?: string;
