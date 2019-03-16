@@ -88,7 +88,7 @@ const Choices: ChoiceSettings = {
         ],
 		"r": [
             ["kamehameha"],
-            ["bouncer"],
+            ["bouncer", "repeater"],
             ["supernova", "rocket"],
         ],
 		"f": [
@@ -956,6 +956,51 @@ const bouncer: Spell = {
         ],
     },
 };
+const repeater: Spell = {
+    id: 'repeater',
+    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately.",
+    action: "projectile",
+
+    color: '#00ff00',
+    icon: "divert",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
+
+    projectile: {
+        density: 5,
+        radius: 0.002,
+        speed: 0.8,
+        maxTicks: 1 * TicksPerSecond,
+        damage: 10,
+        collideWith: Categories.All ^ Categories.Projectile,
+        expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
+        partialDamage: {
+            initialMultiplier: 0.5,
+            ticks: 15,
+        },
+
+        buffs: [
+            {
+                type: "cooldown",
+                owner: true,
+                maxTicks: 1,
+                against: Alliances.Enemy, // Otherwise will repeat when we hit anything
+                spellId: "repeater",
+                maxCooldown: 0,
+            },
+        ],
+
+        sound: "repeater",
+        color: '#00ff00',
+        renderers: [
+            { type: "projectile", ticks: 15 },
+            { type: "ray", intermediatePoints: true, ticks: 15, glow: 0.1 },
+            { type: "strike", ticks: 15, glow: true, growth: 1, numParticles: 5 },
+        ],
+    },
+};
 const drain: Spell = {
     id: 'drain',
     description: "Steal some life from another player. They probably didn't need it anyway.",
@@ -1636,6 +1681,7 @@ const Spells = {
     rocket,
     whip,
     bouncer,
+    repeater,
     drain,
     icewall,
     saber,

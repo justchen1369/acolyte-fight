@@ -878,6 +878,34 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "repeater": {
+        "start": [
+            {
+                "stopTime": 1,
+                "attack": 0.1,
+                "decay": 0.9,
+                "startFreq": 2500,
+                "stopFreq": 2500,
+                "lowPass": 1000,
+                "wave": "triangle",
+                "tremoloFreq": 15,
+                "tremoloStrength": 0.4,
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            },
+            {
+                volume: 0.5,
+                "stopTime": 1,
+                "attack": 0.25,
+                "decay": 0.75,
+                "highPass": 2500,
+                "lowPass": 2500,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "firespray-channelling": {
         cutoffEarly: false,
         start: [

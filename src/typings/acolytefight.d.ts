@@ -463,6 +463,7 @@ declare type BuffTemplate =
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
+	| SetCooldownTemplate
 	| BurnTemplate
 	| ArmorTemplate
 
@@ -509,6 +510,13 @@ declare interface LifestealTemplate extends BuffTemplateBase {
 	type: "lifeSteal";
 	lifeSteal: number;
 	targetOnly?: boolean;
+}
+
+declare interface SetCooldownTemplate extends BuffTemplateBase {
+	type: "cooldown";
+	spellId: string;
+	minCooldown?: number;
+	maxCooldown?: number;
 }
 
 declare interface BurnTemplate extends BuffTemplateBase {

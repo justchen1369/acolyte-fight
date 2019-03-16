@@ -1917,13 +1917,18 @@ function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
 		}
 
 		const against = template.against !== undefined ? template.against : Categories.All;
-		if ((calculateAlliance(projectile.owner, receiver.id, world) & against) > 0) {
-			const id = `${projectile.type}-${template.type}`;
-			instantiateBuff(id, template, receiver, world, {
-				fromHeroId: projectile.owner,
-				toHeroId: target && target.id,
-			});
+		if (against !== Categories.All) {
+			const targetId = target ? target.id : null;
+			if (!(calculateAlliance(projectile.owner, targetId, world) & against)) {
+				return;
+			}
 		}
+
+		const id = `${projectile.type}-${template.type}`;
+		instantiateBuff(id, template, receiver, world, {
+			fromHeroId: projectile.owner,
+			toHeroId: target && target.id,
+		});
 	});
 }
 
@@ -3227,6 +3232,23 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 				stack: template.stack,
 			});
 		}
+	} else if (template.type === "cooldown") {
+		hero.keysToSpells.forEach(spellId => {
+			if (!template.spellId || spellId === template.spellId) {
+				const spell = world.settings.Spells[spellId];
+				const initialCooldown = cooldownRemaining(world, hero, spell);
+				let cooldown = initialCooldown;
+				if (template.maxCooldown !== undefined) {
+					cooldown = Math.min(template.maxCooldown, cooldown);
+				}
+				if (template.minCooldown !== undefined) {
+					cooldown = Math.max(template.minCooldown, cooldown);
+				}
+				if (cooldown !== initialCooldown) {
+					setCooldown(world, hero, spellId, cooldown);
+				}
+			}
+		});
 	} else if (template.type === "armor") {
 		let fromHeroId: string = null;
 		if (template.ownerOnly) {
