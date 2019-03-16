@@ -127,14 +127,26 @@ function recovery(state, hero, cooldowns) {
 }
 
 function deflect(state, hero, cooldowns, projectile) {
+    var target = vectorMidpoint(hero.pos, projectile.pos);
+    var spellId = null;
     if (cooldowns["shield"] === 0) {
-        return { spellId: "shield", target: center };
+        spellId = "shield";
     } else if (cooldowns["icewall"] === 0) {
-        var target = vectorMidpoint(hero.pos, projectile.pos);
-        return { spellId: "icewall", target };
+        spellid = "icewall";
     } else if (cooldowns["saber"] === 0) {
-        var target = vectorMidpoint(hero.pos, projectile.pos);
-        return { spellId: "saber", target };
+        spellId = "saber";
+    } else if (cooldowns["dualSaber"] === 0) {
+        spellId = "dualSaber";
+    } else if (cooldowns["meteor"] === 0) {
+        spellId = "meteor";
+    } else if (cooldowns["meteorite"] === 0) {
+        spellId = "meteorite";
+    } else {
+        spellId = null;
+    }
+
+    if (spellId) {
+        return { spellId, target };
     } else {
         return null;
     }
