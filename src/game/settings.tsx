@@ -1095,6 +1095,7 @@ const gravity: Spell = {
         buffs: [
             {
                 type: "cooldown",
+                against: Alliances.NotFriendly,
                 maxTicks: 1,
                 minCooldown: 0.5 * TicksPerSecond,
             },
