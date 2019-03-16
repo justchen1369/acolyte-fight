@@ -962,7 +962,7 @@ const repeater: Spell = {
     action: "projectile",
 
     color: '#00ff00',
-    icon: "divert",
+    icon: "sonicLightning",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
