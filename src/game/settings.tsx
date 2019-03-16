@@ -317,15 +317,15 @@ const difire: Spell = {
                 targetType: "cursor",
                 trigger: { afterTicks: 5 },
                 redirect: true,
-                newSpeed: 0.5,
+                newSpeed: 0.6,
             },
         ],
 
         color: '#ff0088',
         renderers: [
             { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 10 },
-            { type: "strike", ticks: 10, glow: true, numParticles: 2 },
+            { type: "ray", ticks: 8 },
+            { type: "strike", ticks: 8, glow: true, numParticles: 2 },
         ],
 
         buffs: [
