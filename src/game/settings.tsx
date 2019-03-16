@@ -200,7 +200,7 @@ const flamestrike: Spell = {
         detonate: {
             damage: 20,
             lifeSteal: 0.2,
-            radius: 0.03,
+            radius: 0.0225,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
             renderTicks: 10,
@@ -958,7 +958,7 @@ const bouncer: Spell = {
 };
 const repeater: Spell = {
     id: 'repeater',
-    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately.",
+    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Takes 0.5 seconds to grow to full damage, so hit from a distance for maximum damage.",
     action: "projectile",
 
     color: '#00ff00',
@@ -977,7 +977,7 @@ const repeater: Spell = {
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
         partialDamage: {
-            initialMultiplier: 0.5,
+            initialMultiplier: 0.25,
             ticks: 0.5 * TicksPerSecond,
         },
 
