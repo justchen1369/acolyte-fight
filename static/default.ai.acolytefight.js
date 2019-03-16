@@ -47,7 +47,7 @@ function handleInput(state, heroId, cooldowns) {
             || dodge(state, hero, cooldowns)
             || castSpell(state, hero, strongest, cooldowns)
             || focus(hero, strongest)
-            || chase(state, hero, closest)
+            || chase(state, hero, cooldowns, strongest)
             || move(state, hero, closest);
     } else {
         action = move(state, hero, closest);
@@ -224,7 +224,7 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
     }
 }
 
-function chase(state, hero, opponent) {
+function chase(state, hero, cooldowns, opponent) {
     var numHalos = 0;
     for (var projectileId in state.projectiles) {
         var projectile = state.projectiles[projectileId];
@@ -235,6 +235,9 @@ function chase(state, hero, opponent) {
 
     if (numHalos >= 2) {
         return { spellId: "move", target: opponent.pos };
+    } else if (cooldowns["whip"] === 0) {
+        var target = vectorMidpoint(hero.pos, opponent.pos);
+        return { spellId: "move", target };
     } else {
         return null;
     }
