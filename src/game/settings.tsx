@@ -81,7 +81,7 @@ const Choices: ChoiceSettings = {
             ["boomerang"],
         ],
 		"e": [
-            ["saber"],
+            ["saber", "dualSaber"],
             ["shield", "icewall"],
             ["drain"],
             ["meteor", "meteorite"],
@@ -1395,6 +1395,7 @@ const saber: Spell = {
     maxSpeed: 0.75,
     maxTurnRatePerTickInRevs: 0.1,
 
+    angleOffsetsInRevs: [0],
     width: Pixel,
     length: 0.075,
 
@@ -1413,6 +1414,42 @@ const saber: Spell = {
 
     trailTicks: 5,
     color: '#00ccff',
+
+    sound: "saber",
+    action: "saber",
+};
+
+const dualSaber: Spell = {
+    id: 'dualSaber',
+    name: 'Dualsaber',
+    description: "Swing dual lightsabers to deflect projectiles and knockback enemies!",
+
+    takesOwnership: true,
+    blocksTeleporters: false,
+    shiftMultiplier: 0.25,
+    speedMultiplier: 2,
+    maxSpeed: 0.75,
+    maxTurnRatePerTickInRevs: 0.1,
+
+    angleOffsetsInRevs: [-0.25, 0.25],
+    width: Pixel,
+    length: 0.06,
+
+    movementProportionWhileChannelling: 0.5,
+    interruptibleAfterTicks: 20,
+
+    cooldown: 10 * TicksPerSecond,
+    throttle: false,
+
+    icon: "waveStrike",
+
+    maxTicks: 1.5 * TicksPerSecond,
+
+    categories: Categories.Shield,
+    collidesWith: Categories.Hero | Categories.Projectile,
+
+    trailTicks: 5,
+    color: '#ff0044',
 
     sound: "saber",
     action: "saber",
@@ -1695,6 +1732,7 @@ const Spells = {
     drain,
     icewall,
     saber,
+    dualSaber,
     scourge,
     shield,
     supernova,

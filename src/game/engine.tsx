@@ -264,10 +264,10 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 	return shield;
 }
 
-function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
+function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: number) {
 	const shieldId = "shield" + (world.nextObjectId++);
 
-	const angle = hero.body.getAngle();
+	const angle = hero.body.getAngle() + angleOffset;
 	const position = hero.body.getPosition();
 
 	const body = world.physics.createBody({
@@ -309,6 +309,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell) {
 		glow: spell.glow,
 
 		spellId: spell.id,
+		angleOffset,
 		width: spell.width,
 		length: spell.length,
 		shiftMultiplier: spell.shiftMultiplier,
@@ -3023,8 +3024,11 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
 	const saberTick = world.tick - hero.casting.channellingStartTick;
 	if (saberTick === 0) {
-		const saber = addSaber(world, hero, spell);
-		world.behaviours.push({ type: "saberSwing", shieldId: saber.id });
+		spell.angleOffsetsInRevs.forEach(angleOffsetInRevs => {
+			const angleOffset = angleOffsetInRevs * 2 * Math.PI;
+			const saber = addSaber(world, hero, spell, angleOffset);
+			world.behaviours.push({ type: "saberSwing", shieldId: saber.id });
+		});
 	}
 	return saberTick >= spell.maxTicks;
 }
@@ -3056,7 +3060,8 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const heroPos = hero.body.getPosition();
 
 	const previousAngle = saber.body.getAngle();
-	const newAngle = vector.turnTowards(previousAngle, vector.angle(vector.diff(hero.target, heroPos)), saber.turnRate);
+	const targetAngle = vector.angle(vector.diff(hero.target, heroPos)) + saber.angleOffset;
+	const newAngle = vector.turnTowards(previousAngle, targetAngle, saber.turnRate);
 	if (previousAngle === newAngle) {
 		return true; // Nothing to do
 	}

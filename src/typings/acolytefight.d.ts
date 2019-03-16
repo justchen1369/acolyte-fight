@@ -587,6 +587,7 @@ declare interface SaberSpell extends ShieldSpell {
 	maxSpeed: number; // The maximum speed the saber can accelerate an object to
 	maxTurnRatePerTickInRevs: number; // THe maximum speed the saber can be swung
 
+	angleOffsetsInRevs: number[];
 	length: number;
 	width: number;
 
