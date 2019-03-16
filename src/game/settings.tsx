@@ -973,12 +973,12 @@ const repeater: Spell = {
         radius: 0.002,
         speed: 0.8,
         maxTicks: 1 * TicksPerSecond,
-        damage: 10,
+        damage: 15,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
         partialDamage: {
             initialMultiplier: 0.5,
-            ticks: 15,
+            ticks: 0.5 * TicksPerSecond,
         },
 
         buffs: [
