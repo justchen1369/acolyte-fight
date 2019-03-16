@@ -989,6 +989,8 @@ const repeater: Spell = {
                 against: Alliances.Enemy, // Otherwise will repeat when we hit anything
                 spellId: "repeater",
                 maxCooldown: 0,
+                sound: "repeater",
+                color: '#00ff00',
             },
         ],
 

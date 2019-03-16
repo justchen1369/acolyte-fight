@@ -3249,6 +3249,14 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 				}
 			}
 		});
+
+		world.ui.events.push({
+			type: "cooldown",
+			tick: world.tick,
+			color: template.color,
+			sound: template.sound,
+			heroId: hero.id,
+		});
 	} else if (template.type === "armor") {
 		let fromHeroId: string = null;
 		if (template.ownerOnly) {

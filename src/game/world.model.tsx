@@ -809,6 +809,7 @@ export type WorldEvent =
 	| TeleportEvent
 	| PushEvent
 	| VanishEvent
+	| SetCooldownEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -842,6 +843,13 @@ export interface VanishEvent extends WorldEventBase {
 	heroId: string;
 	pos: pl.Vec2;
 	appear: boolean;
+}
+
+export interface SetCooldownEvent extends WorldEventBase {
+	type: "cooldown";
+	heroId: string;
+	color?: string;
+	sound?: string;
 }
 
 export interface PushEvent extends WorldEventBase {

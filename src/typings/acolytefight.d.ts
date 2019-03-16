@@ -517,6 +517,7 @@ declare interface SetCooldownTemplate extends BuffTemplateBase {
 	spellId: string;
 	minCooldown?: number;
 	maxCooldown?: number;
+	color?: string;
 }
 
 declare interface BurnTemplate extends BuffTemplateBase {

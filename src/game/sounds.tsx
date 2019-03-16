@@ -884,8 +884,8 @@ export const Sounds: Sounds = {
                 "stopTime": 1,
                 "attack": 0.1,
                 "decay": 0.9,
-                "startFreq": 2500,
-                "stopFreq": 2500,
+                "startFreq": 2000,
+                "stopFreq": 2000,
                 "lowPass": 1000,
                 "wave": "triangle",
                 "tremoloFreq": 15,
@@ -896,13 +896,34 @@ export const Sounds: Sounds = {
                 ]
             },
             {
-                volume: 0.5,
+                "volume": 0.5,
                 "stopTime": 1,
                 "attack": 0.25,
                 "decay": 0.75,
-                "highPass": 2500,
-                "lowPass": 2500,
+                "highPass": 2000,
+                "lowPass": 2000,
                 "wave": "brown-noise"
+            }
+        ]
+    },
+    "repeater-setCooldown": {
+        cutoffEarly: false,
+        "start": [
+            {
+                "volume": 0.5,
+                "stopTime": 0.25,
+                "attack": 0.01,
+                "decay": 0.24,
+                "startFreq": 4000,
+                "stopFreq": 4000,
+                "lowPass": 4000,
+                "wave": "square",
+                "tremoloFreq": 15,
+                "tremoloStrength": 0.4,
+                "ratios": [
+                    1,
+                    1.5
+                ]
             }
         ]
     },

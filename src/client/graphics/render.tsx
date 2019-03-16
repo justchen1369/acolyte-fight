@@ -350,6 +350,41 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 	}, world);
 }
 
+function renderSetCooldown(ctxStack: CanvasCtxStack, ev: w.SetCooldownEvent, world: w.World) {
+	const MaxTicks = 15;
+
+	if (world.tick >= ev.tick + MaxTicks) {
+		return; // Too late
+	}
+
+	let owner = world.objects.get(ev.heroId);
+	if (!(owner && owner.category === "hero")) {
+		return;
+	}
+	const pos = owner.body.getPosition();
+
+	if (ev.color) {
+		pushTrail({
+			type: 'ripple',
+			initialTick: ev.tick,
+			max: MaxTicks,
+			pos: vector.clone(pos),
+			fillStyle: ev.color,
+			initialRadius: owner.radius * 1,
+			finalRadius: owner.radius * 1.5,
+		}, world);
+	}
+
+	if (ev.sound && (!world.ui.myHeroId || ev.heroId === world.ui.myHeroId)) {
+		// Only play sound if it affects me
+		world.ui.sounds.push({
+			id: `${owner.id}-setCooldown`,
+			sound: `${ev.sound}-setCooldown`,
+			pos,
+		});
+	}
+}
+
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World) {
 	if (ev.type === "detonate") {
 		renderDetonate(ctxStack, ev, world);
@@ -361,7 +396,9 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderPush(ctxStack, ev, world);
 	} else if (ev.type === "vanish") {
 		renderVanish(ctxStack, ev, world);
-	} else {
+	} else if (ev.type === "cooldown") {
+		renderSetCooldown(ctxStack, ev, world);
+	 } else {
 		return;
 	}
 }
