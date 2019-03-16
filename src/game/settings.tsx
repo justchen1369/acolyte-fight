@@ -942,7 +942,7 @@ const bouncer: Spell = {
         fixedSpeed: false,
         maxTicks: 3.0 * TicksPerSecond,
         hitInterval: 15,
-        damage: 5,
+        damage: 7.5,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
         bounce: {
