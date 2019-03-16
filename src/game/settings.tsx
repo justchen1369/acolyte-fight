@@ -1062,7 +1062,7 @@ const renderGravity: RenderSwirl = {
 const gravity: Spell = {
     id: 'gravity',
     name: 'Ensnare',
-    description: "Hold an enemy in place while you unleash your volleys upon them.",
+    description: "Hold an enemy in place while you unleash your volleys upon them. Your enemy will be unable to cast spells for 0.5 seconds.",
     action: "projectile",
 
     color: '#0ace00',
