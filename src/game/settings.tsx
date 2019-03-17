@@ -966,6 +966,7 @@ const repeater: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    chargeTicks: 3,
     throttle: true,
 
     projectile: {
