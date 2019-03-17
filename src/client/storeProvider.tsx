@@ -37,6 +37,7 @@ function initialState(): s.State {
         party: null,
         world: engine.initialWorld(room.mod),
         items: [],
+        silenced: new Set<string>(),
         profile: null,
         allGameStats: new Map<string, d.GameStats>(),
         hasReplayLookup: new Map<string, string>(),
@@ -145,6 +146,15 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }
+    } else if (action.type === "updateSilence") {
+        const silenced = new Set<string>(state.silenced);
+        if (action.add) {
+            action.add.forEach(userHash => silenced.add(userHash));
+        }
+        if (action.remove) {
+            action.remove.forEach(userHash => silenced.delete(userHash));
+        }
+        return { ...state, silenced };
     } else if (action.type === "updateRoom") {
         return {
             ...state,

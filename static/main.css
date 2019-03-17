@@ -556,6 +556,23 @@ i.clickable:hover, i.clickable:active {
     font-size: 120%;
 }
 
+.player-list .silence-btn {
+    margin-left: 4px;
+    color: #888;
+    pointer-events: all;
+    cursor: hand;
+}
+
+.player-list .silence-btn:hover {
+    color: #fff;
+}
+
+.player-list .player-list-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
 #info-panel .play-vs-ai-btn {
     margin-top: 10px;
 }
@@ -679,6 +696,7 @@ i.clickable:hover, i.clickable:active {
 }
 
 #messages-panel .text-row {
+    pointer-events: all;
     font-size: 120%;
 }
 
@@ -774,6 +792,15 @@ i.clickable:hover, i.clickable:active {
 #messages-panel .advert-row i {
     font-size: 150%;
     margin-left: 0.25em;
+}
+
+#messages-panel .row .silence-btn {
+    opacity: 0;
+    cursor: hand;
+}
+
+#messages-panel .row:hover .silence-btn {
+    opacity: 1;
 }
 
 .recording-status-panel {

@@ -30,6 +30,7 @@ interface Props {
     options: m.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
+    silenced: Set<string>;
 }
 interface State {
     spectatingGameId: string;
@@ -49,6 +50,7 @@ function stateToProps(state: s.State): Props {
         options: state.options,
         exitable: worldInterruptible(state.world),
         items: state.items,
+        silenced: state.silenced,
     };
 }
 
@@ -222,7 +224,27 @@ class MessagesPanel extends React.Component<Props, State> {
     }
 
     private renderTextNotification(key: string, notification: w.TextNotification) {
-        return <div key={key} className="row text-row"><PlayerName player={notification.player} />: <span className="text-message">{notification.text}</span></div>
+        const player = notification.player;
+        if (this.props.silenced.has(player.userHash)) {
+            return null;
+        } else {
+            return <div key={key} className="row text-row"><PlayerName player={player} />: <span className="text-message">{notification.text}</span> {this.renderSilenceBtn(player)}</div>
+        }
+    }
+
+    private renderSilenceBtn(player: w.Player) {
+        if (player.heroId === this.props.myHeroId) {
+            return null;
+        } else {
+            return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onSilenceClick(player.userHash)} title="Hide all messages from this player" />;
+        }
+    }
+
+    private onSilenceClick(userHash: string) {
+        StoreProvider.dispatch({
+            type: "updateSilence",
+            add: [userHash],
+        });
     }
 
     private renderTeamsNotification(key: string, notification: w.TeamsNotification) {

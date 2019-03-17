@@ -27,6 +27,7 @@ export interface State {
     room: RoomState;
     world: w.World;
     items: NotificationItem[];
+    silenced: Set<string>;
 
     profile: m.GetProfileResponse;
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
@@ -94,6 +95,7 @@ export type Action =
     | JoinMatchAction
     | LeaveMatchAction
     | UpdateNotificationsAction
+    | UpdateSilencedAction
     | UpdateRoomAction
     | JoinPartyAction
     | UpdatePartyAction
@@ -179,6 +181,12 @@ export interface UpdatePageAction {
 export interface UpdateNotificationsAction {
     type: "updateNotifications";
     items: NotificationItem[];
+}
+
+export interface UpdateSilencedAction {
+    type: "updateSilence";
+    add?: string[];
+    remove?: string[];
 }
 
 export interface UpdateRoomAction {
