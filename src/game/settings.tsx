@@ -223,7 +223,7 @@ const flamestrike: Spell = {
 const triplet: Spell = {
     id: 'triplet',
     name: 'Trifire',
-    description: "Each bolt of Trifire will add another stack of continuous burning damage. Keep hitting your enemy with Trifire to keep the damage going forever.",
+    description: "Each bolt of Trifire will add another stack of continuous burning damage. Keep hitting your enemy with Trifire to burn them faster and faster.",
     action: "spray",
     sound: "triplet",
 
@@ -279,7 +279,7 @@ const triplet: Spell = {
 const difire: Spell = {
     id: 'difire',
     name: 'Difire',
-    description: "Each bolt of Difire will add another stack of continuous burning damage. Keep hitting your enemy with Difire to keep the damage going forever.",
+    description: "Each bolt of Difire will add another stack of continuous burning damage. Keep hitting your enemy with Difire to burn them faster and faster.",
     action: "spray",
 
     color: '#ff0088',
