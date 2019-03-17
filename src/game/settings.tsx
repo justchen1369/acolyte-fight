@@ -971,7 +971,7 @@ const repeater: Spell = {
 
     projectile: {
         density: 5,
-        radius: 0.002,
+        radius: 0.003,
         speed: 0.8,
         maxTicks: 1 * TicksPerSecond,
         damage: 15,
@@ -999,7 +999,7 @@ const repeater: Spell = {
         color: '#00ff00',
         renderers: [
             { type: "projectile", ticks: 18 },
-            { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.1 },
+            { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.1, radiusMultiplier: 0.5 },
             { type: "strike", ticks: 18, glow: true, growth: 1, numParticles: 5 },
         ],
     },
