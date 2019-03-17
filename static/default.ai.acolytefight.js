@@ -192,7 +192,7 @@ function validAttack(state, hero, opponent, spell) {
             return false;
         }
 
-        var range = spell.projectile.speed * spell.projectile.maxTicks / state.ticksPerSecond;
+        var range = spell.projectile.speed * spell.projectile.maxTicks / state.ticksPerSecond + opponent.radius;
         return distance <= range;
     } else if (spell.action === "scourge") {
         var range = spell.radius + opponent.radius;
