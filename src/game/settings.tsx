@@ -998,9 +998,9 @@ const repeater: Spell = {
         sound: "repeater",
         color: '#00ff00',
         renderers: [
-            { type: "projectile", ticks: 15 },
-            { type: "ray", intermediatePoints: true, ticks: 15, glow: 0.1 },
-            { type: "strike", ticks: 15, glow: true, growth: 1, numParticles: 5 },
+            { type: "projectile", ticks: 18 },
+            { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.1 },
+            { type: "strike", ticks: 18, glow: true, growth: 1, numParticles: 5 },
         ],
     },
 };
