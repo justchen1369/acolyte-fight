@@ -201,7 +201,7 @@ class CanvasPanel extends React.Component<Props, State> {
         const world: w.World = processor.initialWorld(replay);
         console.log("Replay started...", world.ui.myGameId, world.ui.myUserHash);
 
-        while (remaining.length > 0 && !processor.isStartGameTick(remaining[0])) {
+        while (remaining.length > 0 && world.tick < world.startTick) {
             processor.applyTick(remaining.shift(), world);
         }
         this.renderFrame(world, canvasStack);
