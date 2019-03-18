@@ -9,6 +9,8 @@ import { render, CanvasStack, RenderOptions } from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
+const blacklist = /circumcis|sexual|orgasm/i;
+
 const preferredColors = new Map<string, string>(); // userHash -> color
 
 let tickQueue = new Array<m.TickMsg>();
@@ -115,6 +117,18 @@ export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
+
+		data.actions.forEach(action => {
+			if (action.heroId !== world.ui.myHeroId && action.actionType === "text" && blacklist.test(action.text)) {
+				const player = world.players.get(action.heroId);
+				if (player && player.userHash) {
+					StoreProvider.dispatch({
+						type: "updateSilence",
+						add: [player.userHash],
+					});
+				}
+			}
+		});
 	}
 }
 
