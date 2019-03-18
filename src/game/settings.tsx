@@ -966,12 +966,13 @@ const repeater: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
+    chargeTicks: 3,
     throttle: true,
 
     projectile: {
         density: 1,
         radius: 0.002,
-        speed: 0.6,
+        speed: 0.8,
         maxTicks: 1 * TicksPerSecond,
         damage: 15,
         collideWith: Categories.All ^ Categories.Projectile,
