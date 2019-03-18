@@ -233,9 +233,7 @@ function chase(state, hero, cooldowns, opponent) {
         }
     }
 
-    if (numHalos >= 2) {
-        return { spellId: "move", target: opponent.pos };
-    } else if (cooldowns["whip"] === 0) {
+    if (numHalos >= 2 || cooldowns["whip"] === 0) {
         var target = vectorMidpoint(hero.pos, opponent.pos);
         return { spellId: "move", target };
     } else {
