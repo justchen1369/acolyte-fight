@@ -1,9 +1,8 @@
 import _ from 'lodash';
-import moment from 'moment';
-import msgpack from 'msgpack-lite';
 import msgpackParser from 'socket.io-msgpack-parser';
 import uniqid from 'uniqid';
 import * as auth from './auth';
+import * as blacklist from './blacklist';
 import * as segments from './segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
@@ -42,10 +41,19 @@ export function shutdown() {
 	}
 }
 
+function getIPs(socket: SocketIO.Socket) {
+	const from = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+	if (_.isString(from)) {
+		return from.split(',').map(ip => ip.trim());
+	} else {
+		return [from];
+	}
+}
+
 function onConnection(socket: SocketIO.Socket) {
 	const authToken = getAuthTokenFromSocket(socket);
-	const from = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
-	logger.info(`socket ${socket.id} connected - user ${authToken} - ${from}`);
+	const ips = getIPs(socket);
+	logger.info(`socket ${socket.id} connected - user ${authToken} - ${ips.join(', ')}`);
 
 	if (shuttingDown) {
 		logger.info(`socket ${socket.id} disconnecting now - shutting down`);
@@ -450,12 +458,13 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			// This method is always used for public games
 			const partyId: string = null;
 			const isPrivate: boolean = false;
+			const locked = data.locked || blacklist.isBlocked(socket);
 
 			if (data.observe) {
 				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);
-			} else if (data.locked) {
+			} else if (locked) {
 				// The user wants a private game, create one
-				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, data.locked, data.layoutId);
+				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, locked, data.layoutId);
 			} else {
 				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);
 			}
