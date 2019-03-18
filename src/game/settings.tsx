@@ -834,7 +834,7 @@ const link: Spell = {
                 type: "lifeSteal",
                 owner: true,
                 targetOnly: true,
-                lifeSteal: 1,
+                lifeSteal: 0.5,
                 maxTicks: 2 * TicksPerSecond,
             },
         ],
