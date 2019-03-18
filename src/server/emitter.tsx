@@ -43,8 +43,9 @@ export function shutdown() {
 }
 
 function onConnection(socket: SocketIO.Socket) {
-    const authToken = getAuthTokenFromSocket(socket);
-	logger.info(`socket ${socket.id} connected - user ${authToken}`);
+	const authToken = getAuthTokenFromSocket(socket);
+	const from = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+	logger.info(`socket ${socket.id} connected - user ${authToken} - ${from}`);
 
 	if (shuttingDown) {
 		logger.info(`socket ${socket.id} disconnecting now - shutting down`);
