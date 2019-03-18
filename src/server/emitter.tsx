@@ -457,8 +457,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		} else {
 			// This method is always used for public games
 			const partyId: string = null;
-			const isPrivate: boolean = false;
-			const locked = data.locked || blacklist.isBlocked(socket);
+			const locked = data.locked || blacklist.isBlocked(socket.id);
+			const isPrivate: boolean = locked;
 
 			if (data.observe) {
 				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);

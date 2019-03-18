@@ -1,13 +1,13 @@
 const blocked = new Set<string>();
 
-export function isBlocked(socket: SocketIO.Socket) {
-    return blocked.has(socket.id);
+export function isBlocked(socketId: string) {
+    return blocked.has(socketId);
 }
 
-export function setBlocked(socket: SocketIO.Socket, block: boolean) {
-    if (block) {
-        blocked.add(socket.id);
-    } else {
-        blocked.delete(socket.id);
-    }
+export function block(socketId: string) {
+    blocked.add(socketId);
+}
+
+export function unblock(socketId: string) {
+    blocked.delete(socketId);
 }

@@ -96,6 +96,9 @@ export interface Player {
     userId?: string;
     name: string;
     unranked: boolean;
+
+    numActionMessages: number;
+    numTextMessages: number;
 }
 
 export interface Room {
