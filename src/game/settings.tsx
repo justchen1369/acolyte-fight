@@ -1439,7 +1439,7 @@ const dualSaber: Spell = {
     width: Pixel,
     length: 0.06,
 
-    movementProportionWhileChannelling: 0.75,
+    movementProportionWhileChannelling: 0.65,
     interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,
