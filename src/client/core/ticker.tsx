@@ -96,6 +96,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 			continue; // Received the same tick multiple times, skip over it
 		}
 
+		autoBlock(tickData, world);
 		processor.applyTick(tickData, world, preferredColors);
 
 		/*
@@ -117,19 +118,21 @@ export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
-
-		data.actions.forEach(action => {
-			if (action.heroId !== world.ui.myHeroId && action.actionType === "text" && blacklist.test(action.text)) {
-				const player = world.players.get(action.heroId);
-				if (player && player.userHash) {
-					StoreProvider.dispatch({
-						type: "updateSilence",
-						add: [player.userHash],
-					});
-				}
-			}
-		});
 	}
+}
+
+function autoBlock(data: m.TickMsg, world: w.World) {
+	data.actions.forEach(action => {
+		if (action.heroId !== world.ui.myHeroId && action.actionType === "text" && blacklist.test(action.text)) {
+			const player = world.players.get(action.heroId);
+			if (player && player.userHash) {
+				StoreProvider.dispatch({
+					type: "updateSilence",
+					add: [player.userHash],
+				});
+			}
+		}
+	});
 }
 
 function sendSnapshot(world: w.World) {
