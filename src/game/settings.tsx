@@ -1389,6 +1389,7 @@ const saber: Spell = {
     id: 'saber',
     name: 'Lightsaber',
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
+    untargeted: true,
 
     takesOwnership: true,
     blocksTeleporters: false,
@@ -1425,6 +1426,7 @@ const dualSaber: Spell = {
     id: 'dualSaber',
     name: 'Dualsaber',
     description: "Swing dual lightsabers to deflect projectiles and knockback enemies!",
+    untargeted: true,
 
     takesOwnership: true,
     blocksTeleporters: false,
@@ -1437,7 +1439,7 @@ const dualSaber: Spell = {
     width: Pixel,
     length: 0.06,
 
-    movementProportionWhileChannelling: 0.5,
+    movementProportionWhileChannelling: 0.75,
     interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,
