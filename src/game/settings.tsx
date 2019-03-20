@@ -307,6 +307,7 @@ const difire: Spell = {
         damage: 0,
         lifeSteal: 0.2,
         selfPassthrough: true,
+        categories: Categories.Projectile,
 
         sound: "triplet",
         soundHit: "standard",
