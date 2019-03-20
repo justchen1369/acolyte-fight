@@ -48,7 +48,7 @@ function stateToProps(state: s.State): Props {
 }
 
 const calculateTeams = Reselect.createSelector(
-    (state: s.State) => state.world.teams,
+    (state: s.State) => state.world.teamAssignments,
     (teamAssignments: Immutable.Map<string, string>) => {
         let nextTeamId = 1;
         const result = new Map<string, Team>();

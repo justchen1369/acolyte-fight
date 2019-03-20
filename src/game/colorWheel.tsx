@@ -1,3 +1,4 @@
+import Color from 'color';
 import { HeroColors } from './constants';
 
 let nextColors = [...HeroColors.Colors];
@@ -23,4 +24,9 @@ export function takeColor(preferredColor: string): string {
     }
     nextColors.push(color); // Requeue at bottom
     return color;
+}
+
+export function teamColor(baseColor: string): string {
+    const color = Color(baseColor);
+    return color.hue(color.hue() - 30 * Math.random()).darken(0.2 * Math.random()).string();
 }

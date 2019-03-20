@@ -1172,6 +1172,10 @@ function playShieldSounds(obj: w.Shield, world: w.World) {
 
 export function heroColor(heroId: string, world: w.World) {
 	const player = world.players.get(heroId);
+	if (player.userHash === world.ui.myUserHash) {
+		return HeroColors.MyHeroColor;
+	}
+	
 	if (!world.ui.myHeroId) {
 		return player.uiColor;
 	}
@@ -1183,15 +1187,6 @@ export function heroColor(heroId: string, world: w.World) {
 	} else {
 		return player.uiColor;
 	}
-}
-
-function healthBarPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, world: w.World) {
-	barPath(ctx, radius, proportion, HealthBar.Margin, HealthBar.Height, world);
-}
-
-function barPath(ctx: CanvasRenderingContext2D, radius: number, proportion: number, margin: number, height: number, world: w.World) {
-	const barRadius = HealthBar.HeroRadiusFraction * radius;
-	ctx.rect(-barRadius, -radius - height - margin, barRadius * 2 * proportion, height);
 }
 
 function rgColor(proportion: number) {

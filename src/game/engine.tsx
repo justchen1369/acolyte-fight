@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import Color from 'color';
 import moment from 'moment';
 import pl, { World } from 'planck-js';
 import * as Immutable from 'immutable';
@@ -69,7 +68,8 @@ export function initialWorld(mod: Object): w.World {
 		snapshots: [],
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
-		teams: Immutable.Map<string, string>(), // hero ID -> team ID
+		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
+		teamAssignments: Immutable.Map<string, string>(), // hero ID -> team ID
 		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
 		winner: null,
 		winners: null,
@@ -1072,21 +1072,40 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 	for (let i = 0; i < teams.length; ++i) {
 		const team = teams[i];
 		const teamId = `team${i}`;
-		const teamColor = Color(team.some(heroId => heroId === world.ui.myHeroId) ? HeroColors.AllyColor : HeroColors.TeamColors[i]);
+		const teamColor = team.some(heroId => isPresentOrPastSelf(heroId, world)) ? HeroColors.AllyColor : HeroColors.TeamColors[i];
 
 		for (let j = 0; j < team.length; ++j) {
 			const heroId = team[j];
-			world.teams = world.teams.set(heroId, teamId);
+			world.teamAssignments = world.teamAssignments.set(heroId, teamId);
 
 			const player = world.players.get(heroId);
-			player.uiColor = teamColor.hue(teamColor.hue() - 15 * j).darken(0.1 * j).string();
+			player.uiColor = isPresentOrPastSelf(heroId, world) ? HeroColors.MyHeroColor : colorWheel.teamColor(teamColor);
 		}
+
+		world.teams = world.teams.set(teamId, {
+			teamId,
+			color: teamColor,
+			heroIds: team,
+		});
 	}
 
-	world.teams.forEach((teamId, heroId) => {
+	world.teamAssignments.forEach((teamId, heroId) => {
 		console.log("Team", teamId, heroId);
 	});
 	return teams;
+}
+
+function isPresentOrPastSelf(heroId: string, world: w.World) {
+	if (heroId === world.ui.myHeroId) {
+		return true;
+	}
+
+	const player = world.players.get(heroId);
+	if (player && player.userHash === world.ui.myUserHash) {
+		return true;
+	}
+
+	return false;
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {
@@ -1145,7 +1164,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		userHash: ev.userHash,
 		partyHash: ev.partyHash,
 		name: ev.playerName,
-		uiColor: hero.id === world.ui.myHeroId ? HeroColors.MyHeroColor : chooseNewPlayerColor(ev.preferredColor, world),
+		uiColor: choosePlayerColor(hero.id, ev.userHash, ev.preferredColor, world),
 		isBot: ev.isBot,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
@@ -1155,6 +1174,18 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	world.activePlayers = world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
+}
+
+function choosePlayerColor(heroId: string, userHash: string, preferredColor: string, world: w.World) {
+	if (heroId === world.ui.myHeroId || userHash === world.ui.myUserHash) {
+		return HeroColors.MyHeroColor;
+	} else if (world.teamAssignments.has(heroId)) {
+		const teamId = world.teamAssignments.get(heroId);
+		const team = world.teams.get(teamId);
+		return colorWheel.teamColor(team.color);
+	} else {
+		return chooseNewPlayerColor(preferredColor, world);
+	}
 }
 
 function chooseNewPlayerColor(preferredColor: string, world: w.World) {
@@ -1807,7 +1838,7 @@ export function calculateAlliance(fromHeroId: string, toHeroId: string, world: w
 }
 
 export function getTeam(heroId: string, world: w.World) {
-	return world.teams.get(heroId) || heroId;
+	return world.teamAssignments.get(heroId) || heroId;
 }
 
 function findNearest(objects: Map<string, w.WorldObject>, target: pl.Vec2, predicate: (obj: w.WorldObject) => boolean): w.WorldObject {
