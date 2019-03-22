@@ -874,8 +874,12 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		const strokeRadius = radius + ChargingIndicator.Margin;
 		glx.circle(ctxStack, pos, {
 			color: strokeColor,
-			minRadius: strokeRadius - ChargingIndicator.Width / 2,
+			minRadius: hero.radius,
 			maxRadius: strokeRadius + ChargingIndicator.Width / 2,
+			feather: {
+				sigma: HeroColors.GlowRadius,
+				alpha: 0.5,
+			},
 		});
 	}
 }
