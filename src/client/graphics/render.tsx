@@ -833,6 +833,20 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		style = style.lighten(HeroColors.DamageGlowFactor * flash);
 	}
 
+	// Charging
+	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
+		const strokeColor = parseColor(hero.casting.color).alpha(hero.casting.proportion);
+		glx.circle(ctxStack, pos, {
+			color: strokeColor,
+			minRadius: radius,
+			maxRadius: radius + ChargingIndicator.Width,
+			feather: {
+				sigma: HeroColors.GlowRadius,
+				alpha: 0.5,
+			},
+		});
+	}
+
 	// Fill
 	{
 		let gradient: r.Gradient = null;
@@ -865,21 +879,6 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 		glx.convex(ctxStack, pos, points, angle, radius, {
 			color: glyphColor,
 			maxRadius: radius,
-		});
-	}
-
-	// Charging
-	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
-		const strokeColor = parseColor(hero.casting.color).alpha(hero.casting.proportion);
-		const strokeRadius = radius + ChargingIndicator.Margin;
-		glx.circle(ctxStack, pos, {
-			color: strokeColor,
-			minRadius: hero.radius,
-			maxRadius: strokeRadius + ChargingIndicator.Width / 2,
-			feather: {
-				sigma: HeroColors.GlowRadius,
-				alpha: 0.5,
-			},
 		});
 	}
 }
