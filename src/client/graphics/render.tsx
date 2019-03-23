@@ -512,7 +512,7 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World,
 }
 
 function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
-	if (world.ui.myHeroId && !(ev.owner === world.ui.myHeroId)) {
+	if (world.ui.myHeroId && !(ev.owner === world.ui.myHeroId || ev.objectId === world.ui.myHeroId)) {
 		return;
 	}
 
@@ -527,7 +527,7 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 
 	const highlight: w.MapHighlight = {
 		fromTick: ev.tick,
-		maxTicks: HeroColors.ShakeTicks,
+		maxTicks: HeroColors.HighlightTicks,
 		color: ev.color || '#ffffff',
 	};
 	if (world.tick < highlight.fromTick + highlight.maxTicks) {
@@ -551,7 +551,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 		const highlight = takeHighlights(world);
 		if (highlight) {
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
-			color = color.mix(Color(highlight.color), HeroColors.ShakeGlowFactor * proportion);
+			color = color.mix(Color(highlight.color), HeroColors.HighlightFactor * proportion);
 		}
 	}
 

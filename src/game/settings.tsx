@@ -638,6 +638,7 @@ const retractor: Spell = {
         maxTicks: 4.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
+        categories: Categories.Projectile,
 
         partialDamage: {
             initialMultiplier: 0.01,

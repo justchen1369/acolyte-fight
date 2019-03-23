@@ -75,7 +75,9 @@ export namespace HeroColors {
 
 	export const ShakeDistance = 0.02;
 	export const ShakeTicks = 3;
-	export const ShakeGlowFactor = 0.01;
+
+	export const HighlightFactor = 0.01;
+	export const HighlightTicks = 10;
 
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
