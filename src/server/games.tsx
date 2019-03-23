@@ -540,10 +540,11 @@ export function isGameRunning(game: g.Game) {
 }
 
 export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
+	leaveGame(game, params.socketId);
+
 	let heroId: string = null;
 	if (params.reconnectKey) {
 		heroId = game.reconnectKeys.get(params.reconnectKey);
-		game.reconnectKeys.delete(params.reconnectKey);
 	} else {
 		heroId = findExistingSlot(game);
 	}
@@ -570,6 +571,12 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	game.bots.delete(heroId);
 	game.playerNames.push(params.name);
 
+	// Replace reconnectKey
+	game.reconnectKeys.forEach((otherHeroId, otherReconnectKey) => {
+		if (otherHeroId === heroId) {
+			game.reconnectKeys.delete(otherReconnectKey);
+		}
+	});
 	const reconnectKey = uniqid("k-");
 	game.reconnectKeys.set(reconnectKey, heroId);
 

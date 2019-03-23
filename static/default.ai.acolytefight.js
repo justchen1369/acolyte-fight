@@ -213,7 +213,7 @@ function jitter(target, missRadius) {
 
 function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - ensure we are focusing the enemy, otherwise we will miss
     if (hero.casting) {
-        if (hero.casting.spellId === "saber") {
+        if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
             return { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) };
         } else {
