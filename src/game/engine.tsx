@@ -387,6 +387,7 @@ function addHero(world: w.World, heroId: string) {
 		spellsToKeys: new Map<string, string>(),
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
+		horcruxIds: new Set<string>(),
 		retractorIds: new Map<string, string>(),
 		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
@@ -521,6 +522,9 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	if (projectile.detonate) {
 		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
 	}
+	if (projectileTemplate.horcrux) {
+		hero.horcruxIds.add(projectile.id);
+	}
 
 	if (!projectileTemplate.selfPassthrough) {
 		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
@@ -546,6 +550,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateHoming(template, projectile, world);
 		} else if (template.type === "attract") {
 			behaviour = instantiateAttract(template, projectile, world);
+		} else if (template.type === "aura") {
+			behaviour = instantiateAura(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
 		} else if (template.type === "expireOnOwnerDeath") {
@@ -559,20 +565,24 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		const trigger = template.trigger;
 		if (!trigger) {
 			world.behaviours.push(behaviour);
-		} else if(trigger.afterTicks) {
-			world.behaviours.push({
-				type: "delayBehaviour",
-				afterTick: world.tick + (trigger.afterTicks || 0),
-				delayed: behaviour,
-			});
 		} else if (trigger.atCursor) {
 			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
 			const speed = vector.length(projectile.body.getLinearVelocity());
 			const ticksToCursor = ticksTo(distanceToCursor, speed);
 
+			let waitTicks = ticksToCursor;
+			if (trigger.afterTicks) {
+				waitTicks = Math.min(waitTicks, trigger.afterTicks);
+			}
 			world.behaviours.push({
 				type: "delayBehaviour",
-				afterTick: world.tick + ticksToCursor,
+				afterTick: world.tick + waitTicks,
+				delayed: behaviour,
+			});
+		} else if(trigger.afterTicks) {
+			world.behaviours.push({
+				type: "delayBehaviour",
+				afterTick: world.tick + (trigger.afterTicks || 0),
 				delayed: behaviour,
 			});
 		} else {
@@ -609,11 +619,21 @@ function instantiateAttract(template: AttractTemplate, projectile: w.Projectile,
 	};
 }
 
+function instantiateAura(template: AuraTemplate, projectile: w.Projectile, world: w.World): w.AuraBehaviour {
+	return {
+		type: "aura",
+		objectId: projectile.id,
+		owner: projectile.owner,
+		radius: template.radius,
+		tickInterval: template.tickInterval,
+		buff: template.buff,
+	};
+}
+
 function instantiateUpdateProjectileFilter(template: UpdateCollideWithTemplate, projectile: w.Projectile, world: w.World): w.UpdateCollideWithBehaviour {
 	return {
 		type: "updateCollideWith",
 		projectileId: projectile.id,
-		afterTick: world.tick + template.afterTicks,
 		collideWith: template.collideWith,
 	};
 }
@@ -661,6 +681,7 @@ export function tick(world: w.World) {
 		linkForce,
 		gravityForce,
 		attract,
+		aura,
 		reflectFollow,
 		saberSwing,
 		thrustBounce,
@@ -803,10 +824,6 @@ function updateCollideWith(behaviour: w.UpdateCollideWithBehaviour, world: w.Wor
 	if (!(projectile && projectile.category === "projectile")) {
 		return false;
 	} 
-
-	if (world.tick < behaviour.afterTick) {
-		return true;
-	}
 
 	projectile.collideWith = behaviour.collideWith;
 	updateMaskBits(projectile.body.getFixtureList(), behaviour.collideWith);
@@ -1943,24 +1960,32 @@ function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
 
 	const owner: w.Hero = world.objects.get(projectile.owner) as w.Hero;
 	projectile.buffs.forEach(template => {
-		const receiver = template.owner ? owner : target;
-		if (!receiver) {
+		applyBuffFrom(template, owner, target, world, projectile.type);
+	});
+}
+
+function applyBuffFrom(template: BuffTemplate, owner: w.Hero, target: w.Hero, world: w.World, tag: string = "buff") {
+	if (!owner) {
+		return;
+	}
+
+	const receiver = template.owner ? owner : target;
+	if (!receiver) {
+		return;
+	}
+
+	const against = template.against !== undefined ? template.against : Categories.All;
+	if (against !== Categories.All) {
+		const targetId = target ? target.id : null;
+		if (!(calculateAlliance(owner.id, targetId, world) & against)) {
 			return;
 		}
+	}
 
-		const against = template.against !== undefined ? template.against : Categories.All;
-		if (against !== Categories.All) {
-			const targetId = target ? target.id : null;
-			if (!(calculateAlliance(projectile.owner, targetId, world) & against)) {
-				return;
-			}
-		}
-
-		const id = `${projectile.type}-${template.type}`;
-		instantiateBuff(id, template, receiver, world, {
-			fromHeroId: projectile.owner,
-			toHeroId: target && target.id,
-		});
+	const id = `${tag}-${template.type}`;
+	instantiateBuff(id, template, receiver, world, {
+		fromHeroId: owner.id,
+		toHeroId: target && target.id,
 	});
 }
 
@@ -2085,6 +2110,28 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 		}
 
 		obj.body.setLinearVelocity(velocity);
+	});
+	return true;
+}
+
+function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
+	const orb = world.objects.get(behaviour.objectId);
+	if (!(orb && orb.category === "projectile")) {
+		return false;
+	}
+
+	const owner = world.objects.get(orb.owner);
+	if (!(owner && owner.category === "hero")) {
+		return false;
+	}
+
+	const epicenter = orb.body.getPosition();
+	world.objects.forEach(obj => {
+		if (!(obj.category === "hero" && vector.distance(epicenter, obj.body.getPosition()) <= behaviour.radius + obj.radius)) {
+			return;
+		}
+
+		applyBuffFrom(behaviour.buff, owner, obj, world, behaviour.type);
 	});
 	return true;
 }
@@ -2560,7 +2607,7 @@ function reap(world: w.World) {
 	let heroKilled = false;
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (obj.health <= 0) {
+			if (obj.health <= 0 && !hasHorcrux(obj, world)) {
 				destroyObject(world, obj);
 				notifyKill(obj, world);
 				heroKilled = true;
@@ -2585,6 +2632,17 @@ function reap(world: w.World) {
 	if (heroKilled) {
 		notifyWin(world);
 	}
+}
+
+function hasHorcrux(hero: w.Hero, world: w.World): boolean {
+	for (const horcruxId of hero.horcruxIds) {
+		if (world.objects.has(horcruxId)) {
+			return true;
+		} else {
+			hero.horcruxIds.delete(horcruxId);
+		}
+	}
+	return false;
 }
 
 function captureSnapshot(world: w.World) {

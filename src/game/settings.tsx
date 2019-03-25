@@ -83,7 +83,7 @@ const Choices: ChoiceSettings = {
 		"e": [
             ["saber", "dualSaber"],
             ["shield", "icewall"],
-            ["drain"],
+            ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
@@ -1315,7 +1315,7 @@ const halo: Spell = {
 const mines: Spell = {
     id: 'mines',
     name: 'Energy Mines',
-    description: "Mark out your territory with some Energy Mines. If you walk away from the mines, they expire. Energy mines do zero damage if they hit during deploying, but still knockback.",
+    description: "Mark out your territory with some Energy Mines. If you walk away from the mines, they expire. Energy mines only do damage after 0.1 seconds.",
     action: "spray",
     sound: "mines",
 
@@ -1383,6 +1383,113 @@ const mines: Spell = {
         renderers: [
             { type: "projectile", ticks: 1, selfColor: true, glow: 0.2, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
+        ],
+    },
+};
+
+const horcrux: Spell = {
+    id: 'horcrux',
+    name: 'Horcrux',
+    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies.",
+    action: "projectile",
+    sound: "mines",
+
+    color: '#22ee88',
+    icon: "mineExplosion",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
+
+    projectile: {
+        density: 10,
+        radius: 0.006,
+        speed: 0.35,
+        restitution: 0,
+
+        maxTicks: 4 * TicksPerSecond,
+        minTicks: 15,
+        hitInterval: 15,
+        damage: 0,
+        lifeSteal: 1,
+        damageScaling: false,
+
+        categories: Categories.Projectile,
+        collideWith: Categories.Obstacle | Categories.Hero | Categories.Massive,
+        expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle ^ Categories.Hero,
+        destructible: {
+        },
+
+        detonate: {
+            damage: 0,
+            damageScaling: false,
+            radius: 0.015,
+            minImpulse: 0,
+            maxImpulse: 0,
+            renderTicks: 15,
+        },
+
+        horcrux: {},
+
+        shieldTakesOwnership: false,
+
+        behaviours: [
+            {
+                type: "updateCollideWith",
+                trigger: { afterTicks: 60, atCursor: true },
+                collideWith: Categories.All,
+            },
+            {
+                type: "homing",
+                targetType: "cursor",
+                trigger: { afterTicks: 60, atCursor: true },
+                newSpeed: 0,
+                redirect: true,
+            },
+            {
+                type: "attract",
+                against: Alliances.NotFriendly,
+                collideLike: Categories.Hero,
+                categories: Categories.Hero,
+                radius: 0.06,
+                accelerationPerTick: 0.01,
+                maxSpeed: 0.4,
+            },
+            {
+                type: "aura",
+                radius: 0.06,
+                tickInterval: 15,
+                buff: {
+                    type: "burn",
+                    against: Alliances.NotFriendly,
+                    hitInterval: 15,
+                    packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
+                    maxTicks: 15,
+                    render: {
+                        color: "#22ee88",
+                        alpha: 0.3,
+                        ticks: 15,
+                        emissionRadius: Hero.Radius,
+                        particleRadius: 0.5 * Hero.Radius,
+                    },
+                }
+            },
+        ],
+
+        sound: "mines",
+        color: '#22ee88',
+        renderers: [
+            { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3, },
+            { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.06, minRadius: 0.05, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.06, minRadius: 0.05, shrinkTicks: 31, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.06, minRadius: 0.05, shrinkTicks: 10, startingTicks: 10 },
+            {
+                type: "link",
+                color: 'rgba(255, 255, 255, 0.1)',
+                width: 1 * Pixel,
+                glow: 0.1,
+            },
         ],
     },
 };
@@ -1737,6 +1844,7 @@ const Spells = {
     repeater,
     drain,
     icewall,
+    horcrux,
     saber,
     dualSaber,
     scourge,

@@ -1253,7 +1253,8 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 }
 
 function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, reticule: RenderReticule) {
-	const remainingTicks = Math.max(0, projectile.expireTick - world.tick);
+	const finalTick = reticule.startingTicks ? (projectile.createTick + reticule.startingTicks) : projectile.expireTick;
+	const remainingTicks = Math.max(0, finalTick - world.tick);
 	if (reticule.remainingTicks && remainingTicks > reticule.remainingTicks) {
 		// Only display when under remainingTicks
 		return;
@@ -1261,16 +1262,34 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 
 	let proportion = 1;
 	if (reticule.shrinkTicks) {
-		proportion *= Math.min(1, remainingTicks / reticule.shrinkTicks);
+		let tick = remainingTicks;
+		if (reticule.repeat) {
+			tick = tick % reticule.shrinkTicks;
+		}
+
+		let multiplier = Math.min(1, tick / reticule.shrinkTicks);
+		if (reticule.grow) {
+			multiplier = 1 - multiplier;
+		}
+
+		proportion *= multiplier;
 	}
+
 	if (reticule.usePartialDamageMultiplier) {
 		proportion *= engine.calculatePartialDamageMultiplier(world, projectile);
+	}
+	if (proportion <= 0) {
+		return;
 	}
 
 	const pos = projectile.body.getPosition();
 
+	let color = parseColor(reticule.color);
+	if (reticule.fade) {
+		color = color.fade(proportion);
+	}
 	glx.circle(ctxStack, pos, {
-		color: parseColor(reticule.color),
+		color,
 		minRadius: reticule.minRadius * proportion,
 		maxRadius: reticule.radius * proportion,
 	});

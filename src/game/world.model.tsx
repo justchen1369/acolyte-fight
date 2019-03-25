@@ -395,6 +395,7 @@ export interface Hero extends WorldObjectBase {
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	retractorIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
+	horcruxIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 
 	link?: LinkState;
@@ -669,6 +670,7 @@ export type Behaviour =
 	| SaberBehaviour
 	| BurnBehaviour
 	| AttractBehaviour
+	| AuraBehaviour
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
 	| ExpireOnOwnerRetreatBehaviour
@@ -730,7 +732,6 @@ export interface UpdateCollideWithBehaviour extends BehaviourBase {
 	type: "updateCollideWith";
 	projectileId: string;
 	collideWith: number;
-	afterTick: number;
 }
 
 export interface LinkBehaviour extends BehaviourBase {
@@ -781,6 +782,16 @@ export interface AttractBehaviour extends BehaviourBase {
 	radius: number;
 	accelerationPerTick: number;
 	maxSpeed?: number;
+}
+
+export interface AuraBehaviour extends BehaviourBase {
+	type: "aura";
+	objectId: string;
+	owner: string;
+
+	radius: number;
+	tickInterval: number;
+	buff: BuffTemplate;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

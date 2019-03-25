@@ -242,6 +242,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number
     bounce?: BounceParameters;
 	link?: LinkParameters;
+	horcrux?: HorcruxParameters;
 	detonate?: DetonateParameters;
 	gravity?: GravityParameters; // Trap a hero
 	swapWith?: number; // Category flags of what types of objects to swap with
@@ -294,9 +295,13 @@ declare interface GravityParameters {
 declare interface BounceParameters {
 }
 
+declare interface HorcruxParameters {
+}
+
 declare type BehaviourTemplate =
 	HomingTemplate
 	| AttractTemplate
+	| AuraTemplate
 	| UpdateCollideWithTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
@@ -327,6 +332,7 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
 
 	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
+	maxDistanceToTarget?: number; // Homing is only applied if the projectile is closer than this.
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
@@ -344,10 +350,17 @@ declare interface AttractTemplate extends BehaviourTemplateBase {
 	maxSpeed?: number; // Slow down anything caught in the attraction
 }
 
+declare interface AuraTemplate extends BehaviourTemplateBase {
+	type: "aura";
+
+	radius: number; // Maximum range of aura
+	tickInterval: number; // Interval between when to apply the buff
+	buff: BuffTemplate; // Buff to apply
+}
+
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
 	type: "updateCollideWith";
 
-	afterTicks: number;
 	collideWith: number;
 }
 
@@ -441,8 +454,12 @@ declare interface RenderLink extends RenderParamsBase {
 declare interface RenderReticule extends RenderParamsBase {
 	type: "reticule";
 	color: string;
-	remainingTicks?: number;
+	remainingTicks?: number; // Only display when this many ticks remaining
 	shrinkTicks?: number;
+	grow?: boolean;
+	fade?: boolean;
+	startingTicks?: number; // Only display for this many ticks since creation of the projectile
+	repeat?: boolean; // Whether to repeatedly show the reticule shrinking
 	minRadius: number;
 	radius: number;
 	usePartialDamageMultiplier?: boolean;
@@ -532,7 +549,6 @@ declare interface ArmorTemplate extends BuffTemplateBase {
 	proportion: number; // Positive increases damage received, negative negates damage received
 	ownerOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
 	targetOnly?: boolean;
-	color?: string;
 }
 
 declare interface BuffSpell extends SpellBase {
