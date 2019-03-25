@@ -896,7 +896,7 @@ export interface Shake {
 	maxTicks: number;
 }
 
-export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail;
+export type Trail = CircleTrail | LineTrail | RippleTrail | ArcTrail | PolygonTrail;
 
 export interface TrailBase {
 	initialTick: number;
@@ -922,6 +922,15 @@ export interface CircleTrail extends TrailBase {
 	pos: pl.Vec2;
 	velocity?: pl.Vec2;
 	radius: number;
+}
+
+export interface PolygonTrail extends TrailBase {
+	type: "polygon";
+	pos: pl.Vec2;
+	points: pl.Vec2[];
+	angle: number;
+	velocity?: pl.Vec2;
+	extent: number;
 }
 
 export interface LineTrail extends TrailBase {

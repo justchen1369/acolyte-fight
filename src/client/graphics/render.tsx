@@ -289,6 +289,8 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	obj.renderers.forEach(render => {
 		if (render.type === "projectile") {
 			renderProjectile(ctxStack, obj, world, render);
+		} else if (render.type === "polygon") {
+			renderPolygon(ctxStack, obj, world, render);
 		} else if (render.type == "ray") {
 			renderRay(ctxStack, obj, world, render);
 		} else if (render.type === "link") {
@@ -1414,7 +1416,34 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 	}, world);
 }
 
-function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay): number {
+function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderPolygon) {
+	let ticks = render.ticks;
+	const angle = ((world.tick % render.revolutionInterval) / render.revolutionInterval) * 2 * Math.PI;
+	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
+
+	const points = new Array<pl.Vec2>();
+	for (let i = 0; i < render.numPoints; ++i) {
+		points.push(vector.fromAngle((i / render.numPoints) * 2 * Math.PI));
+	}
+
+	pushTrail({
+		type: 'polygon',
+		initialTick: world.tick,
+		max: ticks,
+		pos: vector.clone(projectile.body.getPosition()),
+		points,
+		angle,
+		velocity,
+		fillStyle: projectileColor(render, projectile, world),
+		fade: render.fade,
+		extent: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
+		glow: render.glow,
+		highlight: projectile.uiHighlight,
+		tag: projectile.id,
+	}, world);
+}
+
+function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay | RenderPolygon): number {
 	let multiplier = render.radiusMultiplier || 1;
 	if (!render.noPartialRadius) {
 		multiplier *= engine.calculatePartialDamageMultiplier(world, projectile);
@@ -1482,6 +1511,20 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		glx.circle(ctxStack, pos, {
 			color,
 			maxRadius: radius,
+			feather,
+		});
+	} else if (trail.type === "polygon") {
+		let pos = trail.pos;
+		if (trail.velocity) {
+			const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
+			pos = vector.plus(pos, vector.multiply(trail.velocity, time));
+		}
+
+		const extent = scale * proportion * trail.extent;
+
+		glx.convex(ctxStack, pos, trail.points, trail.angle, extent, {
+			color,
+			maxRadius: extent,
 			feather,
 		});
 	} else if (trail.type === "line") {

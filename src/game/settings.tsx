@@ -1405,7 +1405,6 @@ const horcrux: Spell = {
         density: 10,
         radius: 0.006,
         speed: 0.35,
-        restitution: 0,
 
         maxTicks: 4 * TicksPerSecond,
         minTicks: 15,
@@ -1451,13 +1450,13 @@ const horcrux: Spell = {
                 against: Alliances.NotFriendly,
                 collideLike: Categories.Hero,
                 categories: Categories.Hero,
-                radius: 0.06,
+                radius: 0.045,
                 accelerationPerTick: 0.01,
                 maxSpeed: 0.4,
             },
             {
                 type: "aura",
-                radius: 0.06,
+                radius: 0.045,
                 tickInterval: 15,
                 buff: {
                     type: "burn",
@@ -1479,11 +1478,12 @@ const horcrux: Spell = {
         sound: "mines",
         color: '#22ee88',
         renderers: [
-            { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3, },
+            { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3, radiusMultiplier: 0.5 },
+            { type: "polygon", numPoints: 5, revolutionInterval: 60, ticks: 1, glow: 0.1 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.06, minRadius: 0.05, shrinkTicks: 13, grow: true, fade: true, repeat: true },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.06, minRadius: 0.05, shrinkTicks: 31, grow: true, fade: true, repeat: true },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.06, minRadius: 0.05, shrinkTicks: 10, startingTicks: 10 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.03, shrinkTicks: 31, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.045, minRadius: 0.03, shrinkTicks: 10, startingTicks: 10 },
             {
                 type: "link",
                 color: 'rgba(255, 255, 255, 0.1)',

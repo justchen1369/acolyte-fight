@@ -391,6 +391,7 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 declare type RenderParams =
 	RenderRay
 	| RenderProjectile
+	| RenderPolygon
 	| RenderSwirl
 	| RenderLink
 	| RenderReticule
@@ -420,6 +421,19 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	type: "projectile";
 
 	ticks: number; // How long is the trail?
+	fade?: string;
+	smoke?: number;
+	glow?: number;
+	noPartialRadius?: boolean;
+	radiusMultiplier?: number;
+}
+
+declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams {
+	type: "polygon";
+
+	numPoints: number;
+	ticks: number;
+	revolutionInterval: number;
 	fade?: string;
 	smoke?: number;
 	glow?: number;
