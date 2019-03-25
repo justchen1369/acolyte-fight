@@ -1392,7 +1392,7 @@ const horcrux: Spell = {
     name: 'Horcrux',
     description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies.",
     action: "projectile",
-    sound: "mines",
+    sound: "horcrux",
 
     color: '#22ee88',
     icon: "burningEye",
@@ -1476,7 +1476,7 @@ const horcrux: Spell = {
             },
         ],
 
-        sound: "mines",
+        sound: "horcrux",
         color: '#22ee88',
         renderers: [
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },

@@ -1122,6 +1122,25 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "horcrux": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 1,
+                "attack": 0.25,
+                "decay": 0.75,
+                "startFreq": 150,
+                "stopFreq": 150,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ],
+                "tremoloFreq": 8,
+                "tremoloStrength": 0.1
+            }
+        ]
+    },
     "mines-channelling": {
         "cutoffEarly": false,
         "start": [
