@@ -1390,7 +1390,7 @@ const mines: Spell = {
 const horcrux: Spell = {
     id: 'horcrux',
     name: 'Horcrux',
-    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies. Your Horcrux is fragile, so shoot it close to your enemy, but don't let it touch them!",
+    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies. Your Horcrux is fragile, so shoot it close to your enemy, but don't let it touch them or it will break!",
     action: "projectile",
     sound: "horcrux",
 
@@ -1407,16 +1407,14 @@ const horcrux: Spell = {
         radius: 0.003,
         speed: 0.35,
 
-        maxTicks: 2.5 * TicksPerSecond,
+        maxTicks: 1.5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
-        damageScaling: false,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
-        expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
-        destructible: {
-        },
+        expireOn: Categories.Hero | Categories.Massive,
+        destructible: {},
 
         horcrux: {},
 
@@ -1438,14 +1436,14 @@ const horcrux: Spell = {
             {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.045,
+                radius: 0.04,
                 tickInterval: 15,
                 buffs: [
                     {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
+                        packet: { damage: 3.5, lifeSteal: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
@@ -1462,12 +1460,12 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.04, shrinkTicks: 13, grow: true, fade: true, repeat: true },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.04, shrinkTicks: 31, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.03, shrinkTicks: 31, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.045, minRadius: 0.04, shrinkTicks: 10, startingTicks: 10 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.04, minRadius: 0.03, shrinkTicks: 10, startingTicks: 10 },
             {
                 type: "link",
                 color: 'rgba(255, 255, 255, 0.1)',
