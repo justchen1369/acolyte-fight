@@ -45,6 +45,7 @@ function handleInput(state, heroId, cooldowns) {
         action =
             recovery(state, hero, cooldowns)
             || dodge(state, hero, cooldowns)
+            || evade(state, hero, cooldowns)
             || castSpell(state, hero, strongest, cooldowns)
             || focus(hero, strongest)
             || chase(state, hero, cooldowns, strongest)
@@ -299,6 +300,57 @@ function dodge(state, hero, cooldowns) {
         return { spellId: "move", target };
     }
     return null;
+}
+
+function evade(state, hero, cooldowns) {
+    var target = null;
+    for (var projectileId in state.projectiles) {
+        var projectile = state.projectiles[projectileId];
+        if (projectile.ownerId === hero.id) {
+            // This is my own projectile
+            continue;
+        }
+
+        if (projectile.spellId !== "horcrux") {
+            // Only try to shoot at horcruxes
+            continue;
+        }
+
+        var diff = vectorDiff(hero.pos, projectile.pos);
+        var distance = vectorLength(diff);
+        if (distance >= 0.1) {
+            // Too far away to care
+            continue;
+        }
+
+        target = projectile.pos;
+        break;
+    }
+
+    if (!target) {
+        return null;
+    }
+
+    // Try to shoot at object
+    for (var spellId in cooldowns) {
+        var readyToCast = !cooldowns[spellId];
+        var spell = settings.Spells[spellId];
+
+        if (spell
+            && readyToCast
+            && spell.projectile // only choose spells which shoot
+            && spell.cooldown <= 2 * state.ticksPerSecond // don't waste slow cooldown spells on horcrux
+            ) {
+
+            return { spellId, target };
+        }
+    }
+
+    // Move away from object
+    var away = vectorDiff(hero.pos, target);
+    var step = vectorMultiply(vectorUnit(away), projectile.radius + hero.radius);
+    var evadeTarget = vectorPlus(hero.pos, step);
+    return { spellId: "move", target: evadeTarget };
 }
 
 function vectorDiff(to, from) {
