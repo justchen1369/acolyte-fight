@@ -1796,7 +1796,7 @@ const vanish: Spell = {
     buffs: [
         {
             type: "vanish",
-            maxTicks: 1.5 * TicksPerSecond,
+            maxTicks: 2.5 * TicksPerSecond,
             channelling: true,
             sound: "vanish",
         },
