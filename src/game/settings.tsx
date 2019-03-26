@@ -1131,7 +1131,7 @@ const whirlwind: Spell = {
     sound: "whirlwind",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
 
