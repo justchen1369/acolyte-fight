@@ -1410,6 +1410,7 @@ const horcrux: Spell = {
         maxTicks: 5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
+        damageScaling: false,
         lifeSteal: 1,
 
         categories: Categories.Projectile,
