@@ -1443,7 +1443,7 @@ const horcrux: Spell = {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 3, lifeSteal: 1, noHit: true },
+                        packet: { damage: 2.5, lifeSteal: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
