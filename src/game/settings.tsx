@@ -1398,7 +1398,7 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -1407,7 +1407,7 @@ const horcrux: Spell = {
         radius: 0.003,
         speed: 0.35,
 
-        maxTicks: 5 * TicksPerSecond,
+        maxTicks: 4 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         damageScaling: false,
@@ -1439,14 +1439,14 @@ const horcrux: Spell = {
             {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.06,
+                radius: 0.045,
                 tickInterval: 15,
                 buffs: [
                     {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
+                        packet: { damage: 2.5, damageScaling: false, lifeSteal: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
