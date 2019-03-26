@@ -1407,7 +1407,7 @@ const horcrux: Spell = {
         radius: 0.003,
         speed: 0.35,
 
-        maxTicks: 4 * TicksPerSecond,
+        maxTicks: 2.5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         damageScaling: false,
