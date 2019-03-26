@@ -1024,7 +1024,7 @@ const drain: Spell = {
         radius: 0.002,
         speed: 0.2,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 10,
+        damage: 12,
         lifeSteal: 1.0,
 
         behaviours: [
@@ -1443,7 +1443,7 @@ const horcrux: Spell = {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 2.5, lifeSteal: 1, noHit: true },
+                        packet: { damage: 4, lifeSteal: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
