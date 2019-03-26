@@ -1390,7 +1390,7 @@ const mines: Spell = {
 const horcrux: Spell = {
     id: 'horcrux',
     name: 'Horcrux',
-    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies.",
+    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies, causing damage over time and 50% slow.",
     action: "projectile",
     sound: "horcrux",
 
@@ -1398,35 +1398,24 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
-        density: 25,
+        density: 10,
         restitution: 0,
         radius: 0.003,
         speed: 0.35,
 
         maxTicks: 3 * TicksPerSecond,
-        minTicks: 15,
-        hitInterval: 15,
+        minTicks: 1,
         damage: 0,
         lifeSteal: 1,
-        damageScaling: false,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Obstacle | Categories.Hero | Categories.Massive,
-        expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle ^ Categories.Hero,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+        expireOn: Categories.Projectile | Categories.Massive,
         destructible: {
-        },
-
-        detonate: {
-            damage: 0,
-            damageScaling: false,
-            radius: 0.015,
-            minImpulse: 0,
-            maxImpulse: 0,
-            renderTicks: 15,
         },
 
         horcrux: {},
@@ -1447,40 +1436,39 @@ const horcrux: Spell = {
                 redirect: true,
             },
             {
-                type: "attract",
-                against: Alliances.NotFriendly,
-                collideLike: Categories.Hero,
-                categories: Categories.Hero,
-                radius: 0.045,
-                accelerationPerTick: 0.01,
-                maxSpeed: 0.4,
-            },
-            {
                 type: "aura",
                 radius: 0.045,
                 tickInterval: 15,
-                buff: {
-                    type: "burn",
-                    against: Alliances.NotFriendly,
-                    hitInterval: 15,
-                    packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
-                    maxTicks: 15,
-                    render: {
-                        color: "#22ee88",
-                        alpha: 0.3,
-                        ticks: 15,
-                        emissionRadius: Hero.Radius,
-                        particleRadius: 0.5 * Hero.Radius,
+                buffs: [
+                    {
+                        type: "burn",
+                        against: Alliances.NotFriendly,
+                        hitInterval: 15,
+                        packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
+                        maxTicks: 15,
+                        render: {
+                            color: "#22ee88",
+                            alpha: 0.3,
+                            ticks: 15,
+                            emissionRadius: Hero.Radius,
+                            particleRadius: 0.5 * Hero.Radius,
+                        },
                     },
-                }
+                    {
+                        type: "movement",
+                        against: Alliances.NotFriendly,
+                        maxTicks: 15,
+                        movementProportion: 0.5,
+                    },
+                ]
             },
         ],
 
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
+            { type: "polygon", color: '#fff', numPoints: 5, radiusMultiplier: 1.5, revolutionInterval: 60, ticks: 1 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
-            { type: "polygon", numPoints: 5, radiusMultiplier: 2, revolutionInterval: 60, ticks: 1, glow: 0.1 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.045, minRadius: 0.03, shrinkTicks: 31, grow: true, fade: true, repeat: true },

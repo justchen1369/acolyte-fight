@@ -791,7 +791,7 @@ export interface AuraBehaviour extends BehaviourBase {
 
 	radius: number;
 	tickInterval: number;
-	buff: BuffTemplate;
+	buffs: BuffTemplate[];
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

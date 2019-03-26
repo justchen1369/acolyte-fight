@@ -626,7 +626,7 @@ function instantiateAura(template: AuraTemplate, projectile: w.Projectile, world
 		owner: projectile.owner,
 		radius: template.radius,
 		tickInterval: template.tickInterval,
-		buff: template.buff,
+		buffs: template.buffs,
 	};
 }
 
@@ -2131,7 +2131,9 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 			return;
 		}
 
-		applyBuffFrom(behaviour.buff, owner, obj, world, behaviour.type);
+		behaviour.buffs.forEach(buff => {
+			applyBuffFrom(buff, owner, obj, world, behaviour.type);
+		});
 	});
 	return true;
 }

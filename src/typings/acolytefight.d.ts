@@ -355,7 +355,7 @@ declare interface AuraTemplate extends BehaviourTemplateBase {
 
 	radius: number; // Maximum range of aura
 	tickInterval: number; // Interval between when to apply the buff
-	buff: BuffTemplate; // Buff to apply
+	buffs: BuffTemplate[]; // Buffs to apply
 }
 
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
