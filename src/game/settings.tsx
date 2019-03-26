@@ -1398,7 +1398,7 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -1407,7 +1407,7 @@ const horcrux: Spell = {
         radius: 0.003,
         speed: 0.35,
 
-        maxTicks: 2.5 * TicksPerSecond,
+        maxTicks: 5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
@@ -1454,6 +1454,12 @@ const horcrux: Spell = {
                             emissionRadius: Hero.Radius,
                             particleRadius: 0.5 * Hero.Radius,
                         },
+                    },
+                    {
+                        type: "movement",
+                        against: Alliances.NotFriendly,
+                        maxTicks: 15,
+                        movementProportion: 0.5,
                     },
                 ]
             },
