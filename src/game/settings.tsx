@@ -1390,7 +1390,7 @@ const mines: Spell = {
 const horcrux: Spell = {
     id: 'horcrux',
     name: 'Horcrux',
-    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies, causing damage over time and 50% slow.",
+    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies. Your Horcrux is fragile, so shoot it close to your enemy, but don't let it touch them!",
     action: "projectile",
     sound: "horcrux",
 
@@ -1410,12 +1410,10 @@ const horcrux: Spell = {
         maxTicks: 2.5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
-        damageScaling: false,
         lifeSteal: 1,
 
-        categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
-        expireOn: Categories.Projectile | Categories.Massive,
+        expireOn: Categories.All,
         destructible: {
         },
 
@@ -1446,21 +1444,15 @@ const horcrux: Spell = {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 2.5, damageScaling: false, lifeSteal: 1, noHit: true },
+                        packet: { damage: 2.5, lifeSteal: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
-                            alpha: 0.3,
+                            alpha: 0.01,
                             ticks: 15,
                             emissionRadius: Hero.Radius,
                             particleRadius: 0.5 * Hero.Radius,
                         },
-                    },
-                    {
-                        type: "movement",
-                        against: Alliances.NotFriendly,
-                        maxTicks: 15,
-                        movementProportion: 0.5,
                     },
                 ]
             },

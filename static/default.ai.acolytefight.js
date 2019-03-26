@@ -155,7 +155,7 @@ function deflect(state, hero, cooldowns, projectile) {
 }
 
 function castSpell(state, hero, opponent, cooldowns) {
-    if (Date.now() < nextSpell && !hero.linkedToId) {
+    if (!readyForNextSpell(hero)) {
         return null;
     }
 
@@ -174,7 +174,7 @@ function castSpell(state, hero, opponent, cooldowns) {
 
     if (candidates.length > 0) {
         var spellId = candidates[Math.floor(Math.random() * candidates.length)];
-        nextSpell = Date.now() + delayMilliseconds + Math.floor((Math.random() < 0.5 ? -1 : 1) * Math.random() * delayJitterMilliseconds);
+        updateNextSpellTime();
         return { spellId, target: jitter(opponent.pos, missRadius) };
     } else {
         return null;
@@ -201,6 +201,14 @@ function validAttack(state, hero, opponent, spell) {
     } else {
         return false;
     }
+}
+
+function readyForNextSpell(hero) {
+    return Date.now() >= nextSpell || !!hero.linkedToId;
+}
+
+function updateNextSpellTime() {
+    nextSpell = Date.now() + delayMilliseconds + Math.floor((Math.random() < 0.5 ? -1 : 1) * Math.random() * delayJitterMilliseconds);
 }
 
 function jitter(target, missRadius) {
@@ -332,17 +340,20 @@ function evade(state, hero, cooldowns) {
     }
 
     // Try to shoot at object
-    for (var spellId in cooldowns) {
-        var readyToCast = !cooldowns[spellId];
-        var spell = settings.Spells[spellId];
+    if (readyForNextSpell(hero)) {
+        for (var spellId in cooldowns) {
+            var readyToCast = !cooldowns[spellId];
+            var spell = settings.Spells[spellId];
 
-        if (spell
-            && readyToCast
-            && spell.projectile // only choose spells which shoot
-            && spell.cooldown <= 2 * state.ticksPerSecond // don't waste slow cooldown spells on horcrux
-            ) {
+            if (spell
+                && readyToCast
+                && spell.projectile // only choose spells which shoot
+                && spell.cooldown <= 2 * state.ticksPerSecond // don't waste slow cooldown spells on horcrux
+                ) {
 
-            return { spellId, target };
+                updateNextSpellTime();
+                return { spellId, target };
+            }
         }
     }
 
