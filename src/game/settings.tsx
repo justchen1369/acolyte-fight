@@ -1781,7 +1781,7 @@ const voidRush: Spell = {
 const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
-    description: "Vanish from sight for 1.5 seconds, and also increase movement speed 75%.",
+    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 75%.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
