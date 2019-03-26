@@ -1411,9 +1411,10 @@ const horcrux: Spell = {
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
+        damageScaling: false,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
-        expireOn: Categories.All,
+        expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         destructible: {
         },
 
@@ -1444,7 +1445,7 @@ const horcrux: Spell = {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 2.5, lifeSteal: 1, noHit: true },
+                        packet: { damage: 2.5, lifeSteal: 1, damageScaling: false, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
