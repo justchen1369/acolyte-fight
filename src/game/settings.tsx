@@ -1447,7 +1447,7 @@ const horcrux: Spell = {
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
-                            alpha: 0.01,
+                            alpha: 0.3,
                             ticks: 15,
                             emissionRadius: Hero.Radius,
                             particleRadius: 0.5 * Hero.Radius,
