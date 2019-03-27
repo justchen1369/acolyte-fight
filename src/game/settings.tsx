@@ -1404,13 +1404,14 @@ const horcrux: Spell = {
     projectile: {
         density: 10,
         restitution: 0,
-        radius: 0.003,
+        radius: 0.002,
         speed: 0.35,
 
         maxTicks: 1.5 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
+        damageScaling: false,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
         expireOn: Categories.Hero | Categories.Massive,
@@ -1423,27 +1424,27 @@ const horcrux: Spell = {
         behaviours: [
             {
                 type: "updateCollideWith",
-                trigger: { afterTicks: 60, atCursor: true },
+                trigger: { afterTicks: 30, atCursor: true },
                 collideWith: Categories.All,
             },
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 60, atCursor: true },
+                trigger: { afterTicks: 30, atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
-                trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.05,
+                trigger: { afterTicks: 30, atCursor: true },
+                radius: 0.03,
                 tickInterval: 15,
                 buffs: [
                     {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 4, lifeSteal: 1, noHit: true },
+                        packet: { damage: 4, lifeSteal: 1, damageScaling: false, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
@@ -1460,12 +1461,12 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.05, minRadius: 0.04, shrinkTicks: 13, grow: true, fade: true, repeat: true },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.05, minRadius: 0.04, shrinkTicks: 31, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.03, minRadius: 0.015, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.03, minRadius: 0.015, shrinkTicks: 31, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.05, minRadius: 0.04, shrinkTicks: 10, startingTicks: 10 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.03, minRadius: 0.015, shrinkTicks: 10, startingTicks: 10 },
             {
                 type: "link",
                 color: 'rgba(255, 255, 255, 0.1)',
