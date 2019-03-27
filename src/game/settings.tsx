@@ -1430,14 +1430,14 @@ const horcrux: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 60, atCursor: true, minTicks: 15 },
+                trigger: { afterTicks: 60, atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.025,
+                radius: 0.03,
                 tickInterval: 15,
                 buffs: [
                     {
@@ -1461,11 +1461,11 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.025, minRadius: 0.015, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.03, minRadius: 0.015, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.025, minRadius: 0.015, shrinkTicks: 10, startingTicks: 10 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.03, minRadius: 0.015, shrinkTicks: 10, startingTicks: 10 },
             {
                 type: "link",
                 color: 'rgba(255, 255, 255, 0.1)',
