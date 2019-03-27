@@ -1424,19 +1424,19 @@ const horcrux: Spell = {
         behaviours: [
             {
                 type: "updateCollideWith",
-                trigger: { afterTicks: 30, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true },
                 collideWith: Categories.All,
             },
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 30, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true, minTicks: 15 },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
-                trigger: { afterTicks: 30, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.025,
                 tickInterval: 15,
                 buffs: [

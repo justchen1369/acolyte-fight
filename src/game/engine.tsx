@@ -571,6 +571,9 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			const ticksToCursor = ticksTo(distanceToCursor, speed);
 
 			let waitTicks = ticksToCursor;
+			if (trigger.minTicks) {
+				waitTicks = Math.max(waitTicks, trigger.minTicks);
+			}
 			if (trigger.afterTicks) {
 				waitTicks = Math.min(waitTicks, trigger.afterTicks);
 			}

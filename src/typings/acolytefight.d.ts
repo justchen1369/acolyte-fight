@@ -321,6 +321,7 @@ declare interface BehaviourTemplateBase {
 declare interface BehaviourTrigger {
 	afterTicks?: number; // After this many ticks
 	atCursor?: boolean; // When projectile reaches cursor
+	minTicks?: number; // Don't trigger at cursor until this many ticks have passed
 }
 
 declare interface HomingTemplate extends BehaviourTemplateBase {
