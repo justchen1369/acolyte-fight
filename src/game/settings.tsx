@@ -199,10 +199,15 @@ const flamestrike: Spell = {
         detonate: {
             damage: 20,
             lifeSteal: 0.2,
-            radius: 0.0275,
+            radius: 0.03,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
             renderTicks: 10,
+
+            partialRadius: {
+                initialMultiplier: 0.3,
+                ticks: 1 * TicksPerSecond,
+            },
         },
 
         partialDamage: {
@@ -697,18 +702,22 @@ const rocket: Spell = {
         expireOn: Categories.All ^ Categories.Shield,
         shieldTakesOwnership: false,
 
-        partialDamage: {
-            initialMultiplier: 0.5,
-            ticks: 1 * TicksPerSecond,
-        },
-
         detonate: {
             damage: 0,
-            partialRadius: true,
             radius: 0.035,
             minImpulse: 0.0003,
             maxImpulse: 0.0004,
             renderTicks: 10,
+
+            partialRadius: {
+                initialMultiplier: 0.5,
+                ticks: 1 * TicksPerSecond,
+            },
+
+            partialImpulse: {
+                initialMultiplier: 0.5,
+                ticks: 1 * TicksPerSecond,
+            },
         },
 
         strafe: {
@@ -1354,7 +1363,6 @@ const mines: Spell = {
         detonate: {
             damage: 5.25,
             damageScaling: false,
-            partialRadius: false,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,

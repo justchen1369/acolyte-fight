@@ -243,7 +243,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
     bounce?: BounceParameters;
 	link?: LinkParameters;
 	horcrux?: HorcruxParameters;
-	detonate?: DetonateParameters;
+	detonate?: DetonateParametersTemplate;
 	gravity?: GravityParameters; // Trap a hero
 	swapWith?: number; // Category flags of what types of objects to swap with
 	lifeSteal?: number; // 1.0 means all damage is returned as health to the owner of the projectile
@@ -381,12 +381,16 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 	outerDamage?: number;
 
 	radius: number; // The radius of the explosion
-	partialRadius?: boolean; // Whether to let the radius be affected by PartialDamageParameters
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
 
 	renderTicks: number; // Length of explosion
+}
+
+declare interface DetonateParametersTemplate extends DetonateParameters {
+	partialRadius?: PartialDamageParameters; // Scale the radius over time
+	partialImpulse?: PartialDamageParameters; // Scale the impulse over time
 }
 
 declare type RenderParams =

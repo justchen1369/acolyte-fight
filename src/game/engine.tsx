@@ -1764,8 +1764,7 @@ function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 	world.ui.events.push(push);
 }
 
-export function calculatePartialDamageMultiplier(world: w.World, projectile: w.Projectile): number {
-	const partialDamage = projectile.partialDamage;
+export function calculatePartialDamageMultiplier(world: w.World, projectile: w.Projectile, partialDamage: PartialDamageParameters = projectile.partialDamage): number {
 	const lifetime = world.tick - projectile.createTick;
 	if (partialDamage && lifetime < partialDamage.ticks) {
 		if (partialDamage.step) {
@@ -2427,20 +2426,27 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		return;
 	}
 
+	const template = projectile.detonate;
+
 	// Apply damage
-	const multiplier = calculatePartialDamageMultiplier(world, projectile);
+	const damageMultiplier = calculatePartialDamageMultiplier(world, projectile);
 	const detonate: DetonateParameters = {
-		...projectile.detonate,
-		damage: projectile.detonate.damage * multiplier,
-		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * multiplier,
+		...template,
+		damage: projectile.detonate.damage * damageMultiplier,
+		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * damageMultiplier,
 	};
 
-	const partialRadius = detonate.partialRadius !== undefined ? detonate.partialRadius : false;
-	if (partialRadius) {
-		detonate.minImpulse = projectile.detonate.minImpulse * multiplier;
-		detonate.maxImpulse = projectile.detonate.maxImpulse * multiplier;
-		detonate.radius = projectile.detonate.radius * multiplier;
+	if (template.partialRadius) {
+		const radiusMultiplier = calculatePartialDamageMultiplier(world, projectile, template.partialRadius);
+		detonate.radius = projectile.detonate.radius * radiusMultiplier;
 	}
+
+	if (template.partialImpulse) {
+		const impulseMultiplier = calculatePartialDamageMultiplier(world, projectile, template.partialImpulse);
+		detonate.minImpulse = projectile.detonate.minImpulse * impulseMultiplier;
+		detonate.maxImpulse = projectile.detonate.maxImpulse * impulseMultiplier;
+	}
+
 	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.color, projectile.sound);
 
 	// Don't allow for repeats
