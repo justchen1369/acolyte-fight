@@ -702,6 +702,11 @@ const rocket: Spell = {
         expireOn: Categories.All ^ Categories.Shield,
         shieldTakesOwnership: false,
 
+        partialDamage: {
+            initialMultiplier: 0.5,
+            ticks: 1 * TicksPerSecond,
+        },
+
         detonate: {
             damage: 0,
             radius: 0.035,
