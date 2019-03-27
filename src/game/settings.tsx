@@ -1450,14 +1450,14 @@ const horcrux: Spell = {
             {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.03,
+                radius: 0.035,
                 tickInterval: 15,
                 buffs: [
                     {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 5, lifeSteal: 1, minHealth: 1, damageScaling: false, noHit: true },
+                        packet: { damage: 4, lifeSteal: 1, minHealth: 1, damageScaling: false, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
@@ -1474,11 +1474,11 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.03, minRadius: 0.02, shrinkTicks: 13, grow: true, fade: true, repeat: true },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.035, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
-            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.03, minRadius: 0.02, shrinkTicks: 10, startingTicks: 10 },
+            { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.035, minRadius: 0.03, shrinkTicks: 10, startingTicks: 10 },
             {
                 type: "link",
                 color: 'rgba(255, 255, 255, 0.1)',
