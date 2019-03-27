@@ -3226,11 +3226,11 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: ScourgeSpell) {
 	// Self damage
-	const selfDamage = Math.min(spell.selfDamage, Math.max(0, hero.health - spell.minSelfHealth));
 	const selfPacket: w.DamagePacket = {
 		fromHeroId: hero.id,
-		damage: selfDamage,
+		damage: spell.selfDamage,
 		lifeSteal: 0,
+		minHealth: spell.minSelfHealth,
 	};
 	applyDamage(hero, selfPacket, world);
 
@@ -3423,6 +3423,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		lifeStealTargetHeroId,
 		fromHeroId,
 		noHit: template.noHit,
+		minHealth: template.minHealth,
 	};
 }
 
@@ -3452,7 +3453,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	let amount = Math.max(0, packet.damage);
 	amount = applyArmor(fromHeroId, toHero, amount);
 	amount = mitigateDamage(toHero, amount, fromHeroId, world);
-	amount = Math.min(amount, toHero.health);
+	amount = Math.min(amount, Math.max(0, toHero.health - (packet.minHealth || 0)));
 	toHero.health -= amount;
 
 	// Apply lifesteal

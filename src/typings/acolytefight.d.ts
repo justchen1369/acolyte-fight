@@ -675,6 +675,7 @@ declare interface DamagePacketTemplate {
 	lifeSteal?: number;
 	isLava?: boolean;
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping
+	minHealth?: number; // Never reduce the enemy below this level of health
 }
 
 declare interface Vec2 {
