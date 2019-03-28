@@ -267,8 +267,8 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 10 / 3 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 3 projectiles, 2 seconds, 3 times per second
-                maxTicks: 2 * TicksPerSecond,
+                packet: { damage: 10 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
+                maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 3, // 3 projectiles
@@ -322,15 +322,15 @@ const difire: Spell = {
                 targetType: "cursor",
                 trigger: { afterTicks: 5 },
                 redirect: true,
-                newSpeed: 0.75,
+                newSpeed: 0.6,
             },
         ],
 
         color: '#ff0088',
         renderers: [
             { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 6 },
-            { type: "strike", ticks: 6, glow: true, numParticles: 2 },
+            { type: "ray", ticks: 8 },
+            { type: "strike", ticks: 8, glow: true, numParticles: 2 },
         ],
 
         buffs: [
@@ -339,8 +339,8 @@ const difire: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 10 / 2 / 2 / 3, lifeSteal: 0.2, noHit: true }, // 2 projectiles, 2 seconds, 3 times per second
-                maxTicks: 2 * TicksPerSecond,
+                packet: { damage: 10 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true }, // 2 projectiles, 4 seconds, 3 times per second
+                maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 2, // 2 projectiles
