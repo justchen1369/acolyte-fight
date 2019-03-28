@@ -1403,7 +1403,7 @@ const mines: Spell = {
 const horcrux: Spell = {
     id: 'horcrux',
     name: 'Horcrux',
-    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will steal the soul from any nearby enemies, but will not kill them. Your Horcrux is fragile, so shoot it close to your enemy, but don't let it touch them or it will break!",
+    description: "As long as your Horcrux is alive, you cannot die. The Horcrux will lifesteal from any nearby enemies, but will not kill them. Your Horcrux is fragile, so shoot it close to your enemy, but don't let it touch them or it will break!",
     action: "projectile",
     sound: "horcrux",
 
@@ -1411,7 +1411,7 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -1420,11 +1420,10 @@ const horcrux: Spell = {
         radius: 0.002,
         speed: 0.35,
 
-        maxTicks: 1.5 * TicksPerSecond,
+        maxTicks: 1 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
-        damageScaling: false,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
         expireOn: Categories.Hero | Categories.Massive,
@@ -1457,7 +1456,7 @@ const horcrux: Spell = {
                         type: "burn",
                         against: Alliances.NotFriendly,
                         hitInterval: 15,
-                        packet: { damage: 4, lifeSteal: 1, minHealth: 1, damageScaling: false, noHit: true },
+                        packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true },
                         maxTicks: 15,
                         render: {
                             color: "#22ee88",
