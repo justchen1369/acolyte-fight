@@ -2027,22 +2027,15 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	}
 
 	// Always bounce between owner and another target
-	let nextTarget: w.WorldObject =
-		hitId === projectile.owner
-		? findNearest(
-			world.objects,
-			projectile.body.getPosition(),
-			x => x.category === "hero" && x.id !== projectile.owner && (calculateAlliance(projectile.owner, x.id, world) & Alliances.NotFriendly) > 0 && !isHeroInvisible(x))
-		: world.objects.get(projectile.owner);
+	const nextTargetId = hitId === projectile.targetId ? projectile.owner : projectile.targetId;
+	const nextTarget: w.WorldObject = world.objects.get(nextTargetId);
 	if (!nextTarget) {
 		return;
 	}
 
-	projectile.targetId = nextTarget.id;
-
-	let currentSpeed = vector.length(projectile.body.getLinearVelocity());
-	let newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
-	let newVelocity = vector.multiply(newDirection, currentSpeed);
+	const currentSpeed = vector.length(projectile.body.getLinearVelocity());
+	const newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
+	const newVelocity = vector.multiply(newDirection, currentSpeed);
 	projectile.body.setLinearVelocity(newVelocity);
 }
 
