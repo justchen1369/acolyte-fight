@@ -20,6 +20,8 @@ import { logger } from './logging';
 import { DefaultSettings } from '../game/settings';
 import { required, optional } from './schema';
 
+const TeamGameChance = 0.8;
+
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
@@ -681,7 +683,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	if (game.tick >= game.closeTick) {
 		if (game.bots.size === 0 && [...game.active.values()].every(x => !!x.userId)) {
 			// Everyone must be logged in to activate team mode
-			if (numPlayers >= 4 && (numPlayers % 2) === 0) {
+			if (numPlayers >= 4 && (numPlayers % 2) === 0 && Math.random() < TeamGameChance) {
 				numTeams = numPlayers / 2;
 			}
 		}
