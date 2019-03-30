@@ -953,10 +953,10 @@ const bouncer: Spell = {
     projectile: {
         density: 2,
         radius: 0.001,
-        speed: 1.5,
-        fixedSpeed: false,
+        speed: 1,
+        fixedSpeed: true,
         maxTicks: 3.0 * TicksPerSecond,
-        hitInterval: 10,
+        hitInterval: 15,
         damage: 5,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
