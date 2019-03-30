@@ -340,6 +340,11 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 		return;
 	}
 
+	if (engine.isHeroInvisible(owner)) {
+		// Don't let lifesteal glow give away position
+		return;
+	}
+
 	const pos = owner.body.getPosition();
 	pushTrail({
 		type: 'ripple',
