@@ -993,7 +993,7 @@ const repeater: Spell = {
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
         partialDamage: {
-            initialMultiplier: 0.25,
+            initialMultiplier: 0.33,
             ticks: 0.5 * TicksPerSecond,
         },
 
