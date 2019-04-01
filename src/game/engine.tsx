@@ -2029,7 +2029,11 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 	// Always bounce between owner and another target
 	const nextTargetId = hitId === projectile.targetId ? projectile.owner : projectile.targetId;
 	const nextTarget: w.WorldObject = world.objects.get(nextTargetId);
-	if (!nextTarget) {
+	if (!(nextTarget && nextTarget.category === "hero")) {
+		return;
+	}
+
+	if (isHeroInvisible(nextTarget) && (calculateAlliance(projectile.owner, nextTarget.id, world) & Alliances.NotFriendly) > 0) {
 		return;
 	}
 
