@@ -1672,7 +1672,6 @@ const thrust: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    unlink: true,
     debuff: true,
 
     damageTemplate: {
@@ -1698,7 +1697,6 @@ const swap: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    unlink: true,
 
     projectile: {
         density: 0.001,
@@ -1753,7 +1751,6 @@ const voidRush: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    unlink: true,
     debuff: true,
 
     buffs: [
