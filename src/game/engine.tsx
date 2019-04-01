@@ -18,6 +18,8 @@ interface BuffContext {
 }
 
 interface ProjectileConfig {
+	owner?: string;
+	filterGroupIndex?: number;
 	directionTarget?: pl.Vec2;
 }
 
@@ -418,19 +420,48 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
+function addInteractor(world: w.World, pos: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate) {
+	const center = pl.Vec2(0.5, 0.5);
+	const towardsCenter = vector.diff(center, pos);
+	const angle = vector.angle(towardsCenter);
+
+	const projectile = addProjectileAt(world, pos, angle, pos, type, projectileTemplate);
+
+	return projectile;
+}
+
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
-	const NeverTicks = 1e6;
-
-	let id = spell.id + (world.nextObjectId++);
-
 	const from = hero.body.getPosition();
+
 	let direction = vector.unit(vector.diff(config.directionTarget || target, from));
 	if (direction.x === 0 && direction.y === 0) {
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
 
 	const position = vector.clone(hero.body.getPosition());
-	const velocity = vector.multiply(direction, projectileTemplate.speed);
+	const angle = vector.angle(direction);
+
+	const projectile = addProjectileAt(world, position, angle, target, spell.id, projectileTemplate, {
+		...config,
+		owner: hero.id,
+		filterGroupIndex: hero.filterGroupIndex,
+	});
+
+	if (projectile.strafe) {
+		hero.strafeIds.add(projectile.id);
+	}
+	if (projectileTemplate.horcrux) {
+		hero.horcruxIds.add(projectile.id);
+	}
+
+	return projectile;
+}
+
+function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, target: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
+	const NeverTicks = 1e6;
+
+	let id = type + (world.nextObjectId++);
+	const velocity = vector.multiply(vector.fromAngle(angle), projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
@@ -445,7 +476,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		bullet: true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
-		filterGroupIndex: hero.filterGroupIndex,
+		filterGroupIndex: config.filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
 		density: projectileTemplate.density,
@@ -453,15 +484,15 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		isSensor: projectileTemplate.sensor,
 	} as pl.FixtureDef);
 
-	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(hero.id, x.id, world) & Alliances.Enemy));
+	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(config.owner, x.id, world) & Alliances.Enemy));
 	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
 
 	let projectile = {
 		id,
-		owner: hero.id,
+		owner: config.owner,
 		category: "projectile",
 		categories,
-		type: spell.id,
+		type,
 		body,
 		passthrough: true,
 		speed: projectileTemplate.speed,
@@ -516,14 +547,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	} as w.Projectile;
 
 	world.objects.set(id, projectile);
-	if (projectile.strafe) {
-		hero.strafeIds.add(projectile.id);
-	}
 	if (projectile.detonate) {
 		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
-	}
-	if (projectileTemplate.horcrux) {
-		hero.horcruxIds.add(projectile.id);
 	}
 
 	if (!projectileTemplate.selfPassthrough) {
@@ -533,6 +558,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
+
 }
 
 function ticksTo(distance: number, speed: number) {
@@ -885,7 +911,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
 
-	const World = world.settings.World;
 	const Layouts = world.settings.Layouts;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
@@ -923,6 +948,12 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 			addObstacle(world, position, orientationAngle, points, obstacleTemplate);
 		}
 	});
+
+	if (layout.interactors) {
+		layout.interactors.forEach(interactorTemplate => {
+			addInteractor(world, pl.Vec2(interactorTemplate.x, interactorTemplate.y), interactorTemplate.type, interactorTemplate.projectile);
+		});
+	}
 }
 
 export function allowSpellChoosing(world: w.World, heroId: string) {
@@ -1022,11 +1053,9 @@ function handleClosing(ev: w.Closing, world: w.World) {
 
 		// Clear any stockpiled halos
 		world.objects.forEach(projectile => {
-			if (projectile.category !== "projectile") {
-				return;
+			if (projectile.category === "projectile" && projectile.owner) { // Ignore environmental projectiles
+				projectile.expireTick = Math.min(projectile.expireTick, ev.startTick);
 			}
-
-			projectile.expireTick = Math.min(projectile.expireTick, ev.startTick);
 		});
 	}
 

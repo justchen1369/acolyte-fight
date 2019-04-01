@@ -1,3 +1,5 @@
+import { Categories } from "./constants";
+
 export const Layouts: Layouts = {
     "double": {
         "numPoints": 4,
@@ -53,7 +55,34 @@ export const Layouts: Layouts = {
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             }
-        ]
+        ],
+/*        interactors: [
+            {
+                type: "crater",
+                x: 0.5,
+                y: 0.5,
+                projectile: {
+                    density: 1,
+                    radius: 0.1,
+                    speed: 0,
+                    maxTicks: 1e6,
+
+                    damage: 1,
+
+                    sensor: true,
+                    collideWith: Categories.Hero,
+                    expireOn: Categories.None,
+
+                    hitInterval: 15,
+
+                    color: '#ffcc00',
+                    renderers: [
+                        { type: "projectile", ticks: 15, smoke: 0.1 },
+                        { type: "strike", ticks: 15, glow: true },
+                    ],
+                },
+            },
+        ], */
     },
     "single": {
         "numPoints": 3,
