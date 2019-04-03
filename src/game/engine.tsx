@@ -420,16 +420,6 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 	hero.cooldowns[spell] = world.tick + waitTime;
 }
 
-function addInteractor(world: w.World, pos: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate) {
-	const center = pl.Vec2(0.5, 0.5);
-	const towardsCenter = vector.diff(center, pos);
-	const angle = vector.angle(towardsCenter);
-
-	const projectile = addProjectileAt(world, pos, angle, pos, type, projectileTemplate);
-
-	return projectile;
-}
-
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
 	const from = hero.body.getPosition();
 
@@ -948,12 +938,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 			addObstacle(world, position, orientationAngle, points, obstacleTemplate);
 		}
 	});
-
-	if (layout.interactors) {
-		layout.interactors.forEach(interactorTemplate => {
-			addInteractor(world, pl.Vec2(interactorTemplate.x, interactorTemplate.y), interactorTemplate.type, interactorTemplate.projectile);
-		});
-	}
 }
 
 export function allowSpellChoosing(world: w.World, heroId: string) {

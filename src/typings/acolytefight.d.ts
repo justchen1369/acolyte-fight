@@ -86,17 +86,9 @@ declare interface Layouts {
 
 declare interface Layout {
 	obstacles: ObstacleTemplate[];
-	interactors?: InteractorTemplate[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
-}
-
-declare interface InteractorTemplate {
-	x: number;
-	y: number;
-	type: string;
-	projectile: ProjectileTemplate;
 }
 
 declare interface ObstacleTemplate {
