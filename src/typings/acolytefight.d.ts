@@ -85,24 +85,42 @@ declare interface Layouts {
 }
 
 declare interface Layout {
-	obstacles: ObstacleTemplate[];
+	obstacles: InteractorTemplate[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
 }
 
-declare interface ObstacleTemplate {
+declare type InteractorTemplate =
+	ObstacleTemplate
+	| CraterTemplate
+
+declare interface InteractorTemplateBase {
+	type: string;
+
 	// Where to place the obstacles
 	numObstacles: number;
 	layoutRadius: number;
 	layoutAngleOffsetInRevs: number;
 
-	// Properties of an individual obstacle
+	orientationAngleOffsetInRevs?: number;
+}
+
+declare interface PolygonTemplate {
 	numPoints: number;
 	extent: number; // aka radius but for a polygon
-	orientationAngleOffsetInRevs: number;
+}
+
+declare interface ObstacleTemplate extends InteractorTemplateBase, PolygonTemplate {
+	type: "obstacle";
 
 	health?: number;
+}
+
+declare interface CraterTemplate extends InteractorTemplateBase, PolygonTemplate {
+	type: "crater";
+	color: string;
+	buffs: BuffTemplate[];
 }
 
 declare interface ObstacleSettings {

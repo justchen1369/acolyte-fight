@@ -224,6 +224,8 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world, options);
+	} else if (obj.category === "crater") {
+		renderCrater(ctxStack, obj, world, options);
 	}
 }
 
@@ -660,6 +662,30 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, {
 		color,
 		maxRadius: scale * obstacle.extent,
+	});
+}
+
+function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World, options: RenderOptions) {
+	if (crater.destroyedTick) {
+		return;
+	}
+
+	const body = crater.body;
+	const pos = body.getPosition();
+
+	const hitAge = crater.hitTick ? world.tick - crater.hitTick : Infinity;
+	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+
+	let color = Color(crater.color);
+	if (flash > 0) {
+		color = color.lighten(flash);
+	}
+
+
+	const scale = 1;
+	glx.convex(ctxStack, pos, crater.points, body.getAngle(), scale, {
+		color,
+		maxRadius: crater.extent,
 	});
 }
 

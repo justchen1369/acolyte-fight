@@ -185,6 +185,37 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
+function addCrater(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: CraterTemplate) {
+	const craterId = "crater" + (world.nextObjectId++);
+	const body = world.physics.createBody({
+		userData: craterId,
+		type: 'static',
+		position,
+		angle,
+	});
+
+	body.createFixture(pl.Polygon(points), {
+		filterCategoryBits: Categories.Crater,
+		filterMaskBits: Categories.All,
+		isSensor: true,
+	});
+
+	const crater: w.Crater = {
+		id: craterId,
+		category: "crater",
+		categories: Categories.Obstacle,
+		type: "polygon",
+		body,
+		color: template.color,
+		extent: template.extent,
+		points,
+		buffs: template.buffs,
+	};
+
+	world.objects.set(crater.id, crater);
+	return crater;
+}
+
 function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 	const shieldId = "shield" + (world.nextObjectId++);
 
@@ -903,7 +934,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 
 	const Layouts = world.settings.Layouts;
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
 	let layout: Layout = Layouts[ev.layoutId];
 	if (!layout) {
 		const layouts = Object.keys(Layouts).map(key => Layouts[key]).filter(x => !!x);
@@ -925,19 +955,32 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 		world.mapPoints = points;
 	}
 
-	layout.obstacles.forEach(obstacleTemplate => {
-		const points = polygon(obstacleTemplate.numPoints, obstacleTemplate.extent);
-		for (let i = 0; i < obstacleTemplate.numObstacles; ++i) {
-			const proportion = i / obstacleTemplate.numObstacles;
-			const baseAngle = proportion * (2 * Math.PI);
-			const layoutAngleOffset = obstacleTemplate.layoutAngleOffsetInRevs * 2 * Math.PI;
-			const orientationAngleOffset = obstacleTemplate.orientationAngleOffsetInRevs * 2 * Math.PI;
-			const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), obstacleTemplate.layoutRadius));
+	layout.obstacles.forEach(obstacleTemplate => instantiateInteractors(obstacleTemplate, world));
+}
 
-			const orientationAngle = baseAngle + layoutAngleOffset + orientationAngleOffset;
-			addObstacle(world, position, orientationAngle, points, obstacleTemplate);
-		}
-	});
+function instantiateInteractors(template: InteractorTemplate, world: w.World) {
+	const mapCenter = pl.Vec2(0.5, 0.5);
+
+	for (let i = 0; i < template.numObstacles; ++i) {
+		const proportion = i / template.numObstacles;
+		const baseAngle = proportion * (2 * Math.PI);
+		const layoutAngleOffset = template.layoutAngleOffsetInRevs * 2 * Math.PI;
+		const orientationAngleOffset = template.orientationAngleOffsetInRevs * 2 * Math.PI;
+		const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), template.layoutRadius));
+
+		const orientationAngle = baseAngle + layoutAngleOffset + orientationAngleOffset;
+		instantiateInteractor(template, position, orientationAngle, world);
+	}
+}
+
+function instantiateInteractor(template: InteractorTemplate, position: pl.Vec2, angle: number, world: w.World) {
+	if (template.type === "obstacle") {
+		const points = polygon(template.numPoints, template.extent);
+		addObstacle(world, position, angle, points, template);
+	} else if (template.type === "crater") {
+		const points = polygon(template.numPoints, template.extent);
+		addCrater(world, position, angle, points, template);
+	}
 }
 
 export function allowSpellChoosing(world: w.World, heroId: string) {
@@ -1608,7 +1651,21 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "shield") {
 			handleHeroHitShield(world, object, hit);
 		}
+	} else if (object.category === "crater") {
+		if (hit.category === "hero") {
+			handleCraterHitHero(world, object, hit);
+		}
 	}
+}
+
+function handleCraterHitHero(world: w.World, crater: w.Crater, hero: w.Hero) {
+	crater.buffs.forEach(buff => {
+		const buffId = `${crater.id}-${buff.type}`;
+		instantiateBuff(buffId, buff, hero, world, {
+			fromHeroId: null,
+			toHeroId: hero.id,
+		});
+	});
 }
 
 function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {

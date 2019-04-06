@@ -351,6 +351,18 @@ export interface WorldObjectBase {
 	blocksTeleporters?: boolean;
 }
 
+export interface Crater extends WorldObjectBase {
+	category: "crater";
+	type: string;
+
+	color: string;
+	extent: number;
+	points: pl.Vec2[];
+
+	hitTick?: number;
+	buffs: BuffTemplate[];
+}
+
 export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
 	type: string;
@@ -821,7 +833,8 @@ export type WorldObject =
 	Hero
 	| Shield
 	| Projectile
-	| Obstacle;
+	| Obstacle
+	| Crater
 
 export type WorldEvent =
 	DetonateEvent
