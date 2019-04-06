@@ -351,7 +351,7 @@ export interface WorldObjectBase {
 	blocksTeleporters?: boolean;
 }
 
-export interface Crater extends WorldObjectBase {
+export interface Crater extends WorldObjectBase, HitSource {
 	category: "crater";
 	type: string;
 
@@ -359,7 +359,6 @@ export interface Crater extends WorldObjectBase {
 	extent: number;
 	points: pl.Vec2[];
 
-	hitTick?: number;
 	buffs: BuffTemplate[];
 }
 
@@ -540,6 +539,7 @@ export interface GravityState {
 
 export type Buff =
 	MovementBuff
+	| GlideBuff
 	| LavaImmunityBuff
 	| VanishBuff
 	| LifeStealBuff
@@ -564,6 +564,11 @@ export interface BuffBase {
 export interface MovementBuff extends BuffBase {
 	type: "movement";
 	movementProportion: number;
+}
+
+export interface GlideBuff extends BuffBase {
+	type: "glide";
+	linearDampingMultiplier: number;
 }
 
 export interface LavaImmunityBuff extends BuffBase {
@@ -600,7 +605,13 @@ export interface Cooldowns {
 	[spellId: string]: number;
 }
 
-export interface Projectile extends WorldObjectBase {
+export interface HitSource {
+	hitInterval?: number;
+	hitTick?: number;
+	hitTickLookup: Map<string, number>; // object id -> tick
+}
+
+export interface Projectile extends WorldObjectBase, HitSource {
 	category: "projectile";
 	type: string;
 
@@ -616,9 +627,6 @@ export interface Projectile extends WorldObjectBase {
 
 	target: pl.Vec2;
 	targetId: string | null;
-	hitInterval?: number;
-	hitTick?: number;
-	hitTickLookup: Map<string, number>; // object id -> tick
 
 	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;

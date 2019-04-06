@@ -60,20 +60,19 @@ export const Layouts: Layouts = {
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             },
-/*            {
+            /*{
                 type: "crater",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 7,
-                "extent": 0.02,
+                "extent": 0.1,
                 "orientationAngleOffsetInRevs": 0,
                 color: "#ccccff",
                 buffs: [
                     {
-                        type: "movement",
-                        maxTicks: 1,
-                        movementProportion: 0.5,
+                        type: "glide",
+                        linearDampingMultiplier: 0,
                     },
                 ],
             }*/

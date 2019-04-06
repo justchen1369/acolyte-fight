@@ -210,6 +210,8 @@ function addCrater(world: w.World, position: pl.Vec2, angle: number, points: pl.
 		extent: template.extent,
 		points,
 		buffs: template.buffs,
+		hitInterval: template.hitInterval || 1,
+		hitTickLookup: new Map<string, number>(),
 	};
 
 	world.objects.set(crater.id, crater);
@@ -1659,13 +1661,15 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 }
 
 function handleCraterHitHero(world: w.World, crater: w.Crater, hero: w.Hero) {
-	crater.buffs.forEach(buff => {
-		const buffId = `${crater.id}-${buff.type}`;
-		instantiateBuff(buffId, buff, hero, world, {
-			fromHeroId: null,
-			toHeroId: hero.id,
+	if (takeHit(crater, hero.id, world)) {
+		crater.buffs.forEach(buff => {
+			const buffId = `${crater.id}-${buff.type}`;
+			instantiateBuff(buffId, buff, hero, world, {
+				fromHeroId: null,
+				toHeroId: hero.id,
+			});
 		});
-	});
+	}
 }
 
 function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
@@ -1859,7 +1863,7 @@ function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet:
 	}
 }
 
-function takeHit(projectile: w.Projectile, hitId: string, world: w.World) {
+function takeHit(projectile: w.HitSource, hitId: string, world: w.World) {
 	const hitTick = projectile.hitTickLookup.get(hitId);
 	if (hitTick) {
 		if (projectile.hitInterval) {
@@ -3344,12 +3348,13 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell
 }
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const maxTicks = template.maxTicks || 1;
 	const base = {
 		initialTick: world.tick,
-		expireTick: world.tick + template.maxTicks,
+		expireTick: world.tick + maxTicks,
 		render: template.render,
 		sound: template.sound,
-		maxTicks: template.maxTicks,
+		maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.channellingSpellId,
 		numStacks: 1,
@@ -3360,6 +3365,11 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.buffs.set(id, {
 			...base, id, type: "movement",
 			movementProportion: template.movementProportion,
+		});
+	} else if (template.type === "glide") {
+		hero.buffs.set(id, {
+			...base, id, type: "glide",
+			linearDampingMultiplier: template.linearDampingMultiplier,
 		});
 	} else if (template.type === "lavaImmunity") {
 		hero.buffs.set(id, {

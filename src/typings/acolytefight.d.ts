@@ -120,6 +120,7 @@ declare interface ObstacleTemplate extends InteractorTemplateBase, PolygonTempla
 declare interface CraterTemplate extends InteractorTemplateBase, PolygonTemplate {
 	type: "crater";
 	color: string;
+	hitInterval?: number; // How many ticks between reapplying the buffs
 	buffs: BuffTemplate[];
 }
 
@@ -514,6 +515,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 declare type BuffTemplate =
 	DebuffTemplate
 	| MovementBuffTemplate
+	| GlideTemplate
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
@@ -525,7 +527,7 @@ declare interface BuffTemplateBase {
 	type: string;
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	against?: number; // Which alliances to apply this buff to
-	maxTicks: number;
+	maxTicks?: number;
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
 	render?: RenderBuff;
@@ -548,12 +550,17 @@ declare interface DebuffTemplate extends BuffTemplateBase {
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
 	type: "movement";
-	movementProportion: number;
+	movementProportion: number; // 0 will make the hero unable to move, 2 will make hero movenet twice as fast
+}
+
+declare interface GlideTemplate extends BuffTemplateBase {
+	type: "glide";
+	linearDampingMultiplier: number; // 0 will make the hero glide
 }
 
 declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
 	type: "lavaImmunity";
-	damageProportion: number;
+	damageProportion: number; // 0 will make the hero immune to void damage
 }
 
 declare interface VanishTemplate extends BuffTemplateBase {
