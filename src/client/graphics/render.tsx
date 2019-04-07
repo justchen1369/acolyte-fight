@@ -682,12 +682,33 @@ function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World
 			}
 		}
 
+		let proportion = 1;
+		if (fill.cycleInterval) {
+			proportion = (world.tick % fill.cycleInterval) / fill.cycleInterval;
+
+			if (fill.cycleInwards) {
+				proportion = 1 - proportion;
+			}
+		}
+
+		if (fill.cycleFade) {
+			color = color.fade(proportion);
+		}
+
+		const maxRadius = crater.extent * proportion;
+		const minRadius = maxRadius * (fill.innerRadiusFactor || 0);
+
 		const body = crater.body;
 		const scale = 1;
 		const pos = body.getPosition();
 		glx.convex(ctxStack, pos, crater.points, body.getAngle(), scale, {
 			color,
-			maxRadius: crater.extent,
+			minRadius,
+			maxRadius,
+			feather: fill.glow ? {
+				sigma: HeroColors.GlowRadius,
+				alpha: fill.glow,
+			} : null,
 		});
 	});
 

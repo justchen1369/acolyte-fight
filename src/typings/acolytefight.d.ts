@@ -127,6 +127,11 @@ declare interface CraterTemplate extends InteractorTemplateBase, PolygonTemplate
 
 declare interface CraterFill {
 	color: string;
+	innerRadiusFactor?: number;
+	cycleFade?: boolean;
+	cycleInterval?: number;
+	cycleInwards?: boolean;
+	glow?: number;
 	flash?: number;
 }
 

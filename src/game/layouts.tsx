@@ -67,10 +67,12 @@ export const Layouts: Layouts = {
                 "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0,
 
-                fill: [{
-                    color: "rgba(255, 192, 32, 1)",
-                    flash: 0.5,
-                }],
+                fill: [
+                    {
+                        color: "rgba(255, 192, 32, 1)",
+                        flash: 0.5,
+                    },
+                ],
                 smoke: [{
                     color: "rgba(255, 192, 32, 0.5)",
                     fade: "rgba(0, 0, 0, 0)",
