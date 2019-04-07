@@ -60,7 +60,7 @@ export const Layouts: Layouts = {
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             },
-            /*{
+/*            {
                 type: "crater",
                 "numObstacles": 1,
                 "layoutRadius": 0,
@@ -68,11 +68,22 @@ export const Layouts: Layouts = {
                 "numPoints": 7,
                 "extent": 0.1,
                 "orientationAngleOffsetInRevs": 0,
-                color: "#ccccff",
+                color: "#ff0088",
+                hitInterval: 15,
                 buffs: [
                     {
-                        type: "glide",
-                        linearDampingMultiplier: 0,
+                        type: "burn",
+                        hitInterval: 15,
+                        stack: "burn",
+                        packet: { damage: 1, noHit: true },
+                        maxTicks: 15,
+                        render: {
+                            color: "#ff0088",
+                            alpha: 0.05,
+                            ticks: 15,
+                            emissionRadiusFactor: 1,
+                            particleRadius: 0.005,
+                        },
                     },
                 ],
             }*/

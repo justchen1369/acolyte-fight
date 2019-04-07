@@ -539,7 +539,7 @@ declare interface RenderBuff {
 	alpha?: number;
 	heroColor?: boolean;
 	decay?: boolean;
-	emissionRadius?: number;
+	emissionRadiusFactor?: number; // 1 means smoke comes from the edges of the hero, 0 means it comes from the center
 	particleRadius: number;
 	ticks: number;
 }

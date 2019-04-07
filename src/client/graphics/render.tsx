@@ -817,8 +817,8 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	const velocity = particleVelocity(thrust);
 
 	let pos = vector.clone(hero.body.getPosition());
-	if (render.emissionRadius) {
-		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadius));
+	if (render.emissionRadiusFactor) {
+		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadiusFactor * hero.radius));
 	}
 
 	// Buffs on the bottom
