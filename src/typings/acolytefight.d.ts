@@ -119,9 +119,25 @@ declare interface ObstacleTemplate extends InteractorTemplateBase, PolygonTempla
 
 declare interface CraterTemplate extends InteractorTemplateBase, PolygonTemplate {
 	type: "crater";
-	color: string;
+	fill?: CraterFill[];
+	smoke?: CraterSmoke[];
 	hitInterval?: number; // How many ticks between reapplying the buffs
 	buffs: BuffTemplate[];
+}
+
+declare interface CraterFill {
+	color: string;
+	flash?: number;
+}
+
+declare interface CraterSmoke {
+	color: string;
+	fade?: string;
+
+	ticks: number;
+	interval?: number;
+	speed: number;
+	particleRadius: number;
 }
 
 declare interface ObstacleSettings {

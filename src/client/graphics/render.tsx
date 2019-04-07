@@ -670,23 +670,57 @@ function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World
 		return;
 	}
 
-	const body = crater.body;
-	const pos = body.getPosition();
-
 	const hitAge = crater.hitTick ? world.tick - crater.hitTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
-	let color = Color(crater.color);
-	if (flash > 0) {
-		color = color.lighten(flash);
-	}
+	crater.fill.forEach(fill => {
+		let color = Color(fill.color);
 
+		if (fill.flash) {
+			const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+			if (flash > 0) {
+				color = color.lighten(fill.flash * flash);
+			}
+		}
 
-	const scale = 1;
-	glx.convex(ctxStack, pos, crater.points, body.getAngle(), scale, {
-		color,
-		maxRadius: crater.extent,
+		const body = crater.body;
+		const scale = 1;
+		const pos = body.getPosition();
+		glx.convex(ctxStack, pos, crater.points, body.getAngle(), scale, {
+			color,
+			maxRadius: crater.extent,
+		});
 	});
+
+	crater.smoke.forEach(smoke => {
+		if (smoke.interval && (world.tick % smoke.interval) !== 0) {
+			return;
+		}
+
+		const edgeOffset = randomEdgePoint(crater.body.getAngle(), crater.points);
+		const pos = vector.plus(crater.body.getPosition(), edgeOffset);
+
+		const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
+		underlay({
+			type: "circle",
+			pos,
+			velocity,
+			radius: smoke.particleRadius,
+			initialTick: world.tick,
+			max: smoke.ticks,
+			fillStyle: smoke.color,
+			fade: smoke.fade,
+		}, world);
+	});
+}
+
+function randomEdgePoint(angle: number, points: pl.Vec2[]) {
+	const seed = Math.random() * points.length;
+	const before = Math.floor(seed);
+	const after = Math.ceil(seed) % points.length;
+	const alpha = seed - before;
+
+	const point = vector.plus(vector.multiply(points[before], 1 - alpha), vector.multiply(points[after], alpha));
+	return vector.turnVectorBy(point, angle);
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -2131,4 +2165,12 @@ function pushTrail(trail: w.Trail, world: w.World) {
 		return;
 	}
 	world.ui.trails.push(trail);
+}
+
+function underlay(trail: w.Trail, world: w.World) {
+	if (world.ui.renderedTick === world.tick) {
+		// If network hangs and we keep re-rendering the same frame, don't need to add another trail to a tick when it already has one
+		return;
+	}
+	world.ui.trails.unshift(trail);
 }

@@ -355,7 +355,9 @@ export interface Crater extends WorldObjectBase, HitSource {
 	category: "crater";
 	type: string;
 
-	color: string;
+	fill: CraterFill[];
+	smoke: CraterSmoke[];
+
 	extent: number;
 	points: pl.Vec2[];
 

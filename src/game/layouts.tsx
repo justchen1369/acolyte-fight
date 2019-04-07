@@ -1,5 +1,3 @@
-import { Categories } from "./constants";
-
 export const Layouts: Layouts = {
     "double": {
         "numPoints": 4,
@@ -60,25 +58,38 @@ export const Layouts: Layouts = {
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             },
-/*            {
+            {
                 type: "crater",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 7,
-                "extent": 0.1,
+                "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0,
-                color: "#ff0088",
+
+                fill: [{
+                    color: "rgba(255, 192, 32, 1)",
+                    flash: 0.5,
+                }],
+                smoke: [{
+                    color: "rgba(255, 192, 32, 0.5)",
+                    fade: "rgba(0, 0, 0, 0)",
+                    ticks: 30,
+                    interval: 2,
+                    speed: 0.1,
+                    particleRadius: 0.005,
+                }],
+
                 hitInterval: 15,
                 buffs: [
                     {
                         type: "burn",
                         hitInterval: 15,
                         stack: "burn",
-                        packet: { damage: 1, noHit: true },
+                        packet: { damage: 1 },
                         maxTicks: 15,
                         render: {
-                            color: "#ff0088",
+                            color: "#ffffff",
                             alpha: 0.05,
                             ticks: 15,
                             emissionRadiusFactor: 1,
@@ -86,7 +97,7 @@ export const Layouts: Layouts = {
                         },
                     },
                 ],
-            }*/
+            }
         ],
     },
     "single": {
