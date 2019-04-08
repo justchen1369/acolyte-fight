@@ -64,22 +64,22 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 7,
-                "extent": 0.025,
+                "extent": 0.035,
                 "orientationAngleOffsetInRevs": 0,
 
                 fill: [
                     {
-                        color: "rgba(255, 192, 32, 1)",
-                        flash: 0.5,
+                        color: "rgba(255, 224, 0, 1)",
+                        flash: 1,
                     },
                 ],
                 smoke: [{
-                    color: "rgba(255, 192, 32, 0.5)",
+                    color: "rgba(255, 224, 0, 0.9)",
                     fade: "rgba(0, 0, 0, 0)",
                     ticks: 30,
-                    interval: 2,
-                    speed: 0.1,
-                    particleRadius: 0.005,
+                    interval: 1,
+                    speed: 0.05,
+                    particleRadius: 0.003,
                 }],
 
                 hitInterval: 15,
