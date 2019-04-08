@@ -657,11 +657,11 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 
 	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, {
 		color: strokeStyle,
-		maxRadius: scale * obstacle.extent,
+		maxRadius: 1,
 	});
 	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, {
 		color,
-		maxRadius: scale * obstacle.extent,
+		maxRadius: 1,
 	});
 }
 

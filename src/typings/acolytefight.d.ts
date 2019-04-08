@@ -106,18 +106,18 @@ declare interface InteractorTemplateBase {
 	orientationAngleOffsetInRevs?: number;
 }
 
-declare interface PolygonTemplate {
+declare interface ShapeTemplate extends InteractorTemplateBase  {
 	numPoints: number;
 	extent: number; // aka radius but for a polygon
 }
 
-declare interface ObstacleTemplate extends InteractorTemplateBase, PolygonTemplate {
+declare interface ObstacleTemplate extends ShapeTemplate {
 	type: "obstacle";
 
 	health?: number;
 }
 
-declare interface CraterTemplate extends InteractorTemplateBase, PolygonTemplate {
+declare interface CraterTemplate extends ShapeTemplate {
 	type: "crater";
 	fill?: CraterFill[];
 	smoke?: CraterSmoke[];

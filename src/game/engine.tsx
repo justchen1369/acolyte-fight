@@ -126,10 +126,10 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function polygon(numPoints: number, extent: number) {
-	let points = new Array<pl.Vec2>();
-	for (let i = 0; i < numPoints; ++i) {
-		const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
+function instantiateShape(shape: ShapeTemplate): pl.Vec2[] {
+	const points = new Array<pl.Vec2>();
+	for (let i = 0; i < shape.numPoints; ++i) {
+		const point = vector.multiply(vector.fromAngle((i / shape.numPoints) * (2 * Math.PI)), shape.extent);
 		points.push(point);
 	}
 	return points;
@@ -978,10 +978,10 @@ function instantiateInteractors(template: InteractorTemplate, world: w.World) {
 
 function instantiateInteractor(template: InteractorTemplate, position: pl.Vec2, angle: number, world: w.World) {
 	if (template.type === "obstacle") {
-		const points = polygon(template.numPoints, template.extent);
+		const points = instantiateShape(template);
 		addObstacle(world, position, angle, points, template);
 	} else if (template.type === "crater") {
-		const points = polygon(template.numPoints, template.extent);
+		const points = instantiateShape(template);
 		addCrater(world, position, angle, points, template);
 	}
 }
