@@ -639,7 +639,7 @@ const retractor: Spell = {
         density: 3,
         radius: 0.007,
         speed: 0.25,
-        maxTicks: 4.0 * TicksPerSecond,
+        maxTicks: 5.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
         categories: Categories.Projectile,
