@@ -204,8 +204,10 @@ function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius
 		hitInterval: template.hitInterval || 1,
 		hitTickLookup: new Map<string, number>(),
 	};
-
 	world.swatches.set(swatch.id, swatch);
+
+	world.behaviours.push({ type: "swatch", swatchId: swatch.id });
+
 	return swatch;
 }
 
@@ -757,6 +759,7 @@ export function tick(world: w.World) {
 	});
 
 	applyLavaDamage(world);
+	applySwatches(world);
 	shrink(world);
 
 	reap(world);
@@ -2655,6 +2658,40 @@ export function isInsideMap(obj: w.WorldObject, world: w.World) {
 	}
 }
 
+function applySwatches(world: w.World) {
+	world.objects.forEach(hero => {
+		if (hero.category === "hero") {
+			world.swatches.forEach(swatch => applySwatchToHero(swatch, hero, world));
+		}
+	});
+}
+
+function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
+	const diff = vector.diff(hero.body.getPosition(), swatch.center);
+	const radius = vector.length(diff);
+
+	if (!(swatch.minRadius <= radius && radius <= swatch.maxRadius)) {
+		return;
+	}
+
+	let angle = vector.angle(diff);
+	if (angle < swatch.fromAngle) {
+		angle += 2 * Math.PI;
+	}
+
+	if (!(swatch.fromAngle <= angle && angle <= swatch.toAngle)) {
+		return;
+	}
+
+	if (takeHit(swatch, swatch.id, world)) {
+		if (swatch.buffs) {
+			swatch.buffs.forEach(buff => {
+				instantiateBuff(swatch.id, buff, hero, world, {});
+			});
+		}
+	}
+}
+
 function shrink(world: w.World) {
 	const World = world.settings.World;
 	if (world.tick >= world.startTick && !world.winner) {
@@ -3451,6 +3488,10 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	});
 
 	return true;
+}
+
+function swatch(behaviour: w.SwatchBehaviour, world: w.World) {
+	const swatch = world.swatches.get(behaviour.swatchId);
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {
