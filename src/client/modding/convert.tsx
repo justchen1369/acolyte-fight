@@ -11,6 +11,7 @@ export function settingsToCode(settings: AcolyteFightSettings): e.CodeTree {
     const tree: e.CodeTree = {
         spells: spellsToCode(settings.Spells),
         maps: mapsToCode(settings.Layouts),
+        swatches: swatchesToCode(settings.Swatches),
         icons: iconsToCode(settings.Icons),
         sounds: soundsToCode(settings.Sounds),
         constants: constantsToCode(settings),
@@ -35,6 +36,15 @@ function mapsToCode(layouts: Layouts): e.CodeSection {
             id: id,
             ...layout,
         });
+    }
+    return lookup;
+}
+
+function swatchesToCode(swatches: SwatchTemplates): e.CodeSection {
+    const lookup: e.CodeSection = {};
+    for (const id of Object.keys(swatches)) {
+        const swatch = swatches[id];
+        lookup[swatch.id] = stringify(swatch);
     }
     return lookup;
 }
@@ -84,6 +94,7 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         Sounds: codeToSounds(codeTree, errorTree),
         Icons: codeToIcons(codeTree, errorTree),
         Layouts: codeToLayouts(codeTree, errorTree),
+        Swatches: codeToSwatches(codeTree, errorTree),
         Mod: codeToConstants(codeTree, "mod", errorTree),
         World: codeToConstants(codeTree, "world", errorTree),
         Obstacle: codeToConstants(codeTree, "obstacle", errorTree),
@@ -178,6 +189,26 @@ function codeToLayouts(codeTree: e.CodeTree, errorTree: e.ErrorTree): Layouts {
         errorTree.maps = errors;
     }
     return layouts;
+}
+
+function codeToSwatches(codeTree: e.CodeTree, errorTree: e.ErrorTree): SwatchTemplates {
+    const swatches: SwatchTemplates = {};
+    const errors: e.ErrorSection = {};
+    for (const key of Object.keys(codeTree.swatches)) {
+        try {
+            const code = codeTree.swatches[key];
+            const json = JSON.parse(code);
+
+            const id = json.id;
+            swatches[id] = json;
+        } catch (exception) {
+            errors[key] = `${exception}`;
+        }
+    }
+    if (Object.keys(errors).length > 0) {
+        errorTree.swatches = errors;
+    }
+    return swatches;
 }
 
 function codeToConstants(codeTree: e.CodeTree, key: string, errorTree: e.ErrorTree): any {

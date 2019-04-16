@@ -3,7 +3,6 @@ export const Layouts: Layouts = {
         "numPoints": 4,
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 2,
                 "layoutRadius": 0.07,
                 "layoutAngleOffsetInRevs": 0.125,
@@ -12,7 +11,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.125
             },
             {
-                type: "obstacle",
                 "numObstacles": 4,
                 "layoutRadius": 0.33,
                 "layoutAngleOffsetInRevs": 0,
@@ -27,7 +25,6 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 4,
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.125,
@@ -36,7 +33,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0
             },
             {
-                type: "obstacle",
                 "numObstacles": 6,
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.08333333333,
@@ -50,7 +46,6 @@ export const Layouts: Layouts = {
         "numPoints": 5,
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 5,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -58,55 +53,22 @@ export const Layouts: Layouts = {
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
             },
+        ],
+        swatches: [
             {
-                type: "crater",
-                "numObstacles": 1,
-                "layoutRadius": 0,
-                "layoutAngleOffsetInRevs": 0,
-                "numPoints": 7,
-                "extent": 0.035,
-                "orientationAngleOffsetInRevs": 0,
-
-                fill: [
-                    {
-                        color: "rgba(255, 224, 0, 1)",
-                        flash: 1,
-                    },
-                ],
-                smoke: [{
-                    color: "rgba(255, 224, 0, 0.9)",
-                    fade: "rgba(0, 0, 0, 0)",
-                    ticks: 30,
-                    interval: 1,
-                    speed: 0.05,
-                    particleRadius: 0.003,
-                }],
-
-                hitInterval: 15,
-                buffs: [
-                    {
-                        type: "burn",
-                        hitInterval: 15,
-                        stack: "burn",
-                        packet: { damage: 1 },
-                        maxTicks: 15,
-                        render: {
-                            color: "#ffffff",
-                            alpha: 0.05,
-                            ticks: 15,
-                            emissionRadiusFactor: 1,
-                            particleRadius: 0.005,
-                        },
-                    },
-                ],
-            }
+                type: "volcano",
+                minRadius: 0.32,
+                maxRadius: 0.37,
+                numSwatches: 2,
+                angularWidthInRevs: 0.25,
+                angularOffsetInRevs: 0,
+            },
         ],
     },
     "single": {
         "numPoints": 3,
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -119,7 +81,6 @@ export const Layouts: Layouts = {
     "pepper": {
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 5,
                 "layoutRadius": 0.32,
                 "layoutAngleOffsetInRevs": 0,
@@ -128,7 +89,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.1666667
             },
             {
-                type: "obstacle",
                 "numObstacles": 5,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -142,7 +102,6 @@ export const Layouts: Layouts = {
     "innerStar": {
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 10,
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -152,7 +111,6 @@ export const Layouts: Layouts = {
                 "health": 15
             },
             {
-                type: "obstacle",
                 "numObstacles": 5,
                 "layoutRadius": 0.32,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -167,7 +125,6 @@ export const Layouts: Layouts = {
     "triplet": {
         obstacles: [
             {
-                type: "obstacle",
                 numObstacles: 3,
                 layoutRadius: 0.28,
                 layoutAngleOffsetInRevs: 0.5,
@@ -182,7 +139,6 @@ export const Layouts: Layouts = {
     "surrounded": {
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 15,
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -191,7 +147,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
-                type: "obstacle",
                 "numObstacles": 6,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.2666667,
@@ -200,7 +155,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
-                type: "obstacle",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -214,7 +168,6 @@ export const Layouts: Layouts = {
         "numPoints": 6,
         "obstacles": [
             {
-                type: "obstacle",
                 "numObstacles": 3,
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.32,
@@ -223,7 +176,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.125
             },
             {
-                type: "obstacle",
                 "numObstacles": 3,
                 "layoutRadius": 0.14,
                 "layoutAngleOffsetInRevs": 0.28,
@@ -233,7 +185,6 @@ export const Layouts: Layouts = {
                 "health": 20
             },
             {
-                type: "obstacle",
                 "numObstacles": 3,
                 "layoutRadius": 0.22,
                 "layoutAngleOffsetInRevs": 0.23,
@@ -243,7 +194,6 @@ export const Layouts: Layouts = {
                 "health": 20
             },
             {
-                type: "obstacle",
                 "numObstacles": 3,
                 "layoutRadius": 0.3,
                 "layoutAngleOffsetInRevs": 0.18,

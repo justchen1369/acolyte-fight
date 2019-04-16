@@ -1,6 +1,7 @@
 export interface CodeTree {
     spells: CodeSection;
     maps: CodeSection;
+    swatches: CodeSection;
     icons: CodeSection;
     sounds: CodeSection;
     constants: CodeConstants;

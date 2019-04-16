@@ -24,7 +24,8 @@ Collision category flags (categories, expireOn and collideWith):
 
 declare interface AcolyteFightSettings {
 	Mod: ModSettings;
-    Layouts: Layouts;
+	Layouts: Layouts;
+	Swatches: SwatchTemplates;
     Hero: HeroSettings;
     World: WorldSettings;
     Obstacle: ObstacleSettings;
@@ -85,47 +86,49 @@ declare interface Layouts {
 }
 
 declare interface Layout {
-	obstacles: InteractorTemplate[];
+	obstacles: ObstacleTemplate[];
+	swatches?: SwatchLayout[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
 }
 
-declare type InteractorTemplate =
-	ObstacleTemplate
-	| CraterTemplate
-
-declare interface InteractorTemplateBase {
-	type: string;
-
-	// Where to place the obstacles
-	numObstacles: number;
-	layoutRadius: number;
-	layoutAngleOffsetInRevs: number;
-
-	orientationAngleOffsetInRevs?: number;
-}
-
-declare interface ShapeTemplate extends InteractorTemplateBase  {
+declare interface ShapeTemplate {
 	numPoints: number;
 	extent: number; // aka radius but for a polygon
 }
 
 declare interface ObstacleTemplate extends ShapeTemplate {
-	type: "obstacle";
+	numObstacles: number;
+	layoutRadius: number;
+	layoutAngleOffsetInRevs: number;
+	orientationAngleOffsetInRevs?: number;
 
 	health?: number;
 }
 
-declare interface CraterTemplate extends ShapeTemplate {
-	type: "crater";
-	fill?: CraterFill[];
-	smoke?: CraterSmoke[];
+declare interface SwatchLayout {
+	type: string;
+	minRadius: number;
+	maxRadius: number;
+	numSwatches: number;
+	angularWidthInRevs: number;
+	angularOffsetInRevs: number;
+}
+
+declare interface SwatchTemplates {
+	[key: string]: SwatchTemplate;
+}
+
+declare interface SwatchTemplate {
+	id: string;
+	fill?: SwatchFill[];
+	smoke?: SwatchSmoke[];
 	hitInterval?: number; // How many ticks between reapplying the buffs
 	buffs: BuffTemplate[];
 }
 
-declare interface CraterFill {
+declare interface SwatchFill {
 	color: string;
 	innerRadiusFactor?: number;
 	cycleFade?: boolean;
@@ -135,7 +138,7 @@ declare interface CraterFill {
 	flash?: number;
 }
 
-declare interface CraterSmoke {
+declare interface SwatchSmoke {
 	color: string;
 	fade?: string;
 

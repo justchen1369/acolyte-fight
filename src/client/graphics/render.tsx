@@ -164,6 +164,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 		renderTargetingIndicator(ctxStack, world);
 	}
 
+	world.swatches.forEach(obj => renderSwatch(ctxStack, obj, world, options));
 	world.objects.forEach(obj => renderObject(ctxStack, obj, world, options));
 	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
 	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
@@ -224,8 +225,6 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world, options);
-	} else if (obj.category === "crater") {
-		renderCrater(ctxStack, obj, world, options);
 	}
 }
 
@@ -665,14 +664,10 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	});
 }
 
-function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World, options: RenderOptions) {
-	if (crater.destroyedTick) {
-		return;
-	}
+function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
+	const hitAge = swatch.hitTick ? world.tick - swatch.hitTick : Infinity;
 
-	const hitAge = crater.hitTick ? world.tick - crater.hitTick : Infinity;
-
-	crater.fill.forEach(fill => {
+	swatch.fill.forEach(fill => {
 		let color = Color(fill.color);
 
 		if (fill.flash) {
@@ -695,16 +690,10 @@ function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World
 			color = color.fade(proportion);
 		}
 
-		const maxRadius = crater.extent * proportion;
-		const minRadius = maxRadius * (fill.innerRadiusFactor || 0);
-
-		const body = crater.body;
-		const scale = 1;
-		const pos = body.getPosition();
-		glx.convex(ctxStack, pos, crater.points, body.getAngle(), scale, {
+		glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
 			color,
-			minRadius,
-			maxRadius,
+			minRadius: swatch.minRadius,
+			maxRadius: swatch.maxRadius,
 			feather: fill.glow ? {
 				sigma: HeroColors.GlowRadius,
 				alpha: fill.glow,
@@ -712,13 +701,14 @@ function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World
 		});
 	});
 
-	crater.smoke.forEach(smoke => {
+	swatch.smoke.forEach(smoke => {
 		if (smoke.interval && (world.tick % smoke.interval) !== 0) {
 			return;
 		}
 
-		const edgeOffset = randomEdgePoint(crater.body.getAngle(), crater.points);
-		const pos = vector.plus(crater.body.getPosition(), edgeOffset);
+		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+		const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.toAngle, radius);
+		const pos = vector.plus(swatch.center, edgeOffset);
 
 		const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
 		underlay({
@@ -732,6 +722,12 @@ function renderCrater(ctxStack: CanvasCtxStack, crater: w.Crater, world: w.World
 			fade: smoke.fade,
 		}, world);
 	});
+}
+
+function randomArcPoint(fromAngle: number, toAngle: number, radius: number): pl.Vec2 {
+	const seed = Math.random();
+	const angle = seed * fromAngle + (1 - seed) * toAngle;
+	return vector.multiply(vector.fromAngle(angle), radius);
 }
 
 function randomEdgePoint(angle: number, points: pl.Vec2[]) {

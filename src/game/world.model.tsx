@@ -46,6 +46,7 @@ export interface World {
 	winTick?: number;
 
 	objects: Map<string, WorldObject>,
+	swatches: Map<string, Swatch>;
 	behaviours: Behaviour[],
 
 	physics: pl.World;
@@ -351,15 +352,18 @@ export interface WorldObjectBase {
 	blocksTeleporters?: boolean;
 }
 
-export interface Crater extends WorldObjectBase, HitSource {
-	category: "crater";
+export interface Swatch extends HitSource {
+	id: string;
 	type: string;
 
-	fill: CraterFill[];
-	smoke: CraterSmoke[];
+	fill: SwatchFill[];
+	smoke: SwatchSmoke[];
 
-	extent: number;
-	points: pl.Vec2[];
+	center: pl.Vec2;
+	minRadius: number;
+	maxRadius: number;
+	fromAngle: number;
+	toAngle: number;
 
 	buffs: BuffTemplate[];
 }
@@ -844,7 +848,6 @@ export type WorldObject =
 	| Shield
 	| Projectile
 	| Obstacle
-	| Crater
 
 export type WorldEvent =
 	DetonateEvent

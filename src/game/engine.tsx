@@ -77,6 +77,7 @@ export function initialWorld(mod: Object): w.World {
 		winners: null,
 
 		objects: new Map(),
+		swatches: new Map(),
 		behaviours: [],
 		physics: pl.World(def),
 		actions: new Map(),
@@ -185,38 +186,27 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
-function addCrater(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: CraterTemplate) {
-	const craterId = "crater" + (world.nextObjectId++);
-	const body = world.physics.createBody({
-		userData: craterId,
-		type: 'static',
-		position,
-		angle,
-	});
+function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius: number, fromAngle: number, toAngle: number, template: SwatchTemplate) {
+	const swatchId = "swatch" + (world.nextObjectId++);
+	const swatch: w.Swatch = {
+		id: swatchId,
+		type: template.id,
 
-	body.createFixture(pl.Polygon(points), {
-		filterCategoryBits: Categories.Crater,
-		filterMaskBits: Categories.All,
-		isSensor: true,
-	});
+		center,
+		minRadius,
+		maxRadius,
+		fromAngle,
+		toAngle,
 
-	const crater: w.Crater = {
-		id: craterId,
-		category: "crater",
-		categories: Categories.Obstacle,
-		type: "polygon",
-		body,
 		fill: template.fill || [],
 		smoke: template.smoke || [],
-		extent: template.extent,
-		points,
 		buffs: template.buffs,
 		hitInterval: template.hitInterval || 1,
 		hitTickLookup: new Map<string, number>(),
 	};
 
-	world.objects.set(crater.id, crater);
-	return crater;
+	world.swatches.set(swatch.id, swatch);
+	return swatch;
 }
 
 function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
@@ -958,11 +948,16 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 		world.mapPoints = points;
 	}
 
-	layout.obstacles.forEach(obstacleTemplate => instantiateInteractors(obstacleTemplate, world));
+	layout.obstacles.forEach(obstacleTemplate => instantiateObstacles(obstacleTemplate, world));
+
+	if (layout.swatches) {
+		layout.swatches.forEach(swatchLayout => instantiateSwatches(swatchLayout, world));
+	}
 }
 
-function instantiateInteractors(template: InteractorTemplate, world: w.World) {
+function instantiateObstacles(template: ObstacleTemplate, world: w.World) {
 	const mapCenter = pl.Vec2(0.5, 0.5);
+	const points = instantiateShape(template);
 
 	for (let i = 0; i < template.numObstacles; ++i) {
 		const proportion = i / template.numObstacles;
@@ -971,18 +966,20 @@ function instantiateInteractors(template: InteractorTemplate, world: w.World) {
 		const orientationAngleOffset = template.orientationAngleOffsetInRevs * 2 * Math.PI;
 		const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), template.layoutRadius));
 
-		const orientationAngle = baseAngle + layoutAngleOffset + orientationAngleOffset;
-		instantiateInteractor(template, position, orientationAngle, world);
+		const angle = baseAngle + layoutAngleOffset + orientationAngleOffset;
+		addObstacle(world, position, angle, points, template);
 	}
 }
 
-function instantiateInteractor(template: InteractorTemplate, position: pl.Vec2, angle: number, world: w.World) {
-	if (template.type === "obstacle") {
-		const points = instantiateShape(template);
-		addObstacle(world, position, angle, points, template);
-	} else if (template.type === "crater") {
-		const points = instantiateShape(template);
-		addCrater(world, position, angle, points, template);
+function instantiateSwatches(layout: SwatchLayout, world: w.World) {
+	const template = world.settings.Swatches[layout.type];
+
+	const center = pl.Vec2(0.5, 0.5);
+
+	for (let i = 0; i < layout.numSwatches; ++i) {
+		const fromAngle = 2 * Math.PI * ((i / layout.numSwatches) + layout.angularOffsetInRevs);
+		const toAngle = fromAngle + 2 * Math.PI * layout.angularWidthInRevs;
+		addSwatch(world, center, layout.minRadius, layout.maxRadius, fromAngle, toAngle, template);
 	}
 }
 
@@ -1654,22 +1651,6 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "shield") {
 			handleHeroHitShield(world, object, hit);
 		}
-	} else if (object.category === "crater") {
-		if (hit.category === "hero") {
-			handleCraterHitHero(world, object, hit);
-		}
-	}
-}
-
-function handleCraterHitHero(world: w.World, crater: w.Crater, hero: w.Hero) {
-	if (takeHit(crater, hero.id, world)) {
-		crater.buffs.forEach(buff => {
-			const buffId = `${crater.id}-${buff.type}`;
-			instantiateBuff(buffId, buff, hero, world, {
-				fromHeroId: null,
-				toHeroId: hero.id,
-			});
-		});
 	}
 }
 
