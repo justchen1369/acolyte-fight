@@ -206,8 +206,6 @@ function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius
 	};
 	world.swatches.set(swatch.id, swatch);
 
-	world.behaviours.push({ type: "swatch", swatchId: swatch.id });
-
 	return swatch;
 }
 
@@ -3488,10 +3486,6 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	});
 
 	return true;
-}
-
-function swatch(behaviour: w.SwatchBehaviour, world: w.World) {
-	const swatch = world.swatches.get(behaviour.swatchId);
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {

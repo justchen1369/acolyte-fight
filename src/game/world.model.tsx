@@ -684,7 +684,6 @@ export namespace HomingTargets {
 export type Behaviour =
 	DelayBehaviour
 	| FixateBehaviour
-	| SwatchBehaviour
 	| HomingBehaviour
 	| DetonateBehaviour
 	| RetractorBehaviour
@@ -724,11 +723,6 @@ export interface FixateBehaviour extends BehaviourBase {
 	proportion: number;
 	speed: number;
 	turnRate: number;
-}
-
-export interface SwatchBehaviour extends BehaviourBase {
-	type: "swatch";
-	swatchId: string;
 }
 
 export interface HomingBehaviour extends BehaviourBase {
