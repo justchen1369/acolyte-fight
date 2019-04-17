@@ -145,7 +145,6 @@ declare interface SwatchSmoke {
 	ticks: number;
 	interval?: number;
 	speed: number;
-	particleRadius: number;
 }
 
 declare interface ObstacleSettings {

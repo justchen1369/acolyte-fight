@@ -2,17 +2,16 @@ export const volcano: SwatchTemplate = {
     id: "volcano",
     fill: [
         {
-            color: "rgba(255, 224, 0, 1)",
+            color: "rgba(255, 224, 0, 0.9)",
             flash: 1,
         },
     ],
     smoke: [{
-        color: "rgba(255, 224, 0, 0.9)",
+        color: "rgba(255, 224, 0, 1)",
         fade: "rgba(0, 0, 0, 0)",
         ticks: 30,
         interval: 1,
-        speed: 0.05,
-        particleRadius: 0.003,
+        speed: 0.1,
     }],
 
     hitInterval: 15,

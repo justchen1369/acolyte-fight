@@ -715,7 +715,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 			type: "circle",
 			pos,
 			velocity,
-			radius: smoke.particleRadius,
+			radius: (swatch.maxRadius - swatch.minRadius) / 2,
 			initialTick: world.tick,
 			max: smoke.ticks,
 			fillStyle: smoke.color,

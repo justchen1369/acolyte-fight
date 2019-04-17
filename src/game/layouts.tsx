@@ -58,9 +58,9 @@ export const Layouts: Layouts = {
             {
                 type: "volcano",
                 minRadius: 0.32,
-                maxRadius: 0.37,
-                numSwatches: 2,
-                angularWidthInRevs: 0.25,
+                maxRadius: 0.34,
+                numSwatches: 6,
+                angularWidthInRevs: 0.05,
                 angularOffsetInRevs: 0,
             },
         ],
