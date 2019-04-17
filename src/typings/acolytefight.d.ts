@@ -125,7 +125,8 @@ declare interface SwatchTemplate {
 	fill?: SwatchFill[];
 	smoke?: SwatchSmoke[];
 	hitInterval?: number; // How many ticks between reapplying the buffs
-	buffs: BuffTemplate[];
+	damage?: number;
+	buffs?: BuffTemplate[];
 }
 
 declare interface SwatchFill {

@@ -2,12 +2,12 @@ export const volcano: SwatchTemplate = {
     id: "volcano",
     fill: [
         {
-            color: "rgba(255, 224, 0, 0.9)",
+            color: "rgba(255, 0, 128, 0.9)",
             flash: 1,
         },
     ],
     smoke: [{
-        color: "rgba(255, 224, 0, 1)",
+        color: "rgba(255, 0, 128, 1)",
         fade: "rgba(0, 0, 0, 0)",
         ticks: 30,
         interval: 1,
@@ -15,22 +15,7 @@ export const volcano: SwatchTemplate = {
     }],
 
     hitInterval: 15,
-    buffs: [
-        {
-            type: "burn",
-            hitInterval: 15,
-            stack: "burn",
-            packet: { damage: 1 },
-            maxTicks: 15,
-            render: {
-                color: "#ffffff",
-                alpha: 0.05,
-                ticks: 15,
-                emissionRadiusFactor: 1,
-                particleRadius: 0.005,
-            },
-        },
-    ],
+    damage: 5,
 }
 
 export const Swatches: SwatchTemplates = {

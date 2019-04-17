@@ -366,6 +366,7 @@ export interface Swatch extends HitSource {
 	toAngle: number;
 
 	buffs: BuffTemplate[];
+	damage: number;
 }
 
 export interface Obstacle extends WorldObjectBase {

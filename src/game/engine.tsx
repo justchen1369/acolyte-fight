@@ -200,7 +200,10 @@ function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius
 
 		fill: template.fill || [],
 		smoke: template.smoke || [],
-		buffs: template.buffs,
+
+		buffs: template.buffs || [],
+		damage: template.damage || 0,
+
 		hitInterval: template.hitInterval || 1,
 		hitTickLookup: new Map<string, number>(),
 	};
@@ -2683,6 +2686,16 @@ function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
 	}
 
 	if (takeHit(swatch, swatch.id, world)) {
+		if (swatch.damage) {
+			const packet: w.DamagePacket = {
+				damage: swatch.damage,
+				lifeSteal: 0,
+				fromHeroId: null,
+				isLava: true,
+			};
+			applyDamage(hero, packet, world);
+		}
+
 		if (swatch.buffs) {
 			swatch.buffs.forEach(buff => {
 				instantiateBuff(swatch.id, buff, hero, world, {});
