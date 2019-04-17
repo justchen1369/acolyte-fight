@@ -978,7 +978,7 @@ function instantiateSwatches(layout: SwatchLayout, world: w.World) {
 	const center = pl.Vec2(0.5, 0.5);
 
 	for (let i = 0; i < layout.numSwatches; ++i) {
-		const fromAngle = 2 * Math.PI * ((i / layout.numSwatches) + layout.angularOffsetInRevs);
+		const fromAngle = 2 * Math.PI * ((i / layout.numSwatches) + layout.angularOffsetInRevs - layout.angularWidthInRevs / 2);
 		const toAngle = fromAngle + 2 * Math.PI * layout.angularWidthInRevs;
 		addSwatch(world, center, layout.minRadius, layout.maxRadius, fromAngle, toAngle, template);
 	}
