@@ -2668,16 +2668,17 @@ function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
 	const diff = vector.diff(hero.body.getPosition(), swatch.center);
 	const radius = vector.length(diff);
 
-	if (!(swatch.minRadius <= radius && radius <= swatch.maxRadius)) {
+	if (!(swatch.minRadius <= radius + hero.radius && radius - hero.radius <= swatch.maxRadius)) {
 		return;
 	}
 
-	let angle = vector.angle(diff);
-	if (angle < swatch.fromAngle) {
-		angle += 2 * Math.PI;
+	const fromNormal = vector.fromAngle(swatch.fromAngle + Math.PI / 2);
+	if (vector.dot(diff, fromNormal) + hero.radius < 0) {
+		return;
 	}
 
-	if (!(swatch.fromAngle <= angle && angle <= swatch.toAngle)) {
+	const toNormal = vector.fromAngle(swatch.toAngle - Math.PI / 2);
+	if (vector.dot(diff, toNormal) + hero.radius < 0) {
 		return;
 	}
 
