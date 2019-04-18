@@ -74,8 +74,10 @@ function calculateNextRefresh(numUsers: number) {
         return 5 * 60 * 1000;
     } else if (numUsers < 1000) {
         return 20 * 60 * 1000;
-    } else {
+    } else if (numUsers < 10000) {
         return 60 * 60 * 1000;
+    } else {
+        return 24 * 60 * 60 * 1000;
     }
 }
 
