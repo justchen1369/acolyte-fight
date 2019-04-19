@@ -819,10 +819,10 @@ const link: Spell = {
     projectile: {
         density: 1,
         radius: 0.005,
-        speed: 0.25,
+        speed: 0.3,
         strafe: {},
         restitution: 0,
-        maxTicks: 2.0 * TicksPerSecond,
+        maxTicks: 1.5 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
@@ -858,9 +858,9 @@ const link: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 1.25 * TicksPerSecond },
+                trigger: { afterTicks: 0.75 * TicksPerSecond },
                 targetType: HomingTargets.self,
-                newSpeed: 0.5,
+                newSpeed: 0.4,
                 redirect: true,
             },
             {
