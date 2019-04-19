@@ -890,7 +890,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: false,
 
     projectile: {
@@ -910,7 +910,7 @@ const grapple: Spell = {
             impulsePerTick: 2.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 2 * TicksPerSecond,
+            linkTicks: 1.25 * TicksPerSecond,
             movementProportion: 2,
 
             render: {
