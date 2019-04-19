@@ -9,6 +9,14 @@ export const Layouts: Layouts = {
                 "numPoints": 6,
                 "extent": 0.0125,
                 "orientationAngleOffsetInRevs": 0
+            },
+            {
+                "numObstacles": 3,
+                "layoutRadius": 0.34,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 6,
+                "extent": 0.015,
+                "orientationAngleOffsetInRevs": 0
             }
         ],
         "swatches": [
