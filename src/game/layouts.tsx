@@ -1,4 +1,27 @@
 export const Layouts: Layouts = {
+    "cold": {
+        "numPoints": 6,
+        "obstacles": [
+            {
+                "numObstacles": 3,
+                "layoutRadius": 0.04,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 6,
+                "extent": 0.0125,
+                "orientationAngleOffsetInRevs": 0
+            }
+        ],
+        "swatches": [
+            {
+                "type": "slow",
+                "minRadius": 0.2,
+                "maxRadius": 0.21,
+                "numSwatches": 6,
+                "angularOffsetInRevs": 0,
+                "angularWidthInRevs": 0.1
+            }
+        ]
+    },
     "double": {
         "numPoints": 4,
         "obstacles": [
@@ -18,7 +41,17 @@ export const Layouts: Layouts = {
                 "extent": 0.007,
                 "orientationAngleOffsetInRevs": 0,
             }
-        ]
+        ],
+        swatches: [
+            {
+                type: "slow",
+                minRadius: 0.125,
+                maxRadius: 0.15,
+                numSwatches: 2,
+                angularOffsetInRevs: 0,
+                angularWidthInRevs: 0.25,
+            },
+        ],
     },
     "snowflake": {
         "numPoints": 6,

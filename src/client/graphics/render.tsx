@@ -668,37 +668,48 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 	const hitAge = swatch.hitTick ? world.tick - swatch.hitTick : Infinity;
 
 	swatch.fill.forEach(fill => {
-		let color = Color(fill.color);
+		if (fill.type === "fill") {
+			let color = parseColor(fill.color);
 
-		if (fill.flash) {
-			const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
-			if (flash > 0) {
-				color = color.lighten(fill.flash * flash);
+			if (fill.flash) {
+				const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+				if (flash > 0) {
+					color = color.lighten(fill.flash * flash);
+				}
 			}
-		}
 
-		let proportion = 1;
-		if (fill.cycleInterval) {
-			proportion = (world.tick % fill.cycleInterval) / fill.cycleInterval;
+			glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
+				color,
+				minRadius: swatch.minRadius,
+				maxRadius: swatch.maxRadius,
+				feather: fill.glow ? {
+					sigma: HeroColors.GlowRadius,
+					alpha: fill.glow,
+				} : null,
+			});
+		} else if (fill.type === "axialPulse") {
+			const swatchWidth = swatch.maxRadius - swatch.minRadius;
+			const interval = swatchWidth / (fill.speed / constants.TicksPerSecond);
 
-			if (fill.cycleInwards) {
+			let proportion = (world.tick % interval) / interval;
+			if (fill.inwards) {
 				proportion = 1 - proportion;
 			}
-		}
 
-		if (fill.cycleFade) {
-			color = color.fade(proportion);
-		}
+			const minRadius = swatch.minRadius + swatchWidth * proportion;
+			const maxRadius = Math.min(swatch.maxRadius, minRadius + fill.pulseWidth);
 
-		glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
-			color,
-			minRadius: swatch.minRadius,
-			maxRadius: swatch.maxRadius,
-			feather: fill.glow ? {
-				sigma: HeroColors.GlowRadius,
-				alpha: fill.glow,
-			} : null,
-		});
+			let color = parseColor(fill.fromColor).mix(parseColor(fill.toColor), proportion);
+			glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
+				color,
+				minRadius,
+				maxRadius,
+				feather: fill.glow ? {
+					sigma: HeroColors.GlowRadius,
+					alpha: fill.glow,
+				} : null,
+			});
+		}
 	});
 
 	swatch.smoke.forEach(smoke => {

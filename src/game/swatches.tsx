@@ -2,6 +2,7 @@ export const volcano: SwatchTemplate = {
     id: "volcano",
     fill: [
         {
+            type: "fill",
             color: "rgba(255, 0, 128, 0.9)",
             flash: 1,
         },
@@ -18,6 +19,51 @@ export const volcano: SwatchTemplate = {
     damage: 5,
 }
 
+export const slow: SwatchTemplate = {
+    id: "slow",
+    fill: [
+        {
+            type: "fill",
+            "color": "rgba(64, 255, 255, 0.75)",
+            flash: 1,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: true,
+            speed: 0.05,
+            pulseWidth: 0.01,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: true,
+            speed: 0.03,
+            pulseWidth: 0.005,
+        },
+    ],
+
+    hitInterval: 15,
+
+    buffs: [
+        {
+            type: "movement",
+            maxTicks: 15,
+            movementProportion: 0.5,
+            render: {
+                color: "rgba(64, 255, 255, 1)",
+                alpha: 0.3,
+                ticks: 15,
+                emissionRadiusFactor: 1,
+                particleRadius: 0.01,
+            },
+        },
+    ],
+}
+
 export const Swatches: SwatchTemplates = {
+    slow,
     volcano,
 };

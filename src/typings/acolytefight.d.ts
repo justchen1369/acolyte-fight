@@ -129,14 +129,30 @@ declare interface SwatchTemplate {
 	buffs?: BuffTemplate[];
 }
 
-declare interface SwatchFill {
+declare type SwatchFill =
+	SwatchSolidFill
+	| SwatchAxialPulse;
+
+declare interface SwatchSolidFill {
+	type: "fill";
+
 	color: string;
-	innerRadiusFactor?: number;
-	cycleFade?: boolean;
-	cycleInterval?: number;
-	cycleInwards?: boolean;
 	glow?: number;
 	flash?: number;
+}
+
+declare interface SwatchAxialPulse {
+	type: "axialPulse";
+
+	fromColor: string;
+	toColor: string;
+	glow?: number;
+	
+	fade?: boolean;
+	inwards?: boolean;
+
+	pulseWidth: number;
+	speed: number;
 }
 
 declare interface SwatchSmoke {
