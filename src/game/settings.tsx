@@ -1280,7 +1280,7 @@ const halo: Spell = {
     description: "Build up to 3 charges of your halo, then touch your enemy to lifesteal. Watch out, you lose your halo every time you are hit, so keep dodging!",
     action: "projectile",
 
-    color: '#ffaa77',
+    color: '#ffd800',
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
