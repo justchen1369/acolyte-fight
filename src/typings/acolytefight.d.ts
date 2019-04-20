@@ -104,6 +104,7 @@ declare interface ObstacleTemplate extends ShapeTemplate {
 	layoutAngleOffsetInRevs: number;
 	orientationAngleOffsetInRevs?: number;
 
+	detonate?: boolean;
 	health?: number;
 }
 
@@ -174,6 +175,8 @@ declare interface ObstacleSettings {
 	ReturnProportion: number;
 	ReturnMinSpeed: number;
 	ReturnTurnRate: number;
+
+	Detonate: DetonateParameters;
 }
 
 declare interface ChoiceSettings {

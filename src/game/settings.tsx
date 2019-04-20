@@ -49,6 +49,14 @@ const Obstacle: ObstacleSettings = {
     ReturnProportion: 0.04,
     ReturnMinSpeed: 0.02,
     ReturnTurnRate: 0.002,
+
+    Detonate: {
+        damage: 0,
+        minImpulse: 0.0005,
+        maxImpulse: 0.0005,
+        radius: 0.05,
+        renderTicks: 30,
+    },
 }
 
 const Choices: ChoiceSettings = {

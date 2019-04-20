@@ -171,7 +171,8 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0.5,
-                "health": 15
+                "health": 10,
+                detonate: true,
             },
             {
                 "numObstacles": 5,

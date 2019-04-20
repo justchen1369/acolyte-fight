@@ -629,12 +629,16 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const body = obstacle.body;
 	const pos = body.getPosition();
 
+	let color = parseColor(HeroColors.ObstacleColor);
+
 	const proportion = obstacle.health / obstacle.maxHealth;
+	if (proportion < 1) {
+		color = color.mix(parseColor(HeroColors.ObstacleDeadColor), 1 - proportion);
+	}
 
 	const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
-	let color = parseColor(hsl(0, 1.0 - proportion, 0.5));
 	if (flash > 0) {
 		color = color.lighten(flash);
 	}
@@ -653,6 +657,17 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const strokeStyle = color.lighten(0.6);
 	const obstacleStrokeWidth = 5 * Pixel;
 	const strokeProportion = 1 - Math.min(1, obstacleStrokeWidth / obstacle.extent);
+
+	if (obstacle.detonate) {
+		glx.circle(ctxStack, pos, {
+			color: parseColor(HeroColors.BarrelColor),
+			maxRadius: obstacle.extent,
+			feather: {
+				sigma: HeroColors.GlowRadius,
+				alpha: HeroColors.BarrelGlow,
+			},
+		});
+	}
 
 	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, {
 		color: strokeStyle,

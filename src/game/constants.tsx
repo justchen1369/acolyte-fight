@@ -80,6 +80,12 @@ export namespace HeroColors {
 	export const HighlightFactor = 0.01;
 	export const HighlightTicks = 10;
 
+	export const ObstacleColor = '#888888';
+	export const ObstacleDeadColor = '#882222';
+
+	export const BarrelColor = 'rgba(0, 255, 0, 1)';
+	export const BarrelGlow = 0.1;
+
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';

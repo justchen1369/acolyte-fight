@@ -168,6 +168,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		maxHealth: health,
 		createTick: world.tick,
 		growthTicks: 0,
+		detonate: template.detonate ? world.settings.Obstacle.Detonate : null,
 	};
 
 	// Obstacles start immovable
@@ -2510,6 +2511,20 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 	projectile.detonate = null;
 }
 
+function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
+	if (!obstacle.detonate) {
+		return;
+	}
+
+	const template = obstacle.detonate;
+
+	const owner: string = null;
+	detonateAt(obstacle.body.getPosition(), owner, template, world, obstacle.id);
+
+	// Don't allow for repeats
+	obstacle.detonate = null;
+}
+
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, sound: string = null) {
 	const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
 	const innerDamagePacket = instantiateDamage(detonate, owner, world);
@@ -2733,6 +2748,7 @@ function reap(world: w.World) {
 			}
 		} else if (obj.category === "obstacle") {
 			if (obj.health <= 0) {
+				detonateObstacle(obj, world);
 				destroyObject(world, obj);
 			}
 		} else if (obj.category === "shield") {
