@@ -61,6 +61,38 @@ export const Layouts: Layouts = {
             },
         ],
     },
+    "ring": {
+        "obstacles": [
+            {
+                "numObstacles": 1,
+                "layoutRadius": 0,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 6,
+                "extent": 0.015,
+                "orientationAngleOffsetInRevs": 0.5
+            },
+            {
+                "numObstacles": 4,
+                "layoutRadius": 0.32,
+                "layoutAngleOffsetInRevs": 0.08333333333,
+                "numPoints": 4,
+                "extent": 0.01,
+                "orientationAngleOffsetInRevs": 0
+            }
+        ],
+        "angleOffsetInRevs": 0.08333333333,
+        "numPoints": 4,
+        "swatches": [
+            {
+                "type": "fast",
+                "minRadius": 0.13,
+                "maxRadius": 0.135,
+                "numSwatches": 10,
+                "angularOffsetInRevs": 0,
+                "angularWidthInRevs": 0.1
+            }
+        ]
+    },
     "snowflake": {
         "numPoints": 6,
         "angleOffsetInRevs": 0.08333333333,
@@ -161,7 +193,17 @@ export const Layouts: Layouts = {
             }
         ],
         "numPoints": 5,
-        "angleOffsetInRevs": 0.1
+        "angleOffsetInRevs": 0.1,
+        swatches: [
+            {
+                type: "fast",
+                minRadius: 0.315,
+                maxRadius: 0.325,
+                numSwatches: 5,
+                angularOffsetInRevs: 0,
+                angularWidthInRevs: 0.1,
+            },
+        ],
     },
     "triplet": {
         obstacles: [
