@@ -83,7 +83,8 @@ export namespace HeroColors {
 	export const ObstacleColor = '#888888';
 	export const ObstacleDeadColor = '#882222';
 
-	export const BarrelColor = 'rgba(0, 255, 0, 1)';
+	export const ObstacleStrokeColor = '#ccc';
+	export const BarrelColor = 'rgba(128, 0, 255, 1)';
 	export const BarrelGlow = 0.1;
 
 	export const MyHeroColor = '#00ccff';

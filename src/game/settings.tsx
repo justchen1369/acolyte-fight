@@ -52,7 +52,7 @@ const Obstacle: ObstacleSettings = {
 
     Detonate: {
         damage: 0,
-        minImpulse: 0.0005,
+        minImpulse: 0.0002,
         maxImpulse: 0.0005,
         radius: 0.05,
         renderTicks: 30,

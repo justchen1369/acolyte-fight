@@ -654,7 +654,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		scale *= 1 + HeroColors.ObstacleGrowFactor * flash;
 	}
 
-	const strokeStyle = color.lighten(0.6);
+	let strokeStyle = parseColor(HeroColors.ObstacleStrokeColor);
 	const obstacleStrokeWidth = 5 * Pixel;
 	const strokeProportion = 1 - Math.min(1, obstacleStrokeWidth / obstacle.extent);
 
