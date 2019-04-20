@@ -2713,7 +2713,9 @@ function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
 
 		if (swatch.buffs) {
 			swatch.buffs.forEach(buff => {
-				instantiateBuff(swatch.id, buff, hero, world, {});
+				// Same id for all buffs from swatches so cannot get two buffs standing on two swatches
+				const id = `swatch-${swatch.type}-${buff.type}`;
+				instantiateBuff(id, buff, hero, world, {});
 			});
 		}
 	}

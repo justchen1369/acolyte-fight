@@ -92,12 +92,12 @@ export const fast: SwatchTemplate = {
         },
     ],
 
-    hitInterval: 1,
+    hitInterval: 15,
 
     buffs: [
         {
             type: "movement",
-            maxTicks: 1,
+            maxTicks: 15,
             movementProportion: 1.5,
             render: {
                 color: "rgba(255, 255, 255, 1)",
