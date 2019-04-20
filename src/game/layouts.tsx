@@ -50,16 +50,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0,
             }
         ],
-        swatches: [
-            {
-                type: "slow",
-                minRadius: 0.125,
-                maxRadius: 0.15,
-                numSwatches: 2,
-                angularOffsetInRevs: 0,
-                angularWidthInRevs: 0.25,
-            },
-        ],
     },
     "ring": {
         "obstacles": [
@@ -197,11 +187,11 @@ export const Layouts: Layouts = {
         swatches: [
             {
                 type: "fast",
-                minRadius: 0.315,
-                maxRadius: 0.325,
+                minRadius: 0.319,
+                maxRadius: 0.321,
                 numSwatches: 5,
                 angularOffsetInRevs: 0,
-                angularWidthInRevs: 0.1,
+                angularWidthInRevs: 0.15,
             },
         ],
     },
