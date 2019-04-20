@@ -662,10 +662,10 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		glx.circle(ctxStack, pos, {
 			color: parseColor(HeroColors.BarrelColor),
 			maxRadius: obstacle.extent,
-			feather: {
+			feather: options.rtx >= r.GraphicsLevel.Normal ? {
 				sigma: HeroColors.GlowRadius,
 				alpha: HeroColors.BarrelGlow,
-			},
+			} : null,
 		});
 	}
 
@@ -697,7 +697,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 				color,
 				minRadius: swatch.minRadius,
 				maxRadius: swatch.maxRadius,
-				feather: fill.glow ? {
+				feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
 					sigma: HeroColors.GlowRadius,
 					alpha: fill.glow,
 				} : null,
@@ -719,7 +719,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 				color,
 				minRadius,
 				maxRadius,
-				feather: fill.glow ? {
+				feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
 					sigma: HeroColors.GlowRadius,
 					alpha: fill.glow,
 				} : null,
