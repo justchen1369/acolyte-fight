@@ -106,6 +106,7 @@ export function initialWorld(mod: Object): w.World {
 			shakes: [],
 			highlights: [],
 			events: new Array<w.WorldEvent>(),
+			underlays: [],
 			trails: [],
 			sounds: [],
 			notifications: [],

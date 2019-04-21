@@ -165,12 +165,19 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	}
 
 	world.swatches.forEach(obj => renderSwatch(ctxStack, obj, world, options));
+
+	world.ui.underlays = renderTrails(ctxStack, world.ui.underlays, world);
+
 	world.objects.forEach(obj => renderObject(ctxStack, obj, world, options));
 	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
 	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
+	world.ui.trails = renderTrails(ctxStack, world.ui.trails, world);
+}
+
+function renderTrails(ctxStack: CanvasCtxStack, trails: w.Trail[], world: w.World) {
 	let newTrails = new Array<w.Trail>();
-	world.ui.trails.forEach(trail => {
+	trails.forEach(trail => {
 		renderTrail(ctxStack, trail, world);
 
 		const expireTick = trail.initialTick + trail.max;
@@ -178,7 +185,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 			newTrails.push(trail);
 		}
 	});
-	world.ui.trails = newTrails;
+	return newTrails;
 }
 
 function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
@@ -680,14 +687,15 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 }
 
 function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
-	const hitAge = swatch.hitTick ? world.tick - swatch.hitTick : Infinity;
+	const highlight = renderSwatchHighlight(swatch, world);
+	const hitAge = highlight ? world.tick - highlight.fromTick : Infinity;
+	const flash = Math.max(0, (1 - hitAge / HeroColors.SwatchFlashTicks));
 
 	swatch.fill.forEach(fill => {
 		if (fill.type === "fill") {
 			let color = parseColor(fill.color);
 
 			if (fill.flash) {
-				const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 				if (flash > 0) {
 					color = color.lighten(fill.flash * flash);
 				}
@@ -738,6 +746,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 
 		const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
 		underlay({
+			tag: swatch.id,
 			type: "circle",
 			pos,
 			velocity,
@@ -746,8 +755,35 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 			max: smoke.ticks,
 			fillStyle: smoke.color,
 			fade: smoke.fade,
+			highlight,
 		}, world);
 	});
+}
+
+function renderSwatchHighlight(swatch: w.Swatch, world: w.World): w.TrailHighlight {
+	if (!swatch.hitTick) {
+		return swatch.uiHighlight;
+	}
+
+	const highlightTick = swatch.uiHighlight ? swatch.uiHighlight.fromTick : 0;
+	if (swatch.hitTick <= highlightTick) {
+		return swatch.uiHighlight;
+	}
+
+	// Highlight
+	const highlight: w.TrailHighlight = {
+		fromTick: swatch.hitTick,
+		maxTicks: HeroColors.SwatchFlashTicks,
+		glow: true,
+	};
+	swatch.uiHighlight = highlight;
+	world.ui.underlays.forEach(trail => {
+		if (trail.tag === swatch.id) {
+			trail.highlight = highlight;
+		}
+	});
+
+	return swatch.uiHighlight;
 }
 
 function randomArcPoint(fromAngle: number, toAngle: number, radius: number): pl.Vec2 {
@@ -2215,5 +2251,5 @@ function underlay(trail: w.Trail, world: w.World) {
 		// If network hangs and we keep re-rendering the same frame, don't need to add another trail to a tick when it already has one
 		return;
 	}
-	world.ui.trails.unshift(trail);
+	world.ui.underlays.unshift(trail);
 }

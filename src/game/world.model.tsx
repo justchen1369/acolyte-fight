@@ -107,6 +107,7 @@ export interface UIState {
 	shakes: Shake[];
 	highlights: MapHighlight[];
 
+	underlays: Trail[];
 	trails: Trail[];
 	notifications: Notification[];
 	sounds: AudioElement[];
@@ -367,6 +368,8 @@ export interface Swatch extends HitSource {
 
 	buffs: BuffTemplate[];
 	damage: number;
+
+	uiHighlight?: TrailHighlight;
 }
 
 export interface Obstacle extends WorldObjectBase {

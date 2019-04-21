@@ -87,6 +87,8 @@ export namespace HeroColors {
 	export const BarrelColor = 'rgba(255, 128, 0, 1)';
 	export const BarrelGlow = 0.1;
 
+	export const SwatchFlashTicks = 15;
+
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';

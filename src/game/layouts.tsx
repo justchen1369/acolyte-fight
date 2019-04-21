@@ -125,16 +125,16 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
         ],
-        swatches: [
+        "swatches": [
             {
-                type: "volcano",
-                minRadius: 0.32,
-                maxRadius: 0.34,
-                numSwatches: 5,
-                angularWidthInRevs: 0.05,
-                angularOffsetInRevs: 0,
-            },
-        ],
+                "type": "volcano",
+                "minRadius": 0,
+                "maxRadius": 0.025,
+                "numSwatches": 5,
+                "angularWidthInRevs": 0.2,
+                "angularOffsetInRevs": 0
+            }
+        ]
     },
     "single": {
         "numPoints": 3,
