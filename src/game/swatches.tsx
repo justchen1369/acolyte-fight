@@ -46,6 +46,15 @@ export const slow: SwatchTemplate = {
             pulseWidth: 0.005,
         },
     ],
+    "smoke": [
+        {
+            "color": "rgba(64, 255, 255, 1)",
+            "fade": "rgba(0, 0, 0, 0)",
+            "ticks": 15,
+            "interval": 1,
+            "speed": 0.05
+        }
+    ],
 
     hitInterval: 15,
 
@@ -53,7 +62,7 @@ export const slow: SwatchTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 0.5,
+            movementProportion: 0.75,
             render: {
                 color: "rgba(64, 255, 255, 1)",
                 alpha: 0.3,
@@ -98,12 +107,12 @@ export const fast: SwatchTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 1.5,
+            movementProportion: 1.25,
             render: {
                 color: "rgba(255, 255, 255, 1)",
                 heroColor: true,
                 alpha: 0.3,
-                ticks: 15,
+                ticks: 30,
                 emissionRadiusFactor: 0,
                 particleRadius: 0.0125,
             },
