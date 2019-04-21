@@ -51,7 +51,7 @@ export const slow: SwatchTemplate = {
             "color": "rgba(64, 255, 255, 1)",
             "fade": "rgba(0, 0, 0, 0)",
             "ticks": 15,
-            "interval": 1,
+            "interval": 2,
             "speed": 0.05
         }
     ],
@@ -99,6 +99,15 @@ export const fast: SwatchTemplate = {
             speed: 0.03,
             pulseWidth: 0.005,
         },
+    ],
+    "smoke": [
+        {
+            "color": "rgba(255, 255, 64, 1)",
+            "fade": "rgba(0, 0, 0, 0)",
+            "ticks": 15,
+            "interval": 2,
+            "speed": 0.05
+        }
     ],
 
     hitInterval: 15,
