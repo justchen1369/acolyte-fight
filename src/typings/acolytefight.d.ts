@@ -88,7 +88,7 @@ declare interface Layouts {
 }
 
 declare interface Layout {
-	obstacles: ObstacleTemplate[];
+	obstacles: ObstacleLayout[];
 	swatches?: SwatchLayout[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero
@@ -100,7 +100,7 @@ declare interface ShapeTemplate {
 	extent: number; // aka radius but for a polygon
 }
 
-declare interface ObstacleTemplate extends ShapeTemplate {
+declare interface ObstacleLayout extends ShapeTemplate {
 	numObstacles: number;
 	layoutRadius: number;
 	layoutAngleOffsetInRevs: number;

@@ -138,7 +138,7 @@ function instantiateShape(shape: ShapeTemplate): pl.Vec2[] {
 	return points;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: ObstacleTemplate) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: ObstacleLayout) {
 	const Obstacle = world.settings.Obstacle;
 
 	const obstacleId = "obstacle" + (world.nextObjectId++);
@@ -965,7 +965,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	}
 }
 
-function instantiateObstacles(template: ObstacleTemplate, world: w.World) {
+function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	const points = instantiateShape(template);
 
