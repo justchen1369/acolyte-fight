@@ -39,6 +39,8 @@ const World: WorldSettings = {
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
     ProjectileSpeedMaxError: 0.001,
+
+    SwatchHealth: 100,
 }
 
 const Obstacle: ObstacleSettings = {

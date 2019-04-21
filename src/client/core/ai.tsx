@@ -179,7 +179,7 @@ function worldToState(world: w.World, myHeroId: string): WorldContract {
                 pos: invisible ? invisible.initialPos : obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: vector.fromAngle(obj.body.getAngle()),
-                inside: engine.isInsideMap(obj, world),
+                inside: engine.isInsideMap(obj.body.getPosition(), obj.radius, world),
                 health: obj.health,
                 linkedToId: obj.link ? obj.link.targetId : null,
                 shieldTicksRemaining: 0,

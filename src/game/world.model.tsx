@@ -103,6 +103,7 @@ export interface UIState {
 	sentSnapshotTick: number;
 
 	destroyed: WorldObject[];
+	destroyedSwatches: Swatch[];
 	events: WorldEvent[];
 	shakes: Shake[];
 	highlights: MapHighlight[];
@@ -364,10 +365,15 @@ export interface Swatch extends HitSource {
 	minRadius: number;
 	maxRadius: number;
 	fromAngle: number;
-	toAngle: number;
+	angularWidth: number;
 
 	buffs: BuffTemplate[];
 	damage: number;
+
+	health: number;
+	maxHealth: number;
+
+	destroyedTick?: number;
 
 	uiHighlight?: TrailHighlight;
 }

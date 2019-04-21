@@ -103,6 +103,7 @@ export function initialWorld(mod: Object): w.World {
 			sentSnapshotTick: 0,
 			playedTick: -1,
 			destroyed: [],
+			destroyedSwatches: [],
 			shakes: [],
 			highlights: [],
 			events: new Array<w.WorldEvent>(),
@@ -188,7 +189,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 	return obstacle;
 }
 
-function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius: number, fromAngle: number, toAngle: number, template: SwatchTemplate) {
+function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius: number, fromAngle: number, angularWidth: number, template: SwatchTemplate) {
 	const swatchId = "swatch" + (world.nextObjectId++);
 	const swatch: w.Swatch = {
 		id: swatchId,
@@ -198,7 +199,7 @@ function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius
 		minRadius,
 		maxRadius,
 		fromAngle,
-		toAngle,
+		angularWidth,
 
 		fill: template.fill || [],
 		smoke: template.smoke || [],
@@ -208,6 +209,9 @@ function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius
 
 		hitInterval: template.hitInterval || 1,
 		hitTickLookup: new Map<string, number>(),
+
+		health: world.settings.World.SwatchHealth,
+		maxHealth: world.settings.World.SwatchHealth,
 	};
 	world.swatches.set(swatch.id, swatch);
 
@@ -984,8 +988,8 @@ function instantiateSwatches(layout: SwatchLayout, world: w.World) {
 
 	for (let i = 0; i < layout.numSwatches; ++i) {
 		const fromAngle = 2 * Math.PI * ((i / layout.numSwatches) + layout.angularOffsetInRevs - layout.angularWidthInRevs / 2);
-		const toAngle = fromAngle + 2 * Math.PI * layout.angularWidthInRevs;
-		addSwatch(world, center, layout.minRadius, layout.maxRadius, fromAngle, toAngle, template);
+		const angularWidth = 2 * Math.PI * layout.angularWidthInRevs;
+		addSwatch(world, center, layout.minRadius, layout.maxRadius, fromAngle, angularWidth, template);
 	}
 }
 
@@ -2617,6 +2621,8 @@ function getExtent(obj: w.WorldObject) {
 }
 
 function applyLavaDamage(world: w.World) {
+	const center = pl.Vec2(0.5, 0.5);
+
 	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
 	const damagePacket: w.DamagePacket = {
 		damage: lavaDamagePerTick,
@@ -2626,7 +2632,7 @@ function applyLavaDamage(world: w.World) {
 	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (!isInsideMap(obj, world)) {
+			if (!isInsideMap(obj.body.getPosition(), obj.radius, world)) {
 				let damageMultiplier = 1.0;
 				obj.buffs.forEach(buff => {
 					if (buff.type === "lavaImmunity") {
@@ -2642,21 +2648,29 @@ function applyLavaDamage(world: w.World) {
 				}
 			}
 		} else if (obj.category === "obstacle") {
-			if (!isInsideMap(obj, world)) {
+			if (!isInsideMap(obj.body.getPosition(), obj.extent, world)) {
 				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
 	});
+
+	world.swatches.forEach(swatch => {
+		const angle = swatch.fromAngle + swatch.angularWidth / 2;
+		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+		const point = vector.plus(center, vector.multiply(vector.fromAngle(angle), radius));
+		if (!isInsideMap(point, 0, world)) {
+			applyDamageToSwatch(swatch, lavaDamagePerTick, world);
+		}
+	});
 }
 
-export function isInsideMap(obj: w.WorldObject, world: w.World) {
+export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 	if (world.radius <= 0) {
 		return false;
 	}
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const diff = vector.diff(obj.body.getPosition(), mapCenter);
-	const extent = getExtent(obj);
+	const diff = vector.diff(pos, mapCenter);
 
 	const polygonRadius = world.mapRadiusMultiplier * world.radius;
 	if (world.mapPoints) {
@@ -2696,7 +2710,7 @@ function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	const toNormal = vector.fromAngle(swatch.toAngle - Math.PI / 2);
+	const toNormal = vector.fromAngle(swatch.fromAngle + swatch.angularWidth - Math.PI / 2);
 	if (vector.dot(diff, toNormal) + hero.radius < 0) {
 		return;
 	}
@@ -2758,6 +2772,12 @@ function reap(world: w.World) {
 			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
 			}
+		}
+	});
+
+	world.swatches.forEach(swatch => {
+		if (swatch.health <= 0) {
+			destroySwatch(world, swatch);
 		}
 	});
 
@@ -2948,6 +2968,12 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 
 	object.destroyedTick = world.tick;
 	world.ui.destroyed.push(object);
+}
+
+function destroySwatch(world: w.World, swatch: w.Swatch) {
+	world.swatches.delete(swatch.id);
+	swatch.destroyedTick = world.tick;
+	world.ui.destroyedSwatches.push(swatch);
 }
 
 function calculateMovementProportion(hero: w.Hero, world: w.World): number {
@@ -3669,6 +3695,10 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 		return;
 	}
 	obstacle.health = Math.max(0, obstacle.health - packet.damage);
+}
+
+function applyDamageToSwatch(swatch: w.Swatch, damage: number, world: w.World) {
+	swatch.health = Math.max(0, swatch.health - damage);
 }
 
 export function initScore(heroId: string): w.HeroScore {

@@ -5,7 +5,7 @@ export const volcano: SwatchTemplate = {
             type: "fill",
             color: "rgba(255, 0, 128, 0.9)",
             glow: 0.2,
-            flash: 1,
+            flash: true,
         },
     ],
     smoke: [{
@@ -27,7 +27,7 @@ export const slow: SwatchTemplate = {
             type: "fill",
             "color": "rgba(64, 255, 255, 0.75)",
             glow: 0.2,
-            flash: 1,
+            flash: true,
         },
         {
             type: "axialPulse",
@@ -81,7 +81,7 @@ export const fast: SwatchTemplate = {
             type: "fill",
             "color": "rgba(255, 255, 64, 0.75)",
             glow: 0.2,
-            flash: 1,
+            flash: true,
         },
         {
             type: "axialPulse",

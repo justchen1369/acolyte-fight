@@ -136,6 +136,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	playSounds(world, options);
 
 	world.ui.destroyed = [];
+	world.ui.destroyedSwatches = [];
 	world.ui.events = [];
 	world.ui.sounds = [];
 
@@ -165,6 +166,7 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	}
 
 	world.swatches.forEach(obj => renderSwatch(ctxStack, obj, world, options));
+	world.ui.destroyedSwatches.forEach(obj => renderSwatchDestroyed(ctxStack, obj, world, options));
 
 	world.ui.underlays = renderTrails(ctxStack, world.ui.underlays, world);
 
@@ -690,6 +692,10 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 	const highlight = renderSwatchHighlight(swatch, world);
 	const hitAge = highlight ? world.tick - highlight.fromTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.SwatchFlashTicks));
+	const fade = 1 - swatch.health / swatch.maxHealth;
+
+	const fromAngle = swatch.fromAngle;
+	const toAngle = swatch.fromAngle + swatch.angularWidth;
 
 	swatch.fill.forEach(fill => {
 		if (fill.type === "fill") {
@@ -697,11 +703,15 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 
 			if (fill.flash) {
 				if (flash > 0) {
-					color = color.lighten(fill.flash * flash);
+					color = color.lighten(flash);
+				}
+
+				if (fade > 0) {
+					color = color.lighten(fade).fade(fade);
 				}
 			}
 
-			glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
+			glx.arc(ctxStack, swatch.center, fromAngle, toAngle, false, {
 				color,
 				minRadius: swatch.minRadius,
 				maxRadius: swatch.maxRadius,
@@ -723,7 +733,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 			const maxRadius = Math.min(swatch.maxRadius, minRadius + fill.pulseWidth);
 
 			let color = parseColor(fill.fromColor).mix(parseColor(fill.toColor), proportion);
-			glx.arc(ctxStack, swatch.center, swatch.fromAngle, swatch.toAngle, false, {
+			glx.arc(ctxStack, swatch.center, fromAngle, toAngle, false, {
 				color,
 				minRadius,
 				maxRadius,
@@ -741,7 +751,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 		}
 
 		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
-		const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.toAngle, radius);
+		const edgeOffset = randomArcPoint(fromAngle, swatch.angularWidth, radius);
 		const pos = vector.plus(swatch.center, edgeOffset);
 
 		const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
@@ -758,6 +768,32 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 			highlight,
 		}, world);
 	});
+}
+
+function renderSwatchDestroyed(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
+	const ParticleAngularInterval = 0.02 * 2 * Math.PI;
+	const ExplodeSpeed = 0.1;
+
+	const numParticles = Math.ceil(swatch.angularWidth / ParticleAngularInterval);
+	const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+
+	for (let i = 0; i < numParticles; ++i) {
+		const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.angularWidth, radius);
+		const pos = vector.plus(swatch.center, edgeOffset);
+
+		const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
+		underlay({
+			tag: swatch.id,
+			type: "circle",
+			pos,
+			velocity,
+			radius: (swatch.maxRadius - swatch.minRadius) / 2,
+			initialTick: world.tick,
+			max: 30,
+			fillStyle: '#fff',
+			fade: 'rgba(0, 0, 0, 0)',
+		}, world);
+	}
 }
 
 function renderSwatchHighlight(swatch: w.Swatch, world: w.World): w.TrailHighlight {
@@ -786,9 +822,8 @@ function renderSwatchHighlight(swatch: w.Swatch, world: w.World): w.TrailHighlig
 	return swatch.uiHighlight;
 }
 
-function randomArcPoint(fromAngle: number, toAngle: number, radius: number): pl.Vec2 {
-	const seed = Math.random();
-	const angle = seed * fromAngle + (1 - seed) * toAngle;
+function randomArcPoint(fromAngle: number, angularWidth: number, radius: number): pl.Vec2 {
+	const angle = fromAngle + Math.random() * angularWidth;
 	return vector.multiply(vector.fromAngle(angle), radius);
 }
 

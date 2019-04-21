@@ -79,6 +79,8 @@ declare interface WorldSettings {
 	
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
 	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value
+
+	SwatchHealth: number;
 }
 
 declare interface Layouts {
@@ -139,7 +141,7 @@ declare interface SwatchSolidFill {
 
 	color: string;
 	glow?: number;
-	flash?: number;
+	flash?: boolean;
 }
 
 declare interface SwatchAxialPulse {
