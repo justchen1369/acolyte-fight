@@ -4,14 +4,14 @@ export const Layouts: Layouts = {
         "obstacles": [
             {
                 "numObstacles": 3,
-                "layoutRadius": 0.04,
+                "layoutRadius": 0.0725,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
                 "extent": 0.0125,
                 "orientationAngleOffsetInRevs": 0
             },
             {
-                "numObstacles": 3,
+                "numObstacles": 6,
                 "layoutRadius": 0.34,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
@@ -22,11 +22,19 @@ export const Layouts: Layouts = {
         "swatches": [
             {
                 "type": "slow",
-                "minRadius": 0.2,
-                "maxRadius": 0.21,
+                "minRadius": 0.3375,
+                "maxRadius": 0.3425,
                 "numSwatches": 6,
-                "angularOffsetInRevs": 0,
-                "angularWidthInRevs": 0.1
+                "angularOffsetInRevs": 0.0833333333333,
+                "angularWidthInRevs": 0.12
+            },
+            {
+                "type": "slow",
+                "minRadius": 0.07,
+                "maxRadius": 0.075,
+                "numSwatches": 3,
+                "angularOffsetInRevs": 0.1666666666667,
+                "angularWidthInRevs": 0.2
             }
         ]
     },
