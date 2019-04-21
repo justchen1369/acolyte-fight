@@ -745,54 +745,58 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 		}
 	});
 
-	swatch.smoke.forEach(smoke => {
-		if (smoke.interval && (world.tick % smoke.interval) !== 0) {
-			return;
-		}
+	if (options.rtx > r.GraphicsLevel.Minimum) {
+		swatch.smoke.forEach(smoke => {
+			if (smoke.interval && (world.tick % smoke.interval) !== 0) {
+				return;
+			}
 
-		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
-		const edgeOffset = randomArcPoint(fromAngle, swatch.angularWidth, radius);
-		const pos = vector.plus(swatch.center, edgeOffset);
+			const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+			const edgeOffset = randomArcPoint(fromAngle, swatch.angularWidth, radius);
+			const pos = vector.plus(swatch.center, edgeOffset);
 
-		const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
-		underlay({
-			tag: swatch.id,
-			type: "circle",
-			pos,
-			velocity,
-			radius: (swatch.maxRadius - swatch.minRadius) / 2,
-			initialTick: world.tick,
-			max: smoke.ticks,
-			fillStyle: smoke.color,
-			fade: smoke.fade,
-			highlight,
-		}, world);
-	});
+			const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
+			underlay({
+				tag: swatch.id,
+				type: "circle",
+				pos,
+				velocity,
+				radius: (swatch.maxRadius - swatch.minRadius) / 2,
+				initialTick: world.tick,
+				max: smoke.ticks,
+				fillStyle: smoke.color,
+				fade: smoke.fade,
+				highlight,
+			}, world);
+		});
+	}
 }
 
 function renderSwatchDestroyed(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
 	const ParticleAngularInterval = 0.02 * 2 * Math.PI;
 	const ExplodeSpeed = 0.1;
 
-	const numParticles = Math.ceil(swatch.angularWidth / ParticleAngularInterval);
-	const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+	if (options.rtx > r.GraphicsLevel.Minimum) {
+		const numParticles = Math.ceil(swatch.angularWidth / ParticleAngularInterval);
+		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
 
-	for (let i = 0; i < numParticles; ++i) {
-		const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.angularWidth, radius);
-		const pos = vector.plus(swatch.center, edgeOffset);
+		for (let i = 0; i < numParticles; ++i) {
+			const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.angularWidth, radius);
+			const pos = vector.plus(swatch.center, edgeOffset);
 
-		const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
-		underlay({
-			tag: swatch.id,
-			type: "circle",
-			pos,
-			velocity,
-			radius: (swatch.maxRadius - swatch.minRadius) / 2,
-			initialTick: world.tick,
-			max: 30,
-			fillStyle: '#fff',
-			fade: 'rgba(0, 0, 0, 0)',
-		}, world);
+			const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
+			underlay({
+				tag: swatch.id,
+				type: "circle",
+				pos,
+				velocity,
+				radius: (swatch.maxRadius - swatch.minRadius) / 2,
+				initialTick: world.tick,
+				max: 30,
+				fillStyle: '#fff',
+				fade: 'rgba(0, 0, 0, 0)',
+			}, world);
+		}
 	}
 }
 
