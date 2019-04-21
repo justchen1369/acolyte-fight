@@ -1458,10 +1458,13 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			return; // Wait until are facing the target
 		}
 
+		if (spell.knockbackCancel) {
+			hero.body.setLinearVelocity(vector.zero());
+		}
+
 		hero.casting.uninterruptible = false;
 		hero.casting.initialPosition = vector.clone(hero.body.getPosition()); // Store this to compare against for knockback cancel
 		++hero.casting.stage;
-	} else if (hero.casting.stage > w.CastStage.Orientating) {
 	}
 
 
