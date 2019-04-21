@@ -707,7 +707,7 @@ function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World
 				}
 
 				if (fade > 0) {
-					color = color.lighten(fade).fade(fade);
+					color = color.lighten(fade);
 				}
 			}
 
