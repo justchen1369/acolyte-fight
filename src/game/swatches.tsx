@@ -62,7 +62,7 @@ export const slow: SwatchTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 0.75,
+            movementProportion: 0.67,
             render: {
                 color: "rgba(64, 255, 255, 1)",
                 alpha: 0.3,
@@ -116,7 +116,7 @@ export const fast: SwatchTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 1.25,
+            movementProportion: 1.33,
             render: {
                 color: "rgba(255, 255, 255, 1)",
                 heroColor: true,
