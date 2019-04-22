@@ -44,12 +44,14 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     bumper: {
         "health": 50,
 
-        "color": "#9c4",
-        "stroke": "#cf0",
         "strokeWidth": 0.008,
-        "deadColor": "#cf8",
-        "deadStroke": "#cf0",
 
-        impulse: 0.001,
+        "color": "#c94",
+        "stroke": "#fc0",
+
+        "deadColor": "#fc8",
+        "deadStroke": "#fc0",
+
+        "impulse": 0.00012,
     },
 };

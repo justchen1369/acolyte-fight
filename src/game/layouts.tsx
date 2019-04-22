@@ -42,6 +42,7 @@ export const Layouts: Layouts = {
         "numPoints": 4,
         "obstacles": [
             {
+                type: "bumper",
                 "numObstacles": 2,
                 "layoutRadius": 0.07,
                 "layoutAngleOffsetInRevs": 0.125,

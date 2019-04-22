@@ -860,7 +860,7 @@ const link: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 1 * TicksPerSecond },
+                trigger: { afterTicks: 45 },
                 targetType: HomingTargets.self,
                 redirect: true,
             },
