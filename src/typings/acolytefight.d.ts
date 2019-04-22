@@ -101,12 +101,13 @@ declare interface ShapeTemplate {
 }
 
 declare interface ObstacleLayout extends ShapeTemplate {
+	type?: string;
+
 	numObstacles: number;
 	layoutRadius: number;
 	layoutAngleOffsetInRevs: number;
 	orientationAngleOffsetInRevs?: number;
 
-	detonate?: boolean;
 	health?: number;
 }
 
@@ -168,7 +169,6 @@ declare interface SwatchSmoke {
 }
 
 declare interface ObstacleSettings {
-	Health: number;
 	AngularDamping: number;
 	LinearDamping: number;
 	Density: number;
@@ -178,7 +178,27 @@ declare interface ObstacleSettings {
 	ReturnMinSpeed: number;
 	ReturnTurnRate: number;
 
-	Detonate: DetonateParameters;
+	Templates: ObstacleTemplateLookup;
+}
+
+declare interface ObstacleTemplateLookup {
+	[key: string]: ObstacleTemplate;
+}
+
+declare interface ObstacleTemplate {
+	color: string;
+	stroke: string;
+	strokeWidth: number;
+
+	// Fade to these colors as the obstacle loses health
+	deadColor: string;
+	deadStroke: string;
+
+	collideWith?: number;
+	expireOn?: number;
+
+	health: number;
+	detonate?: DetonateParameters;
 }
 
 declare interface ChoiceSettings {

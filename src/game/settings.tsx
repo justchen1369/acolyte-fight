@@ -44,7 +44,6 @@ const World: WorldSettings = {
 }
 
 const Obstacle: ObstacleSettings = {
-	Health: 50,
 	AngularDamping: 5,
 	LinearDamping: 2,
     Density: 100.0,
@@ -52,12 +51,39 @@ const Obstacle: ObstacleSettings = {
     ReturnMinSpeed: 0.02,
     ReturnTurnRate: 0.002,
 
-    Detonate: {
-        damage: 0,
-        minImpulse: 0.0002,
-        maxImpulse: 0.0005,
-        radius: 0.05,
-        renderTicks: 30,
+    Templates: {
+        default: {
+            health: 50,
+
+            color: '#888',
+            stroke: '#ccc',
+            strokeWidth: 0.005,
+
+            deadColor: '#822',
+            deadStroke: '#c33',
+
+            collideWith: Categories.All,
+            expireOn: Categories.None,
+        },
+        explodingBarrel: {
+            health: 50,
+
+            "color": "#f0f",
+            "stroke": "#fcf",
+            "strokeWidth": 0.002,
+            "deadColor": "#f6f",
+            "deadStroke": "#fff",
+
+            collideWith: Categories.All,
+            expireOn: Categories.Hero,
+            detonate: {
+                damage: 0,
+                minImpulse: 0.0002,
+                maxImpulse: 0.0005,
+                radius: 0.05,
+                renderTicks: 30,
+            },
+        },
     },
 }
 

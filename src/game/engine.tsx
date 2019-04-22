@@ -138,8 +138,10 @@ function instantiateShape(shape: ShapeTemplate): pl.Vec2[] {
 	return points;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], template: ObstacleLayout) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], layout: ObstacleLayout) {
 	const Obstacle = world.settings.Obstacle;
+
+	const template = Obstacle.Templates[layout.type || "default"];
 
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
@@ -151,26 +153,40 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		angularDamping: Obstacle.AngularDamping,
 	});
 
+	const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
+
 	body.createFixture(pl.Polygon(points), {
 		density: Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
-		filterMaskBits: Categories.All,
+		filterMaskBits: collideWith,
 	});
 
-	const health = template.health || Obstacle.Health;
+	const health = layout.health || template.health;
 	const obstacle: w.Obstacle = {
 		id: obstacleId,
 		category: "obstacle",
 		categories: Categories.Obstacle,
-		type: "polygon",
+
+		collideWith,
+		expireOn: template.expireOn || Categories.None,
 		body,
-		extent: template.extent,
+
+		color: template.color,
+		stroke: template.stroke,
+		deadColor: template.deadColor,
+		deadStroke: template.deadStroke,
+		strokeWidth: template.strokeWidth,
+
+		extent: layout.extent,
 		points,
+
 		health,
 		maxHealth: health,
+
 		createTick: world.tick,
 		growthTicks: 0,
-		detonate: template.detonate ? world.settings.Obstacle.Detonate : null,
+
+		detonate: template.detonate,
 	};
 
 	// Obstacles start immovable
@@ -1664,6 +1680,14 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "shield") {
 			handleHeroHitShield(world, object, hit);
 		}
+	} else if (object.category === "obstacle") {
+		handleObstacleHit(world, object, hit);
+	}
+}
+
+function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObject) {
+	if (world.tick > world.startTick && (obstacle.expireOn & hit.categories) > 0) {
+		obstacle.health = 0;
 	}
 }
 

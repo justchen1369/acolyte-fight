@@ -380,12 +380,22 @@ export interface Swatch extends HitSource {
 
 export interface Obstacle extends WorldObjectBase {
 	category: "obstacle";
-	type: string;
+
+	collideWith: number;
+	expireOn: number;
 
 	maxHealth: number;
 	health: number;
+
 	createTick: number;
 	growthTicks: number;
+
+	color: string;
+	stroke: string;
+	deadColor: string;
+	deadStroke: string;
+	strokeWidth: number;
+
 	extent: number;
 	points: pl.Vec2[];
 
