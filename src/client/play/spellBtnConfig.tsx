@@ -51,7 +51,7 @@ function uploadSettings() {
     cloud.uploadSettings();
 }
 
-class SpellKeyConfig extends React.Component<Props, State> {
+class SpellKeyConfig extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

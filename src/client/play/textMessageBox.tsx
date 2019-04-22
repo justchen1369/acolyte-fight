@@ -27,7 +27,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class TextMessageBox extends React.Component<Props, State> {
+class TextMessageBox extends React.PureComponent<Props, State> {
     private keyDownListener = this.onWindowKeyDown.bind(this);
     private textMessageBox: HTMLInputElement = null;
     private previousSendMs = 0;

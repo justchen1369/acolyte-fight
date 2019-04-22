@@ -65,7 +65,7 @@ function nextFrame(): Promise<void> {
     });
 }
 
-class CanvasPanel extends React.Component<Props, State> {
+class CanvasPanel extends React.PureComponent<Props, State> {
     private resizeListener = this.fullScreenCanvas.bind(this);
     private executingToken: CancellationToken;
 

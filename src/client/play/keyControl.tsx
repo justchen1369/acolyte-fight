@@ -27,7 +27,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class KeyControl extends React.Component<Props, State> {
+class KeyControl extends React.PureComponent<Props, State> {
     private uploadStateDebounced = _.debounce(() => this.uploadState(), 500);
 
     constructor(props: Props) {

@@ -44,7 +44,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class InfoPanelPlayer extends React.Component<Props, State> {
+class InfoPanelPlayer extends React.PureComponent<Props, State> {
     render() {
         const numKills = this.props.numKills;
         const isAlive = this.props.isAlive;

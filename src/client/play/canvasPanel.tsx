@@ -132,7 +132,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class CanvasPanel extends React.Component<Props, State> {
+class CanvasPanel extends React.PureComponent<Props, State> {
     private currentTouch: TouchState = null;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;

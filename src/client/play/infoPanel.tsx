@@ -64,7 +64,7 @@ const calculateTeams = Reselect.createSelector(
     }
 );
 
-class InfoPanel extends React.Component<Props, State> {
+class InfoPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

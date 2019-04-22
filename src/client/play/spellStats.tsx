@@ -26,7 +26,7 @@ function formatTime(ticks: number) {
     return Math.round(seconds * 100) / 100;
 }
 
-class SpellStats extends React.Component<Props, State> {
+class SpellStats extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

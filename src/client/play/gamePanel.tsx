@@ -39,7 +39,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class GamePanel extends React.Component<Props, State> {
+class GamePanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
