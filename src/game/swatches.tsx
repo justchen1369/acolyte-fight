@@ -12,7 +12,7 @@ export const volcano: SwatchTemplate = {
         color: "rgba(255, 0, 128, 1)",
         fade: "rgba(0, 0, 0, 0)",
         "ticks": 15,
-        "interval": 1,
+        "interval": 4,
         "speed": 0.1
     }],
 

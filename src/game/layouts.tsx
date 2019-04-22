@@ -130,7 +130,7 @@ export const Layouts: Layouts = {
                 "type": "volcano",
                 "minRadius": 0,
                 "maxRadius": 0.025,
-                "numSwatches": 5,
+                "numSwatches": 4,
                 "angularWidthInRevs": 0.2,
                 "angularOffsetInRevs": 0
             }
@@ -250,6 +250,7 @@ export const Layouts: Layouts = {
         "numPoints": 6,
         "obstacles": [
             {
+                type: "mirror",
                 "numObstacles": 3,
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.32,
