@@ -131,7 +131,7 @@ export const Layouts: Layouts = {
                 "minRadius": 0,
                 "maxRadius": 0.025,
                 "numSwatches": 4,
-                "angularWidthInRevs": 0.2,
+                "angularWidthInRevs": 0.25,
                 "angularOffsetInRevs": 0
             }
         ]
