@@ -50,7 +50,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
         "deadColor": "#fc8",
         "deadStroke": "#fc0",
 
-        "impulse": 0.0002,
+        "impulse": 0.00015,
     },
     heavy: {
         health: 1000,
