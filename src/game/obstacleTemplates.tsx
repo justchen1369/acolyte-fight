@@ -14,11 +14,12 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     explodingBarrel: {
         health: 50,
 
-        "color": "#f0f",
-        "stroke": "#f8f",
         "strokeWidth": 0.002,
-        "deadColor": "#f8f",
-        "deadStroke": "#fff",
+
+        "color": "#c94",
+        "stroke": "#fc0",
+        "deadColor": "#fc8",
+        "deadStroke": "#fc0",
 
         expireOn: Categories.Hero,
         detonate: {

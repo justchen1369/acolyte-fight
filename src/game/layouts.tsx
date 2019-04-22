@@ -163,7 +163,7 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.1666667
             },
             {
-                type: "mirror",
+                type: "bumper",
                 "numObstacles": 5,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -241,7 +241,6 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
-                type: "mirror",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
