@@ -69,9 +69,9 @@ const Obstacle: ObstacleSettings = {
             health: 50,
 
             "color": "#f0f",
-            "stroke": "#fcf",
+            "stroke": "#f8f",
             "strokeWidth": 0.002,
-            "deadColor": "#f6f",
+            "deadColor": "#f8f",
             "deadStroke": "#fff",
 
             collideWith: Categories.All,
