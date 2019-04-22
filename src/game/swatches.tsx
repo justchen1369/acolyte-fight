@@ -12,7 +12,7 @@ export const volcano: SwatchTemplate = {
         color: "rgba(255, 0, 128, 1)",
         fade: "rgba(0, 0, 0, 0)",
         "ticks": 30,
-        "interval": 4,
+        "interval": 8,
         "speed": 0.1
     }],
 
@@ -51,7 +51,7 @@ export const slow: SwatchTemplate = {
             "color": "rgba(64, 255, 255, 1)",
             "fade": "rgba(0, 0, 0, 0)",
             "ticks": 15,
-            "interval": 2,
+            "interval": 4,
             "speed": 0.05
         }
     ],
@@ -105,7 +105,7 @@ export const fast: SwatchTemplate = {
             "color": "rgba(255, 255, 64, 1)",
             "fade": "rgba(0, 0, 0, 0)",
             "ticks": 15,
-            "interval": 2,
+            "interval": 4,
             "speed": 0.05
         }
     ],
