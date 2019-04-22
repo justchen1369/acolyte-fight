@@ -52,6 +52,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
         "deadColor": "#fc8",
         "deadStroke": "#fc0",
 
-        "impulse": 0.00012,
+        "impulse": 0.0002,
     },
 };
