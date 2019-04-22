@@ -148,14 +148,14 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		type: 'dynamic',
 		position,
 		angle,
-		linearDamping: Obstacle.LinearDamping,
-		angularDamping: Obstacle.AngularDamping,
+		linearDamping: template.linearDamping || Obstacle.LinearDamping,
+		angularDamping: template.angularDamping || Obstacle.AngularDamping,
 	});
 
 	const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 
 	body.createFixture(pl.Polygon(points), {
-		density: Obstacle.Density,
+		density: template.density || Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: collideWith,
 	});

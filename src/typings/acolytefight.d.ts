@@ -193,6 +193,10 @@ declare interface ObstacleTemplate {
 	deadColor: string;
 	deadStroke: string;
 
+	angularDamping?: number;
+	linearDamping?: number;
+	density?: number;
+
 	collideWith?: number;
 	expireOn?: number;
 	damageFrom?: number;

@@ -10,8 +10,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         deadColor: '#822',
         deadStroke: '#c33',
-
-        expireOn: Categories.None,
     },
     explodingBarrel: {
         health: 50,
@@ -53,5 +51,18 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
         "deadStroke": "#fc0",
 
         "impulse": 0.0002,
+    },
+    heavy: {
+        health: 250,
+
+        color: '#888',
+        stroke: '#ccc',
+        strokeWidth: 0.01,
+
+        deadColor: '#822',
+        deadStroke: '#c33',
+
+        linearDamping: 100,
+        angularDamping: 0.1,
     },
 };
