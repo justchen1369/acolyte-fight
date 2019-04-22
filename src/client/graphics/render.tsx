@@ -662,7 +662,8 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	}
 	if (flash > 0) {
 		// Hit animation
-		scale *= 1 + HeroColors.ObstacleGrowFactor * flash;
+		const growFactor = obstacle.strokeWidth / obstacle.extent; // Grow by the strokeWidth
+		scale *= 1 + growFactor * flash;
 	}
 
 	const strokeProportion = 1 - Math.min(1, obstacle.strokeWidth / obstacle.extent);
