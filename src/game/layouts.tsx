@@ -63,7 +63,7 @@ export const Layouts: Layouts = {
     "ring": {
         "obstacles": [
             {
-                type: "heavy",
+                type: "mirror",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,

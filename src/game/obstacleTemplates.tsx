@@ -32,8 +32,8 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     },
     "mirror": {
         "health": 50,
-        "color": "#0cf",
-        "stroke": "#8cf",
+        "color": "#0ad",
+        "stroke": "#0cf",
         "strokeWidth": 0.003,
         "deadColor": "#48f",
         "deadStroke": "#48f",
