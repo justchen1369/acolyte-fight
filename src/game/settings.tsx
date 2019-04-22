@@ -1091,6 +1091,7 @@ const drain: Spell = {
                 type: "homing",
                 targetType: "enemy",
                 trigger: { atCursor: true },
+                newSpeed: 0.15,
                 redirect: true,
             },
         ],
