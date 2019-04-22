@@ -63,6 +63,7 @@ export const Layouts: Layouts = {
     "ring": {
         "obstacles": [
             {
+                type: "heavy",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -223,6 +224,7 @@ export const Layouts: Layouts = {
     "surrounded": {
         "obstacles": [
             {
+                type: "mirror",
                 "numObstacles": 15,
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -239,6 +241,7 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
+                type: "mirror",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -252,7 +255,6 @@ export const Layouts: Layouts = {
         "numPoints": 6,
         "obstacles": [
             {
-                type: "mirror",
                 "numObstacles": 3,
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.32,

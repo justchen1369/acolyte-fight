@@ -53,10 +53,10 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
         "impulse": 0.0002,
     },
     heavy: {
-        health: 250,
+        health: 1000,
 
-        color: '#888',
-        stroke: '#ccc',
+        "color": "#555",
+        "stroke": "#fff",
         strokeWidth: 0.01,
 
         deadColor: '#822',
