@@ -4,7 +4,7 @@ export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
 
 export const DefaultRoomId = "r-default";
-export const UpdateModMinutes = 60;
+export const UpdateModMinutes = 24 * 60;
 
 export namespace GameCategory {
     export const PvP = "PvP";
