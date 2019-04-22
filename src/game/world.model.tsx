@@ -401,8 +401,10 @@ export interface Obstacle extends WorldObjectBase {
 	points: pl.Vec2[];
 
 	detonate?: DetonateParameters;
-	mirror?: MirrorParameters;
+	mirror?: boolean;
+	impulse: number;
 
+	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
 }

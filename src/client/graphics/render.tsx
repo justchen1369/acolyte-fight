@@ -647,7 +647,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		strokeStyle = strokeStyle.mix(parseColor(obstacle.deadStroke), 1 - proportion);
 	}
 
-	const hitAge = obstacle.damagedTick ? world.tick - obstacle.damagedTick : Infinity;
+	const hitAge = obstacle.hitTick ? world.tick - obstacle.hitTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
 	if (flash > 0) {

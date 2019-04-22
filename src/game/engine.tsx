@@ -188,6 +188,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 
 		detonate: template.detonate,
 		mirror: template.mirror,
+		impulse: template.impulse || 0,
 	};
 
 	// Obstacles start immovable
@@ -1741,6 +1742,12 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 		const packet = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 		applyDamageToObstacle(obstacle, packet, world);
 		hero.thrust.nullified = true;
+	}
+
+	if (obstacle.impulse) {
+		const impulse = vector.relengthen(vector.diff(hero.body.getPosition(), obstacle.body.getPosition()), obstacle.impulse);
+		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+		obstacle.hitTick = world.tick;
 	}
 }
 
@@ -3716,6 +3723,7 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 	if (packet.isLava) {
 		obstacle.lavaTick = world.tick;
 	} else {
+		obstacle.hitTick = world.tick;
 		obstacle.damagedTick = world.tick;
 	}
 

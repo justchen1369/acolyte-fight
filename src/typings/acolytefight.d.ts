@@ -199,7 +199,8 @@ declare interface ObstacleTemplate {
 
 	health: number;
 	detonate?: DetonateParameters;
-	mirror?: MirrorParameters;
+	mirror?: boolean;
+	impulse?: number;
 }
 
 declare interface ChoiceSettings {
@@ -460,9 +461,6 @@ declare interface ExpireOnOwnerRetreatTemplate extends BehaviourTemplateBase {
 }
 declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
 	type: "expireOnChannellingEnd";
-}
-
-declare interface MirrorParameters {
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {

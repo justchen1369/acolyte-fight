@@ -140,6 +140,8 @@ export const Layouts: Layouts = {
         "numPoints": 3,
         "obstacles": [
             {
+                type: "bumper",
+                health: 100,
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
