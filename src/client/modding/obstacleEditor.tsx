@@ -11,7 +11,7 @@ interface Props {
 interface State {
 }
 
-class SwatchEditor extends React.PureComponent<Props, State> {
+class ObstacleEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -20,10 +20,10 @@ class SwatchEditor extends React.PureComponent<Props, State> {
 
     render() {
         return <EditorPage expand={true}>
-            <SectionEditor sectionKey="swatches" addRemovePrefix="swatch">
+            <SectionEditor sectionKey="obstacles" addRemovePrefix="obstacle">
             </SectionEditor>
         </EditorPage>
     }
 }
 
-export default SwatchEditor;
+export default ObstacleEditor;

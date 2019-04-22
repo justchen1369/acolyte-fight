@@ -28,7 +28,8 @@ declare interface AcolyteFightSettings {
 	Swatches: SwatchTemplates;
     Hero: HeroSettings;
     World: WorldSettings;
-    Obstacle: ObstacleSettings;
+	Obstacle: ObstacleSettings;
+	ObstacleTemplates: ObstacleTemplateLookup;
     Spells: Spells;
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
@@ -177,8 +178,6 @@ declare interface ObstacleSettings {
 	ReturnProportion: number;
 	ReturnMinSpeed: number;
 	ReturnTurnRate: number;
-
-	Templates: ObstacleTemplateLookup;
 }
 
 declare interface ObstacleTemplateLookup {

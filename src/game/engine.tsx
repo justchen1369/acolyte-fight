@@ -140,8 +140,7 @@ function instantiateShape(shape: ShapeTemplate): pl.Vec2[] {
 
 function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], layout: ObstacleLayout) {
 	const Obstacle = world.settings.Obstacle;
-
-	const template = Obstacle.Templates[layout.type || "default"];
+	const template = world.settings.ObstacleTemplates[layout.type || "default"];
 
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({

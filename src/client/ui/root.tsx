@@ -24,6 +24,7 @@ import WatchLooper from '../controls/watchLooper';
 import ModdingOverviewTab from '../modding/overviewTab';
 import IconEditor from '../modding/iconEditor';
 import MapEditor from '../modding/mapEditor';
+import ObstacleEditor from '../modding/obstacleEditor';
 import SoundEditor from '../modding/soundEditor';
 import SpellEditor from '../modding/spellEditor';
 import SwatchEditor from '../modding/swatchEditor';
@@ -87,6 +88,7 @@ class Root extends React.Component<Props> {
                 {page === "modding-sounds" && <SoundEditor />}
                 {page === "modding-maps" && <MapEditor />}
                 {page === "modding-swatches" && <SwatchEditor />}
+                {page === "modding-obstacles" && <ObstacleEditor />}
                 {page === "modding-constants" && <ConstantEditor />}
                 <UrlListener />
             </div>

@@ -12,6 +12,7 @@ export function settingsToCode(settings: AcolyteFightSettings): e.CodeTree {
         spells: spellsToCode(settings.Spells),
         maps: mapsToCode(settings.Layouts),
         swatches: swatchesToCode(settings.Swatches),
+        obstacles: obstacleTemplatesToCode(settings.ObstacleTemplates),
         icons: iconsToCode(settings.Icons),
         sounds: soundsToCode(settings.Sounds),
         constants: constantsToCode(settings),
@@ -45,6 +46,18 @@ function swatchesToCode(swatches: SwatchTemplates): e.CodeSection {
     for (const id of Object.keys(swatches)) {
         const swatch = swatches[id];
         lookup[swatch.id] = stringify(swatch);
+    }
+    return lookup;
+}
+
+function obstacleTemplatesToCode(obstacleTemplates: ObstacleTemplateLookup): e.CodeSection {
+    const lookup: e.CodeSection = {};
+    for (const id of Object.keys(obstacleTemplates)) {
+        const template = obstacleTemplates[id];
+        lookup[id] = stringify({
+            id,
+            ...template,
+        });
     }
     return lookup;
 }
@@ -98,6 +111,7 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         Mod: codeToConstants(codeTree, "mod", errorTree),
         World: codeToConstants(codeTree, "world", errorTree),
         Obstacle: codeToConstants(codeTree, "obstacle", errorTree),
+        ObstacleTemplates: codeToObstacleTemplates(codeTree, errorTree),
         Hero: codeToConstants(codeTree, "hero", errorTree),
         Choices: codeToConstants(codeTree, "choices", errorTree),
     };
@@ -209,6 +223,28 @@ function codeToSwatches(codeTree: e.CodeTree, errorTree: e.ErrorTree): SwatchTem
         errorTree.swatches = errors;
     }
     return swatches;
+}
+
+function codeToObstacleTemplates(codeTree: e.CodeTree, errorTree: e.ErrorTree): ObstacleTemplateLookup {
+    const obstacleTemplates: ObstacleTemplateLookup = {};
+    const errors: e.ErrorSection = {};
+    for (const key of Object.keys(codeTree.obstacles)) {
+        try {
+            const code = codeTree.obstacles[key];
+            const json = JSON.parse(code);
+
+            const id = json.id;
+            delete json.id;
+
+            obstacleTemplates[id] = json;
+        } catch (exception) {
+            errors[key] = `${exception}`;
+        }
+    }
+    if (Object.keys(errors).length > 0) {
+        errorTree.swatches = errors;
+    }
+    return obstacleTemplates;
 }
 
 function codeToConstants(codeTree: e.CodeTree, key: string, errorTree: e.ErrorTree): any {

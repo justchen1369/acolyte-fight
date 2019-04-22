@@ -50,42 +50,42 @@ const Obstacle: ObstacleSettings = {
     ReturnProportion: 0.04,
     ReturnMinSpeed: 0.02,
     ReturnTurnRate: 0.002,
+}
 
-    Templates: {
-        default: {
-            health: 50,
+const ObstacleTemplates: ObstacleTemplateLookup = {
+    default: {
+        health: 50,
 
-            color: '#888',
-            stroke: '#ccc',
-            strokeWidth: 0.005,
+        color: '#888',
+        stroke: '#ccc',
+        strokeWidth: 0.005,
 
-            deadColor: '#822',
-            deadStroke: '#c33',
+        deadColor: '#822',
+        deadStroke: '#c33',
 
-            collideWith: Categories.All,
-            expireOn: Categories.None,
-        },
-        explodingBarrel: {
-            health: 50,
+        collideWith: Categories.All,
+        expireOn: Categories.None,
+    },
+    explodingBarrel: {
+        health: 50,
 
-            "color": "#f0f",
-            "stroke": "#f8f",
-            "strokeWidth": 0.002,
-            "deadColor": "#f8f",
-            "deadStroke": "#fff",
+        "color": "#f0f",
+        "stroke": "#f8f",
+        "strokeWidth": 0.002,
+        "deadColor": "#f8f",
+        "deadStroke": "#fff",
 
-            collideWith: Categories.All,
-            expireOn: Categories.Hero,
-            detonate: {
-                damage: 0,
-                minImpulse: 0.0002,
-                maxImpulse: 0.0005,
-                radius: 0.05,
-                renderTicks: 30,
-            },
+        collideWith: Categories.All,
+        expireOn: Categories.Hero,
+        detonate: {
+            damage: 0,
+            minImpulse: 0.0002,
+            maxImpulse: 0.0005,
+            radius: 0.05,
+            renderTicks: 30,
         },
     },
-}
+};
 
 const Choices: ChoiceSettings = {
 	Keys: [
@@ -1897,6 +1897,7 @@ export const DefaultSettings: AcolyteFightSettings = {
     World,
     Hero,
     Obstacle,
+    ObstacleTemplates,
     Choices,
     Spells,
     Layouts,
