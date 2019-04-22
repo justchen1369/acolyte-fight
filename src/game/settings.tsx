@@ -866,7 +866,7 @@ const link: Spell = {
         speed: 0.3,
         strafe: {},
         restitution: 0,
-        maxTicks: 1.5 * TicksPerSecond,
+        maxTicks: 1.75 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
@@ -902,9 +902,8 @@ const link: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 0.75 * TicksPerSecond },
+                trigger: { afterTicks: 1 * TicksPerSecond },
                 targetType: HomingTargets.self,
-                newSpeed: 0.4,
                 redirect: true,
             },
             {
