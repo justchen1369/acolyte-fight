@@ -165,10 +165,11 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		id: obstacleId,
 		category: "obstacle",
 		categories: Categories.Obstacle,
+		body,
 
 		collideWith,
 		expireOn: template.expireOn || Categories.None,
-		body,
+		damageFrom: template.damageFrom !== undefined ? template.damageFrom : Categories.All,
 
 		color: template.color,
 		stroke: template.stroke,
@@ -186,6 +187,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		growthTicks: 0,
 
 		detonate: template.detonate,
+		mirror: template.mirror,
 	};
 
 	// Obstacles start immovable
@@ -1744,15 +1746,18 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	if (takeHit(projectile, obstacle.id, world)) {
-		let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
+		let packet: w.DamagePacket = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 		packet = scaleForPartialDamage(world, projectile, packet);
-		applyDamageToObstacle(obstacle, packet, world);
+		if (!(obstacle.damageFrom & projectile.categories)) {
+			packet.damage = 0; // Still apply a zero-damage packet so the obstacle flashes and looks like it was hit
+		}
 
-		linkTo(projectile, obstacle, world);
+		applyDamageToObstacle(obstacle, packet, world);
 	}
 
-	if (expireOn(world, projectile, obstacle)) {
+	if (!obstacle.mirror && expireOn(world, projectile, obstacle)) {
 		detonateProjectile(projectile, world);
+		linkTo(projectile, obstacle, world);
 		applySwap(projectile, obstacle, world);
 		destroyObject(world, projectile);
 	}
@@ -3708,12 +3713,10 @@ function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, worl
 
 function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, world: w.World) {
 	// Register hit
-	if (packet.damage > 0) {
-		if (packet.isLava) {
-			obstacle.lavaTick = world.tick;
-		} else {
-			obstacle.damagedTick = world.tick;
-		}
+	if (packet.isLava) {
+		obstacle.lavaTick = world.tick;
+	} else {
+		obstacle.damagedTick = world.tick;
 	}
 
 	if (world.tick < world.startTick) {

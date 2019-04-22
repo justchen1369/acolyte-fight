@@ -63,7 +63,6 @@ const ObstacleTemplates: ObstacleTemplateLookup = {
         deadColor: '#822',
         deadStroke: '#c33',
 
-        collideWith: Categories.All,
         expireOn: Categories.None,
     },
     explodingBarrel: {
@@ -75,7 +74,6 @@ const ObstacleTemplates: ObstacleTemplateLookup = {
         "deadColor": "#f8f",
         "deadStroke": "#fff",
 
-        collideWith: Categories.All,
         expireOn: Categories.Hero,
         detonate: {
             damage: 0,
@@ -84,6 +82,16 @@ const ObstacleTemplates: ObstacleTemplateLookup = {
             radius: 0.05,
             renderTicks: 30,
         },
+    },
+    "mirror": {
+        "health": 50,
+        "color": "#0cf",
+        "stroke": "#8cf",
+        "strokeWidth": 0.003,
+        "deadColor": "#48f",
+        "deadStroke": "#48f",
+        damageFrom: Categories.Massive,
+        mirror: {},
     },
 };
 

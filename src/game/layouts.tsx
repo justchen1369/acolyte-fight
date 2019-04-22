@@ -160,6 +160,7 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.1666667
             },
             {
+                type: "mirror",
                 "numObstacles": 5,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.1,

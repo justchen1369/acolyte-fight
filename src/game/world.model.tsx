@@ -383,6 +383,7 @@ export interface Obstacle extends WorldObjectBase {
 
 	collideWith: number;
 	expireOn: number;
+	damageFrom: number;
 
 	maxHealth: number;
 	health: number;
@@ -400,6 +401,7 @@ export interface Obstacle extends WorldObjectBase {
 	points: pl.Vec2[];
 
 	detonate?: DetonateParameters;
+	mirror?: MirrorParameters;
 
 	damagedTick?: number;
 	lavaTick?: number;
