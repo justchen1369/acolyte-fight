@@ -11,7 +11,7 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0
             },
             {
-                "numObstacles": 6,
+                "numObstacles": 3,
                 "layoutRadius": 0.34,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
