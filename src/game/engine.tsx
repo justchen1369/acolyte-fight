@@ -5,6 +5,7 @@ import * as Immutable from 'immutable';
 import * as arrayUtils from '../utils/arrayUtils';
 import * as colorWheel from './colorWheel';
 import * as constants from './constants';
+import * as shapes from './shapes';
 import * as vector from './vector';
 import * as w from './world.model';
 import { modToSettings } from './modder';
@@ -129,16 +130,7 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function instantiateShape(shape: ShapeTemplate): pl.Vec2[] {
-	const points = new Array<pl.Vec2>();
-	for (let i = 0; i < shape.numPoints; ++i) {
-		const point = vector.multiply(vector.fromAngle((i / shape.numPoints) * (2 * Math.PI)), shape.extent);
-		points.push(point);
-	}
-	return points;
-}
-
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: pl.Vec2[], layout: ObstacleLayout) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: shapes.Shape, layout: ObstacleLayout) {
 	const Obstacle = world.settings.Obstacle;
 	const template = world.settings.ObstacleTemplates[layout.type || "default"];
 
@@ -154,7 +146,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 
 	const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 
-	body.createFixture(pl.Polygon(points), {
+	body.createFixture(shapes.shapeToPlanck(shape), {
 		density: template.density || Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: collideWith,
@@ -177,8 +169,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, points: p
 		deadStroke: template.deadStroke,
 		strokeWidth: template.strokeWidth,
 
-		extent: layout.extent,
-		points,
+		shape,
 
 		health,
 		maxHealth: health,
@@ -985,7 +976,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 
 function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const points = instantiateShape(template);
+	const shape = instantiateShape(template);
 
 	for (let i = 0; i < template.numObstacles; ++i) {
 		const proportion = i / template.numObstacles;
@@ -995,9 +986,34 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 		const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), template.layoutRadius));
 
 		const angle = baseAngle + layoutAngleOffset + orientationAngleOffset;
-		addObstacle(world, position, angle, points, template);
+		addObstacle(world, position, angle, shape, template);
 	}
 }
+
+function instantiateShape(layout: ObstacleLayout): shapes.Shape {
+	if (layout.angularWidthInRevs) {
+		const adjacentAngle = Math.PI * layout.angularWidthInRevs;
+		const hypotonuseMultiplier = 1 / Math.cos(adjacentAngle);
+
+		const topLeft = vector.fromAngle(-adjacentAngle, hypotonuseMultiplier * (layout.layoutRadius + layout.extent));
+		const bottomLeft = vector.fromAngle(-adjacentAngle, hypotonuseMultiplier * (layout.layoutRadius - layout.extent));
+
+		const topRight = vector.fromAngle(adjacentAngle, hypotonuseMultiplier * (layout.layoutRadius + layout.extent));
+		const bottomRight = vector.fromAngle(adjacentAngle, hypotonuseMultiplier * (layout.layoutRadius - layout.extent));
+
+		const objCenter = vector.fromAngle(0, layout.layoutRadius);
+		const points = new Array<pl.Vec2>();
+		points.push(vector.diff(topLeft, objCenter));
+		points.push(vector.diff(topRight, objCenter));
+		points.push(vector.diff(bottomRight, objCenter));
+		points.push(vector.diff(bottomLeft, objCenter));
+
+		return shapes.createPolygon(points);
+	} else {
+		return shapes.createSymmetrical(layout.numPoints, layout.extent);
+	}
+}
+
 
 function instantiateSwatches(layout: SwatchLayout, world: w.World) {
 	const template = world.settings.Swatches[layout.type];
@@ -2574,12 +2590,12 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 	const outerDamagePacket = instantiateDamage({ ...detonate, damage: outerDamage }, owner, world); 
 
 	world.objects.forEach(other => {
-		if (!(other.category === "hero" || other.category === "obstacle" || other.category === "projectile")) {
+		if (!(other.category === "hero" || other.category === "projectile")) {
 			return;
 		}
 
 		const diff = vector.diff(other.body.getPosition(), epicenter);
-		const extent = getExtent(other);
+		const extent = other.radius;
 		const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
 		const distance = vector.length(diff);
@@ -2587,7 +2603,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			return;
 		}
 
-		if (other.category === "hero" || other.category === "obstacle") {
+		if (other.category === "hero") {
 			const proportion = 1.0 - (distance / explosionRadius);
 
 			const packet: w.DamagePacket = {
@@ -2595,15 +2611,11 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
 			};
 			let applyKnockback = false;
-			if (other.category === "hero") {
-				const alliance = calculateAlliance(owner, other.id, world);
-				if ((alliance & Alliances.NotFriendly) > 0) {
-					applyDamage(other, packet, world);
-					expireOnHeroHit(other, world);
-					applyKnockback = true;
-				}
-			} else {
-				applyDamageToObstacle(other, packet, world);
+
+			const alliance = calculateAlliance(owner, other.id, world);
+			if ((alliance & Alliances.NotFriendly) > 0) {
+				applyDamage(other, packet, world);
+				expireOnHeroHit(other, world);
 				applyKnockback = true;
 			}
 
@@ -2639,25 +2651,6 @@ function destructibleBy(projectile: w.Projectile, detonatorHeroId: string, world
 	}
 }
 
-function getExtent(obj: w.WorldObject) {
-	if (obj.category === "obstacle") {
-		return obj.extent;
-	} else if (obj.category === "hero" || obj.category === "projectile") {
-		return obj.radius;
-	} else if (obj.category === "shield") {
-		const shield = obj;
-		if (shield.type === "reflect") {
-			return shield.radius;
-		} else if (shield.type === "wall") {
-			return shield.extent;
-		} else {
-			return 0;
-		}
-	} else {
-		return 0;
-	}
-}
-
 function applyLavaDamage(world: w.World) {
 	const center = pl.Vec2(0.5, 0.5);
 
@@ -2686,7 +2679,7 @@ function applyLavaDamage(world: w.World) {
 				}
 			}
 		} else if (obj.category === "obstacle") {
-			if (!isInsideMap(obj.body.getPosition(), obj.extent, world)) {
+			if (!isInsideMap(obj.body.getPosition(), shapes.getMinExtent(obj.shape), world)) {
 				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
@@ -3365,14 +3358,18 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 
 	let hit = false
 	world.objects.forEach(obj => {
-		if (obj.id === hero.id || !(shouldCollide(saber, obj) || obj.category === "hero" || (obj.category === "projectile" && destructibleBy(obj, hero.id, world)))) {
+		if (obj.id === hero.id) {
 			return;
+		}
+		if (!(obj.category === "hero"
+			|| (obj.category === "projectile" && (shouldCollide(saber, obj) || destructibleBy(obj, hero.id, world))))) {
+				return;
 		}
 
 		const objPos = obj.body.getPosition();
 		const diff = vector.diff(objPos, heroPos);
 		const distance = vector.length(diff);
-		const extent = getExtent(obj);
+		const extent = obj.radius;
 		if (distance > saber.length + extent) {
 			return;
 		}

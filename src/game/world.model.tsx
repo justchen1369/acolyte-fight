@@ -1,6 +1,7 @@
 import moment from 'moment';
 import pl from 'planck-js';
 import * as Immutable from 'immutable';
+import * as shapes from './shapes';
 
 export namespace Actions {
 	export const Move = "move";
@@ -397,8 +398,7 @@ export interface Obstacle extends WorldObjectBase {
 	deadStroke: string;
 	strokeWidth: number;
 
-	extent: number;
-	points: pl.Vec2[];
+	shape: shapes.Shape;
 
 	detonate?: DetonateParameters;
 	mirror?: boolean;
@@ -407,6 +407,10 @@ export interface Obstacle extends WorldObjectBase {
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
+}
+
+export interface CircleShape {
+	radius: number;
 }
 
 export interface Hero extends WorldObjectBase {

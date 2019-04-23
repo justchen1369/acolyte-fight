@@ -43,7 +43,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     bumper: {
         "health": 50,
 
-        "strokeWidth": 0.008,
+        "strokeWidth": 0.004,
 
         "color": "#c94",
         "stroke": "#fc0",

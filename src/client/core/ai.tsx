@@ -201,8 +201,6 @@ function worldToState(world: w.World, myHeroId: string): WorldContract {
                 id: obj.id,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
-                extent: obj.extent,
-                numPoints: obj.points.length,
             };
         }
     });

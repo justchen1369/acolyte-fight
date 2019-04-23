@@ -96,20 +96,21 @@ declare interface Layout {
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
 }
 
-declare interface ShapeTemplate {
-	numPoints: number;
-	extent: number; // aka radius but for a polygon
-}
-
-declare interface ObstacleLayout extends ShapeTemplate {
+declare interface ObstacleLayout {
+	// Properties
 	type?: string;
+	health?: number;
 
+	// Layout
 	numObstacles: number;
 	layoutRadius: number;
 	layoutAngleOffsetInRevs: number;
-	orientationAngleOffsetInRevs?: number;
 
-	health?: number;
+	// Individual obstacle
+	numPoints: number;
+	extent: number; // aka radius but for a polygon
+	orientationAngleOffsetInRevs?: number;
+	angularWidthInRevs?: number;
 }
 
 declare interface SwatchLayout {
@@ -886,8 +887,6 @@ declare interface CooldownsRemainingContract {
 }
 
 declare interface ObstacleContract extends WorldObjectContract {
-	extent: number;
-	numPoints: number;
 }
 
 declare interface ActionContract {

@@ -68,16 +68,20 @@ export function angle(vec: pl.Vec2) {
 	return Math.atan2(vec.y, vec.x);
 }
 
-export function fromAngle(angle: number) {
-	return pl.Vec2(Math.cos(angle), Math.sin(angle));
+export function fromAngle(angle: number, radius: number = 1) {
+	return pl.Vec2(radius * Math.cos(angle), radius * Math.sin(angle));
 }
 
 export function negate(vec: pl.Vec2) {
 	return pl.Vec2(-vec.x, -vec.y);
 }
 
-export function rotateRight(vec: pl.Vec2) {
+export function rotateLeft(vec: pl.Vec2) {
 	return pl.Vec2(vec.y, -vec.x);
+}
+
+export function rotateRight(vec: pl.Vec2) {
+	return pl.Vec2(-vec.y, vec.x);
 }
 
 export function dot(a: pl.Vec2, b: pl.Vec2) {
@@ -139,7 +143,7 @@ export function average(points: pl.Vec2[]) {
 }
 
 export function insideLine(obj: pl.Vec2, objSize: number, lineStart: pl.Vec2, lineEnd: pl.Vec2, antiClockwise: boolean = true) {
-	let outside = rotateRight(unit(diff(lineEnd, lineStart)));
+	let outside = rotateLeft(unit(diff(lineEnd, lineStart)));
 	if (!antiClockwise) {
 		outside = negate(outside);
 	}

@@ -6,6 +6,7 @@ import * as engine from '../../game/engine';
 import * as glx from './glx';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
+import * as shapes from '../../game/shapes';
 import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
@@ -289,7 +290,7 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 		initialTick: world.tick,
 		pos: obstacle.body.getPosition(),
 		fillStyle: 'white',
-		radius: obstacle.extent,
+		radius: shapes.getMinExtent(obstacle.shape),
 	}, world);
 }
 
@@ -660,22 +661,27 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		// "Grow in" animation
 		scale *= (world.tick - obstacle.createTick) / obstacle.growthTicks;
 	}
+
+	let shape = obstacle.shape;
 	if (flash > 0) {
 		// Hit animation
-		const growFactor = obstacle.strokeWidth / obstacle.extent; // Grow by the strokeWidth
-		scale *= 1 + growFactor * flash;
+		shape = shapes.grow(shape, flash * obstacle.strokeWidth);
 	}
 
-	const strokeProportion = 1 - Math.min(1, obstacle.strokeWidth / obstacle.extent);
+	if (shape.type === "symmetrical" || shape.type === "polygon") {
+		glx.convex(ctxStack, pos, shape.points, body.getAngle(), scale, {
+			color: strokeStyle,
+			maxRadius: 1,
+		});
+	}
 
-	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale, {
-		color: strokeStyle,
-		maxRadius: 1,
-	});
-	glx.convex(ctxStack, pos, obstacle.points, body.getAngle(), scale * strokeProportion, {
-		color,
-		maxRadius: 1,
-	});
+	const strokeShape = shapes.grow(shape, -obstacle.strokeWidth);
+	if (strokeShape.type === "symmetrical" || strokeShape.type === "polygon") {
+		glx.convex(ctxStack, pos, strokeShape.points, body.getAngle(), scale, {
+			color,
+			maxRadius: 1,
+		});
+	}
 }
 
 function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {

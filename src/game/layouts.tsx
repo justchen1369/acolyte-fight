@@ -163,13 +163,14 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.1666667
             },
             {
-                type: "bumper",
+                "type": "bumper",
                 "numObstacles": 5,
-                "layoutRadius": 0.15,
+                "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 4,
                 "extent": 0.01,
-                "orientationAngleOffsetInRevs": 0.125
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.04
             }
         ],
         "numPoints": 5

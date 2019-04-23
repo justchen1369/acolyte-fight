@@ -131,7 +131,7 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
 
 export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fill: r.Fill) {
 	const extent = calculateExtent(ctxStack, fill);
-	const down = vector.relengthen(vector.rotateRight(vector.diff(to, from)), extent);
+	const down = vector.relengthen(vector.rotateLeft(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
 
 	appendTrail(ctxStack, from, up, fill);
