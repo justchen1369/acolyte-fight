@@ -80,8 +80,6 @@ export namespace HeroColors {
 	export const HighlightFactor = 0.01;
 	export const HighlightTicks = 10;
 
-	export const SwatchFlashTicks = 15;
-
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';
@@ -121,7 +119,8 @@ export namespace HeroColors {
 	export const ShieldGrowFactor = 0.05;
 	export const ShieldFlashTicks = 3;
 
-	export const ObstacleFlashTicks = 6;
+	export const ObstacleGrowTicks = 6;
+	export const ObstacleFlashTicks = 15;
 
 	export const RangeIndicatorWidth = Pixel * 2;
 };

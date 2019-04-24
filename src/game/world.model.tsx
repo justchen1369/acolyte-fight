@@ -47,7 +47,6 @@ export interface World {
 	winTick?: number;
 
 	objects: Map<string, WorldObject>,
-	swatches: Map<string, Swatch>;
 	behaviours: Behaviour[],
 
 	physics: pl.World;
@@ -104,7 +103,6 @@ export interface UIState {
 	sentSnapshotTick: number;
 
 	destroyed: WorldObject[];
-	destroyedSwatches: Swatch[];
 	events: WorldEvent[];
 	shakes: Shake[];
 	highlights: MapHighlight[];
@@ -355,33 +353,11 @@ export interface WorldObjectBase {
 	blocksTeleporters?: boolean;
 }
 
-export interface Swatch extends HitSource {
-	id: string;
+export interface Obstacle extends WorldObjectBase, HitSource {
+	category: "obstacle";
 	type: string;
 
-	fill: SwatchFill[];
-	smoke: SwatchSmoke[];
-
-	center: pl.Vec2;
-	minRadius: number;
-	maxRadius: number;
-	fromAngle: number;
-	angularWidth: number;
-
-	buffs: BuffTemplate[];
-	damage: number;
-
-	health: number;
-	maxHealth: number;
-
-	destroyedTick?: number;
-
-	uiHighlight?: TrailHighlight;
-}
-
-export interface Obstacle extends WorldObjectBase {
-	category: "obstacle";
-
+	sensor: boolean;
 	collideWith: number;
 	expireOn: number;
 	damageFrom: number;
@@ -390,16 +366,12 @@ export interface Obstacle extends WorldObjectBase {
 	health: number;
 
 	createTick: number;
-	growthTicks: number;
-
-	color: string;
-	stroke: string;
-	deadColor: string;
-	deadStroke: string;
-	strokeWidth: number;
+	destroyedTick?: number;
 
 	shape: shapes.Shape;
 
+	damage: number;
+	buffs: BuffTemplate[];
 	detonate?: DetonateParameters;
 	mirror?: boolean;
 	impulse: number;
@@ -407,6 +379,11 @@ export interface Obstacle extends WorldObjectBase {
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
+
+	fill: SwatchFill[];
+	smoke: SwatchSmoke[];
+
+	uiHighlight?: TrailHighlight;
 }
 
 export interface CircleShape {

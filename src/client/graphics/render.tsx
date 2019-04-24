@@ -137,7 +137,6 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	playSounds(world, options);
 
 	world.ui.destroyed = [];
-	world.ui.destroyedSwatches = [];
 	world.ui.events = [];
 	world.ui.sounds = [];
 
@@ -166,13 +165,21 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 		renderTargetingIndicator(ctxStack, world);
 	}
 
-	world.swatches.forEach(obj => renderSwatch(ctxStack, obj, world, options));
-	world.ui.destroyedSwatches.forEach(obj => renderSwatchDestroyed(ctxStack, obj, world, options));
+	world.objects.forEach(obj => {
+		if (obj.category === "obstacle") {
+			renderObject(ctxStack, obj, world, options)
+		}
+	});
 
 	world.ui.underlays = renderTrails(ctxStack, world.ui.underlays, world);
 
-	world.objects.forEach(obj => renderObject(ctxStack, obj, world, options));
-	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world));
+	world.objects.forEach(obj => {
+		if (obj.category !== "obstacle") {
+			renderObject(ctxStack, obj, world, options)
+		}
+	});
+
+	world.ui.destroyed.forEach(obj => renderDestroyed(ctxStack, obj, world, options));
 	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
 	world.ui.trails = renderTrails(ctxStack, world.ui.trails, world);
@@ -238,7 +245,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 	}
 }
 
-function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World) {
+function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
 	if (world.tick - obj.destroyedTick >= MaxDestroyedTicks) {
 		// Don't render, too old
 	} else if (obj.category === "hero") {
@@ -247,7 +254,7 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 		renderSpell(ctxStack, obj, world);
 		playSpellSounds(obj, world);
 	} else if (obj.category === "obstacle") {
-		renderObstacleDestroyed(ctxStack, obj, world);
+		renderObstacleDestroyed(ctxStack, obj, world, options);
 	}
 }
 
@@ -282,17 +289,36 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 	});
 }
 
-function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World) {
-	const ticks = 15;
-	pushTrail({
-		type: "circle",
-		max: ticks,
-		initialTick: world.tick,
-		pos: obstacle.body.getPosition(),
-		fillStyle: 'white',
-		radius: shapes.getMinExtent(obstacle.shape),
-	}, world);
+function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
+	if (options.rtx <= r.GraphicsLevel.Minimum) {
+		return;
+	}
+
+	const NumParticles = 10;
+	const ExplodeSpeed = 0.1;
+
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	const particleRadius = shapes.getMinExtent(obstacle.shape);
+
+	for (let i = 0; i < NumParticles; ++i) {
+		const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+		const edgeOffset = vector.diff(pos, mapCenter);
+
+		const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
+		underlay({
+			tag: obstacle.id,
+			type: "circle",
+			pos,
+			velocity,
+			radius: particleRadius,
+			initialTick: world.tick,
+			max: 30,
+			fillStyle: '#fff',
+			fade: 'rgba(0, 0, 0, 0)',
+		}, world);
+	}
 }
+
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	obj.uiPath.push(vector.clone(obj.body.getPosition()));
@@ -632,209 +658,170 @@ function takeHighlights(world: w.World): w.MapHighlight {
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
-	if (obstacle.destroyedTick) {
-		return;
+	calculateObstacleHighlight(obstacle, world);
+	obstacle.fill.forEach(fill => renderObstacleFill(ctxStack, obstacle, fill, world, options));
+	obstacle.smoke.forEach(smoke => renderObstacleSmoke(ctxStack, obstacle, smoke, world, options));
+}
+
+function renderObstacleFill(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
+	if (fill.type === "fill") {
+		renderObstacleSolid(ctxStack, obstacle, fill, world, options);
+	} else if (fill.type === "axialPulse") {
+		renderObstaclePulse(ctxStack, obstacle, fill, world, options);
 	}
+}
 
-	const body = obstacle.body;
-	const pos = body.getPosition();
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchSolidFill, world: w.World, options: RenderOptions) {
+	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
+	const grow = Math.max(0, (1 - hitAge / HeroColors.ObstacleGrowTicks));
+	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+	const fade = 1 - obstacle.health / obstacle.maxHealth;
 
-	let color = parseColor(obstacle.color);
-	let strokeStyle = parseColor(obstacle.stroke);
+	let color = parseColor(fill.color);
 
 	const proportion = obstacle.health / obstacle.maxHealth;
 	if (proportion < 1) {
-		color = color.mix(parseColor(obstacle.deadColor), 1 - proportion);
-		strokeStyle = strokeStyle.mix(parseColor(obstacle.deadStroke), 1 - proportion);
+		color = color.mix(parseColor(fill.deadColor), 1 - proportion);
 	}
 
-	const hitAge = obstacle.hitTick ? world.tick - obstacle.hitTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+	if (fill.flash) {
+		if (flash > 0) {
+			color = color.lighten(flash);
+		}
 
-	if (flash > 0) {
-		color = color.lighten(flash);
+		if (fade > 0) {
+			color = color.lighten(fade);
+		}
 	}
 
+	const pos = obstacle.body.getPosition();
+	const angle = obstacle.body.getAngle();
 
-	let scale = 1;
-	if (world.tick - obstacle.createTick < obstacle.growthTicks) {
-		// "Grow in" animation
-		scale *= (world.tick - obstacle.createTick) / obstacle.growthTicks;
-	}
+	const shape = obstacle.shape;
+	if (shape.type === "polygon" || shape.type === "symmetrical") {
+		let drawShape = shape;
+		if (grow > 0) {
+			// Hit animation
+			const HitExpansion = 0.005;
+			drawShape = shapes.grow(drawShape, grow * HitExpansion) as shapes.Polygon;
+		}
+		if (fill.expand) {
+			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
+		}
 
-	let shape = obstacle.shape;
-	if (flash > 0) {
-		// Hit animation
-		shape = shapes.grow(shape, flash * obstacle.strokeWidth);
-	}
-
-	if (shape.type === "symmetrical" || shape.type === "polygon") {
-		glx.convex(ctxStack, pos, shape.points, body.getAngle(), scale, {
-			color: strokeStyle,
-			maxRadius: 1,
-		});
-	}
-
-	const strokeShape = shapes.grow(shape, -obstacle.strokeWidth);
-	if (strokeShape.type === "symmetrical" || strokeShape.type === "polygon") {
-		glx.convex(ctxStack, pos, strokeShape.points, body.getAngle(), scale, {
+		const scale = 1;
+		glx.convex(ctxStack, pos, drawShape.points, angle, scale, {
 			color,
 			maxRadius: 1,
 		});
-	}
-}
+	} else if (shape.type === "arc") {
+		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
 
-function renderSwatch(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
-	const highlight = renderSwatchHighlight(swatch, world);
-	const hitAge = highlight ? world.tick - highlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.SwatchFlashTicks));
-	const fade = 1 - swatch.health / swatch.maxHealth;
-
-	const fromAngle = swatch.fromAngle;
-	const toAngle = swatch.fromAngle + swatch.angularWidth;
-
-	swatch.fill.forEach(fill => {
-		if (fill.type === "fill") {
-			let color = parseColor(fill.color);
-
-			if (fill.flash) {
-				if (flash > 0) {
-					color = color.lighten(flash);
-				}
-
-				if (fade > 0) {
-					color = color.lighten(fade);
-				}
-			}
-
-			glx.arc(ctxStack, swatch.center, fromAngle, toAngle, false, {
-				color,
-				minRadius: swatch.minRadius,
-				maxRadius: swatch.maxRadius,
-				feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
-					sigma: HeroColors.GlowRadius,
-					alpha: fill.glow,
-				} : null,
-			});
-		} else if (fill.type === "axialPulse") {
-			const swatchWidth = swatch.maxRadius - swatch.minRadius;
-			const interval = swatchWidth / (fill.speed / constants.TicksPerSecond);
-
-			let proportion = (world.tick % interval) / interval;
-			if (fill.inwards) {
-				proportion = 1 - proportion;
-			}
-
-			const minRadius = swatch.minRadius + swatchWidth * proportion;
-			const maxRadius = Math.min(swatch.maxRadius, minRadius + fill.pulseWidth);
-
-			let color = parseColor(fill.fromColor).mix(parseColor(fill.toColor), proportion);
-			glx.arc(ctxStack, swatch.center, fromAngle, toAngle, false, {
-				color,
-				minRadius,
-				maxRadius,
-				feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
-					sigma: HeroColors.GlowRadius,
-					alpha: fill.glow,
-				} : null,
-			});
-		}
-	});
-
-	if (options.rtx > r.GraphicsLevel.Minimum) {
-		swatch.smoke.forEach(smoke => {
-			if (smoke.interval && (world.tick % smoke.interval) !== 0) {
-				return;
-			}
-
-			const radius = (swatch.minRadius + swatch.maxRadius) / 2;
-			const edgeOffset = randomArcPoint(fromAngle, swatch.angularWidth, radius);
-			const pos = vector.plus(swatch.center, edgeOffset);
-
-			const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
-			underlay({
-				tag: swatch.id,
-				type: "circle",
-				pos,
-				velocity,
-				radius: (swatch.maxRadius - swatch.minRadius) / 2,
-				initialTick: world.tick,
-				max: smoke.ticks,
-				fillStyle: smoke.color,
-				fade: smoke.fade,
-				highlight,
-			}, world);
+		const fromAngle = angle - shape.angularExtent;
+		const toAngle = angle + shape.angularExtent;
+		glx.arc(ctxStack, center, fromAngle, toAngle, false, {
+			color,
+			minRadius: shape.radius - shape.radialExtent,
+			maxRadius: shape.radius + shape.radialExtent,
+			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
+				sigma: HeroColors.GlowRadius,
+				alpha: fill.glow,
+			} : null,
 		});
 	}
 }
 
-function renderSwatchDestroyed(ctxStack: CanvasCtxStack, swatch: w.Swatch, world: w.World, options: RenderOptions) {
-	const ParticleAngularInterval = 0.02 * 2 * Math.PI;
-	const ExplodeSpeed = 0.1;
+function renderObstaclePulse(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchAxialPulse, world: w.World, options: RenderOptions) {
+	const pos = obstacle.body.getPosition();
+	const angle = obstacle.body.getAngle();
 
-	if (options.rtx > r.GraphicsLevel.Minimum) {
-		const numParticles = Math.ceil(swatch.angularWidth / ParticleAngularInterval);
-		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
+	const shape = obstacle.shape;
 
-		for (let i = 0; i < numParticles; ++i) {
-			const edgeOffset = randomArcPoint(swatch.fromAngle, swatch.angularWidth, radius);
-			const pos = vector.plus(swatch.center, edgeOffset);
+	if (shape.type === "arc") {
+		const fromAngle = angle - shape.angularExtent;
+		const toAngle = angle + shape.angularExtent;
+		const minRadius = shape.radius - shape.radialExtent;
+		const maxRadius = shape.radius + shape.radialExtent;
+		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
 
-			const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
-			underlay({
-				tag: swatch.id,
-				type: "circle",
-				pos,
-				velocity,
-				radius: (swatch.maxRadius - swatch.minRadius) / 2,
-				initialTick: world.tick,
-				max: 30,
-				fillStyle: '#fff',
-				fade: 'rgba(0, 0, 0, 0)',
-			}, world);
+		const swatchWidth = 2 * shape.radialExtent;
+		const interval = swatchWidth / (fill.speed / constants.TicksPerSecond);
+
+		let proportion = (world.tick % interval) / interval;
+		if (fill.inwards) {
+			proportion = 1 - proportion;
 		}
+
+		const drawMinRadius = minRadius + swatchWidth * proportion;
+		const drawMaxRadius = Math.min(maxRadius, minRadius + fill.pulseWidth);
+
+		let color = parseColor(fill.fromColor).mix(parseColor(fill.toColor), proportion);
+		glx.arc(ctxStack, center, fromAngle, toAngle, false, {
+			color,
+			minRadius: drawMinRadius,
+			maxRadius: drawMaxRadius,
+			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
+				sigma: HeroColors.GlowRadius,
+				alpha: fill.glow,
+			} : null,
+		});
 	}
 }
 
-function renderSwatchHighlight(swatch: w.Swatch, world: w.World): w.TrailHighlight {
-	if (!swatch.hitTick) {
-		return swatch.uiHighlight;
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
+	if (options.rtx <= r.GraphicsLevel.Minimum) {
+		return;
 	}
 
-	const highlightTick = swatch.uiHighlight ? swatch.uiHighlight.fromTick : 0;
-	if (swatch.hitTick <= highlightTick) {
-		return swatch.uiHighlight;
+	if (smoke.interval && (world.tick % smoke.interval) !== 0) {
+		return;
+	}
+
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	const particleRadius = shapes.getMinExtent(obstacle.shape);
+
+	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+	const edgeOffset = vector.diff(pos, mapCenter);
+
+	const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
+	underlay({
+		tag: obstacle.id,
+		type: "circle",
+		pos,
+		velocity,
+		radius: particleRadius,
+		initialTick: world.tick,
+		max: smoke.ticks,
+		fillStyle: smoke.color,
+		fade: smoke.fade,
+		highlight: obstacle.uiHighlight,
+	}, world);
+}
+
+function calculateObstacleHighlight(obstacle: w.Obstacle, world: w.World): w.TrailHighlight {
+	if (!obstacle.damagedTick) {
+		return obstacle.uiHighlight;
+	}
+
+	const highlightTick = obstacle.uiHighlight ? obstacle.uiHighlight.fromTick : 0;
+	if (obstacle.damagedTick <= highlightTick) {
+		return obstacle.uiHighlight;
 	}
 
 	// Highlight
 	const highlight: w.TrailHighlight = {
-		fromTick: swatch.hitTick,
-		maxTicks: HeroColors.SwatchFlashTicks,
+		fromTick: obstacle.damagedTick,
+		maxTicks: HeroColors.ObstacleFlashTicks,
 		glow: true,
 	};
-	swatch.uiHighlight = highlight;
+	obstacle.uiHighlight = highlight;
 	world.ui.underlays.forEach(trail => {
-		if (trail.tag === swatch.id) {
+		if (trail.tag === obstacle.id) {
 			trail.highlight = highlight;
 		}
 	});
 
-	return swatch.uiHighlight;
-}
-
-function randomArcPoint(fromAngle: number, angularWidth: number, radius: number): pl.Vec2 {
-	const angle = fromAngle + Math.random() * angularWidth;
-	return vector.multiply(vector.fromAngle(angle), radius);
-}
-
-function randomEdgePoint(angle: number, points: pl.Vec2[]) {
-	const seed = Math.random() * points.length;
-	const before = Math.floor(seed);
-	const after = Math.ceil(seed) % points.length;
-	const alpha = seed - before;
-
-	const point = vector.plus(vector.multiply(points[before], 1 - alpha), vector.multiply(points[after], alpha));
-	return vector.turnVectorBy(point, angle);
+	return obstacle.uiHighlight;
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {

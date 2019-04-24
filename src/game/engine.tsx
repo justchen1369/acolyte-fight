@@ -78,7 +78,6 @@ export function initialWorld(mod: Object): w.World {
 		winners: null,
 
 		objects: new Map(),
-		swatches: new Map(),
 		behaviours: [],
 		physics: pl.World(def),
 		actions: new Map(),
@@ -104,7 +103,6 @@ export function initialWorld(mod: Object): w.World {
 			sentSnapshotTick: 0,
 			playedTick: -1,
 			destroyed: [],
-			destroyedSwatches: [],
 			shakes: [],
 			highlights: [],
 			events: new Array<w.WorldEvent>(),
@@ -144,30 +142,31 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		angularDamping: template.angularDamping || Obstacle.AngularDamping,
 	});
 
+	const sensor = template.sensor || false;
 	const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 
 	body.createFixture(shapes.shapeToPlanck(shape), {
 		density: template.density || Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: collideWith,
+		isSensor: sensor,
 	});
 
 	const health = layout.health || template.health;
 	const obstacle: w.Obstacle = {
 		id: obstacleId,
+		type: layout.type,
 		category: "obstacle",
 		categories: Categories.Obstacle,
 		body,
 
+		sensor,
 		collideWith,
 		expireOn: template.expireOn || Categories.None,
 		damageFrom: template.damageFrom !== undefined ? template.damageFrom : Categories.All,
 
-		color: template.color,
-		stroke: template.stroke,
-		deadColor: template.deadColor,
-		deadStroke: template.deadStroke,
-		strokeWidth: template.strokeWidth,
+		fill: template.fill || [],
+		smoke: template.smoke || [],
 
 		shape,
 
@@ -175,11 +174,15 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		maxHealth: health,
 
 		createTick: world.tick,
-		growthTicks: 0,
 
+		damage: template.damage || 0,
+		buffs: template.buffs || [],
 		detonate: template.detonate,
 		mirror: template.mirror,
 		impulse: template.impulse || 0,
+
+		hitInterval: template.hitInterval || 1,
+		hitTickLookup: new Map<string, number>(),
 	};
 
 	// Obstacles start immovable
@@ -196,35 +199,6 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 
 	world.objects.set(obstacle.id, obstacle);
 	return obstacle;
-}
-
-function addSwatch(world: w.World, center: pl.Vec2, minRadius: number, maxRadius: number, fromAngle: number, angularWidth: number, template: SwatchTemplate) {
-	const swatchId = "swatch" + (world.nextObjectId++);
-	const swatch: w.Swatch = {
-		id: swatchId,
-		type: template.id,
-
-		center,
-		minRadius,
-		maxRadius,
-		fromAngle,
-		angularWidth,
-
-		fill: template.fill || [],
-		smoke: template.smoke || [],
-
-		buffs: template.buffs || [],
-		damage: template.damage || 0,
-
-		hitInterval: template.hitInterval || 1,
-		hitTickLookup: new Map<string, number>(),
-
-		health: world.settings.World.SwatchHealth,
-		maxHealth: world.settings.World.SwatchHealth,
-	};
-	world.swatches.set(swatch.id, swatch);
-
-	return swatch;
 }
 
 function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
@@ -775,7 +749,6 @@ export function tick(world: w.World) {
 	});
 
 	applyLavaDamage(world);
-	applySwatches(world);
 	shrink(world);
 
 	reap(world);
@@ -968,10 +941,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	}
 
 	layout.obstacles.forEach(obstacleTemplate => instantiateObstacles(obstacleTemplate, world));
-
-	if (layout.swatches) {
-		layout.swatches.forEach(swatchLayout => instantiateSwatches(swatchLayout, world));
-	}
 }
 
 function instantiateObstacles(template: ObstacleLayout, world: w.World) {
@@ -981,8 +950,8 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 	for (let i = 0; i < template.numObstacles; ++i) {
 		const proportion = i / template.numObstacles;
 		const baseAngle = proportion * (2 * Math.PI);
-		const layoutAngleOffset = template.layoutAngleOffsetInRevs * 2 * Math.PI;
-		const orientationAngleOffset = template.orientationAngleOffsetInRevs * 2 * Math.PI;
+		const layoutAngleOffset = (template.layoutAngleOffsetInRevs || 0) * 2 * Math.PI;
+		const orientationAngleOffset = (template.orientationAngleOffsetInRevs || 0) * 2 * Math.PI;
 		const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), template.layoutRadius));
 
 		const angle = baseAngle + layoutAngleOffset + orientationAngleOffset;
@@ -991,7 +960,12 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 }
 
 function instantiateShape(layout: ObstacleLayout): shapes.Shape {
-	if (layout.angularWidthInRevs) {
+	if (!layout.numPoints && layout.angularWidthInRevs) {
+		// Arc
+		const angularWidth = 2 * Math.PI * layout.angularWidthInRevs;
+		return shapes.createArc(layout.layoutRadius, layout.extent, angularWidth / 2);
+	} else if (layout.angularWidthInRevs) {
+		// Trapezoid
 		const adjacentAngle = Math.PI * layout.angularWidthInRevs;
 		const hypotonuseMultiplier = 1 / Math.cos(adjacentAngle);
 
@@ -1010,20 +984,8 @@ function instantiateShape(layout: ObstacleLayout): shapes.Shape {
 
 		return shapes.createPolygon(points);
 	} else {
+		// Radial polygon
 		return shapes.createSymmetrical(layout.numPoints, layout.extent);
-	}
-}
-
-
-function instantiateSwatches(layout: SwatchLayout, world: w.World) {
-	const template = world.settings.Swatches[layout.type];
-
-	const center = pl.Vec2(0.5, 0.5);
-
-	for (let i = 0; i < layout.numSwatches; ++i) {
-		const fromAngle = 2 * Math.PI * ((i / layout.numSwatches) + layout.angularOffsetInRevs - layout.angularWidthInRevs / 2);
-		const angularWidth = 2 * Math.PI * layout.angularWidthInRevs;
-		addSwatch(world, center, layout.minRadius, layout.maxRadius, fromAngle, angularWidth, template);
 	}
 }
 
@@ -1684,7 +1646,9 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "projectile") {
 			handleProjectileHitProjectile(world, object, hit);
 		} else if (hit.category === "obstacle") {
-			handleProjectileHitObstacle(world, object, hit);
+			if (recheckObstacleHit(hit, object.body.getPosition(), object.radius)) {
+				handleProjectileHitObstacle(world, object, hit);
+			}
 		} else if (hit.category === "shield") {
 			handleProjectileHitShield(world, object, hit);
 		}
@@ -1694,13 +1658,19 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "projectile") {
 			handleHeroHitProjectile(world, object, hit);
 		} else if (hit.category === "obstacle") {
-			handleHeroHitObstacle(world, object, hit);
+			if (recheckObstacleHit(hit, object.body.getPosition(), object.radius)) {
+				handleHeroHitObstacle(world, object, hit);
+			}
 		} else if (hit.category === "shield") {
 			handleHeroHitShield(world, object, hit);
 		}
 	} else if (object.category === "obstacle") {
 		handleObstacleHit(world, object, hit);
 	}
+}
+
+function recheckObstacleHit(obstacle: w.Obstacle, target: pl.Vec2, targetRadius: number) {
+	return shapes.isConvex(obstacle.shape) || shapes.inside(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), target, targetRadius);
 }
 
 function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObject) {
@@ -1763,7 +1733,29 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 	if (obstacle.impulse) {
 		const impulse = vector.relengthen(vector.diff(hero.body.getPosition(), obstacle.body.getPosition()), obstacle.impulse);
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
-		obstacle.hitTick = world.tick;
+		obstacle.damagedTick = world.tick;
+	}
+
+	if (takeHit(obstacle, obstacle.id, world)) {
+		if (obstacle.damage) {
+			const packet: w.DamagePacket = {
+				damage: obstacle.damage,
+				lifeSteal: 0,
+				fromHeroId: null,
+				isLava: true,
+			};
+			applyDamage(hero, packet, world);
+			obstacle.damagedTick = world.tick;
+		}
+
+		if (obstacle.buffs) {
+			obstacle.buffs.forEach(buff => {
+				// Same id for all buffs from swatches so cannot get two buffs standing on two swatches
+				const id = `swatch-${obstacle.type}-${buff.type}`;
+				instantiateBuff(id, buff, hero, world, {});
+			});
+			obstacle.damagedTick = world.tick;
+		}
 	}
 }
 
@@ -2684,15 +2676,6 @@ function applyLavaDamage(world: w.World) {
 			}
 		}
 	});
-
-	world.swatches.forEach(swatch => {
-		const angle = swatch.fromAngle + swatch.angularWidth / 2;
-		const radius = (swatch.minRadius + swatch.maxRadius) / 2;
-		const point = vector.plus(center, vector.multiply(vector.fromAngle(angle), radius));
-		if (!isInsideMap(point, 0, world)) {
-			applyDamageToSwatch(swatch, lavaDamagePerTick, world);
-		}
-	});
 }
 
 export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
@@ -2717,53 +2700,6 @@ export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 		return true;
 	} else {
 		return vector.length(diff) < polygonRadius - extent;
-	}
-}
-
-function applySwatches(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero") {
-			world.swatches.forEach(swatch => applySwatchToHero(swatch, hero, world));
-		}
-	});
-}
-
-function applySwatchToHero(swatch: w.Swatch, hero: w.Hero, world: w.World) {
-	const diff = vector.diff(hero.body.getPosition(), swatch.center);
-	const radius = vector.length(diff);
-
-	if (!(swatch.minRadius <= radius + hero.radius && radius - hero.radius <= swatch.maxRadius)) {
-		return;
-	}
-
-	const fromNormal = vector.fromAngle(swatch.fromAngle + Math.PI / 2);
-	if (vector.dot(diff, fromNormal) + hero.radius < 0) {
-		return;
-	}
-
-	const toNormal = vector.fromAngle(swatch.fromAngle + swatch.angularWidth - Math.PI / 2);
-	if (vector.dot(diff, toNormal) + hero.radius < 0) {
-		return;
-	}
-
-	if (takeHit(swatch, swatch.id, world)) {
-		if (swatch.damage) {
-			const packet: w.DamagePacket = {
-				damage: swatch.damage,
-				lifeSteal: 0,
-				fromHeroId: null,
-				isLava: true,
-			};
-			applyDamage(hero, packet, world);
-		}
-
-		if (swatch.buffs) {
-			swatch.buffs.forEach(buff => {
-				// Same id for all buffs from swatches so cannot get two buffs standing on two swatches
-				const id = `swatch-${swatch.type}-${buff.type}`;
-				instantiateBuff(id, buff, hero, world, {});
-			});
-		}
 	}
 }
 
@@ -2803,12 +2739,6 @@ function reap(world: w.World) {
 			if (world.tick >= obj.expireTick) {
 				destroyObject(world, obj);
 			}
-		}
-	});
-
-	world.swatches.forEach(swatch => {
-		if (swatch.health <= 0) {
-			destroySwatch(world, swatch);
 		}
 	});
 
@@ -2999,12 +2929,6 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 
 	object.destroyedTick = world.tick;
 	world.ui.destroyed.push(object);
-}
-
-function destroySwatch(world: w.World, swatch: w.Swatch) {
-	world.swatches.delete(swatch.id);
-	swatch.destroyedTick = world.tick;
-	world.ui.destroyedSwatches.push(swatch);
 }
 
 function calculateMovementProportion(hero: w.Hero, world: w.World): number {
@@ -3720,7 +3644,6 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 	if (packet.isLava) {
 		obstacle.lavaTick = world.tick;
 	} else {
-		obstacle.hitTick = world.tick;
 		obstacle.damagedTick = world.tick;
 	}
 
@@ -3729,10 +3652,6 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 		return;
 	}
 	obstacle.health = Math.max(0, obstacle.health - packet.damage);
-}
-
-function applyDamageToSwatch(swatch: w.Swatch, damage: number, world: w.World) {
-	swatch.health = Math.max(0, swatch.health - damage);
 }
 
 export function initScore(heroId: string): w.HeroScore {

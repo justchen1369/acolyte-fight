@@ -25,7 +25,6 @@ Collision category flags (categories, expireOn and collideWith):
 declare interface AcolyteFightSettings {
 	Mod: ModSettings;
 	Layouts: Layouts;
-	Swatches: SwatchTemplates;
     Hero: HeroSettings;
     World: WorldSettings;
 	Obstacle: ObstacleSettings;
@@ -90,7 +89,6 @@ declare interface Layouts {
 
 declare interface Layout {
 	obstacles: ObstacleLayout[];
-	swatches?: SwatchLayout[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
@@ -104,35 +102,13 @@ declare interface ObstacleLayout {
 	// Layout
 	numObstacles: number;
 	layoutRadius: number;
-	layoutAngleOffsetInRevs: number;
+	layoutAngleOffsetInRevs?: number;
 
 	// Individual obstacle
-	numPoints: number;
+	numPoints?: number; // Make this a rotationally-symmetric polygon, otherwise make this an arc
 	extent: number; // aka radius but for a polygon
-	orientationAngleOffsetInRevs?: number;
-	angularWidthInRevs?: number;
-}
-
-declare interface SwatchLayout {
-	type: string;
-	minRadius: number;
-	maxRadius: number;
-	numSwatches: number;
-	angularWidthInRevs: number;
-	angularOffsetInRevs: number;
-}
-
-declare interface SwatchTemplates {
-	[key: string]: SwatchTemplate;
-}
-
-declare interface SwatchTemplate {
-	id: string;
-	fill?: SwatchFill[];
-	smoke?: SwatchSmoke[];
-	hitInterval?: number; // How many ticks between reapplying the buffs
-	damage?: number;
-	buffs?: BuffTemplate[];
+	orientationAngleOffsetInRevs?: number; // Rotate the shape
+	angularWidthInRevs?: number; // Make this a trapezoid
 }
 
 declare type SwatchFill =
@@ -143,6 +119,9 @@ declare interface SwatchSolidFill {
 	type: "fill";
 
 	color: string;
+	deadColor?: string;
+
+	expand?: number;
 	glow?: number;
 	flash?: boolean;
 }
@@ -186,23 +165,24 @@ declare interface ObstacleTemplateLookup {
 }
 
 declare interface ObstacleTemplate {
-	color: string;
-	stroke: string;
-	strokeWidth: number;
+	fill?: SwatchFill[];
+	smoke?: SwatchSmoke[];
 
-	// Fade to these colors as the obstacle loses health
-	deadColor: string;
-	deadStroke: string;
-
+	static?: boolean;
 	angularDamping?: number;
 	linearDamping?: number;
 	density?: number;
 
+	sensor?: boolean;
 	collideWith?: number;
 	expireOn?: number;
 	damageFrom?: number;
 
 	health: number;
+
+	hitInterval?: number; // How many ticks between reapplying the buffs
+	damage?: number;
+	buffs?: BuffTemplate[];
 	detonate?: DetonateParameters;
 	mirror?: boolean;
 	impulse?: number;

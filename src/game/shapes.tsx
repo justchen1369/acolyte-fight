@@ -6,6 +6,7 @@ export type Shape =
     Circle
     | Symmetrical
     | Polygon
+    | Arc
 
 export interface Circle {
     type: "circle";
@@ -26,8 +27,27 @@ export interface Polygon {
     maxExtent: number;
 }
 
+export interface Arc {
+    type: "arc";
+    radius: number;
+    radialExtent: number;
+    angularExtent: number;
+    localCenter: pl.Vec2; // in local coordinates
+}
+
 export function createCircle(radius: number): Circle {
     return { type: "circle", radius };
+}
+
+export function createArc(radius: number, radialExtent: number, angularExtent: number): Arc {
+    const localCenter = vector.negate(vector.fromAngle(0, radius));
+    return {
+        type: "arc",
+        radius,
+        radialExtent,
+        angularExtent,
+        localCenter,
+    };
 }
 
 export function createSymmetrical(numPoints: number, extent: number): Symmetrical {
@@ -70,15 +90,7 @@ export function getMinExtent(shape: Shape) {
         case "circle": return shape.radius;
         case "symmetrical": return shape.extent;
         case "polygon": return shape.minExtent;
-        default: return 0;
-    }
-}
-
-export function getMaxExtent(shape: Shape) {
-    switch (shape.type) {
-        case "circle": return shape.radius;
-        case "symmetrical": return shape.extent;
-        case "polygon": return shape.maxExtent;
+        case "arc": return shape.radialExtent;
         default: return 0;
     }
 }
@@ -108,8 +120,49 @@ export function grow(shape: Shape, amount: number): Shape {
             minExtent: shape.minExtent + amount,
             maxExtent: shape.maxExtent + amount,
         };
+    } else if (shape.type === "arc") {
+        return {
+            type: "arc",
+            radius: shape.radius,
+            radialExtent: Math.max(0, shape.radialExtent + amount),
+            angularExtent: shape.angularExtent,
+            localCenter: shape.localCenter,
+        };
     } else {
         throw "Unknown shape type";
+    }
+}
+
+export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clearance: number = 0): pl.Vec2 {
+    if (shape.type === "circle") {
+        const localPoint = vector.fromAngle(Math.random() * 2 * Math.PI, Math.max(0, shape.radius - clearance));
+        return toWorldCoords(pos, angle, localPoint);
+
+    } else if (shape.type === "symmetrical" || shape.type === "polygon") {
+        const seed = Math.random() * shape.points.length;
+        const before = Math.floor(seed);
+        const after = Math.ceil(seed) % shape.points.length;
+        const alpha = seed - before;
+
+        let localPoint = vector.plus(vector.multiply(shape.points[before], 1 - alpha), vector.multiply(shape.points[after], alpha));
+
+        if (shape.type === "symmetrical") {
+            localPoint = vector.towards(localPoint, vector.zero(), clearance);
+        } else if (shape.type === "polygon") {
+            let normal = vector.plus(vector.multiply(shape.normals[before], 1 - alpha), vector.multiply(shape.normals[after], alpha));
+            localPoint = vector.plus(localPoint, vector.multiply(normal, -clearance));
+        }
+
+        return toWorldCoords(pos, angle, localPoint);
+
+    } else if (shape.type === "arc") {
+        const localAngle = (2 * Math.random() - 1) * shape.angularExtent;
+        const localRadius = shape.radius + (2 * Math.random() - 1) * Math.max(0, shape.radialExtent - clearance);
+        const localPoint = vector.plus(shape.localCenter, vector.fromAngle(localAngle, localRadius));
+        return toWorldCoords(pos, angle, localPoint);
+
+    } else {
+        return pos;
     }
 }
 
@@ -128,22 +181,24 @@ export function closestExtreme(shape: Shape, pos: pl.Vec2, angle: number, target
     }
 }
 
-export function inside(shape: Shape, pos: pl.Vec2, angle: number, target: pl.Vec2, targetRadius: number = 0) {
-    let worldPoint = target;
-    if (targetRadius > 0) {
-        worldPoint = vector.towards(target, pos, targetRadius);
+export function isConvex(shape: Shape): boolean {
+    switch(shape.type) {
+        case "arc": return false;
+        default: return true;
     }
-
-    const localPoint = toLocalCoords(pos, angle, worldPoint);
-    return insideLocal(shape, localPoint);
 }
 
-function insideLocal(shape: Shape, localPoint: pl.Vec2): boolean {
+export function inside(shape: Shape, pos: pl.Vec2, angle: number, target: pl.Vec2, targetRadius: number = 0) {
+    const localPoint = toLocalCoords(pos, angle, target);
+    return insideLocal(shape, localPoint, targetRadius);
+}
+
+function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): boolean {
     if (shape.type === "circle") {
-        return vector.length(localPoint) <= shape.radius;
+        return vector.length(localPoint) <= shape.radius + hitRadius;
     } else if (shape.type === "symmetrical") {
         // This is not 100% correct but close enough for our purposes
-        return vector.length(localPoint) <= shape.extent;
+        return vector.length(localPoint) <= shape.extent + hitRadius;
     } else if (shape.type === "polygon") {
         const length = vector.length(localPoint);
         if (length > shape.maxExtent) {
@@ -158,22 +213,40 @@ function insideLocal(shape: Shape, localPoint: pl.Vec2): boolean {
                 const outside = vector.rotateLeft(vector.unit(vector.diff(next, point)));
                 const distanceToEdge = vector.dot(point, outside);
                 const distanceToTarget = vector.dot(localPoint, outside);
-                if (distanceToTarget > distanceToEdge) {
+                if (distanceToTarget > distanceToEdge + hitRadius) {
                     return false;
                 }
             }
             return true;
         }
+    } else if (shape.type === "arc") {
+        const diff = vector.diff(localPoint, shape.localCenter);
+
+        if (Math.abs(vector.length(diff) - shape.radius) > shape.radialExtent + hitRadius) {
+            return false;
+        }
+
+        const fromNormal = vector.fromAngle(-shape.angularExtent + Math.PI / 2);
+        if (vector.dot(diff, fromNormal) + hitRadius < 0) {
+            return false;
+        }
+
+        const toNormal = vector.fromAngle(shape.angularExtent - Math.PI / 2);
+        if (vector.dot(diff, toNormal) + hitRadius < 0) {
+            return false;
+        }
+
+        return true;
     } else {
         return false;
     }
 }
 
-function toLocalCoords(pos: pl.Vec2, angle: number, worldPoint: pl.Vec2) {
+export function toLocalCoords(pos: pl.Vec2, angle: number, worldPoint: pl.Vec2) {
     return vector.turnVectorBy(vector.diff(worldPoint, pos), -angle);
 }
 
-function toWorldCoords(pos: pl.Vec2, angle: number, localPoint: pl.Vec2) {
+export function toWorldCoords(pos: pl.Vec2, angle: number, localPoint: pl.Vec2) {
     return vector.plus(pos, vector.turnVectorBy(localPoint, angle));
 }
 
@@ -182,6 +255,9 @@ export function shapeToPlanck(shape: Shape): pl.Shape {
         return pl.Circle(shape.radius);
     } else if (shape.type === "symmetrical" || shape.type === "polygon") {
         return pl.Polygon(shape.points);
+    } else if (shape.type === "arc") {
+        // TODO: Make more specific
+        return pl.Circle(shape.radius + shape.radialExtent);
     } else {
         throw "Unknown shape type";
     }

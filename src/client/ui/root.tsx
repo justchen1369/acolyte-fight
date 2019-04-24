@@ -27,7 +27,6 @@ import MapEditor from '../modding/mapEditor';
 import ObstacleEditor from '../modding/obstacleEditor';
 import SoundEditor from '../modding/soundEditor';
 import SpellEditor from '../modding/spellEditor';
-import SwatchEditor from '../modding/swatchEditor';
 import ConstantEditor from '../modding/constantEditor';
 
 interface Props {
@@ -87,7 +86,6 @@ class Root extends React.Component<Props> {
                 {page === "modding-icons" && <IconEditor />}
                 {page === "modding-sounds" && <SoundEditor />}
                 {page === "modding-maps" && <MapEditor />}
-                {page === "modding-swatches" && <SwatchEditor />}
                 {page === "modding-obstacles" && <ObstacleEditor />}
                 {page === "modding-constants" && <ConstantEditor />}
                 <UrlListener />

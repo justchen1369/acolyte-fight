@@ -4,7 +4,6 @@ import { Icons } from './icons';
 import { Layouts } from './layouts';
 import { ObstacleTemplates } from './obstacleTemplates';
 import { Sounds } from './sounds';
-import { Swatches } from './swatches';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
 const Hero: HeroSettings = {
@@ -1867,7 +1866,6 @@ export const DefaultSettings: AcolyteFightSettings = {
     Choices,
     Spells,
     Layouts,
-    Swatches,
     Sounds,
     Icons,
 };

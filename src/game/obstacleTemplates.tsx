@@ -1,25 +1,185 @@
 import { TicksPerSecond, Categories, Pixel, Alliances } from './constants';
 
+export const volcano: ObstacleTemplate = {
+    health: 50,
+
+    collideWith: Categories.Hero,
+    sensor: true,
+    static: true,
+
+    fill: [
+        {
+            type: "fill",
+            color: "rgba(255, 0, 128, 0.9)",
+            glow: 0.2,
+            flash: true,
+        },
+    ],
+    smoke: [{
+        color: "rgba(255, 0, 128, 1)",
+        fade: "rgba(0, 0, 0, 0)",
+        "ticks": 30,
+        "interval": 8,
+        "speed": 0.1
+    }],
+
+    hitInterval: 15,
+    damage: 5,
+}
+
+export const slow: ObstacleTemplate = {
+    health: 50,
+
+    collideWith: Categories.Hero,
+    sensor: true,
+    static: true,
+
+    fill: [
+        {
+            type: "fill",
+            "color": "rgba(64, 255, 255, 0.75)",
+            glow: 0.2,
+            flash: true,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: true,
+            speed: 0.05,
+            pulseWidth: 0.01,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: true,
+            speed: 0.03,
+            pulseWidth: 0.005,
+        },
+    ],
+    "smoke": [
+        {
+            "color": "rgba(64, 255, 255, 1)",
+            "fade": "rgba(0, 0, 0, 0)",
+            "ticks": 15,
+            "interval": 4,
+            "speed": 0.05
+        }
+    ],
+
+    hitInterval: 15,
+
+    buffs: [
+        {
+            type: "movement",
+            maxTicks: 15,
+            movementProportion: 0.67,
+            render: {
+                color: "rgba(64, 255, 255, 1)",
+                alpha: 0.3,
+                ticks: 15,
+                emissionRadiusFactor: 1,
+                particleRadius: 0.01,
+            },
+        },
+    ],
+}
+
+export const fast: ObstacleTemplate = {
+    health: 50,
+
+    collideWith: Categories.Hero,
+    sensor: true,
+    static: true,
+
+    fill: [
+        {
+            type: "fill",
+            "color": "rgba(255, 255, 64, 0.75)",
+            glow: 0.2,
+            flash: true,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: false,
+            speed: 0.05,
+            pulseWidth: 0.01,
+        },
+        {
+            type: "axialPulse",
+            "fromColor": "rgba(255, 255, 255, 0)",
+            "toColor": "rgba(255, 255, 255, 0.25)",
+            inwards: false,
+            speed: 0.03,
+            pulseWidth: 0.005,
+        },
+    ],
+    "smoke": [
+        {
+            "color": "rgba(255, 255, 64, 1)",
+            "fade": "rgba(0, 0, 0, 0)",
+            "ticks": 15,
+            "interval": 4,
+            "speed": 0.05
+        }
+    ],
+
+    hitInterval: 15,
+
+    buffs: [
+        {
+            type: "movement",
+            maxTicks: 15,
+            movementProportion: 1.33,
+            render: {
+                color: "rgba(255, 255, 255, 1)",
+                heroColor: true,
+                alpha: 0.3,
+                ticks: 30,
+                emissionRadiusFactor: 0,
+                particleRadius: 0.0125,
+            },
+        },
+    ],
+}
+
 export const ObstacleTemplates: ObstacleTemplateLookup = {
     default: {
         health: 50,
 
-        color: '#888',
-        stroke: '#ccc',
-        strokeWidth: 0.005,
-
-        deadColor: '#822',
-        deadStroke: '#c33',
+        fill: [
+            {
+                type: "fill",
+                color: '#ccc',
+                deadColor: '#c33',
+            },
+            {
+                type: "fill",
+                color: '#888',
+                deadColor: '#822',
+                expand: -0.005,
+            },
+        ],
     },
     explodingBarrel: {
         health: 50,
 
-        "strokeWidth": 0.002,
-
-        "color": "#c94",
-        "stroke": "#fc0",
-        "deadColor": "#fc8",
-        "deadStroke": "#fc0",
+        fill: [
+            {
+                type: "fill",
+                color: "#fc0",
+                deadColor: "#fc0",
+            },
+            {
+                type: "fill",
+                color: "#c94",
+                deadColor: "#fc8",
+                expand: -0.002,
+            },
+        ],
 
         expireOn: Categories.Hero,
         detonate: {
@@ -32,38 +192,64 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     },
     "mirror": {
         "health": 50,
-        "color": "#0ad",
-        "stroke": "#0cf",
-        "strokeWidth": 0.003,
-        "deadColor": "#48f",
-        "deadStroke": "#48f",
+
+        fill: [
+            {
+                type: "fill",
+                "color": "#0cf",
+                "deadColor": "#48f",
+            },
+            {
+                type: "fill",
+                "color": "#0ad",
+                "deadColor": "#48f",
+                "expand": -0.003,
+            },
+        ],
+
         damageFrom: Categories.Massive,
         mirror: true,
     },
     bumper: {
         "health": 50,
 
-        "strokeWidth": 0.004,
-
-        "color": "#c94",
-        "stroke": "#fc0",
-
-        "deadColor": "#fc8",
-        "deadStroke": "#fc0",
+        fill: [
+            {
+                type: "fill",
+                color: "#fc0",
+                deadColor: "#fc0",
+            },
+            {
+                type: "fill",
+                "color": "#c94",
+                "deadColor": "#fc8",
+                expand: -0.004,
+            },
+        ],
 
         "impulse": 0.00015,
     },
     heavy: {
         health: 1000,
 
-        "color": "#555",
-        "stroke": "#fff",
-        strokeWidth: 0.01,
-
-        deadColor: '#822',
-        deadStroke: '#c33',
+        fill: [
+            {
+                type: "fill",
+                color: "#fff",
+                deadColor: '#c33',
+            },
+            {
+                type: "fill",
+                color: "#555",
+                deadColor: '#822',
+                expand: -0.01,
+            },
+        ],
 
         linearDamping: 100,
         angularDamping: 0.1,
     },
+    volcano,
+    slow,
+    fast,
 };
