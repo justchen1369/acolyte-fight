@@ -674,22 +674,17 @@ function renderObstacleFill(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchSolidFill, world: w.World, options: RenderOptions) {
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
-	const fade = 1 - obstacle.health / obstacle.maxHealth;
 
 	let color = parseColor(fill.color);
 
 	const proportion = obstacle.health / obstacle.maxHealth;
-	if (proportion < 1) {
+	if (fill.deadColor && proportion < 1) {
 		color = color.mix(parseColor(fill.deadColor), 1 - proportion);
 	}
 
 	if (fill.flash) {
 		if (flash > 0) {
 			color = color.lighten(flash);
-		}
-
-		if (fade > 0) {
-			color = color.lighten(fade);
 		}
 	}
 

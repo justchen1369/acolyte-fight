@@ -201,7 +201,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             {
                 type: "fill",
                 "color": "#0cf",
-                "deadColor": "#48f",
                 flash: true,
             },
             {
@@ -213,7 +212,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             },
         ],
 
-        damageFrom: Categories.Massive,
         mirror: true,
     },
     bumper: {
@@ -223,13 +221,12 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             {
                 type: "fill",
                 color: "#fc0",
-                deadColor: "#fc0",
                 flash: true,
             },
             {
                 type: "fill",
                 "color": "#c94",
-                "deadColor": "#fc8",
+                "deadColor": "#753",
                 expand: -0.004,
                 flash: true,
             },

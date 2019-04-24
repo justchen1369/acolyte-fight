@@ -191,7 +191,7 @@ export const Layouts: Layouts = {
             {
                 type: "volcano",
                 layoutRadius: 0.32,
-                extent: 0.02,
+                extent: 0.002,
                 numObstacles: 5,
                 layoutAngleOffsetInRevs: 0,
                 angularWidthInRevs: 0.15,
