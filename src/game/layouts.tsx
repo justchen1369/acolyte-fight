@@ -108,6 +108,17 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0
+            },
+            {
+                "type": "fast",
+                "numObstacles": 24,
+                "pattern": [1, 1, 0, 0, 0, 1],
+                "layoutRadius": 0.12,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.003,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.04166666667
             }
         ]
     },
