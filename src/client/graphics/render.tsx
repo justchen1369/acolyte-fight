@@ -673,7 +673,6 @@ function renderObstacleFill(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill
 
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchSolidFill, world: w.World, options: RenderOptions) {
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const grow = Math.max(0, (1 - hitAge / HeroColors.ObstacleGrowTicks));
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 	const fade = 1 - obstacle.health / obstacle.maxHealth;
 
@@ -700,10 +699,10 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "symmetrical") {
 		let drawShape = shape;
-		if (grow > 0) {
+		if (flash > 0) {
 			// Hit animation
 			const HitExpansion = 0.005;
-			drawShape = shapes.grow(drawShape, grow * HitExpansion) as shapes.Polygon;
+			drawShape = shapes.grow(drawShape, flash * HitExpansion) as shapes.Polygon;
 		}
 		if (fill.expand) {
 			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
