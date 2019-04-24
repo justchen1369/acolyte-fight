@@ -18,6 +18,7 @@ export const volcano: ObstacleTemplate = {
     ],
     smoke: [{
         color: "rgba(255, 0, 128, 1)",
+        particleRadius: 0.01,
         fade: "rgba(0, 0, 0, 0)",
         "ticks": 30,
         "interval": 8,
@@ -47,6 +48,7 @@ export const slow: ObstacleTemplate = {
     "smoke": [
         {
             "color": "rgba(64, 255, 255, 1)",
+            particleRadius: 0.003,
             "fade": "rgba(0, 0, 0, 0)",
             "ticks": 15,
             "interval": 4,
@@ -91,6 +93,7 @@ export const fast: ObstacleTemplate = {
     "smoke": [
         {
             "color": "rgba(255, 255, 64, 1)",
+            particleRadius: 0.003,
             "fade": "rgba(0, 0, 0, 0)",
             "ticks": 15,
             "interval": 4,

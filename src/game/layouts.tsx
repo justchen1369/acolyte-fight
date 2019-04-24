@@ -203,6 +203,7 @@ export const Layouts: Layouts = {
     "triplet": {
         obstacles: [
             {
+                type: "spinner",
                 numObstacles: 3,
                 layoutRadius: 0.28,
                 layoutAngleOffsetInRevs: 0.5,
@@ -273,6 +274,7 @@ export const Layouts: Layouts = {
                 "health": 20
             },
             {
+                type: "mirror",
                 "numObstacles": 3,
                 "layoutRadius": 0.3,
                 "layoutAngleOffsetInRevs": 0.18,

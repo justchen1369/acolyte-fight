@@ -948,6 +948,10 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 	const shape = instantiateShape(template);
 
 	for (let i = 0; i < template.numObstacles; ++i) {
+		if (template.pattern && !template.pattern[i % template.pattern.length]) {
+			continue;
+		}
+
 		const proportion = i / template.numObstacles;
 		const baseAngle = proportion * (2 * Math.PI);
 		const layoutAngleOffset = (template.layoutAngleOffsetInRevs || 0) * 2 * Math.PI;

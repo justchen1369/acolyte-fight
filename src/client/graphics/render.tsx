@@ -750,7 +750,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 	}
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const particleRadius = shapes.getMinExtent(obstacle.shape);
+	const particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
 	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
 	const edgeOffset = vector.diff(pos, mapCenter);

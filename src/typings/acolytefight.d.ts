@@ -103,6 +103,7 @@ declare interface ObstacleLayout {
 	numObstacles: number;
 	layoutRadius: number;
 	layoutAngleOffsetInRevs?: number;
+	pattern?: number[];
 
 	// Individual obstacle
 	numPoints?: number; // Make this a rotationally-symmetric polygon, otherwise make this an arc
@@ -128,6 +129,7 @@ declare interface SwatchSolidFill {
 
 declare interface SwatchSmoke {
 	color: string;
+	particleRadius: number;
 	fade?: string;
 
 	ticks: number;
