@@ -1730,14 +1730,14 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 		hero.thrust.nullified = true;
 	}
 
-	if (obstacle.impulse) {
+	if (obstacle.impulse > 0) {
 		const impulse = vector.relengthen(vector.diff(hero.body.getPosition(), obstacle.body.getPosition()), obstacle.impulse);
 		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
-		obstacle.damagedTick = world.tick;
+		obstacle.activeTick = world.tick;
 	}
 
 	if (takeHit(obstacle, obstacle.id, world)) {
-		if (obstacle.damage) {
+		if (obstacle.damage > 0) {
 			const packet: w.DamagePacket = {
 				damage: obstacle.damage,
 				lifeSteal: 0,
@@ -1745,16 +1745,16 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 				isLava: true,
 			};
 			applyDamage(hero, packet, world);
-			obstacle.damagedTick = world.tick;
+			obstacle.activeTick = world.tick;
 		}
 
-		if (obstacle.buffs) {
+		if (obstacle.buffs && obstacle.buffs.length > 0) {
 			obstacle.buffs.forEach(buff => {
 				// Same id for all buffs from swatches so cannot get two buffs standing on two swatches
 				const id = `swatch-${obstacle.type}-${buff.type}`;
 				instantiateBuff(id, buff, hero, world, {});
 			});
-			obstacle.damagedTick = world.tick;
+			obstacle.activeTick = world.tick;
 		}
 	}
 }
@@ -3641,10 +3641,13 @@ function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, worl
 
 function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, world: w.World) {
 	// Register hit
-	if (packet.isLava) {
-		obstacle.lavaTick = world.tick;
-	} else {
-		obstacle.damagedTick = world.tick;
+	if (packet.damage > 0) {
+		if (packet.isLava) {
+			obstacle.lavaTick = world.tick;
+		} else {
+			obstacle.damagedTick = world.tick;
+			obstacle.activeTick = world.tick;
+		}
 	}
 
 	if (world.tick < world.startTick) {

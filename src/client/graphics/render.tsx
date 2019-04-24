@@ -658,7 +658,7 @@ function takeHighlights(world: w.World): w.MapHighlight {
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
-	calculateObstacleHighlight(obstacle, world);
+	applyHighlight(obstacle.activeTick, obstacle, world);
 	obstacle.fill.forEach(fill => renderObstacleFill(ctxStack, obstacle, fill, world, options));
 	obstacle.smoke.forEach(smoke => renderObstacleSmoke(ctxStack, obstacle, smoke, world, options));
 }
@@ -792,30 +792,31 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 	}, world);
 }
 
-function calculateObstacleHighlight(obstacle: w.Obstacle, world: w.World): w.TrailHighlight {
-	if (!obstacle.damagedTick) {
-		return obstacle.uiHighlight;
+function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number) {
+	if (!activeTick) {
+		return obj.uiHighlight;
 	}
 
-	const highlightTick = obstacle.uiHighlight ? obstacle.uiHighlight.fromTick : 0;
-	if (obstacle.damagedTick <= highlightTick) {
-		return obstacle.uiHighlight;
+	const highlightTick = obj.uiHighlight ? obj.uiHighlight.fromTick : 0;
+	if (activeTick <= highlightTick) {
+		return obj.uiHighlight;
 	}
 
 	// Highlight
 	const highlight: w.TrailHighlight = {
-		fromTick: obstacle.damagedTick,
+		fromTick: activeTick,
 		maxTicks: HeroColors.ObstacleFlashTicks,
-		glow: true,
+		glow,
+		growth,
 	};
-	obstacle.uiHighlight = highlight;
+	obj.uiHighlight = highlight;
 	world.ui.underlays.forEach(trail => {
-		if (trail.tag === obstacle.id) {
+		if (trail.tag === obj.id) {
 			trail.highlight = highlight;
 		}
 	});
 
-	return obstacle.uiHighlight;
+	return obj.uiHighlight;
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -1270,22 +1271,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
 
-	const highlightTick = saber.uiHighlight ? saber.uiHighlight.fromTick : 0;
-	if (saber.hitTick > highlightTick) {
-		// Highlight
-		const highlight: w.TrailHighlight = {
-			fromTick: saber.hitTick,
-			maxTicks: saber.trailTicks,
-			glow: true,
-		};
-		saber.uiHighlight = highlight;
-
-		world.ui.trails.forEach(trail => {
-			if (trail.tag === saber.id) {
-				trail.highlight = highlight;
-			}
-		});
-	}
+	const highlight = applyHighlight(saber.hitTick, saber, world);
 
 	pushTrail({
 		type: "arc",
@@ -1299,7 +1285,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 		antiClockwise,
 		fillStyle: saber.color,
 		glow: saber.glow,
-		highlight: saber.uiHighlight,
+		highlight,
 		tag: saber.id,
 	}, world);
 
@@ -1462,24 +1448,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 		return;
 	}
 
-	const highlightTick = projectile.uiHighlight ? projectile.uiHighlight.fromTick : 0;
-	if (projectile.hitTick <= highlightTick) {
-		return;
-	}
-
-	// Highlight
-	const highlight: w.TrailHighlight = {
-		fromTick: projectile.hitTick,
-		maxTicks: strike.ticks,
-		glow: strike.glow,
-		growth: strike.growth,
-	};
-	projectile.uiHighlight = highlight;
-	world.ui.trails.forEach(trail => {
-		if (trail.tag === projectile.id) {
-			trail.highlight = highlight;
-		}
-	});
+	const highlight = applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth);
 
 	// Particles
 	if (strike.numParticles) {

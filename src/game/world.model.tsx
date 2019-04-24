@@ -353,7 +353,12 @@ export interface WorldObjectBase {
 	blocksTeleporters?: boolean;
 }
 
-export interface Obstacle extends WorldObjectBase, HitSource {
+export interface HighlightSource {
+	id: string;
+	uiHighlight?: TrailHighlight;
+}
+
+export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	category: "obstacle";
 	type: string;
 
@@ -379,11 +384,10 @@ export interface Obstacle extends WorldObjectBase, HitSource {
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;
+	activeTick?: number;
 
 	fill: SwatchFill[];
 	smoke: SwatchSmoke[];
-
-	uiHighlight?: TrailHighlight;
 }
 
 export interface CircleShape {
@@ -469,7 +473,7 @@ export interface Wall extends ShieldBase {
 	points: pl.Vec2[];
 }
 
-export interface Saber extends ShieldBase {
+export interface Saber extends ShieldBase, HighlightSource {
 	type: "saber";
 
 	spellId: string;
@@ -487,7 +491,6 @@ export interface Saber extends ShieldBase {
 	turnRate: number;
 
 	trailTicks: number;
-	uiHighlight?: TrailHighlight;
 	uiPreviousAngle: number;
 }
 
@@ -624,7 +627,7 @@ export interface HitSource {
 	hitTickLookup: Map<string, number>; // object id -> tick
 }
 
-export interface Projectile extends WorldObjectBase, HitSource {
+export interface Projectile extends WorldObjectBase, HitSource, HighlightSource {
 	category: "projectile";
 	type: string;
 
@@ -667,7 +670,6 @@ export interface Projectile extends WorldObjectBase, HitSource {
     radius: number;
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
-	uiHighlight?: TrailHighlight;
 	uiShake?: Shake;
 }
 
