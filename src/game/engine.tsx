@@ -964,6 +964,9 @@ function instantiateShape(layout: ObstacleLayout): shapes.Shape {
 		// Arc
 		const angularWidth = 2 * Math.PI * layout.angularWidthInRevs;
 		return shapes.createArc(layout.layoutRadius, layout.extent, angularWidth / 2);
+	} else if (layout.numPoints === 0) {
+		// Circle
+		return shapes.createCircle(layout.extent);
 	} else if (layout.angularWidthInRevs) {
 		// Trapezoid
 		const adjacentAngle = Math.PI * layout.angularWidthInRevs;

@@ -126,6 +126,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 type: "solid",
                 color: '#ccc',
                 deadColor: '#c33',
+                strikeGrow: 0.005,
                 flash: true,
             },
             {
@@ -133,6 +134,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 color: '#888',
                 deadColor: '#822',
                 expand: -0.005,
+                strikeGrow: 0.005,
                 flash: true,
             },
         ],
@@ -145,6 +147,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 type: "solid",
                 color: "#fc0",
                 deadColor: "#fc0",
+                strikeGrow: 0.005,
                 flash: true,
             },
             {
@@ -152,6 +155,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 color: "#c94",
                 deadColor: "#fc8",
                 expand: -0.002,
+                strikeGrow: 0.005,
                 flash: true,
             },
         ],
@@ -172,6 +176,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             {
                 type: "solid",
                 "color": "#0cf",
+                strikeGrow: 0.005,
                 flash: true,
             },
             {
@@ -179,6 +184,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 "color": "#0ad",
                 "deadColor": "#48f",
                 "expand": -0.003,
+                strikeGrow: 0.005,
                 flash: true,
             },
         ],
@@ -192,6 +198,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             {
                 type: "solid",
                 color: "#fc0",
+                strikeGrow: 0.005,
                 flash: true,
             },
             {
@@ -199,6 +206,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 "color": "#c94",
                 "deadColor": "#753",
                 expand: -0.004,
+                strikeGrow: 0.005,
                 flash: true,
             },
         ],
@@ -213,6 +221,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 type: "solid",
                 color: '#ccc',
                 deadColor: '#c33',
+                strikeGrow: 0.005,
                 flash: true,
             },
             {
@@ -220,6 +229,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
                 color: '#888',
                 deadColor: '#822',
                 expand: -0.005,
+                strikeGrow: 0.005,
                 flash: true,
             },
         ],

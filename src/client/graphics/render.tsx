@@ -690,10 +690,8 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
-		if (flash > 0) {
-			// Hit animation
-			const HitExpansion = 0.005;
-			drawShape = shapes.grow(drawShape, flash * HitExpansion) as shapes.Polygon;
+		if (flash > 0 && fill.strikeGrow) {
+			drawShape = shapes.grow(drawShape, flash * fill.strikeGrow) as shapes.Polygon;
 		}
 		if (fill.expand) {
 			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
@@ -707,16 +705,37 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	} else if (shape.type === "arc") {
 		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
 
+		let radialExtent = shape.radialExtent;
+		if (flash > 0 && fill.strikeGrow) {
+			radialExtent += flash * fill.strikeGrow;
+		}
+		if (fill.expand) {
+			radialExtent += flash * fill.expand;
+		}
+
 		const fromAngle = angle - shape.angularExtent;
 		const toAngle = angle + shape.angularExtent;
 		glx.arc(ctxStack, center, fromAngle, toAngle, false, {
 			color,
-			minRadius: shape.radius - shape.radialExtent,
-			maxRadius: shape.radius + shape.radialExtent,
+			minRadius: shape.radius - radialExtent,
+			maxRadius: shape.radius + radialExtent,
 			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
 				sigma: HeroColors.GlowRadius,
 				alpha: fill.glow,
 			} : null,
+		});
+	} else if (shape.type === "circle") {
+		let radius = shape.radius;
+		if (flash > 0 && fill.strikeGrow) {
+			radius += flash * fill.strikeGrow;
+		}
+		if (fill.expand) {
+			radius += flash * fill.expand;
+		}
+
+		glx.circle(ctxStack, pos, {
+			color,
+			maxRadius: radius,
 		});
 	}
 }

@@ -108,7 +108,7 @@ declare interface ObstacleLayout {
 	numPoints?: number; // Make this a rotationally-symmetric polygon, otherwise make this an arc
 	extent: number; // aka radius but for a polygon
 	orientationAngleOffsetInRevs?: number; // Rotate the shape
-	angularWidthInRevs?: number; // Make this a trapezoid
+	angularWidthInRevs?: number; // For trapezoid or arcs
 }
 
 declare type SwatchFill =
@@ -122,6 +122,7 @@ declare interface SwatchSolidFill {
 
 	expand?: number;
 	glow?: number;
+	strikeGrow?: number;
 	flash?: boolean;
 }
 
