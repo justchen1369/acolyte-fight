@@ -4,7 +4,7 @@ import * as vector from './vector';
 
 export type Shape =
     Circle
-    | Symmetrical
+    | Radial
     | Polygon
     | Arc
 
@@ -13,8 +13,8 @@ export interface Circle {
     radius: number;
 }
 
-export interface Symmetrical {
-    type: "symmetrical";
+export interface Radial {
+    type: "radial";
     points: pl.Vec2[];
     extent: number;
 }
@@ -50,13 +50,13 @@ export function createArc(radius: number, radialExtent: number, angularExtent: n
     };
 }
 
-export function createSymmetrical(numPoints: number, extent: number): Symmetrical {
+export function createRadial(numPoints: number, extent: number): Radial {
     const points = new Array<pl.Vec2>();
     for (let i = 0; i < numPoints; ++i) {
         const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
         points.push(point);
     }
-    return { type: "symmetrical", points, extent };
+    return { type: "radial", points, extent };
 }
 
 // points must be specified clockwise
@@ -88,7 +88,7 @@ export function createPolygon(points: pl.Vec2[]): Polygon {
 export function getMinExtent(shape: Shape) {
     switch (shape.type) {
         case "circle": return shape.radius;
-        case "symmetrical": return shape.extent;
+        case "radial": return shape.extent;
         case "polygon": return shape.minExtent;
         case "arc": return shape.radialExtent;
         default: return 0;
@@ -101,10 +101,10 @@ export function grow(shape: Shape, amount: number): Shape {
             type: "circle",
             radius: shape.radius + amount,
         };
-    } else if (shape.type === "symmetrical") {
+    } else if (shape.type === "radial") {
         const multiplier = 1 + amount / shape.extent;
         return {
-            type: "symmetrical",
+            type: "radial",
             points: shape.points.map(p => vector.multiply(p, multiplier)),
             extent: shape.extent * multiplier,
         };
@@ -138,7 +138,7 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
         const localPoint = vector.fromAngle(Math.random() * 2 * Math.PI, Math.max(0, shape.radius - clearance));
         return toWorldCoords(pos, angle, localPoint);
 
-    } else if (shape.type === "symmetrical" || shape.type === "polygon") {
+    } else if (shape.type === "radial" || shape.type === "polygon") {
         const seed = Math.random() * shape.points.length;
         const before = Math.floor(seed);
         const after = Math.ceil(seed) % shape.points.length;
@@ -146,7 +146,7 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
 
         let localPoint = vector.plus(vector.multiply(shape.points[before], 1 - alpha), vector.multiply(shape.points[after], alpha));
 
-        if (shape.type === "symmetrical") {
+        if (shape.type === "radial") {
             localPoint = vector.towards(localPoint, vector.zero(), clearance);
         } else if (shape.type === "polygon") {
             let normal = vector.plus(vector.multiply(shape.normals[before], 1 - alpha), vector.multiply(shape.normals[after], alpha));
@@ -169,7 +169,7 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
 export function closestExtreme(shape: Shape, pos: pl.Vec2, angle: number, target: pl.Vec2) {
     if (shape.type === "circle") {
         return vector.towards(pos, target, shape.radius);
-    } else if (shape.type === "symmetrical") {
+    } else if (shape.type === "radial") {
         // Not 100% correct but close enough
         return vector.towards(pos, target, shape.extent);
     } else if (shape.type === "polygon") {
@@ -196,7 +196,7 @@ export function inside(shape: Shape, pos: pl.Vec2, angle: number, target: pl.Vec
 function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): boolean {
     if (shape.type === "circle") {
         return vector.length(localPoint) <= shape.radius + hitRadius;
-    } else if (shape.type === "symmetrical") {
+    } else if (shape.type === "radial") {
         // This is not 100% correct but close enough for our purposes
         return vector.length(localPoint) <= shape.extent + hitRadius;
     } else if (shape.type === "polygon") {
@@ -253,7 +253,7 @@ export function toWorldCoords(pos: pl.Vec2, angle: number, localPoint: pl.Vec2) 
 export function shapeToPlanck(shape: Shape): pl.Shape {
     if (shape.type === "circle") {
         return pl.Circle(shape.radius);
-    } else if (shape.type === "symmetrical" || shape.type === "polygon") {
+    } else if (shape.type === "radial" || shape.type === "polygon") {
         return pl.Polygon(shape.points);
     } else if (shape.type === "arc") {
         const points = new Array<pl.Vec2>();

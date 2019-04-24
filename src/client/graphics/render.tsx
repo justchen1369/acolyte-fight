@@ -688,7 +688,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	const angle = obstacle.body.getAngle();
 
 	const shape = obstacle.shape;
-	if (shape.type === "polygon" || shape.type === "symmetrical") {
+	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
 		if (flash > 0) {
 			// Hit animation

@@ -985,7 +985,7 @@ function instantiateShape(layout: ObstacleLayout): shapes.Shape {
 		return shapes.createPolygon(points);
 	} else {
 		// Radial polygon
-		return shapes.createSymmetrical(layout.numPoints, layout.extent);
+		return shapes.createRadial(layout.numPoints, layout.extent);
 	}
 }
 
