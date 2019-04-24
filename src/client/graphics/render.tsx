@@ -659,14 +659,12 @@ function takeHighlights(world: w.World): w.MapHighlight {
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	applyHighlight(obstacle.activeTick, obstacle, world);
-	obstacle.fill.forEach(fill => renderObstacleFill(ctxStack, obstacle, fill, world, options));
+	obstacle.fill.forEach(fill => {
+		if (fill.type === "solid") {
+			renderObstacleSolid(ctxStack, obstacle, fill, world, options);
+		}
+	});
 	obstacle.smoke.forEach(smoke => renderObstacleSmoke(ctxStack, obstacle, smoke, world, options));
-}
-
-function renderObstacleFill(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
-	if (fill.type === "fill") {
-		renderObstacleSolid(ctxStack, obstacle, fill, world, options);
-	}
 }
 
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchSolidFill, world: w.World, options: RenderOptions) {

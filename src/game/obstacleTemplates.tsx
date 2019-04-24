@@ -9,7 +9,7 @@ export const volcano: ObstacleTemplate = {
 
     fill: [
         {
-            type: "fill",
+            type: "solid",
             color: "rgba(255, 0, 128, 0.9)",
             deadColor: "rgba(255, 0, 128, 0.25)",
             glow: 0.2,
@@ -37,7 +37,7 @@ export const slow: ObstacleTemplate = {
 
     fill: [
         {
-            type: "fill",
+            type: "solid",
             "color": "rgba(64, 255, 255, 0.75)",
             deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
@@ -81,7 +81,7 @@ export const fast: ObstacleTemplate = {
 
     fill: [
         {
-            type: "fill",
+            type: "solid",
             "color": "rgba(255, 255, 64, 0.75)",
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
@@ -123,13 +123,13 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         fill: [
             {
-                type: "fill",
+                type: "solid",
                 color: '#ccc',
                 deadColor: '#c33',
                 flash: true,
             },
             {
-                type: "fill",
+                type: "solid",
                 color: '#888',
                 deadColor: '#822',
                 expand: -0.005,
@@ -142,13 +142,13 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         fill: [
             {
-                type: "fill",
+                type: "solid",
                 color: "#fc0",
                 deadColor: "#fc0",
                 flash: true,
             },
             {
-                type: "fill",
+                type: "solid",
                 color: "#c94",
                 deadColor: "#fc8",
                 expand: -0.002,
@@ -170,12 +170,12 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         fill: [
             {
-                type: "fill",
+                type: "solid",
                 "color": "#0cf",
                 flash: true,
             },
             {
-                type: "fill",
+                type: "solid",
                 "color": "#0ad",
                 "deadColor": "#48f",
                 "expand": -0.003,
@@ -190,12 +190,12 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         fill: [
             {
-                type: "fill",
+                type: "solid",
                 color: "#fc0",
                 flash: true,
             },
             {
-                type: "fill",
+                type: "solid",
                 "color": "#c94",
                 "deadColor": "#753",
                 expand: -0.004,
@@ -210,13 +210,13 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         fill: [
             {
-                type: "fill",
+                type: "solid",
                 color: "#fff",
                 deadColor: '#c33',
                 flash: true,
             },
             {
-                type: "fill",
+                type: "solid",
                 color: "#555",
                 deadColor: '#822',
                 expand: -0.01,

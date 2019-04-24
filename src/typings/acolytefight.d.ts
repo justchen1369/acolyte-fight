@@ -115,7 +115,7 @@ declare type SwatchFill =
 	SwatchSolidFill
 
 declare interface SwatchSolidFill {
-	type: "fill";
+	type: "solid";
 
 	color: string;
 	deadColor?: string;
