@@ -43,22 +43,6 @@ export const slow: ObstacleTemplate = {
             glow: 0.2,
             flash: true,
         },
-        {
-            type: "axialPulse",
-            "fromColor": "rgba(255, 255, 255, 0)",
-            "toColor": "rgba(255, 255, 255, 0.25)",
-            inwards: true,
-            speed: 0.05,
-            pulseWidth: 0.01,
-        },
-        {
-            type: "axialPulse",
-            "fromColor": "rgba(255, 255, 255, 0)",
-            "toColor": "rgba(255, 255, 255, 0.25)",
-            inwards: true,
-            speed: 0.03,
-            pulseWidth: 0.005,
-        },
     ],
     "smoke": [
         {
@@ -102,22 +86,6 @@ export const fast: ObstacleTemplate = {
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
             flash: true,
-        },
-        {
-            type: "axialPulse",
-            "fromColor": "rgba(255, 255, 255, 0)",
-            "toColor": "rgba(255, 255, 255, 0.25)",
-            inwards: false,
-            speed: 0.05,
-            pulseWidth: 0.01,
-        },
-        {
-            type: "axialPulse",
-            "fromColor": "rgba(255, 255, 255, 0)",
-            "toColor": "rgba(255, 255, 255, 0.25)",
-            inwards: false,
-            speed: 0.03,
-            pulseWidth: 0.005,
         },
     ],
     "smoke": [

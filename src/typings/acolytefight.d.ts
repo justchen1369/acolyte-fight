@@ -113,7 +113,6 @@ declare interface ObstacleLayout {
 
 declare type SwatchFill =
 	SwatchSolidFill
-	| SwatchAxialPulse;
 
 declare interface SwatchSolidFill {
 	type: "fill";
@@ -124,20 +123,6 @@ declare interface SwatchSolidFill {
 	expand?: number;
 	glow?: number;
 	flash?: boolean;
-}
-
-declare interface SwatchAxialPulse {
-	type: "axialPulse";
-
-	fromColor: string;
-	toColor: string;
-	glow?: number;
-	
-	fade?: boolean;
-	inwards?: boolean;
-
-	pulseWidth: number;
-	speed: number;
 }
 
 declare interface SwatchSmoke {

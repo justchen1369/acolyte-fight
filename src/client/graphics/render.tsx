@@ -666,8 +666,6 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 function renderObstacleFill(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
 	if (fill.type === "fill") {
 		renderObstacleSolid(ctxStack, obstacle, fill, world, options);
-	} else if (fill.type === "axialPulse") {
-		renderObstaclePulse(ctxStack, obstacle, fill, world, options);
 	}
 }
 
@@ -717,43 +715,6 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 			color,
 			minRadius: shape.radius - shape.radialExtent,
 			maxRadius: shape.radius + shape.radialExtent,
-			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
-				sigma: HeroColors.GlowRadius,
-				alpha: fill.glow,
-			} : null,
-		});
-	}
-}
-
-function renderObstaclePulse(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchAxialPulse, world: w.World, options: RenderOptions) {
-	const pos = obstacle.body.getPosition();
-	const angle = obstacle.body.getAngle();
-
-	const shape = obstacle.shape;
-
-	if (shape.type === "arc") {
-		const fromAngle = angle - shape.angularExtent;
-		const toAngle = angle + shape.angularExtent;
-		const minRadius = shape.radius - shape.radialExtent;
-		const maxRadius = shape.radius + shape.radialExtent;
-		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
-
-		const swatchWidth = 2 * shape.radialExtent;
-		const interval = swatchWidth / (fill.speed / constants.TicksPerSecond);
-
-		let proportion = (world.tick % interval) / interval;
-		if (fill.inwards) {
-			proportion = 1 - proportion;
-		}
-
-		const drawMinRadius = minRadius + swatchWidth * proportion;
-		const drawMaxRadius = Math.min(maxRadius, minRadius + fill.pulseWidth);
-
-		let color = parseColor(fill.fromColor).mix(parseColor(fill.toColor), proportion);
-		glx.arc(ctxStack, center, fromAngle, toAngle, false, {
-			color,
-			minRadius: drawMinRadius,
-			maxRadius: drawMaxRadius,
 			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
 				sigma: HeroColors.GlowRadius,
 				alpha: fill.glow,
