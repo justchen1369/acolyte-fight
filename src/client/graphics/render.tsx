@@ -794,12 +794,12 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 
 function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number) {
 	if (!activeTick) {
-		return obj.uiHighlight;
+		return false;
 	}
 
 	const highlightTick = obj.uiHighlight ? obj.uiHighlight.fromTick : 0;
 	if (activeTick <= highlightTick) {
-		return obj.uiHighlight;
+		return false;
 	}
 
 	// Highlight
@@ -816,7 +816,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 		}
 	});
 
-	return obj.uiHighlight;
+	return true;
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
@@ -1271,7 +1271,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
 
-	const highlight = applyHighlight(saber.hitTick, saber, world);
+	applyHighlight(saber.hitTick, saber, world);
 
 	pushTrail({
 		type: "arc",
@@ -1285,7 +1285,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 		antiClockwise,
 		fillStyle: saber.color,
 		glow: saber.glow,
-		highlight,
+		highlight: saber.uiHighlight,
 		tag: saber.id,
 	}, world);
 
@@ -1448,7 +1448,9 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 		return;
 	}
 
-	const highlight = applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth);
+	if (!applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth)) {
+		return;
+	}
 
 	// Particles
 	if (strike.numParticles) {
@@ -1462,7 +1464,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				velocity,
 				radius: projectile.radius,
 				fillStyle: projectileColor(strike, projectile, world),
-				highlight,
+				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
 		}

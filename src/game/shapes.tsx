@@ -256,8 +256,13 @@ export function shapeToPlanck(shape: Shape): pl.Shape {
     } else if (shape.type === "symmetrical" || shape.type === "polygon") {
         return pl.Polygon(shape.points);
     } else if (shape.type === "arc") {
-        // TODO: Make more specific
-        return pl.Circle(shape.radius + shape.radialExtent);
+        const points = new Array<pl.Vec2>();
+        points.push(vector.plus(shape.localCenter, vector.fromAngle(-shape.angularExtent, shape.radius - shape.radialExtent)));
+        points.push(vector.plus(shape.localCenter, vector.fromAngle(-shape.angularExtent, shape.radius + shape.radialExtent)));
+        points.push(vector.plus(shape.localCenter, vector.fromAngle(0, Math.sqrt(2) * (shape.radius + shape.radialExtent)))); // means the polygon fully encloses the a)rc
+        points.push(vector.plus(shape.localCenter, vector.fromAngle(shape.angularExtent, shape.radius + shape.radialExtent)));
+        points.push(vector.plus(shape.localCenter, vector.fromAngle(shape.angularExtent, shape.radius - shape.radialExtent)));
+        return pl.Polygon(points);
     } else {
         throw "Unknown shape type";
     }

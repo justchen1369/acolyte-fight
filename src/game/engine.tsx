@@ -1761,13 +1761,13 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	if (takeHit(projectile, obstacle.id, world)) {
-		let packet: w.DamagePacket = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
-		packet = scaleForPartialDamage(world, projectile, packet);
-		if (!(obstacle.damageFrom & projectile.categories)) {
-			packet.damage = 0; // Still apply a zero-damage packet so the obstacle flashes and looks like it was hit
+		if (obstacle.damageFrom & projectile.categories) {
+			let packet: w.DamagePacket = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
+			packet = scaleForPartialDamage(world, projectile, packet);
+			applyDamageToObstacle(obstacle, packet, world);
+		} else {
+			obstacle.activeTick = world.tick;
 		}
-
-		applyDamageToObstacle(obstacle, packet, world);
 	}
 
 	if (!obstacle.mirror && expireOn(world, projectile, obstacle)) {
