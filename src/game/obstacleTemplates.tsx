@@ -11,6 +11,7 @@ export const volcano: ObstacleTemplate = {
         {
             type: "fill",
             color: "rgba(255, 0, 128, 0.9)",
+            deadColor: "rgba(255, 0, 128, 0.25)",
             glow: 0.2,
             flash: true,
         },
@@ -38,6 +39,7 @@ export const slow: ObstacleTemplate = {
         {
             type: "fill",
             "color": "rgba(64, 255, 255, 0.75)",
+            deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
             flash: true,
         },
@@ -97,6 +99,7 @@ export const fast: ObstacleTemplate = {
         {
             type: "fill",
             "color": "rgba(255, 255, 64, 0.75)",
+            deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
             flash: true,
         },
