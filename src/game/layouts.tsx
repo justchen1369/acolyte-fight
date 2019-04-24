@@ -136,7 +136,7 @@ export const Layouts: Layouts = {
         "numPoints": 3,
         "obstacles": [
             {
-                type: "heavy",
+                type: "spinner",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,

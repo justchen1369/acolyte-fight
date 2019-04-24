@@ -205,21 +205,21 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
 
         "impulse": 0.00015,
     },
-    heavy: {
-        health: 1000,
+    spinner: {
+        health: 100,
 
         fill: [
             {
                 type: "solid",
-                color: "#fff",
+                color: '#ccc',
                 deadColor: '#c33',
                 flash: true,
             },
             {
                 type: "solid",
-                color: "#555",
+                color: '#888',
                 deadColor: '#822',
-                expand: -0.01,
+                expand: -0.005,
                 flash: true,
             },
         ],
