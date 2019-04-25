@@ -7,7 +7,7 @@ export const volcano: ObstacleTemplate = {
     sensor: true,
     static: true,
 
-    fill: [
+    render: [
         {
             type: "solid",
             color: "rgba(255, 0, 128, 0.9)",
@@ -15,15 +15,16 @@ export const volcano: ObstacleTemplate = {
             glow: 0.2,
             flash: true,
         },
+        {
+        type: "smoke",
+            color: "rgba(255, 0, 128, 1)",
+            particleRadius: 0.01,
+            fade: "rgba(0, 0, 0, 0)",
+            "ticks": 30,
+            "interval": 8,
+            "speed": 0.1
+        }
     ],
-    smoke: [{
-        color: "rgba(255, 0, 128, 1)",
-        particleRadius: 0.01,
-        fade: "rgba(0, 0, 0, 0)",
-        "ticks": 30,
-        "interval": 8,
-        "speed": 0.1
-    }],
 
     hitInterval: 15,
     damage: 5,
@@ -36,7 +37,7 @@ export const slow: ObstacleTemplate = {
     sensor: true,
     static: true,
 
-    fill: [
+    render: [
         {
             type: "solid",
             "color": "rgba(64, 255, 255, 0.75)",
@@ -44,9 +45,8 @@ export const slow: ObstacleTemplate = {
             glow: 0.2,
             flash: true,
         },
-    ],
-    "smoke": [
         {
+            type: "smoke",
             "color": "rgba(64, 255, 255, 1)",
             particleRadius: 0.002,
             "fade": "rgba(0, 0, 0, 0)",
@@ -81,7 +81,7 @@ export const fast: ObstacleTemplate = {
     sensor: true,
     static: true,
 
-    fill: [
+    render: [
         {
             type: "solid",
             "color": "rgba(255, 255, 64, 0.75)",
@@ -89,9 +89,8 @@ export const fast: ObstacleTemplate = {
             glow: 0.2,
             flash: true,
         },
-    ],
-    "smoke": [
         {
+            type: "smoke",
             "color": "rgba(255, 255, 64, 1)",
             particleRadius: 0.002,
             "fade": "rgba(0, 0, 0, 0)",
@@ -124,7 +123,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     default: {
         health: 50,
 
-        fill: [
+        render: [
             {
                 type: "solid",
                 color: '#ccc',
@@ -145,7 +144,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     explosive: {
         health: 50,
 
-        fill: [
+        render: [
             {
                 type: "solid",
                 color: "#fc0",
@@ -175,7 +174,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     "mirror": {
         "health": 50,
 
-        fill: [
+        render: [
             {
                 type: "solid",
                 "color": "#0cf",
@@ -197,7 +196,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     bumper: {
         "health": 50,
 
-        fill: [
+        render: [
             {
                 type: "solid",
                 color: "#fc0",
@@ -219,7 +218,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     spinner: {
         health: 100,
 
-        fill: [
+        render: [
             {
                 type: "solid",
                 color: '#ccc',

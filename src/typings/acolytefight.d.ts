@@ -112,10 +112,11 @@ declare interface ObstacleLayout {
 	angularWidthInRevs?: number; // For trapezoid or arcs
 }
 
-declare type SwatchFill =
-	SwatchSolidFill
+declare type SwatchRender =
+	SwatchFill
+	| SwatchSmoke
 
-declare interface SwatchSolidFill {
+declare interface SwatchFill {
 	type: "solid";
 
 	color: string;
@@ -128,6 +129,8 @@ declare interface SwatchSolidFill {
 }
 
 declare interface SwatchSmoke {
+	type: "smoke";
+
 	color: string;
 	particleRadius: number;
 	fade?: string;
@@ -153,8 +156,7 @@ declare interface ObstacleTemplateLookup {
 }
 
 declare interface ObstacleTemplate {
-	fill?: SwatchFill[];
-	smoke?: SwatchSmoke[];
+	render?: SwatchRender[];
 
 	static?: boolean;
 	angularDamping?: number;

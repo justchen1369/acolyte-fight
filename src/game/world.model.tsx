@@ -386,8 +386,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	lavaTick?: number;
 	activeTick?: number;
 
-	fill: SwatchFill[];
-	smoke: SwatchSmoke[];
+	render: SwatchRender[];
 }
 
 export interface CircleShape {

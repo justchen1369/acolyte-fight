@@ -165,8 +165,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		expireOn: template.expireOn || Categories.None,
 		damageFrom: template.damageFrom !== undefined ? template.damageFrom : Categories.All,
 
-		fill: template.fill || [],
-		smoke: template.smoke || [],
+		render: template.render || [],
 
 		shape,
 
