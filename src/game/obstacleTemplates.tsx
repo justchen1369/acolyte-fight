@@ -260,7 +260,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             },
         ],
 
-        linearDamping: 100,
         angularDamping: 0.1,
     },
     screen,

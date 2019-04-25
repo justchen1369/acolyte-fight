@@ -94,6 +94,16 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
             {
+                "type": "fast",
+                "numObstacles": 2,
+                "layoutRadius": 0.085,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.003,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.24
+            },
+            {
                 "numObstacles": 4,
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.125,
@@ -109,17 +119,6 @@ export const Layouts: Layouts = {
                 "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0
             },
-            {
-                "type": "fast",
-                "numObstacles": 24,
-                "pattern": [1, 1, 0, 0, 0, 1],
-                "layoutRadius": 0.12,
-                "layoutAngleOffsetInRevs": 0,
-                "numPoints": 4,
-                "extent": 0.003,
-                "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.04166666667
-            }
         ]
     },
     "inside5": {
@@ -229,7 +228,6 @@ export const Layouts: Layouts = {
     "surrounded": {
         "obstacles": [
             {
-                type: "mirror",
                 "numObstacles": 15,
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.1,
