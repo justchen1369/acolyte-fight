@@ -119,6 +119,30 @@ export const fast: ObstacleTemplate = {
     ],
 }
 
+export const screen: ObstacleTemplate = {
+    "health": 50,
+
+    render: [
+        {
+            type: "solid",
+            "color": "#0cf",
+            strikeGrow: 0.005,
+            flash: true,
+        },
+        {
+            type: "solid",
+            "color": "#222",
+            strikeGrow: 0.005,
+            expand: -0.002,
+            flash: true,
+        },
+    ],
+
+    static: true,
+    collideWith: Categories.Projectile,
+    mirror: true,
+};
+
 export const ObstacleTemplates: ObstacleTemplateLookup = {
     default: {
         health: 50,
@@ -239,6 +263,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
         linearDamping: 100,
         angularDamping: 0.1,
     },
+    screen,
     volcano,
     slow,
     fast,

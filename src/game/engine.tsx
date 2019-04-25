@@ -135,7 +135,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 	const obstacleId = "obstacle" + (world.nextObjectId++);
 	const body = world.physics.createBody({
 		userData: obstacleId,
-		type: 'dynamic',
+		type: template.static ? 'static' : 'dynamic',
 		position,
 		angle,
 		linearDamping: template.linearDamping || Obstacle.LinearDamping,
