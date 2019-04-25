@@ -255,16 +255,7 @@ export const Layouts: Layouts = {
         ]
     },
     "tripletSwirl": {
-        "numPoints": 6,
         "obstacles": [
-            {
-                "numObstacles": 3,
-                "layoutRadius": 0.06,
-                "layoutAngleOffsetInRevs": 0.32,
-                "numPoints": 3,
-                "extent": 0.00375,
-                "orientationAngleOffsetInRevs": 0.125
-            },
             {
                 "numObstacles": 3,
                 "layoutRadius": 0.14,
@@ -284,13 +275,22 @@ export const Layouts: Layouts = {
                 "health": 20
             },
             {
-                type: "mirror",
+                "type": "volcano",
                 "numObstacles": 3,
                 "layoutRadius": 0.3,
                 "layoutAngleOffsetInRevs": 0.18,
                 "numPoints": 6,
                 "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0.125
+            },
+            {
+                "type": "explosive",
+                "numObstacles": 12,
+                "layoutRadius": 0.06,
+                "layoutAngleOffsetInRevs": 0.2216666667,
+                "numPoints": 3,
+                "extent": 0.005,
+                "orientationAngleOffsetInRevs": 0
             }
         ]
     },

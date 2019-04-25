@@ -167,6 +167,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     },
     explosive: {
         health: 50,
+        density: 10,
 
         render: [
             {
