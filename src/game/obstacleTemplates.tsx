@@ -142,7 +142,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
             },
         ],
     },
-    explodingBarrel: {
+    explosive: {
         health: 50,
 
         fill: [

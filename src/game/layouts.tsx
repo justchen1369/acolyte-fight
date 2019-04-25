@@ -183,7 +183,7 @@ export const Layouts: Layouts = {
     "innerStar": {
         "obstacles": [
             {
-                type: "explodingBarrel",
+                type: "explosive",
                 "numObstacles": 10,
                 "layoutRadius": 0.12,
                 "layoutAngleOffsetInRevs": 0.1,
@@ -238,6 +238,7 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
+                type: "bumper",
                 "numObstacles": 6,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.2666667,
