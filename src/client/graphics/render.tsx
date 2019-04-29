@@ -296,9 +296,10 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 
 	const NumParticles = 10;
 	const ExplodeSpeed = 0.1;
+	const MaxParticleRadius = 0.01;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
-	const particleRadius = shapes.getMinExtent(obstacle.shape);
+	const particleRadius = Math.min(MaxParticleRadius, shapes.getMinExtent(obstacle.shape));
 
 	for (let i = 0; i < NumParticles; ++i) {
 		const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);

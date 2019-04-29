@@ -61,8 +61,6 @@ export function createRadial(numPoints: number, extent: number): Radial {
 
 // points must be specified clockwise
 export function createPolygon(points: pl.Vec2[]): Polygon {
-    const distances = points.map(p => vector.length(p));
-
     const normals = new Array<pl.Vec2>();
     for (let i = 0; i < points.length; ++i) {
         const point = points[i];
@@ -76,12 +74,24 @@ export function createPolygon(points: pl.Vec2[]): Polygon {
         normals.push(normal);
     }
 
+    let minExtent = Infinity;
+    let maxExtent = 0;
+    for (let i = 0; i < points.length; ++i) {
+        const current = points[i];
+        const next = points[posMod(i + 1, points.length)];
+
+        const normal = vector.rotateLeft(vector.unit(vector.diff(next, current)));
+        const distanceToLine = Math.abs(vector.dot(current, normal));
+        minExtent = Math.min(minExtent, distanceToLine);
+        maxExtent = Math.max(maxExtent, distanceToLine);
+    }
+
     return {
         type: "polygon",
         points,
         normals,
-        minExtent: _.min(distances) || 0,
-        maxExtent: _.max(distances) || 0,
+        minExtent,
+        maxExtent,
     };
 }
 
