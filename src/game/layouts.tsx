@@ -203,6 +203,21 @@ export const Layouts: Layouts = {
         ],
         "numPoints": 5
     },
+    "mirrors": {
+        "obstacles": [
+            {
+                "type": "mirror",
+                "numObstacles": 7,
+                "layoutRadius": 0.22,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.008,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.05
+            }
+        ],
+        "numPoints": 7
+    },
     "innerStar": {
         "obstacles": [
             {
