@@ -184,7 +184,7 @@ export const Layouts: Layouts = {
             {
                 type: "explosive",
                 "numObstacles": 10,
-                "layoutRadius": 0.12,
+                "layoutRadius": 0.05,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 3,
                 "extent": 0.005,
@@ -285,7 +285,7 @@ export const Layouts: Layouts = {
             },
             {
                 "type": "explosive",
-                "numObstacles": 12,
+                "numObstacles": 9,
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.2216666667,
                 "numPoints": 3,
