@@ -1,4 +1,28 @@
 export const Layouts: Layouts = {
+    "octogon": {
+        "obstacles": [
+            {
+                "type": "slow",
+                "numObstacles": 4,
+                "layoutRadius": 0.075,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.05,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.01
+            },
+            {
+                "numObstacles": 4,
+                "layoutRadius": 0.25,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.03,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.01
+            }
+        ],
+        "numPoints": 8
+    },
     "cold": {
         "numPoints": 6,
         "obstacles": [
