@@ -198,6 +198,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     },
     "mirror": {
         "health": 50,
+        static: true,
 
         render: [
             {
