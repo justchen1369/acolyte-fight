@@ -537,6 +537,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 		expireAgainstHeroes: projectileTemplate.expireAgainstHeroes !== undefined ? projectileTemplate.expireAgainstHeroes : constants.Alliances.All,
 		expireAgainstObjects: projectileTemplate.expireAgainstObjects !== undefined ? projectileTemplate.expireAgainstObjects : constants.Alliances.All,
+		expireOnMirror: projectileTemplate.expireOnMirror,
 		destructible: projectileTemplate.destructible && {
 			against: projectileTemplate.destructible.against !== undefined ? projectileTemplate.destructible.against : constants.Alliances.All,
 		},
@@ -1777,7 +1778,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		}
 	}
 
-	if (!obstacle.mirror && expireOn(world, projectile, obstacle)) {
+	if (expireOn(world, projectile, obstacle)) {
 		detonateProjectile(projectile, world);
 		linkTo(projectile, obstacle, world);
 		applySwap(projectile, obstacle, world);
@@ -1945,6 +1946,10 @@ export function isHeroInvisible(hero: w.Hero): w.VanishBuff {
 function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject) {
 	const expireOn = (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
 	if (!expireOn) { return false; }
+
+	if (other.category === "obstacle" && other.mirror && !projectile.expireOnMirror) {
+		return false;
+	}
 
 	if (other.category === "hero") {
 		const alliance = calculateAlliance(projectile.owner, other.id, world);

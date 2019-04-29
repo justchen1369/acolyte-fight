@@ -901,6 +901,7 @@ const grapple: Spell = {
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
+        expireOnMirror: true,
         shieldTakesOwnership: false,
 
         link: {
@@ -1709,6 +1710,7 @@ const swap: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All, // Expire on a shield, don't bounce off it
+        expireOnMirror: true,
         expireAfterCursorTicks: 0,
         shieldTakesOwnership: false,
         selfPassthrough: true,

@@ -660,6 +660,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	expireOn: number;
 	expireAgainstHeroes: number;
 	expireAgainstObjects: number;
+	expireOnMirror?: boolean;
 	destructible?: DestructibleParameters;
 
 	color: string;
