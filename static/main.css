@@ -1579,6 +1579,8 @@ textarea.ai-js {
 
     display: flex;
     flex-direction: row;
+
+    height: 300px;
 }
 
 .json-editor .entity-panel {
