@@ -186,7 +186,8 @@ declare interface ChoiceSettings {
 
 declare interface KeyConfig {
 	btn: string;
-	weight?: number;
+	barSize?: number;
+	wheelSize?: number;
 }
 
 declare interface Spells {

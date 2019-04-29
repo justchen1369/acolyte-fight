@@ -1880,7 +1880,7 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 
 		if (key) {
 			const offset = nextOffset;
-			const size = ButtonBar.Size * (key.weight || 1);
+			const size = ButtonBar.Size * (key.barSize || 1);
 
 			const left = offset;
 			const top = ButtonBar.Size - size;
@@ -1949,7 +1949,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options
 			const startAngle = nextAngle;
 			const endAngle = startAngle + arcWidth;
 
-			let hitSector = { startAngle, endAngle, weight: key.weight || 1.0 };
+			let hitSector: w.HitSector = { startAngle, endAngle, weight: key.wheelSize || 1.0 };
 			if (options.wheelOnRight) {
 				hitSector = invertSector(hitSector);
 			}
@@ -2126,7 +2126,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 }
 
 function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
-	outerRadius = innerRadius + (0.5 + 0.5 * sector.weight) * (outerRadius - innerRadius);
+	outerRadius = innerRadius + sector.weight * (outerRadius - innerRadius);
 
 	const emphasis = buttonState.emphasis;
 

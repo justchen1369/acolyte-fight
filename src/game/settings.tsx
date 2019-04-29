@@ -54,14 +54,14 @@ const Obstacle: ObstacleSettings = {
 
 const Choices: ChoiceSettings = {
 	Keys: [
-        { btn: "a", weight: 0.75 },
+        { btn: "a", barSize: 0.75, wheelSize: 0.5 },
         null,
-        { btn: "q", weight: 1 },
-        { btn: "w", weight: 1 },
-        { btn: "e", weight: 1 },
-        { btn: "r", weight: 1 },
+        { btn: "q", barSize: 1, wheelSize: 1 },
+        { btn: "w", barSize: 1, wheelSize: 0.75 },
+        { btn: "e", barSize: 1, wheelSize: 0.75 },
+        { btn: "r", barSize: 1, wheelSize: 0.75 },
 		null,
-        { btn: "f", weight: 0.75 },
+        { btn: "f", barSize: 0.75, wheelSize: 0.5 },
     ],
 	Options: {
 		"a": [
