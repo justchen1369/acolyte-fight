@@ -79,7 +79,6 @@ attachToSocket(io);
 
 app.get('/ping', (req, res) => res.send("OK"));
 
-app.use('/static/rpg-awesome', express.static('./node_modules/rpg-awesome'));
 app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));
 app.use('/logs', express.static('./logs'));

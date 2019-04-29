@@ -82,7 +82,6 @@
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "reselect": "^3.0.1",
-    "rpg-awesome": "^0.2.0",
     "screenfull": "^3.3.2",
     "scroll-into-view": "^1.9.3",
     "socket.io": "^2.2.0",
