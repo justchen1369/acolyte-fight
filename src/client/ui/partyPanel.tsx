@@ -1,4 +1,5 @@
 import classNames from 'classnames';
+import QRious from 'qrious';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
@@ -79,10 +80,13 @@ export class PartyPanel extends React.Component<Props, State> {
         }
 
         const origin = regions.getOrigin(party.region);
+        const partyUrl = origin + currentPartyPath;
         return <div>
-            <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link:</p>
-            <p><input className="share-url" type="text" value={origin + currentPartyPath} readOnly onFocus={ev => ev.target.select()} /></p>
+            <p>Forming a party ensures that you and your friends are matched to the same game. Invite friends to join your party by sending them this link, or ask them to scan the QR code with their phone camera:</p>
+            <p><input className="share-url" type="text" value={partyUrl} readOnly onFocus={ev => ev.target.select()} /></p>
+            <canvas className="party-qr" ref={(elem) => this.renderQR(elem, partyUrl)} />
             <p><span className="btn" onClick={() => this.onLeaveParty()}>Leave Party</span></p>
+            <div className="clear" />
             {this.props.party.members.length >= constants.Matchmaking.MaxPlayers && <p>If you party is larger than {constants.Matchmaking.MaxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             {this.renderPartyMode()}
@@ -101,6 +105,10 @@ export class PartyPanel extends React.Component<Props, State> {
             <h1>Games</h1>
             <PartyGameList partyId={party.id} />
         </div>
+    }
+
+    private renderQR(element: HTMLCanvasElement, partyUrl: string) {
+        new QRious({ element, value: partyUrl, size: 192 });
     }
 
     private renderPartyMode() {

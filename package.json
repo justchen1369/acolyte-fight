@@ -75,6 +75,7 @@
     "planck-js": "^0.3.0-rc.2",
     "promise-each": "^2.2.0",
     "promise-map": "^1.2.0",
+    "qrious": "^4.0.2",
     "query-string": "^6.1.0",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",

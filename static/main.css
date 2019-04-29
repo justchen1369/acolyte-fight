@@ -132,6 +132,10 @@ a:hover, a:active {
     color: #ff8800;
 }
 
+.clear {
+    clear: both;
+}
+
 .loading-text {
     animation: loading-text-animation alternate 4s infinite;
 }
@@ -1560,6 +1564,10 @@ textarea.ai-js {
     box-shadow: 5px 5px 5px black;
     padding: 20px;
     margin: 12px 0;
+}
+
+.party-qr {
+    float: right;
 }
 
 .region-list-section .region {

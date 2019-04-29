@@ -27,7 +27,7 @@ export function onDisconnect(socketId: string): g.Party[] {
 export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
 	const partyIndex = getStore().nextPartyId++;
 	const party: g.Party = {
-		id: uniqid("p" + partyIndex + "-"),
+		id: "p" + partyIndex + "-" + Math.floor(Math.random() * 1e6).toString(36),
 		created: moment(),
 		modified: moment(),
 		roomId,
