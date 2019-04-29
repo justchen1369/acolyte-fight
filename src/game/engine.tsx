@@ -1730,7 +1730,8 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 }
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
-	if (hero.thrust) {
+	if (hero.thrust && !obstacle.sensor) {
+		// Only cancel thrust when hitting a solid object
 		const packet = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 		applyDamageToObstacle(obstacle, packet, world);
 		hero.thrust.nullified = true;
