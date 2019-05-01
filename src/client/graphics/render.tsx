@@ -755,9 +755,23 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 	const particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
 	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
-	const edgeOffset = vector.diff(pos, mapCenter);
+	const outward = vector.unit(vector.diff(pos, mapCenter));
 
-	const velocity = particleVelocity(vector.relengthen(edgeOffset, smoke.speed));
+	let velocity = vector.zero();
+
+	if (smoke.speed) {
+		velocity = vector.plus(velocity, particleVelocity(vector.multiply(outward, smoke.speed)));
+	}
+
+	if (smoke.conveyor && obstacle.conveyor) {
+		if (obstacle.conveyor.radialSpeed) {
+			velocity = vector.plus(velocity, vector.multiply(outward, obstacle.conveyor.radialSpeed * smoke.conveyor));
+		}
+		if (obstacle.conveyor.lateralSpeed) {
+			velocity = vector.plus(velocity, vector.multiply(vector.rotateRight(outward), obstacle.conveyor.lateralSpeed * smoke.conveyor));
+		}
+	}
+
 	underlay({
 		tag: obstacle.id,
 		type: "circle",

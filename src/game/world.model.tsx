@@ -379,6 +379,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	buffs: BuffTemplate[];
 	detonate?: DetonateParameters;
 	mirror?: boolean;
+	conveyor?: ConveyorParameters;
 	impulse: number;
 
 	hitTick?: number;
@@ -404,6 +405,7 @@ export interface Hero extends WorldObjectBase {
 	moveSpeedPerSecond: number;
 	maxSpeed: number;
 	revolutionsPerTick: number;
+	conveyorShift?: pl.Vec2; // If set, move by this amount on the next tick. Used to ensure only one conveyor has an effect per tick.
 
 	hitTick?: number;
 	damagedTick?: number;

@@ -138,6 +138,7 @@ declare interface SwatchSmoke {
 	ticks: number;
 	interval?: number;
 	speed: number;
+	conveyor?: number; // 1 means move at the same speed as the conveyor, 0.5 means half speed, etc
 }
 
 declare interface ObstacleSettings {
@@ -176,6 +177,12 @@ declare interface ObstacleTemplate {
 	detonate?: DetonateParameters;
 	mirror?: boolean;
 	impulse?: number;
+	conveyor?: ConveyorParameters;
+}
+
+declare interface ConveyorParameters {
+	radialSpeed?: number;
+	lateralSpeed?: number;
 }
 
 declare interface ChoiceSettings {

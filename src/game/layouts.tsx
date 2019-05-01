@@ -1,28 +1,4 @@
 export const Layouts: Layouts = {
-    "octogon": {
-        "obstacles": [
-            {
-                "type": "slow",
-                "numObstacles": 4,
-                "layoutRadius": 0.075,
-                "layoutAngleOffsetInRevs": 0.125,
-                "numPoints": 4,
-                "extent": 0.05,
-                "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.01
-            },
-            {
-                "numObstacles": 4,
-                "layoutRadius": 0.25,
-                "layoutAngleOffsetInRevs": 0,
-                "numPoints": 4,
-                "extent": 0.03,
-                "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.01
-            }
-        ],
-        "numPoints": 8
-    },
     "cold": {
         "numPoints": 6,
         "obstacles": [
@@ -59,6 +35,62 @@ export const Layouts: Layouts = {
                 angularWidthInRevs: 0.2
             }
         ],
+    },
+    "octogon": {
+        "obstacles": [
+            {
+                "type": "slow",
+                "numObstacles": 4,
+                "layoutRadius": 0.075,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.05,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.01
+            },
+            {
+                "numObstacles": 4,
+                "layoutRadius": 0.25,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 4,
+                "extent": 0.03,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.01
+            }
+        ],
+        "numPoints": 8
+    },
+    "return": {
+        "obstacles": [
+            {
+                "type": "volcano",
+                "numObstacles": 1,
+                "layoutRadius": 0,
+                "layoutAngleOffsetInRevs": 0.2,
+                "numPoints": 3,
+                "extent": 0.025,
+                "orientationAngleOffsetInRevs": 0.5
+            },
+            {
+                "numObstacles": 3,
+                "layoutRadius": 0.25,
+                "layoutAngleOffsetInRevs": 0.36666666667,
+                "numPoints": 4,
+                "extent": 0.01,
+                "orientationAngleOffsetInRevs": 0
+            },
+            {
+                "type": "inward",
+                "layoutRadius": 0.15,
+                "extent": 0.1,
+                "numObstacles": 3,
+                "layoutAngleOffsetInRevs": 0.2,
+                "angularWidthInRevs": 0.01,
+                "health": 200
+            }
+        ],
+        "numPoints": 6,
+        angleOffsetInRevs: 0.2,
     },
     "double": {
         "numPoints": 4,
@@ -263,6 +295,29 @@ export const Layouts: Layouts = {
         ],
         "numPoints": 3,
         "angleOffsetInRevs": 0.16666667,
+    },
+    "square": {
+        "numPoints": 4,
+        "obstacles": [
+            {
+                "type": "fast",
+                "layoutRadius": 0.2,
+                "extent": 0.002,
+                "numObstacles": 2,
+                "layoutAngleOffsetInRevs": 0.125,
+                "angularWidthInRevs": 0.25,
+                "health": 200
+            },
+            {
+                "numObstacles": 2,
+                "layoutRadius": 0.33,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.007,
+                "orientationAngleOffsetInRevs": 0
+            }
+        ],
+        "angleOffsetInRevs": 0.125
     },
     "surrounded": {
         "obstacles": [

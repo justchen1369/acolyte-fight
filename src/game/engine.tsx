@@ -179,6 +179,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		detonate: template.detonate,
 		mirror: template.mirror,
 		impulse: template.impulse || 0,
+		conveyor: template.conveyor,
 
 		hitInterval: template.hitInterval || 1,
 		hitTickLookup: new Map<string, number>(),
@@ -1765,6 +1766,28 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 			obstacle.activeTick = world.tick;
 		}
 	}
+
+	conveyor(world, hero, obstacle);
+}
+
+function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
+	if (obstacle.conveyor) {
+		const mapCenter = pl.Vec2(0.5, 0.5);
+
+		const offset = vector.diff(hero.body.getPosition(), mapCenter);
+		const outward = vector.unit(offset);
+
+		let step = vector.zero();
+		if (obstacle.conveyor.lateralSpeed) {
+			step = vector.plus(step, vector.multiply(vector.rotateRight(outward), obstacle.conveyor.lateralSpeed / TicksPerSecond));
+		}
+
+		if (obstacle.conveyor.radialSpeed) {
+			step = vector.plus(step, vector.multiply(outward, obstacle.conveyor.radialSpeed / TicksPerSecond));
+		}
+
+		hero.conveyorShift = step;
+	}
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
@@ -1947,8 +1970,13 @@ function expireOn(world: w.World, projectile: w.Projectile, other: w.WorldObject
 	const expireOn = (projectile.expireOn & other.categories) && (world.tick >= projectile.createTick + projectile.minTicks);
 	if (!expireOn) { return false; }
 
-	if (other.category === "obstacle" && other.mirror && !projectile.expireOnMirror) {
-		return false;
+	if (other.category === "obstacle") {
+		if (other.sensor) {
+			return false;
+		}
+		if (other.mirror && !projectile.expireOnMirror) {
+			return false;
+		}
 	}
 
 	if (other.category === "hero") {
@@ -2968,7 +2996,12 @@ function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProp
 
 	const idealStep = vector.truncate(vector.diff(target, current), movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
 	const facing = vector.fromAngle(hero.body.getAngle());
-	const step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
+
+	let step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
+	if (hero.conveyorShift) {
+		step = vector.plus(step, hero.conveyorShift);
+		hero.conveyorShift = null;
+	}
 
 	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
 

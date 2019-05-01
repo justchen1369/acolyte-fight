@@ -1,5 +1,7 @@
 import { TicksPerSecond, Categories, Pixel, Alliances } from './constants';
 
+const ConveyorSpeed = 0.15;
+
 export const volcano: ObstacleTemplate = {
     health: 50,
 
@@ -119,6 +121,59 @@ export const fast: ObstacleTemplate = {
     ],
 }
 
+export const conveyorBase: ObstacleTemplate = {
+    health: 50,
+
+    collideWith: Categories.Hero,
+    sensor: true,
+    static: true,
+
+    render: [
+        {
+            type: "solid",
+            "color": "rgba(64, 64, 64, 0.75)",
+            deadColor: "rgba(64, 64, 64, 0.25)",
+            glow: 0.2,
+            flash: true,
+        },
+        {
+            type: "smoke",
+            "color": "rgba(128, 128, 128, 1)",
+            particleRadius: 0.002,
+            "fade": "rgba(0, 0, 0, 0)",
+            "ticks": 20,
+            "interval": 4,
+            speed: 0,
+            conveyor: 0.25,
+        }
+    ],
+}
+
+export const right: ObstacleTemplate = {
+    ...conveyorBase,
+    conveyor: {
+        lateralSpeed: ConveyorSpeed,
+    },
+}
+export const left: ObstacleTemplate = {
+    ...conveyorBase,
+    conveyor: {
+        lateralSpeed: -ConveyorSpeed,
+    },
+}
+export const outward: ObstacleTemplate = {
+    ...conveyorBase,
+    conveyor: {
+        radialSpeed: ConveyorSpeed,
+    },
+}
+export const inward: ObstacleTemplate = {
+    ...conveyorBase,
+    conveyor: {
+        radialSpeed: -ConveyorSpeed,
+    },
+}
+
 export const screen: ObstacleTemplate = {
     "health": 50,
 
@@ -143,128 +198,142 @@ export const screen: ObstacleTemplate = {
     mirror: true,
 };
 
-export const ObstacleTemplates: ObstacleTemplateLookup = {
-    default: {
-        health: 50,
+const defaultTemplate: ObstacleTemplate = {
+    health: 50,
 
-        render: [
-            {
-                type: "solid",
-                color: '#ccc',
-                deadColor: '#c33',
-                strikeGrow: 0.005,
-                flash: true,
-            },
-            {
-                type: "solid",
-                color: '#888',
-                deadColor: '#822',
-                expand: -0.005,
-                strikeGrow: 0.005,
-                flash: true,
-            },
-        ],
-    },
-    explosive: {
-        health: 50,
-        density: 10,
-
-        render: [
-            {
-                type: "solid",
-                color: "#fc0",
-                deadColor: "#fc0",
-                strikeGrow: 0.005,
-                flash: true,
-            },
-            {
-                type: "solid",
-                color: "#c94",
-                deadColor: "#fc8",
-                expand: -0.002,
-                strikeGrow: 0.005,
-                flash: true,
-            },
-        ],
-
-        expireOn: Categories.Hero,
-        detonate: {
-            damage: 0,
-            minImpulse: 0.0002,
-            maxImpulse: 0.0005,
-            radius: 0.05,
-            renderTicks: 30,
+    render: [
+        {
+            type: "solid",
+            color: '#ccc',
+            deadColor: '#c33',
+            strikeGrow: 0.005,
+            flash: true,
         },
+        {
+            type: "solid",
+            color: '#888',
+            deadColor: '#822',
+            expand: -0.005,
+            strikeGrow: 0.005,
+            flash: true,
+        },
+    ],
+};
+
+const explosive: ObstacleTemplate = {
+    health: 50,
+    density: 10,
+
+    render: [
+        {
+            type: "solid",
+            color: "#fc0",
+            deadColor: "#fc0",
+            strikeGrow: 0.005,
+            flash: true,
+        },
+        {
+            type: "solid",
+            color: "#c94",
+            deadColor: "#fc8",
+            expand: -0.002,
+            strikeGrow: 0.005,
+            flash: true,
+        },
+    ],
+
+    expireOn: Categories.Hero,
+    detonate: {
+        damage: 0,
+        minImpulse: 0.0002,
+        maxImpulse: 0.0005,
+        radius: 0.05,
+        renderTicks: 30,
     },
-    "mirror": {
-        "health": 50,
+};
 
-        render: [
-            {
-                type: "solid",
-                "color": "#0cf",
-                strikeGrow: 0.005,
-                flash: true,
-            },
-            {
-                type: "solid",
-                "color": "#0ad",
-                "deadColor": "#48f",
-                "expand": -0.003,
-                strikeGrow: 0.005,
-                flash: true,
-            },
-        ],
+const mirror: ObstacleTemplate = {
+    "health": 50,
 
-        mirror: true,
-    },
-    bumper: {
-        "health": 50,
+    render: [
+        {
+            type: "solid",
+            "color": "#0cf",
+            strikeGrow: 0.005,
+            flash: true,
+        },
+        {
+            type: "solid",
+            "color": "#0ad",
+            "deadColor": "#48f",
+            "expand": -0.003,
+            strikeGrow: 0.005,
+            flash: true,
+        },
+    ],
 
-        render: [
-            {
-                type: "solid",
-                color: "#fc0",
-                strikeGrow: 0.005,
-                flash: true,
-            },
-            {
-                type: "solid",
-                "color": "#c94",
-                "deadColor": "#753",
-                expand: -0.004,
-                strikeGrow: 0.005,
-                flash: true,
-            },
-        ],
+    mirror: true,
+};
 
-        "impulse": 0.00015,
-    },
-    spinner: {
-        health: 100,
+const bumper: ObstacleTemplate = {
+    "health": 50,
 
-        render: [
-            {
-                type: "solid",
-                color: '#ccc',
-                deadColor: '#c33',
-                strikeGrow: 0.005,
-                flash: true,
-            },
-            {
-                type: "solid",
-                color: '#888',
-                deadColor: '#822',
-                expand: -0.005,
-                strikeGrow: 0.005,
-                flash: true,
-            },
-        ],
+    render: [
+        {
+            type: "solid",
+            color: "#fc0",
+            strikeGrow: 0.005,
+            flash: true,
+        },
+        {
+            type: "solid",
+            "color": "#c94",
+            "deadColor": "#753",
+            expand: -0.004,
+            strikeGrow: 0.005,
+            flash: true,
+        },
+    ],
 
-        angularDamping: 0.1,
-    },
+    "impulse": 0.00015,
+};
+
+const spinner: ObstacleTemplate = {
+    health: 100,
+
+    render: [
+        {
+            type: "solid",
+            color: '#ccc',
+            deadColor: '#c33',
+            strikeGrow: 0.005,
+            flash: true,
+        },
+        {
+            type: "solid",
+            color: '#888',
+            deadColor: '#822',
+            expand: -0.005,
+            strikeGrow: 0.005,
+            flash: true,
+        },
+    ],
+
+    angularDamping: 0.1,
+};
+
+export const ObstacleTemplates: ObstacleTemplateLookup = {
+    default: defaultTemplate,
+    explosive,
+    bumper,
+    mirror,
+    spinner,
     screen,
     volcano,
     slow,
     fast,
+    right,
+    left,
+    outward,
+    inward,
 };
