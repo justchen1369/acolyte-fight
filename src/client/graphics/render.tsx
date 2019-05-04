@@ -118,19 +118,19 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	const CenterAlpha = 0.004;
 	const ZoomAlpha = 0.003;
 
-	const MinDistanceFactor = 2.25;
-	const TargetDistanceFactor = 2.25;
 	const MaxZoom = 2;
 	const MinPixelsForZoom = 1024;
-	const SelfAlpha = 0.75;
+	const SelfAlpha = 0.5;
 
 	const CenterTolerance = 0.15;
 	const ZoomTolerance = 0.2;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
+
+	// Calculate max zoom
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const pixels = Math.min(rect.width, rect.height);
-	let maxZoom = Math.max(1, Math.min(MaxZoom, Math.min(MinPixelsForZoom / pixels)));
+	const maxZoom = Math.max(1, Math.min(MaxZoom, MinPixelsForZoom / pixels));
 
 	// Load existing camera
 	const camera = world.ui.camera;
@@ -141,54 +141,53 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 		zoom: 1,
 		center: mapCenter,
 	};
-	if (!world.winners && world.ui.myHeroId && world.ui.nextTarget) {
+	if (options.cameraFollow && world.ui.myHeroId && world.ui.nextTarget) {
 		const hero = world.objects.get(world.ui.myHeroId);
 		if (hero) {
 			const pos = hero.body.getPosition();
 			const target = world.ui.nextTarget;
 
 			// Must be able to see self
-			clampZoom = 1 / Math.max(1e-6, MinDistanceFactor * vector.distance(pos, camera.center));
+			clampZoom = calculateZoom(vector.distance(pos, camera.center), maxZoom);
 
 			// Zoom relative to current center, not new one
 			let distance = Math.max(vector.distance(target, camera.center), vector.distance(pos, camera.center));
-			let zoom = 1 / Math.max(1e-6, TargetDistanceFactor * distance);
-			zoom = Math.max(1, Math.min(maxZoom, zoom));
+			let zoom = calculateZoom(distance, maxZoom);
 
-			if (Math.abs(zoom - camera.zoom) <= ZoomTolerance) {
-				zoom = camera.zoom;
-			}
-
-			// New center
-			let center = cameraTarget.center;
-			if (zoom > 1.1) {
-				center = zoom <= 1 ? mapCenter : pl.Vec2(
+			// New center - only pan if some zooming is involved
+			let center = camera.center;
+			if (maxZoom > 1.1) {
+				center = pl.Vec2(
 					SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
 					SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
 				);
-
-				if (vector.distance(center, camera.center) <= CenterTolerance) {
-					center = camera.center;
-				}
 			}
 
-			// Result
-			cameraTarget = { center, zoom };
+			// Assign
+			cameraTarget.center = vector.distance(center, camera.center) <= CenterTolerance ? camera.center : center;
+			cameraTarget.zoom = Math.abs(zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : zoom;
 		}
 	}
 
 	// Ease
-	const newCenter = pl.Vec2(
-		CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
-		CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
-	);
-	const newZoom = ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom;
-
 	const newCamera: w.Camera = {
-		zoom: Math.min(clampZoom, newZoom),
-		center: newCenter,
+		zoom: Math.min(clampZoom, ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom),
+		center: pl.Vec2(
+			CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
+			CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
+		),
 	};
 	world.ui.camera = newCamera;
+}
+
+function clamp(value: number, min: number, max: number) {
+	return Math.max(min, Math.min(max, value));
+}
+
+function calculateZoom(distance: number, maxZoom: number) {
+	const TargetDistanceFactor = 2.25;
+	const zoom = 1 / Math.max(1e-6, TargetDistanceFactor * distance);
+	return clamp(zoom, 1, maxZoom);
 }
 
 export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions): Dimensions {

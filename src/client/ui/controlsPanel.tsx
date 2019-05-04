@@ -41,6 +41,7 @@ interface ControlState {
     doubleTapKey: string;
     actionWheelSide: string;
     targetingIndicator: string;
+    cameraFollow: string;
     sounds: string;
 }
 interface State extends ControlState {
@@ -68,6 +69,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         doubleTapKey: rebindings[w.SpecialKeys.DoubleTap],
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
+        cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
     };
 }
@@ -160,6 +162,7 @@ class ControlsPanel extends React.Component<Props, State> {
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
             </div>}
+            <div className="row"></div>
             {isMobile && <div className="row">
                 <span className="label">Action wheel</span>
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onActionWheelSideSelected(ev.target.value)}>
@@ -168,12 +171,20 @@ class ControlsPanel extends React.Component<Props, State> {
                 </select>
             </div>}
             <div className="row">
+                <span className="label">Camera follow</span>
+                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onCameraFollowSelected(ev.target.value)}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
+            <div className="row">
                 <span className="label">Targeting Indicator</span>
                 <select className="value" value={this.state.targetingIndicator} onChange={ev => this.onTargetingIndicatorSelected(ev.target.value)}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
+            <div className="row"></div>
             {<div className="row">
                 <span className="label">Sound</span>
                 <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
@@ -233,6 +244,11 @@ class ControlsPanel extends React.Component<Props, State> {
         this.saveStateDebounced();
     }
 
+    private onCameraFollowSelected(cameraFollow: string) {
+        this.setState({ cameraFollow, changed: true, saved: false });
+        this.saveStateDebounced();
+    }
+
     private onTargetingIndicatorSelected(targetingIndicator: string) {
         this.setState({ targetingIndicator, changed: true, saved: false });
         this.saveStateDebounced();
@@ -271,6 +287,7 @@ class ControlsPanel extends React.Component<Props, State> {
             options.wheelOnRight = state.actionWheelSide === Side.Right;
             options.mute = state.sounds === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
+            options.noCameraFollow = state.cameraFollow === Toggle.Off;
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

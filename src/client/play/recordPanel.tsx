@@ -262,6 +262,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             rtx: GraphicsLevel.Ultimate,
             wheelOnRight: false,
             targetingIndicator: false,
+            cameraFollow: false,
             mute: this.props.mute,
             keysToSpells: new Map<string, string>(),
             rebindings: {},

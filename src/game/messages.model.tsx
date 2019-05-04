@@ -59,6 +59,7 @@ export interface UpdateUserSettingsResponse {
 export interface GameOptions {
     wheelOnRight?: boolean;
     noTargetingIndicator?: boolean;
+    noCameraFollow?: boolean;
     mute?: boolean;
     unranked?: boolean;
 }
