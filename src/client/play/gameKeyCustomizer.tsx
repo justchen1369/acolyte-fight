@@ -17,6 +17,7 @@ interface Props {
     gameId: string;
     heroId: string;
     allowSpellChoosing: boolean;
+    gameStarting: boolean;
     gameStarted: boolean;
     hoverBtn: string;
     hoverSpellId: string;
@@ -33,6 +34,7 @@ function stateToProps(state: s.State): Props {
         btn: state.world.ui.customizingBtn,
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
+        gameStarting: engine.isGameStarting(state.world),
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         gameStarted: state.world.tick >= state.world.startTick,
         hoverBtn: state.world.ui.hoverBtn,
@@ -69,6 +71,10 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderChangeSpellHint() {
+        if (this.props.gameStarting) {
+            return null;
+        }
+
         if (isMobile) {
             return null; // No hint for mobile
         } else {
@@ -77,6 +83,10 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderMobileHint(hoverBtn: string, hoverSpellId: string) {
+        if (this.props.gameStarting) {
+            return null;
+        }
+
         const spell = this.props.settings.Spells[hoverSpellId];
         if (!spell) {
             return null;

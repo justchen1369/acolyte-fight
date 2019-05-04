@@ -146,7 +146,7 @@ class AiWorker {
             // Nothing to do
         } else if (message.type === "action") {
             const world = StoreProvider.getState().world;
-            const spellsAllowed = engine.hasGamePrestarted(world);
+            const spellsAllowed = engine.isGameStarting(world);
             if (message.action.spellId === "move" || spellsAllowed) {
                 sendAction(this.gameId, this.heroId, {
                     type: message.action.spellId,
@@ -160,7 +160,7 @@ class AiWorker {
 function worldToState(world: w.World, myHeroId: string): WorldContract {
     const contract: WorldContract = {
         tick: world.tick,
-        prestarted: engine.hasGamePrestarted(world),
+        starting: engine.isGameStarting(world),
         started: world.tick >= world.startTick,
         heroes: {},
         projectiles: {},

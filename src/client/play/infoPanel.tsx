@@ -40,7 +40,7 @@ function stateToProps(state: s.State): Props {
         activePlayers: world.activePlayers,
         players: world.players,
         teams: calculateTeams(state),
-        started: engine.hasGamePrestarted(world),
+        started: engine.isGameStarting(world),
         waitingForPlayers: world.tick < world.startTick,
         live: world.ui.live,
         mute: state.options && state.options.mute,

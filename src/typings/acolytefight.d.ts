@@ -821,7 +821,7 @@ interface SoundBite {
 
 declare interface WorldContract {
 	tick: number;
-	prestarted: boolean; // Whether spells are allowed to be cast yet
+	starting: boolean; // Whether spells are allowed to be cast yet
 	started: boolean; // Whether heroes can take damage yet
 
 	heroes: { [id: string]: HeroContract };
