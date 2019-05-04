@@ -361,10 +361,6 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 }
 
 function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
-	if (options.rtx <= r.GraphicsLevel.Minimum) {
-		return;
-	}
-
 	const NumParticles = 10;
 	const ExplodeSpeed = 0.1;
 	const MaxParticleRadius = 0.01;
