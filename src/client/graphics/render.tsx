@@ -119,7 +119,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	const ZoomAlpha = 0.003;
 
 	const MaxZoom = 2;
-	const MinPixelsForZoom = 1024;
+	const MinPixelsForZoom = 800;
 	const SelfAlpha = 0.5;
 
 	const CenterTolerance = 0.15;
