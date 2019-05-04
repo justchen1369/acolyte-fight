@@ -68,8 +68,6 @@ function stateToProps(state: s.State): Props {
 }
 
 class ControlSurface extends React.PureComponent<Props, State> {
-    private controlSurfaceElem: HTMLElement = null;
-
     private currentTouch: TouchState = null;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
@@ -128,7 +126,6 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 className={className}
 
                 ref={c => {
-                    this.controlSurfaceElem = c;
                     if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
                         c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
                         c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
@@ -154,21 +151,20 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private takeMousePoint(e: React.MouseEvent<HTMLElement>): PointInfo {
         const secondaryBtn = !!e.button;
-        return this.pointInfo(MouseId, e.target as HTMLElement, e.clientX, e.clientY, secondaryBtn);
+        return this.pointInfo(MouseId, e.clientX, e.clientY, secondaryBtn);
     }
 
     private takeTouchPoint(e: React.TouchEvent<HTMLElement>): PointInfo[] {
         let points = new Array<PointInfo>();
         for (let i = 0; i < e.changedTouches.length; ++i) {
             const touch = e.changedTouches.item(i);
-            points.push(this.pointInfo("touch" + touch.identifier, e.target as HTMLElement, touch.clientX, touch.clientY));
+            points.push(this.pointInfo("touch" + touch.identifier, touch.clientX, touch.clientY));
         }
         return points;
     }
 
-    private pointInfo(touchId: string, elem: HTMLElement, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
-        const rect = (this.controlSurfaceElem || elem).getBoundingClientRect();
-        const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
+    private pointInfo(touchId: string, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
+        const interfacePoint = pl.Vec2(clientX, clientY);
         const worldPoint = worldPointFromInterfacePoint(interfacePoint, this.props.world);
 
         return {
