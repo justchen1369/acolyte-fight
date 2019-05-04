@@ -110,6 +110,10 @@ export function initialWorld(mod: Object): w.World {
 			trails: [],
 			sounds: [],
 			notifications: [],
+			camera: {
+				zoom: 1,
+				center: pl.Vec2(0.5, 0.5),
+			},
 		},
 	};
 

@@ -12,7 +12,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond, Pixel } from '../../game/constants';
-import { CanvasStack, GraphicsLevel, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../graphics/render';
+import { CanvasStack, Dimensions, GraphicsLevel, worldPointFromInterfacePoint, whichKeyClicked, touchControls, resetRenderState } from '../graphics/render';
 import { sendAction } from '../core/ticker';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
@@ -155,6 +155,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         gl: null,
         ui: null,
     };
+    private renderedState: Dimensions = null;
 
     private resolveKeys = Reselect.createSelector(
         (props: Props) => props.keyBindings,
@@ -259,7 +260,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private pointInfo(touchId: string, elem: HTMLCanvasElement, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
         const rect = elem.getBoundingClientRect();
         const interfacePoint = pl.Vec2((clientX - rect.left), (clientY - rect.top));
-        const worldPoint = worldPointFromInterfacePoint(interfacePoint, rect, this.props.wheelOnRight);
+        const worldPoint = worldPointFromInterfacePoint(interfacePoint, this.renderedState);
 
         return {
             touchId,
@@ -489,7 +490,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         return vector.towards(center, target, maxRadius);
     }
 
-    private handleLongProcessIfNecessary() {
+    private handleLongPressIfNecessary() {
         if (this.actionSurface && !this.targetSurface) { // If targeting, probably not trying to bring up the spell customizer
             const world = this.props.world;
             const pressLength = Date.now() - this.actionSurface.time;
@@ -590,7 +591,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private frame() {
         if (this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
-            frame(this.canvasStack, this.props.world, {
+            this.renderedState = frame(this.canvasStack, this.props.world, {
                 rtx: this.state.rtx,
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
@@ -598,7 +599,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
             });
-            this.handleLongProcessIfNecessary();
+            this.handleLongPressIfNecessary();
         }
     }
 }

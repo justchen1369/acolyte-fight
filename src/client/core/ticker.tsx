@@ -5,7 +5,7 @@ import * as engine from '../../game/engine';
 import * as processor from './processor';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
-import { render, CanvasStack, RenderOptions } from '../graphics/render';
+import { render, direct, CanvasStack, Dimensions, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
@@ -71,7 +71,7 @@ function incomingLoop(minFramesToProcess: number) {
 	}
 }
 
-export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
+export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions): Dimensions {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
 		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
@@ -104,7 +104,8 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
 		*/
 	}
-	render(world, canvasStack, renderOptions);
+	direct(world, canvasStack, renderOptions);
+	const result = render(world, canvasStack, renderOptions);
 
 	const notifications = engine.takeNotifications(world);
 	if (notifications.length > 0) {
@@ -112,6 +113,8 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	}
 
 	sendSnapshot(world);
+
+	return result;
 }
 
 export function onTickMsg(data: m.TickMsg) {

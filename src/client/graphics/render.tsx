@@ -21,6 +21,12 @@ export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
+export interface Dimensions {
+	rect: ClientRect;
+	viewRect: ClientRect;
+	worldRect: ClientRect;
+}
+
 interface SwirlContext {
 	color?: string;
 	baseVelocity?: pl.Vec2;
@@ -34,16 +40,15 @@ export function resetRenderState(world: w.World) {
 	world.ui.buttonBar = null;
 }
 
-export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, rect: ClientRect, wheelOnRight: boolean) {
-	const viewRect = calculateViewRects(rect, wheelOnRight);
-	const worldPoint = worldPointFromViewRect(interfacePoint, viewRect);
-	return worldPoint;
-}
-
-export function worldPointFromViewRect(interfacePoint: pl.Vec2, viewRect: ClientRect) {
-	const worldRect = calculateWorldRect(viewRect);
-	const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
-	return worldPoint;
+export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, frame: Dimensions) {
+	if (frame) {
+		const worldRect = frame.worldRect;
+		const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
+		return worldPoint;
+	} else {
+		// Default to map center if not yet rendered
+		return pl.Vec2(0.5, 0.5);
+	}
 }
 
 function calculateViewRects(rect: ClientRect, wheelOnRight: boolean): ClientRect {
@@ -94,14 +99,14 @@ function calculateViewRects(rect: ClientRect, wheelOnRight: boolean): ClientRect
 	}
 }
 
-function calculateWorldRect(viewRect: ClientRect): ClientRect {
-	const size = Math.min(viewRect.width, viewRect.height);
+function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect {
+	const size = camera.zoom * Math.min(viewRect.width, viewRect.height);
 
 	const width = size;
 	const height = size;
 
-	const left = viewRect.left + (viewRect.width - size) / 2.0;
-	const top = viewRect.top + (viewRect.height - size) / 2.0;
+	const left = viewRect.left + (viewRect.width / 2) - (camera.center.x * size);
+	const top = viewRect.top + (viewRect.height / 2) - (camera.center.y * size);
 
 	const right = left + width;
 	const bottom = top + height;
@@ -109,10 +114,70 @@ function calculateWorldRect(viewRect: ClientRect): ClientRect {
 	return { left, top, right, bottom, width, height };
 }
 
-export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
+export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
+	const CenterAlpha = 0.001;
+	const ZoomAlpha = 0.003;
+
+	const MinDistanceFactor = 2.05;
+	const TargetDistanceFactor = 2.5;
+	const MaxZoom = 2;
+	const MinPixelsForZoom = 800;
+
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	const rect = canvasStack.ui.getBoundingClientRect();
+	const pixels = Math.min(rect.width, rect.height);
+	let maxZoom = Math.max(1, Math.min(MaxZoom, Math.min(MinPixelsForZoom / pixels)));
+
+	// Load existing camera
+	const camera = world.ui.camera;
+
+	// Choose new target
+	let clampZoom = maxZoom;
+	let cameraTarget: w.Camera = {
+		zoom: 1,
+		center: mapCenter,
+	};
+	if (maxZoom > 1 && !world.winners && world.ui.myHeroId && world.ui.nextTarget) {
+		const hero = world.objects.get(world.ui.myHeroId);
+		if (hero) {
+			const pos = hero.body.getPosition();
+			const target = world.ui.nextTarget;
+
+			// Must be able to see self
+			clampZoom = 1 / Math.max(1e-6, MinDistanceFactor * vector.distance(pos, camera.center));
+
+			// Zoom relative to current center, not new one
+			let distance = Math.max(vector.distance(target, camera.center), vector.distance(pos, camera.center));
+			let zoom = 1 / Math.max(1e-6, TargetDistanceFactor * distance);
+			zoom = Math.max(1, Math.min(maxZoom, zoom));
+
+			// New center
+			const alpha = (zoom - 1) / (maxZoom - 1);
+			const center = pl.Vec2(
+				alpha * pos.x + (1 - alpha) * mapCenter.x,
+				alpha * pos.y + (1 - alpha) * mapCenter.y,
+			);
+
+			// Result
+			cameraTarget = { center, zoom };
+		}
+	}
+
+	// Ease
+	const newCamera: w.Camera = {
+		zoom: Math.min(clampZoom, ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom),
+		center: pl.Vec2(
+			CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
+			CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
+		),
+	};
+	world.ui.camera = newCamera;
+}
+
+export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions): Dimensions {
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
-	const worldRect = calculateWorldRect(viewRect);
+	const worldRect = calculateWorldRect(viewRect, world.ui.camera);
 	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
 
 	const ctxStack: CanvasCtxStack = {
@@ -141,6 +206,12 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	world.ui.sounds = [];
 
 	world.ui.renderedTick = world.tick;
+
+	return {
+		rect,
+		viewRect,
+		worldRect,
+	};
 }
 
 function playSounds(world: w.World, options: RenderOptions) {

@@ -115,8 +115,14 @@ export interface UIState {
 	buttonBar?: ButtonConfig;
 	hoverBtn?: string;
 	customizingBtn?: string;
+	camera: Camera;
 
 	saved?: boolean;
+}
+
+export interface Camera {
+	zoom: number;
+	center: pl.Vec2;
 }
 
 export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;
