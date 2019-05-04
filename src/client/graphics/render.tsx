@@ -115,13 +115,13 @@ function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect 
 }
 
 export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
-	const CenterAlpha = 0.005;
+	const CenterAlpha = 0.004;
 	const ZoomAlpha = 0.003;
 
 	const MinDistanceFactor = 2.25;
-	const TargetDistanceFactor = 2.5;
+	const TargetDistanceFactor = 2.25;
 	const MaxZoom = 2;
-	const MinPixelsForZoom = 800;
+	const MinPixelsForZoom = 1024;
 	const SelfAlpha = 0.75;
 
 	const CenterTolerance = 0.15;
@@ -141,7 +141,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 		zoom: 1,
 		center: mapCenter,
 	};
-	if (maxZoom > 1 && !world.winners && world.ui.myHeroId && world.ui.nextTarget) {
+	if (!world.winners && world.ui.myHeroId && world.ui.nextTarget) {
 		const hero = world.objects.get(world.ui.myHeroId);
 		if (hero) {
 			const pos = hero.body.getPosition();
@@ -155,11 +155,22 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			let zoom = 1 / Math.max(1e-6, TargetDistanceFactor * distance);
 			zoom = Math.max(1, Math.min(maxZoom, zoom));
 
+			if (Math.abs(zoom - camera.zoom) <= ZoomTolerance) {
+				zoom = camera.zoom;
+			}
+
 			// New center
-			const center = zoom <= 1 ? mapCenter : pl.Vec2(
-				SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
-				SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
-			);
+			let center = cameraTarget.center;
+			if (zoom > 1.1) {
+				center = zoom <= 1 ? mapCenter : pl.Vec2(
+					SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
+					SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
+				);
+
+				if (vector.distance(center, camera.center) <= CenterTolerance) {
+					center = camera.center;
+				}
+			}
 
 			// Result
 			cameraTarget = { center, zoom };
@@ -174,8 +185,8 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	const newZoom = ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom;
 
 	const newCamera: w.Camera = {
-		zoom: Math.min(clampZoom, Math.abs(cameraTarget.zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : newZoom),
-		center: vector.distance(cameraTarget.center, camera.center) <= CenterTolerance ? camera.center : newCenter, // Don't move camera unless we moved far enough
+		zoom: Math.min(clampZoom, newZoom),
+		center: newCenter,
 	};
 	world.ui.camera = newCamera;
 }
