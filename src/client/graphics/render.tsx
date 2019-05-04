@@ -124,7 +124,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	const MinPixelsForZoom = 800;
 	const SelfAlpha = 0.75;
 
-	const CameraTolerance = 0.15;
+	const CenterTolerance = 0.15;
 	const ZoomTolerance = 0.2;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
@@ -175,7 +175,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 
 	const newCamera: w.Camera = {
 		zoom: Math.min(clampZoom, Math.abs(cameraTarget.zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : newZoom),
-		center: vector.distance(cameraTarget.center, camera.center) <= CameraTolerance ? camera.center : newCenter, // Don't move camera unless we moved far enough
+		center: vector.distance(cameraTarget.center, camera.center) <= CenterTolerance ? camera.center : newCenter, // Don't move camera unless we moved far enough
 	};
 	world.ui.camera = newCamera;
 }
