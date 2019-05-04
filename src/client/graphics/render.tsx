@@ -21,12 +21,6 @@ export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
-export interface Dimensions {
-	rect: ClientRect;
-	viewRect: ClientRect;
-	worldRect: ClientRect;
-}
-
 interface SwirlContext {
 	color?: string;
 	baseVelocity?: pl.Vec2;
@@ -40,9 +34,9 @@ export function resetRenderState(world: w.World) {
 	world.ui.buttonBar = null;
 }
 
-export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, frame: Dimensions) {
-	if (frame) {
-		const worldRect = frame.worldRect;
+export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, world: w.World) {
+	if (world.ui.renderDimensions) {
+		const worldRect = world.ui.renderDimensions.worldRect;
 		const worldPoint = pl.Vec2((interfacePoint.x - worldRect.left) / worldRect.width, (interfacePoint.y - worldRect.top) / worldRect.height);
 		return worldPoint;
 	} else {
@@ -190,7 +184,7 @@ function calculateZoom(distance: number, maxZoom: number) {
 	return clamp(zoom, 1, maxZoom);
 }
 
-export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions): Dimensions {
+export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect, world.ui.camera);
@@ -223,7 +217,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	world.ui.renderedTick = world.tick;
 
-	return {
+	world.ui.renderDimensions = {
 		rect,
 		viewRect,
 		worldRect,

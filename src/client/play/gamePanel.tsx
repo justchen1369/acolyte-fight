@@ -8,6 +8,7 @@ import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from '../ui/screenLifecycle';
 
+import ControlSurface from './controlSurface';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
@@ -49,14 +50,8 @@ class GamePanel extends React.PureComponent<Props, State> {
     render() {
         const a = options.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;
-        const className = classNames({
-            'mobile': isMobile,
-            'desktop': !isMobile,
-            'wheel-on-left': isMobile && !this.props.wheelOnRight,
-            'wheel-on-right': isMobile && this.props.wheelOnRight,
-        });
         return (
-            <div id="game-panel" className={className}>
+            <ControlSurface>
                 <CanvasPanel />
                 <InfoPanel />
                 <MessagesPanel />
@@ -68,7 +63,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                 <GameKeyCustomizer />
                 <UrlListener />
                 {this.props.watching && <WatchLooper />}
-            </div>
+            </ControlSurface>
         );
     }
 

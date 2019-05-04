@@ -116,6 +116,7 @@ export interface UIState {
 	hoverBtn?: string;
 	customizingBtn?: string;
 	camera: Camera;
+	renderDimensions?: RenderDimensions;
 
 	saved?: boolean;
 }
@@ -123,6 +124,12 @@ export interface UIState {
 export interface Camera {
 	zoom: number;
 	center: pl.Vec2;
+}
+
+export interface RenderDimensions {
+	rect: ClientRect;
+	viewRect: ClientRect;
+	worldRect: ClientRect;
 }
 
 export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;
