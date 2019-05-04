@@ -115,13 +115,17 @@ function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect 
 }
 
 export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
-	const CenterAlpha = 0.001;
+	const CenterAlpha = 0.005;
 	const ZoomAlpha = 0.003;
 
-	const MinDistanceFactor = 2.05;
+	const MinDistanceFactor = 2.25;
 	const TargetDistanceFactor = 2.5;
 	const MaxZoom = 2;
 	const MinPixelsForZoom = 800;
+	const SelfAlpha = 0.75;
+
+	const CameraTolerance = 0.15;
+	const ZoomTolerance = 0.2;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	const rect = canvasStack.ui.getBoundingClientRect();
@@ -152,10 +156,9 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			zoom = Math.max(1, Math.min(maxZoom, zoom));
 
 			// New center
-			const alpha = (zoom - 1) / (maxZoom - 1);
-			const center = pl.Vec2(
-				alpha * pos.x + (1 - alpha) * mapCenter.x,
-				alpha * pos.y + (1 - alpha) * mapCenter.y,
+			const center = zoom <= 1 ? mapCenter : pl.Vec2(
+				SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
+				SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
 			);
 
 			// Result
@@ -164,12 +167,15 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	}
 
 	// Ease
+	const newCenter = pl.Vec2(
+		CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
+		CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
+	);
+	const newZoom = ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom;
+
 	const newCamera: w.Camera = {
-		zoom: Math.min(clampZoom, ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom),
-		center: pl.Vec2(
-			CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
-			CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
-		),
+		zoom: Math.min(clampZoom, Math.abs(cameraTarget.zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : newZoom),
+		center: vector.distance(cameraTarget.center, camera.center) <= CameraTolerance ? camera.center : newCenter, // Don't move camera unless we moved far enough
 	};
 	world.ui.camera = newCamera;
 }
