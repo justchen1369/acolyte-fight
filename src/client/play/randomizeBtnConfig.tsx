@@ -42,14 +42,18 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
 
     render() {
         return <Button
+            onTouchStart={(ev) => { ev.stopPropagation(); ev.preventDefault(); this.onClick() }}
+            onTouchMove={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
+            onTouchEnd={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
+
             className="customize-btn"
-            onClick={(ev) => this.onClick(ev)}
-            onMouseEnter={(ev) => this.onMouseEnter(ev)}
-            onMouseLeave={(ev) => this.onMouseLeave(ev)}
+            onMouseDown={() => this.onClick()}
+            onMouseEnter={() => this.onMouseEnter()}
+            onMouseLeave={() => this.onMouseLeave()}
             >{this.props.children}</Button>
     }
     
-    private onClick(ev: React.MouseEvent) {
+    private onClick() {
         const Options = this.props.settings.Choices.Options;
 
         const keys = Object.keys(Options);
@@ -69,13 +73,13 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
         }
     }
 
-    private onMouseEnter(ev: React.MouseEvent) {
+    private onMouseEnter() {
         StoreProvider.dispatch({
             type: "updateToolbar",
             toolbar: { hoverRandomizer: true },
         });
     }
-    private onMouseLeave(ev: React.MouseEvent) {
+    private onMouseLeave() {
         StoreProvider.dispatch({
             type: "updateToolbar",
             toolbar: { hoverRandomizer: false },
