@@ -81,10 +81,14 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         }
 
         if (isMobile) {
-            return null; // No hint for mobile
+            return null;
         } else {
             return <div className="customize-hint">
-                <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)} />
+                <div>
+                    <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)}>
+                        <i className="fas fa-dice" />
+                    </RandomizeBtnConfig>
+                </div>
                 {this.props.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}
             </div>
         }

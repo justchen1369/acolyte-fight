@@ -162,7 +162,18 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             retinaMultiplier = 1;
         }
         return (
-            <div id="canvas-container" className={this.state.rtx ? "rtx-on" : "rtx-off"}>
+            <div
+                id="canvas-container"
+                className={this.state.rtx ? "rtx-on" : "rtx-off"}
+
+                ref={c => {
+                    if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
+                        c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
+                        c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
+                    }
+                }}
+                >
+
                 <canvas
                     id="gl" ref={c => this.canvasStack.gl = c} className="game"
                     width={Math.round(this.state.width * retinaMultiplier)} height={Math.round(this.state.height * retinaMultiplier)}

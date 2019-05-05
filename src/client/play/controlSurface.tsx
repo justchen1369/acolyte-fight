@@ -125,12 +125,6 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 id="game-panel"
                 className={className}
 
-                ref={c => {
-                    if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
-                        c.addEventListener("touchstart", (ev) => ev.preventDefault(), { passive: false });
-                        c.addEventListener("touchmove", (ev) => ev.preventDefault(), { passive: false });
-                    }
-                }}
                 onMouseDown={(ev) => this.touchStartHandler(this.takeMousePoint(ev))}
                 onMouseEnter={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
                 onMouseMove={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}

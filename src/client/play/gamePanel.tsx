@@ -8,6 +8,7 @@ import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from '../ui/screenLifecycle';
 
+import Button from '../controls/button';
 import ControlSurface from './controlSurface';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
@@ -56,9 +57,9 @@ class GamePanel extends React.PureComponent<Props, State> {
                 <InfoPanel />
                 <MessagesPanel />
                 <SpellInfoPanel />
-                {allowExit && <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
+                {allowExit && <Button className="nav-item exit-link" onClick={(ev) => this.onExitClicked(ev)}>
                     <i className="fa fa-chevron-left" /> Back to Home
-                </span>}
+                </Button>}
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
                 <GameKeyCustomizer />
                 <UrlListener />
@@ -67,7 +68,9 @@ class GamePanel extends React.PureComponent<Props, State> {
         );
     }
 
-    private onExitClicked() {
+    private onExitClicked(ev: React.MouseEvent) {
+        ev.stopPropagation();
+
         if (!(this.props.party)) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();

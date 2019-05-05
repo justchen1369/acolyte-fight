@@ -894,31 +894,38 @@ function retractor(behaviour: w.RetractorBehaviour, world: w.World) {
 }
 
 function handleOccurences(world: w.World) {
+	const newOccurences = new Array<w.Occurrence>();
+
 	world.occurrences.forEach(ev => {
+		let success = true;
 		if (ev.type === "closing") {
-			handleClosing(ev, world);
+			success = handleClosing(ev, world);
 		} else if (ev.type === "botting") {
-			handleBotting(ev, world);
+			success = handleBotting(ev, world);
 		} else if (ev.type === "join") {
-			handleJoining(ev, world);
+			success = handleJoining(ev, world);
 		} else if (ev.type === "leave") {
-			handleLeaving(ev, world);
+			success = handleLeaving(ev, world);
 		} else if (ev.type === "environment") {
-			seedEnvironment(ev, world);
+			success = seedEnvironment(ev, world);
 		} else if (ev.type === "text") {
-			handleTexting(ev, world);
+			success = handleTexting(ev, world);
 		} else if (ev.type === "spells") {
-			handleSpellChoosing(ev, world);
+			success = handleSpellChoosing(ev, world);
 		} else if (ev.type === "sync") {
-			handleSync(ev, world);
+			success = handleSync(ev, world);
+		}
+
+		if (!success) {
+			newOccurences.push(ev);
 		}
 	});
-	world.occurrences = [];
+	world.occurrences = newOccurences;
 }
 
 function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	if (world.seed !== null) {
-		return;
+		return true;
 	}
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
@@ -947,6 +954,8 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	}
 
 	layout.obstacles.forEach(obstacleTemplate => instantiateObstacles(obstacleTemplate, world));
+
+	return true;
 }
 
 function instantiateObstacles(template: ObstacleLayout, world: w.World) {
@@ -1050,6 +1059,8 @@ function handleSync(ev: w.Syncing, world: w.World) {
 			obj.body.setPosition(position);
 		}
 	}
+
+	return true;
 }
 
 function dequeueSnapshot(tick: number, world: w.World) {
@@ -1066,11 +1077,15 @@ function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
 	const ChangeCooldown = 15; // ticks
 
 	if (!allowSpellChoosing(world, ev.heroId)) {
-		return;
+		return true;
 	}
 
 	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category === "hero") {
+		if (hero.casting && hero.casting.uninterruptible) {
+			return false;
+		}
+
 		const previousSpellIds = [...hero.keysToSpells.values()];
 		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 		removeUnknownProjectilesFromHero(hero, world); // Disallow strategies which use two spells that should never co-occur
@@ -1085,6 +1100,8 @@ function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
 			}
 		});
 	}
+
+	return true;
 }
 
 function handleTexting(ev: w.Texting, world: w.World) {
@@ -1096,6 +1113,8 @@ function handleTexting(ev: w.Texting, world: w.World) {
 			text: ev.text,
 		});
 	}
+
+	return true;
 }
 
 function handleClosing(ev: w.Closing, world: w.World) {
@@ -1139,6 +1158,8 @@ function handleClosing(ev: w.Closing, world: w.World) {
 		ticksUntilClose: ev.ticksUntilClose,
 		teamSizes,
 	});
+
+	return true;
 }
 
 function assignTeams(numTeams: number, world: w.World): string[][] {
@@ -1223,7 +1244,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 	if (!hero) {
 		if (alreadyDead(ev.heroId, world)) {
 			console.log("Cannot revive dead player", ev.heroId);
-			return;
+			return true;
 		}
 
 		hero = addHero(world, ev.heroId);
@@ -1248,6 +1269,8 @@ function handleBotting(ev: w.Botting, world: w.World) {
 	world.activePlayers = world.activePlayers.delete(hero.id);
 
 	world.ui.notifications.push({ type: "bot", player });
+
+	return true;
 }
 
 function handleJoining(ev: w.Joining, world: w.World) {
@@ -1256,7 +1279,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	if (!hero) {
 		if (alreadyDead(ev.heroId, world)) {
 			console.log("Cannot revive dead player", ev.heroId);
-			return;
+			return true;
 		}
 
 		hero = addHero(world, ev.heroId);
@@ -1282,6 +1305,8 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	world.activePlayers = world.activePlayers.add(hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
+
+	return true;
 }
 
 function choosePlayerColor(heroId: string, userHash: string, preferredColor: string, world: w.World) {
@@ -1331,7 +1356,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 	console.log("Player left:", ev.heroId);
 	const player = world.players.get(ev.heroId);
 	if (!player) {
-		return;
+		return true;
 	}
 
 	world.activePlayers = world.activePlayers.delete(ev.heroId);
@@ -1350,6 +1375,8 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 
 		world.players = world.players.set(ev.heroId, newPlayer);
 	}
+
+	return true;
 }
 
 function handleActions(world: w.World) {

@@ -11,6 +11,7 @@ import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
+import Button from '../controls/button';
 import PlayButton from '../ui/playButton';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
@@ -188,7 +189,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         if (this.props.showingHelp) {
             const closeLink =
                 <div className="action-row">
-                    <span className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</span>
+                    <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</Button>
                 </div>;
 
             if (isMobile) {

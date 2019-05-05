@@ -10,6 +10,7 @@ import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
 import { loaded } from '../core/loader';
+import Button from '../controls/button';
 
 interface OwnProps {
     again?: boolean;
@@ -67,17 +68,17 @@ class PlayButton extends React.Component<Props, State> {
                 const relevant = party.members.filter(m => m.isLeader || !m.isObserver);
                 const readyCount = relevant.filter(m => m.ready).length;
                 const partySize = Math.max(1, relevant.length);
-                return <span className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)} title="Click to cancel">
+                return <Button className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)} title="Click to cancel">
                     <div className="waiting-for-party-progress" style={{ width: `${100 * readyCount / partySize}%` }}></div>
                     <div className="waiting-for-party-label">Waiting for Party...</div>
-                </span>
+                </Button>
             } else {
-                return <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPartyReadyClicked(true)}>
+                return <Button className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPartyReadyClicked(true)}>
                     {label}
-                </span>
+                </Button>
             }
         } else {
-            return <span className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{label}</span>
+            return <Button className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{label}</Button>
         }
     }
 

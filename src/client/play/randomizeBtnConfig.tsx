@@ -9,6 +9,7 @@ import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 
 interface OwnProps {
+    className?: string;
     btn?: string;
     settings: AcolyteFightSettings;
     onChosen?: (keyBindings: KeyBindings) => void;
@@ -39,17 +40,15 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <div>
-            <span
-                className="customize-btn"
-                onMouseDown={(ev) => this.onMouseDown(ev)}
-                onMouseEnter={(ev) => this.onMouseEnter(ev)}
-                onMouseLeave={(ev) => this.onMouseLeave(ev)}
-                ><i className="fas fa-dice" /></span>
-        </div>
+        return <span
+            className="customize-btn"
+            onClick={(ev) => this.onClick(ev)}
+            onMouseEnter={(ev) => this.onMouseEnter(ev)}
+            onMouseLeave={(ev) => this.onMouseLeave(ev)}
+            >{this.props.children}</span>
     }
     
-    private onMouseDown(ev: React.MouseEvent) {
+    private onClick(ev: React.MouseEvent) {
         ev.stopPropagation();
 
         const Options = this.props.settings.Choices.Options;

@@ -10,6 +10,7 @@ import * as engine from '../../game/engine';
 import * as matches from '../core/matches';
 import * as recording from '../core/recording';
 import * as StoreProvider from '../storeProvider';
+import Button from '../controls/button';
 import InfoPanelPlayer from './infoPanelPlayer';
 
 interface Team {
@@ -94,15 +95,15 @@ class InfoPanel extends React.PureComponent<Props, State> {
     private renderButtons() {
         if (this.props.myHeroId) {
             if (!this.props.started && this.props.players.size > 1 && this.props.players.valueSeq().every(p => p.isBot)) {
-                return <div className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</div>;
+                return <Button className="btn play-vs-ai-btn" onClick={() => matches.startCurrentGame()}>Start Game</Button>;
             } else if (this.props.waitingForPlayers && this.props.players.size < Matchmaking.TargetGameSize) {
-                return <div className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</div>;
+                return <Button className="btn play-vs-ai-btn" onClick={() => matches.addBotToCurrentGame()}>Play vs AI</Button>;
             } else {
                 return null;
             }
         } else {
             if ((!this.props.live || this.props.activePlayers.size === 0) && recording.isRecordingSupported()) {
-                return <div className="btn play-vs-ai-btn" onClick={() => this.onRecordClick()}>Save as Video <i className="fas fa-download" /></div>
+                return <Button className="btn play-vs-ai-btn" onClick={() => this.onRecordClick()}>Save as Video <i className="fas fa-download" /></Button>
             } else {
                 return null;
             }
