@@ -22,7 +22,7 @@ const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
 const LongPressMilliseconds = 500;
-const MaxTouchSurfaceSizeInPixels = 320;
+const MaxTouchSurfaceSizeInPixels = 240;
 
 interface Props {
     world: w.World;
