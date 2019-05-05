@@ -7,6 +7,7 @@ import * as keyboardUtils from '../core/keyboardUtils';
 import * as spellUtils from '../core/spellUtils';
 import * as StoreProvider from '../storeProvider';
 
+import Button from '../controls/button';
 import RandomizeBtnConfig from './randomizeBtnConfig';
 import SpellBtnConfig from './spellBtnConfig';
 
@@ -126,22 +127,27 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderCustomizeBtn(btn: string) {
-        return <div className="spell-config-container" onMouseDown={() => this.close()} onContextMenu={ev => ev.preventDefault()}>
+        return <div className="spell-config-container"
+            onTouchStart={(ev) => ev.stopPropagation()}
+            onTouchMove={(ev) => ev.stopPropagation()}
+            onMouseDown={(ev) => ev.stopPropagation()}
+            onMouseMove={(ev) => ev.stopPropagation()}
+            onClick={() => this.close()} onContextMenu={ev => ev.preventDefault()}>
             <div className="spell-config">
                 {this.props.gameStarted && <div className="in-progress-warning">Game in progress - change will apply to the next game</div>}
-                <SpellBtnConfig btn={btn} onChosen={(keyBindings) => this.onChosen(keyBindings)} settings={this.props.settings} />
+                <SpellBtnConfig btn={btn} onChosen={(keyBindings, random) => this.onChosen(keyBindings, random)} settings={this.props.settings} />
                 <div className="accept-row">
                     {!this.props.wheelOnRight && <div className="spacer" />}
-                    {isMobile && <div className="btn" onClick={() => this.close()}>OK</div>}
+                    {isMobile && <Button onClick={() => this.close()}>OK</Button>}
                     {this.props.wheelOnRight && <div className="spacer" />}
                 </div>
             </div>
         </div>
     }
 
-    private onChosen(keyBindings: KeyBindings) {
+    private onChosen(keyBindings: KeyBindings, random?: boolean) {
         sendKeyBindings(this.props.gameId, this.props.heroId, keyBindings);
-        if (!isMobile) {
+        if (!isMobile && !random) {
             this.close();
         }
     }
@@ -149,7 +155,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private close() {
         StoreProvider.dispatch({
             type: "updateToolbar",
-            toolbar: { customizingBtn: null },
+            toolbar: { customizingBtn: null, hoverRandomizer: false, hoverSpellId: null, hoverBtn: null },
         });
     }
 }

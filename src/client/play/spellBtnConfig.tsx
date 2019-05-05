@@ -18,7 +18,7 @@ interface OwnProps {
     btn: string;
     settings: AcolyteFightSettings;
     rebinding?: boolean;
-    onChosen?: (keyBindings: KeyBindings) => void;
+    onChosen?: (keyBindings: KeyBindings, random?: boolean) => void;
 }
 interface Props extends OwnProps {
     config: KeyBindings;
@@ -72,10 +72,9 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                 <div className="key-detail">
                     <div className="spell-name">{spellUtils.spellName(hovering ? hovering : chosen)}</div>
                     <div className="description">{hovering ? hovering.description : chosen.description}</div>
-                    {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : btn.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
-                <RandomizeBtnConfig btn={this.props.btn} settings={this.props.settings} onChosen={this.props.onChosen}><i className="fas fa-dice" /> Randomize</RandomizeBtnConfig>
+                <RandomizeBtnConfig btn={this.props.btn} settings={this.props.settings} onChosen={keyBindings => this.props.onChosen && this.props.onChosen(keyBindings, true)}><i className="fas fa-dice" /> Randomize</RandomizeBtnConfig>
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;

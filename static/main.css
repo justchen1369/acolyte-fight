@@ -928,15 +928,18 @@ i.clickable:hover, i.clickable:active {
     pointer-events: all;
     cursor: hand;
     color: #ccc;
-    padding: 8px;
-    font-size: 150%;
 }
 
 .customize-btn:hover {
     color: #00ccff;
 }
 
-.mobile .customize-btn {
+.customize-hint-container .customize-btn {
+    padding: 8px;
+    font-size: 150%;
+}
+
+.mobile .customize-hint-container .customize-btn {
     position: fixed;
     top: 90px;
     left: 1em;
@@ -1088,10 +1091,13 @@ h3 {
     padding: 0;
     font-size: 80%;
     
+}
+
+.page .spell-config .key .key-detail-container .customize-btn {
     display: none;
 }
 
-.spell-config .key:hover .key-detail-container .customize-btn {
+.page .spell-config .key:hover .key-detail-container .customize-btn {
     display: block;
 }
 
