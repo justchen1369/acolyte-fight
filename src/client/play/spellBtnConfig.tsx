@@ -10,8 +10,8 @@ import * as icons from '../core/icons';
 import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
+import Button from '../controls/button';
 import KeyControl from './keyControl';
-import RandomizeBtnConfig from './randomizeBtnConfig';
 import SpellStats from './spellStats';
 
 interface OwnProps {
@@ -74,7 +74,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                     <div className="description">{hovering ? hovering.description : chosen.description}</div>
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
-                <RandomizeBtnConfig btn={this.props.btn} settings={this.props.settings} onChosen={keyBindings => this.props.onChosen && this.props.onChosen(keyBindings, true)}><i className="fas fa-dice" /> Randomize</RandomizeBtnConfig>
+                <Button className="randomize-btn" onClick={() => this.onRandomizeClick()}><i className="fas fa-dice" /> Randomize</Button>
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;
@@ -132,8 +132,8 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                 attr={{
                     className,
                     title: spellUtils.spellName(spell),
-                    onMouseDown: () => this.onChoose(btn, spell.id),
-                    onTouchStart: () => this.onChoose(btn, spell.id),
+                    onMouseDown: () => this.onChoose(spell.id),
+                    onTouchStart: () => this.onChoose(spell.id),
                     onMouseEnter: () => this.onMouseHoverSpell(spell.id),
                     onMouseLeave: () => this.onMouseLeaveSpell(),
                 }}
@@ -150,10 +150,10 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
         this.setState({ hovering: null });
     }
     
-    private onChoose(key: string, spellId: string) {
+    private onChoose(spellId: string) {
         const config = { ...this.props.config };
 
-        config[key] = spellId;
+        config[this.props.btn] = spellId;
 
         keyboardUtils.updateKeyBindings(config);
 
@@ -162,6 +162,11 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
         if (this.props.onChosen) {
             this.props.onChosen(config);
         }
+    }
+
+    private onRandomizeClick() {
+        const newSpellId = keyboardUtils.randomizeSpellId(this.props.btn, this.props.config, this.props.settings);
+        this.onChoose(newSpellId);
     }
 }
 

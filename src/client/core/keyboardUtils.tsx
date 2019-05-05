@@ -126,3 +126,22 @@ export function updateKeyBindings(config: KeyBindings) {
     Storage.saveKeyBindingConfig(config);
     uploadSettingsDebounced();
 }
+
+export function allKeys(settings: AcolyteFightSettings) {
+    const Options = settings.Choices.Options;
+    return Object.keys(Options);
+}
+
+export function randomizeBtn(settings: AcolyteFightSettings) {
+    const keys = allKeys(settings);
+    const key = keys[Math.floor(Math.random() * keys.length)];
+    return key;
+}
+
+export function randomizeSpellId(btn: string, config: KeyBindings, settings: AcolyteFightSettings) {
+    const Options = settings.Choices.Options;
+
+    const currentSpellId = config[btn];
+    const spellIds = _.flatten(Options[btn]).filter(x => x !== currentSpellId);
+    return spellIds[Math.floor(Math.random() * spellIds.length)];
+}

@@ -62,8 +62,8 @@ class GamePanel extends React.PureComponent<Props, State> {
                     <i className="fa fa-chevron-left" /> Back to Home
                 </Button>}
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
-                <GameKeyCustomizer />
                 <RandomizePanel />
+                <GameKeyCustomizer />
                 <UrlListener />
                 {this.props.watching && <WatchLooper />}
             </ControlSurface>
