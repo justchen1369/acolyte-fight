@@ -312,7 +312,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 if (this.targetSurface) {
                     world.ui.nextTarget = vector.plus(
                         this.targetSurface.startWorldPoint,
-                        vector.multiply(vector.diff(p.worldPoint, this.targetSurface.startTargetPoint), this.state.touchMultiplier));
+                        vector.multiply(vector.diff(p.worldPoint, this.targetSurface.startTargetPoint), this.state.touchMultiplier * world.ui.camera.zoom));
                 } else {
                     world.ui.nextTarget = p.worldPoint;
                 }
