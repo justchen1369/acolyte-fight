@@ -102,6 +102,7 @@ export function initialWorld(mod: Object): w.World {
 			renderedTick: null,
 			sentSnapshotTick: 0,
 			playedTick: -1,
+			toolbar: {},
 			destroyed: [],
 			shakes: [],
 			highlights: [],
@@ -424,11 +425,11 @@ function addHero(world: w.World, heroId: string) {
 	return hero;
 }
 
-export function cooldownRemaining(world: w.World, hero: w.Hero, spell: Spell) {
-	if (hero.retractorIds.has(spell.id)) {
+export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
+	if (hero.retractorIds.has(spellId)) {
 		return 0;
 	}
-	return calculateCooldown(world, hero, spell.id);
+	return calculateCooldown(world, hero, spellId);
 }
 
 function calculateCooldown(world: w.World, hero: w.Hero, slot: string) {
@@ -1062,14 +1063,27 @@ function dequeueSnapshot(tick: number, world: w.World) {
 }
 
 function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
+	const ChangeCooldown = 15; // ticks
+
 	if (!allowSpellChoosing(world, ev.heroId)) {
 		return;
 	}
 
 	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category === "hero") {
+		const previousSpellIds = [...hero.keysToSpells.values()];
 		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 		removeUnknownProjectilesFromHero(hero, world); // Disallow strategies which use two spells that should never co-occur
+		const currentSpellIds = [...hero.keysToSpells.values()];
+
+		// Set some cooldown to make it flash on change
+		const changedSpellIds = _.difference(currentSpellIds, previousSpellIds);
+		changedSpellIds.forEach(spellId => {
+			const remaining = cooldownRemaining(world, hero, spellId);
+			if (remaining < ChangeCooldown) {
+				setCooldown(world, hero, spellId, ChangeCooldown);
+			}
+		});
 	}
 }
 
@@ -1117,7 +1131,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 		}
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started
-		world.ui.customizingBtn = null;
+		world.ui.toolbar.customizingBtn = null;
 	}
 
 	world.ui.notifications.push({
@@ -1380,6 +1394,7 @@ function handleActions(world: w.World) {
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
 	const resolved = resolveKeyBindings(keyBindings, world.settings);
+
 	hero.keysToSpells = resolved.keysToSpells;
 	hero.spellsToKeys = resolved.spellsToKeys;
 }
@@ -1430,7 +1445,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.movementProportion = 1.0;
 
 		if (spell.cooldown) {
-			const cooldown = cooldownRemaining(world, hero, spell);
+			const cooldown = cooldownRemaining(world, hero, spell.id);
 			if (cooldown > 0) {
 				if (cooldown > constants.MaxCooldownWait) {
 					// Just cancel spells if they're too far off cooldown
@@ -3501,8 +3516,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	} else if (template.type === "cooldown") {
 		hero.keysToSpells.forEach(spellId => {
 			if (!template.spellId || spellId === template.spellId) {
-				const spell = world.settings.Spells[spellId];
-				const initialCooldown = cooldownRemaining(world, hero, spell);
+				const initialCooldown = cooldownRemaining(world, hero, spellId);
 				let cooldown = initialCooldown;
 				if (template.maxCooldown !== undefined) {
 					cooldown = Math.min(template.maxCooldown, cooldown);

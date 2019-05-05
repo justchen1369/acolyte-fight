@@ -294,8 +294,11 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private handleButtonHover(key: string, world: w.World) {
         const hoverSpellId = this.keyToSpellId(key);
-        if (world.ui.hoverSpellId !== hoverSpellId) {
-            StoreProvider.dispatch({ type: "updateHoverSpell", hoverSpellId, hoverBtn: key });
+        if (world.ui.toolbar.hoverSpellId !== hoverSpellId) {
+            StoreProvider.dispatch({
+                type: "updateToolbar",
+                toolbar: { hoverSpellId, hoverBtn: key },
+            });
         }
     }
 
@@ -379,7 +382,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
         const pos = hero.body.getPosition();
         const center = pl.Vec2(0.5, 0.5);
-        if (world.ui.hoverSpellId && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
+        if ((world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverRandomizer) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
             // User is choosing a spell now, don't move them
             return pos;
         }
@@ -409,7 +412,10 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private handleCustomizeBtn(customizingBtn: string) {
-        StoreProvider.dispatch({ type: "customizeBtn", customizingBtn });
+        StoreProvider.dispatch({
+            type: "updateToolbar",
+            toolbar: { customizingBtn },
+        });
     }
 
     private gameKeyDown(e: KeyboardEvent) {

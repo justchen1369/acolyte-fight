@@ -206,12 +206,11 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, showingHelp: action.showingHelp };
     } else if (action.type === "clearNewPlayerFlag") {
         return { ...state, isNewPlayer: false };
-    } else if (action.type === "customizeBtn") {
-        state.world.ui.customizingBtn = action.customizingBtn; // World always gets mutated
-        return { ...state } // Create new object to trigger redux
-    } else if (action.type === "updateHoverSpell") {
-        state.world.ui.hoverSpellId = action.hoverSpellId; // World always gets mutated
-        state.world.ui.hoverBtn = action.hoverBtn;
+    } else if (action.type === "updateToolbar") {
+        state.world.ui.toolbar = {
+            ...state.world.ui.toolbar,
+            ...action.toolbar,
+        }; // World always gets mutated
         return { ...state } // Create new object to trigger redux
     } else if (action.type === "updateRebindings") {
         return { ...state, rebindings: action.rebindings };

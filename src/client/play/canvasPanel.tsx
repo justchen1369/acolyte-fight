@@ -34,30 +34,6 @@ interface State {
     rtx: number;
 }
 
-interface PointInfo {
-    touchId: string;
-    interfacePoint: pl.Vec2;
-    worldPoint: pl.Vec2;
-    time: number;
-    secondaryBtn?: boolean;
-}
-
-interface TargetSurfaceState {
-    startWorldPoint: pl.Vec2;
-    startTargetPoint: pl.Vec2;
-}
-
-interface ActionSurfaceState {
-    touchId: string;
-    activeKey: string;
-    time: number;
-}
-
-interface TouchState {
-    id: string;
-    stack: number;
-}
-
 class AnimationLoop {
     private animate: () => void;
     private currentHandle = 0;

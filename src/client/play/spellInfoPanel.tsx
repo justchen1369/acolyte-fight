@@ -19,7 +19,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        hoverSpellId: state.world.ui.hoverSpellId,
+        hoverSpellId: state.world.ui.toolbar.hoverSpellId,
         buttonBar: state.world.ui.buttonBar,
         settings: state.world.settings,
     };

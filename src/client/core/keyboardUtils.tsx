@@ -1,10 +1,20 @@
+import _ from 'lodash';
 import * as Reselect from 'reselect';
 import * as cloud from './cloud';
+import * as parties from './parties';
+import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as w from '../../game/world.model';
 import { DefaultSettings } from '../../game/settings';
 
 const Dash = "a";
+
+const uploadSettingsDebounced = _.debounce(() => uploadSettings(), 500);
+
+function uploadSettings() {
+    parties.updatePartyAsync();
+    cloud.uploadSettings();
+}
 
 export const getRebindingLookup = Reselect.createSelector(
 	(rebindings: KeyBindings) => rebindings,
@@ -109,4 +119,10 @@ function saveRebinding(key: string, value: string) {
     rebindings[key] = value;
     StoreProvider.dispatch({ type: "updateRebindings", rebindings });
     setTimeout(() => cloud.uploadSettings(), 1);
+}
+
+export function updateKeyBindings(config: KeyBindings) {
+    StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
+    Storage.saveKeyBindingConfig(config);
+    uploadSettingsDebounced();
 }

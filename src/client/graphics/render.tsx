@@ -1150,13 +1150,13 @@ function playHeroSounds(hero: w.Hero, world: w.World) {
 }
 
 function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	if (!(hero.id === world.ui.myHeroId && world.ui.hoverSpellId && !isMobile)) {
+	if (!(hero.id === world.ui.myHeroId && world.ui.toolbar.hoverSpellId && !isMobile)) {
 		return;
 	}
 
 	let range = null;
 
-	const spell = world.settings.Spells[world.ui.hoverSpellId];
+	const spell = world.settings.Spells[world.ui.toolbar.hoverSpellId];
 	if (spell.action === "projectile" || spell.action === "spray" || spell.action === "focus" || spell.action === "retractor") {
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
 		if (spell.projectile.behaviours) {
@@ -1873,7 +1873,7 @@ function calculateButtonStatesFromHero(world: w.World, hero: w.Hero, options: Re
 
 function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>) {
 	const keys = world.settings.Choices.Keys;
-	const hoverSpellId = world.ui.hoverSpellId;
+	const hoverSpellId = world.ui.toolbar.hoverSpellId;
 
 	const buttonStateLookup = new Map<string, w.ButtonRenderState>();
 	for (let i = 0; i < keys.length; ++i) {
@@ -2143,8 +2143,8 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	};
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
-	let isHovered = world.ui.hoverSpellId === spell.id;
-	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell) / constants.TicksPerSecond;
+	let isHovered = world.ui.toolbar.hoverSpellId === spell.id;
+	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 	if (isSelected) {
 		button.color = '#f0f0f0';

@@ -3,14 +3,10 @@ import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import { Motion, spring, SpringHelperConfig } from 'react-motion';
-import * as cloud from '../core/cloud';
 import * as s from '../store.model';
 import { SpellIcon } from '../controls/spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
-import * as parties from '../core/parties';
-import * as Storage from '../storage';
-import * as StoreProvider from '../storeProvider';
 import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
@@ -43,13 +39,6 @@ const springConfig: SpringHelperConfig = {
     stiffness: 300,
     damping: 30,
 };
-
-const uploadSettingsDebounced = _.debounce(() => uploadSettings(), 500);
-
-function uploadSettings() {
-    parties.updatePartyAsync();
-    cloud.uploadSettings();
-}
 
 class SpellKeyConfig extends React.PureComponent<Props, State> {
     constructor(props: Props) {
@@ -161,9 +150,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
 
         config[key] = spellId;
 
-        StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
-        Storage.saveKeyBindingConfig(config);
-        uploadSettingsDebounced();
+        keyboardUtils.updateKeyBindings(config);
 
         this.setState({ saved: true, hovering: null });
 

@@ -920,6 +920,18 @@ i.clickable:hover, i.clickable:active {
     margin-top: 40px;
 }
 
+.customize-btn {
+    display: inline-block;
+    pointer-events: all;
+    cursor: hand;
+    color: #ccc;
+    padding: 8px;
+}
+
+.customize-btn:hover {
+    color: #00ccff;
+}
+
 #game-panel .in-progress-warning {
     font-size: 120%;
     font-weight: bold;

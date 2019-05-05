@@ -97,7 +97,8 @@ export interface UIState {
 
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;
-	hoverSpellId?: string;
+	toolbar: ToolbarState;
+
 	renderedTick: number | null;
 	playedTick: number;
 	sentSnapshotTick: number;
@@ -113,12 +114,17 @@ export interface UIState {
 	sounds: AudioElement[];
 
 	buttonBar?: ButtonConfig;
-	hoverBtn?: string;
-	customizingBtn?: string;
 	camera: Camera;
 	renderDimensions?: RenderDimensions;
 
 	saved?: boolean;
+}
+
+export interface ToolbarState {
+	hoverSpellId?: string;
+	hoverBtn?: string;
+	hoverRandomizer?: boolean;
+	customizingBtn?: string;
 }
 
 export interface Camera {

@@ -7,6 +7,7 @@ import * as keyboardUtils from '../core/keyboardUtils';
 import * as spellUtils from '../core/spellUtils';
 import * as StoreProvider from '../storeProvider';
 
+import RandomizeBtnConfig from './randomizeBtnConfig';
 import SpellBtnConfig from './spellBtnConfig';
 
 import { isMobile } from '../core/userAgent';
@@ -19,8 +20,10 @@ interface Props {
     allowSpellChoosing: boolean;
     gameStarting: boolean;
     gameStarted: boolean;
+    gameFinished: boolean;
     hoverBtn: string;
     hoverSpellId: string;
+    hoverRandomizer: boolean;
     wheelOnRight: boolean;
     config: KeyBindings;
     rebindingLookup: Map<string, string>;
@@ -31,14 +34,16 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        btn: state.world.ui.customizingBtn,
+        btn: state.world.ui.toolbar.customizingBtn,
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
         gameStarting: engine.isGameStarting(state.world),
-        allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         gameStarted: state.world.tick >= state.world.startTick,
-        hoverBtn: state.world.ui.hoverBtn,
-        hoverSpellId: state.world.ui.hoverSpellId,
+        gameFinished: !!state.world.winner,
+        allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
+        hoverBtn: state.world.ui.toolbar.hoverBtn,
+        hoverSpellId: state.world.ui.toolbar.hoverSpellId,
+        hoverRandomizer: state.world.ui.toolbar.hoverRandomizer,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
         rebindingLookup: keyboardUtils.getRebindingLookup(state.rebindings),
@@ -71,14 +76,17 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderChangeSpellHint() {
-        if (this.props.gameStarting) {
+        if (this.props.gameStarting && !this.props.gameFinished) {
             return null;
         }
 
         if (isMobile) {
             return null; // No hint for mobile
         } else {
-            return <div className="customize-hint after-game-over">Right-click a button below to change spells</div>
+            return <div className="customize-hint">
+                <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)} />
+                {this.props.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}
+            </div>
         }
     }
 
@@ -129,7 +137,10 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private close() {
-        StoreProvider.dispatch({ type: "customizeBtn", customizingBtn: null });
+        StoreProvider.dispatch({
+            type: "updateToolbar",
+            toolbar: { customizingBtn: null },
+        });
     }
 }
 

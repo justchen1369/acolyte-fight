@@ -104,8 +104,7 @@ export type Action =
     | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
     | UpdateShowingHelpAction
-    | CustomizeBtnAction
-    | UpdateHoverSpellAction
+    | UpdateToolbarAction
     | UpdateRebindingsAction
     | UpdateServerAction
     | UpdateProfileAction
@@ -235,15 +234,15 @@ export interface UpdateShowingHelpAction {
     showingHelp: boolean;
 }
 
-export interface CustomizeBtnAction {
-    type: "customizeBtn";
-    customizingBtn: string;
-}
-
 export interface UpdateHoverSpellAction {
     type: "updateHoverSpell";
     hoverSpellId: string;
     hoverBtn: string;
+}
+
+export interface UpdateToolbarAction {
+    type: "updateToolbar";
+    toolbar: Partial<w.ToolbarState>;
 }
 
 export interface UpdateRebindingsAction {
