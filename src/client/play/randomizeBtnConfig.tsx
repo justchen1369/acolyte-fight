@@ -7,6 +7,7 @@ import * as w from '../../game/world.model';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
+import Button from '../controls/button';
 
 interface OwnProps {
     className?: string;
@@ -30,7 +31,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class SpellKeyConfig extends React.PureComponent<Props, State> {
+class RandomizeBtnConfig extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -40,17 +41,15 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <span
+        return <Button
             className="customize-btn"
             onClick={(ev) => this.onClick(ev)}
             onMouseEnter={(ev) => this.onMouseEnter(ev)}
             onMouseLeave={(ev) => this.onMouseLeave(ev)}
-            >{this.props.children}</span>
+            >{this.props.children}</Button>
     }
     
     private onClick(ev: React.MouseEvent) {
-        ev.stopPropagation();
-
         const Options = this.props.settings.Choices.Options;
 
         const keys = Object.keys(Options);
@@ -84,4 +83,4 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(SpellKeyConfig);
+export default ReactRedux.connect(stateToProps)(RandomizeBtnConfig);

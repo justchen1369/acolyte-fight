@@ -65,7 +65,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="text-message-container" onClick={() => this.onTextMessageContainerClick()}>
+        return <div className="text-message-container" onMouseDown={ev => ev.stopPropagation()} onTouchStart={ev => ev.stopPropagation()} onClick={() => this.onTextMessageContainerClick()}>
             {!(this.state.text && this.state.text.length > 0) && this.renderHint()}
             <input
                 ref={(textbox) => this.textMessageBox = textbox}

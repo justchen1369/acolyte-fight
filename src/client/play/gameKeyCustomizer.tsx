@@ -81,15 +81,19 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         }
 
         if (isMobile) {
-            return null;
+            return <div className="customize-hint-container">
+                <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)}>
+                    <i className="fas fa-dice" /> Randomize a Spell
+                </RandomizeBtnConfig>
+            </div>
         } else {
-            return <div className="customize-hint">
+            return <div className="customize-hint-container">
                 <div>
                     <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)}>
                         <i className="fas fa-dice" />
                     </RandomizeBtnConfig>
                 </div>
-                {this.props.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}
+                <div className="customize-hint">{this.props.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}</div>
             </div>
         }
     }
@@ -104,8 +108,8 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="customize-hint">
-            <span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change
+        return <div className="customize-hint-container">
+            <div className="customize-hint"><span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change</div>
         </div>;
     }
 
@@ -116,7 +120,9 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             keyboardShortcutHint = ` (Shift+${btn.toUpperCase()})`;
         }
 
-        return <div className="customize-hint">Right-click to change{keyboardShortcutHint}</div>;
+        return <div className="customize-hint-container">
+            <div className="customize-hint">Right-click to change{keyboardShortcutHint}</div>
+        </div>;
     }
 
     private renderCustomizeBtn(btn: string) {

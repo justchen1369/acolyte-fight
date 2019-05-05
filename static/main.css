@@ -896,25 +896,28 @@ i.clickable:hover, i.clickable:active {
     padding: 15px;
 }
 
-#game-panel .customize-hint {
+#game-panel .customize-hint-container {
     position: absolute;
     left: 0;
     right: 0;
     bottom: 0;
     width: 100%;
+    margin-bottom: 90px;
 
+    text-align: center;
+}
+
+#game-panel .customize-hint {
     font-weight: bold;
     font-size: 120%;
     color: white;
-    margin-bottom: 90px;
-    text-align: center;
 }
 
 #game-panel .customize-hint .spell-name {
     font-weight: bold;
 }
 
-#game-panel.mobile .customize-hint {
+#game-panel.mobile .customize-hint-container {
     top: 0;
     bottom: auto;
     margin-top: 40px;
@@ -926,10 +929,25 @@ i.clickable:hover, i.clickable:active {
     cursor: hand;
     color: #ccc;
     padding: 8px;
+    font-size: 150%;
 }
 
 .customize-btn:hover {
     color: #00ccff;
+}
+
+.mobile .customize-btn {
+    position: fixed;
+    top: 100px;
+    left: 1em;
+    
+    font-weight: normal;
+
+    padding: 4px;
+    font-size: 75%;
+    font-style: italic;
+
+    color: #888;
 }
 
 #game-panel .in-progress-warning {
