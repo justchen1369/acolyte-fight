@@ -408,6 +408,7 @@ function addHero(world: w.World, heroId: string) {
 		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
 		spellsToKeys: new Map<string, string>(),
+		spellChangedTick: new Map<string, number>(),
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
 		horcruxIds: new Set<string>(),
@@ -1086,19 +1087,8 @@ function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
 			return false;
 		}
 
-		const previousSpellIds = [...hero.keysToSpells.values()];
 		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 		removeUnknownProjectilesFromHero(hero, world); // Disallow strategies which use two spells that should never co-occur
-		const currentSpellIds = [...hero.keysToSpells.values()];
-
-		// Set some cooldown to make it flash on change
-		const changedSpellIds = _.difference(currentSpellIds, previousSpellIds);
-		changedSpellIds.forEach(spellId => {
-			const remaining = cooldownRemaining(world, hero, spellId);
-			if (remaining < ChangeCooldown) {
-				setCooldown(world, hero, spellId, ChangeCooldown);
-			}
-		});
 	}
 
 	return true;
@@ -1422,8 +1412,16 @@ function handleActions(world: w.World) {
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
 	const resolved = resolveKeyBindings(keyBindings, world.settings);
 
+	const previousSpellIds = [...hero.keysToSpells.values()];
 	hero.keysToSpells = resolved.keysToSpells;
 	hero.spellsToKeys = resolved.spellsToKeys;
+	const newSpellIds = [...hero.keysToSpells.values()];
+
+	// Set some cooldown to make it flash on change
+	const changedSpellIds = _.difference(newSpellIds, previousSpellIds);
+	changedSpellIds.forEach(spellId => {
+		hero.spellChangedTick.set(spellId, world.tick);
+	});
 }
 
 export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFightSettings): ResolvedKeyBindings {

@@ -2144,6 +2144,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	let isSelected = selectedAction === spell.id || world.ui.nextSpellId === spell.id;
 	let isHovered = world.ui.toolbar.hoverSpellId === spell.id;
+	let age = (world.tick - (hero.spellChangedTick.get(spell.id) || 0)) / constants.TicksPerSecond;
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
 	if (isSelected) {
@@ -2159,6 +2160,9 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 		button.color = '#eee';
 	}
 
+	if (age < 0.1) {
+		button.color = parseColor(button.color).darken(0.5).string();
+	}
 	if (isHovered) {
 		button.color = parseColor(button.color).lighten(0.25).string();
 	} 
