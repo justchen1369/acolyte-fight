@@ -46,51 +46,14 @@ export function worldPointFromInterfacePoint(interfacePoint: pl.Vec2, world: w.W
 }
 
 function calculateViewRects(rect: ClientRect, wheelOnRight: boolean): ClientRect {
-	if (isMobile) {
-		if (rect.height >= rect.width) {
-			// Portrait
-			return {
-				left: 0,
-				right: rect.width,
-				width: rect.width,
-				top: 0,
-				bottom: rect.height,
-				height: rect.height,
-			};
-		} else {
-			// Landscape - move map out of wheel space
-			const wheelSize = calculateButtonWheelSize(rect);
-			const width = Math.max(rect.height, rect.width - wheelSize);
-			if (wheelOnRight) {
-				return {
-					left: 0,
-					right: width,
-					width: width,
-					top: 0,
-					bottom: rect.height,
-					height: rect.height,
-				};
-			} else {
-				return {
-					left: rect.width - width,
-					right: rect.width,
-					width: width,
-					top: 0,
-					bottom: rect.height,
-					height: rect.height,
-				};
-			}
-		}
-	} else {
-		return {
-			left: 0,
-			right: rect.width,
-			width: rect.width,
-			top: 0,
-			bottom: rect.height,
-			height: rect.height,
-		};
-	}
+	return {
+		left: 0,
+		right: rect.width,
+		width: rect.width,
+		top: 0,
+		bottom: rect.height,
+		height: rect.height,
+	};
 }
 
 function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect {
@@ -113,7 +76,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	const ZoomAlpha = 0.004;
 
 	const MaxZoom = 2;
-	const MinPixelsForZoom = 800;
+	const MinPixelsForZoom = 640;
 	const SelfAlpha = 0.5;
 
 	const CenterTolerance = 0.15;
