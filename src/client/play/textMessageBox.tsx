@@ -65,7 +65,13 @@ class TextMessageBox extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="text-message-container" onMouseDown={ev => ev.stopPropagation()} onTouchStart={ev => ev.stopPropagation()} onClick={() => this.onTextMessageContainerClick()}>
+        return <div
+            className="text-message-container"
+            onTouchStart={ev => { ev.stopPropagation(); ev.preventDefault(); this.focus(); }}
+            onTouchMove={ev => { ev.stopPropagation(); ev.preventDefault(); }}
+            onTouchEnd={ev => { ev.stopPropagation(); ev.preventDefault(); }}
+            >
+
             {!(this.state.text && this.state.text.length > 0) && this.renderHint()}
             <input
                 ref={(textbox) => this.textMessageBox = textbox}
@@ -88,10 +94,6 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         } else {
             return <div className="hint"><i className="fas fa-comment" /> Press <span className="hint-enter-key">ENTER</span> to chat</div>;
         }
-    }
-
-    private onTextMessageContainerClick() {
-        this.focus();
     }
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {

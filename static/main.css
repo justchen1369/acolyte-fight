@@ -899,7 +899,7 @@ i.clickable:hover, i.clickable:active {
 #game-panel .customize-hint-container {
     pointer-events: none;
 
-    position: absolute;
+    position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
@@ -925,33 +925,49 @@ i.clickable:hover, i.clickable:active {
     margin-top: 40px;
 }
 
-.customize-btn {
+.randomize-panel {
+    pointer-events: none;
+}
+
+.randomize-btn {
     display: inline-block;
     pointer-events: all;
     cursor: hand;
     color: #ccc;
+
+    padding: 8px;
 }
 
-.customize-btn:hover {
+.randomize-btn:hover {
     color: #00ccff;
 }
 
-.customize-hint-container .customize-btn {
-    padding: 8px;
+.desktop .randomize-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin-bottom: 120px;
+
     font-size: 150%;
+    text-align: center;
 }
 
-.mobile .customize-hint-container .customize-btn {
+.mobile .randomize-panel {
     position: fixed;
-    top: 90px;
-    left: 1em;
-    
-    font-weight: normal;
+    top: 0;
+    left: 0;
 
-    padding: 8px;
+    margin-left: 1em;
+    margin-top: 80px;
+
     font-size: 75%;
     font-style: italic;
+    text-align: left;
+}
 
+.mobile .randomize-panel .randomize-btn {
     color: #888;
 }
 
@@ -1085,7 +1101,7 @@ h3 {
     align-items: center;
 }
 
-.spell-config .key-detail-container .customize-btn {
+.spell-config .key-detail-container .randomize-btn {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -1095,11 +1111,11 @@ h3 {
     
 }
 
-.page .spell-config .key .key-detail-container .customize-btn {
+.page .spell-config .key .key-detail-container .randomize-btn {
     display: none;
 }
 
-.page .spell-config .key:hover .key-detail-container .customize-btn {
+.page .spell-config .key:hover .key-detail-container .randomize-btn {
     display: block;
 }
 

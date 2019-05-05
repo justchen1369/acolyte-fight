@@ -8,7 +8,6 @@ import * as spellUtils from '../core/spellUtils';
 import * as StoreProvider from '../storeProvider';
 
 import Button from '../controls/button';
-import RandomizeBtnConfig from './randomizeBtnConfig';
 import SpellBtnConfig from './spellBtnConfig';
 
 import { isMobile } from '../core/userAgent';
@@ -19,12 +18,8 @@ interface Props {
     gameId: string;
     heroId: string;
     allowSpellChoosing: boolean;
-    gameStarting: boolean;
     gameStarted: boolean;
-    gameFinished: boolean;
-    hoverBtn: string;
-    hoverSpellId: string;
-    hoverRandomizer: boolean;
+    toolbar: w.ToolbarState;
     wheelOnRight: boolean;
     config: KeyBindings;
     rebindingLookup: Map<string, string>;
@@ -38,13 +33,9 @@ function stateToProps(state: s.State): Props {
         btn: state.world.ui.toolbar.customizingBtn,
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
-        gameStarting: engine.isGameStarting(state.world),
         gameStarted: state.world.tick >= state.world.startTick,
-        gameFinished: !!state.world.winner,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
-        hoverBtn: state.world.ui.toolbar.hoverBtn,
-        hoverSpellId: state.world.ui.toolbar.hoverSpellId,
-        hoverRandomizer: state.world.ui.toolbar.hoverRandomizer,
+        toolbar: state.world.ui.toolbar,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
         rebindingLookup: keyboardUtils.getRebindingLookup(state.rebindings),
@@ -64,9 +55,9 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         if (btn && !keyboardUtils.isSpecialKey(btn)) {
             return this.renderCustomizeBtn(btn);
         } else if (this.props.allowSpellChoosing) {
-            if (isMobile && this.props.hoverBtn && this.props.hoverSpellId) {
-                return this.renderMobileHint(this.props.hoverBtn, this.props.hoverSpellId);
-            } else if (!isMobile && this.props.hoverBtn) {
+            if (isMobile && this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
+                return this.renderMobileHint(this.props.toolbar.hoverBtn, this.props.toolbar.hoverSpellId);
+            } else if (!isMobile && this.props.toolbar.hoverBtn) {
                 return this.renderDesktopHint();
             } else {
                 return this.renderChangeSpellHint();
@@ -82,25 +73,16 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         }
 
         if (isMobile) {
-            return <div className="customize-hint-container">
-                <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)}>
-                    <i className="fas fa-dice" /> Randomize a Spell
-                </RandomizeBtnConfig>
-            </div>
+            return null;
         } else {
             return <div className="customize-hint-container">
-                <div>
-                    <RandomizeBtnConfig settings={this.props.settings} onChosen={(keyBindings) => this.onChosen(keyBindings)}>
-                        <i className="fas fa-dice" />
-                    </RandomizeBtnConfig>
-                </div>
-                <div className="customize-hint">{this.props.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}</div>
+                <div className="customize-hint">{this.props.toolbar.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}</div>
             </div>
         }
     }
 
     private renderMobileHint(hoverBtn: string, hoverSpellId: string) {
-        if (this.props.gameStarting) {
+        if (!this.props.allowSpellChoosing) {
             return null;
         }
 
@@ -116,8 +98,8 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
 
     private renderDesktopHint() {
         let keyboardShortcutHint: string = null;
-        if (this.props.hoverBtn) {
-            const btn = this.props.rebindingLookup.get(this.props.hoverBtn) || this.props.hoverBtn;
+        if (this.props.toolbar.hoverBtn) {
+            const btn = this.props.rebindingLookup.get(this.props.toolbar.hoverBtn) || this.props.toolbar.hoverBtn;
             keyboardShortcutHint = ` (Shift+${btn.toUpperCase()})`;
         }
 

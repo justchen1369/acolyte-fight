@@ -9,8 +9,7 @@ import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 import Button from '../controls/button';
 
-interface OwnProps {
-    className?: string;
+interface OwnProps extends React.HTMLAttributes<HTMLSpanElement> {
     btn?: string;
     settings: AcolyteFightSettings;
     onChosen?: (keyBindings: KeyBindings) => void;
@@ -42,14 +41,11 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
 
     render() {
         return <Button
-            onTouchStart={(ev) => { ev.stopPropagation(); ev.preventDefault(); this.onClick() }}
-            onTouchMove={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
-            onTouchEnd={(ev) => { ev.stopPropagation(); ev.preventDefault(); }}
+            {...this.props}
 
-            className="customize-btn"
-            onMouseDown={() => this.onClick()}
-            onMouseEnter={() => this.onMouseEnter()}
-            onMouseLeave={() => this.onMouseLeave()}
+            className={this.props.className || "randomize-btn"}
+            onClick={() => this.onClick()}
+
             >{this.props.children}</Button>
     }
     
@@ -71,24 +67,6 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
         if (this.props.onChosen) {
             this.props.onChosen(config);
         }
-
-        StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { hoverRandomizer: false },
-        });
-    }
-
-    private onMouseEnter() {
-        StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { hoverRandomizer: true },
-        });
-    }
-    private onMouseLeave() {
-        StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { hoverRandomizer: false },
-        });
     }
 }
 
