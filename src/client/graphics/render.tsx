@@ -108,21 +108,20 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			clampZoom = calculateZoom(vector.distance(pos, camera.center), maxZoom);
 
 			// Zoom relative to current center, not new one
-			let distance = Math.max(vector.distance(target, camera.center), vector.distance(pos, camera.center));
-			let zoom = calculateZoom(distance, maxZoom);
+			if (maxZoom > 1) {
+				let distance = Math.max(vector.distance(target, camera.center), vector.distance(pos, camera.center));
+				let zoom = calculateZoom(distance, maxZoom);
+				cameraTarget.zoom = Math.abs(zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : zoom;
+			}
 
 			// New center - only pan if some zooming is involved
-			let center = camera.center;
 			if (maxZoom > 1.1) {
-				center = pl.Vec2(
+				let center = pl.Vec2(
 					SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
 					SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
 				);
+				cameraTarget.center = vector.distance(center, camera.center) <= CenterTolerance ? camera.center : center;
 			}
-
-			// Assign
-			cameraTarget.center = vector.distance(center, camera.center) <= CenterTolerance ? camera.center : center;
-			cameraTarget.zoom = Math.abs(zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : zoom;
 		}
 	}
 
