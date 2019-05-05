@@ -77,7 +77,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderChangeSpellHint() {
-        if (this.props.gameStarting && !this.props.gameFinished) {
+        if (!this.props.allowSpellChoosing) {
             return null;
         }
 
