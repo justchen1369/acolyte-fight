@@ -110,7 +110,7 @@ function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect 
 
 export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
 	const CenterAlpha = 0.004;
-	const ZoomAlpha = 0.003;
+	const ZoomAlpha = 0.004;
 
 	const MaxZoom = 2;
 	const MinPixelsForZoom = 800;
