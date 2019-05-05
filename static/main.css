@@ -938,12 +938,12 @@ i.clickable:hover, i.clickable:active {
 
 .mobile .customize-btn {
     position: fixed;
-    top: 100px;
+    top: 90px;
     left: 1em;
     
     font-weight: normal;
 
-    padding: 4px;
+    padding: 8px;
     font-size: 75%;
     font-style: italic;
 
