@@ -1080,6 +1080,20 @@ h3 {
     align-items: center;
 }
 
+.spell-config .key-detail-container .customize-btn {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    margin: 20px 0;
+    padding: 0;
+    font-size: 80%;
+    
+    display: none;
+}
+
+.spell-config .key:hover .key-detail-container .customize-btn {
+    display: block;
+}
 
 .spell-config .key-detail {
     margin-left: 0px;

@@ -57,7 +57,7 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
         const Options = this.props.settings.Choices.Options;
 
         const keys = Object.keys(Options);
-        const key = keys[Math.floor(Math.random() * keys.length)];
+        const key = this.props.btn || keys[Math.floor(Math.random() * keys.length)];
 
         const config = { ...this.props.config };
         const currentSpellId = config[key];
@@ -71,6 +71,11 @@ class RandomizeBtnConfig extends React.PureComponent<Props, State> {
         if (this.props.onChosen) {
             this.props.onChosen(config);
         }
+
+        StoreProvider.dispatch({
+            type: "updateToolbar",
+            toolbar: { hoverRandomizer: false },
+        });
     }
 
     private onMouseEnter() {

@@ -11,6 +11,7 @@ import * as spellUtils from '../core/spellUtils';
 import { isMobile } from '../core/userAgent';
 
 import KeyControl from './keyControl';
+import RandomizeBtnConfig from './randomizeBtnConfig';
 import SpellStats from './spellStats';
 
 interface OwnProps {
@@ -59,7 +60,11 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
         const hovering = Spells[this.state.hovering];
 
         const isRightClick = keyboardUtils.isSpecialKey(btn);
-        return <div className="key" onClick={ev => ev.stopPropagation()}>
+        return <div className="key"
+            onTouchStart={ev => ev.stopPropagation()}
+            onMouseDown={ev => ev.stopPropagation()}
+            onClick={ev => ev.stopPropagation()}>
+
             <div className="key-options">
                 {options.map((row, index) => this.renderOptionsRow(index, row, chosen.id))}
             </div>
@@ -70,6 +75,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                     {this.state.saved && <div className="key-saved">Saved. Your {isMobile ? "" : `${isRightClick ? "right-click" : btn.toUpperCase()} `}spell is now {spellUtils.spellName(chosen)}.</div>}
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
+                <RandomizeBtnConfig btn={this.props.btn} settings={this.props.settings} onChosen={this.props.onChosen}><i className="fas fa-dice" /> Randomize</RandomizeBtnConfig>
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;

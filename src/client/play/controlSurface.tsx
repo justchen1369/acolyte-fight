@@ -313,7 +313,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     world.ui.nextTarget = vector.plus(
                         this.targetSurface.startWorldPoint,
                         vector.multiply(vector.diff(p.worldPoint, this.targetSurface.startTargetPoint), this.state.touchMultiplier));
-                } else if (p.touchId === MouseId) {
+                } else {
                     world.ui.nextTarget = p.worldPoint;
                 }
             }
