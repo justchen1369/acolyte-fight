@@ -897,6 +897,8 @@ i.clickable:hover, i.clickable:active {
 }
 
 #game-panel .customize-hint-container {
+    pointer-events: none;
+
     position: absolute;
     left: 0;
     right: 0;
