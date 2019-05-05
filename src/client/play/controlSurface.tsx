@@ -134,7 +134,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 onMouseLeave={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
                 onMouseUp={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
 
-                onTouchStart={(ev) => this.touchStartHandler(...this.takeTouchPoint(ev))}
+                onTouchStart={(ev) => { this.touched = true; this.touchStartHandler(...this.takeTouchPoint(ev)) }}
                 onTouchMove={(ev) => this.touchMoveHandler(...this.takeTouchPoint(ev))}
                 onTouchEnd={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
                 onTouchCancel={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
@@ -174,7 +174,6 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private touchStartHandler(...points: PointInfo[]) {
-        this.touched = true;
         audio.unlock();
 
         const world = this.props.world;

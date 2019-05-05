@@ -76,7 +76,11 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             return null;
         } else {
             return <div className="customize-hint-container">
-                <div className="customize-hint">{this.props.toolbar.hoverRandomizer ? "Randomize a spell" : "Right-click a button below to change spells"}</div>
+                <div className="customize-hint">
+                    {this.props.toolbar.hoverRandomizer
+                        ? "Randomize a spell"
+                        : "Right-click a button below to change spells"}
+                </div>
             </div>
         }
     }
@@ -97,14 +101,8 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private renderDesktopHint() {
-        let keyboardShortcutHint: string = null;
-        if (this.props.toolbar.hoverBtn) {
-            const btn = this.props.rebindingLookup.get(this.props.toolbar.hoverBtn) || this.props.toolbar.hoverBtn;
-            keyboardShortcutHint = ` (Shift+${btn.toUpperCase()})`;
-        }
-
         return <div className="customize-hint-container">
-            <div className="customize-hint">Right-click to change{keyboardShortcutHint}</div>
+            <div className="customize-hint">Right-click to change</div>
         </div>;
     }
 
@@ -129,9 +127,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
 
     private onChosen(keyBindings: KeyBindings, random?: boolean) {
         sendKeyBindings(this.props.gameId, this.props.heroId, keyBindings);
-        if (!isMobile && !random) {
-            this.close();
-        }
+        this.close();
     }
 
     private close() {
