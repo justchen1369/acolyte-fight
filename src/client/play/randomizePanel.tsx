@@ -44,22 +44,37 @@ class RandomizePanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="randomize-panel">
-            <Button
-                className="randomize-btn"
-                onClick={(ev) => this.onRandomizeClick(ev)}
-                onMouseEnter={() => this.onMouseEnter()}
-                onMouseLeave={() => this.onMouseLeave()}
-                >
-                <i className="fas fa-dice" />{isMobile && " Randomize a Spell"}
-            </Button>
-        </div>
+        if (isMobile) {
+            return <div className="randomize-panel">
+                <div><Button className="randomize-btn" onClick={(ev) => this.onRandomizeClick(false)}><i className="fas fa-dice" /> Randomize one spell</Button></div>
+                <div><Button className="randomize-btn" onClick={(ev) => this.onRandomizeClick(true)}><i className="fas fa-dice" /> Randomize all spells</Button></div>
+            </div>
+        } else {
+            return <div className="randomize-panel">
+                <Button
+                    className="randomize-btn"
+                    onClick={(ev) => this.onRandomizeClick(false)}
+                    onMouseEnter={() => this.updateHover("Randomize one spell")}
+                    onMouseLeave={() => this.clearHover()}
+                    >
+                    <i className="fas fa-dice-three" />
+                </Button>
+                <Button
+                    className="randomize-btn"
+                    onClick={(ev) => this.onRandomizeClick(true)}
+                    onMouseEnter={() => this.updateHover("Randomize all spells")}
+                    onMouseLeave={() => this.clearHover()}
+                    >
+                    <i className="fas fa-dice" />
+                </Button>
+            </div>
+        }
     }
 
-    private onRandomizeClick(ev: React.MouseEvent) {
+    private onRandomizeClick(all: boolean = false) {
         const config = { ...this.props.config };
 
-        const btns = ev.shiftKey ? keyboardUtils.allKeys(this.props.settings) : [keyboardUtils.randomizeBtn(this.props.settings)];
+        const btns = all ? keyboardUtils.allKeys(this.props.settings) : [keyboardUtils.randomizeBtn(this.props.settings)];
         btns.forEach(btn => {
             config[btn] = keyboardUtils.randomizeSpellId(btn, this.props.config, this.props.settings);
         });
@@ -69,17 +84,12 @@ class RandomizePanel extends React.PureComponent<Props, State> {
         sendKeyBindings(this.props.gameId, this.props.heroId, config);
     }
 
-    private onMouseEnter() {
-        StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { hoverRandomizer: true },
-        });
+    private updateHover(hoverControl: string) {
+        StoreProvider.dispatch({ type: "updateToolbar", toolbar: { hoverControl } });
     }
-    private onMouseLeave() {
-        StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { hoverRandomizer: false },
-        });
+
+    private clearHover() {
+        StoreProvider.dispatch({ type: "updateToolbar", toolbar: { hoverControl: null } });
     }
 }
 

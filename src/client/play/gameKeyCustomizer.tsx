@@ -76,11 +76,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
             return null;
         } else {
             return <div className="customize-hint-container">
-                <div className="customize-hint">
-                    {this.props.toolbar.hoverRandomizer
-                        ? "Randomize a spell"
-                        : "Right-click a button below to change spells"}
-                </div>
+                <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
             </div>
         }
     }
@@ -133,7 +129,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private close() {
         StoreProvider.dispatch({
             type: "updateToolbar",
-            toolbar: { customizingBtn: null, hoverRandomizer: false, hoverSpellId: null, hoverBtn: null },
+            toolbar: { customizingBtn: null, hoverControl: null, hoverSpellId: null, hoverBtn: null },
         });
     }
 }

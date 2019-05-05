@@ -123,7 +123,7 @@ export interface UIState {
 export interface ToolbarState {
 	hoverSpellId?: string;
 	hoverBtn?: string;
-	hoverRandomizer?: boolean;
+	hoverControl?: string;
 	customizingBtn?: string;
 }
 

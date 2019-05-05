@@ -379,7 +379,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
         const pos = hero.body.getPosition();
         const center = pl.Vec2(0.5, 0.5);
-        if ((world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverRandomizer) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
+        if ((world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
             // User is choosing a spell now, don't move them
             return pos;
         }

@@ -927,6 +927,7 @@ i.clickable:hover, i.clickable:active {
 
 .randomize-panel {
     pointer-events: none;
+    padding: 4px;
 }
 
 .randomize-btn {
@@ -935,7 +936,7 @@ i.clickable:hover, i.clickable:active {
     cursor: hand;
     color: #ccc;
 
-    padding: 8px;
+    padding: 4px;
 }
 
 .randomize-btn:hover {
