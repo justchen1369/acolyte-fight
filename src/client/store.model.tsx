@@ -7,6 +7,8 @@ export interface State {
     current: PathElements;
     ads?: string;
 
+    touched?: boolean;
+
     userId?: string;
     loggedIn: boolean;
     isNewPlayer: boolean;

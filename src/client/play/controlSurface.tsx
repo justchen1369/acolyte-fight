@@ -68,6 +68,8 @@ function stateToProps(state: s.State): Props {
 }
 
 class ControlSurface extends React.PureComponent<Props, State> {
+    private touched: boolean = isMobile;
+
     private currentTouch: TouchState = null;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
@@ -125,11 +127,12 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 id="game-panel"
                 className={className}
 
-                onMouseDown={(ev) => this.touchStartHandler(this.takeMousePoint(ev))}
-                onMouseEnter={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
-                onMouseMove={(ev) => this.touchMoveHandler(this.takeMousePoint(ev))}
-                onMouseLeave={(ev) => this.touchEndHandler(this.takeMousePoint(ev))}
-                onMouseUp={(ev) => this.touchEndHandler(this.takeMousePoint(ev))}
+                // If touched, we're going to receive duplicate events from the mouse, so ignore the mouse
+                onMouseDown={(ev) => !this.touched && this.touchStartHandler(this.takeMousePoint(ev))}
+                onMouseEnter={(ev) => !this.touched && this.touchMoveHandler(this.takeMousePoint(ev))}
+                onMouseMove={(ev) => !this.touched && this.touchMoveHandler(this.takeMousePoint(ev))}
+                onMouseLeave={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
+                onMouseUp={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
 
                 onTouchStart={(ev) => this.touchStartHandler(...this.takeTouchPoint(ev))}
                 onTouchMove={(ev) => this.touchMoveHandler(...this.takeTouchPoint(ev))}
@@ -171,6 +174,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private touchStartHandler(...points: PointInfo[]) {
+        this.touched = true;
         audio.unlock();
 
         const world = this.props.world;
