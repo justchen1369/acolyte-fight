@@ -701,7 +701,7 @@ const rocket: Spell = {
         speed: 0.15,
         maxTicks: 2.25 * TicksPerSecond,
         collideWith: Categories.All,
-        expireOn: Categories.All ^ Categories.Shield,
+        expireOn: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
         shieldTakesOwnership: false,
 
         partialDamage: {
