@@ -721,10 +721,7 @@ const rocket: Spell = {
                 ticks: 1 * TicksPerSecond,
             },
 
-            partialImpulse: {
-                initialMultiplier: 0.5,
-                ticks: 1 * TicksPerSecond,
-            },
+            partialImpulse: null, // full impulse at point blank range
         },
 
         strafe: {
