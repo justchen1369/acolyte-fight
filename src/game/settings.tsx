@@ -700,8 +700,8 @@ const rocket: Spell = {
         radius: 0.005,
         speed: 0.15,
         maxTicks: 2.25 * TicksPerSecond,
-        collideWith: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
-        expireOn: Categories.All ^ Categories.Shield,
+        collideWith: Categories.All,
+        expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
         shieldTakesOwnership: false,
 
         partialDamage: {
@@ -722,6 +722,15 @@ const rocket: Spell = {
             },
 
             partialImpulse: null, // full impulse at point blank range
+
+            buffs: [
+                {
+                    type: "cooldown",
+                    against: Alliances.NotFriendly,
+                    maxTicks: 1,
+                    minCooldown: 0.5 * TicksPerSecond,
+                },
+            ],
         },
 
         strafe: {

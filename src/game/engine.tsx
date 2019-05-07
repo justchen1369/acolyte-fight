@@ -2156,34 +2156,33 @@ function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
 		return;
 	}
 
-	const owner: w.Hero = world.objects.get(projectile.owner) as w.Hero;
-	projectile.buffs.forEach(template => {
-		applyBuffFrom(template, owner, target, world, projectile.type);
-	});
+	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, projectile.type);
 }
 
-function applyBuffFrom(template: BuffTemplate, owner: w.Hero, target: w.Hero, world: w.World, tag: string = "buff") {
-	if (!owner) {
+function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Hero, world: w.World, tag: string = "buff") {
+	if (!fromHeroId) {
 		return;
 	}
 
-	const receiver = template.owner ? owner : target;
-	if (!receiver) {
-		return;
-	}
-
-	const against = template.against !== undefined ? template.against : Categories.All;
-	if (against !== Categories.All) {
-		const targetId = target ? target.id : null;
-		if (!(calculateAlliance(owner.id, targetId, world) & against)) {
+	buffs.forEach(template => {
+		const receiver = template.owner ? world.objects.get(fromHeroId) : target;
+		if (!(receiver && receiver.category === "hero")) {
 			return;
 		}
-	}
 
-	const id = `${tag}-${template.type}`;
-	instantiateBuff(id, template, receiver, world, {
-		fromHeroId: owner.id,
-		toHeroId: target && target.id,
+		const against = template.against !== undefined ? template.against : Categories.All;
+		if (against !== Categories.All) {
+			const targetId = target ? target.id : null;
+			if (!(calculateAlliance(fromHeroId, targetId, world) & against)) {
+				return;
+			}
+		}
+
+		const id = `${tag}-${template.type}`;
+		instantiateBuff(id, template, receiver, world, {
+			fromHeroId,
+			toHeroId: target && target.id,
+		});
 	});
 }
 
@@ -2315,20 +2314,13 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 		return false;
 	}
 
-	const owner = world.objects.get(orb.owner);
-	if (!(owner && owner.category === "hero")) {
-		return false;
-	}
-
 	const epicenter = orb.body.getPosition();
 	world.objects.forEach(obj => {
 		if (!(obj.category === "hero" && vector.distance(epicenter, obj.body.getPosition()) <= behaviour.radius + obj.radius)) {
 			return;
 		}
 
-		behaviour.buffs.forEach(buff => {
-			applyBuffFrom(buff, owner, obj, world, behaviour.type);
-		});
+		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, behaviour.type);
 	});
 	return true;
 }
@@ -2686,21 +2678,21 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				...innerDamagePacket,
 				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
 			};
-			let applyKnockback = false;
 
 			const alliance = calculateAlliance(owner, other.id, world);
 			if ((alliance & Alliances.NotFriendly) > 0) {
 				applyDamage(other, packet, world);
 				expireOnHeroHit(other, world);
-				applyKnockback = true;
+				applyBuffsFrom(detonate.buffs, owner, other, world);
+
+				if (detonate.maxImpulse) {
+					const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
+					const direction = vector.relengthen(diff, magnitude);
+					other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
+					world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
+				}
 			}
 
-			if (applyKnockback && detonate.maxImpulse) {
-				const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
-				const direction = vector.relengthen(diff, magnitude);
-				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
-			}
 		} else if (other.category === "projectile") {
 			if (destructibleBy(other, owner, world)) {
 				other.expireTick = world.tick;
