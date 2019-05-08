@@ -2152,15 +2152,11 @@ function swapOnExpiry(projectile: w.Projectile, world: w.World) {
 }
 
 function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
-	if (!projectile.buffs) {
-		return;
-	}
-
 	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, projectile.type);
 }
 
 function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Hero, world: w.World, tag: string = "buff") {
-	if (!fromHeroId) {
+	if (!(buffs && fromHeroId)) {
 		return;
 	}
 

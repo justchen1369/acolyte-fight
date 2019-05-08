@@ -281,6 +281,50 @@ export const Layouts: Layouts = {
         "numPoints": 5,
         "angleOffsetInRevs": 0.1,
     },
+    "mirrorhenge": {
+        "obstacles": [
+            {
+                "type": "fast",
+                "numObstacles": 4,
+                "layoutRadius": 0.18,
+                "layoutAngleOffsetInRevs": 0.08333333,
+                "numPoints": 4,
+                "extent": 0.003,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.25
+            },
+            {
+                "type": "spinner",
+                "numObstacles": 3,
+                "layoutRadius": 0.0725,
+                "layoutAngleOffsetInRevs": 0.2,
+                "numPoints": 4,
+                "extent": 0.018,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.03
+            },
+            {
+                "type": "mirror",
+                "pattern": [
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    1
+                ],
+                "numObstacles": 36,
+                "layoutRadius": 0.35,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.01,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.015
+            }
+        ],
+        "numPoints": 6,
+        "angleOffsetInRevs": 0.125
+    },
     "triplet": {
         obstacles: [
             {
