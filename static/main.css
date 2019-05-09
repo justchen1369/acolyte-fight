@@ -382,7 +382,7 @@ i.clickable:hover, i.clickable:active {
     z-index: -100;
     padding: 0;
     flex-grow: 3;
-    max-height: 480px; /* height of video */
+    max-height: 380px; /* height of video */
 
     display: flex;
     flex-direction: column;
