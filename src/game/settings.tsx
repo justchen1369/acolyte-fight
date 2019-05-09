@@ -25,6 +25,8 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 1.0,
+
+    InitialStaticSeconds: 0.5,
 }
 
 const World: WorldSettings = {
@@ -35,7 +37,6 @@ const World: WorldSettings = {
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
     ShrinkPowerMaxPlayers: 1,
-    InitialShieldSeconds: 1.0,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
     ProjectileSpeedMaxError: 0.001,

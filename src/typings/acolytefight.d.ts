@@ -65,6 +65,8 @@ declare interface HeroSettings {
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
 
 	RevolutionsPerTick: number; // Hero turn rate
+
+	InitialStaticSeconds: number; // How many seconds a new player at the start of the game that a player cannot be knocked back
 }
 
 declare interface WorldSettings {
@@ -75,7 +77,6 @@ declare interface WorldSettings {
 	SecondsToShrink: number;
 	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
 	ShrinkPowerMaxPlayers: number;
-	InitialShieldSeconds: number; // How many seconds of shield a new player has when entering the game
 	
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
 	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value

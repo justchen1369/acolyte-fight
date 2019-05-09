@@ -716,6 +716,7 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	DelayBehaviour
+	| ResetMassBehaviour
 	| FixateBehaviour
 	| HomingBehaviour
 	| DetonateBehaviour
@@ -744,6 +745,12 @@ export interface DelayBehaviour extends BehaviourBase {
 	type: "delayBehaviour";
 	afterTick: number;
 	delayed: Behaviour;
+}
+
+export interface ResetMassBehaviour extends BehaviourBase {
+	type: "resetMass";
+	tick: number;
+	objId: string;
 }
 
 export interface FixateBehaviour extends BehaviourBase {
