@@ -1271,6 +1271,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		userId: null,
 		userHash: null,
 		name: Matchmaking.BotName,
+		uiBaseColor: HeroColors.BotColor,
 		uiColor: HeroColors.BotColor,
 		isMobile: false,
 		isBot: true,
@@ -1301,13 +1302,15 @@ function handleJoining(ev: w.Joining, world: w.World) {
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world);
 
+	const uiBaseColor = chooseNewPlayerColor(ev.preferredColor, world);
 	const player: w.Player = {
 		heroId: hero.id,
 		userId: ev.userId,
 		userHash: ev.userHash,
 		partyHash: ev.partyHash,
 		name: ev.playerName,
-		uiColor: choosePlayerColor(hero.id, ev.userHash, ev.preferredColor, world),
+		uiBaseColor,
+		uiColor: choosePlayerColor(hero.id, ev.userHash, uiBaseColor, world),
 		isBot: ev.isBot,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
@@ -1321,7 +1324,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 	return true;
 }
 
-function choosePlayerColor(heroId: string, userHash: string, preferredColor: string, world: w.World) {
+function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
 	if (heroId === world.ui.myHeroId || userHash === world.ui.myUserHash) {
 		return HeroColors.MyHeroColor;
 	} else if (world.teamAssignments.has(heroId)) {
@@ -1329,7 +1332,7 @@ function choosePlayerColor(heroId: string, userHash: string, preferredColor: str
 		const team = world.teams.get(teamId);
 		return colorWheel.teamColor(team.color);
 	} else {
-		return chooseNewPlayerColor(preferredColor, world);
+		return baseColor
 	}
 }
 

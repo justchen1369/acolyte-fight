@@ -177,11 +177,14 @@ export interface Player {
 	userHash: string | null;
 	partyHash?: string;
 	name: string;
-	uiColor: string; // Not synced across clients
-	isSharedBot: boolean; // Not synced across clients
+	isSharedBot: boolean;
 	isBot: boolean;
 	isMobile: boolean;
 	dead?: boolean;
+
+	// Not synced across clients
+	uiBaseColor: string;
+	uiColor: string;
 }
 
 export interface ButtonRenderState {
