@@ -80,7 +80,7 @@ export namespace HeroColors {
 	export const HighlightFactor = 0.01;
 	export const HighlightTicks = 10;
 
-	export const EaseTicks = 15;
+	export const EaseTicks = 30;
 	export const EaseInDistance = 1.0;
 	export const EasePower = 4.0;
 

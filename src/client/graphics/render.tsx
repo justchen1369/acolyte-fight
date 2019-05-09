@@ -19,6 +19,7 @@ import { isMobile, isEdge } from '../core/userAgent';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
+const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
 interface SwirlContext {
@@ -704,17 +705,16 @@ function takeHighlights(world: w.World): w.MapHighlight {
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	applyHighlight(obstacle.activeTick, obstacle, world);
-	const pos = calculateObstacleDrawPos(obstacle, world);
 	obstacle.render.forEach(render => {
 		if (render.type === "solid") {
-			renderObstacleSolid(ctxStack, obstacle, pos, render, world, options);
+			renderObstacleSolid(ctxStack, obstacle, render, world, options);
 		} else if (render.type === "smoke") {
-			renderObstacleSmoke(ctxStack, obstacle, pos, render, world, options)
+			renderObstacleSmoke(ctxStack, obstacle, render, world, options)
 		}
 	});
 }
 
-function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos: pl.Vec2, fill: SwatchFill, world: w.World, options: RenderOptions) {
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
@@ -731,7 +731,14 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos
 		}
 	}
 
+	let scale = 1;
+	const pos = obstacle.body.getPosition();
 	const angle = obstacle.body.getAngle();
+
+	const easeMultiplier = ease(obstacle.createTick, world);
+	if (easeMultiplier > 0) {
+		scale *= 1 - easeMultiplier;
+	}
 
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
@@ -743,8 +750,8 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos
 			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
 		}
 
-		const scale = 1;
-		glx.convex(ctxStack, pos, drawShape.points, angle, scale, {
+		const drawPos = vector.scaleAround(pos, MapCenter, scale);
+		glx.convex(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
 			maxRadius: 1,
 		});
@@ -759,12 +766,13 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos
 			radialExtent += flash * fill.expand;
 		}
 
+		const drawPos = vector.scaleAround(center, MapCenter, scale);
 		const fromAngle = angle - shape.angularExtent;
 		const toAngle = angle + shape.angularExtent;
-		glx.arc(ctxStack, center, fromAngle, toAngle, false, {
+		glx.arc(ctxStack, drawPos, fromAngle, toAngle, false, {
 			color,
-			minRadius: shape.radius - radialExtent,
-			maxRadius: shape.radius + radialExtent,
+			minRadius: scale * (shape.radius - radialExtent),
+			maxRadius: scale * (shape.radius + radialExtent),
 			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
 				sigma: HeroColors.GlowRadius,
 				alpha: fill.glow,
@@ -779,14 +787,15 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos
 			radius += flash * fill.expand;
 		}
 
-		glx.circle(ctxStack, pos, {
+		const drawPos = vector.scaleAround(pos, MapCenter, scale);
+		glx.circle(ctxStack, drawPos, {
 			color,
-			maxRadius: radius,
+			maxRadius: scale * radius,
 		});
 	}
 }
 
-function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, obstaclePos: pl.Vec2, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
 	if (options.rtx <= r.GraphicsLevel.Minimum) {
 		return;
 	}
@@ -798,7 +807,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, obs
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	const particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
-	const pos = shapes.randomEdgePoint(obstacle.shape, obstaclePos, obstacle.body.getAngle(), particleRadius);
+	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
 	const outward = vector.unit(vector.diff(pos, mapCenter));
 
 	let velocity = vector.zero();
@@ -885,10 +894,6 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 function calculateHeroDrawPos(hero: w.Hero, world: w.World): pl.Vec2 {
 	return easeIn(hero.createTick, hero.body.getPosition(), world);
-}
-
-function calculateObstacleDrawPos(obstacle: w.Obstacle, world: w.World): pl.Vec2 {
-	return easeIn(obstacle.createTick, obstacle.body.getPosition(), world);
 }
 
 function easeIn(createTick: number, pos: pl.Vec2, world: w.World): pl.Vec2 {

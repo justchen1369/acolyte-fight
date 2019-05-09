@@ -88,6 +88,17 @@ export function dot(a: pl.Vec2, b: pl.Vec2) {
 	return a.x * b.x + a.y * b.y;
 }
 
+export function scaleAround(pos: pl.Vec2, center: pl.Vec2, multiplier: number): pl.Vec2 {
+	if (multiplier === 1) {
+		return pos;
+	} else if (multiplier === 0) {
+		return center;
+	} else {
+		const offset = diff(pos, center);
+		return plus(center, multiply(offset, multiplier));
+	}
+}
+
 export function angleDelta(currentAngle: number, targetAngle: number) {
 	const Precision = 0.001;
 
