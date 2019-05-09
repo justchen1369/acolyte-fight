@@ -306,7 +306,7 @@ export const Layouts: Layouts = {
             {
                 "type": "mirror",
                 "pattern": [
-                    1,
+                    0,
                     1,
                     0,
                     0,
@@ -317,13 +317,11 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.01,
+                "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.015
+                "angularWidthInRevs": 0.03
             }
-        ],
-        "numPoints": 6,
-        "angleOffsetInRevs": 0.125
+        ]
     },
     "triplet": {
         obstacles: [
