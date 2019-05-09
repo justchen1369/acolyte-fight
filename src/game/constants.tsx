@@ -80,6 +80,10 @@ export namespace HeroColors {
 	export const HighlightFactor = 0.01;
 	export const HighlightTicks = 10;
 
+	export const EaseTicks = 15;
+	export const EaseInDistance = 1.0;
+	export const EasePower = 4.0;
+
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';

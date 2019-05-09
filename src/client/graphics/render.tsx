@@ -639,6 +639,11 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 		}
 	}
 
+	const easeMultiplier = ease(0, world);
+	if (easeMultiplier > 0) {
+		scale *= 1 - easeMultiplier;
+	}
+
 	const strokeStyle = color.lighten(0.3);
 	const strokeProportion = 0.99;
 
@@ -699,16 +704,17 @@ function takeHighlights(world: w.World): w.MapHighlight {
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	applyHighlight(obstacle.activeTick, obstacle, world);
+	const pos = calculateObstacleDrawPos(obstacle, world);
 	obstacle.render.forEach(render => {
 		if (render.type === "solid") {
-			renderObstacleSolid(ctxStack, obstacle, render, world, options);
+			renderObstacleSolid(ctxStack, obstacle, pos, render, world, options);
 		} else if (render.type === "smoke") {
-			renderObstacleSmoke(ctxStack, obstacle, render, world, options)
+			renderObstacleSmoke(ctxStack, obstacle, pos, render, world, options)
 		}
 	});
 }
 
-function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, pos: pl.Vec2, fill: SwatchFill, world: w.World, options: RenderOptions) {
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
 
@@ -725,7 +731,6 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 		}
 	}
 
-	const pos = obstacle.body.getPosition();
 	const angle = obstacle.body.getAngle();
 
 	const shape = obstacle.shape;
@@ -781,7 +786,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	}
 }
 
-function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, obstaclePos: pl.Vec2, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
 	if (options.rtx <= r.GraphicsLevel.Minimum) {
 		return;
 	}
@@ -793,7 +798,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	const particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
-	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+	const pos = shapes.randomEdgePoint(obstacle.shape, obstaclePos, obstacle.body.getAngle(), particleRadius);
 	const outward = vector.unit(vector.diff(pos, mapCenter));
 
 	let velocity = vector.zero();
@@ -857,8 +862,10 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	renderRangeIndicator(ctxStack, hero, world);
-	renderBuffs(ctxStack, hero, world); // Do this before applying translation
+	const pos = calculateHeroDrawPos(hero, world);
+
+	renderRangeIndicator(ctxStack, hero, pos, world);
+	renderBuffs(ctxStack, hero, pos, world); // Do this before applying translation
 
 	const invisible = engine.isHeroInvisible(hero);
 	if (invisible) {
@@ -866,14 +873,44 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			// Enemy - render nothing
 		} else {
 			// Self or observer - render placeholder
-			renderHeroInvisible(ctxStack, hero, invisible, world);
+			renderHeroInvisible(ctxStack, hero, pos, invisible, world);
 		}
 	} else {
-		renderHeroCharacter(ctxStack, hero, world);
-		renderHeroBars(ctxStack, hero, world);
+		renderHeroCharacter(ctxStack, hero, pos, world);
+		renderHeroBars(ctxStack, hero, pos, world);
 	}
 
-	playHeroSounds(hero, world);
+	playHeroSounds(hero, pos, world);
+}
+
+function calculateHeroDrawPos(hero: w.Hero, world: w.World): pl.Vec2 {
+	return easeIn(hero.createTick, hero.body.getPosition(), world);
+}
+
+function calculateObstacleDrawPos(obstacle: w.Obstacle, world: w.World): pl.Vec2 {
+	return easeIn(obstacle.createTick, obstacle.body.getPosition(), world);
+}
+
+function easeIn(createTick: number, pos: pl.Vec2, world: w.World): pl.Vec2 {
+	const multiplier = ease(createTick, world);
+	if (multiplier > 0) {
+		const mapCenter = pl.Vec2(0.5, 0.5);
+		const direction = vector.unit(vector.diff(pos, mapCenter));
+		const step = vector.multiply(direction, HeroColors.EaseInDistance * multiplier);
+		return vector.plus(pos, step);
+	} else {
+		// Must clone because this point might be used for some trails which should not follow
+		return vector.clone(pos);
+	}
+}
+
+function ease(createTick: number, world: w.World): number {
+	const age = world.tick - createTick;
+	if (age < HeroColors.EaseTicks) {
+		return Math.pow(1 - age / HeroColors.EaseTicks, HeroColors.EasePower);
+	} else {
+		return 0;
+	}
 }
 
 function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
@@ -926,17 +963,17 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	});
 }
 
-function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	hero.buffs.forEach(buff => {
 		if (buff.render) {
-			renderBuffSmoke(ctxStack, buff.render, buff, hero, world);
+			renderBuffSmoke(ctxStack, buff.render, buff, hero, pos, world);
 		}
 
 		if (buff.sound) {
 			world.ui.sounds.push({
 				id: `buff-${buff.id}`,
 				sound: `${buff.sound}`,
-				pos: vector.clone(hero.body.getPosition()),
+				pos,
 			});
 		}
 	});
@@ -950,14 +987,14 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 			world.ui.sounds.push({
 				id: `buff-${buff.id}-expired`,
 				sound: `${buff.sound}-expired`,
-				pos: vector.clone(hero.body.getPosition()),
+				pos,
 			});
 		}
 	});
 	hero.uiDestroyedBuffs = [];
 }
 
-function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, world: w.World) {
+function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 	let color = render.color;
 	if (render.heroColor) {
 		color = heroColor(hero.id, world);
@@ -979,7 +1016,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
 	const velocity = particleVelocity(thrust);
 
-	let pos = vector.clone(hero.body.getPosition());
+	let pos = heroPos;
 	if (render.emissionRadiusFactor) {
 		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadiusFactor * hero.radius));
 	}
@@ -1003,9 +1040,7 @@ function particleVelocity(primaryVelocity: pl.Vec2) {
 	return velocity;
 }
 
-function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
-	const pos = hero.body.getPosition();
-
+function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const player = world.players.get(hero.id);
 	let color = heroColor(hero.id, world);
 	if (!(world.activePlayers.has(hero.id) || (player && player.isSharedBot))) {
@@ -1079,11 +1114,11 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wo
 	}
 }
 
-function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, invisible: w.VanishBuff, world: w.World) {
-	renderVanishSmoke(ctxStack, hero, world);
+function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, invisible: w.VanishBuff, world: w.World) {
+	renderVanishSmoke(ctxStack, hero, world, pos);
 }
 
-function playHeroSounds(hero: w.Hero, world: w.World) {
+function playHeroSounds(hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 	// Casting sounds
 	if (hero.casting) {
 		const spell = world.settings.Spells[hero.casting.action.type];
@@ -1098,7 +1133,7 @@ function playHeroSounds(hero: w.Hero, world: w.World) {
 			if (stage) {
 				// Make the sound happen in the correct direction
 				const pos = vector.plus(
-					hero.body.getPosition(),
+					heroPos,
 					vector.multiply(vector.fromAngle(hero.body.getAngle()), hero.radius));
 				const key = `${spell.sound}-${stage}`;
 				world.ui.sounds.push({
@@ -1111,7 +1146,7 @@ function playHeroSounds(hero: w.Hero, world: w.World) {
 	}
 }
 
-function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	if (!(hero.id === world.ui.myHeroId && world.ui.toolbar.hoverSpellId && !isMobile)) {
 		return;
 	}
@@ -1157,10 +1192,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 	}
 
 	if (range) {
-		const pos = hero.body.getPosition();
-
 		const color = parseColor(spell.color);
-		const fill = color.alpha(0.25);
 
 		// Stroke
 		const strokeWidth = ctxStack.pixel * 2;
@@ -1173,9 +1205,8 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.W
 	}
 }
 
-function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const Hero = world.settings.Hero;
-	const pos = hero.body.getPosition();
 
 	const radius = hero.radius;
 

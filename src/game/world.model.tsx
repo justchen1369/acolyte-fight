@@ -427,6 +427,7 @@ export interface Hero extends WorldObjectBase {
 	revolutionsPerTick: number;
 	conveyorShift?: pl.Vec2; // If set, move by this amount on the next tick. Used to ensure only one conveyor has an effect per tick.
 
+	createTick: number;
 	hitTick?: number;
 	damagedTick?: number;
 	lavaTick?: number;

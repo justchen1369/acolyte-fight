@@ -404,6 +404,7 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
+		createTick: world.tick,
 		throttleUntilTick: 0,
 		killerHeroId: null,
 		assistHeroId: null,
