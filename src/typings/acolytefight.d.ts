@@ -449,6 +449,7 @@ declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
 }
 
 declare interface DetonateParameters extends DamagePacketTemplate {
+	against?: number;
 	outerDamage?: number;
 
 	radius: number; // The radius of the explosion

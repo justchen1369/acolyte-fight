@@ -2685,7 +2685,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
 		const distance = vector.length(diff);
-		if (!(other.id !== owner && distance <= explosionRadius)) {
+		if (distance > explosionRadius) {
 			return;
 		}
 
@@ -2698,7 +2698,8 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			};
 
 			const alliance = calculateAlliance(owner, other.id, world);
-			if ((alliance & Alliances.NotFriendly) > 0) {
+			const against = detonate.against !== undefined ? detonate.against : Alliances.NotFriendly;
+			if ((alliance & against) > 0) {
 				applyDamage(other, packet, world);
 				expireOnHeroHit(other, world);
 				applyBuffsFrom(detonate.buffs, owner, other, world);
