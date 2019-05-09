@@ -165,6 +165,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		categories: Categories.Obstacle,
 		body,
 
+		static: template.static,
 		sensor,
 		collideWith,
 		expireOn: template.expireOn || Categories.None,
@@ -2842,7 +2843,7 @@ function captureSnapshot(world: w.World) {
 		objectLookup: new Map<string, w.ObjectSnapshot>(),
 	};
 	world.objects.forEach(obj => {
-		if (obj.category === "hero" || (obstacles && obj.category === "obstacle")) {
+		if (obj.category === "hero" || (obstacles && obj.category === "obstacle" && !obj.static)) {
 			const objSnapshot: w.ObjectSnapshot = {
 				pos: vector.clone(obj.body.getPosition()),
 				health: obj.health,

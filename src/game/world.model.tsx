@@ -381,6 +381,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	category: "obstacle";
 	type: string;
 
+	static?: boolean;
 	sensor: boolean;
 	collideWith: number;
 	expireOn: number;
