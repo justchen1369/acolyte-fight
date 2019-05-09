@@ -682,7 +682,7 @@ const retractor: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Cast Spirit Missile again to detonate it at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Cast Spirit Missile again to detonate it at exactly the right moment. Enemies caught in the blast will be unable to cast spells for 0.5 seconds.",
     action: "focus",
 
     color: '#ff8855',
@@ -723,6 +723,15 @@ const rocket: Spell = {
             },
 
             partialImpulse: null, // full impulse at point blank range
+
+            buffs: [
+                {
+                    type: "cooldown",
+                    against: Alliances.NotFriendly,
+                    maxTicks: 1,
+                    minCooldown: 0.5 * TicksPerSecond,
+                }
+            ],
         },
 
         strafe: {
