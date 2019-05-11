@@ -622,8 +622,6 @@ export function addBot(game: g.Game) {
 	const replaceBots = false;
 	const heroId = findExistingSlot(game, replaceBots) || formatHeroId(game.numPlayers++);
 
-	// Nominate first player as simulator
-	const player = [...game.active.values()][0];
 	game.bots.set(heroId, null);
 
 	const keyBindings = randomKeyBindings(game);
