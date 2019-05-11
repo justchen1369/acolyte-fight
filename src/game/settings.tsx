@@ -984,7 +984,7 @@ const repeater: Spell = {
     throttle: true,
 
     projectile: {
-        density: 10,
+        density: 1,
         radius: 0.002,
         speed: 0.8,
         maxTicks: 1 * TicksPerSecond,
