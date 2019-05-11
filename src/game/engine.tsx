@@ -169,7 +169,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		sensor,
 		collideWith,
 		expireOn: template.expireOn || Categories.None,
-		damageFrom: template.damageFrom !== undefined ? template.damageFrom : Categories.All,
+		undamageable: template.undamageable,
 
 		render: template.render || [],
 
@@ -1861,7 +1861,7 @@ function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
 	if (takeHit(projectile, obstacle.id, world)) {
-		if (obstacle.damageFrom & projectile.categories) {
+		if (!obstacle.undamageable) {
 			let packet: w.DamagePacket = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 			packet = scaleForPartialDamage(world, projectile, packet);
 			applyDamageToObstacle(obstacle, packet, world);
@@ -2639,7 +2639,6 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 	const detonate: DetonateParameters = {
 		...template,
 		damage: projectile.detonate.damage * damageMultiplier,
-		outerDamage: (projectile.detonate.outerDamage !== undefined ? projectile.detonate.outerDamage : projectile.detonate.damage) * damageMultiplier,
 	};
 
 	if (template.partialRadius) {
@@ -2674,50 +2673,45 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 }
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, sound: string = null) {
-	const outerDamage = detonate.outerDamage !== undefined ? detonate.outerDamage : detonate.damage;
-	const innerDamagePacket = instantiateDamage(detonate, owner, world);
-	const outerDamagePacket = instantiateDamage({ ...detonate, damage: outerDamage }, owner, world); 
+	const damagePacket = instantiateDamage(detonate, owner, world);
 
 	world.objects.forEach(other => {
-		if (!(other.category === "hero" || other.category === "projectile")) {
-			return;
-		}
+		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
+			const diff = vector.diff(other.body.getPosition(), epicenter);
+			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
+			const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
-		const diff = vector.diff(other.body.getPosition(), epicenter);
-		const extent = other.radius;
-		const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
-
-		const distance = vector.length(diff);
-		if (distance > explosionRadius) {
-			return;
-		}
-
-		if (other.category === "hero") {
-			const proportion = 1.0 - (distance / explosionRadius);
-
-			const packet: w.DamagePacket = {
-				...innerDamagePacket,
-				damage: proportion * innerDamagePacket.damage + (1 - proportion) * outerDamagePacket.damage,
-			};
-
-			const alliance = calculateAlliance(owner, other.id, world);
-			const against = detonate.against !== undefined ? detonate.against : Alliances.NotFriendly;
-			if ((alliance & against) > 0) {
-				applyDamage(other, packet, world);
-				expireOnHeroHit(other, world);
-				applyBuffsFrom(detonate.buffs, owner, other, world);
-
-				if (detonate.maxImpulse) {
-					const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
-					const direction = vector.relengthen(diff, magnitude);
-					other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-					world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
-				}
+			const distance = vector.length(diff);
+			if (distance > explosionRadius) {
+				return;
 			}
 
-		} else if (other.category === "projectile") {
-			if (destructibleBy(other, owner, world)) {
-				other.expireTick = world.tick;
+			const proportion = 1.0 - (distance / explosionRadius);
+			let applyKnockback = false;
+			if (other.category === "hero") {
+				const alliance = calculateAlliance(owner, other.id, world);
+				const against = detonate.against !== undefined ? detonate.against : Alliances.NotFriendly;
+				if ((alliance & against) > 0) {
+					applyDamage(other, damagePacket, world);
+					expireOnHeroHit(other, world);
+					applyBuffsFrom(detonate.buffs, owner, other, world);
+					applyKnockback = true;
+				}
+
+			} else if (other.category === "projectile") {
+				if (destructibleBy(other, owner, world)) {
+					other.expireTick = world.tick;
+				}
+			} else if (other.category === "obstacle") {
+				applyDamageToObstacle(other, damagePacket, world);
+				applyKnockback = true;
+			}
+
+			if (applyKnockback && detonate.maxImpulse) {
+				const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
+				const direction = vector.relengthen(diff, magnitude);
+				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
+				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
 			}
 		}
 	});

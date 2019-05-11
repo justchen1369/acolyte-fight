@@ -160,15 +160,15 @@ declare interface ObstacleTemplateLookup {
 declare interface ObstacleTemplate {
 	render?: SwatchRender[];
 
-	static?: boolean;
+	static?: boolean; // Whether this obstacle is movable
 	angularDamping?: number;
 	linearDamping?: number;
 	density?: number;
 
-	sensor?: boolean;
+	sensor?: boolean; // Whether other objects (e.g. projectiles) pass through this obstacle
 	collideWith?: number;
 	expireOn?: number;
-	damageFrom?: number;
+	undamageable?: boolean; // Whether projectiles or detonations can damage this obstacle
 
 	health: number;
 
@@ -450,7 +450,6 @@ declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
 
 declare interface DetonateParameters extends DamagePacketTemplate {
 	against?: number;
-	outerDamage?: number;
 
 	radius: number; // The radius of the explosion
 	

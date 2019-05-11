@@ -388,7 +388,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	sensor: boolean;
 	collideWith: number;
 	expireOn: number;
-	damageFrom: number;
+	undamageable?: boolean;
 
 	maxHealth: number;
 	health: number;
