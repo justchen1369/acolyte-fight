@@ -2704,7 +2704,6 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				}
 			} else if (other.category === "obstacle") {
 				applyDamageToObstacle(other, damagePacket, world);
-				applyKnockback = true;
 			}
 
 			if (applyKnockback && detonate.maxImpulse) {
