@@ -869,7 +869,7 @@ const link: Spell = {
         sound: "link",
         color: '#4444ff',
         renderers: [
-            { type: "projectile", ticks: 1 },
+            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1 },
             {
                 type: "link",
                 color: '#4444ff',
@@ -894,8 +894,8 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         radius: 0.005,
-        speed: 0.6,
-        maxTicks: 0.5 * TicksPerSecond,
+        speed: 0.8,
+        maxTicks: 0.4 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -927,7 +927,7 @@ const grapple: Spell = {
         sound: "grapple",
         color: '#ff2200',
         renderers: [
-            { type: "projectile", ticks: 1 },
+            { type: "polygon", color: '#ff2200', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
                 color: '#ff2200',
