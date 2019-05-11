@@ -871,7 +871,17 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	const pos = calculateHeroDrawPos(hero, world);
+	let pos = vector.clone(hero.body.getPosition());
+
+	// Ease in hero on arrival
+	const easeMultiplier = ease(hero.createTick, world);
+	if (easeMultiplier > 0) {
+		const direction = vector.unit(vector.diff(pos, MapCenter));
+		const step = vector.multiply(direction, HeroColors.EaseInDistance * easeMultiplier);
+		pos = vector.plus(pos, step);
+
+		renderHeroArrival(pos, direction, hero, world);
+	}
 
 	renderRangeIndicator(ctxStack, hero, pos, world);
 	renderBuffs(ctxStack, hero, pos, world); // Do this before applying translation
@@ -892,21 +902,16 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	playHeroSounds(hero, pos, world);
 }
 
-function calculateHeroDrawPos(hero: w.Hero, world: w.World): pl.Vec2 {
-	return easeIn(hero.createTick, hero.body.getPosition(), world);
-}
-
-function easeIn(createTick: number, pos: pl.Vec2, world: w.World): pl.Vec2 {
-	const multiplier = ease(createTick, world);
-	if (multiplier > 0) {
-		const mapCenter = pl.Vec2(0.5, 0.5);
-		const direction = vector.unit(vector.diff(pos, mapCenter));
-		const step = vector.multiply(direction, HeroColors.EaseInDistance * multiplier);
-		return vector.plus(pos, step);
-	} else {
-		// Must clone because this point might be used for some trails which should not follow
-		return vector.clone(pos);
-	}
+function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: w.World) {
+	world.ui.trails.unshift({
+		type: "circle",
+		pos,
+		velocity: particleVelocity(vector.multiply(outward, 0.1)),
+		radius: hero.radius,
+		initialTick: world.tick,
+		max: HeroColors.EaseTicks,
+		fillStyle: heroColor(hero.id, world),
+	});
 }
 
 function ease(createTick: number, world: w.World): number {
