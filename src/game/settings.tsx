@@ -991,7 +991,7 @@ const repeater: Spell = {
         maxTicks: 1 * TicksPerSecond,
         damage: 15,
         collideWith: Categories.All ^ Categories.Projectile,
-        expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
+        expireOn: Categories.All ^ Categories.Shield,
         partialDamage: {
             initialMultiplier: 0.33,
             ticks: 0.25 * TicksPerSecond,
