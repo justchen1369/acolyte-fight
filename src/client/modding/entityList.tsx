@@ -102,8 +102,7 @@ class EntityList extends React.PureComponent<Props, State> {
         }
 
         const selectedId = this.props.selectedId;
-        const undeletable = selectedId && (selectedId in this.props.defaults);
-        const disabled = undeletable || !selectedId;
+        const disabled = !selectedId;
         const className = classNames({ 'btn': true, 'btn-disabled': disabled });
         return <div className={className} title="Remove" onClick={() => !disabled && this.onRemoveClick()}><i className="fas fa-trash" /></div>;
     }
