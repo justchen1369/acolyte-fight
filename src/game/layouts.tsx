@@ -145,6 +145,49 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.08333333333,
         "numPoints": 4,
     },
+    "exit": {
+        "obstacles": [
+            {
+                "pattern": [
+                    1,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    0,
+                    1,
+                    1
+                ],
+                "type": "explosive",
+                "numObstacles": 30,
+                "layoutRadius": 0.2,
+                "layoutAngleOffsetInRevs": 0.16666667,
+                "numPoints": 3,
+                "extent": 0.005,
+                "orientationAngleOffsetInRevs": 0
+            },
+            {
+                "type": "outward",
+                "layoutRadius": 0.075,
+                "extent": 0.075,
+                "numObstacles": 3,
+                "layoutAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.005,
+                "health": 200
+            },
+            {
+                "type": "fast",
+                "layoutRadius": 0.23,
+                "extent": 0.002,
+                "numObstacles": 3,
+                "layoutAngleOffsetInRevs": 0.16666667,
+                "angularWidthInRevs": 0.15
+            }
+        ],
+        "numPoints": 0
+    },
     "snowflake": {
         "numPoints": 6,
         "angleOffsetInRevs": 0.08333333333,
