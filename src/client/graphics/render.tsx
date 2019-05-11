@@ -1074,6 +1074,19 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		style = style.lighten(HeroColors.DamageGlowFactor * flash);
 	}
 
+	// Thrust
+	if (hero.thrust) {
+		world.ui.trails.unshift({
+			type: "circle",
+			pos,
+			velocity: particleVelocity(vector.relengthen(hero.thrust.velocity, 0.1)),
+			radius: hero.radius,
+			initialTick: world.tick,
+			max: hero.thrust.ticks,
+			fillStyle: heroColor(hero.id, world),
+		});
+	}
+
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		const strokeColor = parseColor(hero.casting.color).alpha(hero.casting.proportion);
