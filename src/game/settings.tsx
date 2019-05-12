@@ -1195,7 +1195,7 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Freezing Breath',
-    description: "Enemies caught in your freezing breath will be slowed for 2 seconds.",
+    description: "Enemies caught in your freezing breath will be slowed for 2 seconds. The freezing whirlwind will also catch enemy projectiles.",
     action: "projectile",
 
     color: '#44ffff',
