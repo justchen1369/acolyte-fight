@@ -702,6 +702,7 @@ const backlash: Spell = {
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
         categories: Categories.Projectile,
+        shieldTakesOwnership: false,
         strafe: {},
 
         partialDamage: {
