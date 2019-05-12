@@ -684,10 +684,10 @@ const retractor: Spell = {
 const backlash: Spell = {
     id: 'backlash',
     name: 'Backlash',
-    description: "Away and back. Backlash does full damage on its return journey, but only half damage on its way out.",
+    description: "Away and back. Hit your enemy twice, if you can.",
     action: "projectile",
 
-    color: '#00ff88',
+    color: '#00ccff',
     icon: "crackedBallDunk",
 
     maxAngleDiffInRevs: 0.01,
@@ -695,21 +695,19 @@ const backlash: Spell = {
     throttle: true,
 
     projectile: {
-        damage: 15,
+        damage: 10,
         lifeSteal: 0.2,
         density: 1,
         radius: 0.002,
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
         categories: Categories.Projectile,
+        sensor: true,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+        expireOn: Categories.All,
+        expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
-        strafe: {},
-
-        partialDamage: {
-            initialMultiplier: 0.5,
-            ticks: 30,
-            step: true,
-        },
+        hitInterval: 6,
 
         behaviours: [
             {
@@ -721,11 +719,11 @@ const backlash: Spell = {
         ],
 
         sound: "backlash",
-        color: '#00ff88',
+        color: '#00ccff',
         renderers: [
-            { type: "projectile", ticks: 15, smoke: 0.1, selfColor: true },
-            { type: "ray", ticks: 15, selfColor: true },
-            { type: "strike", ticks: 15, glow: true, numParticles: 9, selfColor: true },
+            { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
+            { type: "ray", ownerColor: true, ticks: 15 },
+            { type: "strike", color: '#fff', ticks: 15, growth: 1, glow: true, numParticles: 9, particleSpeedMultiplier: -1 },
         ],
     },
 };

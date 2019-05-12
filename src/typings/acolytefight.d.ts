@@ -566,6 +566,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	glow?: boolean;
 	growth?: number;
 	numParticles?: number;
+	particleSpeedMultiplier?: number;
 }
 
 declare type BuffTemplate =

@@ -1057,9 +1057,9 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	});
 }
 
-function particleVelocity(primaryVelocity: pl.Vec2) {
+function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
 	const direction = vector.fromAngle(2 * Math.PI * Math.random());
-	const speed = Math.random() * vector.dot(direction, primaryVelocity); // can be negative
+	const speed = multiplier * Math.random() * vector.dot(direction, primaryVelocity); // can be negative
 	const velocity = vector.multiply(direction, speed);
 	return velocity;
 }
@@ -1556,7 +1556,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	// Particles
 	if (strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
-			const velocity = particleVelocity(projectile.body.getLinearVelocity());
+			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.particleSpeedMultiplier || 1);
 			pushTrail({
 				type: "circle",
 				initialTick: projectile.hitTick,
