@@ -747,7 +747,7 @@ const rocket: Spell = {
         radius: 0.005,
         speed: 0.15,
         maxTicks: 2.25 * TicksPerSecond,
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
+        collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
         shieldTakesOwnership: false,
 
@@ -769,6 +769,14 @@ const rocket: Spell = {
             },
 
             partialImpulse: null, // full impulse at point blank range
+
+            buffs: [
+                {
+                    type: "movement",
+                    maxTicks: 1 * TicksPerSecond,
+                    movementProportion: 0,
+                }
+            ],
         },
 
         strafe: {
