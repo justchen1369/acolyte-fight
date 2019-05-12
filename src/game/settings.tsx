@@ -1756,7 +1756,7 @@ const swap: Spell = {
     projectile: {
         density: 0.001,
         radius: 0.005,
-        speed: 0.6,
+        speed: 0.8,
         maxTicks: 0.75 * TicksPerSecond,
         damage: 0,
         categories: Categories.Projectile,
