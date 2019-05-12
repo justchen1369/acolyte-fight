@@ -380,7 +380,8 @@ const firespray: Spell = {
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
-        damage: 2.5,
+        damage: 3.3,
+        damageScaling: false,
 
         color: '#ff0044',
         renderers: [
