@@ -458,6 +458,7 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
 
 	renderTicks: number; // Length of explosion
+	sound?: string;
 
 	buffs?: BuffTemplate[];
 }

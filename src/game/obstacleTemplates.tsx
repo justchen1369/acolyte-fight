@@ -254,6 +254,8 @@ const explosive: ObstacleTemplate = {
         maxImpulse: 0.0005,
         radius: 0.05,
         renderTicks: 30,
+
+        sound: "explosive",
     },
 };
 

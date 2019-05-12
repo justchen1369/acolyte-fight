@@ -2675,7 +2675,7 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 	obstacle.detonate = null;
 }
 
-function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, sound: string = null) {
+function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, defaultSound: string = null) {
 	const damagePacket = instantiateDamage(detonate, owner, world);
 
 	world.objects.forEach(other => {
@@ -2722,7 +2722,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 		type: "detonate",
 		tick: world.tick,
 		sourceId,
-		sound: sound,
+		sound: detonate.sound || defaultSound,
 		pos: vector.clone(epicenter),
 		radius: detonate.radius,
 		explosionTicks: detonate.renderTicks,

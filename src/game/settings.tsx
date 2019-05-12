@@ -205,6 +205,7 @@ const flamestrike: Spell = {
             radius: 0.03,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
+
             renderTicks: 10,
 
             partialRadius: {
