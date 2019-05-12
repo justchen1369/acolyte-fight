@@ -708,6 +708,7 @@ const backlash: Spell = {
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
         hitInterval: 6,
+        expireOnMirror: true,
 
         behaviours: [
             {
