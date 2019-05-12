@@ -1722,7 +1722,7 @@ const thrust: Spell = {
     name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
 
-    range: 0.3,
+    range: 0.45,
     radiusMultiplier: 1.5,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
@@ -1732,7 +1732,7 @@ const thrust: Spell = {
     damageTemplate: {
         damage: 0,
     },
-    speed: 1.0,
+    speed: 1.5,
     bounceTicks: 3,
 
     icon: "fireDash",
