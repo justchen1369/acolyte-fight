@@ -1814,7 +1814,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 		obstacle.activeTick = world.tick;
 	}
 
-	if (takeHit(obstacle, obstacle.id, world)) {
+	if (takeHit(obstacle, hero.id, world)) {
 		if (obstacle.damage > 0) {
 			const packet: w.DamagePacket = {
 				damage: obstacle.damage,
