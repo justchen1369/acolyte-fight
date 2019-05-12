@@ -73,7 +73,7 @@ const Choices: ChoiceSettings = {
 		"q": [
             ["fireball", "flamestrike"],
             ["triplet", "difire"],
-            ["retractor"],
+            ["retractor", "backlash"],
             ["whip"],
         ],
 		"w": [
@@ -676,6 +676,52 @@ const retractor: Spell = {
             { type: "projectile", ticks: 1, glow: 0.1 },
             { type: "ray", ticks: 15, glow: 0.1 },
             { type: "strike", ticks: 15, glow: true, numParticles: 9 },
+        ],
+    },
+};
+const backlash: Spell = {
+    id: 'backlash',
+    name: 'Backlash',
+    description: "Away and back. Backlash does more damage on its return journey.",
+    action: "projectile",
+
+    color: '#00ff88',
+    icon: "crackedBallDunk",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 1.5 * TicksPerSecond,
+    throttle: true,
+
+    projectile: {
+        damage: 15,
+        lifeSteal: 0.2,
+        density: 1,
+        radius: 0.002,
+        speed: 0.6,
+        maxTicks: 1.5 * TicksPerSecond,
+        categories: Categories.Projectile,
+
+        partialDamage: {
+            initialMultiplier: 0.5,
+            ticks: 30,
+            step: true,
+        },
+
+        behaviours: [
+            {
+                trigger: { afterTicks: 30 },
+                type: "homing",
+                revolutionsPerSecond: 1,
+                targetType: "self",
+            },
+        ],
+
+        sound: "retractor",
+        color: '#00ff88',
+        renderers: [
+            { type: "projectile", ticks: 15, smoke: 0.1, selfColor: true },
+            { type: "ray", ticks: 15, selfColor: true },
+            { type: "strike", ticks: 15, glow: true, numParticles: 9, selfColor: true },
         ],
     },
 };
@@ -1830,6 +1876,7 @@ const Spells = {
     homing,
     boomerang,
     retractor,
+    backlash,
     rocket,
     whip,
     bouncer,
