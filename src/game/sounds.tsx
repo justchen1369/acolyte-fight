@@ -523,6 +523,62 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "backlash": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 2,
+                "attack": 0.25,
+                "decay": 1.5,
+                "highPass": 1900,
+                "lowPass": 1902,
+                "wave": "brown-noise"
+            },
+            {
+                "stopTime": 2,
+                "attack": 0.5,
+                "decay": 1.5,
+                "startFreq": 950,
+                "stopFreq": 950,
+                "lowPass": 200,
+                "modStartFreq": 2000,
+                "modStopFreq": 2000,
+                "modStartStrength": 300,
+                "modStopStrength": 300,
+                "tremoloFreq": 11,
+                "tremoloStrength": 0.3,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
+    "backlash-hit": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 0.25,
+                "attack": 0.01,
+                "decay": 0.24,
+                "startFreq": 950,
+                "stopFreq": 950,
+                "lowPass": 200,
+                "modStartFreq": 2150,
+                "modStopFreq": 2150,
+                "modStartStrength": 200,
+                "modStopStrength": 200,
+                "tremoloFreq": 11,
+                "tremoloStrength": 0.3,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
     "rocket": {
         "start": [
             {
@@ -1080,6 +1136,7 @@ export const Sounds: Sounds = {
         ]
     },
     "halo-hit": {
+        cutoffEarly: false,
         "start": [
             {
                 "stopTime": 0.3,

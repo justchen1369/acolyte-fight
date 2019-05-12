@@ -716,7 +716,7 @@ const backlash: Spell = {
             },
         ],
 
-        sound: "retractor",
+        sound: "backlash",
         color: '#00ff88',
         renderers: [
             { type: "projectile", ticks: 15, smoke: 0.1, selfColor: true },
