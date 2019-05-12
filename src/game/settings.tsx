@@ -1226,6 +1226,7 @@ const whirlwind: Spell = {
                 collideLike: Categories.Hero,
                 categories: Categories.Projectile,
                 notCategories: Categories.Massive,
+                against: Alliances.NotFriendly,
                 radius: 0.04,
                 accelerationPerTick: 0.1,
                 maxSpeed: 0.4,
