@@ -109,6 +109,7 @@ export function initialWorld(mod: Object): w.World {
 			events: new Array<w.WorldEvent>(),
 			underlays: [],
 			trails: [],
+			changedTrailHighlights: new Map(),
 			sounds: [],
 			notifications: [],
 			camera: {

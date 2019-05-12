@@ -110,6 +110,7 @@ export interface UIState {
 
 	underlays: Trail[];
 	trails: Trail[];
+	changedTrailHighlights: Map<string, TrailHighlight>;
 	notifications: Notification[];
 	sounds: AudioElement[];
 
@@ -982,6 +983,7 @@ export interface TrailBase {
 }
 
 export interface TrailHighlight {
+	tag: string;
 	fromTick: number;
 	maxTicks: number;
 	glow?: boolean;

@@ -227,11 +227,20 @@ function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: Client
 	world.ui.events.forEach(obj => renderEvent(ctxStack, obj, world));
 
 	world.ui.trails = renderTrails(ctxStack, world.ui.trails, world);
+
+	world.ui.changedTrailHighlights.clear();
 }
 
 function renderTrails(ctxStack: CanvasCtxStack, trails: w.Trail[], world: w.World) {
 	let newTrails = new Array<w.Trail>();
 	trails.forEach(trail => {
+		if (trail.tag) {
+			const newHighlight = world.ui.changedTrailHighlights.get(trail.tag);
+			if (newHighlight) {
+				trail.highlight = newHighlight;
+			}
+		}
+
 		renderTrail(ctxStack, trail, world);
 
 		const expireTick = trail.initialTick + trail.max;
@@ -865,22 +874,15 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 
 	// Highlight
 	const highlight: w.TrailHighlight = {
+		tag: obj.id,
 		fromTick: activeTick,
 		maxTicks: HeroColors.ObstacleFlashTicks,
 		glow,
 		growth,
 	};
 	obj.uiHighlight = highlight;
-	world.ui.underlays.forEach(trail => {
-		if (trail.tag === obj.id) {
-			trail.highlight = highlight;
-		}
-	});
-	world.ui.trails.forEach(trail => {
-		if (trail.tag === obj.id) {
-			trail.highlight = highlight;
-		}
-	});
+
+	world.ui.changedTrailHighlights.set(highlight.tag, highlight);
 
 	return true;
 }
