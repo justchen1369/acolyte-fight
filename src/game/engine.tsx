@@ -504,7 +504,17 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		density: projectileTemplate.density,
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 		isSensor: projectileTemplate.sensor,
-	} as pl.FixtureDef);
+	});
+
+	if (projectileTemplate.sense) {
+		body.createFixture(pl.Circle(projectileTemplate.radius), {
+		filterGroupIndex: config.filterGroupIndex,
+			filterCategoryBits: categories,
+			filterMaskBits: projectileTemplate.sense,
+			density: 1e-6,
+			isSensor: true,
+		});
+	}
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(config.owner, x.id, world) & Alliances.Enemy));
 	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
@@ -877,7 +887,11 @@ function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.W
 	// Also allows meteor to be shot further back and so is more likely to push back another hero if they are at point blank range.
 	const hero = world.objects.get(projectile.owner);
 	if (!hero || (hero.category === "hero" && projectileClearedHero(projectile, hero))) {
-		updateGroupIndex(projectile.body.getFixtureList(), 0);
+		let fixture = projectile.body.getFixtureList();
+		while (fixture) {
+			updateGroupIndex(fixture, 0);
+			fixture = fixture.getNext();
+		}
 		return false;
 	} else {
 		return true;
@@ -1926,14 +1940,17 @@ function swapOwnership(projectile: w.Projectile, newOwner: string, world: w.Worl
 	projectile.targetId = projectile.owner;
 	projectile.owner = newOwner;
 
-	const fixture = projectile.body.getFixtureList();
-	if (fixture.getFilterGroupIndex() < 0) {
-		const hero = world.objects.get(newOwner);
-		if (hero && hero.category === "hero") {
-			updateGroupIndex(fixture, hero.filterGroupIndex);
-		} else {
-			updateGroupIndex(fixture, 0);
+	let fixture = projectile.body.getFixtureList();
+	while (fixture) {
+		if (fixture.getFilterGroupIndex() < 0) {
+			const hero = world.objects.get(newOwner);
+			if (hero && hero.category === "hero") {
+				updateGroupIndex(fixture, hero.filterGroupIndex);
+			} else {
+				updateGroupIndex(fixture, 0);
+			}
 		}
+		fixture = fixture.getNext();
 	}
 }
 

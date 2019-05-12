@@ -1556,7 +1556,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	// Particles
 	if (strike.numParticles) {
 		for (let i = 0; i < strike.numParticles; ++i) {
-			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.particleSpeedMultiplier || 1);
+			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.speedMultiplier || 1);
 			pushTrail({
 				type: "circle",
 				initialTick: projectile.hitTick,

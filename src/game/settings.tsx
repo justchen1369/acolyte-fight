@@ -702,13 +702,12 @@ const backlash: Spell = {
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
         categories: Categories.Projectile,
-        sensor: true,
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
-        expireOn: Categories.All,
+        sense: Categories.Hero,
+        collideWith: Categories.Obstacle | Categories.Massive | Categories.Shield,
+        expireOn: Categories.All ^ Categories.Shield,
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
         hitInterval: 6,
-        expireOnMirror: true,
 
         behaviours: [
             {
@@ -724,7 +723,7 @@ const backlash: Spell = {
         renderers: [
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 15 },
-            { type: "strike", color: '#fff', ticks: 15, growth: 1, glow: true, numParticles: 9, particleSpeedMultiplier: -1 },
+            { type: "strike", color: '#fff', ticks: 15, growth: 1, glow: true, numParticles: 9, speedMultiplier: -0.5 },
         ],
     },
 };

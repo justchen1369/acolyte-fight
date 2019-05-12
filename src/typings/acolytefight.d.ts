@@ -331,6 +331,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	expireAgainstObjects?: number; // Alliance flags: Whether to expire against enemies only, etc
 	expireOnMirror?: boolean; // Whether to hit mirrors or not
 	sensor?: boolean; // A sensor will just pass through all objects and report what it would have collided with
+	sense?: number; // Collision flags: Detect when we pass over these objects - different from sensor in that the object can still collide with some things while sensing others
 	selfPassthrough?: boolean; // Whether the projectile just passes through its owner
 	destructible?: DestructibleParameters; // Whether this projectile is destroyed by a detonate (like a Supernova)
 	expireAfterCursorTicks?: number; // Expire this many ticks after the cursor is reached
@@ -566,7 +567,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	glow?: boolean;
 	growth?: number;
 	numParticles?: number;
-	particleSpeedMultiplier?: number;
+	speedMultiplier?: number;
 }
 
 declare type BuffTemplate =
