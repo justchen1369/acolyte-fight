@@ -876,6 +876,11 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 			trail.highlight = highlight;
 		}
 	});
+	world.ui.trails.forEach(trail => {
+		if (trail.tag === obj.id) {
+			trail.highlight = highlight;
+		}
+	});
 
 	return true;
 }
