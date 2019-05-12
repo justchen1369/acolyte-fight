@@ -111,7 +111,7 @@ export const fast: ObstacleTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 1.33,
+            movementProportion: 1.5,
             render: {
                 color: "rgba(255, 255, 255, 1)",
                 heroColor: true,
