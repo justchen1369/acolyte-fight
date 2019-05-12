@@ -683,8 +683,8 @@ const retractor: Spell = {
 };
 const backlash: Spell = {
     id: 'backlash',
-    name: 'Backslash',
-    description: "Away and back. Backslash does full damage on its return journey, but only half damage on its way out.",
+    name: 'Backlash',
+    description: "Away and back. Backlash does full damage on its return journey, but only half damage on its way out.",
     action: "projectile",
 
     color: '#00ff88',
