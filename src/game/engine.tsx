@@ -172,6 +172,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		undamageable: template.undamageable,
 
 		render: template.render || [],
+		sound: template.sound,
 
 		shape,
 
@@ -1837,6 +1838,8 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 	}
 
 	conveyor(world, hero, obstacle);
+
+	obstacle.touchTick = world.tick;
 }
 
 function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
@@ -3740,7 +3743,6 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 		if (packet.isLava) {
 			obstacle.lavaTick = world.tick;
 		} else {
-			obstacle.damagedTick = world.tick;
 			obstacle.activeTick = world.tick;
 		}
 	}

@@ -283,6 +283,7 @@ const mirror: ObstacleTemplate = {
 const bumper: ObstacleTemplate = {
     "health": 50,
 
+    sound: "bumper",
     render: [
         {
             type: "solid",

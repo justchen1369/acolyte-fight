@@ -159,6 +159,7 @@ declare interface ObstacleTemplateLookup {
 
 declare interface ObstacleTemplate {
 	render?: SwatchRender[];
+	sound?: string;
 
 	static?: boolean; // Whether this obstacle is movable
 	angularDamping?: number;

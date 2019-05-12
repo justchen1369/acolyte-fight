@@ -406,11 +406,12 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	impulse: number;
 
 	hitTick?: number;
-	damagedTick?: number;
 	lavaTick?: number;
 	activeTick?: number;
+	touchTick?: number;
 
 	render: SwatchRender[];
+	sound?: string;
 }
 
 export interface CircleShape {

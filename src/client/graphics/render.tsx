@@ -712,6 +712,20 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 			renderObstacleSmoke(ctxStack, obstacle, render, world, options)
 		}
 	});
+
+	playObstacleSounds(obstacle, world);
+}
+
+function playObstacleSounds(obj: w.Obstacle, world: w.World) {
+	if (obj.sound) {
+		if (obj.touchTick) {
+			world.ui.sounds.push({
+				id: `${obj.id}-touch-${obj.touchTick}`, // Each touch has a unique ID
+				sound: obj.sound,
+				pos: vector.clone(obj.body.getPosition()),
+			});
+		}
+	}
 }
 
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
