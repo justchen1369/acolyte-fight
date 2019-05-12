@@ -1148,6 +1148,18 @@ function handleClosing(ev: w.Closing, world: w.World) {
 				projectile.expireTick = Math.min(projectile.expireTick, ev.startTick);
 			}
 		});
+
+		// Clear any stockpiled burns
+		world.objects.forEach(hero => {
+			if (hero.category === "hero") { // Ignore environmental projectiles
+				hero.buffs.forEach(buff => {
+					if (buff.type === "burn" && buff.numStacks > 1) {
+						buff.packet.damage /= buff.numStacks;
+						buff.numStacks = 1;
+					}
+				});
+			}
+		});
 	}
 
 	let teamSizes: number[] = null;
