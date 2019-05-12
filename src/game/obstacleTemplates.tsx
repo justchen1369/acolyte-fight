@@ -8,6 +8,7 @@ export const volcano: ObstacleTemplate = {
     collideWith: Categories.Hero,
     sensor: true,
     static: true,
+    undamageable: true,
 
     render: [
         {
@@ -38,6 +39,7 @@ export const slow: ObstacleTemplate = {
     collideWith: Categories.Hero,
     sensor: true,
     static: true,
+    undamageable: true,
 
     render: [
         {
@@ -82,6 +84,7 @@ export const fast: ObstacleTemplate = {
     collideWith: Categories.Hero,
     sensor: true,
     static: true,
+    undamageable: true,
 
     render: [
         {
@@ -127,6 +130,7 @@ export const conveyorBase: ObstacleTemplate = {
     collideWith: Categories.Hero,
     sensor: true,
     static: true,
+    undamageable: true,
 
     render: [
         {
