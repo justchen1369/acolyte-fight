@@ -1158,8 +1158,8 @@ const gravity: Spell = {
 
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
-            ticks: 1.5 * TicksPerSecond,
-            radius: 0.05,
+            ticks: 2 * TicksPerSecond,
+            radius: 0.045,
             power: 1,
             render: renderGravity,
         },
@@ -1169,7 +1169,7 @@ const gravity: Spell = {
                 type: "cooldown",
                 against: Alliances.NotFriendly,
                 maxTicks: 1,
-                minCooldown: 0.5 * TicksPerSecond,
+                minCooldown: 0.75 * TicksPerSecond,
             },
         ],
 
