@@ -703,8 +703,9 @@ const backlash: Spell = {
         categories: Categories.Projectile,
         sense: Categories.Hero,
         collideWith: Categories.All ^ Categories.Hero,
-        expireOn: Categories.All ^ Categories.Shield,
+        expireOn: Categories.All,
         expireAgainstHeroes: Alliances.Self,
+        expireOnMirror: true,
         shieldTakesOwnership: false,
         hitInterval: 6,
 
