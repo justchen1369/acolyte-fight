@@ -380,8 +380,7 @@ const firespray: Spell = {
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
-        damage: 3.3,
-        damageScaling: false,
+        damage: 2.5,
 
         color: '#ff0044',
         renderers: [
@@ -1350,7 +1349,7 @@ const halo: Spell = {
         speed: 0.5,
         maxTicks: 20.0 * TicksPerSecond,
         hitInterval: 15,
-        damage: 5,
+        damage: 3,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
@@ -1359,7 +1358,6 @@ const halo: Spell = {
         selfPassthrough: true,
         shieldTakesOwnership: false,
         strafe: { expireOnHeroHit: true },
-        damageScaling: false,
         destructible: {
             against: Alliances.NotFriendly,
         },
@@ -1424,16 +1422,13 @@ const mines: Spell = {
         },
 
         detonate: {
-            damage: 5.25,
-            damageScaling: false,
+            damage: 3,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
             renderTicks: 15,
         },
         shieldTakesOwnership: false,
-
-        damageScaling: false,
 
         behaviours: [
             {
@@ -1627,8 +1622,7 @@ const scourge: Spell = {
     untargeted: true,
 
     detonate: {
-        damage: 25,
-        damageScaling: false,
+        damage: 15,
         radius: Hero.Radius * 4,
         minImpulse: 0.0002,
         maxImpulse: 0.0005,
@@ -1640,7 +1634,7 @@ const scourge: Spell = {
     unlink: true,
     interruptibleAfterTicks: 0,
     movementCancel: true,
-    selfDamage: 12.5,
+    selfDamage: 10,
     minSelfHealth: 1,
 
     icon: "deadlyStrike",
