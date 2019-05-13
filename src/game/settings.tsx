@@ -695,12 +695,12 @@ const backlash: Spell = {
     throttle: true,
 
     projectile: {
-        damage: 8,
+        damage: 7,
         lifeSteal: 0.2,
         density: 1,
         radius: 0.002,
-        speed: 0.6,
-        maxTicks: 1.5 * TicksPerSecond,
+        speed: 0.4,
+        maxTicks: 2 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero,
         collideWith: Categories.All ^ Categories.Hero,
@@ -711,7 +711,7 @@ const backlash: Spell = {
 
         behaviours: [
             {
-                trigger: { afterTicks: 30 },
+                trigger: { afterTicks: 45 },
                 type: "homing",
                 revolutionsPerSecond: 1,
                 targetType: "self",
