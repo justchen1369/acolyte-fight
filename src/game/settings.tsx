@@ -1797,7 +1797,7 @@ const swap: Spell = {
                 loopTicks: 15,
             },
             { type: "link", color: '#75e7ff', width: Pixel * 5, glow: 0.25 },
-            { type: "strike", color: '#75e7ff', ticks: 15, numParticles: 9 },
+            { type: "strike", color: '#75e7ff', glow: true, ticks: 15, numParticles: 9 },
         ],
     },
 };
