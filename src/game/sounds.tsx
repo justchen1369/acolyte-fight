@@ -527,9 +527,9 @@ export const Sounds: Sounds = {
         "start": [
             {
                 "volume": 0.25,
-                "stopTime": 2,
+                "stopTime": 1.5,
                 "attack": 0.25,
-                "decay": 1.5,
+                "decay": 1.25,
                 "highPass": 3800,
                 "lowPass": 3804,
                 "wave": "brown-noise"
@@ -540,7 +540,7 @@ export const Sounds: Sounds = {
                 "decay": 1.4,
                 "startFreq": 1900,
                 "stopFreq": 1900,
-                "lowPass": 475,
+                "lowPass": 250,
                 "modStartFreq": 2000,
                 "modStopFreq": 2000,
                 "modStartStrength": 300,
@@ -556,19 +556,19 @@ export const Sounds: Sounds = {
         ]
     },
     "backlash-hit": {
-        "cutoffEarly": false,
+        cutoffEarly: false,
         "start": [
             {
                 "stopTime": 0.3,
                 "attack": 0.01,
                 "decay": 0.29,
                 "startFreq": 3800,
-                "stopFreq": 3850,
-                "lowPass": 900,
-                "modStartFreq": 2000,
-                "modStopFreq": 2000,
-                "modStartStrength": 2400,
-                "modStopStrength": 2400,
+                "stopFreq": 3800,
+                "lowPass": 250,
+                "modStartFreq": 1850,
+                "modStopFreq": 1850,
+                "modStartStrength": 1900,
+                "modStopStrength": 1900,
                 "tremoloFreq": 21,
                 "tremoloStrength": 0.5,
                 "wave": "sine",
