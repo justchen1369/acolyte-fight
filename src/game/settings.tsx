@@ -1221,7 +1221,7 @@ const whirlwind: Spell = {
         behaviours: [
             {
                 type: "attract",
-                collideLike: Categories.Hero,
+                collideLike: Categories.Massive,
                 categories: Categories.Projectile,
                 notCategories: Categories.Massive,
                 against: Alliances.NotFriendly,
