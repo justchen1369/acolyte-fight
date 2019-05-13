@@ -683,7 +683,7 @@ const retractor: Spell = {
 };
 const backlash: Spell = {
     id: 'backlash',
-    name: 'Backlash',
+    name: 'Backslash',
     description: "Away and back. Hit your enemy twice, if you can.",
     action: "projectile",
 
