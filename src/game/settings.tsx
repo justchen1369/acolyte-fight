@@ -695,7 +695,7 @@ const backlash: Spell = {
     throttle: true,
 
     projectile: {
-        damage: 8,
+        damage: 10,
         lifeSteal: 0.2,
         density: 1,
         radius: 0.002,
