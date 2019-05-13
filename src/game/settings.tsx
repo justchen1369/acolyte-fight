@@ -703,7 +703,7 @@ const backlash: Spell = {
         maxTicks: 1.5 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero,
-        collideWith: Categories.Obstacle | Categories.Massive | Categories.Shield,
+        collideWith: Categories.All ^ Categories.Hero,
         expireOn: Categories.All ^ Categories.Shield,
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
