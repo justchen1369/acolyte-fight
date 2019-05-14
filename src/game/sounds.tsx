@@ -540,7 +540,7 @@ export const Sounds: Sounds = {
                 "decay": 1.4,
                 "startFreq": 1900,
                 "stopFreq": 1900,
-                "lowPass": 250,
+                "lowPass": 400,
                 "modStartFreq": 2000,
                 "modStopFreq": 2000,
                 "modStartStrength": 300,
