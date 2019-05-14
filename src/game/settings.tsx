@@ -703,11 +703,9 @@ const backlash: Spell = {
         categories: Categories.Projectile,
         sense: Categories.Hero,
         collideWith: Categories.All ^ Categories.Hero,
-        expireOn: Categories.All,
+        expireOn: Categories.All ^ Categories.Shield,
         expireAgainstHeroes: Alliances.Self,
-        expireOnMirror: true,
         shieldTakesOwnership: false,
-        hitInterval: 6,
 
         behaviours: [
             {
@@ -715,6 +713,10 @@ const backlash: Spell = {
                 type: "homing",
                 revolutionsPerSecond: 1,
                 targetType: "self",
+            },
+            {
+                trigger: { afterTicks: 45 },
+                type: "clearHits",
             },
         ],
 

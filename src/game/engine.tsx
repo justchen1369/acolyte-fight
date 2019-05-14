@@ -614,6 +614,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateAura(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
+		} else if (template.type === "clearHits") {
+			behaviour = { type: "clearHits", projectileId: projectile.id };
 		} else if (template.type === "expireOnOwnerDeath") {
 			behaviour = instantiateExpireOnOwnerDeath(template, projectile, world);
 		} else if (template.type === "expireOnOwnerRetreat") {
@@ -749,6 +751,7 @@ export function tick(world: w.World) {
 		saberSwing,
 		thrustBounce,
 		updateCollideWith,
+		clearHits,
 		resetMass,
 	});
 
@@ -907,6 +910,16 @@ function updateCollideWith(behaviour: w.UpdateCollideWithBehaviour, world: w.Wor
 
 	projectile.collideWith = behaviour.collideWith;
 	updateMaskBits(projectile.body.getFixtureList(), behaviour.collideWith);
+	return false;
+}
+
+function clearHits(behaviour: w.ClearHitsBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	} 
+
+	projectile.hitTickLookup.clear();
 	return false;
 }
 

@@ -376,6 +376,7 @@ declare type BehaviourTemplate =
 	| AttractTemplate
 	| AuraTemplate
 	| UpdateCollideWithTemplate
+	| ClearHitsTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
 	| ExpireOnChannellingEndTemplate
@@ -436,6 +437,10 @@ declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
 	type: "updateCollideWith";
 
 	collideWith: number;
+}
+
+declare interface ClearHitsTemplate extends BehaviourTemplateBase {
+	type: "clearHits";
 }
 
 declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {
