@@ -1550,6 +1550,7 @@ const saber: Spell = {
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
     untargeted: true,
 
+    unlink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
@@ -1587,6 +1588,7 @@ const dualSaber: Spell = {
     description: "Swing dual lightsabers to deflect projectiles and knockback enemies!",
     untargeted: true,
 
+    unlink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
