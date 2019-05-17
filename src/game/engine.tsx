@@ -2274,6 +2274,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	owner.link = {
 		spellId: projectile.type,
 		targetId: target.id,
+		redirectDamageProportion: link.redirectDamageProportion || 0,
 		minDistance: link.minDistance,
 		maxDistance: link.maxDistance,
 		selfFactor: link.selfFactor !== undefined ? link.selfFactor : 1,
@@ -3628,13 +3629,6 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			proportion: template.proportion,
 			fromHeroId,
 		});
-	} else if (template.type === "redirectDamage") {
-		hero.buffs.set(id, {
-			...values, id, type: "redirectDamage",
-			proportion: template.proportion,
-			targetId: config.otherId,
-		});
-		hero.redirectId = id;
 	}
 }
 
@@ -3751,32 +3745,27 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World, all
 }
 
 function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: w.World): number {
-	if (!toHero.redirectId) {
+	if (!(toHero && toHero.link && toHero.link.redirectDamageProportion)) {
 		return amount;
 	}
 
-	const buff = toHero.buffs.get(toHero.redirectId);
-	if (!(buff && buff.type === "redirectDamage")) {
-		toHero.redirectId = null;
-		return amount;
-	}
-
-	const target = world.objects.get(buff.targetId);
+	const target = world.objects.get(toHero.link.targetId);
 	if (!(target && target.category === "hero")) {
-		toHero.redirectId = null;
 		return amount;
 	}
+
+	const proportion = toHero.link.redirectDamageProportion;
 
 	const allowRedirect = false;
 	const packet: w.DamagePacket = {
-		damage: amount * buff.proportion,
+		damage: amount * proportion,
 		isLava,
 		fromHeroId: toHero.id,
 		lifeSteal: 0,
 	};
 	applyDamage(target, packet, world, allowRedirect);
 
-	return amount * (1 - buff.proportion);
+	return amount * (1 - proportion);
 }
 
 function applyArmor(fromHeroId: string, hero: w.Hero, damage: number) {

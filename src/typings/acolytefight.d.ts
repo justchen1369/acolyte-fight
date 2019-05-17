@@ -582,7 +582,6 @@ declare type BuffTemplate =
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
-	| RedirectDamageTemplate
 	| SetCooldownTemplate
 	| BurnTemplate
 	| ArmorTemplate
@@ -636,11 +635,6 @@ declare interface LifestealTemplate extends BuffTemplateBase {
 	type: "lifeSteal";
 	lifeSteal: number;
 	targetOnly?: boolean;
-}
-
-declare interface RedirectDamageTemplate extends BuffTemplateBase {
-	type: "redirectDamage";
-	proportion: number;
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
@@ -762,6 +756,8 @@ declare interface LinkParameters {
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;
+
+	redirectDamageProportion?: number; // Proportion of damage to redirect to the linked hero
 
 	render?: RenderLink;
 }

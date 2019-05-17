@@ -452,7 +452,6 @@ export interface Hero extends WorldObjectBase {
 	retractorIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 	horcruxIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
-	redirectId?: string; // Buff ID. Will keep pointing to buff after it is gone.
 
 	link?: LinkState;
 	thrust?: ThrustState;
@@ -553,6 +552,8 @@ export interface LinkState {
 	minDistance: number;
 	maxDistance: number;
 
+	redirectDamageProportion: number;
+
 	initialTick: number;
 	expireTick: number;
 
@@ -587,7 +588,6 @@ export type Buff =
 	| LavaImmunityBuff
 	| VanishBuff
 	| LifeStealBuff
-	| RedirectDamageBuff
 	| BurnBuff
 	| ArmorBuff
 
@@ -634,12 +634,6 @@ export interface LifeStealBuff extends BuffBase {
 	type: "lifeSteal";
 	lifeSteal: number;
 	lifeStealTargetId?: string;
-}
-
-export interface RedirectDamageBuff extends BuffBase {
-	type: "redirectDamage";
-	targetId: string; // Hero ID
-	proportion: number;
 }
 
 export interface BurnBuff extends BuffBase {
