@@ -894,6 +894,8 @@ const link: Spell = {
             maxDistance: 0.1,
             linkTicks: 2.0 * TicksPerSecond,
 
+            redirectDamageProportion: 1,
+
             render: {
                 type: "link",
                 color: '#4444ff',
@@ -901,16 +903,6 @@ const link: Spell = {
                 glow: 0.1,
             },
         },
-
-        buffs: [
-            {
-                type: "redirectDamage",
-                owner: true,
-                proportion: 1,
-                maxTicks: 2 * TicksPerSecond,
-                linked: true,
-            },
-        ],
 
         behaviours: [
             {
