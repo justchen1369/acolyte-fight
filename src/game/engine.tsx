@@ -15,7 +15,7 @@ import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from '
 interface BuffContext {
 	fromHeroId?: string;
 	toHeroId?: string;
-	channellingSpellId?: string;
+	spellId?: string;
 }
 
 interface ProjectileConfig {
@@ -1729,7 +1729,7 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 			spell.buffs.forEach(template => {
 				const id = `${spell.id}/${template.type}`;
 				instantiateBuff(id, template, hero, world, {
-					channellingSpellId: spell.id,
+					spellId: spell.id,
 				});
 			});
 		}
@@ -2269,13 +2269,13 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 
 	const maxTicks = link.linkTicks;
 	owner.link = {
+		spellId: projectile.type,
 		targetId: target.id,
 		minDistance: link.minDistance,
 		maxDistance: link.maxDistance,
 		selfFactor: link.selfFactor !== undefined ? link.selfFactor : 1,
 		targetFactor: link.targetFactor !== undefined ? link.targetFactor : 1,
 		strength: link.impulsePerTick,
-		movementProportion: link.movementProportion !== undefined ? link.movementProportion : 1,
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		render: link.render,
@@ -2599,6 +2599,7 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 		return true;
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
+	} else if (buff.linkSpellId && (!hero.link || hero.link.spellId !== buff.linkSpellId)) {
 	}
 	return false;
 }
@@ -3073,9 +3074,6 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 	if (hero.casting) {
 		multiplier *= hero.casting.movementProportion || 0.0;
 	}
-	if (hero.link) {
-		multiplier *= hero.link.movementProportion;
-	}
 	hero.buffs.forEach(buff => {
 		if (buff.type === "movement") {
 			multiplier *= buff.movementProportion;
@@ -3533,7 +3531,8 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		sound: template.sound,
 		maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
-		channellingSpellId: template.channelling && config.channellingSpellId,
+		channellingSpellId: template.channelling && config.spellId,
+		linkSpellId: template.linked && config.spellId,
 		numStacks: 1,
 	};
 	if (template.type === "debuff") {

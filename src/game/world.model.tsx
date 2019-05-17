@@ -542,6 +542,7 @@ export interface CastState {
 }
 
 export interface LinkState {
+	spellId: string;
 	targetId: string | null;
 
 	selfFactor: number;
@@ -553,8 +554,6 @@ export interface LinkState {
 
 	initialTick: number;
 	expireTick: number;
-
-	movementProportion: number;
 
 	render: RenderLink;
 }
@@ -598,6 +597,7 @@ export interface BuffBase {
 	initialTick: number;
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
+	linkSpellId?: string; // If the hero becomes unlinked, remove the buff
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
 

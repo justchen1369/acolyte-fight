@@ -969,7 +969,6 @@ const grapple: Spell = {
             minDistance: 0.05,
             maxDistance: 0.25,
             linkTicks: 1.25 * TicksPerSecond,
-            movementProportion: 2,
 
             render: {
                 type: "link",
@@ -978,6 +977,15 @@ const grapple: Spell = {
                 glow: 0.1,
             },
         },
+
+        buffs: [
+            {
+                type: "movement",
+                maxTicks: 1.25 * TicksPerSecond,
+                linked: true,
+                movementProportion: 2,
+            }
+        ],
 
         behaviours: [
             { type: "expireOnOwnerDeath" },

@@ -590,8 +590,9 @@ declare interface BuffTemplateBase {
 	type: string;
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	against?: number; // Which alliances to apply this buff to
-	maxTicks?: number;
+	maxTicks?: number; // Maximum duration of this buff
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
+	linked?: boolean; // Cancel this buff if unlinked
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
 	render?: RenderBuff;
 	sound?: string;
@@ -756,8 +757,6 @@ declare interface LinkParameters {
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;
-
-	movementProportion?: number; // Speed up/slow down movement while link is attached
 
 	render?: RenderLink;
 }
