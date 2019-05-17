@@ -909,6 +909,7 @@ const link: Spell = {
                 targetOnly: true,
                 lifeSteal: 0.5,
                 maxTicks: 2 * TicksPerSecond,
+                linked: true,
             },
         ],
 
