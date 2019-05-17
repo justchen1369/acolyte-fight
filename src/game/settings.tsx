@@ -682,7 +682,7 @@ const retractor: Spell = {
 };
 const backlash: Spell = {
     id: 'backlash',
-    name: 'Backslash',
+    name: 'Boomerang',
     description: "Away and back. Hit your enemy twice, if you can.",
     action: "projectile",
 
@@ -694,16 +694,17 @@ const backlash: Spell = {
     throttle: true,
 
     projectile: {
-        damage: 8,
+        damage: 10,
         lifeSteal: 0.2,
         density: 1,
+        restitution: 0,
         radius: 0.002,
         speed: 0.4,
         maxTicks: 2 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero,
         collideWith: Categories.All ^ Categories.Hero,
-        expireOn: Categories.All ^ Categories.Shield,
+        expireOn: Categories.Projectile,
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
 
