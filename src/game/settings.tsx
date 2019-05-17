@@ -904,10 +904,9 @@ const link: Spell = {
 
         buffs: [
             {
-                type: "lifeSteal",
+                type: "redirectDamage",
                 owner: true,
-                targetOnly: true,
-                lifeSteal: 0.5,
+                proportion: 1,
                 maxTicks: 2 * TicksPerSecond,
                 linked: true,
             },

@@ -15,6 +15,7 @@ import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from '
 interface BuffContext {
 	fromHeroId?: string;
 	toHeroId?: string;
+	otherId?: string;
 	spellId?: string;
 }
 
@@ -2233,6 +2234,7 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Her
 
 	buffs.forEach(template => {
 		const receiver = template.owner ? world.objects.get(fromHeroId) : target;
+		const otherId = template.owner ? (target && target.id) : fromHeroId;
 		if (!(receiver && receiver.category === "hero")) {
 			return;
 		}
@@ -2249,6 +2251,7 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Her
 		instantiateBuff(id, template, receiver, world, {
 			fromHeroId,
 			toHeroId: target && target.id,
+			otherId,
 		});
 	});
 }
@@ -3524,7 +3527,7 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const maxTicks = template.maxTicks || 1;
-	const base = {
+	const values: w.BuffValues = {
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		render: template.render,
@@ -3539,22 +3542,22 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.cleanseTick = world.tick;
 	} else if (template.type === "movement") {
 		hero.buffs.set(id, {
-			...base, id, type: "movement",
+			...values, id, type: "movement",
 			movementProportion: template.movementProportion,
 		});
 	} else if (template.type === "glide") {
 		hero.buffs.set(id, {
-			...base, id, type: "glide",
+			...values, id, type: "glide",
 			linearDampingMultiplier: template.linearDampingMultiplier,
 		});
 	} else if (template.type === "lavaImmunity") {
 		hero.buffs.set(id, {
-			...base, id, type: "lavaImmunity",
+			...values, id, type: "lavaImmunity",
 			damageProportion: template.damageProportion,
 		});
 	} else if (template.type === "vanish") {
 		hero.invisible = {
-			...base, id, type: "vanish",
+			...values, id, type: "vanish",
 			initialPos: vector.clone(hero.body.getPosition()),
 		};
 		hero.buffs.set(id, hero.invisible);
@@ -3562,9 +3565,9 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: false });
 	} else if (template.type === "lifeSteal") {
 		hero.buffs.set(id, {
-			...base, id, type: "lifeSteal",
+			...values, id, type: "lifeSteal",
 			lifeSteal: template.lifeSteal,
-			lifeStealTargetId: template.targetOnly ? config.toHeroId : null,
+			lifeStealTargetId: template.targetOnly ? config.otherId : null,
 		});
 	} else if (template.type === "burn") {
 		let stacked = false;
@@ -3572,7 +3575,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			// Extend existing stacks
 			hero.buffs.forEach(buff => {
 				if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
-					buff.expireTick = base.expireTick;
+					buff.expireTick = values.expireTick;
 					buff.packet.damage += template.packet.damage;
 					++buff.numStacks;
 
@@ -3583,7 +3586,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 
 		if (!stacked) {
 			hero.buffs.set(id, {
-				...base, id, type: "burn",
+				...values, id, type: "burn",
 				fromHeroId: config.fromHeroId,
 				hitInterval: template.hitInterval,
 				packet: { ...template.packet },
@@ -3616,17 +3619,22 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		});
 	} else if (template.type === "armor") {
 		let fromHeroId: string = null;
-		if (template.ownerOnly) {
-			fromHeroId = config.fromHeroId;
-		} else if (template.targetOnly) {
-			fromHeroId = config.toHeroId;
+		if (template.targetOnly) {
+			fromHeroId = config.otherId;
 		}
 
 		hero.buffs.set(id, {
-			...base, id, type: "armor",
+			...values, id, type: "armor",
 			proportion: template.proportion,
 			fromHeroId,
 		});
+	} else if (template.type === "redirectDamage") {
+		hero.buffs.set(id, {
+			...values, id, type: "redirectDamage",
+			proportion: template.proportion,
+			targetId: config.otherId,
+		});
+		hero.redirectId = id;
 	}
 }
 
@@ -3688,7 +3696,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	};
 }
 
-function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
+function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World, allowRedirect: boolean = true) {
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
 	if (!(toHero && packet)) { return; }
 	const fromHeroId = packet.fromHeroId;
@@ -3714,6 +3722,9 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	let amount = Math.max(0, packet.damage);
 	amount = applyArmor(fromHeroId, toHero, amount);
 	amount = mitigateDamage(toHero, amount, fromHeroId, world);
+	if (allowRedirect) {
+		amount = redirectDamage(toHero, amount, packet.isLava, world);
+	}
 	amount = Math.min(amount, Math.max(0, toHero.health - (packet.minHealth || 0)));
 	toHero.health -= amount;
 
@@ -3737,6 +3748,35 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 			toHero.killerHeroId = fromHeroId;
 		}
 	}
+}
+
+function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: w.World): number {
+	if (!toHero.redirectId) {
+		return amount;
+	}
+
+	const buff = toHero.buffs.get(toHero.redirectId);
+	if (!(buff && buff.type === "redirectDamage")) {
+		toHero.redirectId = null;
+		return amount;
+	}
+
+	const target = world.objects.get(buff.targetId);
+	if (!(target && target.category === "hero")) {
+		toHero.redirectId = null;
+		return amount;
+	}
+
+	const allowRedirect = false;
+	const packet: w.DamagePacket = {
+		damage: amount * buff.proportion,
+		isLava,
+		fromHeroId: toHero.id,
+		lifeSteal: 0,
+	};
+	applyDamage(target, packet, world, allowRedirect);
+
+	return amount * (1 - buff.proportion);
 }
 
 function applyArmor(fromHeroId: string, hero: w.Hero, damage: number) {

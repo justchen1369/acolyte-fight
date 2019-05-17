@@ -582,6 +582,7 @@ declare type BuffTemplate =
 	| LavaImmunityBuffTemplate
 	| VanishTemplate
 	| LifestealTemplate
+	| RedirectDamageTemplate
 	| SetCooldownTemplate
 	| BurnTemplate
 	| ArmorTemplate
@@ -637,6 +638,11 @@ declare interface LifestealTemplate extends BuffTemplateBase {
 	targetOnly?: boolean;
 }
 
+declare interface RedirectDamageTemplate extends BuffTemplateBase {
+	type: "redirectDamage";
+	proportion: number;
+}
+
 declare interface SetCooldownTemplate extends BuffTemplateBase {
 	type: "cooldown";
 	spellId?: string;
@@ -655,8 +661,7 @@ declare interface BurnTemplate extends BuffTemplateBase {
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
-	ownerOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
-	targetOnly?: boolean;
+	targetOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
 }
 
 declare interface BuffSpell extends SpellBase {
