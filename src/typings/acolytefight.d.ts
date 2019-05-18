@@ -589,6 +589,7 @@ declare type BuffTemplate =
 declare interface BuffTemplateBase {
 	type: string;
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
+	collideWith?: number; // Only apply the buff if projectile hit this object
 	against?: number; // Which alliances to apply this buff to
 	maxTicks?: number; // Maximum duration of this buff
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell

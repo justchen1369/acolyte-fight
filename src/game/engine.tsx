@@ -2233,11 +2233,16 @@ function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObjec
 }
 
 function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.WorldObject, world: w.World, config: BuffContext = {}) {
-	if (!(buffs && fromHeroId)) {
+	if (!(buffs && fromHeroId && target)) {
 		return;
 	}
 
 	buffs.forEach(template => {
+		const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.Hero;
+		if (!(collideWith & target.categories)) {
+			return;
+		}
+
 		const receiver = template.owner ? world.objects.get(fromHeroId) : target;
 		const otherId = template.owner ? (target && target.id) : fromHeroId;
 		if (!(receiver && receiver.category === "hero")) {

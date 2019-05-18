@@ -973,6 +973,7 @@ const grapple: Spell = {
 
         buffs: [
             {
+                collideWith: Categories.All,
                 owner: true,
                 type: "movement",
                 maxTicks: 5 * TicksPerSecond,
@@ -1789,6 +1790,7 @@ const swap: Spell = {
 
         buffs: [
             {
+                collideWith: Categories.All,
                 type: "debuff",
                 owner: true,
                 maxTicks: 1,
