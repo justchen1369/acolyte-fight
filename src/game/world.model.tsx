@@ -553,6 +553,7 @@ export interface LinkState {
 	maxDistance: number;
 
 	redirectDamageProportion: number;
+	instantRecast?: boolean;
 
 	initialTick: number;
 	expireTick: number;

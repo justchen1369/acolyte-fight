@@ -758,6 +758,7 @@ declare interface LinkParameters {
 	maxDistance: number;
 
 	redirectDamageProportion?: number; // Proportion of damage to redirect to the linked hero
+	instantRecast?: boolean; // If still linked, can immediately cast another link
 
 	render?: RenderLink;
 }

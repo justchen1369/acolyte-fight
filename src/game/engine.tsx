@@ -13,10 +13,9 @@ import { modToSettings } from './modder';
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
 interface BuffContext {
-	fromHeroId?: string;
-	toHeroId?: string;
 	otherId?: string;
 	spellId?: string;
+	tag?: string;
 }
 
 interface ProjectileConfig {
@@ -440,6 +439,8 @@ function addHero(world: w.World, heroId: string) {
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
 	if (hero.retractorIds.has(spellId)) {
+		return 0;
+	} else if (hero.link && hero.link.instantRecast && hero.link.spellId === spellId) {
 		return 0;
 	}
 	return calculateCooldown(world, hero, spellId);
@@ -1918,6 +1919,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		detonateProjectile(projectile, world);
 		linkTo(projectile, obstacle, world);
 		applySwap(projectile, obstacle, world);
+		applyBuffsFromProjectile(projectile, obstacle, world);
 		destroyObject(world, projectile);
 	}
 }
@@ -1977,7 +1979,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	const alliance = calculateAlliance(projectile.owner, hero.id, world);
 
 	if (takeHit(projectile, hero.id, world) && hero.id !== projectile.owner) {
-		applyBuffs(projectile, hero, world);
+		applyBuffsFromProjectile(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
 
@@ -2219,15 +2221,18 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 }
 
 function swapOnExpiry(projectile: w.Projectile, world: w.World) {
-	applyBuffs(projectile, null, world);
+	applyBuffsFromProjectile(projectile, null, world);
 	applySwap(projectile, null, world);
 }
 
-function applyBuffs(projectile: w.Projectile, target: w.Hero, world: w.World) {
-	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, projectile.type);
+function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
+	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, {
+		tag: projectile.type,
+		spellId: projectile.type,
+	});
 }
 
-function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Hero, world: w.World, tag: string = "buff") {
+function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.WorldObject, world: w.World, config: BuffContext = {}) {
 	if (!(buffs && fromHeroId)) {
 		return;
 	}
@@ -2247,10 +2252,9 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Her
 			}
 		}
 
-		const id = `${tag}-${template.type}`;
+		const id = `${config.tag || "buff"}-${template.type}`;
 		instantiateBuff(id, template, receiver, world, {
-			fromHeroId,
-			toHeroId: target && target.id,
+			...config,
 			otherId,
 		});
 	});
@@ -2274,7 +2278,10 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	owner.link = {
 		spellId: projectile.type,
 		targetId: target.id,
+
 		redirectDamageProportion: link.redirectDamageProportion || 0,
+		instantRecast: link.instantRecast,
+
 		minDistance: link.minDistance,
 		maxDistance: link.maxDistance,
 		selfFactor: link.selfFactor !== undefined ? link.selfFactor : 1,
@@ -2391,7 +2398,7 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 			return;
 		}
 
-		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, behaviour.type);
+		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, { tag: behaviour.type });
 	});
 	return true;
 }
@@ -2477,17 +2484,20 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	}
 
 	if (world.tick >= owner.link.expireTick) {
+		// Link expired
 		owner.link = null;
 		return false;
 	}
 
 	const target = world.objects.get(owner.link.targetId);
 	if (!(owner && target)) {
+		// Link owner or target dead
 		owner.link = null;
 		return false;
 	}
 
 	if (target.category === "hero" && target.cleanseTick && owner.link.initialTick < target.cleanseTick) {
+		// Cleanse
 		owner.link = null;
 		return false;
 	}
@@ -2604,6 +2614,7 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
 	} else if (buff.linkSpellId && (!hero.link || hero.link.spellId !== buff.linkSpellId)) {
+		return true;
 	}
 	return false;
 }
@@ -3576,7 +3587,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		if (template.stack) {
 			// Extend existing stacks
 			hero.buffs.forEach(buff => {
-				if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
+				if (buff && buff.type === "burn" && buff.fromHeroId === config.otherId && buff.stack === template.stack) {
 					buff.expireTick = values.expireTick;
 					buff.packet.damage += template.packet.damage;
 					++buff.numStacks;
@@ -3589,7 +3600,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		if (!stacked) {
 			hero.buffs.set(id, {
 				...values, id, type: "burn",
-				fromHeroId: config.fromHeroId,
+				fromHeroId: config.otherId,
 				hitInterval: template.hitInterval,
 				packet: { ...template.packet },
 				stack: template.stack,

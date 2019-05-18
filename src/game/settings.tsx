@@ -932,21 +932,22 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to things and gain a 2x movement speed boost. Swing around while attacking and dodging at super speed! Tip: Use this on obstacles, not other Acolytes, as you get the same speed boost either way.",
+    description: "Attach yourself to things and gain a 2x movement speed boost. You can recast grapple immediately as long as you are still attached. Swing around while attacking and dodging at super speed!",
     action: "projectile",
 
     color: '#ff2200',
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
+    unlink: true,
 
     projectile: {
         density: 1,
         radius: 0.005,
         speed: 0.8,
-        maxTicks: 0.4 * TicksPerSecond,
+        maxTicks: 0.5 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -960,7 +961,9 @@ const grapple: Spell = {
             impulsePerTick: 2.0 / TicksPerSecond,
             minDistance: 0.05,
             maxDistance: 0.25,
-            linkTicks: 1.25 * TicksPerSecond,
+            linkTicks: 2.5 * TicksPerSecond,
+
+            instantRecast: true,
 
             render: {
                 type: "link",
@@ -972,8 +975,9 @@ const grapple: Spell = {
 
         buffs: [
             {
+                owner: true,
                 type: "movement",
-                maxTicks: 1.25 * TicksPerSecond,
+                maxTicks: 5 * TicksPerSecond,
                 linked: true,
                 movementProportion: 2,
             }
