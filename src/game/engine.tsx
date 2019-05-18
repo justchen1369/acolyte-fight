@@ -1976,13 +1976,12 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		return;
 	}
 
-	const alliance = calculateAlliance(projectile.owner, hero.id, world);
-
 	if (takeHit(projectile, hero.id, world) && hero.id !== projectile.owner) {
 		applyBuffsFromProjectile(projectile, hero, world);
 		linkTo(projectile, hero, world);
 		applySwap(projectile, hero, world);
 
+		const alliance = calculateAlliance(projectile.owner, hero.id, world);
 		if ((alliance & Alliances.NotFriendly) > 0) { // Don't damage allies
 			let packet = instantiateDamage(projectile.damageTemplate, projectile.owner, world);
 			packet = scaleForPartialDamage(world, projectile, packet);
