@@ -1364,7 +1364,7 @@ const halo: Spell = {
         speed: 0.5,
         maxTicks: 12 * TicksPerSecond,
         hitInterval: 15,
-        damage: 1,
+        damage: 1.5,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
