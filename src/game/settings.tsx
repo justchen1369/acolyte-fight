@@ -1347,13 +1347,13 @@ const halo: Spell = {
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 3 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     buffs: [
         {
             type: "movement",
-            maxTicks: 12 * TicksPerSecond,
+            maxTicks: 20 * TicksPerSecond,
             movementProportion: 1.1,
             cancelOnHit: true,
         },
@@ -1363,9 +1363,9 @@ const halo: Spell = {
         density: 1,
         radius: 0.002,
         speed: 0.5,
-        maxTicks: 12 * TicksPerSecond,
+        maxTicks: 20 * TicksPerSecond,
         hitInterval: 15,
-        damage: 1.5,
+        damage: 3,
         lifeSteal: 1,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive,
         expireOn: Categories.Massive,
