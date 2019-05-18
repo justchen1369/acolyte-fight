@@ -3490,6 +3490,7 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 		damage: spell.selfDamage,
 		lifeSteal: 0,
 		minHealth: spell.minSelfHealth,
+		noRedirect: true,
 	};
 	applyDamage(hero, selfPacket, world);
 
@@ -3690,7 +3691,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	};
 }
 
-function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World, allowRedirect: boolean = true) {
+function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
 	if (!(toHero && packet)) { return; }
 	const fromHeroId = packet.fromHeroId;
@@ -3716,7 +3717,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World, all
 	let amount = Math.max(0, packet.damage);
 	amount = applyArmor(fromHeroId, toHero, amount);
 	amount = mitigateDamage(toHero, amount, fromHeroId, world);
-	if (allowRedirect) {
+	if (!packet.noRedirect) {
 		amount = redirectDamage(toHero, amount, packet.isLava, world);
 	}
 	amount = Math.min(amount, Math.max(0, toHero.health - (packet.minHealth || 0)));
@@ -3756,14 +3757,14 @@ function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: 
 
 	const proportion = toHero.link.redirectDamageProportion;
 
-	const allowRedirect = false;
 	const packet: w.DamagePacket = {
 		damage: amount * proportion,
 		isLava,
 		fromHeroId: toHero.id,
 		lifeSteal: 0,
+		noRedirect: true, // Stop a recursion loop
 	};
-	applyDamage(target, packet, world, allowRedirect);
+	applyDamage(target, packet, world);
 
 	return amount * (1 - proportion);
 }

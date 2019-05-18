@@ -715,6 +715,7 @@ export interface DamagePacket {
 	isLava?: boolean;
 	noHit?: boolean;
 	minHealth?: number;
+	noRedirect?: boolean;
 }
 
 export namespace HomingTargets {
