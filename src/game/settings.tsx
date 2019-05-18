@@ -863,7 +863,7 @@ const whip: Spell = {
 
 const link: Spell = {
     id: 'link',
-    description: "Pull your enemy to you. All your attacks gain lifesteal for the duration of the link.",
+    description: "Pull your enemy to you. While linked, all damage received gets redirected to your enemy instead.",
     action: "projectile",
 
     color: '#0000ff',
