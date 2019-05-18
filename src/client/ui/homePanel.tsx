@@ -46,7 +46,7 @@ class HomePanel extends React.Component<Props, State> {
                 <div className="spacer" />
                 <div className="title-row">
                     <video autoPlay muted loop>
-                        <source src="https://storage.googleapis.com/acolytefight.io/AcolyteFight2.mp4" type="video/mp4" />
+                        <source src="https://storage.googleapis.com/acolytefight.io/AcolyteFight3.mp4" type="video/mp4" />
                     </video>
                     <div className="title">Acolyte Fight!</div>
                     <div className="mask"></div>
