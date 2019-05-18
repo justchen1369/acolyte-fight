@@ -932,7 +932,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to things and gain a 2x movement speed boost. You can recast grapple immediately as long as you are still attached. Swing around while attacking and dodging at super speed!",
+    description: "Attach yourself to things and gain a 2x movement speed boost. Swing around while attacking and dodging at super speed!",
     action: "projectile",
 
     color: '#ff2200',
