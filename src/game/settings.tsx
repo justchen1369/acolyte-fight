@@ -1340,7 +1340,7 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Build up to 3 charges of your halo, then touch your enemy to lifesteal. Every halo increases your movement speed by 10%. Watch out, you lose your halo every time you are hit, so keep dodging!",
+    description: "Build up to 3 charges of your halo, then touch your enemy to lifesteal. Halo increases your movement speed by 10%. Watch out, you lose your halo every time you are hit, so keep dodging!",
     action: "projectile",
 
     color: '#ffaa77',
