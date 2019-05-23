@@ -1737,7 +1737,7 @@ const thrust: Spell = {
     name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
 
-    range: 0.45,
+    range: 0.4,
     radiusMultiplier: 1.5,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
