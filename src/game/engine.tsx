@@ -1583,6 +1583,10 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		++hero.casting.stage;
 	}
 
+	if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
+		// Recheck cooldown because refract can become invalid by this point
+		hero.casting.stage = w.CastStage.Complete;
+	}
 
 	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
 		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
