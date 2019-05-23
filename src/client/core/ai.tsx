@@ -73,6 +73,11 @@ function isMyBot(world: w.World, heroId: string) {
         return false;
     }
 
+    if (world.winner) {
+        // Stop botting after game complete
+        return false;
+    }
+
     const player = world.players.get(heroId);
     if (player && player.isBot && world.objects.has(heroId)) {
         return player.heroId === world.ui.myHeroId || player.isSharedBot;
@@ -136,6 +141,7 @@ class AiWorker {
     }
 
     terminate() {
+        console.log("Terminating bot", this.heroId);
         this.isTerminated = true;
         this.worker.terminate();
     }
