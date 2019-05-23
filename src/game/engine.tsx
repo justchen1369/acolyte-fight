@@ -1578,14 +1578,15 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.body.setLinearVelocity(vector.zero());
 		}
 
+		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
+			// Recheck cooldown just before casting because refract can become invalid by this point
+			hero.casting = null;
+			return;
+		}
+
 		hero.casting.uninterruptible = false;
 		hero.casting.initialPosition = vector.clone(hero.body.getPosition()); // Store this to compare against for knockback cancel
 		++hero.casting.stage;
-	}
-
-	if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
-		// Recheck cooldown because refract can become invalid by this point
-		hero.casting.stage = w.CastStage.Complete;
 	}
 
 	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
