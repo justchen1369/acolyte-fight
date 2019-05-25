@@ -260,7 +260,9 @@ function move(state, hero, opponent) {
         return null;
     }
 
-    return { spellId: "move", target };
+    var middle = vectorMidpoint(hero.pos, target);
+
+    return { spellId: "move", target: middle };
 }
 
 function dodge(state, hero, cooldowns) {
