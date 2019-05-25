@@ -2806,8 +2806,6 @@ function destructibleBy(projectile: w.Projectile, detonatorHeroId: string, world
 }
 
 function applyLavaDamage(world: w.World) {
-	const center = pl.Vec2(0.5, 0.5);
-
 	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
 	const damagePacket: w.DamagePacket = {
 		damage: lavaDamagePerTick,
@@ -2976,10 +2974,6 @@ function notifyWin(world: w.World) {
 			return -1;
 		} else if (a.damage < b.damage) {
 			return 1;
-		} else if (a.assists > b.assists) {
-			return -1;
-		} else if (a.assists < b.assists) {
-			return 1;
 		}
 		return 0;
 	});
@@ -3065,8 +3059,7 @@ function notifyKill(hero: w.Hero, world: w.World) {
 	const myHeroId = world.ui.myHeroId;
 
 	const killer = hero.killerHeroId && world.players.get(hero.killerHeroId) || null;
-	const assist = hero.assistHeroId && world.players.get(hero.assistHeroId) || null;
-	world.ui.notifications.push({ type: "kill", myHeroId, killed, killer, assist });
+	world.ui.notifications.push({ type: "kill", myHeroId, killed, killer });
 	console.log(`${killed.heroId} ${killed.name} killed at ${world.tick}`);
 
 	if (!world.winner) {
@@ -3077,10 +3070,6 @@ function notifyKill(hero: w.Hero, world: w.World) {
 		if (hero.killerHeroId) {
 			const score = world.scores.get(hero.killerHeroId);
 			world.scores = world.scores.set(hero.killerHeroId, { ...score, kills: score.kills + 1 });
-		}
-		if (hero.assistHeroId) {
-			const score = world.scores.get(hero.assistHeroId);
-			world.scores = world.scores.set(hero.assistHeroId, { ...score, assists: score.assists + 1 });
 		}
 	}
 }
@@ -3758,10 +3747,11 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 			const score = world.scores.get(fromHeroId);
 			world.scores = world.scores.set(fromHeroId, { ...score, damage: score.damage + amount });
 		}
-		if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
-			toHero.assistHeroId = toHero.killerHeroId || toHero.assistHeroId;
-			toHero.killerHeroId = fromHeroId;
-		}
+	}
+
+	// Update last hit
+	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
+		toHero.killerHeroId = fromHeroId;
 	}
 }
 
@@ -3850,7 +3840,6 @@ export function initScore(heroId: string): w.HeroScore {
 	return {
 		heroId,
 		kills: 0,
-		assists: 0,
 		damage: 0,
 		deathTick: null,
 		rank: null,

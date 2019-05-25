@@ -78,7 +78,6 @@ export interface Team {
 export interface HeroScore {
 	heroId: string;
 	kills: number;
-	assists: number;
 	damage: number;
 
 	deathTick: number | null;
@@ -245,7 +244,6 @@ export interface KillNotification {
 	myHeroId: string;
 	killed: Player;
 	killer: Player | null;
-	assist: Player | null;
 }
 
 export interface NewGameNotification {
@@ -460,7 +458,6 @@ export interface Hero extends WorldObjectBase {
 	buffs: Map<string, Buff>;
 
 	killerHeroId: string | null;
-	assistHeroId: string | null;
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
