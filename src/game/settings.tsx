@@ -501,6 +501,7 @@ const kamehameha: Spell = {
         damage: 5,
         lifeSteal: 0.2,
         damageScaling: false,
+        knockbackScaling: false,
         categories: Categories.Projectile | Categories.Massive,
 
         sound: "kamehameha",
