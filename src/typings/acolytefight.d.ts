@@ -59,7 +59,9 @@ declare interface HeroSettings {
 	ThrottleTicks: number; // Within these many ticks, disallow multiple spells to be cast by the same hero
 
     AdditionalDamageMultiplier: number; // Damage scaling
-    AdditionalDamagePower: number;
+	AdditionalDamagePower: number;
+	
+	DamageBonusProportion: number; // for every 1hp of damage, increase damage by this proportion
 
     MaxHealth: number;
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
@@ -73,7 +75,10 @@ declare interface WorldSettings {
 	InitialRadius: number; // Initial radius of the world
 	HeroLayoutRadius: number; // The radius at which to place heroes
 
+	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
 	LavaDamagePerSecond: number;
+	LavaDamageInterval: number; // Ticks between applying lava damage
+
 	SecondsToShrink: number;
 	ShrinkPowerMinPlayers: number; // Make the shrinking non-linear. Higher values mean faster shrinking at the start of the game.
 	ShrinkPowerMaxPlayers: number;
@@ -770,6 +775,7 @@ declare interface DamagePacketTemplate {
 	lifeSteal?: number;
 	isLava?: boolean;
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping
+	noKnockback?: boolean; // Don't count as knockback - will not attribute future void damage to this hero
 	minHealth?: number; // Never reduce the enemy below this level of health
 }
 

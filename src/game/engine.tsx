@@ -386,21 +386,18 @@ function addHero(world: w.World, heroId: string) {
 		restitution: 1.0,
 	});
 
-	let hero = {
+	let hero: w.Hero = {
 		id: heroId,
 		category: "hero",
-		type: "hero",
 		filterGroupIndex,
 		categories: Categories.Hero,
-		collideWith: Categories.All,
 		health: Hero.MaxHealth,
 		maxHealth: Hero.MaxHealth,
 		body,
 		radius: Hero.Radius,
 		damageSources: new Map<string, number>(),
 		damageSourceHistory: [],
-		additionalDamageMultiplier: Hero.AdditionalDamageMultiplier,
-		additionalDamagePower: Hero.AdditionalDamagePower,
+		damageBonus: 0,
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
 		maxSpeed: Hero.MaxSpeed,
 		revolutionsPerTick: Hero.RevolutionsPerTick,
@@ -408,8 +405,6 @@ function addHero(world: w.World, heroId: string) {
 		cooldowns: {},
 		createTick: world.tick,
 		throttleUntilTick: 0,
-		killerHeroId: null,
-		assistHeroId: null,
 		keysToSpells: new Map<string, string>(),
 		spellsToKeys: new Map<string, string>(),
 		spellChangedTick: new Map<string, number>(),
@@ -420,7 +415,7 @@ function addHero(world: w.World, heroId: string) {
 		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
 		uiDestroyedBuffs: [],
-	} as w.Hero;
+	};
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
@@ -522,14 +517,13 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(config.owner, x.id, world) & Alliances.Enemy));
 	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
 
-	let projectile = {
+	let projectile: w.Projectile = {
 		id,
 		owner: config.owner,
 		category: "projectile",
 		categories,
 		type,
 		body,
-		passthrough: true,
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		strafe: projectileTemplate.strafe,
@@ -564,6 +558,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		minTicks: projectileTemplate.minTicks || 0,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
+		sensor: projectileTemplate.sensor,
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 		expireAgainstHeroes: projectileTemplate.expireAgainstHeroes !== undefined ? projectileTemplate.expireAgainstHeroes : constants.Alliances.All,
 		expireAgainstObjects: projectileTemplate.expireAgainstObjects !== undefined ? projectileTemplate.expireAgainstObjects : constants.Alliances.All,
@@ -580,7 +575,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		radius: projectileTemplate.radius,
 
 		uiPath: [vector.clone(position)],
-	} as w.Projectile;
+	};
 
 	world.objects.set(id, projectile);
 	if (projectile.detonate) {
@@ -1635,6 +1630,14 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
 			}
+
+			if (hero.casting.color) {
+				hero.uiCastTrail = {
+					spellId: hero.casting.action.type,
+					color: hero.casting.color,
+					castTick: world.tick,
+				};
+			}
 		}
 
 		// Update interruptibility
@@ -1869,6 +1872,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 				lifeSteal: 0,
 				fromHeroId: null,
 				isLava: true,
+				noKnockback: true,
 			};
 			applyDamage(hero, packet, world);
 			obstacle.activeTick = world.tick;
@@ -2766,6 +2770,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 					applyDamage(other, damagePacket, world);
 					expireOnHeroHit(other, world);
 					applyBuffsFrom(detonate.buffs, owner, other, world);
+
 					applyKnockback = true;
 				}
 
@@ -2806,10 +2811,14 @@ function destructibleBy(projectile: w.Projectile, detonatorHeroId: string, world
 }
 
 function applyLavaDamage(world: w.World) {
-	const lavaDamagePerTick = world.settings.World.LavaDamagePerSecond / TicksPerSecond;
+	const World = world.settings.World;
+	if (world.tick % World.LavaDamageInterval !== 0) {
+		return;
+	}
+
 	const damagePacket: w.DamagePacket = {
-		damage: lavaDamagePerTick,
-		lifeSteal: 0,
+		damage: (World.LavaDamageInterval / TicksPerSecond) * World.LavaDamagePerSecond,
+		lifeSteal: World.LavaLifestealProportion,
 		fromHeroId: null,
 		isLava: true,
 	};
@@ -2823,9 +2832,15 @@ function applyLavaDamage(world: w.World) {
 					}
 				});
 				if (damageMultiplier >= 0) {
+					let fromHeroId: string = null;
+					if (obj.knockbackHeroId && (calculateAlliance(obj.id, obj.knockbackHeroId, world) & Alliances.Enemy) > 0) {
+						fromHeroId = obj.knockbackHeroId;
+					}
+
 					const heroDamagePacket = {
 						...damagePacket,
 						damage: damagePacket.damage * damageMultiplier,
+						fromHeroId,
 					};
 					applyDamage(obj, heroDamagePacket, world);
 				}
@@ -3477,6 +3492,13 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			}
 		} else if (obj.category === "hero") {
 			expireOnHeroHit(obj, world);
+
+			const damagePacket: w.DamagePacket = {
+				damage: 0,
+				lifeSteal: 0,
+				fromHeroId: saber.owner,
+			};
+			applyDamage(obj, damagePacket, world);
 		}
 
 		hit = true;
@@ -3671,8 +3693,14 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	const fromHero = world.objects.get(fromHeroId);
 	const damageScaling = template.damageScaling !== undefined ? template.damageScaling : true;
 	if (damageScaling && fromHeroId) { // Only scale damage from heroes (not the environment), even if they're dead
-		let proportion = (fromHero && fromHero.category === "hero") ? (fromHero.health / fromHero.maxHealth) : 0;
-		const scaleFactor = 1 + Math.pow(1.0 - proportion, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier;
+		let bonus = 0;
+		let healthProportion = 0;
+		if (fromHero && fromHero.category === "hero") {
+			healthProportion = fromHero.health / fromHero.maxHealth;
+			bonus = fromHero.damageBonus;
+		}
+
+		const scaleFactor = 1 + Math.pow(1.0 - healthProportion, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier + bonus;
 		damage *= scaleFactor;
 	}
 
@@ -3696,6 +3724,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		lifeStealTargetHeroId,
 		fromHeroId,
 		noHit: template.noHit,
+		noKnockback: template.noKnockback,
 		minHealth: template.minHealth,
 	};
 }
@@ -3704,6 +3733,14 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Need to be careful - fromHeroId may still be set, even if fromHero is null, due to the hero being dead
 	if (!(toHero && packet)) { return; }
 	const fromHeroId = packet.fromHeroId;
+
+	let fromHero: w.Hero = null;
+	{
+		let fromHeroCandidate = world.objects.get(fromHeroId);
+		if (fromHeroCandidate && fromHeroCandidate.category === "hero") {
+			fromHero = fromHeroCandidate;
+		}
+	}
 
 	// Register hit
 	if (!packet.noHit) {
@@ -3733,12 +3770,9 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHeroId && packet.lifeSteal && (!packet.lifeStealTargetHeroId || packet.lifeStealTargetHeroId === toHero.id)) {
-		const fromHero = world.objects.get(fromHeroId);
-		if (fromHero && fromHero.category === "hero") {
-			fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
-			world.ui.events.push({ type: "lifeSteal", tick: world.tick, owner: fromHero.id });
-		}
+	if (fromHero && packet.lifeSteal && (!packet.lifeStealTargetHeroId || packet.lifeStealTargetHeroId === toHero.id)) {
+		fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
+		world.ui.events.push({ type: "lifeSteal", tick: world.tick, owner: fromHero.id });
 	}
 
 	// Update scores
@@ -3750,8 +3784,17 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	}
 
 	// Update last hit
-	if (fromHeroId && toHero.killerHeroId !== fromHeroId && fromHeroId !== toHero.id) {
+	if (fromHeroId && fromHeroId !== toHero.id) {
 		toHero.killerHeroId = fromHeroId;
+
+		if (!packet.noKnockback) {
+			toHero.knockbackHeroId = fromHeroId;
+		}
+	}
+
+	// Update damage bonus
+	if (fromHero) {
+		fromHero.damageBonus += world.settings.Hero.DamageBonusProportion * amount;
 	}
 }
 

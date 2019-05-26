@@ -438,12 +438,14 @@ export interface Hero extends WorldObjectBase {
 
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
+	damageBonus: number;
 
 	moveTo?: pl.Vec2;
 	target?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
 	throttleUntilTick: number;
+	uiCastTrail?: CastHistoryItem;
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
@@ -457,7 +459,8 @@ export interface Hero extends WorldObjectBase {
 	invisible?: VanishBuff;
 	buffs: Map<string, Buff>;
 
-	killerHeroId: string | null;
+	killerHeroId?: string;
+	knockbackHeroId?: string;
 
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -536,6 +539,12 @@ export interface CastState {
 	color?: string;
 
 	uiScale?: number;
+}
+
+export interface CastHistoryItem {
+	spellId: string;
+	color: string;
+	castTick: number;
 }
 
 export interface LinkState {
@@ -665,6 +674,8 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	owner: string;
 	body: pl.Body;
 	collideWith: number;
+	sensor?: boolean;
+
 	collidedTick?: number;
 	hit?: number;
 
@@ -714,6 +725,7 @@ export interface DamagePacket {
 	noHit?: boolean;
 	minHealth?: number;
 	noRedirect?: boolean;
+	noKnockback?: boolean;
 }
 
 export namespace HomingTargets {

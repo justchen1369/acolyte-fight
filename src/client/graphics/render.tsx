@@ -1109,17 +1109,32 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 
 	// Charging
+	const castRadius = ChargingIndicator.MinWidth + ChargingIndicator.WidthPerBonus * hero.damageBonus;
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		const strokeColor = parseColor(hero.casting.color).alpha(hero.casting.proportion);
 		glx.circle(ctxStack, pos, {
 			color: strokeColor,
 			minRadius: radius,
-			maxRadius: radius + ChargingIndicator.Width,
+			maxRadius: radius + castRadius,
 			feather: {
 				sigma: HeroColors.GlowRadius,
 				alpha: 0.5,
 			},
 		});
+	} else if (hero.uiCastTrail) {
+		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
+		if (proportion > 0) {
+			const strokeColor = parseColor(hero.uiCastTrail.color).alpha(proportion);
+			glx.circle(ctxStack, pos, {
+				color: strokeColor,
+				minRadius: radius + castRadius * (1 - proportion),
+				maxRadius: radius + castRadius,
+				feather: {
+					sigma: HeroColors.GlowRadius,
+					alpha: 0.5,
+				},
+			});
+		}
 	}
 
 	// Fill

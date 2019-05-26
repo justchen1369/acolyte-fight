@@ -134,7 +134,9 @@ export namespace HealthBar {
 	export const Margin = Pixel * 2;
 }
 export namespace ChargingIndicator {
-	export const Width = Pixel * 7;
+	export const MinWidth = Pixel * 7;
+	export const WidthPerBonus = Pixel * 3.5;
+	export const TrailTicks = 15;
 }
 export namespace DashIndicator {
 	export const Color = "#44eeff";
