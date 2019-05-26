@@ -194,7 +194,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 
 		damage: template.damage || 0,
 		buffs: template.buffs || [],
-		detonate: template.detonate && instantiateDetonate(template.detonate, null, world),
+		detonate: template.detonate,
 		mirror: template.mirror,
 		impulse: template.impulse || 0,
 		conveyor: template.conveyor,
@@ -2764,10 +2764,10 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 		return;
 	}
 
-	const template = obstacle.detonate;
+	const detonate = instantiateDetonate(obstacle.detonate, null, world);
 
 	const owner: string = null;
-	detonateAt(obstacle.body.getPosition(), owner, template, world, { sourceId: obstacle.id });
+	detonateAt(obstacle.body.getPosition(), owner, detonate, world, { sourceId: obstacle.id });
 
 	// Don't allow for repeats
 	obstacle.detonate = null;

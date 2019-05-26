@@ -399,7 +399,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 
 	damage: number;
 	buffs: BuffTemplate[];
-	detonate?: DetonateParameters;
+	detonate?: DetonateParametersTemplate;
 	mirror?: boolean;
 	conveyor?: ConveyorParameters;
 	impulse: number;
