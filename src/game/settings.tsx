@@ -22,6 +22,7 @@ const Hero: HeroSettings = {
     AdditionalDamagePower: 1.0,
 
     DamageBonusProportion: 0.01,
+    KnockbackRatio: 1,
 
     MaxHealth: 100,
     SeparationImpulsePerTick: 0.01,
@@ -382,6 +383,7 @@ const firespray: Spell = {
 
     projectile: {
         density: 1,
+        knockbackScaling: false,
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
@@ -885,6 +887,7 @@ const link: Spell = {
 
     projectile: {
         density: 1,
+        knockbackScaling: false,
         radius: 0.005,
         speed: 0.3,
         strafe: {},
@@ -955,6 +958,7 @@ const grapple: Spell = {
 
     projectile: {
         density: 1,
+        knockbackScaling: false,
         radius: 0.005,
         speed: 0.8,
         maxTicks: 0.4 * TicksPerSecond,
@@ -1030,6 +1034,7 @@ const bouncer: Spell = {
         maxTicks: 3.0 * TicksPerSecond,
         hitInterval: 15,
         damage: 5,
+        knockbackScaling: false,
         lifeSteal: 0.2,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,

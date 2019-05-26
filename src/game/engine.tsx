@@ -487,6 +487,15 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
+	const knockbackScaling = projectileTemplate.knockbackScaling !== undefined ? projectileTemplate.knockbackScaling : true;
+	let knockbackMultiplier = 1;
+	if (knockbackScaling) {
+		const hero = world.objects.get(config.owner);
+		if (hero && hero.category === "hero") {
+			knockbackMultiplier += hero.damageBonus * world.settings.Hero.KnockbackRatio;
+		}
+	}
+
 	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
@@ -499,7 +508,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		filterGroupIndex: config.filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
-		density: projectileTemplate.density,
+		density: projectileTemplate.density * knockbackMultiplier,
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 		isSensor: projectileTemplate.sensor,
 	});
@@ -538,13 +547,18 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 			damageScaling: projectileTemplate.damageScaling,
 			lifeSteal: projectileTemplate.lifeSteal,
 			noHit: projectileTemplate.noHit,
+			noKnockback: projectileTemplate.noKnockback,
 		},
 		partialDamage: projectileTemplate.partialDamage,
 
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate,
+		detonate: projectileTemplate.detonate && {
+			...projectileTemplate.detonate,
+			minImpulse: (projectileTemplate.detonate.minImpulse || 0) * knockbackMultiplier,
+			maxImpulse: (projectileTemplate.detonate.maxImpulse || 0) * knockbackMultiplier,
+		},
 		buffs: projectileTemplate.buffs,
 		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,

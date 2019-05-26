@@ -62,6 +62,7 @@ declare interface HeroSettings {
 	AdditionalDamagePower: number;
 	
 	DamageBonusProportion: number; // for every 1hp of damage, increase damage by this proportion
+	KnockbackRatio: number; // How much of the damage bonus applies to knockback 
 
     MaxHealth: number;
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
@@ -306,6 +307,7 @@ declare interface FocusSpell extends SpellBase {
 declare interface ProjectileTemplate extends DamagePacketTemplate {
 	damage: number;
 	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
+	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 	partialDamage?: PartialDamageParameters;
 
 	density: number;
