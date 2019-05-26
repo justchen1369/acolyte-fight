@@ -214,11 +214,11 @@ const flamestrike: Spell = {
             maxImpulse: 0.00005,
 
             renderTicks: 10,
+        },
 
-            partialRadius: {
-                initialMultiplier: 0.3,
-                ticks: 1 * TicksPerSecond,
-            },
+        partialDetonateRadius: {
+            initialMultiplier: 0.3,
+            ticks: 1 * TicksPerSecond,
         },
 
         partialDamage: {
@@ -782,13 +782,6 @@ const rocket: Spell = {
             maxImpulse: 0.0004,
             renderTicks: 10,
 
-            partialRadius: {
-                initialMultiplier: 0.5,
-                ticks: 1 * TicksPerSecond,
-            },
-
-            partialImpulse: null, // full impulse at point blank range
-
             buffs: [
                 {
                     type: "movement",
@@ -796,6 +789,11 @@ const rocket: Spell = {
                     movementProportion: 0,
                 }
             ],
+        },
+
+        partialDetonateRadius: {
+            initialMultiplier: 0.5,
+            ticks: 1 * TicksPerSecond,
         },
 
         strafe: {

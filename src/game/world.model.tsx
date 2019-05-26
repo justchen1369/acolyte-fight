@@ -688,10 +688,12 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 
 	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;
+	partialDetonateRadius?: PartialDamageParameters;
+	partialDetonateImpulse?: PartialDamageParameters;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
 	link?: LinkParameters;
-	detonate?: DetonateParametersTemplate;
+	detonate?: DetonateParameters;
 	buffs?: BuffTemplate[];
 	swapWith?: number;
 	shieldTakesOwnership: boolean;
@@ -727,6 +729,24 @@ export interface DamagePacket {
 	noRedirect?: boolean;
 	noKnockback?: boolean;
 }
+
+export interface DetonateParameters extends DamagePacket {
+	against?: number;
+
+	radius: number; // The radius of the explosion
+	
+	minImpulse: number;
+	maxImpulse: number;
+
+	renderTicks: number; // Length of explosion
+	sound?: string;
+
+	buffs?: BuffTemplate[];
+
+	partialRadius?: PartialDamageParameters; // Scale the radius over time
+	partialImpulse?: PartialDamageParameters; // Scale the impulse over time
+}
+
 
 export namespace HomingTargets {
 	export const enemy = "enemy";

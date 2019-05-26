@@ -24,6 +24,16 @@ interface ProjectileConfig {
 	directionTarget?: pl.Vec2;
 }
 
+interface DetonateConfig {
+	damageMultiplier?: number;
+	radiusMultiplier?: number;
+	impulseMultiplier?: number;
+
+	sourceId: string;
+	color?: string;
+	defaultSound?: string;
+}
+
 export interface ResolvedKeyBindings {
 	keysToSpells: Map<string, string>;
 	spellsToKeys: Map<string, string>;
@@ -184,7 +194,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 
 		damage: template.damage || 0,
 		buffs: template.buffs || [],
-		detonate: template.detonate,
+		detonate: template.detonate && instantiateDetonate(template.detonate, null, world),
 		mirror: template.mirror,
 		impulse: template.impulse || 0,
 		conveyor: template.conveyor,
@@ -542,11 +552,13 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 			noKnockback: projectileTemplate.noKnockback,
 		},
 		partialDamage: projectileTemplate.partialDamage,
+		partialDetonateImpulse: projectileTemplate.partialDetonateImpulse,
+		partialDetonateRadius: projectileTemplate.partialDetonateRadius,
 
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate,
+		detonate: projectileTemplate.detonate && instantiateDetonate(projectileTemplate.detonate, config.owner, world),
 		buffs: projectileTemplate.buffs,
 		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
@@ -2719,27 +2731,29 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		return;
 	}
 
-	const template = projectile.detonate;
-
 	// Apply damage
 	const damageMultiplier = calculatePartialDamageMultiplier(world, projectile);
-	const detonate: DetonateParameters = {
-		...template,
+	const detonate: w.DetonateParameters = {
+		...projectile.detonate,
 		damage: projectile.detonate.damage * damageMultiplier,
 	};
 
-	if (template.partialRadius) {
-		const radiusMultiplier = calculatePartialDamageMultiplier(world, projectile, template.partialRadius);
-		detonate.radius = projectile.detonate.radius * radiusMultiplier;
+	if (projectile.partialDetonateRadius) {
+		const radiusMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialDetonateRadius);
+		detonate.radius *= radiusMultiplier;
 	}
 
-	if (template.partialImpulse) {
-		const impulseMultiplier = calculatePartialDamageMultiplier(world, projectile, template.partialImpulse);
-		detonate.minImpulse = projectile.detonate.minImpulse * impulseMultiplier;
-		detonate.maxImpulse = projectile.detonate.maxImpulse * impulseMultiplier;
+	if (projectile.partialDetonateImpulse) {
+		const impulseMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialDetonateImpulse);
+		detonate.minImpulse *= impulseMultiplier;
+		detonate.maxImpulse *= impulseMultiplier;
 	}
 
-	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, projectile.id, projectile.color, projectile.sound);
+	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, {
+		sourceId: projectile.id,
+		color: projectile.color, 
+		defaultSound: projectile.sound,
+	});
 
 	// Don't allow for repeats
 	projectile.detonate = null;
@@ -2753,16 +2767,25 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 	const template = obstacle.detonate;
 
 	const owner: string = null;
-	detonateAt(obstacle.body.getPosition(), owner, template, world, obstacle.id);
+	detonateAt(obstacle.body.getPosition(), owner, template, world, { sourceId: obstacle.id });
 
 	// Don't allow for repeats
 	obstacle.detonate = null;
 }
 
-function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, defaultSound: string = null) {
-	const damagePacket = instantiateDamage(detonate, owner, world);
-	const knockbackScaling = calculateKnockbackScaling(owner, world, detonate.knockbackScaling);
+function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: string, world: w.World): w.DetonateParameters {
+	const damagePacket = instantiateDamage(template, fromHeroId, world);
+	const knockbackScaling = calculateKnockbackScaling(fromHeroId, world, template.knockbackScaling);
 
+	return {
+		...template,
+		...damagePacket,
+		minImpulse: (template.minImpulse || 0) * knockbackScaling,
+		maxImpulse: (template.maxImpulse || 0) * knockbackScaling,
+	};
+}
+
+function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
 	world.objects.forEach(other => {
 		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
@@ -2780,7 +2803,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 				const alliance = calculateAlliance(owner, other.id, world);
 				const against = detonate.against !== undefined ? detonate.against : Alliances.NotFriendly;
 				if ((alliance & against) > 0) {
-					applyDamage(other, damagePacket, world);
+					applyDamage(other, detonate, world);
 					expireOnHeroHit(other, world);
 					applyBuffsFrom(detonate.buffs, owner, other, world);
 
@@ -2792,14 +2815,14 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 					other.expireTick = world.tick;
 				}
 			} else if (other.category === "obstacle") {
-				applyDamageToObstacle(other, damagePacket, world);
+				applyDamageToObstacle(other, detonate, world);
 			}
 
 			if (applyKnockback && detonate.maxImpulse) {
-				const magnitude = knockbackScaling * (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
+				const magnitude = (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
 				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
-				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
+				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color: config.color, direction });
 			}
 		}
 	});
@@ -2807,8 +2830,8 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 	world.ui.events.push({
 		type: "detonate",
 		tick: world.tick,
-		sourceId,
-		sound: detonate.sound || defaultSound,
+		sourceId: config.sourceId,
+		sound: detonate.sound || config.defaultSound,
 		pos: vector.clone(epicenter),
 		radius: detonate.radius,
 		explosionTicks: detonate.renderTicks,
@@ -3538,13 +3561,12 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	};
 	applyDamage(hero, selfPacket, world);
 
-	const knockbackMultiplier = 1 + hero.damageBonus * world.settings.Hero.KnockbackRatio;
-	const detonateTemplate: DetonateParametersTemplate = {
-		...spell.detonate,
-		minImpulse: (spell.detonate.minImpulse || 0) * knockbackMultiplier,
-		maxImpulse: (spell.detonate.maxImpulse || 0) * knockbackMultiplier,
-	};
-	detonateAt(hero.body.getPosition(), hero.id, detonateTemplate, world, hero.id, spell.color, spell.sound);
+	const detonate = instantiateDetonate(spell.detonate, hero.id, world);
+	detonateAt(hero.body.getPosition(), hero.id, detonate, world, {
+		sourceId: hero.id,
+		color: spell.color,
+		defaultSound: spell.sound,
+	});
 
 	return true;
 }

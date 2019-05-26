@@ -183,7 +183,7 @@ declare interface ObstacleTemplate {
 	hitInterval?: number; // How many ticks between reapplying the buffs
 	damage?: number;
 	buffs?: BuffTemplate[];
-	detonate?: DetonateParameters;
+	detonate?: DetonateParametersTemplate;
 	mirror?: boolean;
 	impulse?: number;
 	conveyor?: ConveyorParameters;
@@ -309,7 +309,10 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	damage: number;
 	damageScaling?: boolean; // Whether to apply damage scaling to this projectile
 	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
-	partialDamage?: PartialDamageParameters;
+
+	partialDamage?: PartialDamageParameters; // Scale damage over time
+	partialDetonateRadius?: PartialDamageParameters; // Scale detonate radius over time, only useful if detonate set
+	partialDetonateImpulse?: PartialDamageParameters; // Scale detonate impulse over time, only useful if detonate set
 
 	density: number;
     radius: number;
@@ -463,7 +466,7 @@ declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
 	type: "expireOnChannellingEnd";
 }
 
-declare interface DetonateParameters extends DamagePacketTemplate {
+declare interface DetonateParametersTemplate extends DamagePacketTemplate {
 	against?: number;
 
 	radius: number; // The radius of the explosion
@@ -476,11 +479,6 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 	sound?: string;
 
 	buffs?: BuffTemplate[];
-}
-
-declare interface DetonateParametersTemplate extends DetonateParameters {
-	partialRadius?: PartialDamageParameters; // Scale the radius over time
-	partialImpulse?: PartialDamageParameters; // Scale the impulse over time
 }
 
 declare type RenderParams =
@@ -680,7 +678,7 @@ declare interface ScourgeSpell extends SpellBase {
 	selfDamage: number;
 	minSelfHealth: number;
 
-	detonate: DetonateParameters;
+	detonate: DetonateParametersTemplate;
 	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
     trailTicks: number;
