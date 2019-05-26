@@ -1894,7 +1894,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 			const packet: w.DamagePacket = {
 				damage: obstacle.damage,
 				lifeSteal: 0,
-				fromHeroId: null,
+				fromHeroId: calculateKnockbackFromId(hero, world),
 				isLava: true,
 				noKnockback: true,
 			};
@@ -2868,15 +2868,10 @@ function applyLavaDamage(world: w.World) {
 					}
 				});
 				if (damageMultiplier >= 0) {
-					let fromHeroId: string = null;
-					if (obj.knockbackHeroId && (calculateAlliance(obj.id, obj.knockbackHeroId, world) & Alliances.Enemy) > 0) {
-						fromHeroId = obj.knockbackHeroId;
-					}
-
 					const heroDamagePacket = {
 						...damagePacket,
 						damage: damagePacket.damage * damageMultiplier,
-						fromHeroId,
+						fromHeroId: calculateKnockbackFromId(obj, world),
 					};
 					applyDamage(obj, heroDamagePacket, world);
 				}
@@ -2887,6 +2882,14 @@ function applyLavaDamage(world: w.World) {
 			}
 		}
 	});
+}
+
+function calculateKnockbackFromId(hero: w.Hero, world: w.World) {
+	if (hero.knockbackHeroId && (calculateAlliance(hero.id, hero.knockbackHeroId, world) & Alliances.Enemy) > 0) {
+		return hero.knockbackHeroId;
+	} else {
+		return null;
+	}
 }
 
 export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
