@@ -1124,7 +1124,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	} else if (hero.uiCastTrail) {
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
 		if (proportion > 0) {
-			const strokeColor = parseColor(hero.uiCastTrail.color).alpha(0.75 * proportion);
+			const strokeColor = parseColor(hero.uiCastTrail.color).alpha(0.5 * proportion);
 			glx.circle(ctxStack, pos, {
 				color: strokeColor,
 				minRadius: radius + castRadius * (1 - proportion),
