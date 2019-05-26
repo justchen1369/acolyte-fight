@@ -470,6 +470,7 @@ declare interface DetonateParameters extends DamagePacketTemplate {
 	
 	minImpulse: number; // The outer rim of the explosion will cause this much knockback
 	maxImpulse: number; // The epicenter of the explosion will cause this much knockback
+	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
 	renderTicks: number; // Length of explosion
 	sound?: string;
@@ -680,6 +681,7 @@ declare interface ScourgeSpell extends SpellBase {
 	minSelfHealth: number;
 
 	detonate: DetonateParameters;
+	knockbackScaling?: boolean; // Increase knockback as acolyte gets more powerful
 
     trailTicks: number;
 }

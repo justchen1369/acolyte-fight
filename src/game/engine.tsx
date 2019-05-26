@@ -487,15 +487,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
-	const knockbackScaling = projectileTemplate.knockbackScaling !== undefined ? projectileTemplate.knockbackScaling : true;
-	let knockbackMultiplier = 1;
-	if (knockbackScaling) {
-		const hero = world.objects.get(config.owner);
-		if (hero && hero.category === "hero") {
-			knockbackMultiplier += hero.damageBonus * world.settings.Hero.KnockbackRatio;
-		}
-	}
-
+	const knockbackScaling = calculateKnockbackScaling(config.owner, world, projectileTemplate.knockbackScaling);
 	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
@@ -508,7 +500,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		filterGroupIndex: config.filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
-		density: projectileTemplate.density * knockbackMultiplier,
+		density: projectileTemplate.density * knockbackScaling,
 		restitution: projectileTemplate.restitution !== undefined ? projectileTemplate.restitution : 1.0,
 		isSensor: projectileTemplate.sensor,
 	});
@@ -554,11 +546,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
 		link: projectileTemplate.link,
-		detonate: projectileTemplate.detonate && {
-			...projectileTemplate.detonate,
-			minImpulse: (projectileTemplate.detonate.minImpulse || 0) * knockbackMultiplier,
-			maxImpulse: (projectileTemplate.detonate.maxImpulse || 0) * knockbackMultiplier,
-		},
+		detonate: projectileTemplate.detonate,
 		buffs: projectileTemplate.buffs,
 		swapWith: projectileTemplate.swapWith,
 		shieldTakesOwnership: projectileTemplate.shieldTakesOwnership !== undefined ? projectileTemplate.shieldTakesOwnership : true,
@@ -603,7 +591,17 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
 
 	return projectile;
+}
 
+function calculateKnockbackScaling(heroId: string, world: w.World, knockbackScaling: boolean = true) {
+	let knockbackMultiplier = 1;
+	if (knockbackScaling) {
+		const hero = world.objects.get(heroId);
+		if (hero && hero.category === "hero") {
+			knockbackMultiplier += hero.damageBonus * world.settings.Hero.KnockbackRatio;
+		}
+	}
+	return knockbackMultiplier;
 }
 
 function ticksTo(distance: number, speed: number) {
@@ -2763,6 +2761,7 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParameters, world: w.World, sourceId: string, color: string = null, defaultSound: string = null) {
 	const damagePacket = instantiateDamage(detonate, owner, world);
+	const knockbackScaling = calculateKnockbackScaling(owner, world, detonate.knockbackScaling);
 
 	world.objects.forEach(other => {
 		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
@@ -2797,7 +2796,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: DetonateParamet
 			}
 
 			if (applyKnockback && detonate.maxImpulse) {
-				const magnitude = detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse);
+				const magnitude = knockbackScaling * (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
 				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
 				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color, direction });
@@ -3539,7 +3538,13 @@ function scourgeAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sc
 	};
 	applyDamage(hero, selfPacket, world);
 
-	detonateAt(hero.body.getPosition(), hero.id, spell.detonate, world, hero.id, spell.color, spell.sound);
+	const knockbackMultiplier = 1 + hero.damageBonus * world.settings.Hero.KnockbackRatio;
+	const detonateTemplate: DetonateParametersTemplate = {
+		...spell.detonate,
+		minImpulse: (spell.detonate.minImpulse || 0) * knockbackMultiplier,
+		maxImpulse: (spell.detonate.maxImpulse || 0) * knockbackMultiplier,
+	};
+	detonateAt(hero.body.getPosition(), hero.id, detonateTemplate, world, hero.id, spell.color, spell.sound);
 
 	return true;
 }
