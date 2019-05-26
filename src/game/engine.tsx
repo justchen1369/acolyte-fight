@@ -3808,7 +3808,8 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 
 	// Update damage bonus
 	if (fromHero) {
-		fromHero.damageBonus += world.settings.Hero.DamageBonusProportion * amount;
+		const Hero = world.settings.Hero;
+		fromHero.damageBonus = Math.min(Hero.MaxDamageBonusProportion, fromHero.damageBonus + Hero.DamageBonusProportion * amount);
 	}
 }
 

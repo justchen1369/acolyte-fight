@@ -22,6 +22,7 @@ const Hero: HeroSettings = {
     AdditionalDamagePower: 1.0,
 
     DamageBonusProportion: 0.01,
+    MaxDamageBonusProportion: 1.5,
     KnockbackRatio: 1,
 
     MaxHealth: 100,

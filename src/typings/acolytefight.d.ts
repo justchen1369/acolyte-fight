@@ -62,6 +62,7 @@ declare interface HeroSettings {
 	AdditionalDamagePower: number;
 	
 	DamageBonusProportion: number; // for every 1hp of damage, increase damage by this proportion
+	MaxDamageBonusProportion: number; // don't let the damage bonus increase beyond this value
 	KnockbackRatio: number; // How much of the damage bonus applies to knockback 
 
     MaxHealth: number;
