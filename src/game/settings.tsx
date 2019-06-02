@@ -725,13 +725,13 @@ const backlash: Spell = {
 
         behaviours: [
             {
-                trigger: { afterTicks: 45 },
+                trigger: { afterTicks: 36 },
                 type: "homing",
                 revolutionsPerSecond: 1,
                 targetType: "self",
             },
             {
-                trigger: { afterTicks: 45 },
+                trigger: { afterTicks: 36 },
                 type: "clearHits",
             },
         ],
