@@ -477,7 +477,7 @@ const kamehameha: Spell = {
     icon: "glowingHands",
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
-    chargeTicks: 0.625 * TicksPerSecond,
+    chargeTicks: 0.4 * TicksPerSecond,
     cooldown: 7.5 * TicksPerSecond,
     throttle: true,
     revsPerTickWhileCharging: 0.0025,
@@ -846,14 +846,18 @@ const whip: Spell = {
         expireOn: Categories.None,
         strafe: {},
         shieldTakesOwnership: false,
+        damageScaling: false,
+        knockbackScaling: false,
 
         detonate: {
-            damage: 16,
+            damage: 32,
             lifeSteal: 1,
             radius: 0.0125,
             minImpulse: 0.0002,
             maxImpulse: 0.0002,
             renderTicks: 10,
+            damageScaling: false,
+            knockbackScaling: false,
         },
 
         sound: "whip",

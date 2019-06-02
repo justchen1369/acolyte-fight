@@ -641,9 +641,9 @@ export const Sounds: Sounds = {
     "kamehameha-charging": {
         start: [
             {
-                stopTime: 0.75,
-                attack: 0.70,
-                decay: 0.05,
+                stopTime: 0.5,
+                attack: 0.49,
+                decay: 0.01,
 
                 startFreq: 4,
                 stopFreq: 19,
