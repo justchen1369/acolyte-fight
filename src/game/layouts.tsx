@@ -1,4 +1,8 @@
 export const Layouts: Layouts = {
+    "circle": {
+        "obstacles": [
+        ]
+    },
     "cold": {
         "numPoints": 6,
         "obstacles": [
