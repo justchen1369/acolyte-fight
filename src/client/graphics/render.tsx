@@ -1079,9 +1079,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 
 
-	const damageAge = hero.damagedTick ? world.tick - hero.damagedTick : Infinity;
-	const lavaAge = hero.lavaTick ? world.tick - (Math.floor(hero.lavaTick / HeroColors.LavaFlashInterval) * HeroColors.LavaFlashInterval) : Infinity;
-	const hitAge = Math.min(lavaAge, damageAge);
+	const hitAge = hero.hitTick ? world.tick - hero.hitTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.DamageFlashTicks));
 
 	const angle = hero.body.getAngle();
