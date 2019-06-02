@@ -606,6 +606,7 @@ const boomerang: Spell = {
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
         hitInterval: 15, // So repeated hits to obstacles work
+        shieldTakesOwnership: false,
 
         behaviours: [
             {
