@@ -13,7 +13,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { TicksPerSecond } from '../../game/constants';
+import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
 
@@ -70,6 +70,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private executingToken: CancellationToken;
 
     private canvasStack: CanvasStack = {
+        atlas: null,
         gl: null,
         ui: null,
     };
@@ -111,6 +112,9 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                     <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
                 </span>
                 <div id="canvas-container">
+                    <canvas
+                        id="atlas" ref={c => this.canvasStack.atlas = c} className="atlas"
+                        width={Atlas.Width} height={Atlas.Height} />
                     <canvas
                         id="gl" ref={c => this.canvasStack.gl = c} className="game"
                         width={Size} height={Size}

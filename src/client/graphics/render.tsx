@@ -1,5 +1,6 @@
 import Color from 'color';
 import * as pl from 'planck-js';
+import * as atlasController from './atlasController';
 import * as audio from '../core/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
@@ -154,6 +155,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
 
 	const ctxStack: CanvasCtxStack = {
+		atlas: canvasStack.atlas.getContext('2d', { alpha: false }),
 		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
@@ -166,6 +168,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	glx.initGl(ctxStack);
 
+	renderAtlas(ctxStack, world);
 	renderWorld(ctxStack, world, worldRect, options);
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
@@ -185,6 +188,27 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		viewRect,
 		worldRect,
 	};
+}
+
+function renderAtlas(ctxStack: CanvasCtxStack, world: w.World) {
+	const instructions = prepareAtlas(world);
+	atlasController.renderAtlas(ctxStack, instructions);
+}
+
+function prepareAtlas(world: w.World): r.AtlasInstruction[] {
+	const instructions = new Array<r.AtlasInstruction>();
+	world.players.forEach(player => {
+		instructions.push({
+			id: player.heroId,
+			type: "text",
+			text: player.name,
+			color: '#fff',
+			font: '12px "ChicagoFLF",sans-serif',
+			height: HeroColors.NameHeightPixels,
+			width: HeroColors.NameWidthPixels,
+		});
+	});
+	return instructions;
 }
 
 function playSounds(world: w.World, options: RenderOptions) {
@@ -918,6 +942,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
 		renderHeroBars(ctxStack, hero, pos, world);
+		renderHeroName(ctxStack, hero, pos, world);
 	}
 
 	playHeroSounds(hero, pos, world);
@@ -1300,6 +1325,26 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 			maxRadius: barHalfHeight,
 		});
 	}
+}
+
+function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+	const texRect: ClientRect = atlasController.lookupImage(ctxStack, hero.id);
+	if (!texRect) {
+		return;
+	}
+
+	const yOffset = hero.radius + HeroColors.NameMargin;
+	const drawWidth = HeroColors.NameWidthPixels * ctxStack.pixel;
+	const drawHeight = HeroColors.NameHeightPixels * ctxStack.pixel;
+	const drawRect: ClientRect = {
+		left: pos.x - drawWidth / 2,
+		right: pos.x + drawWidth / 2,
+		width: drawWidth,
+		top: yOffset + pos.y,
+		bottom: yOffset + pos.y + drawHeight,
+		height: drawHeight,
+	};
+	glx.image(ctxStack, drawRect, texRect);
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {

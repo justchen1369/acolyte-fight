@@ -12,9 +12,11 @@ export namespace GraphicsLevel {
 export interface CanvasStack {
 	gl: HTMLCanvasElement;
 	ui: HTMLCanvasElement;
+	atlas: HTMLCanvasElement;
 }
 
 export interface CanvasCtxStack {
+	atlas: CanvasRenderingContext2D;
     gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
 	rtx: number;
@@ -35,14 +37,15 @@ export interface RenderOptions {
 
 export interface GlContext {
 	gl: WebGLRenderingContext;
+	images: DrawImages;
 	trails: DrawTrails;
 }
 
 export interface Draw {
-	name: string;
 	program: WebGLProgram;
 	uniforms: { [key: string]: UniformInfo };
 	attribs: { [key: string]: AttribInfo };
+	textures2D: Texture2DInfo[];
 }
 
 export interface UniformInfo {
@@ -58,7 +61,17 @@ export interface AttribInfo {
 	type: number; // e.g. gl.FLOAT
 }
 
+export interface Texture2DInfo {
+	buffer: WebGLTexture;
+
+	wrapS: number;
+	wrapT: number;
+	minFilter: number;
+	magFilter: number;
+}
+
 export interface DrawDataLookup {
+	images: DrawImagesData;
 	trails: DrawTrailsData;
 	[program: string]: DrawData;
 }
@@ -66,7 +79,16 @@ export interface DrawDataLookup {
 export interface DrawData {
 	uniforms: UniformData;
 	attribs: AttributeData;
+	textures2D: ImageData[]; // null means keep the same texture as last frame
 	numVertices: number;
+}
+
+export interface DrawImagesData extends DrawData {
+	attribs: {
+		a_pos: number[];
+		a_texCoord: number[];
+	};
+	textures2D: ImageData[];
 }
 
 export interface DrawTrailsData extends DrawData {
@@ -86,9 +108,27 @@ export interface AttributeData {
 	[key: string]: number[];
 }
 
+export interface Texture2DData {
+	[key: string]: ImageData;
+}
+
 export interface FeatherConfig {
 	sigma: number;
 	alpha: number;
+}
+
+export interface DrawImages extends Draw {
+	uniforms: {
+		u_scale: UniformInfo;
+		u_translate: UniformInfo;
+		u_pixel: UniformInfo;
+		u_rtx: UniformInfo;
+	};
+	attribs: {
+		a_pos: AttribInfo;
+		a_texCoord: AttribInfo;
+	};
+	textures2D: Texture2DInfo[];
 }
 
 export interface DrawTrails extends Draw {
@@ -120,4 +160,28 @@ export interface Fill {
 	minRadius?: number;
 	maxRadius: number;
 	feather?: FeatherConfig;
+}
+
+export interface AtlasState {
+	instructions: AtlasInstruction[];
+	coords: Map<string, ClientRect>;
+	height: number;
+	width: number;
+}
+
+export type AtlasInstruction =
+	AtlasTextInstruction;
+
+export interface AtlasInstructionBase {
+	id: string;
+	type: string;
+	height: number;
+	width: number;
+}
+
+export interface AtlasTextInstruction extends AtlasInstructionBase {
+	type: "text";
+	text: string;
+	color: string;
+	font: string;
 }

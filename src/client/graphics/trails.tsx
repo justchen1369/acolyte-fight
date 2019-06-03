@@ -19,6 +19,7 @@ export function initData(): r.DrawTrailsData {
             a_color: [],
             a_fill: [],
         },
+        textures2D: [],
         numVertices: 0,
     };
 }
@@ -26,30 +27,8 @@ export function initData(): r.DrawTrailsData {
 export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	const program = shaders.compileProgram(gl, trailVertexShader, trailFragmentShader);
 	return {
-		name: "trails",
 		program,
-		uniforms: {
-			u_translate: {
-				loc: gl.getUniformLocation(program, "u_translate"),
-				type: gl.FLOAT,
-				size: 2,
-			},
-			u_scale: {
-				loc: gl.getUniformLocation(program, "u_scale"),
-				type: gl.FLOAT,
-				size: 2,
-			},
-			u_pixel: {
-				loc: gl.getUniformLocation(program, "u_pixel"),
-				type: gl.FLOAT,
-				size: 1,
-            },
-			u_rtx: {
-				loc: gl.getUniformLocation(program, "u_rtx"),
-				type: gl.INT,
-				size: 1,
-            },
-		},
+		uniforms: shaders.commonUniforms(gl, program),
 		attribs: {
 			a_pos: {
 				loc: gl.getAttribLocation(program, "a_pos"),
@@ -76,6 +55,7 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				size: 4,
 			},
 		},
+        textures2D: [],
 	};
 }
 

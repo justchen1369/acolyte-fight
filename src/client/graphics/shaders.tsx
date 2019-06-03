@@ -2,6 +2,13 @@ import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
 
+export interface CommonUniforms {
+	u_translate: r.UniformInfo;
+	u_scale: r.UniformInfo;
+	u_pixel: r.UniformInfo;
+	u_rtx: r.UniformInfo;
+}
+
 export function compileProgram(gl: WebGLRenderingContext, vertexShaderCode: string, fragmentShaderCode: string) {
 	const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexShaderCode);
 	const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentShaderCode);
@@ -12,7 +19,6 @@ export function compileProgram(gl: WebGLRenderingContext, vertexShaderCode: stri
 	gl.linkProgram(program);
 
 	return program;
-
 }
 
 export function compileShader(gl: WebGLRenderingContext, type: number, code: string) {
@@ -30,6 +36,31 @@ export function compileShader(gl: WebGLRenderingContext, type: number, code: str
 	gl.deleteShader(shader);
 
 	throw "Error compiling shader";
+}
+
+export function commonUniforms(gl: WebGLRenderingContext, program: WebGLProgram): CommonUniforms {
+	return {
+		u_translate: {
+			loc: gl.getUniformLocation(program, "u_translate"),
+			type: gl.FLOAT,
+			size: 2,
+		},
+		u_scale: {
+			loc: gl.getUniformLocation(program, "u_scale"),
+			type: gl.FLOAT,
+			size: 2,
+		},
+		u_pixel: {
+			loc: gl.getUniformLocation(program, "u_pixel"),
+			type: gl.FLOAT,
+			size: 1,
+		},
+		u_rtx: {
+			loc: gl.getUniformLocation(program, "u_rtx"),
+			type: gl.INT,
+			size: 1,
+		},
+	};
 }
 
 export function appendVec2(data: number[], vec: pl.Vec2) {

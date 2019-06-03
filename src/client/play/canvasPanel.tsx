@@ -9,7 +9,7 @@ import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { TicksPerSecond, Pixel } from '../../game/constants';
+import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, resetRenderState } from '../graphics/render';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
@@ -113,6 +113,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private canvasStack: CanvasStack = {
         gl: null,
         ui: null,
+        atlas: null,
     };
 
     private resolveKeys = Reselect.createSelector(
@@ -175,6 +176,11 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 >
 
                 <canvas
+                    id="atlas" ref={c => this.canvasStack.atlas = c} className="atlas"
+                    width={Atlas.Width} height={Atlas.Height}
+                />
+
+                <canvas
                     id="gl" ref={c => this.canvasStack.gl = c} className="game"
                     width={Math.round(this.state.width * retinaMultiplier)} height={Math.round(this.state.height * retinaMultiplier)}
                     style={{ width: this.state.width, height: this.state.height }}
@@ -201,7 +207,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     private frame() {
-        if (this.canvasStack.gl && this.canvasStack.ui) {
+        if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
                 rtx: this.state.rtx,

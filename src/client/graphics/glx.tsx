@@ -1,12 +1,15 @@
 import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
+import * as textures from './images';
 import * as trails from './trails';
 
+export { atlas, image } from './images';
 export { circle, line, arc, convex } from './trails';
 
 export function initData(): r.DrawDataLookup {
 	return {
+		images: textures.initData(),
 		trails: trails.initData(),
 	};
 }
@@ -33,6 +36,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 	};
 
 	runProgram(context, context.trails, uniforms, ctxStack.data.trails);
+	runProgram(context, context.images, uniforms, ctxStack.data.images);
 }
 
 function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.UniformData, data: r.DrawData) {
@@ -57,6 +61,24 @@ function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.Uni
 		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.attribs[attribName]), gl.STATIC_DRAW);
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
+	}
+
+	for (const textureIndex in draw.textures2D) {
+		const texture = draw.textures2D[textureIndex];
+		const textureData = data.textures2D[textureIndex];
+
+		if (textureData) {
+			gl.bindTexture(gl.TEXTURE_2D, texture.buffer);
+
+			// Set the parameters so we can render any size image.
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texture.wrapS);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texture.wrapT);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.minFilter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.magFilter);
+
+			// Upload the image into the texture.
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.textures2D[textureIndex]);
+		}
 	}
 
 	gl.drawArrays(gl.TRIANGLES, 0, data.numVertices);
@@ -112,6 +134,7 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 
 	return {
 		gl,
+		images: textures.initImages(gl),
 		trails: trails.initTrails(gl),
 	};
 }

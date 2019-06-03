@@ -126,7 +126,16 @@ export namespace HeroColors {
 	export const ObstacleFlashTicks = 6;
 
 	export const RangeIndicatorWidth = Pixel * 2;
+
+	export const NameMargin = Pixel * 2;
+	export const NameHeightPixels = 16;
+	export const NameWidthPixels = 256;
 };
+
+export namespace Atlas {
+	export const Width = 1024;
+	export const Height = 1024;
+}
 
 export namespace HealthBar {
 	export const HeroRadiusFraction = 0.95;
