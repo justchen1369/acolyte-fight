@@ -22,6 +22,7 @@ export interface CanvasCtxStack {
 	rtx: number;
 
 	pixel: number;
+	subpixel: number;
 	data: DrawDataLookup;
 }
 
@@ -33,6 +34,7 @@ export interface RenderOptions {
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
 	rtx: number;
+	retinaMultiplier: number;
 }
 
 export interface GlContext {

@@ -175,7 +175,7 @@ export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2
 }
 
 function calculateExtent(ctxStack: r.CanvasCtxStack, fill: r.Fill) {
-    let extent = fill.maxRadius + ctxStack.pixel;
+    let extent = fill.maxRadius + ctxStack.subpixel;
     if (fill.feather) {
         extent += fill.feather.sigma * FeatherFactor;
     }

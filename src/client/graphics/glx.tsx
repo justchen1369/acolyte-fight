@@ -31,7 +31,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 			2 * (worldRect.left / Math.max(1, rect.width)) - 1,
 			2 * (worldRect.top / Math.max(1, rect.height)) - 1,
 		],
-		u_pixel: [ctxStack.pixel],
+		u_pixel: [ctxStack.subpixel],
 		u_rtx: [ctxStack.rtx],
 	};
 

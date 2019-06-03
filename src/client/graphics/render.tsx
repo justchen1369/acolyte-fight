@@ -12,7 +12,7 @@ import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors, Pixel } from '../../game/constants';
+import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors } from '../../game/constants';
 import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
 import { parseColor } from './colorParser';
 import { renderIconOnly } from './renderIcon';
@@ -152,13 +152,15 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect, world.ui.camera);
-	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
+	const subpixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
+	const pixel = subpixel * options.retinaMultiplier;
 
 	const ctxStack: CanvasCtxStack = {
 		atlas: canvasStack.atlas.getContext('2d', { alpha: true }),
 		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
+		subpixel,
 		pixel,
 		data: glx.initData(),
 	};
@@ -168,7 +170,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	glx.initGl(ctxStack);
 
-	renderAtlas(ctxStack, world);
+	renderAtlas(ctxStack, world, options);
 	renderWorld(ctxStack, world, worldRect, options);
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
@@ -190,12 +192,12 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	};
 }
 
-function renderAtlas(ctxStack: CanvasCtxStack, world: w.World) {
-	const instructions = prepareAtlas(world);
+function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
+	const instructions = prepareAtlas(world, options);
 	atlasController.renderAtlas(ctxStack, instructions);
 }
 
-function prepareAtlas(world: w.World): r.AtlasInstruction[] {
+function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstruction[] {
 	const instructions = new Array<r.AtlasInstruction>();
 	world.players.forEach(player => {
 		instructions.push({
@@ -203,9 +205,9 @@ function prepareAtlas(world: w.World): r.AtlasInstruction[] {
 			type: "text",
 			text: player.name,
 			color: 'rgba(255, 255, 255, 0.7)',
-			font: '12px "ChicagoFLF",sans-serif',
-			height: HeroColors.NameHeightPixels,
-			width: HeroColors.NameWidthPixels,
+			font: `${HeroColors.NameFontPixels * options.retinaMultiplier}px "ChicagoFLF",sans-serif`,
+			height: Math.ceil(options.retinaMultiplier * HeroColors.NameHeightPixels),
+			width: Math.ceil(options.retinaMultiplier * HeroColors.NameWidthPixels),
 		});
 	});
 	return instructions;

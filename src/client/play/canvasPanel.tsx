@@ -156,12 +156,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        let retinaMultiplier: number;
-        if (this.state.rtx >= GraphicsLevel.Ultimate) {
-            retinaMultiplier = window.devicePixelRatio;
-        } else {
-            retinaMultiplier = 1;
-        }
+        const retinaMultiplier = this.calculateRetinaMultiplier();
         return (
             <div
                 id="canvas-container"
@@ -206,6 +201,14 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         });
     }
 
+    private calculateRetinaMultiplier() {
+        if (this.state.rtx >= GraphicsLevel.Ultimate) {
+            return window.devicePixelRatio;
+        } else {
+            return 1;
+        }
+    }
+
     private frame() {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
@@ -217,6 +220,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 mute: this.props.mute,
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
+                retinaMultiplier: this.calculateRetinaMultiplier(),
             });
         }
     }

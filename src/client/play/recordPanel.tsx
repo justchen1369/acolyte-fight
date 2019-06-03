@@ -270,6 +270,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             mute: this.props.mute,
             keysToSpells: new Map<string, string>(),
             rebindings: {},
+            retinaMultiplier: 1,
         });
     }
 }
