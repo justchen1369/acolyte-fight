@@ -30,40 +30,49 @@ class NameConfig extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            name: null,
+            name: props.savedName,
             changed: false,
             saved: true,
         }
     }
+
     render() {
-        const name = this.state.saved ? this.props.savedName : this.state.name;
+        const name = this.state.name;
         return <div>
             <div><input type="text" value={name} maxLength={PlayerName.MaxPlayerNameLength} onChange={(e) => this.onChange(e)} /></div>
-            {this.state.changed && <div style={{ marginTop: 8 }}>
-                {this.state.saved 
-                    ? "Your name has been set to " + name
-                    : "Unsaved changes"}
+            {this.state.changed && this.state.saved && <div style={{ marginTop: 8 }}>
+                Your name has been set to <b>{name}</b>
+            </div>}
+            {this.state.changed && !this.state.saved && <div style={{ marginTop: 8 }}>
+                Unsaved changes <i className="fas fa-undo clickable" title="Cancel" onClick={() => this.onReset()} />
             </div>}
         </div>;
     }
 
     private onChange(ev: React.ChangeEvent<HTMLInputElement>) {
+        const name = PlayerName.sanitizeName(ev.target.value);
         this.setState({
-            name: PlayerName.sanitizeName(ev.target.value),
+            name,
             changed: true,
             saved: false,
         });
         this.saveStateDebounced();
     }
 
-    private saveState() {
-        const name = this.state.name || Storage.createPlayerName();
-        StoreProvider.dispatch({ type: "updatePlayerName", playerName: name });
-        Storage.saveName(name);
-        this.setState({ name: null, saved: true })
+    private onReset() {
+        this.setState({ name: this.props.savedName, saved: true, changed: false });
+    }
 
-        parties.updatePartyAsync()
-        .then(() => cloud.uploadSettings())
+    private saveState() {
+        const name = this.state.name;
+        if (PlayerName.validName(name)) {
+            StoreProvider.dispatch({ type: "updatePlayerName", playerName: name });
+            Storage.saveName(name);
+            this.setState({ saved: true })
+
+            parties.updatePartyAsync()
+            .then(() => cloud.uploadSettings())
+        }
     }
 }
 
