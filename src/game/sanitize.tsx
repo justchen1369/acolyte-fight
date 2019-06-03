@@ -1,4 +1,4 @@
-export const MaxPlayerNameLength = 30;
+export const MaxPlayerNameLength = 24;
 
 export function sanitizeName(input: string) {
     let name = input || "";

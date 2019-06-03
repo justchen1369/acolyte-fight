@@ -128,7 +128,7 @@ export namespace HeroColors {
 	export const RangeIndicatorWidth = Pixel * 2;
 
 	export const NameMargin = Pixel * 2;
-	export const NameFontPixels = 10;
+	export const NameFontPixels = 9;
 	export const NameHeightPixels = 14;
 	export const NameWidthPixels = 256;
 };
