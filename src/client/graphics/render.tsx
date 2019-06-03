@@ -1154,7 +1154,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 				maxRadius: radius + castRadius,
 				feather: {
 					sigma: HeroColors.GlowRadius,
-					alpha: 0.5,
+					alpha: 0.5 * proportion,
 				},
 			});
 		}
