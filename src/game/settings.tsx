@@ -558,7 +558,7 @@ const homing: Spell = {
         density: 25,
         radius: 0.003,
         speed: 0.15,
-        maxTicks: 4.5 * TicksPerSecond,
+        maxTicks: 4 * TicksPerSecond,
         damage: 12,
         lifeSteal: 0.2,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
