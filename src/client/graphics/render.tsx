@@ -205,7 +205,7 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 			type: "text",
 			text: player.name,
 			color: 'rgba(255, 255, 255, 0.3)',
-			font: `${HeroColors.NameFontPixels * options.retinaMultiplier}px "ChicagoFLF",sans-serif`,
+			font: `${HeroColors.NameFontPixels * options.retinaMultiplier}px Helvetica,Arial,sans-serif`,
 			height: Math.ceil(options.retinaMultiplier * HeroColors.NameHeightPixels),
 			width: Math.ceil(options.retinaMultiplier * HeroColors.NameWidthPixels),
 		});
