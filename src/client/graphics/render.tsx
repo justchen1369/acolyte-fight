@@ -152,7 +152,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect, world.ui.camera);
-	const subpixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
+	const subpixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height)) / world.ui.camera.zoom;
 	const pixel = subpixel * options.retinaMultiplier;
 
 	const ctxStack: CanvasCtxStack = {
