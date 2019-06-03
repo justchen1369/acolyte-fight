@@ -204,7 +204,7 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 			id: player.heroId,
 			type: "text",
 			text: player.name,
-			color: 'rgba(255, 255, 255, 0.7)',
+			color: 'rgba(255, 255, 255, 0.3)',
 			font: `${HeroColors.NameFontPixels * options.retinaMultiplier}px "ChicagoFLF",sans-serif`,
 			height: Math.ceil(options.retinaMultiplier * HeroColors.NameHeightPixels),
 			width: Math.ceil(options.retinaMultiplier * HeroColors.NameWidthPixels),
@@ -845,10 +845,6 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 }
 
 function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
-	if (options.rtx <= r.GraphicsLevel.Minimum) {
-		return;
-	}
-
 	if (smoke.interval && (world.tick % smoke.interval) !== 0) {
 		return;
 	}

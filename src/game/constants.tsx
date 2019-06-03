@@ -129,8 +129,8 @@ export namespace HeroColors {
 
 	export const NameMargin = Pixel * 2;
 	export const NameFontPixels = 9;
-	export const NameHeightPixels = 14;
-	export const NameWidthPixels = 256;
+	export const NameHeightPixels = 9;
+	export const NameWidthPixels = 100;
 };
 
 export namespace Atlas {

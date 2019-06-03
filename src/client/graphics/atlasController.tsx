@@ -88,7 +88,7 @@ function renderText(ctxStack: CanvasCtxStack, top: number, instruction: r.AtlasT
 
     ctx.rect(0, 0, instruction.width, instruction.height);
     ctx.clip();
-	ctx.fillText(instruction.text, instruction.width / 2, instruction.height / 2);
+	ctx.fillText(instruction.text, instruction.width / 2, instruction.height / 2, instruction.width);
 
 	ctx.restore();
 
