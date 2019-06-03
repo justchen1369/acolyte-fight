@@ -155,7 +155,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const pixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height));
 
 	const ctxStack: CanvasCtxStack = {
-		atlas: canvasStack.atlas.getContext('2d', { alpha: false }),
+		atlas: canvasStack.atlas.getContext('2d', { alpha: true }),
 		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
 		rtx: options.rtx,
@@ -202,7 +202,7 @@ function prepareAtlas(world: w.World): r.AtlasInstruction[] {
 			id: player.heroId,
 			type: "text",
 			text: player.name,
-			color: '#fff',
+			color: 'rgba(255, 255, 255, 0.7)',
 			font: '12px "ChicagoFLF",sans-serif',
 			height: HeroColors.NameHeightPixels,
 			width: HeroColors.NameWidthPixels,
