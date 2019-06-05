@@ -70,6 +70,7 @@ const io = socketLib(http, {
 	handlePreflightRequest: api.handlePreflightRequest,
 	parser: msgpackParser,
 	origins: '*:*',
+	pingTimeout: 30000,
 } as any); // needs to be as any because handlePreflightRequest not documented
 
 app.use(express.json());
