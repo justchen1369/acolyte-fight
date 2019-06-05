@@ -93,6 +93,7 @@
     "typescript": "^3.2.2",
     "uniqid": "^5.0.3",
     "url-join": "^4.0.0",
+    "uws": "10.148.1",
     "webpack": "^4.28.2",
     "webpack-cli": "^3.1.2",
     "webpack-glsl-loader": "^1.0.1",

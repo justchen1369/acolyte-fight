@@ -67,6 +67,7 @@ app.use(compression());
 
 const http = createServer(app, httpsKeyPath, httpsCertPath);
 const io = socketLib(http, {
+	wsEngine: "uws",
 	handlePreflightRequest: api.handlePreflightRequest,
 	parser: msgpackParser,
 	origins: '*:*',
