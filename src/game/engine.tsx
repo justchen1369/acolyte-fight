@@ -2302,12 +2302,14 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Wor
 	});
 }
 
-function applyBuffToObstacle(template: BuffTemplate, receiver: w.Obstacle, world: w.World, config: BuffContext) {
+function applyBuffToObstacle(template: BuffTemplate, obstacle: w.Obstacle, world: w.World, config: BuffContext) {
 	if (template.type === "burn") {
-		const numHits = template.maxTicks / template.hitInterval;
-		const packet = instantiateDamage(template.packet, config.otherId, world);
-		packet.damage *= numHits;
-		applyDamageToObstacle(receiver, packet, world);
+		if (!obstacle.undamageable) {
+			const numHits = template.maxTicks / template.hitInterval;
+			const packet = instantiateDamage(template.packet, config.otherId, world);
+			packet.damage *= numHits;
+			applyDamageToObstacle(obstacle, packet, world);
+		}
 	}
 }
 
