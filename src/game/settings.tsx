@@ -231,7 +231,7 @@ const flamestrike: Spell = {
         renderers: [
             { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 30 },
-            { type: "strike", ticks: 30, glow: true, numParticles: 3 },
+            { type: "strike", ticks: 30, glow: true, numParticles: 5 },
         ],
     },
 };
@@ -817,7 +817,7 @@ const rocket: Spell = {
         renderers: [
             { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.035, minRadius: 0.03, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 5, glow: 0.1, smoke: 0.5, ownerColor: true },
-            { type: "strike", ticks: 20, glow: true, numParticles: 9 },
+            { type: "strike", ticks: 20, glow: true, ownerColor: true, numParticles: 9 },
         ],
     },
 };
