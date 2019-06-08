@@ -118,8 +118,7 @@ async function start() {
     }
 
     try {
-        const socket = await sockets.connect(base, a.authToken);
-        await sockets.proxy(socket, query.server)
+        await sockets.connect(base, a.authToken);
 
         if (query.party) {
             await parties.joinPartyAsync(query.party);
@@ -153,11 +152,6 @@ async function start() {
 }
 
 async function onReconnect(socket: SocketIOClient.Socket) {
-    const store = StoreProvider.getState();
-    if (store.server) {
-        await sockets.proxy(socket, store.server);
-    }
-
     await matches.reconnectToGame();
 }
 

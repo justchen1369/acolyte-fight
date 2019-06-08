@@ -111,26 +111,6 @@ export function connect(
 }
 
 
-export function proxy(socket: SocketIOClient.Socket, server: string): Promise<void> {
-	if (server) {
-		return new Promise<void>((resolve, reject) => {
-			let msg: m.ProxyRequestMsg = { server };
-			socket.emit('proxy', msg, (response: m.ProxyResponseMsg) => {
-				if (response.success === false) {
-					console.log(`Failed to connect to upstream ${server}`);
-					reject(response.error);
-				} else {
-					StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: response.socketId });
-					console.log(`Connected to upstream ${server}, changed to socketId ${response.socketId}`);
-					resolve();
-				}
-			});
-		});
-	} else {
-		return Promise.resolve();
-	}
-}
-
 function onServerPreparingToShutdown() {
 	console.log("Server preparing to shutdown");
 	StoreProvider.dispatch({ type: "serverPreparingToShutdown" });

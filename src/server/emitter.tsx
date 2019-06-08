@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import msgpackParser from 'socket.io-msgpack-parser';
 import uniqid from 'uniqid';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
@@ -17,7 +16,6 @@ import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as parties from './parties';
-import socketClient from 'socket.io-client';
 
 let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -81,15 +79,6 @@ function onConnection(socket: SocketIO.Socket) {
 		changedParties.forEach(party => emitParty(party));
 	});
 
-	socket.on('proxy', (data, callback) => {
-		const upstream = upstreams.get(socket.id);
-		if (upstream) {
-			logger.error(`Error: socket ${socket.id} attempted to proxy multiple times`);
-			callback({ error: "Cannot connect to new server - already connected to an existing server" });
-		} else {
-			onProxyMsg(socket, authToken, data, callback);
-		}
-	});
 	socket.use((packet: SocketIO.Packet, next) => {
 		const upstream = upstreams.get(socket.id);
 		if (upstream) {
@@ -112,68 +101,6 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
-}
-
-function onProxyMsg(socket: SocketIO.Socket, authToken: string, data: m.ProxyRequestMsg, callback: (msg: m.ProxyResponseMsg) => void) {
-	if (!(required(data, "object")
-		&& required(data.server, "string"))) {
-		callback({ success: false, error: "Bad request" });
-		return;
-	}
-
-	const location = getLocation();
-	if (!location.server || !data.server || location.server === data.server) {
-		// Already connected to the correct server
-		callback({ success: true, server: location.server, region: location.region, socketId: socket.id });
-	} else {
-		const server = sanitizeHostname(data.server);
-		const config: SocketIOClient.ConnectOpts  = {
-			forceNew: true,
-			transportOptions: {
-				polling: {
-					extraHeaders: { [m.AuthHeader]: authToken }
-				}
-			},
-		};
-		(config as any).parser = msgpackParser;
-		const upstream = socketClient(getUpstreamUrl(server), config);
-
-		let attached = false;
-		upstream.on('connect', () => {
-			if (!attached) {
-				attached = true;
-				upstream.emit('instance', {} as m.ServerInstanceRequest, (result: m.ServerInstanceResponse) => {
-					upstreams.set(socket.id, upstream);
-					callback({ success: true, socketId: upstream.id, server: result.server, region: result.region });
-					logger.error(`Socket ${socket.id} connected to upstream ${server}`);
-				});
-			}
-		});
-		upstream.on('connect_error', (error: any) => {
-			if (!attached) {
-				attached = true;
-				callback({ success: false, error: `${error}` });
-				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: ${error}`);
-			}
-		});
-		upstream.on('connect_timeout', () => {
-			if (!attached) {
-				attached = true;
-				callback({ success: false, error: "Timed out connecting to upstream server" });
-				logger.error(`Socket ${socket.id} could not connect to upstream ${server}: timeout`);
-			}
-		});
-		upstream.on('hero', (data: any) => socket.emit('hero', data));
-		upstream.on('tick', (data: any) => socket.emit('tick', data));
-		upstream.on('party', (data: any) => socket.emit('party', data));
-		upstream.on('game', (data: any) => socket.emit('game', data));
-		upstream.on('room', (data: any) => socket.emit('room', data));
-		upstream.on('disconnect', () => {
-			// Only disconnect if we've actually connected before
-			if (!attached) { return; }
-			socket.disconnect();
-		});
-	}
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
