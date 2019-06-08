@@ -275,6 +275,7 @@ const triplet: Spell = {
         buffs: [
             {
                 type: "burn",
+                collideWith: Categories.Hero | Categories.Obstacle,
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
@@ -347,6 +348,7 @@ const difire: Spell = {
         buffs: [
             {
                 type: "burn",
+                collideWith: Categories.Hero | Categories.Obstacle,
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,

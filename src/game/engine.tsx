@@ -2277,24 +2277,38 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Wor
 
 		const receiver = template.owner ? world.objects.get(fromHeroId) : target;
 		const otherId = template.owner ? (target && target.id) : fromHeroId;
-		if (!(receiver && receiver.category === "hero")) {
+		if (!receiver) {
 			return;
-		}
-
-		const against = template.against !== undefined ? template.against : Categories.All;
-		if (against !== Categories.All) {
-			const targetId = target ? target.id : null;
-			if (!(calculateAlliance(fromHeroId, targetId, world) & against)) {
-				return;
+		} else if (receiver.category === "hero") {
+			const against = template.against !== undefined ? template.against : Categories.All;
+			if (against !== Categories.All) {
+				const targetId = target ? target.id : null;
+				if (!(calculateAlliance(fromHeroId, targetId, world) & against)) {
+					return;
+				}
 			}
-		}
 
-		const id = `${config.tag || "buff"}-${template.type}`;
-		instantiateBuff(id, template, receiver, world, {
-			...config,
-			otherId,
-		});
+			const id = `${config.tag || "buff"}-${template.type}`;
+			instantiateBuff(id, template, receiver, world, {
+				...config,
+				otherId,
+			});
+		} else if (receiver.category === "obstacle") {
+			applyBuffToObstacle(template, receiver, world, {
+				...config,
+				otherId,
+			});
+		}
 	});
+}
+
+function applyBuffToObstacle(template: BuffTemplate, receiver: w.Obstacle, world: w.World, config: BuffContext) {
+	if (template.type === "burn") {
+		const numHits = template.maxTicks / template.hitInterval;
+		const packet = instantiateDamage(template.packet, config.otherId, world);
+		packet.damage *= numHits;
+		applyDamageToObstacle(receiver, packet, world);
+	}
 }
 
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
