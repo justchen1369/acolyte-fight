@@ -231,7 +231,7 @@ const flamestrike: Spell = {
         renderers: [
             { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 30 },
-            { type: "strike", ticks: 30, glow: true, numParticles: 3 },
+            { type: "strike", ticks: 30, glow: true, numParticles: 5 },
         ],
     },
 };
