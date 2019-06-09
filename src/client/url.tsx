@@ -58,11 +58,11 @@ export function parseLocation(location: Location): s.PathElements {
     return { path, page, gameId, recordId, profileId, party, server, gclid, hash };
 }
 
-function flatten(param: string | string[]): string {
+function flatten(param: string | number | (string | number)[]): string {
     if (param instanceof Array) {
-        return param[0];
+        return `${param[0]}`;
     } else {
-        return param;
+        return `${param}`;
     }
 }
 
