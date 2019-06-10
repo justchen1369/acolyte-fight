@@ -30,10 +30,6 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
-			if (!opts.reconnectKey) {
-				leaveCurrentGame(false);
-			}
-
 			const msg: m.JoinMsg = {
 				gameId: opts.gameId || null,
 				name: store.playerName,

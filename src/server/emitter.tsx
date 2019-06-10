@@ -16,6 +16,7 @@ import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as parties from './parties';
+import * as sessionLeaderboard from './sessionLeaderboard';
 
 let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -29,6 +30,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
 	modder.attachRoomUpdateListener(emitRoomUpdate);
+	sessionLeaderboard.attachUpdateListener(emitSessionLeaderboard);
 }
 
 export function shutdown() {
@@ -100,6 +102,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('score', data => onScoreMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
+	socket.on('sessionLeaderboard', data => onSessionLeaderboardMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
 
@@ -158,8 +161,10 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		return;
 	}
 
+	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
 	const settings: g.JoinParameters = {
 		socketId: socket.id,
+		userHash,
 		name: data.playerName,
 		authToken,
 		keyBindings: data.keyBindings,
@@ -260,8 +265,10 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		}
 	}
 
+	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
 	const partyMember: g.JoinParameters = {
 		socketId: socket.id,
+		userHash,
 		authToken,
 		name: data.playerName,
 		keyBindings: data.keyBindings,
@@ -370,6 +377,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
+	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
 
 	const room = store.rooms.get(data.room) || null;
 
@@ -393,7 +401,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 				// The user wants a private game, create one
 				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, locked, data.layoutId);
 			} else {
-				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot);
+				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot, [userHash]);
 			}
 		}
 	}).catch(err => {
@@ -405,6 +413,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			let reconnectKey: string = null;
 			if (!data.observe && store.activeGames.has(game.id)) {
 				const joinResult = games.joinGame(game as g.Game, {
+					userHash,
 					name: playerName,
 					keyBindings: data.keyBindings,
 					isBot: data.isBot,
@@ -512,6 +521,23 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	}
 }
 
+async function onSessionLeaderboardMsg(socket: SocketIO.Socket, data: m.GetSessionLeaderboardMsg) {
+	if (!(required(data, "object")
+		&& required(data.category, "string")
+		&& m.GameCategory.All.indexOf(data.category) !== -1
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+	const entries = await sessionLeaderboard.retrieveLeaderboard(data.category);
+	const response: m.SessionLeaderboardEntriesMsg = {
+		category: data.category,
+		entries,
+	};
+	socket.emit('sessionLeaderboard', response);
+}
+
 function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {
 	if (!(required(data, "object")
 		&& required(data.ids, "object") && Array.isArray(data.ids) && data.ids.every(id => required(id, "string"))
@@ -611,4 +637,9 @@ function emitRoomUpdate(room: g.Room) {
 		mod: room.mod,
 	};
 	io.emit('room', msg);
+}
+
+function emitSessionLeaderboard(category: string, entries: m.SessionLeaderboardEntry[]) {
+	const msg: m.SessionLeaderboardEntriesMsg = { category, entries };
+	io.emit('sessionLeaderboard', msg);
 }

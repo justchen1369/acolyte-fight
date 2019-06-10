@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import glicko from 'glicko2';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import * as Firestore from '@google-cloud/firestore';

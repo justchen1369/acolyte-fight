@@ -93,6 +93,7 @@ export interface Player {
     socketId: string;
     partyId: string;
     heroId: string;
+    userHash: string;
     userId?: string;
     name: string;
     unranked: boolean;
@@ -129,6 +130,7 @@ export interface PartyMember extends JoinParameters, PartyMemberStatus {
 
 export interface JoinParameters {
     socketId: string;
+    userHash: string;
     partyHash?: string;
     name: string;
     authToken: string;
@@ -154,5 +156,11 @@ export interface PartyGameAssignment {
 }
 
 export interface PlayerCounts {
-    [category: string]: number;
+    [category: string]: Map<string, OnlinePlayer>; // socket ID
+}
+
+export interface OnlinePlayer {
+    userHash: string;
+    userId: string;
+    name: string;
 }

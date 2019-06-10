@@ -13,6 +13,7 @@ import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as results from './results';
+import * as sessionLeaderboard from './sessionLeaderboard';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
@@ -80,7 +81,7 @@ function startTickProcessing() {
 				anyGameRunning = anyGameRunning || isGameRunning;
 
 				if (isGameRunning) {
-					playerCounts[game.segment] = (playerCounts[game.segment] || 0) + game.active.size;
+					appendOnlinePlayers(game, playerCounts);
 				}
 			});
 			getStore().playerCounts = playerCounts;
@@ -95,17 +96,42 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, numNewPlayers: number = 1): g.Game {
+function appendOnlinePlayers(game: g.Game, playerCounts: g.PlayerCounts) {
+	let playerLookup = playerCounts[game.segment];
+	if (!playerLookup) {
+		playerLookup = playerCounts[game.segment] = new Map<string, g.OnlinePlayer>();
+	}
+	game.active.forEach(player => {
+		const online: g.OnlinePlayer = {
+			userHash: player.userHash,
+			userId: player.userId,
+			name: player.name,
+		};
+		playerLookup.set(player.socketId, online);
+	});
+}
+
+export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
 	const store = getStore();
 
-	let numPlayers = (store.playerCounts[segment] || 0) + numNewPlayers; // +1 player because the current player calling this method is a new player
+	let numPlayers = 0;
+	const playerLookup = store.playerCounts[segment];
+	if (playerLookup) {
+		numPlayers = playerLookup.size;
+		newUserHashes.forEach(userHash => {
+			if (!playerLookup.has(userHash)) {
+				++numPlayers;
+			}
+		});
+	}
+
 	let openGames = new Array<g.Game>();
 	store.joinableGames.forEach(gameId => {
 		const g = store.activeGames.get(gameId);
 		if (g && g.joinable) {
-			if (g.segment === segment && (g.active.size + numNewPlayers) <= Matchmaking.MaxPlayers) {
+			if (g.segment === segment && (g.active.size + newUserHashes.length) <= Matchmaking.MaxPlayers) {
 				openGames.push(g);
 			}
 		} else {
@@ -168,7 +194,12 @@ function watchPriority(game: g.Game): number {
 }
 
 export function calculateRoomStats(segment: string): number {
-	return getStore().playerCounts[segment] || 0;
+	const playerLookup = getStore().playerCounts[segment];
+	if (playerLookup) {
+		return playerLookup.size;
+	} else {
+		return 0;
+	}
 }
 
 export function apportionPerGame(totalPlayers: number) {
@@ -335,7 +366,7 @@ export function assignPartyToGames(party: g.Party) {
 		}
 
 		// Assume all party members on same engine version
-		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, allowBots, group.length);
+		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, allowBots, group.map(p => p.userHash));
 		for (const member of group) {
 			const joinParams: g.JoinParameters = { ...member, partyHash };
 			const joinResult = joinGame(game, joinParams);
@@ -427,13 +458,6 @@ export function leaveGame(game: g.Game, socketId: string) {
 	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
-
-	// Update counts
-	{
-		// Note, this can be a little bit wrong if a player leaves a game that was not being counted due to inactivity - it gets fixed up every 32 milliseconds so we don't care
-		const playerCounts = getStore().playerCounts;
-		playerCounts[game.segment] = Math.max(0, (playerCounts[game.segment] || 0) - 1);
-	}
 }
 
 function wasInactive(player: g.Player) {
@@ -481,6 +505,8 @@ function rankGameIfNecessary(game: g.Game) {
 		for (const listener of finishedGameListeners) {
 			listener(game, newResult || result);
 		}
+
+		sessionLeaderboard.incrementStats(newResult);
 	});
 }
 
@@ -561,8 +587,10 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		return null;
 	}
 
+	const userHash = params.authToken ? auth.getUserHashFromAuthToken(params.authToken) : null;
 	game.active.set(params.socketId, {
 		socketId: params.socketId,
+		userHash,
 		heroId,
 		partyId: null,
 		name: params.name,
@@ -582,7 +610,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	const reconnectKey = uniqid("k-");
 	game.reconnectKeys.set(reconnectKey, heroId);
 
-	const userHash = params.authToken ? auth.getUserHashFromAuthToken(params.authToken) : null;
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
 		game.isRankedLookup.set(userId, !params.unranked);
 		game.socketIds.add(params.socketId);
@@ -604,12 +631,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 			});
 		}
 	});
-
-	// Update counts
-	{
-		const playerCounts = getStore().playerCounts;
-		playerCounts[game.segment] = (playerCounts[game.segment] || 0) + 1;
-	}
 
 	return { heroId, reconnectKey };
 }

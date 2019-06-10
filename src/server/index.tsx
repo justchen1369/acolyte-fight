@@ -24,6 +24,7 @@ import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
+import * as sessionLeaderboard from './sessionLeaderboard';
 import * as statsStorage from './statsStorage';
 
 const rootDir = path.resolve('.');
@@ -132,6 +133,8 @@ setInterval(() => {
 	}
 
 	modder.updateDefaultModIfNecessary();
+
+	sessionLeaderboard.cleanupEntries();
 }, 60 * 1000);
 
 http.on('close', () => {

@@ -344,7 +344,6 @@ export interface InternalStatus {
     numGames: number;
     numPlayers: number;
     numConnections: number;
-    breakdown: Object;
     serverLoad: number;
 }
 
@@ -427,6 +426,20 @@ export interface LeaderboardPlayer {
     winRate: number;
     damagePerGame: number;
     killsPerGame: number;
+}
+
+export interface GetSessionLeaderboardMsg {
+    category: string;
+}
+export interface SessionLeaderboardEntriesMsg {
+    category: string;
+    entries: SessionLeaderboardEntry[];
+}
+export interface SessionLeaderboardEntry {
+    userHash: string;
+    userId?: string;
+    outlasts: number;
+    games: number;
 }
 
 export interface GetRatingAtPercentileResponse {

@@ -53,9 +53,8 @@ export function getInternalStatus() {
         host: location.server,
         numUsers: percentiles.estimateNumUsers(),
         numGames: store.activeGames.size,
-        numPlayers: _.sum(_.values(store.playerCounts)),
+        numPlayers: _.sum(_.values(store.playerCounts).map(playerLookup => playerLookup.size)),
         numConnections: store.numConnections,
-        breakdown: store.playerCounts,
         serverLoad: loadMetrics.getLoadAverage(),
     };
     return status;
