@@ -68,9 +68,5 @@ export function appendVec2(data: number[], vec: pl.Vec2) {
 }
 
 export function appendColor(data: number[], color: Color) {
-    const result = color.unitArray();
-    if (result.length < 4) {
-        result.push(1); // Attach alpha value if not already present
-    }
-	data.push(...result);
+	data.push(color.red() / 255, color.green() / 255, color.blue() / 255, color.alpha());
 }
