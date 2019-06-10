@@ -340,7 +340,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             const delta = notification.acoDelta;
             return <div key={key} className="row rating-notification">
                 <span>Your rating has changed: {this.renderRatingAdjustment(delta)}. </span>
-                <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to see more.</span>
+                <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to changed to unranked mode.</span>
             </div>
         } else {
             return null;
