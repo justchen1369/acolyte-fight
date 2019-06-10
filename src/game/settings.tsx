@@ -1047,6 +1047,7 @@ const bouncer: Spell = {
         lifeSteal: 0.2,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Massive,
+        shieldTakesOwnership: false,
         bounce: {
         },
 
