@@ -481,7 +481,7 @@ const kamehameha: Spell = {
     icon: "glowingHands",
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
-    chargeTicks: 0.4 * TicksPerSecond,
+    chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 7.5 * TicksPerSecond,
     throttle: true,
     revsPerTickWhileCharging: 0.0025,
@@ -1203,7 +1203,7 @@ const gravity: Spell = {
                 type: "cooldown",
                 against: Alliances.NotFriendly,
                 maxTicks: 1,
-                minCooldown: 0.75 * TicksPerSecond,
+                minCooldown: 0.6 * TicksPerSecond,
             },
         ],
 
