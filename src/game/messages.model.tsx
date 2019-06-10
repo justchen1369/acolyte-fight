@@ -1,5 +1,3 @@
-import * as c from './world.model';
-
 export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
 
