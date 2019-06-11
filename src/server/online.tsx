@@ -3,7 +3,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import { getStore } from './serverStore';
 
-let emitOnline: OnlineChangeListener = null;
+let emitOnline: OnlineChangeListener = (segment, diff) => {};
 
 export interface OnlineChangeListener {
 	(segment: string, diff: m.OnlineMsg): void;

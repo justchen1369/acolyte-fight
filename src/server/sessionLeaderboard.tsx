@@ -9,19 +9,19 @@ import { logger } from './logging';
 
 const CutoffMinutes = 20;
 
-const updateListeners = new Array<LeaderboardUpdatedHandler>();
+let updateListener: LeaderboardUpdatedHandler = null;
 
 export interface LeaderboardUpdatedHandler {
 	(category: string, entries: m.SessionLeaderboardEntry[]): void;
 }
 
 export function attachUpdateListener(listener: LeaderboardUpdatedHandler) {
-	updateListeners.push(listener);
+	updateListener = listener;
 }
 
 function sendUpdate(category: string, entries: m.SessionLeaderboardEntry[]) {
-    if (entries.length > 0) {
-        updateListeners.forEach(listener => listener(category, entries));
+    if (updateListener && entries.length > 0) {
+        updateListener(category, entries);
     }
 }
 
