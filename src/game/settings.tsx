@@ -1454,6 +1454,7 @@ const mines: Spell = {
         minTicks: 1, // Ensure mines knockback on their first tick
         damage: 0,
         lifeSteal: 0.2,
+        knockbackScaling: false,
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
@@ -1474,6 +1475,7 @@ const mines: Spell = {
             minImpulse: 0.00007,
             maxImpulse: 0.00007,
             renderTicks: 15,
+            knockbackScaling: false,
         },
         shieldTakesOwnership: false,
 
