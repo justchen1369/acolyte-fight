@@ -119,5 +119,5 @@ export interface SessionLeaderboardEntry {
     damage: number;
     outlasts: number;
     games: number;
-    unixTimestamp: number; // unix timestamp
+    expiry: number; // unix timestamp
 }

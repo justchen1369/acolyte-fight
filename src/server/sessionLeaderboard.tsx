@@ -7,7 +7,9 @@ import * as mirroring from './mirroring';
 import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 
-const CutoffMinutes = 20;
+const MinExpirySeconds = 3 * 60;
+const MaxExpirySeconds = 60 * 60;
+const ExpirySecondsPerGame = 1 * 60;
 
 let updateListener: LeaderboardUpdatedHandler = null;
 
@@ -32,7 +34,8 @@ export async function retrieveLeaderboard(category: string): Promise<m.SessionLe
     const query =
         firestore
         .collection(db.Collections.SessionLeaderboard)
-        .where('region', '==', location.region)
+        .doc(location.region)
+        .collection('entries')
         .where('category', '==', category);
 
     const leaderboard = new Array<m.SessionLeaderboardEntry>();
@@ -71,6 +74,7 @@ export async function incrementStats(gameStats: m.GameStatsMsg) {
 async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, outlasts: number, category: string, region: string) {
     const firestore = getFirestore();
 
+    const now = moment().unix();
     const increment: db.SessionLeaderboardEntry = {
         userHash: playerStats.userHash || null,
         name: playerStats.name,
@@ -82,7 +86,7 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
         damage: playerStats.damage,
         outlasts: outlasts,
         games: 1,
-        unixTimestamp: moment().unix(),
+        expiry: now + MinExpirySeconds,
     };
 
     const newData = await firestore.runTransaction(async (t) => {
@@ -99,6 +103,7 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
                 outlasts: data.outlasts + increment.outlasts,
                 games: data.games + increment.games,
             };
+            newData.expiry = now + Math.max(MinExpirySeconds, Math.min(MaxExpirySeconds, newData.games * ExpirySecondsPerGame));
         }
         doc.ref.set(newData);
         return newData;
@@ -122,8 +127,15 @@ function dbToSessionEntry(data: db.SessionLeaderboardEntry): m.SessionLeaderboar
 
 export async function cleanupEntries() {
     const firestore = getFirestore();
-    const cutoff = moment().subtract(CutoffMinutes, 'minutes').unix();
-    const query = firestore.collection(db.Collections.SessionLeaderboard).where('unixTimestamp', '<', cutoff);
+    const location = mirroring.getLocation();
+
+    const now = moment().unix();
+    const query =
+        firestore
+        .collection(db.Collections.SessionLeaderboard)
+        .doc(location.region)
+        .collection('entries')
+        .where('expiry', '<', now);
 
     let numDeleted = 0;
     await dbStorage.stream(query, doc => {
