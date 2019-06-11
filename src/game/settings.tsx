@@ -495,15 +495,15 @@ const kamehameha: Spell = {
     interruptibleAfterTicks: 0,
     jitterRatio: 0.0,
 
-    intervalTicks: 0.1 * TicksPerSecond,
-    lengthTicks: 3 * TicksPerSecond,
+    intervalTicks: 6,
+    lengthTicks: 2 * TicksPerSecond,
 
     projectile: {
         density: 0.0001,
         radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
-        damage: 5,
+        damage: 7.5,
         lifeSteal: 0.2,
         damageScaling: false,
         knockbackScaling: false,
