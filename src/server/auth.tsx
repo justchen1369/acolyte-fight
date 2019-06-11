@@ -93,6 +93,11 @@ export function getAuthTokenFromSocket(socket: SocketIO.Socket) {
     }
 }
 
+export function getUserHashFromSocket(socket: SocketIO.Socket) {
+    // If user has cleared cookies, use the socket.id as their identifier
+    return getUserHashFromAuthToken(getAuthTokenFromSocket(socket)) || socket.id;
+}
+
 function parseAuthTokenFromRequest(req: express.Request): string | null {
     if (!(req && req.headers)) {
         return null;

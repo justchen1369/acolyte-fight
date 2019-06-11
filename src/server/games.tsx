@@ -12,6 +12,7 @@ import * as segments from './segments';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
+import * as online from './online';
 import * as results from './results';
 import * as sessionLeaderboard from './sessionLeaderboard';
 import * as statsStorage from './statsStorage';
@@ -75,16 +76,17 @@ function startTickProcessing() {
 		const milliseconds = tickTimer.time(() => {
 			let anyGameRunning = false;
 
-			const playerCounts: g.PlayerCounts = {};
+			const newPlayerCounts: g.PlayerCounts = {};
 			getStore().activeGames.forEach(game => {
 				const isGameRunning = gameTick(game);
 				anyGameRunning = anyGameRunning || isGameRunning;
 
 				if (isGameRunning) {
-					appendOnlinePlayers(game, playerCounts);
+					online.appendOnlinePlayers(game, newPlayerCounts);
 				}
 			});
-			getStore().playerCounts = playerCounts;
+
+			online.updateOnlinePlayers(newPlayerCounts);
 
 			if (!anyGameRunning) {
 				ticksProcessing = false;
@@ -94,21 +96,6 @@ function startTickProcessing() {
 		}, '', 'm');
 		addTickMilliseconds(milliseconds);
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
-}
-
-function appendOnlinePlayers(game: g.Game, playerCounts: g.PlayerCounts) {
-	let playerLookup = playerCounts[game.segment];
-	if (!playerLookup) {
-		playerLookup = playerCounts[game.segment] = new Map<string, g.OnlinePlayer>();
-	}
-	game.active.forEach(player => {
-		const online: g.OnlinePlayer = {
-			userHash: player.userHash,
-			userId: player.userId,
-			name: player.name,
-		};
-		playerLookup.set(player.socketId, online);
-	});
 }
 
 export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, newUserHashes: string[]): g.Game {
@@ -587,7 +574,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		return null;
 	}
 
-	const userHash = params.authToken ? auth.getUserHashFromAuthToken(params.authToken) : null;
+	const userHash = params.userHash;
 	game.active.set(params.socketId, {
 		socketId: params.socketId,
 		userHash,

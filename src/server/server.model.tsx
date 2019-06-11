@@ -156,7 +156,7 @@ export interface PartyGameAssignment {
 }
 
 export interface PlayerCounts {
-    [category: string]: Map<string, OnlinePlayer>; // socket ID
+    [category: string]: Map<string, OnlinePlayer>; // userHash -> OnlinePlayer
 }
 
 export interface OnlinePlayer {

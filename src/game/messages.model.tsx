@@ -177,6 +177,20 @@ export interface LeaveMsg {
     gameId: string;
 }
 
+export interface GetOnlineMsg {
+    category: string;
+}
+export interface OnlineMsg {
+    joined: OnlinePlayerMsg[];
+    left: string[];
+}
+
+export interface OnlinePlayerMsg {
+    userHash: string;
+    userId: string;
+    name: string;
+}
+
 export interface ErrorResponseMsg {
     success: false;
     error: string;

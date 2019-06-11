@@ -15,6 +15,7 @@ import * as m from '../game/messages.model';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
+import * as online from './online';
 import * as parties from './parties';
 import * as sessionLeaderboard from './sessionLeaderboard';
 
@@ -30,6 +31,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
 	modder.attachRoomUpdateListener(emitRoomUpdate);
+	online.attachOnlineEmitter(emitOnline);
 	sessionLeaderboard.attachUpdateListener(emitSessionLeaderboard);
 }
 
@@ -102,6 +104,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('score', data => onScoreMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
+	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('sessionLeaderboard', data => onSessionLeaderboardMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
@@ -161,7 +164,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		return;
 	}
 
-	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
+	const userHash = auth.getUserHashFromSocket(socket);
 	const settings: g.JoinParameters = {
 		socketId: socket.id,
 		userHash,
@@ -265,7 +268,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		}
 	}
 
-	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
+	const userHash = auth.getUserHashFromSocket(socket);
 	const partyMember: g.JoinParameters = {
 		socketId: socket.id,
 		userHash,
@@ -377,7 +380,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 
 	const store = getStore();
 	const playerName = PlayerName.sanitizeName(data.name);
-	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
+	const userHash = auth.getUserHashFromSocket(socket);
 
 	const room = store.rooms.get(data.room) || null;
 
@@ -521,6 +524,24 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	}
 }
 
+async function onOnlineMsg(socket: SocketIO.Socket, data: m.GetOnlineMsg) {
+	if (!(required(data, "object")
+		&& required(data.category, "string")
+		&& m.GameCategory.All.indexOf(data.category) !== -1
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+	const segment = segments.publicSegment();
+	const players = online.getOnlinePlayers(segment);
+	const msg: m.OnlineMsg = {
+		joined: players,
+		left: [],
+	};
+	socket.emit('online', msg);
+}
+
 async function onSessionLeaderboardMsg(socket: SocketIO.Socket, data: m.GetSessionLeaderboardMsg) {
 	if (!(required(data, "object")
 		&& required(data.category, "string")
@@ -558,7 +579,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 	}
 
 	socket.join(game.id);
-	const userHash = auth.getUserHashFromAuthToken(auth.getAuthTokenFromSocket(socket));
+	const userHash = auth.getUserHashFromSocket(socket);
 
 	const publicSegment = segments.publicSegment();
 	const numPlayersPublic = games.calculateRoomStats(publicSegment);
@@ -641,5 +662,13 @@ function emitRoomUpdate(room: g.Room) {
 
 function emitSessionLeaderboard(category: string, entries: m.SessionLeaderboardEntry[]) {
 	const msg: m.SessionLeaderboardEntriesMsg = { category, entries };
-	io.emit('sessionLeaderboard', msg);
+	if (category === m.GameCategory.PvP) {
+		io.emit('sessionLeaderboard', msg);
+	}
+}
+
+function emitOnline(segment: string, msg: m.OnlineMsg) {
+	if (segment === segments.publicSegment()) {
+		io.emit('online', msg);
+	}
 }
