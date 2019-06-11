@@ -723,6 +723,7 @@ declare interface SaberSpell extends ShieldSpell {
 	length: number;
 	width: number;
 
+	channelling?: boolean;
 	maxTicks: number;
 
 	categories: number;

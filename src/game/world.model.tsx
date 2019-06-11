@@ -503,6 +503,7 @@ export interface Saber extends ShieldBase, HighlightSource {
 	type: "saber";
 
 	spellId: string;
+	channelling: boolean;
 
 	angleOffset: number;
 	length: number;

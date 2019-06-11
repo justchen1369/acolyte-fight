@@ -337,6 +337,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: 5,
+		channelling: spell.channelling,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
@@ -3470,14 +3471,10 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	}
 
 	const hero = world.objects.get(shield.owner);
-	if (!(hero && hero.category === "hero")) {
-		// Hero died
-		destroyObject(world, shield);
-		return false;
-	}
-
-	if (!(hero.casting && hero.casting.action.type === saber.spellId)) {
-		// Cancelled
+	if (!(hero && hero.category === "hero")
+		|| (saber.channelling && !(hero.casting && hero.casting.action.type === saber.spellId))
+		|| (hero.cleanseTick > saber.createTick)) {
+		// Dead, cancelled or cleansed
 		destroyObject(world, shield);
 		return false;
 	}
@@ -3509,7 +3506,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			return;
 		}
 		if (!(obj.category === "hero"
-			|| (obj.category === "projectile" && (shouldCollide(saber, obj) || destructibleBy(obj, hero.id, world))))) {
+			|| (obj.category === "projectile" && obj.owner !== saber.owner && (shouldCollide(saber, obj) || destructibleBy(obj, hero.id, world))))) {
 				return;
 		}
 
