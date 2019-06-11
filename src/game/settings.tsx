@@ -165,7 +165,7 @@ const fireball: Spell = {
     throttle: true,
 
     projectile: {
-        density: 8,
+        density: 12.5,
         radius: 0.003,
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
@@ -197,7 +197,7 @@ const flamestrike: Spell = {
     throttle: true,
 
     projectile: {
-        density: 3.5,
+        density: 5,
         radius: 0.005,
         speed: 0.18,
         maxTicks: 2 * TicksPerSecond,
@@ -210,8 +210,8 @@ const flamestrike: Spell = {
             damage: 20,
             lifeSteal: 0.2,
             radius: 0.03,
-            minImpulse: 0.000035,
-            maxImpulse: 0.000035,
+            minImpulse: 0.00005,
+            maxImpulse: 0.00005,
 
             renderTicks: 10,
         },
@@ -531,7 +531,7 @@ const lightning: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        density: 2.8,
+        density: 4,
         radius: 0.0025,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
@@ -559,7 +559,7 @@ const homing: Spell = {
     maxAngleDiffInRevs: 0.01,
 
     projectile: {
-        density: 17.5,
+        density: 25,
         radius: 0.003,
         speed: 0.15,
         maxTicks: 4 * TicksPerSecond,
@@ -659,7 +659,7 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         lifeSteal: 0.2,
-        density: 2.1,
+        density: 3,
         radius: 0.007,
         speed: 0.25,
         maxTicks: 5.0 * TicksPerSecond,
@@ -783,8 +783,8 @@ const rocket: Spell = {
         detonate: {
             damage: 0,
             radius: 0.035,
-            minImpulse: 0.00021,
-            maxImpulse: 0.00028,
+            minImpulse: 0.0003,
+            maxImpulse: 0.0004,
             renderTicks: 10,
 
             buffs: [
@@ -1345,8 +1345,8 @@ const supernova: Spell = {
         detonate: {
             damage: 0,
             radius: 0.05,
-            minImpulse: 0.00014,
-            maxImpulse: 0.00035,
+            minImpulse: 0.0002,
+            maxImpulse: 0.0005,
             renderTicks: 30,
         },
 
@@ -1472,8 +1472,8 @@ const mines: Spell = {
             damage: 3,
             lifeSteal: 0.2,
             radius: 0.015,
-            minImpulse: 0.00007,
-            maxImpulse: 0.00007,
+            minImpulse: 0.0001,
+            maxImpulse: 0.0001,
             renderTicks: 15,
             knockbackScaling: false,
         },
@@ -1617,6 +1617,7 @@ const saber: Spell = {
     icon: "waveStrike",
 
     maxTicks: 2 * TicksPerSecond,
+    channelling: true,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
@@ -1655,6 +1656,7 @@ const dualSaber: Spell = {
     icon: "waveStrike",
 
     maxTicks: 2 * TicksPerSecond,
+    channelling: true,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
@@ -1675,8 +1677,8 @@ const scourge: Spell = {
     detonate: {
         damage: 15,
         radius: Hero.Radius * 4,
-        minImpulse: 0.00014,
-        maxImpulse: 0.00035,
+        minImpulse: 0.0002
+        maxImpulse: 0.0005,
         renderTicks: 30,
     },
     chargeTicks: 0.5 * TicksPerSecond,
