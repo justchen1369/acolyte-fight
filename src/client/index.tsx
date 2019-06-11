@@ -14,6 +14,7 @@ import * as cloud from './core/cloud';
 import * as loader from './core/loader';
 import * as matches from './core/matches';
 import * as notifications from './core/notifications';
+import * as online from './core/online';
 import * as options from './options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
@@ -50,6 +51,8 @@ export async function initialize() {
     sockets.listeners.onPartyMsg = parties.onPartyMsg;
     sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
+    sockets.listeners.onOnlineMsg = online.onOnlineMsg;
+    sockets.listeners.onSessionLeaderboardMsg = online.onSessionLeaderboardMsg;
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
 

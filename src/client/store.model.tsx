@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import * as d from './stats.model';
 import * as e from '../client/modding/editor.model';
 import * as m from '../game/messages.model';
@@ -34,6 +35,9 @@ export interface State {
     profile: m.GetProfileResponse;
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
     hasReplayLookup: Map<string, string>; // gameId -> url to replay data
+
+    online: Immutable.Map<string, m.OnlinePlayerMsg>;
+    sessionLeaderboard: Immutable.Map<string, m.SessionLeaderboardEntry>;
 }
 
 export interface NotificationItem {
@@ -94,6 +98,8 @@ export type Action =
     | UpdateUrlAction
     | UpdateHashAction
     | UpdatePageAction
+    | UpdateOnlineAction
+    | UpdateSessionLeaderboardAction
     | JoinMatchAction
     | LeaveMatchAction
     | UpdateNotificationsAction
@@ -115,6 +121,17 @@ export type Action =
     | UpdateCodeTreeAction
     | UpdateCodeTreeItemAction
     | DeleteCodeTreeItemAction
+
+export interface UpdateOnlineAction {
+    type: "online";
+    joined: m.OnlinePlayerMsg[];
+    left: string[];
+}
+
+export interface UpdateSessionLeaderboardAction {
+    type: "sessionLeaderboard";
+    entries: m.SessionLeaderboardEntry[];
+}
 
 export interface JoinMatchAction {
     type: "joinMatch";

@@ -13,6 +13,8 @@ export let listeners: Listeners = {
 	onGameMsg: () => { },
 	onHeroMsg: () => { },
 	onRoomMsg: () => { },
+	onOnlineMsg: () => { },
+	onSessionLeaderboardMsg: () => { },
 	onReconnect: (socket) => { },
 	onDisconnect: () => { },
 };
@@ -23,6 +25,8 @@ export interface Listeners {
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
 	onRoomMsg: (msg: m.RoomUpdateMsg) => void;
+	onOnlineMsg: (msg: m.OnlineMsg) => void;
+	onSessionLeaderboardMsg: (msg: m.SessionLeaderboardEntriesMsg) => void;
 	onReconnect: (socket: SocketIOClient.Socket) => void;
 	onDisconnect: () => void;
 }
@@ -106,6 +110,8 @@ export function connect(
 		socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 		socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
 		socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
+		socket.on('online', (msg: m.OnlineMsg) => listeners.onOnlineMsg(msg));
+		socket.on('sessionLeaderboard', (msg: m.SessionLeaderboardEntriesMsg) => listeners.onSessionLeaderboardMsg(msg));
 		socket.on('shutdown', (msg: any) => onServerPreparingToShutdown());
 	});
 }

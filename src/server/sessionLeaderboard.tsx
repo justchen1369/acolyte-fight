@@ -33,8 +33,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.SessionLe
         firestore
         .collection(db.Collections.SessionLeaderboard)
         .where('region', '==', location.region)
-        .where('category', '==', category)
-        .orderBy(`outlasts`, 'desc');
+        .where('category', '==', category);
 
     const leaderboard = new Array<m.SessionLeaderboardEntry>();
     await dbStorage.stream(query, doc => {

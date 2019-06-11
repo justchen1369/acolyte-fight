@@ -26,6 +26,7 @@ interface Props {
     myHeroId: string;
     isDead: boolean;
     isFinished: boolean;
+    numOnline: number;
     buttonBar: w.ButtonConfig;
     rebindings: KeyBindings;
     options: m.GameOptions;
@@ -46,6 +47,7 @@ function stateToProps(state: s.State): Props {
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
         isFinished: state.world.activePlayers.size === 0,
+        numOnline: state.online.size,
         buttonBar: state.world.ui.buttonBar,
         rebindings: state.rebindings,
         options: state.options,
@@ -155,18 +157,18 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        return <div key={key} className="row"></div>;
-        /*
-        const a = options.getProvider();
-        return <div key={key} className="row">
-            <div>
-                {notification.numPlayersInGameMode} {notification.numPlayersInGameMode === 1 ? "player" : "players"}
-                {notification.isPrivate ? ` in this game mode (${notification.numPlayersPublic} in public games)` : " online"}
+        if (notification.isPrivate) {
+            return null;
+        } else {
+            const numOnline = this.props.numOnline;
+            return <div key={key} className="row">
+                <div>
+                    {numOnline} {numOnline === 1 ? "player" : "players"} online
+                </div>
+                {this.props.exitable && numOnline <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
+                {this.props.exitable && numOnline > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
             </div>
-            {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
-            {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
-        </div>
-        */
+        }
     }
 
     private onRegionsLinkClick(ev: React.MouseEvent) {

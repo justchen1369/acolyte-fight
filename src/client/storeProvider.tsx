@@ -1,3 +1,4 @@
+import Immutable from 'immutable';
 import * as Redux from 'redux';
 import * as d from './stats.model';
 import * as s from './store.model';
@@ -41,6 +42,8 @@ function initialState(): s.State {
         profile: null,
         allGameStats: new Map<string, d.GameStats>(),
         hasReplayLookup: new Map<string, string>(),
+        online: Immutable.Map(),
+        sessionLeaderboard: Immutable.Map(),
     };
 }
 
@@ -124,6 +127,23 @@ function reducer(state: s.State, action: s.Action): s.State {
                 profileId: action.profileId,
             },
         };
+    } else if (action.type === "online") {
+        const online = state.online.withMutations(collection => {
+            action.left.forEach(userHash => {
+                collection.delete(userHash);
+            });
+            action.joined.forEach(player => {
+                collection.set(player.userHash, player);
+            });
+        });
+        return { ...state, online }
+    } else if (action.type === "sessionLeaderboard") {
+        const sessionLeaderboard = state.sessionLeaderboard.withMutations(collection => {
+            action.entries.forEach(entry => {
+                collection.set(entry.userHash, entry);
+            });
+        });
+        return { ...state, sessionLeaderboard }
     } else if (action.type === "joinMatch") {
         return {
             ...state,
