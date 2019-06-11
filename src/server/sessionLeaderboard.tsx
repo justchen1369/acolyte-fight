@@ -87,7 +87,7 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
     };
 
     const newData = await firestore.runTransaction(async (t) => {
-        const key = entryKey(playerStats.userId, playerStats.userHash, category, region);
+        const key = entryKey(playerStats.userHash, category, region);
         const doc = await t.get(firestore.collection(db.Collections.SessionLeaderboard).doc(key));
         let newData: db.SessionLeaderboardEntry = increment;
         if (doc.exists) {
@@ -108,8 +108,8 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
     return newData;
 }
 
-function entryKey(userId: string, userHash: string, category: string, region: string) {
-    return `${userId || userHash}/${category}/${region}`;
+function entryKey(userHash: string, category: string, region: string) {
+    return `${userHash}/${category}/${region}`;
 }
 
 function dbToSessionEntry(data: db.SessionLeaderboardEntry): m.SessionLeaderboardEntry {
