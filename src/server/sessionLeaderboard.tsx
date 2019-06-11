@@ -29,12 +29,11 @@ function sendUpdate(category: string, entries: m.SessionLeaderboardEntry[]) {
 
 export async function retrieveLeaderboard(category: string): Promise<m.SessionLeaderboardEntry[]> {
     const firestore = getFirestore();
-    const location = mirroring.getLocation();
 
     const query =
         firestore
         .collection(db.Collections.SessionLeaderboard)
-        .doc(location.region)
+        .doc(getRegion())
         .collection('entries')
         .where('category', '==', category);
 
@@ -127,13 +126,12 @@ function dbToSessionEntry(data: db.SessionLeaderboardEntry): m.SessionLeaderboar
 
 export async function cleanupEntries() {
     const firestore = getFirestore();
-    const location = mirroring.getLocation();
 
     const now = moment().unix();
     const query =
         firestore
         .collection(db.Collections.SessionLeaderboard)
-        .doc(location.region)
+        .doc(getRegion())
         .collection('entries')
         .where('expiry', '<', now);
 
@@ -146,4 +144,9 @@ export async function cleanupEntries() {
     if (numDeleted > 0) {
         logger.info(`Deleted ${numDeleted} sessions from database`);
     }
+}
+
+function getRegion() {
+    const location = mirroring.getLocation();
+    return location.region || "global";
 }
