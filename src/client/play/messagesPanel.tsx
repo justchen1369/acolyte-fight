@@ -155,10 +155,8 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        if (notification.numPlayersPublic === null || notification.numPlayersPublic === undefined) {
-            return null;
-        }
-
+        return <div key={key} className="row"></div>;
+        /*
         const a = options.getProvider();
         return <div key={key} className="row">
             <div>
@@ -168,6 +166,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
             {this.props.exitable && !notification.isPrivate && notification.numPlayersPublic > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
         </div>
+        */
     }
 
     private onRegionsLinkClick(ev: React.MouseEvent) {

@@ -596,8 +596,6 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 		allowBots: game.allowBots,
 		live,
 		history: game.history,
-		numPlayersPublic,
-		numPlayersInSegment,
 	};
 	socket.emit('hero', msg);
 }

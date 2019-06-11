@@ -252,8 +252,6 @@ export interface NewGameNotification {
 	heroId: string;
 	room: string | null;
 	isPrivate: boolean;
-	numPlayersPublic: number;
-	numPlayersInGameMode: number;
 }
 
 export interface CloseGameNotification {

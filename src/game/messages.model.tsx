@@ -251,8 +251,6 @@ export interface HeroMsg {
 
     live: boolean;
     history: TickMsg[];
-    numPlayersPublic: number;
-    numPlayersInSegment: number;
 }
 
 export interface CreatePartyRequest {

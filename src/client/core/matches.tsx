@@ -151,8 +151,6 @@ export function onHeroMsg(data: m.HeroMsg) {
 		heroId: world.ui.myHeroId,
 		room: data.room,
 		isPrivate: data.isPrivate,
-		numPlayersPublic: data.numPlayersPublic,
-		numPlayersInGameMode: data.numPlayersInSegment,
 	});
 }
 
