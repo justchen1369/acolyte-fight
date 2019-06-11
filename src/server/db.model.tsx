@@ -11,6 +11,7 @@ export namespace Collections {
     export const Game = 'game';
     export const GlobalMod = 'mod';
     export const SessionLeaderboard = 'sessionLeaderboard';
+    export const SessionLeaderboardEntries = 'entries';
 }
 
 export interface GlobalMod {

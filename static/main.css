@@ -756,6 +756,15 @@ i.clickable:hover, i.clickable:active {
     margin-right: 0.5em;
 }
 
+#messages-panel .rating-notification {
+    margin: 0.5em 0;
+}
+
+#messages-panel .unranked-hint {
+    font-size: 75%;
+    color: #888;
+}
+
 #messages-panel .game-started {
     font-weight: bold;
 }

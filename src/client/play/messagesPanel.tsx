@@ -340,8 +340,8 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         if (!this.props.options.unranked && notification.gameId === this.props.myGameId) {
             const delta = notification.acoDelta;
             return <div key={key} className="row rating-notification">
-                <span>Your rating has changed: {this.renderRatingAdjustment(delta)}. </span>
-                <span><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to changed to unranked mode.</span>
+                <div>Your rating has changed: {this.renderRatingAdjustment(delta)}.</div>
+                <div className="unranked-hint"><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to changed to unranked mode.</div>
             </div>
         } else {
             return null;

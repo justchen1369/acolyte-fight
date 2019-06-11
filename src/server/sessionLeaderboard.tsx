@@ -1,4 +1,5 @@
 import moment from 'moment';
+import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';
 import * as g from './server.model';
@@ -31,10 +32,7 @@ export async function retrieveLeaderboard(category: string): Promise<m.SessionLe
     const firestore = getFirestore();
 
     const query =
-        firestore
-        .collection(db.Collections.SessionLeaderboard)
-        .doc(getRegion())
-        .collection('entries')
+        getLeaderboardCollection(firestore)
         .where('category', '==', category);
 
     const leaderboard = new Array<m.SessionLeaderboardEntry>();
@@ -89,8 +87,8 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
     };
 
     const newData = await firestore.runTransaction(async (t) => {
-        const key = entryKey(playerStats.userHash, category, region);
-        const doc = await t.get(firestore.collection(db.Collections.SessionLeaderboard).doc(key));
+        const key = entryKey(playerStats.userHash, category);
+        const doc = await t.get(getLeaderboardCollection(firestore).doc(key));
         let newData: db.SessionLeaderboardEntry = increment;
         if (doc.exists) {
             const data = doc.data() as db.SessionLeaderboardEntry;
@@ -111,8 +109,8 @@ async function incrementPlayer(playerStats: m.PlayerStatsMsg, winner: boolean, o
     return newData;
 }
 
-function entryKey(userHash: string, category: string, region: string) {
-    return `${userHash}/${category}/${region}`;
+function entryKey(userHash: string, category: string) {
+    return `${category}.${userHash}`;
 }
 
 function dbToSessionEntry(data: db.SessionLeaderboardEntry): m.SessionLeaderboardEntry {
@@ -129,10 +127,7 @@ export async function cleanupEntries() {
 
     const now = moment().unix();
     const query =
-        firestore
-        .collection(db.Collections.SessionLeaderboard)
-        .doc(getRegion())
-        .collection('entries')
+        getLeaderboardCollection(firestore)
         .where('expiry', '<', now);
 
     let numDeleted = 0;
@@ -146,7 +141,10 @@ export async function cleanupEntries() {
     }
 }
 
-function getRegion() {
+function getLeaderboardCollection(firestore: Firestore.Firestore) {
     const location = mirroring.getLocation();
-    return location.region || "global";
+    return getFirestore()
+        .collection(db.Collections.SessionLeaderboard)
+        .doc(location.region || "global")
+        .collection(db.Collections.SessionLeaderboardEntries)
 }
