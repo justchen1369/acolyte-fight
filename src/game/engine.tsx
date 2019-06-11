@@ -2676,7 +2676,7 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 function expireOnHeroHit(hero: w.Hero, world: w.World) {
 	for (const projectileId of hero.strafeIds) {
 		const projectile = world.objects.get(projectileId);
-		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit) {
+		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit && world.tick >= projectile.minTicks + projectile.createTick) {
 			projectile.expireTick = world.tick;
 		}
 	}
