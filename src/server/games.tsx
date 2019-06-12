@@ -487,14 +487,17 @@ function rankGameIfNecessary(game: g.Game) {
 	}
 	game.ranked = true;
 
-	const result = results.calculateResult(game);
-	statsStorage.saveGame(game, result).then(newResult => {
-		for (const listener of finishedGameListeners) {
-			listener(game, newResult || result);
-		}
+	let result = results.calculateResult(game);
+	if (result) {
+		statsStorage.saveGame(game, result).then(newResult => {
+			result = newResult || result;
 
-		sessionLeaderboard.incrementStats(newResult);
-	});
+			for (const listener of finishedGameListeners) {
+				listener(game, result);
+			}
+			sessionLeaderboard.incrementStats(result);
+		});
+	}
 }
 
 function finishGameIfNecessary(game: g.Game) {
