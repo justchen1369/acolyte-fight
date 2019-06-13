@@ -37,7 +37,7 @@ export interface State {
     hasReplayLookup: Map<string, string>; // gameId -> url to replay data
 
     online: Immutable.Map<string, m.OnlinePlayerMsg>;
-    sessionLeaderboard: Immutable.Map<string, m.SessionLeaderboardEntry>;
+    onlineSegment: string;
 }
 
 export interface NotificationItem {
@@ -99,7 +99,7 @@ export type Action =
     | UpdateHashAction
     | UpdatePageAction
     | UpdateOnlineAction
-    | UpdateSessionLeaderboardAction
+    | UpdateOnlineSegmentAction
     | JoinMatchAction
     | LeaveMatchAction
     | UpdateNotificationsAction
@@ -124,13 +124,13 @@ export type Action =
 
 export interface UpdateOnlineAction {
     type: "online";
-    joined: m.OnlinePlayerMsg[];
-    left: string[];
+    joined?: m.OnlinePlayerMsg[];
+    left?: string[];
 }
 
-export interface UpdateSessionLeaderboardAction {
-    type: "sessionLeaderboard";
-    entries: m.SessionLeaderboardEntry[];
+export interface UpdateOnlineSegmentAction {
+    type: "onlineSegment";
+    segment: string;
 }
 
 export interface JoinMatchAction {

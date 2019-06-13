@@ -43,7 +43,7 @@ function initialState(): s.State {
         allGameStats: new Map<string, d.GameStats>(),
         hasReplayLookup: new Map<string, string>(),
         online: Immutable.Map(),
-        sessionLeaderboard: Immutable.Map(),
+        onlineSegment: null,
     };
 }
 
@@ -129,21 +129,20 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "online") {
         const online = state.online.withMutations(collection => {
-            action.left.forEach(userHash => {
-                collection.delete(userHash);
-            });
-            action.joined.forEach(player => {
-                collection.set(player.userHash, player);
-            });
+            if (action.left) {
+                action.left.forEach(userHash => {
+                    collection.delete(userHash);
+                });
+            }
+            if (action.joined) {
+                action.joined.forEach(player => {
+                    collection.set(player.userHash, player);
+                });
+            }
         });
         return { ...state, online }
-    } else if (action.type === "sessionLeaderboard") {
-        const sessionLeaderboard = state.sessionLeaderboard.withMutations(collection => {
-            action.entries.forEach(entry => {
-                collection.set(entry.userHash, entry);
-            });
-        });
-        return { ...state, sessionLeaderboard }
+    } else if (action.type === "onlineSegment") {
+        return { ...state, onlineSegment: action.segment, online: Immutable.Map() };
     } else if (action.type === "joinMatch") {
         return {
             ...state,

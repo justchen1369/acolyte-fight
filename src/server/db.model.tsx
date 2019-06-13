@@ -10,8 +10,8 @@ export namespace Collections {
     export const RatingDecay = 'ratingDecay';
     export const Game = 'game';
     export const GlobalMod = 'mod';
-    export const SessionLeaderboard = 'sessionLeaderboard';
-    export const SessionLeaderboardEntries = 'entries';
+    export const Scoreboard = 'scoreboard';
+    export const ScoreboardEntries = 'entries';
 }
 
 export interface GlobalMod {
@@ -109,16 +109,18 @@ export interface AcoChangeMsg {
     e?: number;
 }
 
-export interface SessionLeaderboardEntry {
+export interface PlayerScore {
+    segment: string;
+
     userHash: string;
     name: string;
-    category: string;
-    region: string;
     userId?: string;
+
     wins: number;
     kills: number;
     damage: number;
     outlasts: number;
     games: number;
+
     expiry: number; // unix timestamp
 }

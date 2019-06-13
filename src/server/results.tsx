@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import msgpack from 'msgpack-lite';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
-import * as categories from './segments';
+import * as categories from '../game/segments';
 
 interface HashValues {
     gameId: string;
@@ -79,8 +79,6 @@ function extractValues(gameStats: m.GameStatsMsg): HashValues {
 function calculateGameCategory(game: g.Game) {
     if (game.segment === categories.publicSegment()) {
         return m.GameCategory.PvP;
-    } else if (game.segment === categories.publicSegment(true)) {
-        return m.GameCategory.AIvAI;
     } else {
         return null;
     }

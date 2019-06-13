@@ -158,7 +158,12 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
         if (notification.isPrivate) {
-            return null;
+            const numOnline = this.props.numOnline;
+            return <div key={key} className="row">
+                <div>
+                    {numOnline} {numOnline === 1 ? "player" : "players"} in this game mode
+                </div>
+            </div>
         } else {
             const numOnline = this.props.numOnline;
             return <div key={key} className="row">

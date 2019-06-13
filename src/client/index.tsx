@@ -52,7 +52,6 @@ export async function initialize() {
     sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
     sockets.listeners.onOnlineMsg = online.onOnlineMsg;
-    sockets.listeners.onSessionLeaderboardMsg = online.onSessionLeaderboardMsg;
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
 

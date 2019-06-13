@@ -177,18 +177,30 @@ export interface LeaveMsg {
     gameId: string;
 }
 
-export interface GetOnlineMsg {
-    category: string;
+export interface GetOnlineStartMsg {
+    segment: string;
+}
+export interface GetOnlineStopMsg {
+    segment: string;
 }
 export interface OnlineMsg {
-    joined: OnlinePlayerMsg[];
-    left: string[];
+    segment: string;
+    all?: OnlinePlayerMsg[];
+    joined?: OnlinePlayerMsg[];
+    changed?: OnlinePlayerMsg[];
+    left?: string[];
 }
 
 export interface OnlinePlayerMsg {
     userHash: string;
-    userId: string;
+    userId?: string;
     name: string;
+
+    wins: number;
+    damage: number;
+    outlasts: number;
+    kills: number;
+    games: number;
 }
 
 export interface ErrorResponseMsg {
@@ -438,20 +450,6 @@ export interface LeaderboardPlayer {
     winRate: number;
     damagePerGame: number;
     killsPerGame: number;
-}
-
-export interface GetSessionLeaderboardMsg {
-    category: string;
-}
-export interface SessionLeaderboardEntriesMsg {
-    category: string;
-    entries: SessionLeaderboardEntry[];
-}
-export interface SessionLeaderboardEntry {
-    userHash: string;
-    userId?: string;
-    outlasts: number;
-    games: number;
 }
 
 export interface GetRatingAtPercentileResponse {

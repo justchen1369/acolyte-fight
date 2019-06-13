@@ -5,7 +5,7 @@ export interface ServerStore {
     nextGameId: 0;
     nextPartyId: 0;
     numConnections: number;
-    playerCounts: PlayerCounts;
+    scoreboards: Map<string, Scoreboard>; // partyId.gameCategory -> OnlineList
     rooms: Map<string, Room>; // id -> room
     parties: Map<string, Party>; // id -> party
     joinableGames: Set<string>; // game ids
@@ -155,12 +155,26 @@ export interface PartyGameAssignment {
     reconnectKey: string;
 }
 
-export interface PlayerCounts {
-    [category: string]: Map<string, OnlinePlayer>; // userHash -> OnlinePlayer
+export interface Scoreboard {
+    segment: string;
+    online: Map<string, OnlinePlayer>; // userHash -> OnlinePlayer
+    scores: Map<string, PlayerScore>; // userHash -> Score
 }
 
 export interface OnlinePlayer {
-    userHash: string;
-    userId: string;
+    userHash: string; // or socket id
+    userId?: string;
     name: string;
+}
+
+export interface PlayerScore {
+    userHash: string;
+    userId?: string;
+    name: string;
+    outlasts: number;
+    wins: number;
+    kills: number;
+    damage: number;
+    games: number;
+    expiry: number; // unix timestamp
 }

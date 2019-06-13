@@ -3,7 +3,7 @@ import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import * as Firestore from '@google-cloud/firestore';
 import * as aco from './aco';
-import * as categories from './segments';
+import * as categories from '../game/segments';
 import * as constants from '../game/constants';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';

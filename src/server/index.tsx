@@ -22,9 +22,9 @@ import * as facebook from './facebook';
 import * as kongregate from './kongregate';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
+import * as online from './online';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
-import * as sessionLeaderboard from './sessionLeaderboard';
 import * as statsStorage from './statsStorage';
 
 const rootDir = path.resolve('.');
@@ -112,19 +112,25 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
+online.init().catch(logger.error);
+
 setInterval(async () => {
 	await statsStorage.updateWinRateDistribution(m.GameCategory.PvP);
 }, 24 * 60 * 60 * 1000); // slow-changing data
-statsStorage.updateWinRateDistribution(m.GameCategory.PvP); // don't await
+statsStorage.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 
 setInterval(async () => {
-	modder.cleanupOldRooms(1);
-	await statsStorage.cleanupGames(7);
-	await statsStorage.decrementAco();
-	await statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP);
+	try {
+		modder.cleanupOldRooms(1);
+		await statsStorage.cleanupGames(7);
+		await statsStorage.decrementAco();
+		await statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP);
+	} catch (exception) {
+		logger.error(exception);
+	}
 }, cleanupIntervalMinutes * 60 * 1000);
-statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP); // don't await
-statsStorage.decrementAco(); // don't await
+statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP).catch(logger.error);
+statsStorage.decrementAco().catch(logger.error);
 
 setInterval(() => {
 	const status = api.getInternalStatus();
@@ -132,9 +138,9 @@ setInterval(() => {
 		logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
 	}
 
-	modder.updateDefaultModIfNecessary();
+	modder.updateDefaultModIfNecessary().catch(logger.error);
 
-	sessionLeaderboard.cleanupEntries();
+	online.cleanupScoreboards().catch(logger.error);
 }, 60 * 1000);
 
 http.on('close', () => {

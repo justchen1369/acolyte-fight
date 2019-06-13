@@ -7,7 +7,7 @@ let store: g.ServerStore = {
     nextPartyId: 0,
     nextGameId: 0,
     numConnections: 0,
-    playerCounts: {},
+    scoreboards: new Map(),
     rooms: new Map<string, g.Room>(),
     parties: new Map<string, g.Party>(),
     joinableGames: new Set<string>(),

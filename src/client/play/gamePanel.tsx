@@ -14,6 +14,7 @@ import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
+import OnlineSegmentListener from '../controls/onlineSegmentListener';
 import RandomizePanel from './randomizePanel';
 import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
@@ -64,6 +65,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
                 <RandomizePanel />
                 <GameKeyCustomizer />
+                <OnlineSegmentListener />
                 <UrlListener />
                 {this.props.watching && <WatchLooper />}
             </ControlSurface>

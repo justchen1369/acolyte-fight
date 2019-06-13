@@ -9,7 +9,7 @@ import * as http from 'http';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as auth from './auth';
-import * as categories from './segments';
+import * as categories from '../game/segments';
 import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
@@ -53,7 +53,7 @@ export function getInternalStatus() {
         host: location.server,
         numUsers: percentiles.estimateNumUsers(),
         numGames: store.activeGames.size,
-        numPlayers: _.sum(_.values(store.playerCounts).map(playerLookup => playerLookup.size)),
+        numPlayers: _.sum([...store.scoreboards.values()].map(scoreboard => scoreboard.online.size)),
         numConnections: store.numConnections,
         serverLoad: loadMetrics.getLoadAverage(),
     };

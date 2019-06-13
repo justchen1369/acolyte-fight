@@ -6,47 +6,57 @@ const RefreshInterval = 60 * 60 * 1000;
 let nextRefresh = 0;
 
 export function onOnlineMsg(data: m.OnlineMsg) {
-    StoreProvider.dispatch({
-        type: "online",
-        joined: data.joined,
-        left: data.left,
-    });
-}
-
-export function onSessionLeaderboardMsg(data: m.SessionLeaderboardEntriesMsg) {
-    StoreProvider.dispatch({
-        type: "sessionLeaderboard",
-        entries: data.entries,
-    });
-}
-
-export function refreshIfNecessary() {
-    if (Date.now() >= nextRefresh) {
-        refresh();
+    const state = StoreProvider.getState();
+    if (state.onlineSegment === data.segment) {
+        StoreProvider.dispatch({
+            type: "online",
+            joined: data.all || data.joined || data.changed,
+            left: data.left,
+        });
     }
 }
 
-export function refresh() {
-    nextRefresh = Date.now() + RefreshInterval;
+export function start(newSegment: string) {
+    const state = StoreProvider.getState();
+    const oldSegment = state.onlineSegment;
+    if (oldSegment !== newSegment) {
+        const socket = getSocket();
 
-    refreshOnline();
-    refreshSessionLeaderboard();
+        StoreProvider.dispatch({
+            type: "onlineSegment",
+            segment: newSegment,
+        });
+
+        if (oldSegment) {
+            const leaveMsg: m.GetOnlineStopMsg = {
+                segment: oldSegment,
+            }
+            socket.emit('onlineStop', leaveMsg);
+        }
+
+        if (newSegment) {
+            const joinMsg: m.GetOnlineStartMsg = {
+                segment: newSegment,
+            };
+            socket.emit('online', joinMsg);
+        }
+    }
 }
 
-function refreshOnline() {
-    const socket = getSocket();
+export function stop() {
+    const state = StoreProvider.getState();
+    const oldSegment = state.onlineSegment;
+    if (oldSegment) {
+        const socket = getSocket();
 
-    const msg: m.GetOnlineMsg = {
-        category: m.GameCategory.PvP,
-    };
-    socket.emit('online', msg);
-}
+        StoreProvider.dispatch({
+            type: "onlineSegment",
+            segment: null,
+        });
 
-function refreshSessionLeaderboard() {
-    const socket = getSocket();
-
-    const msg: m.GetSessionLeaderboardMsg = {
-        category: m.GameCategory.PvP,
-    };
-    socket.emit('sessionLeaderboard', msg);
+        const leaveMsg: m.GetOnlineStopMsg = {
+            segment: oldSegment,
+        }
+        socket.emit('onlineStop', leaveMsg);
+    }
 }

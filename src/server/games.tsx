@@ -8,13 +8,12 @@ import * as m from '../game/messages.model';
 import * as w from '../game/world.model';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
-import * as segments from './segments';
+import * as segments from '../game/segments';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as online from './online';
 import * as results from './results';
-import * as sessionLeaderboard from './sessionLeaderboard';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
@@ -74,21 +73,17 @@ function startTickProcessing() {
 
 	tickTimer.setInterval(() => {
 		const milliseconds = tickTimer.time(() => {
-			let anyGameRunning = false;
-
-			const newPlayerCounts: g.PlayerCounts = {};
+			const running = new Array<g.Game>();
 			getStore().activeGames.forEach(game => {
 				const isGameRunning = gameTick(game);
-				anyGameRunning = anyGameRunning || isGameRunning;
-
 				if (isGameRunning) {
-					online.appendOnlinePlayers(game, newPlayerCounts);
+					running.push(game);
 				}
 			});
 
-			online.updateOnlinePlayers(newPlayerCounts);
+			online.updateOnlinePlayers(running);
 
-			if (!anyGameRunning) {
+			if (running.length === 0) {
 				ticksProcessing = false;
 				tickTimer.clearInterval();
 				logger.info("Stopped processing ticks");
@@ -100,15 +95,15 @@ function startTickProcessing() {
 
 export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
+	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
 
 	let numPlayers = 0;
-	const playerLookup = store.playerCounts[segment];
-	if (playerLookup) {
-		numPlayers = playerLookup.size;
+	const scoreboard = store.scoreboards.get(segment);
+	if (scoreboard) {
+		numPlayers = scoreboard.online.size;
 		newUserHashes.forEach(userHash => {
-			if (!playerLookup.has(userHash)) {
+			if (!scoreboard.online.has(userHash)) {
 				++numPlayers;
 			}
 		});
@@ -153,7 +148,7 @@ export function findNewGame(version: string, room: g.Room | null, partyId: strin
 
 export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots);
+	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
 
 	const candidates = [...store.activeGames.values()].filter(x => x.segment === segment && isGameRunning(x));
@@ -181,9 +176,9 @@ function watchPriority(game: g.Game): number {
 }
 
 export function calculateRoomStats(segment: string): number {
-	const playerLookup = getStore().playerCounts[segment];
-	if (playerLookup) {
-		return playerLookup.size;
+	const scoreboard = getStore().scoreboards.get(segment);
+	if (scoreboard) {
+		return scoreboard.online.size;
 	} else {
 		return 0;
 	}
@@ -279,7 +274,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		segment: segments.calculateSegment(version, roomId, partyId, isPrivate, allowBots),
+		segment: segments.calculateSegment(roomId, partyId, isPrivate),
 		roomId,
 		partyId,
 		isPrivate,
@@ -495,7 +490,7 @@ function rankGameIfNecessary(game: g.Game) {
 			for (const listener of finishedGameListeners) {
 				listener(game, result);
 			}
-			sessionLeaderboard.incrementStats(result);
+			online.incrementStats(game.segment, result);
 		});
 	}
 }
@@ -726,6 +721,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 function calculateJoinPeriod(segment: string, numHumans: number): number {
 	const numInRoom = calculateRoomStats(segment);
 	const targetPerGame = minPerGame(numInRoom);
+
 	if (numHumans < targetPerGame) {
 		return Matchmaking.WaitForMorePeriod;
 	} else {

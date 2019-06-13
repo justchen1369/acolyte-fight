@@ -5,7 +5,6 @@ import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as ai from '../core/ai';
 import * as matches from '../core/matches';
-import * as online from '../core/online';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
@@ -89,7 +88,6 @@ class PlayButton extends React.Component<Props, State> {
         }
         this.setState({ joining: true });
         screenLifecycle.enterGame();
-        online.refreshIfNecessary();
 
         await options.getProvider().commercialBreak();
 
@@ -103,7 +101,6 @@ class PlayButton extends React.Component<Props, State> {
         if (party) {
             if (ready) {
                 screenLifecycle.enterGame();
-                online.refreshIfNecessary();
             }
             parties.updateReadyStatusAsync(ready);
         }

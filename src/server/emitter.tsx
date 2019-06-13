@@ -2,7 +2,7 @@ import _ from 'lodash';
 import uniqid from 'uniqid';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
-import * as segments from './segments';
+import * as segments from '../game/segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
@@ -17,7 +17,6 @@ import * as gameStorage from './gameStorage';
 import * as modder from './modder';
 import * as online from './online';
 import * as parties from './parties';
-import * as sessionLeaderboard from './sessionLeaderboard';
 
 let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -32,7 +31,6 @@ export function attachToSocket(_io: SocketIO.Server) {
 	games.attachFinishedGameListener(emitGameResult);
 	modder.attachRoomUpdateListener(emitRoomUpdate);
 	online.attachOnlineEmitter(emitOnline);
-	sessionLeaderboard.attachUpdateListener(emitSessionLeaderboard);
 }
 
 export function shutdown() {
@@ -105,7 +103,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 	socket.on('online', data => onOnlineMsg(socket, data));
-	socket.on('sessionLeaderboard', data => onSessionLeaderboardMsg(socket, data));
+	socket.on('onlineStop', data => onOnlineStopMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
 
@@ -524,39 +522,28 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	}
 }
 
-async function onOnlineMsg(socket: SocketIO.Socket, data: m.GetOnlineMsg) {
+async function onOnlineMsg(socket: SocketIO.Socket, data: m.GetOnlineStartMsg) {
 	if (!(required(data, "object")
-		&& required(data.category, "string")
-		&& m.GameCategory.All.indexOf(data.category) !== -1
+		&& required(data.segment, "string")
 	)) {
 		// callback({ success: false, error: "Bad request" });
 		return;
 	}
 
-	const segment = segments.publicSegment();
-	const players = online.getOnlinePlayers(segment);
-	const msg: m.OnlineMsg = {
-		joined: players,
-		left: [],
-	};
+	const msg = online.getOnlinePlayers(data.segment);
 	socket.emit('online', msg);
+	socket.join(segmentRoom(data.segment));
 }
 
-async function onSessionLeaderboardMsg(socket: SocketIO.Socket, data: m.GetSessionLeaderboardMsg) {
+async function onOnlineStopMsg(socket: SocketIO.Socket, data: m.GetOnlineStopMsg) {
 	if (!(required(data, "object")
-		&& required(data.category, "string")
-		&& m.GameCategory.All.indexOf(data.category) !== -1
+		&& required(data.segment, "string")
 	)) {
 		// callback({ success: false, error: "Bad request" });
 		return;
 	}
 
-	const entries = await sessionLeaderboard.retrieveLeaderboard(data.category);
-	const response: m.SessionLeaderboardEntriesMsg = {
-		category: data.category,
-		entries,
-	};
-	socket.emit('sessionLeaderboard', response);
+	socket.leave(segmentRoom(data.segment));
 }
 
 function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {
@@ -582,8 +569,6 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 	const userHash = auth.getUserHashFromSocket(socket);
 
 	const publicSegment = segments.publicSegment();
-	const numPlayersPublic = games.calculateRoomStats(publicSegment);
-	const numPlayersInSegment = games.calculateRoomStats(game.segment);
 	const msg: m.HeroMsg = {
 		gameId: game.id,
 		heroId,
@@ -658,15 +643,10 @@ function emitRoomUpdate(room: g.Room) {
 	io.emit('room', msg);
 }
 
-function emitSessionLeaderboard(category: string, entries: m.SessionLeaderboardEntry[]) {
-	const msg: m.SessionLeaderboardEntriesMsg = { category, entries };
-	if (category === m.GameCategory.PvP) {
-		io.emit('sessionLeaderboard', msg);
-	}
+function emitOnline(msg: m.OnlineMsg) {
+	io.to(segmentRoom(msg.segment)).emit('online', msg);
 }
 
-function emitOnline(segment: string, msg: m.OnlineMsg) {
-	if (segment === segments.publicSegment()) {
-		io.emit('online', msg);
-	}
+function segmentRoom(segment: string) {
+	return `s-${segment}`;
 }

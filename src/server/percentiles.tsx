@@ -2,7 +2,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import * as Firestore from '@google-cloud/firestore';
-import * as categories from './segments';
+import * as categories from '../game/segments';
 import * as constants from '../game/constants';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';
