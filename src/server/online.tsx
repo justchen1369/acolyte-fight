@@ -19,7 +19,7 @@ export interface OnlineChangeListener {
 }
 
 export async function init() {
-	await loadLeaderboard();
+	await loadScoreboard();
 }
 
 export function attachOnlineEmitter(_emit: OnlineChangeListener) {
@@ -102,15 +102,19 @@ function onlineToMsg(player: g.OnlinePlayer, score: g.PlayerScore): m.OnlinePlay
 	};
 }
 
-async function loadLeaderboard(): Promise<void> {
+async function loadScoreboard(): Promise<void> {
     const firestore = getFirestore();
 
+	const start = Date.now();
     const query = getLeaderboardCollection(firestore)
 
     await dbStorage.stream(query, doc => {
 		const entry = doc.data() as db.PlayerScore;
 		initScore(entry);
-    });
+	});
+
+	const elapsed = Date.now() - start;
+	logger.info(`Loaded scoreboard in ${elapsed} ms`);
 }
 
 function initScore(entry: db.PlayerScore) {
