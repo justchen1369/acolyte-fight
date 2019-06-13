@@ -10,9 +10,7 @@ import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 import { getStore } from './serverStore';
 
-const MinExpirySeconds = 3 * 60;
-const MaxExpirySeconds = 60 * 60;
-const ExpirySecondsPerGame = 1 * 60;
+const ExpirySeconds = 20 * 60;
 
 let emitOnline: OnlineChangeListener = (diff) => {};
 
@@ -161,7 +159,7 @@ function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, out
 			kills: 0,
 			damage: 0,
 			games: 0,
-			expiry: now + MinExpirySeconds,
+			expiry: now + ExpirySeconds,
 		};
 		scoreboard.scores.set(player.userHash, score);
 	}
@@ -178,7 +176,7 @@ function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, out
 		++score.wins;
 	}
 
-	score.expiry = now + calculateExpiryInterval(score.games);
+	score.expiry = now + ExpirySeconds;
 
 	return score;
 }
@@ -239,10 +237,6 @@ function dbToScore(data: db.PlayerScore): g.PlayerScore {
         games: data.games,
         expiry: data.expiry,
 	};
-}
-
-function calculateExpiryInterval(numGames: number) {
-	return Math.max(MinExpirySeconds, Math.min(MaxExpirySeconds, numGames * ExpirySecondsPerGame));
 }
 
 export async function cleanupScoreboards() {
