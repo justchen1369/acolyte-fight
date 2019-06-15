@@ -1,72 +1,72 @@
 import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
-import { HeroColors, Matchmaking } from '../../game/constants';
+import * as Reselect from 'reselect';
+import * as constants from '../../game/constants';
 import * as StoreProvider from '../storeProvider';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from '../core/matches';
-import PlayerName from './playerNameComponent';
+import { heroColor } from '../graphics/render';
 
 interface OwnProps {
-    heroId: string;
+    rank: number;
+    online: m.OnlinePlayerMsg;
 }
-interface Props {
-    myHeroId: string;
-    isAlive: boolean;
-    isActive: boolean;
-    player: w.Player;
-    numKills: number;
+interface Props extends OwnProps {
+    player: w.Player | null;
     silenced: boolean;
+    world: w.World;
 }
 interface State {
 }
 
-function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const world = state.world;
-    const player = world.players.get(ownProps.heroId);
-
-    let numKills = 0;
-    {
-        let scores = world.scores.get(player.heroId);
-        if (scores) {
-            numKills = scores.kills;
-        }
+const calculatePlayerLookup = Reselect.createSelector(
+    (state: s.State) => state.world.players,
+    (players) => {
+        const playerLookup = new Map<string, w.Player>();
+        players.valueSeq().forEach(player => {
+            if (player.userHash) {
+                playerLookup.set(player.userHash, player);
+            }
+        });
+        return playerLookup;
     }
+);
 
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    const userHash = ownProps.online.userHash;
+    const playerLookup = calculatePlayerLookup(state);
     return {
-        myHeroId: world.ui.myHeroId,
-        player,
-        numKills,
-        isAlive: world.objects.has(player.heroId),
-        isActive: world.activePlayers.has(player.heroId) || player.isSharedBot,
-        silenced: state.silenced.has(player.userHash),
+        ...ownProps,
+        player: playerLookup.get(userHash),
+        silenced: state.silenced.has(userHash),
+        world: state.world,
     };
 }
 
 class InfoPanelPlayer extends React.PureComponent<Props, State> {
     render() {
-        const numKills = this.props.numKills;
-        const isAlive = this.props.isAlive;
-        const isActive = this.props.isActive;
+        const online = this.props.online;
         const player = this.props.player;
 
-        let colorOverride: string = null;
-        if (!(isAlive && isActive)) {
-            colorOverride = HeroColors.InactiveColor;
+        let color = constants.HeroColors.OnlineColor;
+        if (player) {
+            color = heroColor(player.heroId, this.props.world);
         }
 
-        return <div className="player-list-row" style={{ opacity: isAlive ? 1.0 : 0.5 }}>
-            <span className="player-icons" title={numKills + " kills"}>{_.range(0, numKills).map(x => <i key={x} className="ra ra-sword" />)}</span>
-            <PlayerName player={player} colorOverride={colorOverride} />
-            {this.renderUnsilenceBtn()}
-        </div>;
+        return <tr className="player-list-row">
+            <td className="player-list-rank">#{this.props.rank}</td>
+            <td className="player-list-name" ><span className="player-name" style={{ color }}>{online.name}</span>{this.renderUnsilenceBtn()}</td>
+            <td className="player-list-outlasts">{online.outlasts}</td>
+        </tr>;
     }
 
     private renderUnsilenceBtn() {
         if (this.props.silenced) {
-            const player = this.props.player;
-            return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onUnsilenceClick(player.userHash)} title="Click to unmute player" />;
+            const userHash = this.props.online.userHash;
+            return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onUnsilenceClick(userHash)} title="Click to unmute player" />;
         } else {
             return null;
         }

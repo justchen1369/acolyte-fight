@@ -556,6 +556,14 @@ i.clickable:hover, i.clickable:active {
     font-size: 80%;
 }
 
+.player-list table {
+    border-collapse: collapse;
+}
+
+.player-list td {
+    padding: 0 0.25em;
+}
+
 .player-list .waiting-for-players {
     margin-right: 4px;
 }
@@ -581,10 +589,30 @@ i.clickable:hover, i.clickable:active {
     color: #fff;
 }
 
+.player-list .player-list-header {
+    font-size: 75%;
+    font-weight: bold;
+}
+
 .player-list .player-list-row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    font-size: 75%;
+}
+
+.player-list .player-list-rank {
+    padding-right: 0.5em;
+    color: #ccc;
+    text-align: left;
+}
+
+.player-list .player-list-name {
+    color: #ccc;
+    text-align: left;
+}
+
+.player-list .player-list-outlasts {
+    padding-left: 0.5em;
+    color: #ccc;
+    text-align: right;
 }
 
 #info-panel .play-vs-ai-btn {
