@@ -49,13 +49,6 @@ class InfoPanel extends React.PureComponent<Props, State> {
         return (
             <div id="info-panel">
                 <table className="player-list">
-                    <thead>
-                        <tr className="player-list-header">
-                            <th className="player-list-rank">Rank</th>
-                            <th className="player-list-name">Name</th>
-                            <th className="player-list-outlasts">Outlasts</th>
-                        </tr>
-                    </thead>
                     <tbody>
                         {this.props.scoreboard.map((score, index) => <InfoPanelPlayer key={score.userHash} rank={index + 1} online={score} />)}
                     </tbody>

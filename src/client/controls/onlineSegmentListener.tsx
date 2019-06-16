@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as online from '../core/online';
@@ -20,10 +21,22 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class OnlineSegmentListener extends React.Component<Props, State> {
-    render(): JSX.Element {
-        online.start(segments.calculateSegment(this.props.roomId, this.props.partyId, this.props.isPrivate));
+function requestUpdate(props: Props) {
+    online.start(segments.calculateSegment(props.roomId, props.partyId, props.isPrivate));
+}
 
+class OnlineSegmentListener extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        requestUpdate(props);
+    }
+
+    componentWillReceiveProps(newProps: Props) {
+        requestUpdate(newProps);
+    }
+
+    render(): JSX.Element {
         return null;
     }
 }

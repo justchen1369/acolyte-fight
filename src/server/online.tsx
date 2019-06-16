@@ -69,22 +69,28 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 	games.forEach(game => {
 		game.active.forEach(player => {
 			left.delete(player.userHash);
+				
+			const joining: g.OnlinePlayer = {
+				userHash: player.userHash,
+				userId: player.userId,
+				name: player.name,
+			};
 
 			const existing = scoreboard.online.get(player.userHash);
-			if (!(existing
-				&& existing.userHash === player.userHash
-				&& existing.userId === player.userId
-				&& existing.name === player.name)) {
-				
-				const joining = {
-					userHash: player.userHash,
-					userId: player.userId,
-					name: player.name,
-				};
+			if (!_.isEqual(existing, joining)) {
+				logger.info(`${joining.name} [${joining.userHash}] online`);
 				scoreboard.online.set(player.userHash, joining);
 				joined.push(joining);
 			}
 		});
+	});
+
+	left.forEach(userHash => {
+		const leaving = scoreboard.online.get(userHash);
+		if (leaving) {
+			logger.info(`${leaving.name} [${leaving.userHash}] offline`);
+			scoreboard.online.delete(userHash);
+		}
 	});
 
 	if (left.size > 0 || joined.length > 0) {

@@ -57,9 +57,8 @@ class InfoPanelPlayer extends React.PureComponent<Props, State> {
         }
 
         return <tr className="player-list-row">
-            <td className="player-list-rank">#{this.props.rank}</td>
-            <td className="player-list-name" ><span className="player-name" style={{ color }}>{online.name}</span>{this.renderUnsilenceBtn()}</td>
-            <td className="player-list-outlasts">{online.outlasts}</td>
+            <td className="player-list-name" >{this.renderUnsilenceBtn()} <span className="player-rank">#{this.props.rank}</span> <span className="player-name" style={{ color }}>{online.name}</span></td>
+            <td className="player-list-outlasts"><i className="fas fa-skull player-metric-icon" />{online.outlasts}</td>
         </tr>;
     }
 

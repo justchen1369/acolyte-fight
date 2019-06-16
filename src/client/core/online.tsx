@@ -2,9 +2,6 @@ import * as m from '../../game/messages.model';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
 
-const RefreshInterval = 60 * 60 * 1000;
-let nextRefresh = 0;
-
 export function onOnlineMsg(data: m.OnlineMsg) {
     const state = StoreProvider.getState();
     if (state.onlineSegment === data.segment) {
