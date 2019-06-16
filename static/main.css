@@ -144,7 +144,7 @@ a:hover, a:active {
 }
 
 .loading-text {
-    animation: loading-text-animation alternate 4s infinite;
+    animation: loading-text-animation alternate 2s infinite;
 }
 
 @media (max-width: 768px) {
