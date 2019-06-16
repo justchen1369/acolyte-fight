@@ -60,10 +60,10 @@ class InfoPanelPlayer extends React.PureComponent<Props, State> {
         const metric = this.props.metric;
         const metricValue = infoPanelHelpers.metricToValue(metric, online);
 
-        return <div className="player-list-row">
-            <span className="player-list-name" >{this.renderUnsilenceBtn()} <span className="player-rank">#{this.props.rank}</span> <span className="player-name" style={{ color }}>{online.name}</span></span>
-            <span className="player-list-metric">{metricValue}</span>
-        </div>;
+        return <tr className="player-list-row">
+            <td className="player-list-name" >{this.renderUnsilenceBtn()} <span className="player-rank">#{this.props.rank}</span> <span className="player-name" style={{ color }}>{online.name}</span></td>
+            <td className="player-list-metric">{metricValue}</td>
+        </tr>;
     }
 
     private renderUnsilenceBtn() {

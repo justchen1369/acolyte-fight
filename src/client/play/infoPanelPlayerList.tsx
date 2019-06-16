@@ -46,9 +46,11 @@ class InfoPanelPlayerList extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <div className="player-list">
-            {this.props.scoreboard.map((score, index) => <InfoPanelPlayer key={score.userHash} rank={index + 1} online={score} metric={this.props.metric} />)}
-        </div>
+        return <table className="player-list">
+            <tbody>
+                {this.props.scoreboard.map((score, index) => <InfoPanelPlayer key={score.userHash} rank={index + 1} online={score} metric={this.props.metric} />)}
+            </tbody>
+        </table>
     }
 }
 
