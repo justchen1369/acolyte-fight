@@ -201,7 +201,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             if (isMobile) {
                 const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
                 const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
-                return <div key={key} className="help-box">
+                return <div key={key} className="help-box dialog-panel">
                     <div className="help-title">How to play:</div>
                     <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
                     {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
@@ -212,7 +212,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
                 const isLeftClickShoot = this.props.rebindings[w.SpecialKeys.LeftClick] === "q";
                 const isRightClickDash = this.props.rebindings[w.SpecialKeys.RightClick] === "a";
                 const showMouseHint = !(isLeftClickShoot || isRightClickDash);
-                return <div key={key} className="help-box">
+                return <div key={key} className="help-box dialog-panel">
                     <div className="help-title">How to play:</div>
                     {showMouseHint && <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>}
                     {isLeftClickShoot && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Left-click</b> to shoot</div>}
@@ -307,7 +307,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderWinNotification(key: string, notification: w.WinNotification) {
-        return <div key={key} className="winner">
+        return <div key={key} className="winner dialog-panel">
             {this.renderWinnerRow(notification.winners)}
             <div className="award-row">Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)})</div>
             <div className="award-row">Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills)</div>
@@ -373,7 +373,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
     
     private renderDead(key: string, spectatingGameId: string) {
-        return <div key={key} className="winner">
+        return <div key={key} className="winner dialog-panel">
             <div className="winner-row">You died.</div>
             <div className="action-row">
                 <div style={{ marginBottom: 12 }}>
@@ -387,7 +387,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderFinished(key: string) {
-        return <div key={key} className="winner">
+        return <div key={key} className="winner dialog-panel">
             <div className="winner-row">Game finished.</div>
             <div className="action-row">
                 {this.renderAgainButton()}

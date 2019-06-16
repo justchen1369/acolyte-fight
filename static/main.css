@@ -757,17 +757,6 @@ a:hover, a:active {
     font-weight: bold;
 }
 
-#messages-panel .help-box {
-    color: white;
-    margin-top: 1em;
-    padding: 0.5em;
-    background: linear-gradient(to right, #111, rgba(0,0,0,0));
-}
-
-.wheel-on-left #messages-panel .help-box {
-    background: linear-gradient(to left, #111, rgba(0,0,0,0));
-}
-
 @media (min-width: 1024px) {
     #messages-panel .help-box {
         font-size: 150%;
@@ -803,14 +792,14 @@ a:hover, a:active {
     font-weight: bold;
 }
 
-#messages-panel .winner {
+#messages-panel .dialog-panel {
     color: white;
     margin-top: 1em;
     padding: 0.5em;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
 }
 
-.wheel-on-left #messages-panel .winner {
+.wheel-on-left #messages-panel .dialog-panel {
     background: linear-gradient(to left, #111, rgba(0,0,0,0));
 }
 
