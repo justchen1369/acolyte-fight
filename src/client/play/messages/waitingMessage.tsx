@@ -33,7 +33,7 @@ class WaitingMessage extends React.PureComponent<Props, State> {
     render() {
         const numOnline = this.props.numOnline;
         return <div className="waiting-panel dialog-panel">
-            <div className="header-row">Waiting for opponents...</div>
+            <div className="header-row loading-text">Waiting for opponents...</div>
             <div>
                 {numOnline} {numOnline === 1 ? "player" : "players"} online.
                 {' '}
