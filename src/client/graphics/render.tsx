@@ -1003,13 +1003,6 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 		toColor: parseColor("#000").alpha(0),
 	};
 
-	// Render cross
-	glx.arc(ctxStack, pos, startAngle, endAngle, false, {
-		gradient,
-		minRadius: radius - lineWidth,
-		maxRadius: radius,
-	});
-
 	// Render line to target
 	glx.line(ctxStack, pos, vector.plus(pos, vector.multiply(guideDirection, guideLength)), {
 		gradient,
