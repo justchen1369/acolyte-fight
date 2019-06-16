@@ -193,11 +193,12 @@ a:hover, a:active {
     margin-left: 0.5em;
 }
 
-i.clickable {
+.clickable {
     color: #ccc;
+    cursor: hand;
 }
 
-i.clickable:hover, i.clickable:active {
+.clickable:hover, .clickable:active, .clickable.selected {
     color: white;
 }
 
@@ -556,16 +557,26 @@ i.clickable:hover, i.clickable:active {
     font-size: 80%;
 }
 
-.player-list table {
-    border-collapse: collapse;
+.player-list-header {
+    margin-bottom: 0.2em;
 }
 
-.player-list td {
-    padding: 0 0.25em;
+.player-list-options {
+    margin: 0.25em 0;
 }
 
-.player-list .waiting-for-players {
-    margin-right: 4px;
+.player-list-title {
+    font-weight: bold;
+    font-size: 125%;
+}
+
+.player-list-options .clickable {
+    margin-left: 0.5em;
+    opacity: 0.5;
+}
+
+.player-list-options:hover .clickable, .player-list-options .clickable.selected {
+    opacity: 0.75;
 }
 
 .player-list .player-icons {
@@ -589,28 +600,19 @@ i.clickable:hover, i.clickable:active {
     color: #fff;
 }
 
-.player-list .player-list-header {
-    font-size: 75%;
-    font-weight: bold;
-}
-
 .player-list .player-list-row {
     font-size: 75%;
-}
-
-.player-list .player-list-rank {
-    padding-right: 0.5em;
-    color: #ccc;
-    text-align: left;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .player-list .player-list-name {
     color: #ccc;
-    text-align: left;
 }
 
-.player-list .player-list-outlasts {
-    padding-left: 0.5em;
+.player-list .player-list-metric {
+    margin-left: 0.5em;
+    min-width: 3em;
     color: #ccc;
     text-align: right;
 }

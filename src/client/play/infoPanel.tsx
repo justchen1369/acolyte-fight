@@ -3,58 +3,65 @@ import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
-import { HeroColors, Matchmaking } from '../../game/constants';
+import * as constants from '../../game/constants';
+import * as infoPanelHelpers from './metrics';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as engine from '../../game/engine';
-import * as matches from '../core/matches';
-import * as recording from '../core/recording';
 import * as StoreProvider from '../storeProvider';
 import Button from '../controls/button';
-import InfoPanelPlayer from './infoPanelPlayer';
+import InfoPanelPlayerList from './infoPanelPlayerList';
 
 interface Props {
-    gameId: string;
-    myHeroId: string;
-    scoreboard: m.OnlinePlayerMsg[];
 }
 interface State {
+    hoveringMetric: string;
+    selectedMetric: string;
 }
 
 function stateToProps(state: s.State): Props {
-    const world = state.world;
     return {
-        gameId: world.ui.myGameId,
-        myHeroId: world.ui.myHeroId,
-        scoreboard: calculateScoreboard(state),
     };
 }
-
-const calculateScoreboard = Reselect.createSelector(
-    (state: s.State) => state.online,
-    (online) => {
-        return online.valueSeq().sortBy(p => -p.outlasts).toArray()
-    }
-);
 
 class InfoPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            selectedMetric: s.ScoreboardMetric.Outlasts,
+            hoveringMetric: null,
         };
     }
 
     render() {
+        const selectedMetric = this.state.hoveringMetric || this.state.selectedMetric;
         return (
             <div id="info-panel">
-                <table className="player-list">
-                    <tbody>
-                        {this.props.scoreboard.map((score, index) => <InfoPanelPlayer key={score.userHash} rank={index + 1} online={score} />)}
-                    </tbody>
-                </table>
+                <div className="info-title">
+                    <div className="player-list-header">
+                        <div className="player-list-options">
+                            {this.renderButton(s.ScoreboardMetric.Games, selectedMetric)}
+                            {this.renderButton(s.ScoreboardMetric.Wins, selectedMetric)}
+                            {this.renderButton(s.ScoreboardMetric.Kills, selectedMetric)}
+                            {this.renderButton(s.ScoreboardMetric.Damage, selectedMetric)}
+                            {this.renderButton(s.ScoreboardMetric.Outlasts, selectedMetric)}
+                        </div>
+                        <div className="player-list-title">Most {infoPanelHelpers.metricToLabel(selectedMetric)}</div>
+                    </div>
+                </div>
+                <InfoPanelPlayerList metric={selectedMetric} />
             </div>
         );
+    }
+
+    private renderButton(metric: string, selectedMetric: string) {
+        const icon = infoPanelHelpers.metricToIcon(metric);
+        return <Button
+            className={`${icon} clickable ${metric === selectedMetric ? 'selected' : ''}`}
+            onClick={() => this.setState({ selectedMetric: metric })}
+            onMouseEnter={() => this.setState({ hoveringMetric: metric })}
+            onMouseLeave={() => this.setState({ hoveringMetric: null })}
+        />;
     }
 }
 

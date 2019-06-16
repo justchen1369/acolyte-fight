@@ -40,6 +40,14 @@ export interface State {
     onlineSegment: string;
 }
 
+export namespace ScoreboardMetric {
+    export const Kills = "kills";
+    export const Outlasts = "outlasts";
+    export const Damage = "damage";
+    export const Wins = "wins";
+    export const Games = "games";
+}
+
 export interface NotificationItem {
     key: string;
     notification: w.Notification;
