@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
+import * as engine from '../../game/engine';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
@@ -16,6 +17,7 @@ import PlayButton from '../ui/playButton';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
 import PlayerName from './playerNameComponent';
+import WaitingMessage from './messages/waitingMessage';
 import { worldInterruptible } from '../core/matches';
 
 interface Props {
@@ -26,6 +28,7 @@ interface Props {
     myHeroId: string;
     isDead: boolean;
     isFinished: boolean;
+    isWaiting: boolean;
     numOnline: number;
     buttonBar: w.ButtonConfig;
     rebindings: KeyBindings;
@@ -47,6 +50,7 @@ function stateToProps(state: s.State): Props {
         myHeroId: state.world.ui.myHeroId,
         isDead: !state.world.objects.has(state.world.ui.myHeroId),
         isFinished: state.world.activePlayers.size === 0,
+        isWaiting: state.world.tick < state.world.startTick,
         numOnline: state.online.size,
         buttonBar: state.world.ui.buttonBar,
         rebindings: state.rebindings,
@@ -88,7 +92,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
         let finished = false;
 
-        let actionRow: JSX.Element = this.renderHelp("help");
+        let actionRow: React.ReactNode = this.renderHelp("help");
         if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
             actionRow = this.renderDead("dead", this.props.myGameId);
             finished = true;
@@ -97,7 +101,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             finished = true;
         }
 
-        let rows = new Array<JSX.Element>();
+        let rows = new Array<React.ReactNode>();
         const now = new Date().getTime();
         this.props.items.forEach(item => {
             if (now >= item.expiryTime) {
@@ -131,11 +135,12 @@ class MessagesPanel extends React.PureComponent<Props, State> {
                 {rows}
             </div>
             {actionRow}
+            {this.props.myHeroId && this.props.isWaiting && <WaitingMessage key="waiting" />}
             <TextMessageBox />
         </div>;
     }
 
-    private renderNotification(key: string, notification: w.Notification) {
+    private renderNotification(key: string, notification: w.Notification): React.ReactNode {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "text": return this.renderTextNotification(key, notification);
@@ -156,35 +161,8 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         return <div key={key} className="row error">Disconnected from server. Exit the game and try again.</div>
     }
 
-    private renderNewGameNotification(key: string, notification: w.NewGameNotification) {
-        if (notification.isPrivate) {
-            const numOnline = this.props.numOnline;
-            return <div key={key} className="row">
-                <div>
-                    {numOnline} {numOnline === 1 ? "player" : "players"} in this game mode
-                </div>
-            </div>
-        } else {
-            const numOnline = this.props.numOnline;
-            return <div key={key} className="row">
-                <div>
-                    {numOnline} {numOnline === 1 ? "player" : "players"} online
-                </div>
-                {this.props.exitable && numOnline <= 1 && <div>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</div>}
-                {this.props.exitable && numOnline > 1 && <div>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</div>}
-            </div>
-        }
-    }
-
-    private onRegionsLinkClick(ev: React.MouseEvent) {
-        ev.preventDefault();
-        matches.leaveCurrentGame(true);
-        pages.changePage("regions");
-    }
-
-    private onWatchLiveClick(ev: React.MouseEvent) {
-        ev.preventDefault();
-        matches.watchLiveGame();
+    private renderNewGameNotification(key: string, notification: w.NewGameNotification): React.ReactNode {
+        return null;
     }
 
     private renderHelp(key: string) {
@@ -270,7 +248,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             if (notification.teamSizes) {
                 return <div key={key} className="row game-started">Team game! Your allies are blue. Defeat your enemies together!</div>
             } else {
-                return <div key={key} className="row game-started">Game started</div>
+                return null;
             }
         } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
@@ -279,16 +257,16 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         }
     }
 
-    private renderJoinNotification(key: string, notification: w.JoinNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>
+    private renderJoinNotification(key: string, notification: w.JoinNotification): React.ReactNode {
+        return null;
     }
 
-    private renderBotNotification(key: string, notification: w.BotNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>
+    private renderBotNotification(key: string, notification: w.BotNotification): React.ReactNode {
+        return null;
     }
 
-    private renderLeaveNotification(key: string, notification: w.LeaveNotification) {
-        return <div key={key} className="row"><PlayerName player={notification.player} /> left</div>
+    private renderLeaveNotification(key: string, notification: w.LeaveNotification): React.ReactNode {
+        return null;
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
