@@ -848,8 +848,12 @@ table.player-list {
     margin-left: 0.25em;
 }
 
+#messages-panel .waiting-panel .row {
+    font-size: 75%;
+}
+
 #messages-panel .waiting-panel .header-row {
-    font-size: 150%;
+    font-size: 120%;
     font-weight: bold;
     margin-bottom: 0.5em;
 }
