@@ -48,9 +48,16 @@ function getOrCreateScoreboard(segment: string): g.Scoreboard {
 }
 
 export function updateOnlinePlayers(running: g.Game[]) {
+	const store = getStore();
+
 	const gamesBySegment = _.groupBy(running, game => game.segment);
 	for (const segment in gamesBySegment) {
 		updateOnlineSegment(segment, gamesBySegment[segment]);
+	}
+
+	const emptySegments = _.difference([...store.scoreboards.keys()], Object.keys(gamesBySegment)); 
+	for (const segment of emptySegments) {
+		updateOnlineSegment(segment, []);
 	}
 }
 
