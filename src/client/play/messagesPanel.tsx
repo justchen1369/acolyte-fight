@@ -15,6 +15,7 @@ import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import Button from '../controls/button';
 import LeftMessage from './messages/leftMessage';
+import HelpMessage from './messages/helpMessage';
 import PlayButton from '../ui/playButton';
 import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
@@ -26,7 +27,6 @@ import { worldInterruptible } from '../core/matches';
 interface Props {
     userId: string;
     loggedIn: boolean;
-    showingHelp: boolean;
     myGameId: string;
     myHeroId: string;
     isDead: boolean;
@@ -34,7 +34,6 @@ interface Props {
     isWaiting: boolean;
     numOnline: number;
     buttonBar: w.ButtonConfig;
-    rebindings: KeyBindings;
     options: m.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
@@ -49,7 +48,6 @@ function stateToProps(state: s.State): Props {
     return {
         userId: state.userId,
         loggedIn: state.loggedIn,
-        showingHelp: state.showingHelp,
         myGameId: world.ui.myGameId,
         myHeroId: world.ui.myHeroId,
         isDead: player && player.dead,
@@ -57,7 +55,6 @@ function stateToProps(state: s.State): Props {
         isWaiting: world.tick < state.world.startTick,
         numOnline: state.online.size,
         buttonBar: world.ui.buttonBar,
-        rebindings: state.rebindings,
         options: state.options,
         exitable: worldInterruptible(world),
         items: state.items,
@@ -95,7 +92,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
         let finished = false;
 
-        let actionRow: React.ReactNode = this.renderHelp("help");
+        let actionRow: React.ReactNode = <HelpMessage key="help" />;
         if (this.props.myGameId !== this.state.spectatingGameId && this.props.myHeroId && this.props.isDead) {
             actionRow = this.renderDead("dead", this.props.myGameId);
             finished = true;
@@ -166,49 +163,6 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification): React.ReactNode {
         return null;
-    }
-
-    private renderHelp(key: string) {
-        if (!this.props.myHeroId) {
-            return null; // Observer doesn't need instructions
-        }
-
-        if (this.props.showingHelp) {
-            const closeLink =
-                <div className="action-row">
-                    <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</Button>
-                </div>;
-
-            if (isMobile) {
-                const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
-                const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
-                return <div key={key} className="help-box dialog-panel">
-                    <div className="help-title">How to play:</div>
-                    <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
-                    {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
-                    {isDoubleTapDash && <div className="help-row"><span className="icon-container"><i className="fas fa-forward" /></span> <b>Double-tap</b> to dash</div>}
-                    {closeLink}
-                </div>
-            } else {
-                const isLeftClickShoot = this.props.rebindings[w.SpecialKeys.LeftClick] === "q";
-                const isRightClickDash = this.props.rebindings[w.SpecialKeys.RightClick] === "a";
-                const showMouseHint = !(isLeftClickShoot || isRightClickDash);
-                return <div key={key} className="help-box dialog-panel">
-                    <div className="help-title">How to play:</div>
-                    {showMouseHint && <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>}
-                    {isLeftClickShoot && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Left-click</b> to shoot</div>}
-                    {isRightClickDash && <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> <b>Right-click</b> to dash</div>}
-                    <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> <b>Keyboard</b> to cast spells</div>
-                    {closeLink}
-                </div>
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private onCloseHelpClicked(e: React.MouseEvent) {
-        StoreProvider.dispatch({ type: "updateShowingHelp", showingHelp: false });
     }
 
     private renderTeamsNotification(key: string, notification: w.TeamsNotification) {
