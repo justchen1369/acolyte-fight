@@ -40,7 +40,7 @@ export function getOnlinePlayers(segment: string): m.OnlineMsg {
 			texts.push(message.msg);
 		});
 	}
-	return { segment, all };
+	return { segment, all, texts };
 }
 
 function getOrCreateScoreboard(segment: string): g.Scoreboard {
