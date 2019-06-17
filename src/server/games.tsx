@@ -205,9 +205,6 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 			&& required(data.targetX, "number")
 			&& required(data.targetY, "number")
 		) || (
-			data.actionType === "text"
-			&& required(data.text, "string")
-		) || (
 			data.actionType === "spells"
 			&& required(data.keyBindings, "object")
 		) || (
@@ -231,23 +228,12 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		return;
 	}
 
-	if (data.actionType === "text" && (data.text.length > constants.MaxTextMessageLength || data.text.indexOf("\n") !== -1)) {
-		logger.info("Game [" + game.id + "]: text message received from socket " + socketId + " was invalid");
-		return;
-	}
-
 	if (data.heroId === player.heroId || takeBotControl(game, data.heroId, socketId)) {
 		queueAction(game, data);
-
-		if (data.actionType === "text") {
-			logger.info("Game [" + game.id + "]: " + player.name + " says: " + data.text);
-		}
 	}
 
 	if (data.heroId === player.heroId) {
-		if (data.actionType === "text") {
-			++player.numTextMessages;
-		} else if (data.actionType === "game") {
+		if (data.actionType === "game") {
 			++player.numActionMessages;
 		}
 	}
@@ -372,10 +358,7 @@ function formatHeroId(index: number): string {
 }
 
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
-	if (actionData.actionType === "text") {
-		game.messages.push(actionData);
-		return;
-	} else if (actionData.actionType === m.ActionType.Sync) {
+	if (actionData.actionType === m.ActionType.Sync) {
 		if (game.syncTick < actionData.tick) {
 			game.syncTick = actionData.tick;
 			game.actions.set(systemHeroId(m.ActionType.Sync), actionData);
@@ -429,10 +412,6 @@ export function leaveGame(game: g.Game, socketId: string) {
 	if (!player) {
 		return;
 	}
-	if (wasInactive(player)) {
-		logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] blocked due to inactivity");
-		blacklist.block(socketId);
-	}
 
 	game.active.delete(socketId);
 	reassignBots(game, player.heroId, socketId);
@@ -440,11 +419,6 @@ export function leaveGame(game: g.Game, socketId: string) {
 	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
-}
-
-function wasInactive(player: g.Player) {
-	// Should normally have hundreds of action messages. If they have time to chat but not to play, boot them.
-	return player.numTextMessages >= 3 && player.numActionMessages === 0;
 }
 
 function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string) {
@@ -581,7 +555,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		name: params.name,
 		unranked: params.unranked,
 		numActionMessages: 0,
-		numTextMessages: 0,
 	});
 	game.bots.delete(heroId);
 	game.playerNames.push(params.name);

@@ -82,12 +82,6 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				seed: actionData.seed,
 				layoutId: actionData.layoutId,
 			});
-		} else if (actionData.actionType === m.ActionType.Text) {
-			world.occurrences.push({
-				type: "text",
-				heroId: actionData.heroId,
-				text: actionData.text,
-			});
 		} else if (actionData.actionType === m.ActionType.Spells) {
 			world.occurrences.push({
 				type: "spells",

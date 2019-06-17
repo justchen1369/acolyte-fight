@@ -5,7 +5,7 @@ import * as s from '../store.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
-import * as ticker from '../core/ticker';
+import * as online from '../core/online';
 import { isMobile } from '../core/userAgent';
 
 const MaxCharsPerSecond = 10;
@@ -109,7 +109,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
                 } else if (this.isTooMany(this.state.text.length)) {
                     this.blur("Too many messages, try again");
                 } else {
-                    ticker.sendTextMessage(this.props.myGameId, this.props.myHeroId, this.state.text);
+                    online.sendTextMessage(this.state.text);
                     this.previousMessage = this.state.text;
                     this.previousSendMs = Date.now();
                     this.blur();

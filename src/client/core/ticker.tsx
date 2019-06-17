@@ -9,8 +9,6 @@ import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
-const blacklist = /circumcis|sexual|orgasm/i;
-
 const preferredColors = new Map<string, string>(); // userHash -> color
 
 let tickQueue = new Array<m.TickMsg>();
@@ -96,7 +94,6 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 			continue; // Received the same tick multiple times, skip over it
 		}
 
-		autoBlock(tickData, world);
 		processor.applyTick(tickData, world, preferredColors);
 
 		/*
@@ -120,20 +117,6 @@ export function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
 	}
-}
-
-function autoBlock(data: m.TickMsg, world: w.World) {
-	data.actions.forEach(action => {
-		if (action.heroId !== world.ui.myHeroId && action.actionType === "text" && blacklist.test(action.text)) {
-			const player = world.players.get(action.heroId);
-			if (player && player.userHash) {
-				StoreProvider.dispatch({
-					type: "updateSilence",
-					add: [player.userHash],
-				});
-			}
-		}
-	});
 }
 
 function sendSnapshot(world: w.World) {
@@ -182,16 +165,6 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		targetX: Math.round(action.target.x / Precision) * Precision,
 		targetY: Math.round(action.target.y / Precision) * Precision,
 	}
-	send(actionMsg);
-}
-
-export function sendTextMessage(gameId: string, heroId: string, text: string) {
-	const actionMsg: m.ActionMsg = {
-		gameId,
-		heroId,
-		actionType: m.ActionType.Text,
-		text,
-	};
 	send(actionMsg);
 }
 

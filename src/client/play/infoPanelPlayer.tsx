@@ -6,6 +6,7 @@ import * as constants from '../../game/constants';
 import * as infoPanelHelpers from './metrics';
 import * as StoreProvider from '../storeProvider';
 import * as m from '../../game/messages.model';
+import * as playerHelper from './playerHelper';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import { heroColor } from '../graphics/render';
@@ -23,22 +24,9 @@ interface Props extends OwnProps {
 interface State {
 }
 
-const calculatePlayerLookup = Reselect.createSelector(
-    (state: s.State) => state.world.players,
-    (players) => {
-        const playerLookup = new Map<string, w.Player>();
-        players.valueSeq().forEach(player => {
-            if (player.userHash) {
-                playerLookup.set(player.userHash, player);
-            }
-        });
-        return playerLookup;
-    }
-);
-
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const userHash = ownProps.online.userHash;
-    const playerLookup = calculatePlayerLookup(state);
+    const playerLookup = playerHelper.calculatePlayerLookup(state);
     return {
         ...ownProps,
         player: playerLookup.get(userHash),

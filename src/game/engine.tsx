@@ -982,8 +982,6 @@ function handleOccurences(world: w.World) {
 			success = handleLeaving(ev, world);
 		} else if (ev.type === "environment") {
 			success = seedEnvironment(ev, world);
-		} else if (ev.type === "text") {
-			success = handleTexting(ev, world);
 		} else if (ev.type === "spells") {
 			success = handleSpellChoosing(ev, world);
 		} else if (ev.type === "sync") {
@@ -1162,19 +1160,6 @@ function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
 
 		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 		removeUnknownProjectilesFromHero(hero, world); // Disallow strategies which use two spells that should never co-occur
-	}
-
-	return true;
-}
-
-function handleTexting(ev: w.Texting, world: w.World) {
-	const player = world.players.get(ev.heroId);
-	if (player) {
-		world.ui.notifications.push({
-			type: "text",
-			player,
-			text: ev.text,
-		});
 	}
 
 	return true;

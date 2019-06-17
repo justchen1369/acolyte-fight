@@ -1,15 +1,31 @@
 import * as m from '../../game/messages.model';
+import * as w from '../../game/world.model';
+import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
 
 export function onOnlineMsg(data: m.OnlineMsg) {
     const state = StoreProvider.getState();
     if (state.onlineSegment === data.segment) {
-        StoreProvider.dispatch({
-            type: "online",
-            joined: data.all || data.joined || data.changed,
-            left: data.left,
-        });
+        const joined = data.all || data.joined || data.changed;
+        const left = data.left;
+        if (joined || left) {
+            StoreProvider.dispatch({ type: "online", joined, left });
+        }
+
+        if (data.texts) {
+            const newNotifications = new Array<w.Notification>();
+            data.texts.forEach(msg => {
+                const textNotification: w.TextNotification = {
+                    type: "text",
+                    userHash: msg.userHash,
+                    name: msg.name,
+                    text: msg.text,
+                };
+                newNotifications.push(textNotification);
+            });
+            notifications.notify(...newNotifications);
+        }
     }
 }
 
@@ -55,5 +71,19 @@ export function stop() {
             segment: oldSegment,
         }
         socket.emit('onlineStop', leaveMsg);
+    }
+}
+
+export function sendTextMessage(text: string) {
+    const state = StoreProvider.getState();
+    const segment = state.onlineSegment;
+    if (segment) {
+        const socket = getSocket();
+
+        const msg: m.SendTextMsg = {
+            segment,
+            text,
+        };
+        socket.emit('text', msg);
     }
 }

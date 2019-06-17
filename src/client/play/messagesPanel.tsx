@@ -10,10 +10,12 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
+import * as playerHelper from './playerHelper';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import Button from '../controls/button';
 import PlayButton from '../ui/playButton';
+import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
 import PlayerName from './playerNameComponent';
@@ -35,7 +37,6 @@ interface Props {
     options: m.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
-    silenced: Set<string>;
 }
 interface State {
     spectatingGameId: string;
@@ -57,7 +58,6 @@ function stateToProps(state: s.State): Props {
         options: state.options,
         exitable: worldInterruptible(state.world),
         items: state.items,
-        silenced: state.silenced,
     };
 }
 
@@ -143,7 +143,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     private renderNotification(key: string, notification: w.Notification): React.ReactNode {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
-            case "text": return this.renderTextNotification(key, notification);
+            case "text": return <TextMessage key={key} notification={notification} />
             case "new": return this.renderNewGameNotification(key, notification);
             case "teams": return this.renderTeamsNotification(key, notification);
             case "closing": return this.renderClosingNotification(key, notification);
@@ -206,30 +206,6 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     private onCloseHelpClicked(e: React.MouseEvent) {
         StoreProvider.dispatch({ type: "updateShowingHelp", showingHelp: false });
-    }
-
-    private renderTextNotification(key: string, notification: w.TextNotification) {
-        const player = notification.player;
-        if (this.props.silenced.has(player.userHash)) {
-            return null;
-        } else {
-            return <div key={key} className="row text-row"><PlayerName player={player} />: <span className="text-message">{notification.text}</span> {this.renderSilenceBtn(player)}</div>
-        }
-    }
-
-    private renderSilenceBtn(player: w.Player) {
-        if (player.heroId === this.props.myHeroId) {
-            return null;
-        } else {
-            return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onSilenceClick(player.userHash)} title="Hide all messages from this player" />;
-        }
-    }
-
-    private onSilenceClick(userHash: string) {
-        StoreProvider.dispatch({
-            type: "updateSilence",
-            add: [userHash],
-        });
     }
 
     private renderTeamsNotification(key: string, notification: w.TeamsNotification) {

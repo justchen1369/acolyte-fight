@@ -104,6 +104,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('action', data => onActionMsg(socket, data));
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('onlineStop', data => onOnlineStopMsg(socket, data));
+	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
 
@@ -544,6 +545,19 @@ async function onOnlineStopMsg(socket: SocketIO.Socket, data: m.GetOnlineStopMsg
 	}
 
 	socket.leave(segmentRoom(data.segment));
+}
+
+async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {
+	if (!(required(data, "object")
+		&& required(data.segment, "string")
+		&& required(data.text, "string")
+	)) {
+		// callback({ success: false, error: "Bad request" });
+		return;
+	}
+
+	const userHash = auth.getUserHashFromSocket(socket);
+	online.receiveTextMessage(data.segment, userHash, data.text);
 }
 
 function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {

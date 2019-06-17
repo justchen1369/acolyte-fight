@@ -220,7 +220,8 @@ export interface ExitNotification {
 
 export interface TextNotification {
 	type: "text";
-	player: Player;
+	userHash: string;
+	name: string;
 	text: string;
 }
 
@@ -295,7 +296,6 @@ export type Occurrence =
 	| Joining
 	| Leaving
 	| EnvironmentSeed
-	| Texting
 	| ChoosingSpells
 	| Syncing
 
@@ -309,12 +309,6 @@ export interface ChoosingSpells {
 	type: "spells";
 	heroId: string;
 	keyBindings: KeyBindings;
-}
-
-export interface Texting {
-	type: "text";
-	heroId: string;
-	text: string;
 }
 
 export interface Closing {

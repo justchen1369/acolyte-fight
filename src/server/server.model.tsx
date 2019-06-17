@@ -99,7 +99,6 @@ export interface Player {
     unranked: boolean;
 
     numActionMessages: number;
-    numTextMessages: number;
 }
 
 export interface Room {
@@ -159,6 +158,12 @@ export interface Scoreboard {
     segment: string;
     online: Map<string, OnlinePlayer>; // userHash -> OnlinePlayer
     scores: Map<string, PlayerScore>; // userHash -> Score
+    messages: TextMessage[];
+}
+
+export interface TextMessage {
+    timestamp: number; // Date.now()
+    msg: m.TextMsg;
 }
 
 export interface OnlinePlayer {

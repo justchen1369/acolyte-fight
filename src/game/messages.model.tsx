@@ -69,7 +69,6 @@ export type ActionMsg =
     | LeaveActionMsg
     | CloseGameMsg
     | GameActionMsg
-    | TextMsg
     | SpellsMsg
     | SyncMsg
 
@@ -117,11 +116,6 @@ export interface GameActionMsg extends ActionMsgBase {
     spellId: string;
     targetX: number;
     targetY: number;
-}
-
-export interface TextMsg extends ActionMsgBase {
-    actionType: "text";
-    text: string;
 }
 
 export interface SpellsMsg extends ActionMsgBase {
@@ -188,6 +182,7 @@ export interface OnlineMsg {
     all?: OnlinePlayerMsg[];
     joined?: OnlinePlayerMsg[];
     changed?: OnlinePlayerMsg[];
+    texts?: TextMsg[];
     left?: string[];
 }
 
@@ -202,6 +197,18 @@ export interface OnlinePlayerMsg {
     kills: number;
     games: number;
 }
+
+export interface SendTextMsg {
+    segment: string;
+    text: string;
+}
+
+export interface TextMsg {
+    userHash: string;
+    name: string;
+    text: string;
+}
+
 
 export interface ErrorResponseMsg {
     success: false;

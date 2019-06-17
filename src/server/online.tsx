@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as Firestore from '@google-cloud/firestore';
@@ -10,7 +11,8 @@ import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 import { getStore } from './serverStore';
 
-const ExpirySeconds = 20 * 60;
+const OnlineExpirySeconds = 20 * 60;
+const TextExpirySeconds = 2 * 60;
 
 let emitOnline: OnlineChangeListener = (diff) => {};
 
@@ -29,9 +31,13 @@ export function attachOnlineEmitter(_emit: OnlineChangeListener) {
 export function getOnlinePlayers(segment: string): m.OnlineMsg {
 	const scoreboard = getStore().scoreboards.get(segment);
 	const all = new Array<m.OnlinePlayerMsg>();
+	const texts = new Array<m.TextMsg>();
     if (scoreboard) {
 		scoreboard.online.forEach(player => {
 			all.push(onlineToMsg(player, scoreboard.scores.get(player.userHash)));
+		});
+		scoreboard.messages.forEach(message => {
+			texts.push(message.msg);
 		});
 	}
 	return { segment, all };
@@ -41,10 +47,43 @@ function getOrCreateScoreboard(segment: string): g.Scoreboard {
 	const store = getStore();
 	let scoreboard = store.scoreboards.get(segment);
 	if (!scoreboard) {
-		scoreboard = { segment, online: new Map(), scores: new Map() };
+		scoreboard = { segment, online: new Map(), scores: new Map(), messages: [] };
 		store.scoreboards.set(segment, scoreboard);
 	}
 	return scoreboard;
+}
+
+export function receiveTextMessage(segment: string, userHash: string, text: string) {
+	if (text.length > constants.MaxTextMessageLength || text.indexOf("\n") !== -1) {
+		logger.info("text message received from [" + userHash + "] was invalid");
+		return;
+	}
+
+	const store = getStore();
+	const scoreboard = store.scoreboards.get(segment);
+	if (!scoreboard) {
+		return;
+	}
+
+	const online = scoreboard.online.get(userHash);
+	if (!online) {
+		return;
+	}
+
+	const timestamp = Date.now();
+	const msg: m.TextMsg = {
+		userHash,
+		name: online.name,
+		text,
+	};
+	scoreboard.messages.push({ timestamp, msg });
+
+	emitOnline({
+		segment,
+		texts: [msg],
+	});
+
+	logger.info(`${online.name} says: ${text}`);
 }
 
 export function updateOnlinePlayers(running: g.Game[]) {
@@ -176,7 +215,7 @@ function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, out
 			kills: 0,
 			damage: 0,
 			games: 0,
-			expiry: now + ExpirySeconds,
+			expiry: now + OnlineExpirySeconds,
 		};
 		scoreboard.scores.set(player.userHash, score);
 	}
@@ -193,7 +232,7 @@ function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, out
 		++score.wins;
 	}
 
-	score.expiry = now + ExpirySeconds;
+	score.expiry = now + OnlineExpirySeconds;
 
 	return score;
 }
@@ -260,6 +299,7 @@ export async function cleanupScoreboards() {
 	const store = getStore();
 	for (const scoreboard of store.scoreboards.values()) {
 		await cleanupScoreboard(scoreboard);
+		expireMessages(scoreboard);
 	}
 
 	store.scoreboards.forEach(scoreboard => {
@@ -279,6 +319,11 @@ export async function cleanupScoreboard(scoreboard: g.Scoreboard) {
 			await collection.doc(scoreToDbKey(scoreboard.segment, score)).delete();
 		}
 	}
+}
+
+export function expireMessages(scoreboard: g.Scoreboard) {
+	const cutoff = Date.now() - TextExpirySeconds * 1000;
+	scoreboard.messages = _.dropWhile(scoreboard.messages, t => t.timestamp < cutoff);
 }
 
 function getLeaderboardCollection(firestore: Firestore.Firestore) {
