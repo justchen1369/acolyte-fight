@@ -12,6 +12,7 @@ import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
+import DeadMessage from './messages/deadMessage';
 import LeftMessage from './messages/leftMessage';
 import HelpMessage from './messages/helpMessage';
 import PlayButton from '../ui/playButton';
@@ -244,17 +245,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
     
     private renderDead(key: string, spectatingGameId: string) {
-        return <div key={key} className="winner dialog-panel">
-            <div className="winner-row">You died.</div>
-            <div className="action-row">
-                <div style={{ marginBottom: 12 }}>
-                    <b><a href="#" onClick={() => this.setState({ spectatingGameId })}>Continue Watching</a></b> or
-                </div>
-                <div>
-                    {this.renderAgainButton()}
-                </div>
-            </div>
-        </div>;
+        return <DeadMessage key={key} onSpectateClick={() => this.setState({ spectatingGameId })} />
     }
 
     private renderFinished(key: string) {
