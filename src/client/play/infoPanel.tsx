@@ -13,6 +13,7 @@ import Button from '../controls/button';
 import InfoPanelPlayerList from './infoPanelPlayerList';
 
 interface Props {
+    live: boolean;
 }
 interface State {
     hoveringMetric: string;
@@ -21,6 +22,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        live: state.world.ui.live,
     };
 }
 
@@ -34,6 +36,11 @@ class InfoPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
+        if (!this.props.live) {
+            // Watching replay, cannot see leaderboard
+            return null;
+        }
+
         const selectedMetric = this.state.hoveringMetric || this.state.selectedMetric;
         return (
             <div id="info-panel">
