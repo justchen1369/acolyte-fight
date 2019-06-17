@@ -563,6 +563,7 @@ async function onOnlineStopMsg(socket: SocketIO.Socket, data: m.GetOnlineStopMsg
 async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {
 	if (!(required(data, "object")
 		&& required(data.segment, "string")
+		&& required(data.name, "string")
 		&& required(data.text, "string")
 	)) {
 		// callback({ success: false, error: "Bad request" });
@@ -570,7 +571,10 @@ async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {
 	}
 
 	const userHash = auth.getUserHashFromSocket(socket);
-	online.receiveTextMessage(data.segment, userHash, data.text);
+	const name = PlayerName.sanitizeName(data.name);
+	if (name.length > 0) {
+		online.receiveTextMessage(data.segment, userHash, name, data.text);
+	}
 }
 
 function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameListRequest, callback: (response: m.GameListResponseMsg) => void) {

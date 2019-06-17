@@ -82,6 +82,7 @@ export function sendTextMessage(text: string) {
 
         const msg: m.SendTextMsg = {
             segment,
+            name: state.playerName,
             text,
         };
         socket.emit('text', msg);

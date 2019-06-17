@@ -53,7 +53,7 @@ function getOrCreateScoreboard(segment: string): g.Scoreboard {
 	return scoreboard;
 }
 
-export function receiveTextMessage(segment: string, userHash: string, text: string) {
+export function receiveTextMessage(segment: string, userHash: string, name: string, text: string) {
 	if (text.length > constants.MaxTextMessageLength || text.indexOf("\n") !== -1) {
 		logger.info("text message received from [" + userHash + "] was invalid");
 		return;
@@ -65,15 +65,10 @@ export function receiveTextMessage(segment: string, userHash: string, text: stri
 		return;
 	}
 
-	const online = scoreboard.online.get(userHash);
-	if (!online) {
-		return;
-	}
-
 	const timestamp = Date.now();
 	const msg: m.TextMsg = {
 		userHash,
-		name: online.name,
+		name,
 		text,
 	};
 	scoreboard.messages.push({ timestamp, msg });
@@ -83,7 +78,7 @@ export function receiveTextMessage(segment: string, userHash: string, text: stri
 		texts: [msg],
 	});
 
-	logger.info(`${online.name} says: ${text}`);
+	logger.info(`${name} says: ${text}`);
 }
 
 export function updateOnlinePlayers(running: g.Game[]) {

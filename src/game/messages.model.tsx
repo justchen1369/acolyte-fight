@@ -201,6 +201,7 @@ export interface OnlinePlayerMsg {
 
 export interface SendTextMsg {
     segment: string;
+    name: string;
     text: string;
 }
 
