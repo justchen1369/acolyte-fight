@@ -17,9 +17,7 @@ interface Props {
     btn: string;
     gameId: string;
     heroId: string;
-    allowSpellChoosing: boolean;
     gameStarted: boolean;
-    toolbar: w.ToolbarState;
     wheelOnRight: boolean;
     config: KeyBindings;
     rebindingLookup: Map<string, string>;
@@ -34,8 +32,6 @@ function stateToProps(state: s.State): Props {
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
         gameStarted: state.world.tick >= state.world.startTick,
-        allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
-        toolbar: state.world.ui.toolbar,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
         rebindingLookup: keyboardUtils.getRebindingLookup(state.rebindings),
@@ -54,52 +50,9 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
         const btn = this.props.btn;
         if (btn && !keyboardUtils.isSpecialKey(btn)) {
             return this.renderCustomizeBtn(btn);
-        } else if (this.props.allowSpellChoosing) {
-            if (isMobile && this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
-                return this.renderMobileHint(this.props.toolbar.hoverBtn, this.props.toolbar.hoverSpellId);
-            } else if (!isMobile && this.props.toolbar.hoverBtn) {
-                return this.renderDesktopHint();
-            } else {
-                return this.renderChangeSpellHint();
-            }
         } else {
             return null;
         }
-    }
-
-    private renderChangeSpellHint() {
-        if (!this.props.allowSpellChoosing) {
-            return null;
-        }
-
-        if (isMobile) {
-            return null;
-        } else {
-            return <div className="customize-hint-container">
-                <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
-            </div>
-        }
-    }
-
-    private renderMobileHint(hoverBtn: string, hoverSpellId: string) {
-        if (!this.props.allowSpellChoosing) {
-            return null;
-        }
-
-        const spell = this.props.settings.Spells[hoverSpellId];
-        if (!spell) {
-            return null;
-        }
-
-        return <div className="customize-hint-container">
-            <div className="customize-hint"><span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change</div>
-        </div>;
-    }
-
-    private renderDesktopHint() {
-        return <div className="customize-hint-container">
-            <div className="customize-hint">Right-click to change</div>
-        </div>;
     }
 
     private renderCustomizeBtn(btn: string) {

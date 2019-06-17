@@ -13,6 +13,7 @@ import ControlSurface from './controlSurface';
 import InfoPanel from './infoPanel';
 import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
+import HintPanel from './hintPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
 import ButtonPanel from './buttonPanel';
@@ -64,6 +65,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                 </Button>}
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
                 <ButtonPanel />
+                <HintPanel />
                 <GameKeyCustomizer />
                 <OnlineSegmentListener />
                 <UrlListener />
