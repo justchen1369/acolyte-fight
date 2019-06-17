@@ -14,6 +14,7 @@ import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as mirroring from './mirroring';
 import * as modder from './modder';
 import * as online from './online';
 import * as parties from './parties';
@@ -361,6 +362,7 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
 	if (!(required(data, "object")
+		&& optional(data.server, "string")
 		&& required(data.name, "string")
 		&& required(data.keyBindings, "object")
 		&& optional(data.room, "string")
@@ -378,6 +380,14 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 	}
 
 	const store = getStore();
+	const location = mirroring.getLocation();
+
+	if (data.server !== location.server) {
+		callback({ success: false, error: "Wrong server" });
+		socket.disconnect(); // Force disconnect so client re-downloads and re-connects with latest client codebase
+		return;
+	}
+
 	const playerName = PlayerName.sanitizeName(data.name);
 	const userHash = auth.getUserHashFromSocket(socket);
 

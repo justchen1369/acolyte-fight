@@ -64,8 +64,8 @@ export function connect(
 					onServerRestarted();
 					reject();
 				} else {
-					StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
 					serverInstanceId = newInstanceId;
+					StoreProvider.dispatch({ type: "updateServer", server: response.server, region: response.region, socketId: socket.id });
 
 					if (alreadyConnected) {
 						listeners.onReconnect(socket);

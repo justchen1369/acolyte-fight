@@ -31,6 +31,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 		const store = StoreProvider.getState();
 		if (store.socketId) {
 			const msg: m.JoinMsg = {
+				server: store.server,
 				gameId: opts.gameId || null,
 				name: store.playerName,
 				keyBindings: store.keyBindings,

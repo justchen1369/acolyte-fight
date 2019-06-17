@@ -143,6 +143,7 @@ export interface TickMsg {
 }
 
 export interface JoinMsg {
+    server: string;
     gameId: string | null;
     room: string | null;
     layoutId: string | null;
