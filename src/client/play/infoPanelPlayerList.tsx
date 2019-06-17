@@ -5,6 +5,7 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
 import * as m from '../../game/messages.model';
+import * as metrics from './metrics';
 import * as playerHelper from './playerHelper';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
@@ -21,28 +22,32 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     myUserHash: string;
-    scoreboard: m.OnlinePlayerMsg[];
+    online: Immutable.Map<string, m.OnlinePlayerMsg>;
     playerLookup: Map<string, w.Player>;
 }
 interface State {
     height: number;
-    hoveringMetric: string;
-    chosenMetric: string;
+}
+
+interface ScoreboardParameters {
+    online: Immutable.Map<string, m.OnlinePlayerMsg>;
+    metric: string;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         myUserHash: state.world.ui.myUserHash,
-        scoreboard: calculateScoreboard(state),
+        online: state.online,
         playerLookup: playerHelper.calculatePlayerLookup(state),
     };
 }
 
 const calculateScoreboard = Reselect.createSelector(
-    (state: s.State) => state.online,
-    (online) => {
-        return online.valueSeq().sortBy(p => -p.outlasts).toArray()
+    (params: ScoreboardParameters) => params.online,
+    (params: ScoreboardParameters) => params.metric,
+    (online, metric) => {
+        return online.valueSeq().sortBy(p => -metrics.metricToValue(metric, p)).toArray()
     }
 );
 
@@ -53,8 +58,6 @@ class InfoPanelPlayerList extends React.PureComponent<Props, State> {
         super(props);
         this.state = {
             height: document.body.clientHeight,
-            chosenMetric: s.ScoreboardMetric.Outlasts,
-            hoveringMetric: null,
         };
     }
 
@@ -68,7 +71,10 @@ class InfoPanelPlayerList extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const scoreboard = this.props.scoreboard;
+        const scoreboard = calculateScoreboard({
+            online: this.props.online,
+            metric: this.props.metric,
+        });
         const playerLookup = this.props.playerLookup;
         const maxEntries = Math.min(MaxEntries, Math.max(MinEntries, Math.floor(this.state.height / PixelsPerRow)));
         const selfIndex = scoreboard.findIndex(x => x.userHash === this.props.myUserHash);
