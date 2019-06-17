@@ -11,8 +11,7 @@ import { isMobile } from '../core/userAgent';
 const MaxCharsPerSecond = 10;
 
 interface Props {
-    myGameId: string;
-    myHeroId: string;
+    live: boolean;
     numOnline: number;
 }
 interface State {
@@ -23,8 +22,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        myGameId: state.world.ui.myGameId,
-        myHeroId: state.world.ui.myHeroId,
+        live: state.world.ui.live,
         numOnline: state.online.size,
     };
 }
@@ -53,17 +51,8 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         window.removeEventListener('keydown', this.keyDownListener);
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.myGameId !== this.props.myGameId) {
-            // New game, reset state
-            this.setState({ text: "", error: null });
-            this.previousMessage = "";
-            this.previousSendMs = 0;
-        }
-    }
-
     render() {
-        if (!(this.props.myGameId && this.props.myHeroId)) {
+        if (!this.props.live) {
             return null;
         }
 
