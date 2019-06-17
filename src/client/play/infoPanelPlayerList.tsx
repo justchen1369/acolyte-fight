@@ -13,7 +13,7 @@ import InfoPanelPlayer from './infoPanelPlayer';
 
 const MinEntries = 1;
 const MaxEntries = 30;
-const PixelsPerRow = 50;
+const PixelsPerRow = 50; // 2x larger than the row because we only want to take up top half of screen
 const SurroundingEntries = 2;
 
 interface OwnProps {
