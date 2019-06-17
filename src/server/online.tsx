@@ -117,7 +117,6 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 
 			const existing = scoreboard.online.get(player.userHash);
 			if (!_.isEqual(existing, joining)) {
-				logger.info(`${joining.name} [${joining.userHash}] online`);
 				scoreboard.online.set(joining.userHash, joining);
 				joined.push(joining);
 			}
@@ -127,7 +126,6 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 	left.forEach(userHash => {
 		const leaving = scoreboard.online.get(userHash);
 		if (leaving) {
-			logger.info(`${leaving.name} [${leaving.userHash}] offline`);
 			scoreboard.online.delete(userHash);
 		}
 	});
