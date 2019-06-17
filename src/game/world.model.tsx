@@ -78,6 +78,7 @@ export interface Team {
 export interface HeroScore {
 	heroId: string;
 	kills: number;
+	outlasts: number;
 	damage: number;
 
 	deathTick: number | null;

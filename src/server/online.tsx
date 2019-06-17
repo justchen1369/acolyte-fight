@@ -190,9 +190,8 @@ export async function incrementStats(segment: string, gameStats: m.GameStatsMsg)
             continue;
         }
 
-		const outlasts = gameStats.players.length - player.rank;
 		const isWinner = winners.has(player.userHash);
-		const score = incrementPlayer(scoreboard, player, outlasts, isWinner);
+		const score = incrementPlayer(scoreboard, player, isWinner);
 
         updated.push(score);
 	}
@@ -201,7 +200,7 @@ export async function incrementStats(segment: string, gameStats: m.GameStatsMsg)
 	await writeUpdate(scoreboard, updated);
 }
 
-function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, outlasts: number, winner: boolean) {
+function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, winner: boolean) {
 	const now = moment().unix();
 
 	let score = scoreboard.scores.get(player.userHash);
@@ -223,7 +222,7 @@ function incrementPlayer(scoreboard: g.Scoreboard, player: m.PlayerStatsMsg, out
 	score.name = player.name;
 	score.userId = player.userId;
 	
-	score.outlasts += outlasts;
+	score.outlasts += player.outlasts;
 	score.kills += player.kills;
 	score.damage += player.damage;
 

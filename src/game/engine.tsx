@@ -3127,6 +3127,13 @@ function notifyKill(hero: w.Hero, world: w.World) {
 			const score = world.scores.get(hero.killerHeroId);
 			world.scores = world.scores.set(hero.killerHeroId, { ...score, kills: score.kills + 1 });
 		}
+
+		world.players.forEach(player => {
+			if (!player.dead) {
+				const score = world.scores.get(player.heroId);
+				world.scores = world.scores.set(player.heroId, { ...score, outlasts: score.outlasts + 1 });
+			}
+		});
 	}
 }
 
@@ -3926,6 +3933,7 @@ export function initScore(heroId: string): w.HeroScore {
 	return {
 		heroId,
 		kills: 0,
+		outlasts: 0,
 		damage: 0,
 		deathTick: null,
 		rank: null,

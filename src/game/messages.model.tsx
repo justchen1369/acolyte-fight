@@ -416,6 +416,7 @@ export interface PlayerStatsMsg {
     teamId?: string;
     name: string;
     kills: number;
+    outlasts: number;
     damage: number;
     rank: number;
     ticks: number;

@@ -81,6 +81,7 @@ function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
         teamId: playerStats.teamId,
         name: playerStats.name,
         kills: playerStats.kills,
+        outlasts: playerStats.outlasts,
         damage: playerStats.damage,
         ticks: playerStats.ticks,
         rank: playerStats.rank,
@@ -98,6 +99,7 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             name: p.name,
             damage: p.damage,
             kills: p.kills,
+            outlasts: p.outlasts,
             rank: p.rank,
             ticks: p.ticks,
 
@@ -219,6 +221,7 @@ function playerStatsFromScore(player: w.Player, teamId: string, score: w.HeroSco
         teamId,
         name: player.name,
         kills: score.kills,
+        outlasts: score.outlasts,
         damage: Math.round(score.damage),
         ticks: score.deathTick,
         rank: score.rank,

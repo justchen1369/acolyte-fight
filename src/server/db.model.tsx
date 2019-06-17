@@ -90,6 +90,7 @@ export interface PlayerStats {
     teamId?: string;
     name: string;
     kills: number;
+    outlasts: number;
     damage: number;
     ticks: number;
     rank: number;

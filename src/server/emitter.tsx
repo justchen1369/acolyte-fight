@@ -485,6 +485,7 @@ function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
 			&& required(p.name, "string")
 			&& required(p.damage, "number")
 			&& required(p.kills, "number")
+			&& required(p.outlasts, "number")
 		)
 	)) {
 		// callback({ success: false, error: "Bad request" });

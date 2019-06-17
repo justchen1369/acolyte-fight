@@ -129,6 +129,7 @@ function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
         name: p.name,
         damage: p.damage,
         kills: p.kills,
+        outlasts: p.outlasts,
         ticks: p.ticks,
         rank: p.rank,
 
@@ -180,6 +181,7 @@ function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         name: player.name,
         damage: player.damage,
         kills: player.kills,
+        outlasts: player.outlasts,
         ticks: player.ticks || 0, // Might not be present in old data
         rank: player.rank || 0, // Might not be present in old data
         initialNumGames: player.initialNumGames,
