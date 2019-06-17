@@ -423,7 +423,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		if (game) {
 			let heroId: string = null;
 			let reconnectKey: string = null;
-			let live = false;
+			let live = data.live || false;
 			if (!data.observe && store.activeGames.has(game.id)) {
 				const joinResult = games.joinGame(game as g.Game, {
 					userHash,
