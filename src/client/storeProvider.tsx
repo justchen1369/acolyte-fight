@@ -147,7 +147,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             world: action.world,
-            items: [],
+            items: state.items.filter(x => x.notification.type === "text"), // Keep all text messages, discard all else
             current: {
                 ...state.current,
                 gameId: action.world.ui.myGameId,
@@ -157,7 +157,6 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             world: engine.initialWorld(state.room.mod),
-            items: [],
             current: {
                 ...state.current,
                 gameId: null,
