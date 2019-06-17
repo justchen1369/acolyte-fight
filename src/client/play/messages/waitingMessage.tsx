@@ -34,7 +34,7 @@ class WaitingMessage extends React.PureComponent<Props, State> {
         const numOnline = this.props.numOnline;
         return <div className="waiting-panel dialog-panel">
             <div className="header-row loading-text">Waiting for opponents...</div>
-            <div className="row">
+            <div className="body-row">
                 {numOnline} {numOnline === 1 ? "player" : "players"} online.
                 {' '}
                 {this.props.exitable && numOnline <= 1 && <>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</>}
