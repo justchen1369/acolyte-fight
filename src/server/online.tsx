@@ -118,7 +118,7 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 			const existing = scoreboard.online.get(player.userHash);
 			if (!_.isEqual(existing, joining)) {
 				logger.info(`${joining.name} [${joining.userHash}] online`);
-				scoreboard.online.set(player.userHash, joining);
+				scoreboard.online.set(joining.userHash, joining);
 				joined.push(joining);
 			}
 		});
