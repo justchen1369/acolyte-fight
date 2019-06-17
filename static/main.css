@@ -817,6 +817,22 @@ table.player-list {
     margin-bottom: 1em;
 }
 
+#messages-panel .award-group {
+    margin-bottom: 1em;
+}
+
+#messages-panel .self-metric {
+    font-size: 75%;
+    color: #888;
+    font-style: italic;
+}
+
+#messages-panel .outlast-row {
+    margin-top: 0.75em;
+    color: #ccc;
+    font-style: italic;
+}
+
 #messages-panel .action-row {
     margin-top: 1em;
     align-items: center;
