@@ -172,7 +172,8 @@ export interface AtlasState {
 }
 
 export type AtlasInstruction =
-	AtlasTextInstruction;
+	AtlasTextInstruction
+	| AtlasIconInstruction
 
 export interface AtlasInstructionBase {
 	id: string;
@@ -186,4 +187,10 @@ export interface AtlasTextInstruction extends AtlasInstructionBase {
 	text: string;
 	color: string;
 	font: string;
+}
+
+export interface AtlasIconInstruction extends AtlasInstructionBase {
+	type: "icon";
+	icon: string;
+	color: string;
 }

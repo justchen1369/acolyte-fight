@@ -16,12 +16,12 @@ export function renderIconButton(ctx: CanvasRenderingContext2D, icon: Path2D, co
     renderIconOnly(ctx, icon, alpha, size);
 }
 
-export function renderIconOnly(ctx: CanvasRenderingContext2D, icon: Path2D, alpha: number, size: number) {
+export function renderIconOnly(ctx: CanvasRenderingContext2D, icon: Path2D, alpha: number, size: number, color: string = 'white') {
     if (icon) {
         ctx.save();
 
         ctx.globalAlpha = alpha;
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = color;
         ctx.scale(size / 512, size / 512);
         ctx.fill(icon);
 

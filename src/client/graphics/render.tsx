@@ -23,6 +23,8 @@ export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
+const AtlasAiIcon = "ai";
+
 interface SwirlContext {
 	color?: string;
 	baseVelocity?: pl.Vec2;
@@ -199,6 +201,16 @@ function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOp
 
 function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstruction[] {
 	const instructions = new Array<r.AtlasInstruction>();
+
+	instructions.push({
+		id: AtlasAiIcon,
+		type: "icon",
+		icon: "microchip",
+		color: 'rgba(255, 255, 255, 0.3)',
+		height: Math.ceil(options.retinaMultiplier * HeroColors.IconSizePixels),
+		width: Math.ceil(options.retinaMultiplier * HeroColors.IconSizePixels),
+	});
+
 	world.players.forEach(player => {
 		instructions.push({
 			id: player.heroId,
@@ -941,6 +953,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		renderHeroCharacter(ctxStack, hero, pos, world);
 		renderHeroBars(ctxStack, hero, pos, world);
 		renderHeroName(ctxStack, hero, pos, world);
+		renderHeroIcon(ctxStack, hero, pos, world);
 	}
 
 	playHeroSounds(hero, pos, world);
@@ -1316,6 +1329,35 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 			maxRadius: barHalfHeight,
 		});
 	}
+}
+
+function renderHeroIcon(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+	/*
+	const player = world.players.get(hero.id);
+	if (player.isBot) {
+		renderHeroIconByName(ctxStack, hero, pos, AtlasAiIcon);
+	}
+	*/
+}
+
+function renderHeroIconByName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, icon: string) {
+	const texRect: ClientRect = atlasController.lookupImage(ctxStack, icon);
+	if (!texRect) {
+		return;
+	}
+
+	const drawWidth = HeroColors.IconSizePixels * ctxStack.pixel;
+	const drawHeight = HeroColors.IconSizePixels * ctxStack.pixel;
+	const yOffset = -hero.radius - HeroColors.IconMargin - drawHeight;
+	const drawRect: ClientRect = {
+		left: pos.x - drawWidth / 2,
+		right: pos.x + drawWidth / 2,
+		width: drawWidth,
+		top: yOffset + pos.y,
+		bottom: yOffset + pos.y + drawHeight,
+		height: drawHeight,
+	};
+	glx.image(ctxStack, drawRect, texRect);
 }
 
 function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {

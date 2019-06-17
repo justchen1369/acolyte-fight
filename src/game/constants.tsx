@@ -132,6 +132,9 @@ export namespace HeroColors {
 	export const NameFontPixels = 9;
 	export const NameHeightPixels = 11;
 	export const NameWidthPixels = 100;
+
+	export const IconSizePixels = 8;
+	export const IconMargin = Pixel * 8;
 };
 
 export namespace Atlas {

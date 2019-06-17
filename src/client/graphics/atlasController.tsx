@@ -6,8 +6,9 @@ import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { } from '../../game/constants';
-import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
+import { CanvasCtxStack } from './render.model';
+import { Icons } from '../../game/icons';
+import { renderIconOnly } from './renderIcon';
 
 interface AtlasStateProvider {
     atlasState: r.AtlasState;
@@ -68,27 +69,16 @@ function alreadyDrawn(state: r.AtlasState, instructions: r.AtlasInstruction[]): 
 }
 
 function renderInstruction(ctxStack: CanvasCtxStack, top: number, instruction: r.AtlasInstruction): ClientRect {
-    switch (instruction.type) {
-        case "text": return renderText(ctxStack, top, instruction);
-        default: throw `Unknown atlas instruction ${instruction.type}`;
-    }
-}
-
-function renderText(ctxStack: CanvasCtxStack, top: number, instruction: r.AtlasTextInstruction): ClientRect {
 	const ctx = ctxStack.atlas;
 
     ctx.save();
 
     ctx.translate(0, top);
 
-	ctx.font = instruction.font;
-	ctx.fillStyle = instruction.color;
-	ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-
     ctx.rect(0, 0, instruction.width, instruction.height);
     ctx.clip();
-	ctx.fillText(instruction.text, instruction.width / 2, instruction.height / 2, instruction.width);
+
+    renderInstructionAtOrigin(ctxStack, instruction);
 
 	ctx.restore();
 
@@ -100,6 +90,39 @@ function renderText(ctxStack: CanvasCtxStack, top: number, instruction: r.AtlasT
         right: instruction.width,
         width: instruction.width,
     };
+}
+
+function renderInstructionAtOrigin(ctxStack: CanvasCtxStack, instruction: r.AtlasInstruction) {
+    switch (instruction.type) {
+        case "text": return renderText(ctxStack, instruction);
+        case "icon": return renderIcon(ctxStack, instruction);
+        default: throw `Unknown atlas instruction`;
+    }
+}
+
+function renderText(ctxStack: CanvasCtxStack, instruction: r.AtlasTextInstruction) {
+	const ctx = ctxStack.atlas;
+
+	ctx.font = instruction.font;
+	ctx.fillStyle = instruction.color;
+	ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    ctx.fillText(instruction.text, instruction.width / 2, instruction.height / 2, instruction.width);
+    
+    return instruction;
+}
+
+function renderIcon(ctxStack: CanvasCtxStack, instruction: r.AtlasIconInstruction) {
+	const ctx = ctxStack.atlas;
+    const size = Math.min(instruction.width, instruction.height);
+    const icon = Icons[instruction.icon];
+
+    if (icon) {
+        renderIconOnly(ctx, new Path2D(icon.path), 1, size, instruction.color);
+    }
+
+    return instruction;
 }
 
 export function lookupImage(ctxStack: CanvasCtxStack, textureId: string): ClientRect {
