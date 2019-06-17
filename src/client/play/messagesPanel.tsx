@@ -44,20 +44,22 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
+    const world = state.world;
+    const player = world.players.get(world.ui.myHeroId);
     return {
         userId: state.userId,
         loggedIn: state.loggedIn,
         showingHelp: state.showingHelp,
-        myGameId: state.world.ui.myGameId,
-        myHeroId: state.world.ui.myHeroId,
-        isDead: !state.world.objects.has(state.world.ui.myHeroId),
-        isFinished: state.world.activePlayers.size === 0,
-        isWaiting: state.world.tick < state.world.startTick,
+        myGameId: world.ui.myGameId,
+        myHeroId: world.ui.myHeroId,
+        isDead: player && player.dead,
+        isFinished: !!world.winner,
+        isWaiting: world.tick < state.world.startTick,
         numOnline: state.online.size,
-        buttonBar: state.world.ui.buttonBar,
+        buttonBar: world.ui.buttonBar,
         rebindings: state.rebindings,
         options: state.options,
-        exitable: worldInterruptible(state.world),
+        exitable: worldInterruptible(world),
         items: state.items,
     };
 }
