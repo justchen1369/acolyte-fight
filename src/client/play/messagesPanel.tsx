@@ -14,6 +14,7 @@ import * as playerHelper from './playerHelper';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import Button from '../controls/button';
+import LeftMessage from './messages/leftMessage';
 import PlayButton from '../ui/playButton';
 import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
@@ -149,7 +150,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
             case "bot": return this.renderBotNotification(key, notification);
-            case "leave": return this.renderLeaveNotification(key, notification);
+            case "leave": return <LeftMessage key={key} notification={notification} />
             case "kill": return this.renderKillNotification(key, notification);
             case "win": return this.renderWinNotification(key, notification);
             case "ratingAdjustment": return this.renderRatingAdjustmentNotification(key, notification);
@@ -234,15 +235,11 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderJoinNotification(key: string, notification: w.JoinNotification): React.ReactNode {
-        return null;
+        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>;
     }
 
     private renderBotNotification(key: string, notification: w.BotNotification): React.ReactNode {
-        return null;
-    }
-
-    private renderLeaveNotification(key: string, notification: w.LeaveNotification): React.ReactNode {
-        return null;
+        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>;
     }
 
     private renderKillNotification(key: string, notification: w.KillNotification) {
