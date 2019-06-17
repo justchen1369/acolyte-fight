@@ -68,7 +68,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         }
 
         return <div
-            className="text-message-container"
+            className="text-message-container button-panel-row"
             onTouchStart={ev => { ev.stopPropagation(); ev.preventDefault(); this.focus(); }}
             onTouchMove={ev => { ev.stopPropagation(); ev.preventDefault(); }}
             onTouchEnd={ev => { ev.stopPropagation(); ev.preventDefault(); }}
@@ -90,11 +90,11 @@ class TextMessageBox extends React.PureComponent<Props, State> {
 
     private renderHint() {
         if (this.state.focus) {
-            return <div className="hint"><i className="fas fa-comment" /> Send message</div>;
+            return <div className="hint"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> Send message</div>;
         } else if (isMobile) {
-            return <div className="hint"><i className="fas fa-comment" /> Chat {this.renderNumPlayers()}</div>;
+            return <div className="hint clickable"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> Chat {this.renderNumPlayers()}</div>;
         } else {
-            return <div className="hint"><i className="fas fa-comment" /> Press <span className="hint-enter-key">ENTER</span> to chat {this.renderNumPlayers()}</div>;
+            return <div className="hint"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> Press <span className="hint-enter-key">ENTER</span> to chat {this.renderNumPlayers()}</div>;
         }
     }
 

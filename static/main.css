@@ -640,24 +640,24 @@ table.player-list {
 }
 
 .mobile .text-message-container {
+    cursor: hand;
     pointer-events: all;
-    cursor: pointer;
-
-    position: fixed;
-    top: 50px;
-    left: 1em;
 }
 
 .text-message-container .hint {
     position: absolute;
     width: 100%;
     height: 100%;
+}
 
-    padding: 4px;
+.desktop .text-message-container {
     font-size: 75%;
     font-style: italic;
+}
 
+.desktop .text-message-container .hint {
     color: #888;
+    padding: 4px;
 }
 
 .text-message-container .hint .hint-enter-key {
@@ -668,8 +668,8 @@ table.player-list {
 .text-message-container .text-message-box {
     background: transparent;
     color: white;
-    font-size: 75%;
     border: none;
+    font-style: normal;
     padding: 4px;
 }
 
@@ -985,51 +985,31 @@ table.player-list {
     margin-top: 40px;
 }
 
-.randomize-panel {
-    pointer-events: none;
-    padding: 4px;
-}
-
-.randomize-btn {
-    display: inline-block;
-    pointer-events: all;
-    cursor: hand;
-    color: #ccc;
-
-    padding: 4px;
-}
-
-.randomize-btn:hover {
-    color: #00ccff;
-}
-
-.desktop .randomize-panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    margin-bottom: 120px;
-
-    font-size: 150%;
-    text-align: center;
-}
-
-.mobile .randomize-panel {
+#game-panel .button-panel {
     position: fixed;
     top: 0;
     left: 0;
 
     margin-left: 1em;
-    margin-top: 80px;
+    margin-top: 50px;
 
     font-size: 75%;
-    font-style: italic;
     text-align: left;
 }
 
-.mobile .randomize-panel .randomize-btn {
-    color: #888;
+#game-panel .button-panel-row {
+    margin-top: 0.5em;
+    font-style: italic;
+}
+
+#game-panel .button-panel-row-icon {
+    display: inline-block;
+    min-width: 2em;
+    text-align: center;
+}
+
+#game-panel .button-panel .clickable:hover {
+    color: #00ccff;
 }
 
 #game-panel .in-progress-warning {
@@ -1039,7 +1019,6 @@ table.player-list {
     text-align: center;
     color: white;
 }
-
 
 .player-name {
     font-weight: bold;

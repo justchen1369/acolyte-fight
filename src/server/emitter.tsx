@@ -340,7 +340,7 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 		const assignments = games.assignPartyToGames(party);
 		parties.onPartyStarted(party, assignments);
 		assignments.forEach(assignment => {
-			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId, assignment.reconnectKey);
+			emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId, assignment.reconnectKey, true);
 		});
 	}
 
@@ -413,6 +413,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		if (game) {
 			let heroId: string = null;
 			let reconnectKey: string = null;
+			let live = false;
 			if (!data.observe && store.activeGames.has(game.id)) {
 				const joinResult = games.joinGame(game as g.Game, {
 					userHash,
@@ -429,10 +430,11 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 				if (joinResult) {
 					heroId = joinResult.heroId;
 					reconnectKey = joinResult.reconnectKey;
+					live = true;
 				}
 			}
 
-			emitHero(socket.id, game, heroId, reconnectKey, data.live);
+			emitHero(socket.id, game, heroId, reconnectKey, live);
 
 			if (heroId) {
 				const botLog = data.isBot ? " (bot)" : "";

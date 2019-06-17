@@ -136,7 +136,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             </div>
             {actionRow}
             {this.props.myHeroId && this.props.isWaiting && <WaitingMessage key="waiting" />}
-            <TextMessageBox />
+            {!isMobile && <TextMessageBox />}
         </div>;
     }
 

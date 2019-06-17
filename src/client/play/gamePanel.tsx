@@ -15,7 +15,7 @@ import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
-import RandomizePanel from './randomizePanel';
+import ButtonPanel from './buttonPanel';
 import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from '../controls/urlListener';
@@ -63,7 +63,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                     <i className="fa fa-chevron-left" /> Back to Home
                 </Button>}
                 {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
-                <RandomizePanel />
+                <ButtonPanel />
                 <GameKeyCustomizer />
                 <OnlineSegmentListener />
                 <UrlListener />
