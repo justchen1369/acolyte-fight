@@ -41,7 +41,7 @@ class InfoPanelPlayer extends React.PureComponent<Props, State> {
         const player = this.props.player;
 
         let color = constants.HeroColors.OnlineColor;
-        if (player) {
+        if (player && !player.dead) {
             color = heroColor(player.heroId, this.props.world);
         }
 
