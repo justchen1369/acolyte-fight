@@ -31,7 +31,9 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const player = playerLookup.get(userHash);
 
     let color = constants.HeroColors.OnlineColor;
-    if (player && !player.dead) {
+    if (userHash === state.world.ui.myUserHash) {
+        color = constants.HeroColors.MyHeroColor;
+    } else if (player && !player.dead) {
         color = heroColor(player.heroId, state.world);
     }
 
