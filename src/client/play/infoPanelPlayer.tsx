@@ -17,7 +17,7 @@ interface OwnProps {
     online: m.OnlinePlayerMsg;
 }
 interface Props extends OwnProps {
-    player: w.Player | null;
+    color: string;
     silenced: boolean;
     world: w.World;
 }
@@ -26,10 +26,18 @@ interface State {
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const userHash = ownProps.online.userHash;
+
     const playerLookup = playerHelper.calculatePlayerLookup(state);
+    const player = playerLookup.get(userHash);
+
+    let color = constants.HeroColors.OnlineColor;
+    if (player && !player.dead) {
+        color = heroColor(player.heroId, state.world);
+    }
+
     return {
         ...ownProps,
-        player: playerLookup.get(userHash),
+        color,
         silenced: state.silenced.has(userHash),
         world: state.world,
     };
@@ -37,13 +45,8 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 
 class InfoPanelPlayer extends React.PureComponent<Props, State> {
     render() {
+        const color = this.props.color;
         const online = this.props.online;
-        const player = this.props.player;
-
-        let color = constants.HeroColors.OnlineColor;
-        if (player && !player.dead) {
-            color = heroColor(player.heroId, this.props.world);
-        }
 
         const metric = this.props.metric;
         const metricValue = infoPanelHelpers.metricToValue(metric, online);
