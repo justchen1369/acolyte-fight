@@ -1427,16 +1427,28 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 	world.ui.notifications.push({ type: "leave", player });
 
 	const hero = world.objects.get(ev.heroId);
-	if (hero && !world.winner) {
-		// Replace leaving hero with bot
-		const newPlayer = {
-			...player,
-			isBot: true,
-			isSharedBot: true,
-			isMobile: false,
-		};
+	if (hero && hero.category == "hero") {
+		if (world.winner) {
+			hero.exitTick = world.tick;
 
-		world.players = world.players.set(ev.heroId, newPlayer);
+			// Mark player as dead so they cannot reconnect to this game
+			const newPlayer = {
+				...player,
+				dead: true,
+			};
+
+			world.players = world.players.set(ev.heroId, newPlayer);
+		} else {
+			// Replace leaving hero with bot
+			const newPlayer = {
+				...player,
+				isBot: true,
+				isSharedBot: true,
+				isMobile: false,
+			};
+
+			world.players = world.players.set(ev.heroId, newPlayer);
+		}
 	}
 
 	return true;

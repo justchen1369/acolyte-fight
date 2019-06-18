@@ -428,6 +428,7 @@ export interface Hero extends WorldObjectBase {
 	damagedTick?: number;
 	lavaTick?: number;
 	cleanseTick?: number;
+	exitTick?: number;
 
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];

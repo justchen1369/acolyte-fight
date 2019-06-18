@@ -929,7 +929,18 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	let pos = vector.clone(hero.body.getPosition());
 
 	// Ease in hero on arrival
-	const easeMultiplier = ease(hero.createTick, world);
+	let easeMultiplier = ease(hero.createTick, world);
+	if (hero.exitTick) {
+		const leaveMultiplier = 1 - ease(hero.exitTick, world);
+		if (leaveMultiplier >= 1) {
+			// This hero has already left, don't render
+			return;
+		}
+
+		// Ease out
+		easeMultiplier = leaveMultiplier;
+	}
+
 	if (easeMultiplier > 0) {
 		const direction = vector.unit(vector.diff(pos, MapCenter));
 		const step = vector.multiply(direction, HeroColors.EaseInDistance * easeMultiplier);
@@ -1101,12 +1112,7 @@ function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
-	const player = world.players.get(hero.id);
 	let color = heroColor(hero.id, world);
-	if (!(world.activePlayers.has(hero.id) || (player && player.isSharedBot))) {
-		color = HeroColors.InactiveColor;
-	}
-
 
 	const hitAge = hero.hitTick ? world.tick - hero.hitTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.DamageFlashTicks));
