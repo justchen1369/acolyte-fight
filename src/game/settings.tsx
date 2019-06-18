@@ -12,7 +12,7 @@ const Hero: HeroSettings = {
     Radius: 0.0125,
     Density: 0.72,
 
-    AngularDamping: 1,
+    AngularDamping: 100,
     Damping: 3,
 
     DamageMitigationTicks: 90,
