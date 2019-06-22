@@ -1258,7 +1258,7 @@ export const Sounds: Sounds = {
 
                 startFreq: 150,
                 stopFreq: 0.01,
-                lowPass: 500,
+                lowPass: 250,
 
                 wave: "triangle",
 
