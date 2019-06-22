@@ -6,6 +6,10 @@ var dodgeMinRadius = 0.03;
 var reactionTimeMilliseconds = 200;
 var delayMilliseconds = 1000;
 var delayJitterMilliseconds = 500;
+var cursorSpeed = 0.01;
+
+var MinCastCosineAgreement = 0.9;
+
 var AllianceSelf = 0x01;
 var AllianceAlly = 0x02;
 var AllianceEnemy = 0x04;
@@ -18,6 +22,8 @@ var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain 
 };
 
 var nextSpell = 0;
+var cursor = { x: 0.5, y: 0.5 };
+var lastCursorMoveTime = Date.now();
 
 onmessage = function (e) {
     var msg = JSON.parse(e.data);
@@ -101,6 +107,31 @@ function findStrongest(heroes, myHeroId, allianceFlags) {
     return choice;
 }
 
+function moveCursor(target, range) {
+    var d = vectorDiff(target, cursor);
+    var distance = vectorLength(d);
+
+    if (distance <= cursorSpeed) {
+        cursor = target;
+    } else {
+        cursor = vectorPlus(cursor, vectorMultiply(d, cursorSpeed / distance));
+    }
+}
+
+function castOrMove(hero, action) {
+    moveCursor(action.target);
+
+    var towardsTarget = vectorDiff(action.target, hero.pos);
+    var towardsCursor = vectorDiff(cursor, hero.pos);
+    var alignment = vectorDot(vectorUnit(towardsTarget), vectorUnit(towardsCursor));
+
+    if (alignment < MinCastCosineAgreement) {
+        return { spellId: "move", target: cursor };
+    } else {
+        return action;
+    }
+}
+
 function recovery(state, hero, cooldowns) {
     if (hero.inside || state.radius <= 0) {
         // No need to recover
@@ -123,8 +154,9 @@ function recovery(state, hero, cooldowns) {
     }
 
     if (spellId) {
-        return { spellId, target: center };
+        return castOrMove(hero, { spellId, target: center });
     }
+    return null;
 }
 
 function deflect(state, hero, cooldowns, projectile) {
@@ -147,7 +179,7 @@ function deflect(state, hero, cooldowns, projectile) {
     }
 
     if (spellId) {
-        return { spellId, target };
+        return castOrMove(hero, { spellId, target });
     } else {
         return null;
     }
@@ -173,8 +205,11 @@ function castSpell(state, hero, opponent, cooldowns) {
 
     if (candidates.length > 0) {
         var spellId = candidates[Math.floor(Math.random() * candidates.length)];
-        updateNextSpellTime();
-        return { spellId, target: jitter(opponent.pos, missRadius) };
+        var action = castOrMove(hero, { spellId, target: jitter(opponent.pos, missRadius) });
+        if (action.spellId === spellId) {
+            updateNextSpellTime();
+        }
+        return action;
     } else {
         return null;
     }
@@ -223,9 +258,9 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
     if (hero.casting) {
         if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
-            return { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) };
+            return castOrMove(hero, { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) });
         } else {
-            return { spellId: "retarget", target: opponent.pos };
+            return castOrMove(hero, { spellId: "retarget", target: opponent.pos });
         }
     } else {
         return null;
@@ -243,7 +278,7 @@ function chase(state, hero, cooldowns, opponent) {
 
     if (numHalos >= 2 || cooldowns["whip"] === 0) {
         var target = vectorMidpoint(hero.pos, opponent.pos);
-        return { spellId: "move", target };
+        return castOrMove(hero, { spellId: "move", target });
     } else {
         return null;
     }
@@ -262,7 +297,7 @@ function move(state, hero, opponent) {
 
     var middle = vectorMidpoint(hero.pos, target);
 
-    return { spellId: "move", target: middle };
+    return castOrMove(hero, { spellId: "move", target: middle });
 }
 
 function dodge(state, hero, cooldowns) {
@@ -306,7 +341,7 @@ function dodge(state, hero, cooldowns) {
         var direction = vectorUnit(vectorNegate(vectorDiff(collisionPoint, hero.pos)));
         var step = vectorMultiply(direction, projectile.radius + hero.radius);
         var target = vectorPlus(hero.pos, step);
-        return { spellId: "move", target };
+        return castOrMove(hero, { spellId: "move", target });
     }
     return null;
 }
