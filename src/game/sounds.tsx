@@ -2,10 +2,9 @@ export const Sounds: Sounds = {
     "thrust-channelling": {
         start: [
             {
-                "volume": 0.25,
-                "stopTime": 0.3,
-                "attack": 0.2,
-                "decay": 0.1,
+                "stopTime": 0.25,
+                "attack": 0.05,
+                "decay": 0.2,
                 "lowPass": 600,
                 "wave": "brown-noise"
             }
