@@ -2,15 +2,13 @@ export const Sounds: Sounds = {
     "thrust-channelling": {
         start: [
             {
-                stopTime: 0.25,
-                attack: 0.03,
-                decay: 0.22,
-
-                highPass: 100,
-                lowPass: 900,
-
-                wave: "brown-noise",
-            },
+                "volume": 0.25,
+                "stopTime": 0.3,
+                "attack": 0.2,
+                "decay": 0.1,
+                "lowPass": 600,
+                "wave": "brown-noise"
+            }
         ],
     },
     "teleport-channelling": {
