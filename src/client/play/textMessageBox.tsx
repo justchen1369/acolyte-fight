@@ -13,6 +13,7 @@ const MaxCharsPerSecond = 10;
 interface Props {
     live: boolean;
     numOnline: number;
+    isPlaying: boolean;
 }
 interface State {
     text: string;
@@ -24,6 +25,7 @@ function stateToProps(state: s.State): Props {
     return {
         live: state.world.ui.live,
         numOnline: state.online.size,
+        isPlaying: !!state.world.ui.myHeroId,
     };
 }
 
@@ -88,7 +90,8 @@ class TextMessageBox extends React.PureComponent<Props, State> {
     }
 
     private renderNumPlayers() {
-        const numOthers = Math.max(0, this.props.numOnline - 1);
+        const numSelf = this.props.isPlaying ? 1 : 0;
+        const numOthers = Math.max(0, this.props.numOnline - numSelf);
         if (numOthers >= 1) {
             return `with ${numOthers} ${numOthers === 1 ? 'player' : 'players'}`;
         } else {
