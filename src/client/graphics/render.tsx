@@ -320,10 +320,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 			renderGravityWell(ctxStack, obj, world);
 		}
 		if (obj.link) {
-			const target = world.objects.get(obj.link.targetId);
-			if (target && obj.link.render) {
-				renderLinkBetween(ctxStack, obj, target, obj.link.render);
-			}
+			renderAttachedLink(ctxStack, obj, world);
 		}
 	} else if (obj.category === "shield") {
 		renderShield(ctxStack, obj, world);
@@ -334,6 +331,20 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world, options);
 	}
+}
+
+function renderAttachedLink(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	if (!(hero.link && hero.link.render)) {
+		return;
+	}
+
+	const target = world.objects.get(hero.link.targetId);
+	if (!target) {
+		return;
+	}
+
+	applyHighlight(hero.link.redirectDamageTick, hero.link, world, hero.link.render.redirectFlash, hero.link.render.redirectGrowth);
+	renderLinkBetween(ctxStack, hero, target, world, hero.link.render, hero.link.uiHighlight);
 }
 
 function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
@@ -419,7 +430,7 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 		} else if (render.type == "ray") {
 			renderRay(ctxStack, obj, world, render);
 		} else if (render.type === "link") {
-			renderLink(ctxStack, obj, world, render);
+			renderUnattachedLink(ctxStack, obj, world, render);
 		} else if (render.type === "swirl") {
 			renderSwirl(ctxStack, obj, world, render);
 		} else if (render.type === "reticule") {
@@ -777,7 +788,7 @@ function playObstacleSounds(obj: w.Obstacle, world: w.World) {
 
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.ObstacleFlashTicks));
+	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
 
 	let color = parseColor(fill.color);
 
@@ -910,7 +921,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 	const highlight: w.TrailHighlight = {
 		tag: obj.id,
 		fromTick: activeTick,
-		maxTicks: HeroColors.ObstacleFlashTicks,
+		maxTicks: HeroColors.FlashTicks,
 		glow,
 		growth,
 	};
@@ -1676,17 +1687,28 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	}
 }
 
-function renderLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
+function renderUnattachedLink(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderLink) {
 	let owner: w.WorldObject = world.objects.get(projectile.owner);
 	if (owner && owner.category == "hero") {
-		renderLinkBetween(ctxStack, owner, projectile, render);
+		renderLinkBetween(ctxStack, owner, projectile, world, render);
 	}
 }
 
-function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, render: RenderLink) {
+function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, world: w.World, render: RenderLink, highlight?: w.TrailHighlight) {
+	let color = parseColor(render.color);
+	let scale = 1;
+
+	if (highlight) {
+		const highlightProportion = calculateHighlightProportion(highlight, world);
+		if (highlightProportion > 0) {
+			color = color.lighten(highlightProportion);
+			scale += highlight.growth * highlightProportion;
+		}
+	}
+
 	const fill: r.Fill = {
-		color: parseColor(render.color),
-		maxRadius: render.width / 2,
+		color,
+		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.High) ? {
 			sigma: HeroColors.GlowRadius,
 			alpha: render.glow,
@@ -1814,7 +1836,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		color = color.mix(Color(trail.fade), 1 - proportion);
 	}
 	if (trail.highlight) {
-		const highlightProportion = Math.max(0, 1 - ((world.tick - trail.highlight.fromTick) / trail.highlight.maxTicks));
+		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
 		if (highlightProportion > 0) {
 			if (trail.highlight.glow) {
 				color = color.lighten(highlightProportion);
@@ -1894,6 +1916,10 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	}
 
 	return false;
+}
+
+function calculateHighlightProportion(highlight: w.TrailHighlight, world: w.World) {
+	return Math.max(0, 1 - ((world.tick - highlight.fromTick) / highlight.maxTicks));
 }
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, options: RenderOptions) {

@@ -124,7 +124,7 @@ export namespace HeroColors {
 	export const ShieldGrowFactor = 0.05;
 	export const ShieldFlashTicks = 3;
 
-	export const ObstacleFlashTicks = 6;
+	export const FlashTicks = 6;
 
 	export const RangeIndicatorWidth = Pixel * 2;
 

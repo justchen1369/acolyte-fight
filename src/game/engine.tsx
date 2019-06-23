@@ -2329,6 +2329,8 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 
 	const maxTicks = link.linkTicks;
 	owner.link = {
+		id: `link${world.nextObjectId++}`,
+
 		spellId: projectile.type,
 		targetId: target.id,
 
@@ -3858,7 +3860,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 }
 
 function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: w.World): number {
-	if (!(toHero && toHero.link && toHero.link.redirectDamageProportion)) {
+	if (!(amount && toHero && toHero.link && toHero.link.redirectDamageProportion)) {
 		return amount;
 	}
 
@@ -3877,6 +3879,8 @@ function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: 
 		noRedirect: true, // Stop a recursion loop
 	};
 	applyDamage(target, packet, world);
+
+	toHero.link.redirectDamageTick = world.tick;
 
 	return amount * (1 - proportion);
 }

@@ -542,7 +542,7 @@ export interface CastHistoryItem {
 	castTick: number;
 }
 
-export interface LinkState {
+export interface LinkState extends HighlightSource {
 	spellId: string;
 	targetId: string | null;
 
@@ -558,6 +558,7 @@ export interface LinkState {
 
 	initialTick: number;
 	expireTick: number;
+	redirectDamageTick?: number;
 
 	render: RenderLink;
 }

@@ -934,6 +934,9 @@ const link: Spell = {
                 color: '#4444ff',
                 width: 5 * Pixel,
                 glow: 0.1,
+
+                redirectFlash: true,
+                redirectGrowth: 1.25,
             },
         },
 
