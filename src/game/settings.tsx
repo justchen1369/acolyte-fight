@@ -1414,7 +1414,7 @@ const halo: Spell = {
             type: "movement",
             maxTicks: 3 * TicksPerSecond,
             movementProportion: 1.2,
-            cancelOnHit: true,
+            channelling: true,
         },
     ],
 
