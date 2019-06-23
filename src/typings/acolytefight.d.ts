@@ -313,6 +313,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	partialDamage?: PartialDamageParameters; // Scale damage over time
 	partialDetonateRadius?: PartialDamageParameters; // Scale detonate radius over time, only useful if detonate set
 	partialDetonateImpulse?: PartialDamageParameters; // Scale detonate impulse over time, only useful if detonate set
+	partialBuffDuration?: PartialDamageParameters; // Scale buff durations over time, only useful if buffs set
 
 	density: number;
     radius: number;
@@ -622,7 +623,7 @@ declare interface DebuffTemplate extends BuffTemplateBase {
 
 declare interface MovementBuffTemplate extends BuffTemplateBase {
 	type: "movement";
-	movementProportion: number; // 0 will make the hero unable to move, 2 will make hero movenet twice as fast
+	movementProportion: number; // 0 will make the hero unable to move, 2 will make hero movement twice as fast
 }
 
 declare interface GlideTemplate extends BuffTemplateBase {

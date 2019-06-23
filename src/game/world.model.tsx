@@ -685,6 +685,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	partialDamage?: PartialDamageParameters;
 	partialDetonateRadius?: PartialDamageParameters;
 	partialDetonateImpulse?: PartialDamageParameters;
+	partialBuffDuration?: PartialDamageParameters;
 	bounce?: BounceParameters;
 	gravity?: GravityParameters;
 	link?: LinkParameters;

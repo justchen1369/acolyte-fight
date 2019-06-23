@@ -752,7 +752,7 @@ const backlash: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. However, enemies hit will be unable to move for 1 second. Cast Spirit Missile again to detonate it at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. However, enemies hit will also be unable to move - the longer you were unable to move, the longer they cannot move. Cast Spirit Missile again to detonate it at exactly the right moment.",
     action: "focus",
 
     color: '#ff8855',
@@ -790,7 +790,7 @@ const rocket: Spell = {
             buffs: [
                 {
                     type: "movement",
-                    maxTicks: 1 * TicksPerSecond,
+                    maxTicks: 2.25 * TicksPerSecond,
                     movementProportion: 0,
                 }
             ],
@@ -799,6 +799,11 @@ const rocket: Spell = {
         partialDetonateRadius: {
             initialMultiplier: 0.5,
             ticks: 1 * TicksPerSecond,
+        },
+
+        partialBuffDuration: {
+            initialMultiplier: 0,
+            ticks: 2.25 * TicksPerSecond,
         },
 
         strafe: {

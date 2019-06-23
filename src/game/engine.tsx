@@ -16,6 +16,7 @@ interface BuffContext {
 	otherId?: string;
 	spellId?: string;
 	tag?: string;
+	durationMultiplier?: number;
 }
 
 interface ProjectileConfig {
@@ -555,6 +556,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		partialDamage: projectileTemplate.partialDamage,
 		partialDetonateImpulse: projectileTemplate.partialDetonateImpulse,
 		partialDetonateRadius: projectileTemplate.partialDetonateRadius,
+		partialBuffDuration: projectileTemplate.partialBuffDuration,
 
 		bounce: projectileTemplate.bounce,
 		gravity: projectileTemplate.gravity,
@@ -2253,9 +2255,11 @@ function swapOnExpiry(projectile: w.Projectile, world: w.World) {
 }
 
 function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
+	const durationMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialBuffDuration);
 	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, {
 		tag: projectile.type,
 		spellId: projectile.type,
+		durationMultiplier,
 	});
 }
 
@@ -3610,7 +3614,7 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell
 }
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const maxTicks = template.maxTicks || 1;
+	const maxTicks = (template.maxTicks || 1) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
 	const values: w.BuffValues = {
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
