@@ -100,7 +100,7 @@ const Choices: ChoiceSettings = {
 		"f": [
             ["scourge"],
             ["firespray"],
-            ["mines"],
+            ["mines", "iceBomb"],
             ["halo"],
         ],
 	},
@@ -1293,7 +1293,7 @@ const whirlwind: Spell = {
                     emissionRadiusFactor: 1,
                     particleRadius: 0.01,
                 },
-            },
+            }
         ],
 
         sound: "whirlwind",
@@ -1512,6 +1512,91 @@ const mines: Spell = {
         renderers: [
             { type: "projectile", ticks: 1, selfColor: true, glow: 0.2, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
+        ],
+    },
+};
+
+const iceBomb: Spell = {
+    id: 'iceBomb',
+    name: 'Freezing Mines',
+    description: "Freeze enemies for 1.5 seconds. If you walk away from the mines, they expire.",
+    action: "spray",
+    sound: "mines",
+
+    color: '#44ffff',
+    icon: "iceBomb",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 5 * TicksPerSecond,
+    throttle: true,
+
+    intervalTicks: 1,
+    lengthTicks: 6,
+
+    jitterRatio: 1.0,
+
+    projectile: {
+        density: 1,
+        radius: 0.005,
+        speed: 0.5,
+        maxTicks: 4.5 * TicksPerSecond,
+        minTicks: 1, // Ensure mines knockback on their first tick
+        damage: 0,
+        lifeSteal: 0.2,
+        knockbackScaling: false,
+
+        categories: Categories.Projectile,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
+        expireOn: Categories.All ^ Categories.Shield,
+        destructible: {
+        },
+
+        buffs: [
+            {
+                type: "movement",
+                movementProportion: 0.1,
+                maxTicks: 1.5 * TicksPerSecond,
+                against: Alliances.NotFriendly,
+                render: {
+                    color: "rgba(64, 255, 255, 1)",
+                    alpha: 0.3,
+                    ticks: 15,
+                    emissionRadiusFactor: 1,
+                    particleRadius: 0.01,
+                },
+            }
+        ],
+
+        detonate: {
+            damage: 0,
+            radius: 0.015,
+            minImpulse: 0,
+            maxImpulse: 0,
+            renderTicks: 15,
+            knockbackScaling: false,
+        },
+        shieldTakesOwnership: false,
+
+        behaviours: [
+            {
+                type: "homing",
+                targetType: "cursor",
+                trigger: { afterTicks: 6 },
+                newSpeed: 0,
+                redirect: true,
+            },
+            {
+                type: "expireOnOwnerRetreat",
+                maxDistance: 0.1,
+            },
+        ],
+
+        sound: "mines",
+        color: '#44ffff',
+        renderers: [
+            { type: "polygon", numPoints: 6, revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 1, color: "rgba(255, 255, 255, 0.7)" },
+            { type: "projectile", revolutionInterval: 53, ticks: 1, selfColor: true, glow: 0.2, radiusMultiplier: 0.5 },
+            { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true },
         ],
     },
 };
@@ -1964,6 +2049,7 @@ const Spells = {
     supernova,
     halo,
     mines,
+    iceBomb,
     teleport,
     thrust,
     swap,
