@@ -872,10 +872,12 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 		return;
 	}
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
-	const particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
+	const easeMultiplier = ease(obstacle.createTick, world);
 
-	const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+	const mapCenter = pl.Vec2(0.5, 0.5);
+	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
+
+	let pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
 	const outward = vector.unit(vector.diff(pos, mapCenter));
 
 	let velocity = vector.zero();
@@ -891,6 +893,12 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 		if (obstacle.conveyor.lateralSpeed) {
 			velocity = vector.plus(velocity, vector.multiply(vector.rotateRight(outward), obstacle.conveyor.lateralSpeed * smoke.conveyor));
 		}
+	}
+
+	if (easeMultiplier > 0) {
+		const scale = 1 - easeMultiplier;
+		pos = vector.scaleAround(pos, mapCenter, scale);
+		particleRadius *= scale;
 	}
 
 	underlay({
