@@ -15,6 +15,7 @@ interface OwnProps {
 interface Props extends OwnProps {
     silenced: Set<string>;
     player: w.Player;
+    live: boolean;
 }
 interface State {
 }
@@ -25,11 +26,16 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         silenced: state.silenced,
         player: playerLookup.get(ownProps.notification.userHash),
+        live: state.world.ui.live,
     };
 }
 
 class TextMessage extends React.PureComponent<Props, State> {
     render() {
+        if (!this.props.live) {
+            return null; // Don't show messages in a replay
+        }
+
         const notification = this.props.notification;
         if (this.props.silenced.has(notification.userHash)) {
             return null;
