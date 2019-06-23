@@ -1627,8 +1627,8 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 3 * TicksPerSecond,
-    channelling: true,
+    maxTicks: 2 * TicksPerSecond,
+    channelling: false,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
@@ -1666,8 +1666,8 @@ const dualSaber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 3 * TicksPerSecond,
-    channelling: true,
+    maxTicks: 2 * TicksPerSecond,
+    channelling: false,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
