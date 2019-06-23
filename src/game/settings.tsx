@@ -601,7 +601,7 @@ const boomerang: Spell = {
         radius: 0.004,
         speed: 0.6,
         maxTicks: 5.0 * TicksPerSecond,
-        damage: 15,
+        damage: 20,
         lifeSteal: 0.2,
         noKnockback: true,
         expireOn: Categories.Hero | Categories.Massive,
