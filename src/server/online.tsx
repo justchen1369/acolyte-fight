@@ -233,7 +233,9 @@ function sendUpdate(scoreboard: g.Scoreboard, updated: g.PlayerScore[]) {
 	const changed = new Array<m.OnlinePlayerMsg>();
 	updated.forEach(score => {
 		const player = scoreboard.online.get(score.userHash);
-		changed.push(onlineToMsg(player, score));
+		if (player) {
+			changed.push(onlineToMsg(player, score));
+		}
 	});
 
 	if (changed.length > 0) {
