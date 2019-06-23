@@ -1602,7 +1602,7 @@ const iceBomb: Spell = {
         color: '#44ffff',
         renderers: [
             { type: "polygon", numPoints: 6, revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 1, selfColor: true },
-            { type: "projectile", revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 0.5, color: "rgba(0, 0, 0, 0.2)"  },
+            { type: "projectile", revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 0.5, color: "rgba(0, 0, 0, 0.15)"  },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true },
         ],
     },
