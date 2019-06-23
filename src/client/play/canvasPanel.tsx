@@ -14,7 +14,7 @@ import { CanvasStack, GraphicsLevel, resetRenderState } from '../graphics/render
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
-const MaxSlowFrames = 20;
+const MaxSlowFrames = 10;
 const SlowFrameWaitInterval = 60;
 const FpsThreshold = 0.9;
 
