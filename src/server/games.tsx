@@ -200,26 +200,26 @@ export function averagePlayersPerGame(totalPlayers: number) {
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
 	if (!(
 		(
-			data.actionType === "game"
-			&& required(data.spellId, "string")
-			&& required(data.targetX, "number")
-			&& required(data.targetY, "number")
+			data.type === "game"
+			&& required(data.sid, "string")
+			&& required(data.x, "number")
+			&& required(data.y, "number")
 		) || (
-			data.actionType === "spells"
+			data.type === "spells"
 			&& required(data.keyBindings, "object")
 		) || (
-			data.actionType === m.ActionType.Sync
+			data.type === m.ActionType.Sync
 			&& required(data.tick, "number")
-			&& required(data.heroes, "object") && data.heroes instanceof Array
-			&& data.heroes.every(snapshot => 
+			&& required(data.objects, "object") && data.objects instanceof Array
+			&& data.objects.every(snapshot => 
 				required(snapshot, "object")
-				&& required(snapshot.heroId, "string")
-				&& required(snapshot.health, "number")
-				&& required(snapshot.posX, "number")
-				&& required(snapshot.posY, "number"))
+				&& required(snapshot.id, "string")
+				&& required(snapshot.hp, "number")
+				&& required(snapshot.x, "number")
+				&& required(snapshot.y, "number"))
 		)
 	)) {
-		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.actionType);
+		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.type);
 		return;
 	}
 
@@ -228,12 +228,12 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 		return;
 	}
 
-	if (data.heroId === player.heroId || takeBotControl(game, data.heroId, socketId)) {
+	if (data.hid === player.heroId || takeBotControl(game, data.hid, socketId)) {
 		queueAction(game, data);
 	}
 
-	if (data.heroId === player.heroId) {
-		if (data.actionType === "game") {
+	if (data.hid === player.heroId) {
+		if (data.type === "game") {
 			++player.numActionMessages;
 		}
 	}
@@ -296,9 +296,9 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 
 	const heroId = systemHeroId(m.ActionType.Environment);
 	game.actions.set(heroId, {
-		gameId: game.id,
-		heroId,
-		actionType: m.ActionType.Environment,
+		gid: game.id,
+		hid: heroId,
+		type: m.ActionType.Environment,
 		seed: gameIndex,
 		layoutId: layoutId,
 	});
@@ -358,7 +358,7 @@ function formatHeroId(index: number): string {
 }
 
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
-	if (actionData.actionType === m.ActionType.Sync) {
+	if (actionData.type === m.ActionType.Sync) {
 		if (game.syncTick < actionData.tick) {
 			game.syncTick = actionData.tick;
 			game.actions.set(systemHeroId(m.ActionType.Sync), actionData);
@@ -366,11 +366,11 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 		return;
 	}
 
-	let currentPrecedence = actionPrecedence(game.actions.get(actionData.heroId));
+	let currentPrecedence = actionPrecedence(game.actions.get(actionData.hid));
 	let newPrecedence = actionPrecedence(actionData);
 
 	if (newPrecedence >= currentPrecedence) {
-		game.actions.set(actionData.heroId, actionData);
+		game.actions.set(actionData.hid, actionData);
 	}
 
 	startTickProcessing();
@@ -379,15 +379,15 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 function actionPrecedence(actionData: m.ActionMsg): number {
 	if (!actionData) {
 		return 0;
-	} else if (actionData.actionType === "join" || actionData.actionType === "leave" || actionData.actionType === "bot") {
+	} else if (actionData.type === "join" || actionData.type === "leave" || actionData.type === "bot") {
 		return 1000;
-	} else if (actionData.actionType === "spells") {
+	} else if (actionData.type === "spells") {
 		return 101;
-	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.MoveAndCancel) {
+	} else if (actionData.type === "game" && actionData.sid === w.Actions.MoveAndCancel) {
 		return 11;
-	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.Move) {
+	} else if (actionData.type === "game" && actionData.sid === w.Actions.Move) {
 		return 10;
-	} else if (actionData.actionType === "game" && actionData.spellId === w.Actions.Retarget) {
+	} else if (actionData.type === "game" && actionData.sid === w.Actions.Retarget) {
 		return 1;
 	} else {
 		return 100;
@@ -395,7 +395,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.actionType === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.spellId);
+	return actionData.type === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.sid);
 }
 
 export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {
@@ -416,7 +416,7 @@ export function leaveGame(game: g.Game, socketId: string) {
 	game.active.delete(socketId);
 	reassignBots(game, player.heroId, socketId);
 
-	queueAction(game, { gameId: game.id, heroId: player.heroId, actionType: "leave" });
+	queueAction(game, { gid: game.id, hid: player.heroId, type: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
@@ -576,9 +576,9 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		if (player) {
 			player.userId = userId;
 			queueAction(game, {
-				gameId: game.id,
-				heroId,
-				actionType: "join",
+				gid: game.id,
+				hid: heroId,
+				type: "join",
 				userId,
 				userHash,
 				partyHash: params.partyHash,
@@ -604,7 +604,7 @@ export function addBot(game: g.Game) {
 	game.bots.set(heroId, null);
 
 	const keyBindings = randomKeyBindings(game);
-	queueAction(game, { gameId: game.id, heroId, actionType: "bot", keyBindings });
+	queueAction(game, { gid: game.id, hid: heroId, type: "bot", keyBindings });
 
 	return heroId;
 }
@@ -681,9 +681,9 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 
 	if (waitPeriod !== null) {
 		queueAction(game, {
-			gameId: game.id,
-			heroId: systemHeroId(m.ActionType.CloseGame),
-			actionType: m.ActionType.CloseGame,
+			gid: game.id,
+			hid: systemHeroId(m.ActionType.CloseGame),
+			type: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
 			waitPeriod,
 			numTeams,

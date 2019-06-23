@@ -522,15 +522,15 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 
 function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	if (!(required(data, "object")
-		&& required(data.actionType, "string")
-		&& required(data.gameId, "string")
-		&& required(data.heroId, "string")
+		&& required(data.type, "string")
+		&& required(data.gid, "string")
+		&& required(data.hid, "string")
 	)) {
 		// callback({ success: false, error: "Bad request" });
 		return;
 	}
 
-	const game = getStore().activeGames.get(data.gameId);
+	const game = getStore().activeGames.get(data.gid);
 	if (game) {
 		games.receiveAction(game, data, socket.id);
 	}

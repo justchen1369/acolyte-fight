@@ -130,22 +130,22 @@ function sendSnapshot(world: w.World) {
 	}
 	world.ui.sentSnapshotTick = snapshot.tick;
 
-	const heroes = new Array<m.HeroSyncMsg>();
+	const heroes = new Array<m.ObjectSyncMsg>();
 	snapshot.objectLookup.forEach((heroSnapshot, heroId) => {
 		heroes.push({
-			heroId,
-			health: heroSnapshot.health,
-			posX: heroSnapshot.pos.x,
-			posY: heroSnapshot.pos.y,
+			id: heroId,
+			hp: heroSnapshot.health,
+			x: heroSnapshot.pos.x,
+			y: heroSnapshot.pos.y,
 		});
 	});
 
 	const syncMsg: m.SyncMsg = {
-		actionType: m.ActionType.Sync,
-		gameId: world.ui.myGameId,
-		heroId: world.ui.myHeroId,
+		type: m.ActionType.Sync,
+		gid: world.ui.myGameId,
+		hid: world.ui.myHeroId,
 		tick: snapshot.tick,
-		heroes,
+		objects: heroes,
 	};
 	send(syncMsg);
 }
@@ -158,12 +158,12 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 	}
 
 	const actionMsg: m.ActionMsg = {
-		gameId,
-		heroId,
-		actionType: m.ActionType.GameAction,
-		spellId: action.type,
-		targetX: Math.round(action.target.x / Precision) * Precision,
-		targetY: Math.round(action.target.y / Precision) * Precision,
+		gid: gameId,
+		hid: heroId,
+		type: m.ActionType.GameAction,
+		sid: action.type,
+		x: Math.round(action.target.x / Precision) * Precision,
+		y: Math.round(action.target.y / Precision) * Precision,
 	}
 	send(actionMsg);
 }
@@ -174,9 +174,9 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 	}
 
 	const actionMsg: m.ActionMsg = {
-		gameId,
-		heroId,
-		actionType: m.ActionType.Spells,
+		gid: gameId,
+		hid: heroId,
+		type: m.ActionType.Spells,
 		keyBindings,
 	}
 	send(actionMsg);

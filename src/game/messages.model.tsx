@@ -73,19 +73,19 @@ export type ActionMsg =
     | SyncMsg
 
 export interface ActionMsgBase {
-    actionType: string;
-    gameId: string;
-    heroId: string;
+    type: string;
+    gid: string;
+    hid: string;
 }
 
 export interface EnvironmentMsg extends ActionMsgBase {
-    actionType: "environment";
+    type: "environment";
     seed: number;
     layoutId?: string;
 }
 
 export interface JoinActionMsg extends ActionMsgBase {
-    actionType: "join";
+    type: "join";
     userId: string | null;
     userHash: string | null;
     partyHash?: string;
@@ -96,44 +96,44 @@ export interface JoinActionMsg extends ActionMsgBase {
 }
 
 export interface BotActionMsg extends ActionMsgBase {
-    actionType: "bot";
+    type: "bot";
     keyBindings: KeyBindings;
 }
 
 export interface LeaveActionMsg extends ActionMsgBase {
-    actionType: "leave";
+    type: "leave";
 }
 
 export interface CloseGameMsg extends ActionMsgBase {
-    actionType: "close";
+    type: "close";
     closeTick: number;
     waitPeriod: number;
     numTeams?: number;
 }
 
 export interface GameActionMsg extends ActionMsgBase {
-    actionType: "game";
-    spellId: string;
-    targetX: number;
-    targetY: number;
+    type: "game";
+    sid: string;
+    x: number;
+    y: number;
 }
 
 export interface SpellsMsg extends ActionMsgBase {
-    actionType: "spells";
+    type: "spells";
     keyBindings: KeyBindings;
 }
 
 export interface SyncMsg extends ActionMsgBase {
-    actionType: "sync";
+    type: "sync";
     tick: number;
-    heroes: HeroSyncMsg[];
+    objects: ObjectSyncMsg[];
 }
 
-export interface HeroSyncMsg {
-    heroId: string;
-    posX: number;
-    posY: number;
-    health: number;
+export interface ObjectSyncMsg {
+    id: string;
+    x: number;
+    y: number;
+    hp: number;
 }
 
 export interface TickMsg {

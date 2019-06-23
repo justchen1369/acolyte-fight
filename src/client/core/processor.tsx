@@ -20,7 +20,7 @@ export function initialWorld(data: m.HeroMsg) {
 export function isStartGameTick(tickData: m.TickMsg) {
 	let result = false;
 	tickData.actions.forEach(actionData => {
-		if (actionData.actionType === m.ActionType.CloseGame) {
+		if (actionData.type === m.ActionType.CloseGame) {
 			result = true;
 		}
 	});
@@ -38,24 +38,24 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 	}
 
 	tickData.actions.forEach(actionData => {
-		if (actionData.gameId !== world.ui.myGameId) {
+		if (actionData.gid !== world.ui.myGameId) {
 			// Skip this action
-		} else if (actionData.actionType === m.ActionType.GameAction) {
-			world.actions.set(actionData.heroId, {
-				type: actionData.spellId,
-				target: pl.Vec2(actionData.targetX, actionData.targetY),
+		} else if (actionData.type === m.ActionType.GameAction) {
+			world.actions.set(actionData.hid, {
+				type: actionData.sid,
+				target: pl.Vec2(actionData.x, actionData.y),
 			});
-		} else if (actionData.actionType === m.ActionType.CloseGame) {
+		} else if (actionData.type === m.ActionType.CloseGame) {
 			world.occurrences.push({
 				type: "closing",
 				startTick: actionData.closeTick,
 				ticksUntilClose: actionData.waitPeriod,
 				numTeams: actionData.numTeams,
 			});
-		} else if (actionData.actionType === m.ActionType.Join) {
+		} else if (actionData.type === m.ActionType.Join) {
 			world.occurrences.push({
 				type: "join",
-				heroId: actionData.heroId,
+				heroId: actionData.hid,
 				userId: actionData.userId,
 				userHash: actionData.userHash,
 				partyHash: actionData.partyHash,
@@ -65,35 +65,35 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				isBot: actionData.isBot,
 				isMobile: actionData.isMobile,
 			});
-		} else if (actionData.actionType === m.ActionType.Bot) {
+		} else if (actionData.type === m.ActionType.Bot) {
 			world.occurrences.push({
 				type: "botting",
-				heroId: actionData.heroId,
+				heroId: actionData.hid,
 				keyBindings: actionData.keyBindings,
 			});
-		} else if (actionData.actionType === m.ActionType.Leave) {
+		} else if (actionData.type === m.ActionType.Leave) {
 			world.occurrences.push({
 				type: "leave",
-				heroId: actionData.heroId,
+				heroId: actionData.hid,
 			});
-		} else if (actionData.actionType === m.ActionType.Environment) {
+		} else if (actionData.type === m.ActionType.Environment) {
 			world.occurrences.push({
 				type: "environment",
 				seed: actionData.seed,
 				layoutId: actionData.layoutId,
 			});
-		} else if (actionData.actionType === m.ActionType.Spells) {
+		} else if (actionData.type === m.ActionType.Spells) {
 			world.occurrences.push({
 				type: "spells",
-				heroId: actionData.heroId,
+				heroId: actionData.hid,
 				keyBindings: actionData.keyBindings,
 			});
-		} else if (actionData.actionType === m.ActionType.Sync) {
+		} else if (actionData.type === m.ActionType.Sync) {
 			const heroLookup = new Map<string, w.ObjectSnapshot>();
-			actionData.heroes.forEach(snapshot => {
-				heroLookup.set(snapshot.heroId, {
-					health: snapshot.health,
-					pos: pl.Vec2(snapshot.posX, snapshot.posY),
+			actionData.objects.forEach(snapshot => {
+				heroLookup.set(snapshot.id, {
+					health: snapshot.hp,
+					pos: pl.Vec2(snapshot.x, snapshot.y),
 				});
 			});
 			world.occurrences.push({
