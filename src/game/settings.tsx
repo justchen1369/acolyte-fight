@@ -761,6 +761,7 @@ const rocket: Spell = {
 
     interruptibleAfterTicks: 0,
     movementProportionWhileChannelling: 0.05,
+    strikeCancel: {},
 
     projectile: {
         damage: 0,

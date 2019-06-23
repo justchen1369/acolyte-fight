@@ -33,6 +33,7 @@ interface DetonateConfig {
 	sourceId: string;
 	color?: string;
 	defaultSound?: string;
+	buffDurationMultiplier?: number;
 }
 
 export interface ResolvedKeyBindings {
@@ -2764,10 +2765,16 @@ function detonateProjectile(projectile: w.Projectile, world: w.World) {
 		detonate.maxImpulse *= impulseMultiplier;
 	}
 
+	let buffDurationMultiplier = 1;
+	if (projectile.partialBuffDuration) {
+		buffDurationMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialBuffDuration);
+	}
+
 	detonateAt(projectile.body.getPosition(), projectile.owner, detonate, world, {
 		sourceId: projectile.id,
 		color: projectile.color, 
 		defaultSound: projectile.sound,
+		buffDurationMultiplier,
 	});
 
 	// Don't allow for repeats
@@ -2820,7 +2827,9 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 				if ((alliance & against) > 0) {
 					applyDamage(other, detonate, world);
 					expireOnHeroHit(other, world);
-					applyBuffsFrom(detonate.buffs, owner, other, world);
+					applyBuffsFrom(detonate.buffs, owner, other, world, {
+						durationMultiplier: config.buffDurationMultiplier,
+					});
 
 					applyKnockback = true;
 				}
