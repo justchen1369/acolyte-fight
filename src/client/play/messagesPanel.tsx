@@ -181,7 +181,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             if (notification.teamSizes) {
                 return <div key={key} className="row game-started">Team game! Your allies are blue. Defeat your enemies together!</div>
             } else {
-                return null;
+                return <div key={key} className="row game-started">Game started. Defeat your enemies!</div>;
             }
         } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
