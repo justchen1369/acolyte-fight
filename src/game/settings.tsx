@@ -18,7 +18,7 @@ const Hero: HeroSettings = {
     DamageMitigationTicks: 90,
     ThrottleTicks: 15,
 
-    DamageBonusProportion: 0.005,
+    DamageBonusProportion: 0.01,
     MaxDamageBonusProportion: 1.5,
     KnockbackRatio: 1,
 
@@ -1687,8 +1687,8 @@ const scourge: Spell = {
     detonate: {
         damage: 15,
         radius: Hero.Radius * 4,
-        minImpulse: 0.0002,
-        maxImpulse: 0.0005,
+        minImpulse: 0.00075,
+        maxImpulse: 0.00075,
         renderTicks: 30,
     },
     chargeTicks: 0.5 * TicksPerSecond,

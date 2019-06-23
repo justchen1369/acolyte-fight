@@ -66,7 +66,7 @@ export const slow: ObstacleTemplate = {
         {
             type: "movement",
             maxTicks: 15,
-            movementProportion: 0.67,
+            movementProportion: 0.8,
             render: {
                 color: "rgba(64, 255, 255, 1)",
                 alpha: 0.3,
