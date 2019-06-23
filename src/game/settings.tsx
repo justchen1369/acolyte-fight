@@ -839,6 +839,14 @@ const whip: Spell = {
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
+    buffs: [
+        {
+            type: "movement",
+            maxTicks: 1.5 * TicksPerSecond,
+            movementProportion: 1.2,
+        },
+    ],
+
     projectile: {
         density: 2,
         radius: 0.001,
