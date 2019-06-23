@@ -18,7 +18,7 @@ const Hero: HeroSettings = {
     DamageMitigationTicks: 90,
     ThrottleTicks: 15,
 
-    DamageBonusProportion: 0.01,
+    DamageBonusProportion: 0.005,
     MaxDamageBonusProportion: 1.5,
     KnockbackRatio: 1,
 
