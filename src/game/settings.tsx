@@ -749,7 +749,7 @@ const backlash: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. However, enemies hit will also be unable to move - the longer you were unable to move, the longer they cannot move. Cast Spirit Missile again to detonate it at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit by spirit missile will be unable to move for a short time. Cast Spirit Missile again to detonate it at exactly the right moment.",
     action: "focus",
 
     color: '#ff8855',
@@ -789,7 +789,14 @@ const rocket: Spell = {
                 {
                     type: "movement",
                     maxTicks: 1.5 * TicksPerSecond,
-                    movementProportion: 0,
+                    movementProportion: 0.1,
+                    render: {
+                        color: "rgba(64, 255, 255, 1)",
+                        alpha: 0.3,
+                        ticks: 15,
+                        emissionRadiusFactor: 1,
+                        particleRadius: 0.01,
+                    },
                 }
             ],
         },
@@ -1519,7 +1526,7 @@ const mines: Spell = {
 const iceBomb: Spell = {
     id: 'iceBomb',
     name: 'Freezing Mines',
-    description: "Freeze enemies for 1.5 seconds. If you walk away from the mines, they expire.",
+    description: "Freeze enemies for 1 second. If you walk away from the mines, they expire.",
     action: "spray",
     sound: "mines",
 
@@ -1555,7 +1562,7 @@ const iceBomb: Spell = {
             {
                 type: "movement",
                 movementProportion: 0.1,
-                maxTicks: 1.5 * TicksPerSecond,
+                maxTicks: 1 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
