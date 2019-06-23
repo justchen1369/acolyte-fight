@@ -800,7 +800,7 @@ const rocket: Spell = {
         },
 
         partialBuffDuration: {
-            initialMultiplier: 0,
+            initialMultiplier: 0.2,
             ticks: 2.25 * TicksPerSecond,
         },
 
