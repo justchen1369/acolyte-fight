@@ -36,7 +36,8 @@ export class TitleSection extends React.Component<Props, State> {
             <p>
                 This game is a 2D skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
                 This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
-                {Hero.AdditionalDamageMultiplier && `Acolytes become more dangerous as they lose health - dealing up to ${1 + Hero.AdditionalDamageMultiplier}x more damage! `}
+            </p>
+            <p>
                 {Hero.DamageBonusProportion && `Acolytes become more dangerous as they do more damage. Every 1% of damage you deal increases your damage and knockback by ${Hero.DamageBonusProportion * 100}%. `}
                 {Hero.DamageBonusProportion && `Your damage/knockback bonus is limited to ${Hero.MaxDamageBonusProportion * 100}%. `}
                 {Hero.DamageBonusProportion && `When you cast a spell, there is a flash around your Acolyte, this flash gets bigger as your damage/knockback bonus increases. `}

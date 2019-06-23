@@ -3749,13 +3749,11 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	const damageScaling = template.damageScaling !== undefined ? template.damageScaling : true;
 	if (damageScaling && fromHeroId) { // Only scale damage from heroes (not the environment), even if they're dead
 		let bonus = 0;
-		let healthProportion = 0;
 		if (fromHero && fromHero.category === "hero") {
-			healthProportion = fromHero.health / fromHero.maxHealth;
 			bonus = fromHero.damageBonus;
 		}
 
-		const scaleFactor = 1 + Math.pow(1.0 - healthProportion, Hero.AdditionalDamagePower) * Hero.AdditionalDamageMultiplier + bonus;
+		const scaleFactor = 1 + bonus;
 		damage *= scaleFactor;
 	}
 

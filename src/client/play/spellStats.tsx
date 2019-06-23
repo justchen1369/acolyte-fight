@@ -77,8 +77,8 @@ class SpellStats extends React.PureComponent<Props, State> {
     private renderScaling(damageScaling: boolean) {
         const scales = damageScaling === undefined ? true : damageScaling;
         if (scales) {
-            const maxScaling = 1 + this.props.settings.Hero.AdditionalDamageMultiplier;
-            return <span className="spell-stats-scaling" title={`This spell scales up to ${maxScaling}x damage as the Acolyte loses health`}>+</span>;
+            const maxScaling = 1 + this.props.settings.Hero.MaxDamageBonusProportion;
+            return <span className="spell-stats-scaling" title={`This spell scales up to ${maxScaling}x damage as you do more damage.`}>+</span>;
         } else {
             return null;
         }
