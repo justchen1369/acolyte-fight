@@ -26,6 +26,10 @@ function formatTime(ticks: number) {
     return Math.round(seconds * 100) / 100;
 }
 
+function isMultiHit(projectile: ProjectileTemplate) {
+    return projectile.hitInterval < 60 || (projectile.behaviours && projectile.behaviours.some(b => b.type === "clearHits"));
+}
+
 class SpellStats extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -39,16 +43,16 @@ class SpellStats extends React.PureComponent<Props, State> {
             return null;
         }
 
-        if (spell.action === "projectile" || spell.action === "retractor" || spell.action === "focus") {
+        if (spell.action === "projectile" || spell.action === "retractor" || spell.action === "focus" || (spell.action === "spray" && isMultiHit(spell.projectile))) {
             const damage = this.calculateProjectileDamage(spell.projectile);
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{spell.projectile.bounce && " per bounce"}</span>
+                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{isMultiHit(spell.projectile) && " per hit"}</span>
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "spray") {
-            const hits = spell.lengthTicks / spell.intervalTicks;
+            const hits = Math.floor(spell.lengthTicks / spell.intervalTicks);
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
             const overTime = spell.lengthTicks >= 60 ? ` over ${formatTime(spell.lengthTicks)} s` : "";
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
