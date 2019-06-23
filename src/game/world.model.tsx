@@ -424,9 +424,8 @@ export interface Hero extends WorldObjectBase {
 	conveyorShift?: pl.Vec2; // If set, move by this amount on the next tick. Used to ensure only one conveyor has an effect per tick.
 
 	createTick: number;
-	hitTick?: number;
-	damagedTick?: number;
-	lavaTick?: number;
+	hitTick?: number; // hit by anything (lava or non-lava)
+	strikeTick?: number; // hit by something (not lava)
 	cleanseTick?: number;
 	exitTick?: number;
 
@@ -522,6 +521,7 @@ export type Shield = Reflect | Wall | Saber;
 
 export interface CastState {
 	action: Action;
+	direction: pl.Vec2;
 	stage: number;
 	uninterruptible?: boolean;
 	movementProportion?: number;

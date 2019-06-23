@@ -21,7 +21,7 @@ interface BuffContext {
 interface ProjectileConfig {
 	owner?: string;
 	filterGroupIndex?: number;
-	directionTarget?: pl.Vec2;
+	direction?: pl.Vec2;
 }
 
 interface DetonateConfig {
@@ -464,7 +464,7 @@ function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: numb
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
 	const from = hero.body.getPosition();
 
-	let direction = vector.unit(vector.diff(config.directionTarget || target, from));
+	let direction = vector.unit(config.direction || vector.diff(target, from));
 	if (direction.x === 0 && direction.y === 0) {
 		direction = vector.fromAngle(hero.body.getAngle());
 	}
@@ -1548,7 +1548,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
-		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown };
+		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown, direction: vector.diff(action.target, hero.body.getPosition()) };
 	}
 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
@@ -1591,10 +1591,6 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			return; // Wait until are facing the target
 		}
 
-		if (spell.knockbackCancel) {
-			hero.body.setLinearVelocity(vector.zero());
-		}
-
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
 			// Recheck cooldown just before casting because refract can become invalid by this point
 			hero.casting = null;
@@ -1606,11 +1602,12 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		++hero.casting.stage;
 	}
 
-	if (spell.knockbackCancel && vector.distance(hero.casting.initialPosition, hero.body.getPosition()) > constants.Pixel) {
+	if (spell.strikeCancel && hero.strikeTick && hero.casting.chargeStartTick && hero.strikeTick >= hero.casting.chargeStartTick) {
+		// Spell cancelled by getting struck
 		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
-		const maxChannellingTicks = spell.knockbackCancel.maxChannelingTicks ? spell.knockbackCancel.maxChannelingTicks : Infinity;
-		if (spell.knockbackCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
-			setCooldown(world, hero, spell.id, spell.knockbackCancel.cooldownTicks);
+		const maxChannellingTicks = spell.strikeCancel.maxChannelingTicks ? spell.strikeCancel.maxChannelingTicks : Infinity;
+		if (spell.strikeCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
+			setCooldown(world, hero, spell.id, spell.strikeCancel.cooldownTicks);
 		}
 		hero.casting.stage = w.CastStage.Complete;
 	}
@@ -3225,26 +3222,19 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	}
 
 	if (currentLength % spell.intervalTicks === 0) {
-		const pos = hero.body.getPosition();
-
-		let directionTarget = action.target;
-		if (spell.revsPerTickWhileChannelling > 0 || (directionTarget.x === pos.x && directionTarget.y === pos.y)) {
-			directionTarget = vector.plus(pos, vector.fromAngle(hero.body.getAngle()));
-		}
-
-		const diff = vector.diff(directionTarget, pos);
-		const currentAngle = vector.angle(diff);
+		const direction = hero.casting.direction;
+		const currentAngle = vector.angle(direction);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
 		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
 		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
 		const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
-		const jitterRadius = vector.length(diff) * spell.jitterRatio;
-		directionTarget = vector.plus(directionTarget, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
+		const jitterRadius = vector.length(direction) * spell.jitterRatio;
+		const jitterDirection = vector.plus(direction, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
 
 		addProjectile(world, hero, action.target, spell, spell.projectile, {
-			directionTarget,
+			direction: jitterDirection,
 		});
 	}
 	return false;
@@ -3806,12 +3796,8 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Register hit
 	if (!packet.noHit) {
 		toHero.hitTick = world.tick;
-		if (packet.damage > 0) {
-			if (packet.isLava) {
-				toHero.lavaTick = world.tick;
-			} else {
-				toHero.damagedTick = world.tick;
-			}
+		if (!packet.isLava) {
+			toHero.strikeTick = world.tick;
 		}
 	}
 

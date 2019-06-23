@@ -247,7 +247,7 @@ declare interface SpellBase {
     cooldown: number;
     interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
     movementCancel?: boolean; // Whether moving cancels the spell.
-	knockbackCancel?: KnockbackCancelParams; // If this spell is being channelled, whether knockback cancels it.
+	strikeCancel?: SpellCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
 	
 	buffs?: BuffTemplate[]
 
@@ -256,7 +256,7 @@ declare interface SpellBase {
     color: string; // The colour of the button for this spell (not the projectile)
 }
 
-declare interface KnockbackCancelParams {
+declare interface SpellCancelParams {
 	cooldownTicks?: number; // If cancelled by knockback, set cooldown to this value. This can be used to allow the spell to be re-cast quickly if interrupted.
 	maxChannelingTicks?: number; // Only apply the cooldown reset if have been channelling for less than this time.
 }

@@ -487,7 +487,7 @@ const kamehameha: Spell = {
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
-    knockbackCancel: {
+    strikeCancel: {
         cooldownTicks: 0.5 * TicksPerSecond,
         maxChannelingTicks: 1 * TicksPerSecond,
     },
