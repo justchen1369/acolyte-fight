@@ -788,7 +788,7 @@ const rocket: Spell = {
             buffs: [
                 {
                     type: "movement",
-                    maxTicks: 2.25 * TicksPerSecond,
+                    maxTicks: 1.5 * TicksPerSecond,
                     movementProportion: 0,
                 }
             ],
@@ -800,8 +800,8 @@ const rocket: Spell = {
         },
 
         partialBuffDuration: {
-            initialMultiplier: 0.2,
-            ticks: 2.25 * TicksPerSecond,
+            initialMultiplier: 0.33,
+            ticks: 1 * TicksPerSecond,
         },
 
         strafe: {
