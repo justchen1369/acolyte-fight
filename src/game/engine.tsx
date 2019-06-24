@@ -3237,7 +3237,11 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	}
 
 	if (currentLength % spell.intervalTicks === 0) {
-		const direction = hero.casting.direction;
+		let direction = hero.casting.direction;
+		if (direction.x === 0 && direction.y === 0) {
+			direction = vector.multiply(vector.fromAngle(hero.body.getAngle()), constants.Pixel);
+		}
+
 		const currentAngle = vector.angle(direction);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
