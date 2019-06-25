@@ -431,7 +431,6 @@ export interface Hero extends WorldObjectBase {
 
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
-	damageBonus: number;
 
 	moveTo?: pl.Vec2;
 	target?: pl.Vec2;
@@ -636,7 +635,6 @@ export interface VanishBuff extends BuffBase {
 export interface LifeStealBuff extends BuffBase {
 	type: "lifeSteal";
 	lifeSteal: number;
-	lifeStealTargetId?: string;
 }
 
 export interface BurnBuff extends BuffBase {
@@ -719,7 +717,6 @@ export interface DamagePacket {
 	fromHeroId: string;
 	damage: number;
 	lifeSteal: number;
-	lifeStealTargetHeroId?: string;
 	isLava?: boolean;
 	noHit?: boolean;
 	minHealth?: number;

@@ -38,9 +38,7 @@ export class TitleSection extends React.Component<Props, State> {
                 This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
             </p>
             <p>
-                {Hero.DamageBonusProportion && `Acolytes become more dangerous as they do more damage. Every 1% of damage you deal increases your damage and knockback by ${Hero.DamageBonusProportion * 100}%. `}
-                {Hero.DamageBonusProportion && `Your damage/knockback bonus is limited to ${Hero.MaxDamageBonusProportion * 100}%. `}
-                {Hero.DamageBonusProportion && `When you cast a spell, there is a flash around your Acolyte, this flash gets bigger as your damage/knockback bonus increases. `}
+                Acolytes become more dangerous as they lose health. You scale up to {1 + this.props.settings.Hero.ScalingBonus}x damage and knockback as you get closer to 0hp.
                 Also, if multiple opponents attack you within {this.props.settings.Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds,
                 you will only take damage from the opponent who did the most damage.
                 This means you can always make a comeback, just keep dodging and aim carefully!

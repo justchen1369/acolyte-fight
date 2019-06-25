@@ -410,7 +410,6 @@ function addHero(world: w.World, heroId: string) {
 		radius: Hero.Radius,
 		damageSources: new Map<string, number>(),
 		damageSourceHistory: [],
-		damageBonus: 0,
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
 		maxSpeed: Hero.MaxSpeed,
 		revolutionsPerTick: Hero.RevolutionsPerTick,
@@ -500,7 +499,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
-	const knockbackScaling = calculateKnockbackScaling(config.owner, world, projectileTemplate.knockbackScaling);
+	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
 	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
@@ -609,15 +608,28 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	return projectile;
 }
 
-function calculateKnockbackScaling(heroId: string, world: w.World, knockbackScaling: boolean = true) {
-	let knockbackMultiplier = 1;
-	if (knockbackScaling) {
-		const hero = world.objects.get(heroId);
-		if (hero && hero.category === "hero") {
-			knockbackMultiplier += hero.damageBonus * world.settings.Hero.KnockbackRatio;
-		}
+export function calculateScaling(heroId: string, world: w.World, scaling: boolean = true) {
+	if (!heroId) {
+		// Environment doesn't scale
+		return 1;
 	}
-	return knockbackMultiplier;
+
+	const hero = world.objects.get(heroId);
+	return calculateScalingFromHero(hero as w.Hero, world, scaling);
+}
+
+export function calculateScalingFromHero(hero: w.Hero, world: w.World, scaling: boolean = true) {
+	if (!scaling) {
+		return 1;
+	}
+
+	let hpProportion = 0;
+	if (hero && hero.category === "hero") {
+		hpProportion = Math.max(0, hero.health / hero.maxHealth);
+	}
+
+	const Hero = world.settings.Hero;
+	return 1 + (1 - hpProportion) * Hero.ScalingBonus;
 }
 
 function ticksTo(distance: number, speed: number) {
@@ -2799,7 +2811,7 @@ function detonateObstacle(obstacle: w.Obstacle, world: w.World) {
 
 function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: string, world: w.World): w.DetonateParameters {
 	const damagePacket = instantiateDamage(template, fromHeroId, world);
-	const knockbackScaling = calculateKnockbackScaling(fromHeroId, world, template.knockbackScaling);
+	const knockbackScaling = calculateScaling(fromHeroId, world, template.knockbackScaling);
 
 	return {
 		...template,
@@ -3670,7 +3682,6 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.buffs.set(id, {
 			...values, id, type: "lifeSteal",
 			lifeSteal: template.lifeSteal,
-			lifeStealTargetId: template.targetOnly ? config.otherId : null,
 		});
 	} else if (template.type === "burn") {
 		let stacked = false;
@@ -3757,22 +3768,10 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		return null;
 	}
 
-	let damage = template.damage;
+	let damage = template.damage * calculateScaling(fromHeroId, world, template.damageScaling);
 	let lifeSteal = template.lifeSteal;
 
 	const fromHero = world.objects.get(fromHeroId);
-	const damageScaling = template.damageScaling !== undefined ? template.damageScaling : true;
-	if (damageScaling && fromHeroId) { // Only scale damage from heroes (not the environment), even if they're dead
-		let bonus = 0;
-		if (fromHero && fromHero.category === "hero") {
-			bonus = fromHero.damageBonus;
-		}
-
-		const scaleFactor = 1 + bonus;
-		damage *= scaleFactor;
-	}
-
-	let lifeStealTargetHeroId: string = null;
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
 			if (buff.type === "lifeSteal") {
@@ -3780,7 +3779,6 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 					lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
 				} else {
 					lifeSteal = buff.lifeSteal;
-					lifeStealTargetHeroId = buff.lifeStealTargetId;
 				}
 			}
 		});
@@ -3789,7 +3787,6 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	return {
 		damage,
 		lifeSteal,
-		lifeStealTargetHeroId,
 		fromHeroId,
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
@@ -3834,7 +3831,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	toHero.health -= amount;
 
 	// Apply lifesteal
-	if (fromHero && packet.lifeSteal && (!packet.lifeStealTargetHeroId || packet.lifeStealTargetHeroId === toHero.id)) {
+	if (fromHero && packet.lifeSteal) {
 		fromHero.health = Math.min(fromHero.maxHealth, fromHero.health + amount * packet.lifeSteal);
 		world.ui.events.push({ type: "lifeSteal", tick: world.tick, owner: fromHero.id });
 	}
@@ -3854,12 +3851,6 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 		if (!packet.noKnockback) {
 			toHero.knockbackHeroId = fromHeroId;
 		}
-	}
-
-	// Update damage bonus
-	if (fromHero) {
-		const Hero = world.settings.Hero;
-		fromHero.damageBonus = Math.min(Hero.MaxDamageBonusProportion, fromHero.damageBonus + Hero.DamageBonusProportion * amount);
 	}
 }
 

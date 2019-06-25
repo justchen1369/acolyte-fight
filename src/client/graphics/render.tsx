@@ -1173,7 +1173,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			},
 		});
 	} else if (hero.uiCastTrail) {
-		const castRadius = ChargingIndicator.MinWidth + ChargingIndicator.WidthPerBonus * hero.damageBonus;
+		const castRadius = ChargingIndicator.MinWidth + ChargingIndicator.WidthPerBonus * engine.calculateScalingFromHero(hero, world);
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
 		if (proportion > 0) {
 			const strokeColor = parseColor(color).alpha(0.5 * proportion);

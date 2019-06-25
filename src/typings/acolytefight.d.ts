@@ -58,9 +58,7 @@ declare interface HeroSettings {
 
 	ThrottleTicks: number; // Within these many ticks, disallow multiple spells to be cast by the same hero
 
-	DamageBonusProportion: number; // for every 1hp of damage, increase damage by this proportion
-	MaxDamageBonusProportion: number; // don't let the damage bonus increase beyond this value
-	KnockbackRatio: number; // How much of the damage bonus applies to knockback 
+	ScalingBonus: number; // as acolytes get closer to 0hp, add this multiplier to damage and knockback
 
     MaxHealth: number;
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
