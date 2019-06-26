@@ -68,9 +68,9 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		"a": [
-            ["thrust"],
             ["teleport", "swap"],
             ["voidRush", "vanish"],
+            ["thrust"],
         ],
 		"q": [
             ["fireball", "flamestrike"],
@@ -79,25 +79,25 @@ const Choices: ChoiceSettings = {
             ["whip"],
         ],
 		"w": [
+            ["homing", "boomerang"],
             ["gravity", "whirlwind"],
             ["link", "grapple"],
             ["lightning"],
-            ["homing", "boomerang"],
         ],
 		"e": [
-            ["saber", "dualSaber"],
             ["shield", "icewall"],
+            ["saber", "dualSaber"],
             ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
-            ["kamehameha"],
-            ["bouncer", "repeater"],
             ["supernova", "rocket"],
+            ["bouncer", "repeater"],
+            ["kamehameha"],
         ],
 		"f": [
-            ["scourge"],
             ["firespray"],
+            ["scourge"],
             ["mines", "iceBomb"],
             ["halo"],
         ],
