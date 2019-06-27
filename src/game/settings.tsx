@@ -68,9 +68,9 @@ const Choices: ChoiceSettings = {
     ],
 	Options: {
 		"a": [
+            ["thrust"],
             ["teleport", "swap"],
             ["voidRush", "vanish"],
-            ["thrust"],
         ],
 		"q": [
             ["fireball", "flamestrike"],
