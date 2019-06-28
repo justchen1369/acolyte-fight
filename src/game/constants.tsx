@@ -84,6 +84,8 @@ export namespace HeroColors {
 	export const EaseInDistance = 0.5;
 	export const EasePower = 2.0;
 
+	export const ExitTicks = 30;
+
 	export const MyHeroColor = '#00ccff';
 	export const AllyColor = '#00a3cc';
 	export const BotColor = '#cccccc';

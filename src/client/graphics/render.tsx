@@ -365,6 +365,11 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 	const MaxTicks = 30;
 	const Speed = 0.1;
 
+	if (hero.exitTick) {
+		// Exited intentionally, not a death
+		return;
+	}
+
 	const pos = vector.clone(hero.body.getPosition());
 
 	for (let i = 0; i < NumParticles; ++i) {

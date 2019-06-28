@@ -2975,9 +2975,12 @@ function reap(world: w.World) {
 	let heroKilled = false;
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (obj.health <= 0 && !hasHorcrux(obj, world)) {
+			if ((obj.exitTick && world.tick >= obj.exitTick + HeroColors.ExitTicks) || obj.health <= 0 && !hasHorcrux(obj, world)) {
 				destroyObject(world, obj);
-				notifyKill(obj, world);
+				if (!obj.exitTick) {
+					// Exited intentionally, not a kill
+					notifyKill(obj, world);
+				}
 				heroKilled = true;
 			}
 		} else if (obj.category === "projectile") {
