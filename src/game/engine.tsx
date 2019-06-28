@@ -1021,7 +1021,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 
 	let layout: Layout = Layouts[ev.layoutId];
 	if (!layout) {
-		const layouts = Object.keys(Layouts).map(key => Layouts[key]).filter(x => !!x);
+		const layouts = Object.keys(Layouts).sort().map(key => Layouts[key]).filter(x => !!x);
 		layout = layouts[world.seed % layouts.length];
 	}
 	
