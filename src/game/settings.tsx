@@ -1068,6 +1068,7 @@ const bouncer: Spell = {
         expireOn: Categories.Massive,
         shieldTakesOwnership: false,
         bounce: {
+            cleanseable: true,
         },
 
         sound: "bouncer",

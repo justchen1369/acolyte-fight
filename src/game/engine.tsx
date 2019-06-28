@@ -2373,6 +2373,10 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 		return;
 	}
 
+	if (projectile.bounce.cleanseable && nextTarget.cleanseTick && nextTarget.cleanseTick >= projectile.createTick) {
+		return;
+	}
+
 	if (isHeroInvisible(nextTarget) && (calculateAlliance(projectile.owner, nextTarget.id, world) & Alliances.NotFriendly) > 0) {
 		return;
 	}

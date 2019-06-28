@@ -373,6 +373,7 @@ declare interface GravityParameters {
 }
 
 declare interface BounceParameters {
+	cleanseable?: boolean; // If the target player casts a cleanse (like teleport), stop bouncing towards them
 }
 
 declare interface HorcruxParameters {
