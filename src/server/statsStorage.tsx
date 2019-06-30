@@ -900,11 +900,7 @@ function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.Pl
 }
 
 function calculateAverageRating(ratings: number[]) {
-    let product = 1;
-    for (const rating of ratings) {
-        product *= rating;
-    }
-    return Math.pow(product, 1 / ratings.length);
+    return _.mean(ratings);
 }
 
 function calculateNewStats(userRating: g.UserRating, player: m.PlayerStatsMsg, isWinner: boolean) {
