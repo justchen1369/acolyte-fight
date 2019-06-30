@@ -27,12 +27,12 @@ export function isStartGameTick(tickData: m.TickMsg) {
 	return result;
 }
 
-export function applyTick(tickData: m.TickMsg, world: w.World, preferredColors: Map<string, string> = null) {
-    applyTickActions(tickData, world, preferredColors);
+export function applyTick(tickData: m.TickMsg, world: w.World) {
+    applyTickActions(tickData, world);
     engine.tick(world);
 }
 
-function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: Map<string, string> = null) {
+function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	if (tickData.gameId !== world.ui.myGameId) {
 		return;
 	}
@@ -61,7 +61,6 @@ function applyTickActions(tickData: m.TickMsg, world: w.World, preferredColors: 
 				partyHash: actionData.partyHash,
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
-				preferredColor: preferredColors && preferredColors.get(actionData.userHash),
 				isBot: actionData.isBot,
 				isMobile: actionData.isMobile,
 			});

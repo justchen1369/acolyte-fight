@@ -1355,7 +1355,10 @@ function handleJoining(ev: w.Joining, world: w.World) {
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world);
 
-	const uiBaseColor = chooseNewPlayerColor(ev.preferredColor, world);
+	const preferredColor = colorWheel.getPreferredColor(ev.userHash);
+	const uiBaseColor = chooseNewPlayerColor(preferredColor, world);
+	colorWheel.setPreferredColor(ev.userHash, uiBaseColor);
+
 	const player: w.Player = {
 		heroId: hero.id,
 		userId: ev.userId,

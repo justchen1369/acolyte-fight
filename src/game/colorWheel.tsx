@@ -2,9 +2,18 @@ import Color from 'color';
 import { HeroColors } from './constants';
 
 let nextColors = [...HeroColors.Colors];
+const preferredColors = new Map<string, string>();
 
 export function getColorQueue() {
     return nextColors;
+}
+
+export function getPreferredColor(userHash: string) {
+    return preferredColors.get(userHash);
+}
+
+export function setPreferredColor(userHash: string, color: string) {
+    preferredColors.set(userHash, color);
 }
 
 export function takeColor(preferredColor: string): string {

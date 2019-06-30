@@ -9,8 +9,6 @@ import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
 import { notify } from './notifications';
 
-const preferredColors = new Map<string, string>(); // userHash -> color
-
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
@@ -33,12 +31,6 @@ export function reset(history: m.TickMsg[], live: boolean) {
 		}
 	}
 }
-
-export function setPreferredColor(userHash: string, color: string) {
-	preferredColors.set(userHash, color);
-}
-
-
 
 function incomingLoop(minFramesToProcess: number) {
 	const world = StoreProvider.getState().world;
@@ -94,7 +86,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 			continue; // Received the same tick multiple times, skip over it
 		}
 
-		processor.applyTick(tickData, world, preferredColors);
+		processor.applyTick(tickData, world);
 
 		/*
 		const hash = engine.hash(world);
