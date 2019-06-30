@@ -37,11 +37,10 @@ export class TitleSection extends React.Component<Props, State> {
                 This game is a 2D skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
                 This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
             </p>
+            <h2>Special rules</h2>
             <p>
-                Acolytes become more dangerous as they lose health. You scale up to {1 + this.props.settings.Hero.ScalingBonus}x damage and knockback as you get closer to 0hp.
-                Also, if multiple opponents attack you within {this.props.settings.Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds,
+                If multiple opponents attack you within {this.props.settings.Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds,
                 you will only take damage from the opponent who did the most damage.
-                This means you can always make a comeback, just keep dodging and aim carefully!
             </p>
             <h1>Community</h1>
             <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>

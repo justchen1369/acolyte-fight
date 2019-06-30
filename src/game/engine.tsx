@@ -619,17 +619,7 @@ export function calculateScaling(heroId: string, world: w.World, scaling: boolea
 }
 
 export function calculateScalingFromHero(hero: w.Hero, world: w.World, scaling: boolean = true) {
-	if (!scaling) {
-		return 1;
-	}
-
-	let hpProportion = 0;
-	if (hero && hero.category === "hero") {
-		hpProportion = Math.max(0, hero.health / hero.maxHealth);
-	}
-
-	const Hero = world.settings.Hero;
-	return 1 + (1 - hpProportion) * Hero.ScalingBonus;
+	return 1;
 }
 
 function ticksTo(distance: number, speed: number) {

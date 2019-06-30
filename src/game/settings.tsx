@@ -18,8 +18,6 @@ const Hero: HeroSettings = {
     DamageMitigationTicks: 90,
     ThrottleTicks: 15,
 
-    ScalingBonus: 1.5,
-
     MaxHealth: 100,
     SeparationImpulsePerTick: 0.01,
 
