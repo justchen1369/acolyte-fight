@@ -6,6 +6,7 @@ import * as Reselect from 'reselect';
 import * as s from '../../store.model';
 import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
+import Button from '../../controls/button';
 import PlayButton from '../../ui/playButton';
 
 interface OwnProps {
@@ -41,7 +42,7 @@ class DeadMessage extends React.PureComponent<Props, State> {
 
             <div className="action-row">
                 <div style={{ marginBottom: 12 }}>
-                    <b><a href="#" onClick={() => this.props.onSpectateClick()}>Continue Watching</a></b> or
+                    <b><Button className="link-btn" onClick={() => this.props.onSpectateClick()}>Continue Watching</Button></b> or
                 </div>
                 <div>
                     <PlayButton again={!!this.props.myHeroId} />

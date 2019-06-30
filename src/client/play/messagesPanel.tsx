@@ -5,13 +5,13 @@ import * as s from '../store.model';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
-import * as engine from '../../game/engine';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as pages from '../core/pages';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
+import Link from '../controls/link';
 import DeadMessage from './messages/deadMessage';
 import LeftMessage from './messages/leftMessage';
 import HelpMessage from './messages/helpMessage';
@@ -218,17 +218,11 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             const delta = notification.acoDelta;
             return <div key={key} className="row rating-notification">
                 <div>Your rating has changed: {this.renderRatingAdjustment(delta)}.</div>
-                <div className="unranked-hint"><a href="profile" onClick={(ev) => this.onProfileClicked(ev)}>Go to your profile</a> to changed to unranked mode.</div>
+                <div className="unranked-hint"><Link page="profile" profileId={this.props.userId} onClick={() => matches.leaveCurrentGame()}>Go to your profile</Link> to changed to unranked mode.</div>
             </div>
         } else {
             return null;
         }
-    }
-
-    private onProfileClicked(ev: React.MouseEvent) {
-        ev.preventDefault();
-        matches.leaveCurrentGame();
-        pages.changePage("profile", this.props.userId);
     }
 
 

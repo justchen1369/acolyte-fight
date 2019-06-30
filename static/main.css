@@ -139,6 +139,16 @@ a:hover, a:active {
     color: #ff8800;
 }
 
+.link-btn, .link-btn:visited {
+    cursor: pointer;
+    pointer-events: all;
+    color: #00ccff;
+    text-decoration: none;
+}
+.link-btn:hover, .link-btn:active {
+    color: #ff8800;
+}
+
 .clear {
     clear: both;
 }

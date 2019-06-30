@@ -40,8 +40,8 @@ class WaitingMessage extends React.PureComponent<Props, State> {
             <div className="body-row">
                 {numOnline} {numOnline === 1 ? "player" : "players"} online{!isPublic && " in this game mode"}.
                 {' '}
-                {this.props.exitable && numOnline <= 1 && <>You might find players on <a href="/regions" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</a>.</>}
-                {this.props.exitable && numOnline > 1 && <>Would you like to <a href="/#watch" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</a>?</>}
+                {this.props.exitable && numOnline <= 1 && <>You might find players on <Button className="link-btn" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</Button>.</>}
+                {this.props.exitable && numOnline > 1 && <>Would you like to <Button className="link-btn" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</Button>?</>}
             </div>
             {this.props.numPlayers <= 1 && <div className="action-row">
                 <Button onClick={() => matches.addBotToCurrentGame()}>Play vs AI</Button>
