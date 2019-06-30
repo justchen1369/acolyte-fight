@@ -21,7 +21,7 @@ import { logger } from './logging';
 import { DefaultSettings } from '../game/settings';
 import { required, optional } from './schema';
 
-const TeamGameChance = 0.33;
+const TeamGameChance = 1.0;
 
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
@@ -185,7 +185,8 @@ export function calculateRoomStats(segment: string): number {
 }
 
 export function apportionPerGame(totalPlayers: number) {
-	return Math.ceil(averagePlayersPerGame(totalPlayers));
+	// Round up to nearest even number
+	return Math.min(Matchmaking.MaxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers) / 2) * 2);
 }
 
 export function minPerGame(totalPlayers: number) {
