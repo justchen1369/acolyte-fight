@@ -6,9 +6,12 @@ import * as rooms from './rooms';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import { getSocket } from './sockets';
+import { loaded } from './loader';
 import { isMobile } from './userAgent';
 
-export function createPartyAsync(): Promise<void> {
+export async function createPartyAsync(): Promise<void> {
+	await loaded(); // Ensure the correct room has been joined
+
 	const store = StoreProvider.getState();
 	return new Promise<string>((resolve, reject) => {
 		let msg: m.CreatePartyRequest = {

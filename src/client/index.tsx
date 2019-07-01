@@ -126,7 +126,6 @@ async function start() {
             await parties.joinPartyAsync(query.party);
         } else {
             await rooms.joinRoomAsync(rooms.DefaultRoom);
-            await parties.movePartyAsync(rooms.DefaultRoom); // In case user is so fast they create a party before default room loaded
         }
     } catch(error) {
         console.error(error)
