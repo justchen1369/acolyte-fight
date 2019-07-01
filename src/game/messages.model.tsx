@@ -20,6 +20,12 @@ export namespace GameCategory {
     ];
 }
 
+export namespace LockType {
+    export const ModPreview = "mod-preview";
+    export const Tutorial = "tutorial";
+    export const Blocked = "blocked";
+}
+
 export namespace ActionType {
     export const Environment = "environment";
     export const Join = "join";
@@ -151,10 +157,11 @@ export interface JoinMsg {
     isMobile: boolean;
     observe: boolean;
     live: boolean;
-    locked: boolean;
+    locked: string;
     version: string;
     unranked: boolean;
     reconnectKey?: string;
+    numBots?: number;
 }
 
 export interface JoinResponse {
@@ -264,6 +271,7 @@ export interface HeroMsg {
     isPrivate: boolean;
     partyId: string;
     room: string | null;
+    locked: string | null;
 
     mod: Object;
 

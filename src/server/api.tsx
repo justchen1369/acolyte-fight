@@ -266,6 +266,7 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
             userHash,
             isPrivate: replay.isPrivate,
             partyId: replay.partyId,
+            locked: replay.locked,
             room: replay.roomId,
             mod: replay.mod,
             live: false,

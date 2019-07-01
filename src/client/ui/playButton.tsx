@@ -1,9 +1,8 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
-import * as w from '../../game/world.model';
 import * as options from '../options';
-import * as ai from '../core/ai';
 import * as matches from '../core/matches';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
@@ -17,6 +16,7 @@ interface OwnProps {
 }
 interface Props {
     again: boolean;
+    isNewPlayer: boolean;
     selfId: string;
     party: s.PartyState;
     isModded: boolean;
@@ -28,6 +28,7 @@ interface State {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         again: ownProps.again || false,
+        isNewPlayer: state.isNewPlayer,
         party: state.party,
         selfId: state.socketId,
         isModded: rooms.isModded(state.room),
@@ -89,7 +90,12 @@ class PlayButton extends React.Component<Props, State> {
 
         await loaded();
 
-        matches.joinNewGame({});
+        const joinParams: matches.JoinParams = {};
+        if (this.props.isNewPlayer) {
+            joinParams.locked = m.LockType.Tutorial;
+            joinParams.numBots = 1;
+        }
+        matches.joinNewGame(joinParams);
     }
 
     private onPartyReadyClicked(ready: boolean) {

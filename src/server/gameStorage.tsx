@@ -110,6 +110,7 @@ function extractReplay(game: g.Game): g.Replay {
         roomId: game.roomId,
         partyId: game.partyId,
         isPrivate: game.isPrivate,
+        locked: game.locked,
 
         mod: game.mod,
 

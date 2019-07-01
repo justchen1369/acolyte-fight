@@ -94,6 +94,7 @@ export interface UIState {
 	myUserHash: string | null;
 	reconnectKey: string | null;
 	live: boolean;
+	locked?: string;
 
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;

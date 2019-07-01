@@ -1,5 +1,6 @@
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as convert from './convert';
 import * as matches from '../core/matches';
@@ -29,7 +30,7 @@ export function updateSelected(selectedId: string) {
 export async function previewMod(mod: ModTree, layoutId: string = null) {
     if (mod) {
         const roomId = await rooms.createRoomAsync(mod)
-        await matches.joinNewGame({ layoutId, roomId, locked: true });
+        await matches.joinNewGame({ layoutId, roomId, locked: m.LockType.ModPreview });
     }
 }
 

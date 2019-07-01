@@ -254,7 +254,7 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 	}
 }
 
-export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, locked: boolean = false, layoutId: string = null) {
+export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, locked: string = null, layoutId: string = null) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
@@ -280,6 +280,7 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		tick: 0,
 		activeTick: 0,
 		joinable: true,
+		locked,
 		closeTick: Matchmaking.MaxHistoryLength,
 		ranked: false,
 		actions: new Map<string, m.ActionMsg>(),
@@ -308,7 +309,12 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 	if (room) {
 		gameName = room.id + "/" + gameName;
 	}
-	logger.info(`Game [${gameName}]: started (${game.segment})`);
+	
+	let lockedFormat = "";
+	if (locked) {
+		lockedFormat = " " + locked;
+	}
+	logger.info(`Game [${gameName}]: started (${game.segment})${lockedFormat}`);
 	return game;
 }
 

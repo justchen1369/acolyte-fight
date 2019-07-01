@@ -8,7 +8,6 @@ import * as constants from '../../game/constants';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
-import * as pages from '../core/pages';
 import * as StoreProvider from '../storeProvider';
 import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
 import Link from '../controls/link';

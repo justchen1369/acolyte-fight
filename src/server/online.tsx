@@ -101,6 +101,10 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 	const left = new Set<string>(scoreboard.online.keys());
 	const joined = new Array<g.OnlinePlayer>();
 	games.forEach(game => {
+		if (game.locked) {
+			return; // Private game - doesn't count
+		}
+
 		game.active.forEach(player => {
 			left.delete(player.userHash);
 				

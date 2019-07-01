@@ -14,6 +14,7 @@ import InfoPanelPlayerList from './infoPanelPlayerList';
 
 interface Props {
     live: boolean;
+    locked: boolean;
 }
 interface State {
     hoveringMetric: string;
@@ -23,6 +24,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         live: state.world.ui.live,
+        locked: !!state.world.ui.locked,
     };
 }
 
@@ -36,7 +38,7 @@ class InfoPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (!this.props.live) {
+        if (!this.props.live || this.props.locked) {
             // Watching replay, cannot see leaderboard
             return null;
         }

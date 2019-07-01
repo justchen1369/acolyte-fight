@@ -12,9 +12,9 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.myUserHash = data.userHash;
 	world.ui.reconnectKey = data.reconnectKey;
 	world.ui.live = data.live;
+	world.ui.locked = data.locked;
 
 	return world;
-
 }
 
 export function isStartGameTick(tickData: m.TickMsg) {

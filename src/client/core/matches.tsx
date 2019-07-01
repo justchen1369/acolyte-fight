@@ -18,15 +18,16 @@ export interface JoinParams {
 	live?: boolean;
 	layoutId?: string;
 	roomId?: string;
-	locked?: boolean;
+	locked?: string;
 	reconnectKey?: string;
+	numBots?: number;
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 	return new Promise<boolean>(resolve => {
 		const live = opts.live || false;
 		const observe = opts.observe || false;
-		const locked = opts.locked || false;
+		const locked = opts.locked || null;
 
 		const store = StoreProvider.getState();
 		if (store.socketId) {
@@ -43,6 +44,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				live,
 				locked,
 				version: engine.version(),
+				numBots: opts.numBots || 0,
 			};
 			getSocket().emit('join', msg, (response: m.JoinResponseMsg) => {
 				if (response.success) {

@@ -366,9 +366,10 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& optional(data.gameId, "string")
 		&& optional(data.isMobile, "boolean")
 		&& optional(data.unranked, "boolean")
-		&& optional(data.locked, "boolean")
+		&& optional(data.locked, "string")
 		&& optional(data.observe, "boolean")
 		&& optional(data.reconnectKey, "string")
+		&& optional(data.numBots, "number")
 	)) {
 		callback({ success: false, error: "Bad request" });
 		return;
@@ -399,8 +400,8 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		} else {
 			// This method is always used for public games
 			const partyId: string = null;
-			const locked = data.locked || blacklist.isBlocked(socket.id);
-			const isPrivate: boolean = locked;
+			const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
+			const isPrivate: boolean = !!locked;
 
 			if (data.observe) {
 				return games.findExistingGame(data.version, room, partyId, isPrivate);
@@ -435,6 +436,13 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 					heroId = joinResult.heroId;
 					reconnectKey = joinResult.reconnectKey;
 					live = true;
+				}
+
+				if (data.numBots) {
+					const numBots = Math.min(constants.Matchmaking.MaxPlayers, data.numBots);
+					for (let i = 0; i < numBots; ++i) {
+						games.addBot(game as g.Game);
+					}
 				}
 			}
 
@@ -598,6 +606,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 		heroId,
 		userHash,
 		reconnectKey,
+		locked: game.locked,
 		isPrivate: game.segment !== publicSegment,
 		partyId: game.partyId,
 		room: game.roomId,

@@ -6,7 +6,9 @@ import * as Reselect from 'reselect';
 import * as matches from '../../core/matches';
 import * as pages from '../../core/pages';
 import * as segments from '../../../game/segments';
+import * as m from '../../../game/messages.model';
 import * as s from '../../store.model';
+import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
 import { worldInterruptible } from '../../core/matches';
 import Button from '../../controls/button';
@@ -15,6 +17,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     segment: string;
+    locked: string;
     numOnline: number;
     numPlayers: number;
     exitable: boolean;
@@ -25,6 +28,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         segment: state.onlineSegment,
+        locked: state.world.ui.locked,
         numOnline: state.online.size,
         numPlayers: state.world.players.size,
         exitable: worldInterruptible(state.world),
@@ -33,6 +37,14 @@ function stateToProps(state: s.State): Props {
 
 class WaitingMessage extends React.PureComponent<Props, State> {
     render() {
+        if (this.props.locked === m.LockType.Tutorial) {
+            return null; // Tutorial handled elsewhere
+        } else {
+            return this.renderOnline();
+        }
+    }
+
+    private renderOnline() {
         const numOnline = this.props.numOnline;
         const isPublic = this.props.segment === segments.publicSegment();
         return <div className="waiting-panel dialog-panel">
@@ -40,8 +52,8 @@ class WaitingMessage extends React.PureComponent<Props, State> {
             <div className="body-row">
                 {numOnline} {numOnline === 1 ? "player" : "players"} online{!isPublic && " in this game mode"}.
                 {' '}
-                {this.props.exitable && numOnline <= 1 && <>You might find players on <Button className="link-btn" onClick={(ev) => this.onRegionsLinkClick(ev)}>other regions</Button>.</>}
-                {this.props.exitable && numOnline > 1 && <>Would you like to <Button className="link-btn" onClick={(ev) => this.onWatchLiveClick(ev)}>watch the other players</Button>?</>}
+                {this.props.exitable && numOnline <= 1 && <>You might find players on <Button className="link-btn" onClick={() => this.onRegionsLinkClick()}>other regions</Button>.</>}
+                {this.props.exitable && numOnline > 1 && <>Would you like to <Button className="link-btn" onClick={() => this.onWatchLiveClick()}>watch the other players</Button>?</>}
             </div>
             {this.props.numPlayers <= 1 && <div className="action-row">
                 <Button onClick={() => matches.addBotToCurrentGame()}>Play vs AI</Button>
@@ -49,14 +61,13 @@ class WaitingMessage extends React.PureComponent<Props, State> {
         </div>
     }
 
-    private onRegionsLinkClick(ev: React.MouseEvent) {
-        ev.preventDefault();
+    private onRegionsLinkClick() {
         matches.leaveCurrentGame(true);
         pages.changePage("regions");
     }
 
-    private onWatchLiveClick(ev: React.MouseEvent) {
-        ev.preventDefault();
+    private onWatchLiveClick() {
+        matches.leaveCurrentGame(true);
         matches.watchLiveGame();
     }
 }

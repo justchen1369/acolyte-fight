@@ -56,6 +56,7 @@ export interface Replay {
     roomId: string | null;
     partyId: string | null;
     isPrivate: boolean;
+    locked: string | null;
 
     mod: Object;
 
