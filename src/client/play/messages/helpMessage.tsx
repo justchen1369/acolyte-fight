@@ -3,6 +3,7 @@ import Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
+import * as analytics from '../../core/analytics';
 import * as m from '../../../game/messages.model';
 import * as matches from '../../core/matches';
 import * as s from '../../store.model';
@@ -99,6 +100,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
     private onExitTutorialClick() {
         StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
         matches.joinNewGame({});
+        analytics.send('exitTutorial');
     }
 
     private onCloseHelpClicked(e: React.MouseEvent) {
