@@ -11,7 +11,7 @@ export function onNotification(notifs: w.Notification[]) {
     if (notifs.some(n => n.type === "win")) {
         const state = StoreProvider.getState();
         const world = state.world;
-        if (world.winner && world.ui.myHeroId && world.winner === world.ui.myHeroId) {
+        if (state.isNewPlayer && world.winner && world.ui.myHeroId && world.winner === world.ui.myHeroId) {
             StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
         }
     }
