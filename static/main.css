@@ -458,6 +458,12 @@ a:hover, a:active {
 .home .primary-button-row .btn {
     font-size: 285%;
 }
+.home .secondary-button-row .btn {
+    background: linear-gradient(to bottom, #08b, #08b 90%, #045 90%, #045);
+}
+.home .secondary-button-row .btn:hover {
+    background: #f80;
+}
 .home .btn.disabled {
     background-color: #ccc;
 }
