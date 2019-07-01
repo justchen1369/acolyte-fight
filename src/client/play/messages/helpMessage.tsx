@@ -88,7 +88,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
         return <div className="waiting-panel dialog-panel">
             <div className="header-row">Tutorial</div>
             <div className="body-row">
-                Try fighting this bot until you are ready to enter the real game!
+                Fight this bot until you are ready to enter the real game!
             </div>
             <div className="action-row">
                 <Button onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
