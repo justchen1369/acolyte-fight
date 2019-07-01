@@ -61,7 +61,6 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				partyHash: actionData.partyHash,
 				playerName: actionData.playerName || "Acolyte",
 				keyBindings: actionData.keyBindings,
-				isBot: actionData.isBot,
 				isMobile: actionData.isMobile,
 			});
 		} else if (actionData.type === m.ActionType.Bot) {

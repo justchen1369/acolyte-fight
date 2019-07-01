@@ -1367,7 +1367,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 		name: ev.playerName,
 		uiBaseColor,
 		uiColor: choosePlayerColor(hero.id, ev.userHash, uiBaseColor, world),
-		isBot: ev.isBot,
+		isBot: false,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
 	};

@@ -112,7 +112,6 @@ function extractReplay(game: g.Game): g.Replay {
         isPrivate: game.isPrivate,
 
         mod: game.mod,
-        allowBots: game.allowBots,
 
         numPlayers: game.numPlayers,
         history: game.history,

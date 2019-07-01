@@ -93,7 +93,7 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, newUserHashes: string[]): g.Game {
+export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
@@ -141,12 +141,12 @@ export function findNewGame(version: string, room: g.Room | null, partyId: strin
 	}
 
 	if (!game) {
-		game = initGame(version, room, partyId, isPrivate, allowBots);
+		game = initGame(version, room, partyId, isPrivate);
 	}
 	return game;
 }
 
-export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean): g.Game {
+export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
@@ -254,7 +254,7 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 	}
 }
 
-export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, allowBots: boolean, locked: boolean = false, layoutId: string = null) {
+export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, locked: boolean = false, layoutId: string = null) {
 	const store = getStore();
 	const roomId = room ? room.id : null;
 
@@ -266,7 +266,6 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		partyId,
 		isPrivate,
 		mod: room ? room.mod : {},
-		allowBots,
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
@@ -320,7 +319,6 @@ export function assignPartyToGames(party: g.Party) {
 
 	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
-	const allowBots = [...party.active.values()].some(p => p.isBot);
 	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready && !p.isObserver));
 	const maxPlayersPerGame = apportionPerGame(remaining.length);
 	while (remaining.length > 0) {
@@ -335,7 +333,7 @@ export function assignPartyToGames(party: g.Party) {
 		}
 
 		// Assume all party members on same engine version
-		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, allowBots, group.map(p => p.userHash));
+		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, group.map(p => p.userHash));
 		for (const member of group) {
 			const joinParams: g.JoinParameters = { ...member, partyHash };
 			const joinResult = joinGame(game, joinParams);
@@ -585,7 +583,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 				partyHash: params.partyHash,
 				playerName: params.name,
 				keyBindings: params.keyBindings,
-				isBot: params.isBot,
 				isMobile: params.isMobile,
 			});
 		}

@@ -327,7 +327,6 @@ export interface Joining {
 	heroId: string;
 	playerName: string;
 	keyBindings: KeyBindings;
-	isBot: boolean;
 	isMobile: boolean;
 }
 

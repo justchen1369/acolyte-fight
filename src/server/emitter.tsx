@@ -157,7 +157,6 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		&& required(data.playerName, "string")
 		&& required(data.keyBindings, "object")
 		&& optional(data.unranked, "boolean")
-		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
 	)) {
 		callback({ success: false, error: "Bad request" });
@@ -171,7 +170,6 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 		name: data.playerName,
 		authToken,
 		keyBindings: data.keyBindings,
-		isBot: data.isBot,
 		isMobile: data.isMobile,
 		unranked: data.unranked,
 		version: data.version,
@@ -241,7 +239,6 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		&& required(data.keyBindings, "object")
 		&& optional(data.joining, "boolean")
 		&& optional(data.unranked, "boolean")
-		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
 	)) {
 		callback({ success: false, error: "Bad request" });
@@ -275,7 +272,6 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 		authToken,
 		name: data.playerName,
 		keyBindings: data.keyBindings,
-		isBot: data.isBot,
 		isMobile: data.isMobile,
 		unranked: data.unranked,
 		version: data.version,
@@ -368,7 +364,6 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 		&& optional(data.room, "string")
 		&& optional(data.layoutId, "string")
 		&& optional(data.gameId, "string")
-		&& optional(data.isBot, "boolean")
 		&& optional(data.isMobile, "boolean")
 		&& optional(data.unranked, "boolean")
 		&& optional(data.locked, "boolean")
@@ -408,12 +403,12 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			const isPrivate: boolean = locked;
 
 			if (data.observe) {
-				return games.findExistingGame(data.version, room, partyId, isPrivate, data.isBot);
+				return games.findExistingGame(data.version, room, partyId, isPrivate);
 			} else if (locked) {
 				// The user wants a private game, create one
-				return games.initGame(data.version, room, partyId, isPrivate, data.isBot, locked, data.layoutId);
+				return games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
 			} else {
-				return games.findNewGame(data.version, room, partyId, isPrivate, data.isBot, [userHash]);
+				return games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
 			}
 		}
 	}).catch(err => {
@@ -429,7 +424,6 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 					userHash,
 					name: playerName,
 					keyBindings: data.keyBindings,
-					isBot: data.isBot,
 					isMobile: data.isMobile,
 					authToken,
 					unranked: data.unranked,
@@ -447,8 +441,7 @@ function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinM
 			emitHero(socket.id, game, heroId, reconnectKey, live);
 
 			if (heroId) {
-				const botLog = data.isBot ? " (bot)" : "";
-				logger.info(`Game [${game.id}]: player ${playerName}${botLog} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+				logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
 			} else {
 				logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 			}
@@ -609,7 +602,6 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 		partyId: game.partyId,
 		room: game.roomId,
 		mod: game.mod,
-		allowBots: game.allowBots,
 		live,
 		history: game.history,
 	};
@@ -640,7 +632,6 @@ function partyMembersToContract(party: g.Party) {
 			socketId: member.socketId,
 			name: member.name,
 			ready: member.ready,
-			isBot: member.isBot,
 			isObserver: member.isObserver,
 			isLeader: member.isLeader,
 		}

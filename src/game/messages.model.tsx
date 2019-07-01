@@ -91,7 +91,6 @@ export interface JoinActionMsg extends ActionMsgBase {
     partyHash?: string;
     playerName: string;
     keyBindings: KeyBindings;
-    isBot: boolean;
     isMobile: boolean;
 }
 
@@ -149,7 +148,6 @@ export interface JoinMsg {
     layoutId: string | null;
     name: string;
     keyBindings: KeyBindings;
-    isBot: boolean;
     isMobile: boolean;
     observe: boolean;
     live: boolean;
@@ -268,7 +266,6 @@ export interface HeroMsg {
     room: string | null;
 
     mod: Object;
-    allowBots: boolean;
 
     live: boolean;
     history: TickMsg[];
@@ -279,7 +276,6 @@ export interface CreatePartyRequest {
 
     playerName: string;
     keyBindings: KeyBindings;
-    isBot: boolean;
     isMobile: boolean;
     unranked: boolean;
     version: string;
@@ -298,7 +294,6 @@ export interface PartyRequest {
     partyId: string;
     playerName: string;
     keyBindings: KeyBindings;
-    isBot: boolean;
     isMobile: boolean;
     unranked: boolean;
     version: string;
@@ -359,7 +354,6 @@ export interface PartyMemberMsg {
     socketId: string;
     name: string;
     ready: boolean;
-    isBot: boolean;
     isObserver: boolean;
     isLeader: boolean;
 }

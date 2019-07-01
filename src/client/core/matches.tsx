@@ -37,7 +37,6 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				keyBindings: store.keyBindings,
 				room: opts.roomId || store.room.id,
 				layoutId: opts.layoutId || null,
-				isBot: ai.playingAsAI(store) && !opts.gameId,
 				isMobile,
 				unranked: store.options.unranked || false,
 				observe,
@@ -138,7 +137,7 @@ export function onHeroMsg(data: m.HeroMsg) {
 
 	ticker.reset(data.history, data.live);
 
-	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod, data.allowBots);
+	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod);
 
 	StoreProvider.dispatch({ type: "joinMatch", world });
 	notify({

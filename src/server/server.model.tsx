@@ -58,7 +58,6 @@ export interface Replay {
     isPrivate: boolean;
 
     mod: Object;
-    allowBots: boolean;
 
     numPlayers: number;
 	history: m.TickMsg[];
@@ -134,7 +133,6 @@ export interface JoinParameters {
     name: string;
     authToken: string;
     keyBindings: KeyBindings;
-    isBot: boolean;
     isMobile: boolean;
     unranked: boolean;
     version: string;

@@ -14,11 +14,6 @@ export function startTimers() {
     setInterval(() => onTick(StoreProvider.getState().world), 100);
 }
 
-export function playingAsAI(store: s.State = null) {
-    store = store || StoreProvider.getState();
-    return !!store.aiCode;
-}
-
 export function onTick(world: w.World) {
     if (!world.ui.myGameId) {
         return;

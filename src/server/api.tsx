@@ -268,7 +268,6 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
             partyId: replay.partyId,
             room: replay.roomId,
             mod: replay.mod,
-            allowBots: replay.allowBots,
             live: false,
             history: replay.history,
         };

@@ -70,7 +70,6 @@ export interface PartyMemberState {
 	socketId: string;
 	name: string;
 	ready: boolean;
-	isBot: boolean;
     isObserver: boolean;
     isLeader: boolean;
 }

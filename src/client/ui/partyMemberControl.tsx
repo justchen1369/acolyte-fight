@@ -33,7 +33,6 @@ export class PartyMemberControl extends React.PureComponent<Props> {
             <span className="party-member-name">{member.name}</span>
             {showAll && member.isLeader && <i className="settings-icon fas fa-crown" title={`${member.name} is the party leader`} onClick={() => !isSelf && editable && parties.makeLeaderAsync(member.socketId, false)} />}
             {showAll && !member.isLeader && <i className="settings-icon fas fa-user" title={`${member.name} is not the party leader`} onClick={() => editable && parties.makeLeaderAsync(member.socketId)} />}
-            {member.isBot && <i className="settings-icon fas fa-microchip" title={`${member.name} is playing using AI autopilot`} onClick={() => pages.changePage("ai")} />}
             {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => editable && parties.makeObserverAsync(member.socketId, false)} />}
             {showAll && !member.isObserver && <i className="settings-icon fas fa-gamepad" title={`${member.name} is playing (not observing)`} onClick={() => editable && parties.makeObserverAsync(member.socketId, true)} />}
             <div className="spacer" />
