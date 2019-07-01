@@ -45,13 +45,10 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null; // Logged-in user doesn't need instructions
         }
 
-        if (this.props.showingHelp) {
-            return this.renderHelp();
-        } else if (this.props.tutorial) {
-            return this.renderTutorial();
-        } else {
-            return null;
-        }
+        return <>
+            {this.props.showingHelp && this.renderHelp()}
+            {this.props.tutorial && this.renderTutorial()}
+        </>
     }
 
     private renderHelp() {
