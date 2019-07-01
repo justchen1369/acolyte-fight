@@ -57,7 +57,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
     private renderHelp() {
         const closeLink =
             <div className="action-row">
-                <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>{this.props.tutorial ? "Next" : "OK"}</Button>
+                <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</Button>
             </div>;
 
         if (isMobile) {
@@ -89,7 +89,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
         return <div className="waiting-panel dialog-panel">
             <div className="header-row">Tutorial</div>
             <div className="body-row">
-                Fight this bot until you are ready to play against humans!
+                Defeat this bot!
             </div>
             <div className="action-row">
                 <Button onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>

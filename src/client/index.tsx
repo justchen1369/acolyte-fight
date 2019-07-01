@@ -26,6 +26,7 @@ import * as stats from './core/stats';
 import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
 import * as ticker from './core/ticker';
+import * as tutor from './core/tutor';
 import * as tracker from './core/tracker';
 import * as url from './url';
 import * as userAgent from './core/userAgent';
@@ -45,6 +46,7 @@ export async function initialize() {
     notifications.attachListener(n => cloud.onNotification(n));
     notifications.attachListener(n => stats.onNotification(n));
     notifications.attachListener(n => rankings.onNotification(n));
+    notifications.attachListener(n => tutor.onNotification(n));
 
     sockets.listeners.onGameMsg = stats.onGameMsg;
     sockets.listeners.onHeroMsg = matches.onHeroMsg;
