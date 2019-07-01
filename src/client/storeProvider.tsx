@@ -85,7 +85,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, ads: action.ads };
     } else if (action.type === "updateUserId") {
         let newState: s.State = { ...state, userId: action.userId, loggedIn: action.loggedIn, profile: null };
-        if (action.loggedIn) {
+        if (action.userId) {
             newState.isNewPlayer = false;
         }
         return newState;
