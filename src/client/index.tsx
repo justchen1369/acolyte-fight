@@ -91,6 +91,7 @@ function loadCSS(href: string): Promise<void> {
 async function loginAsync() {
     const userId = await cloud.downloadSettings();
     if (userId) {
+        StoreProvider.dispatch({ type: "clearNewPlayerFlag" }); // This user is not new
         tracker.setUserId(userId);
         await parties.updatePartyAsync();
     }
