@@ -45,16 +45,19 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null; // Logged-in user doesn't need instructions
         }
 
-        return <>
-            {this.props.showingHelp && this.renderHelp()}
-            {this.props.tutorial && this.renderTutorial()}
-        </>
+        if (this.props.showingHelp) {
+            return this.renderHelp();
+        } else if (this.props.tutorial) {
+            return this.renderTutorial();
+        } else {
+            return null;
+        }
     }
 
     private renderHelp() {
         const closeLink =
             <div className="action-row">
-                <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>OK</Button>
+                <Button className="btn" onClick={(e) => this.onCloseHelpClicked(e)}>{this.props.tutorial ? "Next" : "OK"}</Button>
             </div>;
 
         if (isMobile) {
