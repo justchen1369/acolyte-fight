@@ -163,6 +163,9 @@ function watchPriority(game: g.Game): number {
 	if (!(game.active.size && isGameRunning(game))) {
 		// Discourage watching finished game
 		return 0;
+	} else if (game.locked) {
+		// Discourage watching locked games
+		return game.active.size;
 	} else if (game.winTick) {
 		// Discourage watching a game which is not live
 		return game.active.size;
