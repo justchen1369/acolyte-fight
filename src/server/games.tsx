@@ -21,7 +21,7 @@ import { logger } from './logging';
 import { DefaultSettings } from '../game/settings';
 import { required, optional } from './schema';
 
-const TeamGameChance = 0.33;
+const TeamGameChance = 1.0;
 
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
