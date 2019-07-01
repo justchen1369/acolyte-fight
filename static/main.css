@@ -416,6 +416,12 @@ a:hover, a:active {
     text-shadow: 2px 2px black;
 }
 
+@media (max-height: 768px) {
+    .home .title {
+        font-size: 300%;
+    }
+}
+
 .home .title-row video {
     position: absolute;
     margin: auto;
@@ -448,6 +454,8 @@ a:hover, a:active {
 
 .home .btn {
     min-width: 250px;
+}
+.home .primary-button-row .btn {
     font-size: 285%;
 }
 .home .btn.disabled {

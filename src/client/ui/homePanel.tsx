@@ -5,7 +5,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as url from '../url';
-import ControlsPanel from './controlsPanel';
+import Button from '../controls/button';
 import NameConfig from './nameConfig';
 import PlayButton from './playButton';
 import SocialBar from '../controls/socialBar';
@@ -52,16 +52,15 @@ class HomePanel extends React.Component<Props, State> {
                     <div className="mask"></div>
                 </div>
                 <div className="spacer" />
-                <div className="button-row">
+                <div className="primary-button-row button-row">
                     <PlayButton />
+                </div>
+                <div className="secondary-button-row button-row">
+                    <Button onClick={() => this.scrollBelowFold()}>Choose Spells</Button>
                 </div>
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noPartyLink && <PartyList />}
                 <div className="spacer" />
-                <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
-                    <div className="fold-info">choose spells</div>
-                    <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
-                </div>
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noExternalLinks && <div className="more-io-games">
                     <a href="https://iogames.space">More .io Games</a>
