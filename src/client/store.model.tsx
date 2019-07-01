@@ -328,7 +328,6 @@ export interface OptionsProvider {
     source?: string;
     noLogin?: boolean;
     noExternalLinks?: boolean;
-    noScrolling?: boolean;
     noMenu?: boolean;
     noAdvanced?: boolean;
     noDiscordAd?: boolean;

@@ -58,10 +58,10 @@ class HomePanel extends React.Component<Props, State> {
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noPartyLink && <PartyList />}
                 <div className="spacer" />
-                {!a.noScrolling && <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
+                <div className="fold-indicator" onClick={() => this.scrollBelowFold()}>
                     <div className="fold-info">choose spells</div>
                     <div className="fold-arrow"><i className="fa fa-chevron-down" /></div>
-                </div>}
+                </div>
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noExternalLinks && <div className="more-io-games">
                     <a href="https://iogames.space">More .io Games</a>
@@ -69,7 +69,7 @@ class HomePanel extends React.Component<Props, State> {
                 </div>}
                 {!a.noExternalLinks && <SocialBar />}
             </div>
-            {!a.noScrolling && <div className="page" ref={(elem) => this.belowFoldElem = elem}>
+            <div className="page" ref={(elem) => this.belowFoldElem = elem}>
                 <h1>Welcome Acolyte!</h1>
                 <p>
                     Time to practice your skills.
@@ -81,7 +81,7 @@ class HomePanel extends React.Component<Props, State> {
                 <SpellBtnConfig />
                 <h1>More Settings</h1>
                 <p className="view-more-ad">Go to <Link page="settings">Settings</Link> for more settings</p>
-            </div>}
+            </div>
         </div>;
     }
 
