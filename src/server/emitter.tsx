@@ -6,7 +6,7 @@ import * as segments from '../game/segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
 import { getStore } from './serverStore';
-import { getLocation, sanitizeHostname, getUpstreamUrl } from './mirroring';
+import { getLocation } from './mirroring';
 import { logger } from './logging';
 import { required, optional } from './schema';
 import * as PlayerName from '../game/sanitize';
