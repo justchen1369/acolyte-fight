@@ -1,9 +1,8 @@
-import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as shaders from './shaders';
 import * as vector from '../../game/vector';
-import { Pixel } from '../../game/constants';
+import ColTuple from './colorTuple';
 
 const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur reaches close to zero
 const trailFragmentShader = require('./trailFragmentShader.glsl');
@@ -70,7 +69,7 @@ function appendCurveShape(data: number[], fill: r.Fill) {
 }
 
 function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fill: r.Fill) {
-    let color: Color = fill.color;
+    let color: ColTuple = fill.color;
     if (fill.gradient) {
         const point = vector.plus(pos, rel);
         const diff = vector.diff(point, fill.gradient.from);
@@ -80,13 +79,13 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fil
             range = 1e-9;
         }
         const mix = Math.min(1, Math.max(0, vector.dot(diff, vector.unit(axis)) / vector.length(axis)));
-        color = fill.gradient.fromColor.mix(fill.gradient.toColor, mix);
+        color = fill.gradient.fromColor.clone().mix(fill.gradient.toColor, mix);
     }
 
     const trails = ctxStack.data.trails;
 	shaders.appendVec2(trails.attribs.a_pos, pos);
 	shaders.appendVec2(trails.attribs.a_rel, rel);
-	shaders.appendColor(trails.attribs.a_color, color);
+	shaders.appendColTuple(trails.attribs.a_color, color);
 	appendCurveShape(trails.attribs.a_fill, fill);
 	++trails.numVertices;
 }

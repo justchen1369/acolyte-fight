@@ -1,6 +1,7 @@
 import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
+import ColTuple from './colorTuple';
 
 export interface CommonUniforms {
 	u_translate: r.UniformInfo;
@@ -69,4 +70,8 @@ export function appendVec2(data: number[], vec: pl.Vec2) {
 
 export function appendColor(data: number[], color: Color) {
 	data.push(color.red() / 255, color.green() / 255, color.blue() / 255, color.alpha());
+}
+
+export function appendColTuple(data: number[], col: ColTuple) {
+	data.push(...col.tuple);
 }

@@ -1,5 +1,5 @@
-import Color from 'color';
 import * as pl from 'planck-js';
+import ColTuple from './colorTuple';
 
 export namespace GraphicsLevel {
 	export const Ultimate = 4;
@@ -150,13 +150,13 @@ export interface DrawTrails extends Draw {
 
 export interface Gradient {
 	from: pl.Vec2;
-	fromColor: Color;
+	fromColor: ColTuple;
 	to: pl.Vec2;
-	toColor: Color;
+	toColor: ColTuple;
 }
 
 export interface Fill {
-	color?: Color;
+	color?: ColTuple;
 	gradient?: Gradient;
 
 	minRadius?: number;
