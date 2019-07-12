@@ -7,13 +7,6 @@ import * as trails from './trails';
 export { atlas, image } from './images';
 export { circle, line, arc, convex } from './trails';
 
-export function initData(): r.DrawDataLookup {
-	return {
-		images: textures.initData(),
-		trails: trails.initData(),
-	};
-}
-
 export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect) {
 	let context: r.GlContext = initGl(ctxStack);
 	const gl = context.gl;
@@ -35,8 +28,8 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 		u_rtx: [ctxStack.rtx],
 	};
 
-	runProgram(context, context.trails, uniforms, ctxStack.data.trails);
-	runProgram(context, context.images, uniforms, ctxStack.data.images);
+	runProgram(context, context.trails, uniforms, context.data.trails);
+	runProgram(context, context.images, uniforms, context.data.images);
 }
 
 function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.UniformData, data: r.DrawData) {
@@ -59,7 +52,7 @@ function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.Uni
 		gl.bindAttribLocation(draw.program, 0, attribName);
 		gl.enableVertexAttribArray(attrib.loc);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.attribs[attribName]), gl.STATIC_DRAW);
+		gl.bufferData(gl.ARRAY_BUFFER, data.attribs[attribName].asArray(), gl.STATIC_DRAW);
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
 	}
 
@@ -136,5 +129,15 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		gl,
 		images: textures.initImages(gl),
 		trails: trails.initTrails(gl),
+		data: {
+			images: textures.initData(),
+			trails: trails.initData(),
+		},
 	};
+}
+
+export function clearGl(ctxStack: r.CanvasCtxStack) {
+	const context = initGl(ctxStack);
+	textures.clearData(context.data.images);
+	trails.clearData(context.data.trails);
 }

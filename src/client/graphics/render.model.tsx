@@ -1,4 +1,5 @@
 import * as pl from 'planck-js';
+import { Float32List } from './list';
 import ColTuple from './colorTuple';
 
 export namespace GraphicsLevel {
@@ -23,7 +24,6 @@ export interface CanvasCtxStack {
 
 	pixel: number;
 	subpixel: number;
-	data: DrawDataLookup;
 }
 
 export interface RenderOptions {
@@ -41,6 +41,7 @@ export interface GlContext {
 	gl: WebGLRenderingContext;
 	images: DrawImages;
 	trails: DrawTrails;
+	data: DrawDataLookup;
 }
 
 export interface Draw {
@@ -87,18 +88,18 @@ export interface DrawData {
 
 export interface DrawImagesData extends DrawData {
 	attribs: {
-		a_pos: number[];
-		a_texCoord: number[];
+		a_pos: Float32List;
+		a_texCoord: Float32List;
 	};
 	textures2D: ImageData[];
 }
 
 export interface DrawTrailsData extends DrawData {
 	attribs: {
-		a_pos: number[];
-		a_rel: number[];
-		a_color: number[];
-		a_fill: number[];
+		a_pos: Float32List;
+		a_rel: Float32List;
+		a_color: Float32List;
+		a_fill: Float32List;
 	};
 }
 
@@ -107,7 +108,7 @@ export interface UniformData {
 }
 
 export interface AttributeData {
-	[key: string]: number[];
+	[key: string]: Float32List;
 }
 
 export interface Texture2DData {

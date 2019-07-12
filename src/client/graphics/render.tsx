@@ -163,13 +163,13 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		rtx: options.rtx,
 		subpixel,
 		pixel,
-		data: glx.initData(),
 	};
 	if (!(ctxStack.gl && ctxStack.ui)) {
 		throw "Error getting context";
 	}
 
 	glx.initGl(ctxStack);
+	glx.clearGl(ctxStack);
 
 	renderAtlas(ctxStack, world, options);
 	renderWorld(ctxStack, world, worldRect, options);

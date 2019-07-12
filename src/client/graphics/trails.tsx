@@ -2,6 +2,7 @@ import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as shaders from './shaders';
 import * as vector from '../../game/vector';
+import { Float32List } from './list';
 import ColTuple from './colorTuple';
 
 const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur reaches close to zero
@@ -13,14 +14,25 @@ export function initData(): r.DrawTrailsData {
         uniforms: {
         },
         attribs: {
-            a_pos: [],
-            a_rel: [],
-            a_color: [],
-            a_fill: [],
+            a_pos: new Float32List(),
+            a_rel: new Float32List(),
+            a_color: new Float32List(),
+            a_fill: new Float32List(),
         },
         textures2D: [],
         numVertices: 0,
     };
+}
+
+export function clearData(data: r.DrawData) {
+	data.uniforms = {};
+
+	for (const key in data.attribs) {
+		data.attribs[key].clear();
+	}
+
+	data.textures2D = [];
+	data.numVertices = 0;
 }
 
 export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
@@ -58,13 +70,16 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	};
 }
 
-function appendCurveShape(data: number[], fill: r.Fill) {
-	data.push(fill.minRadius || 0.0, fill.maxRadius);
+function appendCurveShape(data: Float32List, fill: r.Fill) {
+	data.push(fill.minRadius || 0.0);
+	data.push(fill.maxRadius);
 
 	if (fill.feather) {
-		data.push(fill.feather.sigma, fill.feather.alpha);
+		data.push(fill.feather.sigma);
+		data.push(fill.feather.alpha);
 	} else {
-		data.push(0, 0);
+		data.push(0);
+		data.push(0);
 	}
 }
 
@@ -82,7 +97,7 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fil
         color = fill.gradient.fromColor.clone().mix(fill.gradient.toColor, mix);
     }
 
-    const trails = ctxStack.data.trails;
+    const trails = shaders.getContext(ctxStack.gl).data.trails;
 	shaders.appendVec2(trails.attribs.a_pos, pos);
 	shaders.appendVec2(trails.attribs.a_rel, rel);
 	shaders.appendColTuple(trails.attribs.a_color, color);

@@ -1,6 +1,6 @@
-import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
+import { Float32List } from './list';
 import ColTuple from './colorTuple';
 
 export interface CommonUniforms {
@@ -64,14 +64,19 @@ export function commonUniforms(gl: WebGLRenderingContext, program: WebGLProgram)
 	};
 }
 
-export function appendVec2(data: number[], vec: pl.Vec2) {
-	data.push(vec.x, vec.y);
+export function getContext(gl: WebGLRenderingContext) {
+	const context: r.GlContext = (gl as any).context;
+	return context;
 }
 
-export function appendColor(data: number[], color: Color) {
-	data.push(color.red() / 255, color.green() / 255, color.blue() / 255, color.alpha());
+export function appendVec2(data: Float32List, vec: pl.Vec2) {
+	data.push(vec.x);
+	data.push(vec.y);
 }
 
-export function appendColTuple(data: number[], col: ColTuple) {
-	data.push(...col.tuple);
+export function appendColTuple(data: Float32List, col: ColTuple) {
+	data.push(col.tuple[0]);
+	data.push(col.tuple[1]);
+	data.push(col.tuple[2]);
+	data.push(col.tuple[3]);
 }
