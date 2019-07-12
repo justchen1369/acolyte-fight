@@ -7,7 +7,7 @@ import * as matches from '../core/matches';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
-import * as url from '../url';
+import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
 
@@ -85,6 +85,7 @@ class PlayButton extends React.Component<Props, State> {
         }
         this.setState({ joining: true });
         screenLifecycle.enterGame();
+        watcher.stopWatching();
 
         await options.getProvider().commercialBreak();
 

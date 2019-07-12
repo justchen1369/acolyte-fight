@@ -76,6 +76,7 @@ class NavBar extends React.Component<Props, State> {
             <PageLink page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
             {<PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
             {!a.noPartyLink && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
+            <PageLink page="watch"><i className="icon fas fa-eye" /> Spectate</PageLink>
             <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>
             <div className="spacer" />
             {!a.noAdvanced && <PageLink className="large-screen-nav-item" page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}

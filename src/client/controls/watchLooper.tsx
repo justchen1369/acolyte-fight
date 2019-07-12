@@ -2,9 +2,10 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as matches from '../core/matches';
-import * as url from '../url';
+import * as watcher from '../core/watcher';
 
 interface Props {
+    watching: boolean;
     winner: boolean;
     finished: boolean;
 }
@@ -14,6 +15,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        watching: watcher.isWatching(state),
         winner: !!state.world.winner,
         finished: state.world.activePlayers.size === 0,
     };
@@ -45,6 +47,10 @@ class WatchLooper extends React.Component<Props, State> {
     }
 
     private async recheck() {
+        if (!this.props.watching) {
+            return;
+        }
+
         if (this.state.loading) {
             return; // Already loading next game
         }

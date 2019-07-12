@@ -19,7 +19,7 @@ import TitleSection from './titleSection';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from '../controls/urlListener';
-import WatchLooper from '../controls/watchLooper';
+import WatchPanel from './watchPanel';
 
 import ModdingOverviewTab from '../modding/overviewTab';
 import IconEditor from '../modding/iconEditor';
@@ -173,7 +173,7 @@ class Root extends React.Component<Props> {
         return <div className="content-container">
             <NavBar />
             <div className="page">
-                <WatchLooper />
+                <WatchPanel />
             </div>
         </div>;
     }

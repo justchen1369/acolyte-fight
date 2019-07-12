@@ -7,6 +7,7 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from '../ui/screenLifecycle';
+import * as watcher from '../core/watcher';
 
 import Button from '../controls/button';
 import ControlSurface from './controlSurface';
@@ -25,7 +26,6 @@ import WatchLooper from '../controls/watchLooper';
 import { isMobile } from '../core/userAgent';
 
 interface Props {
-    watching: boolean;
     party: s.PartyState;
     connected: boolean;
     exitable: boolean;
@@ -36,7 +36,6 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        watching: state.current.page === "watch",
         party: state.party,
         connected: !!state.socketId,
         exitable: matches.worldInterruptible(state.world),
@@ -69,7 +68,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                 <GameKeyCustomizer />
                 <OnlineSegmentListener />
                 <UrlListener />
-                {this.props.watching && <WatchLooper />}
+                <WatchLooper />
             </ControlSurface>
         );
     }
@@ -81,6 +80,8 @@ class GamePanel extends React.PureComponent<Props, State> {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();
         }
+
+        watcher.stopWatching();
         matches.leaveCurrentGame();
         pages.reloadPageIfNecessary();
     }
