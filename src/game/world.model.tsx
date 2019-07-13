@@ -752,6 +752,7 @@ export type Behaviour =
 	| ResetMassBehaviour
 	| FixateBehaviour
 	| HomingBehaviour
+	| AccelerateBehaviour
 	| DetonateBehaviour
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
@@ -811,6 +812,15 @@ export interface HomingBehaviour extends BehaviourBase {
 
 	redirect?: boolean;
 	newSpeed?: number;
+}
+
+export interface AccelerateBehaviour extends BehaviourBase {
+	type: "accelerate";
+
+	projectileId: string;
+
+	maxSpeed: number;
+	accelerationPerTick: number;
 }
 
 export interface DetonateBehaviour extends BehaviourBase {

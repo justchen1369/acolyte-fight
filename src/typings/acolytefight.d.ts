@@ -379,6 +379,7 @@ declare interface HorcruxParameters {
 
 declare type BehaviourTemplate =
 	HomingTemplate
+	| AccelerateTemplate
 	| AttractTemplate
 	| AuraTemplate
 	| UpdateCollideWithTemplate
@@ -417,6 +418,13 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
+}
+
+declare interface AccelerateTemplate extends BehaviourTemplateBase {
+	type: "accelerate";
+
+	maxSpeed: number;
+	accelerationPerSecond: number; // Add this amount to the projectile speed every second
 }
 
 declare interface AttractTemplate extends BehaviourTemplateBase {

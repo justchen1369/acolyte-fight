@@ -638,6 +638,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		let behaviour: w.Behaviour = null;
 		if (template.type === "homing") {
 			behaviour = instantiateHoming(template, projectile, world);
+		} else if (template.type === "accelerate") {
+			behaviour = instantiateAccelerate(template, projectile, world);
 		} else if (template.type === "attract") {
 			behaviour = instantiateAttract(template, projectile, world);
 		} else if (template.type === "aura") {
@@ -696,6 +698,15 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		targetType: template.targetType || w.HomingTargets.enemy,
 		newSpeed: template.newSpeed,
 		redirect: template.redirect,
+	};
+}
+
+function instantiateAccelerate(template: AccelerateTemplate, projectile: w.Projectile, world: w.World): w.AccelerateBehaviour {
+	return {
+		type: "accelerate",
+		projectileId: projectile.id,
+		accelerationPerTick: template.accelerationPerSecond / TicksPerSecond,
+		maxSpeed: template.maxSpeed,
 	};
 }
 
@@ -773,6 +784,7 @@ export function tick(world: w.World) {
 	handleBehaviours(world, {
 		delayBehaviour,
 		homing,
+		accelerate,
 		linkForce,
 		gravityForce,
 		attract,
@@ -2542,6 +2554,19 @@ function homing(homing: w.HomingBehaviour, world: w.World) {
 	} else {
 		return true;
 	}
+}
+
+function accelerate(behaviour: w.AccelerateBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	if (projectile.speed < behaviour.maxSpeed) {
+		projectile.speed = Math.min(behaviour.maxSpeed, projectile.speed + behaviour.accelerationPerTick);
+	}
+
+	return true;
 }
 
 function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
