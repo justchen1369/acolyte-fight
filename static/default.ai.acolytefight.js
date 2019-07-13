@@ -11,13 +11,9 @@ var AllianceSelf = 0x01;
 var AllianceAlly = 0x02;
 var AllianceEnemy = 0x04;
 
-var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain spells
+var spellReactionTimeMilliseconds = { // Change the reaction time on certain spells
     retarget: 100,
-    move: 100,
-    shield: 500,
-    icewall: 500,
-    teleport: 500,
-    thrust: 500
+    move: 200,
 };
 
 var nextSpell = 0;
