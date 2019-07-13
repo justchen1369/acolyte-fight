@@ -1563,6 +1563,7 @@ const iceBomb: Spell = {
 
     projectile: {
         density: 1,
+        restitution: 0,
         radius: 0.01,
         speed: 0.2,
         maxTicks: 30,
