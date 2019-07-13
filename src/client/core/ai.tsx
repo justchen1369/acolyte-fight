@@ -1,3 +1,4 @@
+import pl from 'planck-js';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
@@ -151,7 +152,7 @@ class AiWorker {
             if (message.action.spellId === "move" || spellsAllowed) {
                 sendAction(this.gameId, this.heroId, {
                     type: message.action.spellId,
-                    target: message.action.target,
+                    target: pl.Vec2(message.action.target),
                 });
             }
         }
