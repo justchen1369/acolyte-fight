@@ -1565,7 +1565,7 @@ const iceBomb: Spell = {
         density: 1,
         radius: 0.01,
         speed: 0.2,
-        maxTicks: 25,
+        maxTicks: 30,
         minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
