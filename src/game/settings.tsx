@@ -1533,7 +1533,7 @@ const mines: Spell = {
 const iceBomb: Spell = {
     id: 'iceBomb',
     name: 'Freezing Mines',
-    description: "Freeze enemies for 1 second. If you walk away from the mines, they expire.",
+    description: "Freeze enemies for 0.75 seconds. If you walk away from the mines, they expire.",
     action: "spray",
     sound: "mines",
 
@@ -1569,7 +1569,7 @@ const iceBomb: Spell = {
             {
                 type: "movement",
                 movementProportion: 0.1,
-                maxTicks: 1 * TicksPerSecond,
+                maxTicks: 0.75 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
