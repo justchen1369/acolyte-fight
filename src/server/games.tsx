@@ -208,6 +208,7 @@ export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string)
 			&& required(data.sid, "string")
 			&& required(data.x, "number")
 			&& required(data.y, "number")
+			&& optional(data.r, "boolean")
 		) || (
 			data.type === "spells"
 			&& required(data.keyBindings, "object")
@@ -391,13 +392,19 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		return 1000;
 	} else if (actionData.type === "spells") {
 		return 101;
+	} else if (actionData.type === "game" && actionData.sid === w.Actions.Stop) {
+		return 12;
 	} else if (actionData.type === "game" && actionData.sid === w.Actions.MoveAndCancel) {
 		return 11;
 	} else if (actionData.type === "game" && actionData.sid === w.Actions.Move) {
 		return 10;
 	} else if (actionData.type === "game" && actionData.sid === w.Actions.Retarget) {
 		return 1;
+	} else if (actionData.type === "game" && actionData.r) {
+		// Releasing key less important than casting new spell
+		return 99;
 	} else {
+		// Casting spell
 		return 100;
 	}
 }

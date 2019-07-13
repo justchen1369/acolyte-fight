@@ -118,9 +118,10 @@ export interface CloseGameMsg extends ActionMsgBase {
 
 export interface GameActionMsg extends ActionMsgBase {
     type: "game";
-    sid: string;
+    sid: string; // spell ID
     x: number;
     y: number;
+    r?: boolean; // is this a button release?
 }
 
 export interface SpellsMsg extends ActionMsgBase {

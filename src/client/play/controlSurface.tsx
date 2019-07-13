@@ -81,6 +81,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
     private doubleTapKey: string;
 
     private keyDownListener = this.gameKeyDown.bind(this);
+    private keyUpListener = this.gameKeyUp.bind(this);
     private resizeListener = this.onResize.bind(this);
     private longPressDebounced = _.debounce(() => this.handleLongPressIfNecessary(), LongPressMilliseconds);
 
@@ -104,15 +105,16 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     componentWillMount() {
         window.addEventListener('keydown', this.keyDownListener);
+        window.addEventListener('keyup', this.keyUpListener);
         window.addEventListener('resize', this.resizeListener);
 
         this.onResize();
-
     }
 
     componentWillUnmount() {
         window.removeEventListener('resize', this.resizeListener);
         window.removeEventListener('keydown', this.keyDownListener);
+        window.removeEventListener('keyup', this.keyUpListener);
     }
 
     render() {
@@ -426,6 +428,27 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 if (world.ui.nextTarget) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
                 }
+            }
+        }
+    }
+    
+    private gameKeyUp(e: KeyboardEvent) {
+        const world = this.props.world;
+        if (!ControlSurface.interactive(world)) {
+            return;
+        }
+
+        if (e.repeat) {
+            // Ignore repeats because they cancel channelling spells
+            return;
+        }
+
+        const key = this.rebind(keyboardUtils.readKey(e));
+        const spellType = this.keyToSpellId(key);
+        const spell = world.settings.Spells[spellType];
+        if (spell) {
+            if (world.ui.nextTarget) {
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
             }
         }
     }

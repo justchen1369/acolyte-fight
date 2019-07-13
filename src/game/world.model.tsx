@@ -526,6 +526,7 @@ export interface CastState {
 
 	chargeStartTick?: number;
 	channellingStartTick?: number;
+	releaseTick?: number;
 
 	proportion?: number;
 	color?: string;
@@ -998,6 +999,7 @@ export interface PushEvent extends WorldEventBase {
 export interface Action {
 	type: string;
 	target: pl.Vec2;
+	release?: boolean;
 }
 
 export interface MapHighlight {

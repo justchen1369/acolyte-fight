@@ -44,6 +44,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 			world.actions.set(actionData.hid, {
 				type: actionData.sid,
 				target: pl.Vec2(actionData.x, actionData.y),
+				release: actionData.r,
 			});
 		} else if (actionData.type === m.ActionType.CloseGame) {
 			world.occurrences.push({

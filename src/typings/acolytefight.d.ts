@@ -233,6 +233,7 @@ declare interface SpellBase {
 	debuff?: boolean; // When this spell is cast, remove all buffs
 	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
+	chargeReleaseable?: boolean; // Whether this spell can be released early before fully charged
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
 	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging

@@ -1492,6 +1492,13 @@ function handleActions(world: w.World) {
 			hero.target = action.target;
 		}
 
+		if (action && action.release) {
+			if (hero.casting && hero.casting.action.type === action.type) {
+				hero.casting.releaseTick = world.tick;
+			}
+			action = null;
+		}
+
 		if (action) {
 			const spell = world.settings.Spells[action.type];
 			if (spell) {
@@ -1653,7 +1660,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		
 		// Waiting for charging to complete
 		const ticksCharging = world.tick - hero.casting.chargeStartTick;
-		if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
+		if (spell.chargeTicks && ticksCharging < spell.chargeTicks && !(spell.chargeReleaseable && hero.casting.releaseTick)) {
 			hero.casting.proportion = 1.0 * ticksCharging / spell.chargeTicks;
 			return;
 		}

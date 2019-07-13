@@ -156,6 +156,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		sid: action.type,
 		x: Math.round(action.target.x / Precision) * Precision,
 		y: Math.round(action.target.y / Precision) * Precision,
+		r: action.release,
 	}
 	send(actionMsg);
 }
