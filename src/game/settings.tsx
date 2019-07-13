@@ -1483,6 +1483,7 @@ const mines: Spell = {
         damage: 0,
         lifeSteal: 0.2,
         knockbackScaling: false,
+        hitInterval: 30,
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
@@ -1497,7 +1498,7 @@ const mines: Spell = {
         },
 
         detonate: {
-            damage: 6,
+            damage: 12,
             lifeSteal: 0.2,
             radius: 0.015,
             minImpulse: 0.00005,
