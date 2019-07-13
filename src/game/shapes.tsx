@@ -2,6 +2,8 @@ import _ from 'lodash';
 import pl from 'planck-js';
 import * as vector from './vector';
 
+const vectorZero = vector.zero();
+
 export type Shape =
     Circle
     | Radial
@@ -40,7 +42,7 @@ export function createCircle(radius: number): Circle {
 }
 
 export function createArc(radius: number, radialExtent: number, angularExtent: number): Arc {
-    const localCenter = vector.negate(vector.fromAngle(0, radius));
+    const localCenter = vector.fromAngle(0, radius).neg();
     return {
         type: "arc",
         radius,
@@ -53,7 +55,7 @@ export function createArc(radius: number, radialExtent: number, angularExtent: n
 export function createRadial(numPoints: number, extent: number): Radial {
     const points = new Array<pl.Vec2>();
     for (let i = 0; i < numPoints; ++i) {
-        const point = vector.multiply(vector.fromAngle((i / numPoints) * (2 * Math.PI)), extent);
+        const point = vector.fromAngle((i / numPoints) * (2 * Math.PI)).mul(extent);
         points.push(point);
     }
     return { type: "radial", points, extent };
@@ -115,13 +117,13 @@ export function grow(shape: Shape, amount: number): Shape {
         const multiplier = 1 + amount / shape.extent;
         return {
             type: "radial",
-            points: shape.points.map(p => vector.multiply(p, multiplier)),
+            points: shape.points.map(p => p.clone().mul(multiplier)),
             extent: shape.extent * multiplier,
         };
     } else if (shape.type === "polygon") {
         const newPoints = new Array<pl.Vec2>();
         for (let i = 0; i < shape.points.length; ++i) {
-            newPoints.push(vector.plus(shape.points[i], vector.multiply(shape.normals[i], amount)));
+            newPoints.push(shape.points[i].clone().addMul(amount, shape.normals[i]));
         }
         return {
             type: "polygon",
@@ -154,13 +156,13 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
         const after = Math.ceil(seed) % shape.points.length;
         const alpha = seed - before;
 
-        let localPoint = vector.plus(vector.multiply(shape.points[before], 1 - alpha), vector.multiply(shape.points[after], alpha));
+        let localPoint = pl.Vec2.combine(1 - alpha, shape.points[before], alpha, shape.points[after]);
 
         if (shape.type === "radial") {
-            localPoint = vector.towards(localPoint, vector.zero(), clearance);
+            localPoint.add(vector.diff(vectorZero, localPoint).clamp(clearance));
         } else if (shape.type === "polygon") {
-            let normal = vector.plus(vector.multiply(shape.normals[before], 1 - alpha), vector.multiply(shape.normals[after], alpha));
-            localPoint = vector.plus(localPoint, vector.multiply(normal, -clearance));
+            const normal = pl.Vec2.combine(1 - alpha, shape.normals[before], alpha, shape.normals[after]);
+            localPoint.addMul(-clearance, normal);
         }
 
         return toWorldCoords(pos, angle, localPoint);
@@ -168,7 +170,7 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
     } else if (shape.type === "arc") {
         const localAngle = (2 * Math.random() - 1) * shape.angularExtent;
         const localRadius = shape.radius + (2 * Math.random() - 1) * Math.max(0, shape.radialExtent - clearance);
-        const localPoint = vector.plus(shape.localCenter, vector.fromAngle(localAngle, localRadius));
+        const localPoint = vector.fromAngle(localAngle, localRadius).add(shape.localCenter);
         return toWorldCoords(pos, angle, localPoint);
 
     } else {
@@ -205,12 +207,12 @@ export function inside(shape: Shape, pos: pl.Vec2, angle: number, target: pl.Vec
 
 function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): boolean {
     if (shape.type === "circle") {
-        return vector.length(localPoint) <= shape.radius + hitRadius;
+        return localPoint.length() <= shape.radius + hitRadius;
     } else if (shape.type === "radial") {
         // This is not 100% correct but close enough for our purposes
-        return vector.length(localPoint) <= shape.extent + hitRadius;
+        return localPoint.length() <= shape.extent + hitRadius;
     } else if (shape.type === "polygon") {
-        const length = vector.length(localPoint);
+        const length = localPoint.length();
         if (length > shape.maxExtent) {
             return false;
         } else if (length <= shape.minExtent) {
@@ -220,7 +222,9 @@ function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): 
                 const point = shape.points[i];
                 const next = shape.points[(i + 1) % shape.points.length];
 
-                const outside = vector.rotateLeft(vector.unit(vector.diff(next, point)));
+                const outside = vector.rotateLeft(vector.diff(next, point));
+                outside.normalize();
+
                 const distanceToEdge = vector.dot(point, outside);
                 const distanceToTarget = vector.dot(localPoint, outside);
                 if (distanceToTarget > distanceToEdge + hitRadius) {
@@ -232,7 +236,7 @@ function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): 
     } else if (shape.type === "arc") {
         const diff = vector.diff(localPoint, shape.localCenter);
 
-        if (Math.abs(vector.length(diff) - shape.radius) > shape.radialExtent + hitRadius) {
+        if (Math.abs(diff.length() - shape.radius) > shape.radialExtent + hitRadius) {
             return false;
         }
 
@@ -257,7 +261,7 @@ export function toLocalCoords(pos: pl.Vec2, angle: number, worldPoint: pl.Vec2) 
 }
 
 export function toWorldCoords(pos: pl.Vec2, angle: number, localPoint: pl.Vec2) {
-    return vector.plus(pos, vector.turnVectorBy(localPoint, angle));
+    return vector.turnVectorBy(localPoint, angle).add(pos);
 }
 
 export function shapeToPlanck(shape: Shape): pl.Shape {
@@ -267,11 +271,11 @@ export function shapeToPlanck(shape: Shape): pl.Shape {
         return pl.Polygon(shape.points);
     } else if (shape.type === "arc") {
         const points = new Array<pl.Vec2>();
-        points.push(vector.plus(shape.localCenter, vector.fromAngle(-shape.angularExtent, shape.radius - shape.radialExtent)));
-        points.push(vector.plus(shape.localCenter, vector.fromAngle(-shape.angularExtent, shape.radius + shape.radialExtent)));
-        points.push(vector.plus(shape.localCenter, vector.fromAngle(0, Math.sqrt(2) * (shape.radius + shape.radialExtent)))); // means the polygon fully encloses the a)rc
-        points.push(vector.plus(shape.localCenter, vector.fromAngle(shape.angularExtent, shape.radius + shape.radialExtent)));
-        points.push(vector.plus(shape.localCenter, vector.fromAngle(shape.angularExtent, shape.radius - shape.radialExtent)));
+        points.push(vector.fromAngle(-shape.angularExtent, shape.radius - shape.radialExtent).add(shape.localCenter));
+        points.push(vector.fromAngle(-shape.angularExtent, shape.radius + shape.radialExtent).add(shape.localCenter));
+        points.push(vector.fromAngle(0, Math.sqrt(2) * (shape.radius + shape.radialExtent)).add(shape.localCenter)); // means the polygon fully encloses the a)rc
+        points.push(vector.fromAngle(shape.angularExtent, shape.radius + shape.radialExtent).add(shape.localCenter));
+        points.push(vector.fromAngle(shape.angularExtent, shape.radius - shape.radialExtent).add(shape.localCenter));
         return pl.Polygon(points);
     } else {
         throw "Unknown shape type";

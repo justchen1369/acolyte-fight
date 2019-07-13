@@ -86,14 +86,14 @@ function appendCurveShape(data: Float32List, fill: r.Fill) {
 function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fill: r.Fill) {
     let color: ColTuple = fill.color;
     if (fill.gradient) {
-        const point = vector.plus(pos, rel);
+        const point = pos.clone().add(rel);
         const diff = vector.diff(point, fill.gradient.from);
         const axis = vector.diff(fill.gradient.to, fill.gradient.from);
-        let range = vector.length(axis);
+        let range = axis.length();
         if (range === 0.0) {
             range = 1e-9;
         }
-        const mix = Math.min(1, Math.max(0, vector.dot(diff, vector.unit(axis)) / vector.length(axis)));
+        const mix = Math.min(1, Math.max(0, vector.dot(diff, axis) / range / range));
         color = fill.gradient.fromColor.clone().mix(fill.gradient.toColor, mix);
     }
 
@@ -145,7 +145,7 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
 
     let currentAngle = angle1;
     for (let i = 0; i < 4; ++i) { // Maximum 4 right angle rotations
-		const rel = vector.multiply(vector.fromAngle(currentAngle), extent);
+		const rel = vector.fromAngle(currentAngle).mul(extent);
 		rels.push(rel);
 
         const direction = (antiClockwise ? -1 : 1);
@@ -175,8 +175,8 @@ export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2
 	const center = vector.zero();
 
     for (let i = 0; i < points.length; ++i) {
-        const a = vector.multiply(vector.turnVectorBy(points[i], rotate), scale);
-        const b = vector.multiply(vector.turnVectorBy(points[(i + 1) % points.length], rotate), scale);
+        const a = vector.turnVectorBy(points[i], rotate).mul(scale);
+        const b = vector.turnVectorBy(points[(i + 1) % points.length], rotate).mul(scale);
         if ((a.x === center.x && a.y === center.x) || (b.x === center.y && b.y === center.y)) {
             // This will just draw zero-space triangles, so don't bother
             continue;

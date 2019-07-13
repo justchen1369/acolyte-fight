@@ -95,7 +95,7 @@ export function scaleAround(pos: pl.Vec2, center: pl.Vec2, multiplier: number): 
 		return center;
 	} else {
 		const offset = diff(pos, center);
-		return plus(center, multiply(offset, multiplier));
+		return offset.mul(multiplier).add(center);
 	}
 }
 

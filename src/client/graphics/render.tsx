@@ -372,9 +372,9 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 	const pos = vector.clone(hero.body.getPosition());
 
 	for (let i = 0; i < NumParticles; ++i) {
-		const baseVelocity = particleVelocity(hero.body.getLinearVelocity());
-		const expireVelocity = vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), Math.random() * Speed);
-		const velocity = vector.plus(baseVelocity, expireVelocity);
+		const velocity = particleVelocity(hero.body.getLinearVelocity());
+		const expireVelocity = vector.fromAngle(Math.random() * 2 * Math.PI).mul(Math.random() * Speed);
+		velocity.add(expireVelocity);
 
 		pushTrail({
 			type: "circle",
@@ -406,8 +406,9 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 	for (let i = 0; i < NumParticles; ++i) {
 		const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
 		const edgeOffset = vector.diff(pos, mapCenter);
-
-		const velocity = particleVelocity(vector.relengthen(edgeOffset, ExplodeSpeed));
+		edgeOffset.normalize();
+		edgeOffset.mul(ExplodeSpeed);
+		const velocity = particleVelocity(edgeOffset);
 		underlay({
 			tag: obstacle.id,
 			type: "circle",
@@ -424,7 +425,7 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 
 
 function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
-	obj.uiPath.push(vector.clone(obj.body.getPosition()));
+	obj.uiPath.push(obj.body.getPosition().clone());
 
 	obj.renderers.forEach(render => {
 		if (render.type === "projectile") {
@@ -454,7 +455,7 @@ function playSpellSounds(obj: w.Projectile, world: w.World) {
 		world.ui.sounds.push({
 			id: obj.id,
 			sound: obj.sound,
-			pos: vector.clone(obj.body.getPosition()),
+			pos: obj.body.getPosition().clone(),
 		});
 	}
 
@@ -463,7 +464,7 @@ function playSpellSounds(obj: w.Projectile, world: w.World) {
 		world.ui.sounds.push({
 			id: `${obj.id}-hit-${obj.hit}`, // Each hit has a unique ID
 			sound: `${hitSound}-hit`,
-			pos: vector.clone(obj.body.getPosition()),
+			pos: obj.body.getPosition().clone(),
 		});
 	}
 }
@@ -490,7 +491,7 @@ function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, w
 		type: 'ripple',
 		initialTick: ev.tick,
 		max: MaxTicks,
-		pos: vector.clone(pos),
+		pos: pos.clone(),
 		fillStyle: HeroColors.HealColor,
 		initialRadius: owner.radius * 1,
 		finalRadius: owner.radius * 1.5,
@@ -515,7 +516,7 @@ function renderSetCooldown(ctxStack: CanvasCtxStack, ev: w.SetCooldownEvent, wor
 			type: 'ripple',
 			initialTick: ev.tick,
 			max: MaxTicks,
-			pos: vector.clone(pos),
+			pos: pos.clone(),
 			fillStyle: ev.color,
 			initialRadius: owner.radius * 1,
 			finalRadius: owner.radius * 1.5,
@@ -579,7 +580,6 @@ function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.Worl
 
 	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category === "hero" && (world.tick - ev.tick) < constants.TicksPerSecond) {
-		const pos = ev.appear ? vector.clone(hero.body.getPosition()) : ev.pos; // when disappearing, don't reveal the current location if we're a few frames behind
 		for (let i = 0; i < NumParticles; ++i) {
 			renderVanishSmoke(ctxStack, hero, world, ev.pos);
 		}
@@ -587,14 +587,12 @@ function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.Worl
 }
 
 function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, pos?: pl.Vec2) {
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
-
+	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle(), -hero.moveSpeedPerSecond);
 	pushTrail({
 		type: 'circle',
 		initialTick: world.tick,
 		max: 60,
-		pos: pos || vector.clone(hero.body.getPosition()),
+		pos: pos || hero.body.getPosition().clone(),
 		fillStyle: "#111",
 		radius: hero.radius,
 		velocity,
@@ -649,7 +647,7 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World,
 		world.ui.trails.unshift({ // Smoke at bottom
 			type: "circle",
 			pos,
-			velocity: vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), MaxSpeed * Math.random()),
+			velocity: vector.fromAngle(Math.random() * 2 * Math.PI).mul(MaxSpeed * Math.random()),
 			radius: Hero.Radius,
 			initialTick: initialTick,
 			max: MaxTicks,
@@ -744,7 +742,7 @@ function takeShakes(world: w.World) {
 			keep.push(shake);
 
 			const magnitude = Math.pow(proportion, 2) * Math.cos(5 * proportion * 2 * Math.PI);
-			offset = vector.plus(offset, vector.multiply(shake.direction, magnitude));
+			offset.addMul(magnitude, shake.direction);
 		}
 	});
 	world.ui.shakes = keep;
@@ -785,7 +783,7 @@ function playObstacleSounds(obj: w.Obstacle, world: w.World) {
 			world.ui.sounds.push({
 				id: `${obj.id}-touch-${obj.touchTick}`, // Each touch has a unique ID
 				sound: obj.sound,
-				pos: vector.clone(obj.body.getPosition()),
+				pos: obj.body.getPosition().clone(),
 			});
 		}
 	}
@@ -883,20 +881,21 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
 	let pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
-	const outward = vector.unit(vector.diff(pos, mapCenter));
+	const outward = vector.diff(pos, mapCenter);
+	outward.normalize();
 
-	let velocity = vector.zero();
+	const velocity = vector.zero();
 
 	if (smoke.speed) {
-		velocity = vector.plus(velocity, particleVelocity(vector.multiply(outward, smoke.speed)));
+		velocity.add(particleVelocity(outward, smoke.speed));
 	}
 
 	if (smoke.conveyor && obstacle.conveyor) {
 		if (obstacle.conveyor.radialSpeed) {
-			velocity = vector.plus(velocity, vector.multiply(outward, obstacle.conveyor.radialSpeed * smoke.conveyor));
+			velocity.addMul(obstacle.conveyor.radialSpeed * smoke.conveyor, outward);
 		}
 		if (obstacle.conveyor.lateralSpeed) {
-			velocity = vector.plus(velocity, vector.multiply(vector.rotateRight(outward), obstacle.conveyor.lateralSpeed * smoke.conveyor));
+			velocity.addMul(obstacle.conveyor.lateralSpeed * smoke.conveyor, vector.rotateRight(outward));
 		}
 	}
 
@@ -950,7 +949,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		return;
 	}
 
-	let pos = vector.clone(hero.body.getPosition());
+	const pos = hero.body.getPosition().clone();
 
 	// Ease in hero on arrival
 	let easeMultiplier = ease(hero.createTick, world);
@@ -966,10 +965,9 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	}
 
 	if (easeMultiplier > 0) {
-		const direction = vector.unit(vector.diff(pos, MapCenter));
-		const step = vector.multiply(direction, HeroColors.EaseInDistance * easeMultiplier);
-		pos = vector.plus(pos, step);
-
+		const direction = vector.diff(pos, MapCenter);
+		direction.normalize();
+		pos.addMul(HeroColors.EaseInDistance * easeMultiplier, direction);
 		renderHeroArrival(pos, direction, hero, world);
 	}
 
@@ -998,7 +996,7 @@ function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: 
 	world.ui.trails.unshift({
 		type: "circle",
 		pos,
-		velocity: particleVelocity(vector.multiply(outward, 0.1)),
+		velocity: particleVelocity(outward, 0.1),
 		radius: hero.radius,
 		initialTick: world.tick,
 		max: HeroColors.EaseTicks,
@@ -1033,7 +1031,7 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const diff = vector.diff(target, pos);
 	const guideLength = 0.5;
 	const guideDirection = vector.unit(diff);
-	const proportion = Math.min(1, vector.length(diff) / guideLength);
+	const proportion = Math.min(1, diff.length() / guideLength);
 
 	const radius = vector.length(diff);
 	const angle = vector.angle(diff);
@@ -1047,12 +1045,12 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const gradient: r.Gradient = {
 		from: pos,
 		fromColor: ColTuple.parse("#000").alpha(MaxAlpha * proportion),
-		to: vector.plus(pos, vector.multiply(guideDirection, guideLength)),
+		to: pos.clone().addMul(guideLength, guideDirection),
 		toColor: ColTuple.parse("#000").alpha(0),
 	};
 
 	// Render line to target
-	glx.line(ctxStack, pos, vector.plus(pos, vector.multiply(guideDirection, guideLength)), {
+	glx.line(ctxStack, pos, pos.clone().addMul(guideLength, guideDirection), {
 		gradient,
 		maxRadius: lineWidth / 2,
 	});
@@ -1108,12 +1106,11 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		color = ColTuple.parse(color).alpha(alpha).string();
 	}
 
-	const thrust = vector.multiply(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	const velocity = particleVelocity(thrust);
+	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
 
-	let pos = heroPos;
+	const pos = heroPos.clone();
 	if (render.emissionRadiusFactor) {
-		pos = vector.plus(pos, vector.multiply(vector.fromAngle(Math.random() * 2 * Math.PI), render.emissionRadiusFactor * hero.radius));
+		pos.addMul(render.emissionRadiusFactor * hero.radius, vector.fromAngle(Math.random() * 2 * Math.PI));
 	}
 
 	// Buffs on the bottom
@@ -1129,9 +1126,9 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 }
 
 function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
-	const direction = vector.fromAngle(2 * Math.PI * Math.random());
-	const speed = multiplier * Math.random() * vector.dot(direction, primaryVelocity); // can be negative
-	const velocity = vector.multiply(direction, speed);
+	const velocity = vector.fromAngle(2 * Math.PI * Math.random());
+	const speed = multiplier * Math.random() * vector.dot(velocity, primaryVelocity); // can be negative
+	velocity.mul(speed);
 	return velocity;
 }
 
@@ -1198,10 +1195,18 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	{
 		let gradient: r.Gradient = null;
 		if (ctxStack.rtx >= r.GraphicsLevel.Normal) {
+			const from = pos.clone();
+			from.x += -radius;
+			from.y += -radius;
+
+			const to = pos.clone();
+			to.x += radius;
+			to.y += radius;
+
 			gradient = {
-				from: vector.plus(pos, pl.Vec2(-radius, -radius)),
+				from,
 				fromColor: style.clone(),
-				to: vector.plus(pos, pl.Vec2(radius, radius)),
+				to,
 				toColor: style.clone().darken(0.5),
 			};
 		}
@@ -1248,9 +1253,7 @@ function playHeroSounds(hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 
 			if (stage) {
 				// Make the sound happen in the correct direction
-				const pos = vector.plus(
-					heroPos,
-					vector.multiply(vector.fromAngle(hero.body.getAngle()), hero.radius));
+				const pos = heroPos.clone().addMul(hero.radius, vector.fromAngle(hero.body.getAngle()));
 				const key = `${spell.sound}-${stage}`;
 				world.ui.sounds.push({
 					id: `${hero.id}-${key}`,
@@ -1481,7 +1484,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = hero.body.getPosition();
 		const angle = shield.body.getAngle();
 
-		const tip = vector.plus(pos, vector.multiply(vector.fromAngle(angle), shield.length));
+		const tip = vector.fromAngle(angle).mul(shield.length).add(pos);
 		glx.line(ctxStack, pos, tip, {
 			color,
 			minRadius: hero.radius,
@@ -1522,7 +1525,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 
 	if (saber.sound) {
 		const intensity = Math.min(1, 10 * Math.abs(vector.angleDelta(previousAngle, newAngle)) / (2 * Math.PI));
-		const tip = vector.multiply(vector.fromAngle(newAngle), saber.length);
+		const tip = vector.fromAngle(newAngle).mul(saber.length);
 		world.ui.sounds.push({
 			id: saber.id,
 			sound: saber.sound,
@@ -1537,14 +1540,14 @@ function playShieldSounds(obj: w.Shield, world: w.World) {
 		world.ui.sounds.push({
 			id: obj.id,
 			sound: obj.sound,
-			pos: vector.clone(obj.body.getPosition()),
+			pos: obj.body.getPosition().clone(),
 		});
 
 		if (obj.hitTick) {
 			world.ui.sounds.push({
 				id: `${obj.id}-hit-${obj.hitTick}`, // Each hit has a unique ID
 				sound: `${obj.sound}-hit`,
-				pos: vector.clone(obj.body.getPosition()),
+				pos: obj.body.getPosition().clone(),
 			});
 		}
 	}
@@ -1608,14 +1611,14 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 	const numParticles = swirl.numParticles;
 
 	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
-	const velocity = swirl.smoke ? particleVelocity(vector.multiply(context.baseVelocity, -swirl.smoke)) : null;
+	const velocity = swirl.smoke ? particleVelocity(context.baseVelocity, -swirl.smoke) : null;
 	
 	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		pushTrail({
 			type: "circle",
-			pos: vector.plus(location, vector.multiply(vector.fromAngle(angle), multiplier * swirl.radius)),
+			pos: vector.fromAngle(angle).mul(multiplier * swirl.radius).add(location),
 			velocity,
 			radius: multiplier * swirl.particleRadius,
 			initialTick: world.tick,
@@ -1770,12 +1773,12 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
 	let ticks = render.ticks;
-	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
+	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), -render.smoke) : null;
 	pushTrail({
 		type: 'circle',
 		initialTick: world.tick,
 		max: ticks,
-		pos: vector.clone(projectile.body.getPosition()),
+		pos: projectile.body.getPosition().clone(),
 		velocity,
 		fillStyle: projectileColor(render, projectile, world),
 		fade: render.fade,
@@ -1789,7 +1792,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderPolygon) {
 	let ticks = render.ticks;
 	const angle = ((world.tick % render.revolutionInterval) / render.revolutionInterval) * 2 * Math.PI;
-	const velocity = render.smoke ? particleVelocity(vector.multiply(projectile.body.getLinearVelocity(), -render.smoke)) : null;
+	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), -render.smoke) : null;
 
 	const points = new Array<pl.Vec2>();
 	for (let i = 0; i < render.numPoints; ++i) {
@@ -1800,7 +1803,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		type: 'polygon',
 		initialTick: world.tick,
 		max: ticks,
-		pos: vector.clone(projectile.body.getPosition()),
+		pos: projectile.body.getPosition().clone(),
 		points,
 		angle,
 		velocity,
@@ -1873,7 +1876,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		let pos = trail.pos;
 		if (trail.velocity) {
 			const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
-			pos = vector.plus(pos, vector.multiply(trail.velocity, time));
+			pos = pos.clone().addMul(time, trail.velocity);
 		}
 
 		const radius = scale * proportion * trail.radius;
@@ -1887,7 +1890,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		let pos = trail.pos;
 		if (trail.velocity) {
 			const time = (world.tick - trail.initialTick) / constants.TicksPerSecond;
-			pos = vector.plus(pos, vector.multiply(trail.velocity, time));
+			pos = pos.clone().addMul(time, trail.velocity);
 		}
 
 		const extent = scale * proportion * trail.extent;
@@ -1962,7 +1965,7 @@ export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
 		});
 	} else if (config.view === "wheel") {
 		const offset = pl.Vec2(pos.x - config.center.x, pos.y - config.center.y);
-		const radius = vector.length(offset);
+		const radius = offset.length();
 
 		if (config.innerRadius <= radius && radius < config.outerRadius) {
 			const angle = vector.angle(offset);
@@ -2421,9 +2424,7 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 
 		// Translate to center of button
 		if (sector.startAngle && sector.endAngle) {
-			const midVector = vector.multiply(
-				vector.fromAngle((sector.startAngle + sector.endAngle) / 2),
-				(innerRadius + outerRadius) / 2);
+			const midVector = vector.fromAngle((sector.startAngle + sector.endAngle) / 2).mul((innerRadius + outerRadius) / 2);
 			ctx.translate(midVector.x, midVector.y);
 		}
 
