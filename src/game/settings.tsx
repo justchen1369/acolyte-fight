@@ -1520,7 +1520,7 @@ const mines: Spell = {
             {
                 type: "expireOnOwnerRetreat",
                 maxDistance: 0.1,
-                trigger: { afterTicks: 30 },
+                trigger: { afterTicks: 60 },
             },
         ],
 
