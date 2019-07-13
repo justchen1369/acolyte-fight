@@ -131,6 +131,7 @@ export type Action =
 
 export interface UpdateOnlineAction {
     type: "online";
+    all?: boolean;
     joined?: m.OnlinePlayerMsg[];
     left?: string[];
 }

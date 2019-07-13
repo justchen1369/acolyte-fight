@@ -128,7 +128,12 @@ function reducer(state: s.State, action: s.Action): s.State {
             },
         };
     } else if (action.type === "online") {
-        const online = state.online.withMutations(collection => {
+        let online = state.online;
+        if (action.all) {
+            online = online.clear();
+        }
+
+        online = online.withMutations(collection => {
             if (action.left) {
                 action.left.forEach(userHash => {
                     collection.delete(userHash);
@@ -140,6 +145,7 @@ function reducer(state: s.State, action: s.Action): s.State {
                 });
             }
         });
+
         return { ...state, online }
     } else if (action.type === "onlineSegment") {
         return { ...state, onlineSegment: action.segment, online: Immutable.Map() };

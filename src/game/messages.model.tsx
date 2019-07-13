@@ -177,12 +177,12 @@ export interface LeaveMsg {
     gameId: string;
 }
 
-export interface GetOnlineStartMsg {
-    segment: string;
+export interface OnlineControlMsg {
+    refresh?: string;
+    join?: string;
+    leave?: string;
 }
-export interface GetOnlineStopMsg {
-    segment: string;
-}
+
 export interface OnlineMsg {
     segment: string;
     all?: OnlinePlayerMsg[];

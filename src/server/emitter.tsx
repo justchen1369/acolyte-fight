@@ -104,7 +104,6 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
 	socket.on('online', data => onOnlineMsg(socket, data));
-	socket.on('onlineStop', data => onOnlineStopMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
@@ -537,28 +536,30 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	}
 }
 
-async function onOnlineMsg(socket: SocketIO.Socket, data: m.GetOnlineStartMsg) {
+async function onOnlineMsg(socket: SocketIO.Socket, data: m.OnlineControlMsg) {
 	if (!(required(data, "object")
-		&& required(data.segment, "string")
+		&& optional(data.join, "string")
+		&& optional(data.leave, "string")
+		&& optional(data.refresh, "string")
 	)) {
 		// callback({ success: false, error: "Bad request" });
 		return;
 	}
 
-	const msg = online.getOnlinePlayers(data.segment);
-	socket.emit('online', msg);
-	socket.join(segmentRoom(data.segment));
-}
-
-async function onOnlineStopMsg(socket: SocketIO.Socket, data: m.GetOnlineStopMsg) {
-	if (!(required(data, "object")
-		&& required(data.segment, "string")
-	)) {
-		// callback({ success: false, error: "Bad request" });
-		return;
+	if (data.leave) {
+		socket.leave(segmentRoom(data.leave));
 	}
 
-	socket.leave(segmentRoom(data.segment));
+	if (data.join) {
+		const msg = online.getOnlinePlayers(data.join);
+		socket.emit('online', msg);
+		socket.join(segmentRoom(data.join));
+	}
+
+	if (data.refresh) {
+		const msg = online.getOnlinePlayers(data.join);
+		socket.emit('online', msg);
+	}
 }
 
 async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {

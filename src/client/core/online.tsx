@@ -7,10 +7,11 @@ import { getSocket } from './sockets';
 export function onOnlineMsg(data: m.OnlineMsg) {
     const state = StoreProvider.getState();
     if (state.onlineSegment === data.segment) {
+        const all = !!data.all;
         const joined = data.all || data.joined || data.changed;
         const left = data.left;
         if (joined || left) {
-            StoreProvider.dispatch({ type: "online", joined, left });
+            StoreProvider.dispatch({ type: "online", all, joined, left });
         }
 
         if (data.texts) {
@@ -40,19 +41,35 @@ export function start(newSegment: string) {
             segment: newSegment,
         });
 
-        if (oldSegment) {
-            const leaveMsg: m.GetOnlineStopMsg = {
-                segment: oldSegment,
-            }
-            socket.emit('onlineStop', leaveMsg);
-        }
+        const msg: m.OnlineControlMsg = {
+            leave: oldSegment,
+            join: newSegment,
+        };
+        socket.emit('online', msg);
+    }
+}
 
-        if (newSegment) {
-            const joinMsg: m.GetOnlineStartMsg = {
-                segment: newSegment,
-            };
-            socket.emit('online', joinMsg);
-        }
+export function rejoin() {
+    const state = StoreProvider.getState();
+    if (state.onlineSegment) {
+        const socket = getSocket();
+
+        const msg: m.OnlineControlMsg = {
+            join: state.onlineSegment,
+        };
+        socket.emit('online', msg);
+    }
+}
+
+export function refresh() {
+    const state = StoreProvider.getState();
+    if (state.onlineSegment) {
+        const socket = getSocket();
+
+        const msg: m.OnlineControlMsg = {
+            refresh: state.onlineSegment,
+        };
+        socket.emit('online', msg);
     }
 }
 
@@ -67,10 +84,10 @@ export function stop() {
             segment: null,
         });
 
-        const leaveMsg: m.GetOnlineStopMsg = {
-            segment: oldSegment,
+        const leaveMsg: m.OnlineControlMsg = {
+            leave: oldSegment,
         }
-        socket.emit('onlineStop', leaveMsg);
+        socket.emit('online', leaveMsg);
     }
 }
 
