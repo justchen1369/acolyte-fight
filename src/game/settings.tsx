@@ -776,7 +776,7 @@ const rocket: Spell = {
 
         detonate: {
             damage: 0,
-            radius: 0.035,
+            radius: 0.028,
             minImpulse: 0.0006,
             maxImpulse: 0.0008,
             renderTicks: 10,
@@ -823,7 +823,7 @@ const rocket: Spell = {
         sound: "rocket",
         color: '#ff9a00',
         renderers: [
-            { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.035, minRadius: 0.03, usePartialDamageMultiplier: true },
+            { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.028, minRadius: 0.024, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 5, glow: 0.1, smoke: 0.5, ownerColor: true },
             { type: "strike", ticks: 20, glow: true, ownerColor: true, numParticles: 9 },
         ],
