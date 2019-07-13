@@ -12,6 +12,10 @@ import { modToSettings } from './modder';
 
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
+const Precision = 0.0001;
+const vectorZero = vector.zero();
+const vectorCenter = pl.Vec2(0.5, 0.5);
+
 interface BuffContext {
 	otherId?: string;
 	spellId?: string;
@@ -374,10 +378,9 @@ function addHero(world: w.World, heroId: string) {
 	let angle;
 	{
 		const radius = world.settings.World.HeroLayoutRadius;
-		const center = pl.Vec2(0.5, 0.5);
 
-		let posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
-		position = vector.plus(vector.multiply(vector.fromAngle(posAngle), radius), center);
+		const posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
+		position = vector.fromAngle(posAngle).mul(radius).add(vectorCenter);
 
 		angle = posAngle + Math.PI; // Face inward
 	}
@@ -493,7 +496,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const NeverTicks = 1e6;
 
 	let id = type + (world.nextObjectId++);
-	const velocity = vector.multiply(vector.fromAngle(angle), projectileTemplate.speed);
+	const velocity = vector.fromAngle(angle).mul(projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
@@ -528,7 +531,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	}
 
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(config.owner, x.id, world) & Alliances.Enemy));
-	const ticksToCursor = ticksTo(vector.length(diff), vector.length(velocity))
+	const ticksToCursor = ticksTo(diff.length(), velocity.length())
 
 	let projectile: w.Projectile = {
 		id,
@@ -656,7 +659,7 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			world.behaviours.push(behaviour);
 		} else if (trigger.atCursor) {
 			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
-			const speed = vector.length(projectile.body.getLinearVelocity());
+			const speed = projectile.body.getLinearVelocity().length();
 			const ticksToCursor = ticksTo(distanceToCursor, speed);
 
 			let waitTicks = ticksToCursor;
@@ -848,20 +851,24 @@ function physicsStep(world: w.World) {
 function applySpeedLimit(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "projectile" && obj.fixedSpeed) {
-			const currentVelocity = obj.body.getLinearVelocity();
-			const currentSpeed = vector.length(currentVelocity);
+			const velocity = obj.body.getLinearVelocity();
+			const currentSpeed = velocity.length();
 
 			const diff = obj.speed - currentSpeed;
 			if (Math.abs(diff) > world.settings.World.ProjectileSpeedMaxError) {
 				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
-				obj.body.setLinearVelocity(vector.relengthen(currentVelocity, newSpeed));
+				if (currentSpeed > 0) {
+					velocity.mul(newSpeed / currentSpeed);
+				} else {
+					// Stationary - take direction from heading
+					velocity.set(vector.fromAngle(obj.body.getAngle()).mul(newSpeed));
+				}
+				obj.body.setLinearVelocity(velocity);
 			}
 		} else if (obj.category === "hero" && obj.maxSpeed) {
-			const currentVelocity = obj.body.getLinearVelocity();
-			const currentSpeed = vector.length(currentVelocity);
-			if (currentSpeed > obj.maxSpeed) {
-				obj.body.setLinearVelocity(vector.truncate(currentVelocity, obj.maxSpeed));
-			}
+			const velocity = obj.body.getLinearVelocity();
+			velocity.clamp(obj.maxSpeed);
+			obj.body.setLinearVelocity(velocity);
 		}
 	});
 }
@@ -881,7 +888,7 @@ function fixate(behaviour: w.FixateBehaviour, world: w.World) {
 		const pos = obj.body.getPosition();
 		const diff = vector.diff(behaviour.pos, pos);
 		const step = vector.truncate(diff, Math.max(behaviour.speed / TicksPerSecond, behaviour.proportion * vector.length(diff)));
-		obj.body.setPosition(vector.plus(pos, step));
+		obj.body.setPosition(pos.add(step));
 	}
 
 
@@ -1036,7 +1043,6 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 }
 
 function instantiateObstacles(template: ObstacleLayout, world: w.World) {
-	const mapCenter = pl.Vec2(0.5, 0.5);
 	const shape = instantiateShape(template);
 
 	for (let i = 0; i < template.numObstacles; ++i) {
@@ -1048,7 +1054,7 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 		const baseAngle = proportion * (2 * Math.PI);
 		const layoutAngleOffset = (template.layoutAngleOffsetInRevs || 0) * 2 * Math.PI;
 		const orientationAngleOffset = (template.orientationAngleOffsetInRevs || 0) * 2 * Math.PI;
-		const position = vector.plus(mapCenter, vector.multiply(vector.fromAngle(baseAngle + layoutAngleOffset), template.layoutRadius));
+		const position = vector.fromAngle(baseAngle + layoutAngleOffset).mul(template.layoutRadius).add(vectorCenter);
 
 		const angle = baseAngle + layoutAngleOffset + orientationAngleOffset;
 		addObstacle(world, position, angle, shape, template);
@@ -1131,9 +1137,11 @@ function handleSync(ev: w.Syncing, world: w.World) {
 			}
 
 			const posDiff = vector.diff(theirHeroSnapshot.pos, myHeroSnapshot.pos);
-			let position = obj.body.getPosition();
-			position = vector.plus(position, posDiff);
-			obj.body.setPosition(position);
+			if (posDiff.lengthSquared() > Precision * Precision) {
+				const position = obj.body.getPosition();
+				position.add(posDiff);
+				obj.body.setPosition(position);
+			}
 		}
 	}
 
@@ -1606,7 +1614,6 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		}
 
 		hero.casting.uninterruptible = false;
-		hero.casting.initialPosition = vector.clone(hero.body.getPosition()); // Store this to compare against for knockback cancel
 		++hero.casting.stage;
 	}
 
@@ -1652,7 +1659,6 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.casting.channellingStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
 			hero.casting.movementProportion = spell.movementProportionWhileChannelling;
-			hero.casting.initialPosition = hero.casting.initialPosition || vector.clone(hero.body.getPosition());
 
 			if (spell.cooldown) {
 				setCooldown(world, hero, spell.id, spell.cooldown);
@@ -1846,12 +1852,11 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const Hero = world.settings.Hero;
 
 	// Push back other heroes
-	const pushbackDirection = vector.unit(vector.diff(hero.body.getPosition(), other.body.getPosition()));
-	const repelDistance = Hero.Radius * 2 - vector.distance(hero.body.getPosition(), other.body.getPosition());
-	if (repelDistance > 0) {
-		const step = vector.multiply(pushbackDirection, repelDistance);
-		const impulse = vector.multiply(step, Hero.SeparationImpulsePerTick);
-		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+	{
+		const impulse = vector.diff(hero.body.getPosition(), other.body.getPosition());
+		const magnitude = Math.max(0, Hero.Radius * 2 - impulse.length()) * Hero.SeparationImpulsePerTick;
+		impulse.mul(magnitude / impulse.length());
+		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
 	}
 
 	// If using thrust, cause damage
@@ -1887,8 +1892,9 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 	}
 
 	if (obstacle.impulse > 0) {
-		const impulse = vector.relengthen(vector.diff(hero.body.getPosition(), obstacle.body.getPosition()), obstacle.impulse);
-		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+		const impulse = vector.diff(hero.body.getPosition(), obstacle.body.getPosition())
+		impulse.mul(obstacle.impulse / impulse.length());
+		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
 		obstacle.activeTick = world.tick;
 	}
 
@@ -1922,18 +1928,16 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 
 function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (obstacle.conveyor) {
-		const mapCenter = pl.Vec2(0.5, 0.5);
-
-		const offset = vector.diff(hero.body.getPosition(), mapCenter);
-		const outward = vector.unit(offset);
+		const outward = vector.diff(hero.body.getPosition(), vectorCenter);
+		outward.normalize();
 
 		let step = vector.zero();
 		if (obstacle.conveyor.lateralSpeed) {
-			step = vector.plus(step, vector.multiply(vector.rotateRight(outward), obstacle.conveyor.lateralSpeed / TicksPerSecond));
+			step.addMul(obstacle.conveyor.lateralSpeed / TicksPerSecond, vector.rotateRight(outward));
 		}
 
 		if (obstacle.conveyor.radialSpeed) {
-			step = vector.plus(step, vector.multiply(outward, obstacle.conveyor.radialSpeed / TicksPerSecond));
+			step.addMul(obstacle.conveyor.radialSpeed / TicksPerSecond, outward);
 		}
 
 		hero.conveyorShift = step;
@@ -2374,9 +2378,9 @@ function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
 		return;
 	}
 
-	const currentSpeed = vector.length(projectile.body.getLinearVelocity());
-	const newDirection = vector.unit(vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition()));
-	const newVelocity = vector.multiply(newDirection, currentSpeed);
+	const currentSpeed = projectile.body.getLinearVelocity().length();
+	const newVelocity = vector.diff(nextTarget.body.getPosition(), projectile.body.getPosition());
+	newVelocity.mul(currentSpeed / newVelocity.length());
 	projectile.body.setLinearVelocity(newVelocity);
 }
 
@@ -2390,8 +2394,8 @@ function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
 		return false;
 	}
 
-	const towardsOrb = vector.diff(hero.gravity.location, hero.body.getPosition());
-	const distanceTo = vector.length(towardsOrb);
+	const impulse = vector.diff(hero.gravity.location, hero.body.getPosition());
+	const distanceTo = impulse.length();
 	if (distanceTo >= hero.gravity.radius) {
 		hero.gravity = null;
 		return false;
@@ -2399,9 +2403,9 @@ function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
 
 	const proportion = Math.pow(1.0 - distanceTo / hero.gravity.radius, hero.gravity.power);
 	const strength = hero.gravity.strength * proportion;
+	impulse.mul(strength / impulse.length());
 
-	const impulse = vector.multiply(vector.unit(towardsOrb), strength);
-	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vector.zero()), true);
+	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
 	return true;
 }
 
@@ -2430,19 +2434,18 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 			}
 		}
 
-		const towardsOrb = vector.diff(epicenter, obj.body.getPosition());
-		const distanceTo = vector.length(towardsOrb);
+		const acceleration = vector.diff(epicenter, obj.body.getPosition());
+		const distanceTo = acceleration.length();
 		if (distanceTo >= attraction.radius) {
 			return;
 		}
+		acceleration.mul(attraction.accelerationPerTick / acceleration.length());
 
-		const acceleration = vector.relengthen(towardsOrb, attraction.accelerationPerTick);
-
-		let velocity = obj.body.getLinearVelocity();
-		velocity = vector.plus(velocity, acceleration);
+		const velocity = obj.body.getLinearVelocity();
+		velocity.add(acceleration);
 
 		if (attraction.maxSpeed) {
-			velocity = vector.truncate(velocity, attraction.maxSpeed);
+			velocity.clamp(attraction.maxSpeed);
 		}
 
 		obj.body.setLinearVelocity(velocity);
@@ -2523,9 +2526,9 @@ function homing(homing: w.HomingBehaviour, world: w.World) {
 	const turnRate = Math.min(homing.turnRate, maxTurnRate);
 	const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
 
-	const currentSpeed = vector.length(currentVelocity);
+	const currentSpeed = currentVelocity.length();
 	const newSpeed = homing.newSpeed !== undefined ? homing.newSpeed : currentSpeed;
-	const newVelocity = vector.multiply(vector.fromAngle(newAngle), newSpeed);
+	const newVelocity = vector.fromAngle(newAngle).mul(newSpeed);
 
 	obj.body.setLinearVelocity(newVelocity);
 
@@ -2570,7 +2573,7 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	const maxDistance = owner.link.maxDistance;
 
 	const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
-	const distance = vector.length(diff);
+	const distance = diff.length();
 	const strength = owner.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
 	if (strength <= 0) {
 		return true;
@@ -2578,12 +2581,12 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 
 	owner.body.applyLinearImpulse(
 		vector.relengthen(diff, owner.link.selfFactor * strength * owner.body.getMass()),
-		owner.body.getWorldPoint(vector.zero()), true);
+		owner.body.getWorldPoint(vectorZero), true);
 
 	if (target.category === "hero") {
 		target.body.applyLinearImpulse(
 			vector.relengthen(vector.negate(diff), owner.link.targetFactor * strength * target.body.getMass()),
-			target.body.getWorldPoint(vector.zero()), true);
+			target.body.getWorldPoint(vectorZero), true);
 	}
 
 	return true;
@@ -2594,7 +2597,7 @@ function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
 	if (shield && shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
 		const hero = world.objects.get(shield.owner);
 		if (hero) {
-			shield.body.setPosition(vector.clone(hero.body.getPosition()));
+			shield.body.setPosition(hero.body.getPosition());
 			return true;
 		} else {
 			shield.expireTick = world.tick;
@@ -2825,7 +2828,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
 			const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
-			const distance = vector.length(diff);
+			const distance = diff.length();
 			if (distance > explosionRadius) {
 				return;
 			}
@@ -2856,7 +2859,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 			if (applyKnockback && detonate.maxImpulse) {
 				const magnitude = (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
-				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vector.zero()), true);
+				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vectorZero), true);
 				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color: config.color, direction });
 			}
 		}
@@ -2932,12 +2935,9 @@ export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 		return false;
 	}
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
-	const diff = vector.diff(pos, mapCenter);
-
 	const polygonRadius = world.mapRadiusMultiplier * world.radius;
 	if (world.mapPoints) {
-		const scaledDiff = vector.multiply(diff, 1 / polygonRadius);
+		const scaledDiff = vector.diff(pos, vectorCenter).mul(1 / polygonRadius);
 		const scaledExtent = -extent / polygonRadius;
 		for (let i = 0; i < world.mapPoints.length; ++i) {
 			const a = world.mapPoints[i];
@@ -2948,7 +2948,7 @@ export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 		}
 		return true;
 	} else {
-		return vector.length(diff) < polygonRadius - extent;
+		return vector.distance(pos, vectorCenter) < polygonRadius - extent;
 	}
 }
 
@@ -3201,22 +3201,18 @@ function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProp
 
 	const current = hero.body.getPosition();
 
-	const idealStep = vector.truncate(vector.diff(target, current), movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
-	const facing = vector.fromAngle(hero.body.getAngle());
-
-	let step = vector.multiply(vector.unit(idealStep), vector.dot(idealStep, facing)); // Project onto the direction we're facing
+	const step = vector.diff(target, current).clamp(movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
 	if (hero.conveyorShift) {
-		step = vector.plus(step, hero.conveyorShift);
+		step.add(hero.conveyorShift);
 		hero.conveyorShift = null;
 	}
-
-	hero.body.setPosition(vector.plus(hero.body.getPosition(), step));
+	hero.body.setPosition(current.add(step));
 
 	hero.strafeIds.forEach(projectileId => {
 		const projectile = world.objects.get(projectileId);
 		if (projectile) {
 			if (projectile.category === "projectile" && projectile.strafe && projectile.owner === hero.id) {
-				projectile.body.setPosition(vector.plus(projectile.body.getPosition(), step));
+				projectile.body.setPosition(projectile.body.getPosition().add(step));
 			}
 		} else {
 			hero.strafeIds.delete(projectileId); // Yes you can delete from a set while iterating in ES6
@@ -3251,7 +3247,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (currentLength % spell.intervalTicks === 0) {
 		let direction = hero.casting.direction;
 		if (direction.x === 0 && direction.y === 0) {
-			direction = vector.multiply(vector.fromAngle(hero.body.getAngle()), constants.Pixel);
+			direction = vector.fromAngle(hero.body.getAngle()).mul(constants.Pixel);
 		}
 
 		const currentAngle = vector.angle(direction);
@@ -3261,8 +3257,8 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
 		const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
-		const jitterRadius = vector.length(direction) * spell.jitterRatio;
-		const jitterDirection = vector.plus(direction, vector.multiply(vector.fromAngle(newAngle), jitterRadius));
+		const jitterRadius = direction.length() * spell.jitterRatio;
+		const jitterDirection = vector.plus(direction, vector.fromAngle(newAngle).mul(jitterRadius));
 
 		addProjectile(world, hero, action.target, spell, spell.projectile, {
 			direction: jitterDirection,
@@ -3388,8 +3384,8 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		const diff = vector.diff(action.target, hero.body.getPosition());
 		const distancePerTick = speed / TicksPerSecond;
-		const ticksToTarget = Math.floor(vector.length(diff) / distancePerTick);
-		const velocity = vector.multiply(vector.unit(diff), speed);
+		const ticksToTarget = Math.floor(diff.length() / distancePerTick);
+		const velocity = vector.unit(diff).mul(speed);
 
 		const ticks = Math.min(maxTicks, ticksToTarget);
 
@@ -3459,7 +3455,7 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 
 	--hero.thrust.ticks;
 	if (hero.thrust.ticks <= 0) {
-		hero.body.setLinearVelocity(vector.zero());
+		hero.body.setLinearVelocity(vectorZero);
 		hero.radius = hero.thrust.initialRadius;
 
 		hero.body.destroyFixture(hero.thrust.fixture);
@@ -3516,14 +3512,14 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const saberAngleDelta = vector.angleDelta(previousAngle, newAngle);
 
 	const antiClockwise = saberAngleDelta >= 0;
-	const previousTip = vector.multiply(vector.fromAngle(previousAngle), saber.length);
-	const newTip = vector.multiply(vector.fromAngle(newAngle), saber.length);
+	const previousTip = vector.fromAngle(previousAngle).mul(saber.length);
+	const newTip = vector.fromAngle(newAngle).mul(saber.length);
 
 	const swing = vector.diff(newTip, previousTip);
-	const swingVelocity = vector.truncate(vector.multiply(swing, TicksPerSecond * saber.speedMultiplier), saber.maxSpeed);
-	const swingSpeed = vector.length(swingVelocity);
+	const swingVelocity = swing.clone().mul(TicksPerSecond * saber.speedMultiplier).clamp(saber.maxSpeed);
+	const swingSpeed = swingVelocity.length();
 
-	const shift = vector.multiply(swing, Math.max(0, saber.shiftMultiplier));
+	const shift = swing.clone().mul(Math.max(0, saber.shiftMultiplier));
 
 	let hit = false
 	world.objects.forEach(obj => {
@@ -3543,17 +3539,18 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			return;
 		}
 
-		const insidePrevious = vector.insideLine(diff, extent, vector.zero(), previousTip, antiClockwise);
-		const insideNew = vector.insideLine(diff, extent, newTip, vector.zero(), antiClockwise);
+		const insidePrevious = vector.insideLine(diff, extent, vectorZero, previousTip, antiClockwise);
+		const insideNew = vector.insideLine(diff, extent, newTip, vectorZero, antiClockwise);
 		if (!(insidePrevious && insideNew)) {
 			return;
 		}
 
-		obj.body.setPosition(vector.plus(obj.body.getPosition(), shift));
+		obj.body.setPosition(objPos.add(shift));
 
-		const currentSpeed = vector.length(obj.body.getLinearVelocity());
+		const objVelocity = obj.body.getLinearVelocity();
+		const currentSpeed = objVelocity.length();
 		if (currentSpeed < swingSpeed) {
-			obj.body.setLinearVelocity(swingVelocity);
+			obj.body.setLinearVelocity(objVelocity.set(swingVelocity));
 
 			world.ui.events.push({ type: "push", tick: world.tick, owner: hero.id, objectId: obj.id, direction: swingVelocity });
 		}
@@ -3585,7 +3582,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		saber.hitTick = world.tick;
 	}
 
-	saber.body.setPosition(vector.clone(heroPos));
+	saber.body.setPosition(heroPos);
 	saber.body.setAngle(newAngle);
 
 	return true;
@@ -3622,10 +3619,10 @@ function wallAction(world: w.World, hero: w.Hero, action: w.Action, spell: WallS
 		pl.Vec2(-halfWidth, halfLength),
 	];
 
-	const diff = vector.truncate(vector.diff(action.target, hero.body.getPosition()), spell.maxRange);
+	const diff = vector.diff(action.target, hero.body.getPosition()).clamp(spell.maxRange);
 	const angle = 0.5 * Math.PI + vector.angle(diff);
 
-	const position = vector.plus(hero.body.getPosition(), diff);
+	const position = hero.body.getPosition().clone().add(diff);
 	addWall(world, hero, spell, position, angle, points, Math.max(halfWidth, halfLength));
 
 	return true;
@@ -3673,11 +3670,11 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	} else if (template.type === "vanish") {
 		hero.invisible = {
 			...values, id, type: "vanish",
-			initialPos: vector.clone(hero.body.getPosition()),
+			initialPos: hero.body.getPosition().clone(),
 		};
 		hero.buffs.set(id, hero.invisible);
 
-		world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: false });
+		world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: hero.body.getPosition().clone(), appear: false });
 	} else if (template.type === "lifeSteal") {
 		hero.buffs.set(id, {
 			...values, id, type: "lifeSteal",
