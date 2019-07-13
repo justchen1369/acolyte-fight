@@ -1545,7 +1545,7 @@ const mines: Spell = {
 const iceBomb: Spell = {
     id: 'iceBomb',
     name: 'Frostsplatter',
-    description: "Freeze enemies for 1 second.",
+    description: "Freeze nearby enemies for 1 second.",
     action: "spray",
     sound: "iceBomb",
 
