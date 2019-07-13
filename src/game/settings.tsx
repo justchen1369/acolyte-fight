@@ -95,9 +95,9 @@ const Choices: ChoiceSettings = {
             ["kamehameha"],
         ],
 		"f": [
-            ["firespray"],
+            ["firespray", "iceBomb"],
             ["scourge"],
-            ["mines", "iceBomb"],
+            ["mines"],
             ["halo"],
         ],
 	},
@@ -1544,38 +1544,36 @@ const mines: Spell = {
 
 const iceBomb: Spell = {
     id: 'iceBomb',
-    name: 'Freezing Mines',
-    description: "Freeze enemies for 0.75 seconds. If you walk away from the mines, they expire.",
+    name: 'Frostsplatter',
+    description: "Freeze enemies for 1 second.",
     action: "spray",
-    sound: "mines",
+    sound: "iceBomb",
 
     color: '#44ffff',
-    icon: "iceBomb",
+    icon: "frostfire",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     intervalTicks: 1,
-    lengthTicks: 6,
+    lengthTicks: 5,
 
-    jitterRatio: 1.0,
+    jitterRatio: 0.75,
 
     projectile: {
         density: 1,
-        radius: 0.005,
-        speed: 0.5,
-        maxTicks: 4.5 * TicksPerSecond,
-        minTicks: 1, // Ensure mines knockback on their first tick
+        radius: 0.01,
+        speed: 0.2,
+        maxTicks: 25,
+        minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
         knockbackScaling: false,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
-        expireOn: Categories.All ^ Categories.Shield,
-        destructible: {
-        },
+        collideWith: Categories.Hero | Categories.Massive | Categories.Shield | Categories.Obstacle,
+        expireOn: Categories.Hero | Categories.Massive,
 
         buffs: [
             {
@@ -1593,36 +1591,13 @@ const iceBomb: Spell = {
             }
         ],
 
-        detonate: {
-            damage: 0,
-            radius: 0.015,
-            minImpulse: 0,
-            maxImpulse: 0,
-            renderTicks: 15,
-            knockbackScaling: false,
-        },
         shieldTakesOwnership: false,
 
-        behaviours: [
-            {
-                type: "homing",
-                targetType: "cursor",
-                trigger: { afterTicks: 6 },
-                newSpeed: 0,
-                redirect: true,
-            },
-            {
-                type: "expireOnOwnerRetreat",
-                maxDistance: 0.1,
-            },
-        ],
-
-        sound: "mines",
+        sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "polygon", numPoints: 6, revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 1, selfColor: true },
-            { type: "projectile", revolutionInterval: 53, ticks: 1, glow: 0.2, radiusMultiplier: 0.5, color: "rgba(0, 0, 0, 0.15)"  },
-            { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true },
+            { type: "projectile", ticks: 10, color: "rgba(64, 255, 255, 0.25)", smoke: 1.3, fade: "#144" },
+            { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
     },
 };

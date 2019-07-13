@@ -392,6 +392,20 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "iceBomb-channelling": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.6,
+                "attack": 0.07,
+                "decay": 0.5,
+                "highPass": 100,
+                "lowPass": 150,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "homing": {
         start: [
             {
