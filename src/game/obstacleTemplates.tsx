@@ -53,7 +53,7 @@ export const slow: ObstacleTemplate = {
             type: "smoke",
             "color": "rgba(64, 255, 255, 1)",
             particleRadius: 0.002,
-            "fade": "rgba(0, 0, 0, 0)",
+            "fade": "rgba(64, 255, 255, 0)",
             "ticks": 15,
             "interval": 4,
             "speed": 0.05
@@ -98,7 +98,7 @@ export const fast: ObstacleTemplate = {
             type: "smoke",
             "color": "rgba(255, 255, 64, 1)",
             particleRadius: 0.002,
-            "fade": "rgba(0, 0, 0, 0)",
+            "fade": "rgba(255, 255, 64, 0)",
             "ticks": 15,
             "interval": 4,
             "speed": 0.05
