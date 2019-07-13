@@ -1652,7 +1652,8 @@ const horcrux: Spell = {
         lifeSteal: 1,
 
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
-        expireOn: Categories.Hero | Categories.Massive,
+        expireOn: Categories.Hero | Categories.Massive | Categories.Shield,
+        expireAgainstObjects: Alliances.Enemy,
         destructible: {},
 
         horcrux: {},
