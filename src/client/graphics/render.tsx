@@ -587,7 +587,7 @@ function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.Worl
 }
 
 function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, pos?: pl.Vec2) {
-	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle(), -hero.moveSpeedPerSecond);
+	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle(), -hero.moveSpeedPerSecond));
 	pushTrail({
 		type: 'circle',
 		initialTick: world.tick,

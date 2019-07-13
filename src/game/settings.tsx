@@ -5,6 +5,7 @@ import { Layouts } from './layouts';
 import { ObstacleTemplates } from './obstacleTemplates';
 import { Sounds } from './sounds';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
+import { number } from 'prop-types';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.1,
@@ -1479,7 +1480,7 @@ const mines: Spell = {
         radius: 0.004,
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
-        minTicks: 1, // Ensure mines knockback on their first tick
+        minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
         knockbackScaling: false,
@@ -1519,6 +1520,7 @@ const mines: Spell = {
             {
                 type: "expireOnOwnerRetreat",
                 maxDistance: 0.1,
+                trigger: { afterTicks: 30 },
             },
         ],
 
