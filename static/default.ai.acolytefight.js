@@ -6,15 +6,14 @@ var dodgeMinRadius = 0.03;
 var reactionTimeMilliseconds = 400;
 var delayMilliseconds = 1000;
 var delayJitterMilliseconds = 500;
-var cursorSpeed = 0.01;
-
-var MinCastCosineAgreement = 0.9;
 
 var AllianceSelf = 0x01;
 var AllianceAlly = 0x02;
 var AllianceEnemy = 0x04;
 
 var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain spells
+    retarget: 100,
+    move: 100,
     shield: 500,
     icewall: 500,
     teleport: 500,
@@ -22,8 +21,6 @@ var spellReactionTimeMilliseconds = { // Slow down the reaction time on certain 
 };
 
 var nextSpell = 0;
-var cursor = { x: 0.5, y: 0.5 };
-var lastCursorMoveTime = Date.now();
 
 onmessage = function (e) {
     var msg = JSON.parse(e.data);
@@ -107,29 +104,8 @@ function findStrongest(heroes, myHeroId, allianceFlags) {
     return choice;
 }
 
-function moveCursor(target, range) {
-    var d = vectorDiff(target, cursor);
-    var distance = vectorLength(d);
-
-    if (distance <= cursorSpeed) {
-        cursor = target;
-    } else {
-        cursor = vectorPlus(cursor, vectorMultiply(d, cursorSpeed / distance));
-    }
-}
-
 function castOrMove(hero, action) {
-    moveCursor(action.target);
-
-    var towardsTarget = vectorDiff(action.target, hero.pos);
-    var towardsCursor = vectorDiff(cursor, hero.pos);
-    var alignment = vectorDot(vectorUnit(towardsTarget), vectorUnit(towardsCursor));
-
-    if (alignment < MinCastCosineAgreement) {
-        return { spellId: "move", target: cursor };
-    } else {
-        return action;
-    }
+    return action;
 }
 
 function recovery(state, hero, cooldowns) {
