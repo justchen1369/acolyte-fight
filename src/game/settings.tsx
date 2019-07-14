@@ -577,7 +577,7 @@ const blast: Spell = {
         collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         density: 10,
-        radius: 0.01,
+        radius: 0.015,
         speed: 0.7,
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
