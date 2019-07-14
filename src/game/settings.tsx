@@ -563,7 +563,7 @@ const blast: Spell = {
     },
 
     chargeDamage: {
-        initialMultiplier: 0.2,
+        initialMultiplier: 0.1,
         ticks: 3 * TicksPerSecond,
     },
 
