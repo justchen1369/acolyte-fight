@@ -1050,7 +1050,7 @@ table.player-list {
 #game-panel.mobile .customize-hint-container {
     top: 0;
     bottom: auto;
-    margin-top: 40px;
+    margin-top: 15px;
 }
 
 #game-panel .button-panel {

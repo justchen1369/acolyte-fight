@@ -70,7 +70,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                     {<ButtonPanel />}
                 </>}
                 {customizing && <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
-                    <i className="fas fa-times" /> Choosing Spells
+                    <i className="fas fa-times" />{!isMobile && "Choosing Spells"}
                 </Button>}
                 <SpellInfoPanel />
                 <HintPanel />

@@ -68,15 +68,9 @@ class HintPanel extends React.PureComponent<Props, State> {
                 <div className="customize-hint">Tap a spell button to change</div>
             </div>
         } else {
-            if (this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
-                return <div className="customize-hint-container">
-                    <div className="customize-hint">Click to change</div>
-                </div>
-            } else {
-                return <div className="customize-hint-container">
-                    <div className="customize-hint">Click a button below to change</div>
-                </div>
-            }
+            return <div className="customize-hint-container">
+                <div className="customize-hint">Click a button below to change</div>
+            </div>
         }
     }
 
@@ -86,9 +80,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         }
 
         if (isMobile) {
-            return <div className="customize-hint-container">
-                <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
-            </div>
+            return null;
         } else {
             return <div className="customize-hint-container">
                 <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>

@@ -58,9 +58,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private renderCustomizeBtn(btn: string) {
         return <div className="spell-config-container"
             onTouchStart={(ev) => ev.stopPropagation()}
-            onTouchMove={(ev) => ev.stopPropagation()}
             onMouseDown={(ev) => ev.stopPropagation()}
-            onMouseMove={(ev) => ev.stopPropagation()}
             onClick={() => this.close()} onContextMenu={ev => ev.preventDefault()}>
             <div className="spell-config">
                 {this.props.gameStarted && <div className="in-progress-warning">Game in progress - change will apply to the next game</div>}

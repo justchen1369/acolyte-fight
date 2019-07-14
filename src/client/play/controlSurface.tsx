@@ -25,6 +25,7 @@ const MaxTouchSurfaceSizeInPixels = 240;
 interface Props {
     world: w.World;
     customizing: boolean;
+    customizingBtn: boolean;
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -61,6 +62,7 @@ function stateToProps(state: s.State): Props {
     return {
         world: state.world,
         customizing: state.customizing,
+        customizingBtn: !!state.world.ui.toolbar.customizingBtn,
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
@@ -310,6 +312,10 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 type: "updateToolbar",
                 toolbar: { hoverSpellId, hoverBtn: key },
             });
+
+            if (key && this.props.customizing) {
+                this.handleCustomizeBtn(key);
+            }
         }
     }
 
@@ -391,10 +397,12 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
-        const pos = hero.body.getPosition();
-        if ((this.props.customizing || world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
-            // User is choosing a spell now, don't move them
-            return pos;
+        if (this.props.customizing || this.props.customizingBtn || world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl) {
+            const pos = hero.body.getPosition();
+            if (engine.allowSpellChoosing(world, world.ui.myHeroId)) {
+                // User is choosing a spell now, don't move them
+                return pos;
+            }
         }
 
         return target;
