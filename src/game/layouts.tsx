@@ -1,11 +1,11 @@
 export const Layouts: Layouts = {
     "circle": {
-        color: "#131624",
+        color: "#1e2026",
         "obstacles": [
         ]
     },
     "cold": {
-        "color": "#122424",
+        "color": "#202424",
         "numPoints": 6,
         "obstacles": [
             {
@@ -43,7 +43,7 @@ export const Layouts: Layouts = {
         ],
     },
     "octogon": {
-        color: "#121e24",
+        color: "#1e2124",
         "obstacles": [
             {
                 "type": "slow",
@@ -68,7 +68,7 @@ export const Layouts: Layouts = {
         "numPoints": 8
     },
     "return": {
-        color: "#240f1a",
+        color: "#241d20",
         "obstacles": [
             {
                 "type": "volcano",
@@ -101,7 +101,7 @@ export const Layouts: Layouts = {
         angleOffsetInRevs: 0.2,
     },
     "double": {
-        color: "#242115",
+        color: "#242320",
         "numPoints": 4,
         "obstacles": [
             {
@@ -124,7 +124,7 @@ export const Layouts: Layouts = {
         ],
     },
     "ring": {
-        color: "#141c26",
+        color: "#1f2226",
         "obstacles": [
             {
                 type: "mirror",
@@ -156,7 +156,7 @@ export const Layouts: Layouts = {
         "numPoints": 4,
     },
     "exit": {
-        color: "#151e26",
+        color: "#212324",
         "obstacles": [
             {
                 "pattern": [
@@ -200,7 +200,7 @@ export const Layouts: Layouts = {
         "numPoints": 0
     },
     "snowflake": {
-        color: "#262412",
+        color: "#24231b",
         "numPoints": 6,
         "angleOffsetInRevs": 0.08333333333,
         "obstacles": [
@@ -233,7 +233,7 @@ export const Layouts: Layouts = {
         ]
     },
     "inside5": {
-        color: "#240715",
+        color: "#241e21",
         "numPoints": 5,
         "obstacles": [
             {
@@ -255,7 +255,7 @@ export const Layouts: Layouts = {
         ],
     },
     "single": {
-        color: "#1b0529",
+        color: "#1d1524",
         "numPoints": 3,
         "obstacles": [
             {
@@ -270,7 +270,7 @@ export const Layouts: Layouts = {
         ]
     },
     "pepper": {
-        color: "#242115",
+        color: "#242321",
         "obstacles": [
             {
                 "numObstacles": 5,
@@ -294,7 +294,7 @@ export const Layouts: Layouts = {
         "numPoints": 5
     },
     "mirrors": {
-        color: "#181b24",
+        color: "#1d1f24",
         "obstacles": [
             {
                 "type": "mirror",
@@ -310,7 +310,7 @@ export const Layouts: Layouts = {
         "numPoints": 7
     },
     "innerStar": {
-        color: "#24121b",
+        color: "#241f21",
         "obstacles": [
             {
                 type: "explosive",
@@ -342,7 +342,7 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.1,
     },
     "mirrorhenge": {
-        color: "#132024",
+        color: "#1a2124",
         "obstacles": [
             {
                 "type": "fast",
@@ -385,7 +385,7 @@ export const Layouts: Layouts = {
         ],
     },
     "triplet": {
-        color: "#132226",
+        color: "#1d2224",
         obstacles: [
             {
                 type: "spinner",
@@ -401,7 +401,7 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.16666667,
     },
     "square": {
-        color: "#262423",
+        color: "#272423",
         "numPoints": 4,
         "obstacles": [
             {
@@ -425,7 +425,7 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.125
     },
     "surrounded": {
-        color: "#262213",
+        color: "#262521",
         "obstacles": [
             {
                 "numObstacles": 15,
@@ -455,7 +455,7 @@ export const Layouts: Layouts = {
         ]
     },
     "tripletSwirl": {
-        color: "#24191e",
+        color: "#242022",
         "obstacles": [
             {
                 "numObstacles": 3,
