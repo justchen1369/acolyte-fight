@@ -820,7 +820,7 @@ const backlash: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit will be unable to move for a short time. Cast Spirit Missile again to detonate it at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit will be unable to move for a short time. Hold the button down, then release to detonate at exactly the right moment.",
     action: "focus",
 
     color: '#ff8855',
@@ -834,6 +834,14 @@ const rocket: Spell = {
     interruptibleAfterTicks: 0,
     movementProportionWhileChannelling: 0.05,
     strikeCancel: {},
+
+    release: {},
+    releaseBehaviours: [
+        {
+            type: "expireOnOwnerRetreat",
+            maxDistance: 0,
+        },
+    ],
 
     projectile: {
         damage: 0,
