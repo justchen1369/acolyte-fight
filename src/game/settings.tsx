@@ -2009,6 +2009,7 @@ const swap: Spell = {
                 particleRadius: 0.001,
                 numParticles: 2,
                 loopTicks: 15,
+                glow: 0,
             },
             { type: "link", color: '#75e7ff', width: Pixel * 5, glow: 0.25 },
             { type: "strike", color: '#75e7ff', glow: true, ticks: 15, numParticles: 9 },
