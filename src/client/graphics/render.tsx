@@ -1295,7 +1295,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Ve
 	let range = null;
 
 	const spell = world.settings.Spells[world.ui.toolbar.hoverSpellId];
-	if (spell.action === "projectile" || spell.action === "spray" || spell.action === "focus" || spell.action === "retractor") {
+	if (spell.action === "projectile" || spell.action === "spray" || spell.action === "focus") {
 		range = spell.projectile.speed * spell.projectile.maxTicks / constants.TicksPerSecond;
 		if (spell.projectile.behaviours) {
 			spell.projectile.behaviours.forEach(b => {

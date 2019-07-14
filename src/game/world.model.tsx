@@ -441,7 +441,6 @@ export interface Hero extends WorldObjectBase {
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
 	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
-	retractorIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 	horcruxIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 

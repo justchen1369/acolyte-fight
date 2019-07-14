@@ -213,7 +213,6 @@ declare type Spell =
 	| ChargingSpell
 	| ProjectileSpell
 	| ReflectSpell
-	| RetractorSpell
 	| FocusSpell
 	| SaberSpell
 	| SpraySpell
@@ -236,7 +235,7 @@ declare interface SpellBase {
 	debuff?: boolean; // When this spell is cast, remove all buffs
 	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
-	releaseTicks?: number; // If set, the spell can be released early, until this tick when it automatically fires
+	release?: ReleaseParams; // If set, the spell will track the release of the button. Behaviour depends on the type of spell.
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
 	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging
@@ -251,6 +250,10 @@ declare interface SpellBase {
     icon?: string;
 
     color: string; // The colour of the button for this spell (not the projectile)
+}
+
+declare interface ReleaseParams {
+	maxChargeTicks?: number; // Don't finish charging until button is released or until this number of ticks
 }
 
 declare interface SpellCancelParams {
@@ -297,19 +300,13 @@ declare interface ChargingSpell extends SpellBase {
 	chargeRadius?: PartialDamageParameters; // Scale projectile radius with charge time
 }
 
-declare interface RetractorSpell extends SpellBase {
-	action: "retractor";
-	
-	projectile: ProjectileTemplate;
-
-	retractCooldownTicks: number; // Must wait this many ticks before retracting
-	retractBehaviours: BehaviourTemplate[]; // Add these behaviours to the projectile when retracted
-}
-
 declare interface FocusSpell extends SpellBase {
 	action: "focus";
 	
 	projectile: ProjectileTemplate;
+
+	focusDelaysCooldown?: boolean; // Whether to delay the cooldown until focusing is complete
+	releaseBehaviours?: BehaviourTemplate[]; // Add these behaviours to the projectile when button is released. Must also specify the release property so the UI sends the release signal.
 }
 
 declare interface ProjectileTemplate extends DamagePacketTemplate {

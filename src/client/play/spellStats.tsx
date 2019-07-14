@@ -43,7 +43,7 @@ class SpellStats extends React.PureComponent<Props, State> {
             return null;
         }
 
-        if (spell.action === "projectile" || spell.action === "retractor" || spell.action === "focus" || spell.action === "charge" || (spell.action === "spray" && isMultiHit(spell.projectile))) {
+        if (spell.action === "projectile" || spell.action === "focus" || spell.action === "charge" || (spell.action === "spray" && isMultiHit(spell.projectile))) {
             const damage = this.calculateProjectileDamage(spell.projectile);
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">

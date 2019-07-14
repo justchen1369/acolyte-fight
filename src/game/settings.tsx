@@ -554,7 +554,9 @@ const blast: Spell = {
     cooldown: 5 * TicksPerSecond,
     throttle: true,
     chargeTicks: 3 * TicksPerSecond,
-    releaseTicks: 7.5 * TicksPerSecond,
+    release: {
+        maxChargeTicks: 7.5 * TicksPerSecond,
+    },
     retarget: true,
     movementProportionWhileCharging: 0.5,
     revsPerTickWhileChannelling: 0,
@@ -690,18 +692,20 @@ const boomerang: Spell = {
 const retractor: Spell = {
     id: 'retractor',
     name: 'Refract',
-    description: "Refract can turn corners - cast a second time to redirect the spell. Damage increases with distance travelled, so take an indirect path to do maximum damage.",
-    action: "retractor",
+    description: "Refract can turn corners - hold the button down, then release the button to redirect. Damage increases with distance travelled, so take an indirect path to do maximum damage.",
+    action: "focus",
 
     color: '#00ff7f',
     icon: "arcingBolt",
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
+    focusDelaysCooldown: false,
     throttle: true,
 
-    retractCooldownTicks: 0,
-    retractBehaviours: [
+    movementProportionWhileChannelling: 1,
+    release: {},
+    releaseBehaviours: [
         {
             type: "homing",
             targetType: "cursor",
@@ -824,6 +828,7 @@ const rocket: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
+    focusDelaysCooldown: false,
     throttle: true,
 
     interruptibleAfterTicks: 0,

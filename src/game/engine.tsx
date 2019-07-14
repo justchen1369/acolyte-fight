@@ -427,7 +427,6 @@ function addHero(world: w.World, heroId: string) {
 		shieldIds: new Set<string>(),
 		strafeIds: new Set<string>(),
 		horcruxIds: new Set<string>(),
-		retractorIds: new Map<string, string>(),
 		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
 		uiHealth: Hero.MaxHealth,
@@ -450,9 +449,7 @@ function addHero(world: w.World, heroId: string) {
 }
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
-	if (hero.retractorIds.has(spellId)) {
-		return 0;
-	} else if (hero.link && hero.link.instantRecast && hero.link.spellId === spellId) {
+	if (hero.link && hero.link.instantRecast && hero.link.spellId === spellId) {
 		return 0;
 	}
 	return calculateCooldown(world, hero, spellId);
@@ -813,7 +810,6 @@ export function tick(world: w.World) {
 	decayMitigation(world);
 
 	handleBehaviours(world, {
-		retractor,
 		fixate,
 		burn,
 		removePassthrough,
@@ -975,22 +971,6 @@ function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 	const NumTicksCleared = 3;
 	const distance = vector.distance(hero.body.getPosition(), projectile.body.getPosition());
 	return distance > hero.radius + projectile.radius + (NumTicksCleared * hero.moveSpeedPerSecond / TicksPerSecond) + constants.Pixel;
-}
-
-function retractor(behaviour: w.RetractorBehaviour, world: w.World) {
-	const hero = world.objects.get(behaviour.heroId);
-	if (!(hero && hero.category === "hero")) {
-		return false;
-	}
-
-	const retractorId = hero.retractorIds.get(behaviour.spellId);
-	if (world.objects.has(retractorId)) {
-		return true; // Keep watching until retractor disappears
-	} else {
-		// Retractor expired, can't call it back anymore
-		hero.retractorIds.delete(behaviour.spellId);
-		return false;
-	}
 }
 
 function handleOccurences(world: w.World) {
@@ -1669,8 +1649,8 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.proportion = Math.min(1, ticksCharging / spell.chargeTicks);
 		
 		// Waiting for charging to complete
-		if (spell.releaseTicks) {
-			if (!(hero.casting.releaseTick || ticksCharging >= spell.releaseTicks)) {
+		if (spell.release && spell.release.maxChargeTicks) {
+			if (!(hero.casting.releaseTick || ticksCharging >= spell.release.maxChargeTicks)) {
 				return;
 			}
 		} else {
@@ -1780,7 +1760,6 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
 		case "charge": return chargeProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
-		case "retractor": return retractorAction(world, hero, action, spell);
 		case "focus": return focusAction(world, hero, action, spell);
 		case "saber": return saberAction(world, hero, action, spell);
 		case "scourge": return scourgeAction(world, hero, action, spell);
@@ -3355,31 +3334,6 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	return false;
 }
 
-function retractorAction(world: w.World, hero: w.Hero, action: w.Action, spell: RetractorSpell) {
-	if (!action.target) { return true; }
-
-	const retractorId = hero.retractorIds.get(spell.id);
-	if (retractorId) {
-		const retractor = world.objects.get(retractorId);
-		if (retractor && retractor.category === "projectile") {
-			retractor.owner = hero.id; // Take back ownership, if it was lost to a shield
-			retractor.target = action.target;
-			instantiateProjectileBehaviours(spell.retractBehaviours, retractor, world);
-			hero.retractorIds.delete(spell.id);
-		}
-	} else {
-		const retractor = addProjectile(world, hero, action.target, spell, spell.projectile);
-		hero.retractorIds.set(spell.id, retractor.id);
-		world.behaviours.push({
-			type: "retractor",
-			heroId: hero.id,
-			spellId: spell.id,
-		});
-	}
-
-	return true;
-}
-
 function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: FocusSpell) {
 	if (!action.target) { return true; }
 
@@ -3388,19 +3342,31 @@ function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: Focu
 		hero.focusIds.set(spell.id, focus.id);
 	}
 
-	let done = true;
+	let done = false;
 
 	const focusId = hero.focusIds.get(spell.id);
-	if (focusId) {
-		const focus = world.objects.get(focusId);
-		done = !(focus && focus.category === "projectile");
+	const focus = world.objects.get(focusId);
+	if (focus && focus.category === "projectile") {
+		if (spell.release && hero.casting.releaseTick) {
+			done = true;
+
+			if (spell.releaseBehaviours) {
+				focus.target = hero.target;
+				instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
+			}
+		}
+	} else {
+		done = true;
 	}
 
-	if (!done) {
-		// Keep resetting the cooldown until focus complete
-		setCooldown(world, hero, spell.id, spell.cooldown);
+	if (done) {
+		hero.focusIds.delete(spell.id);
+	} else {
+		if (spell.focusDelaysCooldown) {
+			// Keep resetting the cooldown until focus complete
+			setCooldown(world, hero, spell.id, spell.cooldown);
+		}
 	}
-
 	return done;
 }
 
