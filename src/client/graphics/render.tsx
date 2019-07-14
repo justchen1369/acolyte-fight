@@ -1157,6 +1157,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			velocity: particleVelocity(vector.relengthen(hero.thrust.velocity, 0.1)),
 			radius: hero.radius,
 			initialTick: world.tick,
+			shine: 1,
+			glow: 0.1,
 			max: hero.thrust.ticks,
 			fillStyle: heroColor(hero.id, world),
 		});

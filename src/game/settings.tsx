@@ -261,8 +261,8 @@ const triplet: Spell = {
         soundHit: "standard",
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 10 },
+            { type: "projectile", ticks: 1, shine: 0.75 },
+            { type: "ray", ticks: 10, shine: 0.75 },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
         ],
 
@@ -334,9 +334,9 @@ const difire: Spell = {
 
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 1, shine: 0.5, glow: 0.1 },
-            { type: "ray", ticks: 8, shine: 0.5, glow: 0.1 },
-            { type: "strike", ticks: 8, glow: true, numParticles: 2, particleShine: 0.5, particleGlow: 0.5 },
+            { type: "projectile", ticks: 1, shine: 0.75 },
+            { type: "ray", ticks: 8, shine: 0.75 },
+            { type: "strike", ticks: 8, glow: true, numParticles: 2 },
         ],
 
         buffs: [
@@ -593,9 +593,9 @@ const blast: Spell = {
         },
 
         sound: "blast",
-        color: 'rgba(255, 255, 255, 0.75)',
+        color: '#0ff',
         renderers: [
-            { type: "projectile", ticks: 10, smoke: 0.15, fade: "#0ff", glow: 0.25 },
+            { type: "projectile", ticks: 10, selfColor: true, shine: 1, smoke: 0.15, glow: 0.2 },
             { type: "strike", ticks: 10, numParticles: 10, glow: true },
         ],
     },
@@ -758,7 +758,7 @@ const retractor: Spell = {
                 loopTicks: 15,
             },
             { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 10 },
+            { type: "ray", ticks: 10, glow: 0.2 },
             { type: "strike", ticks: 10, glow: true, numParticles: 9 },
         ],
     },
