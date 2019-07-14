@@ -20,6 +20,7 @@ import { isMobile, isEdge } from '../core/userAgent';
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const ShadowOffset = pl.Vec2(0, 0.01);
+const ShadowFeatherRadius = 0.005;
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
@@ -1205,6 +1206,10 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		glx.circle(ctxStack, pos.clone().add(ShadowOffset), {
 			color: ColTuple.parse("rgba(0, 0, 0, 0.5)"),
 			maxRadius: radius,
+			feather: {
+				sigma: ShadowFeatherRadius,
+				alpha: 0.5,
+			},
 		});
 	}
 
