@@ -429,6 +429,7 @@ function addHero(world: w.World, heroId: string) {
 		retractorIds: new Map<string, string>(),
 		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
+		uiHealth: Hero.MaxHealth,
 		uiDestroyedBuffs: [],
 	};
 	world.objects.set(heroId, hero);

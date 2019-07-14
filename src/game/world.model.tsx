@@ -457,6 +457,7 @@ export interface Hero extends WorldObjectBase {
 	spellsToKeys: Map<string, string>;
 	spellChangedTick: Map<string, number>;
 
+	uiHealth: number;
 	uiDestroyedBuffs: Buff[];
 }
 

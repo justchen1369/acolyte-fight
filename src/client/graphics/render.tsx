@@ -1340,6 +1340,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 	// Health
 	{
 		const healthProportion = hero.health / Hero.MaxHealth;
+		const shineProportion = hero.uiHealth / Hero.MaxHealth;
 		const startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
 
 		let color = rgColor(healthProportion);
@@ -1353,6 +1354,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 
 		const barLeft = pl.Vec2(pos.x - barHalfWidth, barY);
 		const barMid = pl.Vec2(barLeft.x + healthProportion * 2 * barHalfWidth, barY);
+		const barShine = pl.Vec2(barLeft.x + shineProportion * 2 * barHalfWidth, barY);
 		const barRight = pl.Vec2(pos.x + barHalfWidth, barY);
 
 		glx.line(ctxStack, barLeft, barRight, {
@@ -1363,6 +1365,20 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 			color,
 			maxRadius: barHalfHeight,
 		});
+
+		if (barShine > barMid) {
+			glx.line(ctxStack, barMid, barShine, {
+				color: ColTuple.parse("#fff"),
+				maxRadius: barHalfHeight,
+			});
+		} else {
+			glx.line(ctxStack, barShine, barMid, {
+				color: color.clone().darken(0.5),
+				maxRadius: barHalfHeight,
+			});
+		}
+
+		hero.uiHealth += 0.025 * (hero.health - hero.uiHealth);
 	}
 }
 
