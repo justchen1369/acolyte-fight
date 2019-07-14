@@ -1657,12 +1657,20 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		if (spell.revsPerTickWhileCharging > 0 && hero.target) {
 			turnTowards(hero, hero.target, spell.revsPerTickWhileCharging);
 		}
+
+		// Update charging status
+		const ticksCharging = world.tick - hero.casting.chargeStartTick;
+		hero.casting.proportion = Math.min(1, ticksCharging / spell.chargeTicks);
 		
 		// Waiting for charging to complete
-		const ticksCharging = world.tick - hero.casting.chargeStartTick;
-		if (spell.chargeTicks && ticksCharging < spell.chargeTicks && !(spell.chargeReleaseable && hero.casting.releaseTick)) {
-			hero.casting.proportion = 1.0 * ticksCharging / spell.chargeTicks;
-			return;
+		if (spell.releaseTicks) {
+			if (!(hero.casting.releaseTick || ticksCharging >= spell.releaseTicks)) {
+				return;
+			}
+		} else {
+			if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
+				return;
+			}
 		}
 
 		// Exiting charging stage
@@ -1764,6 +1772,7 @@ function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spel
 		case "stop": return stopAction(world, hero, action, spell); // Do nothing
 		case "buff": return buffAction(world, hero, action, spell);
 		case "projectile": return spawnProjectileAction(world, hero, action, spell);
+		case "charge": return chargeProjectileAction(world, hero, action, spell);
 		case "spray": return sprayProjectileAction(world, hero, action, spell);
 		case "retractor": return retractorAction(world, hero, action, spell);
 		case "focus": return focusAction(world, hero, action, spell);
@@ -2083,17 +2092,25 @@ function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 	world.ui.events.push(push);
 }
 
+function calculatePartialMultiplier(lifetime: number, partialDamage: PartialDamageParameters): number {
+	let multiplier = 1;
+	if (partialDamage) {
+		let proportion = 1;
+		if (lifetime < partialDamage.ticks) {
+			if (partialDamage.step) {
+				proportion = 0;
+			} else {
+				proportion = lifetime / partialDamage.ticks;
+			}
+		}
+		multiplier = partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * proportion;
+	}
+	return multiplier;
+}
+
 export function calculatePartialDamageMultiplier(world: w.World, projectile: w.Projectile, partialDamage: PartialDamageParameters = projectile.partialDamage): number {
 	const lifetime = world.tick - projectile.createTick;
-	if (partialDamage && lifetime < partialDamage.ticks) {
-		if (partialDamage.step) {
-			return partialDamage.initialMultiplier;
-		} else {
-			return partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * (lifetime / partialDamage.ticks);
-		}
-	} else {
-		return 1;
-	}
+	return calculatePartialMultiplier(lifetime, partialDamage);
 }
 
 function scaleForPartialDamage(world: w.World, projectile: w.Projectile, packet: w.DamagePacket): w.DamagePacket {
@@ -3264,6 +3281,39 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
+
+	return true;
+}
+
+function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ChargingSpell) {
+	if (!hero.casting.chargeStartTick) {
+		return true;
+	}
+
+	let target = action.target;
+	if (spell.retarget) {
+		target = hero.target || target;
+	}
+	if (!target) { return true; }
+
+	const chargeTicks = Math.min(spell.chargeTicks, world.tick - hero.casting.chargeStartTick);
+	const template = { ...spell.projectile };
+
+	if (spell.chargeDamage) {
+		const damageMultiplier = calculatePartialMultiplier(chargeTicks, spell.chargeDamage);
+		template.damage *= damageMultiplier;
+		if (template.detonate) {
+			template.detonate = {
+				...template.detonate,
+				damage: template.detonate.damage * damageMultiplier,
+			};
+		}
+	}
+	if (spell.chargeRadius) {
+		template.radius *= calculatePartialMultiplier(chargeTicks, spell.chargeRadius);
+	}
+
+	addProjectile(world, hero, target, spell, template);
 
 	return true;
 }

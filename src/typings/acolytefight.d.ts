@@ -208,6 +208,7 @@ declare type Spell =
 	| StopSpell
 	| RetargetSpell
 	| BuffSpell
+	| ChargingSpell
 	| ProjectileSpell
 	| ReflectSpell
 	| RetractorSpell
@@ -233,7 +234,7 @@ declare interface SpellBase {
 	debuff?: boolean; // When this spell is cast, remove all buffs
 	throttle?: boolean; // Don't allow throttled spells to be cast too quickly
 	chargeTicks?: number; // The number of ticks of charge-up time before casting the spell
-	chargeReleaseable?: boolean; // Whether this spell can be released early before fully charged
+	releaseTicks?: number; // If set, the spell can be released early, until this tick when it automatically fires
 	movementProportionWhileCharging?: number; // Proportion of movement to allow during the charge-up time
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
 	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging
@@ -282,6 +283,16 @@ declare interface SpraySpell extends SpellBase {
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 90 degrees either side. Weird units, I know.
+}
+
+declare interface ChargingSpell extends SpellBase {
+    action: "charge";
+
+	projectile: ProjectileTemplate;
+	retarget?: boolean; // If the charging takes a while, use the player's latest cursor position as the target, not the initial cursor position
+
+	chargeDamage?: PartialDamageParameters; // Scale damage with charge time
+	chargeRadius?: PartialDamageParameters; // Scale projectile radius with charge time
 }
 
 declare interface RetractorSpell extends SpellBase {

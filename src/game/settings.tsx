@@ -92,7 +92,7 @@ const Choices: ChoiceSettings = {
 		"r": [
             ["supernova", "rocket"],
             ["bouncer", "repeater"],
-            ["kamehameha"],
+            ["kamehameha", "blast"],
         ],
 		"f": [
             ["firespray", "iceBomb"],
@@ -537,6 +537,66 @@ const lightning: Spell = {
         renderers: [
             { type: "ray", intermediatePoints: true, ticks: 30 },
             { type: "strike", ticks: 30, glow: true },
+        ],
+    },
+};
+const blast: Spell = {
+    id: 'blast',
+    name: 'Acolyte Blast',
+    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage and knockback. Just don't get interrupted while charging!",
+    action: "charge",
+
+    color: '#0ff',
+    icon: "fireRay",
+    sound: "blast",
+
+    maxAngleDiffInRevs: 0.01,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: true,
+    chargeTicks: 2 * TicksPerSecond,
+    releaseTicks: 5 * TicksPerSecond,
+    retarget: true,
+    movementProportionWhileCharging: 0.5,
+    revsPerTickWhileChannelling: 0,
+    strikeCancel: {
+        cooldownTicks: 1 * TicksPerSecond,
+    },
+
+    chargeDamage: {
+        initialMultiplier: 0,
+        ticks: 2 * TicksPerSecond,
+    },
+
+    chargeRadius: {
+        initialMultiplier: 0.1,
+        ticks: 2 * TicksPerSecond,
+    },
+
+    projectile: {
+        categories: Categories.Projectile | Categories.Massive,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
+        expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
+        density: 10,
+        radius: 0.01,
+        speed: 0.7,
+        lifeSteal: 0.2,
+        maxTicks: 2 * TicksPerSecond,
+        damage: 50,
+
+        detonate: {
+            damage: 0,
+            lifeSteal: 0.2,
+            radius: 0.02,
+            minImpulse: 0,
+            maxImpulse: 0,
+            renderTicks: 15,
+        },
+
+        sound: "blast",
+        color: 'rgba(255, 255, 255, 0.75)',
+        renderers: [
+            { type: "projectile", ticks: 10, smoke: 0.15, fade: "#0ff", glow: 0.25 },
+            { type: "strike", ticks: 10, numParticles: 10, glow: true },
         ],
     },
 };
@@ -2033,6 +2093,7 @@ const Spells = {
     grapple,
     kamehameha,
     lightning,
+    blast,
     homing,
     boomerang,
     retractor,
