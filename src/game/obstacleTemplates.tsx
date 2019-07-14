@@ -204,7 +204,7 @@ export const screen: ObstacleTemplate = {
 
 const shadow: SwatchFill = {
     type: "solid",
-    color: 'rgba(0, 0, 0, 0.5)',
+    color: 'rgba(0, 0, 0, 0.75)',
     shadow: true,
 };
 
