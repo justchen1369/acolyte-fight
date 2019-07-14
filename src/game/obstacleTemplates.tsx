@@ -202,10 +202,18 @@ export const screen: ObstacleTemplate = {
     mirror: true,
 };
 
+const shadow: SwatchFill = {
+    type: "solid",
+    color: 'rgba(0, 0, 0, 0.5)',
+    shadow: true,
+    expand: 0.003,
+};
+
 const defaultTemplate: ObstacleTemplate = {
     health: 50,
 
     render: [
+        shadow,
         {
             type: "solid",
             color: '#ccc',
@@ -230,6 +238,7 @@ const explosive: ObstacleTemplate = {
     linearDamping: 1.5,
 
     render: [
+        shadow,
         {
             type: "solid",
             color: "#fc0",
@@ -263,6 +272,7 @@ const mirror: ObstacleTemplate = {
     "health": 50,
 
     render: [
+        shadow,
         {
             type: "solid",
             "color": "#0cf",
@@ -287,6 +297,7 @@ const bumper: ObstacleTemplate = {
 
     sound: "bumper",
     render: [
+        shadow,
         {
             type: "solid",
             color: "#fc0",
@@ -310,6 +321,7 @@ const spinner: ObstacleTemplate = {
     health: 100,
 
     render: [
+        shadow,
         {
             type: "solid",
             color: '#ccc',

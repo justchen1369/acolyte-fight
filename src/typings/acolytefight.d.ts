@@ -127,6 +127,7 @@ declare interface SwatchFill {
 	glow?: number;
 	strikeGrow?: number;
 	flash?: boolean;
+	shadow?: boolean; // Apply shadow offset and shadow feather to fill
 }
 
 declare interface SwatchSmoke {

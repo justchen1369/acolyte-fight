@@ -19,6 +19,13 @@ import { isMobile, isEdge } from '../core/userAgent';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
+const ShadowOffset = pl.Vec2(0, 0.004);
+const ShadowRadius = 0.004;
+const ShadowFeather: r.FeatherConfig = {
+	sigma: ShadowRadius,
+	alpha: 0.5,
+};
+
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
@@ -814,6 +821,11 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 		scale *= 1 - easeMultiplier;
 	}
 
+	let feather: r.FeatherConfig = null;
+	if (fill.shadow) {
+		feather = ShadowFeather;
+	}
+
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
@@ -824,10 +836,14 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
 		}
 
-		const drawPos = vector.scaleAround(pos, MapCenter, scale);
+		let drawPos = vector.scaleAround(pos, MapCenter, scale);
+		if (fill.shadow) {
+			drawPos = drawPos.clone().add(ShadowOffset);
+		}
 		glx.convex(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
 			maxRadius: 1,
+			feather,
 		});
 	} else if (shape.type === "arc") {
 		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
@@ -861,10 +877,14 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 			radius += flash * fill.expand;
 		}
 
-		const drawPos = vector.scaleAround(pos, MapCenter, scale);
+		let drawPos = vector.scaleAround(pos, MapCenter, scale);
+		if (fill.shadow) {
+			drawPos = drawPos.clone().add(ShadowOffset);
+		}
 		glx.circle(ctxStack, drawPos, {
 			color,
 			maxRadius: scale * radius,
+			feather,
 		});
 	}
 }
@@ -1192,16 +1212,25 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		}
 	}
 
+	// Shadow
+	{
+		glx.circle(ctxStack, pos.clone().add(ShadowOffset), {
+			color: ColTuple.parse("rgba(0, 0, 0, 0.5)"),
+			maxRadius: radius,
+			feather: ShadowFeather,
+		});
+	}
+
 	// Fill
 	{
 		let gradient: r.Gradient = null;
 		if (ctxStack.rtx >= r.GraphicsLevel.Normal) {
 			const from = pos.clone();
-			from.x += -radius;
+			from.x += radius;
 			from.y += -radius;
 
 			const to = pos.clone();
-			to.x += radius;
+			to.x += -radius;
 			to.y += radius;
 
 			gradient = {
