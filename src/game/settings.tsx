@@ -551,7 +551,7 @@ const blast: Spell = {
     sound: "blast",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
     chargeTicks: 3 * TicksPerSecond,
     releaseTicks: 7.5 * TicksPerSecond,
@@ -578,7 +578,7 @@ const blast: Spell = {
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         density: 10,
         radius: 0.015,
-        speed: 0.4,
+        speed: 0.7,
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
         damage: 50,
