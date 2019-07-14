@@ -706,10 +706,9 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 	}
 
 	const strokeStyle = color.clone().lighten(0.05);
-
 	const strokeProportion = 0.99;
 
-	let radius = world.radius * world.mapRadiusMultiplier;
+	const radius = world.radius * world.mapRadiusMultiplier;
 
 	const points = world.mapPoints;
 	if (points) {
