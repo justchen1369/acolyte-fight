@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import CodeEditor from './codeEditor';
 import ModBar from './modBar';
 import NavBar from '../nav/navbar';
+import { isLocal } from '../core/userAgent';
 
 interface OwnProps {
     expand?: boolean;
@@ -35,7 +36,7 @@ class EditorPage extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (!this.props.isLoggedIn) {
+        if (!(this.props.isLoggedIn || isLocal)) {
             return this.renderNotLoggedIn();
         } else if (!this.isAdmin()) {
             return this.renderReadonly();
