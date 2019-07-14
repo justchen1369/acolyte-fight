@@ -153,6 +153,7 @@ class AiWorker {
                 sendAction(this.gameId, this.heroId, {
                     type: message.action.spellId,
                     target: pl.Vec2(message.action.target),
+                    release: message.action.release,
                 });
             }
         }

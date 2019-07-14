@@ -919,6 +919,7 @@ declare interface ObstacleContract extends WorldObjectContract {
 declare interface ActionContract {
 	spellId: string;
 	target: Vec2;
+	release?: boolean;
 }
 
 declare type MsgContract =

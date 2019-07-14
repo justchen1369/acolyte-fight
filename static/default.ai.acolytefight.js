@@ -191,7 +191,7 @@ function validAttack(state, hero, opponent, spell) {
     var opponentShielded = !!opponent.shieldTicksRemaining;
 
     var distance = vectorDistance(hero.pos, opponent.pos);
-    if (spell.action === "projectile" || spell.action === "spray" || spell.action === "retractor" || spell.action === "focus") {
+    if (spell.action === "projectile" || spell.action === "spray" || spell.action === "retractor" || spell.action === "focus" || spell.action === "charge") {
         if (spell.projectile.swapWith) { // Swap doesn't work as an attack
             return false;
         }
@@ -228,7 +228,10 @@ function jitter(target, missRadius) {
 
 function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - ensure we are focusing the enemy, otherwise we will miss
     if (hero.casting) {
-        if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
+        if (hero.casting.spellId === "blast") {
+            // Have to release or it won't fire
+            return castOrMove(hero, { spellId: "blast", release: true, target: opponent.pos });
+        } else if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
             return castOrMove(hero, { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) });
         } else {
