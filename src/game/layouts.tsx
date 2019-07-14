@@ -1,5 +1,6 @@
 export const Layouts: Layouts = {
     "circle": {
+        color: "#131624",
         "obstacles": [
         ]
     },
@@ -155,7 +156,7 @@ export const Layouts: Layouts = {
         "numPoints": 4,
     },
     "exit": {
-        color: "#241b0e",
+        color: "#151e26",
         "obstacles": [
             {
                 "pattern": [
@@ -254,7 +255,7 @@ export const Layouts: Layouts = {
         ],
     },
     "single": {
-        color: "#1d0724",
+        color: "#1b0529",
         "numPoints": 3,
         "obstacles": [
             {
