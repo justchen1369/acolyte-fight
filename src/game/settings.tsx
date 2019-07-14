@@ -1637,7 +1637,7 @@ const iceBomb: Spell = {
         knockbackScaling: false,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Hero | Categories.Massive | Categories.Shield | Categories.Obstacle,
+        collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
         expireOn: Categories.Hero | Categories.Massive,
 
         buffs: [
