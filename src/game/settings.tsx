@@ -1836,7 +1836,7 @@ const dualSaber: Spell = {
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
-    description: "After a short charging time, unleash a melee-range explosion that will send your enemies flying. Be careful though, this spell is so powerful it costs you some health too.",
+    description: "After a short charging time, unleash a melee-range explosion that will send your enemies flying. Enemies hit by Overload cannot cast spells for 1 second. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
 
     detonate: {
@@ -1845,6 +1845,13 @@ const scourge: Spell = {
         minImpulse: 0.001,
         maxImpulse: 0.001,
         renderTicks: 30,
+
+        buffs: [
+            {
+                type: "cooldown",
+                minCooldown: 1 * TicksPerSecond,
+            }
+        ],
     },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
