@@ -353,6 +353,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
     private touchEndHandler(...points: PointInfo[]) {
         points.forEach(p => {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
+                this.releaseKey(this.actionSurface.activeKey);
                 this.actionSurface = null;
             } else if (this.currentTouch && this.currentTouch.id === p.touchId) {
                 --this.currentTouch.stack;
@@ -442,16 +443,21 @@ class ControlSurface extends React.PureComponent<Props, State> {
     
     private gameKeyUp(e: KeyboardEvent) {
         const world = this.props.world;
-        if (!ControlSurface.interactive(world)) {
-            return;
-        }
-
         if (e.repeat) {
             // Ignore repeats because they cancel channelling spells
             return;
         }
 
         const key = this.rebind(keyboardUtils.readKey(e));
+        this.releaseKey(key);
+    }
+
+    private releaseKey(key: string) {
+        const world = this.props.world;
+        if (!ControlSurface.interactive(world)) {
+            return;
+        }
+
         const spellType = this.keyToSpellId(key);
         const spell = world.settings.Spells[spellType];
         if (spell) {
