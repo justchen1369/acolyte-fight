@@ -85,6 +85,12 @@ function calculateNextLeague(percentile: number): League {
     return _.minBy(higher, l => l.minPercentile);
 }
 
+export async function retrieveMyStatsAsync() {
+    const state = StoreProvider.getState();
+    if (state.userId) {
+        await retrieveUserStatsAsync(state.userId);
+    }
+}
 
 export async function retrieveUserStatsAsync(profileId: string) {
     if (!profileId) {

@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
+import * as rankings from '../core/rankings';
 import * as watcher from '../core/watcher';
 import Link from '../controls/link';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
@@ -10,14 +11,19 @@ import WatchLooper from '../controls/watchLooper';
 
 interface Props {
     isLoggedIn: boolean;
+    allowedToWatch: boolean;
+    numMatches: number;
     numOnline: number;
 }
 interface State {
+    statsRetrieved: boolean;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         isLoggedIn: state.loggedIn,
+        numMatches: watcher.numMatches(state),
+        allowedToWatch: watcher.allowedToWatch(state),
         numOnline: state.online.size,
     };
 }
@@ -26,11 +32,33 @@ class WatchPanel extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            statsRetrieved: false,
         };
     }
 
+    componentWillMount() {
+        this.retrieveStatsIfNecessary();
+    }
+
+    private async retrieveStatsIfNecessary() {
+        if (!this.state.statsRetrieved) {
+            await rankings.retrieveMyStatsAsync();
+            this.setState({ statsRetrieved: true });
+        }
+    }
+
     render() {
-        return this.props.isLoggedIn ? this.renderLoggedIn() : this.renderNotLoggedIn();
+        if (this.props.isLoggedIn) {
+            if (!this.state.statsRetrieved) {
+                return this.renderLoadingStats();
+            } else if (this.props.allowedToWatch) {
+                return this.renderWatching();
+            } else {
+                return this.renderNotAllowedYet();
+            }
+        } else {
+            return this.renderNotLoggedIn();
+        }
     }
 
     private renderNotLoggedIn() {
@@ -40,7 +68,22 @@ class WatchPanel extends React.Component<Props, State> {
         </div>;
     }
 
-    private renderLoggedIn() {
+    private renderLoadingStats() {
+        return <div>
+            <h1>Spectate</h1>
+            <p className="loading-text">Loading...</p>
+        </div>;
+    }
+
+    private renderNotAllowedYet() {
+        return <div>
+            <h1>Spectate</h1>
+            <p>Watch all live games here!</p>
+            <p>Spectator mode is only available to players who have played more than 1000 PvP matches. <Link page="profile">You have played {this.props.numMatches} matches.</Link></p>
+        </div>;
+    }
+
+    private renderWatching() {
         return <div>
             <h1>Spectate</h1>
             <p>{this.props.numOnline} players online.</p>

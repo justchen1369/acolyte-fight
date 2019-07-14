@@ -1,9 +1,26 @@
 import * as pages from './pages';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 
+export function numMatches(state: s.State) {
+    if (!(state.profile && state.profile.ratings)) {
+        return 0;
+    }
+    const rating = state.profile.ratings[m.GameCategory.PvP];
+    if (rating) {
+        return rating.numGames;
+    } else {
+        return 0;
+    }
+}
+
+export function allowedToWatch(state: s.State) {
+    return state.loggedIn && numMatches(state) >= 1000;
+}
+
 export function isWatching(state: s.State) {
-    return state.current.page === "watch";
+    return state.current.page === "watch" && allowedToWatch(state);
 }
 
 export function stopWatching() {

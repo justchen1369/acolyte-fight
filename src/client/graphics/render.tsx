@@ -1203,7 +1203,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	// Shadow
 	{
 		glx.circle(ctxStack, pos.clone().add(ShadowOffset), {
-			color: ColTuple.parse("rgba(0, 0, 0, 0.7)"),
+			color: ColTuple.parse("rgba(0, 0, 0, 0.5)"),
 			maxRadius: radius,
 		});
 	}
