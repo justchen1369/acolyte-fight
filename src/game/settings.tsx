@@ -1892,7 +1892,7 @@ const shield: Spell = {
     maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    radius: Hero.Radius * 2,
+    radius: Hero.Radius * 1.8,
     takesOwnership: true,
     blocksTeleporters: false,
 
