@@ -34,6 +34,7 @@ export namespace CastStage {
 
 export interface World {
 	seed: number | null;
+	color: string;
 	tick: number;
 	startTick: number;
 

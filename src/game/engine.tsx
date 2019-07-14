@@ -80,6 +80,7 @@ export function initialWorld(mod: Object): w.World {
 
 	let world: w.World = {
 		seed: null,
+		color: constants.HeroColors.WorldColor,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
@@ -1033,6 +1034,10 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 	if (!layout) {
 		const layouts = Object.keys(Layouts).sort().map(key => Layouts[key]).filter(x => !!x);
 		layout = layouts[world.seed % layouts.length];
+	}
+
+	if (layout.color) {
+		world.color = layout.color;
 	}
 	
 	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? (1.0 + 1 / layout.numPoints) : 1.0);

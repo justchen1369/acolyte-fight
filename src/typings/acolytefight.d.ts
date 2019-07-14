@@ -89,6 +89,7 @@ declare interface Layouts {
 }
 
 declare interface Layout {
+	color?: string; // Color of the map
 	obstacles: ObstacleLayout[];
 	numPoints?: number; // Number of points to this layout, defaults to zero (circle)
 	angleOffsetInRevs?: number; // Rotate the map by this angle, defaults to zero

@@ -694,7 +694,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
 		color = ColTuple.parse(heroColor(world.winner, world)).darken(0.5).lighten(proportion);
 	} else {
-		color = ColTuple.parse(HeroColors.WorldColor);
+		color = ColTuple.parse(world.color);
 
 		const highlight = takeHighlights(world);
 		if (highlight) {
