@@ -261,8 +261,8 @@ const triplet: Spell = {
         soundHit: "standard",
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 1, shine: 0.75 },
-            { type: "ray", ticks: 10, shine: 0.75 },
+            { type: "projectile", ticks: 1 },
+            { type: "ray", ticks: 10 },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
         ],
 
@@ -334,8 +334,8 @@ const difire: Spell = {
 
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 1, shine: 0.75 },
-            { type: "ray", ticks: 8, shine: 0.75 },
+            { type: "projectile", ticks: 1 },
+            { type: "ray", ticks: 8 },
             { type: "strike", ticks: 8, glow: true, numParticles: 2 },
         ],
 
