@@ -19,8 +19,8 @@ import { isMobile, isEdge } from '../core/userAgent';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
-const ShadowOffset = pl.Vec2(0, 0.01);
-const ShadowFeatherRadius = 0.0025;
+const ShadowOffset = pl.Vec2(0, 0.005);
+const ShadowFeatherRadius = 0.002;
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
