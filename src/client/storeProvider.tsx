@@ -22,6 +22,7 @@ function initialState(): s.State {
         settings: settings.DefaultSettings,
     };
     return {
+        customizing: false,
         loggedIn: false,
         showingHelp: true,
         isNewPlayer,
@@ -100,6 +101,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {
         return { ...state, keyBindings: action.keyBindings };
+    } else if (action.type === "customizing") {
+        return { ...state, customizing: action.customizing };
     } else if (action.type === "updateOptions") {
         return {
             ...state,

@@ -13,7 +13,6 @@ import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { TicksPerSecond, Pixel } from '../../game/constants';
 import { worldPointFromInterfacePoint, whichKeyClicked, touchControls } from '../graphics/render';
 import { sendAction } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
@@ -21,11 +20,11 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
-const LongPressMilliseconds = 500;
 const MaxTouchSurfaceSizeInPixels = 240;
 
 interface Props {
     world: w.World;
+    customizing: boolean;
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -61,6 +60,7 @@ interface TouchState {
 function stateToProps(state: s.State): Props {
     return {
         world: state.world,
+        customizing: state.customizing,
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
@@ -83,7 +83,6 @@ class ControlSurface extends React.PureComponent<Props, State> {
     private keyDownListener = this.gameKeyDown.bind(this);
     private keyUpListener = this.gameKeyUp.bind(this);
     private resizeListener = this.onResize.bind(this);
-    private longPressDebounced = _.debounce(() => this.handleLongPressIfNecessary(), LongPressMilliseconds);
 
     private resolveKeys = Reselect.createSelector(
         (props: Props) => props.keyBindings,
@@ -123,6 +122,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             'desktop': !isMobile,
             'wheel-on-left': isMobile && !this.props.wheelOnRight,
             'wheel-on-right': isMobile && this.props.wheelOnRight,
+            'customizing': this.props.customizing,
         });
         return (
             <div
@@ -183,6 +183,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             return;
         }
 
+        let mapTouched = false;
         points.forEach(p => {
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
             if (key) {
@@ -191,7 +192,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     activeKey: key,
                     time: Date.now(),
                 };
-                if (p.secondaryBtn) {
+                if (p.secondaryBtn || this.props.customizing) {
                     this.handleCustomizeBtn(key);
                 } else {
                     this.handleButtonClick(key, world);
@@ -239,6 +240,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     }
                     this.previousTouchStart = p;
                 }
+
+                mapTouched = true;
             }
         });
 
@@ -247,7 +250,16 @@ class ControlSurface extends React.PureComponent<Props, State> {
             world.ui.nextSpellId = w.Actions.MoveAndCancel;
         }
         this.processCurrentTouch();
-        this.longPressDebounced();
+
+        if (mapTouched) {
+            this.uncustomizeIfNecessary();
+        }
+    }
+
+    private uncustomizeIfNecessary() {
+        if (this.props.customizing) {
+            StoreProvider.dispatch({ type: "customizing", customizing: false });
+        }
     }
 
     private autoBindDoubleTap() {
@@ -380,24 +392,12 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
         const pos = hero.body.getPosition();
-        if ((world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
+        if ((this.props.customizing || world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl) && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
             // User is choosing a spell now, don't move them
             return pos;
         }
 
         return target;
-    }
-
-    private handleLongPressIfNecessary() {
-        if (this.actionSurface && !this.targetSurface) { // If targeting, probably not trying to bring up the spell customizer
-            const world = this.props.world;
-            const pressLength = Date.now() - this.actionSurface.time;
-            if (pressLength >= LongPressMilliseconds && engine.allowSpellChoosing(world, world.ui.myHeroId)) {
-                const btn = this.actionSurface.activeKey;
-                this.actionSurface.time += 1e9; // Don't repeat the long press
-                this.handleCustomizeBtn(btn);
-            }
-        }
     }
 
     private handleCustomizeBtn(customizingBtn: string) {

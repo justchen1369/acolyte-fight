@@ -7,6 +7,7 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as screenLifecycle from '../ui/screenLifecycle';
+import * as StoreProvider from '../storeProvider';
 import * as watcher from '../core/watcher';
 
 import Button from '../controls/button';
@@ -30,6 +31,7 @@ interface Props {
     connected: boolean;
     exitable: boolean;
     wheelOnRight: boolean;
+    customizing: boolean;
 }
 interface State {
 }
@@ -40,6 +42,7 @@ function stateToProps(state: s.State): Props {
         connected: !!state.socketId,
         exitable: matches.worldInterruptible(state.world),
         wheelOnRight: state.options.wheelOnRight,
+        customizing: state.customizing,
     };
 }
 
@@ -53,17 +56,23 @@ class GamePanel extends React.PureComponent<Props, State> {
     render() {
         const a = options.getProvider();
         const allowExit = this.props.exitable || !this.props.connected;
+        const customizing = this.props.customizing;
         return (
             <ControlSurface>
                 <CanvasPanel />
-                <InfoPanel />
-                <MessagesPanel />
-                <SpellInfoPanel />
-                {allowExit && <Button className="nav-item exit-link" onClick={(ev) => this.onExitClicked(ev)}>
-                    <i className="fa fa-chevron-left" /> Back to Home
+                {!customizing && <>
+                    <InfoPanel />
+                    <MessagesPanel />
+                    {allowExit && <Button className="nav-item exit-link" onClick={(ev) => this.onExitClicked(ev)}>
+                        <i className="fa fa-chevron-left" /> Back to Home
+                    </Button>}
+                    {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
+                    {<ButtonPanel />}
+                </>}
+                {customizing && <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
+                    <i className="fas fa-times" /> Choosing Spells
                 </Button>}
-                {!a.noExternalLinks && !isMobile && allowExit && <SocialBar />}
-                <ButtonPanel />
+                <SpellInfoPanel />
                 <HintPanel />
                 <GameKeyCustomizer />
                 <OnlineSegmentListener />
@@ -74,8 +83,6 @@ class GamePanel extends React.PureComponent<Props, State> {
     }
 
     private onExitClicked(ev: React.MouseEvent) {
-        ev.stopPropagation();
-
         if (!(this.props.party)) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();
@@ -84,6 +91,10 @@ class GamePanel extends React.PureComponent<Props, State> {
         watcher.stopWatching();
         matches.leaveCurrentGame();
         pages.reloadPageIfNecessary();
+    }
+
+    private onUncustomizeClicked(ev: React.MouseEvent) {
+        StoreProvider.dispatch({ type: "customizing", customizing: false });
     }
 }
 

@@ -5,7 +5,6 @@ import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../core/userAgent';
 
-import Button from '../controls/button';
 import MutePanel from './buttons/mutePanel';
 import RandomizePanel from './buttons/randomizePanel';
 import TextMessageBox from './textMessageBox';

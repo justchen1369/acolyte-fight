@@ -42,7 +42,23 @@ class RandomizePanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <ButtonRow label="Randomize Spells" icon="fas fa-dice" onClick={() => this.onRandomizeClick(true)} />
+        return <>
+            <ButtonRow label="Choose Spells" icon="fas fa-wand-magic" onClick={() => this.onCustomizeClick(true)} />
+            <ButtonRow label="Randomize Spells" icon="fas fa-dice" onClick={() => this.onRandomizeClick(true)} />
+        </>
+    }
+
+    private onCustomizeClick(mute: boolean) {
+        StoreProvider.dispatch({
+            type: "customizing",
+            customizing: true,
+        });
+
+        // Clear hover - when in customize mode all the buttons disappear and a mouse out event never fires so have to clear it manually here
+        StoreProvider.dispatch({
+            type: "updateToolbar",
+            toolbar: { hoverControl: null },
+        });
     }
 
     private onRandomizeClick(all: boolean = false) {

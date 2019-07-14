@@ -11,6 +11,7 @@ import { isMobile } from '../core/userAgent';
 
 interface Props {
     customizingBtn: string;
+    customizingMode: boolean;
     allowSpellChoosing: boolean;
     toolbar: w.ToolbarState;
     settings: AcolyteFightSettings;
@@ -22,6 +23,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         customizingBtn: state.world.ui.toolbar.customizingBtn,
+        customizingMode: state.customizing,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         toolbar: state.world.ui.toolbar,
         settings: state.world.settings,
@@ -37,8 +39,14 @@ class HintPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (this.props.customizingBtn) {
+        if (this.props.toolbar.hoverControl) {
+            return <div className="customize-hint-container">
+                <div className="customize-hint">{this.props.toolbar.hoverControl}</div>
+            </div>
+        } else if (this.props.customizingBtn) {
             return null;
+        } else if (this.props.customizingMode) {
+            return this.renderCustomizingMode();
         } else if (this.props.allowSpellChoosing) {
             if (isMobile && this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
                 return this.renderMobileHint(this.props.toolbar.hoverBtn, this.props.toolbar.hoverSpellId);
@@ -53,6 +61,24 @@ class HintPanel extends React.PureComponent<Props, State> {
             return null;
         }
     }
+    
+    private renderCustomizingMode() {
+        if (isMobile) {
+            return <div className="customize-hint-container">
+                <div className="customize-hint">Tap a spell button to change</div>
+            </div>
+        } else {
+            if (this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
+                return <div className="customize-hint-container">
+                    <div className="customize-hint">Click to change</div>
+                </div>
+            } else {
+                return <div className="customize-hint-container">
+                    <div className="customize-hint">Click a button below to change</div>
+                </div>
+            }
+        }
+    }
 
     private renderChangeSpellHint() {
         if (!this.props.allowSpellChoosing) {
@@ -60,7 +86,9 @@ class HintPanel extends React.PureComponent<Props, State> {
         }
 
         if (isMobile) {
-            return null;
+            return <div className="customize-hint-container">
+                <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
+            </div>
         } else {
             return <div className="customize-hint-container">
                 <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
@@ -79,7 +107,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         }
 
         return <div className="customize-hint-container">
-            <div className="customize-hint"><span className="spell-name">{spellUtils.spellName(spell)}</span> - long press to change</div>
+            <div className="customize-hint"><span className="spell-name">{spellUtils.spellName(spell)}</span></div>
         </div>;
     }
 

@@ -6,6 +6,7 @@ import * as w from '../game/world.model';
 
 export interface State {
     current: PathElements;
+    customizing: boolean;
     ads?: string;
 
     touched?: boolean;
@@ -101,6 +102,7 @@ export type Action =
     | LogoutAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
+    | UpdateCustomizingAction
     | UpdateOptionsAction
     | UpdateUrlAction
     | UpdateHashAction
@@ -128,6 +130,11 @@ export type Action =
     | UpdateCodeTreeAction
     | UpdateCodeTreeItemAction
     | DeleteCodeTreeItemAction
+
+export interface UpdateCustomizingAction {
+    type: "customizing";
+    customizing: boolean;
+}
 
 export interface UpdateOnlineAction {
     type: "online";

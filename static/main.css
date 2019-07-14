@@ -83,10 +83,38 @@ body .page {
     font-size: 20px;
     padding: 15px 20px;
     text-align: center;
-    vertical-align: center;
+    vertical-align: middle;
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+}
+
+.customizing #gl {
+    opacity: 0.5;
+}
+
+#game-panel .customizing-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    width: 100%;
+
+    display: block;
+
+    background: #00ccff;
+    color: #fff;
+
+    cursor: pointer;
+
+    font-size: 20px;
+    padding: 15px 20px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#game-panel .customizing-bar > i {
+    padding-right: 1em;
 }
 
 #game-panel .exit-link:hover {
