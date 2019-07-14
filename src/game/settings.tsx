@@ -578,7 +578,7 @@ const blast: Spell = {
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         density: 10,
         radius: 0.015,
-        speed: 0.7,
+        speed: 0.4,
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
         damage: 50,

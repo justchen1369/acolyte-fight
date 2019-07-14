@@ -652,11 +652,11 @@ export const Sounds: Sounds = {
     "blast-charging": {
         "start": [
             {
-                "stopTime": 2,
+                "stopTime": 5,
                 "attack": 0.25,
                 "decay": 0.5,
                 "startFreq": 4,
-                "stopFreq": 4,
+                "stopFreq": 9,
                 "wave": "triangle",
                 "ratios": [
                     1,
@@ -681,6 +681,14 @@ export const Sounds: Sounds = {
                 "decay": 0.9,
                 "highPass": 100,
                 "lowPass": 500,
+                "wave": "brown-noise"
+            },
+            {
+                "stopTime": 1,
+                "attack": 0.1,
+                "decay": 0.9,
+                "highPass": 8000,
+                "lowPass": 9000,
                 "wave": "brown-noise"
             }
         ]
