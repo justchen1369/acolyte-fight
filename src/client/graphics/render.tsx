@@ -1624,7 +1624,8 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle: context.color || swirl.color,
-			glow: swirl.glow,
+			shine: swirl.shine !== undefined ? swirl.shine : 0.5,
+			glow: swirl.glow !== undefined ? swirl.glow : 0.1,
 			fade: swirl.fade,
 			tag: context.tag,
 		}, world);
@@ -1695,6 +1696,8 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				velocity,
 				radius: projectile.radius,
 				fillStyle: projectileColor(strike, projectile, world),
+				glow: strike.particleGlow !== undefined ? strike.particleGlow : 0.1,
+				shine: strike.particleShine !== undefined ? strike.particleShine: 0.5,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1748,8 +1751,10 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				from: previous,
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
+				shine: render.shine !== undefined ? render.shine : 0.5,
+				fade: render.fade,
 				width: multiplier * projectile.radius * 2,
-				glow: render.glow,
+				glow: render.glow !== undefined ? render.glow : 0.1,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1781,9 +1786,10 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 		pos: projectile.body.getPosition().clone(),
 		velocity,
 		fillStyle: projectileColor(render, projectile, world),
+		shine: render.shine !== undefined ? render.shine : 0.5,
 		fade: render.fade,
 		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
-		glow: render.glow,
+		glow: render.glow !== undefined ? render.glow : 0.1,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
 	}, world);
@@ -1847,8 +1853,11 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let scale = 1;
 
 	let color = ColTuple.parse(trail.fillStyle);
+	if (trail.shine) {
+		color.lighten(trail.shine * proportion);
+	}
 	if (trail.fade) {
-		color = color.mix(ColTuple.parse(trail.fade), 1 - proportion);
+		color.mix(ColTuple.parse(trail.fade), 1 - proportion);
 	}
 	if (trail.highlight) {
 		const highlightProportion = calculateHighlightProportion(trail.highlight, world);

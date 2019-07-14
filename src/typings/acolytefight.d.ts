@@ -521,6 +521,8 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 
 	ticks: number; // How long is the trail?
 	glow?: number;
+	shine?: number;
+	fade?: string;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -532,6 +534,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	fade?: string;
 	smoke?: number;
 	glow?: number;
+	shine?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -561,6 +564,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	numParticles: number;
 	particleRadius: number;
 
+	shine?: number;
 	smoke?: number;
 	fade?: string;
 	glow?: number;
@@ -597,6 +601,8 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	glow?: boolean;
 	growth?: number;
 	numParticles?: number;
+	particleShine?: number;
+	particleGlow?: number;
 	speedMultiplier?: number;
 }
 

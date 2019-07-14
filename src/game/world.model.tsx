@@ -1021,6 +1021,7 @@ export interface TrailBase {
 	max: number;
 
 	fillStyle: string;
+	shine?: number;
 	fade?: string;
 
 	glow?: number;
