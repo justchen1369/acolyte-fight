@@ -56,6 +56,7 @@ interface ActionSurfaceState {
 interface TouchState {
     id: string;
     stack: number;
+    activeKey?: string;
 }
 
 function stateToProps(state: s.State): Props {
@@ -218,28 +219,35 @@ class ControlSurface extends React.PureComponent<Props, State> {
                         world.ui.nextTarget = p.worldPoint;
                     }
 
+                    let key: string = null;
                     if (isMobile) {
                         if (this.isDoubleClick(p)) {
                             if (this.doubleTapKey === undefined) {
                                 this.autoBindDoubleTap();
                             }
-                            this.handleButtonClick(this.doubleTapKey, world);
+                            key = this.doubleTapKey;
                         } else {
-                            this.handleButtonClick(this.singleTapKey, world);
+                            key = this.singleTapKey;
                         }
                     } else {
                         if (p.secondaryBtn) {
                             if (this.rightClickKey === undefined) {
                                 this.autoBindRightClick(p.secondaryBtn);
                             }
-                            this.handleButtonClick(this.rightClickKey, world);
+                            key = this.rightClickKey;
                         } else {
                             if (!world.ui.nextSpellId) {
                                 // If pressed the button bar, a left click should cast that spell, rather than cast what is normally bound to left click
-                                this.handleButtonClick(this.leftClickKey, world);
+                                key = this.leftClickKey;
                             }
                         }
                     }
+
+                    if (key) {
+                        this.handleButtonClick(key, world);
+                        this.currentTouch.activeKey = key;
+                    }
+
                     this.previousTouchStart = p;
                 }
 
@@ -325,6 +333,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
                 const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
                 if (this.actionSurface.activeKey !== key) {
+                    this.releaseKey(this.actionSurface.activeKey);
                     this.actionSurface.activeKey = key; // Ignore dragging on the same key
                     this.actionSurface.time = Date.now();
                     if (key) {
@@ -358,6 +367,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             } else if (this.currentTouch && this.currentTouch.id === p.touchId) {
                 --this.currentTouch.stack;
                 if (this.currentTouch.stack <= 0) {
+                    this.releaseKey(this.currentTouch.activeKey);
                     this.currentTouch = null;
                     this.targetSurface = null;
                 }
@@ -453,6 +463,10 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private releaseKey(key: string) {
+        if (!key) {
+            return;
+        }
+
         const world = this.props.world;
         if (!ControlSurface.interactive(world)) {
             return;
