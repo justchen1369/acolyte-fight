@@ -1178,7 +1178,7 @@ const repeater: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 7.5 * TicksPerSecond,
-    chargeTicks: 3,
+    chargeTicks: 6,
     throttle: true,
 
     projectile: {
@@ -1192,7 +1192,7 @@ const repeater: Spell = {
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
         partialDamage: {
-            initialMultiplier: 0.1,
+            initialMultiplier: 0.01,
             ticks: 0.4 * TicksPerSecond,
         },
 
