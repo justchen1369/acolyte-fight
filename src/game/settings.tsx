@@ -470,7 +470,7 @@ const meteorite: Spell = {
 const kamehameha: Spell = {
     id: 'kamehameha',
     name: 'Acolyte Beam',
-    description: "After a long charge time, unleash a beam so powerful it can wipe out a full-health enemy in seconds. If you take an enemy hit, Acolyte Beam will be cancelled, but if it is cancelled within 1 second, you can cast it again immediately.",
+    description: "Hold down the button to charge and unleash a beam so powerful it can wipe out a full-health enemy in seconds. If you take an enemy hit, Acolyte Beam will be cancelled, but if it is cancelled within 1 second, you can cast it again immediately.",
     action: "spray",
     sound: "kamehameha",
 
@@ -484,6 +484,9 @@ const kamehameha: Spell = {
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
+    release: {
+        interrupt: true,
+    },
     strikeCancel: {
         cooldownTicks: 0.5 * TicksPerSecond,
         maxChannelingTicks: 1 * TicksPerSecond,
