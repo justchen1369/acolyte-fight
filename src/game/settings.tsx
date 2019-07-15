@@ -1401,7 +1401,7 @@ const whirlwind: Spell = {
                 numParticles: 2,
                 particleRadius: 0.02,
 
-                shine: 0.2,
+                shine: 0,
                 smoke: 1.3,
                 fade: "#144",
             },
@@ -1674,7 +1674,7 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "projectile", ticks: 10, color: "rgba(64, 255, 255, 0.25)", shine: 0.2, smoke: 1.3, fade: "#144" },
+            { type: "projectile", ticks: 10, color: "rgba(64, 255, 255, 0.25)", shine: 0, smoke: 1.3, fade: "#144" },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
     },
