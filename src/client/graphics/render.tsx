@@ -24,7 +24,7 @@ const MaxDestroyedTicks = constants.TicksPerSecond;
 
 const AtlasAiIcon = "ai";
 
-const DefaultShine = 0.4;
+const DefaultShine = 0.5;
 const DefaultGlow = 0.1;
 
 const ShadowOffset = pl.Vec2(0, 0.005);
