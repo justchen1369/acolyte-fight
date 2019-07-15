@@ -480,6 +480,7 @@ export interface ShieldBase extends WorldObjectBase {
 	selfColor?: boolean;
 	hitTick?: number;
 	glow?: number;
+	shine?: number;
 }
 
 export interface Reflect extends ShieldBase {

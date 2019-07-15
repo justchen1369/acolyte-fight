@@ -635,9 +635,9 @@ const homing: Spell = {
         soundHit: "standard",
         color: '#44ffcc',
         renderers: [
-            { type: "projectile", ticks: 30, smoke: 0.05 },
-            { type: "ray", ticks: 5 },
-            { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10 },
+            { type: "projectile", ticks: 30, smoke: 0.05, shine: 0.5 },
+            { type: "ray", ticks: 10, shine: 0.5 },
+            { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10, particleShine: 0.5 },
         ],
     },
 };
@@ -1247,10 +1247,10 @@ const drain: Spell = {
 
         color: '#22ee88',
         renderers: [
-            { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 15 },
-            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45 },
-            { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4 },
+            { type: "projectile", ticks: 1, shine: 0.5 },
+            { type: "ray", ticks: 15, shine: 0.5 },
+            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, shine: 0.5 },
+            { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4, particleShine: 0.5 },
         ],
     },
 };
@@ -1802,6 +1802,7 @@ const saber: Spell = {
 
     trailTicks: 5,
     color: '#00ccff',
+    shine: 0.1,
 
     sound: "saber",
     action: "saber",
@@ -1841,6 +1842,7 @@ const dualSaber: Spell = {
 
     trailTicks: 5,
     color: '#ff0044',
+    shine: 0.1,
 
     sound: "saber",
     action: "saber",

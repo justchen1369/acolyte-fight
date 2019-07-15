@@ -19,13 +19,16 @@ import { isMobile, isEdge } from '../core/userAgent';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
-const ShadowOffset = pl.Vec2(0, 0.005);
-const ShadowFeatherRadius = 0.001;
-
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
 const AtlasAiIcon = "ai";
+
+const DefaultShine = 0.4;
+const DefaultGlow = 0.1;
+
+const ShadowOffset = pl.Vec2(0, 0.005);
+const ShadowFeatherRadius = 0.001;
 
 interface SwirlContext {
 	color?: string;
@@ -1555,6 +1558,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 		antiClockwise,
 		fillStyle: saber.color,
 		glow: saber.glow,
+		shine: saber.shine,
 		highlight: saber.uiHighlight,
 		tag: saber.id,
 	}, world);
@@ -1662,8 +1666,8 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			initialTick: world.tick,
 			max: swirl.ticks, 
 			fillStyle: context.color || swirl.color,
-			shine: swirl.shine !== undefined ? swirl.shine : 0.5,
-			glow: swirl.glow !== undefined ? swirl.glow : 0.1,
+			shine: swirl.shine !== undefined ? swirl.shine : DefaultShine,
+			glow: swirl.glow !== undefined ? swirl.glow : DefaultGlow,
 			fade: swirl.fade,
 			tag: context.tag,
 		}, world);
@@ -1734,8 +1738,8 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				velocity,
 				radius: projectile.radius,
 				fillStyle: projectileColor(strike, projectile, world),
-				glow: strike.particleGlow !== undefined ? strike.particleGlow : 0.1,
-				shine: strike.particleShine !== undefined ? strike.particleShine: 0.5,
+				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
+				shine: strike.particleShine !== undefined ? strike.particleShine: DefaultShine,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1789,10 +1793,10 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				from: previous,
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
-				shine: render.shine !== undefined ? render.shine : 0.5,
+				shine: render.shine !== undefined ? render.shine : DefaultShine,
 				fade: render.fade,
 				width: multiplier * projectile.radius * 2,
-				glow: render.glow !== undefined ? render.glow : 0.1,
+				glow: render.glow !== undefined ? render.glow : DefaultGlow,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1824,10 +1828,10 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 		pos: projectile.body.getPosition().clone(),
 		velocity,
 		fillStyle: projectileColor(render, projectile, world),
-		shine: render.shine !== undefined ? render.shine : 0.5,
+		shine: render.shine !== undefined ? render.shine : DefaultShine,
 		fade: render.fade,
 		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
-		glow: render.glow !== undefined ? render.glow : 0.1,
+		glow: render.glow !== undefined ? render.glow : DefaultGlow,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
 	}, world);

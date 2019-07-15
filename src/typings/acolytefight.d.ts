@@ -752,6 +752,7 @@ declare interface SaberSpell extends ShieldSpell {
 	categories: number;
 	collidesWith: number;
 
+	shine?: number;
 	trailTicks: number;
 }
 
