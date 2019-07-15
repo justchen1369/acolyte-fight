@@ -1427,11 +1427,11 @@ const supernova: Spell = {
         density: 5,
         radius: 0.001,
         speed: 0.3,
-        maxTicks: 1 * TicksPerSecond,
+        maxTicks: 1.05 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.None,
         expireOn: Categories.None,
-        expireAfterCursorTicks: 0.25 * TicksPerSecond,
+        expireAfterCursorTicks: 0.3 * TicksPerSecond,
 
         behaviours: [ // Either one of the following will stop the projectile
             {
