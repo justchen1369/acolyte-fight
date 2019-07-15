@@ -586,7 +586,7 @@ const blast: Spell = {
         speed: 0.5,
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
-        damage: 80,
+        damage: 50,
 
         detonate: {
             damage: 0,
