@@ -470,7 +470,7 @@ const meteorite: Spell = {
 const kamehameha: Spell = {
     id: 'kamehameha',
     name: 'Acolyte Beam',
-    description: "Hold down the button to charge and unleash a beam so powerful it can wipe out a full-health enemy in seconds. If you take an enemy hit, Acolyte Beam will be cancelled, but if it is cancelled within 1 second, you can cast it again immediately.",
+    description: "Unleash a beam so powerful it can wipe out a full-health enemy in seconds. If you take an enemy hit, Acolyte Beam will be cancelled, but if it is cancelled within 1 second, you can cast it again immediately.",
     action: "spray",
     sound: "kamehameha",
 
@@ -484,9 +484,6 @@ const kamehameha: Spell = {
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
-    release: {
-        interrupt: true,
-    },
     strikeCancel: {
         cooldownTicks: 0.5 * TicksPerSecond,
         maxChannelingTicks: 1 * TicksPerSecond,
@@ -827,7 +824,7 @@ const backlash: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit will be unable to move for a short time. Hold the button down, then release to detonate at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit will be unable to move for a short time. Cast Spirit Missile again to detonate at exactly the right moment.",
     action: "focus",
 
     color: '#ff8855',
@@ -841,14 +838,6 @@ const rocket: Spell = {
     interruptibleAfterTicks: 0,
     movementProportionWhileChannelling: 0.05,
     strikeCancel: {},
-
-    release: {},
-    releaseBehaviours: [
-        {
-            type: "expireOnOwnerRetreat",
-            maxDistance: 0,
-        },
-    ],
 
     projectile: {
         damage: 0,
@@ -1479,7 +1468,7 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Hold down the button to build up to 3 halos over 3 seconds, gaining a 20% speed bonus, then touch your enemy for lifesteal. The halos will be interrupted if you are hit.",
+    description: "Build up to 3 halos over 3 seconds, gaining a 20% speed bonus, then touch your enemy for lifesteal. The halos and speed bonus will be interrupted if you are hit, or if you cast another spell.",
     action: "spray",
 
     color: '#ffaa77',
@@ -1493,11 +1482,7 @@ const halo: Spell = {
     interruptibleAfterTicks: 0,
 
     strikeCancel: {},
-
-    release: {
-        interrupt: true,
-    },
-    maxChannellingTicks: 5 * TicksPerSecond,
+    maxChannellingTicks: 5 * TicksPerSecond, // A bit higher than normal so that the movement speed buff can last
 
     jitterRatio: 0.0,
     intervalTicks: 1.5 * TicksPerSecond,
@@ -1874,7 +1859,7 @@ const dualSaber: Spell = {
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
-    description: "Hold down the button to charge a melee-range explosion that will send your enemies flying. Enemies hit by Overload cannot cast spells for 1 second. Be careful - this spell is so powerful it costs you some health too.",
+    description: "Release a melee-range explosion that will send your enemies flying. Enemies hit by Overload cannot cast spells for 1 second. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
 
     detonate: {
@@ -1896,9 +1881,6 @@ const scourge: Spell = {
     throttle: false,
     unlink: true,
 
-    release: {
-        interrupt: true,
-    },
     interruptibleAfterTicks: 0,
     movementCancel: true,
 
