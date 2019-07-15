@@ -1480,7 +1480,7 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Build up to 3 halos over 3 seconds, gaining a 20% speed bonus, then touch your enemy for lifesteal. The speed bonus and halos will be interrupted if you are hit, or if you cast a new spell.",
+    description: "Hold down the button to build up to 3 halos over 3 seconds, gaining a 20% speed bonus, then touch your enemy for lifesteal. The halos will be interrupted if you are hit.",
     action: "spray",
 
     color: '#ffaa77',
@@ -1495,6 +1495,9 @@ const halo: Spell = {
 
     strikeCancel: {},
 
+    release: {},
+    releaseCancel: true,
+
     jitterRatio: 0.0,
     intervalTicks: 1.5 * TicksPerSecond,
     lengthTicks: 3 * TicksPerSecond + 1,
@@ -1502,9 +1505,20 @@ const halo: Spell = {
     buffs: [
         {
             type: "movement",
-            maxTicks: 3 * TicksPerSecond,
+            maxTicks: 5 * TicksPerSecond,
             movementProportion: 1.2,
             channelling: true,
+
+            render: {
+                color: "#8800ff",
+                heroColor: true,
+                ticks: 30,
+                emissionRadiusFactor: 0,
+                particleRadius: Hero.Radius,
+                shine: 0.5,
+                vanish: 1,
+                decay: true,
+            },
         },
     ],
 

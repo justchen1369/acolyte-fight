@@ -285,6 +285,8 @@ declare interface SpraySpell extends SpellBase {
 
 	projectile: ProjectileTemplate;
 
+	releaseCancel?: boolean; // Releasing this button stops the channelling of the spray
+
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 90 degrees either side. Weird units, I know.

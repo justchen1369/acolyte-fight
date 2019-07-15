@@ -3307,11 +3307,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
-	if (currentLength >= spell.lengthTicks) {
-		return true;
-	}
-
-	if (currentLength % spell.intervalTicks === 0) {
+	if (currentLength < spell.lengthTicks && currentLength % spell.intervalTicks === 0) {
 		let direction = hero.casting.direction;
 		if (direction.x === 0 && direction.y === 0) {
 			direction = vector.fromAngle(hero.body.getAngle()).mul(constants.Pixel);
@@ -3331,7 +3327,13 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 			direction: jitterDirection,
 		});
 	}
-	return false;
+
+	if (spell.release && spell.releaseCancel) {
+		// Keep spraying until the user lets go
+		return !!hero.casting.releaseTick;
+	} else {
+		return currentLength >= spell.lengthTicks;
+	}
 }
 
 function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: FocusSpell) {
