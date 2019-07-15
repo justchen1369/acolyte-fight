@@ -885,11 +885,6 @@ const rocket: Spell = {
             ],
         },
 
-        partialDetonateRadius: {
-            initialMultiplier: 0.5,
-            ticks: 1 * TicksPerSecond,
-        },
-
         partialBuffDuration: {
             initialMultiplier: 0.33,
             ticks: 1 * TicksPerSecond,
