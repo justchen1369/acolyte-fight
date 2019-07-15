@@ -519,9 +519,10 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 
 	ticks: number; // How long is the trail?
-	glow?: number;
-	shine?: number;
-	fade?: string;
+	glow?: number; // How much alpha to apply to the glow
+	shine?: number; // Lighten the trail initially
+	fade?: string; // Fade towards this color
+	vanish?: number; // Fade away the trail until it is transparent - 1 means fade it all away, 0 means do nothing
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -531,6 +532,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 
 	ticks: number; // How long is the trail?
 	fade?: string;
+	vanish?: number;
 	smoke?: number;
 	glow?: number;
 	shine?: number;
@@ -545,6 +547,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	ticks: number;
 	revolutionInterval: number;
 	fade?: string;
+	vanish?: number;
 	smoke?: number;
 	glow?: number;
 	noPartialRadius?: boolean;
@@ -566,6 +569,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	shine?: number;
 	smoke?: number;
 	fade?: string;
+	vanish?: number;
 	glow?: number;
 }
 
@@ -602,6 +606,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	numParticles?: number;
 	particleShine?: number;
 	particleGlow?: number;
+	particleVanish?: number;
 	speedMultiplier?: number;
 }
 
@@ -632,6 +637,10 @@ declare interface BuffTemplateBase {
 declare interface RenderBuff {
 	color: string;
 	alpha?: number;
+	shine?: number;
+	glow?: number;
+	fade?: string;
+	vanish?: number;
 	heroColor?: boolean;
 	decay?: boolean;
 	emissionRadiusFactor?: number; // 1 means smoke comes from the edges of the hero, 0 means it comes from the center

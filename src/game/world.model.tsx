@@ -1023,10 +1023,11 @@ export interface TrailBase {
 	max: number;
 
 	fillStyle: string;
-	shine?: number;
-	fade?: string;
+	shine?: number; // Lighten to start with
+	fade?: string; // Fade away into this color
+	vanish?: number; // Fade away into transparent
 
-	glow?: number;
+	glow?: number; // Glow alpha
 	highlight?: TrailHighlight;
 	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
 }
