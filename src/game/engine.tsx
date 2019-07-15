@@ -1636,6 +1636,11 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.stage = w.CastStage.Complete;
 	}
 
+	if (spell.release && spell.release.interrupt && hero.casting.releaseTick) {
+		// Spell cancelled by releasing button
+		hero.casting.stage = w.CastStage.Complete;
+	}
+
 	if (hero.casting.stage === w.CastStage.Charging) {
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {

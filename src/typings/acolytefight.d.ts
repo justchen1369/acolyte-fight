@@ -254,6 +254,7 @@ declare interface SpellBase {
 
 declare interface ReleaseParams {
 	maxChargeTicks?: number; // Don't finish charging until button is released or until this number of ticks
+	interrupt?: boolean; // Whether releasing the button interrupts the spell
 }
 
 declare interface SpellCancelParams {
