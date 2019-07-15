@@ -1391,7 +1391,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 
 		if (barShine > barMid) {
 			glx.line(ctxStack, barMid, barShine, {
-				color: ColTuple.parse("#fff"),
+				color: ColTuple.parse("#ccc"),
 				maxRadius: barHalfHeight,
 			});
 		} else {
