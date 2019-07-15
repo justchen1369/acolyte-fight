@@ -1491,8 +1491,10 @@ const halo: Spell = {
 
     strikeCancel: {},
 
-    release: {},
-    releaseCancel: true,
+    release: {
+        interrupt: true,
+    },
+    maxChannellingTicks: 5 * TicksPerSecond,
 
     jitterRatio: 0.0,
     intervalTicks: 1.5 * TicksPerSecond,

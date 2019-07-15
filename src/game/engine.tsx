@@ -3352,12 +3352,8 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		});
 	}
 
-	if (spell.release && spell.releaseCancel) {
-		// Keep spraying until the user lets go
-		return !!hero.casting.releaseTick;
-	} else {
-		return currentLength >= spell.lengthTicks;
-	}
+	const cutoff = spell.maxChannellingTicks || spell.lengthTicks;
+	return currentLength >= cutoff;
 }
 
 function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: FocusSpell) {

@@ -286,7 +286,7 @@ declare interface SpraySpell extends SpellBase {
 
 	projectile: ProjectileTemplate;
 
-	releaseCancel?: boolean; // Releasing this button stops the channelling of the spray
+	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
 
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
