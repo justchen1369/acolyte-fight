@@ -234,6 +234,8 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
         } else if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
             return castOrMove(hero, { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) });
+        } else if (hero.casting.spellId === "halo") {
+            return castOrMove(hero, { spellId: "move", target: opponent.pos });
         } else {
             return castOrMove(hero, { spellId: "retarget", target: opponent.pos });
         }
@@ -243,15 +245,7 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
 }
 
 function chase(state, hero, cooldowns, opponent) {
-    var numHalos = 0;
-    for (var projectileId in state.projectiles) {
-        var projectile = state.projectiles[projectileId];
-        if (projectile.ownerId === hero.id && projectile.spellId === "halo") {
-            ++numHalos;
-        }
-    }
-
-    if (numHalos >= 2 || cooldowns["whip"] === 0) {
+    if (cooldowns["whip"] === 0) {
         var target = vectorMidpoint(hero.pos, opponent.pos);
         return castOrMove(hero, { spellId: "move", target });
     } else {
