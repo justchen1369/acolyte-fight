@@ -1802,6 +1802,7 @@ const saber: Spell = {
     speedMultiplier: 2,
     maxSpeed: 0.75,
     maxTurnRatePerTickInRevs: 0.1,
+    damageMultiplier: 0.5,
 
     angleOffsetsInRevs: [0],
     width: Pixel,
@@ -1842,6 +1843,7 @@ const dualSaber: Spell = {
     speedMultiplier: 2,
     maxSpeed: 0.75,
     maxTurnRatePerTickInRevs: 0.1,
+    damageMultiplier: 0.5,
 
     angleOffsetsInRevs: [-0.25, 0.25],
     width: Pixel,
@@ -1918,6 +1920,7 @@ const shield: Spell = {
     radius: Hero.Radius * 1.8,
     takesOwnership: true,
     blocksTeleporters: false,
+    damageMultiplier: 0.5,
 
     icon: "shieldReflect",
 
@@ -1941,6 +1944,7 @@ const icewall: Spell = {
     throttle: false,
     takesOwnership: true,
     blocksTeleporters: true,
+    damageMultiplier: 0.5,
 
     length: 0.005,
     width: 0.15,

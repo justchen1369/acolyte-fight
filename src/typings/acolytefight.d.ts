@@ -721,6 +721,7 @@ declare interface ScourgeSpell extends SpellBase {
 declare interface ShieldSpell extends SpellBase {
 	maxTicks: number;
 	takesOwnership: boolean;
+	damageMultiplier: number;
 	blocksTeleporters: boolean;
 	glow?: number;
 }

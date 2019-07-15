@@ -251,6 +251,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: 0,
+		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
@@ -292,6 +293,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: spell.growthTicks,
+		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
@@ -345,6 +347,8 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		expireTick: world.tick + spell.maxTicks,
 		growthTicks: 5,
 		channelling: spell.channelling,
+
+		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
@@ -1997,6 +2001,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	if (!myProjectile && projectile.shieldTakesOwnership && shield.takesOwnership && (calculateAlliance(shield.owner, projectile.owner, world) & Alliances.Enemy) > 0) { // Stop double redirections cancelling out
 		// Redirect back to owner
 		swapOwnership(projectile, shield.owner, world);
+		reduceDamage(projectile, shield.damageMultiplier);
 	}
 
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
@@ -2021,6 +2026,20 @@ function swapOwnership(projectile: w.Projectile, newOwner: string, world: w.Worl
 			}
 		}
 		fixture = fixture.getNext();
+	}
+}
+
+function reduceDamage(projectile: w.Projectile, multiplier: number) {
+	projectile.damageTemplate = {
+		...projectile.damageTemplate,
+		damage: projectile.damageTemplate.damage * multiplier,
+	};
+
+	if (projectile.detonate) {
+		projectile.detonate = {
+			...projectile.detonate,
+			damage: projectile.detonate.damage * multiplier,
+		};
 	}
 }
 

@@ -471,11 +471,15 @@ export interface ShieldBase extends WorldObjectBase {
 	category: "shield";
 	type: string;
 	sound?: string;
+
 	createTick: number;
 	expireTick: number;
 	growthTicks: number;
+
+	damageMultiplier: number;
 	takesOwnership: boolean;
 	owner: string;
+
 	color: string;
 	selfColor?: boolean;
 	hitTick?: number;
