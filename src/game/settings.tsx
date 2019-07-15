@@ -261,7 +261,7 @@ const triplet: Spell = {
         soundHit: "standard",
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 10, smoke: 0.05, shine: 0.75 },
+            { type: "projectile", ticks: 10, smoke: 0.1, shine: 0.75 },
             { type: "ray", ticks: 5 },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
         ],
@@ -334,7 +334,7 @@ const difire: Spell = {
 
         color: '#ff0088',
         renderers: [
-            { type: "projectile", ticks: 8, smoke: 0.05, shine: 0.75 },
+            { type: "projectile", ticks: 8, smoke: 0.1, shine: 0.75 },
             { type: "ray", ticks: 5 },
             { type: "strike", ticks: 8, glow: true, numParticles: 2 },
         ],
@@ -376,11 +376,13 @@ const firespray: Spell = {
     intervalTicks: 2,
     lengthTicks: 20,
 
-    jitterRatio: 0.4,
+    jitterRatio: 0.3,
 
     projectile: {
         density: 1,
         knockbackScaling: false,
+        categories: Categories.Projectile,
+        collideWith: Categories.All ^ Categories.Projectile, // Don't collide with self
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
@@ -389,7 +391,8 @@ const firespray: Spell = {
 
         color: '#ff0044',
         renderers: [
-            { type: "ray", intermediatePoints: true, ticks: 30 },
+            { type: "projectile", ticks: 30, smoke: 0.1, fade: "rgba(255, 0, 64, 0.25)" },
+            { type: "ray", intermediatePoints: true, ticks: 7 },
             { type: "strike", ticks: 30, glow: true, numParticles: 1 },
         ],
     },
