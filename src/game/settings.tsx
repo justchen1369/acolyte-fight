@@ -685,9 +685,9 @@ const boomerang: Spell = {
         sound: "boomerang",
         soundHit: "standard",
         renderers: [
-            { type: "projectile", selfColor: true, ticks: 10 },
-            { type: "ray", selfColor: true, ticks: 10 },
-            { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60 },
+            { type: "projectile", selfColor: true, ticks: 10, vanish: 1 },
+            { type: "ray", selfColor: true, ticks: 10, vanish: 1 },
+            { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60, vanish: 1 },
             { type: "strike", selfColor: true, ticks: 15, glow: true, numParticles: 5 },
         ],
     },
