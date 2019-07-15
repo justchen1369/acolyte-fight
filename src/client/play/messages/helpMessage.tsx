@@ -7,10 +7,13 @@ import * as analytics from '../../core/analytics';
 import * as m from '../../../game/messages.model';
 import * as matches from '../../core/matches';
 import * as s from '../../store.model';
+import * as seen from '../../core/seen';
 import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
 import { isMobile } from '../../core/userAgent';
 import Button from '../../controls/button';
+
+const NewVersion = 1;
 
 interface OwnProps {
 }
@@ -20,6 +23,7 @@ interface Props extends OwnProps {
     showingHelp: boolean;
     rebindings: KeyBindings;
     tutorial: boolean;
+    seenVersion: number;
 }
 interface State {
 }
@@ -32,6 +36,7 @@ function stateToProps(state: s.State): Props {
         showingHelp: state.showingHelp,
         rebindings: state.rebindings,
         tutorial: state.world.ui.locked === m.LockType.Tutorial,
+        seenVersion: state.seen,
     };
 }
 
@@ -41,14 +46,13 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null; // Observer doesn't need instructions
         }
 
-        if (this.props.userId) {
-            return null; // Logged-in user doesn't need instructions
-        }
-
-        if (this.props.showingHelp) {
+        const needsHelp = !this.props.userId; // Logged-in user doesn't need instructions
+        if (this.props.showingHelp && needsHelp) {
             return this.renderHelp();
         } else if (this.props.tutorial) {
             return this.renderTutorial();
+        } else if (this.props.seenVersion < NewVersion) {
+            return this.renderNewVersion();
         } else {
             return null;
         }
@@ -86,13 +90,24 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderTutorial() {
-        return <div className="waiting-panel dialog-panel">
+        return <div className="info-panel dialog-panel">
             <div className="header-row">Tutorial</div>
             <div className="body-row">
                 Defeat this bot!
             </div>
             <div className="action-row">
                 <Button onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
+            </div>
+        </div>
+    }
+
+    private renderNewVersion() {
+        return <div className="info-panel dialog-panel">
+            <div className="header-row">Recent Updates</div>
+            <div className="body-row">You now need to <b>hold down the button</b> to channel <b>Spirit Missile</b>, <b>Halo</b> and <b>Refract</b>.</div>
+            <div className="body-row">For more updates, check the <a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /> Discord</a>.</div>
+            <div className="action-row">
+                <Button className="btn" onClick={(e) => this.onCloseVersionClicked()}>OK</Button>
             </div>
         </div>
     }
@@ -105,6 +120,10 @@ class HelpMessage extends React.PureComponent<Props, State> {
 
     private onCloseHelpClicked(e: React.MouseEvent) {
         StoreProvider.dispatch({ type: "updateShowingHelp", showingHelp: false });
+    }
+
+    private onCloseVersionClicked() {
+        seen.saveSeenVersion(NewVersion);
     }
 }
 

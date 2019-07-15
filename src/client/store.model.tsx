@@ -11,6 +11,7 @@ export interface State {
 
     touched?: boolean;
 
+    seen: number;
     userId?: string;
     loggedIn: boolean;
     isNewPlayer: boolean;
@@ -98,6 +99,7 @@ export type Action =
     DisconnectedAction
     | ServerPreparingToShutdownAction
     | UpdateAdsAction
+    | UpdateSeenAction
     | UpdateUserIdAction
     | LogoutAction
     | UpdatePlayerNameAction
@@ -168,6 +170,11 @@ export interface DisconnectedAction {
 export interface UpdateAdsAction {
     type: "updateAds";
     ads: string;
+}
+
+export interface UpdateSeenAction {
+    type: "seen";
+    seen: number;
 }
 
 export interface UpdateUserIdAction {

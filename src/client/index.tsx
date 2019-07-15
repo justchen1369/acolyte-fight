@@ -21,6 +21,7 @@ import * as parties from './core/parties';
 import * as rankings from './core/rankings';
 import * as replays from './core/replays';
 import * as rooms from './core/rooms';
+import * as seen from './core/seen';
 import * as sockets from './core/sockets';
 import * as stats from './core/stats';
 import * as storage from './storage';
@@ -71,6 +72,7 @@ export async function initialize() {
 
     render();
 
+    seen.loadSeenVersion(); // Don't bother awaiting
     storage.cleanupGameStats();
 }
 

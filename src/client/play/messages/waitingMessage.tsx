@@ -47,7 +47,7 @@ class WaitingMessage extends React.PureComponent<Props, State> {
     private renderOnline() {
         const numOnline = this.props.numOnline;
         const isPublic = this.props.segment === segments.publicSegment();
-        return <div className="waiting-panel dialog-panel">
+        return <div className="info-panel dialog-panel">
             <div className="header-row loading-text">Waiting for opponents...</div>
             <div className="body-row">
                 {numOnline} {numOnline === 1 ? "player" : "players"} online{!isPublic && " in this game mode"}.

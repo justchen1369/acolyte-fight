@@ -21,6 +21,7 @@ namespace StorageKeys {
 namespace SettingsKeys {
     export const Known = "known";
     export const NumGames = "num-games";
+    export const SeenVersion = "seen-version";
     export const LatestGameStatUnixTimestamp = "latest-game-unix";
 }
 
@@ -159,6 +160,14 @@ export async function getKnownUser() {
 
 export async function setKnownUser(known: boolean) {
     await settingsStorage.setItem(SettingsKeys.Known, known);
+}
+
+export async function getSeenVersion() {
+    return await settingsStorage.getItem<number>(SettingsKeys.SeenVersion) || 0;
+}
+
+export async function setSeenVersion(version: number) {
+    await settingsStorage.setItem(SettingsKeys.SeenVersion, version);
 }
 
 function migrateGame(game: d.GameStats): d.GameStats {

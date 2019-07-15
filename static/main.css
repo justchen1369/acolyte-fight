@@ -916,11 +916,11 @@ table.player-list {
     margin-left: 0.25em;
 }
 
-#messages-panel .waiting-panel .body-row {
+#messages-panel .info-panel .body-row {
     font-size: 75%;
 }
 
-#messages-panel .waiting-panel .header-row {
+#messages-panel .info-panel .header-row {
     font-size: 120%;
     font-weight: bold;
     margin-bottom: 0.5em;

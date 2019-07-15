@@ -23,6 +23,7 @@ function initialState(): s.State {
     };
     return {
         customizing: false,
+        seen: 0,
         loggedIn: false,
         showingHelp: true,
         isNewPlayer,
@@ -84,6 +85,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateAds") {
         return { ...state, ads: action.ads };
+    } else if (action.type === "seen") {
+        return { ...state, seen: action.seen };
     } else if (action.type === "updateUserId") {
         let newState: s.State = { ...state, userId: action.userId, loggedIn: action.loggedIn, profile: null };
         if (action.loggedIn) {
