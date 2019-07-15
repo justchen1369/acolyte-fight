@@ -1886,7 +1886,7 @@ const scourge: Spell = {
             }
         ],
     },
-    chargeTicks: 0.5 * TicksPerSecond,
+    chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
