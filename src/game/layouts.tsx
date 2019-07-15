@@ -1,6 +1,6 @@
 export const Layouts: Layouts = {
     "circle": {
-        color: "#1e2026",
+        color: "#22242b",
         "obstacles": [
         ]
     },
@@ -43,7 +43,7 @@ export const Layouts: Layouts = {
         ],
     },
     "octogon": {
-        color: "#1e2124",
+        color: "#202326",
         "obstacles": [
             {
                 "type": "slow",
@@ -68,7 +68,7 @@ export const Layouts: Layouts = {
         "numPoints": 8
     },
     "return": {
-        color: "#241d20",
+        color: "#292124",
         "obstacles": [
             {
                 "type": "volcano",
@@ -124,7 +124,7 @@ export const Layouts: Layouts = {
         ],
     },
     "ring": {
-        color: "#1f2226",
+        color: "#212529",
         "obstacles": [
             {
                 type: "mirror",
@@ -233,7 +233,7 @@ export const Layouts: Layouts = {
         ]
     },
     "inside5": {
-        color: "#241e21",
+        color: "#262023",
         "numPoints": 5,
         "obstacles": [
             {
@@ -255,7 +255,7 @@ export const Layouts: Layouts = {
         ],
     },
     "single": {
-        color: "#1d1524",
+        color: "#23192b",
         "numPoints": 3,
         "obstacles": [
             {
@@ -294,7 +294,7 @@ export const Layouts: Layouts = {
         "numPoints": 5
     },
     "mirrors": {
-        color: "#1d1f24",
+        color: "#212329",
         "obstacles": [
             {
                 "type": "mirror",
@@ -310,7 +310,7 @@ export const Layouts: Layouts = {
         "numPoints": 7
     },
     "innerStar": {
-        color: "#241f21",
+        color: "#262123",
         "obstacles": [
             {
                 type: "explosive",
@@ -342,7 +342,7 @@ export const Layouts: Layouts = {
         "angleOffsetInRevs": 0.1,
     },
     "mirrorhenge": {
-        color: "#1a2124",
+        color: "#202426",
         "obstacles": [
             {
                 "type": "fast",
@@ -385,7 +385,7 @@ export const Layouts: Layouts = {
         ],
     },
     "triplet": {
-        color: "#1d2224",
+        color: "#1f2426",
         obstacles: [
             {
                 type: "spinner",
@@ -455,7 +455,7 @@ export const Layouts: Layouts = {
         ]
     },
     "tripletSwirl": {
-        color: "#242022",
+        color: "#262224",
         "obstacles": [
             {
                 "numObstacles": 3,
