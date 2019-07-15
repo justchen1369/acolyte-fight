@@ -1432,11 +1432,11 @@ const supernova: Spell = {
         density: 5,
         radius: 0.001,
         speed: 0.3,
-        maxTicks: 1.25 * TicksPerSecond,
+        maxTicks: 1 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.None,
         expireOn: Categories.None,
-        expireAfterCursorTicks: 0.5 * TicksPerSecond,
+        expireAfterCursorTicks: 0.25 * TicksPerSecond,
 
         behaviours: [ // Either one of the following will stop the projectile
             {
@@ -1470,8 +1470,8 @@ const supernova: Spell = {
                 type: "reticule",
                 color: '#ff9a00',
                 minRadius: 0.049,
-                remainingTicks: 0.5 * TicksPerSecond,
-                shrinkTicks: 0.5 * TicksPerSecond,
+                remainingTicks: 0.25 * TicksPerSecond,
+                shrinkTicks: 0.25 * TicksPerSecond,
                 radius: 0.05,
             },
         ],
