@@ -1647,7 +1647,7 @@ const iceBomb: Spell = {
         restitution: 0,
         radius: 0.01,
         speed: 0.2,
-        maxTicks: 20,
+        maxTicks: 25,
         minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
@@ -1661,7 +1661,7 @@ const iceBomb: Spell = {
             {
                 type: "movement",
                 movementProportion: 0.1,
-                maxTicks: 0.75 * TicksPerSecond,
+                maxTicks: 1 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
