@@ -1591,7 +1591,7 @@ const mines: Spell = {
         },
 
         detonate: {
-            damage: 12,
+            damage: 20,
             lifeSteal: 0.2,
             radius: 0.015,
             minImpulse: 0.0001,
@@ -1611,7 +1611,7 @@ const mines: Spell = {
             },
             {
                 type: "expireOnOwnerRetreat",
-                maxDistance: 0.1,
+                maxDistance: 0.15,
                 trigger: { afterTicks: 60 },
             },
         ],
