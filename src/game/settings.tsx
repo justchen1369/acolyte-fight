@@ -790,8 +790,8 @@ const backlash: Spell = {
         density: 1,
         restitution: 0,
         radius: 0.002,
-        speed: 0.5,
-        maxTicks: 2 * TicksPerSecond,
+        speed: 0.4,
+        maxTicks: 2.4 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero,
         collideWith: Categories.All ^ Categories.Hero,
@@ -816,8 +816,8 @@ const backlash: Spell = {
         color: '#00ccff',
         renderers: [
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
-            { type: "ray", ownerColor: true, ticks: 15, vanish: 1 },
-            { type: "strike", color: '#fff', ticks: 15, growth: 1.5, glow: true, numParticles: 9, speedMultiplier: -0.5 },
+            { type: "ray", ownerColor: true, ticks: 25, vanish: 1 },
+            { type: "strike", color: '#fff', ticks: 25, growth: 1.5, glow: true, numParticles: 9, speedMultiplier: -0.5 },
         ],
     },
 };
