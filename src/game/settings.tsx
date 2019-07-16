@@ -546,7 +546,7 @@ const lightning: Spell = {
 const blast: Spell = {
     id: 'blast',
     name: 'Acolyte Blast',
-    description: "Hold down the button to charge your blast for longer. Charge for 3 seconds for maximum damage and knockback. Just don't get interrupted while charging!",
+    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage. Just don't get interrupted while charging!",
     action: "charge",
 
     color: '#0ff',
@@ -556,7 +556,7 @@ const blast: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
-    chargeTicks: 3 * TicksPerSecond,
+    chargeTicks: 2 * TicksPerSecond,
     release: {
         maxChargeTicks: 7.5 * TicksPerSecond,
     },
@@ -569,12 +569,12 @@ const blast: Spell = {
 
     chargeDamage: {
         initialMultiplier: 0.1,
-        ticks: 3 * TicksPerSecond,
+        ticks: 2 * TicksPerSecond,
     },
 
     chargeRadius: {
         initialMultiplier: 0.25,
-        ticks: 3 * TicksPerSecond,
+        ticks: 2 * TicksPerSecond,
     },
 
     projectile: {
