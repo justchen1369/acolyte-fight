@@ -381,12 +381,10 @@ const firespray: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        categories: Categories.Projectile,
-        collideWith: Categories.All ^ Categories.Projectile, // Don't collide with self
         radius: 0.002,
         speed: 0.5,
         maxTicks: 0.25 * TicksPerSecond,
-        damage: 6,
+        damage: 4,
         lifeSteal: 0.2,
 
         color: '#ff0044',
