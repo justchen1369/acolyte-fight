@@ -123,18 +123,18 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
 	appendTrail(ctxStack, pos, quad[0], fill);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fill: r.Fill) {
-	const extent = calculateExtent(ctxStack, fill);
+export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.Fill, toFill: r.Fill = fromFill) {
+	const extent = calculateExtent(ctxStack, fromFill);
 	const down = vector.relengthen(vector.rotateLeft(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
 
-	appendTrail(ctxStack, from, up, fill);
-	appendTrail(ctxStack, from, down, fill);
-	appendTrail(ctxStack, to, up, fill);
+	appendTrail(ctxStack, from, up, fromFill);
+	appendTrail(ctxStack, from, down, fromFill);
+	appendTrail(ctxStack, to, up, toFill);
 
-	appendTrail(ctxStack, to, up, fill);
-	appendTrail(ctxStack, from, down, fill);
-	appendTrail(ctxStack, to, down, fill);
+	appendTrail(ctxStack, to, up, toFill);
+	appendTrail(ctxStack, from, down, fromFill);
+	appendTrail(ctxStack, to, down, toFill);
 }
 
 export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.Fill) {

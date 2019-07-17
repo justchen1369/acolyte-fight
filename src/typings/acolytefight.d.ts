@@ -555,6 +555,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	vanish?: number;
 	smoke?: number;
 	glow?: number;
+	shine?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -582,6 +583,7 @@ declare interface RenderLink extends RenderParamsBase {
 	type: "link";
 	color: string;
 	width: number;
+	shine?: number;
 	glow?: number;
 
 	redirectGrowth?: number;

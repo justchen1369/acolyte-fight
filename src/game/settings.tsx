@@ -1758,7 +1758,7 @@ const horcrux: Spell = {
         color: '#22ee88',
         renderers: [
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
-            { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1 },
+            { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1, shine: 0 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.04, minRadius: 0.03, shrinkTicks: 10, startingTicks: 10 },

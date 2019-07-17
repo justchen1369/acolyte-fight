@@ -1780,7 +1780,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		}
 	}
 
-	const fill: r.Fill = {
+	const fromFill: r.Fill = {
 		color,
 		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.High) ? {
@@ -1789,9 +1789,18 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		} : null,
 	};
 
+	let toFill = fromFill;
+	const shine = render.shine !== undefined ? render.shine : DefaultShine;
+	if (shine) {
+		toFill = {
+			...fromFill,
+			color: fromFill.color.clone().lighten(shine),
+		};
+	}
+
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
-	glx.line(ctxStack, from, to, fill);
+	glx.line(ctxStack, from, to, fromFill, toFill);
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -1875,6 +1884,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		fillStyle: projectileColor(render, projectile, world),
 		fade: render.fade,
 		extent: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
+		shine: render.shine !== undefined ? render.shine : DefaultShine,
 		glow: render.glow,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
