@@ -1020,6 +1020,7 @@ function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: 
 		fillStyle: heroColor(hero.id, world),
 		shine: 0.5,
 		glow: 0.2,
+		vanish: 1,
 	});
 }
 
