@@ -1651,7 +1651,7 @@ const iceBomb: Spell = {
     throttle: true,
 
     intervalTicks: 1,
-    lengthTicks: 5,
+    lengthTicks: 6,
 
     jitterRatio: 0.75,
 
@@ -1659,9 +1659,9 @@ const iceBomb: Spell = {
         density: 1,
         sensor: true,
         restitution: 0,
-        radius: 0.015,
-        speed: 0.3,
-        maxTicks: 18,
+        radius: 0.01,
+        speed: 0.2,
+        maxTicks: 25,
         minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
