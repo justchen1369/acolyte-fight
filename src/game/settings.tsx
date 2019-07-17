@@ -788,7 +788,7 @@ const backlash: Spell = {
         density: 1,
         restitution: 0,
         radius: 0.002,
-        speed: 0.5,
+        speed: 0.55,
         maxTicks: 2 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero,
@@ -799,13 +799,13 @@ const backlash: Spell = {
 
         behaviours: [
             {
-                trigger: { afterTicks: 45 },
+                trigger: { afterTicks: 40 },
                 type: "homing",
                 revolutionsPerSecond: 1,
                 targetType: "self",
             },
             {
-                trigger: { afterTicks: 45 },
+                trigger: { afterTicks: 40 },
                 type: "clearHits",
             },
         ],
