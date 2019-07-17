@@ -1034,7 +1034,7 @@ const link: Spell = {
         sound: "link",
         color: '#4444ff',
         renderers: [
-            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1 },
+            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 5, vanish: 1 },
             {
                 type: "link",
                 color: '#4444ff',
