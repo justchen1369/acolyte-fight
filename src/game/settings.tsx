@@ -892,7 +892,7 @@ const rocket: Spell = {
 const whip: Spell = {
     id: 'whip',
     name: 'Electroshock',
-    description: "Shock your enemies for damage and lifesteal. The whip has a fixed length, so stay close, but not too close.",
+    description: "Shock your enemies at short-range. Electroshock lifesteals from your enemy, and also gives you a 20% movement speed bonus for 3 seconds.",
     action: "projectile",
 
     color: '#39fffa',
@@ -906,8 +906,19 @@ const whip: Spell = {
     buffs: [
         {
             type: "movement",
-            maxTicks: 1.5 * TicksPerSecond,
+            maxTicks: 3 * TicksPerSecond,
             movementProportion: 1.2,
+            render: {
+                color: "#8800ff",
+                heroColor: true,
+                ticks: 30,
+                emissionRadiusFactor: 0,
+                particleRadius: Hero.Radius,
+                shine: 0.5,
+                glow: 0.2,
+                vanish: 1,
+                decay: true,
+            },
         },
     ],
 
