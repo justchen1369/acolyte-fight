@@ -658,8 +658,8 @@ const boomerang: Spell = {
     projectile: {
         density: 1,
         restitution: 0,
-        radius: 0.004,
-        speed: 0.5,
+        radius: 0.003,
+        speed: 0.6,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 20,
         lifeSteal: 0.2,
