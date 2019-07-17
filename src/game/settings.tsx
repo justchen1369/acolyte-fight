@@ -1973,7 +1973,7 @@ const icewall: Spell = {
     damageMultiplier: 0.25,
 
     length: 0.005,
-    width: 0.15,
+    width: 0.1,
     density: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
