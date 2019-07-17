@@ -2596,6 +2596,13 @@ function accelerate(behaviour: w.AccelerateBehaviour, world: w.World) {
 		projectile.speed = Math.min(behaviour.maxSpeed, projectile.speed + behaviour.accelerationPerTick);
 	}
 
+	const velocity = projectile.body.getLinearVelocity();
+	const currentSpeed = velocity.length();
+	if (currentSpeed < projectile.speed) {
+		const newSpeed = Math.max(projectile.speed, currentSpeed + behaviour.accelerationPerTick);
+		projectile.body.setLinearVelocity(vector.relengthen(velocity, newSpeed));
+	}
+
 	return true;
 }
 

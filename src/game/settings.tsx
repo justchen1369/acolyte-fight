@@ -711,7 +711,7 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        damage: 66,
+        damage: 0,
         lifeSteal: 0.2,
         density: 6,
         radius: 0.007,
@@ -720,17 +720,29 @@ const retractor: Spell = {
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
         categories: Categories.Projectile,
+        shieldTakesOwnership: false,
 
         partialDamage: {
             initialMultiplier: 0.01,
             ticks: 3 * TicksPerSecond,
         },
 
+        detonate: {
+            damage: 66,
+            lifeSteal: 0.2,
+            radius: 0.025,
+
+            minImpulse: 0,
+            maxImpulse: 0,
+
+            renderTicks: 15,
+        },
+
         behaviours: [
             {
                 type: "accelerate",
                 maxSpeed: 0.8,
-                accelerationPerSecond: 0.4,
+                accelerationPerSecond: 0.8,
             }
         ],
 
@@ -748,10 +760,11 @@ const retractor: Spell = {
                 numParticles: 2,
                 loopTicks: 15,
                 vanish: 1,
+                selfColor: true,
             },
-            { type: "projectile", ticks: 1, glow: 0.2 },
-            { type: "ray", ticks: 10, glow: 0.2, vanish: 0.25 },
-            { type: "strike", ticks: 10, glow: true, numParticles: 9, detonate: 0.025 },
+            { type: "projectile", ticks: 1, glow: 0.2, selfColor: true },
+            { type: "ray", ticks: 10, glow: 0.2, vanish: 0.25, selfColor: true },
+            { type: "strike", ticks: 10, glow: true, numParticles: 9, selfColor: true },
         ],
     },
 };
