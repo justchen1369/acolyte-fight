@@ -715,10 +715,10 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         lifeSteal: 0.2,
-        density: 24,
-        radius: 0.0035,
+        density: 6,
+        radius: 0.007,
         speed: 0.4,
-        maxTicks: 3.0 * TicksPerSecond,
+        maxTicks: 2.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
         categories: Categories.Projectile,
@@ -743,7 +743,7 @@ const retractor: Spell = {
         behaviours: [
             {
                 type: "accelerate",
-                maxSpeed: 0.8,
+                maxSpeed: 0.6,
                 accelerationPerSecond: 0.4,
             }
         ],
@@ -755,7 +755,7 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#00ff7f',
                 ticks: 30,
-                radius: 0.005,
+                radius: 0.009,
                 particleRadius: 0.001,
                 glow: 0.05,
                 smoke: 0.1,
