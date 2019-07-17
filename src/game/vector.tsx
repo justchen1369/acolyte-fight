@@ -18,11 +18,6 @@ export function unit(vec: pl.Vec2) {
 	return len == 0 ? vec : pl.Vec2(vec.x / len, vec.y / len);
 }
 
-export function direction(to: pl.Vec2, from: pl.Vec2, length: number) {
-	let d = diff(to, from);
-	return multiply(unit(d), length);
-}
-
 export function multiply(vec: pl.Vec2, multiplier: number) {
 	return pl.Vec2(vec.x * multiplier, vec.y * multiplier);
 }
@@ -44,12 +39,14 @@ export function towards(from: pl.Vec2, to: pl.Vec2, distance: number) {
 
 // Keep length, but use new direction
 export function redirect(oldDirection: pl.Vec2, newDirection: pl.Vec2) {
-	return multiply(unit(newDirection), length(oldDirection));
+	return relengthen(newDirection, oldDirection.length());
 }
 
 // Keep direction, but use new length
 export function relengthen(oldDirection: pl.Vec2, newLength: number) {
-	return multiply(unit(oldDirection), newLength);
+	let result = oldDirection.clone();
+	result.normalize();
+	return result.mul(newLength);
 }
 
 export function plus(a: pl.Vec2, b: pl.Vec2) {
@@ -57,7 +54,7 @@ export function plus(a: pl.Vec2, b: pl.Vec2) {
 }
 
 export function distance(a: pl.Vec2, b: pl.Vec2) {
-	return length(diff(a, b));
+	return pl.Vec2.distance(a, b);
 }
 
 export function clone(vec: pl.Vec2) {
@@ -137,7 +134,7 @@ export function turnVectorBy(currentVector: pl.Vec2, deltaAngle: number) {
 	const currentAngle = angle(currentVector);
 	const newAngle = currentAngle + deltaAngle;
 
-	return multiply(unit(fromAngle(newAngle)), length(currentVector));
+	return fromAngle(newAngle, length(currentVector));
 }
 
 export function average(points: pl.Vec2[]) {
