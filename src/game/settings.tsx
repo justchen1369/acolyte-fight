@@ -586,20 +586,11 @@ const blast: Spell = {
         maxTicks: 2 * TicksPerSecond,
         damage: 50,
 
-        detonate: {
-            damage: 0,
-            lifeSteal: 0.2,
-            radius: 0.02,
-            minImpulse: 0,
-            maxImpulse: 0,
-            renderTicks: 15,
-        },
-
         sound: "blast",
         color: '#0ff',
         renderers: [
             { type: "projectile", ticks: 10, selfColor: true, shine: 1, smoke: 0.15, glow: 0.2, vanish: 0.5 },
-            { type: "strike", ticks: 10, numParticles: 10, glow: true },
+            { type: "strike", ticks: 10, numParticles: 10, glow: true, detonate: 0.025 },
         ],
     },
 };
@@ -716,7 +707,7 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        damage: 0,
+        damage: 66,
         lifeSteal: 0.2,
         density: 6,
         radius: 0.007,
@@ -729,15 +720,6 @@ const retractor: Spell = {
         partialDamage: {
             initialMultiplier: 0.01,
             ticks: 3 * TicksPerSecond,
-        },
-
-        detonate: {
-            damage: 66,
-            lifeSteal: 0.2,
-            radius: 0.025,
-            minImpulse: 0,
-            maxImpulse: 0,
-            renderTicks: 10,
         },
 
         behaviours: [
@@ -765,7 +747,7 @@ const retractor: Spell = {
             },
             { type: "projectile", ticks: 1, glow: 0.2 },
             { type: "ray", ticks: 10, glow: 0.2, vanish: 0.25 },
-            { type: "strike", ticks: 10, glow: true, numParticles: 9 },
+            { type: "strike", ticks: 10, glow: true, numParticles: 9, detonate: 0.025 },
         ],
     },
 };
