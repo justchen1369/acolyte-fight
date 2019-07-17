@@ -1592,7 +1592,7 @@ const mines: Spell = {
         },
 
         detonate: {
-            damage: 20,
+            damage: 12,
             lifeSteal: 0.2,
             radius: 0.015,
             minImpulse: 0.0001,
