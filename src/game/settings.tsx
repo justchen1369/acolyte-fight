@@ -1010,6 +1010,7 @@ const link: Spell = {
                 width: 2.5 * Pixel,
                 toWidth: 5 * Pixel,
                 glow: 0.2,
+                shine: 0.25,
 
                 redirectFlash: true,
                 redirectGrowth: 2,
@@ -1048,6 +1049,7 @@ const link: Spell = {
                 width: 2.5 * Pixel,
                 toWidth: 5 * Pixel,
                 glow: 0.1,
+                shine: 0.25,
             },
         ],
     },
@@ -1092,6 +1094,7 @@ const grapple: Spell = {
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 glow: 0.2,
+                shine: 0.25,
             },
         },
 
@@ -1120,6 +1123,7 @@ const grapple: Spell = {
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 glow: 0.2,
+                shine: 0.25,
             },
         ],
     },
