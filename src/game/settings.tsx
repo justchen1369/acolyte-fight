@@ -1847,7 +1847,7 @@ const scourge: Spell = {
 
     detonate: {
         damage: 30,
-        radius: Hero.Radius * 5,
+        radius: Hero.Radius * 4,
         minImpulse: 0.001,
         maxImpulse: 0.001,
         renderTicks: 30,
@@ -1859,7 +1859,7 @@ const scourge: Spell = {
             }
         ],
     },
-    chargeTicks: 0.5 * TicksPerSecond,
+    chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
