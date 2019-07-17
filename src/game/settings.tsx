@@ -707,7 +707,7 @@ const retractor: Spell = {
         {
             type: "homing",
             targetType: "cursor",
-            newSpeed: 0.3,
+            newSpeed: 0.4,
             redirect: true,
         },
     ],
@@ -715,8 +715,8 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         lifeSteal: 0.2,
-        density: 6,
-        radius: 0.007,
+        density: 24,
+        radius: 0.0035,
         speed: 0.4,
         maxTicks: 3.0 * TicksPerSecond,
         collideWith: Categories.All,
@@ -744,7 +744,7 @@ const retractor: Spell = {
             {
                 type: "accelerate",
                 maxSpeed: 0.8,
-                accelerationPerSecond: 0.8,
+                accelerationPerSecond: 0.4,
             }
         ],
 
@@ -755,7 +755,7 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#00ff7f',
                 ticks: 30,
-                radius: 0.009,
+                radius: 0.005,
                 particleRadius: 0.001,
                 glow: 0.05,
                 smoke: 0.1,
