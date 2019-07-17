@@ -541,6 +541,8 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	shine?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
+
+	intermediateInterpolations?: number; // Render at this many intermediate points as well - fill in the gaps of very fast projectiles
 }
 
 declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams {

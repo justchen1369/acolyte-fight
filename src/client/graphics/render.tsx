@@ -1836,21 +1836,29 @@ function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
 	let ticks = render.ticks;
 	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), -render.smoke) : null;
-	pushTrail({
-		type: 'circle',
-		initialTick: world.tick,
-		max: ticks,
-		pos: projectile.body.getPosition().clone(),
-		velocity,
-		fillStyle: projectileColor(render, projectile, world),
-		shine: render.shine !== undefined ? render.shine : DefaultShine,
-		fade: render.fade,
-		radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
-		glow: render.glow !== undefined ? render.glow : DefaultGlow,
-		vanish: render.vanish,
-		highlight: projectile.uiHighlight,
-		tag: projectile.id,
-	}, world);
+
+	const last = projectile.body.getPosition();
+	const first = projectile.uiPath[0] || last;
+	const numRenders = 1 + (render.intermediateInterpolations || 0);
+	for (let i = 1; i <= numRenders; ++i) {
+		const proportion = i / numRenders;
+		const pos = pl.Vec2.combine(1 - proportion, first, proportion, last);
+		pushTrail({
+			type: 'circle',
+			initialTick: world.tick,
+			max: ticks,
+			pos,
+			velocity,
+			fillStyle: projectileColor(render, projectile, world),
+			shine: render.shine !== undefined ? render.shine : DefaultShine,
+			fade: render.fade,
+			radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
+			glow: render.glow !== undefined ? render.glow : DefaultGlow,
+			vanish: render.vanish,
+			highlight: projectile.uiHighlight,
+			tag: projectile.id,
+		}, world);
+	}
 }
 
 function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderPolygon) {

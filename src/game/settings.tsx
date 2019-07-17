@@ -1678,7 +1678,7 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "projectile", ticks: 40, color: "rgba(64, 255, 255, 0.25)", shine: 0.2, smoke: 0.4, fade: "#144", vanish: 1 },
+            { type: "projectile", ticks: 40, color: "rgba(64, 255, 255, 0.25)", shine: 0.2, smoke: 0.2, vanish: 1 },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
     },
