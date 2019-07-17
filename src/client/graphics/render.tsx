@@ -1126,7 +1126,13 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		color = ColTuple.parse(color).alpha(alpha).string();
 	}
 
-	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	let velocity: pl.Vec2 = null;
+	if (render.smoke) {
+		velocity = particleVelocity(hero.thrust.velocity, render.smoke);
+	} else {
+		// Normally hero not moving fast enough to create smoke
+		velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+	}
 
 	const pos = heroPos.clone();
 	if (render.emissionRadiusFactor) {
@@ -1171,22 +1177,6 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	let style = ColTuple.parse(color);
 	if (flash > 0) {
 		style.lighten(HeroColors.DamageGlowFactor * flash);
-	}
-
-	// Thrust
-	if (hero.thrust) {
-		world.ui.trails.unshift({
-			type: "circle",
-			pos,
-			velocity: particleVelocity(vector.relengthen(hero.thrust.velocity, 0.1)),
-			radius: hero.radius,
-			initialTick: world.tick,
-			shine: 1,
-			glow: 0.1,
-			vanish: 1,
-			max: hero.thrust.ticks,
-			fillStyle: heroColor(hero.id, world),
-		});
 	}
 
 	// Charging

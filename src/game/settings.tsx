@@ -1990,6 +1990,24 @@ const thrust: Spell = {
     color: '#ff00cc',
     action: "thrust",
     sound: "thrust",
+
+    buffs: [
+        { // Only used for rendering
+            type: "movement",
+            movementProportion: 1,
+            maxTicks: 16,
+            render: {
+                color: "#fff",
+                heroColor: true,
+                ticks: 8,
+                emissionRadiusFactor: 0,
+                particleRadius: Hero.Radius * 1.5,
+                glow: 0.2,
+                shine: 1,
+                decay: true,
+            },
+        }
+    ],
 };
 const swap: Spell = {
     id: 'swap',

@@ -647,6 +647,7 @@ declare interface RenderBuff {
 	shine?: number;
 	glow?: number;
 	fade?: string;
+	smoke?: number;
 	vanish?: number;
 	heroColor?: boolean;
 	decay?: boolean;
@@ -787,6 +788,10 @@ declare interface ThrustSpell extends SpellBase {
 	speed: number;
 
 	damageTemplate: DamagePacketTemplate;
+}
+
+declare interface RenderThrust {
+	ticks: number;
 }
 
 declare interface KeyBindingOptions {
