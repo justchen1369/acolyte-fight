@@ -1104,7 +1104,7 @@ const grapple: Spell = {
         sound: "grapple",
         color: '#ff2200',
         renderers: [
-            { type: "polygon", color: '#ff2200', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#ff2200', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 5, vanish: 1 },
             {
                 type: "link",
                 color: '#ff2200',
