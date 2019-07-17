@@ -5,7 +5,6 @@ import { Layouts } from './layouts';
 import { ObstacleTemplates } from './obstacleTemplates';
 import { Sounds } from './sounds';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
-import { number } from 'prop-types';
 
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.11,
