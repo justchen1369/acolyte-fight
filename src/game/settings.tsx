@@ -726,11 +726,11 @@ const retractor: Spell = {
 
         partialDamage: {
             initialMultiplier: 0.01,
-            ticks: 3 * TicksPerSecond,
+            ticks: 1.5 * TicksPerSecond,
         },
 
         detonate: {
-            damage: 66,
+            damage: 40,
             lifeSteal: 0.2,
             radius: 0.025,
 
