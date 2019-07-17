@@ -1802,13 +1802,13 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		} : null,
 	};
 
-	let toFill = fromFill;
+	const toFill = { ...fromFill };
 	const shine = render.shine !== undefined ? render.shine : DefaultShine;
 	if (shine) {
-		toFill = {
-			...fromFill,
-			color: fromFill.color.clone().lighten(shine),
-		};
+		toFill.color = fromFill.color.clone().lighten(shine);
+	}
+	if (render.toWidth) {
+		toFill.maxRadius = scale * render.toWidth / 2;
 	}
 
 	const from = owner.body.getPosition();

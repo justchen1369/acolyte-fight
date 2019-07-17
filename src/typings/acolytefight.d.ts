@@ -582,6 +582,7 @@ declare interface RenderLink extends RenderParamsBase {
 	type: "link";
 	color: string;
 	width: number;
+	toWidth?: number;
 	shine?: number;
 	glow?: number;
 

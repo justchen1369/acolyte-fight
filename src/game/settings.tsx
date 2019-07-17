@@ -992,11 +992,12 @@ const link: Spell = {
             render: {
                 type: "link",
                 color: '#4444ff',
-                width: 5 * Pixel,
-                glow: 0.1,
+                width: 2.5 * Pixel,
+                toWidth: 5 * Pixel,
+                glow: 0.2,
 
                 redirectFlash: true,
-                redirectGrowth: 1.25,
+                redirectGrowth: 2,
             },
         },
 
@@ -1020,7 +1021,8 @@ const link: Spell = {
             {
                 type: "link",
                 color: '#4444ff',
-                width: 5 * Pixel,
+                width: 2.5 * Pixel,
+                toWidth: 5 * Pixel,
                 glow: 0.1,
             },
         ],
@@ -1063,8 +1065,9 @@ const grapple: Spell = {
             render: {
                 type: "link",
                 color: '#ff2200',
-                width: 5 * Pixel,
-                glow: 0.1,
+                width: 1.5 * Pixel,
+                toWidth: 3 * Pixel,
+                glow: 0.2,
             },
         },
 
@@ -1090,8 +1093,9 @@ const grapple: Spell = {
             {
                 type: "link",
                 color: '#ff2200',
-                width: 3 * Pixel,
-                glow: 0.1,
+                width: 1.5 * Pixel,
+                toWidth: 3 * Pixel,
+                glow: 0.2,
             },
         ],
     },

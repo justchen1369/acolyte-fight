@@ -124,7 +124,11 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
 }
 
 export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.Fill, toFill: r.Fill = fromFill) {
-	const extent = calculateExtent(ctxStack, fromFill);
+	let extent = calculateExtent(ctxStack, fromFill);
+	if (fromFill !== toFill) {
+		extent = Math.max(extent, calculateExtent(ctxStack, toFill));
+	}
+
 	const down = vector.relengthen(vector.rotateLeft(vector.diff(to, from)), extent);
 	const up = vector.negate(down);
 
