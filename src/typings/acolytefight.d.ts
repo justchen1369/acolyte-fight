@@ -610,6 +610,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	ticks: number;
 	glow?: boolean;
 	growth?: number;
+	detonate?: number; // Render an explosion of this radius on hit
 	numParticles?: number;
 	particleShine?: number;
 	particleGlow?: number;

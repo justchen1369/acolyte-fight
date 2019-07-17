@@ -1747,7 +1747,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				type: "circle",
 				initialTick: projectile.hitTick,
 				max: strike.ticks,
-				pos: projectile.body.getPosition(),
+				pos: projectile.body.getPosition().clone(),
 				velocity,
 				radius: projectile.radius,
 				fillStyle: projectileColor(strike, projectile, world),
@@ -1758,6 +1758,19 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				tag: projectile.id,
 			}, world);
 		}
+	}
+
+	// Detonation
+	if (strike.detonate) {
+		pushTrail({
+			type: "circle",
+			max: 15,
+			initialTick: world.tick,
+			pos: projectile.body.getPosition().clone(),
+			fillStyle: 'white',
+			radius: strike.detonate,
+			glow: 0.2,
+		}, world);
 	}
 }
 
