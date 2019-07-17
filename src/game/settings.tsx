@@ -1648,9 +1648,9 @@ const iceBomb: Spell = {
     projectile: {
         density: 1,
         restitution: 0,
-        radius: 0.01,
-        speed: 0.2,
-        maxTicks: 25,
+        radius: 0.0125,
+        speed: 0.3,
+        maxTicks: 18,
         minTicks: 1,
         damage: 0,
         lifeSteal: 0.2,
@@ -1681,7 +1681,7 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "projectile", ticks: 40, color: "rgba(64, 255, 255, 0.25)", shine: 0.2, smoke: 0.2, vanish: 1 },
+            { type: "projectile", ticks: 40, color: "rgba(64, 255, 255, 0.25)", shine: 0.2, smoke: 0.25, vanish: 1 },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
     },
