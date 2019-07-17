@@ -1905,7 +1905,7 @@ const scourge: Spell = {
         damage: 30,
         radius: Hero.Radius * 5,
         minImpulse: 0.001,
-        maxImpulse: 0.002,
+        maxImpulse: 0.001,
         renderTicks: 30,
 
         buffs: [
