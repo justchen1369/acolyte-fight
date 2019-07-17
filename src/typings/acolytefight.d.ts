@@ -363,7 +363,6 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 }
 
 declare interface StrafeParameters {
-	expireOnHeroHit?: boolean; // Whether to lose one of thse projectiles every time the hero is hit
 }
 
 declare interface DestructibleParameters {

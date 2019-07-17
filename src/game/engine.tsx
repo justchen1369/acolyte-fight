@@ -1890,8 +1890,6 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			if ((alliance && Alliances.NotFriendly) > 0) {
 				const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 				applyDamage(other, damagePacket, world);
-	
-				expireOnHeroHit(other, world);
 			}
 		}
 	}
@@ -2065,7 +2063,6 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			applyDamage(hero, packet, world);
 
 			emitPush(projectile, hero, world);
-			expireOnHeroHit(hero, world);
 		}
 		projectile.hit = world.tick;
 	}
@@ -2744,17 +2741,6 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 	return false;
 }
 
-function expireOnHeroHit(hero: w.Hero, world: w.World) {
-	for (const projectileId of hero.strafeIds) {
-		const projectile = world.objects.get(projectileId);
-		if (projectile && projectile.category === "projectile" && projectile.strafe && projectile.strafe.expireOnHeroHit && world.tick >= projectile.minTicks + projectile.createTick) {
-			projectile.expireTick = world.tick;
-		}
-	}
-
-	return true;
-}
-
 function expireOnOwnerDeath(behaviour: w.ExpireOnOwnerDeathBehaviour, world: w.World) {
 	const projectile = world.objects.get(behaviour.projectileId);
 	if (!(projectile && projectile.category === "projectile")) {
@@ -2898,7 +2884,6 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 				const against = detonate.against !== undefined ? detonate.against : Alliances.NotFriendly;
 				if ((alliance & against) > 0) {
 					applyDamage(other, detonate, world);
-					expireOnHeroHit(other, world);
 					applyBuffsFrom(detonate.buffs, owner, other, world, {
 						durationMultiplier: config.buffDurationMultiplier,
 					});
@@ -3641,8 +3626,6 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 				obj.expireTick = world.tick;
 			}
 		} else if (obj.category === "hero") {
-			expireOnHeroHit(obj, world);
-
 			const damagePacket: w.DamagePacket = {
 				damage: 0,
 				lifeSteal: 0,
