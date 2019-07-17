@@ -649,8 +649,8 @@ const boomerang: Spell = {
         density: 1,
         restitution: 0,
         radius: 0.003,
-        speed: 0.6,
-        maxTicks: 5.0 * TicksPerSecond,
+        speed: 0.8,
+        maxTicks: 5 * TicksPerSecond,
         damage: 30,
         lifeSteal: 0.2,
         noKnockback: true,
@@ -659,11 +659,16 @@ const boomerang: Spell = {
         hitInterval: 15, // So repeated hits to obstacles work
         shieldTakesOwnership: false,
 
+        partialDamage: {
+            ticks: 0.25 * TicksPerSecond,
+            initialMultiplier: 0.1,
+        },
+
         behaviours: [
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
-                maxTurnProportion: 0.05,
+                maxTurnProportion: 0.055,
                 minDistanceToTarget: 0.075,
                 targetType: HomingTargets.self,
             },
@@ -1641,6 +1646,7 @@ const iceBomb: Spell = {
 
     projectile: {
         density: 1,
+        sensor: true,
         restitution: 0,
         radius: 0.015,
         speed: 0.3,
@@ -1652,7 +1658,7 @@ const iceBomb: Spell = {
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
-        expireOn: Categories.Hero | Categories.Massive,
+        expireOn: Categories.All,
 
         buffs: [
             {
