@@ -1798,7 +1798,12 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 	let previous: pl.Vec2 = null;
 
 	const multiplier = projectileRadiusMultiplier(projectile, world, render);
-	for (let pos of getRenderPoints(projectile.uiPath, render.intermediatePoints)) {
+
+	const path = projectile.uiPath;
+	const step = render.intermediatePoints ? 1 : path.length - 1;
+	for (let i = 0; i < path.length; i += step) {
+		const pos = path[i];
+
 		if (previous) {
 			pushTrail({
 				type: 'line',
@@ -1818,18 +1823,6 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 		}
 
 		previous = pos;
-	}
-}
-
-function getRenderPoints(path: pl.Vec2[], intermediatePoints: boolean) {
-	if (intermediatePoints) {
-		return path;
-	} else {
-		if (path.length <= 2) {
-			return path;
-		} else {
-			return [path[0], path[path.length - 1]];
-		}
 	}
 }
 
