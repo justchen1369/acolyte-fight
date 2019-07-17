@@ -9,6 +9,8 @@ const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur
 const trailFragmentShader = require('./trailFragmentShader.glsl');
 const trailVertexShader = require('./trailVertexShader.glsl');
 
+const vectorZero = vector.zero();
+
 export function initData(): r.DrawTrailsData {
     return {
         uniforms: {
@@ -144,7 +146,7 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fro
 export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.Fill) {
     const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill); // sqrt(2) ensures the triangle always fully enclosees the arc
 
-	const center = vector.zero();
+	const center = vectorZero;
 	const rels = new Array<pl.Vec2>();
 
     let currentAngle = angle1;
@@ -176,7 +178,7 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
 }
 
 export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.Fill) {
-	const center = vector.zero();
+	const center = vectorZero;
 
     for (let i = 0; i < points.length; ++i) {
         const a = vector.turnVectorBy(points[i], rotate).mul(scale);
