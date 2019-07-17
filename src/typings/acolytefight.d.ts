@@ -596,6 +596,7 @@ declare interface RenderReticule extends RenderParamsBase {
 	remainingTicks?: number; // Only display when this many ticks remaining
 	shrinkTicks?: number;
 	grow?: boolean;
+	shine?: number;
 	fade?: boolean;
 	startingTicks?: number; // Only display for this many ticks since creation of the projectile
 	repeat?: boolean; // Whether to repeatedly show the reticule shrinking

@@ -1722,9 +1722,16 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	const pos = projectile.body.getPosition();
 
 	let color = ColTuple.parse(reticule.color);
+
+	const shine = reticule.shine !== undefined ? reticule.shine : DefaultShine;
+	if (shine) {
+		color.lighten(shine * proportion);
+	}
+
 	if (reticule.fade) {
 		color.fade(proportion);
 	}
+
 	glx.circle(ctxStack, pos, {
 		color,
 		minRadius: reticule.minRadius * proportion,
