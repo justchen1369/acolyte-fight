@@ -1001,6 +1001,15 @@ const link: Spell = {
             },
         },
 
+        detonate: {
+            damage: 0,
+            lifeSteal: 0.2,
+            radius: 0.01,
+            minImpulse: 0.0001,
+            maxImpulse: 0.0001,
+            renderTicks: 0,
+        },
+
         behaviours: [
             {
                 type: "homing",
