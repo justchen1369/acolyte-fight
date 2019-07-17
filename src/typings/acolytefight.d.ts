@@ -750,6 +750,8 @@ declare interface WallSpell extends ShieldSpell {
 	growthTicks: number;
 	maxTicks: number;
 
+	density?: number; // If set, the wall is moveable
+
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
 }

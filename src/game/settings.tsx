@@ -1974,6 +1974,7 @@ const icewall: Spell = {
 
     length: 0.005,
     width: 0.15,
+    density: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
     selfPassthrough: true,

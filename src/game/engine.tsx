@@ -272,7 +272,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 
 	const body = world.physics.createBody({
 		userData: shieldId,
-		type: 'static',
+		type: spell.density > 0 ? 'dynamic' : 'static',
 		position,
 		angle,
 	});
@@ -281,6 +281,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		filterCategoryBits: spell.categories !== undefined ? spell.categories : Categories.Shield,
 		filterMaskBits: Categories.Hero | Categories.Projectile,
 		filterGroupIndex: spell.selfPassthrough ? hero.filterGroupIndex : undefined,
+		density: spell.density,
 	});
 
 	const shield: w.Shield = {
