@@ -595,11 +595,20 @@ const blast: Spell = {
         maxTicks: 2 * TicksPerSecond,
         damage: 25,
 
+        detonate: {
+            radius: 0.025,
+            damage: 0,
+            lifeSteal: 0,
+            minImpulse: 0.0001,
+            maxImpulse: 0.0001,
+            renderTicks: 0,
+        },
+
         sound: "blast",
         color: '#0ff',
         renderers: [
             { type: "projectile", ticks: 10, selfColor: true, shine: 1, smoke: 0.15, glow: 0.2, vanish: 0.5 },
-            { type: "strike", ticks: 10, numParticles: 10, glow: true, detonate: 0.025 },
+            { type: "strike", ticks: 10, numParticles: 10, glow: true },
         ],
     },
 };
