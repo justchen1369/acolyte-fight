@@ -1,4 +1,22 @@
 export const Sounds: Sounds = {
+    "message": {
+        "start": [
+            {
+                "volume": 0.05,
+                "stopTime": 0.1,
+                "attack": 0.05,
+                "decay": 0.05,
+                "startFreq": 400,
+                "stopFreq": 400,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.33,
+                    4
+                ]
+            }
+        ]
+    },
     "thrust-channelling": {
         start: [
             {

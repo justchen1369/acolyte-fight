@@ -8,8 +8,8 @@ export interface NotificationListener {
 
 const ExpireInterval = 1000;
 const ExpiryMilliseconds = 15000;
-const TeamsSplashMilliseconds = 2000;
-const TextMilliseconds = 60000;
+const TeamsSplashMilliseconds = 4000;
+const TextMilliseconds = 30000;
 
 const listeners = new Array<NotificationListener>();
 let nextNotificationId = 0;

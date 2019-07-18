@@ -1,5 +1,6 @@
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as audio from './audio';
 import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
@@ -14,7 +15,7 @@ export function onOnlineMsg(data: m.OnlineMsg) {
             StoreProvider.dispatch({ type: "online", all, joined, left });
         }
 
-        if (data.texts) {
+        if (data.texts && data.texts.length > 0) {
             const newNotifications = new Array<w.Notification>();
             data.texts.forEach(msg => {
                 const textNotification: w.TextNotification = {

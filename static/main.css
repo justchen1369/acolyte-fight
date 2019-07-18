@@ -796,7 +796,7 @@ table.player-list {
 }
 
 #messages-panel .row.text-row {
-    animation-duration: 60s;
+    animation-duration: 30s;
 }
 
 #messages-panel .row.error {

@@ -7,6 +7,7 @@ const Z = -0.1;
 const RefDistance = 0.1;
 let env: AudioEnvironment = null;
 let sources = new Map<string, AudioSource>();
+let nextUnattachedId = 0;
 
 interface AudioEnvironment {
     ctx: AudioContext;
@@ -18,7 +19,7 @@ interface AudioEnvironment {
 }
 
 interface AudioRef {
-    panner: PannerNode;
+    panner?: PannerNode;
     volume: GainNode;
     expire: number;
 }
@@ -36,11 +37,11 @@ class AudioSource {
         this.sound = sound;
     }
 
-    start(pos: pl.Vec2) {
+    start(pos: pl.Vec2 | null) {
         this.play(pos, this.sound.start);
     }
 
-    sustain(pos: pl.Vec2) {
+    sustain(pos: pl.Vec2 | null) {
         const t = env.ctx.currentTime;
 
         // Play sounds
@@ -58,12 +59,15 @@ class AudioSource {
             }
 
             keep.push(follow);
-            if (follow.panner.positionX && follow.panner.positionY) {
-                const when = t + 1 / TicksPerSecond;
-                follow.panner.positionX.linearRampToValueAtTime(pos.x, when);
-                follow.panner.positionY.linearRampToValueAtTime(pos.y, when);
-            } else {
-                follow.panner.setPosition(pos.x, pos.y, Z);
+
+            if (pos && follow.panner) {
+                if (follow.panner.positionX && follow.panner.positionY) {
+                    const when = t + 1 / TicksPerSecond;
+                    follow.panner.positionX.linearRampToValueAtTime(pos.x, when);
+                    follow.panner.positionY.linearRampToValueAtTime(pos.y, when);
+                } else {
+                    follow.panner.setPosition(pos.x, pos.y, Z);
+                }
             }
         }
         this.following = keep;
@@ -99,7 +103,7 @@ class AudioSource {
         }
     }
 
-    private play(pos: pl.Vec2, bites: SoundBite[]) {
+    private play(pos: pl.Vec2 | null, bites: SoundBite[]) {
         if (bites) {
             for (const bite of bites) {
                 const follow = playSoundBite(bite, pos, env);
@@ -209,6 +213,12 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
     sources = keep;
 }
 
+export function playUnattached(name: string, sounds: Sounds) {
+    const sound = sounds[name];
+    const source = new AudioSource(`${name}${nextUnattachedId++}`, sound);
+    source.start(null);
+}
+
 function generateBrownNoise(ctx: AudioContext) {
 	const bufferSize = 10 * ctx.sampleRate;
 	const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -224,12 +234,13 @@ function generateBrownNoise(ctx: AudioContext) {
 	return noiseBuffer;
 }
 
-function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): AudioRef {
+function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: AudioEnvironment): AudioRef {
     let next: AudioNode = env.next;
     const nodes = new Array<AudioNode>();
 
-    const panner = createPannerNode(pos, env, nodes, next);
-    if (!isMobile) { // Only connect panner on desktop
+    let panner: PannerNode = null;
+    if (!isMobile && pos) { // Only connect panner on desktop
+        panner = createPannerNode(pos, env, nodes, next);
         next = panner;
     }
 
@@ -250,7 +261,7 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2, env: AudioEnvironment): Au
     };
 }
 
-function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode): PannerNode {
     const pan = env.ctx.createPanner();
     pan.panningModel = 'HRTF';
     pan.distanceModel = 'inverse';
