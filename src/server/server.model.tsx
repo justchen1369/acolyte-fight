@@ -84,7 +84,6 @@ export interface Game extends Replay {
     ranked: boolean;
 
     actions: Map<string, m.ActionMsg>; // heroId -> actionData
-    messages: m.TextMsg[];
 
     syncTick: number;
 }

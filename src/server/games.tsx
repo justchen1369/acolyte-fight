@@ -288,7 +288,6 @@ export function initGame(version: string, room: g.Room | null, partyId: string |
 		closeTick: Matchmaking.MaxHistoryLength,
 		ranked: false,
 		actions: new Map<string, m.ActionMsg>(),
-		messages: new Array<m.TextMsg>(),
 		history: [],
 	};
 	store.activeGames.set(game.id, game);
@@ -517,13 +516,12 @@ function gameTurn(game: g.Game) {
 	let data = {
 		gameId: game.id,
 		tick: game.tick++,
-		actions: [...game.actions.values(), ...game.messages],
+		actions: [...game.actions.values()],
 	} as m.TickMsg;
-	if (game.actions.size > 0 || game.messages.length > 0) {
+	if (data.actions.some(a => a.type === "game")) {
 		game.activeTick = game.tick;
 	}
 	game.actions.clear();
-	game.messages.length = 0;
 
 	if (game.history) {
 		if (game.history.length < Matchmaking.MaxHistoryLength) {
