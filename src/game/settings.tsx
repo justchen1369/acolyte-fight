@@ -596,6 +596,7 @@ const blast: Spell = {
         density: 100,
         radius: 0.015,
         speed: 0.5,
+        minTicks: 3, // Enough ticks to clear any obstacles the player is touching
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
         damage: 30,
