@@ -3501,7 +3501,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		const thrustRadius = hero.radius * spell.radiusMultiplier;
 		const fixture = hero.body.createFixture(pl.Circle(thrustRadius), {
-			density: 0,
+			density: spell.density || 0,
 			filterCategoryBits: Categories.Hero,
 			filterMaskBits: Categories.All,
 			filterGroupIndex: hero.filterGroupIndex,

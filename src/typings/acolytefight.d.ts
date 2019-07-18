@@ -792,6 +792,7 @@ declare interface ThrustSpell extends SpellBase {
 
 	range: number;
 	radiusMultiplier: number;
+	density?: number; // Make the acolyte heavier during thrust
 	nullifiable?: boolean; // Hitting an obstacle will cancel the thrust
 	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
 	speed: number;

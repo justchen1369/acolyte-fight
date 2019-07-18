@@ -1988,9 +1988,9 @@ const icewall: Spell = {
     damageMultiplier: 0.25,
 
     length: 0.005,
-    width: 0.15,
+    width: 0.1,
     density: 100,
-    linearDamping: 3,
+    linearDamping: 6,
     angularDamping: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
@@ -2030,6 +2030,7 @@ const thrust: Spell = {
 
     range: 0.4,
     radiusMultiplier: 1.5,
+    density: 10,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
