@@ -2,7 +2,7 @@ export const Sounds: Sounds = {
     "join": {
         "start": [
             {
-                "volume": 0.1,
+                "volume": 0.25,
                 "stopTime": 0.5,
                 "attack": 0.25,
                 "decay": 0.25,
