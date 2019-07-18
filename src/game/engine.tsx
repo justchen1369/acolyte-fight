@@ -3904,7 +3904,10 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	if (!packet.noRedirect) {
 		amount = redirectDamage(toHero, amount, packet.isLava, world);
 	}
-	amount = Math.min(amount, Math.max(0, toHero.health - (packet.minHealth || 0)));
+	if (packet.minHealth) {
+		const maxDamage = Math.max(0, toHero.health - packet.minHealth);
+		amount = Math.min(amount, maxDamage);
+	}
 	toHero.health -= amount;
 
 	// Apply lifesteal

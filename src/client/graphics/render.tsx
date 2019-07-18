@@ -1366,8 +1366,8 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 
 	// Health
 	{
-		const healthProportion = hero.health / Hero.MaxHealth;
-		const shineProportion = hero.uiHealth / Hero.MaxHealth;
+		const healthProportion = Math.max(0, hero.health / Hero.MaxHealth);
+		const shineProportion = Math.max(0, hero.uiHealth / Hero.MaxHealth);
 		const startProportion = Math.min(healthProportion, ticksUntilStart / constants.Matchmaking.JoinPeriod);
 
 		let color = rgColor(healthProportion);
