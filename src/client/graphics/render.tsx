@@ -1026,7 +1026,9 @@ function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: 
 
 function ease(createTick: number, world: w.World): number {
 	const age = world.tick - createTick;
-	if (age < HeroColors.EaseTicks) {
+	if (age < 0) {
+		return 1;
+	} else if (age < HeroColors.EaseTicks) {
 		return Math.pow(1 - age / HeroColors.EaseTicks, HeroColors.EasePower);
 	} else {
 		return 0;

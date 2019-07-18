@@ -13,6 +13,7 @@ import { modToSettings } from './modder';
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
 const Precision = 0.0001;
+const BotsExitAfterTicks = 2 * TicksPerSecond;
 const vectorZero = vector.zero();
 const vectorCenter = pl.Vec2(0.5, 0.5);
 
@@ -1474,6 +1475,28 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 	}
 
 	return true;
+}
+
+function removeBots(world: w.World) {
+	let newPlayers = world.players;
+
+	world.players.forEach(player => {
+		if (player.isBot) {
+			const hero = world.objects.get(player.heroId);
+			if (hero && hero.category === "hero") {
+				hero.exitTick = world.tick + BotsExitAfterTicks;
+			}
+
+			// Mark player as dead so they cannot reconnect to this game
+			const newPlayer = {
+				...player,
+				dead: true,
+			};
+			newPlayers = newPlayers.set(player.heroId, newPlayer);
+		}
+	});
+
+	world.players = newPlayers;
 }
 
 function handleActions(world: w.World) {
@@ -3178,6 +3201,8 @@ function notifyWin(world: w.World) {
 		mostKills: world.players.get(mostKills.heroId),
 		mostKillsCount: mostKills.kills,
 	});
+
+	removeBots(world);
 }
 
 function isGameFinished(world: w.World) {
