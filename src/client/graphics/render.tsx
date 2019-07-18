@@ -1001,9 +1001,12 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		}
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
-		renderHeroBars(ctxStack, hero, pos, world);
 		renderHeroName(ctxStack, hero, pos, world);
 		renderHeroIcon(ctxStack, hero, pos, world);
+
+		if (!easeMultiplier) {
+			renderHeroBars(ctxStack, hero, pos, world);
+		}
 	}
 
 	playHeroSounds(hero, pos, world);
