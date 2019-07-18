@@ -6,8 +6,8 @@ export const Sounds: Sounds = {
                 "stopTime": 0.1,
                 "attack": 0.05,
                 "decay": 0.05,
-                "startFreq": 400,
-                "stopFreq": 400,
+                "startFreq": 300,
+                "stopFreq": 300,
                 "wave": "sine",
                 "ratios": [
                     1,
