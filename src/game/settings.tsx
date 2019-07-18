@@ -1041,7 +1041,11 @@ const link: Spell = {
             maxDistance: 0.1,
             linkTicks: 1.5 * TicksPerSecond,
 
-            redirectDamageProportion: 1,
+            redirectDamage: {
+                selfProportion: 0,
+                redirectProportion: 1,
+                redirectAfterTicks: 15,
+            },
 
             render: {
                 type: "link",

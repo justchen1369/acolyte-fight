@@ -822,10 +822,16 @@ declare interface LinkParameters {
 	minDistance: number;
 	maxDistance: number;
 
-	redirectDamageProportion?: number; // Proportion of damage to redirect to the linked hero
+	redirectDamage?: RedirectDamageParameters;
 	instantRecast?: boolean; // If still linked, can immediately cast another link
 
 	render?: RenderLink;
+}
+
+declare interface RedirectDamageParameters {
+	selfProportion: number; // Proportion of damage to absorb when linked (0 means no damage)
+	redirectProportion: number; // Proportion of damage to redirect when linked (1 means all damage)
+	redirectAfterTicks: number; // Don't start redirecting damage until this many ticks have passed
 }
 
 declare interface DamagePacketTemplate {

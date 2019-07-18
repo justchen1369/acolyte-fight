@@ -557,7 +557,7 @@ export interface LinkState extends HighlightSource {
 	minDistance: number;
 	maxDistance: number;
 
-	redirectDamageProportion: number;
+	redirectDamage?: RedirectDamageParameters;
 	instantRecast?: boolean;
 
 	initialTick: number;

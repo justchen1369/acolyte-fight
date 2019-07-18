@@ -2389,7 +2389,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		spellId: projectile.type,
 		targetId: target.id,
 
-		redirectDamageProportion: link.redirectDamageProportion || 0,
+		redirectDamage: link.redirectDamage,
 		instantRecast: link.instantRecast,
 
 		minDistance: link.minDistance,
@@ -3938,29 +3938,30 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 }
 
 function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: w.World): number {
-	if (!(amount && toHero && toHero.link && toHero.link.redirectDamageProportion)) {
+	if (!(amount && toHero && toHero.link && toHero.link.redirectDamage)) {
 		return amount;
 	}
+	const redirect = toHero.link.redirectDamage;
 
 	const target = world.objects.get(toHero.link.targetId);
 	if (!(target && target.category === "hero")) {
 		return amount;
 	}
 
-	const proportion = toHero.link.redirectDamageProportion;
+	if (world.tick >= toHero.link.initialTick + redirect.redirectAfterTicks) {
+		const packet: w.DamagePacket = {
+			damage: amount * redirect.redirectProportion,
+			isLava,
+			fromHeroId: toHero.id,
+			lifeSteal: 0,
+			noRedirect: true, // Stop a recursion loop
+		};
+		applyDamage(target, packet, world);
 
-	const packet: w.DamagePacket = {
-		damage: amount * proportion,
-		isLava,
-		fromHeroId: toHero.id,
-		lifeSteal: 0,
-		noRedirect: true, // Stop a recursion loop
-	};
-	applyDamage(target, packet, world);
+		toHero.link.redirectDamageTick = world.tick;
+	}
 
-	toHero.link.redirectDamageTick = world.tick;
-
-	return amount * (1 - proportion);
+	return amount * redirect.selfProportion;
 }
 
 function applyArmor(fromHeroId: string, hero: w.Hero, damage: number) {
