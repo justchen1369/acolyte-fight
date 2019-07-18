@@ -110,7 +110,8 @@ export function onTickMsg(data: m.TickMsg) {
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
 
-		if (data.actions.some(t => t.type === "join" && t.hid !== world.ui.myHeroId)) {
+		if (data.actions.some(t => t.type === "join" && t.hid !== world.ui.myHeroId && !world.objects.has(t.hid))) {
+			// Only play joining sound for other players if they are arriving for the first time
 			cues.play("join");
 		}
 	}

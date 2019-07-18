@@ -3,22 +3,24 @@ export const Sounds: Sounds = {
         "start": [
             {
                 "volume": 0.1,
-                "stopTime": 0.1,
-                "attack": 0.01,
-                "decay": 0.08,
-                "startFreq": 225,
-                "stopFreq": 225,
-                "lowPass": 225,
-                "tremoloFreq": 5,
-                "tremoloStrength": 0.8,
-                "wave": "sine",
+                "stopTime": 0.5,
+                "attack": 0.25,
+                "decay": 0.25,
+                "startFreq": 10,
+                "stopFreq": 10,
+                "modStartFreq": 500,
+                "modStopFreq": 700,
+                "modStartStrength": 125,
+                "modStopStrength": 125,
+                "tremoloFreq": 3,
+                "tremoloStrength": 0.1,
+                "wave": "triangle",
                 "ratios": [
                     1,
-                    1.25,
-                    1.33,
-                    1.5,
-                    2,
-                    4
+                    1.2,
+                    1.4,
+                    2.4,
+                    3.6
                 ]
             }
         ]
