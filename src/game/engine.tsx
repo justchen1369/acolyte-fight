@@ -549,6 +549,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		strafe: projectileTemplate.strafe,
+		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -2472,7 +2473,9 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 				return;
 			}
 		} else if (obj.category === "projectile") {
-			if (!(obj.collideWith & attraction.collideLike)) {
+			if (!obj.attractable) {
+				return;
+			} else if (!(obj.collideWith & attraction.collideLike)) {
 				return;
 			} else if (!(calculateAlliance(attraction.owner, obj.owner, world) & attraction.against)) {
 				return;

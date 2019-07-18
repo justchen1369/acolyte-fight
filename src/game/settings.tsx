@@ -414,6 +414,7 @@ const meteor: Spell = {
 
     projectile: {
         density: 100,
+        attractable: false,
         knockbackScaling: false,
         radius: 0.03,
         speed: 0.2,
@@ -449,6 +450,7 @@ const meteorite: Spell = {
 
     projectile: {
         density: 100,
+        attractable: false,
         knockbackScaling: false,
         radius: 0.015,
         speed: 0.3,
@@ -500,6 +502,7 @@ const kamehameha: Spell = {
 
     projectile: {
         density: 0.0001,
+        attractable: false,
         radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
@@ -586,6 +589,8 @@ const blast: Spell = {
     },
 
     projectile: {
+        categories: Categories.Projectile | Categories.Massive,
+        attractable: true,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
         density: 100,
@@ -1325,6 +1330,7 @@ const gravity: Spell = {
 
     projectile: {
         density: 0.0001,
+        attractable: false,
         radius: 0.0125,
         speed: 0.3,
         maxTicks: 5.0 * TicksPerSecond,
@@ -1400,7 +1406,6 @@ const whirlwind: Spell = {
                 type: "attract",
                 collideLike: Categories.Massive,
                 categories: Categories.Projectile,
-                notCategories: Categories.Massive,
                 against: Alliances.NotFriendly,
                 radius: 0.04,
                 accelerationPerTick: 0.1,
@@ -1916,7 +1921,7 @@ const scourge: Spell = {
 
     detonate: {
         damage: 30,
-        radius: Hero.Radius * 5,
+        radius: Hero.Radius * 4.5,
         minImpulse: 0.001,
         maxImpulse: 0.001,
         renderTicks: 30,
