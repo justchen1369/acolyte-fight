@@ -1,4 +1,28 @@
 export const Sounds: Sounds = {
+    "join": {
+        "start": [
+            {
+                "volume": 0.1,
+                "stopTime": 0.1,
+                "attack": 0.01,
+                "decay": 0.08,
+                "startFreq": 225,
+                "stopFreq": 225,
+                "lowPass": 225,
+                "tremoloFreq": 5,
+                "tremoloStrength": 0.8,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.25,
+                    1.33,
+                    1.5,
+                    2,
+                    4
+                ]
+            }
+        ]
+    },
     "message": {
         "start": [
             {

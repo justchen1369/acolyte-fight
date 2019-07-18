@@ -10,7 +10,6 @@ import * as w from '../game/world.model';
 
 import * as ai from './core/ai';
 import * as audio from './core/audio';
-import * as audioCues from './core/audioCues';
 import * as cloud from './core/cloud';
 import * as loader from './core/loader';
 import * as matches from './core/matches';
@@ -45,7 +44,6 @@ export async function initialize() {
     await options.init();
 
     notifications.attachListener(n => options.getProvider().onNotification(n));
-    notifications.attachListener(n => audioCues.onNotification(n));
     notifications.attachListener(n => cloud.onNotification(n));
     notifications.attachListener(n => stats.onNotification(n));
     notifications.attachListener(n => rankings.onNotification(n));

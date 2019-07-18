@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as cues from './cues';
 import * as engine from '../../game/engine';
 import * as processor from './processor';
 import * as sockets from './sockets';
@@ -108,6 +109,10 @@ export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
 	if (data.gameId === world.ui.myGameId) {
 		incomingQueue.push(data);
+
+		if (data.actions.some(t => t.type === "join" && t.hid !== world.ui.myHeroId)) {
+			cues.play("join");
+		}
 	}
 }
 
