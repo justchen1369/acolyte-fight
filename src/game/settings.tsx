@@ -549,7 +549,7 @@ const lightning: Spell = {
 const blast: Spell = {
     id: 'blast',
     name: 'Acolyte Blast',
-    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage. Just don't get interrupted while charging!",
+    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage and knockback. Just don't get interrupted while charging!",
     action: "charge",
 
     color: '#0ff',
@@ -571,7 +571,7 @@ const blast: Spell = {
     },
 
     chargeDamage: {
-        initialMultiplier: 0.1,
+        initialMultiplier: 0.25,
         ticks: 2 * TicksPerSecond,
     },
 
@@ -580,16 +580,20 @@ const blast: Spell = {
         ticks: 2 * TicksPerSecond,
     },
 
+    chargeImpulse: {
+        initialMultiplier: 0.05,
+        ticks: 2 * TicksPerSecond,
+    },
+
     projectile: {
-        categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
+        collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
-        density: 10,
+        density: 100,
         radius: 0.015,
         speed: 0.5,
         lifeSteal: 0.2,
         maxTicks: 2 * TicksPerSecond,
-        damage: 50,
+        damage: 25,
 
         sound: "blast",
         color: '#0ff',

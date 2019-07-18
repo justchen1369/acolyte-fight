@@ -3316,6 +3316,17 @@ function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, 
 	if (spell.chargeRadius) {
 		template.radius *= calculatePartialMultiplier(chargeTicks, spell.chargeRadius);
 	}
+	if (spell.chargeImpulse) {
+		const impulseMultiplier = calculatePartialMultiplier(chargeTicks, spell.chargeImpulse);
+		template.density *= impulseMultiplier;
+		if (template.detonate) {
+			template.detonate = {
+				...template.detonate,
+				minImpulse: template.detonate.minImpulse * impulseMultiplier,
+				maxImpulse: template.detonate.maxImpulse * impulseMultiplier,
+			};
+		}
+	}
 
 	addProjectile(world, hero, target, spell, template);
 

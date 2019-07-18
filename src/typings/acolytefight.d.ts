@@ -301,6 +301,7 @@ declare interface ChargingSpell extends SpellBase {
 
 	chargeDamage?: PartialDamageParameters; // Scale damage with charge time
 	chargeRadius?: PartialDamageParameters; // Scale projectile radius with charge time
+	chargeImpulse?: PartialDamageParameters; // Scale detonation knockback with charge time
 }
 
 declare interface FocusSpell extends SpellBase {
