@@ -1979,7 +1979,7 @@ const icewall: Spell = {
     damageMultiplier: 0.25,
 
     length: 0.005,
-    width: 0.1,
+    width: 0.15,
     density: 10,
     linearDamping: 3,
     angularDamping: 100,
