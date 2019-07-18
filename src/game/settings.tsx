@@ -2067,6 +2067,7 @@ const swap: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    debuff: true,
 
     projectile: {
         density: 0.001,
