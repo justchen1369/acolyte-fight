@@ -329,7 +329,7 @@ const difire: Spell = {
                 targetType: "cursor",
                 trigger: { afterTicks: 1 },
                 redirect: true,
-                newSpeed: 0.72,
+                newSpeed: 0.6,
             },
         ],
 
