@@ -1907,13 +1907,6 @@ const scourge: Spell = {
         minImpulse: 0.001,
         maxImpulse: 0.001,
         renderTicks: 30,
-
-        buffs: [
-            {
-                type: "cooldown",
-                minCooldown: 1 * TicksPerSecond,
-            }
-        ],
     },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
@@ -1975,6 +1968,8 @@ const icewall: Spell = {
     length: 0.005,
     width: 0.1,
     density: 10,
+    linearDamping: 3,
+    angularDamping: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
     selfPassthrough: true,

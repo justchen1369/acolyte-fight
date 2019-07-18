@@ -751,6 +751,8 @@ declare interface WallSpell extends ShieldSpell {
 	maxTicks: number;
 
 	density?: number; // If set, the wall is moveable
+	linearDamping?: number; // Higher means receives less knockback
+	angularDamping?: number; // Higher means less rotation on knockback
 
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
@@ -788,6 +790,7 @@ declare interface ThrustSpell extends SpellBase {
 
 	range: number;
 	radiusMultiplier: number;
+	nullifiable?: boolean; // Hitting an obstacle will cancel the thrust
 	bounceTicks: number; // If a hero crashes into something with thrust, the number of ticks they will bounce off for before coming to a stop
 	speed: number;
 

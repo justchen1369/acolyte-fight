@@ -275,6 +275,8 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		type: spell.density > 0 ? 'dynamic' : 'static',
 		position,
 		angle,
+		linearDamping: spell.linearDamping,
+		angularDamping: spell.angularDamping,
 	});
 
 	body.createFixture(pl.Polygon(points), {
@@ -3484,7 +3486,7 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 	}
 
 	if (hero.thrust) {
-		if (hero.thrust.nullified) {
+		if (hero.thrust.nullified && spell.nullifiable) {
 			hero.thrust.ticks = Math.min(spell.bounceTicks, hero.thrust.ticks);
 		} else {
 			hero.body.setLinearVelocity(hero.thrust.velocity);
