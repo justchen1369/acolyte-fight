@@ -272,7 +272,7 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 25 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 3 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 30 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -347,7 +347,7 @@ const difire: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 25 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 2 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 20 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 2 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
