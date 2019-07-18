@@ -1989,7 +1989,7 @@ const icewall: Spell = {
 
     length: 0.005,
     width: 0.15,
-    density: 10,
+    density: 100,
     linearDamping: 3,
     angularDamping: 100,
 
