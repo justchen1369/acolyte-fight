@@ -128,7 +128,6 @@ export function initialWorld(mod: Object): w.World {
 			underlays: [],
 			trails: [],
 			changedTrailHighlights: new Map(),
-			sounds: [],
 			notifications: [],
 			camera: {
 				zoom: 1,

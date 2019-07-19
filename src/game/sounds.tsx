@@ -1,5 +1,5 @@
 export const Sounds: Sounds = {
-    "join": {
+    "joining": {
         "start": [
             {
                 "volume": 0.25,
@@ -10,6 +10,32 @@ export const Sounds: Sounds = {
                 "stopFreq": 10,
                 "modStartFreq": 500,
                 "modStopFreq": 700,
+                "modStartStrength": 125,
+                "modStopStrength": 125,
+                "tremoloFreq": 3,
+                "tremoloStrength": 0.1,
+                "wave": "triangle",
+                "ratios": [
+                    1,
+                    1.2,
+                    1.4,
+                    2.4,
+                    3.6
+                ]
+            }
+        ]
+    },
+    "leaving": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.5,
+                "attack": 0.25,
+                "decay": 0.25,
+                "startFreq": 10,
+                "stopFreq": 10,
+                "modStartFreq": 700,
+                "modStopFreq": 500,
                 "modStartStrength": 125,
                 "modStopStrength": 125,
                 "tremoloFreq": 3,

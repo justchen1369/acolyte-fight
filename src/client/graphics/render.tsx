@@ -970,7 +970,10 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 
 	// Ease in hero on arrival
 	let easeMultiplier = ease(hero.createTick, world);
+	let arriving = true;
 	if (hero.exitTick) {
+		arriving = false;
+
 		const leaveMultiplier = 1 - ease(hero.exitTick, world);
 		if (leaveMultiplier >= 1) {
 			// This hero has already left, don't render
@@ -985,7 +988,8 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		const direction = vector.diff(pos, MapCenter);
 		direction.normalize();
 		pos.addMul(HeroColors.EaseInDistance * easeMultiplier, direction);
-		renderHeroArrival(pos, direction, hero, world);
+
+		renderHeroArrival(ctxStack, pos, direction, arriving, hero, world);
 	}
 
 	renderRangeIndicator(ctxStack, hero, pos, world);
@@ -1012,7 +1016,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	playHeroSounds(ctxStack, hero, pos, world);
 }
 
-function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: w.World) {
+function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.Vec2, arriving: boolean, hero: w.Hero, world: w.World) {
 	world.ui.trails.unshift({
 		type: "circle",
 		pos,
@@ -1025,6 +1029,12 @@ function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: 
 		glow: 0.2,
 		vanish: 1,
 	});
+
+	if (arriving) {
+		ctxStack.sounds.push({ id: `joining-${hero.id}`, sound: 'joining', pos });
+	} else {
+		ctxStack.sounds.push({ id: `leaving-${hero.id}`, sound: 'leaving', pos });
+	}
 }
 
 function ease(createTick: number, world: w.World): number {
