@@ -1,12 +1,15 @@
 import * as pl from 'planck-js';
-import * as w from '../../game/world.model';
-import { isMobile } from './userAgent';
+import { isMobile } from '../core/userAgent';
 import { TicksPerSecond } from '../../game/constants';
+import { AudioElement } from './render.model';
+
+export { AudioElement } from './render.model';
 
 const Z = -0.1;
 const RefDistance = 0.1;
 let env: AudioEnvironment = null;
-let sources = new Map<string, AudioSource>();
+let attached = new Map<string, AudioSource>();
+let unattached = new Map<string, AudioSource>();
 let nextUnattachedId = 0;
 
 interface AudioEnvironment {
@@ -172,13 +175,27 @@ export function unrecord() {
     }
 }
 
-export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
+export function play(self: pl.Vec2, elems: AudioElement[], sounds: Sounds) {
     if (!env) {
         return;
     }
 
     env.ctx.listener.setPosition(self.x, self.y, 0);
 
+    // Replace sources for next time
+    attached = playReactively(attached, elems, sounds);
+}
+
+export function playUnattached(elems: AudioElement[], sounds: Sounds) {
+    if (!env) {
+        return;
+    }
+
+    // Replace sources for next time
+    unattached = playReactively(unattached, elems, sounds);
+}
+
+function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[], sounds: Sounds) {
     const keep = new Map<string, AudioSource>();
 
     // Start/sustain current sound sources
@@ -209,14 +226,7 @@ export function play(self: pl.Vec2, elems: w.AudioElement[], sounds: Sounds) {
         }
     }
 
-    // Replace sources for next time
-    sources = keep;
-}
-
-export function playUnattached(name: string, sounds: Sounds) {
-    const sound = sounds[name];
-    const source = new AudioSource(`${name}${nextUnattachedId++}`, sound);
-    source.start(null);
+    return keep;
 }
 
 function generateBrownNoise(ctx: AudioContext) {

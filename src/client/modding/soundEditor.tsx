@@ -6,7 +6,7 @@ import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as audio from '../core/audio';
+import * as audio from '../graphics/audio';
 import * as editing from './editing';
 import EditorPage from './editorPage';
 import SectionEditor from './sectionEditor';
@@ -18,7 +18,7 @@ interface Props {
     selectedId: string;
 }
 interface State {
-    currentAudioElement: w.AudioElement;
+    currentAudioElement: audio.AudioElement;
     audioCancelTime: number;
 }
 
@@ -64,7 +64,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
     private onPreviewClick(soundId: string) {
         audio.unlock();
 
-        const audioElement: w.AudioElement = {
+        const audioElement: audio.AudioElement = {
             id: uniqid("preview-"),
             sound: soundId,
             pos: center,
@@ -87,7 +87,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
             return;
         }
 
-        const elements = new Array<w.AudioElement>();
+        const elements = new Array<audio.AudioElement>();
         if (this.state.currentAudioElement) {
             elements.push(this.state.currentAudioElement);
         }

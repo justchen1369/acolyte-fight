@@ -2,7 +2,7 @@ import pl from 'planck-js';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 
-import * as audio from '../core/audio';
+import * as audio from '../graphics/audio';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
 import * as processor from '../core/processor';

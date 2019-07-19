@@ -1,6 +1,6 @@
 import * as pl from 'planck-js';
 import * as atlasController from './atlasController';
-import * as audio from '../core/audio';
+import * as audio from './audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as glx from './glx';
@@ -163,6 +163,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	const pixel = subpixel * options.retinaMultiplier;
 
 	const ctxStack: CanvasCtxStack = {
+		sounds: [],
 		atlas: canvasStack.atlas.getContext('2d', { alpha: true }),
 		gl: canvasStack.gl.getContext('webgl', { alpha: false }),
 		ui: canvasStack.ui.getContext('2d', { alpha: true }),
@@ -184,11 +185,10 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 
 	glx.renderGl(ctxStack, worldRect, rect);
 
-	playSounds(world, options);
+	playSounds(ctxStack, world, options);
 
 	world.ui.destroyed = [];
 	world.ui.events = [];
-	world.ui.sounds = [];
 
 	world.ui.renderedTick = world.tick;
 
@@ -230,7 +230,7 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 	return instructions;
 }
 
-function playSounds(world: w.World, options: RenderOptions) {
+function playSounds(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
 	if (options.mute
 		|| world.tick <= world.ui.playedTick // Already played this tick
 		|| (world.tick - world.ui.playedTick) > MaxDestroyedTicks) { // We've lagged or entered a game late, don't replay all the sounds because it just causes WebAudio to hang
@@ -239,7 +239,7 @@ function playSounds(world: w.World, options: RenderOptions) {
 	} else {
 		const hero = world.objects.get(world.ui.myHeroId);
 		const self = hero ? hero.body.getPosition() : pl.Vec2(0.5, 0.5);
-		audio.play(self, world.ui.sounds, world.settings.Sounds);
+		audio.play(self, ctxStack.sounds, world.settings.Sounds);
 	}
 
 	world.ui.playedTick = world.tick; // Always update this so if user unmutes they don't classified as get sound lag
@@ -329,10 +329,10 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		}
 	} else if (obj.category === "shield") {
 		renderShield(ctxStack, obj, world);
-		playShieldSounds(obj, world);
+		playShieldSounds(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
-		playSpellSounds(obj, world);
+		playSpellSounds(ctxStack, obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world, options);
 	}
@@ -359,7 +359,7 @@ function renderDestroyed(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.
 		renderHeroDeath(ctxStack, obj, world);
 	} else if (obj.category === "projectile") {
 		renderSpell(ctxStack, obj, world);
-		playSpellSounds(obj, world);
+		playSpellSounds(ctxStack, obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacleDestroyed(ctxStack, obj, world, options);
 	}
@@ -394,7 +394,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 		}, world);
 	}
 
-	world.ui.sounds.push({
+	ctxStack.sounds.push({
 		id: `${hero.id}-death`,
 		sound: 'death',
 		pos,
@@ -456,9 +456,9 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	}
 }
 
-function playSpellSounds(obj: w.Projectile, world: w.World) {
+function playSpellSounds(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World) {
 	if (obj.sound) {
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: obj.id,
 			sound: obj.sound,
 			pos: obj.body.getPosition().clone(),
@@ -467,7 +467,7 @@ function playSpellSounds(obj: w.Projectile, world: w.World) {
 
 	const hitSound = obj.soundHit || obj.sound;
 	if (hitSound && obj.hit) {
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: `${obj.id}-hit-${obj.hit}`, // Each hit has a unique ID
 			sound: `${hitSound}-hit`,
 			pos: obj.body.getPosition().clone(),
@@ -534,7 +534,7 @@ function renderSetCooldown(ctxStack: CanvasCtxStack, ev: w.SetCooldownEvent, wor
 
 	if (ev.sound && (!world.ui.myHeroId || ev.heroId === world.ui.myHeroId)) {
 		// Only play sound if it affects me
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: `${owner.id}-setCooldown`,
 			sound: `${ev.sound}-setCooldown`,
 			pos,
@@ -576,7 +576,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 	}, world);
 
 	if (ev.sound) {
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: `${ev.sourceId}-detonating`,
 			sound: `${ev.sound}-detonating`,
 			pos: ev.pos,
@@ -636,7 +636,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 		}
 
 		if (ev.sound) {
-			world.ui.sounds.push({
+			ctxStack.sounds.push({
 				id: `${ev.heroId}-teleport-arriving`,
 				sound: `${ev.sound}-arriving`,
 				pos: ev.toPos,
@@ -785,13 +785,13 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		}
 	});
 
-	playObstacleSounds(obstacle, world);
+	playObstacleSounds(ctxStack, obstacle, world);
 }
 
-function playObstacleSounds(obj: w.Obstacle, world: w.World) {
+function playObstacleSounds(ctxStack: CanvasCtxStack, obj: w.Obstacle, world: w.World) {
 	if (obj.sound) {
 		if (obj.touchTick) {
-			world.ui.sounds.push({
+			ctxStack.sounds.push({
 				id: `${obj.id}-touch-${obj.touchTick}`, // Each touch has a unique ID
 				sound: obj.sound,
 				pos: obj.body.getPosition().clone(),
@@ -1009,7 +1009,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		}
 	}
 
-	playHeroSounds(hero, pos, world);
+	playHeroSounds(ctxStack, hero, pos, world);
 }
 
 function renderHeroArrival(pos: pl.Vec2, outward: pl.Vec2, hero: w.Hero, world: w.World) {
@@ -1088,7 +1088,7 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 		}
 
 		if (buff.sound) {
-			world.ui.sounds.push({
+			ctxStack.sounds.push({
 				id: `buff-${buff.id}`,
 				sound: `${buff.sound}`,
 				pos,
@@ -1102,7 +1102,7 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 		}
 
 		if (buff.sound) {
-			world.ui.sounds.push({
+			ctxStack.sounds.push({
 				id: `buff-${buff.id}-expired`,
 				sound: `${buff.sound}-expired`,
 				pos,
@@ -1273,7 +1273,7 @@ function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	renderVanishSmoke(ctxStack, hero, world, pos);
 }
 
-function playHeroSounds(hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
+function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 	// Casting sounds
 	if (hero.casting) {
 		const spell = world.settings.Spells[hero.casting.action.type];
@@ -1289,7 +1289,7 @@ function playHeroSounds(hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 				// Make the sound happen in the correct direction
 				const pos = heroPos.clone().addMul(hero.radius, vector.fromAngle(hero.body.getAngle()));
 				const key = `${spell.sound}-${stage}`;
-				world.ui.sounds.push({
+				ctxStack.sounds.push({
 					id: `${hero.id}-${key}`,
 					sound: key,
 					pos,
@@ -1542,11 +1542,11 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			feather,
 		});
 
-		renderSaberTrail(shield, world);
+		renderSaberTrail(ctxStack, shield, world);
 	}
 }
 
-function renderSaberTrail(saber: w.Saber, world: w.World) {
+function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.World) {
 	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
 	const newAngle = saber.body.getAngle();
 
@@ -1578,7 +1578,7 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 	if (saber.sound) {
 		const intensity = Math.min(1, 10 * Math.abs(vector.angleDelta(previousAngle, newAngle)) / (2 * Math.PI));
 		const tip = vector.fromAngle(newAngle).mul(saber.length);
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: saber.id,
 			sound: saber.sound,
 			pos: tip,
@@ -1587,16 +1587,16 @@ function renderSaberTrail(saber: w.Saber, world: w.World) {
 	}
 }
 
-function playShieldSounds(obj: w.Shield, world: w.World) {
+function playShieldSounds(ctxStack: CanvasCtxStack, obj: w.Shield, world: w.World) {
 	if (obj.sound) {
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: obj.id,
 			sound: obj.sound,
 			pos: obj.body.getPosition().clone(),
 		});
 
 		if (obj.hitTick) {
-			world.ui.sounds.push({
+			ctxStack.sounds.push({
 				id: `${obj.id}-hit-${obj.hitTick}`, // Each hit has a unique ID
 				sound: `${obj.sound}-hit`,
 				pos: obj.body.getPosition().clone(),
@@ -1650,7 +1650,7 @@ function renderGravityWell(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Worl
 	}
 
 	if (spell.sound) {
-		world.ui.sounds.push({
+		ctxStack.sounds.push({
 			id: `${hero.id}-trapped`,
 			sound: `${spell.sound}-trapped`,
 			pos: hero.gravity.location,

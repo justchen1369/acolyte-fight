@@ -1,6 +1,5 @@
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
-import * as cues from './cues';
 import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
@@ -27,8 +26,6 @@ export function onOnlineMsg(data: m.OnlineMsg) {
                 newNotifications.push(textNotification);
             });
             notifications.notify(...newNotifications);
-
-            cues.play("message");
         }
     }
 }

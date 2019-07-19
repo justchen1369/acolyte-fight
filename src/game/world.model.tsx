@@ -114,7 +114,6 @@ export interface UIState {
 	trails: Trail[];
 	changedTrailHighlights: Map<string, TrailHighlight>;
 	notifications: Notification[];
-	sounds: AudioElement[];
 
 	buttonBar?: ButtonConfig;
 	camera: Camera;
@@ -1085,11 +1084,4 @@ export interface ArcTrail extends TrailBase {
 	fromAngle: number;
 	toAngle: number;
 	antiClockwise: boolean;
-}
-
-export interface AudioElement {
-    id: string;
-    sound: string;
-	pos: pl.Vec2;
-	intensity?: number;
 }

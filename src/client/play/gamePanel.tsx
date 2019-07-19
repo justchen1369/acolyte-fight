@@ -20,6 +20,7 @@ import GameKeyCustomizer from './gameKeyCustomizer';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
 import ButtonPanel from './buttonPanel';
 import SocialBar from '../controls/socialBar';
+import SoundController from './soundController';
 import SpellInfoPanel from './spellInfoPanel';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
@@ -75,6 +76,7 @@ class GamePanel extends React.PureComponent<Props, State> {
                 <SpellInfoPanel />
                 <HintPanel />
                 <GameKeyCustomizer />
+                <SoundController />
                 <OnlineSegmentListener />
                 <UrlListener />
                 <WatchLooper />

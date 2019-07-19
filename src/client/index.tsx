@@ -9,7 +9,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 
 import * as ai from './core/ai';
-import * as audio from './core/audio';
+import * as audio from './graphics/audio';
 import * as cloud from './core/cloud';
 import * as loader from './core/loader';
 import * as matches from './core/matches';

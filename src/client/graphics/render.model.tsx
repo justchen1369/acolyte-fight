@@ -17,6 +17,8 @@ export interface CanvasStack {
 }
 
 export interface CanvasCtxStack {
+	sounds: AudioElement[];
+
 	atlas: CanvasRenderingContext2D;
     gl: WebGLRenderingContext;
 	ui: CanvasRenderingContext2D;
@@ -35,6 +37,13 @@ export interface RenderOptions {
 	rebindings: KeyBindings;
 	rtx: number;
 	retinaMultiplier: number;
+}
+
+export interface AudioElement {
+    id: string;
+    sound: string;
+	pos?: pl.Vec2;
+	intensity?: number;
 }
 
 export interface GlContext {
