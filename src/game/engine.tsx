@@ -419,6 +419,7 @@ function addHero(world: w.World, heroId: string) {
 		maxHealth: Hero.MaxHealth,
 		body,
 		radius: Hero.Radius,
+		linearDamping: Hero.Damping,
 		damageSources: new Map<string, number>(),
 		damageSourceHistory: [],
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
@@ -794,6 +795,7 @@ export function tick(world: w.World) {
 		gravityForce,
 		attract,
 		aura,
+		glide,
 		reflectFollow,
 		saberSwing,
 		thrustBounce,
@@ -2697,6 +2699,26 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	return true;
 }
 
+function glide(behaviour: w.GlideBehaviour, world: w.World) {
+	// Must be idempotent because may have multiple repeated glide behaviours for same hero
+	const hero = world.objects.get(behaviour.heroId);
+	if (hero && hero.category === "hero") {
+		let keep = false;
+		let damping = hero.linearDamping;
+		hero.buffs.forEach(buff => {
+			if (buff.type === "glide") {
+				keep = true;
+				damping *= buff.linearDampingMultiplier;
+			}
+		});
+		hero.body.setLinearDamping(damping);
+
+		return keep;
+	} else {
+		return false;
+	}
+}
+
 function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
 	const shield = world.objects.get(behaviour.shieldId);
 	if (shield && shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
@@ -2785,9 +2807,15 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 		return true;
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
-	} else if (buff.linkSpellId && (!hero.link || hero.link.spellId !== buff.linkSpellId)) {
-		return true;
 	}
+
+	if (buff.link) {
+		const hero = world.objects.get(buff.link.owner);
+		if (!(hero && hero.category === "hero" && hero.link && hero.link.spellId === buff.link.spellId)) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -3773,9 +3801,15 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.spellId,
-		linkSpellId: template.linked && config.spellId,
 		numStacks: 1,
 	};
+
+	if (template.linkOwner) {
+		values.link = { owner: hero.id, spellId: config.spellId };
+	} else if (template.linkVictim) {
+		values.link = { owner: config.otherId, spellId: config.spellId };
+	}
+
 	if (template.type === "debuff") {
 		hero.cleanseTick = world.tick;
 	} else if (template.type === "movement") {
@@ -3788,6 +3822,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			...values, id, type: "glide",
 			linearDampingMultiplier: template.linearDampingMultiplier,
 		});
+		world.behaviours.push({ type: "glide", heroId: hero.id }); // In case hero receives multiple glide buffs, may have multiple glide behaviours, but that is okay because idempotent
 	} else if (template.type === "lavaImmunity") {
 		hero.buffs.set(id, {
 			...values, id, type: "lavaImmunity",

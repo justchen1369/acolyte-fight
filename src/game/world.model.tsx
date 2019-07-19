@@ -421,6 +421,7 @@ export interface Hero extends WorldObjectBase {
 	maxSpeed: number;
 	revolutionsPerTick: number;
 	conveyorShift?: pl.Vec2; // If set, move by this amount on the next tick. Used to ensure only one conveyor has an effect per tick.
+	linearDamping: number;
 
 	createTick: number;
 	hitTick?: number; // hit by anything (lava or non-lava)
@@ -604,12 +605,17 @@ export interface BuffValues {
 	initialTick: number;
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
-	linkSpellId?: string; // If the hero becomes unlinked, remove the buff
+	link?: LinkChannellingBuffParams;
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
 
 	render?: RenderBuff;
 	sound?: string;
+}
+
+export interface LinkChannellingBuffParams {
+	owner: string; // heroId
+	spellId: string; // The owner must be casting this link spell
 }
 
 export interface BuffBase extends BuffValues {
@@ -769,6 +775,7 @@ export type Behaviour =
 	| ClearHitsBehaviour
 	| LinkBehaviour
 	| GravityBehaviour
+	| GlideBehaviour
 	| ReflectFollowBehaviour
 	| ThrustBounceBehaviour
 	| ThrustDecayBehaviour
@@ -866,6 +873,11 @@ export interface LinkBehaviour extends BehaviourBase {
 
 export interface GravityBehaviour extends BehaviourBase {
 	type: "gravityForce";
+	heroId: string;
+}
+
+export interface GlideBehaviour extends BehaviourBase {
+	type: "glide";
 	heroId: string;
 }
 

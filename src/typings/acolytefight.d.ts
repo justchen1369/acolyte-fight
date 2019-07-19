@@ -641,7 +641,8 @@ declare interface BuffTemplateBase {
 	against?: number; // Which alliances to apply this buff to
 	maxTicks?: number; // Maximum duration of this buff
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
-	linked?: boolean; // Cancel this buff if unlinked
+	linkOwner?: boolean; // Cancel this buff if unlinked
+	linkVictim?: boolean; // Cancel this buff if no longer the victim of a link
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
 	render?: RenderBuff;
 	sound?: string;

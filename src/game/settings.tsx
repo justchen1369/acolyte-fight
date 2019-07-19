@@ -415,6 +415,7 @@ const meteor: Spell = {
     projectile: {
         density: 100,
         attractable: false,
+        linkable: true,
         knockbackScaling: false,
         radius: 0.03,
         speed: 0.2,
@@ -451,6 +452,7 @@ const meteorite: Spell = {
     projectile: {
         density: 100,
         attractable: false,
+        linkable: true,
         knockbackScaling: false,
         radius: 0.015,
         speed: 0.3,
@@ -1100,8 +1102,8 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Attach yourself to things and gain a 2x movement speed boost. Swing around while attacking and dodging at super speed!",
-    action: "projectile",
+    description: "Hold the button to grapple. Swing your enemies around and throw them into the void.",
+    action: "focus",
 
     color: '#ff2200',
     icon: "grapple",
@@ -1111,10 +1113,14 @@ const grapple: Spell = {
     throttle: false,
     unlink: true,
 
+    release: {},
+    maxChannellingTicks: 1.5 * TicksPerSecond, // projectile time + link time
+    movementProportionWhileChannelling: 1,
+
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.005,
+        radius: 0.003,
         speed: 0.8,
         maxTicks: 0.4 * TicksPerSecond,
         damage: 0,
@@ -1124,13 +1130,15 @@ const grapple: Spell = {
         shieldTakesOwnership: false,
 
         link: {
-            linkWith: Categories.Hero | Categories.Obstacle,
+            linkWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
             selfFactor: 1,
             targetFactor: 1,
-            impulsePerTick: 0.000006,
+            impulsePerTick: 0.00002,
+            sidewaysImpulsePerTick: 0.000012,
             minDistance: 0.05,
-            maxDistance: 0.25,
+            maxDistance: 0.1,
             linkTicks: 1 * TicksPerSecond,
+            channelling: true,
 
             render: {
                 type: "link",
@@ -1146,11 +1154,18 @@ const grapple: Spell = {
             {
                 collideWith: Categories.All,
                 owner: true,
-                type: "movement",
-                maxTicks: 5 * TicksPerSecond,
-                linked: true,
-                movementProportion: 2,
-            }
+                type: "glide",
+                maxTicks: 1 * TicksPerSecond,
+                linkOwner: true,
+                linearDampingMultiplier: 10,
+            },
+            {
+                collideWith: Categories.Hero,
+                type: "glide",
+                maxTicks: 1 * TicksPerSecond,
+                linkVictim: true,
+                linearDampingMultiplier: 0,
+            },
         ],
 
         behaviours: [
