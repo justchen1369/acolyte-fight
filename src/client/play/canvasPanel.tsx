@@ -65,6 +65,7 @@ class AnimationLoop {
     }
 
     stop() {
+        window.clearInterval(this.currentInterval);
         this.isRunning = false;
         this.currentInterval = null;
     }
