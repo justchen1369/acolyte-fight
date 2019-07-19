@@ -739,7 +739,7 @@ const retractor: Spell = {
         damage: 0,
         lifeSteal: 0.2,
         density: 24,
-        radius: 0.007,
+        radius: 0.0035,
         speed: 0.4,
         maxTicks: 2.0 * TicksPerSecond,
         collideWith: Categories.All,
@@ -767,7 +767,7 @@ const retractor: Spell = {
             {
                 type: "accelerate",
                 maxSpeed: 0.6,
-                accelerationPerSecond: 0.3,
+                accelerationPerSecond: 0.4,
             }
         ],
 
@@ -778,7 +778,7 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#00ff7f',
                 ticks: 30,
-                radius: 0.009,
+                radius: 0.0045,
                 particleRadius: 0.001,
                 glow: 0.05,
                 smoke: 0.1,
