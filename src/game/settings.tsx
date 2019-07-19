@@ -1111,11 +1111,13 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
-    strikeCancel: {},
+    strikeCancel: {
+        cooldownTicks: 1 * TicksPerSecond,
+    },
 
     release: {},
     maxChannellingTicks: 1.5 * TicksPerSecond, // projectile time + link time
