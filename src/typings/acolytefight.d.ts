@@ -330,6 +330,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
 	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
+	linkable?: boolean; // Whether a link can attach tot his projectile
 
 	strafe?: StrafeParameters; // if true, the projectile will move with the hero's movement
 	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number

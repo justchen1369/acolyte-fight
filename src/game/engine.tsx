@@ -548,6 +548,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		strafe: projectileTemplate.strafe,
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
+		linkable: projectileTemplate.linkable,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -2013,6 +2014,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 	if (expireOn(world, projectile, other)) {
 		detonateProjectile(projectile, world);
+		linkTo(projectile, other, world);
 		applySwap(projectile, other, world);
 		destroyObject(world, projectile);
 	}
@@ -2400,7 +2402,9 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		&& owner && owner.category === "hero")) {
 		return;
 	}
-	projectile.expireTick = world.tick;
+	if (target.category === "projectile" && !target.linkable) {
+		return;
+	}
 
 	const maxTicks = link.linkTicks;
 	owner.link = {

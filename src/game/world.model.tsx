@@ -682,7 +682,8 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	speed: number;
 	fixedSpeed: boolean;
 	strafe?: StrafeParameters;
-	attractable: boolean;
+	attractable?: boolean;
+	linkable?: boolean;
 
 	target: pl.Vec2;
 	targetId: string | null;
