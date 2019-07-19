@@ -742,7 +742,7 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         lifeSteal: 0.2,
-        density: 50,
+        density: 40,
         radius: 0.002,
         speed: 0.1,
         maxTicks: 2.0 * TicksPerSecond,
