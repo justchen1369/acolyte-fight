@@ -61,7 +61,7 @@ function incomingLoop(minFramesToProcess: number) {
 	}
 }
 
-export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
+export function frame(canvasStack: CanvasStack, world: w.World, display: boolean, renderOptions: RenderOptions) {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
 		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
@@ -93,8 +93,11 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
 		*/
 	}
-	direct(world, canvasStack, renderOptions);
-	render(world, canvasStack, renderOptions);
+
+	if (display) {
+		direct(world, canvasStack, renderOptions);
+		render(world, canvasStack, renderOptions);
+	}
 
 	const notifications = engine.takeNotifications(world);
 	if (notifications.length > 0) {

@@ -14,6 +14,7 @@ import { CanvasStack, GraphicsLevel, resetRenderState } from '../graphics/render
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
+const HiddenRenderTimeoutMiliseconds = 1000;
 const MaxSlowFrames = 10;
 const SlowFrameWaitInterval = 60;
 const FpsThreshold = 0.9;
@@ -35,8 +36,9 @@ interface State {
 }
 
 class AnimationLoop {
-    private animate: () => void;
+    private animate: (display: boolean) => void;
     private currentHandle = 0;
+    private currentInterval: number = null;
     private isRunning = false;
 
     private slow: () => void;
@@ -45,23 +47,30 @@ class AnimationLoop {
 
     private numSlowFrames = 0;
 
-    constructor(animate: () => void, slow: () => void) {
+    constructor(animate: (display: boolean) => void, slow: () => void) {
         this.animate = animate;
         this.slow = slow;
     }
 
     start() {
+        if (this.isRunning) {
+            console.error("AnimationLoop.start() called when already started");
+            return;
+        }
+
         const handle = ++this.currentHandle;
         this.isRunning = true;
         window.requestAnimationFrame(() => this.loop(handle));
+        this.currentInterval = window.setInterval(() => this.hiddenRenderLoop(), HiddenRenderTimeoutMiliseconds);
     }
 
     stop() {
         this.isRunning = false;
+        this.currentInterval = null;
     }
 
     private loop(handle: number) {
-        this.animate();
+        this.animate(true);
 
         const timeOfThisFrame = Date.now();
         const renderingMilliseconds = timeOfThisFrame - this.timeOfLastFrame;
@@ -88,6 +97,13 @@ class AnimationLoop {
             window.requestAnimationFrame(() => this.loop(handle));
         }
     }
+
+    private hiddenRenderLoop() {
+        const renderAge = Date.now() - this.timeOfLastFrame;
+        if (renderAge >= HiddenRenderTimeoutMiliseconds) {
+            this.animate(false);
+        }
+    }
 }
 
 function stateToProps(state: s.State): Props {
@@ -106,7 +122,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private resizeListener = this.fullScreenCanvas.bind(this);
 
     private animationLoop = new AnimationLoop(
-        () => this.frame(),
+        (display: boolean) => this.frame(display),
         () => this.reduceGraphics(),
     );
 
@@ -209,10 +225,10 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         }
     }
 
-    private frame() {
+    private frame(display: boolean) {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
-            frame(this.canvasStack, this.props.world, {
+            frame(this.canvasStack, this.props.world, display, {
                 rtx: this.state.rtx,
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
