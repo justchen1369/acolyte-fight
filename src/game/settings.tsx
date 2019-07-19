@@ -767,7 +767,7 @@ const retractor: Spell = {
             {
                 type: "accelerate",
                 maxSpeed: 0.6,
-                accelerationPerSecond: 1.6,
+                accelerationPerSecond: 1.5,
             }
         ],
 
