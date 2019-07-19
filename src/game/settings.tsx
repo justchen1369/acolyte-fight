@@ -1102,7 +1102,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Hold the button to grapple. Swing your enemies around and throw them into the void.",
+    description: "Hold the button to grapple. Move your cursor to swing your enemies around and throw them into the void.",
     action: "focus",
 
     color: '#ff2200',
@@ -1120,7 +1120,7 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.003,
+        radius: 0.005,
         speed: 0.8,
         maxTicks: 0.4 * TicksPerSecond,
         damage: 0,
@@ -1132,11 +1132,11 @@ const grapple: Spell = {
         link: {
             linkWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
             selfFactor: 1,
-            targetFactor: 1,
+            targetFactor: 0.5,
             impulsePerTick: 0.00002,
-            sidewaysImpulsePerTick: 0.000012,
-            minDistance: 0.05,
-            maxDistance: 0.1,
+            sidewaysImpulsePerTick: 0.000013,
+            minDistance: 0.025,
+            maxDistance: 0.075,
             linkTicks: 1 * TicksPerSecond,
             channelling: true,
 
