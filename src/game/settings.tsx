@@ -242,6 +242,8 @@ const triplet: Spell = {
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
+    movementProportionWhileChannelling: 1.0,
+
     intervalTicks: 1,
     lengthTicks: 3,
 
@@ -251,7 +253,7 @@ const triplet: Spell = {
         density: 10,
         radius: 0.002,
         speed: 0.3,
-        maxTicks: 1.5 * TicksPerSecond,
+        maxTicks: 2.25 * TicksPerSecond,
         damage: 0,
         lifeSteal: 0.2,
         categories: Categories.Projectile,
@@ -261,7 +263,7 @@ const triplet: Spell = {
         color: '#ff0088',
         renderers: [
             { type: "projectile", ticks: 15, smoke: 0.05, vanish: 1 },
-            { type: "ray", ticks: 7, vanish: 0.5 },
+            { type: "ray", ticks: 9, vanish: 0.5 },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
         ],
 
@@ -303,7 +305,6 @@ const difire: Spell = {
     interruptibleAfterTicks: 0,
 
     movementProportionWhileChannelling: 1.0,
-    revsPerTickWhileChannelling: 1.0,
 
     intervalTicks: 1,
     lengthTicks: 2,
@@ -738,7 +739,7 @@ const retractor: Spell = {
         damage: 0,
         lifeSteal: 0.2,
         density: 24,
-        radius: 0.0035,
+        radius: 0.007,
         speed: 0.4,
         maxTicks: 2.0 * TicksPerSecond,
         collideWith: Categories.All,
@@ -766,7 +767,7 @@ const retractor: Spell = {
             {
                 type: "accelerate",
                 maxSpeed: 0.6,
-                accelerationPerSecond: 0.4,
+                accelerationPerSecond: 0.3,
             }
         ],
 
@@ -777,7 +778,7 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#00ff7f',
                 ticks: 30,
-                radius: 0.0045,
+                radius: 0.009,
                 particleRadius: 0.001,
                 glow: 0.05,
                 smoke: 0.1,
