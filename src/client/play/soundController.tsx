@@ -12,6 +12,7 @@ interface Props {
     mute?: boolean;
     items: s.NotificationItem[];
     sounds: Sounds;
+    myHeroId: string;
 }
 interface State {
 }
@@ -21,6 +22,7 @@ function stateToProps(state: s.State): Props {
         mute: state.options.mute,
         items: state.items,
         sounds: state.world.settings.Sounds,
+        myHeroId: state.world.ui.myHeroId,
     };
 }
 
@@ -38,15 +40,27 @@ class SoundController extends React.PureComponent<Props, State> {
 
         const elems = new Array<audio.AudioElement>();
         this.props.items.forEach(item => {
-            const notif = item.notification;
-            if (notif.type === "text") {
-                elems.push({ id: item.key, sound: "message" });
+            let sound: string = this.calculateSound(item.notification);
+            if (sound) {
+                elems.push({ id: item.key, sound });
             }
         });
 
         if (elems.length > 0) {
             const Sounds = this.props.sounds;
             audio.playUnattached(elems, Sounds);
+        }
+
+        return null;
+    }
+
+    private calculateSound(notif: w.Notification) {
+        if (notif.type === "text") {
+            return "message";
+        } else if (notif.type === "join") {
+            if (notif.player.heroId !== this.props.myHeroId) {
+                return "join";
+            }
         }
 
         return null;
