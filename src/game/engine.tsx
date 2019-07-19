@@ -12,6 +12,7 @@ import { modToSettings } from './modder';
 
 import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
 
+const NeverTicks = 1e6;
 const Precision = 0.0001;
 const BotsExitAfterTicks = 2 * TicksPerSecond;
 const vectorZero = vector.zero();
@@ -497,8 +498,6 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 }
 
 function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, target: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
-	const NeverTicks = 1e6;
-
 	let id = type + (world.nextObjectId++);
 	const velocity = vector.fromAngle(angle).mul(projectileTemplate.speed);
 	const diff = vector.diff(target, position);
@@ -695,6 +694,13 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 }
 
 function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, world: w.World): w.HomingBehaviour {
+	let maxTicks = NeverTicks;
+	if (template.redirect) {
+		maxTicks = 0;
+	} else if (template.maxTicks) {
+		maxTicks = template.maxTicks;
+	}
+
 	return {
 		type: "homing",
 		projectileId: projectile.id,
@@ -703,7 +709,8 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		minDistanceToTarget: template.minDistanceToTarget || 0,
 		targetType: template.targetType || w.HomingTargets.enemy,
 		newSpeed: template.newSpeed,
-		redirect: template.redirect,
+		expireWithinAngle: template.expireWithinRevs !== undefined ? (template.expireWithinRevs * 2 * Math.PI) : null,
+		expireTick: world.tick + maxTicks,
 	};
 }
 
@@ -2596,26 +2603,28 @@ function homing(homing: w.HomingBehaviour, world: w.World) {
 	const currentAngle = vector.angle(currentVelocity);
 	const idealAngle = vector.angle(diff);
 
-	const maxTurnRate = homing.maxTurnProportion * Math.abs(vector.angleDelta(currentAngle, idealAngle));
+	const angleDelta = vector.angleDelta(currentAngle, idealAngle);
+	const maxTurnRate = homing.maxTurnProportion * Math.abs(angleDelta);
 	const turnRate = Math.min(homing.turnRate, maxTurnRate);
 	const newAngle = vector.turnTowards(currentAngle, idealAngle, turnRate);
 
 	const currentSpeed = currentVelocity.length();
-	const newSpeed = homing.newSpeed !== undefined ? homing.newSpeed : currentSpeed;
-	const newVelocity = vector.fromAngle(newAngle).mul(newSpeed);
+	let newSpeed = currentSpeed;
+	if (homing.newSpeed !== undefined) {
+		newSpeed = homing.newSpeed;
+		obj.speed = homing.newSpeed;
+		delete homing.newSpeed; // Only apply the new speed once
+	}
 
+	const newVelocity = vector.fromAngle(newAngle).mul(newSpeed);
 	obj.body.setLinearVelocity(newVelocity);
 
-	// Change the projectile's intended speed so it doesn't get corrected away from the change
-	if (homing.newSpeed !== undefined) {
-		obj.speed = homing.newSpeed;
+	if (homing.expireWithinAngle && Math.abs(angleDelta) <= homing.expireWithinAngle) {
+		// Aim is perfect, stop homing
+		return false;
 	}
 
-	if (homing.redirect) {
-		return false; // Only want to do this once, cancel immediately
-	} else {
-		return true;
-	}
+	return world.tick < homing.expireTick;
 }
 
 function accelerate(behaviour: w.AccelerateBehaviour, world: w.World) {

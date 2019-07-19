@@ -429,11 +429,13 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 
 	revolutionsPerSecond?: number; // The maximum turn rate of the homing projectile. Defaults to infinity
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
+	expireWithinRevs?: number; // Stop homing once within this many revs of aiming directly at the target
 
 	minDistanceToTarget?: number; // Homing is only applied if the projectile is further than this. Used to keep projectiles orbiting at a particular distance.
 	maxDistanceToTarget?: number; // Homing is only applied if the projectile is closer than this.
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
+	maxTicks?: number; // Only perform homing for this many ticks
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
 }
 

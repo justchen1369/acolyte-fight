@@ -826,7 +826,9 @@ export interface HomingBehaviour extends BehaviourBase {
 	maxTurnProportion: number;
 	minDistanceToTarget: number;
 
-	redirect?: boolean;
+	expireWithinAngle: number;
+	expireTick: number;
+
 	newSpeed?: number;
 }
 
