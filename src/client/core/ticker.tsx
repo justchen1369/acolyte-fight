@@ -61,7 +61,7 @@ function incomingLoop(minFramesToProcess: number) {
 	}
 }
 
-export function frame(canvasStack: CanvasStack, world: w.World, display: boolean, renderOptions: RenderOptions) {
+export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
 		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
@@ -94,10 +94,8 @@ export function frame(canvasStack: CanvasStack, world: w.World, display: boolean
 		*/
 	}
 
-	if (display) {
-		direct(world, canvasStack, renderOptions);
-		render(world, canvasStack, renderOptions);
-	}
+	direct(world, canvasStack, renderOptions);
+	render(world, canvasStack, renderOptions);
 
 	const notifications = engine.takeNotifications(world);
 	if (notifications.length > 0) {

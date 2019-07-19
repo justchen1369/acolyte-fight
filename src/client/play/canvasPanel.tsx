@@ -229,7 +229,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private frame(display: boolean) {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
-            frame(this.canvasStack, this.props.world, display, {
+            frame(this.canvasStack, this.props.world, {
                 rtx: this.state.rtx,
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
