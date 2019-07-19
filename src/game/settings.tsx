@@ -1105,7 +1105,7 @@ const grapple: Spell = {
     description: "Hold the button to grapple. Move your cursor to swing your enemies around and throw them into the void.",
     action: "focus",
 
-    color: '#ff2200',
+    color: '#f02',
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
@@ -1142,7 +1142,7 @@ const grapple: Spell = {
 
             render: {
                 type: "link",
-                color: '#ff2200',
+                color: '#f02',
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 glow: 0.2,
@@ -1173,12 +1173,12 @@ const grapple: Spell = {
         ],
 
         sound: "grapple",
-        color: '#ff2200',
+        color: '#f02',
         renderers: [
-            { type: "polygon", color: '#ff2200', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
-                color: '#ff2200',
+                color: '#f02',
                 width: 1.5 * Pixel,
                 toWidth: 3 * Pixel,
                 glow: 0.2,
