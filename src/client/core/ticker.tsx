@@ -150,6 +150,13 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		return;
 	}
 
+	const state = StoreProvider.getState();
+	const world = state.world;
+	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
+		// Don't send any actions for dead heroes
+		return;
+	}
+
 	const actionMsg: m.ActionMsg = {
 		gid: gameId,
 		hid: heroId,
