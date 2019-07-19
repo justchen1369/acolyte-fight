@@ -553,12 +553,13 @@ export interface LinkState extends HighlightSource {
 	selfFactor: number;
 	targetFactor: number;
 
-	strength: number;
+	impulsePerTick: number;
+	sidewaysImpulsePerTick: number;
 	minDistance: number;
 	maxDistance: number;
 
 	redirectDamage?: RedirectDamageParameters;
-	instantRecast?: boolean;
+	channelling?: boolean;
 
 	initialTick: number;
 	expireTick: number;

@@ -457,9 +457,6 @@ function addHero(world: w.World, heroId: string) {
 }
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
-	if (hero.link && hero.link.instantRecast && hero.link.spellId === spellId) {
-		return 0;
-	}
 	return calculateCooldown(world, hero, spellId);
 }
 
@@ -2413,13 +2410,14 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		targetId: target.id,
 
 		redirectDamage: link.redirectDamage,
-		instantRecast: link.instantRecast,
+		channelling: link.channelling,
 
 		minDistance: link.minDistance,
 		maxDistance: link.maxDistance,
 		selfFactor: link.selfFactor !== undefined ? link.selfFactor : 1,
 		targetFactor: link.targetFactor !== undefined ? link.targetFactor : 1,
-		strength: link.impulsePerTick,
+		impulsePerTick: link.impulsePerTick,
+		sidewaysImpulsePerTick: link.sidewaysImpulsePerTick || 0,
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		render: link.render,
@@ -2660,23 +2658,36 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 		return false;
 	}
 
-	const minDistance = owner.link.minDistance;
-	const maxDistance = owner.link.maxDistance;
-
-	const diff = vector.diff(target.body.getPosition(), owner.body.getPosition());
-	const distance = diff.length();
-	const strength = owner.link.strength * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
-	if (strength <= 0) {
-		return true;
+	if (owner.link.channelling && !(owner.casting && owner.casting.action.type === owner.link.spellId)) {
+		// Channelling complete
+		owner.link = null;
+		return false;
 	}
 
-	owner.body.applyLinearImpulse(
-		vector.relengthen(diff, owner.link.selfFactor * strength * owner.body.getMass()),
-		owner.body.getWorldPoint(vectorZero), true);
+	const link = owner.link;
+	const minDistance = link.minDistance;
+	const maxDistance = link.maxDistance;
 
-	if (target.category === "hero") {
+	const outward = vector.diff(target.body.getPosition(), owner.body.getPosition());
+	const distance = outward.length();
+	const impulsePerTick = link.impulsePerTick * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
+	if (impulsePerTick > 0) {
+		owner.body.applyLinearImpulse(
+			vector.relengthen(outward, link.selfFactor * impulsePerTick),
+			owner.body.getWorldPoint(vectorZero), true);
+
 		target.body.applyLinearImpulse(
-			vector.relengthen(vector.negate(diff), owner.link.targetFactor * strength * target.body.getMass()),
+			vector.relengthen(outward, link.targetFactor * impulsePerTick).neg(),
+			target.body.getWorldPoint(vectorZero), true);
+	}
+
+	if (link.sidewaysImpulsePerTick > 0 && owner.target) {
+		const toCursor = vector.diff(owner.target, target.body.getPosition());
+		const toRight = vector.rotateRight(outward);
+		const sideways = Math.abs(pl.Vec2.dot(toRight, toCursor) / toRight.length() / toCursor.length());
+
+		target.body.applyLinearImpulse(
+			vector.relengthen(toCursor, sideways * link.sidewaysImpulsePerTick),
 			target.body.getWorldPoint(vectorZero), true);
 	}
 
@@ -3398,21 +3409,25 @@ function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: Focu
 		hero.focusIds.set(spell.id, focus.id);
 	}
 
-	let done = false;
-
 	const focusId = hero.focusIds.get(spell.id);
 	const focus = world.objects.get(focusId);
-	if (focus && focus.category === "projectile") {
-		if (spell.release && hero.casting.releaseTick) {
-			done = true;
 
-			if (spell.releaseBehaviours) {
-				focus.target = hero.target;
-				instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
-			}
-		}
-	} else {
+	let done: boolean;
+	if (spell.release && hero.casting.releaseTick) {
 		done = true;
+
+		if (spell.releaseBehaviours && focus && focus.category === "projectile") {
+			focus.target = hero.target;
+			instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
+		}
+	} else if (focus && focus.category === "projectile") {
+		// Not done - still focusing projectile
+		done = false;
+	} else {
+		// Projectile gone, but unreleased - wait until max channelling time
+		const cutoff = spell.maxChannellingTicks || 0;
+		const currentLength = world.tick - hero.casting.channellingStartTick;
+		done = currentLength >= cutoff;
 	}
 
 	if (done) {

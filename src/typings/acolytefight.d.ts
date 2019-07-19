@@ -311,6 +311,7 @@ declare interface FocusSpell extends SpellBase {
 
 	focusDelaysCooldown?: boolean; // Whether to delay the cooldown until focusing is complete
 	releaseBehaviours?: BehaviourTemplate[]; // Add these behaviours to the projectile when button is released. Must also specify the release property so the UI sends the release signal.
+	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
 }
 
 declare interface ProjectileTemplate extends DamagePacketTemplate {
@@ -815,16 +816,18 @@ declare interface KeyBindings {
 declare interface LinkParameters {
 	linkWith: number; // Categories of object to link to
 
-	selfFactor?: number; // How much should the link pull the hero
-	targetFactor?: number; // How much should the link pull the target
+	selfFactor?: number; // How much should the link pull the hero towards the target
+	targetFactor?: number; // How much should the link pull the target towards the hero
 
 	impulsePerTick: number;
+	sidewaysImpulsePerTick?: number; // How much should the link pull the target sideways
+
 	linkTicks: number;
 	minDistance: number;
 	maxDistance: number;
 
 	redirectDamage?: RedirectDamageParameters;
-	instantRecast?: boolean; // If still linked, can immediately cast another link
+	channelling?: boolean;
 
 	render?: RenderLink;
 }
