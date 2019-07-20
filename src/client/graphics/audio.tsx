@@ -10,7 +10,6 @@ const RefDistance = 0.1;
 let env: AudioEnvironment = null;
 let attached = new Map<string, AudioSource>();
 let unattached = new Map<string, AudioSource>();
-let nextUnattachedId = 0;
 
 interface AudioEnvironment {
     ctx: AudioContext;
