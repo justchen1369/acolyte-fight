@@ -1110,7 +1110,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
@@ -1133,7 +1133,7 @@ const grapple: Spell = {
         link: {
             linkWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
             selfFactor: 1,
-            targetFactor: 0.5,
+            targetFactor: 0.25,
             impulsePerTick: 0.00002,
             sidewaysImpulsePerTick: 0.000017,
             minDistance: 0.025,
