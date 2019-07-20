@@ -1104,7 +1104,7 @@ const link: Spell = {
 };
 const grapple: Spell = {
     id: 'grapple',
-    description: "Hold the button to grapple. Move your cursor to swing Grapple around. Throw your enemies around and throw them into the void! But don't get hit - that will interrupt your grapple!",
+    description: "Hold the button to grapple. Move your cursor to swing Grapple around. Throw your enemies around and throw them into the void!",
     action: "focus",
 
     color: '#f02',
@@ -1115,10 +1115,6 @@ const grapple: Spell = {
     throttle: false,
     unlink: true,
 
-    strikeCancel: {
-        cooldownTicks: 1 * TicksPerSecond,
-    },
-
     release: {},
     maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
@@ -1127,8 +1123,8 @@ const grapple: Spell = {
         density: 1,
         knockbackScaling: false,
         radius: 0.003,
-        speed: 0.6,
-        maxTicks: 1 * TicksPerSecond,
+        speed: 0.8,
+        maxTicks: 40,
         damage: 0,
         collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1177,7 +1173,7 @@ const grapple: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 30 },
+                trigger: { afterTicks: 20 },
                 targetType: HomingTargets.self,
             },
             { type: "expireOnOwnerDeath" },
