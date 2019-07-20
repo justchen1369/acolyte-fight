@@ -1114,6 +1114,8 @@ const grapple: Spell = {
     throttle: false,
     unlink: true,
 
+    chargeTicks: 6,
+
     release: {},
     maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
@@ -1121,9 +1123,9 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.005,
-        speed: 0.6,
-        maxTicks: 60,
+        radius: 0.003,
+        speed: 1,
+        maxTicks: 15,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1177,11 +1179,6 @@ const grapple: Spell = {
         ],
 
         behaviours: [
-            {
-                type: "homing",
-                trigger: { afterTicks: 30 },
-                targetType: HomingTargets.self,
-            },
             { type: "expireOnOwnerDeath" },
             { type: "expireOnChannellingEnd" },
         ],
@@ -1189,7 +1186,7 @@ const grapple: Spell = {
         sound: "grapple",
         color: '#f02',
         renderers: [
-            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
                 color: '#f02',
