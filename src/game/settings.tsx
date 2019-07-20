@@ -1120,15 +1120,16 @@ const grapple: Spell = {
     },
 
     release: {},
-    maxChannellingTicks: 1.5 * TicksPerSecond, // projectile time + link time
+    maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
 
     projectile: {
         density: 1,
         knockbackScaling: false,
         radius: 0.003,
-        speed: 0.8,
-        maxTicks: 0.4 * TicksPerSecond,
+        speed: 0.6,
+        strafe: {},
+        maxTicks: 1 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1175,6 +1176,13 @@ const grapple: Spell = {
         ],
 
         behaviours: [
+            {
+                type: "homing",
+                trigger: { afterTicks: 25 },
+                targetType: HomingTargets.self,
+                newSpeed: 0.4,
+                redirect: true,
+            },
             { type: "expireOnOwnerDeath" },
             { type: "expireOnChannellingEnd" },
         ],
