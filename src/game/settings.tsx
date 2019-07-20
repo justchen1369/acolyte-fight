@@ -732,7 +732,7 @@ const retractor: Spell = {
         {
             type: "homing",
             targetType: "cursor",
-            newSpeed: 0.2,
+            newSpeed: 0.3,
             revolutionsPerSecond: 1,
             redirect: true,
         },
@@ -741,7 +741,7 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         lifeSteal: 0.2,
-        density: 6,
+        density: 15,
         radius: 0.007,
         speed: 0.3,
         maxTicks: 2.0 * TicksPerSecond,
@@ -791,8 +791,8 @@ const retractor: Spell = {
                 selfColor: true,
             },
             { type: "projectile", ticks: 1, glow: 0.2, selfColor: true },
-            { type: "ray", ticks: 10, glow: 0.2, vanish: 0.25, selfColor: true },
-            { type: "strike", ticks: 10, glow: true, numParticles: 9, selfColor: true },
+            { type: "ray", ticks: 15, glow: 0.2, vanish: 0.25, selfColor: true },
+            { type: "strike", ticks: 15, glow: true, numParticles: 9, selfColor: true },
         ],
     },
 };
