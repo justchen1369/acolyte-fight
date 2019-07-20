@@ -234,7 +234,10 @@ function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - 
         } else if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
             return castOrMove(hero, { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) });
-        } else if (hero.casting.spellId === "halo") {
+        } else if (hero.casting.spellId === "grapple") {
+            // Throw away
+            return castOrMove(hero, { spellId: hero.casting.spellId, release: true, target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) });
+        }  else if (hero.casting.spellId === "halo") {
             return castOrMove(hero, { spellId: "move", target: opponent.pos });
         } else {
             return castOrMove(hero, { spellId: "retarget", target: opponent.pos });
