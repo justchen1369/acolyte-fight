@@ -732,7 +732,7 @@ const retractor: Spell = {
         {
             type: "homing",
             targetType: "cursor",
-            newSpeed: 0.1,
+            newSpeed: 0.2,
             revolutionsPerSecond: 1,
             redirect: true,
         },
@@ -743,7 +743,7 @@ const retractor: Spell = {
         lifeSteal: 0.2,
         density: 6,
         radius: 0.007,
-        speed: 0.1,
+        speed: 0.3,
         maxTicks: 2.0 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
@@ -769,8 +769,8 @@ const retractor: Spell = {
         behaviours: [
             {
                 type: "accelerate",
-                maxSpeed: 1,
-                accelerationPerSecond: 1.25,
+                maxSpeed: 1.2,
+                accelerationPerSecond: 0.6,
             }
         ],
 
