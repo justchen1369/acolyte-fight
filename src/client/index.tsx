@@ -33,6 +33,7 @@ import * as url from './url';
 import * as userAgent from './core/userAgent';
 
 import { base } from './url';
+import { Sounds } from '../game/sounds';
 import Root from './ui/root';
 
 export async function initialize() {
@@ -74,6 +75,8 @@ export async function initialize() {
 
     seen.loadSeenVersion(); // Don't bother awaiting
     storage.cleanupGameStats();
+
+    audio.cache(Sounds); // Don't bother awaiting
 }
 
 async function loadDependencies() {

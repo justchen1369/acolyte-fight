@@ -5,19 +5,38 @@ import { AudioElement } from './render.model';
 
 export { AudioElement } from './render.model';
 
+// Constants
+const SampleRate = 44100;
+
 const Z = -0.1;
 const RefDistance = 0.1;
+
+// Globals
 let env: AudioEnvironment = null;
 let attached = new Map<string, AudioSource>();
 let unattached = new Map<string, AudioSource>();
 
-interface AudioEnvironment {
+// Caches
+const biteCache = new Map<SoundBite, SoundBiteCacheItem>();
+let cacheAge = 0;
+let brownNoise: AudioBuffer = null;
+
+interface OutputEnvironment {
+    ctx: BaseAudioContext;
+    next: AudioNode;
+}
+
+interface AudioEnvironment extends OutputEnvironment {
     ctx: AudioContext;
     final: AudioNode;
     next: AudioNode;
     recordingDestination: MediaStreamAudioDestinationNode;
-    brownNoise: AudioBuffer;
     locked: boolean;
+}
+
+interface SoundBiteCacheItem {
+    buffer: AudioBuffer;
+    creationAge: number;
 }
 
 interface AudioRef {
@@ -115,35 +134,109 @@ class AudioSource {
     }
 }
 
+function getAudioContextConstructor(): any {
+    return ((window as any).AudioContext || (window as any).webkitAudioContext);
+}
+
+function getOfflineAudioContextConstructor(): any {
+    return ((window as any).OfflineAudioContext || (window as any).webkitOfflineAudioContext);
+}
+
 export function init() {
-    const audioContextConstructor = ((window as any).AudioContext || (window as any).webkitAudioContext);
-    if (audioContextConstructor) {
-        const ctx = new audioContextConstructor() as AudioContext;
-        const brownNoise = generateBrownNoise(ctx);
+    const AudioContext = getAudioContextConstructor();
+    if (!AudioContext) {
+        return;
+    }
 
-        ctx.listener.setPosition(0.5, 0.5, 0);
-        ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
+    const params: AudioContextOptions = {
+        sampleRate: SampleRate,
+    };
+    const ctx = new AudioContext(params) as AudioContext;
 
-        let next: AudioNode = ctx.destination;
+    ctx.listener.setPosition(0.5, 0.5, 0);
+    ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
 
-        const compressor = ctx.createDynamicsCompressor();
-        const final = compressor;
-        compressor.connect(next);
-        next = compressor;
+    let next: AudioNode = ctx.destination;
 
-        const masterVolume = ctx.createGain();
-        masterVolume.connect(next);
-        masterVolume.gain.value = 0.5;
-        next = masterVolume;
+    const compressor = ctx.createDynamicsCompressor();
+    const final = compressor;
+    compressor.connect(next);
+    next = compressor;
 
-        env = {
-            ctx,
-            final,
-            next,
-            brownNoise,
-            recordingDestination: null,
-            locked: true,
+    const masterVolume = ctx.createGain();
+    masterVolume.connect(next);
+    masterVolume.gain.value = 0.5;
+    next = masterVolume;
+
+    env = {
+        ctx,
+        final,
+        next,
+        recordingDestination: null,
+        locked: true,
+    };
+}
+
+export async function cache(sounds: Sounds) {
+    const MaxAge = 10; // Haven't used in 10 games, delete
+
+    const OfflineAudioContext = getOfflineAudioContextConstructor();
+    if (!OfflineAudioContext) {
+        console.log("Cannot cache audio - OfflineAudioContext not available");
+        return;
+    }
+
+    const start = Date.now();
+    
+    const bites = new Array<SoundBite>();
+    for (const id in sounds) {
+        const sound = sounds[id];
+        if (sound.start) {
+            bites.push(...sound.start);
+        }
+        if (sound.sustain) {
+            bites.push(...sound.sustain);
+        }
+    }
+
+    const creationAge = cacheAge++;
+    for (const bite of bites) {
+        const item = biteCache.get(bite);
+        if (item) {
+            item.creationAge = creationAge;
+            continue;
+        }
+
+        const buffer = await bufferSoundBite(bite);
+        if (buffer) {
+            biteCache.set(bite, { buffer, creationAge });
+        }
+    }
+
+    // Delete old sound bites
+    const cutoff = creationAge - MaxAge;
+    biteCache.forEach((item, key) => {
+        if (item.creationAge <= cutoff) {
+            biteCache.delete(key);
+        }
+    });
+
+    console.log(`Audio caching completed in ${(Date.now() - start).toFixed(0)} ms`);
+}
+
+async function bufferSoundBite(bite: SoundBite) {
+    try {
+        const OfflineAudioContext = getOfflineAudioContextConstructor();
+        const offlineCtx = new OfflineAudioContext(1, bite.stopTime * SampleRate, SampleRate);
+        const offlineEnv: OutputEnvironment = {
+            ctx: offlineCtx,
+            next: offlineCtx.destination,
         };
+        playSoundBite(bite, null, offlineEnv);
+        return await offlineCtx.startRendering();
+    } catch (exception) {
+        console.error("Unable to buffer sound bite", exception);
+        return null;
     }
 }
 
@@ -228,7 +321,7 @@ function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[]
     return keep;
 }
 
-function generateBrownNoise(ctx: AudioContext) {
+function generateBrownNoise(ctx: BaseAudioContext) {
 	const bufferSize = 10 * ctx.sampleRate;
 	const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
 	const output = noiseBuffer.getChannelData(0);
@@ -243,7 +336,7 @@ function generateBrownNoise(ctx: AudioContext) {
 	return noiseBuffer;
 }
 
-function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: AudioEnvironment): AudioRef {
+function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironment): AudioRef {
     let next: AudioNode = env.next;
     const nodes = new Array<AudioNode>();
 
@@ -254,14 +347,22 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: AudioEnvironme
     }
 
     const volume = next = createVolumeNode(env, nodes, next);
-    next = createAttackDecayNode(bite, env, nodes, next);
-    next = createTremoloNode(bite, env, nodes, next);
-    next = createHighPassNode(bite, env, nodes, next);
-    next = createLowPassNode(bite, env, nodes, next);
 
-    createSource(bite, env, nodes, next, () => {
-        nodes.forEach(node => node.disconnect());
-    });
+    const cacheItem = biteCache.get(bite);
+    if (cacheItem) {
+        replayBuffer(cacheItem.buffer, env, nodes, next, () => {
+            nodes.forEach(node => node.disconnect());
+        });
+    } else {
+        next = createAttackDecayNode(bite, env, nodes, next);
+        next = createTremoloNode(bite, env, nodes, next);
+        next = createHighPassNode(bite, env, nodes, next);
+        next = createLowPassNode(bite, env, nodes, next);
+
+        createSource(bite, env, nodes, next, () => {
+            nodes.forEach(node => node.disconnect());
+        });
+    }
 
     return {
         panner,
@@ -270,7 +371,7 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: AudioEnvironme
     };
 }
 
-function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode): PannerNode {
+function createPannerNode(pos: pl.Vec2, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode): PannerNode {
     const pan = env.ctx.createPanner();
     pan.panningModel = 'HRTF';
     pan.distanceModel = 'inverse';
@@ -282,7 +383,7 @@ function createPannerNode(pos: pl.Vec2, env: AudioEnvironment, nodes: AudioNode[
     return pan;
 }
 
-function createVolumeNode(env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createVolumeNode(env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
 	const volume = env.ctx.createGain();
 	volume.gain.setValueAtTime(1, env.ctx.currentTime);
 
@@ -291,7 +392,7 @@ function createVolumeNode(env: AudioEnvironment, nodes: AudioNode[], next: Audio
     return volume;
 }
 
-function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createAttackDecayNode(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
     const t = env.ctx.currentTime;
     const startTime = bite.startTime || 0;
     const stopTime = bite.stopTime;
@@ -316,7 +417,7 @@ function createAttackDecayNode(bite: SoundBite, env: AudioEnvironment, nodes: Au
     return volume;
 }
 
-function createTremoloNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createTremoloNode(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!(bite.tremoloFreq && bite.tremoloStrength)) {
         return next;
     }
@@ -348,7 +449,7 @@ function createTremoloNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioN
     return tremoloGain;
 }
 
-function createHighPassNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createHighPassNode(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!bite.highPass) {
         return next;
     }
@@ -362,7 +463,7 @@ function createHighPassNode(bite: SoundBite, env: AudioEnvironment, nodes: Audio
     return highPass;
 }
 
-function createLowPassNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createLowPassNode(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
     if (!bite.lowPass) {
         return next;
     }
@@ -376,7 +477,7 @@ function createLowPassNode(bite: SoundBite, env: AudioEnvironment, nodes: AudioN
     return lowPass;
 }
 
-function createNormalizer(divisor: number, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode) {
+function createNormalizer(divisor: number, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode) {
     const normalizer = env.ctx.createGain();
     normalizer.gain.value = 1 / divisor;
     normalizer.connect(next);
@@ -384,7 +485,7 @@ function createNormalizer(divisor: number, env: AudioEnvironment, nodes: AudioNo
     return normalizer;
 }
 
-function createSource(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[], next: AudioNode, onEnded: () => void) {
+function createSource(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode, onEnded: () => void) {
     const ctx = env.ctx;
     const t = ctx.currentTime;
 
@@ -392,8 +493,11 @@ function createSource(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[]
     const stopTime = bite.stopTime;
 
 	if (bite.wave === "brown-noise") {
-		var noise = ctx.createBufferSource();
-		noise.buffer = env.brownNoise;
+        var noise = ctx.createBufferSource();
+        if (!brownNoise) {
+            brownNoise = generateBrownNoise(ctx);
+        }
+		noise.buffer = brownNoise;
 
 		noise.start(t + startTime);
         noise.stop(t + stopTime);
@@ -437,7 +541,19 @@ function createSource(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[]
     }
 }
 
-function createFrequencyModulator(bite: SoundBite, env: AudioEnvironment, nodes: AudioNode[]) {
+function replayBuffer(buffer: AudioBuffer, env: OutputEnvironment, nodes: AudioNode[], next: AudioNode, onEnded: () => void) {
+    const ctx = env.ctx;
+
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.onended = onEnded;
+    source.connect(next);
+
+    nodes.push(source);
+    source.start();
+}
+
+function createFrequencyModulator(bite: SoundBite, env: OutputEnvironment, nodes: AudioNode[]) {
     const ctx = env.ctx;
     const t = ctx.currentTime;
 

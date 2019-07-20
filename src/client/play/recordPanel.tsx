@@ -33,6 +33,7 @@ interface Props {
     recordId: string;
     server: string;
     mute: boolean;
+    sounds: Sounds;
 }
 interface State {
     top: number;
@@ -50,6 +51,7 @@ function stateToProps(state: s.State): Props {
         recordId: state.current.recordId,
         server: state.current.server,
         mute: state.options.mute,
+        sounds: state.world.settings.Sounds,
     };
 }
 
@@ -164,7 +166,10 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 return;
             }
 
+            const audioCaching = audio.cache(this.props.sounds);
             const replay = await replays.getReplay(this.props.recordId, this.props.server);
+
+            await audioCaching;
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
 
