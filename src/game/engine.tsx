@@ -2698,10 +2698,10 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	if (link.sidewaysImpulsePerTick > 0 && owner.target) {
 		const toCursor = vector.diff(owner.target, target.body.getPosition());
 		const toRight = vector.rotateRight(outward);
-		const sideways = Math.abs(pl.Vec2.dot(toRight, toCursor) / toRight.length() / toCursor.length());
+		const sidewaysMagnitude = pl.Vec2.dot(toRight, toCursor) / toRight.length() / toCursor.length();
 
 		target.body.applyLinearImpulse(
-			vector.relengthen(toCursor, sideways * link.sidewaysImpulsePerTick),
+			vector.relengthen(toRight, sidewaysMagnitude * link.sidewaysImpulsePerTick),
 			target.body.getWorldPoint(vectorZero), true);
 	}
 
