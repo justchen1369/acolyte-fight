@@ -1110,7 +1110,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
@@ -1121,9 +1121,9 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.005,
-        speed: 0.8,
-        maxTicks: 40,
+        radius: 0.003,
+        speed: 0.6,
+        maxTicks: 60,
         damage: 0,
         collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1172,7 +1172,7 @@ const grapple: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 20 },
+                trigger: { afterTicks: 30 },
                 targetType: HomingTargets.self,
             },
             { type: "expireOnOwnerDeath" },
