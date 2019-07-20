@@ -1121,7 +1121,7 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.003,
+        radius: 0.005,
         speed: 0.8,
         maxTicks: 40,
         damage: 0,
