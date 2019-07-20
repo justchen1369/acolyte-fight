@@ -1128,7 +1128,6 @@ const grapple: Spell = {
         knockbackScaling: false,
         radius: 0.003,
         speed: 0.6,
-        strafe: {},
         maxTicks: 1 * TicksPerSecond,
         damage: 0,
         collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
@@ -1178,10 +1177,8 @@ const grapple: Spell = {
         behaviours: [
             {
                 type: "homing",
-                trigger: { afterTicks: 25 },
+                trigger: { afterTicks: 30 },
                 targetType: HomingTargets.self,
-                newSpeed: 0.4,
-                redirect: true,
             },
             { type: "expireOnOwnerDeath" },
             { type: "expireOnChannellingEnd" },
