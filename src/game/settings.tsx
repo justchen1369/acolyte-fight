@@ -1135,7 +1135,7 @@ const grapple: Spell = {
             selfFactor: 1,
             targetFactor: 0.25,
             impulsePerTick: 0.00002,
-            sidewaysImpulsePerTick: 0.000017,
+            sidewaysImpulsePerTick: 0.00002,
             minDistance: 0.025,
             maxDistance: 0.075,
             linkTicks: 1 * TicksPerSecond,
@@ -1165,7 +1165,7 @@ const grapple: Spell = {
                 type: "glide",
                 maxTicks: 1 * TicksPerSecond,
                 linkVictim: true,
-                linearDampingMultiplier: 0,
+                linearDampingMultiplier: 0.7,
             },
         ],
 
@@ -1186,8 +1186,8 @@ const grapple: Spell = {
             {
                 type: "link",
                 color: '#f02',
-                width: 1.5 * Pixel,
-                toWidth: 3 * Pixel,
+                width: 1 * Pixel,
+                toWidth: 5 * Pixel,
                 glow: 0.2,
                 shine: 0.25,
             },
