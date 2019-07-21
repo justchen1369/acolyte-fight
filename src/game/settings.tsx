@@ -1344,7 +1344,7 @@ const drain: Spell = {
             { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 15, vanish: 1 },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1 },
-            { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4 },
+            { type: "strike", ticks: 30, growth: 2, glow: true, numParticles: 4, particleBloom: 0.02 },
         ],
     },
 };
