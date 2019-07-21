@@ -524,7 +524,7 @@ const kamehameha: Spell = {
         sound: "kamehameha",
         color: '#ffffff',
         renderers: [
-            { type: "ray", intermediatePoints: true, ticks: 60, glow: 0.1, vanish: 1 },
+            { type: "ray", intermediatePoints: true, ticks: 60, glow: 0.1, bloom: 0.01 },
         ],
     },
 };
