@@ -955,7 +955,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 10,
+    chargeTicks: 6,
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
@@ -972,6 +972,7 @@ const whip: Spell = {
                 particleRadius: Hero.Radius,
                 shine: 0.5,
                 glow: 0.2,
+                bloom: 0.02,
                 vanish: 1,
                 decay: true,
             },
