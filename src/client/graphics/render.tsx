@@ -1108,7 +1108,7 @@ function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.V
 		max: HeroColors.EaseTicks,
 		fillStyle: heroColor(hero.id, world),
 		shine: 0.5,
-		glow: DefaultGlow,
+		glow: 0.05,
 		bloom: DefaultBloomRadius,
 		vanish: 1,
 	});
