@@ -1557,6 +1557,23 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			maxRadius: shield.extent * scale,
 			feather,
 		});
+
+		if (feather) {
+			glx.circle(ctxStack, pos, {
+				color,
+				maxRadius: 0,
+				feather,
+			});
+
+			for (let i = 0; i < shield.points.length; ++i) {
+				const point = vector.turnVectorBy(shield.points[i], angle).add(pos);
+				glx.circle(ctxStack, point, {
+					color,
+					maxRadius: 0,
+					feather,
+				});
+			}
+		}
 	} else if (shield.type === "saber") {
 		const hero = world.objects.get(shield.owner);
 		if (!(hero && hero.category === "hero")) {

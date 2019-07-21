@@ -755,6 +755,7 @@ declare interface ShieldSpell extends SpellBase {
 	damageMultiplier: number;
 	blocksTeleporters: boolean;
 	glow?: number;
+	bloom?: number;
 }
 
 declare interface ReflectSpell extends ShieldSpell {

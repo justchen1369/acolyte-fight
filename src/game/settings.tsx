@@ -2023,7 +2023,8 @@ const shield: Spell = {
     icon: "shieldReflect",
 
     color: '#3366ff',
-    glow: 0.25,
+    glow: 0.1,
+    bloom: 0.03,
 
     action: "shield",
     sound: "shield",
@@ -2056,7 +2057,8 @@ const icewall: Spell = {
     icon: "woodenFence",
 
     color: '#0088ff',
-    glow: 0.25,
+    glow: 0.1,
+    bloom: 0.02,
 
     action: "wall",
     sound: "icewall",

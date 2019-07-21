@@ -259,6 +259,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		radius: spell.radius,
 		color: spell.color,
 		glow: spell.glow,
+		bloom: spell.bloom,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -306,6 +307,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		color: spell.color,
 		selfColor: spell.selfPassthrough,
 		glow: spell.glow,
+		bloom: spell.bloom,
 	};
 
 	world.objects.set(shield.id, shield);
