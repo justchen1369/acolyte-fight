@@ -837,6 +837,14 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 		scale *= 1 - easeMultiplier;
 	}
 
+	let feather: r.FeatherConfig = null;
+	if (fill.glow && options.rtx >= r.GraphicsLevel.Normal) {
+		feather = {
+			sigma: fill.bloom !== undefined ? fill.bloom : HeroColors.GlowRadius,
+			alpha: fill.glow,
+		};
+	}
+
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
@@ -851,9 +859,11 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 		if (fill.shadow) {
 			drawPos = drawPos.clone().add(ShadowOffset);
 		}
+
 		glx.convex(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
 			maxRadius: 1,
+			feather,
 		});
 	} else if (shape.type === "arc") {
 		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
@@ -873,10 +883,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 			color,
 			minRadius: scale * (shape.radius - radialExtent),
 			maxRadius: scale * (shape.radius + radialExtent),
-			feather: fill.glow && options.rtx >= r.GraphicsLevel.Normal ? {
-				sigma: HeroColors.GlowRadius,
-				alpha: fill.glow,
-			} : null,
+			feather,
 		});
 	} else if (shape.type === "circle") {
 		let radius = shape.radius;
@@ -894,6 +901,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 		glx.circle(ctxStack, drawPos, {
 			color,
 			maxRadius: scale * radius,
+			feather,
 		});
 	}
 }
