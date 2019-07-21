@@ -525,7 +525,7 @@ const kamehameha: Spell = {
         sound: "kamehameha",
         color: '#ffffff',
         renderers: [
-            { type: "ray", intermediatePoints: true, ticks: 60, glow: 0.1, bloom: 0.01 },
+            { type: "ray", intermediatePoints: true, ticks: 60, glow: 0.2, bloom: 0.01 },
         ],
     },
 };
@@ -940,7 +940,7 @@ const rocket: Spell = {
         renderers: [
             { type: "bloom", ownerColor: true, radius: 0.028 },
             { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.028, minRadius: 0.024, usePartialDamageMultiplier: true },
-            { type: "projectile", ticks: 5, glow: 0.1, smoke: 0.5, ownerColor: true },
+            { type: "projectile", ticks: 5, glow: 0.2, smoke: 0.5, ownerColor: true },
             { type: "strike", ticks: 20, glow: true, ownerColor: true, numParticles: 9 },
         ],
     },
@@ -973,7 +973,7 @@ const whip: Spell = {
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius,
                 shine: 0.5,
-                glow: 0.1,
+                glow: 0.2,
                 bloom: 0.03,
                 vanish: 1,
                 decay: true,
@@ -1021,7 +1021,7 @@ const whip: Spell = {
                 vanish: 1,
                 glow: 0.05,
             },
-            { type: "link", color: '#fffcb1', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.25 },
+            { type: "link", color: '#fffcb1', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.2 },
             { type: "strike", ticks: 30, glow: true, numParticles: 7 },
         ],
     },
@@ -1112,7 +1112,7 @@ const link: Spell = {
                 color: '#4444ff',
                 width: 2.5 * Pixel,
                 toWidth: 5 * Pixel,
-                glow: 0.1,
+                glow: 0.2,
                 shine: 0.25,
             },
         ],
@@ -1302,7 +1302,7 @@ const repeater: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "projectile", ticks: 18, noPartialRadius: true },
-            { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.1, radiusMultiplier: 0.25 },
+            { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.2, radiusMultiplier: 0.25 },
             { type: "strike", ticks: 18, glow: true, growth: 1, numParticles: 5 },
         ],
     },
@@ -1362,7 +1362,7 @@ const renderGravity: RenderSwirl = {
     numParticles: 3,
     particleRadius: 0.02 / 3,
 
-    glow: 0.1,
+    glow: 0.2,
     shine: 0.4,
     vanish: 0.5,
     bloom: 0.04,
@@ -1611,7 +1611,7 @@ const halo: Spell = {
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius,
                 shine: 0.5,
-                glow: 0.1,
+                glow: 0.2,
                 vanish: 1,
                 decay: true,
             },
@@ -1879,7 +1879,7 @@ const horcrux: Spell = {
             { type: "bloom" },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1, shine: 0 },
-            { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
+            { type: "projectile", ticks: 10, glow: 0.2, smoke: 0.3 },
             { type: "strike", ticks: 10, glow: true, growth: 1.25, numParticles: 5 },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.5)', radius: 0.04, minRadius: 0.03, shrinkTicks: 10, startingTicks: 10 },
             {
@@ -1887,7 +1887,7 @@ const horcrux: Spell = {
                 color: 'rgba(255, 255, 255, 0.1)',
                 width: 1 * Pixel,
                 toWidth: 2 * Pixel,
-                glow: 0.1,
+                glow: 0.2,
             },
         ],
     },
@@ -2028,7 +2028,7 @@ const shield: Spell = {
     icon: "shieldReflect",
 
     color: '#3366ff',
-    glow: 0.1,
+    glow: 0.2,
     bloom: 0.03,
 
     action: "shield",
@@ -2062,7 +2062,7 @@ const icewall: Spell = {
     icon: "woodenFence",
 
     color: '#0088ff',
-    glow: 0.1,
+    glow: 0.2,
     bloom: 0.02,
 
     action: "wall",
@@ -2189,7 +2189,7 @@ const swap: Spell = {
                 loopTicks: 15,
                 glow: 0.05,
             },
-            { type: "link", color: '#75e7ff', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.25 },
+            { type: "link", color: '#75e7ff', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.2 },
             { type: "strike", color: '#75e7ff', glow: true, ticks: 15, numParticles: 9 },
         ],
     },

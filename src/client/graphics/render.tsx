@@ -28,7 +28,9 @@ const DefaultBloomRadius = 0.03;
 const DefaultParticleBloomRadius = 0.015;
 
 const DefaultShine = 0.5;
-const DefaultGlow = 0.1;
+const DefaultGlow = 0.2;
+
+const DefaultCastingGlow = 0.1;
 
 const ShadowOffset = pl.Vec2(0, 0.005);
 const ShadowFeatherRadius = 0.001;
@@ -1282,7 +1284,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			maxRadius: radius + ChargingIndicator.MinWidth,
 			feather: {
 				sigma: DefaultBloomRadius,
-				alpha: DefaultGlow,
+				alpha: DefaultCastingGlow,
 			},
 		});
 	} else if (hero.uiCastTrail) {
@@ -1294,7 +1296,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 				maxRadius: 0,
 				feather: {
 					sigma: radius + proportion * DefaultBloomRadius,
-					alpha: hero.uiCastTrail.glow !== undefined ? hero.uiCastTrail.glow : DefaultGlow,
+					alpha: hero.uiCastTrail.glow !== undefined ? hero.uiCastTrail.glow : DefaultCastingGlow,
 				},
 			});
 		}
