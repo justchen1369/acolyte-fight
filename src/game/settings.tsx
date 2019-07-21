@@ -1182,7 +1182,7 @@ const grapple: Spell = {
                 type: "glide",
                 maxTicks: 1 * TicksPerSecond,
                 linkVictim: true,
-                linearDampingMultiplier: 0.9,
+                linearDampingMultiplier: 0.5,
             },
             {
                 collideWith: Categories.Obstacle,
