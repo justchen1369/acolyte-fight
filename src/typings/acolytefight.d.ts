@@ -528,7 +528,8 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 
 	ticks: number; // How long is the trail?
-	glow?: number; // How much alpha to apply to the glow
+	glow?: number; // How much alpha to apply to the bloom
+	bloom?: number; // How much radius to give the bloom
 	shine?: number; // Lighten the trail initially
 	fade?: string; // Fade towards this color
 	vanish?: number; // Fade away the trail until it is transparent - 1 means fade it all away, 0 means do nothing
@@ -544,6 +545,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	vanish?: number;
 	smoke?: number;
 	glow?: number;
+	bloom?: number;
 	shine?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
@@ -561,6 +563,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	vanish?: number;
 	smoke?: number;
 	glow?: number;
+	bloom?: number;
 	shine?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
@@ -593,6 +596,7 @@ declare interface RenderLink extends RenderParamsBase {
 	toWidth?: number;
 	shine?: number;
 	glow?: number;
+	bloom?: number;
 
 	redirectGrowth?: number;
 	redirectFlash?: boolean;
@@ -611,7 +615,8 @@ declare interface RenderReticule extends RenderParamsBase {
 	minRadius: number;
 	radius: number;
 	usePartialDamageMultiplier?: boolean;
-	glow?: boolean;
+	glow?: number;
+	bloom?: number;
 }
 
 declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
@@ -794,6 +799,8 @@ declare interface SaberSpell extends ShieldSpell {
 	collidesWith: number;
 
 	shine?: number;
+	bloom?: number;
+	glow?: number;
 	trailTicks: number;
 }
 

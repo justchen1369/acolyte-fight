@@ -1527,7 +1527,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	let feather: r.FeatherConfig = null;
 	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
 		feather = {
-			sigma: HeroColors.GlowRadius,
+			sigma: shield.bloom !== undefined ? shield.bloom : HeroColors.GlowRadius,
 			alpha: shield.glow,
 		};
 	}
@@ -1565,7 +1565,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const tip = vector.fromAngle(angle).mul(shield.length).add(pos);
 		glx.line(ctxStack, pos, tip, {
 			color,
-			minRadius: hero.radius,
+			minRadius: 0,
 			maxRadius: shield.width,
 			feather,
 		});
@@ -1768,10 +1768,20 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 		color.fade(proportion);
 	}
 
+	let feather: r.FeatherConfig = null;
+	if (reticule.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
+		const bloom = reticule.bloom !== undefined ? reticule.bloom : DefaultBloomRadius;
+		feather = {
+			sigma: proportion * bloom,
+			alpha: reticule.glow,
+		};
+	}
+
 	glx.circle(ctxStack, pos, {
 		color,
 		minRadius: reticule.minRadius * proportion,
 		maxRadius: reticule.radius * proportion,
+		feather,
 	});
 }
 
@@ -1843,7 +1853,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		color,
 		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.High) ? {
-			sigma: HeroColors.GlowRadius,
+			sigma: render.bloom !== undefined ? render.bloom : HeroColors.GlowRadius,
 			alpha: render.glow,
 		} : null,
 	};
@@ -1885,6 +1895,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				vanish: render.vanish,
 				width: multiplier * projectile.radius * 2,
 				glow: render.glow !== undefined ? render.glow : DefaultGlow,
+				bloom: render.bloom,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1915,6 +1926,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 			fade: render.fade,
 			radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 			glow: render.glow !== undefined ? render.glow : DefaultGlow,
+			bloom: render.bloom,
 			vanish: render.vanish,
 			highlight: projectile.uiHighlight,
 			tag: projectile.id,
@@ -1945,6 +1957,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		extent: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 		shine: render.shine !== undefined ? render.shine : DefaultShine,
 		glow: render.glow,
+		bloom: render.bloom,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
 	}, world);

@@ -359,6 +359,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		points,
 		color: spell.color,
 		glow: spell.glow,
+		bloom: spell.bloom,
 
 		spellId: spell.id,
 		angleOffset,

@@ -1922,6 +1922,8 @@ const saber: Spell = {
     trailTicks: 5,
     color: '#00ccff',
     shine: 0.1,
+    glow: 0.2,
+    bloom: 0.01,
 
     sound: "saber",
     action: "saber",
@@ -1963,6 +1965,8 @@ const dualSaber: Spell = {
     trailTicks: 5,
     color: '#ff0044',
     shine: 0.1,
+    glow: 0.2,
+    bloom: 0.01,
 
     sound: "saber",
     action: "saber",
