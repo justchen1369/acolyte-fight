@@ -583,6 +583,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	fade?: string;
 	vanish?: number;
 	glow?: number;
+	bloom?: number;
 }
 
 declare interface RenderLink extends RenderParamsBase {
@@ -660,12 +661,13 @@ declare interface BuffTemplateBase {
 
 declare interface RenderBuff {
 	color: string;
-	alpha?: number;
-	shine?: number;
-	glow?: number;
-	fade?: string;
-	smoke?: number;
-	vanish?: number;
+	alpha?: number; // Semi-transparent
+	shine?: number; // Brighter initially
+	glow?: number; // How much alpha to apply to the bloom
+	bloom?: number; // Bloom radius
+	fade?: string; // Decay to this color
+	smoke?: number; // Move smoke trail
+	vanish?: number; // Decay to transparent
 	heroColor?: boolean;
 	decay?: boolean;
 	emissionRadiusFactor?: number; // 1 means smoke comes from the edges of the hero, 0 means it comes from the center

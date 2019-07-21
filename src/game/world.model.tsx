@@ -1047,7 +1047,9 @@ export interface TrailBase {
 	fade?: string; // Fade away into this color
 	vanish?: number; // Fade away into transparent
 
-	glow?: number; // Glow alpha
+	bloom?: number; // Bloom radius
+	glow?: number; // Bloom alpha
+
 	highlight?: TrailHighlight;
 	tag?: string; // Normally based on the projectile id or hero id - used to make the projectile glow on hit
 }

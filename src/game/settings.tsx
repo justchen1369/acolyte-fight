@@ -475,7 +475,7 @@ const meteorite: Spell = {
         sound: "meteorite",
         color: '#ff0066',
         renderers: [
-            { type: "bloom" },
+            { type: "bloom", radius: 0.04 },
             { type: "projectile", ticks: 10, shine: 0, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
@@ -852,7 +852,7 @@ const backlash: Spell = {
         sound: "backlash",
         color: '#00ccff',
         renderers: [
-            { type: "bloom" },
+            { type: "bloom", ownerColor: true },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
             { type: "strike", color: '#fff', ticks: 25, growth: 1.5, glow: true, numParticles: 5, speedMultiplier: -0.5, detonate: 0.02 },
@@ -1362,6 +1362,7 @@ const renderGravity: RenderSwirl = {
     glow: 0.1,
     shine: 0.4,
     vanish: 0.5,
+    bloom: 0.04,
 };
 const gravity: Spell = {
     id: 'gravity',
@@ -2110,6 +2111,7 @@ const thrust: Spell = {
                 particleRadius: Hero.Radius * 1.5,
                 glow: 0.2,
                 shine: 1,
+                bloom: 0.05,
                 decay: true,
             },
         }

@@ -393,6 +393,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			fillStyle: "white",
 			radius: hero.radius,
 			glow: 0.1,
+			bloom: 0.03,
 		}, world);
 	}
 
@@ -577,6 +578,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		fillStyle: 'white',
 		radius: ev.radius,
 		glow: 0.2,
+		bloom: 0.03,
 	}, world);
 
 	if (ev.sound) {
@@ -634,6 +636,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 				fillStyle: '#ccc',
 				shine: DefaultShine,
 				vanish: 1,
+				bloom: 0.05,
 				initialRadius: Hero.Radius,
 				finalRadius: Hero.Radius * 4,
 			}, world);
@@ -1172,6 +1175,17 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		fade: render.fade,
 		vanish: render.vanish,
 	});
+
+	if (render.bloom) {
+		glx.circle(ctxStack, pos, {
+			color: ColTuple.parse(color),
+			maxRadius: 0,
+			feather: {
+				sigma: render.bloom,
+				alpha: render.glow !== undefined ? render.glow : DefaultGlow,
+			},
+		});
+	}
 }
 
 function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
@@ -1206,8 +1220,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			minRadius: radius,
 			maxRadius: radius + ChargingIndicator.MinWidth,
 			feather: {
-				sigma: HeroColors.GlowRadius,
-				alpha: 0.5,
+				sigma: 0.03,
+				alpha: DefaultGlow,
 			},
 		});
 	} else if (hero.uiCastTrail) {
@@ -1220,8 +1234,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 				minRadius: radius + castRadius * (1 - proportion),
 				maxRadius: radius + castRadius,
 				feather: {
-					sigma: HeroColors.GlowRadius,
-					alpha: 0.5 * proportion,
+					sigma: 0.03,
+					alpha: DefaultGlow,
 				},
 			});
 		}
@@ -1680,6 +1694,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 	const velocity = swirl.smoke ? particleVelocity(context.baseVelocity, -swirl.smoke) : null;
 	
 	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
+	const fillStyle = context.color || swirl.color;
 	for (let i = 0; i < numParticles; ++i) {
 		const angle = angleOffset + (2 * Math.PI) * i / numParticles;
 		pushTrail({
@@ -1689,13 +1704,24 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			radius: multiplier * swirl.particleRadius,
 			initialTick: world.tick,
 			max: swirl.ticks, 
-			fillStyle: context.color || swirl.color,
+			fillStyle,
 			shine: swirl.shine !== undefined ? swirl.shine : DefaultShine,
 			glow: swirl.glow !== undefined ? swirl.glow : DefaultGlow,
 			vanish: swirl.vanish,
 			fade: swirl.fade,
 			tag: context.tag,
 		}, world);
+	}
+
+	if (swirl.bloom) {
+		glx.circle(ctxStack, location, {
+			color: ColTuple.parse(fillStyle),
+			maxRadius: 0,
+			feather: {
+				sigma: swirl.bloom,
+				alpha: swirl.glow !== undefined ? swirl.glow : DefaultGlow,
+			},
+		});
 	}
 }
 
@@ -1788,6 +1814,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 			pos: projectile.body.getPosition().clone(),
 			fillStyle: 'white',
 			radius: strike.detonate,
+			bloom: 0.03,
 			glow: 0.2,
 		}, world);
 	}
@@ -1995,7 +2022,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
 		feather = {
-			sigma: HeroColors.GlowRadius,
+			sigma: scale * proportion * (trail.bloom !== undefined ? trail.bloom : HeroColors.GlowRadius),
 			alpha: trail.glow,
 		};
 	}
