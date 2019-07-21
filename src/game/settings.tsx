@@ -1187,6 +1187,7 @@ const grapple: Spell = {
             {
                 collideWith: Categories.Obstacle,
                 owner: true,
+                linkOwner: true,
                 type: "movement",
                 maxTicks: 1 * TicksPerSecond,
                 movementProportion: 2,
