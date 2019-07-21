@@ -1225,22 +1225,21 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			minRadius: radius,
 			maxRadius: radius + ChargingIndicator.MinWidth,
 			feather: {
-				sigma: 0.03,
+				sigma: DefaultBloomRadius,
 				alpha: DefaultGlow,
 			},
 		});
 	} else if (hero.uiCastTrail) {
-		const castRadius = ChargingIndicator.MinWidth + ChargingIndicator.WidthPerBonus * engine.calculateScalingFromHero(hero, world);
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(0.5 * proportion);
 			glx.circle(ctxStack, pos, {
 				color: strokeColor,
-				minRadius: radius + castRadius * (1 - proportion),
-				maxRadius: radius + castRadius,
+				minRadius: radius,
+				maxRadius: radius,
 				feather: {
-					sigma: 0.03,
-					alpha: DefaultGlow,
+					sigma: DefaultBloomRadius * proportion,
+					alpha: 0.5,
 				},
 			});
 		}
