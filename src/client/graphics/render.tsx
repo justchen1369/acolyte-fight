@@ -1288,6 +1288,18 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		style.lighten(HeroColors.DamageGlowFactor * flash);
 	}
 
+	// Hit flash
+	if (flash > 0) {
+		glx.circle(ctxStack, pos, {
+			color: style,
+			maxRadius: 0,
+			feather: {
+				sigma: radius + flash * DefaultBloomRadius,
+				alpha: DefaultGlow,
+			},
+		});
+	}
+
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		const strokeColor = ColTuple.parse(hero.casting.color).alpha(hero.casting.proportion);
@@ -1303,14 +1315,14 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	} else if (hero.uiCastTrail) {
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
 		if (proportion > 0) {
-			const strokeColor = ColTuple.parse(color).alpha(0.5 * proportion);
+			const strokeColor = ColTuple.parse(color).alpha(proportion);
 			glx.circle(ctxStack, pos, {
 				color: strokeColor,
 				minRadius: radius,
 				maxRadius: radius,
 				feather: {
 					sigma: DefaultBloomRadius * proportion,
-					alpha: 0.5,
+					alpha: 0.25,
 				},
 			});
 		}
