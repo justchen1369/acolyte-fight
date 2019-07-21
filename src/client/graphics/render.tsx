@@ -25,6 +25,7 @@ const MaxDestroyedTicks = constants.TicksPerSecond;
 const AtlasAiIcon = "ai";
 
 const DefaultBloomRadius = 0.03;
+const DefaultParticleBloomRadius = 0.015;
 
 const DefaultShine = 0.5;
 const DefaultGlow = 0.1;
@@ -1898,7 +1899,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				vanish: strike.particleVanish,
 				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
 				shine: strike.particleShine,
-				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultBloomRadius,
+				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultParticleBloomRadius,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);

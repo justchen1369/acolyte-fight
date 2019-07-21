@@ -555,7 +555,7 @@ const lightning: Spell = {
         renderers: [
             { type: "bloom", radius: 0.05 },
             { type: "ray", intermediatePoints: true, ticks: 30, vanish: 0.5 },
-            { type: "strike", ticks: 30, glow: true },
+            { type: "strike", ticks: 30, glow: true, numParticles: 3, },
         ],
     },
 };
