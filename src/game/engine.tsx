@@ -1613,7 +1613,12 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
-		hero.casting = { action: action, color: spell.color, stage: w.CastStage.Cooldown, direction: vector.diff(action.target, hero.body.getPosition()) };
+		hero.casting = {
+			action: action,
+			color: spell.color,
+			stage: w.CastStage.Cooldown,
+			initialAngle: vector.angle(vector.diff(action.target, hero.body.getPosition())),
+		};
 	}
 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
@@ -3424,18 +3429,17 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 	const currentLength = world.tick - hero.casting.channellingStartTick;
 	if (currentLength < spell.lengthTicks && currentLength % spell.intervalTicks === 0) {
-		let direction = hero.casting.direction;
-		if (direction.x === 0 && direction.y === 0) {
-			direction = vector.fromAngle(hero.body.getAngle()).mul(constants.Pixel);
+		let currentAngle = hero.casting.initialAngle;
+		if (spell.revsPerTickWhileChannelling) {
+			currentAngle = hero.body.getAngle();
 		}
-
-		const currentAngle = vector.angle(direction);
 
 		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
 		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
 		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
 		const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
+		const direction = vector.fromAngle(currentAngle);
 		const jitterRadius = direction.length() * spell.jitterRatio;
 		const jitterDirection = vector.plus(direction, vector.fromAngle(newAngle).mul(jitterRadius));
 

@@ -526,7 +526,9 @@ export type Shield = Reflect | Wall | Saber;
 
 export interface CastState {
 	action: Action;
-	direction: pl.Vec2;
+
+	initialAngle: number;
+
 	stage: number;
 	uninterruptible?: boolean;
 	movementProportion?: number;

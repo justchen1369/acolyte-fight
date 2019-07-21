@@ -495,7 +495,7 @@ const kamehameha: Spell = {
     chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
-    revsPerTickWhileCharging: 0.0025,
+    revsPerTickWhileCharging: 0.01,
     revsPerTickWhileChannelling: 0.00005,
 
     strikeCancel: {
@@ -578,7 +578,6 @@ const blast: Spell = {
     },
     retarget: true,
     movementProportionWhileCharging: 0.5,
-    revsPerTickWhileChannelling: 0,
     strikeCancel: {
         cooldownTicks: 1 * TicksPerSecond,
     },
