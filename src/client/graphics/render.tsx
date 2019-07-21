@@ -1497,7 +1497,9 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 			});
 		}
 
-		hero.uiHealth += 0.025 * (hero.health - hero.uiHealth);
+		// Adjust upwards slower so lifesteal clearer
+		const adjustProportion = hero.health <= hero.uiHealth ? 0.025 : 0.01;
+		hero.uiHealth += adjustProportion * (hero.health - hero.uiHealth);
 	}
 }
 
