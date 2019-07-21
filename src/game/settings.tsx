@@ -1124,7 +1124,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
@@ -1181,7 +1181,7 @@ const grapple: Spell = {
                 type: "glide",
                 maxTicks: 1 * TicksPerSecond,
                 linkVictim: true,
-                linearDampingMultiplier: 0.5,
+                linearDampingMultiplier: 0.9,
             },
             {
                 collideWith: Categories.Obstacle,
