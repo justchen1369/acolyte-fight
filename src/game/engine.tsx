@@ -1951,6 +1951,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 		// Only cancel thrust when hitting a solid object
 		const packet = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 		applyDamageToObstacle(obstacle, packet, world);
+		obstacle.activeTick = world.tick;
 		hero.thrust.nullified = true;
 	}
 
