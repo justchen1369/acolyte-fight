@@ -911,6 +911,7 @@ const rocket: Spell = {
                         particleRadius: 0.01,
                         shine: 0.2,
                         glow: 0.2,
+                        bloom: 0.03,
                     },
                 }
             ],
@@ -1479,6 +1480,7 @@ const whirlwind: Spell = {
                     particleRadius: 0.01,
                     shine: 0.2,
                     glow: 0.2,
+                    bloom: 0.03,
                 },
             }
         ],
@@ -1783,6 +1785,7 @@ const iceBomb: Spell = {
                     particleRadius: 0.01,
                     shine: 0.2,
                     glow: 0.2,
+                    bloom: 0.03,
                 },
             }
         ],
