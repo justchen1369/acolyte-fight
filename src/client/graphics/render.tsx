@@ -933,14 +933,16 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		return;
 	}
 
-	const color = calculateObstacleColor(obstacle, params, fill, world);
-	if (fill.strikeOnly) {
+	if (fill.strikeOnly && !params.flash) {
 		// Only display on strike
-		if (params.flash > 0) {
-			color.fade(1 - params.flash);
-		} else {
-			return;
-		}
+		return;
+	}
+
+	const color = calculateObstacleColor(obstacle, params, fill, world);
+	let bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
+	if (fill.strikeOnly) {
+		color.fade(1 - params.flash);
+		bloom *= params.flash;
 	}
 
 	let scale = 1;
@@ -949,9 +951,8 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	}
 
 	const extent = shapes.getMinExtent(obstacle.shape);
-	const bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
 	let feather: r.FeatherConfig = {
-		sigma: extent + bloom,
+		sigma: extent + scale * bloom,
 		alpha: fill.glow !== undefined ? fill.glow : DefaultGlow,
 	};
 
