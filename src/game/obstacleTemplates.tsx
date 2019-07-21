@@ -23,6 +23,8 @@ export const volcano: ObstacleTemplate = {
             color: "rgba(255, 0, 128, 1)",
             particleRadius: 0.01,
             fade: "rgba(0, 0, 0, 0)",
+            bloom: 0.01,
+            glow: 0.05,
             "ticks": 30,
             "interval": 8,
             "speed": 0.1
@@ -53,10 +55,12 @@ export const slow: ObstacleTemplate = {
             type: "smoke",
             "color": "rgba(64, 255, 255, 1)",
             particleRadius: 0.002,
-            "fade": "rgba(64, 255, 255, 0)",
+            bloom: 0.01,
+            glow: 0.05,
+            vanish: 1,
             "ticks": 15,
             "interval": 4,
-            "speed": 0.05
+            "speed": 0.05,
         }
     ],
 
@@ -101,10 +105,12 @@ export const fast: ObstacleTemplate = {
             type: "smoke",
             "color": "rgba(255, 255, 64, 1)",
             particleRadius: 0.002,
-            "fade": "rgba(255, 255, 64, 0)",
+            bloom: 0.01,
+            glow: 0.05,
+            vanish: 1,
             "ticks": 15,
             "interval": 4,
-            "speed": 0.05
+            "speed": 0.05,
         }
     ],
 
@@ -150,7 +156,9 @@ export const conveyorBase: ObstacleTemplate = {
             type: "smoke",
             "color": "rgba(128, 128, 128, 1)",
             particleRadius: 0.002,
-            "fade": "rgba(0, 0, 0, 0)",
+            bloom: 0.01,
+            glow: 0.05,
+            vanish: 1,
             "ticks": 20,
             "interval": 4,
             speed: 0,

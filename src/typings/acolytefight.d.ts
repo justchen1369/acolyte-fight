@@ -136,7 +136,12 @@ declare interface SwatchSmoke {
 
 	color: string;
 	particleRadius: number;
+
+	shine?: number;
 	fade?: string;
+	glow?: number;
+	bloom?: number;
+	vanish?: number;
 
 	ticks: number;
 	interval?: number;

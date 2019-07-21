@@ -942,7 +942,11 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 		initialTick: world.tick,
 		max: smoke.ticks,
 		fillStyle: smoke.color,
+		shine: smoke.shine,
 		fade: smoke.fade,
+		glow: smoke.glow,
+		bloom: smoke.bloom,
+		vanish: smoke.vanish,
 		highlight: obstacle.uiHighlight,
 	}, world);
 }
