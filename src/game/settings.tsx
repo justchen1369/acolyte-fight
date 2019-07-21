@@ -1394,7 +1394,7 @@ const gravity: Spell = {
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
             ticks: 2 * TicksPerSecond,
-            radius: 0.05,
+            radius: 0.045,
             power: 1,
             render: renderGravity,
         },
