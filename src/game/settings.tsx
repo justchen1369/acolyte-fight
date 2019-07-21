@@ -2216,6 +2216,7 @@ const voidRush: Spell = {
                 decay: true,
                 glow: 0.2,
                 shine: 0.5,
+                bloom: 0.03,
                 vanish: 1,
             },
         },

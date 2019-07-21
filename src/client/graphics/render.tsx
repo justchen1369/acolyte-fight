@@ -619,12 +619,14 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 	const Hero = world.settings.Hero;
 	const MaxTicks = 30;
 
+	const color = heroColor(ev.heroId, world);
+
 	if (ev.fromPos) {
-		renderJumpSmoke(ctxStack, ev.fromPos, world, ev.tick);
+		renderJumpSmoke(ctxStack, color, ev.fromPos, world, ev.tick);
 	}
 
 	if (ev.toPos) {
-		renderJumpSmoke(ctxStack, ev.toPos, world, ev.tick);
+		renderJumpSmoke(ctxStack, color, ev.toPos, world, ev.tick);
 
 		if (ev.heroId === world.ui.myHeroId) {
 			// Clearly indicate yourself
@@ -652,10 +654,10 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 	}
 }
 
-function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World, initialTick: number = world.tick) {
+function renderJumpSmoke(ctxStack: CanvasCtxStack, color: string, pos: pl.Vec2, world: w.World, initialTick: number = world.tick) {
 	const Hero = world.settings.Hero;
 	const MaxTicks = 15;
-	const NumParticles = 10;
+	const NumParticles = 5;
 	const MaxSpeed = 0.05;
 
 	if (world.tick >= initialTick + MaxTicks) {
@@ -670,7 +672,9 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, pos: pl.Vec2, world: w.World,
 			radius: Hero.Radius,
 			initialTick: initialTick,
 			max: MaxTicks,
-			fillStyle: "#fff",
+			fillStyle: color,
+			bloom: 0.015,
+			glow: DefaultGlow,
 		});
 	}
 }

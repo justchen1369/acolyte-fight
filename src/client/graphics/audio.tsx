@@ -226,8 +226,10 @@ export async function cache(sounds: Sounds) {
 
 async function bufferSoundBite(bite: SoundBite) {
     try {
+        const ExtraSeconds = 0.5;
+
         const OfflineAudioContext = getOfflineAudioContextConstructor();
-        const offlineCtx = new OfflineAudioContext(1, bite.stopTime * SampleRate, SampleRate);
+        const offlineCtx = new OfflineAudioContext(1, (bite.stopTime + ExtraSeconds) * SampleRate, SampleRate);
         const offlineEnv: OutputEnvironment = {
             ctx: offlineCtx,
             next: offlineCtx.destination,
