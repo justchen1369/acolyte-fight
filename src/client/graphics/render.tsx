@@ -1176,7 +1176,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		vanish: render.vanish,
 	});
 
-	if (render.bloom) {
+	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.High) {
 		glx.circle(ctxStack, pos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
@@ -1713,7 +1713,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 		}, world);
 	}
 
-	if (swirl.bloom) {
+	if (swirl.bloom && ctxStack.rtx >= r.GraphicsLevel.High) {
 		glx.circle(ctxStack, location, {
 			color: ColTuple.parse(fillStyle),
 			maxRadius: 0,
