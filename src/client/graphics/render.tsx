@@ -488,34 +488,7 @@ function playSpellSounds(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.W
 }
 
 function renderLifeStealReturn(ctxStack: CanvasCtxStack, ev: w.LifeStealEvent, world: w.World) {
-	const MaxTicks = 15;
-
-	if (world.tick >= ev.tick + MaxTicks) {
-		return; // Too late
-	}
-
-	let owner = world.objects.get(ev.owner);
-	if (!(owner && owner.category === "hero")) {
-		return;
-	}
-
-	if (engine.isHeroInvisible(owner)) {
-		// Don't let lifesteal glow give away position
-		return;
-	}
-
-	const pos = owner.body.getPosition();
-	pushTrail({
-		type: 'ripple',
-		initialTick: ev.tick,
-		max: MaxTicks,
-		pos: pos.clone(),
-		fillStyle: HeroColors.HealColor,
-		shine: DefaultShine,
-		vanish: 1,
-		initialRadius: owner.radius * 1,
-		finalRadius: owner.radius * 1.5,
-	}, world);
+	// Don't render anything
 }
 
 function renderSetCooldown(ctxStack: CanvasCtxStack, ev: w.SetCooldownEvent, world: w.World) {
