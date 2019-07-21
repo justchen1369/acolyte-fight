@@ -496,7 +496,7 @@ const kamehameha: Spell = {
     chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
-    revsPerTickWhileCharging: 0.005,
+    revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
 
     strikeCancel: {
@@ -957,7 +957,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 6,
+    chargeTicks: 10,
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
@@ -1127,7 +1127,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
@@ -1395,7 +1395,7 @@ const gravity: Spell = {
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
             ticks: 2 * TicksPerSecond,
-            radius: 0.045,
+            radius: 0.04,
             power: 1,
             render: renderGravity,
         },
@@ -1405,7 +1405,7 @@ const gravity: Spell = {
                 type: "cooldown",
                 against: Alliances.NotFriendly,
                 maxTicks: 1,
-                minCooldown: 0.75 * TicksPerSecond,
+                minCooldown: 0.6 * TicksPerSecond,
             },
         ],
 
@@ -2197,7 +2197,7 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 2.5 seconds, increase movement speed 2x, and also become immune to damage from the void.",
+    description: "For 2.5 seconds, increase movement speed 75%, and also become immune to damage from the void.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2208,7 +2208,7 @@ const voidRush: Spell = {
     buffs: [
         {
             type: "movement",
-            movementProportion: 2,
+            movementProportion: 1.75,
             maxTicks: 2.5 * TicksPerSecond,
         },
         {
@@ -2238,7 +2238,7 @@ const voidRush: Spell = {
 const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
-    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 2x.",
+    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 75%.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2246,7 +2246,7 @@ const vanish: Spell = {
     throttle: false,
     unlink: true,
     debuff: true,
-    movementProportionWhileChannelling: 2,
+    movementProportionWhileChannelling: 1.75,
     interruptibleAfterTicks: 15,
 
     buffs: [
