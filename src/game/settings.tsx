@@ -495,7 +495,7 @@ const kamehameha: Spell = {
     chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
-    revsPerTickWhileCharging: 0.01,
+    revsPerTickWhileCharging: 0.005,
     revsPerTickWhileChannelling: 0.00005,
 
     strikeCancel: {
