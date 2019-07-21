@@ -1500,8 +1500,6 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const MaxAlpha = 0.75;
 	const MinAlpha = 0.10;
 
-	const glow = shield.glow;
-
 	const ticksRemaining = shield.expireTick - world.tick;
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
