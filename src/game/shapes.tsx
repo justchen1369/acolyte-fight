@@ -289,3 +289,8 @@ function posMod(num: number, max: number) {
     }
     return mod;
 }
+
+// A polygon's extent needs to be larger than a circle's radius for them to look the same size
+export function calculateMaxExtentMultiplier(numPoints: number) {
+    return 1 + (1 / numPoints);
+}

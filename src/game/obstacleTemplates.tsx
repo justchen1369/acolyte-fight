@@ -235,6 +235,7 @@ const explosive: ObstacleTemplate = {
     health: 50,
     density: 10,
     linearDamping: 1.5,
+    circularHitbox: true,
 
     render: [
         shadow,

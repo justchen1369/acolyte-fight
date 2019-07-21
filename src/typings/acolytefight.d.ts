@@ -172,6 +172,7 @@ declare interface ObstacleTemplate {
 	collideWith?: number;
 	expireOn?: number;
 	undamageable?: boolean; // Whether projectiles or detonations can damage this obstacle
+	circularHitbox?: boolean; // For physics, ignore the shape of the polygon, just it a circular hitbox so it is easier to predict how it will move
 
 	health: number;
 

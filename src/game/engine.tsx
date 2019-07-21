@@ -169,7 +169,11 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 	const sensor = template.sensor || false;
 	const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 
-	body.createFixture(shapes.shapeToPlanck(shape), {
+	const hitbox: pl.Shape =
+		template.circularHitbox
+		? pl.Circle(layout.extent / shapes.calculateMaxExtentMultiplier(layout.numPoints || 0))
+		: shapes.shapeToPlanck(shape);
+	body.createFixture(hitbox, {
 		density: template.density || Obstacle.Density,
 		filterCategoryBits: Categories.Obstacle,
 		filterMaskBits: collideWith,
@@ -1038,7 +1042,7 @@ function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
 		world.color = layout.color;
 	}
 	
-	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? (1.0 + 1 / layout.numPoints) : 1.0);
+	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? shapes.calculateMaxExtentMultiplier(layout.numPoints) : 1.0);
 	if (radiusMultiplier) {
 		world.mapRadiusMultiplier = radiusMultiplier;
 	}
