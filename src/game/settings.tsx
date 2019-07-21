@@ -1485,6 +1485,7 @@ const whirlwind: Spell = {
         sound: "whirlwind",
         color: "#44ffff",
         renderers: [
+            { type: "bloom", radius: 0.05 },
             {
                 type: "swirl",
 
@@ -1790,6 +1791,7 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
+            { type: "bloom", radius: 0.015 },
             { type: "projectile", ticks: 40, color: "rgba(64, 255, 255, 0.25)", shine: 0.4, smoke: 0.3, vanish: 1 },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
