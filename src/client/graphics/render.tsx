@@ -24,6 +24,8 @@ const MaxDestroyedTicks = constants.TicksPerSecond;
 
 const AtlasAiIcon = "ai";
 
+const DefaultBloomRadius = 0.03;
+
 const DefaultShine = 0.5;
 const DefaultGlow = 0.1;
 
@@ -448,6 +450,8 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 			renderReticule(ctxStack, obj, world, render);
 		} else if (render.type === "strike") {
 			renderStrike(ctxStack, obj, world, render);
+		} else if (render.type === "bloom") {
+			renderBloom(ctxStack, obj, world, render);
 		}
 	});
 
@@ -1917,6 +1921,21 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
 	}, world);
+}
+
+function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderBloom) {
+	let color = ColTuple.parse(projectileColor(render, projectile, world));
+	if (render.shine) {
+		color.lighten(render.shine);
+	}
+	glx.circle(ctxStack, projectile.body.getPosition(), {
+		color,
+		maxRadius: 0,
+		feather: {
+			sigma: render.radius !== undefined ? render.radius : DefaultBloomRadius,
+			alpha: render.glow !== undefined ? render.glow : DefaultGlow,
+		},
+	});
 }
 
 function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay | RenderPolygon): number {

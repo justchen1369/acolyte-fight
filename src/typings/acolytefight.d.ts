@@ -511,6 +511,7 @@ declare type RenderParams =
 	| RenderLink
 	| RenderReticule
 	| RenderStrike
+	| RenderBloom
 
 declare interface RenderParamsBase {
 	type: string;
@@ -623,6 +624,13 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	particleGlow?: number;
 	particleVanish?: number;
 	speedMultiplier?: number;
+}
+
+declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {
+	type: "bloom";
+	shine?: number;
+	glow?: number;
+	radius?: number;
 }
 
 declare type BuffTemplate =

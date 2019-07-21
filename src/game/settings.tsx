@@ -170,6 +170,7 @@ const fireball: Spell = {
         soundHit: "standard",
         color: '#f80',
         renderers: [
+            { type: "bloom", radius: 0.045 },
             { type: "projectile", ticks: 30, smoke: 0.05 },
             { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, glow: true, numParticles: 5 },
@@ -222,6 +223,7 @@ const flamestrike: Spell = {
         sound: "flamestrike",
         color: '#ff4400', 
         renderers: [
+            { type: "bloom" },
             { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, glow: true, numParticles: 5 },
@@ -262,6 +264,7 @@ const triplet: Spell = {
         soundHit: "standard",
         color: '#ff0088',
         renderers: [
+            { type: "bloom", radius: 0.02 },
             { type: "projectile", ticks: 15, smoke: 0.05, vanish: 1 },
             { type: "ray", ticks: 9, vanish: 0.5 },
             { type: "strike", ticks: 30, glow: true, numParticles: 2 },
@@ -335,6 +338,7 @@ const difire: Spell = {
 
         color: '#ff0088',
         renderers: [
+            { type: "bloom", radius: 0.02 },
             { type: "projectile", ticks: 15, smoke: 0.05, vanish: 1 },
             { type: "ray", ticks: 8, vanish: 0.5 },
             { type: "strike", ticks: 8, glow: true, numParticles: 2 },
@@ -394,6 +398,7 @@ const firespray: Spell = {
 
         color: '#ff0044',
         renderers: [
+            { type: "bloom", radius: 0.02 },
             { type: "projectile", ticks: 30, smoke: 0.1, vanish: 0.75 },
             { type: "ray", intermediatePoints: true, ticks: 7 },
             { type: "strike", ticks: 30, glow: true, numParticles: 1 },
@@ -432,6 +437,7 @@ const meteor: Spell = {
         sound: "meteor",
         color: '#ff0000',
         renderers: [
+            { type: "bloom", radius: 0.06 },
             { type: "projectile", ticks: 15, shine: 0, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 15, glow: true, growth: 0.1 },
         ],
@@ -469,6 +475,7 @@ const meteorite: Spell = {
         sound: "meteorite",
         color: '#ff0066',
         renderers: [
+            { type: "bloom" },
             { type: "projectile", ticks: 10, shine: 0, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 10, glow: true, growth: 0.1 },
         ],
@@ -546,6 +553,7 @@ const lightning: Spell = {
         sound: "lightning",
         color: '#00ddff',
         renderers: [
+            { type: "bloom", radius: 0.05 },
             { type: "ray", intermediatePoints: true, ticks: 30, vanish: 0.5 },
             { type: "strike", ticks: 30, glow: true },
         ],
@@ -615,6 +623,7 @@ const blast: Spell = {
         sound: "blast",
         color: '#0ff',
         renderers: [
+            { type: "bloom", selfColor: true, radius: 0.05 },
             { type: "projectile", ticks: 10, selfColor: true, shine: 1, smoke: 0.15, glow: 0.2, vanish: 0.5 },
             { type: "strike", ticks: 10, numParticles: 10, glow: true },
         ],
@@ -653,6 +662,7 @@ const homing: Spell = {
         soundHit: "standard",
         color: '#44ffcc',
         renderers: [
+            { type: "bloom" },
             { type: "projectile", ticks: 30, smoke: 0.05, vanish: 0.75 },
             { type: "ray", ticks: 10, vanish: 0.75 },
             { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10 },
@@ -705,6 +715,7 @@ const boomerang: Spell = {
         sound: "boomerang",
         soundHit: "standard",
         renderers: [
+            { type: "bloom", selfColor: true },
             { type: "projectile", selfColor: true, ticks: 10, vanish: 1 },
             { type: "ray", selfColor: true, ticks: 10, vanish: 1 },
             { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60, vanish: 1 },
@@ -777,6 +788,7 @@ const retractor: Spell = {
         sound: "retractor",
         color: '#00ff7f',
         renderers: [
+            { type: "bloom", selfColor: true },
             {
                 type: "swirl",
                 color: '#00ff7f',
@@ -840,6 +852,7 @@ const backlash: Spell = {
         sound: "backlash",
         color: '#00ccff',
         renderers: [
+            { type: "bloom" },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
             { type: "strike", color: '#fff', ticks: 25, growth: 1.5, glow: true, numParticles: 5, speedMultiplier: -0.5, detonate: 0.02 },
@@ -924,6 +937,7 @@ const rocket: Spell = {
         sound: "rocket",
         color: '#ff9a00',
         renderers: [
+            { type: "bloom", ownerColor: true, radius: 0.028 },
             { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.028, minRadius: 0.024, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 5, glow: 0.1, smoke: 0.5, ownerColor: true },
             { type: "strike", ticks: 20, glow: true, ownerColor: true, numParticles: 9 },
@@ -1089,6 +1103,7 @@ const link: Spell = {
         sound: "link",
         color: '#4444ff',
         renderers: [
+            { type: "bloom" },
             { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1 },
             {
                 type: "link",
@@ -1186,6 +1201,7 @@ const grapple: Spell = {
         sound: "grapple",
         color: '#f02',
         renderers: [
+            { type: "bloom" },
             { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
@@ -1231,6 +1247,7 @@ const bouncer: Spell = {
         sound: "bouncer",
         color: '#88ee22',
         renderers: [
+            { type: "bloom", selfColor: true },
             { type: "ray", intermediatePoints: true, selfColor: true, ticks: 60, vanish: 0.25 },
             { type: "strike", selfColor: true, ticks: 15, glow: true, growth: 1 },
         ],
@@ -1280,6 +1297,7 @@ const repeater: Spell = {
         sound: "repeater",
         color: '#00ff00',
         renderers: [
+            { type: "bloom" },
             { type: "projectile", ticks: 18, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 12, glow: 0.1, radiusMultiplier: 0.25 },
             { type: "strike", ticks: 18, glow: true, growth: 1, numParticles: 5 },
@@ -1320,6 +1338,7 @@ const drain: Spell = {
 
         color: '#22ee88',
         renderers: [
+            { type: "bloom" },
             { type: "projectile", ticks: 1 },
             { type: "ray", ticks: 15, vanish: 1 },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1 },
@@ -1535,6 +1554,7 @@ const supernova: Spell = {
         sound: "supernova",
         color: '#ff9a00',
         renderers: [
+            { type: "bloom", radius: 0.03 },
             { type: "ray", ticks: 30, vanish: 1 },
             {
                 type: "reticule",
@@ -1626,6 +1646,7 @@ const halo: Spell = {
         soundHit: "halo",
         color: '#ccc',
         renderers: [
+            { type: "bloom", selfColor: true, ownerColor: true, radius: 0.02 },
             { type: "ray", selfColor: true, ownerColor: true, ticks: 15, glow: 0, vanish: 1 },
             { type: "strike", selfColor: true, ownerColor: true, ticks: 15, growth: 1.1, glow: true, numParticles: 3 },
         ],
@@ -1703,6 +1724,7 @@ const mines: Spell = {
         sound: "mines",
         color: '#ff009c',
         renderers: [
+            { type: "bloom", selfColor: true, radius: 0.015 },
             { type: "projectile", ticks: 1, selfColor: true, shine: 0, glow: 0.2, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
         ],
@@ -1846,6 +1868,7 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
+            { type: "bloom" },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1, shine: 0 },
             { type: "projectile", ticks: 10, glow: 0.1, smoke: 0.3 },
@@ -2138,6 +2161,7 @@ const swap: Spell = {
         sound: "swap",
         color: '#75e7ff',
         renderers: [
+            { type: "bloom" },
             {
                 type: "swirl",
                 color: '#75e7ff',
