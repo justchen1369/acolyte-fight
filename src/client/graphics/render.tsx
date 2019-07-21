@@ -1897,7 +1897,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				fillStyle: projectileColor(strike, projectile, world),
 				vanish: strike.particleVanish,
 				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
-				shine: strike.particleShine !== undefined ? strike.particleShine: DefaultShine,
+				shine: strike.particleShine,
 				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultBloomRadius,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
@@ -2125,7 +2125,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
 		feather = {
-			sigma: scale * proportion * (trail.bloom !== undefined ? trail.bloom : HeroColors.GlowRadius),
+			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : HeroColors.GlowRadius),
 			alpha: trail.glow,
 		};
 	}
