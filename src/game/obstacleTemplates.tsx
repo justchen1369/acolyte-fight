@@ -115,8 +115,11 @@ export const fast: ObstacleTemplate = {
             render: {
                 color: "rgba(255, 255, 255, 1)",
                 heroColor: true,
-                alpha: 0.3,
                 ticks: 30,
+                shine: 0.5,
+                glow: 0.1,
+                bloom: 0.03,
+                vanish: 1,
                 emissionRadiusFactor: 0,
                 particleRadius: 0.0125,
             },
