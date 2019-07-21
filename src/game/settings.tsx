@@ -2119,7 +2119,7 @@ const thrust: Spell = {
                 particleRadius: Hero.Radius * 1.5,
                 glow: 0.2,
                 shine: 1,
-                bloom: 0.05,
+                bloom: 0.07,
                 decay: true,
             },
         }
