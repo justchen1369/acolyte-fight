@@ -399,7 +399,7 @@ const firespray: Spell = {
         color: '#ff0044',
         renderers: [
             { type: "bloom", radius: 0.02 },
-            { type: "projectile", ticks: 30, smoke: 0.1, vanish: 0.75 },
+            { type: "projectile", ticks: 30, smoke: 0.1, vanish: 1, bloom: 0.01 },
             { type: "ray", intermediatePoints: true, ticks: 7 },
             { type: "strike", ticks: 30, glow: true, numParticles: 1 },
         ],
