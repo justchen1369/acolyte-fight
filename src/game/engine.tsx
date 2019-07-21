@@ -1552,9 +1552,7 @@ function handleActions(world: w.World) {
 		performHeroActions(world, hero, action);
 
 		const movementProportion = calculateMovementProportion(hero, world);
-		if (movementProportion > 0) {
-			moveTowards(world, hero, hero.moveTo, movementProportion);
-		}
+		moveTowards(world, hero, hero.moveTo, movementProportion);
 	});
 	world.actions = nextActions;
 }
@@ -3341,7 +3339,9 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {
 	if (!target) { return; }
 
-	turnTowards(hero, target);
+	if (movementProportion > 0) {
+		turnTowards(hero, target);
+	}
 
 	const current = hero.body.getPosition();
 
