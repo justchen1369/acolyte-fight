@@ -1103,7 +1103,7 @@ const link: Spell = {
         sound: "link",
         color: '#4444ff',
         renderers: [
-            { type: "bloom" },
+            { type: "bloom", radius: 0.05 },
             { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1 },
             {
                 type: "link",
@@ -1201,7 +1201,7 @@ const grapple: Spell = {
         sound: "grapple",
         color: '#f02',
         renderers: [
-            { type: "bloom" },
+            { type: "bloom", radius: 0.05 },
             { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
