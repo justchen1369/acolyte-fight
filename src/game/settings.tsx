@@ -855,7 +855,7 @@ const backlash: Spell = {
             { type: "bloom", ownerColor: true },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
-            { type: "strike", color: '#fff', ticks: 25, growth: 1.5, glow: true, numParticles: 5, speedMultiplier: -0.5, detonate: 0.02 },
+            { type: "strike", color: '#fff', ticks: 25, growth: 1.5, glow: true, speedMultiplier: -0.5, detonate: 0.02 },
         ],
     },
 };

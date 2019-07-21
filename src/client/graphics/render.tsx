@@ -392,8 +392,8 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			velocity,
 			fillStyle: "white",
 			radius: hero.radius,
-			glow: 0.1,
-			bloom: 0.03,
+			glow: DefaultGlow,
+			bloom: DefaultBloomRadius,
 		}, world);
 	}
 
@@ -577,8 +577,8 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
-		glow: 0.2,
-		bloom: 0.03,
+		glow: DefaultGlow,
+		bloom: DefaultBloomRadius,
 	}, world);
 
 	if (ev.sound) {
@@ -1033,7 +1033,8 @@ function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.V
 		max: HeroColors.EaseTicks,
 		fillStyle: heroColor(hero.id, world),
 		shine: 0.5,
-		glow: 0.2,
+		glow: DefaultGlow,
+		bloom: DefaultBloomRadius,
 		vanish: 1,
 	});
 
@@ -1809,6 +1810,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				vanish: strike.particleVanish,
 				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
 				shine: strike.particleShine !== undefined ? strike.particleShine: DefaultShine,
+				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultBloomRadius,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -1824,8 +1826,8 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 			pos: projectile.body.getPosition().clone(),
 			fillStyle: 'white',
 			radius: strike.detonate,
-			bloom: 0.03,
-			glow: 0.2,
+			bloom: DefaultBloomRadius,
+			glow: DefaultGlow,
 		}, world);
 	}
 }

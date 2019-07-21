@@ -628,6 +628,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	numParticles?: number;
 	particleShine?: number;
 	particleGlow?: number;
+	particleBloom?: number;
 	particleVanish?: number;
 	speedMultiplier?: number;
 }
