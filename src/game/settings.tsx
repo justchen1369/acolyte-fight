@@ -140,6 +140,7 @@ const stop: Spell = {
     id: 'stop',
     description: "",
     color: 'white',
+    glow: 0.5,
     maxAngleDiffInRevs: 1.0,
     interruptibleAfterTicks: 0,
     cooldown: 0,

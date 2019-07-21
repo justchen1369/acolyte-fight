@@ -1321,7 +1321,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 				maxRadius: 0,
 				feather: {
 					sigma: radius + proportion * DefaultBloomRadius,
-					alpha: DefaultGlow,
+					alpha: hero.uiCastTrail.glow !== undefined ? hero.uiCastTrail.glow : DefaultGlow,
 				},
 			});
 		}

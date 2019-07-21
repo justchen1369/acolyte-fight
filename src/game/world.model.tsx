@@ -546,6 +546,7 @@ export interface CastState {
 export interface CastHistoryItem {
 	spellId: string;
 	color: string;
+	glow?: number;
 	castTick: number;
 }
 

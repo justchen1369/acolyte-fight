@@ -150,7 +150,6 @@ export namespace HealthBar {
 }
 export namespace ChargingIndicator {
 	export const MinWidth = Pixel * 7;
-	export const WidthPerBonus = Pixel * 7;
 	export const TrailTicks = 15;
 }
 export namespace DashIndicator {

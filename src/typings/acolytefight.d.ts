@@ -268,7 +268,8 @@ declare interface SpellBase {
 
     icon?: string;
 
-    color: string; // The colour of the button for this spell (not the projectile)
+	color: string; // The colour of the button for this spell (not the projectile)
+	glow?: number; // 0 means no glow, 1 means full glow around acolyte when casting
 }
 
 declare interface ReleaseParams {

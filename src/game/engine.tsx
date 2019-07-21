@@ -1733,6 +1733,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 				hero.uiCastTrail = {
 					spellId: hero.casting.action.type,
 					color: hero.casting.color,
+					glow: spell.glow,
 					castTick: world.tick,
 				};
 			}
