@@ -1318,11 +1318,10 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
 			glx.circle(ctxStack, pos, {
 				color: strokeColor,
-				minRadius: radius,
-				maxRadius: radius,
+				maxRadius: 0,
 				feather: {
-					sigma: DefaultBloomRadius * proportion,
-					alpha: 0.25,
+					sigma: radius + proportion * DefaultBloomRadius,
+					alpha: DefaultGlow,
 				},
 			});
 		}
