@@ -39,6 +39,12 @@ interface SwirlContext {
 	multiplier?: number;
 }
 
+interface RenderObstacleParams {
+	flash: number;
+	healthProportion: number;
+	ease: number;
+}
+
 // Rendering
 export function resetRenderState(world: w.World) {
 	world.ui.renderedTick = null;
@@ -788,11 +794,25 @@ function takeHighlights(world: w.World): w.MapHighlight {
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	applyHighlight(obstacle.activeTick, obstacle, world);
+
+	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
+	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
+	const healthProportion = obstacle.health / obstacle.maxHealth;
+	const easeMultiplier = ease(obstacle.createTick, world);
+
+	const params: RenderObstacleParams = {
+		flash,
+		healthProportion,
+		ease: easeMultiplier,
+	};
+
 	obstacle.render.forEach(render => {
 		if (render.type === "solid") {
-			renderObstacleSolid(ctxStack, obstacle, render, world, options);
+			renderObstacleSolid(ctxStack, obstacle, params, render, world, options);
+		} else if (render.type === "bloom") {
+			renderObstacleBloom(ctxStack, obstacle, params, render, world, options);
 		} else if (render.type === "smoke") {
-			renderObstacleSmoke(ctxStack, obstacle, render, world, options)
+			renderObstacleSmoke(ctxStack, obstacle, params, render, world, options)
 		}
 	});
 
@@ -811,31 +831,33 @@ function playObstacleSounds(ctxStack: CanvasCtxStack, obj: w.Obstacle, world: w.
 	}
 }
 
-function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fill: SwatchFill, world: w.World, options: RenderOptions) {
-	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
-
+function calculateObstacleColor(obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchColor, world: w.World) {
 	let color = ColTuple.parse(fill.color);
 
-	const proportion = obstacle.health / obstacle.maxHealth;
-	if (fill.deadColor && proportion < 1) {
-		color.mix(ColTuple.parse(fill.deadColor), 1 - proportion);
+	if (fill.deadColor && params.healthProportion < 1) {
+		color.mix(ColTuple.parse(fill.deadColor), 1 - params.healthProportion);
 	}
 
-	if (fill.flash) {
-		if (flash > 0) {
-			color.lighten(flash);
-		}
+	const flash = params.flash;
+	if (fill.flash && flash > 0) {
+		color.lighten(params.flash);
 	}
 
-	let scale = 1;
+	return color;
+}
+
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchFill, world: w.World, options: RenderOptions) {
+	const color = calculateObstacleColor(obstacle, params, fill, world);
+
 	const pos = obstacle.body.getPosition();
 	const angle = obstacle.body.getAngle();
 
-	const easeMultiplier = ease(obstacle.createTick, world);
-	if (easeMultiplier > 0) {
-		scale *= 1 - easeMultiplier;
+	let scale = 1;
+	if (params.ease > 0) {
+		scale *= 1 - params.ease;
 	}
+
+	const flash = params.flash;
 
 	let feather: r.FeatherConfig = null;
 	if (fill.glow && options.rtx >= r.GraphicsLevel.Normal) {
@@ -906,12 +928,47 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, fil
 	}
 }
 
-function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
-	if (smoke.interval && (world.tick % smoke.interval) !== 0) {
+function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchBloom, world: w.World, options: RenderOptions) {
+	if (options.rtx < r.GraphicsLevel.High) {
 		return;
 	}
 
-	const easeMultiplier = ease(obstacle.createTick, world);
+	const color = calculateObstacleColor(obstacle, params, fill, world);
+	if (fill.strikeOnly) {
+		// Only display on strike
+		if (params.flash > 0) {
+			color.fade(1 - params.flash);
+		} else {
+			return;
+		}
+	}
+
+	let scale = 1;
+	if (params.ease > 0) {
+		scale *= 1 - params.ease;
+	}
+
+	const extent = shapes.getMinExtent(obstacle.shape);
+	const bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
+	let feather: r.FeatherConfig = {
+		sigma: extent + bloom,
+		alpha: fill.glow !== undefined ? fill.glow : DefaultGlow,
+	};
+
+	const pos = obstacle.body.getPosition();
+	const drawPos = vector.scaleAround(pos, MapCenter, scale);
+
+	glx.circle(ctxStack, drawPos, {
+		color,
+		maxRadius: 0,
+		feather,
+	});
+}
+
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
+	if (smoke.interval && (world.tick % smoke.interval) !== 0) {
+		return;
+	}
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
 	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
@@ -935,8 +992,8 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, smo
 		}
 	}
 
-	if (easeMultiplier > 0) {
-		const scale = 1 - easeMultiplier;
+	if (params.ease > 0) {
+		const scale = 1 - params.ease;
 		pos = vector.scaleAround(pos, mapCenter, scale);
 		particleRadius *= scale;
 	}

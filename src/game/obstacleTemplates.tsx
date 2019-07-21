@@ -228,6 +228,13 @@ const defaultTemplate: ObstacleTemplate = {
     render: [
         shadow,
         {
+            type: "bloom",
+            color: '#ccc',
+            flash: true,
+            strikeOnly: true,
+            bloom: 0.05,
+        },
+        {
             type: "solid",
             color: '#ccc',
             deadColor: '#c33',
@@ -288,6 +295,13 @@ const mirror: ObstacleTemplate = {
     render: [
         shadow,
         {
+            type: "bloom",
+            color: '#0cf',
+            bloom: 0.05,
+            flash: true,
+            strikeOnly: true,
+        },
+        {
             type: "solid",
             "color": "#0cf",
             strikeGrow: 0.005,
@@ -313,6 +327,13 @@ const bumper: ObstacleTemplate = {
     render: [
         shadow,
         {
+            type: "bloom",
+            color: "#fc0",
+            bloom: 0.05,
+            flash: true,
+            strikeOnly: true,
+        },
+        {
             type: "solid",
             color: "#fc0",
             strikeGrow: 0.005,
@@ -336,6 +357,13 @@ const spinner: ObstacleTemplate = {
 
     render: [
         shadow,
+        {
+            type: "bloom",
+            color: '#ccc',
+            bloom: 0.05,
+            flash: true,
+            strikeOnly: true,
+        },
         {
             type: "solid",
             color: '#ccc',

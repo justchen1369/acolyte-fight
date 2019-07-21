@@ -116,20 +116,32 @@ declare interface ObstacleLayout {
 
 declare type SwatchRender =
 	SwatchFill
+	| SwatchBloom
 	| SwatchSmoke
 
-declare interface SwatchFill {
-	type: "solid";
-
+declare interface SwatchColor {
 	color: string;
 	deadColor?: string;
+	flash?: boolean;
+}
+
+declare interface SwatchFill extends SwatchColor {
+	type: "solid";
 
 	expand?: number;
 	glow?: number;
 	bloom?: number
 	strikeGrow?: number;
-	flash?: boolean;
 	shadow?: boolean; // Apply shadow offset and shadow feather to fill
+}
+
+declare interface SwatchBloom extends SwatchColor {
+	type: "bloom";
+
+	glow?: number;
+	bloom?: number
+
+	strikeOnly?: boolean; // Only display the bloom on strike
 }
 
 declare interface SwatchSmoke {
