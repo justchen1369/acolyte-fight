@@ -665,7 +665,7 @@ const homing: Spell = {
             { type: "bloom" },
             { type: "projectile", ticks: 30, smoke: 0.05, vanish: 0.75 },
             { type: "ray", ticks: 10, vanish: 0.75 },
-            { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 10 },
+            { type: "strike", ticks: 30, growth: 1, glow: true, numParticles: 5 },
         ],
     },
 };
