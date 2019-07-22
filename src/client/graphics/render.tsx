@@ -1650,8 +1650,9 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const angle = shield.body.getAngle();
 
 		// Draw the saber
+		const handle = vector.fromAngle(angle).mul(hero.radius).add(pos);
 		const tip = vector.fromAngle(angle).mul(shield.length).add(pos);
-		glx.line(ctxStack, pos, tip, {
+		glx.line(ctxStack, handle, tip, {
 			color,
 			minRadius: 0,
 			maxRadius: shield.width,
