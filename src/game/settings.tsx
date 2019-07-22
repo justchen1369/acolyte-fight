@@ -756,8 +756,6 @@ const retractor: Spell = {
         radius: 0.007,
         speed: 0.3,
         maxTicks: 2.0 * TicksPerSecond,
-        collideWith: Categories.All,
-        expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
         categories: Categories.Projectile,
         shieldTakesOwnership: false,
 
