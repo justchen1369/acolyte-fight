@@ -479,6 +479,7 @@ export interface ShieldBase extends WorldObjectBase {
 
 	damageMultiplier: number;
 	takesOwnership: boolean;
+	destroying?: boolean;
 	owner: string;
 
 	color: string;

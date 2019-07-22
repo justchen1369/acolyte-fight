@@ -360,6 +360,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 
 		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
+		destroying: true,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		points,
@@ -2053,7 +2054,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		reduceDamage(projectile, shield.damageMultiplier);
 	}
 
-	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
+	if (!myProjectile && (expireOn(world, projectile, shield) || shield.destroying && destructibleBy(projectile, shield.owner, world))) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
 		applySwap(projectile, shield, world);
 		projectile.expireTick = world.tick;
