@@ -67,7 +67,7 @@ class WaitingMessage extends React.PureComponent<Props, State> {
     }
 
     private onWatchLiveClick() {
-        matches.leaveCurrentGame(true);
+        matches.leaveCurrentGame(false);
         matches.watchLiveGame();
     }
 }
