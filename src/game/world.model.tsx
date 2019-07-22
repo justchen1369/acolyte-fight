@@ -101,6 +101,7 @@ export interface UIState {
 	nextSpellId?: string;
 	toolbar: ToolbarState;
 
+	initialRenderTick?: number;
 	renderedTick: number | null;
 	playedTick: number;
 	sentSnapshotTick: number;

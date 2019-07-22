@@ -186,6 +186,9 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		throw "Error getting context";
 	}
 
+	if (world.ui.initialRenderTick === undefined) {
+		world.ui.initialRenderTick = world.tick;
+	}
 	glx.initGl(ctxStack);
 	glx.clearGl(ctxStack);
 
@@ -705,7 +708,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 		}
 	}
 
-	const easeMultiplier = ease(0, world);
+	const easeMultiplier = ease(world.ui.initialRenderTick, world);
 	if (easeMultiplier > 0) {
 		scale *= 1 - easeMultiplier;
 	}
@@ -774,7 +777,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
 	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
 	const healthProportion = obstacle.health / obstacle.maxHealth;
-	const easeMultiplier = ease(obstacle.createTick, world);
+	const easeMultiplier = ease(Math.max(obstacle.createTick, world.ui.initialRenderTick), world);
 
 	const params: RenderObstacleParams = {
 		flash,
@@ -1035,7 +1038,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	const pos = hero.body.getPosition().clone();
 
 	// Ease in hero on arrival
-	let easeMultiplier = ease(hero.createTick, world);
+	let easeMultiplier = ease(Math.max(hero.createTick, world.ui.initialRenderTick), world);
 	let arriving = true;
 	if (hero.exitTick) {
 		arriving = false;
