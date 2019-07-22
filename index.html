@@ -69,7 +69,7 @@
 		<script>
 			function loadScript(src) {
 				return new Promise(function (resolve, reject) {
-					const scriptTag = document.createElement("script");
+					var scriptTag = document.createElement("script");
 					scriptTag.src = src;
 					scriptTag.addEventListener('load', function (ev) {
 						resolve();
