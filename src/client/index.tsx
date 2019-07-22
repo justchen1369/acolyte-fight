@@ -75,8 +75,6 @@ export async function initialize() {
 
     seen.loadSeenVersion(); // Don't bother awaiting
     storage.cleanupGameStats();
-
-    audio.cache(Sounds); // Don't bother awaiting
 }
 
 async function loadDependencies() {

@@ -166,10 +166,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 return;
             }
 
-            const audioCaching = audio.cache(this.props.sounds);
             const replay = await replays.getReplay(this.props.recordId, this.props.server);
-
-            await audioCaching;
             const canvasStack = await this.waitForCanvas();
             const blob = await this.recordVideo(replay, canvasStack, token);
 

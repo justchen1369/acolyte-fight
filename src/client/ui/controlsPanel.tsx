@@ -42,6 +42,7 @@ interface ControlState {
     actionWheelSide: string;
     targetingIndicator: string;
     cameraFollow: string;
+    audioCaching: string;
     sounds: string;
 }
 interface State extends ControlState {
@@ -70,6 +71,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
+        audioCaching: options.noAudioCaching ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
     };
 }
@@ -106,9 +108,10 @@ class ControlsPanel extends React.Component<Props, State> {
 
     render() {
         return <div className="controls-panel" onClick={ev => this.onClick(ev)}>
+            <h2>Controls</h2>
             {!isMobile && <div className="row">
                 <span className="label">Move with</span>
-                <select className="value" value={this.state.moveWith} onChange={ev => this.onMoveWithSelected(ev.target.value)}>
+                <select className="value" value={this.state.moveWith} onChange={ev => this.onUpdate({ moveWith: ev.target.value })}>
                     <option value={MoveWith.Click}>Click</option>
                     <option value={MoveWith.FollowCursor}>Follow cursor</option>
                 </select>
@@ -118,7 +121,7 @@ class ControlsPanel extends React.Component<Props, State> {
                 <select
                     className="value"
                     value={formatOption(this.state.leftClickKey)}
-                    onChange={ev => this.onLeftClickSelected(parseOption(ev.target.value))}
+                    onChange={ev => this.onUpdate({ leftClickKey: parseOption(ev.target.value) })}
                     >
 
                     <option value={formatOption(null)}>Move</option>
@@ -130,7 +133,7 @@ class ControlsPanel extends React.Component<Props, State> {
                 <select
                     className="value"
                     value={formatOption(this.state.rightClickKey)}
-                    onChange={ev => this.onRightClickSelected(parseOption(ev.target.value))}
+                    onChange={ev => this.onUpdate({ rightClickKey: parseOption(ev.target.value) })}
                     >
 
                     {this.state.rightClickKey === undefined && <option value={formatOption(undefined)}></option>}
@@ -143,7 +146,7 @@ class ControlsPanel extends React.Component<Props, State> {
                 <select
                     className="value"
                     value={formatOption(this.state.singleTapKey)}
-                    onChange={ev => this.onSingleTapSelected(parseOption(ev.target.value))}
+                    onChange={ev => this.onUpdate({ singleTapKey: parseOption(ev.target.value) })}
                     >
 
                     <option value={formatOption(null)}>Move</option>
@@ -155,7 +158,7 @@ class ControlsPanel extends React.Component<Props, State> {
                 <select
                     className="value"
                     value={formatOption(this.state.doubleTapKey)}
-                    onChange={ev => this.onDoubleTapSelected(parseOption(ev.target.value))}
+                    onChange={ev => this.onUpdate({ doubleTapKey: parseOption(ev.target.value) })}
                     >
 
                     <option value={formatOption(null)}>Move</option>
@@ -165,34 +168,46 @@ class ControlsPanel extends React.Component<Props, State> {
             <div className="row"></div>
             {isMobile && <div className="row">
                 <span className="label">Action wheel</span>
-                <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onActionWheelSideSelected(ev.target.value)}>
+                <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onUpdate({ actionWheelSide: ev.target.value })}>
                     <option value={formatOption(Side.Left)}>Left</option>
                     <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
+            <h2>Interface</h2>
             <div className="row">
                 <span className="label">Camera follow</span>
-                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onCameraFollowSelected(ev.target.value)}>
+                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
             <div className="row">
                 <span className="label">Targeting Indicator</span>
-                <select className="value" value={this.state.targetingIndicator} onChange={ev => this.onTargetingIndicatorSelected(ev.target.value)}>
+                <select className="value" value={this.state.targetingIndicator} onChange={ev => this.onUpdate({ targetingIndicator: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <div className="row"></div>
-            {<div className="row">
+            <div className="row">
                 <span className="label">Sound</span>
-                <select className="value" value={this.state.sounds} onChange={ev => this.onSoundsSelected(ev.target.value)}>
+                <select className="value" value={this.state.sounds} onChange={ev => this.onUpdate({ sounds: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
-            </div>}
-            {this.state.changed && <div style={{ textAlign: "center", marginTop: 8 }}>
+            </div>
+            <h2>Performance</h2>
+            <div className="row">
+                <span className="label">Audio Caching</span>
+                <select className="value" value={this.state.audioCaching} onChange={ev => this.onUpdate({ audioCaching: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
+            <div className="row info">
+                <span className="label"></span>
+                <span className="value">Only turn off audio caching if the game is crashing.</span>
+            </div>
+            {this.state.changed && <div className="status-row">
                 {this.state.saved 
                     ? "Changes saved"
                     : "Unsaved changes"}
@@ -214,48 +229,9 @@ class ControlsPanel extends React.Component<Props, State> {
         }
     }
 
-    private onMoveWithSelected(moveWith: string) {
-        this.setState({ moveWith, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onLeftClickSelected(leftClickKey: string) {
-        this.setState({ leftClickKey, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onRightClickSelected(rightClickKey: string) {
-        this.setState({ rightClickKey, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onSingleTapSelected(singleTapKey: string) {
-        this.setState({ singleTapKey, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onDoubleTapSelected(doubleTapKey: string) {
-        this.setState({ doubleTapKey, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onActionWheelSideSelected(actionWheelSide: string) {
-        this.setState({ actionWheelSide, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onCameraFollowSelected(cameraFollow: string) {
-        this.setState({ cameraFollow, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onTargetingIndicatorSelected(targetingIndicator: string) {
-        this.setState({ targetingIndicator, changed: true, saved: false });
-        this.saveStateDebounced();
-    }
-
-    private onSoundsSelected(sounds: string) {
-        this.setState({ sounds, changed: true, saved: false });
+    private onUpdate(settings: Partial<ControlState>) {
+        const update: Partial<State> = { ...settings, changed: true, saved: false };
+        this.setState(update as any);
         this.saveStateDebounced();
     }
 
@@ -288,6 +264,7 @@ class ControlsPanel extends React.Component<Props, State> {
             options.mute = state.sounds === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
+            options.noAudioCaching = state.audioCaching === Toggle.Off;
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

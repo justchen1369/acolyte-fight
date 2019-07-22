@@ -10,6 +10,7 @@ import * as StoreProvider from '../storeProvider';
 
 interface Props {
     sounds: Sounds;
+    noAudioCaching: boolean;
 }
 interface State {
 }
@@ -17,6 +18,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         sounds: state.world.settings.Sounds,
+        noAudioCaching: state.options.noAudioCaching,
     };
 }
 
@@ -28,6 +30,10 @@ class AudioCacheController extends React.PureComponent<Props, State> {
     }
 
     render(): React.ReactNode {
+        if (this.props.noAudioCaching) {
+            return null;
+        }
+
         const Sounds = this.props.sounds;
         audio.cache(Sounds); // If the mod changes, sounds may need to be re-cached
         return null;
