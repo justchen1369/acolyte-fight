@@ -3862,6 +3862,8 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.buffs.set(id, {
 			...values, id, type: "lifeSteal",
 			lifeSteal: template.lifeSteal,
+			damageMultiplier: template.damageMultiplier,
+			minHealth: template.minHealth,
 		});
 	} else if (template.type === "burn") {
 		let stacked = false;
@@ -3949,16 +3951,21 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	}
 
 	let damage = template.damage * calculateScaling(fromHeroId, world, template.damageScaling);
-	let lifeSteal = template.lifeSteal;
+	let lifeSteal = template.lifeSteal || 0;
+	let minHealth = template.minHealth;
 
 	const fromHero = world.objects.get(fromHeroId);
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
 			if (buff.type === "lifeSteal") {
-				if (lifeSteal) {
+				if (buff.lifeSteal) {
 					lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
-				} else {
-					lifeSteal = buff.lifeSteal;
+				}
+				if (buff.damageMultiplier) {
+					damage *= buff.damageMultiplier;
+				}
+				if (buff.minHealth) {
+					minHealth = Math.max(minHealth || 0, buff.minHealth);
 				}
 			}
 		});
@@ -3970,7 +3977,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		fromHeroId,
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
-		minHealth: template.minHealth,
+		minHealth,
 	};
 }
 

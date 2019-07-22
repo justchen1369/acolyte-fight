@@ -2066,7 +2066,7 @@ const icewall: Spell = {
 };
 const teleport: Spell = {
     id: 'teleport',
-    description: "Teleport to a nearby location. Get close, or get away.",
+    description: "Teleport to a nearby location. Get close, or get away. After teleporting, you will only do 25% damage for 0.5 seconds, and you cannot reduce an enemy's health below 1%.",
 
     range: 0.3,
     maxAngleDiffInRevs: 1.0,
@@ -2082,6 +2082,16 @@ const teleport: Spell = {
 
     action: "teleport",
     sound: "teleport",
+
+    buffs: [
+        { // Reduced damage for 0.5 seconds after teleporting
+            owner: true,
+            type: "lifeSteal",
+            maxTicks: 0.5 * TicksPerSecond,
+            damageMultiplier: 0.25,
+            minHealth: 1,
+        },
+    ],
 };
 const thrust: Spell = {
     id: 'thrust',

@@ -650,7 +650,9 @@ export interface VanishBuff extends BuffBase {
 
 export interface LifeStealBuff extends BuffBase {
 	type: "lifeSteal";
-	lifeSteal: number;
+	lifeSteal?: number;
+	damageMultiplier?: number;
+	minHealth?: number;
 }
 
 export interface BurnBuff extends BuffBase {

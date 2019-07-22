@@ -724,10 +724,11 @@ declare interface VanishTemplate extends BuffTemplateBase {
 	type: "vanish";
 }
 
-declare interface LifestealTemplate extends BuffTemplateBase {
+declare interface LifestealTemplate extends BuffTemplateBase { // Does more than lifesteal now...
 	type: "lifeSteal";
-	lifeSteal: number;
-	targetOnly?: boolean;
+	damageMultiplier?: number;
+	lifeSteal?: number;
+	minHealth?: number;
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
