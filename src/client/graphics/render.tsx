@@ -1282,7 +1282,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			maxRadius: 0,
 			feather: {
 				sigma: radius + flash * DefaultBloomRadius,
-				alpha: DefaultGlow,
+				alpha: DefaultCastingGlow,
 			},
 		});
 	}
