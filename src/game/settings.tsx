@@ -2195,7 +2195,7 @@ const swap: Spell = {
 const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
-    description: "For 2.5 seconds, increase movement speed 75%, and also become immune to damage from the void.",
+    description: "For 2.5 seconds, increase movement speed 2x, and also become immune to damage from the void.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2206,7 +2206,7 @@ const voidRush: Spell = {
     buffs: [
         {
             type: "movement",
-            movementProportion: 1.75,
+            movementProportion: 2,
             maxTicks: 2.5 * TicksPerSecond,
         },
         {
@@ -2236,7 +2236,7 @@ const voidRush: Spell = {
 const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
-    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 75%.",
+    description: "Vanish from sight for 2.5 seconds, and also increase movement speed 2x.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2244,7 +2244,7 @@ const vanish: Spell = {
     throttle: false,
     unlink: true,
     debuff: true,
-    movementProportionWhileChannelling: 1.75,
+    movementProportionWhileChannelling: 2,
     interruptibleAfterTicks: 15,
 
     buffs: [
