@@ -784,11 +784,11 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 
 	obstacle.render.forEach(render => {
 		if (render.type === "solid") {
-			renderObstacleSolid(ctxStack, obstacle, params, render, world, options);
+			renderObstacleSolid(ctxStack, obstacle, params, render, world);
 		} else if (render.type === "bloom") {
-			renderObstacleBloom(ctxStack, obstacle, params, render, world, options);
+			renderObstacleBloom(ctxStack, obstacle, params, render, world);
 		} else if (render.type === "smoke") {
-			renderObstacleSmoke(ctxStack, obstacle, params, render, world, options)
+			renderObstacleSmoke(ctxStack, obstacle, params, render, world)
 		}
 	});
 
@@ -822,7 +822,12 @@ function calculateObstacleColor(obstacle: w.Obstacle, params: RenderObstaclePara
 	return color;
 }
 
-function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchFill, world: w.World, options: RenderOptions) {
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchFill, world: w.World) {
+	if (fill.shadow && ctxStack.rtx <= r.GraphicsLevel.Low) {
+		// No shadows for Low
+		return;
+	}
+
 	const color = calculateObstacleColor(obstacle, params, fill, world);
 
 	const pos = obstacle.body.getPosition();
@@ -836,7 +841,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	const flash = params.flash;
 
 	let feather: r.FeatherConfig = null;
-	if (fill.glow && options.rtx >= r.GraphicsLevel.Normal) {
+	if (fill.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
 			sigma: fill.bloom !== undefined ? fill.bloom : HeroColors.GlowRadius,
 			alpha: fill.glow,
@@ -904,8 +909,8 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	}
 }
 
-function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchBloom, world: w.World, options: RenderOptions) {
-	if (options.rtx < r.GraphicsLevel.High) {
+function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchBloom, world: w.World) {
+	if (ctxStack.rtx < r.GraphicsLevel.Ultra) {
 		return;
 	}
 
@@ -942,7 +947,11 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	});
 }
 
-function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, smoke: SwatchSmoke, world: w.World, options: RenderOptions) {
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, smoke: SwatchSmoke, world: w.World) {
+	if (ctxStack.rtx < r.GraphicsLevel.High) {
+		return;
+	}
+
 	if (smoke.interval && (world.tick % smoke.interval) !== 0) {
 		return;
 	}
@@ -1227,7 +1236,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		vanish: render.vanish,
 	}, world);
 
-	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.High) {
+	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		glx.circle(ctxStack, pos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
@@ -1264,7 +1273,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 
 	// Hit flash
-	if (flash > 0) {
+	if (flash > 0 && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		glx.circle(ctxStack, pos, {
 			color: style,
 			maxRadius: 0,
@@ -1282,10 +1291,10 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			color: strokeColor,
 			minRadius: radius,
 			maxRadius: radius + ChargingIndicator.MinWidth,
-			feather: {
+			feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 				sigma: DefaultBloomRadius,
 				alpha: DefaultCastingGlow,
-			},
+			} : null,
 		});
 	} else if (hero.uiCastTrail) {
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
@@ -1294,16 +1303,16 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			glx.circle(ctxStack, pos, {
 				color: strokeColor,
 				maxRadius: 0,
-				feather: {
+				feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 					sigma: radius + proportion * DefaultBloomRadius,
 					alpha: hero.uiCastTrail.glow !== undefined ? hero.uiCastTrail.glow : DefaultCastingGlow,
-				},
+				} : null,
 			});
 		}
 	}
 
 	// Shadow
-	{
+	if (ctxStack.rtx > r.GraphicsLevel.Low) {
 		glx.circle(ctxStack, pos.clone().add(ShadowOffset), {
 			color: ColTuple.parse("rgba(0, 0, 0, 0.75)"),
 			maxRadius: radius,
@@ -1317,7 +1326,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	// Fill
 	{
 		let gradient: r.Gradient = null;
-		if (ctxStack.rtx >= r.GraphicsLevel.Normal) {
+		if (ctxStack.rtx > r.GraphicsLevel.Low) {
 			const from = pos.clone();
 			from.x += radius;
 			from.y += -radius;
@@ -1586,7 +1595,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
+	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
 			sigma: shield.bloom !== undefined ? shield.bloom : HeroColors.GlowRadius,
 			alpha: shield.glow,
@@ -1799,7 +1808,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 		}, world);
 	}
 
-	if (swirl.bloom && ctxStack.rtx >= r.GraphicsLevel.High) {
+	if (swirl.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		glx.circle(ctxStack, location, {
 			color: ColTuple.parse(fillStyle),
 			maxRadius: 0,
@@ -1855,7 +1864,7 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (reticule.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
+	if (reticule.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		const bloom = reticule.bloom !== undefined ? reticule.bloom : DefaultBloomRadius;
 		feather = {
 			sigma: proportion * bloom,
@@ -1881,7 +1890,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	}
 
 	// Particles
-	if (strike.numParticles) {
+	if (strike.numParticles && ctxStack.rtx >= r.GraphicsLevel.High) {
 		for (let i = 0; i < strike.numParticles; ++i) {
 			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.speedMultiplier || 1);
 			pushTrail({
@@ -1939,7 +1948,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 	const fromFill: r.Fill = {
 		color,
 		maxRadius: scale * render.width / 2,
-		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.High) ? {
+		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) ? {
 			sigma: render.bloom !== undefined ? render.bloom : HeroColors.GlowRadius,
 			alpha: render.glow,
 		} : null,
@@ -2051,6 +2060,10 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 }
 
 function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderBloom) {
+	if (ctxStack.rtx < r.GraphicsLevel.Ultra) {
+		return;
+	}
+
 	let color = ColTuple.parse(projectileColor(render, projectile, world));
 	if (render.shine) {
 		color.lighten(render.shine);
@@ -2120,7 +2133,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	}
 
 	let feather: r.FeatherConfig = null;
-	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.High) {
+	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
 			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : HeroColors.GlowRadius),
 			alpha: trail.glow,

@@ -24,6 +24,7 @@ interface Props {
     wheelOnRight: boolean;
     noTargetingIndicator: boolean;
     noCameraFollow: boolean;
+    graphics?: number;
     mute: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -113,10 +114,15 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         noTargetingIndicator: state.options.noTargetingIndicator,
         noCameraFollow: state.options.noCameraFollow,
+        graphics: state.options.graphics,
         mute: state.options.mute,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
     };
+}
+
+function autoGraphics(graphics: number) {
+    return !graphics;
 }
 
 class CanvasPanel extends React.PureComponent<Props, State> {
@@ -145,7 +151,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             width: 0,
             height: 0,
             touchMultiplier: 1,
-            rtx: GraphicsLevel.Ultimate,
+            rtx: GraphicsLevel.Maximum,
         };
     }
 
@@ -165,7 +171,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     reduceGraphics() {
-        if (this.state.rtx > GraphicsLevel.Minimum) {
+        if (!autoGraphics(this.props.graphics) && this.state.rtx > GraphicsLevel.Low) {
             const newLevel = this.state.rtx - 1;
             this.setState({ rtx: newLevel });
             console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
@@ -219,7 +225,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     private calculateRetinaMultiplier() {
-        if (this.state.rtx >= GraphicsLevel.Ultimate) {
+        if (this.state.rtx >= GraphicsLevel.Maximum) {
             return window.devicePixelRatio;
         } else {
             return 1;
@@ -230,7 +236,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
-                rtx: this.state.rtx,
+                rtx: this.props.graphics || this.state.rtx,
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
                 cameraFollow: !this.props.noCameraFollow,

@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as m from '../../game/messages.model';
+import * as r from '../graphics/render.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as cloud from '../core/cloud';
@@ -26,6 +27,14 @@ namespace Side {
     export const Right = "right";
 }
 
+namespace Graphics {
+    export const Maximum = "maximum";
+    export const Ultra = "ultra";
+    export const High = "high";
+    export const Medium = "medium";
+    export const Low = "low";
+}
+
 interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -44,6 +53,7 @@ interface ControlState {
     cameraFollow: string;
     audioCaching: string;
     sounds: string;
+    graphics: string;
 }
 interface State extends ControlState {
     changed: boolean;
@@ -73,6 +83,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         audioCaching: options.noAudioCaching ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
+        graphics: formatGraphics(options.graphics),
     };
 }
 
@@ -85,6 +96,28 @@ function parseOption(value: string): string {
         return null;
     } else {
         return value;
+    }
+}
+
+function formatGraphics(graphics: number): string {
+    switch (graphics) {
+        case r.GraphicsLevel.Maximum: return Graphics.Maximum;
+        case r.GraphicsLevel.Ultra: return Graphics.Ultra;
+        case r.GraphicsLevel.High: return Graphics.High;
+        case r.GraphicsLevel.Medium: return Graphics.Medium;
+        case r.GraphicsLevel.Low: return Graphics.Low;
+        default: return null;
+    }
+}
+
+function parseGraphics(graphics: string): number {
+    switch (graphics) {
+        case Graphics.Maximum: return r.GraphicsLevel.Maximum;
+        case Graphics.Ultra: return r.GraphicsLevel.Ultra;
+        case Graphics.High: return r.GraphicsLevel.High;
+        case Graphics.Medium: return r.GraphicsLevel.Medium;
+        case Graphics.Low: return r.GraphicsLevel.Low;
+        default: return null;
     }
 }
 
@@ -197,6 +230,17 @@ class ControlsPanel extends React.Component<Props, State> {
             </div>
             <h2>Performance</h2>
             <div className="row">
+                <span className="label">Graphics</span>
+                <select className="value" value={this.state.graphics} onChange={ev => this.onUpdate({ graphics: ev.target.value })}>
+                    <option value={formatOption(null)}>Auto</option>
+                    <option value={Graphics.Maximum}>Maximum</option>
+                    <option value={Graphics.Ultra}>Ultra</option>
+                    <option value={Graphics.High}>High</option>
+                    <option value={Graphics.Medium}>Medium</option>
+                    <option value={Graphics.Low}>Low</option>
+                </select>
+            </div>
+            <div className="row">
                 <span className="label">Audio Caching</span>
                 <select className="value" value={this.state.audioCaching} onChange={ev => this.onUpdate({ audioCaching: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
@@ -265,6 +309,7 @@ class ControlsPanel extends React.Component<Props, State> {
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noAudioCaching = state.audioCaching === Toggle.Off;
+            options.graphics = parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

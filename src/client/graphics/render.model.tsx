@@ -3,11 +3,11 @@ import { Float32List } from './list';
 import ColTuple from './colorTuple';
 
 export namespace GraphicsLevel {
-	export const Ultimate = 4;
-	export const High = 3;
-	export const Normal = 2;
+	export const Maximum = 5;
+	export const Ultra = 4; // Blooms
+	export const High = 3; // Particles
+	export const Medium = 2;
 	export const Low = 1;
-	export const Minimum = 0;
 }
 
 export interface CanvasStack {

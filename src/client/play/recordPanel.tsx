@@ -265,7 +265,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     private renderFrame(world: w.World, canvasStack: CanvasStack) {
         // Game is started
         render(world, canvasStack, {
-            rtx: GraphicsLevel.Ultimate,
+            rtx: GraphicsLevel.Maximum,
             wheelOnRight: false,
             targetingIndicator: false,
             cameraFollow: false,

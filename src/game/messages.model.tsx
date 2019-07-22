@@ -67,6 +67,7 @@ export interface GameOptions {
     mute?: boolean;
     noAudioCaching?: boolean;
     unranked?: boolean;
+    graphics?: number;
 }
 
 export type ActionMsg =
