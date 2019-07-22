@@ -1129,8 +1129,6 @@ const grapple: Spell = {
     throttle: false,
     unlink: true,
 
-    chargeTicks: 6,
-
     release: {},
     maxChannellingTicks: 2 * TicksPerSecond, // projectile time + link time
     movementProportionWhileChannelling: 1,
