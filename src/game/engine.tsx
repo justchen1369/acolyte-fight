@@ -62,7 +62,7 @@ type BehaviourHandlers = {
 	settings.velocityThreshold = 0;
 
 	// We need to adjust this because our scale is not a normal scale and the defaults let some small projectiles tunnel through others
-	settings.linearSlop = 0.000001; // Must be smaller than every impulse used in the game
+	settings.linearSlop = 0.0001; // Must be smaller than every impulse used in the game
 	settings.linearSlopSquared = Math.pow(settings.linearSlop, 2.0);
 	settings.polygonRadius = (2.0 * settings.linearSlop);
 }
