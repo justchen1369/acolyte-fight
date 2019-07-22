@@ -1125,7 +1125,7 @@ const grapple: Spell = {
     icon: "grapple",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
