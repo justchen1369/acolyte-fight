@@ -647,7 +647,7 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, color: string, pos: pl.Vec2, 
 	}
 
 	for (let i = 0; i < NumParticles; ++i) {
-		world.ui.trails.unshift({ // Smoke at bottom
+		unshiftTrail({ // Smoke at bottom
 			type: "circle",
 			pos,
 			velocity: vector.fromAngle(Math.random() * 2 * Math.PI).mul(MaxSpeed * Math.random()),
@@ -657,7 +657,7 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, color: string, pos: pl.Vec2, 
 			fillStyle: color,
 			bloom: 0.015,
 			glow: DefaultGlow,
-		});
+		}, world);
 	}
 }
 
@@ -1074,7 +1074,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 }
 
 function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.Vec2, arriving: boolean, hero: w.Hero, world: w.World) {
-	world.ui.trails.unshift({
+	unshiftTrail({
 		type: "circle",
 		pos,
 		velocity: particleVelocity(outward, 0.1),
@@ -1086,7 +1086,7 @@ function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.V
 		glow: 0.05,
 		bloom: DefaultBloomRadius,
 		vanish: 1,
-	});
+	}, world);
 
 	if (arriving) {
 		ctxStack.sounds.push({ id: `joining-${hero.id}`, sound: 'joining', pos });
@@ -1213,7 +1213,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	}
 
 	// Buffs on the bottom
-	world.ui.trails.unshift({
+	unshiftTrail({
 		type: "circle",
 		pos,
 		velocity,
@@ -1225,7 +1225,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		shine: render.shine,
 		fade: render.fade,
 		vanish: render.vanish,
-	});
+	}, world);
 
 	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.High) {
 		glx.circle(ctxStack, pos, {
@@ -2714,6 +2714,14 @@ function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: nu
 	ctx.fillText(text, x, y);
 
 	ctx.restore();
+}
+
+function unshiftTrail(trail: w.Trail, world: w.World) {
+	if (world.ui.renderedTick === world.tick) {
+		// If network hangs and we keep re-rendering the same frame, don't need to add another trail to a tick when it already has one
+		return;
+	}
+	world.ui.trails.unshift(trail);
 }
 
 function pushTrail(trail: w.Trail, world: w.World) {
