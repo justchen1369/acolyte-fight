@@ -226,7 +226,7 @@ export async function cache(sounds: Sounds) {
 
 async function bufferSoundBite(bite: SoundBite) {
     try {
-        const ExtraSeconds = 2;
+        const ExtraSeconds = 1;
 
         const OfflineAudioContext = getOfflineAudioContextConstructor();
         const offlineCtx = new OfflineAudioContext(1, (bite.stopTime + ExtraSeconds) * SampleRate, SampleRate);
@@ -353,7 +353,6 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironm
     const cacheItem = biteCache.get(bite);
     if (cacheItem) {
         replayBuffer(cacheItem.buffer, env, nodes, next, () => {
-            nodes.forEach(node => node.disconnect());
         });
     } else {
         next = createAttackDecayNode(bite, env, nodes, next);
@@ -362,7 +361,6 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironm
         next = createLowPassNode(bite, env, nodes, next);
 
         createSource(bite, env, nodes, next, () => {
-            nodes.forEach(node => node.disconnect());
         });
     }
 
