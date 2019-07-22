@@ -28,6 +28,7 @@ namespace Side {
 }
 
 namespace Graphics {
+    export const Auto = "auto";
     export const Maximum = "maximum";
     export const Ultra = "ultra";
     export const High = "high";
@@ -106,7 +107,7 @@ function formatGraphics(graphics: number): string {
         case r.GraphicsLevel.High: return Graphics.High;
         case r.GraphicsLevel.Medium: return Graphics.Medium;
         case r.GraphicsLevel.Low: return Graphics.Low;
-        default: return null;
+        default: return Graphics.Auto;
     }
 }
 
