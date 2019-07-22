@@ -1597,7 +1597,7 @@ export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFi
 function removeUnknownProjectilesFromHero(hero: w.Hero, world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "projectile" && obj.owner === hero.id && !hero.spellsToKeys.has(obj.type)) {
-			destroyObject(world, obj);
+			obj.expireTick = world.tick;
 		}
 	});
 }
@@ -2025,7 +2025,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		linkTo(projectile, obstacle, world);
 		applySwap(projectile, obstacle, world);
 		applyBuffsFromProjectile(projectile, obstacle, world);
-		destroyObject(world, projectile);
+		projectile.expireTick = world.tick;
 	}
 }
 
@@ -2036,7 +2036,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 		detonateProjectile(projectile, world);
 		linkTo(projectile, other, world);
 		applySwap(projectile, other, world);
-		destroyObject(world, projectile);
+		projectile.expireTick = world.tick;
 	}
 }
 
@@ -2056,7 +2056,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	if (!myProjectile && expireOn(world, projectile, shield)) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
 		applySwap(projectile, shield, world);
-		destroyObject(world, projectile);
+		projectile.expireTick = world.tick;
 	}
 }
 
@@ -2121,7 +2121,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	}
 	if (expireOn(world, projectile, hero)) {
 		detonateProjectile(projectile, world);
-		destroyObject(world, projectile);
+		projectile.expireTick = world.tick;
 	}
 }
 
@@ -3674,7 +3674,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		|| (saber.channelling && !(hero.casting && hero.casting.action.type === saber.spellId))
 		|| (hero.cleanseTick > saber.createTick)) {
 		// Dead, cancelled or cleansed
-		destroyObject(world, shield);
+		shield.expireTick = world.tick;
 		return false;
 	}
 
