@@ -404,7 +404,7 @@ function renderHeroDeath(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World)
 			velocity,
 			fillStyle: "white",
 			radius: hero.radius,
-			glow: DefaultGlow,
+			glow: 0.05,
 			bloom: DefaultBloomRadius,
 		}, world);
 	}
