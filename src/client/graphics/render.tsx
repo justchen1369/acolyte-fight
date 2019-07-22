@@ -1640,11 +1640,19 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = hero.body.getPosition();
 		const angle = shield.body.getAngle();
 
+		// Draw the saber
 		const tip = vector.fromAngle(angle).mul(shield.length).add(pos);
 		glx.line(ctxStack, pos, tip, {
 			color,
 			minRadius: 0,
 			maxRadius: shield.width,
+			feather: null, // Don't bloom the saber, bloom the owner
+		});
+
+		// Bloom the owner
+		glx.circle(ctxStack, pl.Vec2.mid(pos, tip), {
+			color,
+			maxRadius: 0,
 			feather,
 		});
 

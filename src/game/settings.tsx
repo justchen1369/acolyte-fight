@@ -1930,7 +1930,7 @@ const saber: Spell = {
     color: '#00ccff',
     shine: 0.1,
     glow: 0.2,
-    bloom: 0.01,
+    bloom: 0.03,
 
     sound: "saber",
     action: "saber",
@@ -1973,7 +1973,7 @@ const dualSaber: Spell = {
     color: '#ff0044',
     shine: 0.1,
     glow: 0.2,
-    bloom: 0.01,
+    bloom: 0.03,
 
     sound: "saber",
     action: "saber",
