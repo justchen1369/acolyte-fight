@@ -15,7 +15,7 @@ const Hero: HeroSettings = {
     AngularDamping: 100,
     Damping: 3,
 
-    DamageMitigationTicks: 90,
+    DamageMitigationTicks: 5 * TicksPerSecond,
     ThrottleTicks: 15,
 
     MaxHealth: 100,
@@ -278,7 +278,7 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 30 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 3 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 30 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -352,7 +352,7 @@ const difire: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 20 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true, noKnockback: true }, // 2 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 20 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true }, // 2 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -690,7 +690,6 @@ const boomerang: Spell = {
         maxTicks: 5 * TicksPerSecond,
         damage: 30,
         lifeSteal: 0.2,
-        noKnockback: true,
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
         hitInterval: 15, // So repeated hits to obstacles work
@@ -833,6 +832,7 @@ const backlash: Spell = {
         expireOn: Categories.Projectile ^ Categories.Hero,
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
+        noKnockback: true,
 
         behaviours: [
             {
@@ -1763,6 +1763,7 @@ const iceBomb: Spell = {
         damage: 0,
         lifeSteal: 0.2,
         knockbackScaling: false,
+        noKnockback: true,
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
