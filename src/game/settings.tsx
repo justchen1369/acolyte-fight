@@ -2145,7 +2145,6 @@ const icewall: Spell = {
     maxRange: 0.25,
     movementProportionWhileCharging: 1.0,
     maxTicks: 1.5 * TicksPerSecond,
-    chargeTicks: 6,
     growthTicks: 5,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
