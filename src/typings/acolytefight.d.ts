@@ -244,7 +244,7 @@ declare interface SpellBase {
 	id: string;
 	name?: string;
 	description: string;
-	effects?: EffectInfo[];
+	effects?: EffectInfo[]; // Only used for display purposes
 
 	action: string; // Which action function to use
 	sound?: string; // Which sound to use for charging/channelling

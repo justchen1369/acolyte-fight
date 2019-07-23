@@ -1220,12 +1220,13 @@ h3 {
 }
 
 .spell-config .key-detail-container .randomize-btn {
+    cursor: hand;
     position: absolute;
-    left: 0;
+    right: 0;
     bottom: 0;
-    margin: 20px 0;
+    margin: 20px;
     padding: 0;
-    font-size: 80%;
+    font-size: 75%;
     
 }
 
@@ -1272,13 +1273,14 @@ h3 {
 .spell-effect {
     font-size: 75%;
     margin-bottom: 0.5em;
-    color: #ddd;
+    color: #ccc;
+    font-style: italic;
 }
 
 .spell-config .spell-effect > i {
     display: inline-block;
     text-align: center;
-    min-width: 1em;
+    min-width: 1.25em;
 }
 
 .spell-config .key-options {

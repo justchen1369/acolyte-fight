@@ -76,7 +76,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                     {this.renderEffects(displaying.effects)}
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
-                <Button className="randomize-btn" onClick={() => this.onRandomizeClick()}><i className="fas fa-dice" /> Randomize</Button>
+                <Button className="clickable randomize-btn" onClick={() => this.onRandomizeClick()}><i className="fas fa-dice" /> Randomize</Button>
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;

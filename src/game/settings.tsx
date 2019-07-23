@@ -107,6 +107,12 @@ const Choices: ChoiceSettings = {
     },
 }
 
+const cleanse: EffectInfo = {
+    icon: "fas fa-briefcase-medical",
+    title: "Cleanse",
+    text: "Clears all positive and negative effects currently affecting you.",
+};
+
 const move: MoveSpell = {
     id: Actions.Move,
     description: "",
@@ -485,7 +491,16 @@ const meteorite: Spell = {
 const kamehameha: Spell = {
     id: 'kamehameha',
     name: 'Acolyte Beam',
-    description: "Unleash a beam so powerful it can wipe out a full-health enemy in seconds. If you take an enemy hit, Acolyte Beam will be cancelled, but if it is cancelled within 1 second, you can cast it again immediately.",
+    description: "Unleash a beam so powerful it can wipe out a full-health enemy in seconds.",
+
+    effects: [
+        {
+            icon: "fas fa-hand-paper",
+            title: "Interruptible",
+            text: "If you take an enemy hit, Acolyte Beam will be interrupted.",
+        },
+    ],
+
     action: "spray",
     sound: "kamehameha",
 
@@ -563,7 +578,16 @@ const lightning: Spell = {
 const blast: Spell = {
     id: 'blast',
     name: 'Acolyte Blast',
-    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage and knockback. Just don't get interrupted while charging!",
+    description: "Hold down the button to charge your blast for longer. Charge for 2 seconds for maximum damage and knockback.",
+
+    effects: [
+        {
+            icon: "fas fa-hand-paper",
+            title: "Interruptible",
+            text: "If you take an enemy hit, Acolyte Blast will be interrupted.",
+        },
+    ],
+
     action: "charge",
 
     color: '#0ff',
@@ -860,7 +884,19 @@ const backlash: Spell = {
 const rocket: Spell = {
     id: 'rocket',
     name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Enemies hit will be unable to move for a short time. Cast Spirit Missile again to detonate at exactly the right moment.",
+    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Cast Spirit Missile again to detonate at exactly the right moment.",
+    effects: [
+        {
+            icon: "fas fa-hand-paper",
+            title: "Interruptible",
+            text: "If you take an enemy hit, Spirit Missile will be interrupted.",
+        },
+        {
+            icon: "fas fa-snowflake",
+            title: "Freeze",
+            text: "Enemies hit will be unable to move for a short time.",
+        },
+    ],
     action: "focus",
 
     color: '#ff8855',
@@ -948,7 +984,14 @@ const rocket: Spell = {
 const whip: Spell = {
     id: 'whip',
     name: 'Electroshock',
-    description: "Shock your enemies at short-range. Electroshock lifesteals from your enemy, and also gives you a 20% movement speed bonus for 3 seconds.",
+    description: "Shock your enemies at short-range. Electroshock lifesteals from your enemy.",
+    effects: [
+        {
+            icon: "fas fa-running",
+            title: "Fast",
+            text: "Gain a 20% movement speed bonus for 3 seconds when casting (even if you miss).",
+        },
+    ],
     action: "projectile",
 
     color: '#39fffa',
@@ -1366,7 +1409,14 @@ const renderGravity: RenderSwirl = {
 const gravity: Spell = {
     id: 'gravity',
     name: 'Ensnare',
-    description: "Hold an enemy in place while you unleash your volleys upon them. Your enemy will be unable to cast spells for 0.75 seconds.",
+    description: "Hold an enemy in place while you unleash your volleys upon them.",
+    effects: [
+        {
+            icon: "fas fa-hourglass-half",
+            title: "Silence",
+            text: "Your enemy will be unable to cast spells for 0.75 seconds.",
+        }
+    ],
     action: "projectile",
 
     color: '#0ace00',
@@ -1425,7 +1475,14 @@ const gravity: Spell = {
 const whirlwind: Spell = {
     id: 'whirlwind',
     name: 'Freezing Breath',
-    description: "Enemies caught in your freezing breath will be slowed for 2 seconds. The freezing whirlwind will also catch enemy projectiles.",
+    description: "A freezing whirlwind to slow your enemies. The whirlwind also catches enemy projectiles.",
+    effects: [
+        {
+            icon: "fas fa-snowflake",
+            title: "Slow",
+            text: "Enemies caught in your freezing breath will be slowed 50% for 2 seconds.",
+        }
+    ],
     action: "projectile",
 
     color: '#44ffff',
@@ -1573,7 +1630,19 @@ const supernova: Spell = {
 const halo: Spell = {
     id: 'halo',
     name: 'Halo',
-    description: "Build up to 3 halos over 3 seconds, gaining a 20% speed bonus, then touch your enemy for lifesteal. The halos and speed bonus will be interrupted if you are hit, or if you cast another spell.",
+    description: "Build up to 3 halos over 3 seconds, then touch your enemy for lifesteal.",
+    effects: [
+        {
+            icon: "fas fa-running",
+            title: "Fast",
+            text: "Gain a 20% movement speed boost.",
+        },
+        {
+            icon: "fas fa-hand-paper",
+            title: "Interruptible",
+            text: "The halos and speed boost will be cancelled if you are hit, or if you cast another spell.",
+        },
+    ],
     action: "spray",
 
     color: '#ffaa77',
@@ -1736,8 +1805,15 @@ const mines: Spell = {
 const iceBomb: Spell = {
     id: 'iceBomb',
     name: 'Frostsplatter',
-    description: "Freeze nearby enemies for 1 second.",
+    description: "Shoot a splatter of frost in a wide arc.",
     action: "spray",
+    effects: [
+        {
+            icon: "fas fa-snowflake",
+            title: "Freeze",
+            text: "Freeze nearby enemies for 1 second.",
+        },
+    ],
     sound: "iceBomb",
 
     color: '#44ffff',
@@ -1987,7 +2063,7 @@ const dualSaber: Spell = {
 const scourge: Spell = {
     id: 'scourge',
     name: 'Overload',
-    description: "Release a melee-range explosion that will send your enemies flying. Enemies hit by Overload cannot cast spells for 1 second. Be careful - this spell is so powerful it costs you some health too.",
+    description: "Release a melee-range explosion that will send your enemies flying. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
 
     detonate: {
@@ -2079,10 +2155,11 @@ const teleport: Spell = {
 
     effects: [
         {
-            icon: "fas fa-tint",
-            title: "Teleport sickness",
+            icon: "fas fa-heartbeat",
+            title: "Weak",
             text: "For 0.5 seconds after teleporting, you will only deal 25% damage and cannot deal fatal damage.",
-        }
+        },
+        cleanse,
     ],
 
     range: 0.3,
@@ -2114,6 +2191,9 @@ const thrust: Spell = {
     id: 'thrust',
     name: 'Charge',
     description: "Accelerate quickly, knocking away anything in your path.",
+    effects: [
+        cleanse,
+    ],
 
     range: 0.4,
     radiusMultiplier: 1.5,
@@ -2157,6 +2237,9 @@ const swap: Spell = {
     id: 'swap',
     name: 'Swap',
     description: "Swap positions with an enemy, obstacle or meteor. Teleports if you miss.",
+    effects: [
+        cleanse,
+    ],
     action: "projectile",
 
     color: '#23e3ff',
@@ -2221,6 +2304,9 @@ const voidRush: Spell = {
     id: 'voidRush',
     name: 'Void Rush',
     description: "For 2.5 seconds, increase movement speed 2x, and also become immune to damage from the void.",
+    effects: [
+        cleanse,
+    ],
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2262,6 +2348,9 @@ const vanish: Spell = {
     id: 'vanish',
     name: 'Vanish',
     description: "Vanish from sight for 2.5 seconds, and also increase movement speed 2x.",
+    effects: [
+        cleanse,
+    ],
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
