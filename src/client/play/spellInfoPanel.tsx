@@ -71,8 +71,17 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
             <div className="spell-description">
                 {spell.description}
             </div>
+            {this.renderEffects(spell.effects)}
             <SpellStats spellId={this.props.hoverSpellId} settings={this.props.settings} />
         </div>;
+    }
+
+    private renderEffects(effects: EffectInfo[]) {
+        if (!effects) {
+            return null;
+        }
+
+        return effects.map(effect => <div className="spell-effect" key={effect.title}><i className={effect.icon} /> <b>{effect.title}:</b> {effect.text}</div>);
     }
 }
 

@@ -59,7 +59,8 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
         const chosen = spellUtils.resolveSpellForKey(btn, this.props.config, this.props.settings);
         const hovering = Spells[this.state.hovering];
 
-        const isRightClick = keyboardUtils.isSpecialKey(btn);
+        const displaying = hovering || chosen;
+
         return <div className="key"
             onTouchStart={ev => ev.stopPropagation()}
             onMouseDown={ev => ev.stopPropagation()}
@@ -70,14 +71,23 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             </div>
             <div className="key-detail-container">
                 <div className="key-detail">
-                    <div className="spell-name">{spellUtils.spellName(hovering ? hovering : chosen)}</div>
-                    <div className="description">{hovering ? hovering.description : chosen.description}</div>
+                    <div className="spell-name">{spellUtils.spellName(displaying)}</div>
+                    <div className="spell-description">{displaying.description}</div>
+                    {this.renderEffects(displaying.effects)}
                 </div>
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
                 <Button className="randomize-btn" onClick={() => this.onRandomizeClick()}><i className="fas fa-dice" /> Randomize</Button>
             </div>
             {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;
+    }
+
+    private renderEffects(effects: EffectInfo[]) {
+        if (!effects) {
+            return null;
+        }
+
+        return effects.map(effect => <div className="spell-effect" key={effect.title}><i className={effect.icon} /> <b>{effect.title}:</b> {effect.text}</div>);
     }
 
     private renderOptionsRow(rowIndex: number, row: string[], chosenId: string) {

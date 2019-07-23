@@ -243,7 +243,9 @@ declare type Spell =
 declare interface SpellBase {
 	id: string;
 	name?: string;
-    description: string;
+	description: string;
+	effects?: EffectInfo[];
+
 	action: string; // Which action function to use
 	sound?: string; // Which sound to use for charging/channelling
 	untargeted?: boolean; // No target required. i.e. cast instantly when you click the button
@@ -270,6 +272,12 @@ declare interface SpellBase {
 
 	color: string; // The colour of the button for this spell (not the projectile)
 	glow?: number; // 0 means no glow, 1 means full glow around acolyte when casting
+}
+
+declare interface EffectInfo {
+	icon: string; // Font awesome or RPG awesome class: see https://fontawesome.com/icons or https://nagoshiashumari.github.io/Rpg-Awesome/
+	title: string;
+	text: string;
 }
 
 declare interface ReleaseParams {

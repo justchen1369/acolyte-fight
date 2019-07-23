@@ -2075,7 +2075,15 @@ const icewall: Spell = {
 };
 const teleport: Spell = {
     id: 'teleport',
-    description: "Teleport to a nearby location. Get close, or get away. Teleport sickness: For 0.5 seconds after teleporting, you will only deal 25% damage and cannot do fatal damage.",
+    description: "Teleport to a nearby location. Get close, or get away.",
+
+    effects: [
+        {
+            icon: "fas fa-tint",
+            title: "Teleport sickness",
+            text: "For 0.5 seconds after teleporting, you will only deal 25% damage and cannot deal fatal damage.",
+        }
+    ],
 
     range: 0.3,
     maxAngleDiffInRevs: 1.0,
