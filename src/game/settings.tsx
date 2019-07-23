@@ -2056,7 +2056,7 @@ const icewall: Spell = {
     damageMultiplier: 0.25,
 
     length: 0.005,
-    width: 0.1,
+    width: 0.15,
     density: 100,
     linearDamping: 6,
     angularDamping: 100,
@@ -2068,7 +2068,7 @@ const icewall: Spell = {
 
     color: '#0088ff',
     glow: 0.2,
-    bloom: 0.02,
+    bloom: 0.03,
 
     action: "wall",
     sound: "icewall",
