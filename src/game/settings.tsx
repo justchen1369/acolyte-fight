@@ -1978,6 +1978,13 @@ const saber: Spell = {
     id: 'saber',
     name: 'Lightsaber',
     description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
+    effects: [
+        {
+            icon: "fas fa-unlink",
+            title: "Detach",
+            text: "Lightsaber cuts through any Links or Grapples currently attached to you.",
+        },
+    ],
     untargeted: true,
 
     unlink: true,
@@ -2021,9 +2028,17 @@ const dualSaber: Spell = {
     id: 'dualSaber',
     name: 'Dualsaber',
     description: "Swing dual lightsabers to deflect projectiles and knockback enemies!",
+    effects: [
+        {
+            icon: "fas fa-unlink",
+            title: "Detach",
+            text: "Dualsaber cuts through any Links or Grapples currently attached to you.",
+        },
+    ],
     untargeted: true,
 
     unlink: true,
+    delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
