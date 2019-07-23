@@ -1107,7 +1107,7 @@ const link: Spell = {
             targetFactor: 1,
             minDistance: 0.025,
             maxDistance: 0.1,
-            linkTicks: 2 * TicksPerSecond,
+            linkTicks: 1.5 * TicksPerSecond,
 
             redirectDamage: {
                 selfProportion: 0,
