@@ -1814,6 +1814,14 @@ const horcrux: Spell = {
     cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
+    buffs: [
+        { // Normally attacks can make your life go negative, which makes it hard to recover from. With Horcrux any lifesteal should save you.
+            type: "lifeSteal",
+            maxTicks: 2 * TicksPerSecond,
+            minHealth: 0,
+        },
+    ],
+
     projectile: {
         density: 10,
         restitution: 0,
