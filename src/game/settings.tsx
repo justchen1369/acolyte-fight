@@ -1070,7 +1070,14 @@ const whip: Spell = {
 
 const link: Spell = {
     id: 'link',
-    description: "Pull your enemy to you. While linked, all received damage is instead applied to your enemy.",
+    description: "Pull your enemy towards you.",
+    effects: [
+        {
+            icon: "fas fa-exchange",
+            title: "Redirect",
+            text: "While linked, all received damage is instead applied to your enemy.",
+        }
+    ],
     action: "projectile",
 
     color: '#0000ff',
