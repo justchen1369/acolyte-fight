@@ -1136,7 +1136,7 @@ const grapple: Spell = {
     projectile: {
         density: 1,
         knockbackScaling: false,
-        radius: 0.003,
+        radius: 0.005,
         speed: 1,
         maxTicks: 15,
         damage: 0,
@@ -1201,7 +1201,7 @@ const grapple: Spell = {
         color: '#f02',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
                 color: '#f02',
