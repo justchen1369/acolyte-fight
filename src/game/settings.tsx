@@ -1286,7 +1286,7 @@ const bouncer: Spell = {
         damage: 10,
         knockbackScaling: false,
         lifeSteal: 0.2,
-        collideWith: Categories.All ^ Categories.Projectile,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
         expireOn: Categories.Massive,
         shieldTakesOwnership: false,
         bounce: {
