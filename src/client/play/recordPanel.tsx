@@ -107,7 +107,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     render() {
         const style = { top: this.state.top, left: this.state.left, width: this.state.size, height: this.state.size };
         return (
-            <div id="game-panel">
+            <div id="game-panel" onClick={() => this.onGameClick()}>
                 <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
                     <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
                 </span>
@@ -132,6 +132,10 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 <UrlListener />
             </div>
         );
+    }
+
+    private onGameClick() {
+        audio.unlock();
     }
 
     private onDownloadClicked(ev: React.MouseEvent) {
