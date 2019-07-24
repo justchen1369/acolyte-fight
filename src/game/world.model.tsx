@@ -741,6 +741,7 @@ export interface DamagePacket {
 	isLava?: boolean;
 	noHit?: boolean;
 	minHealth?: number;
+	noMitigate?: boolean;
 	noRedirect?: boolean;
 	noKnockback?: boolean;
 }

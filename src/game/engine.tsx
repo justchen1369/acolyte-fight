@@ -3046,6 +3046,7 @@ function applyLavaDamage(world: w.World) {
 		lifeSteal: World.LavaLifestealProportion,
 		fromHeroId: null,
 		isLava: true,
+		noMitigate: true,
 	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
@@ -4019,7 +4020,9 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	// Apply damage
 	let amount = Math.max(0, packet.damage);
 	amount = applyArmor(fromHeroId, toHero, amount);
-	amount = mitigateDamage(toHero, amount, fromHeroId, world);
+	if (!packet.noMitigate) {
+		amount = mitigateDamage(toHero, amount, fromHeroId, world);
+	}
 	if (!packet.noRedirect) {
 		amount = redirectDamage(toHero, amount, packet.isLava, world);
 	}
