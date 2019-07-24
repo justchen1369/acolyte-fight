@@ -26,7 +26,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class LoginButton extends React.Component<Props> {
+class LoginButton extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
         this.state = {

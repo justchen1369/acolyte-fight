@@ -80,7 +80,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class RegionList extends React.Component<Props, State> {
+class RegionList extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

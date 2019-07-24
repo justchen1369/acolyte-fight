@@ -45,7 +45,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class UserStatsPanel extends React.Component<Props, State> {
+class UserStatsPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

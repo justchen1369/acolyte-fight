@@ -24,7 +24,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class NameConfig extends React.Component<Props, State> {
+class NameConfig extends React.PureComponent<Props, State> {
     private saveStateDebounced = _.debounce(() => this.saveState(), 500);
 
     constructor(props: Props) {

@@ -19,7 +19,7 @@ interface State {
     hovering: boolean;
 }
 
-export class SpellIcon extends React.Component<Props, State> {
+export class SpellIcon extends React.PureComponent<Props, State> {
     private elem: HTMLCanvasElement = null;
 
     constructor(props: Props) {

@@ -41,7 +41,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class Root extends React.Component<Props> {
+class Root extends React.PureComponent<Props> {
     constructor(props: Props) {
         super(props);
         this.state = {

@@ -18,7 +18,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class DebugPanel extends React.Component<Props, State> {
+export class DebugPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

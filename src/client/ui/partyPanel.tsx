@@ -45,7 +45,7 @@ function PartyMode(props: { selected: boolean, onClick: () => void, children?: R
     </div>
 }
 
-export class PartyPanel extends React.Component<Props, State> {
+export class PartyPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

@@ -122,7 +122,7 @@ function parseGraphics(graphics: string): number {
     }
 }
 
-class ControlsPanel extends React.Component<Props, State> {
+class ControlsPanel extends React.PureComponent<Props, State> {
     private saveStateDebounced = _.debounce(() => this.saveState(), 500);
 
     constructor(props: Props) {

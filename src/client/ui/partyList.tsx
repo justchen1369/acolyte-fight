@@ -25,7 +25,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class HomePanel extends React.Component<Props, State> {
+class HomePanel extends React.PureComponent<Props, State> {
     render() {
         return this.props.party ? this.renderParty() : this.renderNoParty();
     }

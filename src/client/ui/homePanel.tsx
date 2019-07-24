@@ -28,7 +28,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class HomePanel extends React.Component<Props, State> {
+class HomePanel extends React.PureComponent<Props, State> {
     private belowFoldElem: HTMLElement = null;
 
     constructor(props: Props) {

@@ -30,7 +30,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class AiPanel extends React.Component<Props, State> {
+class AiPanel extends React.PureComponent<Props, State> {
     private saveStateDebounced = _.debounce(() => this.saveState(), 200);
 
     constructor(props: Props) {

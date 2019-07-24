@@ -14,7 +14,7 @@ interface Props {
     onClick?: (ev: React.MouseEvent) => void;
 }
 
-class CustomItem extends React.Component<Props> {
+class CustomItem extends React.PureComponent<Props> {
     render() {
         const classSelectors: any = {
             'nav-item': true,

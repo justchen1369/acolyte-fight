@@ -21,7 +21,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class Link extends React.Component<Props> {
+class Link extends React.PureComponent<Props> {
     render() {
         const href = url.getPath({
             ...this.props.current,

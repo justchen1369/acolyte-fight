@@ -33,7 +33,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class ProfilePanel extends React.Component<Props, State> {
+export class ProfilePanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

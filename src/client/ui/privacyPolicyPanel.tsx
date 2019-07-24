@@ -6,7 +6,7 @@ interface Props {
 interface State {
 }
 
-export class PrivacyPolicyPanel extends React.Component<Props, State> {
+export class PrivacyPolicyPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

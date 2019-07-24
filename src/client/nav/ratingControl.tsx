@@ -27,7 +27,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class RatingControl extends React.Component<Props> {
+class RatingControl extends React.PureComponent<Props> {
     private uploadSettingsDebounced = _.debounce(() => cloud.uploadSettings(), 200);
 
     constructor(props: Props) {

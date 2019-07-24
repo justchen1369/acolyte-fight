@@ -37,7 +37,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class ProfileGameList extends React.Component<Props, State> {
+class ProfileGameList extends React.PureComponent<Props, State> {
     private getGameSubset = Reselect.createSelector(
         (props: State) => props.category,
         (props: State) => props.allGameStats,

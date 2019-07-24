@@ -23,7 +23,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class UnrankedTogglePanel extends React.Component<Props, State> {
+export class UnrankedTogglePanel extends React.PureComponent<Props, State> {
     private uploadSettingsDebounced = _.debounce(() => cloud.uploadSettings(), 200);
 
     constructor(props: Props) {

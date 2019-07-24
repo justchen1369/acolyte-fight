@@ -11,21 +11,20 @@ interface OwnProps {
 }
 
 interface Props extends OwnProps {
-    heroColor: string;
+    world: w.World;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
-        heroColor: heroColor(ownProps.player.heroId, state.world),
+        world: state.world,
     };
 }
 
 class PlayerName extends React.PureComponent<Props> {
     render() {
         const player = this.props.player;
-        
-        const color = this.props.colorOverride || this.props.heroColor;
+        const color = this.props.colorOverride || heroColor(player.heroId, this.props.world);
 
         let title = player.name;
         if (player.isBot) {

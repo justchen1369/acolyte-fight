@@ -43,7 +43,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class LeaderboardPanel extends React.Component<Props, State> {
+class LeaderboardPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

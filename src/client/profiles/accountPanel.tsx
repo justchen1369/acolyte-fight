@@ -19,7 +19,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class AccountPanel extends React.Component<Props, State> {
+export class AccountPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

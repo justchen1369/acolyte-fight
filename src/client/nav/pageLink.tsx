@@ -29,7 +29,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class PageLink extends React.Component<Props> {
+class PageLink extends React.PureComponent<Props> {
     render() {
         const page = this.props.page;
         const profileId = this.props.profileId || null;

@@ -30,7 +30,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class PartyGameList extends React.Component<Props, State> {
+class PartyGameList extends React.PureComponent<Props, State> {
     private getGameSubset = Reselect.createSelector(
         (props: Props) => props.partyId,
         (props: Props) => props.allGameStats,

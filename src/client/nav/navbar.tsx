@@ -34,7 +34,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class NavBar extends React.Component<Props, State> {
+class NavBar extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

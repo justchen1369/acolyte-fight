@@ -25,7 +25,7 @@ function requestUpdate(props: Props) {
     online.start(segments.calculateSegment(props.roomId, props.partyId, props.isPrivate));
 }
 
-class OnlineSegmentListener extends React.Component<Props, State> {
+class OnlineSegmentListener extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
 

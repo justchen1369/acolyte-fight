@@ -26,7 +26,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class SettingsPanel extends React.Component<Props, State> {
+export class SettingsPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

@@ -15,7 +15,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class SocialBar extends React.Component<Props, State> {
+class SocialBar extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {

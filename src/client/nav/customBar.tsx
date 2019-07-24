@@ -11,7 +11,7 @@ interface State {
     open: boolean;
 }
 
-class CustomBar extends React.Component<Props, State> {
+class CustomBar extends React.PureComponent<Props, State> {
     private windowClickListener = this.onWindowClick.bind(this);
 
     constructor(props: Props) {
