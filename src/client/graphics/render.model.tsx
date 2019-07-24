@@ -32,7 +32,6 @@ export interface RenderOptions {
 	targetingIndicator: boolean;
 	cameraFollow: boolean;
 	wheelOnRight: boolean;
-	mute: boolean;
 	keysToSpells: Map<string, string>;
 	rebindings: KeyBindings;
 	rtx: number;

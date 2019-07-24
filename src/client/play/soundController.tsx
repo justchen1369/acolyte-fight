@@ -14,6 +14,7 @@ interface Props {
     items: s.NotificationItem[];
     sounds: Sounds;
     myHeroId: string;
+    noAudioCaching: boolean;
 }
 interface State {
 }
@@ -25,6 +26,7 @@ function stateToProps(state: s.State): Props {
         items: state.items,
         sounds: state.world.settings.Sounds,
         myHeroId: state.world.ui.myHeroId,
+        noAudioCaching: state.options.noAudioCaching,
     };
 }
 
@@ -36,8 +38,14 @@ class SoundController extends React.PureComponent<Props, State> {
     }
 
     render(): React.ReactNode {
-        if (this.props.mute) {
-            return null;
+        if (!this.props.noAudioCaching) {
+            audio.cache(this.props.sounds);
+        }
+
+        if (!this.props.mute) {
+            audio.unmute();
+        } else {
+            audio.mute();
         }
 
         const elems = new Array<audio.AudioElement>();
@@ -47,7 +55,6 @@ class SoundController extends React.PureComponent<Props, State> {
                 elems.push({ id: item.key, sound });
             }
         });
-
         if (elems.length > 0) {
             const Sounds = this.props.sounds;
             audio.playUnattached(elems, Sounds);

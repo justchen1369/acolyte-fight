@@ -32,7 +32,6 @@ interface CancellationToken {
 interface Props {
     recordId: string;
     server: string;
-    mute: boolean;
     sounds: Sounds;
 }
 interface State {
@@ -50,7 +49,6 @@ function stateToProps(state: s.State): Props {
     return {
         recordId: state.current.recordId,
         server: state.current.server,
-        mute: state.options.mute,
         sounds: state.world.settings.Sounds,
     };
 }
@@ -216,12 +214,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
 
         // Firefox cannot start capturing stream until Canvas has had getContext called on it, so do this here
         const videoStream = recording.recordCanvas(canvasStack.gl);
-        let stream = videoStream;
-
-        if (!this.props.mute) {
-            const audioStream = audio.record();
-            stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
-        }
+        const audioStream = audio.record();
+        const stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
 
         const videoRecorder = new VideoRecorder(stream);
         try {
@@ -269,7 +263,6 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             wheelOnRight: false,
             targetingIndicator: false,
             cameraFollow: false,
-            mute: this.props.mute,
             keysToSpells: new Map<string, string>(),
             rebindings: {},
             retinaMultiplier: 1,

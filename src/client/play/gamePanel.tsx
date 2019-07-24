@@ -10,7 +10,6 @@ import * as screenLifecycle from '../ui/screenLifecycle';
 import * as StoreProvider from '../storeProvider';
 import * as watcher from '../core/watcher';
 
-import AudioCacheController from './audioCacheController';
 import Button from '../controls/button';
 import ControlSurface from './controlSurface';
 import InfoPanel from './infoPanel';
@@ -61,7 +60,6 @@ class GamePanel extends React.PureComponent<Props, State> {
         const customizing = this.props.customizing;
         return (
             <ControlSurface>
-                <AudioCacheController />
                 <CanvasPanel />
                 {!customizing && <>
                     <InfoPanel />

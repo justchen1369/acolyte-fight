@@ -245,8 +245,7 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 }
 
 function playSounds(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
-	if (options.mute
-		|| world.tick <= world.ui.playedTick // Already played this tick
+	if (world.tick <= world.ui.playedTick // Already played this tick
 		|| (world.tick - world.ui.playedTick) > MaxDestroyedTicks) { // We've lagged or entered a game late, don't replay all the sounds because it just causes WebAudio to hang
 
 		// Play nothing

@@ -30,6 +30,7 @@ interface AudioEnvironment extends OutputEnvironment {
     ctx: AudioContext;
     final: AudioNode;
     next: AudioNode;
+    muted: boolean;
     recordingDestination: MediaStreamAudioDestinationNode;
     locked: boolean;
 }
@@ -156,12 +157,9 @@ export function init() {
     ctx.listener.setPosition(0.5, 0.5, 0);
     ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
 
-    let next: AudioNode = ctx.destination;
-
     const compressor = ctx.createDynamicsCompressor();
     const final = compressor;
-    compressor.connect(next);
-    next = compressor;
+    let next: AudioNode = compressor;
 
     const masterVolume = ctx.createGain();
     masterVolume.connect(next);
@@ -172,6 +170,7 @@ export function init() {
         ctx,
         final,
         next,
+        muted: true,
         recordingDestination: null,
         locked: true,
     };
@@ -249,6 +248,24 @@ export function unlock() {
             env.ctx.resume();
         }
     }
+}
+
+export function mute() {
+    if (env.muted) {
+        return;
+    }
+
+    env.final.disconnect(env.ctx.destination);
+    env.muted = true;
+}
+
+export function unmute() {
+    if (!env.muted) {
+        return;
+    }
+
+    env.final.connect(env.ctx.destination);
+    env.muted = false;
 }
 
 export function record() {
