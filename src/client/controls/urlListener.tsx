@@ -15,7 +15,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class UrlListener extends React.Component<Props, State> {
+class UrlListener extends React.PureComponent<Props, State> {
     render(): JSX.Element {
         const previous = window.history.state || url.parseLocation(window.location);
 

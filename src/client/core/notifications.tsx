@@ -60,11 +60,8 @@ function notificationCleanup() {
     }
 
     const now = new Date().getTime();
-    let items = new Array<s.NotificationItem>();
-    store.items.forEach(item => {
-        if (item.expiryTime > now) {
-            items.push(item);
-        }
-    });
-    StoreProvider.dispatch({ type: "updateNotifications", items });
+    const items = store.items.filter(item => item.expiryTime > now);
+    if (items.length < store.items.length) {
+        StoreProvider.dispatch({ type: "updateNotifications", items });
+    }
 }
