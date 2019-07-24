@@ -18,6 +18,7 @@ let unattached = new Map<string, AudioSource>();
 
 // Caches
 const biteCache = new Map<SoundBite, SoundBiteCacheItem>();
+let biteCacheSounds: Sounds = null;
 let cacheAge = 0;
 let brownNoise: AudioBuffer = null;
 
@@ -177,7 +178,11 @@ export function init() {
 }
 
 export async function cache(sounds: Sounds) {
-    const MaxAge = 10; // Haven't used in 10 games, delete
+    const MaxAge = 3; // Haven't used in 3 games, delete
+    if (biteCacheSounds === sounds) {
+        return;
+    }
+    biteCacheSounds = sounds;
 
     const OfflineAudioContext = getOfflineAudioContextConstructor();
     if (!OfflineAudioContext) {
@@ -198,6 +203,7 @@ export async function cache(sounds: Sounds) {
         }
     }
 
+    let numCreated = 0;
     const creationAge = cacheAge++;
     for (const bite of bites) {
         const item = biteCache.get(bite);
@@ -208,6 +214,7 @@ export async function cache(sounds: Sounds) {
 
         const buffer = await bufferSoundBite(bite);
         if (buffer) {
+            ++numCreated;
             biteCache.set(bite, { buffer, creationAge });
         }
     }
@@ -220,7 +227,7 @@ export async function cache(sounds: Sounds) {
         }
     });
 
-    console.log(`Audio caching completed in ${(Date.now() - start).toFixed(0)} ms`);
+    console.log(`Cached ${numCreated} sounds in ${(Date.now() - start).toFixed(0)} ms`);
 }
 
 async function bufferSoundBite(bite: SoundBite) {
@@ -228,17 +235,24 @@ async function bufferSoundBite(bite: SoundBite) {
         const ExtraSeconds = 1;
 
         const OfflineAudioContext = getOfflineAudioContextConstructor();
-        const offlineCtx = new OfflineAudioContext(1, (bite.stopTime + ExtraSeconds) * SampleRate, SampleRate);
+        const offlineCtx: OfflineAudioContext = new OfflineAudioContext(1, (bite.stopTime + ExtraSeconds) * SampleRate, SampleRate);
         const offlineEnv: OutputEnvironment = {
             ctx: offlineCtx,
             next: offlineCtx.destination,
         };
         playSoundBite(bite, null, offlineEnv);
-        return await offlineCtx.startRendering();
+        return renderToBuffer(offlineCtx);
     } catch (exception) {
         console.error("Unable to buffer sound bite", exception);
         return null;
     }
+}
+
+function renderToBuffer(offlineCtx: OfflineAudioContext) {
+    return new Promise<AudioBuffer>((resolve, reject) => {
+        offlineCtx.oncomplete = ev => resolve(ev.renderedBuffer);
+        offlineCtx.startRendering();
+    });
 }
 
 export function unlock() {
