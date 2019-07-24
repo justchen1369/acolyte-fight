@@ -2007,7 +2007,7 @@ const saber: Spell = {
     width: Pixel,
     length: 0.075,
 
-    movementProportionWhileChannelling: 0.5,
+    movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,
@@ -2058,7 +2058,7 @@ const dualSaber: Spell = {
     width: Pixel,
     length: 0.06,
 
-    movementProportionWhileChannelling: 0.65,
+    movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,
