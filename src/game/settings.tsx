@@ -559,7 +559,7 @@ const lightning: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        density: 8,
+        density: 12,
         radius: 0.0025,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
