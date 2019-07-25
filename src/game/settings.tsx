@@ -1695,7 +1695,7 @@ const halo: Spell = {
         density: 1,
         radius: 0.002,
         speed: 0.5,
-        maxTicks: 5 * TicksPerSecond,
+        maxTicks: 7.5 * TicksPerSecond,
         hitInterval: 15,
         damage: 6,
         lifeSteal: 1,
