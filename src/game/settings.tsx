@@ -1656,7 +1656,7 @@ const halo: Spell = {
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: true,
 
     movementProportionWhileChannelling: 1,
@@ -1718,6 +1718,7 @@ const halo: Spell = {
                 minDistanceToTarget: 0.02,
                 targetType: HomingTargets.self,
             },
+            { type: "expireOnChannellingEnd" },
         ],
 
         sound: "halo",
