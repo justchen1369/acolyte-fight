@@ -2206,6 +2206,7 @@ const teleport: Spell = {
             maxTicks: 0.5 * TicksPerSecond,
             damageMultiplier: 0.25,
             minHealth: 1,
+            decay: true,
         },
     ],
 };

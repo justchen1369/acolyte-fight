@@ -3899,6 +3899,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			lifeSteal: template.lifeSteal,
 			damageMultiplier: template.damageMultiplier,
 			minHealth: template.minHealth,
+			decay: template.decay,
 		});
 	} else if (template.type === "burn") {
 		let stacked = false;
@@ -3993,11 +3994,16 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
 			if (buff.type === "lifeSteal") {
+				let proportion = 1;
+				if (buff.decay) {
+					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
+				}
+
 				if (buff.lifeSteal) {
-					lifeSteal = Math.max(lifeSteal, buff.lifeSteal);
+					lifeSteal = Math.max(lifeSteal, buff.lifeSteal * proportion);
 				}
 				if (buff.damageMultiplier) {
-					damage *= buff.damageMultiplier;
+					damage *= proportion * buff.damageMultiplier + (1 - proportion) * 1;
 				}
 				if (buff.minHealth) {
 					minHealth = Math.max(minHealth || 0, buff.minHealth);

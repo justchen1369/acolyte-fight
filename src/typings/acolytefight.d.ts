@@ -741,6 +741,7 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 	damageMultiplier?: number;
 	lifeSteal?: number;
 	minHealth?: number;
+	decay?: boolean;
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
