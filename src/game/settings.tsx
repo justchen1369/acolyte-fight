@@ -1656,14 +1656,14 @@ const halo: Spell = {
     icon: "angelOutfit",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 0,
 
     strikeCancel: {},
-    maxChannellingTicks: 5 * TicksPerSecond, // A bit higher than normal so that the movement speed buff can last
+    maxChannellingTicks: 7.5 * TicksPerSecond, // A bit higher than normal so that the movement speed buff can last
 
     jitterRatio: 0.0,
     intervalTicks: 1.5 * TicksPerSecond,
@@ -1672,7 +1672,7 @@ const halo: Spell = {
     buffs: [
         {
             type: "movement",
-            maxTicks: 5 * TicksPerSecond,
+            maxTicks: 7.5 * TicksPerSecond,
             movementProportion: 1.2,
             channelling: true,
 
