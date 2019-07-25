@@ -192,6 +192,13 @@ export async function cache(sounds: Sounds) {
         return;
     }
 
+    const crashingUntil = await storage.getOfflineCrashing();
+    const unix = moment().unix();
+    if (unix < crashingUntil) {
+        console.log("Not audio caching as a crash was detected recently.");
+        return;
+    }
+
     const start = Date.now();
     console.log(`Audio caching started...`);
     
@@ -206,6 +213,9 @@ export async function cache(sounds: Sounds) {
         }
     }
 
+    await storage.setOfflineCrashing(unix + 86400); // Don't retry audio caching until tomorrow, if it fails
+    let oneSucceeded = false;
+
     let numCreated = 0;
     const version = cacheVersion++;
     for (const bite of bites) {
@@ -219,6 +229,11 @@ export async function cache(sounds: Sounds) {
         if (buffer) {
             ++numCreated;
             biteCache.set(bite, { buffer, version: version });
+        }
+
+        if (!oneSucceeded) {
+            oneSucceeded = true;
+            await storage.clearOfflineCrashing();
         }
     }
 

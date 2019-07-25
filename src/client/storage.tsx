@@ -179,6 +179,10 @@ export async function setOfflineCrashing(unix: number) {
     await settingsStorage.setItem(SettingsKeys.OfflineCrashingUnix, unix);
 }
 
+export async function clearOfflineCrashing() {
+    await settingsStorage.setItem(SettingsKeys.OfflineCrashingUnix, 0);
+}
+
 function migrateGame(game: d.GameStats): d.GameStats {
     return {
         ...game,
