@@ -752,6 +752,9 @@ function instantiateAura(template: AuraTemplate, projectile: w.Projectile, world
 		type: "aura",
 		objectId: projectile.id,
 		owner: projectile.owner,
+		against: template.against !== undefined ? template.against : Alliances.Enemy,
+		remainingHits: template.maxHits !== undefined ? template.maxHits : NeverTicks,
+		packet: template.packet,
 		radius: template.radius,
 		tickInterval: template.tickInterval,
 		buffs: template.buffs,
@@ -2558,19 +2561,37 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 }
 
 function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
+	if (world.tick % behaviour.tickInterval !== 0) {
+		return true;
+	}
+
 	const orb = world.objects.get(behaviour.objectId);
 	if (!(orb && orb.category === "projectile")) {
 		return false;
 	}
 
 	const epicenter = orb.body.getPosition();
+
+	let hit = false;
+	const packet = behaviour.remainingHits > 0 ? instantiateDamage(behaviour.packet, behaviour.owner, world) : null;
 	world.objects.forEach(obj => {
 		if (!(obj.category === "hero" && vector.distance(epicenter, obj.body.getPosition()) <= behaviour.radius + obj.radius)) {
 			return;
 		}
 
+		if ((calculateAlliance(behaviour.owner, obj.id, world) & behaviour.against) === 0) {
+			return;
+		}
+
+		hit = true;
+		applyDamage(obj, packet, world);
 		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, { tag: behaviour.type });
 	});
+
+	if (hit) {
+		--behaviour.remainingHits;
+	}
+
 	return true;
 }
 

@@ -89,13 +89,12 @@ class SpellStats extends React.PureComponent<Props, State> {
         }
         if (projectile.behaviours) {
             projectile.behaviours.forEach(behaviour => {
-                if (behaviour.type === "aura") {
-                    const numHits = projectile.maxTicks / behaviour.tickInterval;
-                    behaviour.buffs.forEach(buff => {
-                        if (buff.type === "burn") {
-                            damage += numHits * buff.packet.damage * (buff.maxTicks / buff.hitInterval);
-                        }
-                    });
+                if (behaviour.type === "aura" && behaviour.packet) {
+                    let numHits = projectile.maxTicks / behaviour.tickInterval;
+                    if (behaviour.maxHits) {
+                        numHits = Math.min(numHits, behaviour.maxHits);
+                    }
+                    damage += behaviour.packet.damage * numHits;
                 }
             });
         }

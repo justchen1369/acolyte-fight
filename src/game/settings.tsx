@@ -1942,14 +1942,14 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.04,
-                tickInterval: 10,
+                tickInterval: 6,
+                maxHits: 6,
+                packet: { damage: 6, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
-                    {
-                        type: "burn",
-                        against: Alliances.NotFriendly,
-                        hitInterval: 10,
-                        packet: { damage: 5, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                    { // Just used for graphics
+                        type: "movement",
                         maxTicks: 10,
+                        movementProportion: 1,
                         render: {
                             color: "#22ee88",
                             alpha: 0.3,

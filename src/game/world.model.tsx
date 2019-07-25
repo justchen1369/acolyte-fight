@@ -936,9 +936,12 @@ export interface AuraBehaviour extends BehaviourBase {
 	type: "aura";
 	objectId: string;
 	owner: string;
+	against: number;
 
 	radius: number;
 	tickInterval: number;
+	remainingHits: number;
+	packet?: DamagePacketTemplate;
 	buffs: BuffTemplate[];
 }
 

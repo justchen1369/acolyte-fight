@@ -490,8 +490,11 @@ declare interface AttractTemplate extends BehaviourTemplateBase {
 declare interface AuraTemplate extends BehaviourTemplateBase {
 	type: "aura";
 
+	against?: number;
 	radius: number; // Maximum range of aura
 	tickInterval: number; // Interval between when to apply the buff
+	maxHits?: number;
+	packet?: DamagePacketTemplate;
 	buffs: BuffTemplate[]; // Buffs to apply
 }
 
