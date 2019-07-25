@@ -2,6 +2,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import uniqid from 'uniqid';
+import wu from 'wu';
 import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -114,10 +115,10 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 export function isPartyReady(party: g.Party): boolean {
     if (party.isPrivate && !party.waitForPlayers) {
         // Start private party games immediately
-        return [...party.active.values()].some(p => p.ready && !p.isObserver);
+        return wu(party.active.values()).some(p => p.ready && !p.isObserver);
     } else {
-        const relevant = [...party.active.values()].filter(p => !p.isObserver)
-        const leaders = [...party.active.values()].filter(p => p.isLeader)
+        const relevant = wu(party.active.values()).filter(p => !p.isObserver).toArray();
+        const leaders = wu(party.active.values()).filter(p => p.isLeader).toArray();
         const required = games.apportionPerGame(relevant.length);
         return relevant.length > 0 && relevant.filter(p => p.ready).length >= required && leaders.every(l => l.ready);
     }
@@ -146,9 +147,9 @@ export function removePartyMember(party: g.Party, socketId: string) {
         // The party is not finished
         if (party.active.size <= constants.Matchmaking.MaxPlayers) {
             // Small party, mark everyone as unready instead when someone leaves
-            for (const member of party.active.values()) {
+            party.active.forEach(member => {
                 member.ready = false;
-            }
+            });
         }
 	} else {
 		// This party is finished, delete it

@@ -2385,25 +2385,23 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	ctx.save();
 	ctx.translate(config.center.x, config.center.y);
 
-	for (const key of config.hitSectors.keys()) {
-		if (!key) {
-			continue;
+	config.hitSectors.forEach((buttonSector, key) => {
+		if (!(key && buttonSector)) {
+			return;
 		}
 
 		const newState = states.get(key);
 		const currentState = config.buttons.get(key);
 
 		if (buttonStateChanged(currentState, newState)) {
-			const buttonSector = config.hitSectors.get(key);
-			if (buttonSector) {
-				config.buttons.set(key, newState);
+			config.buttons.set(key, newState);
 
-				ctx.save();
-				renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState, iconLookup);
-				ctx.restore();
-			}
+			ctx.save();
+			renderWheelButton(ctx, buttonSector, config.innerRadius, config.outerRadius, newState, iconLookup);
+			ctx.restore();
 		}
-	}
+
+	});
 	ctx.restore();
 }
 

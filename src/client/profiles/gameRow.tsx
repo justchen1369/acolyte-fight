@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import wu from 'wu';
 import classNames from 'classnames';
 import moment from 'moment';
 import * as React from 'react';
@@ -74,7 +75,7 @@ class GameRow extends React.PureComponent<Props, State> {
                         <span className="timestamp">{game.createdTimestamp.fromNow()}</span>
                         {hasReplay && <a className="watch" href={this.gameUrl(game)} onClick={(ev) => this.onWatchGameClicked(ev, game)}> - watch <i className="fas fa-video" /></a>}
                     </div>
-                    <div className="player-list">{joinWithComma([...game.players.values()].map(player => <GamePlayer key={player.userHash} player={player} />))}</div>
+                    <div className="player-list">{joinWithComma(wu(game.players.values()).map(player => <GamePlayer key={player.userHash} player={player} />).toArray())}</div>
                 </div>
                 <div className="spacer" />
                 {canExpand && <div title="Click for more details" className="expander"><i className="fas fa-caret-down" /></div>}
@@ -105,7 +106,7 @@ class GameRow extends React.PureComponent<Props, State> {
     private renderRatingChange(change: m.AcoChangeMsg) {
         const game = this.props.game;
         if (change.otherTeamId && change.e) {
-            const others = [...game.players.values()].filter(p => p.teamId === change.otherTeamId).map(p => p.name);
+            const others = wu(game.players.values()).filter(p => p.teamId === change.otherTeamId).map(p => p.name).toArray();
 
             const odds = (1 / (1 - change.e)) - 1;
             return <div className="adjustment-detail">

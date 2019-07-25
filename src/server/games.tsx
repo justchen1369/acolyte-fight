@@ -2,6 +2,7 @@ import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
 import uniqid from 'uniqid';
+import wu from 'wu';
 import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -151,7 +152,7 @@ export function findExistingGame(version: string, room: g.Room | null, partyId: 
 	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
 
-	const candidates = [...store.activeGames.values()].filter(x => x.segment === segment && isGameRunning(x));
+	const candidates = wu(store.activeGames.values()).filter(x => x.segment === segment && isGameRunning(x)).toArray();
 	if (candidates.length === 0) {
 		return null;
 	}
@@ -328,7 +329,7 @@ export function assignPartyToGames(party: g.Party) {
 
 	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
-	const remaining = _.shuffle([...party.active.values()].filter(p => p.ready && !p.isObserver));
+	const remaining = _.shuffle(wu(party.active.values()).filter(p => p.ready && !p.isObserver).toArray());
 	const maxPlayersPerGame = apportionPerGame(remaining.length);
 	while (remaining.length > 0) {
 		const group = new Array<g.PartyMember>();
@@ -351,7 +352,7 @@ export function assignPartyToGames(party: g.Party) {
 	}
 
 	if (assignments.length > 0) {
-		const observers = [...party.active.values()].filter(p => p.ready && p.isObserver);
+		const observers = wu(party.active.values()).filter(p => p.ready && p.isObserver).toArray();
 		const game = assignments[0].game;
 		for (const observer of observers) {
 			assignments.push({ game, partyMember: observer, heroId: null, reconnectKey: null });
@@ -454,7 +455,6 @@ function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string)
 	}
 
 	// Assign to first active player
-	const newPlayer = [...game.active.values()][0];
 	botsToReassign.forEach(heroId => {
 		game.bots.set(heroId, null);
 	});
@@ -516,7 +516,7 @@ function gameTurn(game: g.Game) {
 	let data = {
 		gameId: game.id,
 		tick: game.tick++,
-		actions: [...game.actions.values()],
+		actions: wu(game.actions.values()).toArray(),
 	} as m.TickMsg;
 	if (data.actions.some(a => a.type === "game")) {
 		game.activeTick = game.tick;
@@ -635,9 +635,9 @@ function randomKeyBindings(game: g.Game): KeyBindings {
 
 function findExistingSlot(game: g.Game, replaceBots: boolean = true): string {
 	// Take an existing slot, if possible
-	let activeHeroIds = new Set<string>([...game.active.values()].map(x => x.heroId));
+	let activeHeroIds = new Set<string>(wu(game.active.values()).map(x => x.heroId));
 	if (!replaceBots) {
-		[...game.bots.keys()].forEach(heroId => activeHeroIds.add(heroId));
+		wu(game.bots.keys()).forEach(heroId => activeHeroIds.add(heroId));
 	}
 
 	for (let i = 0; i < game.numPlayers; ++i) {
@@ -670,7 +670,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	if (game.tick >= game.closeTick) {
-		if (game.bots.size === 0 && [...game.active.values()].every(x => !!x.userId)) {
+		if (game.bots.size === 0 && wu(game.active.values()).every(x => !!x.userId)) {
 			// Everyone must be logged in to activate team mode
 			if (numPlayers >= 4 && Math.random() < TeamGameChance) {
 				const candidates = new Array<number>();

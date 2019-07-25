@@ -363,11 +363,11 @@ function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[]
     }
 
     // Stop expired sound sources
-    for (const source of sources.values()) {
+    sources.forEach(source => {
         if (!keep.has(source.id)) {
             source.stop();
         }
-    }
+    });
 
     return keep;
 }

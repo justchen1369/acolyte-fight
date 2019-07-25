@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import wu from 'wu';
 import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
@@ -89,7 +90,7 @@ export function updateOnlinePlayers(running: g.Game[]) {
 		updateOnlineSegment(segment, gamesBySegment[segment]);
 	}
 
-	const emptySegments = _.difference([...store.scoreboards.keys()], Object.keys(gamesBySegment)); 
+	const emptySegments = _.difference(wu(store.scoreboards.keys()).toArray(), Object.keys(gamesBySegment)); 
 	for (const segment of emptySegments) {
 		updateOnlineSegment(segment, []);
 	}
@@ -133,7 +134,7 @@ function updateOnlineSegment(segment: string, games: g.Game[]) {
 		emitOnline({
 			segment,
 			joined: joined.map(player => onlineToMsg(player, scoreboard.scores.get(player.userHash))),
-			left: [...left],
+			left: wu(left).toArray(),
 		});
 	}
 }
@@ -295,7 +296,7 @@ function dbToScore(data: db.PlayerScore): g.PlayerScore {
 
 export async function cleanupScoreboards() {
 	const store = getStore();
-	for (const scoreboard of store.scoreboards.values()) {
+	for (const scoreboard of wu(store.scoreboards.values()).toArray()) {
 		await cleanupScoreboard(scoreboard);
 		expireMessages(scoreboard);
 	}
@@ -311,7 +312,7 @@ export async function cleanupScoreboard(scoreboard: g.Scoreboard) {
 	const firestore = getFirestore();
 	const collection = getLeaderboardCollection(firestore);
 	const now = moment().unix();
-	for (const score of scoreboard.scores.values()) {
+	for (const score of wu(scoreboard.scores.values()).toArray()) {
 		if (now >= score.expiry) {
 			scoreboard.scores.delete(score.userHash);
 			await collection.doc(scoreToDbKey(scoreboard.segment, score)).delete();

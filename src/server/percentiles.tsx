@@ -62,9 +62,9 @@ export async function refreshCumulativeFrequencies() {
     numUsersCache = result.numUsers;
     cumulativeFrequenciesCache = calculateCumulativeFrequency(result.frequencies);
 
-    for (const key of cumulativeFrequenciesCache.keys()) {
-        distributionCache.set(key, calculateDistribution(cumulativeFrequenciesCache.get(key)));
-    }
+    cumulativeFrequenciesCache.forEach((cumulativeFrequency, key) => {
+        distributionCache.set(key, calculateDistribution(cumulativeFrequency));
+    });
 
     logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
 }

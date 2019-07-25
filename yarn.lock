@@ -504,6 +504,11 @@
   dependencies:
     winston "*"
 
+"@types/wu@^2.1.39":
+  version "2.1.39"
+  resolved "https://registry.yarnpkg.com/@types/wu/-/wu-2.1.39.tgz#84ec33c25115514ed95b899aee52e707f70b2c45"
+  integrity sha512-GcWc+khCfE3yBonhADArZxvWqgxp3HzzjG720JSB+5s5jFlN0OMcTIOUCBmnPx8tSzj6HNKty7S5zOtZ6VKKSA==
+
 "@webassemblyjs/ast@1.8.5":
   version "1.8.5"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.8.5.tgz#51b1c5fe6576a34953bf4b253df9f0d490d9e359"
@@ -6650,6 +6655,11 @@ ws@~6.1.0:
   integrity sha512-eqZfL+NE/YQc1/ZynhojeV8q+H050oR8AZ2uIev7RU10svA9ZnJUddHcOUZTJLinZ9yEfdA2kSATS2qZK5fhJA==
   dependencies:
     async-limiter "~1.0.0"
+
+wu@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/wu/-/wu-2.1.0.tgz#7e72e3fba23e0ff669ddd537e1c857d3d4b1614f"
+  integrity sha1-fnLj+6I+D/Zp3dU34chX09SxYU8=
 
 xdg-basedir@^3.0.0:
   version "3.0.0"

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import pl, { World } from 'planck-js';
+import wu from 'wu';
 import * as Immutable from 'immutable';
 import * as arrayUtils from '../utils/arrayUtils';
 import * as colorWheel from './colorWheel';
@@ -1129,14 +1130,13 @@ function handleSync(ev: w.Syncing, world: w.World) {
 	const mySnapshot = dequeueSnapshot(ev.tick, world);
 	const theirSnapshot: w.Snapshot = ev;
 
-	for (const objId of theirSnapshot.objectLookup.keys()) {
+	theirSnapshot.objectLookup.forEach((theirHeroSnapshot, objId) => {
 		const myHeroSnapshot = mySnapshot.objectLookup.get(objId);
-		const theirHeroSnapshot = theirSnapshot.objectLookup.get(objId);
 
 		const obj = world.objects.get(objId);
 		if (!(obj)) {
 			// Cannot sync non-existent hero
-			continue;
+			return;
 		}
 
 		if (myHeroSnapshot && !theirHeroSnapshot) {
@@ -1164,7 +1164,8 @@ function handleSync(ev: w.Syncing, world: w.World) {
 				obj.body.setPosition(position);
 			}
 		}
-	}
+
+	});
 
 	return true;
 }
@@ -1561,10 +1562,10 @@ function handleActions(world: w.World) {
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
 	const resolved = resolveKeyBindings(keyBindings, world.settings);
 
-	const previousSpellIds = [...hero.keysToSpells.values()];
+	const previousSpellIds = wu(hero.keysToSpells.values()).toArray();
 	hero.keysToSpells = resolved.keysToSpells;
 	hero.spellsToKeys = resolved.spellsToKeys;
-	const newSpellIds = [...hero.keysToSpells.values()];
+	const newSpellIds = wu(hero.keysToSpells.values()).toArray();
 
 	// Set some cooldown to make it flash on change
 	const changedSpellIds = _.difference(newSpellIds, previousSpellIds);
@@ -2203,14 +2204,15 @@ function takeHit(projectile: w.HitSource, hitId: string, world: w.World) {
 }
 
 function isHeroShielded(hero: w.Hero, world: w.World) {
-	for (const shieldId of hero.shieldIds) {
+	let isShielded = false;
+	hero.shieldIds.forEach(shieldId => {
 		if (world.objects.has(shieldId)) {
-			return true;
+			isShielded = true;
 		} else {
 			hero.shieldIds.delete(shieldId);
 		}
-	}
-	return false;
+	});
+	return isShielded;
 }
 
 export function isHeroInvisible(hero: w.Hero): w.VanishBuff {
@@ -3152,14 +3154,16 @@ function reap(world: w.World) {
 }
 
 function hasHorcrux(hero: w.Hero, world: w.World): boolean {
-	for (const horcruxId of hero.horcruxIds) {
+	let horcrux = false;
+	hero.horcruxIds.forEach(horcruxId => {
 		if (world.objects.has(horcruxId)) {
-			return true;
+			horcrux = true;
 		} else {
 			hero.horcruxIds.delete(horcruxId);
 		}
-	}
-	return false;
+
+	});
+	return horcrux;
 }
 
 function captureSnapshot(world: w.World) {
@@ -3279,7 +3283,7 @@ function notifyWin(world: w.World) {
 }
 
 function isGameFinished(world: w.World) {
-	const heroes = [...world.objects.values()].filter(x => x.category === "hero") as w.Hero[];
+	const heroes = wu(world.objects.values()).filter(x => x.category === "hero").toArray() as w.Hero[];
 	if (heroes.length === 0) {
 		return true;
 	}
@@ -3820,7 +3824,7 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 }
 
 function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
-	return ![...hero.buffs.values()].some(b => b.channellingSpellId === spell.id);
+	return !wu(hero.buffs.values()).some(b => b.channellingSpellId === spell.id);
 }
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {

@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import msgpack from 'msgpack-lite';
+import wu from 'wu';
 import * as g from './server.model';
 import * as m from '../game/messages.model';
 import * as categories from '../game/segments';
@@ -34,7 +35,7 @@ function findStats(game: g.Game): m.GameStatsMsg {
     const Majority = 0.51;
     const corroborateThreshold = Math.max(1, Math.ceil(game.scores.size * Majority));
     const candidates = new Map<string, CandidateHash>();
-    for (const gameStats of game.scores.values()) {
+    for (const gameStats of wu(game.scores.values()).toArray()) {
         const hash = hashStats(gameStats);
         if (candidates.has(hash)) {
             const candidate = candidates.get(hash);

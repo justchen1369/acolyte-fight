@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import wu from 'wu';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as credentials from './credentials';
@@ -21,7 +22,7 @@ export async function checkForReplays(gameStats: d.GameStats[]) {
 async function checkForReplaysOnServer(gameIds: string[], server: string) {
     const hasReplayLookup = StoreProvider.getState().hasReplayLookup;
 
-    const gameIdsToCheck = _.difference(gameIds, [...hasReplayLookup.keys()]);
+    const gameIdsToCheck = _.difference(gameIds, wu(hasReplayLookup.keys()).toArray());
     if (gameIdsToCheck.length === 0) {
         return;
     }

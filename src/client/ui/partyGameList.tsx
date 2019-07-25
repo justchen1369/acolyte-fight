@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import wu from 'wu';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
@@ -36,7 +37,7 @@ class PartyGameList extends React.PureComponent<Props, State> {
         (props: Props) => props.allGameStats,
         (partyId, allGameStats) => {
             if (partyId && allGameStats) {
-                return [...allGameStats.values()].filter(g => g.partyId === partyId);
+                return wu(allGameStats.values()).filter(g => g.partyId === partyId).toArray();
             } else {
                 return [];
             }

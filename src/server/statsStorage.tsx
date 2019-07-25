@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
+import wu from 'wu';
 import * as Firestore from '@google-cloud/firestore';
 import * as aco from './aco';
 import * as categories from '../game/segments';
@@ -697,7 +698,7 @@ async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLooku
 
         // Apply changes
         const result: UpdateRatingsResult = {};
-        for (const playerDelta of deltas.values()) {
+        for (const playerDelta of wu(deltas.values()).toArray()) {
             const isRanked = isRankedLookup.get(playerDelta.userId);
             const initialRating = initialRatings.get(playerDelta.userId);
             const selfRating = userRatings.get(playerDelta.userId);

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment';
+import wu from 'wu';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
@@ -40,7 +41,7 @@ class RecentGameList extends React.PureComponent<Props, State> {
         (props: Props) => props.allGameStats,
         (category, allGameStats) => {
             if (allGameStats) {
-                let replays = [...allGameStats.values()];
+                let replays = wu(allGameStats.values()).toArray();
                 if (category !== m.GameCategory.AllCategory) {
                     replays = replays.filter(g => g.category === category);
                 }

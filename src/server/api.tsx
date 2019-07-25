@@ -4,6 +4,7 @@ import moment from 'moment';
 import msgpack from 'msgpack-lite';
 import express from 'express';
 import url from 'url';
+import wu from 'wu';
 import * as http from 'http';
 
 import * as g from './server.model';
@@ -53,7 +54,7 @@ export function getInternalStatus() {
         host: location.server,
         numUsers: percentiles.estimateNumUsers(),
         numGames: store.activeGames.size,
-        numPlayers: _.sum([...store.scoreboards.values()].map(scoreboard => scoreboard.online.size)),
+        numPlayers: wu(store.scoreboards.values()).map(scoreboard => scoreboard.online.size).reduce((a, b) => a + b, 0),
         numConnections: store.numConnections,
         serverLoad: loadMetrics.getLoadAverage(),
     };

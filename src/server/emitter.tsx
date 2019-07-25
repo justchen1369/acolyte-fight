@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import uniqid from 'uniqid';
+import wu from 'wu';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
 import * as segments from '../game/segments';
@@ -652,7 +653,7 @@ function partyMembersToContract(party: g.Party) {
 
 function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 	if (result) {
-		const rooms = [...game.socketIds];
+		const rooms = wu(game.socketIds).toArray();
 		if (game.partyId) {
 			rooms.push(game.partyId);
 		}
