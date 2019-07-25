@@ -1,4 +1,6 @@
+import moment from 'moment';
 import * as pl from 'planck-js';
+import * as storage from '../storage';
 import { isMobile } from '../core/userAgent';
 import { TicksPerSecond } from '../../game/constants';
 import { AudioElement } from './render.model';
@@ -19,7 +21,7 @@ let unattached = new Map<string, AudioSource>();
 // Caches
 const biteCache = new Map<SoundBite, SoundBiteCacheItem>();
 let biteCacheSounds: Sounds = null;
-let cacheAge = 0;
+let cacheVersion = 0;
 let brownNoise: AudioBuffer = null;
 
 interface OutputEnvironment {
@@ -38,7 +40,7 @@ interface AudioEnvironment extends OutputEnvironment {
 
 interface SoundBiteCacheItem {
     buffer: AudioBuffer;
-    creationAge: number;
+    version: number;
 }
 
 interface AudioRef {
@@ -191,6 +193,7 @@ export async function cache(sounds: Sounds) {
     }
 
     const start = Date.now();
+    console.log(`Audio caching started...`);
     
     const bites = new Array<SoundBite>();
     for (const id in sounds) {
@@ -204,25 +207,25 @@ export async function cache(sounds: Sounds) {
     }
 
     let numCreated = 0;
-    const creationAge = cacheAge++;
+    const version = cacheVersion++;
     for (const bite of bites) {
         const item = biteCache.get(bite);
         if (item) {
-            item.creationAge = creationAge;
+            item.version = version;
             continue;
         }
 
         const buffer = await bufferSoundBite(bite);
         if (buffer) {
             ++numCreated;
-            biteCache.set(bite, { buffer, creationAge });
+            biteCache.set(bite, { buffer, version: version });
         }
     }
 
     // Delete old sound bites
-    const cutoff = creationAge - MaxAge;
+    const cutoff = version - MaxAge;
     biteCache.forEach((item, key) => {
-        if (item.creationAge <= cutoff) {
+        if (item.version <= cutoff) {
             biteCache.delete(key);
         }
     });
