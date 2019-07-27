@@ -670,7 +670,7 @@ const homing: Spell = {
         radius: 0.003,
         speed: 0.15,
         maxTicks: 3.5 * TicksPerSecond,
-        damage: 24,
+        damage: 10,
         lifeSteal: 0.2,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
@@ -712,7 +712,7 @@ const boomerang: Spell = {
         radius: 0.003,
         speed: 0.8,
         maxTicks: 5 * TicksPerSecond,
-        damage: 30,
+        damage: 15,
         lifeSteal: 0.2,
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
