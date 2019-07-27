@@ -1834,7 +1834,7 @@ const iceBomb: Spell = {
     intervalTicks: 1,
     lengthTicks: 6,
 
-    jitterRatio: 0.75,
+    jitterRatio: 0.5,
 
     projectile: {
         density: 1,
