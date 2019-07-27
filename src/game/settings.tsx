@@ -37,6 +37,7 @@ const World: WorldSettings = {
     LavaDamageInterval: 20,
 
     MaxScaling: 2.5,
+    ScalingPower: 2,
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
     ShrinkPowerMaxPlayers: 1,

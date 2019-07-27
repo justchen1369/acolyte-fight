@@ -638,7 +638,7 @@ export function calculateScaling(heroId: string, world: w.World, scaling: boolea
 
 	const World = world.settings.World;
 	const growth = World.MaxScaling - 1;
-	const proportion = 1 - world.shrink;
+	const proportion = 1 - Math.pow(world.shrink, World.ScalingPower);
 	return 1 + (proportion * growth);
 }
 
