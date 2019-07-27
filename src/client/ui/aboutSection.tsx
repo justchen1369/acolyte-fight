@@ -40,6 +40,13 @@ export class AboutSection extends React.PureComponent<Props, State> {
             </p>
             <h2>Special rules</h2>
             <p>
+                The map shrinks over <b>{World.SecondsToShrink} seconds</b>. The area outside of the map is called the void. It does <b>{World.LavaDamagePerSecond}</b> damage per second.
+            </p>
+            <p>
+                Most spells have lifesteal - that means a proportion of damage dealt is added to your health.
+                The last player to knockback an enemy receives <b>{100 * World.LavaLifestealProportion}% lifesteal</b> from the void damage.
+            </p>
+            <p>
                 The damage of most spells increases with time. Damage will increase <b>{World.MaxScaling}x</b> over <b>{World.SecondsToShrink} seconds</b>.
             </p>
             <p>
