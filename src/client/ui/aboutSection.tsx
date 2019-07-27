@@ -27,6 +27,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
 
     render() {
         const Hero = this.props.settings.Hero;
+        const World = this.props.settings.World;
         return <div>
             <h1 className="title">Acolyte Fight!</h1>
             <p>
@@ -34,12 +35,15 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 In this arena, you'll find others just like you. Will you be the last one standing?
             </p>
             <p>
-                This game is a 2D skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
-                This game is about skill, not about secret combos! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
+                This game is skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
+                This game is about skill! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
             </p>
             <h2>Special rules</h2>
             <p>
-                If multiple opponents attack you within {this.props.settings.Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds,
+                The damage of most spells increases with time. Damage will increase <b>{World.MaxScaling}x</b> over <b>{World.SecondsToShrink} seconds</b>.
+            </p>
+            <p>
+                If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond}</b> seconds,
                 you will only take damage from the opponent who did the most damage.
             </p>
             <h1>Community</h1>
