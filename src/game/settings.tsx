@@ -2199,7 +2199,7 @@ const teleport: Spell = {
         {
             icon: "fas fa-heartbeat",
             title: "Weak",
-            text: "For 0.5 seconds after teleporting, you will only deal 25% damage and cannot deal fatal damage.",
+            text: "For 0.25 seconds after teleporting, you will only deal 25% damage and cannot deal fatal damage.",
         },
         cleanse,
     ],
@@ -2220,10 +2220,10 @@ const teleport: Spell = {
     sound: "teleport",
 
     buffs: [
-        { // Reduced damage for 0.5 seconds after teleporting
+        {
             owner: true,
             type: "lifeSteal",
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 0.25 * TicksPerSecond,
             damageMultiplier: 0.25,
             minHealth: 1,
             decay: true,
