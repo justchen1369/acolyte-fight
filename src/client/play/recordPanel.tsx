@@ -17,6 +17,7 @@ import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
 
+import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 
 const FileSaver = require('../../lib/file-saver');
@@ -108,6 +109,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const style = { top: this.state.top, left: this.state.left, width: this.state.size, height: this.state.size };
         return (
             <div id="game-panel" onClick={() => this.onGameClick()}>
+                <TitleListener subtitle="Recording" />
                 <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
                     <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
                 </span>

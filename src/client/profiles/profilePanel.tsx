@@ -65,6 +65,7 @@ export class ProfilePanel extends React.PureComponent<Props, State> {
                 showRanking={isMe ? !this.props.unranked : true}
                 showWinRates={isMe ? !this.props.unranked : true}
                 showBuild={true}
+                pageTitle={true}
                 />
             <h1>Replays</h1>
             {isMe

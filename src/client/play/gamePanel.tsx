@@ -22,6 +22,7 @@ import ButtonPanel from './buttonPanel';
 import SocialBar from '../controls/socialBar';
 import SoundController from './soundController';
 import SpellInfoPanel from './spellInfoPanel';
+import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
 
@@ -60,6 +61,7 @@ class GamePanel extends React.PureComponent<Props, State> {
         const customizing = this.props.customizing;
         return (
             <ControlSurface>
+                <TitleListener />
                 <CanvasPanel />
                 {!customizing && <>
                     <InfoPanel />

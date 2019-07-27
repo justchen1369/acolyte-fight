@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import CodeEditor from './codeEditor';
 import ModBar from './modBar';
 import NavBar from '../nav/navbar';
+import TitleListener from '../controls/titleListener';
 import { isLocal } from '../core/userAgent';
 
 interface OwnProps {
@@ -47,6 +48,7 @@ class EditorPage extends React.PureComponent<Props, State> {
 
     private renderNotLoggedIn() {
         return <div className="content-container">
+            <TitleListener subtitle="Modding" />
             <NavBar />
             <div className="page">
                 <h1>Modding</h1>
@@ -58,6 +60,7 @@ class EditorPage extends React.PureComponent<Props, State> {
 
     private renderReadonly() {
         return <div className="content-container">
+            <TitleListener subtitle="Modding" />
             <NavBar />
             <div className="page mod-readonly">
                 <h1>Modding</h1>
@@ -74,11 +77,13 @@ class EditorPage extends React.PureComponent<Props, State> {
     private renderEditor() {
         if (this.props.expand) {
             return <div className="content-container full-height-page">
+                <TitleListener subtitle="Modding" />
                 <ModBar />
                 {this.props.children}
             </div>
         } else {
             return <div className="content-container">
+                <TitleListener subtitle="Modding" />
                 <ModBar />
                 <div className="page">
                     {this.props.children}

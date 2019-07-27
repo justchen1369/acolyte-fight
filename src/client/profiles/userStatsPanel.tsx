@@ -12,6 +12,7 @@ import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
 import BuildPanel from './buildPanel';
+import TitleListener from '../controls/titleListener';
 
 interface OwnProps {
     profileId: string;
@@ -20,6 +21,7 @@ interface OwnProps {
     showRanking?: boolean;
     showWinRates?: boolean;
     showBuild?: boolean;
+    pageTitle?: boolean;
 }
 interface Props extends OwnProps {
     myProfile: m.GetProfileResponse;
@@ -105,7 +107,10 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
 
         const profile = this.state.profile;
         const rating = profile.ratings[this.props.category];
-        return rating ? this.renderRating(profile, rating) : this.renderNoRating(profile);
+        return <>
+            {this.props.pageTitle && <TitleListener subtitle={profile.name} />}
+            {rating ? this.renderRating(profile, rating) : this.renderNoRating(profile)}
+        </>
     }
 
     private renderError() {

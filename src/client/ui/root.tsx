@@ -15,6 +15,7 @@ import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from '../profiles/profilePanel';
 import RecordPanel from '../play/recordPanel';
 import SettingsPanel from './settingsPanel';
+import TitleListener from '../controls/titleListener';
 import TitleSection from './titleSection';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
@@ -99,6 +100,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderParty() {
         return <div className="content-container">
+            <TitleListener subtitle="Party" />
             <NavBar />
             <div className="page">
                 <PartyPanel />
@@ -108,6 +110,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderAi() {
         return <div className="content-container">
+            <TitleListener subtitle="AI" />
             <NavBar />
             <div className="page">
                 <AiPanel />
@@ -117,6 +120,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderRegions() {
         return <div className="content-container">
+            <TitleListener subtitle="Regions" />
             <NavBar />
             <div className="page">
                 <RegionsPanel />
@@ -126,6 +130,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderAbout() {
         return <div className="content-container">
+            <TitleListener subtitle="About" />
             <NavBar />
             <div className="page">
                 <TitleSection />
@@ -135,6 +140,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderDebug() {
         return <div className="content-container">
+            <TitleListener subtitle="Debug" />
             <NavBar />
             <div className="page">
                 <DebugPanel />
@@ -144,6 +150,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderLeaderboard() {
         return <div className="content-container">
+            <TitleListener subtitle="Leaderboard" />
             <NavBar />
             <div className="page">
                 <LeaderboardPanel category={m.GameCategory.PvP} />
@@ -153,6 +160,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderProfile() {
         return <div className="content-container">
+            <TitleListener subtitle="Profile" />
             <NavBar />
             <div className="page">
                 <ProfilePanel />
@@ -162,6 +170,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderSettings() {
         return <div className="content-container">
+            <TitleListener subtitle="Settings" />
             <NavBar />
             <div className="page">
                 <SettingsPanel />
@@ -171,6 +180,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderWatch() {
         return <div className="content-container">
+            <TitleListener subtitle="Spectate" />
             <NavBar />
             <div className="page">
                 <WatchPanel />
@@ -180,6 +190,7 @@ class Root extends React.PureComponent<Props> {
 
     private renderPrivacy() {
         return <div className="content-container">
+            <TitleListener subtitle="Privacy Policy" />
             <NavBar />
             <div className="page">
                 <PrivacyPolicyPanel />

@@ -13,6 +13,7 @@ import SpellBtnConfig from './spellConfig';
 import Link from '../controls/link';
 import NavBar from '../nav/navbar';
 import PartyList from './partyList';
+import TitleListener from '../controls/titleListener';
 
 const scrollIntoView = require('scroll-into-view');
 
@@ -42,6 +43,7 @@ class HomePanel extends React.PureComponent<Props, State> {
 
         return <div className="content-container">
             <div className="home">
+                <TitleListener />
                 <NavBar />
                 <div className="spacer" />
                 <div className="title-row">
