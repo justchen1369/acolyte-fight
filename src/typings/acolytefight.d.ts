@@ -70,6 +70,8 @@ declare interface WorldSettings {
 	InitialRadius: number; // Initial radius of the world
 	HeroLayoutRadius: number; // The radius at which to place heroes
 
+	MaxScaling: number; // How much can damage increase as the world shrinks?
+
 	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
 	LavaDamagePerSecond: number;
 	LavaDamageInterval: number; // Ticks between applying lava damage
@@ -81,7 +83,7 @@ declare interface WorldSettings {
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
 	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value
 
-	SwatchHealth: number;
+	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
 }
 
 declare interface Layouts {

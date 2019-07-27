@@ -54,6 +54,7 @@ export interface World {
 
 	mapPoints?: pl.Vec2[];
 	mapRadiusMultiplier: number;
+	shrink: number;
 	radius: number;
 
 	occurrences: Occurrence[];

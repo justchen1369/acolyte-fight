@@ -101,6 +101,7 @@ export function initialWorld(mod: Object): w.World {
 		behaviours: [],
 		physics: pl.World(def),
 		actions: new Map(),
+		shrink: 1,
 		radius: settings.World.InitialRadius,
 		mapRadiusMultiplier: 1.0,
 
@@ -625,18 +626,20 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	return projectile;
 }
 
-export function calculateScaling(heroId: string, world: w.World, scaling: boolean = true) {
+export function calculateScaling(heroId: string, world: w.World, scaling: boolean = false) {
+	if (!scaling) {
+		return 1;
+	}
+
 	if (!heroId) {
 		// Environment doesn't scale
 		return 1;
 	}
 
-	const hero = world.objects.get(heroId);
-	return calculateScalingFromHero(hero as w.Hero, world, scaling);
-}
-
-export function calculateScalingFromHero(hero: w.Hero, world: w.World, scaling: boolean = true) {
-	return 1;
+	const World = world.settings.World;
+	const growth = World.MaxScaling - 1;
+	const proportion = 1 - world.shrink;
+	return 1 + (proportion * growth);
 }
 
 function ticksTo(distance: number, speed: number) {
@@ -3135,7 +3138,8 @@ function shrink(world: w.World) {
 
 		const powerAlpha = Math.min(1, world.players.size / Matchmaking.MaxPlayers);
 		const power = powerAlpha * World.ShrinkPowerMaxPlayers + (1 - powerAlpha) * World.ShrinkPowerMinPlayers;
-		world.radius = World.InitialRadius * Math.pow(proportion, power);
+		world.shrink = Math.pow(proportion, power);
+		world.radius = World.InitialRadius * proportion;
 	}
 }
 
