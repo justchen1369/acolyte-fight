@@ -18,7 +18,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-export class TitleSection extends React.PureComponent<Props, State> {
+export class AboutSection extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -152,4 +152,4 @@ export class TitleSection extends React.PureComponent<Props, State> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(TitleSection);
+export default ReactRedux.connect(stateToProps)(AboutSection);

@@ -5,6 +5,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
+import AboutSection from './aboutSection';
 import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
 import GamePanel from '../play/gamePanel';
@@ -16,7 +17,6 @@ import ProfilePanel from '../profiles/profilePanel';
 import RecordPanel from '../play/recordPanel';
 import SettingsPanel from './settingsPanel';
 import TitleListener from '../controls/titleListener';
-import TitleSection from './titleSection';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
 import UrlListener from '../controls/urlListener';
@@ -133,7 +133,7 @@ class Root extends React.PureComponent<Props> {
             <TitleListener subtitle="About" />
             <NavBar />
             <div className="page">
-                <TitleSection />
+                <AboutSection />
             </div>
         </div>;
     }
