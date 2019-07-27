@@ -43,7 +43,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 The damage of most spells increases with time. Damage will increase <b>{World.MaxScaling}x</b> over <b>{World.SecondsToShrink} seconds</b>.
             </p>
             <p>
-                If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond}</b> seconds,
+                If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds</b>,
                 you will only take damage from the opponent who did the most damage.
             </p>
             <h1>Community</h1>
