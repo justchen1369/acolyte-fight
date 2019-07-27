@@ -6,6 +6,8 @@ import { ObstacleTemplates } from './obstacleTemplates';
 import { Sounds } from './sounds';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
+const lifeSteal = 0.25;
+
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.11,
     MaxSpeed: 1.0,
@@ -31,7 +33,7 @@ const World: WorldSettings = {
     HeroLayoutRadius: 0.25,
 
     LavaDamagePerSecond: 12.5,
-    LavaLifestealProportion: 0.2,
+    LavaLifestealProportion: lifeSteal,
     LavaDamageInterval: 20,
 
     MaxScaling: 2.5,
@@ -172,7 +174,7 @@ const fireball: Spell = {
         maxTicks: 1.5 * TicksPerSecond,
         damage: 10,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         categories: Categories.Projectile,
 
         sound: "fireball",
@@ -206,14 +208,14 @@ const flamestrike: Spell = {
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         categories: Categories.Projectile,
         expireAfterCursorTicks: 0,
 
         detonate: {
             damage: 20,
             damageScaling: true,
-            lifeSteal: 0.2,
+            lifeSteal,
             radius: 0.04,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
@@ -269,7 +271,7 @@ const triplet: Spell = {
         maxTicks: 2.25 * TicksPerSecond,
         damage: 0,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         categories: Categories.Projectile,
 
         sound: "triplet",
@@ -289,7 +291,7 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 15 / 3 / 4 / 3, lifeSteal: 0.2, noHit: true, damageScaling: true }, // 3 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 15 / 3 / 4 / 3, lifeSteal, noHit: true, damageScaling: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -333,7 +335,7 @@ const difire: Spell = {
         maxTicks: 1.5 * TicksPerSecond,
         damage: 0,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         categories: Categories.Projectile,
 
         sound: "triplet",
@@ -364,7 +366,7 @@ const difire: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 10 / 2 / 4 / 3, lifeSteal: 0.2, noHit: true, damageScaling: true }, // 2 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 10 / 2 / 4 / 3, lifeSteal, noHit: true, damageScaling: true }, // 2 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 render: {
                     color: "#ff0088",
@@ -408,7 +410,7 @@ const firespray: Spell = {
         maxTicks: 0.25 * TicksPerSecond,
         damage: 2.5,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
 
         color: '#ff0044',
         renderers: [
@@ -539,7 +541,7 @@ const kamehameha: Spell = {
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         damage: 5,
-        lifeSteal: 0.2,
+        lifeSteal,
         damageScaling: false,
         knockbackScaling: false,
         categories: Categories.Projectile | Categories.Massive,
@@ -638,14 +640,14 @@ const blast: Spell = {
         radius: 0.015,
         speed: 0.5,
         minTicks: 3, // Enough ticks to clear any obstacles the player is touching
-        lifeSteal: 0.2,
+        lifeSteal,
         maxTicks: 2 * TicksPerSecond,
         damage: 30,
 
         detonate: {
             radius: 0.025,
             damage: 0,
-            lifeSteal: 0,
+            lifeSteal,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
             renderTicks: 0,
@@ -679,7 +681,7 @@ const homing: Spell = {
         maxTicks: 3.5 * TicksPerSecond,
         damage: 12,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         expireOn: Categories.Hero | Categories.Massive | Categories.Obstacle,
 
         behaviours: [
@@ -722,7 +724,7 @@ const boomerang: Spell = {
         maxTicks: 5 * TicksPerSecond,
         damage: 15,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
         hitInterval: 15, // So repeated hits to obstacles work
@@ -784,7 +786,7 @@ const retractor: Spell = {
     projectile: {
         damage: 0,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         density: 15,
         radius: 0.007,
         speed: 0.3,
@@ -800,7 +802,7 @@ const retractor: Spell = {
         detonate: {
             damage: 20,
             damageScaling: true,
-            lifeSteal: 0.2,
+            lifeSteal,
             radius: 0.025,
 
             minImpulse: 0,
@@ -856,7 +858,7 @@ const backlash: Spell = {
     projectile: {
         damage: 10,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         density: 1,
         restitution: 0,
         radius: 0.002,
@@ -1142,7 +1144,7 @@ const link: Spell = {
 
         detonate: {
             damage: 0,
-            lifeSteal: 0.2,
+            lifeSteal,
             radius: 0.01,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
@@ -1298,7 +1300,7 @@ const bouncer: Spell = {
         damage: 5,
         damageScaling: true,
         knockbackScaling: false,
-        lifeSteal: 0.2,
+        lifeSteal,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
         expireOn: Categories.Massive,
         shieldTakesOwnership: false,
@@ -1335,7 +1337,7 @@ const repeater: Spell = {
         maxTicks: 1 * TicksPerSecond,
         damage: 15,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         knockbackScaling: false,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
@@ -1388,7 +1390,7 @@ const drain: Spell = {
         maxTicks: 2.0 * TicksPerSecond,
         damage: 12,
         damageScaling: true,
-        lifeSteal: 1.0,
+        lifeSteal: 1,
 
         behaviours: [
             {
@@ -1775,7 +1777,7 @@ const mines: Spell = {
         minTicks: 1,
         damage: 0,
         damageScaling: true,
-        lifeSteal: 0.2,
+        lifeSteal,
         knockbackScaling: false,
         hitInterval: 30,
 
@@ -1794,7 +1796,7 @@ const mines: Spell = {
         detonate: {
             damage: 6,
             damageScaling: true,
-            lifeSteal: 0.2,
+            lifeSteal,
             radius: 0.015,
             minImpulse: 0.0001,
             maxImpulse: 0.0001,
@@ -1863,7 +1865,7 @@ const iceBomb: Spell = {
         maxTicks: 25,
         minTicks: 1,
         damage: 0,
-        lifeSteal: 0.2,
+        lifeSteal,
         knockbackScaling: false,
         noKnockback: true,
 
