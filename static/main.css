@@ -1339,8 +1339,8 @@ h3 {
 
 .controls-panel .row.info {
     font-size: 75%;
-    margin-top: 0.5em;
-    margin-bottom: 1.5em;
+    margin-top: 0em;
+    margin-bottom: 2em;
 }
 
 .controls-panel .row .label {

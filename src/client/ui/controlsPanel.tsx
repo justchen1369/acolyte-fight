@@ -36,6 +36,11 @@ namespace Graphics {
     export const Low = "low";
 }
 
+namespace ChangeSpellsWith {
+    export const RightClick = "right";
+    export const CtrlClick = "ctrl";
+}
+
 interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -52,6 +57,7 @@ interface ControlState {
     actionWheelSide: string;
     targetingIndicator: string;
     cameraFollow: string;
+    changeSpellsWith: string;
     audioCaching: string;
     sounds: string;
     graphics: string;
@@ -82,6 +88,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
+        changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
         audioCaching: options.noAudioCaching ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: formatGraphics(options.graphics),
@@ -209,8 +216,8 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             </div>}
             <h2>Interface</h2>
             <div className="row">
-                <span className="label">Camera follow</span>
-                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
+                <span className="label">Sound</span>
+                <select className="value" value={this.state.sounds} onChange={ev => this.onUpdate({ sounds: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
@@ -223,12 +230,29 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 </select>
             </div>
             <div className="row">
-                <span className="label">Sound</span>
-                <select className="value" value={this.state.sounds} onChange={ev => this.onUpdate({ sounds: ev.target.value })}>
+                <span className="label">Camera follow</span>
+                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
+            <div className="row info">
+                <span className="label"></span>
+                <span className="value">Whether to zoom and pan if the screen is too small.</span>
+            </div>
+            {!isMobile && <>
+                <div className="row">
+                    <span className="label">Change spells with</span>
+                    <select className="value" value={this.state.changeSpellsWith} onChange={ev => this.onUpdate({ changeSpellsWith: ev.target.value })}>
+                        <option value={ChangeSpellsWith.RightClick}>Right-click</option>
+                        <option value={ChangeSpellsWith.CtrlClick}>Ctrl+Click</option>
+                    </select>
+                </div>
+                <div className="row info">
+                    <span className="label"></span>
+                    <span className="value">Change spells in-game by {this.state.changeSpellsWith === ChangeSpellsWith.RightClick ? "right-clicking" : "ctrl+clicking"} the spell buttons.</span>
+                </div>
+            </>}
             <h2>Performance</h2>
             <div className="row">
                 <span className="label">Graphics</span>
@@ -309,6 +333,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.mute = state.sounds === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
+            options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
             options.noAudioCaching = state.audioCaching === Toggle.Off;
             options.graphics = parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });

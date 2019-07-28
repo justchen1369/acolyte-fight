@@ -26,6 +26,7 @@ interface Props {
     world: w.World;
     customizing: boolean;
     customizingBtn: boolean;
+    noRightClickChangeSpells: boolean;
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -65,6 +66,7 @@ function stateToProps(state: s.State): Props {
         world: state.world,
         customizing: state.customizing,
         customizingBtn: !!state.world.ui.toolbar.customizingBtn,
+        noRightClickChangeSpells: state.options.noRightClickChangeSpells,
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
@@ -198,7 +200,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     activeKey: key,
                     time: Date.now(),
                 };
-                if (p.modifierBtn || p.secondaryBtn || this.props.customizing) {
+                if (p.modifierBtn || (p.secondaryBtn && !this.props.noRightClickChangeSpells) || this.props.customizing) {
                     this.handleCustomizeBtn(key);
                 } else {
                     this.handleButtonClick(key, world);

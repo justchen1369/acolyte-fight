@@ -13,6 +13,7 @@ interface Props {
     customizingBtn: string;
     customizingMode: boolean;
     allowSpellChoosing: boolean;
+    noRightClickChangeSpells: boolean;
     toolbar: w.ToolbarState;
     settings: AcolyteFightSettings;
     teams: Immutable.Map<string, w.Team>;
@@ -25,6 +26,7 @@ function stateToProps(state: s.State): Props {
         customizingBtn: state.world.ui.toolbar.customizingBtn,
         customizingMode: state.customizing,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
+        noRightClickChangeSpells: state.options.noRightClickChangeSpells,
         toolbar: state.world.ui.toolbar,
         settings: state.world.settings,
         teams: state.world.teams,
@@ -83,7 +85,7 @@ class HintPanel extends React.PureComponent<Props, State> {
             return null;
         } else {
             return <div className="customize-hint-container">
-                <div className="customize-hint">{this.props.toolbar.hoverControl || "Right-click a button below to change spells"}</div>
+                <div className="customize-hint">{this.props.toolbar.hoverControl || `${this.renderModifierClick()} a button below to change spells`}</div>
             </div>
         }
     }
@@ -105,8 +107,12 @@ class HintPanel extends React.PureComponent<Props, State> {
 
     private renderDesktopHint() {
         return <div className="customize-hint-container">
-            <div className="customize-hint">Right-click to change</div>
+            <div className="customize-hint">{this.renderModifierClick()} to change</div>
         </div>;
+    }
+
+    private renderModifierClick() {
+        return this.props.noRightClickChangeSpells ? "Ctrl+Click" : "Right-click";
     }
 
     private renderTeamHint() {
