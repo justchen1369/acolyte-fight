@@ -179,6 +179,12 @@ export async function cache(sounds: Sounds) {
     console.log(`Audio caching started...`);
     
     try {
+        const available = await workerClient.isBufferingAvailable();
+        if (!available) {
+            console.log(`Audio caching unavailable.`);
+            return;
+        }
+
         const bites = new Array<SoundBite>();
         for (const id in sounds) {
             const sound = sounds[id];

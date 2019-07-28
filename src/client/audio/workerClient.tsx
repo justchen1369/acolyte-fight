@@ -4,7 +4,6 @@ import * as r from './audio.model';
 let workerElem: HTMLIFrameElement = null;
 let nextMsgId = 0;
 
-let offlineAvailable = false;
 let ready = defer<void>();
 
 const callbacks = new Map<number, Callback>();
@@ -30,16 +29,6 @@ export function init(): Promise<void> {
 
 async function onWorkerLoaded() {
     console.log("Audio worker loaded.");
-
-    const req: r.ReadyRequest = {
-        key: "acolyte",
-        id: nextMsgId++,
-        type: "readyRequest",
-    };
-    const res = await call(req) as r.ReadyResponse;
-    offlineAvailable = res.offlineAvailable;
-
-    console.log(`Audio worker ready. offlineAvailable=${offlineAvailable}`);
     ready.resolve();
 }
 
@@ -54,23 +43,32 @@ function onMessage(ev: MessageEvent) {
     if (callback) {
         callback(msg);
     }
-    callbacks.delete(msg.id);
 }
 
 function call(req: r.Message): Promise<r.Message> {
     return new Promise((resolve, reject) => {
         callbacks.set(req.id, (res) => {
+            callbacks.delete(req.id);
             resolve(res);
         });
         workerElem.contentWindow.postMessage(req, "*");
     });
 }
 
+export async function isBufferingAvailable() {
+    await ready.promise;
+
+    const req: r.ReadyRequest = {
+        key: "acolyte",
+        id: nextMsgId++,
+        type: "readyRequest",
+    };
+    const res = await call(req) as r.ReadyResponse;
+    return res.offlineAvailable;
+}
+
 export async function bufferSoundBite(bite: SoundBite, ctx: BaseAudioContext): Promise<AudioBuffer> {
     await ready.promise;
-    if (!offlineAvailable) {
-        return null;
-    }
 
     const req: r.CacheAudioRequest = {
         key: "acolyte",
