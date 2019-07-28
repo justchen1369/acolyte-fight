@@ -40,7 +40,7 @@ export async function initialize() {
     await loadDependencies();
 
     StoreProvider.init();
-    audio.init();
+    audio.init().then(() => audio.cache(Sounds)); // Don't bother awaiting
 
     await options.init();
 

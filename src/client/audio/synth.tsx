@@ -1,3 +1,5 @@
+import { SampleRate } from './audio.model';
+
 let brownNoise: AudioBuffer = null;
 
 export function generate(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
@@ -10,8 +12,8 @@ export function generate(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode
 }
 
 function generateBrownNoise(ctx: BaseAudioContext) {
-	const bufferSize = 10 * ctx.sampleRate;
-	const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+	const bufferSize = 10 * SampleRate;
+    const noiseBuffer = ctx.createBuffer(1, bufferSize, SampleRate);
 	const output = noiseBuffer.getChannelData(0);
 
 	let lastOut = 0.0;

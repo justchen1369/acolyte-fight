@@ -1,4 +1,6 @@
+import * as r from './audio.model';
 import * as synth from './synth';
+import * as workerClient from './workerClient';
 import { isMobile } from '../core/userAgent';
 import { TicksPerSecond } from '../../game/constants';
 import { AudioElement, SampleRate, Vec2 } from './audio.model';
@@ -131,7 +133,7 @@ function getAudioContextConstructor(): any {
     return ((window as any).AudioContext || (window as any).webkitAudioContext);
 }
 
-export function init() {
+export async function init() {
     const AudioContext = getAudioContextConstructor();
     if (!AudioContext) {
         return;
@@ -162,77 +164,60 @@ export function init() {
         recordingDestination: null,
         locked: true,
     };
+
+    await workerClient.init();
 }
 
 export async function cache(sounds: Sounds) {
-    /*
     const MaxAge = 3; // Haven't used in 3 games, delete
     if (biteCacheSounds === sounds) {
         return;
     }
     biteCacheSounds = sounds;
 
-    const OfflineAudioContext = getOfflineAudioContextConstructor();
-    if (!OfflineAudioContext) {
-        console.log("Cannot cache audio - OfflineAudioContext not available");
-        return;
-    }
-
-    const crashingUntil = await storage.getOfflineCrashing();
-    const unix = moment().unix();
-    if (unix < crashingUntil) {
-        console.log("Not audio caching as a crash was detected recently.");
-        return;
-    }
-
     const start = Date.now();
     console.log(`Audio caching started...`);
     
-    const bites = new Array<SoundBite>();
-    for (const id in sounds) {
-        const sound = sounds[id];
-        if (sound.start) {
-            bites.push(...sound.start);
+    try {
+        const bites = new Array<SoundBite>();
+        for (const id in sounds) {
+            const sound = sounds[id];
+            if (sound.start) {
+                bites.push(...sound.start);
+            }
+            if (sound.sustain) {
+                bites.push(...sound.sustain);
+            }
         }
-        if (sound.sustain) {
-            bites.push(...sound.sustain);
+
+        let numCreated = 0;
+        const version = cacheVersion++;
+        for (const bite of bites) {
+            const item = biteCache.get(bite);
+            if (item) {
+                item.version = version;
+                continue;
+            }
+
+            const buffer = await workerClient.bufferSoundBite(bite, env.ctx);
+            if (buffer) {
+                ++numCreated;
+                biteCache.set(bite, { buffer, version: version });
+            }
         }
+
+        // Delete old sound bites
+        const cutoff = version - MaxAge;
+        biteCache.forEach((item, key) => {
+            if (item.version <= cutoff) {
+                biteCache.delete(key);
+            }
+        });
+
+        console.log(`Cached ${numCreated} sounds in ${(Date.now() - start).toFixed(0)} ms`);
+    } catch (exception) {
+        console.error("Audio caching failed", exception);
     }
-
-    await storage.setOfflineCrashing(unix + 86400); // Don't retry audio caching until tomorrow, if it fails
-    let oneSucceeded = false;
-
-    let numCreated = 0;
-    const version = cacheVersion++;
-    for (const bite of bites) {
-        const item = biteCache.get(bite);
-        if (item) {
-            item.version = version;
-            continue;
-        }
-
-        const buffer = await bufferSoundBite(bite);
-        if (buffer) {
-            ++numCreated;
-            biteCache.set(bite, { buffer, version: version });
-        }
-
-        if (!oneSucceeded) {
-            oneSucceeded = true;
-            await storage.clearOfflineCrashing();
-        }
-    }
-
-    // Delete old sound bites
-    const cutoff = version - MaxAge;
-    biteCache.forEach((item, key) => {
-        if (item.version <= cutoff) {
-            biteCache.delete(key);
-        }
-    });
-
-    console.log(`Cached ${numCreated} sounds in ${(Date.now() - start).toFixed(0)} ms`);
-    */
 }
 
 export function unlock() {

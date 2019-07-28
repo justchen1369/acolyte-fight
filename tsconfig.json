@@ -66,6 +66,7 @@
     "src/typings/fb-instant.d.ts",
     "src/typings/glicko2.d.ts",
     "src/typings/kongregate.d.ts",
+    "src/typings/promise-defer.d.ts",
     "src/typings/poki.d.ts",
     "src/typings/socket.io-msgpack-parser.d.ts",
     "src/typings/qrious.d.ts",

@@ -110,6 +110,7 @@ app.get('/favicon.ico', (req, res) => res.sendFile(rootDir + '/favicon.ico'));
 app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest.webmanifest'));
 
 
+app.get('/audioWorker.html', (req, res) => res.sendFile(rootDir + '/audioWorker.html'));
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
