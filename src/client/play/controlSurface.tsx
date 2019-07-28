@@ -40,6 +40,7 @@ interface PointInfo {
     worldPoint: pl.Vec2;
     time: number;
     secondaryBtn?: boolean;
+    modifierBtn?: boolean;
 }
 
 interface TargetSurfaceState {
@@ -153,7 +154,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private takeMousePoint(e: React.MouseEvent<HTMLElement>): PointInfo {
         const secondaryBtn = !!e.button;
-        return this.pointInfo(MouseId, e.clientX, e.clientY, secondaryBtn);
+        const modifierBtn = e.ctrlKey || e.shiftKey || e.altKey;
+        return this.pointInfo(MouseId, e.clientX, e.clientY, secondaryBtn, modifierBtn);
     }
 
     private takeTouchPoint(e: React.TouchEvent<HTMLElement>): PointInfo[] {
@@ -165,7 +167,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         return points;
     }
 
-    private pointInfo(touchId: string, clientX: number, clientY: number, secondaryBtn: boolean = false): PointInfo {
+    private pointInfo(touchId: string, clientX: number, clientY: number, secondaryBtn: boolean = false, modifierBtn: boolean = false): PointInfo {
         const interfacePoint = pl.Vec2(clientX, clientY);
         const worldPoint = worldPointFromInterfacePoint(interfacePoint, this.props.world);
 
@@ -175,6 +177,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             worldPoint,
             time: Date.now(),
             secondaryBtn,
+            modifierBtn,
         };
     }
 
@@ -195,7 +198,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     activeKey: key,
                     time: Date.now(),
                 };
-                if (p.secondaryBtn || this.props.customizing) {
+                if (p.modifierBtn || p.secondaryBtn || this.props.customizing) {
                     this.handleCustomizeBtn(key);
                 } else {
                     this.handleButtonClick(key, world);
