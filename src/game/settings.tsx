@@ -1964,7 +1964,7 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.04,
-                tickInterval: 10,
+                tickInterval: 5,
                 maxHits: 6,
                 packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true, damageScaling: true },
                 buffs: [
