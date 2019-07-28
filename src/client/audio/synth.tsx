@@ -1,17 +1,12 @@
-export interface OutputEnvironment {
-    ctx: BaseAudioContext;
-    next: AudioNode;
-}
-
 let brownNoise: AudioBuffer = null;
 
-export function generate(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
-    next = createAttackDecayNode(bite, env, next);
-    next = createTremoloNode(bite, env, next);
-    next = createHighPassNode(bite, env, next);
-    next = createLowPassNode(bite, env, next);
+export function generate(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
+    next = createAttackDecayNode(bite, ctx, next);
+    next = createTremoloNode(bite, ctx, next);
+    next = createHighPassNode(bite, ctx, next);
+    next = createLowPassNode(bite, ctx, next);
 
-    createSource(bite, env, next);
+    createSource(bite, ctx, next);
 }
 
 function generateBrownNoise(ctx: BaseAudioContext) {
@@ -29,8 +24,8 @@ function generateBrownNoise(ctx: BaseAudioContext) {
 	return noiseBuffer;
 }
 
-function createAttackDecayNode(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
-    const t = env.ctx.currentTime;
+function createAttackDecayNode(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
+    const t = ctx.currentTime;
     const startTime = bite.startTime || 0;
     const stopTime = bite.stopTime;
     const attack = bite.attack || 0.03;
@@ -40,7 +35,7 @@ function createAttackDecayNode(bite: SoundBite, env: OutputEnvironment, next: Au
     const maxStartTime = t + startTime + attack;
     const maxStopTime = Math.max(maxStartTime, t + stopTime - decay);
 
-    const volume = env.ctx.createGain();
+    const volume = ctx.createGain();
     volume.gain.value = 0;
 	volume.gain.setValueAtTime(0, t + startTime);
     volume.gain.linearRampToValueAtTime(maxVolume, maxStartTime);
@@ -53,12 +48,11 @@ function createAttackDecayNode(bite: SoundBite, env: OutputEnvironment, next: Au
     return volume;
 }
 
-function createTremoloNode(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
+function createTremoloNode(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
     if (!(bite.tremoloFreq && bite.tremoloStrength)) {
         return next;
     }
 
-    const ctx = env.ctx;
     const strength = bite.tremoloStrength;
     const freq = bite.tremoloFreq;
     const startTime = bite.startTime || 0;
@@ -81,12 +75,12 @@ function createTremoloNode(bite: SoundBite, env: OutputEnvironment, next: AudioN
     return tremoloGain;
 }
 
-function createHighPassNode(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
+function createHighPassNode(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
     if (!bite.highPass) {
         return next;
     }
 
-    const highPass = env.ctx.createBiquadFilter();
+    const highPass = ctx.createBiquadFilter();
     highPass.type = "highpass";
     highPass.frequency.value = bite.highPass;
     highPass.connect(next);
@@ -94,12 +88,12 @@ function createHighPassNode(bite: SoundBite, env: OutputEnvironment, next: Audio
     return highPass;
 }
 
-function createLowPassNode(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
+function createLowPassNode(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
     if (!bite.lowPass) {
         return next;
     }
 
-    const lowPass = env.ctx.createBiquadFilter();
+    const lowPass = ctx.createBiquadFilter();
     lowPass.type = "lowpass";
     lowPass.frequency.value = bite.lowPass;
     lowPass.connect(next);
@@ -108,15 +102,14 @@ function createLowPassNode(bite: SoundBite, env: OutputEnvironment, next: AudioN
 }
 
 
-function createNormalizer(divisor: number, env: OutputEnvironment, next: AudioNode) {
-    const normalizer = env.ctx.createGain();
+function createNormalizer(divisor: number, ctx: BaseAudioContext, next: AudioNode) {
+    const normalizer = ctx.createGain();
     normalizer.gain.value = 1 / divisor;
     normalizer.connect(next);
     return normalizer;
 }
 
-function createSource(bite: SoundBite, env: OutputEnvironment, next: AudioNode) {
-    const ctx = env.ctx;
+function createSource(bite: SoundBite, ctx: BaseAudioContext, next: AudioNode) {
     const t = ctx.currentTime;
 
     const startTime = bite.startTime || 0;
@@ -137,8 +130,8 @@ function createSource(bite: SoundBite, env: OutputEnvironment, next: AudioNode) 
         const startFreq = bite.startFreq || 440;
         const stopFreq = bite.stopFreq || 440;
 
-        const frequencyModulator = createFrequencyModulator(bite, env);
-        next = createNormalizer(ratios.length, env, next); // Ensure volume is the same regardless of number of oscillators
+        const frequencyModulator = createFrequencyModulator(bite, ctx);
+        next = createNormalizer(ratios.length, ctx, next); // Ensure volume is the same regardless of number of oscillators
 
         let ended = false;
 		for (const ratio of ratios) {
@@ -161,8 +154,7 @@ function createSource(bite: SoundBite, env: OutputEnvironment, next: AudioNode) 
     }
 }
 
-function createFrequencyModulator(bite: SoundBite, env: OutputEnvironment) {
-    const ctx = env.ctx;
+function createFrequencyModulator(bite: SoundBite, ctx: BaseAudioContext) {
     const t = ctx.currentTime;
 
     const startTime = bite.startTime || 0;

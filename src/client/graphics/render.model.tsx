@@ -1,6 +1,8 @@
 import * as pl from 'planck-js';
 import { Float32List } from './list';
 import ColTuple from './colorTuple';
+import { AudioElement } from '../audio/audio.model';
+export { AudioElement } from '../audio/audio.model';
 
 export namespace GraphicsLevel {
 	export const Maximum = 5;
@@ -36,13 +38,6 @@ export interface RenderOptions {
 	rebindings: KeyBindings;
 	rtx: number;
 	retinaMultiplier: number;
-}
-
-export interface AudioElement {
-    id: string;
-    sound: string;
-	pos?: pl.Vec2;
-	intensity?: number;
 }
 
 export interface GlContext {

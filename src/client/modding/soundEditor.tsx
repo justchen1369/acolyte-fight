@@ -6,7 +6,7 @@ import * as ReactRedux from 'react-redux';
 import * as e from './editor.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as audio from '../graphics/audio';
+import * as audio from '../audio/audio';
 import * as editing from './editing';
 import EditorPage from './editorPage';
 import SectionEditor from './sectionEditor';

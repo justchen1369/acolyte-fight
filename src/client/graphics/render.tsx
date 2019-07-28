@@ -1,6 +1,6 @@
 import * as pl from 'planck-js';
 import * as atlasController from './atlasController';
-import * as audio from './audio';
+import * as audio from '../audio/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as glx from './glx';

@@ -7,7 +7,7 @@ import * as Reselect from 'reselect';
 
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
-import * as audio from '../graphics/audio';
+import * as audio from '../audio/audio';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';

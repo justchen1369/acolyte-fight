@@ -1,17 +1,10 @@
-import moment from 'moment';
-import * as pl from 'planck-js';
-import * as storage from '../storage';
 import * as synth from './synth';
 import { isMobile } from '../core/userAgent';
 import { TicksPerSecond } from '../../game/constants';
-import { AudioElement } from './render.model';
-import { OutputEnvironment } from './synth';
-
-export { AudioElement } from './render.model';
+import { AudioElement, SampleRate, Vec2 } from './audio.model';
+export { AudioElement } from './audio.model';
 
 // Constants
-const SampleRate = 44100;
-
 const Z = -0.1;
 const RefDistance = 0.1;
 
@@ -25,7 +18,7 @@ const biteCache = new Map<SoundBite, SoundBiteCacheItem>();
 let biteCacheSounds: Sounds = null;
 let cacheVersion = 0;
 
-interface AudioEnvironment extends OutputEnvironment {
+interface AudioEnvironment {
     ctx: AudioContext;
     final: AudioNode;
     next: AudioNode;
@@ -58,11 +51,11 @@ class AudioSource {
         this.sound = sound;
     }
 
-    start(pos: pl.Vec2 | null) {
+    start(pos: Vec2 | null) {
         this.play(pos, this.sound.start);
     }
 
-    sustain(pos: pl.Vec2 | null) {
+    sustain(pos: Vec2 | null) {
         const t = env.ctx.currentTime;
 
         // Play sounds
@@ -124,7 +117,7 @@ class AudioSource {
         }
     }
 
-    private play(pos: pl.Vec2 | null, bites: SoundBite[]) {
+    private play(pos: Vec2 | null, bites: SoundBite[]) {
         if (bites) {
             for (const bite of bites) {
                 const follow = playSoundBite(bite, pos, env);
@@ -136,10 +129,6 @@ class AudioSource {
 
 function getAudioContextConstructor(): any {
     return ((window as any).AudioContext || (window as any).webkitAudioContext);
-}
-
-function getOfflineAudioContextConstructor(): any {
-    return ((window as any).OfflineAudioContext || (window as any).webkitOfflineAudioContext);
 }
 
 export function init() {
@@ -176,6 +165,7 @@ export function init() {
 }
 
 export async function cache(sounds: Sounds) {
+    /*
     const MaxAge = 3; // Haven't used in 3 games, delete
     if (biteCacheSounds === sounds) {
         return;
@@ -242,31 +232,7 @@ export async function cache(sounds: Sounds) {
     });
 
     console.log(`Cached ${numCreated} sounds in ${(Date.now() - start).toFixed(0)} ms`);
-}
-
-async function bufferSoundBite(bite: SoundBite) {
-    try {
-        const ExtraSeconds = 1;
-
-        const OfflineAudioContext = getOfflineAudioContextConstructor();
-        const offlineCtx: OfflineAudioContext = new OfflineAudioContext(1, (bite.stopTime + ExtraSeconds) * SampleRate, SampleRate);
-        const offlineEnv: OutputEnvironment = {
-            ctx: offlineCtx,
-            next: offlineCtx.destination,
-        };
-        playSoundBite(bite, null, offlineEnv);
-        return renderToBuffer(offlineCtx);
-    } catch (exception) {
-        console.error("Unable to buffer sound bite", exception);
-        return null;
-    }
-}
-
-function renderToBuffer(offlineCtx: OfflineAudioContext) {
-    return new Promise<AudioBuffer>((resolve, reject) => {
-        offlineCtx.oncomplete = ev => resolve(ev.renderedBuffer);
-        offlineCtx.startRendering();
-    });
+    */
 }
 
 export function unlock() {
@@ -314,7 +280,7 @@ export function unrecord() {
     }
 }
 
-export function play(self: pl.Vec2, elems: AudioElement[], sounds: Sounds) {
+export function play(self: Vec2, elems: AudioElement[], sounds: Sounds) {
     if (!env) {
         return;
     }
@@ -368,7 +334,7 @@ function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[]
     return keep;
 }
 
-function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironment): AudioRef {
+function playSoundBite(bite: SoundBite, pos: Vec2 | null, env: AudioEnvironment): AudioRef {
     let next: AudioNode = env.next;
 
     let panner: PannerNode = null;
@@ -383,7 +349,7 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironm
     if (cacheItem) {
         replayBuffer(cacheItem.buffer, env, next);
     } else {
-        synth.generate(bite, env, next);
+        synth.generate(bite, env.ctx, next);
     }
 
     return {
@@ -393,7 +359,7 @@ function playSoundBite(bite: SoundBite, pos: pl.Vec2 | null, env: OutputEnvironm
     };
 }
 
-function createPannerNode(pos: pl.Vec2, env: OutputEnvironment, next: AudioNode): PannerNode {
+function createPannerNode(pos: Vec2, env: AudioEnvironment, next: AudioNode): PannerNode {
     const pan = env.ctx.createPanner();
     pan.panningModel = 'HRTF';
     pan.distanceModel = 'inverse';
@@ -404,7 +370,7 @@ function createPannerNode(pos: pl.Vec2, env: OutputEnvironment, next: AudioNode)
     return pan;
 }
 
-function createVolumeNode(env: OutputEnvironment, next: AudioNode) {
+function createVolumeNode(env: AudioEnvironment, next: AudioNode) {
 	const volume = env.ctx.createGain();
 	volume.gain.setValueAtTime(1, env.ctx.currentTime);
 
@@ -412,7 +378,7 @@ function createVolumeNode(env: OutputEnvironment, next: AudioNode) {
     return volume;
 }
 
-function replayBuffer(buffer: AudioBuffer, env: OutputEnvironment, next: AudioNode) {
+function replayBuffer(buffer: AudioBuffer, env: AudioEnvironment, next: AudioNode) {
     const ctx = env.ctx;
 
     const source = ctx.createBufferSource();
