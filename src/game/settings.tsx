@@ -114,7 +114,7 @@ const Choices: ChoiceSettings = {
 const cleanse: EffectInfo = {
     icon: "fas fa-briefcase-medical",
     title: "Cleanse",
-    text: "Clears all positive and negative effects currently affecting you.",
+    text: "Clears all positive and negative effects.",
 };
 
 const move: MoveSpell = {
