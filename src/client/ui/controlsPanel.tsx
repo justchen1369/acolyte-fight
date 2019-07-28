@@ -265,17 +265,6 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={Graphics.Low}>Low</option>
                 </select>
             </div>
-            <div className="row">
-                <span className="label">Audio Caching</span>
-                <select className="value" value={this.state.audioCaching} onChange={ev => this.onUpdate({ audioCaching: ev.target.value })}>
-                    <option value={Toggle.On}>On</option>
-                    <option value={Toggle.Off}>Off</option>
-                </select>
-            </div>
-            <div className="row info">
-                <span className="label"></span>
-                <span className="value">Only turn off audio caching if the game is crashing.</span>
-            </div>
             {this.state.changed && <div className="status-row">
                 {this.state.saved 
                     ? "Changes saved"
