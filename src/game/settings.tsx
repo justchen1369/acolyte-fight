@@ -1651,7 +1651,7 @@ const halo: Spell = {
     interruptibleAfterTicks: 0,
 
     strikeCancel: {},
-    maxChannellingTicks: 7.5 * TicksPerSecond, // A bit higher than normal so that the movement speed buff can last
+    maxChannellingTicks: 5 * TicksPerSecond, // A bit higher than normal so that the movement speed buff can last
 
     jitterRatio: 0.0,
     intervalTicks: 1.5 * TicksPerSecond,
@@ -1683,7 +1683,7 @@ const halo: Spell = {
         density: 1,
         radius: 0.002,
         speed: 0.5,
-        maxTicks: 7.5 * TicksPerSecond,
+        maxTicks: 4 * TicksPerSecond,
         hitInterval: 15,
         damage: 6,
         lifeSteal: 1,
@@ -1706,7 +1706,6 @@ const halo: Spell = {
                 minDistanceToTarget: 0.02,
                 targetType: HomingTargets.self,
             },
-            { type: "expireOnChannellingEnd" },
         ],
 
         sound: "halo",
