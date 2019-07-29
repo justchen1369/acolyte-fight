@@ -13,7 +13,7 @@ import * as w from '../../../game/world.model';
 import { isMobile } from '../../core/userAgent';
 import Button from '../../controls/button';
 
-const NewVersion = 3;
+const NewVersion = 4;
 
 interface OwnProps {
 }
@@ -104,7 +104,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
     private renderNewVersion() {
         return <div className="info-panel dialog-panel">
             <div className="header-row">Recent Updates</div>
-            <div className="body-row">Damage is now <b>50% lower</b> initially but increases <b>2.5x</b> over the course of the match.</div>
+            <div className="body-row">The recent changes to damage scaling have been reverted.</div>
             <div className="body-row">For more updates, check the <a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /> Discord</a>.</div>
             <div className="action-row">
                 <Button className="btn" onClick={(e) => this.onCloseVersionClicked()}>OK</Button>
