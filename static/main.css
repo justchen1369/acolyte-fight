@@ -479,7 +479,7 @@ a:hover, a:active {
 }
 
 @keyframes fly-from-left {
-    from { transform: translateX(-1000px) }
+    from { transform: translateX(-100vw) }
     to { transform: translateX(0); }
 }
 
@@ -489,7 +489,7 @@ a:hover, a:active {
 }
 
 @keyframes fly-from-right {
-    from { transform: translateX(1000px) }
+    from { transform: translateX(100vw) }
     to { transform: translateX(0); }
 }
 
