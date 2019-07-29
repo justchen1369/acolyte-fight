@@ -47,9 +47,6 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 The last player to knockback an enemy receives <b>{100 * World.LavaLifestealProportion}% lifesteal</b> from the void damage.
             </p>
             <p>
-                The damage of most spells increases with time. Damage will increase <b>{World.MaxScaling}x</b> over <b>{World.SecondsToShrink} seconds</b>.
-            </p>
-            <p>
                 If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds</b>,
                 you will only take damage from the opponent who did the most damage.
             </p>
