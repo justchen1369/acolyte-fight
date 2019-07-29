@@ -91,6 +91,8 @@ body .page {
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+
+    transition: background-color 0.2s ease;
 }
 
 .customizing #gl {
@@ -166,6 +168,8 @@ a, a:visited {
     pointer-events: all;
     color: #00ccff;
     text-decoration: none;
+
+    transition: color 0.2s ease;
 }
 a:hover, a:active {
     color: #ff8800;
@@ -211,6 +215,8 @@ a:hover, a:active {
     border-radius: 3px;
     background: linear-gradient(to bottom, #00ccff, #00ccff 95%, #0088bb 95%, #0088bb);
     padding: 10px 40px;
+
+    transition: background-color 0.2s ease;
 }
 
 .btn:hover {
@@ -238,6 +244,8 @@ a:hover, a:active {
 .clickable {
     color: #ccc;
     cursor: hand;
+
+    transition: color 0.2s ease;
 }
 
 .clickable:hover, .clickable:active, .clickable.selected {
@@ -301,6 +309,8 @@ a:hover, a:active {
     cursor: pointer;
     font-weight: bold;
     text-decoration: none;
+
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 .navbar .nav-item.error {
     color: #ff0000;
@@ -656,6 +666,8 @@ table.player-list {
     color: #888;
     pointer-events: all;
     cursor: hand;
+
+    transition: color 0.2s ease;
 }
 
 .player-list .silence-btn:hover {
@@ -940,6 +952,8 @@ table.player-list {
 #messages-panel .row .silence-btn {
     opacity: 0;
     cursor: hand;
+
+    transition: opacity 0.2s ease;
 }
 
 #messages-panel .row:hover .silence-btn {
@@ -1182,6 +1196,8 @@ h3 {
 
     pointer-events: all;
     cursor: hand;
+
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .spell-config .key-name-container:hover {
@@ -1310,6 +1326,8 @@ h3 {
     border: 2px #333 solid;
     box-sizing: border-box;
     box-shadow: 2px 2px 3px #222;
+
+    transition: border 0.2s ease;
 }
 
 .spell-config .spell-icon-secondary {
@@ -1418,6 +1436,8 @@ h3 {
     box-shadow: 5px 5px 5px black;
 
     text-align: center;
+
+    transition: background-color 0.2s ease;
 }
 
 .stats-card-row .stats-card:hover {
@@ -1449,6 +1469,8 @@ h3 {
 
     margin: 10px;
     padding: 10px;
+
+    transition: background-color 0.2s ease;
 }
 
 .leaderboard-row:hover {
@@ -1469,6 +1491,7 @@ h3 {
 
 .leaderboard-row .leaderboard-num-games {
     opacity: 0;
+    transition: 0.2s opacity ease;
 }
 
 .leaderboard-row:hover .leaderboard-num-games {
@@ -1522,6 +1545,8 @@ h3 {
     padding: 10px 20px;
     background: #333;
     border: 1px #444 solid;
+
+    transition: background-color 0.2s ease;
 }
 
 .profile-panel .category:hover {
@@ -1554,6 +1579,8 @@ h3 {
 
     display: flex;
     flex-direction: column;
+
+    transition: background-color 0.2s ease;
 }
 
 .game-list .game-card .game-summary {
@@ -1615,6 +1642,8 @@ h3 {
     font-size: 300%;
     opacity: 0;
     cursor: pointer;
+
+    transition: opacity 0.2s ease;
 }
 
 .game-list .game-card:hover .expander {
@@ -1637,6 +1666,8 @@ h3 {
     display: flex;
     flex-direction: row;
     align-items: center;
+
+    transition: background-color 0.2s ease;
 }
 
 .game-list .game-card .adjustment-detail:hover {
@@ -1725,6 +1756,8 @@ textarea.ai-js {
     margin: 12px 0;
 
     cursor: pointer;
+
+    transition: background-color 0.2s ease;
 }
 
 .party-mode-row:hover {
@@ -1840,6 +1873,7 @@ textarea.ai-js {
 .entity-list-item {
     padding: 2px;
     cursor: pointer;
+    transition: background-color 0.2s ease;
 }
 .entity-list-item:hover {
     background: #555;
