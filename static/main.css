@@ -1660,6 +1660,8 @@ h3 {
     background: #222;
     display: flex;
     flex-direction: column;
+
+    transition: background-color 0.2s ease;
 }
 
 .game-list .game-card .adjustment-detail {
@@ -1730,6 +1732,8 @@ textarea.ai-js {
     left: 0;
     height: 100%;
     background: #22ee88;
+
+    transition: width 0.2s ease;
 }
 
 .btn.waiting-for-party:hover .waiting-for-party-progress {
@@ -1785,6 +1789,8 @@ textarea.ai-js {
     padding: 3px 15px;
     border-radius: 15px;
     margin-right: 5px;
+
+    transition: background-color 0.2s ease, opacity 0.2s ease;
 }
 
 .party-list .party-member-ready {
