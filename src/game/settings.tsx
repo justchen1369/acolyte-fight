@@ -1410,7 +1410,7 @@ const gravity: Spell = {
         {
             icon: "fas fa-hourglass-half",
             title: "Silence",
-            text: "Your enemy will be unable to cast spells for 0.75 seconds.",
+            text: "Your enemy will be unable to cast spells for 0.5 seconds.",
         }
     ],
     action: "projectile",
@@ -1447,7 +1447,7 @@ const gravity: Spell = {
                 type: "cooldown",
                 against: Alliances.NotFriendly,
                 maxTicks: 1,
-                minCooldown: 0.75 * TicksPerSecond,
+                minCooldown: 0.5 * TicksPerSecond,
             },
         ],
 
