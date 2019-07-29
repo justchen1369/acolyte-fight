@@ -2214,7 +2214,6 @@ const thrust: Spell = {
         damage: 0,
     },
     speed: 1.5,
-    bounceTicks: 3,
 
     icon: "fireDash",
     color: '#ff00cc',

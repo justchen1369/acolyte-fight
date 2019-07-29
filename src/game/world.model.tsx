@@ -366,6 +366,10 @@ export interface WorldObjectBase {
 	body: pl.Body;
 	destroyedTick?: number;
 	blocksTeleporters?: boolean;
+
+	posDelta?: pl.Vec2;
+	velocityDelta?: pl.Vec2;
+	impulseDelta?: pl.Vec2;
 }
 
 export interface HighlightSource {
@@ -422,7 +426,6 @@ export interface Hero extends WorldObjectBase {
 	moveSpeedPerSecond: number;
 	maxSpeed: number;
 	revolutionsPerTick: number;
-	conveyorShift?: pl.Vec2; // If set, move by this amount on the next tick. Used to ensure only one conveyor has an effect per tick.
 	linearDamping: number;
 
 	createTick: number;
@@ -902,7 +905,6 @@ export interface ReflectFollowBehaviour extends BehaviourBase {
 export interface ThrustBounceBehaviour extends BehaviourBase {
 	type: "thrustBounce";
 	heroId: string;
-	bounceTicks: number;
 }
 
 export interface ThrustDecayBehaviour extends BehaviourBase {

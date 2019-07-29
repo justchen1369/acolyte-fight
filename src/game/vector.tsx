@@ -5,6 +5,10 @@ export function zero() {
 	return pl.Vec2(0, 0);
 }
 
+export function isZero(vec: pl.Vec2) {
+	return vec.x === 0 && vec.y === 0;
+}
+
 export function diff(to: pl.Vec2, from: pl.Vec2) {
 	return pl.Vec2(to.x - from.x, to.y - from.y);
 }

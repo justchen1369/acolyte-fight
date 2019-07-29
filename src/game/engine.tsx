@@ -467,6 +467,30 @@ function addHero(world: w.World, heroId: string) {
 	return hero;
 }
 
+function applyPosDelta(obj: w.WorldObject, delta: pl.Vec2) {
+	if (obj.posDelta) {
+		obj.posDelta.add(delta);
+	} else {
+		obj.posDelta = delta;
+	}
+}
+
+function applyVelocityDelta(obj: w.WorldObject, delta: pl.Vec2) {
+	if (obj.velocityDelta) {
+		obj.velocityDelta.add(delta);
+	} else {
+		obj.velocityDelta = delta;
+	}
+}
+
+function applyImpulseDelta(obj: w.WorldObject, delta: pl.Vec2) {
+	if (obj.impulseDelta) {
+		obj.impulseDelta.add(delta);
+	} else {
+		obj.impulseDelta = delta;
+	}
+}
+
 export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
 	return calculateCooldown(world, hero, spellId);
 }
@@ -823,6 +847,7 @@ export function tick(world: w.World) {
 		resetMass,
 	});
 
+	move(world);
 	physicsStep(world);
 
 	handleBehaviours(world, {
@@ -1935,7 +1960,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		const impulse = vector.diff(hero.body.getPosition(), other.body.getPosition());
 		const magnitude = Math.max(0, Hero.Radius * 2 - impulse.length()) * Hero.SeparationImpulsePerTick;
 		impulse.mul(magnitude / impulse.length());
-		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
+		applyImpulseDelta(hero, impulse);
 	}
 
 	// If using thrust, cause damage
@@ -1972,7 +1997,7 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 	if (obstacle.impulse > 0) {
 		const impulse = vector.diff(hero.body.getPosition(), obstacle.body.getPosition())
 		impulse.mul(obstacle.impulse / impulse.length());
-		hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
+		applyImpulseDelta(hero, impulse);
 		obstacle.activeTick = world.tick;
 	}
 
@@ -2018,7 +2043,7 @@ function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 			step.addMul(obstacle.conveyor.radialSpeed / TicksPerSecond, outward);
 		}
 
-		hero.conveyorShift = step;
+		applyPosDelta(hero, step);
 	}
 }
 
@@ -2510,7 +2535,7 @@ function gravityForce(behaviour: w.GravityBehaviour, world: w.World) {
 	const strength = hero.gravity.strength * proportion;
 	impulse.mul(strength / impulse.length());
 
-	hero.body.applyLinearImpulse(impulse, hero.body.getWorldPoint(vectorZero), true);
+	applyImpulseDelta(hero, impulse);
 	return true;
 }
 
@@ -2730,13 +2755,8 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	const distance = outward.length();
 	const impulsePerTick = link.impulsePerTick * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
 	if (impulsePerTick > 0) {
-		owner.body.applyLinearImpulse(
-			vector.relengthen(outward, link.selfFactor * impulsePerTick),
-			owner.body.getWorldPoint(vectorZero), true);
-
-		target.body.applyLinearImpulse(
-			vector.relengthen(outward, link.targetFactor * impulsePerTick).neg(),
-			target.body.getWorldPoint(vectorZero), true);
+		applyImpulseDelta(owner, vector.relengthen(outward, link.selfFactor * impulsePerTick));
+		applyImpulseDelta(target, vector.relengthen(outward, link.targetFactor * impulsePerTick).neg());
 	}
 
 	if (link.sidewaysImpulsePerTick > 0 && owner.target) {
@@ -2744,9 +2764,7 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 		const toRight = vector.rotateRight(outward);
 		const sidewaysMagnitude = pl.Vec2.dot(toRight, toCursor) / toRight.length() / toCursor.length();
 
-		target.body.applyLinearImpulse(
-			vector.relengthen(toRight, sidewaysMagnitude * link.sidewaysImpulsePerTick),
-			target.body.getWorldPoint(vectorZero), true);
+		applyImpulseDelta(target, vector.relengthen(toRight, sidewaysMagnitude * link.sidewaysImpulsePerTick));
 	}
 
 	return true;
@@ -3033,7 +3051,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 			if (applyKnockback && detonate.maxImpulse) {
 				const magnitude = (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
-				other.body.applyLinearImpulse(direction, other.body.getWorldPoint(vectorZero), true);
+				applyImpulseDelta(other, direction);
 				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color: config.color, direction });
 			}
 		}
@@ -3377,32 +3395,54 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {
 	if (!target) { return; }
 
-	if (movementProportion > 0) {
-		turnTowards(hero, target);
-	}
-
 	const current = hero.body.getPosition();
 
-	const step = vector.diff(target, current).clamp(movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
-	if (hero.conveyorShift) {
-		step.add(hero.conveyorShift);
-		hero.conveyorShift = null;
-	}
-	hero.body.setPosition(current.add(step));
+	if (movementProportion > 0) {
+		turnTowards(hero, target);
 
-	hero.strafeIds.forEach(projectileId => {
-		const projectile = world.objects.get(projectileId);
-		if (projectile) {
-			if (projectile.category === "projectile" && projectile.strafe && projectile.owner === hero.id) {
-				projectile.body.setPosition(projectile.body.getPosition().add(step));
-			}
-		} else {
-			hero.strafeIds.delete(projectileId); // Yes you can delete from a set while iterating in ES6
-		}
-	});
+		const step = vector.diff(target, current).clamp(movementProportion * hero.moveSpeedPerSecond / TicksPerSecond);
+		applyPosDelta(hero, step);
+	}
 
 	const done = vector.distance(current, target) < constants.Pixel;
 	hero.moveTo = done ? null : target;
+}
+
+// Sometimes different browsers applied these deltas in different orders and caused desyncs. Collate them all and apply them in one call to avoid this.
+function move(world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.posDelta) {
+			const current = obj.body.getPosition();
+			obj.body.setPosition(current.add(obj.posDelta));
+
+			if (obj.category === "hero") {
+				// Strafe
+				obj.strafeIds.forEach(projectileId => {
+					const projectile = world.objects.get(projectileId);
+					if (projectile) {
+						if (projectile.category === "projectile" && projectile.strafe && projectile.owner === obj.id) {
+							projectile.body.setPosition(projectile.body.getPosition().add(obj.posDelta));
+						}
+					} else {
+						obj.strafeIds.delete(projectileId); // Yes you can delete from a set while iterating in ES6
+					}
+				});
+			}
+
+			obj.posDelta = null;
+		}
+
+		if (obj.velocityDelta) {
+			const velocity = obj.body.getLinearVelocity();
+			obj.body.setLinearVelocity(velocity.add(obj.velocityDelta));
+			obj.velocityDelta = null;
+		}
+
+		if (obj.impulseDelta) {
+			obj.body.applyLinearImpulse(obj.impulseDelta, obj.body.getWorldPoint(vectorZero), true);
+			obj.impulseDelta = null;
+		}
+	});
 }
 
 function stopAction(world: w.World, hero: w.Hero, action: w.Action, spell: StopSpell) {
@@ -3624,16 +3664,8 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
 
-		world.behaviours.push({ type: "thrustBounce", heroId: hero.id, bounceTicks: spell.bounceTicks });
+		world.behaviours.push({ type: "thrustBounce", heroId: hero.id });
 		world.behaviours.push({ type: "thrustDecay", heroId: hero.id });
-	}
-
-	if (hero.thrust) {
-		if (hero.thrust.nullified && spell.nullifiable) {
-			hero.thrust.ticks = Math.min(spell.bounceTicks, hero.thrust.ticks);
-		} else {
-			hero.body.setLinearVelocity(hero.thrust.velocity);
-		}
 	}
 
 	return !hero.thrust;
@@ -3648,11 +3680,7 @@ function thrustBounce(behaviour: w.ThrustBounceBehaviour, world: w.World) {
 	if (hero.thrust) {
 		updateMaskBits(hero.body.getFixtureList(), Categories.All);
 
-		if (hero.thrust.nullified) {
-			hero.thrust.ticks = Math.min(behaviour.bounceTicks, hero.thrust.ticks);
-		} else {
-			hero.body.setLinearVelocity(hero.thrust.velocity);
-		}
+		hero.body.setLinearVelocity(hero.thrust.velocity);
 
 		return true;
 	} else {
@@ -3759,12 +3787,11 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			return;
 		}
 
-		obj.body.setPosition(objPos.add(shift));
+		applyPosDelta(obj, shift);
 
-		const objVelocity = obj.body.getLinearVelocity();
-		const currentSpeed = objVelocity.length();
+		const currentSpeed = obj.body.getLinearVelocity().length();
 		if (currentSpeed < swingSpeed) {
-			obj.body.setLinearVelocity(objVelocity.set(swingVelocity));
+			applyVelocityDelta(obj, swingVelocity);
 
 			world.ui.events.push({ type: "push", tick: world.tick, owner: hero.id, objectId: obj.id, direction: swingVelocity });
 		}
