@@ -50,7 +50,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                     <video autoPlay muted loop>
                         <source src="https://storage.googleapis.com/acolytefight.io/AcolyteFight5.m4v" type="video/mp4" />
                     </video>
-                    <div className="title">Acolyte Fight!</div>
+                    <div className="title"><span className="title-left">Acolyte</span> <span className="title-right">Fight!</span></div>
                     <div className="mask"></div>
                 </div>
                 <div className="spacer" />

@@ -190,7 +190,7 @@ a:hover, a:active {
 }
 
 .loading-text {
-    animation: loading-text-animation alternate 2s infinite;
+    animation: loading-text-animation alternate 2s infinite linear;
 }
 
 @media (max-width: 768px) {
@@ -455,7 +455,16 @@ a:hover, a:active {
     font-family: "ChicagoFLF", "Helvetica", sans-serif;
     font-size: 500%;
     font-weight: bold;
-    text-shadow: 2px 2px black;
+    text-shadow: 4px 4px 4px black;
+    font-style: italic;
+    opacity: 0.9;
+
+    animation: title-flash alternate 1s infinite linear;
+}
+
+@keyframes title-flash {
+    from { opacity: 0.85 }
+    to { opacity: 0.95 }
 }
 
 @media (max-height: 768px) {
@@ -463,6 +472,28 @@ a:hover, a:active {
         font-size: 300%;
     }
 }
+
+.title-left {
+    display: inline-block;
+    animation: fly-from-left 0.5s both ease-in;
+}
+
+@keyframes fly-from-left {
+    from { transform: translateX(-1000px) }
+    to { transform: translateX(0); }
+}
+
+.title-right {
+    display: inline-block;
+    animation: fly-from-right 0.5s both ease-in;
+}
+
+@keyframes fly-from-right {
+    from { transform: translateX(1000px) }
+    to { transform: translateX(0); }
+}
+
+
 
 .home .title-row video {
     position: absolute;
