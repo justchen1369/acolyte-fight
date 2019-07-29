@@ -636,10 +636,7 @@ export function calculateScaling(heroId: string, world: w.World, scaling: boolea
 		return 1;
 	}
 
-	const World = world.settings.World;
-	const growth = World.MaxScaling - 1;
-	const proportion = 1 - Math.pow(world.shrink, World.ScalingPower);
-	return 1 + (proportion * growth);
+	return 1;
 }
 
 function ticksTo(distance: number, speed: number) {

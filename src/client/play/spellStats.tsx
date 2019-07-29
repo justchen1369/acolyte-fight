@@ -75,12 +75,7 @@ class SpellStats extends React.PureComponent<Props, State> {
     }
 
     private renderScaling(damageScaling: boolean): React.ReactNode {
-        if (damageScaling) {
-            const World = this.props.settings.World;
-            return <span className="spell-stats-scaling" title={`Damage increases to ${World.MaxScaling}x over ${World.SecondsToShrink} seconds`}>+</span>;
-        } else {
-            return null;
-        }
+        return null;
     }
 
     private calculateProjectileDamage(projectile: ProjectileTemplate) {

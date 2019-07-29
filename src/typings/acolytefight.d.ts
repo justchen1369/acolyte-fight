@@ -70,9 +70,6 @@ declare interface WorldSettings {
 	InitialRadius: number; // Initial radius of the world
 	HeroLayoutRadius: number; // The radius at which to place heroes
 
-	MaxScaling: number; // How much can damage increase as the world shrinks?
-	ScalingPower: number; // Make the scaling non-linear - larger means scaling grows faster initially and slower later
-
 	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
 	LavaDamagePerSecond: number;
 	LavaDamageInterval: number; // Ticks between applying lava damage
