@@ -3903,21 +3903,24 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			decay: template.decay,
 		});
 	} else if (template.type === "burn") {
-		let stacked = false;
+		let stack: w.BurnBuff = null;
 		if (template.stack) {
 			// Extend existing stacks
 			hero.buffs.forEach(buff => {
 				if (buff && buff.type === "burn" && buff.fromHeroId === config.otherId && buff.stack === template.stack) {
-					buff.expireTick = values.expireTick;
-					buff.packet.damage += template.packet.damage;
-					++buff.numStacks;
-
-					stacked = true;
+					stack = buff;
 				}
 			});
 		}
 
-		if (!stacked) {
+		if (stack) {
+			stack.expireTick = values.expireTick;
+
+			if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+				stack.packet.damage += template.packet.damage;
+				++stack.numStacks;
+			}
+		} else {
 			hero.buffs.set(id, {
 				...values, id, type: "burn",
 				fromHeroId: config.otherId,

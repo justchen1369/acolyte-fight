@@ -32,7 +32,26 @@ export const volcano: ObstacleTemplate = {
     ],
 
     hitInterval: 15,
-    damage: 5,
+
+    buffs: [
+        {
+            type: "burn",
+            maxTicks: 15,
+            packet: { damage: 3, lifeSteal: 0, noKnockback: true, noHit: true, isLava: true },
+            hitInterval: 5,
+            stack: "volcano",
+            maxStacks: 1,
+            render: {
+                color: "#ff0088",
+                alpha: 0.3,
+                ticks: 30,
+                emissionRadiusFactor: 1,
+                particleRadius: 0.005,
+                shine: 0.2,
+                glow: 0.2,
+            },
+        },
+    ],
 }
 
 export const slow: ObstacleTemplate = {
@@ -74,7 +93,7 @@ export const slow: ObstacleTemplate = {
             render: {
                 color: "rgba(64, 255, 255, 1)",
                 alpha: 0.3,
-                ticks: 15,
+                ticks: 30,
                 emissionRadiusFactor: 1,
                 particleRadius: 0.01,
                 shine: 0.2,
