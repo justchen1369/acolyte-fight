@@ -1804,7 +1804,7 @@ const iceBomb: Spell = {
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 1 second.",
+            text: "Freeze nearby enemies for 0.75 second.",
         },
     ],
     sound: "iceBomb",
@@ -1841,7 +1841,7 @@ const iceBomb: Spell = {
             {
                 type: "movement",
                 movementProportion: 0.1,
-                maxTicks: 1 * TicksPerSecond,
+                maxTicks: 0.75 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
