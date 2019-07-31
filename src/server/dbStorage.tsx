@@ -19,7 +19,6 @@ export function getFirestore() {
 function recreateFirestore() {
     logger.info("Recreating firestore...");
     firestore = new Firestore.Firestore({
-        timestampsInSnapshots: true,
     });
 }
 
