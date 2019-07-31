@@ -1177,9 +1177,9 @@ const grapple: Spell = {
 
     projectile: {
         density: 1,
-        radius: 0.005,
-        speed: 0.5,
-        maxTicks: 30,
+        radius: 0.0025,
+        speed: 0.8,
+        maxTicks: 20,
         damage: 0,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.Hero | Categories.Obstacle | Categories.Massive,
@@ -1242,7 +1242,7 @@ const grapple: Spell = {
         color: '#f02',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
             {
                 type: "link",
                 color: '#f02',
