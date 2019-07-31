@@ -13,6 +13,7 @@ import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
 import PageLink from '../nav/pageLink';
 import PreviewButton from './previewButton';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     codeTree: e.CodeTree;
@@ -54,8 +55,20 @@ class ModBar extends React.PureComponent<Props, State> {
     }
 
     private renderEditing() {
-        return <CustomBar>
-            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Play with Mod</HrefItem>
+        const horizontal = <>
+            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}>{isMobile ? <><i className="fas fa-home" /> Home</> : <><i className="fas fa-chevron-left" /> Play with Mod</>}</HrefItem>
+            <PageLink page="modding" shrink={isMobile}>Overview</PageLink>
+            <PageLink page="modding-spells" shrink={isMobile} error={"spells" in this.props.errors}>Spells</PageLink>
+            <PageLink page="modding-sounds" shrink={isMobile} error={"sounds" in this.props.errors}>Sounds</PageLink>
+            <PageLink page="modding-icons" shrink={isMobile} error={"icons" in this.props.errors}>Icons</PageLink>
+            <PageLink page="modding-maps" shrink={isMobile} error={"maps" in this.props.errors}>Maps</PageLink>
+            <PageLink page="modding-obstacles" shrink={isMobile} error={"obstacles" in this.props.errors}>Obstacles</PageLink>
+            <PageLink page="modding-constants" shrink={isMobile} error={"constants" in this.props.errors}>Constants</PageLink>
+            <div className="spacer">{this.props.children}</div>
+            <PreviewButton>Preview Mod</PreviewButton>
+        </>
+
+        const vertical = isMobile && <>
             <PageLink page="modding">Overview</PageLink>
             <PageLink page="modding-spells" error={"spells" in this.props.errors}>Spells</PageLink>
             <PageLink page="modding-sounds" error={"sounds" in this.props.errors}>Sounds</PageLink>
@@ -63,9 +76,9 @@ class ModBar extends React.PureComponent<Props, State> {
             <PageLink page="modding-maps" error={"maps" in this.props.errors}>Maps</PageLink>
             <PageLink page="modding-obstacles" error={"obstacles" in this.props.errors}>Obstacles</PageLink>
             <PageLink page="modding-constants" error={"constants" in this.props.errors}>Constants</PageLink>
-            <div className="spacer">{this.props.children}</div>
-            <PreviewButton>Preview Mod</PreviewButton>
-        </CustomBar>
+        </>
+
+        return <CustomBar vertical={vertical}>{horizontal}</CustomBar>
     }
 
     private async onHomeClick() {

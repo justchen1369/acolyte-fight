@@ -126,9 +126,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     private renderCurrentMod() {
         return <div className="modding-overview">
             <p>
-                The mod below is currently active.
-                You will automatically be matched to other players who currently have the same mod activated.
-                Explore the tabs (above) to edit this mod. Click "Preview Mod" (top right) to play this mod by yourself.
+                The mod below is currently active. <b>Explore the menu</b> (above) to edit this mod. Click <b>Preview Mod</b> (top right) to play this mod by yourself.
             </p>
             {this.props.party
                 ? <p>The mod has been activated for all your <a href="party" onClick={(ev) => this.onPartyClick(ev)}>party</a> members too.</p>
