@@ -115,8 +115,8 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
 
-setInterval(async () => {
-	await statsStorage.updateWinRateDistribution(m.GameCategory.PvP);
+setInterval(() => {
+	statsStorage.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 }, 24 * 60 * 60 * 1000); // slow-changing data
 statsStorage.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 
@@ -133,15 +133,18 @@ setInterval(async () => {
 statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP).catch(logger.error);
 statsStorage.decrementAco().catch(logger.error);
 
-setInterval(() => {
-	const status = api.getInternalStatus();
-	if (status.numPlayers > 0) {
-		logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
+setInterval(async () => {
+	try {
+		const status = api.getInternalStatus();
+		if (status.numPlayers > 0) {
+			logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
+		}
+
+		modder.updateDefaultModIfNecessary();
+		online.cleanupScoreboards();
+	} catch (exception) {
+		logger.error(exception);
 	}
-
-	modder.updateDefaultModIfNecessary().catch(logger.error);
-
-	online.cleanupScoreboards().catch(logger.error);
 }, 60 * 1000);
 
 http.on('close', () => {
