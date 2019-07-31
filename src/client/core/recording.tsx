@@ -6,6 +6,8 @@ interface CanvasSource {
 
 interface MediaRecorderOpts {
     mimeType: string;
+    videoBitsPerSecond?: number;
+    audioBitsPerSecond?: number;
 }
 
 interface BlobEvent {
@@ -45,6 +47,7 @@ export class VideoRecorder {
     constructor(stream: MediaStream) {
         this.recorder = new MediaRecorder(stream, {
             mimeType: 'video/webm',
+            videoBitsPerSecond: 5000000,
         });
         this.recorder.ondataavailable = (e) => {
             this.chunks.push(e.data);
