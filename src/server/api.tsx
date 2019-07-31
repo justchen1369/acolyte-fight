@@ -38,12 +38,20 @@ export function init(_port: number) {
 }
 
 export function onDefaultSettings(req: express.Request, res: express.Response) {
-    res.header("Content-Type", "application/json");
-    res.send(JSON.stringify(DefaultSettings));
+    try {
+        res.header("Content-Type", "application/json");
+        res.send(JSON.stringify(DefaultSettings));
+	} catch (exception) {
+        handleError(exception, res);
+	}
 }
 
 export function onInternalStatus(req: express.Request, res: express.Response) {
-    res.send(getInternalStatus());
+    try {
+        res.send(getInternalStatus());
+	} catch (exception) {
+        handleError(exception, res);
+	}
 }
 
 export function getInternalStatus() {
@@ -62,25 +70,33 @@ export function getInternalStatus() {
 }
 
 export function onExternalStatus(req: express.Request, res: express.Response) {
-	res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.send(getExternalStatus());
+    try {
+        res.header("Access-Control-Allow-Origin", "*");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        res.send(getExternalStatus());
+	} catch (exception) {
+        handleError(exception, res);
+	}
 }
 
 export function handlePreflightRequest(req: express.Request, res: express.Response) {
-    const allowHeaders = [m.AuthHeader];
-    const requestedHeaders = req.headers["access-control-request-headers"];
-    if (typeof requestedHeaders === "string") {
-        allowHeaders.push(...requestedHeaders.split(",").map(x => x.trim()));
-    }
+    try {
+        const allowHeaders = [m.AuthHeader];
+        const requestedHeaders = req.headers["access-control-request-headers"];
+        if (typeof requestedHeaders === "string") {
+            allowHeaders.push(...requestedHeaders.split(",").map(x => x.trim()));
+        }
 
-    var headers: http.OutgoingHttpHeaders = {
-        'Access-Control-Allow-Headers': allowHeaders,
-        'Access-Control-Allow-Origin': req.headers.origin || "*",
-        'Access-Control-Allow-Credentials': 'true',
-    };
-    res.writeHead(200, headers);
-    res.end();
+        var headers: http.OutgoingHttpHeaders = {
+            'Access-Control-Allow-Headers': allowHeaders,
+            'Access-Control-Allow-Origin': req.headers.origin || "*",
+            'Access-Control-Allow-Credentials': 'true',
+        };
+        res.writeHead(200, headers);
+        res.end();
+	} catch (exception) {
+        handleError(exception, res);
+	}
 }
 
 export function getExternalStatus() {
@@ -389,7 +405,7 @@ function handleError(error: any, res: express.Response) {
     } else {
         logger.error(error);
     }
-    res.status(500).send("Internal server error");
+    res.status(500).send(`${error}`);
 }
 
 export async function onGetUserSettingsAsync(req: express.Request, res: express.Response): Promise<void> {
