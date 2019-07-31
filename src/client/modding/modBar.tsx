@@ -55,8 +55,12 @@ class ModBar extends React.PureComponent<Props, State> {
     }
 
     private renderEditing() {
-        const horizontal = <>
-            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}>{isMobile ? <><i className="fas fa-home" /> Home</> : <><i className="fas fa-chevron-left" /> Play with Mod</>}</HrefItem>
+        const horizontal = isMobile ? <>
+            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-home" /> Home</HrefItem>
+            <div className="spacer">{this.props.children}</div>
+            <PreviewButton>Preview Mod</PreviewButton>
+        </> : <>
+            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Play with Mod</HrefItem>
             <PageLink page="modding" shrink={isMobile}>Overview</PageLink>
             <PageLink page="modding-spells" shrink={isMobile} error={"spells" in this.props.errors}>Spells</PageLink>
             <PageLink page="modding-sounds" shrink={isMobile} error={"sounds" in this.props.errors}>Sounds</PageLink>
