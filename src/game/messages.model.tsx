@@ -69,6 +69,7 @@ export interface GameOptions {
     noAudioCaching?: boolean;
     unranked?: boolean;
     graphics?: number;
+    touchSurfacePixels?: number;
 }
 
 export type ActionMsg =

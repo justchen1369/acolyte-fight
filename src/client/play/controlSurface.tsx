@@ -20,13 +20,14 @@ import { isMobile } from '../core/userAgent';
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
 const DoubleTapPixels = 100;
-const MaxTouchSurfaceSizeInPixels = 240;
+const DefaultMaxTouchSurfaceSizeInPixels = 240;
 
 interface Props {
     world: w.World;
     customizing: boolean;
     customizingBtn: boolean;
     noRightClickChangeSpells: boolean;
+    touchSurfacePixels: number;
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -67,6 +68,7 @@ function stateToProps(state: s.State): Props {
         customizing: state.customizing,
         customizingBtn: !!state.world.ui.toolbar.customizingBtn,
         noRightClickChangeSpells: state.options.noRightClickChangeSpells,
+        touchSurfacePixels: state.options.touchSurfacePixels,
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
@@ -531,7 +533,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private onResize() {
         const screenSize = Math.min(document.body.clientWidth, document.body.clientHeight);
-        const touchSize = Math.max(1, Math.min(MaxTouchSurfaceSizeInPixels, screenSize));
+        const touchSize = Math.max(1, Math.min(this.props.touchSurfacePixels || DefaultMaxTouchSurfaceSizeInPixels, screenSize));
         const touchMultiplier = screenSize / touchSize;
         this.setState({
             touchMultiplier,

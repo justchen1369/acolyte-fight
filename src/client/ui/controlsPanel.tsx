@@ -41,6 +41,14 @@ namespace ChangeSpellsWith {
     export const CtrlClick = "ctrl";
 }
 
+namespace TouchTracking {
+    export const Fastest = "fastest";
+    export const Fast = "fast";
+    export const Medium = "medium";
+    export const Slow = "slow";
+    export const Slowest = "slowest";
+}
+
 interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -55,6 +63,7 @@ interface ControlState {
     singleTapKey: string;
     doubleTapKey: string;
     actionWheelSide: string;
+    touchTracking: string;
     targetingIndicator: string;
     cameraFollow: string;
     changeSpellsWith: string;
@@ -86,6 +95,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         singleTapKey: rebindings[w.SpecialKeys.SingleTap],
         doubleTapKey: rebindings[w.SpecialKeys.DoubleTap],
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
+        touchTracking: formatTouchTracking(options.touchSurfacePixels),
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
@@ -125,6 +135,33 @@ function parseGraphics(graphics: string): number {
         case Graphics.High: return r.GraphicsLevel.High;
         case Graphics.Medium: return r.GraphicsLevel.Medium;
         case Graphics.Low: return r.GraphicsLevel.Low;
+        default: return null;
+    }
+}
+
+function formatTouchTracking(pixels: number): string {
+    if (pixels >= 600) {
+        return TouchTracking.Slowest;
+    } else if (pixels >= 480) {
+        return TouchTracking.Slow;
+    } else if (pixels >= 320) {
+        return TouchTracking.Medium;
+    } else if (pixels >= 240) {
+        return TouchTracking.Fast;
+    } else if (pixels >= 180) {
+        return TouchTracking.Fastest;
+     } else {
+        return TouchTracking.Fast;
+    }
+}
+
+function parseTouchTracking(tracking: string): number {
+    switch (tracking) {
+        case TouchTracking.Fastest: return 180;
+        case TouchTracking.Fast: return 240;
+        case TouchTracking.Medium: return 320;
+        case TouchTracking.Slow: return 480;
+        case TouchTracking.Slowest: return 600;
         default: return null;
     }
 }
@@ -212,6 +249,16 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onUpdate({ actionWheelSide: ev.target.value })}>
                     <option value={formatOption(Side.Left)}>Left</option>
                     <option value={formatOption(Side.Right)}>Right</option>
+                </select>
+            </div>}
+            {isMobile && <div className="row">
+                <span className="label">Touch tracking</span>
+                <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
+                    <option value={formatOption(TouchTracking.Fastest)}>Fastest</option>
+                    <option value={formatOption(TouchTracking.Fast)}>Fast</option>
+                    <option value={formatOption(TouchTracking.Medium)}>Medium</option>
+                    <option value={formatOption(TouchTracking.Slow)}>Slow</option>
+                    <option value={formatOption(TouchTracking.Slowest)}>Slowest</option>
                 </select>
             </div>}
             <h2>Interface</h2>
@@ -324,6 +371,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
             options.noAudioCaching = state.audioCaching === Toggle.Off;
+            options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
             options.graphics = parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
