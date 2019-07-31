@@ -40,7 +40,15 @@ class TextMessage extends React.PureComponent<Props, State> {
         if (this.props.silenced.has(notification.userHash)) {
             return null;
         } else {
-            return <div className="row text-row">{this.renderPlayerName()}: <span className="text-message">{notification.text}</span> {this.renderSilenceBtn()}</div>
+            return <div className="row text-row">{this.renderPlayerName()}: {this.renderMessage(notification.text)} {this.renderSilenceBtn()}</div>
+        }
+    }
+
+    private renderMessage(text: string) {
+        if (text.startsWith("http")) {
+            return <a href={text} target="_blank" className="text-message">{text}</a>;
+        } else {
+            return <span className="text-message">{text}</span>
         }
     }
 

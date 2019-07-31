@@ -862,7 +862,7 @@ table.player-list {
     font-size: 120%;
 }
 
-#messages-panel .text-message {
+#messages-panel span.text-message {
     color: white;
     font-weight: bold;
 }
