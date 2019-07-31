@@ -10,6 +10,8 @@ export { AudioElement } from './audio.model';
 const Z = -0.1;
 const RefDistance = 0.1;
 
+const vectorZero: Vec2 = { x: 0, y: 0 };
+
 // Globals
 let env: AudioEnvironment = null;
 let attached = new Map<string, AudioSource>();
@@ -53,18 +55,18 @@ class AudioSource {
         this.sound = sound;
     }
 
-    start(pos: Vec2 | null) {
-        this.play(pos, this.sound.start);
+    start(offset: Vec2) {
+        this.play(offset, this.sound.start);
     }
 
-    sustain(pos: Vec2 | null) {
+    sustain(offset: Vec2) {
         const t = env.ctx.currentTime;
 
         // Play sounds
         if (t >= this.repeatWhen) {
             const repeatIntervalSeconds = this.sound.repeatIntervalSeconds || 1;
             this.repeatWhen = t + repeatIntervalSeconds;
-            this.play(pos, this.sound.sustain);
+            this.play(offset, this.sound.sustain);
         }
 
         // Pan existing sounds
@@ -76,14 +78,8 @@ class AudioSource {
 
             keep.push(follow);
 
-            if (pos && follow.panner) {
-                if (follow.panner.positionX && follow.panner.positionY) {
-                    const when = t + 1 / TicksPerSecond;
-                    follow.panner.positionX.linearRampToValueAtTime(pos.x, when);
-                    follow.panner.positionY.linearRampToValueAtTime(pos.y, when);
-                } else {
-                    follow.panner.setPosition(pos.x, pos.y, Z);
-                }
+            if (follow.panner) {
+                follow.panner.setPosition(offset.x, offset.y, Z);
             }
         }
         this.following = keep;
@@ -119,10 +115,10 @@ class AudioSource {
         }
     }
 
-    private play(pos: Vec2 | null, bites: SoundBite[]) {
+    private play(offset: Vec2 | null, bites: SoundBite[]) {
         if (bites) {
             for (const bite of bites) {
-                const follow = playSoundBite(bite, pos, env);
+                const follow = playSoundBite(bite, offset, env);
                 this.following.push(follow);
             }
         }
@@ -144,7 +140,7 @@ export async function init() {
     };
     const ctx = new AudioContext(params) as AudioContext;
 
-    ctx.listener.setPosition(0.5, 0.5, 0);
+    ctx.listener.setPosition(0, 0, 0);
     ctx.listener.setOrientation(0, 0, -1, 0, 1, 0);
 
     const compressor = ctx.createDynamicsCompressor();
@@ -276,10 +272,8 @@ export function play(self: Vec2, elems: AudioElement[], sounds: Sounds) {
         return;
     }
 
-    env.ctx.listener.setPosition(self.x, self.y, 0);
-
     // Replace sources for next time
-    attached = playReactively(attached, elems, sounds);
+    attached = playReactively(attached, self, elems, sounds);
 }
 
 export function playUnattached(elems: AudioElement[], sounds: Sounds) {
@@ -288,10 +282,10 @@ export function playUnattached(elems: AudioElement[], sounds: Sounds) {
     }
 
     // Replace sources for next time
-    unattached = playReactively(unattached, elems, sounds);
+    unattached = playReactively(unattached, vectorZero, elems, sounds);
 }
 
-function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[], sounds: Sounds) {
+function playReactively(sources: Map<string, AudioSource>, self: Vec2, elems: AudioElement[], sounds: Sounds) {
     const keep = new Map<string, AudioSource>();
 
     // Start/sustain current sound sources
@@ -301,12 +295,12 @@ function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[]
             const sound = sounds[elem.sound];
             if (sound) {
                 source = new AudioSource(elem.id, sound);
-                source.start(elem.pos);
+                source.start(calculateOffset(elem.pos, self));
             }
         }
 
         if (source) {
-            source.sustain(elem.pos);
+            source.sustain(calculateOffset(elem.pos, self));
             keep.set(source.id, source);
         }
 
@@ -325,12 +319,20 @@ function playReactively(sources: Map<string, AudioSource>, elems: AudioElement[]
     return keep;
 }
 
-function playSoundBite(bite: SoundBite, pos: Vec2 | null, env: AudioEnvironment): AudioRef {
+function calculateOffset(pos: Vec2 | null, self: Vec2) {
+    if (pos) {
+        return { x: pos.x - self.x, y: pos.y - self.y };
+    } else {
+        return vectorZero;
+    }
+}
+
+function playSoundBite(bite: SoundBite, offset: Vec2 | null, env: AudioEnvironment): AudioRef {
     let next: AudioNode = env.next;
 
     let panner: PannerNode = null;
-    if (!isMobile && pos) { // Only connect panner on desktop
-        panner = createPannerNode(pos, env, next);
+    if (!isMobile && offset) { // Only connect panner on desktop
+        panner = createPannerNode(offset, env, next);
         next = panner;
     }
 
@@ -350,12 +352,12 @@ function playSoundBite(bite: SoundBite, pos: Vec2 | null, env: AudioEnvironment)
     };
 }
 
-function createPannerNode(pos: Vec2, env: AudioEnvironment, next: AudioNode): PannerNode {
+function createPannerNode(offset: Vec2, env: AudioEnvironment, next: AudioNode): PannerNode {
     const pan = env.ctx.createPanner();
     pan.panningModel = 'HRTF';
     pan.distanceModel = 'inverse';
     pan.refDistance = RefDistance;
-    pan.setPosition(pos.x, pos.y, Z);
+    pan.setPosition(offset.x, offset.y, Z);
     pan.setOrientation(0, 0, 1);
     pan.connect(next);
     return pan;
