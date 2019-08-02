@@ -76,7 +76,7 @@ export default class ColTuple {
     }
 
     string(): string {
-        return this.toColor().string();
+        return `rgba(${Math.round(this.r * 255)}, ${Math.round(this.g * 255)}, ${Math.round(this.b * 255)}, ${(this.a).toFixed(2)})`;
     }
 
     mix(newCol: ColTuple, fraction: number) {

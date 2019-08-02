@@ -89,20 +89,7 @@ export class SpellIcon extends React.PureComponent<Props, State> {
                 color = Color(color).mix(Color("white"), 0.5).string();
             }
 
-            const left = (rect.width - this.props.size) / 2;
-            const top = (rect.height - this.props.size) / 2;
-
-            ctx.save();
-
-            ctx.fillStyle = color;
-            ctx.beginPath();
-            ctx.rect(0, 0, rect.width, rect.height);
-            ctx.fill();
-
-            ctx.translate(left, top);
-
-            renderIconButton(ctx, icon, color, 0.9, this.props.size);
-            ctx.restore();
+            renderIconButton(ctx, icon, color, 0.9, rect.width, rect.height);
         }
     }
 }

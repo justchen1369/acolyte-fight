@@ -2627,7 +2627,11 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 		ctx.save();
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
-        ctx.fillStyle = buttonState.color;
+
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, buttonState.color);
+        gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.3).string());
+        ctx.fillStyle = gradient;
 		
         ctx.beginPath();
         ctx.rect(0, 0, size, size);

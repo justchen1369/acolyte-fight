@@ -1364,7 +1364,7 @@ h3 {
 }
 
 .spell-config .spell-icon:hover {
-    border: 2px white solid;
+    border: 2px #eee solid;
 }
 
 @media (max-width: 768px) {
