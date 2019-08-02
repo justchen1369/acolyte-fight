@@ -69,6 +69,10 @@ export function angle(vec: pl.Vec2) {
 	return Math.atan2(vec.y, vec.x);
 }
 
+export function angleDiff(to: pl.Vec2, from: pl.Vec2) {
+	return Math.atan2(to.y - from.y, to.x - from.x);
+}
+
 export function fromAngle(angle: number, radius: number = 1) {
 	return pl.Vec2(radius * Math.cos(angle), radius * Math.sin(angle));
 }

@@ -1993,6 +1993,7 @@ const saber: Spell = {
     length: 0.075,
 
     movementProportionWhileChannelling: 1,
+
     interruptibleAfterTicks: 20,
 
     cooldown: 10 * TicksPerSecond,

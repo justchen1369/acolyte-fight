@@ -324,7 +324,8 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: number) {
 	const shieldId = "shield" + (world.nextObjectId++);
 
-	const angle = hero.body.getAngle() + angleOffset;
+	const heroAngle = hero.target ? vector.angleDiff(hero.target, hero.body.getPosition()) : hero.body.getAngle();
+	const angle = heroAngle + angleOffset;
 	const position = hero.body.getPosition();
 
 	const body = world.physics.createBody({
