@@ -2685,13 +2685,20 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
 function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, innerRadius: number, outerRadius: number, buttonState: w.ButtonRenderState, iconLookup: IconLookup) {
 	outerRadius = innerRadius + sector.weight * (outerRadius - innerRadius);
+	const buttonCenter = vector.fromAngle((sector.startAngle + sector.endAngle) / 2).mul((innerRadius + outerRadius) / 2);
+	const size = outerRadius - innerRadius;
 
 	const emphasis = buttonState.emphasis;
 
 	ctx.save();
 
 	// Render button
-	ctx.fillStyle = buttonState.color;
+	const gradient = ctx.createLinearGradient(
+		buttonCenter.x - size / 2, buttonCenter.y - size / 2,
+		buttonCenter.x + size / 2, buttonCenter.y + size / 2);
+	gradient.addColorStop(0, buttonState.color);
+	gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.2).string());
+	ctx.fillStyle = gradient;
 
 	ctx.beginPath();
 	if (sector.startAngle && sector.endAngle) {
@@ -2710,11 +2717,8 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 
 		// Translate to center of button
 		if (sector.startAngle && sector.endAngle) {
-			const midVector = vector.fromAngle((sector.startAngle + sector.endAngle) / 2).mul((innerRadius + outerRadius) / 2);
-			ctx.translate(midVector.x, midVector.y);
+			ctx.translate(buttonCenter.x, buttonCenter.y);
 		}
-
-		const size = outerRadius - innerRadius;
 
 		// Render icon
 		{
