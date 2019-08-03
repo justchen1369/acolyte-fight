@@ -17,8 +17,13 @@ var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
 var alreadyChosenSpells = false;
 var nextSpell = 0;
 
-// See ai.contracts.ts: input is InputContract, output is OutputContract
+// See ai.contracts.ts:
+// input is InputContract - contains information about the current state of the world
+// output is OutputContract - an action you want to take in response to the world 
 function act(input) {
+    // Want the bot to do nothing? Uncomment the line below (remove the //):
+    // return null;
+
     var state = input.state;
     var heroId = input.heroId;
     var hero = state.heroes[heroId];
@@ -48,6 +53,7 @@ function act(input) {
     }
 
     if (action) {
+        // Give the bot a reaction time otherwise it is OP
         var reactionMilliseconds = ReactionMillisecondsLookup[action.spellId] || DefaultReactionMilliseconds;
         action.delayMilliseconds = reactionMilliseconds;
         return action;
@@ -70,20 +76,20 @@ function chooseSpells(settings) {
 function randomSpells(settings) {
 	var keyBindings = {};
 	var allOptions = settings.Choices.Options;
-	for (var key in allOptions) {
-        var options = allOptions[key];
+	for (var btn in allOptions) { // One of the buttons, e.g. Q or R
+        var options = allOptions[btn];
 
-        var spells = [];
+        var spellIds = [];
         for (var i = 0; i < options.length; ++i) {
             var row = options[i];
             for (var j = 0; j < row.length; ++j) {
-                var spell = row[j];
-                spells.push(spell);
+                var spellId = row[j];
+                spellIds.push(spellId);
             }
         }
 
-		if (spells.length > 1) {
-			keyBindings[key] = spells[Math.floor(Math.random() * spells.length)];
+		if (spellIds.length > 1) {
+			keyBindings[btn] = spellIds[Math.floor(Math.random() * spellIds.length)];
 		}
 	}
 	return keyBindings;
@@ -252,7 +258,7 @@ function jitter(target, missRadius) {
     };
 }
 
-function focus(hero, opponent) { // When charging a spell (e.g. Acolyte Beam) - ensure we are focusing the enemy, otherwise we will miss
+function focus(hero, opponent) { // When using a spell (e.g. Acolyte Beam, Spirit Missile) - ensure we are focusing the enemy, otherwise we will miss
     if (hero.casting) {
         if (hero.casting.spellId === "blast" || hero.casting.spellId === "retractor" || hero.casting.spellId === "rocket") {
             // Have to release or it won't fire
@@ -293,9 +299,7 @@ function move(state, hero, opponent) {
         return null;
     }
 
-    var middle = vectorMidpoint(hero.pos, target);
-
-    return { spellId: "move", target: middle };
+    return { spellId: "move", target };
 }
 
 function dodge(state, hero, cooldowns) {
