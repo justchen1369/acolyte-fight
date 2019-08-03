@@ -138,7 +138,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			}
 
 			// New center - only pan if some zooming is involved or if can't see entire map
-			if (maxZoom > 1.1 || world.radius * world.mapRadiusMultiplier > 0.5) {
+			if (maxZoom > 1.1 || world.radius > 0.5) {
 				let center = pl.Vec2(
 					SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
 					SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
