@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import CodeEditor from './codeEditor';
+import CompileModListener from './compileModListener';
 import ModBar from './modBar';
 import NavBar from '../nav/navbar';
 import TitleListener from '../controls/titleListener';
@@ -78,12 +79,14 @@ class EditorPage extends React.PureComponent<Props, State> {
         if (this.props.expand) {
             return <div className="content-container full-height-page">
                 <TitleListener subtitle="Modding" />
+                <CompileModListener />
                 <ModBar />
                 {this.props.children}
             </div>
         } else {
             return <div className="content-container">
                 <TitleListener subtitle="Modding" />
+                <CompileModListener />
                 <ModBar />
                 <div className="page">
                     {this.props.children}

@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
 import * as m from '../../game/messages.model';
@@ -48,39 +49,12 @@ export async function exitEditor(mod: ModTree, nextPage: string = "") {
     StoreProvider.dispatch({ type: "updateHash", hash: null });
 }
 
-export const codeToSettings = Reselect.createSelector(
-    (codeTree: e.CodeTree) => codeTree,
-    (codeTree: e.CodeTree) => modToSettings(codeToMod(codeTree).mod));
-
-function modToSettings(mod: ModTree) {
-    return mod ? modder.modToSettings(mod) : null;
-}
-
-export const codeToMod = Reselect.createSelector(
-    (codeTree: e.CodeTree) => codeTree,
-    (codeTree: e.CodeTree) => {
-        const result: ModResult = {
-            mod: null,
-            errors: {},
-        };
-        if (!codeTree) {
-            return result;
+export const modToSettings = Reselect.createSelector(
+    (mod: ModTree) => mod,
+    (mod: ModTree) => {
+        if (mod) {
+            modder.modToSettings(mod)
+        } else {
+            return null;
         }
-
-        try {
-            result.mod = convert.codeToMod(codeTree);
-        } catch (exception) {
-            if (exception instanceof e.ParseException) {
-                result.errors = exception.errors;
-            } else {
-                throw exception;
-            }
-        }
-        return result;
-    }
-);
-
-export interface ModResult {
-    mod: ModTree;
-    errors: e.ErrorTree;
-}
+    });

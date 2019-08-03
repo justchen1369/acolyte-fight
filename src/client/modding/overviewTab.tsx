@@ -37,15 +37,14 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = editing.codeToMod(state.codeTree);
     return {
         playerName: state.playerName,
         party: !!state.party,
         roomId: state.room.id,
         roomMod: state.room.mod,
         codeTree: state.codeTree,
-        currentMod: modResult.mod,
-        errors: modResult.errors,
+        currentMod: state.mod,
+        errors: state.modErrors,
     };
 }
 
@@ -144,7 +143,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private renderCurrentModError() {
         return <div className="modding-overview">
-            <p className="error">Your mod currently has errors - check the other tabs (above) to fix them.</p>
+            {this.props.currentMod && <p className="error">Your mod currently has errors - check the other tabs (above) to fix them.</p>}
+            {!this.props.currentMod && <p className="loading-text">Compiling mod...</p>}
             {this.renderDiscard()}
             {this.renderReference()}
         </div>

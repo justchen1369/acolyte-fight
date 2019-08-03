@@ -21,9 +21,11 @@ export interface State {
     rebindings: KeyBindings;
     options: m.GameOptions;
 
-    aiCode: string;
-
     codeTree?: e.CodeTree;
+
+    modBuiltFrom?: e.CodeTree; // This just signals if mod is not compiled for the current code tree
+    mod?: ModTree;
+    modErrors: e.ErrorTree;
 
     socketId: string;
     party: PartyState;
@@ -120,7 +122,6 @@ export type Action =
     | UpdatePartyAction
     | UpdateObservingPartyAction
     | LeavePartyAction
-    | UpdateAiCodeAction
     | ClearNewPlayerFlagAction
     | UpdateShowingHelpAction
     | UpdateToolbarAction
@@ -132,6 +133,7 @@ export type Action =
     | UpdateCodeTreeAction
     | UpdateCodeTreeItemAction
     | DeleteCodeTreeItemAction
+    | UpdateModTreeAction
 
 export interface UpdateCustomizingAction {
     type: "customizing";
@@ -261,11 +263,6 @@ export interface LeavePartyAction {
     partyId: string;
 }
 
-export interface UpdateAiCodeAction {
-    type: "updateAiCode";
-    aiCode: string;
-}
-
 export interface ClearNewPlayerFlagAction {
     type: "clearNewPlayerFlag";
 }
@@ -337,6 +334,12 @@ export interface DeleteCodeTreeItemAction {
     itemId: string;
 }
 
+export interface UpdateModTreeAction {
+    type: "updateModTree";
+    modBuiltFrom: e.CodeTree;
+    mod: ModTree;
+    modErrors: e.ErrorTree;
+}
 
 
 export interface OptionsProvider {

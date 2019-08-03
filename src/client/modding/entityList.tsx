@@ -25,14 +25,14 @@ interface State {
 
 const noErrors = {}; // Reuse this to keep reference equality
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const modResult = editing.codeToMod(state.codeTree);
+    // const modResult = editing.codeToMod(state.codeTree);
     const defaults = editing.defaultTree[ownProps.sectionKey];
     return {
         ...ownProps,
         codeTree: state.codeTree,
         defaults,
         section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
-        errors: modResult.errors[ownProps.sectionKey] || noErrors,
+        errors: state.modErrors[ownProps.sectionKey] || noErrors,
         selectedId: state.current.hash,
     };
 }

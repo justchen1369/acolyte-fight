@@ -14,10 +14,9 @@ interface Props extends OwnProps {
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
-    const modResult = editing.codeToMod(state.codeTree);
     return {
         ...ownProps,
-        mod: modResult.mod,
+        mod: state.mod,
     };
 }
 

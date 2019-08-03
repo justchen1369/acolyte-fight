@@ -24,11 +24,10 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const modResult = editing.codeToMod(state.codeTree);
     return {
         codeTree: state.codeTree,
-        currentMod: modResult.mod,
-        errors: modResult.errors,
+        currentMod: state.mod,
+        errors: state.modErrors,
     };
 }
 

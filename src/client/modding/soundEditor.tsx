@@ -23,9 +23,8 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
-    const settings = editing.codeToSettings(state.codeTree);
     return {
-        settings,
+        settings: editing.modToSettings(state.mod),
         selectedId: state.current.hash,
     };
 }

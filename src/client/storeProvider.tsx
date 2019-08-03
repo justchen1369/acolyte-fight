@@ -32,7 +32,7 @@ function initialState(): s.State {
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
         options: storage.getOptionsOrDefaults(),
-        aiCode: null,
+        modErrors: {},
         current: { page: "", profileId: null },
         socketId: null,
         server: null,
@@ -231,8 +231,6 @@ function reducer(state: s.State, action: s.Action): s.State {
         } else {
             return state;
         }
-    } else if (action.type === "updateAiCode") {
-        return { ...state, aiCode: action.aiCode };
     } else if (action.type === "updateShowingHelp") {
         return { ...state, showingHelp: action.showingHelp };
     } else if (action.type === "clearNewPlayerFlag") {
@@ -262,7 +260,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         });
         return { ...state, hasReplayLookup };
     } else if (action.type === "updateCodeTree") {
-        return { ...state, codeTree: action.codeTree };
+        return { ...state, codeTree: action.codeTree, mod: null };
     } else if (action.type === "updateCodeItem") {
         return {
             ...state,
@@ -273,19 +271,27 @@ function reducer(state: s.State, action: s.Action): s.State {
                     [action.itemId]: action.code,
                 },
             },
+            mod: null,
         };
     } else if (action.type === "deleteCodeItem") {
         const newSection = { ...state.codeTree[action.sectionKey] };
         delete newSection[action.itemId];
 
-        const newState = {
+        return {
             ...state,
             codeTree: {
                 ...state.codeTree,
                 [action.sectionKey]: newSection,
             },
+            mod: null,
         };
-        return newState;
+    } else if (action.type === "updateModTree") {
+        return {
+            ...state,
+            mod: action.mod,
+            modErrors: action.modErrors,
+            modBuiltFrom: action.modBuiltFrom,
+        };
     } else {
         console.log(action);
         return state;
