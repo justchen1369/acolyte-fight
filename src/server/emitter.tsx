@@ -215,7 +215,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 			&& optional(data.isPrivate, "boolean")
 			&& optional(data.isLocked, "boolean")
 			&& optional(data.waitForPlayers, "boolean")
-			&& required(data.roomId, "string")
+			&& optional(data.roomId, "string")
 			&& optional(data.initialObserver, "boolean")
 		)) {
 			callback({ success: false, error: "Bad request" });
@@ -231,7 +231,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 			return;
 		}
 
-		if (!(store.rooms.has(data.roomId))) {
+		if (data.roomId !== undefined && !store.rooms.has(data.roomId)) {
 			callback({ success: false, error: `Room ${data.roomId} does not exist` });
 			return;
 		}

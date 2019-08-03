@@ -122,6 +122,7 @@ body .page {
 #game-panel .exit-link:hover {
     background: #555;
     color: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 
@@ -169,6 +170,7 @@ a, a:visited {
 }
 a:hover, a:active {
     color: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .link-btn, .link-btn:visited {
@@ -179,6 +181,7 @@ a:hover, a:active {
 }
 .link-btn:hover, .link-btn:active {
     color: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .clear {
@@ -217,6 +220,12 @@ a:hover, a:active {
 
 .btn:hover {
     background: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+@keyframes shine-loop {
+    from { filter: brightness(1) }
+    to { filter: brightness(1.2) }
 }
 
 .btn:active {
@@ -245,7 +254,8 @@ a:hover, a:active {
 }
 
 .clickable:hover, .clickable:active, .clickable.selected {
-    color: white;
+    color: #eee;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .error {
@@ -344,6 +354,7 @@ a:hover, a:active {
 .navbar .nav-item.login-btn:hover {
     background: #ff8800;
     color: white;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-profile-item {
@@ -376,11 +387,13 @@ a:hover, a:active {
 
 .navbar .nav-item:hover .nav-item-label .badge {
     color: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-item:hover {
     background: #555;
     color: #ff8800;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-item-selected {
@@ -584,7 +597,7 @@ a:hover, a:active {
 }
 
 .social-bar a:hover {
-    color: white;
+    color: #eee;
 }
 
 .home .fold-indicator {
@@ -670,6 +683,7 @@ a:hover, a:active {
 
 .player-list-options:hover .clickable, .player-list-options .clickable.selected {
     opacity: 0.75;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 table.player-list {
@@ -697,7 +711,8 @@ table.player-list {
 }
 
 .player-list .silence-btn:hover {
-    color: #fff;
+    color: #eee;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .player-list .player-list-row {
@@ -1226,6 +1241,7 @@ h3 {
 
 .spell-config .key-name-container:hover {
     background: #555;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .spell-config .key-name {
@@ -1238,7 +1254,7 @@ h3 {
 }
 
 .spell-config .key-name-container .rebind-help {
-    visibility: hidden;
+    opacity: 0;
 
     position: absolute;
     bottom: 0;
@@ -1249,10 +1265,12 @@ h3 {
 
     font-size: 80%;
     color: #ccc;
+
+    transition: opacity 0.2s;
 }
 
 .spell-config .key-name-container:focus .rebind-help {
-    visibility: visible;
+    opacity: 1;
 }
 
 .spell-config .key-detail-container {
@@ -1276,11 +1294,12 @@ h3 {
 }
 
 .page .spell-config .key .key-detail-container .randomize-btn {
-    display: none;
+    opacity: 0;
+    transition: opacity 0.2s;
 }
 
 .page .spell-config .key:hover .key-detail-container .randomize-btn {
-    display: block;
+    opacity: 1;
 }
 
 .spell-config .key-detail {
@@ -1364,7 +1383,13 @@ h3 {
 }
 
 .spell-config .spell-icon:hover {
-    border: 2px #eee solid;
+    border: 2px #aaa solid;
+    animation: spell-hover-loop alternate 0.5s infinite linear;
+}
+
+@keyframes spell-hover-loop {
+    from { filter: brightness(1); border-color: #aaa }
+    to { filter: brightness(1.2); border-color: #bbb }
 }
 
 @media (max-width: 768px) {
