@@ -1836,7 +1836,6 @@ const iceBomb: Spell = {
         maxTicks: 25,
         minTicks: 1,
         damage: 0,
-        lifeSteal,
         noKnockback: true,
 
         categories: Categories.Projectile,
