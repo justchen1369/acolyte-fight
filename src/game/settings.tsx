@@ -1230,14 +1230,6 @@ const grapple: Spell = {
                 linkVictim: true,
                 linearDampingMultiplier: 0.9,
             },
-            {
-                collideWith: Categories.Obstacle,
-                owner: true,
-                linkOwner: true,
-                type: "movement",
-                maxTicks: 1 * TicksPerSecond,
-                movementProportion: 2,
-            },
         ],
 
         behaviours: [
