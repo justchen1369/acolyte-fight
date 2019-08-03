@@ -140,7 +140,6 @@ setInterval(async () => {
 			logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
 		}
 
-		modder.updateDefaultModIfNecessary();
 		online.cleanupScoreboards();
 	} catch (exception) {
 		logger.error(exception);

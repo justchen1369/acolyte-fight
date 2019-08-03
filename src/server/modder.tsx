@@ -29,17 +29,6 @@ export function init() {
         isCustom: false,
     };
     store.rooms.set(room.id, room);
-
-    // Update default room
-    updateDefaultModIfNecessary();
-}
-
-export function attachRoomUpdateListener(listener: RoomUpdateListener) {
-    roomUpdateListeners.push(listener);
-}
-
-function sendRoomUpdate(room: g.Room) {
-    roomUpdateListeners.forEach(listener => listener(room));
 }
 
 export function initRoom(mod: Object, authToken: string): g.Room {
@@ -90,74 +79,4 @@ export function cleanupOldRooms(maxAgeUnusedHours: number) {
     idsToCleanup.forEach(id => {
         store.rooms.delete(id);
     });
-}
-
-export async function updateDefaultModIfNecessary() {
-    const store = getStore();
-    let room = store.rooms.get(m.DefaultRoomId);
-    const currentInterval = truncateToUpdateInterval(moment());
-    if (!room || truncateToUpdateInterval(room.created) !== currentInterval) {
-        const mod = await getOrCreateGlobalMod(`m-${currentInterval}`);
-        const room: g.Room = {
-            id: m.DefaultRoomId,
-            created: moment(),
-            accessed: moment(),
-            mod,
-            isCustom: false,
-        };
-        store.rooms.set(room.id, room);
-        sendRoomUpdate(room);
-
-        logger.info("Updated default room: " + JSON.stringify(room.mod));
-    }
-}
-
-function truncateToUpdateInterval(moment: moment.Moment): number {
-    const interval = m.UpdateModMinutes * 60;
-    return Math.floor(moment.unix() / interval) * interval;
-}
-
-async function getOrCreateGlobalMod(intervalId: string): Promise<ModTree> {
-    const firestore = getFirestore();
-
-    const candidateMod = generateMod();
-    const candidateJson = JSON.stringify(candidateMod);
-
-    const json = await firestore.runTransaction(async (t) => {
-        const doc = await t.get(firestore.collection(db.Collections.GlobalMod).doc(intervalId));
-
-        let data = doc.data() as db.GlobalMod;
-        if (!data) {
-            data = { json: candidateJson };
-            t.set(doc.ref, data);
-        }
-
-        return data.json;
-    });
-    return JSON.parse(json);
-}
-
-function generateMod(): ModTree {
-    return {};
-    /*
-    const SpellsPerKey = 3;
-
-    const initialOptions = settings.DefaultSettings.Choices.Options;
-    const newOptions: KeyBindingOptions = {};
-
-    for (const key in initialOptions) {
-        const initialSpells = initialOptions[key];
-
-        // Do this so the spells remain in the same order on screen, and the default is always highest in the list
-        const newSpells = _(_.range(0, initialSpells.length)).shuffle().take(SpellsPerKey).sort().map(x => initialSpells[x]).value();
-
-        newOptions[key] = newSpells;
-    }
-
-    return {
-        Choices: {
-            Options: newOptions,
-        },
-    };
-    */
 }

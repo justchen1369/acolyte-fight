@@ -31,7 +31,6 @@ export function attachToSocket(_io: SocketIO.Server) {
     io.on('connection', onConnection);
 	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
-	modder.attachRoomUpdateListener(emitRoomUpdate);
 	online.attachOnlineEmitter(emitOnline);
 }
 
@@ -739,14 +738,6 @@ function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 			emitTo.emit('game', result);
 		}
 	}
-}
-
-function emitRoomUpdate(room: g.Room) {
-	const msg: m.RoomUpdateMsg = {
-		roomId: room.id,
-		mod: room.mod,
-	};
-	io.emit('room', msg);
 }
 
 function emitOnline(msg: m.OnlineMsg) {

@@ -12,7 +12,6 @@ export let listeners: Listeners = {
 	onPartyMsg: () => { },
 	onGameMsg: () => { },
 	onHeroMsg: () => { },
-	onRoomMsg: () => { },
 	onOnlineMsg: () => { },
 	onReconnect: (socket) => { },
 	onDisconnect: () => { },
@@ -23,7 +22,6 @@ export interface Listeners {
 	onPartyMsg: (msg: m.PartyMsg) => void;
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
-	onRoomMsg: (msg: m.RoomUpdateMsg) => void;
 	onOnlineMsg: (msg: m.OnlineMsg) => void;
 	onReconnect: (socket: SocketIOClient.Socket) => void;
 	onDisconnect: () => void;
@@ -107,7 +105,6 @@ export function connect(
 		socket.on('party', (msg: m.PartyMsg) => listeners.onPartyMsg(msg));
 		socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 		socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
-		socket.on('room', (msg: m.RoomUpdateMsg) => listeners.onRoomMsg(msg));
 		socket.on('online', (msg: m.OnlineMsg) => listeners.onOnlineMsg(msg));
 		socket.on('shutdown', (msg: any) => onServerPreparingToShutdown());
 	});

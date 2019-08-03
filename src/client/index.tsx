@@ -53,7 +53,6 @@ export async function initialize() {
     sockets.listeners.onGameMsg = stats.onGameMsg;
     sockets.listeners.onHeroMsg = matches.onHeroMsg;
     sockets.listeners.onPartyMsg = parties.onPartyMsg;
-    sockets.listeners.onRoomMsg = rooms.onRoomMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
     sockets.listeners.onOnlineMsg = online.onOnlineMsg;
     sockets.listeners.onReconnect = onReconnect;

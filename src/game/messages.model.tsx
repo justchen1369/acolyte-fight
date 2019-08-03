@@ -256,16 +256,13 @@ export interface JoinRoomRequest {
     roomId: string;
 }
 
-export interface JoinRoomResponse extends RoomUpdateMsg {
+export interface JoinRoomResponse {
+    roomId: string;
+    mod: ModTree;
     success: true;
 }
 
 export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
-
-export interface RoomUpdateMsg {
-    roomId: string;
-    mod: ModTree;
-}
 
 export interface HeroMsg {
     gameId: string;

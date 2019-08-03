@@ -2,7 +2,6 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as modder from '../../game/modder';
-import * as sockets from './sockets';
 import * as settings from '../../game/settings';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
@@ -58,7 +57,7 @@ export function joinRoomAsync(roomId: string): Promise<string> {
 	}
 }
 
-export function joinRoomFrom(response: m.RoomUpdateMsg) {
+export function joinRoomFrom(response: m.JoinRoomResponse) {
     console.log("Joining room", response.roomId, response.mod);
     const mod = response.mod || {};
     StoreProvider.dispatch({
@@ -70,13 +69,6 @@ export function joinRoomFrom(response: m.RoomUpdateMsg) {
         }
     });
     return response.roomId;
-}
-
-export function onRoomMsg(msg: m.RoomUpdateMsg) {
-    const store = StoreProvider.getState();
-    if (store.room.id === msg.roomId) {
-        joinRoomFrom(msg);
-    }
 }
 
 export function leaveRoom() {
