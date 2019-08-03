@@ -371,7 +371,6 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
 	linkable?: boolean; // Whether a link can attach tot his projectile
 
-	strafe?: StrafeParameters; // if true, the projectile will move with the hero's movement
 	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number
     bounce?: BounceParameters;
 	link?: LinkParameters;
@@ -405,9 +404,6 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	soundHit?: string;
 }
 
-declare interface StrafeParameters {
-}
-
 declare interface DestructibleParameters {
 	against?: number; // who can destroy this projectile?
 }
@@ -438,6 +434,7 @@ declare type BehaviourTemplate =
 	| AccelerateTemplate
 	| AttractTemplate
 	| AuraTemplate
+	| StrafeTemplate
 	| UpdateCollideWithTemplate
 	| ClearHitsTemplate
 	| ExpireOnOwnerDeathTemplate
@@ -506,6 +503,11 @@ declare interface AuraTemplate extends BehaviourTemplateBase {
 	maxHits?: number;
 	packet?: DamagePacketTemplate;
 	buffs: BuffTemplate[]; // Buffs to apply
+}
+
+declare interface StrafeTemplate extends BehaviourTemplateBase {
+	// Make this projectile follow the movements of its owner
+	type: "strafe";
 }
 
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {

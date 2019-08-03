@@ -449,7 +449,6 @@ export interface Hero extends WorldObjectBase {
 	uiCastTrail?: CastHistoryItem;
 
 	shieldIds: Set<string>; // Will keep pointing at shield after it is gone
-	strafeIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	horcruxIds: Set<string>; // Will keep pointing at projectiles after they are gone
 	focusIds: Map<string, string>; // spellId -> projectile id. Will keep pointing at projectiles after they are gone
 
@@ -705,7 +704,6 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 
 	speed: number;
 	fixedSpeed: boolean;
-	strafe?: StrafeParameters;
 	attractable?: boolean;
 	linkable?: boolean;
 
@@ -796,6 +794,7 @@ export type Behaviour =
 	| LinkBehaviour
 	| GravityBehaviour
 	| GlideBehaviour
+	| StrafeBehaviour
 	| ReflectFollowBehaviour
 	| ThrustBounceBehaviour
 	| ThrustDecayBehaviour
@@ -901,6 +900,13 @@ export interface GravityBehaviour extends BehaviourBase {
 export interface GlideBehaviour extends BehaviourBase {
 	type: "glide";
 	heroId: string;
+}
+
+export interface StrafeBehaviour extends BehaviourBase {
+	type: "strafe";
+	projectileId: string;
+	previousOwner: string;
+	previousPos: pl.Vec2;
 }
 
 export interface ReflectFollowBehaviour extends BehaviourBase {

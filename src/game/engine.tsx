@@ -446,7 +446,6 @@ function addHero(world: w.World, heroId: string) {
 		spellsToKeys: new Map<string, string>(),
 		spellChangedTick: new Map<string, number>(),
 		shieldIds: new Set<string>(),
-		strafeIds: new Set<string>(),
 		horcruxIds: new Set<string>(),
 		focusIds: new Map<string, string>(),
 		buffs: new Map<string, w.Buff>(),
@@ -523,9 +522,6 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		filterGroupIndex: hero.filterGroupIndex,
 	});
 
-	if (projectile.strafe) {
-		hero.strafeIds.add(projectile.id);
-	}
 	if (projectileTemplate.horcrux) {
 		hero.horcruxIds.add(projectile.id);
 	}
@@ -581,7 +577,6 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		body,
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
-		strafe: projectileTemplate.strafe,
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
 		linkable: projectileTemplate.linkable,
 
@@ -684,6 +679,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateAttract(template, projectile, world);
 		} else if (template.type === "aura") {
 			behaviour = instantiateAura(template, projectile, world);
+		} else if (template.type === "strafe") {
+			behaviour = instantiateStrafe(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
 		} else if (template.type === "clearHits") {
@@ -787,6 +784,15 @@ function instantiateAura(template: AuraTemplate, projectile: w.Projectile, world
 	};
 }
 
+function instantiateStrafe(template: StrafeTemplate, projectile: w.Projectile, world: w.World): w.StrafeBehaviour {
+	return {
+		type: "strafe",
+		projectileId: projectile.id,
+		previousOwner: null,
+		previousPos: null,
+	};
+}
+
 function instantiateUpdateProjectileFilter(template: UpdateCollideWithTemplate, projectile: w.Projectile, world: w.World): w.UpdateCollideWithBehaviour {
 	return {
 		type: "updateCollideWith",
@@ -865,6 +871,7 @@ export function tick(world: w.World) {
 
 	handleBehaviours(world, {
 		fixate,
+		strafe,
 		burn,
 		removePassthrough,
 		thrustDecay,
@@ -3428,20 +3435,6 @@ function move(world: w.World) {
 			const current = obj.body.getPosition();
 			obj.body.setPosition(current.add(obj.posDelta));
 
-			if (obj.category === "hero") {
-				// Strafe
-				obj.strafeIds.forEach(projectileId => {
-					const projectile = world.objects.get(projectileId);
-					if (projectile) {
-						if (projectile.category === "projectile" && projectile.strafe && projectile.owner === obj.id) {
-							projectile.body.setPosition(projectile.body.getPosition().add(obj.posDelta));
-						}
-					} else {
-						obj.strafeIds.delete(projectileId); // Yes you can delete from a set while iterating in ES6
-					}
-				});
-			}
-
 			obj.posDelta = null;
 		}
 
@@ -3456,6 +3449,30 @@ function move(world: w.World) {
 			obj.impulseDelta = null;
 		}
 	});
+}
+
+function strafe(strafe: w.StrafeBehaviour, world: w.World) {
+	const projectile = world.objects.get(strafe.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	const owner = world.objects.get(projectile.owner);
+	if (!(owner && owner.category === "hero")) {
+		return false;
+	}
+
+	const pos = owner.body.getPosition();
+
+	if (strafe.previousPos && strafe.previousOwner === projectile.owner) { // If owner changes, position will jump, don't make the projectile jump too
+		const delta = vector.diff(pos, strafe.previousPos);
+		projectile.body.setPosition(projectile.body.getPosition().add(delta));
+	}
+
+	strafe.previousOwner = projectile.owner;
+	strafe.previousPos = pos.clone();
+
+	return true;
 }
 
 function stopAction(world: w.World, hero: w.Hero, action: w.Action, spell: StopSpell) {

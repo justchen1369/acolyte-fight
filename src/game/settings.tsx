@@ -963,10 +963,8 @@ const rocket: Spell = {
             ticks: 1 * TicksPerSecond,
         },
 
-        strafe: {
-        },
-
         behaviours: [
+            { type: "strafe" },
             {
                 type: "homing",
                 targetType: "follow",
@@ -1037,7 +1035,6 @@ const whip: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.None,
-        strafe: {},
         shieldTakesOwnership: false,
 
         detonate: {
@@ -1048,6 +1045,10 @@ const whip: Spell = {
             maxImpulse: 0.0002,
             renderTicks: 10,
         },
+
+        behaviours: [
+            { type: "strafe" },
+        ],
 
         sound: "whip",
         color: '#fffcb1',
@@ -1093,7 +1094,6 @@ const link: Spell = {
         density: 1,
         radius: 0.005,
         speed: 0.3,
-        strafe: {},
         restitution: 0,
         maxTicks: 1.75 * TicksPerSecond,
         damage: 0,
@@ -1139,6 +1139,7 @@ const link: Spell = {
         },
 
         behaviours: [
+            { type: "strafe" },
             {
                 type: "homing",
                 trigger: { afterTicks: 45 },
@@ -1695,12 +1696,12 @@ const halo: Spell = {
         expireAgainstObjects: Alliances.NotFriendly,
         selfPassthrough: true,
         shieldTakesOwnership: false,
-        strafe: {},
         destructible: {
             against: Alliances.NotFriendly,
         },
 
         behaviours: [
+            { type: "strafe" },
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
