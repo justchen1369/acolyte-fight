@@ -37,30 +37,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-const uncommitted = new Map<string, CodeChange>();
-function queueChange(sectionKey: string, id: string, code: string) {
-    const change: CodeChange = { sectionKey, id, code };
-    uncommitted.set(changeKey(change), change);
-    commitDebounced();
-}
-const commitDebounced = _.debounce(() => commit(), 200);
-function commit() {
-    uncommitted.forEach(change => {
-        editing.updateItem(change.sectionKey, change.id, change.code);
-    });
-    uncommitted.clear();
-}
-
-interface CodeChange {
-    sectionKey: string;
-    id: string;
-    code: string;
-}
-
-function changeKey(change: CodeChange): string {
-    return `${change.sectionKey}/${change.id}`;
-}
-
 class ItemEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -105,10 +81,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     private onCodeChange(id: string, code: string) {
-        if (this.props.currentMod) {
-            StoreProvider.dispatch({ type: "invalidateModTree"});
-        }
-        queueChange(this.props.sectionKey, id, code);
+        editing.updateItem(this.props.sectionKey, id, code);
     }
 
     private renderRevertButton() {
