@@ -1,9 +1,9 @@
 var center = { x: 0.5, y: 0.5 };
 
-var missRadius = 0.05;
-var dodgeMinRadius = 0.03;
-var delayMilliseconds = 1000;
-var delayJitterMilliseconds = 500;
+var MissRadius = 0.05;
+var DodgeRadius = 0.03;
+var SpellCastIntervalMilliseconds = 1000;
+var SpellCastJitterMilliseconds = 500;
 
 var DefaultReactionMilliseconds = 400;
 
@@ -168,7 +168,7 @@ function castSpell(state, hero, opponent, cooldowns, settings) {
 
     if (candidates.length > 0) {
         var spellId = candidates[Math.floor(Math.random() * candidates.length)];
-        var action = { spellId, target: jitter(opponent.pos, missRadius) };
+        var action = { spellId, target: jitter(opponent.pos, MissRadius) };
         if (action.spellId === spellId) {
             updateNextSpellTime();
         }
@@ -205,7 +205,7 @@ function readyForNextSpell(hero) {
 }
 
 function updateNextSpellTime() {
-    nextSpell = Date.now() + delayMilliseconds + Math.floor((Math.random() < 0.5 ? -1 : 1) * Math.random() * delayJitterMilliseconds);
+    nextSpell = Date.now() + SpellCastIntervalMilliseconds + Math.floor((Math.random() < 0.5 ? -1 : 1) * Math.random() * SpellCastJitterMilliseconds);
 }
 
 function jitter(target, missRadius) {
@@ -291,7 +291,7 @@ function dodge(state, hero, cooldowns) {
 
         var collisionPoint = vectorPlus(projectile.pos, vectorMultiply(projectile.velocity, timeToCollision));
         var distanceToCollision = vectorDistance(collisionPoint, hero.pos);
-        if (distanceToCollision > Math.max(dodgeMinRadius, projectile.radius) + hero.radius) {
+        if (distanceToCollision > Math.max(DodgeRadius, projectile.radius) + hero.radius) {
             // Won't hit us
         }
 
