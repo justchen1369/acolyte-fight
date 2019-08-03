@@ -128,7 +128,7 @@ class AiWorker {
             return true;
         }
 
-        let cooldowns: AI.CooldownsRemainingContract = {};
+        let cooldowns: AI.CooldownsRemaining = {};
         hero.keysToSpells.forEach(spellId => {
             const next = hero.cooldowns[spellId] || 0;
             cooldowns[spellId] = Math.max(0, next - world.tick);
@@ -186,8 +186,8 @@ class AiWorker {
     }
 }
 
-function worldToState(world: w.World, myHeroId: string): AI.WorldContract {
-    const contract: AI.WorldContract = {
+function worldToState(world: w.World, myHeroId: string): AI.World {
+    const contract: AI.World = {
         tick: world.tick,
         started: world.tick >= world.startTick,
         heroes: {},
