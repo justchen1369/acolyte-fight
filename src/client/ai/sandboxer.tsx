@@ -5,6 +5,9 @@ interface Exports {
 const exclude = [
     "self",
     "fetch", // Why doesn't this get excluded naturally, I don't know
+    "setTimeout",
+    "setInterval",
+    "setImmediate",
 ];
 const include = new Set<string>([
     "console",

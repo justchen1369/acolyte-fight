@@ -1,29 +1,30 @@
 import pl from 'planck-js';
 import * as AI from './ai.model';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
-import { sendAction } from '../core/ticker';
 
 const DefaultCodeUrl = "static/default.ai.acolytefight.js";
+const DefaultDelayMilliseconds = 400;
 
 const workers = new Map<string, AiWorker>();
 
-export function startTimers() {
-    setInterval(() => onTick(StoreProvider.getState().world), 100);
+interface SendActionFunc {
+    (gameId: string, heroId: string, action: w.Action): void;
 }
 
-export function onTick(world: w.World) {
+export function onTick(world: w.World, sendAction: SendActionFunc) {
     if (!world.ui.myGameId) {
         return;
     }
 
     // Start any new bots
     if (world.ui.myHeroId) { // If not a replay
-        world.players.forEach(player => startBotIfNecessary(world, player.heroId));
+        world.players.forEach(player => startBotIfNecessary(world, player.heroId, sendAction));
     }
 
     // Process all bots
@@ -41,12 +42,12 @@ export function onTick(world: w.World) {
     });
 }
 
-function startBotIfNecessary(world: w.World, heroId: string) {
+function startBotIfNecessary(world: w.World, heroId: string, sendAction: SendActionFunc) {
     if (isMyBot(world, heroId)) {
         const key = workerKey(world.ui.myGameId, heroId);
         if (!workers.has(key)) {
             console.log("Starting bot", heroId);
-            const worker = new AiWorker(world, heroId);
+            const worker = new AiWorker(world, heroId, sendAction);
             workers.set(key, worker);
 
             worker.start(); // Don't await
@@ -80,13 +81,16 @@ class AiWorker {
     private gameId: string;
     private heroId: string;
     private settings: AcolyteFightSettings;
+    private sendAction: SendActionFunc;
     private worker: Worker;
+    private awaitingTick: number = null;
     private isTerminated = false;
 
-    constructor(world: w.World, heroId: string) {
+    constructor(world: w.World, heroId: string, sendAction: SendActionFunc) {
         this.gameId = world.ui.myGameId;
         this.heroId = heroId;
         this.settings = world.settings;
+        this.sendAction = sendAction;
 
         const worker = new Worker("dist/aiWorker.js", { credentials: 'omit' });
         worker.onmessage = (ev) => this.onWorkerMessage(ev);
@@ -123,6 +127,11 @@ class AiWorker {
             return false;
         }
 
+        if (this.awaitingTick) {
+            // Only let the bot process one tick at a time
+            return true;
+        }
+
         let cooldowns: AI.CooldownsRemainingContract = {};
         hero.keysToSpells.forEach(spellId => {
             const next = hero.cooldowns[spellId] || 0;
@@ -135,6 +144,7 @@ class AiWorker {
             cooldowns,
         };
         this.worker.postMessage(JSON.stringify(stateMsg));
+        this.awaitingTick = stateMsg.state.tick;
 
         return true;
     }
@@ -150,14 +160,24 @@ class AiWorker {
         if (!message) {
             // Nothing to do
         } else if (message.type === "action") {
-            const world = StoreProvider.getState().world;
-            const spellsAllowed = engine.isGameStarting(world);
-            if (message.action.spellId === "move" || spellsAllowed) {
-                sendAction(this.gameId, this.heroId, {
-                    type: message.action.spellId,
-                    target: pl.Vec2(message.action.target),
-                    release: message.action.release,
-                });
+            if (this.awaitingTick === message.tick) {
+                this.awaitingTick = null;
+            }
+
+            const action = message.action;
+            if (action) {
+                const world = StoreProvider.getState().world;
+                const spellsAllowed = engine.isGameStarting(world);
+                if (spellsAllowed || w.Actions.NonGameStarters.indexOf(action.spellId) !== -1) {
+                    const delayMilliseconds = action.delayMilliseconds || DefaultDelayMilliseconds;
+                    setTimeout(() => {
+                        this.sendAction(this.gameId, this.heroId, {
+                            type: action.spellId,
+                            target: pl.Vec2(action.target),
+                            release: action.release,
+                        });
+                    }, delayMilliseconds);
+                }
             }
         }
     }

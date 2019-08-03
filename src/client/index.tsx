@@ -65,7 +65,6 @@ export async function initialize() {
         }
     }
 
-    ai.startTimers();
     notifications.startTimers();
 
     loader.setLoadedPromise(start());

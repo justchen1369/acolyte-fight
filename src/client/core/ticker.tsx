@@ -1,6 +1,7 @@
 import pl from 'planck-js';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
+import * as ai from '../ai/ai';
 import * as engine from '../../game/engine';
 import * as processor from './processor';
 import * as sockets from './sockets';
@@ -103,6 +104,8 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	}
 
 	sendSnapshot(world);
+
+	setTimeout(() => ai.onTick(world, sendAction), 1);
 }
 
 export function onTickMsg(data: m.TickMsg) {

@@ -21,5 +21,6 @@ export interface StateMsgContract {
 
 export interface ActionMsgContract {
     type: "action";
+    tick: number;
     action: C.ActionContract;
 }

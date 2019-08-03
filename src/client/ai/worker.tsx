@@ -1,8 +1,6 @@
 import * as AI from './ai.model';
 import { sandbox } from './sandboxer';
 
-const DefaultDelayMilliseconds = 400;
-
 let settings: AcolyteFightSettings = null;
 let bot: AI.Bot = null;
 let errored = false;
@@ -28,32 +26,30 @@ function onInit(msg: AI.InitMsgContract) {
 }
 
 function onInput(msg: AI.StateMsgContract) {
-    if (!(bot && settings)) {
-        // Not initialised
-        return;
-    }
-
-    if (errored) {
-        // Stop running bot once it has errored
-        return;
-    }
-
     try {
-        const input: AI.InputContract = {
-            state: msg.state,
-            heroId: msg.heroId,
-            cooldowns: msg.cooldowns,
-            settings,
-        };
-        const action = bot.act(input);
-        if (action) {
-            const delayMilliseconds = action.delayMilliseconds !== undefined ? action.delayMilliseconds : DefaultDelayMilliseconds;
-            const actionMsg: AI.ActionMsgContract = {
-                type: "action",
-                action,
-            };
-            setTimeout(() => send(actionMsg), delayMilliseconds);
+        if (errored) {
+            // Stop running bot once it has errored
+            return;
         }
+
+        let action: AI.ActionContract = null;
+        if (bot && settings) {
+            const input: AI.InputContract = {
+                state: msg.state,
+                heroId: msg.heroId,
+                cooldowns: msg.cooldowns,
+                settings,
+            };
+            action = bot.act(input);
+        }
+
+        const actionMsg: AI.ActionMsgContract = {
+            type: "action",
+            tick: msg.state.tick,
+            action,
+        };
+        send(actionMsg);
+
     } catch (exception) {
         console.error("Error in bot code", exception);
         errored = true;
