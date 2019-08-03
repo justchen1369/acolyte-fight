@@ -68,9 +68,12 @@ function chooseSpells(settings) {
     }
     alreadyChosenSpells = true;
 
-    return {
-        spells: randomSpells(settings),
-    };
+    var spells = randomSpells(settings);
+
+    // Want to test a particular spell? Uncomment and edit the line below
+    // spells["e"] = "saber";
+
+    return { spells };
 }
 
 function randomSpells(settings) {
@@ -265,10 +268,10 @@ function focus(hero, opponent) { // When using a spell (e.g. Acolyte Beam, Spiri
             return { spellId: hero.casting.spellId, release: true, target: opponent.pos };
         } else if (hero.casting.spellId === "saber" || hero.casting.spellId === "dualSaber") {
             // Don't focus the lightsaber, just swish it around
-            return { spellId: "retarget", target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) };
+            return { spellId: "retarget", target: vectorPlus(hero.pos, vectorFromAngle(hero.heading + Math.PI / 2)) };
         } else if (hero.casting.spellId === "grapple") {
-            // Throw away
-            return { spellId: hero.casting.spellId, release: true, target: vectorPlus(hero.pos, vectorRotateRight(hero.heading)) };
+            // Throw away to the right (TODO: be smarter about this)
+            return { spellId: hero.casting.spellId, release: true, target: vectorPlus(hero.pos, vectorFromAngle(hero.heading + Math.PI / 2)) };
         }  else if (hero.casting.spellId === "halo") {
             return { spellId: "move", target: opponent.pos };
         } else {
@@ -390,8 +393,8 @@ function vectorMidpoint(a, b) {
     return vectorPlus(a, vectorMultiply(diff, 0.5));
 }
 
-function vectorRotateRight(vec) {
-	return { x: vec.y, y: -vec.x };
+function vectorFromAngle(angle) {
+	return { x: Math.cos(angle), y: Math.sin(angle) };
 }
 
 // See ai.contracts.ts: Must return a BotContract
