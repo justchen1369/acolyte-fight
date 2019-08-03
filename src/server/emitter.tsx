@@ -391,112 +391,111 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 }
 
 function onJoinGameMsg(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg, callback: (hero: m.JoinResponseMsg) => void) {
-	try {
-		if (!(required(data, "object")
-			&& optional(data.server, "string")
-			&& required(data.name, "string")
-			&& required(data.keyBindings, "object")
-			&& optional(data.room, "string")
-			&& optional(data.layoutId, "string")
-			&& optional(data.gameId, "string")
-			&& optional(data.isMobile, "boolean")
-			&& optional(data.unranked, "boolean")
-			&& optional(data.locked, "string")
-			&& optional(data.observe, "boolean")
-			&& optional(data.reconnectKey, "string")
-			&& optional(data.numBots, "number")
-		)) {
-			callback({ success: false, error: "Bad request" });
-			return;
-		}
-
-		const store = getStore();
-		const location = mirroring.getLocation();
-
-		if (data.server !== location.server) {
-			callback({ success: false, error: "Wrong server" });
-			socket.disconnect(); // Force disconnect so client re-downloads and re-connects with latest client codebase
-			return;
-		}
-
-		const playerName = PlayerName.sanitizeName(data.name);
-		const userHash = auth.getUserHashFromSocket(socket);
-
-		const room = store.rooms.get(data.room) || null;
-
-		Promise.resolve().then(() => {
-			if (data.gameId) {
-				const replay = store.activeGames.get(data.gameId);
-				if (!replay) {
-					return gameStorage.loadGame(data.gameId);
-				} else {
-					return replay;
-				}
-			} else {
-				// This method is always used for public games
-				const partyId: string = null;
-				const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
-				const isPrivate: boolean = !!locked;
-
-				if (data.observe) {
-					return games.findExistingGame(data.version, room, partyId, isPrivate);
-				} else if (locked) {
-					// The user wants a private game, create one
-					return games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
-				} else {
-					return games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
-				}
-			}
-		}).catch(err => {
-			logger.error(`Error joining game: ${err}`);
-			return null as g.Replay;
-		}).then(game => {
-			if (game) {
-				let heroId: string = null;
-				let reconnectKey: string = null;
-				let live = data.live || false;
-				if (!data.observe && store.activeGames.has(game.id)) {
-					const joinResult = games.joinGame(game as g.Game, {
-						userHash,
-						name: playerName,
-						keyBindings: data.keyBindings,
-						isMobile: data.isMobile,
-						authToken,
-						unranked: data.unranked,
-						socketId: socket.id,
-						version: data.version,
-						reconnectKey: data.reconnectKey,
-					});
-					if (joinResult) {
-						heroId = joinResult.heroId;
-						reconnectKey = joinResult.reconnectKey;
-						live = true;
-					}
-
-					if (data.numBots) {
-						const numBots = Math.min(constants.Matchmaking.MaxPlayers, data.numBots);
-						for (let i = 0; i < numBots; ++i) {
-							games.addBot(game as g.Game);
-						}
-					}
-				}
-
-				emitHero(socket.id, game, heroId, reconnectKey, live);
-
-				if (heroId) {
-					logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
-				} else {
-					logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
-				}
-				callback({ success: true });
-			} else {
-				// logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
-				callback({ success: false, error: `Unable to find game` });
-			}
-		});
-	} catch (exception) {
+	onJoinGameMsgAsync(socket, authToken, data).then(response => callback(response)).catch(exception => {
 		logger.error(exception);
 		callback({ success: false, error: `${exception}` });
+	});
+}
+
+async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, data: m.JoinMsg): Promise<m.JoinResponseMsg> {
+	if (!(required(data, "object")
+		&& optional(data.server, "string")
+		&& required(data.name, "string")
+		&& required(data.keyBindings, "object")
+		&& required(data.room, "string")
+		&& optional(data.layoutId, "string")
+		&& optional(data.gameId, "string")
+		&& optional(data.isMobile, "boolean")
+		&& optional(data.unranked, "boolean")
+		&& optional(data.locked, "string")
+		&& optional(data.observe, "boolean")
+		&& optional(data.reconnectKey, "string")
+		&& optional(data.numBots, "number")
+	)) {
+		return { success: false, error: "Bad request" };
+	}
+
+	const store = getStore();
+	const location = mirroring.getLocation();
+
+	if (data.server !== location.server) {
+		socket.disconnect(); // Force disconnect so client re-downloads and re-connects with latest client codebase
+		return { success: false, error: "Wrong server" };
+	}
+
+	const playerName = PlayerName.sanitizeName(data.name);
+	const userHash = auth.getUserHashFromSocket(socket);
+
+	const room = store.rooms.get(data.room);
+	if (!room) {
+		return { success: false, error: `Unable to find room ${data.room}` };
+	}
+
+	let game: g.Replay;
+	if (data.gameId) {
+		const replay = store.activeGames.get(data.gameId);
+		if (!replay) {
+			game = await gameStorage.loadGame(data.gameId);
+		} else {
+			game = replay;
+		}
+	} else {
+		// This method is always used for public games
+		const partyId: string = null;
+		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
+		const isPrivate: boolean = !!locked;
+
+		if (data.observe) {
+			game = games.findExistingGame(data.version, room, partyId, isPrivate);
+		} else if (locked) {
+			// The user wants a private game, create one
+			game = games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
+		} else {
+			game = games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
+		}
+	}
+
+	if (game) {
+		let heroId: string = null;
+		let reconnectKey: string = null;
+		let live = data.live || false;
+		if (!data.observe && store.activeGames.has(game.id)) {
+			const joinResult = games.joinGame(game as g.Game, {
+				userHash,
+				name: playerName,
+				keyBindings: data.keyBindings,
+				isMobile: data.isMobile,
+				authToken,
+				unranked: data.unranked,
+				socketId: socket.id,
+				version: data.version,
+				reconnectKey: data.reconnectKey,
+			});
+			if (joinResult) {
+				heroId = joinResult.heroId;
+				reconnectKey = joinResult.reconnectKey;
+				live = true;
+			}
+
+			if (data.numBots) {
+				const numBots = Math.min(constants.Matchmaking.MaxPlayers, data.numBots);
+				for (let i = 0; i < numBots; ++i) {
+					games.addBot(game as g.Game);
+				}
+			}
+		}
+
+		emitHero(socket.id, game, heroId, reconnectKey, live);
+
+		if (heroId) {
+			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+		} else {
+			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+		}
+		return { success: true };
+	} else {
+		// logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
+		return { success: false, error: `Unable to find game` };
 	}
 }
 
