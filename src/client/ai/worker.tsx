@@ -1,4 +1,5 @@
 import * as AI from './ai.model';
+import { sandbox } from './sandboxer';
 
 const DefaultDelayMilliseconds = 400;
 
@@ -7,10 +8,6 @@ let bot: AI.Bot = null;
 let errored = false;
 
 onmessage = onMessage;
-
-interface BotConstructor {
-    (): AI.Bot;
-}
 
 function onMessage(e: MessageEvent) {
     const msg = JSON.parse(e.data) as AI.MsgContract;
@@ -22,9 +19,12 @@ function onMessage(e: MessageEvent) {
 }
 
 function onInit(msg: AI.InitMsgContract) {
-    settings = msg.settings;
-    const botConstructor = new Function(msg.code) as BotConstructor;
-    bot = botConstructor();
+    try {
+        bot = sandbox(msg.code) as AI.Bot;
+        settings = msg.settings;
+    } catch (exception) {
+        console.error("Error initializing bot code", exception);
+    }
 }
 
 function onInput(msg: AI.StateMsgContract) {

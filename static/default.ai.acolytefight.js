@@ -132,7 +132,7 @@ function deflect(state, hero, cooldowns, projectile) {
     if (cooldowns["shield"] === 0) {
         spellId = "shield";
     } else if (cooldowns["icewall"] === 0) {
-        spellid = "icewall";
+        spellId = "icewall";
     } else if (cooldowns["saber"] === 0) {
         spellId = "saber";
     } else if (cooldowns["dualSaber"] === 0) {
