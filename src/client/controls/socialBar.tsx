@@ -27,10 +27,9 @@ class SocialBar extends React.PureComponent<Props, State> {
     }
 
     private renderSocialBar() {
-        // <a href="http://twitter.com/acolytefight" target="_blank" title="Twitter"><i className="fab fa-twitter-square" /></a>
         return <div className="social-bar">
             <a href="https://facebook.com/acolytefight" target="_blank" title="Facebook"><i className="fab fa-facebook" /></a>
-            <a href="https://reddit.com/r/acolytefight" target="_blank" title="Reddit"><i className="fab fa-reddit-square" /></a>
+            <a href="http://twitter.com/acolytefight" target="_blank" title="Twitter"><i className="fab fa-twitter-square" /></a>
             <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><i className="fab fa-discord" /></a>
         </div>
     }
