@@ -1198,6 +1198,7 @@ const grapple: Spell = {
             targetFactor: 0.25,
             impulsePerTick: 0.00002,
             sidewaysImpulsePerTick: 0.00002,
+            massInvariant: true,
             minDistance: 0.025,
             maxDistance: 0.075,
             linkTicks: 1 * TicksPerSecond,

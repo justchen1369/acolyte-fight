@@ -2490,6 +2490,7 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		targetFactor: link.targetFactor !== undefined ? link.targetFactor : 1,
 		impulsePerTick: link.impulsePerTick,
 		sidewaysImpulsePerTick: link.sidewaysImpulsePerTick || 0,
+		massInvariant: link.massInvariant,
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		render: link.render,
@@ -2763,9 +2764,11 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	const outward = vector.diff(target.body.getPosition(), owner.body.getPosition());
 	const distance = outward.length();
 	const impulsePerTick = link.impulsePerTick * Math.max(0, distance - minDistance) / (maxDistance - minDistance);
+
+	const targetMassMultiplier = link.massInvariant ? (target.body.getMass() / owner.body.getMass()) : 1;
 	if (impulsePerTick > 0) {
 		applyImpulseDelta(owner, vector.relengthen(outward, link.selfFactor * impulsePerTick));
-		applyImpulseDelta(target, vector.relengthen(outward, link.targetFactor * impulsePerTick).neg());
+		applyImpulseDelta(target, vector.relengthen(outward, link.targetFactor * impulsePerTick * targetMassMultiplier).neg());
 	}
 
 	if (link.sidewaysImpulsePerTick > 0 && owner.target) {
@@ -2773,7 +2776,7 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 		const toRight = vector.rotateRight(outward);
 		const sidewaysMagnitude = pl.Vec2.dot(toRight, toCursor) / toRight.length() / toCursor.length();
 
-		applyImpulseDelta(target, vector.relengthen(toRight, sidewaysMagnitude * link.sidewaysImpulsePerTick));
+		applyImpulseDelta(target, vector.relengthen(toRight, sidewaysMagnitude * link.sidewaysImpulsePerTick * targetMassMultiplier));
 	}
 
 	return true;

@@ -884,6 +884,7 @@ declare interface LinkParameters {
 
 	impulsePerTick: number;
 	sidewaysImpulsePerTick?: number; // How much should the link pull the target sideways
+	massInvariant?: boolean; // Same force regardless of the mass that is being pulled
 
 	linkTicks: number;
 	minDistance: number;

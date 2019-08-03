@@ -572,6 +572,7 @@ export interface LinkState extends HighlightSource {
 	sidewaysImpulsePerTick: number;
 	minDistance: number;
 	maxDistance: number;
+	massInvariant?: boolean;
 
 	redirectDamage?: RedirectDamageParameters;
 	channelling?: boolean;
