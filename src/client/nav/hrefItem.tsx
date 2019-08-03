@@ -37,7 +37,9 @@ class CustomItem extends React.PureComponent<Props> {
     }
 
     private onNavClick(ev: React.MouseEvent<HTMLAnchorElement>) {
-        if (this.props.onClick) {
+        if (this.props.disabled) {
+            ev.preventDefault();
+        } else if (this.props.onClick) {
             this.props.onClick(ev);
 
             if (!this.props.href) {
