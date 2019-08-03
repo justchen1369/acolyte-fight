@@ -562,7 +562,7 @@ export interface CastHistoryItem {
 
 export interface LinkState extends HighlightSource {
 	spellId: string;
-	targetId: string | null;
+	targetId: string;
 
 	selfFactor: number;
 	targetFactor: number;
