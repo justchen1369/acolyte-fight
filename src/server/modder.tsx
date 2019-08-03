@@ -47,7 +47,6 @@ export function initRoom(mod: ModTree, authToken: string): g.Room {
         // Apply mod to matchmaker
         const matchmakingMod = mod.Matchmaking as Partial<MatchmakingSettings>;
         if (matchmakingMod
-            && optional(matchmakingMod.BotName, "string")
             && optional(matchmakingMod.MaxPlayers, "number")) {
 
             Matchmaking = modder.merge(Matchmaking, mod.Matchmaking);

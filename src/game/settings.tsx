@@ -10,7 +10,6 @@ const lifeSteal = 0.25;
 
 const Matchmaking: MatchmakingSettings = {
 	MaxPlayers: 6,
-	BotName: "AcolyteBot",
 };
 
 const Hero: HeroSettings = {
@@ -49,6 +48,8 @@ const World: WorldSettings = {
     ProjectileSpeedMaxError: 0.001,
 
     SwatchHealth: 100,
+
+	BotName: "AcolyteBot",
 }
 
 const Obstacle: ObstacleSettings = {

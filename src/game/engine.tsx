@@ -1368,6 +1368,8 @@ function isPresentOrPastSelf(heroId: string, world: w.World) {
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {
+	const World = world.settings.World;
+
 	console.log("Bot joined:", ev.heroId);
 
 	let hero = world.objects.get(ev.heroId);
@@ -1388,7 +1390,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		heroId: hero.id,
 		userId: null,
 		userHash: null,
-		name: Matchmaking.BotName,
+		name: World.BotName,
 		uiBaseColor: HeroColors.BotColor,
 		uiColor: HeroColors.BotColor,
 		isMobile: false,
