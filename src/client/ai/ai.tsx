@@ -8,26 +8,13 @@ import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
 
-const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 const DefaultDelayMilliseconds = 400;
 
-let defaultCode: string = null;
 const workers = new Map<string, AiWorker>();
 
 export interface SendContext {
     action: (gameId: string, heroId: string, action: w.Action) => void;
     spells: (gameId: string, heroId: string, keyBindings: KeyBindings) => void;
-}
-
-export async function retrieveDefaultAiCode() {
-    if (defaultCode) {
-        return defaultCode;
-    }
-
-    const res = await fetch(DefaultCodeUrl);
-    const code = await res.text();
-    defaultCode = code;
-    return code;
 }
 
 export function onTick(world: w.World, send: SendContext) {
@@ -111,10 +98,7 @@ class AiWorker {
     }
 
     async start() {
-        let code = this.settings.Code;
-        if (!code) {
-            code = await retrieveDefaultAiCode();
-        }
+        const code = this.settings.Code;
         const initMsg: AI.InitMsgContract = { type: "init", settings: this.settings, code };
         this.worker.postMessage(JSON.stringify(initMsg));
     }

@@ -78,6 +78,7 @@ function soundsToCode(sounds: Sounds): e.CodeSection {
 
 function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
     return {
+        ai: settings.Code,
         mod: stringify(settings.Mod),
         matchmaking: stringify(settings.Matchmaking),
         world: stringify(settings.World),
@@ -105,6 +106,7 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         ObstacleTemplates: codeToObstacleTemplates(codeTree, errorTree),
         Hero: codeToConstants(codeTree, "hero", errorTree),
         Choices: codeToConstants(codeTree, "choices", errorTree),
+        Code: codeTree.constants.ai,
     };
     if (Object.keys(errorTree).length > 0) {
         throw new e.ParseException(errorTree);

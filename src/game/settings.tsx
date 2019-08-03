@@ -6,6 +6,9 @@ import { ObstacleTemplates } from './obstacleTemplates';
 import { Sounds } from './sounds';
 import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
+// @ts-ignore
+import Code from '!!raw-loader!./default.ai.js';
+
 const lifeSteal = 0.25;
 
 const Matchmaking: MatchmakingSettings = {
@@ -2447,4 +2450,5 @@ export const DefaultSettings: AcolyteFightSettings = {
     Layouts,
     Sounds,
     Icons,
+    Code,
 };

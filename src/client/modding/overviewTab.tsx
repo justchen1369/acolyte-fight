@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
+import * as ai from '../ai/ai';
 import * as e from './editor.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';

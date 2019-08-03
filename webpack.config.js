@@ -31,6 +31,10 @@ const clientConfig = {
         test: /\.glsl$/i,
         use: ['webpack-glsl-loader'],
       },
+      {
+        test: /\.ai\.js$/i,
+        use: ['raw-loader'],
+      },
     ],
   },
   output: {

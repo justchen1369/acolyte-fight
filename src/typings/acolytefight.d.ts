@@ -34,7 +34,7 @@ declare interface AcolyteFightSettings {
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
 	Icons: IconLookup;
-	Code?: string;
+	Code: string;
 }
 
 declare type ModTree = {
