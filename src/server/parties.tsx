@@ -119,7 +119,8 @@ export function isPartyReady(party: g.Party): boolean {
     } else {
         const relevant = wu(party.active.values()).filter(p => !p.isObserver).toArray();
         const leaders = wu(party.active.values()).filter(p => p.isLeader).toArray();
-        const required = games.apportionPerGame(relevant.length);
+        const room = getStore().rooms.get(party.roomId);
+        const required = games.apportionPerGame(relevant.length, room.Matchmaking.MaxPlayers);
         return relevant.length > 0 && relevant.filter(p => p.ready).length >= required && leaders.every(l => l.ready);
     }
 }
@@ -145,12 +146,6 @@ export function removePartyMember(party: g.Party, socketId: string) {
 
 	if (party.active.size > 0) {
         // The party is not finished
-        if (party.active.size <= constants.Matchmaking.MaxPlayers) {
-            // Small party, mark everyone as unready instead when someone leaves
-            party.active.forEach(member => {
-                member.ready = false;
-            });
-        }
 	} else {
 		// This party is finished, delete it
 		const store = getStore();

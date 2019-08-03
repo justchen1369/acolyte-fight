@@ -18,6 +18,7 @@ interface Props {
     selfId: string
     current: s.PathElements;
     party: s.PartyState;
+    maxPlayers: number;
 }
 interface State {
     loading: boolean;
@@ -30,6 +31,7 @@ function stateToProps(state: s.State): Props {
         selfId: state.socketId,
         current: state.current,
         party: state.party,
+        maxPlayers: state.room.settings.Matchmaking.MaxPlayers,
     };
 }
 
@@ -86,7 +88,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
             <p><input className="share-url" type="text" value={partyUrl} readOnly onFocus={ev => ev.target.select()} /></p>
             <canvas className="party-qr" ref={(elem) => this.renderQR(elem, partyUrl)} />
             <p><span className="btn" onClick={() => this.onLeaveParty()}>Leave Party</span></p>
-            {this.props.party.members.length >= constants.Matchmaking.MaxPlayers && <p>If you party is larger than {constants.Matchmaking.MaxPlayers} players, the party will be split across multiple games.</p>}
+            {this.props.party.members.length >= this.props.maxPlayers && <p>If your party is larger than {this.props.maxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             <div className="clear" />
             {this.renderPartyMode()}

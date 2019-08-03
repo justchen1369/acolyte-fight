@@ -395,7 +395,7 @@ export type GameListResponseMsg = GameListResponse | ErrorResponseMsg;
 
 
 export interface CreateRoomRequest {
-    mod: Object;
+    mod: ModTree;
 }
 export interface CreateRoomResponse {
     success: true;

@@ -8,6 +8,11 @@ import { Actions, SpecialKeys, HomingTargets } from './world.model';
 
 const lifeSteal = 0.25;
 
+const Matchmaking: MatchmakingSettings = {
+	MaxPlayers: 6,
+	BotName: "AcolyteBot",
+};
+
 const Hero: HeroSettings = {
     MoveSpeedPerSecond: 0.11,
     MaxSpeed: 1.0,
@@ -2435,6 +2440,7 @@ export const Mod: ModSettings = {
 
 export const DefaultSettings: AcolyteFightSettings = {
     Mod,
+    Matchmaking,
     World,
     Hero,
     Obstacle,

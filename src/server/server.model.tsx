@@ -67,6 +67,7 @@ export interface Replay {
 export interface Game extends Replay {
     created: moment.Moment;
 
+    maxPlayers: number;
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
     reconnectKeys: Map<string, string>; // key -> heroId
@@ -106,6 +107,8 @@ export interface Room {
     accessed: moment.Moment;
     mod: ModTree;
     isCustom: boolean;
+
+    Matchmaking: MatchmakingSettings;
 }
 
 export interface Party extends PartyStatus {

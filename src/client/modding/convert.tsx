@@ -79,6 +79,7 @@ function soundsToCode(sounds: Sounds): e.CodeSection {
 function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
     return {
         mod: stringify(settings.Mod),
+        matchmaking: stringify(settings.Matchmaking),
         world: stringify(settings.World),
         obstacle: stringify(settings.Obstacle),
         hero: stringify(settings.Hero),
@@ -93,6 +94,7 @@ export function stringify(data: any): string {
 function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
     const errorTree: e.ErrorTree = {};
     const settings: AcolyteFightSettings = {
+        Matchmaking: codeToConstants(codeTree, "matchmaking", errorTree),
         Spells: codeToSpells(codeTree, errorTree),
         Sounds: codeToSounds(codeTree, errorTree),
         Icons: codeToIcons(codeTree, errorTree),

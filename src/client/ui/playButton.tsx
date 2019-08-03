@@ -20,6 +20,7 @@ interface Props {
     selfId: string;
     party: s.PartyState;
     isModded: boolean;
+    maxPlayers: number;
 }
 interface State {
     joining: boolean;
@@ -32,6 +33,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         party: state.party,
         selfId: state.socketId,
         isModded: rooms.isModded(state.room),
+        maxPlayers: state.room.settings.Matchmaking.MaxPlayers,
     };
 }
 
@@ -65,8 +67,9 @@ class PlayButton extends React.PureComponent<Props, State> {
                 const relevant = party.members.filter(m => m.isLeader || !m.isObserver);
                 const readyCount = relevant.filter(m => m.ready).length;
                 const partySize = Math.max(1, relevant.length);
+                const waitingFor = Math.min(this.props.maxPlayers, partySize);
                 return <Button className="btn waiting-for-party" onClick={(ev) => this.onPartyReadyClicked(false)} title="Click to cancel">
-                    <div className="waiting-for-party-progress" style={{ width: `${100 * readyCount / partySize}%` }}></div>
+                    <div className="waiting-for-party-progress" style={{ width: `${100 * Math.min(1, readyCount / waitingFor)}%` }}></div>
                     <div className="waiting-for-party-label">Waiting for Party...</div>
                 </Button>
             } else {

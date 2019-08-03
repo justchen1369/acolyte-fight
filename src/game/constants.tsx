@@ -34,10 +34,10 @@ export namespace Alliances {
 }
 
 export namespace Matchmaking {
+	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
 	export const WaitForMorePeriod = 10 * TicksPerSecond;
 	export const JoinPeriod = 3 * TicksPerSecond;
-	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
-	export const MaxPlayers = 6;
+
 	export const BotName = "AcolyteBot";
 }
 

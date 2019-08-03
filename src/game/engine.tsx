@@ -389,6 +389,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 }
 
 function addHero(world: w.World, heroId: string) {
+	const Matchmaking = world.settings.Matchmaking;
 	const Hero = world.settings.Hero;
 
 	const heroIndex = world.nextPositionId++;
@@ -3152,6 +3153,7 @@ export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 }
 
 function shrink(world: w.World) {
+	const Matchmaking = world.settings.Matchmaking;
 	const World = world.settings.World;
 	if (world.tick >= world.startTick && !world.winner) {
 		const seconds = (world.tick - world.startTick) / TicksPerSecond;

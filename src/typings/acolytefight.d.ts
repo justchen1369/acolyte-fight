@@ -24,6 +24,7 @@ Collision category flags (categories, expireOn and collideWith):
 
 declare interface AcolyteFightSettings {
 	Mod: ModSettings;
+	Matchmaking: MatchmakingSettings;
 	Layouts: Layouts;
     Hero: HeroSettings;
     World: WorldSettings;
@@ -82,6 +83,11 @@ declare interface WorldSettings {
 	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value
 
 	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
+}
+
+declare interface MatchmakingSettings {
+	MaxPlayers: number; // Maximum number of players in one game
+	BotName: string; // What to call the bot
 }
 
 declare interface Layouts {

@@ -168,7 +168,7 @@ function onRoomCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cre
 function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.CreatePartyRequest, callback: (output: m.CreatePartyResponseMsg) => void) {
 	try {
 		if (!(required(data, "object")
-			&& optional(data.roomId, "string")
+			&& required(data.roomId, "string")
 			&& required(data.playerName, "string")
 			&& required(data.keyBindings, "object")
 			&& optional(data.unranked, "boolean")
@@ -215,7 +215,7 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 			&& optional(data.isPrivate, "boolean")
 			&& optional(data.isLocked, "boolean")
 			&& optional(data.waitForPlayers, "boolean")
-			&& optional(data.roomId, "string")
+			&& required(data.roomId, "string")
 			&& optional(data.initialObserver, "boolean")
 		)) {
 			callback({ success: false, error: "Bad request" });
@@ -228,6 +228,11 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 		if (!(party && parties.isAuthorizedToAdmin(party, socket.id))) {
 			logger.info(`Party ${data.partyId} not found or inaccessible for user ${socket.id} [${authToken}]`);
 			callback({ success: false, error: `Party ${data.partyId} not found or inaccessible` });
+			return;
+		}
+
+		if (!(store.rooms.has(data.roomId))) {
+			callback({ success: false, error: `Room ${data.roomId} does not exist` });
 			return;
 		}
 
@@ -478,7 +483,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			}
 
 			if (data.numBots) {
-				const numBots = Math.min(constants.Matchmaking.MaxPlayers, data.numBots);
+				const numBots = Math.min(room.Matchmaking.MaxPlayers, data.numBots);
 				for (let i = 0; i < numBots; ++i) {
 					games.addBot(game as g.Game);
 				}

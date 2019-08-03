@@ -15,6 +15,7 @@ export interface CodeSection {
 
 export interface CodeConstants extends CodeSection {
     mod: string;
+    matchmaking: string;
     world: string;
     obstacle: string;
     hero: string;

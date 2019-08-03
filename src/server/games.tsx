@@ -94,10 +94,11 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, newUserHashes: string[]): g.Game {
+export function findNewGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
 	const store = getStore();
+	const MaxPlayers = room.Matchmaking.MaxPlayers;
 
 	let numPlayers = 0;
 	const scoreboard = store.scoreboards.get(segment);
@@ -114,7 +115,7 @@ export function findNewGame(version: string, room: g.Room | null, partyId: strin
 	store.joinableGames.forEach(gameId => {
 		const g = store.activeGames.get(gameId);
 		if (g && g.joinable) {
-			if (g.segment === segment && (g.active.size + newUserHashes.length) <= Matchmaking.MaxPlayers) {
+			if (g.segment === segment && (g.active.size + newUserHashes.length) <= MaxPlayers) {
 				openGames.push(g);
 			}
 		} else {
@@ -123,14 +124,14 @@ export function findNewGame(version: string, room: g.Room | null, partyId: strin
 		}
 	});
 
-	const targetPlayersPerGame = numPlayers > Matchmaking.MaxPlayers ? apportionPerGame(numPlayers) : Matchmaking.MaxPlayers;
+	const targetPlayersPerGame = numPlayers > MaxPlayers ? apportionPerGame(numPlayers, MaxPlayers) : MaxPlayers;
 
 	let game: g.Game = null;
 	if (openGames.length > 0) {
 		let minSize = Infinity;
 		openGames.forEach(g => {
 			const size = g.active.size;
-			if (size < Matchmaking.MaxPlayers && size < minSize) {
+			if (size < MaxPlayers && size < minSize) {
 				minSize = size;
 				game = g;
 			}
@@ -188,17 +189,17 @@ export function calculateRoomStats(segment: string): number {
 	}
 }
 
-export function apportionPerGame(totalPlayers: number) {
+export function apportionPerGame(totalPlayers: number, maxPlayers: number) {
 	// Round up to nearest even number
-	return Math.min(Matchmaking.MaxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers) / 2) * 2);
+	return Math.min(maxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers, maxPlayers) / 2) * 2);
 }
 
-export function minPerGame(totalPlayers: number) {
-	return Math.floor(averagePlayersPerGame(totalPlayers));
+export function minPerGame(totalPlayers: number, maxPlayers: number) {
+	return Math.floor(averagePlayersPerGame(totalPlayers, maxPlayers));
 }
 
-export function averagePlayersPerGame(totalPlayers: number) {
-	const maxGames = Math.ceil(totalPlayers / Matchmaking.MaxPlayers);
+export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) {
+	const maxGames = Math.ceil(totalPlayers / maxPlayers);
 	return totalPlayers / maxGames;
 }
 
@@ -259,15 +260,15 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 	}
 }
 
-export function initGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean, locked: string = null, layoutId: string = null) {
+export function initGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, locked: string = null, layoutId: string = null) {
 	const store = getStore();
-	const roomId = room ? room.id : null;
 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
-		segment: segments.calculateSegment(roomId, partyId, isPrivate),
-		roomId,
+		segment: segments.calculateSegment(room.id, partyId, isPrivate),
+		maxPlayers: room.Matchmaking.MaxPlayers,
+		roomId: room.id,
 		partyId,
 		isPrivate,
 		mod: room ? room.mod : {},
@@ -330,7 +331,7 @@ export function assignPartyToGames(party: g.Party) {
 	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
 	const remaining = _.shuffle(wu(party.active.values()).filter(p => p.ready && !p.isObserver).toArray());
-	const maxPlayersPerGame = apportionPerGame(remaining.length);
+	const maxPlayersPerGame = apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
 	while (remaining.length > 0) {
 		const group = new Array<g.PartyMember>();
 		for (let i = 0; i < maxPlayersPerGame; ++i) {
@@ -550,7 +551,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	}
 
 	// No existing slots, create a new one
-	const newPlayersAllowed = game.joinable && game.active.size < Matchmaking.MaxPlayers;
+	const newPlayersAllowed = game.joinable && game.active.size < game.maxPlayers;
 	if (!heroId && newPlayersAllowed) {
 		heroId = formatHeroId(game.numPlayers++);
 	}
@@ -606,7 +607,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 }
 
 export function addBot(game: g.Game) {
-	if (game.numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
+	if (game.numPlayers >= game.maxPlayers || game.active.size === 0 || !game.joinable) {
 		return null;
 	}
 
@@ -660,7 +661,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
-		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size, game.locked);
+		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size, game.locked, game.maxPlayers);
 
 		const newCloseTick = game.tick + joinPeriod;
 		if (newCloseTick < game.closeTick) {
@@ -703,13 +704,13 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 }
 
-function calculateJoinPeriod(segment: string, numHumans: number, locked: string): number {
+function calculateJoinPeriod(segment: string, numHumans: number, locked: string, maxPlayers: number): number {
 	if (locked) {
 		return Matchmaking.JoinPeriod;
 	}
 
 	const numInRoom = calculateRoomStats(segment);
-	const targetPerGame = minPerGame(numInRoom);
+	const targetPerGame = minPerGame(numInRoom, maxPlayers);
 
 	if (numHumans < targetPerGame) {
 		return Matchmaking.WaitForMorePeriod;
