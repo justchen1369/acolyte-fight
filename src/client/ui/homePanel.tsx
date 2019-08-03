@@ -19,6 +19,8 @@ const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     isLoggedIn: boolean;
+    titleLeft: string;
+    titleRight: string;
 }
 interface State {
 }
@@ -26,6 +28,8 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         isLoggedIn: state.loggedIn,
+        titleLeft: state.room.settings.World.TitleLeft,
+        titleRight: state.room.settings.World.TitleRight,
     };
 }
 
@@ -50,7 +54,7 @@ class HomePanel extends React.PureComponent<Props, State> {
                     <video autoPlay muted loop>
                         <source src="https://storage.googleapis.com/acolytefight.io/AcolyteFight5.m4v" type="video/mp4" />
                     </video>
-                    <div className="title"><span className="title-left">Acolyte</span> <span className="title-right">Fight!</span></div>
+                    <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
                     <div className="mask"></div>
                 </div>
                 <div className="spacer" />

@@ -1,6 +1,7 @@
 import Immutable from 'immutable';
 import * as Redux from 'redux';
 import * as d from './stats.model';
+import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';
@@ -17,7 +18,7 @@ function initialState(): s.State {
     const isNewPlayer = !storage.loadName();
 
     const room: s.RoomState = {
-        id: null,
+        id: m.DefaultRoomId,
         mod: {},
         settings: settings.DefaultSettings,
     };

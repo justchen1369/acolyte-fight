@@ -49,7 +49,10 @@ const World: WorldSettings = {
 
     SwatchHealth: 100,
 
-	BotName: "AcolyteBot",
+    BotName: "AcolyteBot",
+
+    TitleLeft: "Acolyte",
+    TitleRight: "Fight!",
 }
 
 const Obstacle: ObstacleSettings = {

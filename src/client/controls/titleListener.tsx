@@ -21,4 +21,4 @@ class TitleListener extends React.PureComponent<Props, State> {
     }
 }
 
-export default TitleListener;
+export default TitleListener
