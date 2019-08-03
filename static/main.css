@@ -146,7 +146,7 @@ canvas.atlas {
 
 canvas.game {
     background: transparent;
-    cursor: crosshair;
+    cursor: url("https://storage.googleapis.com/acolytefight.io/Cursor2.png") 8 8, crosshair;
     position: absolute;
     top: 0;
     left: 0;
