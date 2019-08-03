@@ -17,6 +17,7 @@ interface Props extends OwnProps {
     defaults: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
+    currentMod: ModTree;
     children?: React.ReactFragment;
 }
 interface State {
@@ -31,6 +32,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         defaults,
         section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
         errors: state.modErrors[ownProps.sectionKey] || noErrors,
+        currentMod: state.mod,
         selectedId: state.current.hash,
     };
 }
@@ -103,7 +105,9 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     private onCodeChange(id: string, code: string) {
-        StoreProvider.dispatch({ type: "invalidateModTree"});
+        if (this.props.currentMod) {
+            StoreProvider.dispatch({ type: "invalidateModTree"});
+        }
         queueChange(this.props.sectionKey, id, code);
     }
 

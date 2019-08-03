@@ -26,15 +26,12 @@ function stateToProps(state: s.State): Props {
 
 const compileModDebounced = _.debounce(() => {
     const state = StoreProvider.getState();
-    let codeTree = state.codeTree;
+    const codeTree = state.codeTree;
     const modResult = codeToMod(codeTree);
-    if (modResult.mod) {
-        codeTree = editing.modToCode(modResult.mod);
-    }
     StoreProvider.dispatch({
         type: "updateModTree",
         mod: modResult.mod,
-        codeTree,
+        modBuiltFrom: codeTree,
         modErrors: modResult.errors,
     });
 }, 1000);

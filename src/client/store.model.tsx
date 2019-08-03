@@ -337,7 +337,7 @@ export interface DeleteCodeTreeItemAction {
 
 export interface UpdateModTreeAction {
     type: "updateModTree";
-    codeTree: e.CodeTree;
+    modBuiltFrom: e.CodeTree;
     mod: ModTree;
     modErrors: e.ErrorTree;
 }

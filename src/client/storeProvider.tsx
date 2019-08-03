@@ -294,8 +294,7 @@ function reducer(state: s.State, action: s.Action): s.State {
             ...state,
             mod: action.mod,
             modErrors: action.modErrors,
-            modBuiltFrom: action.codeTree,
-            codeTree: action.codeTree,
+            modBuiltFrom: action.modBuiltFrom,
         };
     } else if (action.type === "invalidateModTree") {
         if (state.mod) {
