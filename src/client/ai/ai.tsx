@@ -5,7 +5,7 @@ import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
-import { sendAction } from './ticker';
+import { sendAction } from '../core/ticker';
 
 const DefaultCodeUrl = "static/default.ai.acolytefight.js";
 
@@ -92,7 +92,9 @@ class AiWorker {
         this.gameId = world.ui.myGameId;
         this.heroId = heroId;
 
-        const worker = new Worker(codeUrl);
+        const worker = new Worker(codeUrl, {
+            credentials: 'omit',
+        });
         worker.onmessage = (ev) => this.onWorkerMessage(ev);
         this.worker = worker;
 

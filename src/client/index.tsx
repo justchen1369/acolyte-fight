@@ -8,7 +8,7 @@ import * as m from '../game/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 
-import * as ai from './core/ai';
+import * as ai from './ai/ai';
 import * as audio from './audio/audio';
 import * as cloud from './core/cloud';
 import * as loader from './core/loader';

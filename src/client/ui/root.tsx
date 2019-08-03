@@ -6,7 +6,6 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import AboutSection from './aboutSection';
-import AiPanel from './aiPanel';
 import DebugPanel from './debugPanel';
 import GamePanel from '../play/gamePanel';
 import HomePanel from './homePanel';
@@ -75,7 +74,6 @@ class Root extends React.PureComponent<Props> {
                 {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
                 {page === "party" && this.renderParty()}
-                {page === "ai" && this.renderAi()}
                 {page === "regions" && this.renderRegions()}
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
@@ -104,16 +102,6 @@ class Root extends React.PureComponent<Props> {
             <NavBar />
             <div className="page">
                 <PartyPanel />
-            </div>
-        </div>;
-    }
-
-    private renderAi() {
-        return <div className="content-container">
-            <TitleListener subtitle="AI" />
-            <NavBar />
-            <div className="page">
-                <AiPanel />
             </div>
         </div>;
     }

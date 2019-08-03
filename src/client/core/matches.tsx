@@ -1,4 +1,3 @@
-import * as ai from './ai';
 import * as engine from '../../game/engine';
 import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
