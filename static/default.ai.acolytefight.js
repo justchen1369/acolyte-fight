@@ -1,6 +1,6 @@
 var center = { x: 0.5, y: 0.5 };
 
-var CloseEnoughDistance = 0.03;
+var CloseEnoughDistance = 0.05;
 var MissRadius = 0.05;
 var DodgeRadius = 0.03;
 var SpellCastIntervalMilliseconds = 1000;
