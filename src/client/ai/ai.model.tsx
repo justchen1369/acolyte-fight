@@ -4,7 +4,7 @@ export * from './contract.model';
 export type MsgContract =
 	InitMsgContract
     | StateMsgContract
-	| ActionMsgContract
+	| ResponseMsgContract
 
 export interface InitMsgContract {
 	type: "init";
@@ -19,8 +19,8 @@ export interface StateMsgContract {
     cooldowns: C.CooldownsRemainingContract;
 }
 
-export interface ActionMsgContract {
-    type: "action";
+export interface ResponseMsgContract {
+    type: "response";
     tick: number;
-    action: C.ActionContract;
+    output: C.OutputContract;
 }

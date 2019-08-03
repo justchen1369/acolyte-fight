@@ -32,7 +32,7 @@ function onInput(msg: AI.StateMsgContract) {
             return;
         }
 
-        let action: AI.ActionContract = null;
+        let output: AI.OutputContract = null;
         if (bot && settings) {
             const input: AI.InputContract = {
                 state: msg.state,
@@ -40,15 +40,15 @@ function onInput(msg: AI.StateMsgContract) {
                 cooldowns: msg.cooldowns,
                 settings,
             };
-            action = bot.act(input);
+            output = bot.act(input);
         }
 
-        const actionMsg: AI.ActionMsgContract = {
-            type: "action",
+        const response: AI.ResponseMsgContract = {
+            type: "response",
             tick: msg.state.tick,
-            action,
+            output,
         };
-        send(actionMsg);
+        send(response);
 
     } catch (exception) {
         console.error("Error in bot code", exception);

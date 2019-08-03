@@ -1,5 +1,5 @@
 export interface Bot {
-    act: (input: InputContract) => ActionContract;
+    act: (input: InputContract) => OutputContract;
 }
 
 export interface InputContract {
@@ -58,10 +58,14 @@ export interface CooldownsRemainingContract {
 export interface ObstacleContract extends WorldObjectContract {
 }
 
-export interface ActionContract {
-	spellId: string;
-	target: Vec2;
-    release?: boolean;
+export interface OutputContract {
+	delayMilliseconds?: number; // Reaction time - number of milliseconds to wait before perform this action. Must be greater than 0.
 
-    delayMilliseconds?: number; // Number of milliseconds to wait before casting spell
+	// Cast a spell
+	spellId?: string;
+	target?: Vec2;
+	release?: boolean;
+
+	// Change spells
+	spells?: KeyBindings;
 }

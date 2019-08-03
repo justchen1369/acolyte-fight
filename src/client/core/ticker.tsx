@@ -98,14 +98,24 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	direct(world, canvasStack, renderOptions);
 	render(world, canvasStack, renderOptions);
 
+	// Don't have to happen in animation frame
+	setTimeout(() => sendSnapshot(world), 1);
+	setTimeout(() => notificationTick(world), 1);
+	setTimeout(() => aiTick(world), 1);
+}
+
+function notificationTick(world: w.World) {
 	const notifications = engine.takeNotifications(world);
 	if (notifications.length > 0) {
 		notify(...notifications);
 	}
+}
 
-	sendSnapshot(world);
-
-	setTimeout(() => ai.onTick(world, sendAction), 1);
+function aiTick(world: w.World) {
+	ai.onTick(world, {
+		action: sendAction,
+		spells: sendKeyBindings,
+	})
 }
 
 export function onTickMsg(data: m.TickMsg) {
