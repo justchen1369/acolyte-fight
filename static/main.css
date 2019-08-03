@@ -785,9 +785,7 @@ table.player-list {
     align-items: center;
     align-content: center;
 
-    animation-name: splash-out;
-    animation-duration: 4s;
-    animation-fill-mode: both;
+    animation: splash-out 4s both ease-out;
 }
 
 .splash {
