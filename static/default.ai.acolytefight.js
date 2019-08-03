@@ -1,5 +1,6 @@
 var center = { x: 0.5, y: 0.5 };
 
+var CloseEnoughDistance = 0.05;
 var MissRadius = 0.05;
 var DodgeRadius = 0.03;
 var SpellCastIntervalMilliseconds = 1000;
@@ -253,7 +254,7 @@ function move(state, hero, opponent) {
     var target = vectorPlus(center, vectorRelengthen(offset, targetDistance));
 
     var distanceToTarget = vectorDistance(hero.pos, target);
-    if (distanceToTarget <= 0.001) {
+    if (distanceToTarget <= CloseEnoughDistance) {
         // Close enough - don't send any action so the game can sleep while waiting for players
         return null;
     }
