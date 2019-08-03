@@ -11,6 +11,7 @@ import * as StoreProvider from '../storeProvider';
 interface Props {
     codeTree: e.CodeTree;
     modBuiltFrom: e.CodeTree;
+    mod: ModTree;
 }
 interface State {
 }
@@ -19,17 +20,21 @@ function stateToProps(state: s.State): Props {
     return {
         codeTree: state.codeTree,
         modBuiltFrom: state.modBuiltFrom,
+        mod: state.mod,
     };
 }
 
 const compileModDebounced = _.debounce(() => {
     const state = StoreProvider.getState();
-    const codeTree = state.codeTree;
+    let codeTree = state.codeTree;
     const modResult = codeToMod(codeTree);
+    if (modResult.mod) {
+        codeTree = editing.modToCode(modResult.mod);
+    }
     StoreProvider.dispatch({
         type: "updateModTree",
         mod: modResult.mod,
-        modBuiltFrom: codeTree,
+        codeTree,
         modErrors: modResult.errors,
     });
 }, 1000);
@@ -71,7 +76,7 @@ class CompileModListener extends React.PureComponent<Props, State> {
     }
 
     render(): React.ReactNode {
-        if (this.props.codeTree !== this.props.modBuiltFrom) {
+        if (!this.props.mod || this.props.codeTree !== this.props.modBuiltFrom) {
             compileModDebounced();
         }
 

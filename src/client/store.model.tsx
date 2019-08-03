@@ -134,6 +134,7 @@ export type Action =
     | UpdateCodeTreeItemAction
     | DeleteCodeTreeItemAction
     | UpdateModTreeAction
+    | InvalidateModTreeAction
 
 export interface UpdateCustomizingAction {
     type: "customizing";
@@ -336,9 +337,13 @@ export interface DeleteCodeTreeItemAction {
 
 export interface UpdateModTreeAction {
     type: "updateModTree";
-    modBuiltFrom: e.CodeTree;
+    codeTree: e.CodeTree;
     mod: ModTree;
     modErrors: e.ErrorTree;
+}
+
+export interface InvalidateModTreeAction {
+    type: "invalidateModTree";
 }
 
 

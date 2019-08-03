@@ -262,17 +262,21 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updateCodeTree") {
         return { ...state, codeTree: action.codeTree, mod: null };
     } else if (action.type === "updateCodeItem") {
-        return {
-            ...state,
-            codeTree: {
-                ...state.codeTree,
-                [action.sectionKey]: {
-                    ...state.codeTree[action.sectionKey],
-                    [action.itemId]: action.code,
+        if (state.codeTree[action.sectionKey][action.itemId] !== action.code) {
+            return {
+                ...state,
+                codeTree: {
+                    ...state.codeTree,
+                    [action.sectionKey]: {
+                        ...state.codeTree[action.sectionKey],
+                        [action.itemId]: action.code,
+                    },
                 },
-            },
-            mod: null,
-        };
+                mod: null,
+            };
+        } else {
+            return state;
+        }
     } else if (action.type === "deleteCodeItem") {
         const newSection = { ...state.codeTree[action.sectionKey] };
         delete newSection[action.itemId];
@@ -290,8 +294,18 @@ function reducer(state: s.State, action: s.Action): s.State {
             ...state,
             mod: action.mod,
             modErrors: action.modErrors,
-            modBuiltFrom: action.modBuiltFrom,
+            modBuiltFrom: action.codeTree,
+            codeTree: action.codeTree,
         };
+    } else if (action.type === "invalidateModTree") {
+        if (state.mod) {
+            return {
+                ...state,
+                mod: null,
+            };
+        } else {
+            return state;
+        }
     } else {
         console.log(action);
         return state;

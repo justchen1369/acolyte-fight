@@ -17,7 +17,6 @@ interface Props extends OwnProps {
     defaults: e.CodeSection;
     section: e.CodeSection;
     errors: e.ErrorSection;
-    currentMod: ModTree;
     children?: React.ReactFragment;
 }
 interface State {
@@ -31,15 +30,36 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         codeTree: state.codeTree,
         defaults,
         section: state.codeTree ? state.codeTree[ownProps.sectionKey] : defaults,
-        currentMod: state.mod,
         errors: state.modErrors[ownProps.sectionKey] || noErrors,
         selectedId: state.current.hash,
     };
 }
 
-class ItemEditor extends React.PureComponent<Props, State> {
-    private canonicalizeDebounced = _.debounce(() => this.canonicalize(), 1000);
+const uncommitted = new Map<string, CodeChange>();
+function queueChange(sectionKey: string, id: string, code: string) {
+    const change: CodeChange = { sectionKey, id, code };
+    uncommitted.set(changeKey(change), change);
+    commitDebounced();
+}
+const commitDebounced = _.debounce(() => commit(), 200);
+function commit() {
+    uncommitted.forEach(change => {
+        editing.updateItem(change.sectionKey, change.id, change.code);
+    });
+    uncommitted.clear();
+}
 
+interface CodeChange {
+    sectionKey: string;
+    id: string;
+    code: string;
+}
+
+function changeKey(change: CodeChange): string {
+    return `${change.sectionKey}/${change.id}`;
+}
+
+class ItemEditor extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -83,16 +103,8 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     private onCodeChange(id: string, code: string) {
-        editing.updateItem(this.props.sectionKey, id, code);
-        this.canonicalizeDebounced();
-    }
-
-    private canonicalize() {
-        // Respond to the user changing IDs or removing fields that can't be removed
-        if (this.props.currentMod) {
-            const codeTree = editing.modToCode(this.props.currentMod);
-            StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
-        }
+        StoreProvider.dispatch({ type: "invalidateModTree"});
+        queueChange(this.props.sectionKey, id, code);
     }
 
     private renderRevertButton() {
