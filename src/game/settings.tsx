@@ -992,7 +992,7 @@ const whip: Spell = {
         {
             icon: "fas fa-running",
             title: "Fast",
-            text: "Gain a 20% movement speed bonus for 3 seconds when casting (even if you miss).",
+            text: "Gain a 20% movement speed bonus for 3 seconds (even if you miss).",
         },
     ],
     action: "projectile",
