@@ -1,5 +1,5 @@
-import * as C from './contract.model';
-export * from './contract.model';
+import * as C from './ai.contracts';
+export * from './ai.contracts';
 
 export type MsgContract =
 	InitMsgContract

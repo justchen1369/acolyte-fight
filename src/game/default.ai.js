@@ -6,12 +6,9 @@ var DodgeRadius = 0.03;
 var SpellCastIntervalMilliseconds = 1000;
 var SpellCastJitterMilliseconds = 500;
 
+var TicksPerSecond = 60;
+
 var DefaultReactionMilliseconds = 400;
-
-var AllianceSelf = 0x01;
-var AllianceAlly = 0x02;
-var AllianceEnemy = 0x04;
-
 var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     retarget: 100,
     move: 200,
@@ -20,6 +17,7 @@ var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
 var alreadyChosenSpells = false;
 var nextSpell = 0;
 
+// See ai.contracts.ts: input is InputContract, output is OutputContract
 function act(input) {
     var state = input.state;
     var heroId = input.heroId;
@@ -27,8 +25,8 @@ function act(input) {
     var cooldowns = input.cooldowns;
     var settings = input.settings;
 
-    var strongest = findStrongest(state.heroes, heroId, AllianceEnemy);
-    var closest = findClosest(state.heroes, heroId, AllianceEnemy);
+    var strongest = findStrongestEnemy(state.heroes, heroId);
+    var closest = findClosestEnemy(state.heroes, heroId);
     if (!(hero && strongest && closest)) {
         // Either we're dead, or everyone else is, nothing to do
         return null;
@@ -91,7 +89,7 @@ function randomSpells(settings) {
 	return keyBindings;
 }
 
-function findClosest(heroes, myHeroId, allianceFlags) {
+function findClosestEnemy(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -101,7 +99,7 @@ function findClosest(heroes, myHeroId, allianceFlags) {
     var closestDistance = Infinity;
     for (var heroId in heroes) {
         var hero = heroes[heroId];
-        if (hero.alliance & allianceFlags) {
+        if (hero.isEnemy) {
             var distance = vectorDistance(hero.pos, myHero.pos);
             if (distance < closestDistance) {
                 closestDistance = distance;
@@ -112,7 +110,7 @@ function findClosest(heroes, myHeroId, allianceFlags) {
     return closest;
 }
 
-function findStrongest(heroes, myHeroId, allianceFlags) {
+function findStrongestEnemy(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -122,7 +120,7 @@ function findStrongest(heroes, myHeroId, allianceFlags) {
     var mostHealth = 0;
     for (var heroId in heroes) {
         var hero = heroes[heroId];
-        if (hero.alliance & allianceFlags) {
+        if (hero.isEnemy) {
             if (hero.health > mostHealth) {
                 mostHealth = hero.health;
                 choice = hero;
@@ -227,7 +225,7 @@ function validAttack(state, hero, opponent, spell) {
             return false;
         }
 
-        var range = spell.projectile.speed * spell.projectile.maxTicks / state.ticksPerSecond + opponent.radius;
+        var range = spell.projectile.speed * spell.projectile.maxTicks / TicksPerSecond + opponent.radius;
         return distance <= range;
     } else if (spell.action === "scourge") {
         var range = spell.radius + opponent.radius;
@@ -392,4 +390,5 @@ function vectorRotateRight(vec) {
 	return { x: vec.y, y: -vec.x };
 }
 
+// See ai.contracts.ts: Must return a BotContract
 return { act };

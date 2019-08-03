@@ -83,7 +83,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
         return <div>
             <h2>Reference</h2>
             <ul>
-                <li><a href="api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript definition file that defines the schema of the settings</li>
+                <li><a href="api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript file that defines the schema of settings</li>
+                <li><a href="api/ai.contracts.ts">ai.contracts.ts</a> - this is a TypeScript file that defines the inputs and outputs of the AI code</li>
             </ul>
         </div>
     }

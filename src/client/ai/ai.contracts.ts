@@ -6,12 +6,11 @@ export interface InputContract {
 	heroId: string; // The ID of the hero you are controlling
     cooldowns: CooldownsRemainingContract; // The remaining cooldowns for your hero
     state: WorldContract; // The state of the world
-    settings: AcolyteFightSettings; // The current settings for this mod
+    settings: AcolyteFightSettings; // The current settings for this mod - see acolytefight.d.ts
 }
 
 export interface WorldContract {
 	tick: number;
-	starting: boolean; // Whether spells are allowed to be cast yet
 	started: boolean; // Whether heroes can take damage yet
 
 	heroes: { [id: string]: HeroContract };
@@ -19,8 +18,6 @@ export interface WorldContract {
 	obstacles: { [id: string]: ObstacleContract };
 
 	radius: number; // The current radius of the stage
-
-	ticksPerSecond: number;
 }
 
 export interface WorldObjectContract {
@@ -30,7 +27,9 @@ export interface WorldObjectContract {
 }
 
 export interface HeroContract extends WorldObjectContract {
-	alliance: number;
+	isSelf: boolean; // Is the hero you are controlling
+	isAlly: boolean;
+	isEnemy: boolean;
 	health: number; // The current health of the hero (out of 100)
 	heading: Vec2; // A unit vector representing the direction the Hero is currently facing
 	radius: number; // The radius of the hero

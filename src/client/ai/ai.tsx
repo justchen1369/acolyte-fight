@@ -189,13 +189,11 @@ class AiWorker {
 function worldToState(world: w.World, myHeroId: string): AI.WorldContract {
     const contract: AI.WorldContract = {
         tick: world.tick,
-        starting: engine.isGameStarting(world),
         started: world.tick >= world.startTick,
         heroes: {},
         projectiles: {},
         obstacles: {},
         radius: world.radius,
-        ticksPerSecond: constants.TicksPerSecond,
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
@@ -203,7 +201,9 @@ function worldToState(world: w.World, myHeroId: string): AI.WorldContract {
             const invisible = engine.isHeroInvisible(obj);
             contract.heroes[obj.id] = {
                 id: obj.id,
-                alliance,
+                isSelf: (alliance & constants.Alliances.Self) > 0,
+                isAlly: (alliance & constants.Alliances.Ally) > 0,
+                isEnemy: (alliance & constants.Alliances.Enemy) > 0,
                 radius: obj.radius,
                 pos: invisible ? invisible.initialPos : obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
