@@ -59,7 +59,7 @@ class ModBar extends React.PureComponent<Props, State> {
             <div className="spacer">{this.props.children}</div>
             <PreviewButton>Preview Mod</PreviewButton>
         </> : <>
-            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Play with Mod</HrefItem>
+            <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Home</HrefItem>
             <PageLink page="modding" shrink={isMobile}>Overview</PageLink>
             <PageLink page="modding-spells" shrink={isMobile} error={"spells" in this.props.errors}>Spells</PageLink>
             <PageLink page="modding-sounds" shrink={isMobile} error={"sounds" in this.props.errors}>Sounds</PageLink>
@@ -68,7 +68,7 @@ class ModBar extends React.PureComponent<Props, State> {
             <PageLink page="modding-obstacles" shrink={isMobile} error={"obstacles" in this.props.errors}>Obstacles</PageLink>
             <PageLink page="modding-constants" shrink={isMobile} error={"constants" in this.props.errors}>Constants</PageLink>
             <div className="spacer">{this.props.children}</div>
-            <PreviewButton>Preview Mod</PreviewButton>
+            <PreviewButton>Preview</PreviewButton>
         </>
 
         const vertical = isMobile && <>
