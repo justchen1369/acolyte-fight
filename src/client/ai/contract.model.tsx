@@ -63,5 +63,5 @@ export interface ActionContract {
 	target: Vec2;
     release?: boolean;
 
-    delay?: number; // Number of milliseconds to wait before casting spell
+    delayMilliseconds?: number; // Number of milliseconds to wait before casting spell
 }

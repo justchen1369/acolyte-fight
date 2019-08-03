@@ -47,12 +47,12 @@ function onInput(msg: AI.StateMsgContract) {
         };
         const action = bot.act(input);
         if (action) {
-            const delay = action.delay !== undefined ? action.delay : DefaultDelayMilliseconds;
+            const delayMilliseconds = action.delayMilliseconds !== undefined ? action.delayMilliseconds : DefaultDelayMilliseconds;
             const actionMsg: AI.ActionMsgContract = {
                 type: "action",
                 action,
             };
-            setTimeout(() => send(actionMsg), delay);
+            setTimeout(() => send(actionMsg), delayMilliseconds);
         }
     } catch (exception) {
         console.error("Error in bot code", exception);
