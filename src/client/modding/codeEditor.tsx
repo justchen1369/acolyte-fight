@@ -22,9 +22,9 @@ export class CodeEditor extends React.PureComponent<Props> {
 
     componentWillReceiveProps(newProps: Props) {
         if (newProps.code !== this.props.code) {
-            this.code = newProps.code;
-            if (this.editor) {
-                this.editor.updateCode(this.code);
+            if (this.editor && this.code !== newProps.code) {
+                this.code = newProps.code;
+                this.editor.updateCode(newProps.code);
             }
         }
     }
