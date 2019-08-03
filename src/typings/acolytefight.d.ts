@@ -34,6 +34,7 @@ declare interface AcolyteFightSettings {
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
 	Icons: IconLookup;
+	Code?: string;
 }
 
 declare type ModTree = {
@@ -975,81 +976,4 @@ interface SoundBite {
 
 	wave: WaveType;
 	ratios?: number[];
-}
-
-declare interface WorldContract {
-	tick: number;
-	starting: boolean; // Whether spells are allowed to be cast yet
-	started: boolean; // Whether heroes can take damage yet
-
-	heroes: { [id: string]: HeroContract };
-	projectiles: { [id: string]: ProjectileContract };
-	obstacles: { [id: string]: ObstacleContract };
-
-	radius: number; // The current radius of the stage
-
-	ticksPerSecond: number;
-}
-
-declare interface WorldObjectContract {
-	id: string;
-	pos: Vec2;
-	velocity: Vec2;
-}
-
-declare interface HeroContract extends WorldObjectContract {
-	alliance: number;
-	health: number; // The current health of the hero (out of 100)
-	heading: Vec2; // A unit vector representing the direction the Hero is currently facing
-	radius: number; // The radius of the hero
-	inside: boolean; // Whether the unit in inside or outside the confines of the map
-	linkedToId?: string; // If set, this Hero currently has trapped another Hero in a link. This is the ID of the other Hero (the "victim").
-	casting?: CastingContract; // If set, currently casting a channelled spell
-	shieldTicksRemaining: number; // The number of ticks that the hero will continue to be shielded for, 0 if unshielded
-}
-
-declare interface ProjectileContract extends WorldObjectContract {
-	ownerId: string;
-	spellId: string;
-
-	radius: number;
-}
-
-declare interface CastingContract {
-	spellId: string;
-}
-
-declare interface CooldownsRemainingContract {
-	[spellId: string]: number;
-}
-
-declare interface ObstacleContract extends WorldObjectContract {
-}
-
-declare interface ActionContract {
-	spellId: string;
-	target: Vec2;
-	release?: boolean;
-}
-
-declare type MsgContract =
-	InitMsgContract
-    | StateMsgContract
-	| ActionMsgContract
-
-declare interface InitMsgContract {
-	type: "init";
-	settings: AcolyteFightSettings;
-}
-
-declare interface StateMsgContract {
-	type: "state";
-	heroId: string;
-    state: WorldContract;
-    cooldowns: CooldownsRemainingContract;
-}
-
-declare interface ActionMsgContract {
-    type: "action";
-    action: ActionContract;
 }

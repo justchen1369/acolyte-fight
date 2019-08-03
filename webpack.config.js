@@ -42,6 +42,33 @@ const clientConfig = {
   ],
 };
 
+const aiWorkerConfig = {
+  entry: './src/client/ai/worker.tsx',
+  mode,
+  resolve: {
+    extensions: [".ts", ".tsx", ".js"],
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true,
+        },
+      },
+    ],
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'aiWorker.js'
+  },
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ],
+};
+
 const audioWorkerConfig = {
   entry: './src/client/audio/worker.tsx',
   mode,
@@ -98,4 +125,4 @@ const serverConfig = {
   externals: [nodeExternals()],
 };
 
-module.exports = [ clientConfig, audioWorkerConfig, serverConfig ];
+module.exports = [ clientConfig, aiWorkerConfig, audioWorkerConfig, serverConfig ];

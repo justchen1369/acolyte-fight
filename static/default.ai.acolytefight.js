@@ -1,42 +1,35 @@
-var settings = null;
-
 var center = { x: 0.5, y: 0.5 };
+
 var missRadius = 0.05;
 var dodgeMinRadius = 0.03;
-var reactionTimeMilliseconds = 400;
 var delayMilliseconds = 1000;
 var delayJitterMilliseconds = 500;
+
+var DefaultReactionMilliseconds = 400;
 
 var AllianceSelf = 0x01;
 var AllianceAlly = 0x02;
 var AllianceEnemy = 0x04;
 
-var spellReactionTimeMilliseconds = { // Change the reaction time on certain spells
+var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     retarget: 100,
     move: 200,
 };
 
 var nextSpell = 0;
 
-onmessage = function (e) {
-    var msg = JSON.parse(e.data);
-    if (msg.type === "init") {
-        settings = msg.settings;
-    } else if (msg.type === "state") {
-        var state = msg.state;
-        var heroId = msg.heroId;
-        var cooldowns = msg.cooldowns;
-        handleInput(state, heroId, cooldowns);
-    }
-}
-
-function handleInput(state, heroId, cooldowns) {
+function act(input) {
+    var state = input.state;
+    var heroId = input.heroId;
     var hero = state.heroes[heroId];
+    var cooldowns = input.cooldowns;
+    var settings = input.settings;
+
     var strongest = findStrongest(state.heroes, heroId, AllianceEnemy);
     var closest = findClosest(state.heroes, heroId, AllianceEnemy);
     if (!(hero && strongest && closest)) {
         // Either we're dead, or everyone else is, nothing to do
-        return;
+        return null;
     }
     
     var action = null;
@@ -44,7 +37,7 @@ function handleInput(state, heroId, cooldowns) {
         action =
             recovery(state, hero, cooldowns)
             || dodge(state, hero, cooldowns)
-            || castSpell(state, hero, strongest, cooldowns)
+            || castSpell(state, hero, strongest, cooldowns, settings)
             || focus(hero, strongest)
             || chase(state, hero, cooldowns, strongest)
             || move(state, hero, closest);
@@ -53,9 +46,11 @@ function handleInput(state, heroId, cooldowns) {
     }
 
     if (action) {
-        setTimeout(function() {
-            postMessage(JSON.stringify({ type: "action", action }));
-        }, spellReactionTimeMilliseconds[action.spellId] || reactionTimeMilliseconds);
+        var reactionMilliseconds = ReactionMillisecondsLookup[action.spellId] || DefaultReactionMilliseconds;
+        action.delay = reactionMilliseconds;
+        return action;
+    } else {
+        return null;
     }
 }
 
@@ -157,7 +152,7 @@ function deflect(state, hero, cooldowns, projectile) {
     }
 }
 
-function castSpell(state, hero, opponent, cooldowns) {
+function castSpell(state, hero, opponent, cooldowns, settings) {
     if (!readyForNextSpell(hero)) {
         return null;
     }
@@ -363,3 +358,5 @@ function vectorMidpoint(a, b) {
 function vectorRotateRight(vec) {
 	return { x: vec.y, y: -vec.x };
 }
+
+return { act };

@@ -1,4 +1,5 @@
 import pl from 'planck-js';
+import * as AI from './ai.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
@@ -45,18 +46,11 @@ function startBotIfNecessary(world: w.World, heroId: string) {
         const key = workerKey(world.ui.myGameId, heroId);
         if (!workers.has(key)) {
             console.log("Starting bot", heroId);
-            const allowCustomCode = heroId === world.ui.myHeroId;
-            workers.set(key, new AiWorker(world, heroId, createCodeUrl(allowCustomCode)));
-        }
-    }
-}
+            const worker = new AiWorker(world, heroId);
+            workers.set(key, worker);
 
-function createCodeUrl(allowCustomCode: boolean) {
-    const store = StoreProvider.getState();
-    if (store.aiCode && allowCustomCode) {
-        return `data:text/javascript;base64,${btoa(store.aiCode)}`;
-    } else {
-        return DefaultCodeUrl;
+            worker.start(); // Don't await
+        }
     }
 }
 
@@ -85,21 +79,28 @@ function isMyBot(world: w.World, heroId: string) {
 class AiWorker {
     private gameId: string;
     private heroId: string;
+    private settings: AcolyteFightSettings;
     private worker: Worker;
     private isTerminated = false;
 
-    constructor(world: w.World, heroId: string, codeUrl: string) {
+    constructor(world: w.World, heroId: string) {
         this.gameId = world.ui.myGameId;
         this.heroId = heroId;
+        this.settings = world.settings;
 
-        const worker = new Worker(codeUrl, {
-            credentials: 'omit',
-        });
+        const worker = new Worker("dist/aiWorker.js", { credentials: 'omit' });
         worker.onmessage = (ev) => this.onWorkerMessage(ev);
         this.worker = worker;
+    }
 
-        const initMsg: InitMsgContract = { type: "init", settings: world.settings };
-        worker.postMessage(JSON.stringify(initMsg));
+    async start() {
+        let code = this.settings.Code;
+        if (!code) {
+            const res = await fetch(DefaultCodeUrl);
+            code = await res.text();
+        }
+        const initMsg: AI.InitMsgContract = { type: "init", settings: this.settings, code };
+        this.worker.postMessage(JSON.stringify(initMsg));
     }
 
     /**
@@ -122,12 +123,12 @@ class AiWorker {
             return false;
         }
 
-        let cooldowns: CooldownsRemainingContract = {};
+        let cooldowns: AI.CooldownsRemainingContract = {};
         hero.keysToSpells.forEach(spellId => {
             const next = hero.cooldowns[spellId] || 0;
             cooldowns[spellId] = Math.max(0, next - world.tick);
         });
-        const stateMsg: StateMsgContract = {
+        const stateMsg: AI.StateMsgContract = {
             type: "state",
             heroId: this.heroId,
             state: worldToState(world, this.heroId),
@@ -145,7 +146,7 @@ class AiWorker {
     }
 
     private onWorkerMessage(ev: MessageEvent) {
-        const message: MsgContract = JSON.parse(ev.data);
+        const message: AI.MsgContract = JSON.parse(ev.data);
         if (!message) {
             // Nothing to do
         } else if (message.type === "action") {
@@ -162,8 +163,8 @@ class AiWorker {
     }
 }
 
-function worldToState(world: w.World, myHeroId: string): WorldContract {
-    const contract: WorldContract = {
+function worldToState(world: w.World, myHeroId: string): AI.WorldContract {
+    const contract: AI.WorldContract = {
         tick: world.tick,
         starting: engine.isGameStarting(world),
         started: world.tick >= world.startTick,
