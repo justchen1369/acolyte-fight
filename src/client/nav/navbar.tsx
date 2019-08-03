@@ -16,7 +16,6 @@ import RatingControl from './ratingControl';
 interface Props {
     page: string;
     userId: string;
-    isUsingAI: boolean;
     isModded: boolean;
     inParty: boolean;
 }
@@ -28,7 +27,6 @@ function stateToProps(state: s.State): Props {
     return {
         page: state.current.page,
         userId: state.userId,
-        isUsingAI: !!state.aiCode,
         isModded: rooms.isModded(state.room),
         inParty: !!state.party,
     };
@@ -63,7 +61,6 @@ class NavBar extends React.PureComponent<Props, State> {
             <PageLink page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>
             {<PageLink page="regions"><i className="fas fa-globe-americas" title="Regions" /></PageLink>}
             {this.props.isModded && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></PageLink>}
-            {this.props.isUsingAI && <PageLink page="ai" badge={this.props.isUsingAI}><i className="icon fas fa-microchip" title="AI" /></PageLink>}
             {this.props.inParty && <PageLink page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></PageLink>}
             <div className="spacer" />
             <RatingControl />
