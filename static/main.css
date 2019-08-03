@@ -1863,6 +1863,17 @@ textarea.ai-js {
     box-shadow: 5px 5px 5px black;
     padding: 20px;
     margin: 12px 0;
+    animation: shine-in 0.5s;
+    transition: background-color 0.2s;
+}
+
+.region-list-section .region:hover {
+    background: #555;
+}
+
+@keyframes shine-in {
+    from { background: #666 }
+    to { background: #333 }
 }
 
 .region-list-section .region-name {
