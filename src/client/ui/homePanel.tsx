@@ -28,8 +28,8 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         isLoggedIn: state.loggedIn,
-        titleLeft: state.room.settings.World.TitleLeft,
-        titleRight: state.room.settings.World.TitleRight,
+        titleLeft: state.room.settings.Mod.titleLeft,
+        titleRight: state.room.settings.Mod.titleRight,
     };
 }
 

@@ -45,6 +45,9 @@ declare interface ModSettings {
 	name: string;
 	author: string;
 	description: string;
+
+	titleLeft: string; // On the homepage, this text flies in from left
+	titleRight: string; // On the homepage, this text flies in from right
 }
 
 declare interface HeroSettings {
@@ -86,9 +89,6 @@ declare interface WorldSettings {
 	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
 
 	BotName: string; // What to call the bot
-
-	TitleLeft: string; // On the homepage, this text flies in from left
-	TitleRight: string; // On the homepage, this text flies in from right
 }
 
 declare interface MatchmakingSettings {

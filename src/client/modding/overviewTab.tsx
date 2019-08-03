@@ -174,14 +174,11 @@ class OverviewTab extends React.PureComponent<Props, State> {
             name: `${this.props.playerName}'s mod`,
             author: this.props.playerName,
             description: new Date().toUTCString(),
-        };
-        const World: Partial<WorldSettings> = {
-            TitleLeft: `${this.props.playerName}'s`,
-            TitleRight: "Mod!",
+            titleLeft: `${this.props.playerName}'s`,
+            titleRight: "Mod!",
         };
         const initialMod: ModTree = {
             Mod: meta,
-            World,
         };
         const codeTree = convert.modToCode(initialMod);
         StoreProvider.dispatch({ type: "updateCodeTree", codeTree });

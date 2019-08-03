@@ -53,9 +53,6 @@ const World: WorldSettings = {
     SwatchHealth: 100,
 
     BotName: "AcolyteBot",
-
-    TitleLeft: "Acolyte",
-    TitleRight: "Fight!",
 }
 
 const Obstacle: ObstacleSettings = {
@@ -2436,6 +2433,9 @@ export const Mod: ModSettings = {
     name: null,
     author: null,
     description: null,
+
+    titleLeft: "Acolyte",
+    titleRight: "Fight!",
 };
 
 export const DefaultSettings: AcolyteFightSettings = {
