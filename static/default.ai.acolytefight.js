@@ -17,6 +17,7 @@ var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     move: 200,
 };
 
+var alreadyChosenSpells = false;
 var nextSpell = 0;
 
 function act(input) {
@@ -43,7 +44,9 @@ function act(input) {
             || chase(state, hero, cooldowns, strongest)
             || move(state, hero, closest);
     } else {
-        action = move(state, hero, closest);
+        action =
+            chooseSpells(settings)
+            || move(state, hero, closest);
     }
 
     if (action) {
@@ -53,6 +56,39 @@ function act(input) {
     } else {
         return null;
     }
+}
+
+function chooseSpells(settings) {
+    if (alreadyChosenSpells) {
+        return null;
+    }
+    alreadyChosenSpells = true;
+
+    return {
+        spells: randomSpells(settings),
+    };
+}
+
+function randomSpells(settings) {
+	var keyBindings = {};
+	var allOptions = settings.Choices.Options;
+	for (var key in allOptions) {
+        var options = allOptions[key];
+
+        var spells = [];
+        for (var i = 0; i < options.length; ++i) {
+            var row = options[i];
+            for (var j = 0; j < row.length; ++j) {
+                var spell = row[j];
+                spells.push(spell);
+            }
+        }
+
+		if (spells.length > 1) {
+			keyBindings[key] = spells[Math.floor(Math.random() * spells.length)];
+		}
+	}
+	return keyBindings;
 }
 
 function findClosest(heroes, myHeroId, allianceFlags) {

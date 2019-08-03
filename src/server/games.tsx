@@ -616,22 +616,10 @@ export function addBot(game: g.Game) {
 
 	game.bots.set(heroId, null);
 
-	const keyBindings = randomKeyBindings(game);
+	const keyBindings = {};
 	queueAction(game, { gid: game.id, hid: heroId, type: "bot", keyBindings });
 
 	return heroId;
-}
-
-function randomKeyBindings(game: g.Game): KeyBindings {
-	const keyBindings: KeyBindings = {};
-	const allOptions = DefaultSettings.Choices.Options
-	for (const key in allOptions) {
-		const options = _.flatten(allOptions[key]);
-		if (options.length > 1) {
-			keyBindings[key] = options[Math.floor(Math.random() * options.length)];
-		}
-	}
-	return keyBindings;
 }
 
 function findExistingSlot(game: g.Game, replaceBots: boolean = true): string {
