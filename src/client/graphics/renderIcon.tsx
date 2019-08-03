@@ -8,7 +8,7 @@ export function renderIconButton(ctx: CanvasRenderingContext2D, icon: Path2D, co
     // Button
     const gradient = ctx.createLinearGradient(0, 0, width, height);
     gradient.addColorStop(0, color);
-    gradient.addColorStop(1, ColTuple.parse(color).darken(0.3).string());
+    gradient.addColorStop(1, ColTuple.parse(color).darken(0.2).string());
     ctx.fillStyle = gradient;
 
     ctx.beginPath();

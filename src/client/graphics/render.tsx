@@ -2630,7 +2630,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 
         const gradient = ctx.createLinearGradient(0, 0, size, size);
         gradient.addColorStop(0, buttonState.color);
-        gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.3).string());
+        gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.2).string());
         ctx.fillStyle = gradient;
 		
         ctx.beginPath();
