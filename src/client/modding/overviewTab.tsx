@@ -67,7 +67,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     }
 
     componentWillReceiveProps(newProps: Props) {
-        if (newProps.currentMod != this.props.currentMod) {
+        if (newProps.currentMod && newProps.currentMod !== this.props.currentMod) {
             this.setState({ code: stringifyMod(newProps.currentMod) });
         }
     }
@@ -90,7 +90,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private renderCurrentState() {
         if (this.props.codeTree) {
-            if (this.props.currentMod) {
+            if (this.state.code) {
                 return this.renderCurrentMod();
             } else {
                 return this.renderCurrentModError();
@@ -165,7 +165,6 @@ class OverviewTab extends React.PureComponent<Props, State> {
             const codeTree = convert.modToCode(mod);
             StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
         } catch (exception) {
-            console.error(exception);
             this.setState({ codeError: `${exception}` });
         }
     }
