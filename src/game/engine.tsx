@@ -1191,6 +1191,11 @@ function handleSync(ev: w.Syncing, world: w.World) {
 				const position = obj.body.getPosition();
 				position.add(posDiff);
 				obj.body.setPosition(position);
+
+				if (!obj.uiEase) {
+					obj.uiEase = vector.zero();
+				}
+				obj.uiEase.sub(posDiff);
 			}
 		}
 

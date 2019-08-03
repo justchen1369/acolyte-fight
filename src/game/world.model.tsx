@@ -370,6 +370,8 @@ export interface WorldObjectBase {
 	posDelta?: pl.Vec2;
 	velocityDelta?: pl.Vec2;
 	impulseDelta?: pl.Vec2;
+
+	uiEase?: pl.Vec2;
 }
 
 export interface HighlightSource {
@@ -409,6 +411,8 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 
 	render: SwatchRender[];
 	sound?: string;
+
+	uiEase?: pl.Vec2;
 }
 
 export interface CircleShape {
@@ -462,6 +466,7 @@ export interface Hero extends WorldObjectBase {
 	spellsToKeys: Map<string, string>;
 	spellChangedTick: Map<string, number>;
 
+	// These fields are not synced
 	uiHealth: number;
 	uiDestroyedBuffs: Buff[];
 }

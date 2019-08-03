@@ -35,6 +35,8 @@ const DefaultCastingGlow = 0.1;
 const ShadowOffset = pl.Vec2(0, 0.005);
 const ShadowFeatherRadius = 0.001;
 
+const EaseDecay = 0.9;
+
 interface SwirlContext {
 	color?: string;
 	baseVelocity?: pl.Vec2;
@@ -43,6 +45,7 @@ interface SwirlContext {
 }
 
 interface RenderObstacleParams {
+	pos: pl.Vec2;
 	flash: number;
 	healthProportion: number;
 	ease: number;
@@ -777,8 +780,15 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
 	const healthProportion = obstacle.health / obstacle.maxHealth;
 	const easeMultiplier = ease(Math.max(obstacle.createTick, world.ui.initialRenderTick), world);
+	
+	const pos = obstacle.body.getPosition().clone();
+	if (obstacle.uiEase) {
+		pos.add(obstacle.uiEase);
+		obstacle.uiEase.mul(EaseDecay);
+	}
 
 	const params: RenderObstacleParams = {
+		pos,
 		flash,
 		healthProportion,
 		ease: easeMultiplier,
@@ -1058,6 +1068,11 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		pos.addMul(HeroColors.EaseInDistance * easeMultiplier, direction);
 
 		renderHeroArrival(ctxStack, pos, direction, arriving, hero, world);
+	}
+
+	if (hero.uiEase) {
+		pos.add(hero.uiEase);
+		hero.uiEase.mul(EaseDecay);
 	}
 
 	renderRangeIndicator(ctxStack, hero, pos, world);
