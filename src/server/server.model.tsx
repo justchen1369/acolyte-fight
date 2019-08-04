@@ -67,7 +67,8 @@ export interface Replay {
 export interface Game extends Replay {
     created: moment.Moment;
 
-    maxPlayers: number;
+    matchmaking: MatchmakingSettings;
+
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
     reconnectKeys: Map<string, string>; // key -> heroId

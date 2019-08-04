@@ -267,7 +267,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
 		segment: segments.calculateSegment(room.id, partyId, isPrivate),
-		maxPlayers: room.Matchmaking.MaxPlayers,
+		matchmaking: { ...room.Matchmaking },
 		roomId: room.id,
 		partyId,
 		isPrivate,
@@ -551,7 +551,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	}
 
 	// No existing slots, create a new one
-	const newPlayersAllowed = game.joinable && game.active.size < game.maxPlayers;
+	const newPlayersAllowed = game.joinable && game.active.size < game.matchmaking.MaxPlayers;
 	if (!heroId && newPlayersAllowed) {
 		heroId = formatHeroId(game.numPlayers++);
 	}
@@ -606,8 +606,11 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	return { heroId, reconnectKey };
 }
 
+export function addBots(game: g.Game) {
+}
+
 export function addBot(game: g.Game) {
-	if (game.numPlayers >= game.maxPlayers || game.active.size === 0 || !game.joinable) {
+	if (game.numPlayers >= game.matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
 		return null;
 	}
 
@@ -649,7 +652,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && data.actions.some(action => isSpell(action))) {
 		// Casting any spell closes the game
-		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size, game.locked, game.maxPlayers);
+		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size, game.locked, game.matchmaking.MaxPlayers);
 
 		const newCloseTick = game.tick + joinPeriod;
 		if (newCloseTick < game.closeTick) {
