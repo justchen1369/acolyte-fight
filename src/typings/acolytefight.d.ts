@@ -97,6 +97,7 @@ declare interface MatchmakingSettings {
 	MaxBots: number; // maximum number of bots to add when Play vs AI clicked
 	MaxPlayers: number; // Maximum number of players in one game
 	TeamGameProbability: number; // Probability of creating a team game if there are an even number of players
+	AllowBotTeams: boolean; // Allow teams even when bots are in the game
 }
 
 declare interface Layouts {

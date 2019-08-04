@@ -16,6 +16,7 @@ const Matchmaking: MatchmakingSettings = {
     MaxBots: 2,
     MaxPlayers: 7,
     TeamGameProbability: 0.5,
+    AllowBotTeams: false,
 };
 
 const Hero: HeroSettings = {
