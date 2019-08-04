@@ -516,12 +516,7 @@ function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {
 
 		const game = getStore().activeGames.get(data.gameId);
 		if (game && game.active.has(socket.id)) {
-			const targetGameSize = Math.random() < 0.5 ? 2 : 3;
-			const botsToAdd = Math.max(1, targetGameSize - game.numPlayers);
-			for (let i = 0; i < botsToAdd; ++i) {
-				games.addBot(game);
-			}
-			logger.info(`Game [${game.id}]: added ${botsToAdd} bots`);
+			games.addBots(game);
 		}
 	} catch (exception) {
 		logger.error(exception);

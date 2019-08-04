@@ -12,6 +12,8 @@ import Code from '!!raw-loader!./default.ai.js';
 const lifeSteal = 0.25;
 
 const Matchmaking: MatchmakingSettings = {
+    MinBots: 1,
+    MaxBots: 2,
 	MaxPlayers: 6,
 };
 

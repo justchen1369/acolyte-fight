@@ -92,6 +92,8 @@ declare interface WorldSettings {
 }
 
 declare interface MatchmakingSettings {
+	MinBots: number; // minimum number of bots to add when Play vs AI clicked
+	MaxBots: number; // maximum number of bots to add when Play vs AI clicked
 	MaxPlayers: number; // Maximum number of players in one game
 }
 

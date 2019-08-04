@@ -607,6 +607,12 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 }
 
 export function addBots(game: g.Game) {
+	const targetGameSize = 1 + game.matchmaking.MinBots + Math.round(Math.random() * (game.matchmaking.MaxBots - game.matchmaking.MinBots));
+	const botsToAdd = Math.max(1, targetGameSize - game.numPlayers);
+	for (let i = 0; i < botsToAdd; ++i) {
+		addBot(game);
+	}
+	logger.info(`Game [${game.id}]: added ${botsToAdd} bots`);
 }
 
 export function addBot(game: g.Game) {
