@@ -113,8 +113,6 @@ export namespace HeroColors {
 		"#a97fc1",
 	];
 
-	export const LavaFlashInterval = 20;
-
 	export const DamageGrowFactor = 0.25;
 	export const DamageGlowFactor = 1.0;
 	export const DamageFlashTicks = 10;
@@ -125,15 +123,10 @@ export namespace HeroColors {
 
 	export const FlashTicks = 6;
 
-	export const RangeIndicatorWidth = Pixel * 2;
-
 	export const NameMargin = Pixel * 2;
 	export const NameFontPixels = 9;
 	export const NameHeightPixels = 11;
 	export const NameWidthPixels = 100;
-
-	export const IconSizePixels = 8;
-	export const IconMargin = Pixel * 8;
 };
 
 export namespace Atlas {
