@@ -2094,7 +2094,7 @@ const saber: Spell = {
     glow: 0.2,
     bloom: 0.03,
     strike: {
-        ticks: 5,
+        ticks: 6,
         flash: true,
     },
 
@@ -2148,6 +2148,10 @@ const dualSaber: Spell = {
     shine: 0.1,
     glow: 0.2,
     bloom: 0.03,
+    strike: {
+        ticks: 6,
+        flash: true,
+    },
 
     sound: "saber",
     action: "saber",
@@ -2205,9 +2209,9 @@ const shield: Spell = {
     glow: 0.2,
     bloom: 0.03,
     strike: {
-        ticks: 3,
+        ticks: 10,
         flash: true,
-        growth: 0.05,
+        growth: 0.3,
     },
 
     action: "shield",
@@ -2243,7 +2247,7 @@ const icewall: Spell = {
     glow: 0.2,
     bloom: 0.03,
     strike: {
-        ticks: 3,
+        ticks: 10,
         flash: true,
         growth: 0.05,
     },
