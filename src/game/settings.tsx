@@ -67,10 +67,10 @@ const Obstacle: ObstacleSettings = {
 }
 
 const Visuals: VisualSettings = {
-	WorldColor: '#222',
+	DefaultWorldColor: '#222',
 	WorldAnimateWinTicks: 15,
 	WorldWinGrowth: 0.05,
-	GlowRadius: 4 * Pixel,
+	DefaultGlowRadius: 4 * Pixel,
 
 	ShakeDistance: 0.02,
 	ShakeTicks: 3,
@@ -90,7 +90,7 @@ const Visuals: VisualSettings = {
 	OnlineColor: '#ccc',
 
 	ChargingRadius: Pixel * 7,
-	ChargingFlashTicks: 15,
+	CastingFlashTicks: 15,
 
 	DamageGrowFactor: 0.25,
 	DamageGlowFactor: 1.0,
@@ -100,7 +100,7 @@ const Visuals: VisualSettings = {
 	ShieldGrowFactor: 0.05,
 	ShieldFlashTicks: 3,
 
-	FlashTicks: 6,
+	DefaultFlashTicks: 6,
 
 	NameMargin: Pixel * 2,
 	NameFontPixels: 9,

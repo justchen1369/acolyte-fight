@@ -354,7 +354,7 @@ function renderAttachedLink(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wor
 		return;
 	}
 
-	applyHighlight(hero.link.redirectDamageTick, hero.link, world, hero.link.render.redirectFlash, hero.link.render.redirectGrowth);
+	applyHighlight(hero.link.redirectDamageTick, hero.link, world, hero.link.render.redirectFlash, hero.link.render.redirectGrowth, hero.link.render.redirectFlashTicks);
 	renderLinkBetween(ctxStack, hero, target, world, hero.link.render, hero.link.uiHighlight);
 }
 
@@ -773,7 +773,7 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 	applyHighlight(obstacle.activeTick, obstacle, world);
 
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / Visuals.FlashTicks));
+	const flash = Math.max(0, (1 - hitAge / Visuals.DefaultFlashTicks));
 	const healthProportion = obstacle.health / obstacle.maxHealth;
 	const easeMultiplier = ease(Math.max(obstacle.createTick, world.ui.initialRenderTick), world);
 	
@@ -853,7 +853,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	let feather: r.FeatherConfig = null;
 	if (fill.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: fill.bloom !== undefined ? fill.bloom : Visuals.GlowRadius,
+			sigma: fill.bloom !== undefined ? fill.bloom : Visuals.DefaultGlowRadius,
 			alpha: fill.glow,
 		};
 	}
@@ -1028,7 +1028,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 	const highlight: w.TrailHighlight = {
 		tag: obj.id,
 		fromTick: activeTick,
-		maxTicks: ticks || Visuals.FlashTicks,
+		maxTicks: ticks || Visuals.DefaultFlashTicks,
 		glow,
 		growth,
 	};
@@ -1321,7 +1321,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			} : null,
 		});
 	} else if (hero.uiCastTrail) {
-		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.ChargingFlashTicks;
+		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.CastingFlashTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
 			glx.circle(ctxStack, pos, {
@@ -1597,7 +1597,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	let feather: r.FeatherConfig = null;
 	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: shield.bloom !== undefined ? shield.bloom : Visuals.GlowRadius,
+			sigma: shield.bloom !== undefined ? shield.bloom : Visuals.DefaultGlowRadius,
 			alpha: shield.glow,
 		};
 	}
@@ -1954,7 +1954,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		color,
 		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) ? {
-			sigma: render.bloom !== undefined ? render.bloom : Visuals.GlowRadius,
+			sigma: render.bloom !== undefined ? render.bloom : Visuals.DefaultGlowRadius,
 			alpha: render.glow,
 		} : null,
 	};
@@ -2144,7 +2144,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : Visuals.GlowRadius),
+			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : Visuals.DefaultGlowRadius),
 			alpha: trail.glow,
 		};
 	}

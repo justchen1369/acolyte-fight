@@ -648,6 +648,7 @@ declare interface RenderLink extends RenderParamsBase {
 
 	redirectGrowth?: number;
 	redirectFlash?: boolean;
+	redirectFlashTicks?: number;
 }
 
 declare interface RenderReticule extends RenderParamsBase {
@@ -982,40 +983,42 @@ interface SoundBite {
 }
 
 interface VisualSettings {
-	WorldColor: string;
+	// Default projectile visuals
+	DefaultFlashTicks: number;
+	DefaultGlowRadius: number;
+
+	// Map visuals
+	DefaultWorldColor: string;
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;
-	GlowRadius: number;
 
+	// How much to shake the map when projectiles hit
 	ShakeDistance: number;
 	ShakeTicks: number;
 
+	// How much to flash the map when projectiles hit
 	HighlightFactor: number;
 	HighlightTicks: number;
 
+	// Controls the rate at which acolytes arrive/depart
 	EaseTicks: number;
 	EaseInDistance: number;
 	EasePower: number;
-
 	ExitTicks: number;
 
-	MyHeroColor: string;
-	AllyColor: string;
-	BotColor: string;
-	OnlineColor: string;
-
+	// Spell casting visuals
 	ChargingRadius: number;
-	ChargingFlashTicks: number;
+	CastingFlashTicks: number;
 
+	// Visuals when acolyte takes damage
 	DamageGrowFactor: number;
 	DamageGlowFactor: number;
 	DamageFlashTicks: number;
 
+	// Visuals for shields
 	ShieldGlowFactor: number;
 	ShieldGrowFactor: number;
 	ShieldFlashTicks: number;
-
-	FlashTicks: number;
 
 	// Controls the name floating above the acolyte
 	NameMargin: number;
@@ -1036,7 +1039,13 @@ interface VisualSettings {
 	ButtonBarGap: number;
 
 	// Acolyte colors
-	Colors: string[];
-	TeamColors: string[];
+	MyHeroColor: string;
+	AllyColor: string;
+	BotColor: string;
+
+	OnlineColor: string; // Color in the scoreboard if player not in your current game
+
+	Colors: string[]; // List of all acolyte colors
+	TeamColors: string[]; // List of all acolyte team colors
 
 }

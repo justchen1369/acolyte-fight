@@ -84,7 +84,7 @@ export function initialWorld(mod: Object): w.World {
 
 	let world: w.World = {
 		seed: null,
-		color: Visuals.WorldColor,
+		color: Visuals.DefaultWorldColor,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
