@@ -113,6 +113,9 @@ export namespace HeroColors {
 		"#a97fc1",
 	];
 
+	export const ChargingRadius = Pixel * 7;
+	export const ChargingFlashTicks = 15;
+
 	export const DamageGrowFactor = 0.25;
 	export const DamageGlowFactor = 1.0;
 	export const DamageFlashTicks = 10;
@@ -138,15 +141,6 @@ export namespace HealthBar {
 	export const HeroRadiusFraction = 0.95;
 	export const Height = Pixel * 2;
 	export const Margin = Pixel * 2;
-}
-export namespace ChargingIndicator {
-	export const MinWidth = Pixel * 7;
-	export const TrailTicks = 15;
-}
-export namespace DashIndicator {
-	export const Color = "#44eeff";
-	export const Height = Pixel * 2;
-	export const Margin = Pixel * 0;
 }
 export namespace ButtonBar {
 	export const MaxHeightProportion = 0.15;

@@ -11,7 +11,7 @@ import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { Alliances, ButtonBar, ChargingIndicator, DashIndicator, HealthBar, HeroColors } from '../../game/constants';
+import { Alliances, ButtonBar, HealthBar, HeroColors } from '../../game/constants';
 import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
 import ColTuple from './colorTuple';
 import { renderIconOnly } from './renderIcon';
@@ -1297,14 +1297,14 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		glx.circle(ctxStack, pos, {
 			color: strokeColor,
 			minRadius: radius,
-			maxRadius: radius + ChargingIndicator.MinWidth,
+			maxRadius: radius + HeroColors.ChargingRadius,
 			feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 				sigma: DefaultBloomRadius,
 				alpha: DefaultCastingGlow,
 			} : null,
 		});
 	} else if (hero.uiCastTrail) {
-		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / ChargingIndicator.TrailTicks;
+		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / HeroColors.ChargingFlashTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
 			glx.circle(ctxStack, pos, {
