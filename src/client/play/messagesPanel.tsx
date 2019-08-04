@@ -9,7 +9,7 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as mathUtils from '../core/mathUtils';
 import * as StoreProvider from '../storeProvider';
-import { ButtonBar, Matchmaking, TicksPerSecond } from '../../game/constants';
+import { Matchmaking, TicksPerSecond } from '../../game/constants';
 import Link from '../controls/link';
 import DeadMessage from './messages/deadMessage';
 import LeftMessage from './messages/leftMessage';
@@ -33,6 +33,7 @@ interface Props {
     isWaiting: boolean;
     numOnline: number;
     buttonBar: w.ButtonConfig;
+    settings: AcolyteFightSettings;
     options: m.GameOptions;
     exitable: boolean;
     items: s.NotificationItem[];
@@ -54,6 +55,7 @@ function stateToProps(state: s.State): Props {
         isWaiting: world.tick < state.world.startTick,
         numOnline: state.online.size,
         buttonBar: world.ui.buttonBar,
+        settings: world.settings,
         options: state.options,
         exitable: worldInterruptible(world),
         items: state.items,
@@ -70,6 +72,8 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     render() {
         // Offset the messages from the button bar
+        const Visuals = this.props.settings.Visuals;
+
         let bottom = 0;
         let left: number = undefined;
         let right: number = undefined;
@@ -77,7 +81,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         if (buttonBar) {
             if (buttonBar.view === "bar") {
                 left = 0;
-                bottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+                bottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
             } else if (buttonBar.view === "wheel") {
                 if (this.props.options.wheelOnRight) {
                     // Wheel is right-aligned, put messages to the left

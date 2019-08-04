@@ -7,7 +7,7 @@ import * as processor from './processor';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
 import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
-import { TicksPerTurn, TicksPerSecond, HeroColors } from '../../game/constants';
+import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
 
 let tickQueue = new Array<m.TickMsg>();

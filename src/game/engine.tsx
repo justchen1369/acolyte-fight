@@ -11,7 +11,7 @@ import * as vector from './vector';
 import * as w from './world.model';
 import { modToSettings } from './modder';
 
-import { Alliances, Categories, Matchmaking, HeroColors, TicksPerSecond } from './constants';
+import { Alliances, Categories, TicksPerSecond } from './constants';
 
 const NeverTicks = 1e6;
 const Precision = 0.0001;
@@ -74,6 +74,7 @@ export function version() {
 
 export function initialWorld(mod: Object): w.World {
 	const settings = modToSettings(mod);
+	const Visuals = settings.Visuals;
 
 	const def: pl.WorldDef = {
 		positionIterations: 3,
@@ -83,7 +84,7 @@ export function initialWorld(mod: Object): w.World {
 
 	let world: w.World = {
 		seed: null,
-		color: constants.HeroColors.WorldColor,
+		color: Visuals.WorldColor,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
@@ -1300,6 +1301,8 @@ function handleClosing(ev: w.Closing, world: w.World) {
 }
 
 function assignTeams(numTeams: number, world: w.World): string[][] {
+	const Visuals = world.settings.Visuals;
+
 	if (numTeams <= 1) {
 		return null;
 	}
@@ -1338,14 +1341,14 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 	for (let i = 0; i < teams.length; ++i) {
 		const team = teams[i];
 		const teamId = `team${i}`;
-		const teamColor = team.some(heroId => isPresentOrPastSelf(heroId, world)) ? HeroColors.AllyColor : HeroColors.TeamColors[i];
+		const teamColor = team.some(heroId => isPresentOrPastSelf(heroId, world)) ? Visuals.AllyColor : Visuals.TeamColors[i];
 
 		for (let j = 0; j < team.length; ++j) {
 			const heroId = team[j];
 			world.teamAssignments = world.teamAssignments.set(heroId, teamId);
 
 			const player = world.players.get(heroId);
-			player.uiColor = isPresentOrPastSelf(heroId, world) ? HeroColors.MyHeroColor : colorWheel.teamColor(teamColor);
+			player.uiColor = isPresentOrPastSelf(heroId, world) ? Visuals.MyHeroColor : colorWheel.teamColor(teamColor);
 		}
 
 		world.teams = world.teams.set(teamId, {
@@ -1375,6 +1378,7 @@ function isPresentOrPastSelf(heroId: string, world: w.World) {
 }
 
 function handleBotting(ev: w.Botting, world: w.World) {
+	const Visuals = world.settings.Visuals;
 	const World = world.settings.World;
 
 	console.log("Bot joined:", ev.heroId);
@@ -1398,8 +1402,8 @@ function handleBotting(ev: w.Botting, world: w.World) {
 		userId: null,
 		userHash: null,
 		name: World.BotName,
-		uiBaseColor: HeroColors.BotColor,
-		uiColor: HeroColors.BotColor,
+		uiBaseColor: Visuals.BotColor,
+		uiColor: Visuals.BotColor,
 		isMobile: false,
 		isBot: true,
 		isSharedBot: true,
@@ -1455,8 +1459,10 @@ function handleJoining(ev: w.Joining, world: w.World) {
 }
 
 function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
+	const Visuals = world.settings.Visuals;
+	
 	if (heroId === world.ui.myHeroId || userHash === world.ui.myUserHash) {
-		return HeroColors.MyHeroColor;
+		return Visuals.MyHeroColor;
 	} else if (world.teamAssignments.has(heroId)) {
 		const teamId = world.teamAssignments.get(heroId);
 		const team = world.teams.get(teamId);
@@ -1467,6 +1473,8 @@ function choosePlayerColor(heroId: string, userHash: string, baseColor: string, 
 }
 
 function chooseNewPlayerColor(preferredColor: string, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	let alreadyUsedColors = new Set<string>();	
 	world.players.forEach(player => {
 		if (world.activePlayers.has(player.heroId)) {
@@ -1474,24 +1482,14 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 		}
 	});	
  	let uiColor: string = null;
-	if (preferredColor && !alreadyUsedColors.has(preferredColor)) {
-		uiColor = colorWheel.takeColor(preferredColor)
+	if (preferredColor) {
+		uiColor = colorWheel.takeColor(preferredColor, alreadyUsedColors, Visuals.Colors)
 	} else {
-		uiColor = colorWheel.takeColor(null);
-	}
-
-	if (!uiColor || alreadyUsedColors.has(uiColor)) {
-		for (let i = 0; i < HeroColors.Colors.length; ++i) {	
-			let candidate = HeroColors.Colors[i];
-			if (!alreadyUsedColors.has(candidate)) {	
-				uiColor = candidate;	
-				break;	
-			}	
-		}	
+		uiColor = colorWheel.takeColor(null, alreadyUsedColors, Visuals.Colors);
 	}
 
 	if (!uiColor) {
-		uiColor = HeroColors.Colors[0];
+		uiColor = Visuals.Colors[0];
 	}
 
  	return uiColor;	
@@ -3179,10 +3177,12 @@ function shrink(world: w.World) {
 }
 
 function reap(world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	let heroKilled = false;
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if ((obj.exitTick && world.tick >= obj.exitTick + HeroColors.ExitTicks) || obj.health <= 0 && !hasHorcrux(obj, world)) {
+			if ((obj.exitTick && world.tick >= obj.exitTick + Visuals.ExitTicks) || obj.health <= 0 && !hasHorcrux(obj, world)) {
 				destroyObject(world, obj);
 				if (!obj.exitTick) {
 					// Exited intentionally, not a kill

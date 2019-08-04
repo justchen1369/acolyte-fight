@@ -2,7 +2,6 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
-import * as constants from '../../game/constants';
 import * as infoPanelHelpers from './metrics';
 import * as StoreProvider from '../storeProvider';
 import * as m from '../../game/messages.model';
@@ -19,20 +18,21 @@ interface OwnProps {
 interface Props extends OwnProps {
     color: string;
     silenced: boolean;
-    world: w.World;
 }
 interface State {
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    const world = state.world;
     const userHash = ownProps.online.userHash;
 
     const playerLookup = playerHelper.calculatePlayerLookup(state);
     const player = playerLookup.get(userHash);
 
-    let color = constants.HeroColors.OnlineColor;
+    const Visuals = world.settings.Visuals;
+    let color = Visuals.OnlineColor;
     if (userHash === state.world.ui.myUserHash) {
-        color = constants.HeroColors.MyHeroColor;
+        color = Visuals.MyHeroColor;
     } else if (player && !player.dead) {
         color = heroColor(player.heroId, state.world);
     }
@@ -41,7 +41,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         color,
         silenced: state.silenced.has(userHash),
-        world: state.world,
     };
 }
 

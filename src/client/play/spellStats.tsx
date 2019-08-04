@@ -4,7 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as spellUtils from '../core/spellUtils';
-import { ButtonBar, TicksPerSecond } from '../../game/constants';
+import { TicksPerSecond } from '../../game/constants';
 
 interface OwnProps {
     spellId: string;

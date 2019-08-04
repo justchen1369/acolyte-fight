@@ -11,7 +11,7 @@ import * as r from './render.model';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
-import { Alliances, ButtonBar, HealthBar, HeroColors } from '../../game/constants';
+import { Alliances } from '../../game/constants';
 import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
 import ColTuple from './colorTuple';
 import { renderIconOnly } from './renderIcon';
@@ -21,8 +21,6 @@ export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
-
-const AtlasAiIcon = "ai";
 
 const DefaultBloomRadius = 0.03;
 const DefaultParticleBloomRadius = 0.015;
@@ -222,6 +220,7 @@ function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOp
 }
 
 function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstruction[] {
+	const Visuals = world.settings.Visuals;
 	const instructions = new Array<r.AtlasInstruction>();
 
 	world.players.forEach(player => {
@@ -230,9 +229,9 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 			type: "text",
 			text: player.name,
 			color: 'rgba(255, 255, 255, 0.3)',
-			font: `${HeroColors.NameFontPixels * options.retinaMultiplier}px Helvetica,Arial,sans-serif`,
-			height: Math.ceil(options.retinaMultiplier * HeroColors.NameHeightPixels),
-			width: Math.ceil(options.retinaMultiplier * HeroColors.NameWidthPixels),
+			font: `${Visuals.NameFontPixels * options.retinaMultiplier}px Helvetica,Arial,sans-serif`,
+			height: Math.ceil(options.retinaMultiplier * Visuals.NameHeightPixels),
+			width: Math.ceil(options.retinaMultiplier * Visuals.NameWidthPixels),
 		});
 	});
 	return instructions;
@@ -658,14 +657,16 @@ function renderJumpSmoke(ctxStack: CanvasCtxStack, color: string, pos: pl.Vec2, 
 }
 
 function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	if (world.ui.myHeroId && !(ev.owner === world.ui.myHeroId || ev.objectId === world.ui.myHeroId)) {
 		return;
 	}
 
 	const shake: w.Shake = {
 		fromTick: ev.tick,
-		maxTicks: HeroColors.ShakeTicks,
-		direction: vector.relengthen(ev.direction, HeroColors.ShakeDistance),
+		maxTicks: Visuals.ShakeTicks,
+		direction: vector.relengthen(ev.direction, Visuals.ShakeDistance),
 	};
 	if (world.tick < shake.fromTick + shake.maxTicks) {
 		world.ui.shakes.push(shake);
@@ -673,7 +674,7 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 
 	const highlight: w.MapHighlight = {
 		fromTick: ev.tick,
-		maxTicks: HeroColors.HighlightTicks,
+		maxTicks: Visuals.HighlightTicks,
 		color: ev.color || '#ffffff',
 	};
 	if (world.tick < highlight.fromTick + highlight.maxTicks) {
@@ -682,14 +683,16 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 }
 
 function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	const shake = takeShakes(world);
 	const pos = pl.Vec2(0.5 + shake.x, 0.5 + shake.y);
 
 	let scale = 1;
 	let color: ColTuple;
 	if (world.winner) {
-		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / HeroColors.WorldAnimateWinTicks);
-		scale *= 1 + HeroColors.WorldWinGrowth * proportion;
+		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / Visuals.WorldAnimateWinTicks);
+		scale *= 1 + Visuals.WorldWinGrowth * proportion;
 		color = ColTuple.parse(heroColor(world.winner, world)).darken(0.5 * (1 - proportion));
 	} else {
 		color = ColTuple.parse(world.color);
@@ -697,7 +700,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
 		const highlight = takeHighlights(world);
 		if (highlight) {
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
-			color.mix(ColTuple.parse(highlight.color), HeroColors.HighlightFactor * proportion);
+			color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
 		}
 	}
 
@@ -765,10 +768,12 @@ function takeHighlights(world: w.World): w.MapHighlight {
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
+	const Visuals = world.settings.Visuals;
+
 	applyHighlight(obstacle.activeTick, obstacle, world);
 
 	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.FlashTicks));
+	const flash = Math.max(0, (1 - hitAge / Visuals.FlashTicks));
 	const healthProportion = obstacle.health / obstacle.maxHealth;
 	const easeMultiplier = ease(Math.max(obstacle.createTick, world.ui.initialRenderTick), world);
 	
@@ -826,6 +831,8 @@ function calculateObstacleColor(obstacle: w.Obstacle, params: RenderObstaclePara
 }
 
 function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchFill, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	if (fill.shadow && ctxStack.rtx <= r.GraphicsLevel.Low) {
 		// No shadows for Low
 		return;
@@ -846,7 +853,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	let feather: r.FeatherConfig = null;
 	if (fill.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: fill.bloom !== undefined ? fill.bloom : HeroColors.GlowRadius,
+			sigma: fill.bloom !== undefined ? fill.bloom : Visuals.GlowRadius,
 			alpha: fill.glow,
 		};
 	}
@@ -1006,6 +1013,8 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 }
 
 function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number) {
+	const Visuals = world.settings.Visuals;
+
 	if (!activeTick) {
 		return false;
 	}
@@ -1019,7 +1028,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 	const highlight: w.TrailHighlight = {
 		tag: obj.id,
 		fromTick: activeTick,
-		maxTicks: HeroColors.FlashTicks,
+		maxTicks: Visuals.FlashTicks,
 		glow,
 		growth,
 	};
@@ -1031,6 +1040,8 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 }
 
 function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	if (hero.destroyedTick) {
 		return;
 	}
@@ -1056,7 +1067,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 	if (easeMultiplier > 0) {
 		const direction = vector.diff(pos, MapCenter);
 		direction.normalize();
-		pos.addMul(HeroColors.EaseInDistance * easeMultiplier, direction);
+		pos.addMul(Visuals.EaseInDistance * easeMultiplier, direction);
 
 		renderHeroArrival(ctxStack, pos, direction, arriving, hero, world);
 	}
@@ -1090,13 +1101,15 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 }
 
 function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.Vec2, arriving: boolean, hero: w.Hero, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	unshiftTrail({
 		type: "circle",
 		pos,
 		velocity: particleVelocity(outward, 0.1),
 		radius: hero.radius,
 		initialTick: world.tick,
-		max: HeroColors.EaseTicks,
+		max: Visuals.EaseTicks,
 		fillStyle: heroColor(hero.id, world),
 		shine: 0.5,
 		glow: 0.05,
@@ -1112,11 +1125,13 @@ function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.V
 }
 
 function ease(createTick: number, world: w.World): number {
+	const Visuals = world.settings.Visuals;
+
 	const age = world.tick - createTick;
 	if (age < 0) {
 		return 1;
-	} else if (age < HeroColors.EaseTicks) {
-		return Math.pow(1 - age / HeroColors.EaseTicks, HeroColors.EasePower);
+	} else if (age < Visuals.EaseTicks) {
+		return Math.pow(1 - age / Visuals.EaseTicks, Visuals.EasePower);
 	} else {
 		return 0;
 	}
@@ -1263,20 +1278,22 @@ function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
 }
 
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	let color = heroColor(hero.id, world);
 
 	const hitAge = hero.hitTick ? world.tick - hero.hitTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / HeroColors.DamageFlashTicks));
+	const flash = Math.max(0, (1 - hitAge / Visuals.DamageFlashTicks));
 
 	const angle = hero.body.getAngle();
 	let radius = hero.radius;
 	if (flash > 0) {
-		radius += HeroColors.DamageGrowFactor * radius * flash;
+		radius += Visuals.DamageGrowFactor * radius * flash;
 	}
 
 	let style = ColTuple.parse(color);
 	if (flash > 0) {
-		style.lighten(HeroColors.DamageGlowFactor * flash);
+		style.lighten(Visuals.DamageGlowFactor * flash);
 	}
 
 	// Hit flash
@@ -1297,14 +1314,14 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		glx.circle(ctxStack, pos, {
 			color: strokeColor,
 			minRadius: radius,
-			maxRadius: radius + HeroColors.ChargingRadius,
+			maxRadius: radius + Visuals.ChargingRadius,
 			feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 				sigma: DefaultBloomRadius,
 				alpha: DefaultCastingGlow,
 			} : null,
 		});
 	} else if (hero.uiCastTrail) {
-		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / HeroColors.ChargingFlashTicks;
+		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.ChargingFlashTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
 			glx.circle(ctxStack, pos, {
@@ -1465,6 +1482,7 @@ function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Ve
 
 function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const Hero = world.settings.Hero;
+	const Visuals = world.settings.Visuals;
 
 	const radius = hero.radius;
 
@@ -1485,9 +1503,9 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 			color.lighten(0.75 + 0.25 * startProportion);
 		}
 
-		const barY = pos.y - radius - HealthBar.Height - HealthBar.Margin;
-		const barHalfWidth = HealthBar.HeroRadiusFraction * radius;
-		const barHalfHeight = HealthBar.Height / 2;
+		const barY = pos.y - radius - Visuals.HealthBarHeight - Visuals.HealthBarMargin;
+		const barHalfWidth = Visuals.HealthBarHeroRadiusFraction * radius;
+		const barHalfHeight = Visuals.HealthBarHeight / 2;
 
 		const barLeft = pl.Vec2(pos.x - barHalfWidth, barY);
 		const barMid = pl.Vec2(barLeft.x + healthProportion * 2 * barHalfWidth, barY);
@@ -1522,14 +1540,16 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 }
 
 function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	const texRect: ClientRect = atlasController.lookupImage(ctxStack, hero.id);
 	if (!texRect) {
 		return;
 	}
 
-	const yOffset = hero.radius + HeroColors.NameMargin;
-	const drawWidth = HeroColors.NameWidthPixels * ctxStack.pixel;
-	const drawHeight = HeroColors.NameHeightPixels * ctxStack.pixel;
+	const yOffset = hero.radius + Visuals.NameMargin;
+	const drawWidth = Visuals.NameWidthPixels * ctxStack.pixel;
+	const drawHeight = Visuals.NameHeightPixels * ctxStack.pixel;
 	const drawRect: ClientRect = {
 		left: pos.x - drawWidth / 2,
 		right: pos.x + drawWidth / 2,
@@ -1542,6 +1562,8 @@ function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	const MaxAlpha = 0.75;
 	const MinAlpha = 0.10;
 
@@ -1552,20 +1574,20 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	let flash = 0;
 	if (shield.hitTick >= 0) {
 		const hitAge = world.tick - shield.hitTick;
-		if (hitAge < HeroColors.ShieldFlashTicks) {
-			flash = (1 - hitAge / HeroColors.ShieldFlashTicks);
+		if (hitAge < Visuals.ShieldFlashTicks) {
+			flash = (1 - hitAge / Visuals.ShieldFlashTicks);
 		}
 	}
 
-	let color = ColTuple.parse((shield.selfColor && shield.owner === world.ui.myHeroId) ? HeroColors.MyHeroColor : shield.color);
+	let color = ColTuple.parse((shield.selfColor && shield.owner === world.ui.myHeroId) ? Visuals.MyHeroColor : shield.color);
 	if (flash > 0) {
-		color.lighten(HeroColors.ShieldGlowFactor * flash);
+		color.lighten(Visuals.ShieldGlowFactor * flash);
 	}
 	color.alpha((MaxAlpha - MinAlpha) * proportion + MinAlpha);
 
 	let scale: number = 1;
 	if (flash > 0) {
-		scale += HeroColors.ShieldGrowFactor * flash;
+		scale += Visuals.ShieldGrowFactor * flash;
 	}
 	if (world.tick - shield.createTick < shield.growthTicks) {
 		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
@@ -1575,7 +1597,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	let feather: r.FeatherConfig = null;
 	if (shield.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: shield.bloom !== undefined ? shield.bloom : HeroColors.GlowRadius,
+			sigma: shield.bloom !== undefined ? shield.bloom : Visuals.GlowRadius,
 			alpha: shield.glow,
 		};
 	}
@@ -1708,9 +1730,11 @@ function playShieldSounds(ctxStack: CanvasCtxStack, obj: w.Shield, world: w.Worl
 }
 
 export function heroColor(heroId: string, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	const player = world.players.get(heroId);
 	if (player.userHash === world.ui.myUserHash) {
-		return HeroColors.MyHeroColor;
+		return Visuals.MyHeroColor;
 	}
 	
 	if (!world.ui.myHeroId) {
@@ -1718,9 +1742,9 @@ export function heroColor(heroId: string, world: w.World) {
 	}
 
 	if (heroId === world.ui.myHeroId) {
-		return HeroColors.MyHeroColor;
+		return Visuals.MyHeroColor;
 	} else if (engine.calculateAlliance(world.ui.myHeroId, heroId, world) & Alliances.Ally) {
-		return HeroColors.AllyColor;
+		return Visuals.AllyColor;
 	} else {
 		return player.uiColor;
 	}
@@ -1913,6 +1937,8 @@ function renderUnattachedLink(ctxStack: CanvasCtxStack, projectile: w.Projectile
 }
 
 function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.WorldObject, world: w.World, render: RenderLink, highlight?: w.TrailHighlight) {
+	const Visuals = world.settings.Visuals;
+
 	let color = ColTuple.parse(render.color);
 	let scale = 1;
 
@@ -1928,7 +1954,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		color,
 		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) ? {
-			sigma: render.bloom !== undefined ? render.bloom : HeroColors.GlowRadius,
+			sigma: render.bloom !== undefined ? render.bloom : Visuals.GlowRadius,
 			alpha: render.glow,
 		} : null,
 	};
@@ -2066,8 +2092,10 @@ function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, re
 }
 
 function projectileColor(render: ProjectileColorParams, projectile: w.Projectile, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	if (render.selfColor && projectile.owner === world.ui.myHeroId) {
-		return HeroColors.MyHeroColor;
+		return Visuals.MyHeroColor;
 	}
 
 	if (render.ownerColor) {
@@ -2078,6 +2106,8 @@ function projectileColor(render: ProjectileColorParams, projectile: w.Projectile
 }
 
 function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	const expireTick = trail.initialTick + trail.max;
 	const remaining = expireTick - world.tick;
 	if (remaining <= 0) {
@@ -2114,7 +2144,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
-			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : HeroColors.GlowRadius),
+			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : Visuals.GlowRadius),
 			alpha: trail.glow,
 		};
 	}
@@ -2262,7 +2292,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 
 	if (buttonStateLookup) {
 		if (!world.ui.buttonBar) {
-			world.ui.buttonBar = calculateButtonLayout(world.settings.Choices.Keys, rect, options);
+			world.ui.buttonBar = calculateButtonLayout(world.settings.Choices.Keys, rect, world, options);
 		}
 
 		const config = world.ui.buttonBar;
@@ -2320,11 +2350,11 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 	return buttonStateLookup;
 }
 
-function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, options: RenderOptions): w.ButtonConfig {
+function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, world: w.World, options: RenderOptions): w.ButtonConfig {
 	if (isMobile) {
-		return calculateButtonWheelLayout(keys, rect, options);
+		return calculateButtonWheelLayout(keys, rect, world, options);
 	} else {
-		return calculateButtonBarLayout(keys, rect);
+		return calculateButtonBarLayout(keys, rect, world);
 	}
 }
 
@@ -2381,20 +2411,22 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	ctx.restore();
 }
 
-function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.ButtonBarConfig {
+function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.World): w.ButtonBarConfig {
+	const Visuals = world.settings.Visuals;
+
 	const hitBoxes = new Map<string, ClientRect>();
 	let nextOffset = 0;
 	keys.forEach(key => {
 		if (nextOffset > 0) {
-			nextOffset += ButtonBar.Spacing;
+			nextOffset += Visuals.ButtonBarSpacing;
 		}
 
 		if (key) {
 			const offset = nextOffset;
-			const size = ButtonBar.Size * (key.barSize || 1);
+			const size = Visuals.ButtonBarSize * (key.barSize || 1);
 
 			const left = offset;
-			const top = ButtonBar.Size - size;
+			const top = Visuals.ButtonBarSize - size;
 			const width = size;
 			const height = size;
 			const right = left + width;
@@ -2403,15 +2435,15 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect): w.Button
 
 			nextOffset += size;
 		} else {
-			nextOffset += ButtonBar.Gap;
+			nextOffset += Visuals.ButtonBarGap;
 		}
 	});
 
 	const scaleFactor = Math.min(
 		calculateButtonScaleFactor(rect.width, nextOffset),
-		calculateButtonScaleFactor(rect.height * ButtonBar.MaxHeightProportion, ButtonBar.Size)
+		calculateButtonScaleFactor(rect.height * Visuals.ButtonBarMaxHeightProportion, Visuals.ButtonBarSize)
 	);
-	const region = calculateButtonBarRegion(rect, nextOffset, scaleFactor);
+	const region = calculateButtonBarRegion(rect, nextOffset, scaleFactor, world);
 
 	return {
 		view: "bar",
@@ -2433,22 +2465,24 @@ function calculateButtonScaleFactor(available: number, actual: number): number {
 	}
 }
 
-function calculateButtonBarRegion(rect: ClientRect, totalSize: number, scaleFactor: number): ClientRect {
+function calculateButtonBarRegion(rect: ClientRect, totalSize: number, scaleFactor: number, world: w.World): ClientRect {
+	const Visuals = world.settings.Visuals;
+
 	const axisSize = totalSize * scaleFactor;
-	const crossSize = ButtonBar.Size * scaleFactor;
+	const crossSize = Visuals.ButtonBarSize * scaleFactor;
 
 	const height = crossSize;
 	const width = axisSize;
 
 	const left = rect.width / 2.0 - width / 2.0;
-	const top = rect.height - crossSize - ButtonBar.Margin;
+	const top = rect.height - crossSize - Visuals.ButtonBarMargin;
 
 	const right = left + width;
 	const bottom = top + height;
 	return { left, top, right, bottom, width, height };
 }
 
-function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options: RenderOptions): w.ButtonWheelConfig {
+function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, world: w.World, options: RenderOptions): w.ButtonWheelConfig {
 	const WheelAngleOffset = (2 * Math.PI) * (1.75 / 6);
 
 	const hitSectors = new Map<string, w.HitSector>();
@@ -2472,7 +2506,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, options
 	});
 	// hitSectors.set(w.SpecialKeys.RightClick, { startAngle: null, endAngle: null });
 
-	const region = calculateButtonWheelRegion(rect, options);
+	const region = calculateButtonWheelRegion(rect, world, options);
 	const outerRadius = Math.min(region.width, region.height) / 2.0;
 	const innerRadius = outerRadius / 2;
 	const center = pl.Vec2((region.left + region.right) / 2, (region.top + region.bottom) / 2);
@@ -2499,20 +2533,22 @@ function invertSector(input: w.HitSector): w.HitSector {
 	};
 }
 
-function calculateButtonWheelRegion(rect: ClientRect, options: RenderOptions): ClientRect {
-	const size = calculateButtonWheelSize(rect);
+function calculateButtonWheelRegion(rect: ClientRect, world: w.World, options: RenderOptions): ClientRect {
+	const Visuals = world.settings.Visuals;
+
+	const size = calculateButtonWheelSize(rect, world);
 
 	let left;
 	let right;
 	if (options.wheelOnRight) {
-		right = rect.width - ButtonBar.Margin;
+		right = rect.width - Visuals.ButtonBarMargin;
 		left = right - size;
 	} else {
-		left = ButtonBar.Margin;
+		left = Visuals.ButtonBarMargin;
 		right = left + size;
 	}
 
-	const bottom = rect.bottom - ButtonBar.Margin;
+	const bottom = rect.bottom - Visuals.ButtonBarMargin;
 	const top = bottom - size;
 	const width = size;
 	const height = size;
@@ -2520,12 +2556,14 @@ function calculateButtonWheelRegion(rect: ClientRect, options: RenderOptions): C
 	return { left, top, right, bottom, width, height };
 }
 
-function calculateButtonWheelSize(rect: ClientRect) {
-	const maxSize = ButtonBar.Size * 3;
+function calculateButtonWheelSize(rect: ClientRect, world: w.World) {
+	const Visuals = world.settings.Visuals;
+
+	const maxSize = Visuals.ButtonBarSize * 3;
 
 	let size = Math.min(
-		(rect.width - ButtonBar.Margin) / 2, // Half width
-		(rect.height - ButtonBar.Margin * 2)); // Or whole height
+		(rect.width - Visuals.ButtonBarMargin) / 2, // Half width
+		(rect.height - Visuals.ButtonBarMargin * 2)); // Or whole height
 	size = Math.max(0, Math.min(maxSize, size));
 
 	return size;

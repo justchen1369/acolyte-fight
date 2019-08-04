@@ -85,6 +85,7 @@ function constantsToCode(settings: AcolyteFightSettings): e.CodeConstants {
         obstacle: stringify(settings.Obstacle),
         hero: stringify(settings.Hero),
         choices: stringify(settings.Choices),
+        visuals: stringify(settings.Visuals),
     };
 }
 
@@ -106,6 +107,7 @@ function codeToSettings(codeTree: e.CodeTree): AcolyteFightSettings {
         ObstacleTemplates: codeToObstacleTemplates(codeTree, errorTree),
         Hero: codeToConstants(codeTree, "hero", errorTree),
         Choices: codeToConstants(codeTree, "choices", errorTree),
+        Visuals: codeToConstants(codeTree, "visuals", errorTree),
         Code: codeTree.constants.ai,
     };
     if (Object.keys(errorTree).length > 0) {

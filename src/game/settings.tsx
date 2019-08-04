@@ -66,6 +66,81 @@ const Obstacle: ObstacleSettings = {
     ReturnTurnRate: 0.002,
 }
 
+const Visuals: VisualSettings = {
+	WorldColor: '#222',
+	WorldAnimateWinTicks: 15,
+	WorldWinGrowth: 0.05,
+	GlowRadius: 4 * Pixel,
+
+	ShakeDistance: 0.02,
+	ShakeTicks: 3,
+
+	HighlightFactor: 0.01,
+	HighlightTicks: 10,
+
+	EaseTicks: 30,
+	EaseInDistance: 0.5,
+	EasePower: 2.0,
+
+	ExitTicks: 30,
+
+	MyHeroColor: '#00ccff',
+	AllyColor: '#00a3cc',
+	BotColor: '#cccccc',
+	OnlineColor: '#ccc',
+
+	Colors: [
+		"#cb8fc1",
+		"#7db37d",
+		"#917ccc",
+		"#cc7c88",
+		"#d0c16b",
+		"#56b5bf",
+		"#6d89cc",
+		"#b9cc64",
+		"#cea85c",
+		"#54b7a2",
+		"#a97fc1",
+	],
+
+	TeamColors: [
+		"#cb8fc1",
+		"#d0c16b",
+		"#7db37d",
+		"#cea85c",
+		"#54b7a2",
+		"#a97fc1",
+	],
+
+	ChargingRadius: Pixel * 7,
+	ChargingFlashTicks: 15,
+
+	DamageGrowFactor: 0.25,
+	DamageGlowFactor: 1.0,
+	DamageFlashTicks: 10,
+
+	ShieldGlowFactor: 1.0,
+	ShieldGrowFactor: 0.05,
+	ShieldFlashTicks: 3,
+
+	FlashTicks: 6,
+
+	NameMargin: Pixel * 2,
+	NameFontPixels: 9,
+	NameHeightPixels: 11,
+    NameWidthPixels: 100,
+
+	HealthBarHeroRadiusFraction: 0.95,
+	HealthBarHeight: Pixel * 2,
+    HealthBarMargin: Pixel * 2,
+
+	ButtonBarMaxHeightProportion: 0.15,
+	ButtonBarSpacing: 8,
+	ButtonBarMargin: 5,
+	ButtonBarSize: 72,
+	ButtonBarGap: 12,
+}
+
 const Choices: ChoiceSettings = {
 	Keys: [
         { btn: "a", barSize: 0.75, wheelSize: 0.5 },
@@ -2451,6 +2526,7 @@ export const DefaultSettings: AcolyteFightSettings = {
     Spells,
     Layouts,
     Sounds,
+    Visuals,
     Icons,
     Code,
 };

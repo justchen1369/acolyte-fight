@@ -5,7 +5,6 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as icons from '../core/icons';
 import * as spellUtils from '../core/spellUtils';
-import { ButtonBar } from '../../game/constants';
 import { SpellIcon } from '../controls/spellIcon';
 import SpellStats from './spellStats';
 
@@ -37,12 +36,14 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
             return null; // Nothing to render
         }
 
+        const Visuals = this.props.settings.Visuals;
+
         // Offset the messages from the button bar
         let marginBottom = 0;
         const buttonBar = this.props.buttonBar;
         if (buttonBar) {
             if (buttonBar.view === "bar") {
-                marginBottom = ButtonBar.Size * buttonBar.scaleFactor + ButtonBar.Margin * 2;
+                marginBottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
             } else if (buttonBar.view === "wheel") {
                 return null; // Simply don't display tooltip on mobile, not enough space
             }

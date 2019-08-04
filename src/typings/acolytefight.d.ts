@@ -33,6 +33,7 @@ declare interface AcolyteFightSettings {
     Spells: Spells;
 	Choices: ChoiceSettings;
 	Sounds: Sounds;
+	Visuals: VisualSettings;
 	Icons: IconLookup;
 	Code: string;
 }
@@ -978,4 +979,59 @@ interface SoundBite {
 
 	wave: WaveType;
 	ratios?: number[];
+}
+
+interface VisualSettings {
+	WorldColor: string;
+	WorldAnimateWinTicks: number;
+	WorldWinGrowth: number;
+	GlowRadius: number;
+
+	ShakeDistance: number;
+	ShakeTicks: number;
+
+	HighlightFactor: number;
+	HighlightTicks: number;
+
+	EaseTicks: number;
+	EaseInDistance: number;
+	EasePower: number;
+
+	ExitTicks: number;
+
+	MyHeroColor: string;
+	AllyColor: string;
+	BotColor: string;
+	OnlineColor: string;
+
+	Colors: string[];
+	TeamColors: string[];
+
+	ChargingRadius: number;
+	ChargingFlashTicks: number;
+
+	DamageGrowFactor: number;
+	DamageGlowFactor: number;
+	DamageFlashTicks: number;
+
+	ShieldGlowFactor: number;
+	ShieldGrowFactor: number;
+	ShieldFlashTicks: number;
+
+	FlashTicks: number;
+
+	NameMargin: number;
+	NameFontPixels: number;
+	NameHeightPixels: number;
+	NameWidthPixels: number;
+
+	HealthBarHeroRadiusFraction: number;
+	HealthBarHeight: number;
+	HealthBarMargin: number;
+
+	ButtonBarMaxHeightProportion: number;
+	ButtonBarSpacing: number;
+	ButtonBarMargin: number;
+	ButtonBarSize: number;
+	ButtonBarGap: number;
 }
