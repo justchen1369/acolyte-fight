@@ -1091,6 +1091,7 @@ export interface TrailHighlight {
 	maxTicks: number;
 	flash?: boolean;
 	growth?: number;
+	bloom?: number;
 }
 
 export interface CircleTrail extends TrailBase {

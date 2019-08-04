@@ -136,7 +136,6 @@ declare type SwatchRender =
 declare interface SwatchColor {
 	color: string;
 	deadColor?: string;
-	flash?: boolean;
 }
 
 declare interface SwatchFill extends SwatchColor {
@@ -153,8 +152,7 @@ declare interface SwatchBloom extends SwatchColor {
 
 	glow?: number;
 	bloom?: number
-
-	strikeOnly?: boolean; // Only display the bloom on strike
+	strikeOnly?: boolean;
 }
 
 declare interface SwatchSmoke {
@@ -682,6 +680,7 @@ declare interface RenderStrikeParams {
 	ticks?: number;
 	flash?: boolean;
 	growth?: number;
+	bloom?: number;
 }
 
 declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {

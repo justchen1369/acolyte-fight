@@ -10,13 +10,17 @@ export const volcano: ObstacleTemplate = {
     static: true,
     undamageable: true,
 
+    strike: {
+        ticks: 15,
+        flash: true,
+    },
+
     render: [
         {
             type: "solid",
             color: "rgba(255, 0, 128, 0.9)",
             deadColor: "rgba(255, 0, 128, 0.25)",
             glow: 0.2,
-            flash: true,
         },
         {
         type: "smoke",
@@ -62,13 +66,17 @@ export const slow: ObstacleTemplate = {
     static: true,
     undamageable: true,
 
+    strike: {
+        ticks: 15,
+        flash: true,
+    },
+
     render: [
         {
             type: "solid",
             "color": "rgba(64, 255, 255, 0.75)",
             deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
-            flash: true,
         },
         {
             type: "smoke",
@@ -112,13 +120,17 @@ export const fast: ObstacleTemplate = {
     static: true,
     undamageable: true,
 
+    strike: {
+        ticks: 15,
+        flash: true,
+    },
+
     render: [
         {
             type: "solid",
             "color": "rgba(255, 255, 64, 0.75)",
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
-            flash: true,
         },
         {
             type: "smoke",
@@ -169,7 +181,6 @@ export const conveyorBase: ObstacleTemplate = {
             "color": "rgba(64, 64, 64, 0.75)",
             deadColor: "rgba(64, 64, 64, 0.25)",
             glow: 0.2,
-            flash: true,
         },
         {
             type: "smoke",
@@ -230,7 +241,6 @@ const defaultTemplate: ObstacleTemplate = {
         {
             type: "bloom",
             color: '#ccc',
-            flash: true,
             strikeOnly: true,
             bloom: 0.05,
         },
@@ -238,14 +248,12 @@ const defaultTemplate: ObstacleTemplate = {
             type: "solid",
             color: '#ccc',
             deadColor: '#c33',
-            flash: true,
         },
         {
             type: "solid",
             color: '#888',
             deadColor: '#822',
             expand: -0.005,
-            flash: true,
         },
     ],
 };
@@ -268,14 +276,12 @@ const explosive: ObstacleTemplate = {
             type: "solid",
             color: "#fc0",
             deadColor: "#fc0",
-            flash: true,
         },
         {
             type: "solid",
             color: "#c94",
             deadColor: "#fc8",
             expand: -0.002,
-            flash: true,
         },
     ],
 
@@ -306,20 +312,17 @@ const mirror: ObstacleTemplate = {
             type: "bloom",
             color: '#0cf',
             bloom: 0.05,
-            flash: true,
             strikeOnly: true,
         },
         {
             type: "solid",
             "color": "#0cf",
-            flash: true,
         },
         {
             type: "solid",
             "color": "#0ad",
             "deadColor": "#48f",
             "expand": -0.003,
-            flash: true,
         },
     ],
 
@@ -342,20 +345,17 @@ const bumper: ObstacleTemplate = {
             type: "bloom",
             color: "#fc0",
             bloom: 0.05,
-            flash: true,
             strikeOnly: true,
         },
         {
             type: "solid",
             color: "#fc0",
-            flash: true,
         },
         {
             type: "solid",
             "color": "#c94",
             "deadColor": "#753",
             expand: -0.004,
-            flash: true,
         },
     ],
 
@@ -377,21 +377,18 @@ const spinner: ObstacleTemplate = {
             type: "bloom",
             color: '#ccc',
             bloom: 0.05,
-            flash: true,
             strikeOnly: true,
         },
         {
             type: "solid",
             color: '#ccc',
             deadColor: '#c33',
-            flash: true,
         },
         {
             type: "solid",
             color: '#888',
             deadColor: '#822',
             expand: -0.005,
-            flash: true,
         },
     ],
 

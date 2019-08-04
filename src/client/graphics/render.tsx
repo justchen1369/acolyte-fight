@@ -54,6 +54,7 @@ interface HighlightResult {
 	proportion: number;
 	flash: number;
 	growth: number;
+	bloom: number;
 	params: w.TrailHighlight;
 }
 
@@ -922,26 +923,34 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 	}
 }
 
-function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleContext, fill: SwatchBloom, world: w.World) {
+function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, context: RenderObstacleContext, fill: SwatchBloom, world: w.World) {
 	if (ctxStack.rtx < r.GraphicsLevel.Ultra) {
 		return;
 	}
 
-	if (fill.strikeOnly && !params.highlight) {
-		// Only display on strike
-		return;
+	const color = calculateObstacleColor(obstacle, context, fill, world);
+	let bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
+
+	const highlight = context.highlight;
+	if (highlight && highlight.bloom) {
+		bloom += highlight.bloom;
 	}
 
-	const color = calculateObstacleColor(obstacle, params, fill, world);
-	let bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
 	if (fill.strikeOnly) {
-		color.fade(1 - params.highlight.flash);
-		bloom *= params.highlight.flash;
+		if (highlight) {
+			color.fade(1 - highlight.proportion);
+		} else {
+			return;
+		}
 	}
 
 	let scale = 1;
-	if (params.ease > 0) {
-		scale *= 1 - params.ease;
+	if (context.ease > 0) {
+		scale *= 1 - context.ease;
+	}
+
+	if (!(bloom && color.a > 0)) {
+		return;
 	}
 
 	const extent = shapes.getMinExtent(obstacle.shape);
@@ -1030,6 +1039,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 			proportion,
 			flash: highlight.flash ? proportion : 0,
 			growth: highlight.growth ? proportion * highlight.growth : 0,
+			bloom: highlight.bloom ? proportion * highlight.bloom : 0,
 			params: highlight,
 		};
 	} else {
@@ -1062,6 +1072,7 @@ function modifyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wo
 		maxTicks: strike.ticks || Visuals.DefaultFlashTicks,
 		flash: strike.flash,
 		growth: strike.growth,
+		bloom: strike.bloom,
 	};
 	obj.uiHighlight = highlight;
 
