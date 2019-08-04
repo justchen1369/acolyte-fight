@@ -14,7 +14,7 @@ const lifeSteal = 0.25;
 const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
     MaxBots: 2,
-    MaxPlayers: 6,
+    MaxPlayers: 7,
     TeamGameProbability: 0.5,
 };
 
@@ -48,7 +48,7 @@ const World: WorldSettings = {
 
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,
-    ShrinkPowerMaxPlayers: 1,
+    ShrinkPowerMaxPlayers: 0.75,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
     ProjectileSpeedMaxError: 0.001,
