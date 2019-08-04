@@ -14,7 +14,8 @@ const lifeSteal = 0.25;
 const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
     MaxBots: 2,
-	MaxPlayers: 6,
+    MaxPlayers: 6,
+    TeamGameProbability: 0.5,
 };
 
 const Hero: HeroSettings = {
