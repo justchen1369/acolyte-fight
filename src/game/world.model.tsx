@@ -410,6 +410,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	touchTick?: number;
 
 	render: SwatchRender[];
+	strike?: RenderStrikeParams;
 	sound?: string;
 
 	uiEase?: pl.Vec2;
@@ -419,7 +420,7 @@ export interface CircleShape {
 	radius: number;
 }
 
-export interface Hero extends WorldObjectBase {
+export interface Hero extends WorldObjectBase, HighlightSource {
 	category: "hero";
 	filterGroupIndex: number;
 
@@ -496,6 +497,7 @@ export interface ShieldBase extends WorldObjectBase {
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	strike?: RenderStrikeParams;
 }
 
 export interface Reflect extends ShieldBase {
@@ -527,6 +529,7 @@ export interface Saber extends ShieldBase, HighlightSource {
 
 	turnRate: number;
 
+	strike?: RenderStrikeParams;
 	trailTicks: number;
 	uiPreviousAngle: number;
 }
@@ -1086,7 +1089,7 @@ export interface TrailHighlight {
 	tag: string;
 	fromTick: number;
 	maxTicks: number;
-	glow?: boolean;
+	flash?: boolean;
 	growth?: number;
 }
 

@@ -211,30 +211,6 @@ export const inward: ObstacleTemplate = {
     },
 }
 
-export const screen: ObstacleTemplate = {
-    "health": 50,
-
-    render: [
-        {
-            type: "solid",
-            "color": "#0cf",
-            strikeGrow: 0.005,
-            flash: true,
-        },
-        {
-            type: "solid",
-            "color": "#222",
-            strikeGrow: 0.005,
-            expand: -0.002,
-            flash: true,
-        },
-    ],
-
-    static: true,
-    collideWith: Categories.Projectile,
-    mirror: true,
-};
-
 const shadow: SwatchFill = {
     type: "solid",
     color: 'rgba(0, 0, 0, 0.75)',
@@ -243,6 +219,11 @@ const shadow: SwatchFill = {
 
 const defaultTemplate: ObstacleTemplate = {
     health: 50,
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.005,
+    },
 
     render: [
         shadow,
@@ -257,7 +238,6 @@ const defaultTemplate: ObstacleTemplate = {
             type: "solid",
             color: '#ccc',
             deadColor: '#c33',
-            strikeGrow: 0.005,
             flash: true,
         },
         {
@@ -265,7 +245,6 @@ const defaultTemplate: ObstacleTemplate = {
             color: '#888',
             deadColor: '#822',
             expand: -0.005,
-            strikeGrow: 0.005,
             flash: true,
         },
     ],
@@ -277,13 +256,18 @@ const explosive: ObstacleTemplate = {
     linearDamping: 1.5,
     circularHitbox: true,
 
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.005,
+    },
+
     render: [
         shadow,
         {
             type: "solid",
             color: "#fc0",
             deadColor: "#fc0",
-            strikeGrow: 0.005,
             flash: true,
         },
         {
@@ -291,7 +275,6 @@ const explosive: ObstacleTemplate = {
             color: "#c94",
             deadColor: "#fc8",
             expand: -0.002,
-            strikeGrow: 0.005,
             flash: true,
         },
     ],
@@ -311,6 +294,12 @@ const explosive: ObstacleTemplate = {
 const mirror: ObstacleTemplate = {
     "health": 50,
 
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.005,
+    },
+
     render: [
         shadow,
         {
@@ -323,7 +312,6 @@ const mirror: ObstacleTemplate = {
         {
             type: "solid",
             "color": "#0cf",
-            strikeGrow: 0.005,
             flash: true,
         },
         {
@@ -331,7 +319,6 @@ const mirror: ObstacleTemplate = {
             "color": "#0ad",
             "deadColor": "#48f",
             "expand": -0.003,
-            strikeGrow: 0.005,
             flash: true,
         },
     ],
@@ -341,6 +328,12 @@ const mirror: ObstacleTemplate = {
 
 const bumper: ObstacleTemplate = {
     "health": 50,
+
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.01,
+    },
 
     sound: "bumper",
     render: [
@@ -355,7 +348,6 @@ const bumper: ObstacleTemplate = {
         {
             type: "solid",
             color: "#fc0",
-            strikeGrow: 0.005,
             flash: true,
         },
         {
@@ -363,7 +355,6 @@ const bumper: ObstacleTemplate = {
             "color": "#c94",
             "deadColor": "#753",
             expand: -0.004,
-            strikeGrow: 0.005,
             flash: true,
         },
     ],
@@ -373,6 +364,12 @@ const bumper: ObstacleTemplate = {
 
 const spinner: ObstacleTemplate = {
     health: 100,
+
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.005,
+    },
 
     render: [
         shadow,
@@ -387,7 +384,6 @@ const spinner: ObstacleTemplate = {
             type: "solid",
             color: '#ccc',
             deadColor: '#c33',
-            strikeGrow: 0.005,
             flash: true,
         },
         {
@@ -395,7 +391,6 @@ const spinner: ObstacleTemplate = {
             color: '#888',
             deadColor: '#822',
             expand: -0.005,
-            strikeGrow: 0.005,
             flash: true,
         },
     ],
@@ -409,7 +404,6 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     bumper,
     mirror,
     spinner,
-    screen,
     volcano,
     slow,
     fast,

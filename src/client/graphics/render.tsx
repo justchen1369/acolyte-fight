@@ -42,11 +42,19 @@ interface SwirlContext {
 	multiplier?: number;
 }
 
-interface RenderObstacleParams {
+interface RenderObstacleContext {
 	pos: pl.Vec2;
-	flash: number;
+	highlight: HighlightResult;
 	healthProportion: number;
 	ease: number;
+}
+
+interface HighlightResult {
+	created: boolean; // A new highlight was created
+	proportion: number;
+	flash: number;
+	growth: number;
+	params: w.TrailHighlight;
 }
 
 // Rendering
@@ -354,7 +362,7 @@ function renderAttachedLink(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.Wor
 		return;
 	}
 
-	applyHighlight(hero.link.redirectDamageTick, hero.link, world, hero.link.render.redirectFlash, hero.link.render.redirectGrowth, hero.link.render.redirectFlashTicks);
+	applyHighlight(hero.link.redirectDamageTick, hero.link, world, hero.link.render.strike);
 	renderLinkBetween(ctxStack, hero, target, world, hero.link.render, hero.link.uiHighlight);
 }
 
@@ -770,10 +778,7 @@ function takeHighlights(world: w.World): w.MapHighlight {
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
 	const Visuals = world.settings.Visuals;
 
-	applyHighlight(obstacle.activeTick, obstacle, world);
-
-	const hitAge = obstacle.uiHighlight ? world.tick - obstacle.uiHighlight.fromTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / Visuals.DefaultFlashTicks));
+	const highlight = applyHighlight(obstacle.activeTick, obstacle, world, obstacle.strike);
 	const healthProportion = obstacle.health / obstacle.maxHealth;
 	const easeMultiplier = ease(Math.max(obstacle.createTick, world.ui.initialRenderTick), world);
 	
@@ -783,9 +788,9 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 		obstacle.uiEase.mul(EaseDecay);
 	}
 
-	const params: RenderObstacleParams = {
+	const params: RenderObstacleContext = {
 		pos,
-		flash,
+		highlight,
 		healthProportion,
 		ease: easeMultiplier,
 	};
@@ -815,22 +820,21 @@ function playObstacleSounds(ctxStack: CanvasCtxStack, obj: w.Obstacle, world: w.
 	}
 }
 
-function calculateObstacleColor(obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchColor, world: w.World) {
+function calculateObstacleColor(obstacle: w.Obstacle, context: RenderObstacleContext, fill: SwatchColor, world: w.World) {
 	let color = ColTuple.parse(fill.color);
 
-	if (fill.deadColor && params.healthProportion < 1) {
-		color.mix(ColTuple.parse(fill.deadColor), 1 - params.healthProportion);
+	if (fill.deadColor && context.healthProportion < 1) {
+		color.mix(ColTuple.parse(fill.deadColor), 1 - context.healthProportion);
 	}
 
-	const flash = params.flash;
-	if (fill.flash && flash > 0) {
-		color.lighten(params.flash);
+	if (context.highlight && context.highlight.flash) {
+		color.lighten(context.highlight.flash);
 	}
 
 	return color;
 }
 
-function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchFill, world: w.World) {
+function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, context: RenderObstacleContext, fill: SwatchFill, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
 	if (fill.shadow && ctxStack.rtx <= r.GraphicsLevel.Low) {
@@ -838,17 +842,15 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		return;
 	}
 
-	const color = calculateObstacleColor(obstacle, params, fill, world);
+	const color = calculateObstacleColor(obstacle, context, fill, world);
 
 	const pos = obstacle.body.getPosition();
 	const angle = obstacle.body.getAngle();
 
 	let scale = 1;
-	if (params.ease > 0) {
-		scale *= 1 - params.ease;
+	if (context.ease > 0) {
+		scale *= 1 - context.ease;
 	}
-
-	const flash = params.flash;
 
 	let feather: r.FeatherConfig = null;
 	if (fill.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
@@ -858,11 +860,12 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		};
 	}
 
+	const highlight = context.highlight;
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
-		if (flash > 0 && fill.strikeGrow) {
-			drawShape = shapes.grow(drawShape, flash * fill.strikeGrow) as shapes.Polygon;
+		if (highlight && highlight.growth) {
+			drawShape = shapes.grow(drawShape, highlight.growth) as shapes.Polygon;
 		}
 		if (fill.expand) {
 			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
@@ -882,11 +885,11 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
 
 		let radialExtent = shape.radialExtent;
-		if (flash > 0 && fill.strikeGrow) {
-			radialExtent += flash * fill.strikeGrow;
+		if (highlight && highlight.growth) {
+			radialExtent += highlight.growth;
 		}
 		if (fill.expand) {
-			radialExtent += flash * fill.expand;
+			radialExtent += fill.expand;
 		}
 
 		const drawPos = vector.scaleAround(center, MapCenter, scale);
@@ -900,11 +903,11 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		});
 	} else if (shape.type === "circle") {
 		let radius = shape.radius;
-		if (flash > 0 && fill.strikeGrow) {
-			radius += flash * fill.strikeGrow;
+		if (highlight && highlight.growth) {
+			radius += highlight.growth;
 		}
 		if (fill.expand) {
-			radius += flash * fill.expand;
+			radius += fill.expand;
 		}
 
 		let drawPos = vector.scaleAround(pos, MapCenter, scale);
@@ -919,12 +922,12 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	}
 }
 
-function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, fill: SwatchBloom, world: w.World) {
+function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleContext, fill: SwatchBloom, world: w.World) {
 	if (ctxStack.rtx < r.GraphicsLevel.Ultra) {
 		return;
 	}
 
-	if (fill.strikeOnly && !params.flash) {
+	if (fill.strikeOnly && !params.highlight) {
 		// Only display on strike
 		return;
 	}
@@ -932,8 +935,8 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	const color = calculateObstacleColor(obstacle, params, fill, world);
 	let bloom = fill.bloom !== undefined ? fill.bloom : DefaultBloomRadius;
 	if (fill.strikeOnly) {
-		color.fade(1 - params.flash);
-		bloom *= params.flash;
+		color.fade(1 - params.highlight.flash);
+		bloom *= params.highlight.flash;
 	}
 
 	let scale = 1;
@@ -957,7 +960,7 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	});
 }
 
-function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleParams, smoke: SwatchSmoke, world: w.World) {
+function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleContext, smoke: SwatchSmoke, world: w.World) {
 	if (ctxStack.rtx < r.GraphicsLevel.High) {
 		return;
 	}
@@ -1012,7 +1015,34 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	}, world);
 }
 
-function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number, ticks?: number) {
+function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, strike: RenderStrikeParams): HighlightResult {
+	const created = modifyHighlight(activeTick, obj, world, strike);
+
+	if (obj.uiHighlight && world.tick >= obj.uiHighlight.fromTick + obj.uiHighlight.maxTicks) {
+		obj.uiHighlight = null;
+	}
+
+	const highlight = obj.uiHighlight;
+	if (highlight) {
+		const proportion = calculateHighlightProportion(highlight, world);
+		return {
+			created,
+			proportion,
+			flash: highlight.flash ? proportion : 0,
+			growth: highlight.growth ? proportion * highlight.growth : 0,
+			params: highlight,
+		};
+	} else {
+		return null;
+	}
+}
+
+function modifyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, strike: RenderStrikeParams) {
+	if (!strike) {
+		// No highlight configured
+		return false;
+	}
+
 	const Visuals = world.settings.Visuals;
 
 	if (!activeTick) {
@@ -1021,6 +1051,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 
 	const highlightTick = obj.uiHighlight ? obj.uiHighlight.fromTick : 0;
 	if (activeTick <= highlightTick) {
+		// Already highlighted
 		return false;
 	}
 
@@ -1028,9 +1059,9 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 	const highlight: w.TrailHighlight = {
 		tag: obj.id,
 		fromTick: activeTick,
-		maxTicks: ticks || Visuals.DefaultFlashTicks,
-		glow,
-		growth,
+		maxTicks: strike.ticks || Visuals.DefaultFlashTicks,
+		flash: strike.flash,
+		growth: strike.growth,
 	};
 	obj.uiHighlight = highlight;
 
@@ -1282,30 +1313,29 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 
 	let color = heroColor(hero.id, world);
 
-	const hitAge = hero.hitTick ? world.tick - hero.hitTick : Infinity;
-	const flash = Math.max(0, (1 - hitAge / Visuals.DamageFlashTicks));
+	const highlight = applyHighlight(hero.hitTick, hero, world, Visuals.Damage);
 
 	const angle = hero.body.getAngle();
 	let radius = hero.radius;
-	if (flash > 0) {
-		radius += Visuals.DamageGrowFactor * radius * flash;
+	if (highlight && highlight.growth) {
+		radius += highlight.growth * radius;
 	}
 
 	let style = ColTuple.parse(color);
-	if (flash > 0) {
-		style.lighten(Visuals.DamageGlowFactor * flash);
-	}
+	if (highlight && highlight.flash) {
+		style.lighten(highlight.flash);
 
-	// Hit flash
-	if (flash > 0 && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
-		glx.circle(ctxStack, pos, {
-			color: style,
-			maxRadius: 0,
-			feather: {
-				sigma: radius + flash * DefaultBloomRadius,
-				alpha: DefaultCastingGlow,
-			},
-		});
+		// Hit flash
+		if (ctxStack.rtx >= r.GraphicsLevel.Ultra) {
+			glx.circle(ctxStack, pos, {
+				color: style,
+				maxRadius: 0,
+				feather: {
+					sigma: radius + highlight.flash * DefaultBloomRadius,
+					alpha: DefaultCastingGlow,
+				},
+			});
+		}
 	}
 
 	// Charging
@@ -1571,23 +1601,17 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	const maxTicks = shield.expireTick - shield.createTick;
 	const proportion = 1.0 * ticksRemaining / maxTicks;
 
-	let flash = 0;
-	if (shield.hitTick >= 0) {
-		const hitAge = world.tick - shield.hitTick;
-		if (hitAge < Visuals.ShieldFlashTicks) {
-			flash = (1 - hitAge / Visuals.ShieldFlashTicks);
-		}
-	}
+	const highlight = applyHighlight(shield.hitTick, shield, world, shield.strike);
 
 	let color = ColTuple.parse((shield.selfColor && shield.owner === world.ui.myHeroId) ? Visuals.MyHeroColor : shield.color);
-	if (flash > 0) {
-		color.lighten(Visuals.ShieldGlowFactor * flash);
+	if (highlight && highlight.flash) {
+		color.lighten(highlight.flash);
 	}
 	color.alpha((MaxAlpha - MinAlpha) * proportion + MinAlpha);
 
 	let scale: number = 1;
-	if (flash > 0) {
-		scale += Visuals.ShieldGrowFactor * flash;
+	if (highlight && highlight.growth) {
+		scale += highlight.growth;
 	}
 	if (world.tick - shield.createTick < shield.growthTicks) {
 		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
@@ -1677,7 +1701,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 	const antiClockwise = vector.angleDelta(previousAngle, newAngle) < 0;
 
 
-	applyHighlight(saber.hitTick, saber, world);
+	applyHighlight(saber.hitTick, saber, world, saber.strike);
 
 	pushTrail({
 		type: "arc",
@@ -1888,7 +1912,9 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 		return;
 	}
 
-	if (!applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth, strike.ticks)) {
+	const highlightResult = applyHighlight(projectile.hitTick, projectile, world, strike);
+	if (!(highlightResult && highlightResult.created)) {
+		// Sometimes can strike multiple times in same tick - don't want to create extra copies of particles
 		return;
 	}
 
@@ -2127,7 +2153,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	if (trail.highlight) {
 		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
 		if (highlightProportion > 0) {
-			if (trail.highlight.glow) {
+			if (trail.highlight.flash) {
 				color = color.lighten(highlightProportion);
 			}
 			if (trail.highlight.growth) {

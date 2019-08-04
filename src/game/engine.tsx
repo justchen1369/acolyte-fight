@@ -198,6 +198,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		undamageable: template.undamageable,
 
 		render: template.render || [],
+		strike: template.strike,
 		sound: template.sound,
 
 		shape,
@@ -267,6 +268,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		color: spell.color,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		strike: spell.strike,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -315,6 +317,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		selfColor: spell.selfPassthrough,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		strike: spell.strike,
 	};
 
 	world.objects.set(shield.id, shield);
@@ -371,6 +374,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		color: spell.color,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		strike: spell.strike,
 
 		spellId: spell.id,
 		angleOffset,

@@ -145,7 +145,6 @@ declare interface SwatchFill extends SwatchColor {
 	expand?: number;
 	glow?: number;
 	bloom?: number
-	strikeGrow?: number;
 	shadow?: boolean; // Apply shadow offset and shadow feather to fill
 }
 
@@ -193,6 +192,7 @@ declare interface ObstacleTemplateLookup {
 
 declare interface ObstacleTemplate {
 	render?: SwatchRender[];
+	strike?: RenderStrikeParams;
 	sound?: string;
 
 	static?: boolean; // Whether this obstacle is movable
@@ -645,10 +645,7 @@ declare interface RenderLink extends RenderParamsBase {
 	shine?: number;
 	glow?: number;
 	bloom?: number;
-
-	redirectGrowth?: number;
-	redirectFlash?: boolean;
-	redirectFlashTicks?: number;
+	strike?: RenderStrikeParams;
 }
 
 declare interface RenderReticule extends RenderParamsBase {
@@ -668,11 +665,10 @@ declare interface RenderReticule extends RenderParamsBase {
 	bloom?: number;
 }
 
-declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
+declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams, RenderStrikeParams {
 	type: "strike";
 	ticks: number;
-	glow?: boolean;
-	growth?: number;
+
 	detonate?: number; // Render an explosion of this radius on hit
 	numParticles?: number;
 	particleShine?: number;
@@ -680,6 +676,12 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams {
 	particleBloom?: number;
 	particleVanish?: number;
 	speedMultiplier?: number;
+}
+
+declare interface RenderStrikeParams {
+	ticks?: number;
+	flash?: boolean;
+	growth?: number;
 }
 
 declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {
@@ -812,7 +814,8 @@ declare interface ShieldSpell extends SpellBase {
 
 declare interface ReflectSpell extends ShieldSpell {
     action: "shield";
-    radius: number;
+	radius: number;
+	strike?: RenderStrikeParams;
 }
 
 declare interface WallSpell extends ShieldSpell {
@@ -832,6 +835,8 @@ declare interface WallSpell extends ShieldSpell {
 
 	categories?: number; // Use this to make a wall an impassable obstacle
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
+
+	strike?: RenderStrikeParams;
 }
 
 declare interface SaberSpell extends ShieldSpell {
@@ -855,6 +860,7 @@ declare interface SaberSpell extends ShieldSpell {
 	shine?: number;
 	bloom?: number;
 	glow?: number;
+	strike?: RenderStrikeParams;
 	trailTicks: number;
 }
 
@@ -1011,14 +1017,7 @@ interface VisualSettings {
 	CastingFlashTicks: number;
 
 	// Visuals when acolyte takes damage
-	DamageGrowFactor: number;
-	DamageGlowFactor: number;
-	DamageFlashTicks: number;
-
-	// Visuals for shields
-	ShieldGlowFactor: number;
-	ShieldGrowFactor: number;
-	ShieldFlashTicks: number;
+	Damage: RenderStrikeParams;
 
 	// Controls the name floating above the acolyte
 	NameMargin: number;
