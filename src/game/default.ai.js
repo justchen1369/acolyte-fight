@@ -70,7 +70,7 @@ function chooseSpells(settings) {
 
     var spells = randomSpells(settings);
 
-    // Want to test a particular spell? Uncomment and edit the line below
+    // Want to test a particular spell? Uncomment and edit the lines below
     // spells["e"] = "saber";
 
     return { spells };
@@ -233,6 +233,10 @@ function validAttack(state, hero, opponent, spell) {
         if (opponentShielded && !spell.projectile.detonate) { // Detonate spells can penetrate shields, nothing else can
             return false;
         }
+        if (spell.id === "whip") {
+            // Just keep casting Electroshock even if out of range
+            return true;
+        }
 
         var range = spell.projectile.speed * spell.projectile.maxTicks / TicksPerSecond + opponent.radius;
         return distance <= range;
@@ -245,7 +249,10 @@ function validAttack(state, hero, opponent, spell) {
 }
 
 function readyForNextSpell(hero) {
-    return Date.now() >= nextSpell || !!hero.linkedToId;
+    return (
+        Date.now() >= nextSpell // Don't cast too fast
+        || !!hero.link // If linked to something, cast as many spells as possible
+    );
 }
 
 function updateNextSpellTime() {
@@ -283,7 +290,8 @@ function focus(hero, opponent) { // When using a spell (e.g. Acolyte Beam, Spiri
 }
 
 function chase(state, hero, cooldowns, opponent) {
-    if (cooldowns["whip"] === 0) {
+    if ("whip" in cooldowns) {
+        // Got to get within range when using Electroshock
         var target = vectorMidpoint(hero.pos, opponent.pos);
         return { spellId: "move", target };
     } else {

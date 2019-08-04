@@ -46,9 +46,14 @@ export interface Hero extends WorldObject {
 	heading: number; // the direction the hero is currently facing, in radians
 	radius: number; // The radius of the hero
 	inside: boolean; // Whether the unit in inside or outside the confines of the map
-	linkedToId?: string; // If set, this Hero currently has trapped another Hero in a link. This is the ID of the other Hero (the "victim").
+	link: LinkState; // If set, this Hero currently has trapped another hero in a link
 	casting?: CastingState; // If set, currently casting a channelled spell
 	shieldTicksRemaining: number; // The number of ticks that the hero will continue to be shielded for, 0 if unshielded
+}
+
+export interface LinkState {
+	spellId: string; // The type of link
+	targetId: string; // The ID of the other object (e.g. hero or obstacle) currently attached to
 }
 
 export interface Projectile extends WorldObject {
@@ -67,4 +72,5 @@ export interface CooldownsRemaining {
 }
 
 export interface Obstacle extends WorldObject {
+	type: string;
 }

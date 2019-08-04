@@ -210,7 +210,10 @@ function worldToState(world: w.World, myHeroId: string): AI.World {
                 heading: obj.body.getAngle(),
                 inside: engine.isInsideMap(obj.body.getPosition(), obj.radius, world),
                 health: obj.health,
-                linkedToId: obj.link ? obj.link.targetId : null,
+                link: obj.link ? {
+                    spellId: obj.link.spellId,
+                    targetId: obj.link.targetId,
+                } : null,
                 shieldTicksRemaining: 0,
                 casting: obj.casting ? { 
                     spellId: obj.casting.action.type,
@@ -228,6 +231,7 @@ function worldToState(world: w.World, myHeroId: string): AI.World {
         } else if (obj.category === "obstacle") {
             contract.obstacles[obj.id] = {
                 id: obj.id,
+                type: obj.type,
                 pos: obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
             };
