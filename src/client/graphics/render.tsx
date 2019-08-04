@@ -1012,7 +1012,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 	}, world);
 }
 
-function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number) {
+function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.World, glow: boolean = true, growth?: number, ticks?: number) {
 	const Visuals = world.settings.Visuals;
 
 	if (!activeTick) {
@@ -1028,7 +1028,7 @@ function applyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wor
 	const highlight: w.TrailHighlight = {
 		tag: obj.id,
 		fromTick: activeTick,
-		maxTicks: Visuals.FlashTicks,
+		maxTicks: ticks || Visuals.FlashTicks,
 		glow,
 		growth,
 	};
@@ -1888,7 +1888,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 		return;
 	}
 
-	if (!applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth)) {
+	if (!applyHighlight(projectile.hitTick, projectile, world, strike.glow, strike.growth, strike.ticks)) {
 		return;
 	}
 

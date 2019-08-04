@@ -1004,9 +1004,6 @@ interface VisualSettings {
 	BotColor: string;
 	OnlineColor: string;
 
-	Colors: string[];
-	TeamColors: string[];
-
 	ChargingRadius: number;
 	ChargingFlashTicks: number;
 
@@ -1020,18 +1017,26 @@ interface VisualSettings {
 
 	FlashTicks: number;
 
+	// Controls the name floating above the acolyte
 	NameMargin: number;
 	NameFontPixels: number;
 	NameHeightPixels: number;
 	NameWidthPixels: number;
 
+	// Health bar floating above the acolyte
 	HealthBarHeroRadiusFraction: number;
 	HealthBarHeight: number;
 	HealthBarMargin: number;
 
+	// The buttons at the bottom of the screen
 	ButtonBarMaxHeightProportion: number;
 	ButtonBarSpacing: number;
 	ButtonBarMargin: number;
 	ButtonBarSize: number;
 	ButtonBarGap: number;
+
+	// Acolyte colors
+	Colors: string[];
+	TeamColors: string[];
+
 }

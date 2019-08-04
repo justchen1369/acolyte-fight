@@ -89,29 +89,6 @@ const Visuals: VisualSettings = {
 	BotColor: '#cccccc',
 	OnlineColor: '#ccc',
 
-	Colors: [
-		"#cb8fc1",
-		"#7db37d",
-		"#917ccc",
-		"#cc7c88",
-		"#d0c16b",
-		"#56b5bf",
-		"#6d89cc",
-		"#b9cc64",
-		"#cea85c",
-		"#54b7a2",
-		"#a97fc1",
-	],
-
-	TeamColors: [
-		"#cb8fc1",
-		"#d0c16b",
-		"#7db37d",
-		"#cea85c",
-		"#54b7a2",
-		"#a97fc1",
-	],
-
 	ChargingRadius: Pixel * 7,
 	ChargingFlashTicks: 15,
 
@@ -138,7 +115,31 @@ const Visuals: VisualSettings = {
 	ButtonBarSpacing: 8,
 	ButtonBarMargin: 5,
 	ButtonBarSize: 72,
-	ButtonBarGap: 12,
+    ButtonBarGap: 12,
+
+	Colors: [
+		"#cb8fc1",
+		"#7db37d",
+		"#917ccc",
+		"#cc7c88",
+		"#d0c16b",
+		"#56b5bf",
+		"#6d89cc",
+		"#b9cc64",
+		"#cea85c",
+		"#54b7a2",
+		"#a97fc1",
+	],
+
+	TeamColors: [
+		"#cb8fc1",
+		"#d0c16b",
+		"#7db37d",
+		"#cea85c",
+		"#54b7a2",
+		"#a97fc1",
+	],
+
 }
 
 const Choices: ChoiceSettings = {
