@@ -2186,7 +2186,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 				scale = 1 + trail.highlight.growth * highlightProportion;
 			}
 			if (trail.highlight.bloom && feather) {
-				feather.sigma += trail.highlight.bloom * highlightProportion;
+				feather.sigma += proportion * trail.highlight.bloom * highlightProportion;
 			}
 		} else {
 			trail.highlight = null; // highlight expired
