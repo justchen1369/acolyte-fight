@@ -295,7 +295,7 @@ const mirror: ObstacleTemplate = {
     "health": 50,
 
     strike: {
-        ticks: 6,
+        ticks: 10,
         flash: true,
         growth: 0.005,
     },

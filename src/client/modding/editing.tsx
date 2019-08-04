@@ -53,8 +53,8 @@ export const modToSettings = Reselect.createSelector(
     (mod: ModTree) => mod,
     (mod: ModTree) => {
         if (mod) {
-            modder.modToSettings(mod)
+            return modder.modToSettings(mod)
         } else {
-            return null;
+            return settings.DefaultSettings;
         }
     });
