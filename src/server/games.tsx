@@ -666,7 +666,7 @@ function closeGameIfNecessary(game: g.Game, data: m.TickMsg) {
 	}
 
 	if (game.tick >= game.closeTick) {
-		if (game.bots.size === 0 && wu(game.active.values()).every(x => !!x.userId)) {
+		if (wu(game.active.values()).every(x => !!x.userId)) {
 			// Everyone must be logged in to activate team mode
 			if (numPlayers >= 4 && Math.random() < game.matchmaking.TeamGameProbability) {
 				const candidates = new Array<number>();
