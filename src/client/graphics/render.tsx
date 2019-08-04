@@ -1337,12 +1337,12 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		style.lighten(highlight.flash);
 
 		// Hit flash
-		if (ctxStack.rtx >= r.GraphicsLevel.Ultra) {
+		if (highlight.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 			glx.circle(ctxStack, pos, {
 				color: style,
 				maxRadius: 0,
 				feather: {
-					sigma: radius + highlight.flash * DefaultBloomRadius,
+					sigma: radius + highlight.bloom,
 					alpha: DefaultCastingGlow,
 				},
 			});
@@ -1635,6 +1635,9 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			sigma: shield.bloom !== undefined ? shield.bloom : Visuals.DefaultGlowRadius,
 			alpha: shield.glow,
 		};
+	}
+	if (highlight && highlight.bloom && feather) {
+		feather.sigma += highlight.bloom;
 	}
 
 	if (shield.type === "reflect") {
@@ -2161,19 +2164,6 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	if (trail.fade) {
 		color.mix(ColTuple.parse(trail.fade), 1 - proportion);
 	}
-	if (trail.highlight) {
-		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
-		if (highlightProportion > 0) {
-			if (trail.highlight.flash) {
-				color = color.lighten(highlightProportion);
-			}
-			if (trail.highlight.growth) {
-				scale = 1 + trail.highlight.growth * highlightProportion;
-			}
-		} else {
-			trail.highlight = null; // highlight expired
-		}
-	}
 	if (trail.vanish) {
 		color.fade(trail.vanish * (1 - proportion));
 	}
@@ -2184,6 +2174,23 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			sigma: proportion * (trail.bloom !== undefined ? trail.bloom : Visuals.DefaultGlowRadius),
 			alpha: trail.glow,
 		};
+	}
+
+	if (trail.highlight) {
+		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
+		if (highlightProportion > 0) {
+			if (trail.highlight.flash) {
+				color = color.lighten(highlightProportion);
+			}
+			if (trail.highlight.growth) {
+				scale = 1 + trail.highlight.growth * highlightProportion;
+			}
+			if (trail.highlight.bloom && feather) {
+				feather.sigma += trail.highlight.bloom * highlightProportion;
+			}
+		} else {
+			trail.highlight = null; // highlight expired
+		}
 	}
 
 	if (trail.type === "circle") {

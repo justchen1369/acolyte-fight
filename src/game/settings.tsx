@@ -95,6 +95,7 @@ const Visuals: VisualSettings = {
     Damage: {
         ticks: 10,
         growth: 0.25,
+        bloom: 0.05,
         flash: true,
     },
 
