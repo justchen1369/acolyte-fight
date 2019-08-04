@@ -1926,7 +1926,7 @@ textarea.ai-js {
 }
 
 .entity-panel {
-    padding: 5px;
+    padding: 0;
     display: flex;
     flex-direction: column;
 }
@@ -1938,7 +1938,7 @@ textarea.ai-js {
 }
 
 .entity-list-item {
-    padding: 2px;
+    padding: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
@@ -1948,12 +1948,19 @@ textarea.ai-js {
 .entity-list-item.unmodded {
     color: #888;
 }
-.entity-list-item.selected {
+.entity-list-item.multi-selected {
     background: #333;
+}
+.entity-list-item.selected {
+    background: #0cf;
+    color: white;
+}
+
+.entity-panel .button-row {
+    padding: 5px;
 }
 
 .code-panel {
-    padding: 5px;
     display: flex;
     flex-direction: column;
 }
@@ -1963,6 +1970,8 @@ textarea.ai-js {
 }
 
 .editor-actions {
+    padding: 5px;
+    padding-left: 0;
     display: flex;
     flex-direction: row;
     align-items: center;

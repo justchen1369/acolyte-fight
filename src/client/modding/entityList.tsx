@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import uniqid from 'uniqid';
 import classNames from 'classnames';
+import * as Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
@@ -21,6 +22,7 @@ interface Props extends OwnProps {
     selectedId: string;
 }
 interface State {
+    selectedIds: Immutable.Set<string>;
 }
 
 const noErrors = {}; // Reuse this to keep reference equality
@@ -48,7 +50,7 @@ class EntityList extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            selectedId: null,
+            selectedIds: Immutable.Set(),
         };
     }
 
@@ -74,6 +76,7 @@ class EntityList extends React.PureComponent<Props, State> {
         const className = classNames({
             'entity-list-item': true,
             'selected': id === this.props.selectedId,
+            'multi-selected': this.state.selectedIds.has(id),
             'modded': isModded,
             'unmodded': !isModded,
             'error': id in this.props.errors,
@@ -81,7 +84,7 @@ class EntityList extends React.PureComponent<Props, State> {
         return <div
             key={id}
             className={className}
-            onMouseDown={() => editing.updateSelected(id)}
+            onMouseDown={(ev) => this.onEntityClick(ev, id)}
             >{id}</div>
     }
 
@@ -105,6 +108,38 @@ class EntityList extends React.PureComponent<Props, State> {
         const disabled = !selectedId;
         const className = classNames({ 'btn': true, 'btn-disabled': disabled });
         return <div className={className} title="Remove" onClick={() => !disabled && this.onRemoveClick()}><i className="fas fa-trash" /></div>;
+    }
+
+    private onEntityClick(ev: React.MouseEvent, id: string) {
+        if (ev.shiftKey) {
+            const ids = this.idSelector(this.props.section);
+            const initialIndex = ids.indexOf(this.props.selectedId);
+            const finalIndex = ids.indexOf(id);
+            if (initialIndex !== -1 && finalIndex !== -1) {
+                let selectedIds = this.state.selectedIds;
+                const from = Math.min(initialIndex, finalIndex);
+                const to = Math.max(initialIndex, finalIndex);
+                for (let i = from; i <= to; ++i) {
+                    selectedIds = selectedIds.add(ids[i]);
+                }
+                this.setState({ selectedIds });
+            }
+        } else if (ev.ctrlKey) {
+            let selectedIds = this.state.selectedIds;
+            if (selectedIds.has(id)) {
+                selectedIds = selectedIds.delete(id);
+            } else {
+                selectedIds = selectedIds.add(id);
+            }
+            this.setState({ selectedIds });
+        } else {
+            let selectedIds = this.state.selectedIds;
+            selectedIds = selectedIds.clear();
+            selectedIds.add(id);
+            this.setState({ selectedIds });
+        }
+
+        editing.updateSelected(id);
     }
 
     private onAddClick() {
@@ -136,6 +171,10 @@ class EntityList extends React.PureComponent<Props, State> {
 
         editing.deleteItem(this.props.sectionKey, this.props.selectedId);
         editing.updateSelected(null);
+
+        this.state.selectedIds.forEach(id => {
+            editing.deleteItem(this.props.sectionKey, id);
+        });
     }
 }
 
