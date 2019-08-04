@@ -418,6 +418,7 @@ const difire: Spell = {
         damage: 0,
         lifeSteal,
         categories: Categories.Projectile,
+        expireAgainstObjects: Alliances.All ^ Alliances.Self,
 
         sound: "triplet",
         soundHit: "standard",
