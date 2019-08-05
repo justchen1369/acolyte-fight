@@ -31,8 +31,7 @@ function act(input) {
     var settings = input.settings;
 
     var strongest = findStrongestEnemy(state.heroes, heroId);
-    var closest = findClosestEnemy(state.heroes, heroId);
-    if (!(hero && strongest && closest)) {
+    if (!(hero && strongest)) {
         // Either we're dead, or everyone else is, nothing to do
         return null;
     }
@@ -45,11 +44,11 @@ function act(input) {
             || castSpell(state, hero, strongest, cooldowns, settings)
             || focus(hero, strongest)
             || chase(state, hero, cooldowns, strongest)
-            || move(state, hero, closest);
+            || move(state, hero);
     } else {
         action =
             chooseSpells(settings)
-            || move(state, hero, closest);
+            || move(state, hero);
     }
 
     if (action) {
@@ -299,8 +298,28 @@ function chase(state, hero, cooldowns, opponent) {
     }
 }
 
-function move(state, hero, opponent) {
-    var offset = vectorNegate(vectorDiff(opponent.pos, center)); // Move to the opposite side of the arena
+function move(state, hero) {
+    var centroid = { x: 0, y: 0 };
+    var numOpponents = 0;
+    for (var heroId in state.heroes) {
+        if (heroId === hero.id) {
+            continue; // Ignore self
+        }
+
+        var opponent = state.heroes[heroId];
+        centroid.x += opponent.pos.x;
+        centroid.y += opponent.pos.y;
+
+        ++numOpponents;
+    }
+    centroid.x /= numOpponents;
+    centroid.y /= numOpponents;
+
+    if (!numOpponents) {
+        return;
+    }
+
+    var offset = vectorNegate(vectorDiff(centroid, center)); // Move to the opposite side of the arena
     var targetDistance = state.radius * 0.33; // Closer to center than edge (for polygonal maps)
     var target = vectorPlus(center, vectorRelengthen(offset, targetDistance));
 
