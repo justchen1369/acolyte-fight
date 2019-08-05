@@ -96,6 +96,7 @@ app.get('/api/games/:gameId', (req, res) => api.onGetGame(req, res));
 app.get('/api/gameStats', (req, res) => api.onGetGameStats(req, res));
 app.post('/api/kongregate', (req, res) => api.onKongregateLogin(req, res));
 app.get('/api/leaderboard', (req, res) => api.onGetLeaderboard(req, res));
+app.get('/api/leagues/:category', (req, res) => api.onGetLeagues(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/profile', (req, res) => api.onGetProfile(req, res));
 app.get('/api/ratingAtPercentile', (req, res) => api.onGetRatingAtPercentile(req, res));

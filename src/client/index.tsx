@@ -67,8 +67,7 @@ export async function initialize() {
 
     notifications.startTimers();
 
-    loader.setLoadedPromise(start());
-
+    start().then(() => loader.unblock()).catch(console.error); // Don't await
     render();
 
     seen.loadSeenVersion(); // Don't bother awaiting

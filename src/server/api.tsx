@@ -376,6 +376,44 @@ export async function onGetRatingAtPercentileAsync(req: express.Request, res: ex
     res.send(response);
 }
 
+export function onGetLeagues(req: express.Request, res: express.Response) {
+    onGetLeaguesAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetLeaguesAsync(req: express.Request, res: express.Response): Promise<void> {
+    const Placements = constants.Placements;
+    if (!(required(req.params.category, "string"))) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    await percentiles.ready.promise;
+
+    const category = req.params.category;
+
+    const leagues: m.League[] = [
+        estimateLeague(category, "Grandmaster", Placements.Grandmaster),
+        estimateLeague(category, "Master", Placements.Master),
+        estimateLeague(category, "Diamond", Placements.Diamond),
+        estimateLeague(category, "Platinum", Placements.Grandmaster),
+        estimateLeague(category, "Gold", Placements.Gold),
+        estimateLeague(category, "Silver", Placements.Silver),
+        estimateLeague(category, "Bronze", Placements.Bronze),
+        estimateLeague(category, "Wood", Placements.Wood),
+    ];
+
+    const response: m.GetLeaguesResponse = { leagues };
+    res.send(response);
+}
+
+function estimateLeague(category: string, name: string, minPercentile: number): m.League {
+    return {
+        name,
+        minPercentile,
+        minRating: percentiles.estimateRatingAtPercentile(category, minPercentile),
+    };
+}
+
 export function onGetProfile(req: express.Request, res: express.Response) {
     onGetProfileAsync(req, res).catch(error => handleError(error, res));
 }

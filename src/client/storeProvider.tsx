@@ -43,6 +43,7 @@ function initialState(): s.State {
         items: [],
         silenced: new Set<string>(),
         profile: null,
+        leagues: null,
         allGameStats: new Map<string, d.GameStats>(),
         hasReplayLookup: new Map<string, string>(),
         online: Immutable.Map(),
@@ -247,6 +248,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, server: action.server, region: action.region, socketId: action.socketId };
     } else if (action.type === "updateProfile") {
         return { ...state, profile: action.profile };
+    } else if (action.type === "updateLeagues") {
+        return { ...state, leagues: action.leagues };
     } else if (action.type === "updateGameStats") {
         const allGameStats = new Map<string, d.GameStats>(state.allGameStats);
         for (const gameStats of action.allGameStats) {

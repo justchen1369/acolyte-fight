@@ -37,6 +37,7 @@ export interface State {
     silenced: Set<string>;
 
     profile: m.GetProfileResponse;
+    leagues: m.League[];
     allGameStats: Map<string, d.GameStats>; // gameId -> gameStats
     hasReplayLookup: Map<string, string>; // gameId -> url to replay data
 
@@ -128,6 +129,7 @@ export type Action =
     | UpdateRebindingsAction
     | UpdateServerAction
     | UpdateProfileAction
+    | UpdateLeaguesAction
     | UpdateGameStatsAction
     | UpdateHasReplayAction
     | UpdateCodeTreeAction
@@ -299,6 +301,11 @@ export interface UpdateServerAction {
 export interface UpdateProfileAction {
     type: "updateProfile";
     profile: m.GetProfileResponse;
+}
+
+export interface UpdateLeaguesAction {
+    type: "updateLeagues";
+    leagues: m.League[];
 }
 
 export interface UpdateGameStatsAction {

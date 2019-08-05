@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import crypto from 'crypto';
+import deferred from 'promise-defer';
 import moment from 'moment';
 import * as Firestore from '@google-cloud/firestore';
 import * as categories from '../game/segments';
@@ -22,6 +23,9 @@ interface DbFrequenciesResult {
 let cumulativeFrequenciesCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
 let distributionCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
 let numUsersCache: number = 0;
+
+export const ready = deferred<void>();
+let isReady = false;
 
 export async function init() {
     refreshCumulativeFrequenciesLoop();
@@ -51,6 +55,11 @@ export function estimateNumUsers(): number {
 
 async function refreshCumulativeFrequenciesLoop() {
     await refreshCumulativeFrequencies();
+    if (!isReady) {
+        isReady = true;
+        ready.resolve();
+    }
+
     const delayMilliseconds = calculateNextRefresh(numUsersCache);
     setTimeout(() => refreshCumulativeFrequenciesLoop(), delayMilliseconds);
 }

@@ -470,6 +470,15 @@ export interface GetRatingAtPercentileResponse {
     rating: number;
 }
 
+export interface GetLeaguesResponse {
+    leagues: League[];
+}
+export interface League {
+    name: string;
+    minPercentile: number;
+    minRating: number;
+}
+
 export interface GetProfileResponse {
     userId: string;
     name: string;

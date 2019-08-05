@@ -1,9 +1,10 @@
-let loadingPromise = Promise.resolve();
+import defer from 'promise-defer';
+let loading = defer<void>();
 
 export function loaded() {
-    return loadingPromise;
+    return loading.promise;
 }
 
-export function setLoadedPromise(promise: Promise<void>) {
-    loadingPromise = promise;
+export function unblock() {
+    loading.resolve();
 }

@@ -6,7 +6,6 @@ import * as m from '../../game/messages.model';
 import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as credentials from './credentials';
-import * as rankings from './rankings';
 import * as stats from './stats';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';

@@ -10,28 +10,15 @@ import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
-export interface League {
-    name: string;
-    minPercentile: number;
-}
-export interface PointsToNextLeague {
-    name: string;
-    pointsRemaining: number;
-}
-export interface PointsToNextLeagueLookup {
-    [category: string]: PointsToNextLeague;
-}
+export async function downloadLeagues() {
+    const state = StoreProvider.getState();
+    if (state.leagues) {
+        return;
+    }
 
-export const leagues = [
-    { name: "Grandmaster", minPercentile: constants.Placements.Grandmaster },
-    { name: "Master", minPercentile: constants.Placements.Master },
-    { name: "Diamond", minPercentile: constants.Placements.Diamond },
-    { name: "Platinum", minPercentile: constants.Placements.Platinum },
-    { name: "Gold", minPercentile: constants.Placements.Gold },
-    { name: "Silver", minPercentile: constants.Placements.Silver },
-    { name: "Bronze", minPercentile: constants.Placements.Bronze },
-    { name: "Wood", minPercentile: constants.Placements.Wood },
-];
+    const leagues = await retrieveLeagues(m.GameCategory.PvP);
+    StoreProvider.dispatch({ type: "updateLeagues", leagues });
+}
 
 export function onNotification(notifs: w.Notification[]) {
     for (const notif of notifs) {
@@ -66,22 +53,13 @@ function adjustRating(adjustment: w.RatingAdjustmentNotification) {
     StoreProvider.dispatch({ type: "updateProfile", profile });
 }
 
-export function getLeagueName(percentile: number) {
+export function getLeagueName(percentile: number, leagues: m.League[]) {
     for (const league of leagues) {
         if (percentile >= league.minPercentile) {
             return league.name;
         }
     }
     return "";
-}
-
-function calculateNextLeague(percentile: number): League {
-    const higher = leagues.filter(l => percentile < l.minPercentile);
-    if (higher.length === 0) {
-        return null;
-    }
-
-    return _.minBy(higher, l => l.minPercentile);
 }
 
 export async function retrieveMyStatsAsync() {
@@ -115,54 +93,16 @@ export async function retrieveUserStatsAsync(profileId: string) {
     }
 }
 
-export async function retrievePointsToNextLeagueAsync(ratings: m.UserRatingLookup): Promise<PointsToNextLeagueLookup> {
-    const categories = [m.GameCategory.PvP];
-    const lookup: PointsToNextLeagueLookup = {};
-
-    if (!ratings) {
-        return lookup;
-    }
-
-    for (const category of categories) {
-        const userRating = ratings[category];
-        if (!userRating) {
-            continue;
-        }
-
-        if (userRating.acoExposure && userRating.acoPercentile >= 0) {
-            lookup[category] = await calculatePointsUntilNextLeague(userRating.acoExposure, userRating.acoPercentile, category);
-        }
-    }
-    return lookup;
-}
-
-async function retrieveRatingAtPercentile(category: string, percentile: number): Promise<number> {
-    const res = await fetch(`${url.base}/api/ratingAtPercentile?category=${encodeURIComponent(category)}&percentile=${percentile}`, {
+export async function retrieveLeagues(category: string): Promise<m.League[]> {
+    const res = await fetch(`${url.base}/api/leagues/${encodeURIComponent(category)}`, {
         headers: credentials.headers(),
         credentials: 'same-origin',
     });
     if (res.status === 200) {
-        const json = await res.json() as m.GetRatingAtPercentileResponse;
-        return json.rating;
+        const json = await res.json() as m.GetLeaguesResponse;
+        return json.leagues;
     } else {
         throw await res.text();
-    }
-}
-
-async function calculatePointsUntilNextLeague(exposure: number, percentile: number, category: string): Promise<PointsToNextLeague> {
-    const nextLeague = calculateNextLeague(percentile);
-    if (!nextLeague) {
-        return null;
-    }
-
-    const minRating = await retrieveRatingAtPercentile(category, Math.ceil(nextLeague.minPercentile));
-    if (minRating) {
-        return {
-            name: nextLeague.name,
-            pointsRemaining: minRating - exposure,
-        };
-    } else {
-        return null;
     }
 }
 

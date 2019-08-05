@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as cloud from '../core/cloud';
 import * as constants from '../../game/constants';
+import * as loader from '../core/loader';
 import * as m from '../../game/messages.model';
 import * as pages from '../core/pages';
 import * as s from '../store.model';
@@ -17,6 +18,7 @@ interface Props {
     userId: string;
     profile: m.GetProfileResponse;
     unranked: boolean;
+    leagues: m.League[];
 }
 
 function stateToProps(state: s.State): Props {
@@ -24,6 +26,7 @@ function stateToProps(state: s.State): Props {
         userId: state.userId,
         profile: state.profile,
         unranked: state.options.unranked,
+        leagues: state.leagues,
     };
 }
 
@@ -37,14 +40,17 @@ class RatingControl extends React.PureComponent<Props> {
     }
 
     componentWillMount() {
-        if (this.props.userId && !this.props.profile) {
-            rankings.retrieveUserStatsAsync(this.props.userId); // Don't await
-        }
+        this.loadData(); // Don't await
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.userId && !newProps.profile) {
-            rankings.retrieveUserStatsAsync(this.props.userId); // Don't await
+    private async loadData() {
+        await loader.loaded();
+
+        if (!this.props.profile) {
+            await rankings.retrieveMyStatsAsync();
+        }
+        if (!this.props.leagues) {
+            await rankings.downloadLeagues();
         }
     }
 
@@ -90,7 +96,12 @@ class RatingControl extends React.PureComponent<Props> {
     }
 
     private renderRank(rating: m.UserRating) {
-        const league = rankings.getLeagueName(rating.acoPercentile);
+        if (!this.props.leagues) {
+            // Leagues not loaded, cannot render yet
+            return null;
+        }
+
+        const league = rankings.getLeagueName(rating.acoPercentile, this.props.leagues);
         return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
             <b>{league}</b> {rating.acoExposure.toFixed(0)}
         </PageLink>

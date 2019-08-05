@@ -28,12 +28,12 @@ interface Props extends OwnProps {
     playerName: string;
     loggedIn: boolean;
     myUserId: string;
+    leagues: m.League[];
 }
 
 interface State {
     profileId: string;
     profile: m.GetProfileResponse;
-    pointsToNextLeague: rankings.PointsToNextLeagueLookup;
     error: string;
 }
 
@@ -44,7 +44,18 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         playerName: state.playerName,
         loggedIn: state.loggedIn,
         myUserId: state.userId,
+        leagues: state.leagues,
     };
+}
+
+function calculateNextLeague(exposure: number, leagues: m.League[]): m.League {
+    const higherLeagues = leagues.filter(x => x.minRating > exposure);
+    if (higherLeagues.length === 0) {
+        return null;
+    }
+
+    const nextLeague = _.minBy(higherLeagues, x => x.minRating);
+    return nextLeague;
 }
 
 class UserStatsPanel extends React.PureComponent<Props, State> {
@@ -53,13 +64,16 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         this.state = {
             profileId: null,
             profile: null,
-            pointsToNextLeague: {},
             error: null,
         };
     }
 
     componentWillMount() {
         this.loadDataAsync(this.props.profileId || this.props.myUserId);
+
+        if (!this.props.leagues) {
+            rankings.downloadLeagues(); // Don't await
+        }
     }
 
     componentWillReceiveProps(newProps: Props) {
@@ -73,18 +87,11 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
                 if (this.props.myProfile && this.props.myProfile.userId === profileId) {
                     profile = this.props.myProfile;
                 }
-                this.setState({ profileId, profile, pointsToNextLeague: {}, error: null });
+                this.setState({ profileId, profile, error: null });
                 try {
                     const profile = await rankings.retrieveUserStatsAsync(profileId);
                     if (profile.userId === this.state.profileId) {
                         this.setState({ profile });
-                    }
-
-                    if (profile.userId === this.props.myUserId) {
-                        const pointsToNextLeague = await rankings.retrievePointsToNextLeagueAsync(profile.ratings);
-                        if (profile.userId === this.state.profileId) {
-                            this.setState({ pointsToNextLeague });
-                        }
                     }
                 } catch(error) {
                     console.error("UserStatsPanel error", error);
@@ -149,9 +156,13 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
     }
 
     private renderRankingStats(profile: m.GetProfileResponse, rating: m.UserRating) {
+        if (!this.props.leagues) {
+            // Leagues haven't loaded yet, can't display
+            return null;
+        }
+
         const isMe = profile.userId === this.props.myUserId;
-        const leagueName = rankings.getLeagueName(rating.acoPercentile);
-        const nextLeague = this.state.pointsToNextLeague[this.props.category];
+        const leagueName = rankings.getLeagueName(rating.acoPercentile, this.props.leagues);
 
         return <div>
             {<div className="stats-card-row">
@@ -164,9 +175,24 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
                     <div className="value">{leagueName}</div>
                 </div>
             </div>}
-            {isMe && nextLeague && <div className="points-to-next-league">
-                You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(nextLeague.pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
-            </div>}
+            {isMe && this.renderNextLeague(rating)}
+        </div>
+    }
+    
+    private renderNextLeague(rating: m.UserRating) {
+        if (!(rating && this.props.leagues)) {
+            return null;
+        }
+
+        const nextLeague = calculateNextLeague(rating.acoExposure, this.props.leagues);
+        if (!nextLeague) {
+            return null;
+        }
+
+        const leagueName = rankings.getLeagueName(rating.acoPercentile, this.props.leagues);
+        const pointsRemaining = nextLeague.minRating - rating.acoExposure;
+        return <div className="points-to-next-league">
+            You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
         </div>
     }
 
