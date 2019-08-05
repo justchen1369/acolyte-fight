@@ -511,7 +511,7 @@ export interface Wall extends ShieldBase {
 	points: pl.Vec2[];
 }
 
-export interface Saber extends ShieldBase, HighlightSource {
+export interface Saber extends ShieldBase, HighlightSource, HitSource {
 	type: "saber";
 
 	spellId: string;
@@ -528,6 +528,9 @@ export interface Saber extends ShieldBase, HighlightSource {
 	maxSpeed: number;
 
 	turnRate: number;
+
+	damageTemplate?: DamagePacketTemplate;
+	hitBuffs?: BuffTemplate[];
 
 	strike?: RenderStrikeParams;
 	trailTicks: number;

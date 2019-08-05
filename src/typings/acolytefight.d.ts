@@ -702,17 +702,21 @@ declare type BuffTemplate =
 	| SetCooldownTemplate
 	| BurnTemplate
 	| ArmorTemplate
+	| DelinkTemplate
 
 declare interface BuffTemplateBase {
 	type: string;
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
+
 	collideWith?: number; // Only apply the buff if projectile hit this object
 	against?: number; // Which alliances to apply this buff to
 	maxTicks?: number; // Maximum duration of this buff
+
 	channelling?: boolean; // Cancel this buff if the hero stops casting the spell
-	linkOwner?: boolean; // Cancel this buff if unlinked
+	linkOwner?: boolean; // Cancel this buff if no longer the owner of a link
 	linkVictim?: boolean; // Cancel this buff if no longer the victim of a link
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
+
 	render?: RenderBuff;
 	sound?: string;
 }
@@ -786,6 +790,10 @@ declare interface ArmorTemplate extends BuffTemplateBase {
 	targetOnly?: boolean; // If this armor is received by a projectile, only apply the armor to further damage received from the owner of the projectile
 }
 
+declare interface DelinkTemplate extends BuffTemplateBase {
+	type: "delink";
+}
+
 declare interface BuffSpell extends SpellBase {
     action: "buff";
 
@@ -857,6 +865,10 @@ declare interface SaberSpell extends ShieldSpell {
 
 	categories: number;
 	collidesWith: number;
+
+	damageTemplate?: DamagePacketTemplate; // Damage to apply to anyone we hit
+	hitInterval?: number; // If saber hits multiple times, only apply damage/buffs at this interval
+	hitBuffs?: BuffTemplate[]; // Buffs to apply to whoever we hit
 
 	shine?: number;
 	bloom?: number;

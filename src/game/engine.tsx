@@ -365,12 +365,19 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		growthTicks: 5,
 		channelling: spell.channelling,
 
+		damageTemplate: spell.damageTemplate,
+		hitTickLookup: new Map(),
+		hitInterval: spell.hitInterval,
+		hitBuffs: spell.hitBuffs,
+
 		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
 		destroying: true,
 		blocksTeleporters: spell.blocksTeleporters,
+
 		owner: hero.id,
 		points,
+
 		color: spell.color,
 		glow: spell.glow,
 		bloom: spell.bloom,
@@ -385,6 +392,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		maxSpeed: spell.maxSpeed,
 		turnRate: spell.maxTurnRatePerTickInRevs * (2 * Math.PI),
 		trailTicks: spell.trailTicks,
+
 		uiPreviousAngle: null,
 	};
 
@@ -1947,6 +1955,8 @@ function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObje
 		} else if (hit.category === "shield") {
 			handleHeroHitShield(world, object, hit);
 		}
+	} else if (object.category === "shield") {
+		handleShieldHit(world, object, hit);
 	} else if (object.category === "obstacle") {
 		handleObstacleHit(world, object, hit);
 	}
@@ -1959,6 +1969,44 @@ function recheckObstacleHit(obstacle: w.Obstacle, target: pl.Vec2, targetRadius:
 function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObject) {
 	if (world.tick > world.startTick && (obstacle.expireOn & hit.categories) > 0) {
 		obstacle.health = 0;
+	}
+}
+
+function handleShieldHit(world: w.World, shield: w.Shield, hit: w.WorldObject) {
+	if (shield.type === "saber") {
+		handleSaberHit(shield, hit, world);
+	}
+}
+
+function handleSaberHit(saber: w.Saber, obj: w.WorldObject, world: w.World) {
+	if (takeHit(saber, obj.id, world)) {
+		if (obj.category === "hero" || obj.category === "obstacle") {
+			if (saber.damageTemplate) {
+				const packet = instantiateDamage(saber.damageTemplate, saber.owner, world);
+				if (obj.category === "hero") {
+					applyDamage(obj, packet, world);
+				} else if (obj.category === "obstacle") {
+					applyDamageToObstacle(obj, packet, world);
+				}
+			}
+
+			if (saber.hitBuffs) {
+				applyBuffsFrom(saber.hitBuffs, saber.owner, obj, world, {
+					otherId: saber.owner,
+					spellId: saber.spellId,
+					tag: "saber",
+				});
+			}
+		} else if (obj.category === "projectile") {
+			if (obj.owner !== saber.owner && saber.takesOwnership && obj.shieldTakesOwnership && (calculateAlliance(saber.owner, obj.owner, world) & Alliances.Enemy) > 0) {
+				// Redirect back to owner
+				swapOwnership(obj, saber.owner, world);
+			}
+
+			if (destructibleBy(obj, saber.owner, world)) {
+				obj.expireTick = world.tick;
+			}
+		}
 	}
 }
 
@@ -3830,23 +3878,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 			world.ui.events.push({ type: "push", tick: world.tick, owner: hero.id, objectId: obj.id, direction: swingVelocity });
 		}
 
-		if (obj.category === "projectile") {
-			if (saber.takesOwnership && obj.shieldTakesOwnership && (calculateAlliance(saber.owner, obj.owner, world) & Alliances.Enemy) > 0) {
-				// Redirect back to owner
-				swapOwnership(obj, shield.owner, world);
-			}
-
-			if (destructibleBy(obj, hero.id, world)) {
-				obj.expireTick = world.tick;
-			}
-		} else if (obj.category === "hero") {
-			const damagePacket: w.DamagePacket = {
-				damage: 0,
-				lifeSteal: 0,
-				fromHeroId: saber.owner,
-			};
-			applyDamage(obj, damagePacket, world);
-		}
+		handleSaberHit(saber, obj, world);
 
 		hit = true;
 	});
@@ -4025,6 +4057,10 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			proportion: template.proportion,
 			fromHeroId,
 		});
+	} else if (template.type === "delink") {
+		if (hero.link) {
+			hero.link.expireTick = world.tick;
+		}
 	}
 }
 

@@ -2060,7 +2060,7 @@ const saber: Spell = {
         {
             icon: "fas fa-unlink",
             title: "Detach",
-            text: "Lightsaber cuts through any Links or Grapples currently attached to you.",
+            text: "Lightsaber cuts through any Links or Grapples.",
         },
     ],
     untargeted: true,
@@ -2093,6 +2093,11 @@ const saber: Spell = {
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
 
+    damageTemplate: { damage: 0 },
+    hitBuffs: [
+        { type: "delink" },
+    ],
+
     trailTicks: 5,
     color: '#00ccff',
     shine: 0.1,
@@ -2116,13 +2121,12 @@ const dualSaber: Spell = {
         {
             icon: "fas fa-unlink",
             title: "Detach",
-            text: "Dualsaber cuts through any Links or Grapples currently attached to you.",
+            text: "Dualsaber cuts through any Links or Grapples.",
         },
     ],
     untargeted: true,
 
     unlink: true,
-    delink: true,
     takesOwnership: true,
     blocksTeleporters: false,
     shiftMultiplier: 0.25,
@@ -2148,6 +2152,11 @@ const dualSaber: Spell = {
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
+
+    damageTemplate: { damage: 0 },
+    hitBuffs: [
+        { type: "delink" },
+    ],
 
     trailTicks: 5,
     color: '#ff0044',
