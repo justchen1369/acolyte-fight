@@ -356,6 +356,7 @@ const triplet: Spell = {
         damage: 0,
         lifeSteal,
         categories: Categories.Projectile,
+        expireAgainstObjects: Alliances.All ^ Alliances.Self, // Don't expire when trifire expires with itself
 
         sound: "triplet",
         soundHit: "standard",
