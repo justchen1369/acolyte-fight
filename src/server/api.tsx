@@ -395,7 +395,7 @@ export async function onGetLeaguesAsync(req: express.Request, res: express.Respo
         estimateLeague(category, "Grandmaster", Placements.Grandmaster),
         estimateLeague(category, "Master", Placements.Master),
         estimateLeague(category, "Diamond", Placements.Diamond),
-        estimateLeague(category, "Platinum", Placements.Grandmaster),
+        estimateLeague(category, "Platinum", Placements.Platinum),
         estimateLeague(category, "Gold", Placements.Gold),
         estimateLeague(category, "Silver", Placements.Silver),
         estimateLeague(category, "Bronze", Placements.Bronze),
