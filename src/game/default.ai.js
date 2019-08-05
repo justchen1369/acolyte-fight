@@ -97,27 +97,6 @@ function randomSpells(settings) {
 	return keyBindings;
 }
 
-function findClosestEnemy(heroes, myHeroId) {
-    var myHero = heroes[myHeroId];
-    if (!myHero) {
-        return null;
-    }
-
-    var closest = null;
-    var closestDistance = Infinity;
-    for (var heroId in heroes) {
-        var hero = heroes[heroId];
-        if (hero.isEnemy) {
-            var distance = vectorDistance(hero.pos, myHero.pos);
-            if (distance < closestDistance) {
-                closestDistance = distance;
-                closest = hero;
-            }
-        }
-    }
-    return closest;
-}
-
 function findStrongestEnemy(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
