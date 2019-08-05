@@ -3,10 +3,12 @@ import * as ReactRedux from 'react-redux';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
+import * as rankings from '../core/rankings';
 import PrivacyPolicyPanel from './privacyPolicyPanel';
 
 interface Props {
     settings: AcolyteFightSettings;
+    leagues: m.League[];
 }
 
 interface State {
@@ -15,6 +17,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         settings: state.room.settings,
+        leagues: state.leagues,
     };
 }
 
@@ -23,6 +26,12 @@ export class AboutSection extends React.PureComponent<Props, State> {
         super(props);
         this.state = {
         };
+    }
+
+    componentWillMount() {
+        if (!this.props.leagues) {
+            rankings.downloadLeagues(); // Don't await
+        }
     }
 
     render() {
@@ -83,21 +92,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 you only lose points for being below the player most similar to your skill level.
                 This is to discourage "noob hunting". There is nothing to be gained from defeating the newbies first when there are people more similar to your skill level in the same game.
             </p>
-            <h2>How are the leagues calculated?</h2>
-            <p>
-                These are the leagues and the minimum percentiles:
-            </p>
-            <ul>
-                <li>Grandmaster: {constants.Placements.Grandmaster} percentile</li>
-                <li>Master: {constants.Placements.Master} percentile</li>
-                <li>Diamond {constants.Placements.Diamond} percentile</li>
-                <li>Platinum: {constants.Placements.Platinum} percentile</li>
-                <li>Gold: {constants.Placements.Gold} percentile</li>
-                <li>Silver: {constants.Placements.Silver} percentile</li>
-                <li>Bronze: {constants.Placements.Bronze} percentile</li>
-                <li>Wood: {constants.Placements.Wood} percentile</li>
-            </ul>
-            <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
+            {this.renderLeagues()}
             <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
             <p>
                 No other factors are considered in the rating - kills do not matter, damage does not matter - the game is to be the last one standing
@@ -145,18 +140,33 @@ export class AboutSection extends React.PureComponent<Props, State> {
             <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
             was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
             originally created by <b>Zymoran</b>, <b>Adynathos</b>, <b>Toraxxx</b> and <b>sides</b>.</p>
-            <p>
-                <ul>
-                    <li><a href="http://piqnt.com/planck.js/" target="_blank">Planck.js</a> created by Erin Catto and Ali Shakiba and used under zlib license.</li>
-                    <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                    <li>Icons created by <a href="https://opengameart.org/content/95-game-icons" target="_blank">sbed</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                    <li>Icons created by <a href="http://delapouite.com/" target="_blank">Delapouite</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                    <li>RPG Awesome font used under <a href="https://github.com/nagoshiashumari/Rpg-Awesome" target="_blank">CC 3.0, SIL and MIT license</a>.</li>
-                    <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
-                </ul>
-            </p>
+            <ul>
+                <li><a href="http://piqnt.com/planck.js/" target="_blank">Planck.js</a> created by Erin Catto and Ali Shakiba and used under zlib license.</li>
+                <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
+                <li>Icons created by <a href="https://opengameart.org/content/95-game-icons" target="_blank">sbed</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
+                <li>Icons created by <a href="http://delapouite.com/" target="_blank">Delapouite</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
+                <li>RPG Awesome font used under <a href="https://github.com/nagoshiashumari/Rpg-Awesome" target="_blank">CC 3.0, SIL and MIT license</a>.</li>
+                <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
+            </ul>
             <PrivacyPolicyPanel />
         </div>;
+    }
+
+    private renderLeagues() {
+        if (!this.props.leagues) {
+            return null;
+        }
+
+        return <>
+            <h2>How are the leagues calculated?</h2>
+            <p>
+                These are the leagues and the minimum percentiles:
+            </p>
+            <ul>
+                {this.props.leagues.map(x => <li key={x.name}><b>{x.name}</b>: {x.minPercentile} percentile - {x.minRating} rating</li>)}
+            </ul>
+            <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
+        </>
     }
 }
 
