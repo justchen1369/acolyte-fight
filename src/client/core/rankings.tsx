@@ -7,7 +7,6 @@ import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
