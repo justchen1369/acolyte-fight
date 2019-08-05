@@ -99,17 +99,17 @@ class GameRow extends React.PureComponent<Props, State> {
 
     private renderGameDetail(self: p.PlayerStats) {
         return <div className="game-detail">
-            {self.acoChanges.map(change => this.renderRatingChange(change))}
+            {self.acoChanges.map((change, index) => this.renderRatingChange(change, index))}
         </div>
     }
 
-    private renderRatingChange(change: m.AcoChangeMsg) {
+    private renderRatingChange(change: m.AcoChangeMsg, key: number) {
         const game = this.props.game;
         if (change.otherTeamId && change.e) {
             const others = wu(game.players.values()).filter(p => p.teamId === change.otherTeamId).map(p => p.name).toArray();
 
             const odds = (1 / (1 - change.e)) - 1;
-            return <div className="adjustment-detail">
+            return <div key={key} className="adjustment-detail">
                 <div className="adjustment-label">
                     <div className="adjustment-label-title">{change.delta >= 0 ? "Won vs" : "Lost vs"} {others.join(", ")}</div>
                     {change.delta >= 0 && <div className="adjustment-label-subtitle">Would have lost {mathUtils.deltaPrecision(-change.delta * odds)} ({(change.e * 100).toFixed(0)}% win probability)</div>}
@@ -119,7 +119,7 @@ class GameRow extends React.PureComponent<Props, State> {
                 {this.renderRatingDelta(change.delta)}
             </div>
         } else {
-            return <div className="adjustment-detail">
+            return <div key={key} className="adjustment-detail">
                 <div className="adjustment-label">
                     <div className="adjustment-label-title">Activity bonus</div>
                     <div className="adjustment-label-subtitle">Up to +{constants.Placements.AcoDeflatePerDay} per day, if on leaderboard</div>
