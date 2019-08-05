@@ -1,6 +1,8 @@
 import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as loader from '../core/loader';
+import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import * as rankings from '../core/rankings';
@@ -10,17 +12,18 @@ import OnlineSegmentListener from '../controls/onlineSegmentListener';
 import WatchLooper from '../controls/watchLooper';
 
 interface Props {
+    profile: m.GetProfileResponse;
     isLoggedIn: boolean;
     allowedToWatch: boolean;
     numMatches: number;
     numOnline: number;
 }
 interface State {
-    statsRetrieved: boolean;
 }
 
 function stateToProps(state: s.State): Props {
     return {
+        profile: state.profile,
         isLoggedIn: state.loggedIn,
         numMatches: watcher.numMatches(state),
         allowedToWatch: watcher.allowedToWatch(state),
@@ -41,7 +44,8 @@ class WatchPanel extends React.PureComponent<Props, State> {
     }
 
     private async retrieveStatsIfNecessary() {
-        if (!this.state.statsRetrieved) {
+        if (!this.props.profile) {
+            await loader.loaded();
             await rankings.retrieveMyStatsAsync();
             this.setState({ statsRetrieved: true });
         }
@@ -49,7 +53,7 @@ class WatchPanel extends React.PureComponent<Props, State> {
 
     render() {
         if (this.props.isLoggedIn) {
-            if (!this.state.statsRetrieved) {
+            if (!this.props.profile) {
                 return this.renderLoadingStats();
             } else if (this.props.allowedToWatch) {
                 return this.renderWatching();
