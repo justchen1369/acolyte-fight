@@ -142,25 +142,25 @@ function parseGraphics(graphics: string): number {
 function formatTouchTracking(pixels: number): string {
     if (pixels >= 600) {
         return TouchTracking.Slowest;
-    } else if (pixels >= 480) {
+    } else if (pixels >= 420) {
         return TouchTracking.Slow;
-    } else if (pixels >= 320) {
-        return TouchTracking.Medium;
     } else if (pixels >= 240) {
-        return TouchTracking.Fast;
+        return TouchTracking.Medium;
     } else if (pixels >= 180) {
+        return TouchTracking.Fast;
+    } else if (pixels >= 120) {
         return TouchTracking.Fastest;
      } else {
-        return TouchTracking.Fast;
+        return TouchTracking.Medium;
     }
 }
 
 function parseTouchTracking(tracking: string): number {
     switch (tracking) {
-        case TouchTracking.Fastest: return 180;
-        case TouchTracking.Fast: return 240;
-        case TouchTracking.Medium: return 320;
-        case TouchTracking.Slow: return 480;
+        case TouchTracking.Fastest: return 120;
+        case TouchTracking.Fast: return 180;
+        case TouchTracking.Medium: return 240;
+        case TouchTracking.Slow: return 420;
         case TouchTracking.Slowest: return 600;
         default: return null;
     }
@@ -251,16 +251,22 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={formatOption(Side.Right)}>Right</option>
                 </select>
             </div>}
-            {isMobile && <div className="row">
-                <span className="label">Touch tracking</span>
-                <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
-                    <option value={formatOption(TouchTracking.Fastest)}>Fastest</option>
-                    <option value={formatOption(TouchTracking.Fast)}>Fast</option>
-                    <option value={formatOption(TouchTracking.Medium)}>Medium</option>
-                    <option value={formatOption(TouchTracking.Slow)}>Slow</option>
-                    <option value={formatOption(TouchTracking.Slowest)}>Slowest</option>
-                </select>
-            </div>}
+            {isMobile && <>
+                <div className="row">
+                    <span className="label">Touch tracking speed</span>
+                    <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
+                        <option value={formatOption(TouchTracking.Fastest)}>Fastest</option>
+                        <option value={formatOption(TouchTracking.Fast)}>Fast</option>
+                        <option value={formatOption(TouchTracking.Medium)}>Medium</option>
+                        <option value={formatOption(TouchTracking.Slow)}>Slow</option>
+                        <option value={formatOption(TouchTracking.Slowest)}>Slowest</option>
+                    </select>
+                </div>
+                <div className="row info">
+                    <span className="label"></span>
+                    <span className="value">How fast should the cursor move?</span>
+                </div>
+            </>}
             <h2>Interface</h2>
             <div className="row">
                 <span className="label">Sound</span>
@@ -276,17 +282,19 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <div className="row">
-                <span className="label">Camera follow</span>
-                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
-                    <option value={Toggle.On}>On</option>
-                    <option value={Toggle.Off}>Off</option>
-                </select>
-            </div>
-            <div className="row info">
-                <span className="label"></span>
-                <span className="value">Whether to zoom and pan if the screen is too small.</span>
-            </div>
+            <>
+                <div className="row">
+                    <span className="label">Camera follow</span>
+                    <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
+                        <option value={Toggle.On}>On</option>
+                        <option value={Toggle.Off}>Off</option>
+                    </select>
+                </div>
+                <div className="row info">
+                    <span className="label"></span>
+                    <span className="value">Whether to zoom and pan if the screen is too small.</span>
+                </div>
+            </>
             {!isMobile && <>
                 <div className="row">
                     <span className="label">Change spells with</span>
