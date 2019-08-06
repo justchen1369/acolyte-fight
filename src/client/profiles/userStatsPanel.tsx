@@ -12,6 +12,7 @@ import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
 import BuildPanel from './buildPanel';
+import RankIcon from '../controls/rankIcon';
 import TitleListener from '../controls/titleListener';
 
 interface OwnProps {
@@ -135,8 +136,9 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
+        const league = this.props.leagues ? rankings.getLeagueFromPercentile(rating.acoPercentile, this.props.leagues) : null;
         return <div className="user-stats-panel">
-            <h1>{profile.name}</h1>
+            <h1>{league && <RankIcon league={league.name} />} {profile.name}</h1>
             {this.props.showBuild && <BuildPanel bindings={profile.bindings} />}
             {this.props.showNumGames && this.renderNumGames(rating)}
             {this.props.showRanking && this.renderRankingStats(profile, rating)}
