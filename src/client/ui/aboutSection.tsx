@@ -4,6 +4,7 @@ import * as m from '../../game/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
 import * as rankings from '../core/rankings';
+import RankIcon from '../controls/rankIcon';
 import PrivacyPolicyPanel from './privacyPolicyPanel';
 
 interface Props {
@@ -162,9 +163,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
             <p>
                 These are the leagues and the minimum percentiles:
             </p>
-            <ul>
-                {this.props.leagues.map(x => <li key={x.name}><b>{x.name}</b>: {x.minPercentile} percentile - {x.minRating} rating</li>)}
-            </ul>
+            {this.props.leagues.map(x => <div className="league-description" key={x.name}><RankIcon league={x.name} /> <b>{x.name}</b>: {x.minPercentile} percentile - {x.minRating} rating</div>)}
             <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
         </>
     }

@@ -1,10 +1,8 @@
 import _ from 'lodash';
-import moment from 'moment';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
-import * as credentials from '../core/credentials';
 import * as d from '../stats.model';
 import * as m from '../../game/messages.model';
 import * as s from '../store.model';
@@ -13,6 +11,7 @@ import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
 import Link from '../controls/link';
+import RankIcon from '../controls/rankIcon';
 import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
 
@@ -24,6 +23,7 @@ interface Props extends OwnProps {
     myUserId: string;
     loggedIn: boolean;
     unranked: boolean;
+    leagues: m.League[];
 }
 
 interface State {
@@ -40,6 +40,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         myUserId: state.userId,
         loggedIn: state.loggedIn,
         unranked: state.options.unranked,
+        leagues: state.leagues,
     };
 }
 
@@ -56,6 +57,10 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
 
     componentWillMount() {
         this.loadDataAsync(this.props.category);
+
+        if (!this.props.leagues) {
+            rankings.downloadLeagues(); // Don't await
+        }
     }
 
     componentWillReceiveProps(newProps: Props) {
@@ -123,6 +128,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         ].filter(x => !!x).join(', ');
         return <div key={player.userId} className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
             <span className="position">{position}</span>
+            {this.renderLeague(player)}
             {this.renderPlayerName(player)}
             <span className="win-count">{Math.round(player.acoExposure)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
@@ -152,6 +158,11 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
             damagePerGame: userRating.damagePerGame,
         };
         return result;
+    }
+
+    private renderLeague(player: m.LeaderboardPlayer) {
+        const league = this.props.leagues ? rankings.getLeagueFromRating(player.acoExposure, this.props.leagues) : null;
+        return league ? <RankIcon league={league.name} /> : null;
     }
 
     private renderPlayerName(player: m.LeaderboardPlayer) {

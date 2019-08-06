@@ -162,7 +162,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         }
 
         const isMe = profile.userId === this.props.myUserId;
-        const leagueName = rankings.getLeagueName(rating.acoPercentile, this.props.leagues);
+        const leagueName = rankings.getLeagueNameFromPercentile(rating.acoPercentile, this.props.leagues);
 
         return <div>
             {<div className="stats-card-row">
@@ -189,7 +189,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        const leagueName = rankings.getLeagueName(rating.acoPercentile, this.props.leagues);
+        const leagueName = rankings.getLeagueNameFromPercentile(rating.acoPercentile, this.props.leagues);
         const pointsRemaining = nextLeague.minRating - rating.acoExposure;
         return <div className="points-to-next-league">
             You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.

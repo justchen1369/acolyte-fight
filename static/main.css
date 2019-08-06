@@ -1509,6 +1509,61 @@ h3 {
     }
 }
 
+.league-description {
+    font-size: 150%;
+    margin: 1em;
+}
+
+.rank-icon {
+    height: 1em;
+    width: 1em;
+    vertical-align: bottom;
+    border: 1px rgba(255, 255, 255, 0.3) solid;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 2px;
+    --gradient: linear-gradient(
+        160deg,
+        rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.3) 5%,
+        transparent 15%,
+        transparent 45%,
+        rgba(0, 0, 0, 0.5) 55%,
+        rgba(0, 0, 0, 0.6));
+}
+
+.rank-icon.Grandmaster {
+    background: rgb(0, 255, 255) var(--gradient);
+}
+
+.rank-icon.Master {
+    background: rgb(0, 183, 255) var(--gradient);
+}
+
+.rank-icon.Diamond {
+    background: rgb(0, 102, 255) var(--gradient);
+}
+
+.rank-icon.Platinum {
+    background: rgb(255, 0, 136) var(--gradient);
+}
+
+.rank-icon.Gold {
+    background: rgb(255, 208, 0) var(--gradient);
+}
+
+.rank-icon.Silver {
+    background: rgb(221, 221, 221) var(--gradient);
+}
+
+.rank-icon.Bronze {
+    background: rgb(255, 102, 0) var(--gradient);
+}
+
+.rank-icon.Wood {
+    background: rgb(155, 0, 72) var(--gradient);
+}
+
 .leaderboard-row {
     background: #333;
     box-shadow: 5px 5px 5px black;
@@ -1548,8 +1603,12 @@ h3 {
 }
 
 .leaderboard-row .position {
-    margin-right: 20px;
+    margin-right: 1.5em;
     color: #ccc;
+}
+
+.leaderboard-row .rank-icon {
+    margin-right: 0.75em;
 }
 
 .leaderboard-row .player-name {
