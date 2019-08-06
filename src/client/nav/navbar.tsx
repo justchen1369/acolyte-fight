@@ -58,7 +58,7 @@ class NavBar extends React.PureComponent<Props, State> {
     private renderNavBar() {
         const a = options.getProvider();
         const horizontal = <>
-            <PageLink page="leaderboard" shrink={true}><i className="fas fa-medal" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>
+            <PageLink page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>
             {<PageLink page="regions"><i className="fas fa-globe-americas" title="Regions" /></PageLink>}
             {this.props.isModded && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" title="Modding" /></PageLink>}
             {this.props.inParty && <PageLink page="party" badge={this.props.inParty} shrink={true}><i className="fas fa-user-friends" title="Party" /></PageLink>}
