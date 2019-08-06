@@ -1438,6 +1438,10 @@ h3 {
     position: relative;
 }
 
+.user-stats-panel h1 .rank-icon {
+    margin-right: 0.25em;
+}
+
 .user-stats-panel .character-build {
     position: absolute;
     top: 0;
