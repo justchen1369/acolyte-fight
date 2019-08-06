@@ -1521,8 +1521,7 @@ h3 {
     border: 1px rgba(255, 255, 255, 0.3) solid;
     border-radius: 0.25em;
     box-sizing: border-box;
-    box-shadow: rgba(0, 0, 0, 0.2) 0px 4px 2px;
-    --gradient: linear-gradient(
+    --rank-gradient: linear-gradient(
         160deg,
         rgba(0, 0, 0, 0.4),
         rgba(0, 0, 0, 0.3) 5%,
@@ -1532,40 +1531,41 @@ h3 {
         rgba(0, 0, 0, 0.6));
 }
 
-.rank-icon.Grandmaster {
-    background: rgb(0, 255, 255) var(--gradient);
+.Grandmaster {
+    background: rgb(0, 255, 255) var(--rank-gradient);
 }
 
-.rank-icon.Master {
-    background: rgb(0, 183, 255) var(--gradient);
+.Master {
+    background: rgb(0, 183, 255) var(--rank-gradient);
 }
 
-.rank-icon.Diamond {
-    background: rgb(0, 102, 255) var(--gradient);
+.Diamond {
+    background: rgb(0, 102, 255) var(--rank-gradient);
 }
 
-.rank-icon.Platinum {
-    background: rgb(255, 0, 136) var(--gradient);
+.Platinum {
+    background: rgb(255, 0, 136) var(--rank-gradient);
 }
 
-.rank-icon.Gold {
-    background: rgb(255, 208, 0) var(--gradient);
+.Gold {
+    background: rgb(255, 208, 0) var(--rank-gradient);
 }
 
-.rank-icon.Silver {
-    background: rgb(221, 221, 221) var(--gradient);
+.Silver {
+    background: rgb(221, 221, 221) var(--rank-gradient);
 }
 
-.rank-icon.Bronze {
-    background: rgb(255, 102, 0) var(--gradient);
+.Bronze {
+    background: rgb(255, 102, 0) var(--rank-gradient);
 }
 
-.rank-icon.Wood {
-    background: rgb(155, 0, 72) var(--gradient);
+.Wood {
+    background: rgb(155, 0, 72) var(--rank-gradient);
 }
 
 .leaderboard-row {
-    background: #333;
+    position: relative;
+
     box-shadow: 5px 5px 5px black;
 
     display: flex;
@@ -1575,18 +1575,27 @@ h3 {
     padding: 10px;
 
     transition: background-color 0.2s ease;
+
+    text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px;
+    --rank-gradient: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.8),
+        rgba(0, 0, 0, 0.75) 5%,
+        rgba(0, 0, 0, 0.6) 15%,
+        rgba(0, 0, 0, 0.6) 55%,
+        rgba(0, 0, 0, 0.85) 65%,
+        rgba(0, 0, 0, 0.9));
 }
 
 .leaderboard-row:hover {
-    background: #555;
-}
-
-.leaderboard-row.leaderboard-self {
-    background: #555;
-}
-
-.leaderboard-row.leaderboard-self:hover {
-    background: #666;
+    --rank-gradient: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.6),
+        rgba(0, 0, 0, 0.5) 5%,
+        rgba(0, 0, 0, 0.3) 15%,
+        rgba(0, 0, 0, 0.3) 55%,
+        rgba(0, 0, 0, 0.7) 65%,
+        rgba(0, 0, 0, 0.8));
 }
 
 .leaderboard-row.leaderboard-self .player-name {
@@ -1610,6 +1619,8 @@ h3 {
 .leaderboard-row .rank-icon {
     font-size: 120%;
     margin-right: 0.5em;
+
+    box-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px;
 }
 
 .leaderboard-row .player-name {

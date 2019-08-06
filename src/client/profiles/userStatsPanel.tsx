@@ -232,7 +232,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         const a = options.getProvider();
         return <div>
             <h1>{this.props.playerName}</h1>
-            {!a.noLogin && !this.props.loggedIn && <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to receive your rating and stats</p>}
+            {!a.noLogin && !this.props.loggedIn && <p className="login-ad"><span className="btn" onClick={() => window.location.href = "login"}>Login</span> to receive your rating and stats</p>}
         </div>
     }
 }

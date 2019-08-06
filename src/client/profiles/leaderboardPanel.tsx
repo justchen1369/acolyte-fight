@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
@@ -126,9 +127,21 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
             `${player.killsPerGame.toFixed(1)} kills per game`,
             `${player.damagePerGame.toFixed(1)} damage per game`,
         ].filter(x => !!x).join(', ');
-        return <div key={player.userId} className={player.userId === this.props.myUserId ? "leaderboard-row leaderboard-self" : "leaderboard-row"} title={title}>
+
+        const league = this.props.leagues ? rankings.getLeagueFromRating(player.acoExposure, this.props.leagues) : null;
+
+        let className = classNames({
+            'leaderboard-row': true,
+            'leaderboard-self': player.userId === this.props.myUserId,
+        });
+
+        if (league) {
+            className += " " + league.name;
+        }
+
+        return <div key={player.userId} className={className} title={title}>
             <span className="position">{position}</span>
-            {this.renderLeague(player)}
+            {league && <RankIcon league={league.name} />}
             {this.renderPlayerName(player)}
             <span className="win-count">{Math.round(player.acoExposure)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
@@ -158,11 +171,6 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
             damagePerGame: userRating.damagePerGame,
         };
         return result;
-    }
-
-    private renderLeague(player: m.LeaderboardPlayer) {
-        const league = this.props.leagues ? rankings.getLeagueFromRating(player.acoExposure, this.props.leagues) : null;
-        return league ? <RankIcon league={league.name} /> : null;
     }
 
     private renderPlayerName(player: m.LeaderboardPlayer) {
