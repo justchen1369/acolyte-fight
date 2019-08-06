@@ -159,12 +159,14 @@ export class AboutSection extends React.PureComponent<Props, State> {
         }
 
         return <>
-            <h2>How are the leagues calculated?</h2>
-            <p>
-                These are the leagues and the minimum percentiles:
-            </p>
-            {this.props.leagues.map(x => <div className="league-description" key={x.name}><RankIcon league={x.name} /> <b>{x.name}</b>: {x.minPercentile} percentile - {x.minRating} rating</div>)}
-            <p>In other words, to reach Grandmaster, your rating must be in the top {100 - constants.Placements.Grandmaster}% of players.</p>
+            <h2>What is the minimum rating for each league?</h2>
+            <div className="leaderboard">
+                {this.props.leagues.map(x => <div className={`leaderboard-row ${x.name}`} key={x.name}>
+                    <RankIcon league={x.name} />
+                    <span className="player-name">{x.name}</span>
+                    <span className="win-count">{x.minRating} rating <span className="leaderboard-num-games">({x.minPercentile} percentile)</span></span>
+                </div>)}
+            </div>
         </>
     }
 }
