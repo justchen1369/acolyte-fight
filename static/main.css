@@ -1608,7 +1608,8 @@ h3 {
 }
 
 .leaderboard-row .rank-icon {
-    margin-right: 0.75em;
+    font-size: 120%;
+    margin-right: 0.5em;
 }
 
 .leaderboard-row .player-name {
