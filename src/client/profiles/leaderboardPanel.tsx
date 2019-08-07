@@ -104,11 +104,6 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         const category = this.state.category;
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
-            {!!this.props.myUserId && <UnrankedTogglePanel />}
-            {!this.props.unranked && <>
-                <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />
-                <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>
-            </>}
             <h1>Leaderboard</h1>
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
