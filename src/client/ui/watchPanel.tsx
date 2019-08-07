@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as loader from '../core/loader';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import * as rankings from '../core/rankings';

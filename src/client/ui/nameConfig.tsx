@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
-import * as PlayerName from '../../game/sanitize';
+import * as PlayerName from '../../shared/sanitize';
 import * as parties from '../core/parties';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';

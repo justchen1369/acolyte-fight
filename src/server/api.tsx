@@ -8,9 +8,9 @@ import wu from 'wu';
 import * as http from 'http';
 
 import * as g from './server.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as auth from './auth';
-import * as categories from '../game/segments';
+import * as categories from '../shared/segments';
 import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
@@ -20,7 +20,7 @@ import * as kongregate from './kongregate';
 import * as loadMetrics from './loadMetrics';
 import * as mirroring from './mirroring';
 import * as percentiles from './percentiles';
-import * as sanitize from '../game/sanitize';
+import * as sanitize from '../shared/sanitize';
 import * as statsStorage from './statsStorage';
 import * as userStorage from './userStorage';
 

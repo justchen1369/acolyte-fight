@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as Reselect from 'reselect';
 import * as e from './editor.model';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as convert from './convert';
 import * as matches from '../core/matches';

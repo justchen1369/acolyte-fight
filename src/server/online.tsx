@@ -3,7 +3,7 @@ import moment from 'moment';
 import wu from 'wu';
 import * as constants from '../game/constants';
 import * as g from './server.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';

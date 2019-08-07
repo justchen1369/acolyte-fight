@@ -4,7 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
 import * as d from '../stats.model';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
 import * as rankings from '../core/rankings';

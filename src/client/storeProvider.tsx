@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import * as Redux from 'redux';
 import * as d from './stats.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';

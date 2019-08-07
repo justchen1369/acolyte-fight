@@ -1,4 +1,4 @@
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';

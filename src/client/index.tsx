@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 

@@ -4,7 +4,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as d from '../stats.model';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as cloud from '../core/cloud';
 import * as matches from '../core/matches';

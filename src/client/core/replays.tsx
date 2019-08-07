@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import wu from 'wu';
 import * as d from '../stats.model';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as credentials from './credentials';
 import * as matches from './matches';
 import * as regions from './regions';

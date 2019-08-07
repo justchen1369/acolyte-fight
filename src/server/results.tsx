@@ -2,8 +2,8 @@ import crypto from 'crypto';
 import msgpack from 'msgpack-lite';
 import wu from 'wu';
 import * as g from './server.model';
-import * as m from '../game/messages.model';
-import * as categories from '../game/segments';
+import * as m from '../shared/messages.model';
+import * as categories from '../shared/segments';
 
 interface HashValues {
     gameId: string;

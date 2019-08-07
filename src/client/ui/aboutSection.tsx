@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
 import * as rankings from '../core/rankings';

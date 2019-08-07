@@ -1,7 +1,7 @@
 import express from 'express';
 import { logger } from './logging';
 import * as g from './server.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 
 let location: g.LocationStore = {
     region: null,

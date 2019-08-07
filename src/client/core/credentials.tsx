@@ -1,4 +1,4 @@
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as options from '../options';
 
 export function headers() {

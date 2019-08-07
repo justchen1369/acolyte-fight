@@ -2,7 +2,7 @@ import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as constants from '../../game/constants';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
 import * as pages from '../core/pages';

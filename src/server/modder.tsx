@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import moment from 'moment';
 import * as db from './db.model';
 import * as g from './server.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as modder from '../game/modder';
 import * as w from '../game/world.model';
 import * as settings from '../game/settings';

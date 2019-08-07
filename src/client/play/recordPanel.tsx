@@ -9,7 +9,7 @@ import * as processor from '../core/processor';
 import * as recording from '../core/recording';
 import * as replays from '../core/replays';
 import * as StoreProvider from '../storeProvider';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 

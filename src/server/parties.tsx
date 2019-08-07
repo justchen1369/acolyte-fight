@@ -5,7 +5,7 @@ import uniqid from 'uniqid';
 import wu from 'wu';
 import * as constants from '../game/constants';
 import * as g from './server.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
 import * as games from './games';
 import { getStore } from './serverStore';

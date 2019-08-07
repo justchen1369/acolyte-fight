@@ -1,5 +1,5 @@
 import * as React from 'react';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 
 interface Props extends React.HTMLAttributes<HTMLImageElement> {
     league: string;

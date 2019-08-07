@@ -1,5 +1,5 @@
 import * as engine from '../../game/engine';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as processor from './processor';
 import * as stats from './stats';

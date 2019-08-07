@@ -1,7 +1,7 @@
 import Immutable from 'immutable';
 import * as d from './stats.model';
 import * as e from '../client/modding/editor.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
 
 export interface State {

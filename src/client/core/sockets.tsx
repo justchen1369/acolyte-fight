@@ -1,5 +1,5 @@
 import msgpackParser from 'socket.io-msgpack-parser';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as SocketIO from 'socket.io-client';
 import * as StoreProvider from '../storeProvider';

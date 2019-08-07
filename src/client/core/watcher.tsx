@@ -1,5 +1,5 @@
 import * as pages from './pages';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 

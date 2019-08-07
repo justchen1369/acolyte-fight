@@ -5,7 +5,7 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as constants from '../../game/constants';
 import * as infoPanelHelpers from './metrics';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';

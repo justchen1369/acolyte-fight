@@ -1,5 +1,5 @@
 import * as moment from 'moment';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 
 export interface ServerStore {
     nextGameId: 0;

@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as keyboardUtils from '../core/keyboardUtils';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as r from '../graphics/render.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';

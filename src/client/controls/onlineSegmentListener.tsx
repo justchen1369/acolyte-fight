@@ -2,7 +2,7 @@ import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as online from '../core/online';
-import * as segments from '../../game/segments';
+import * as segments from '../../shared/segments';
 import * as s from '../store.model';
 
 interface Props {

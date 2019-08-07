@@ -4,7 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as infoPanelHelpers from './metrics';
 import * as StoreProvider from '../storeProvider';
-import * as m from '../../game/messages.model';
+import * as m from '../../shared/messages.model';
 import * as playerHelper from './playerHelper';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';

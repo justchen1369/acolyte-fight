@@ -8,7 +8,7 @@ import socketLib from 'socket.io';
 import express from 'express';
 import compression from 'compression';
 import * as os from 'os';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as api from './api';
 import * as auth from './auth';
 import { authMiddleware } from './auth';

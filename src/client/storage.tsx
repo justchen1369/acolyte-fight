@@ -4,9 +4,9 @@ import moment from 'moment';
 import { MaxGamesToKeep } from '../game/constants';
 import { DefaultSettings } from '../game/settings';
 import * as d from './stats.model';
-import * as m from '../game/messages.model';
+import * as m from '../shared/messages.model';
 import * as options from './options';
-import * as sanitize from '../game/sanitize';
+import * as sanitize from '../shared/sanitize';
 
 const settingsStorage = localForage.createInstance({ name: 'acolyte-fight-settings' });
 const gameStorage = localForage.createInstance({ name: 'acolyte-fight-games' });
