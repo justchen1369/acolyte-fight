@@ -1,5 +1,5 @@
 body {
-    background: #111;
+    background: #181818 linear-gradient(to right, #181818, #111 50%, #181818);
     font-family: "Helvetica", "Arial", sans-serif;
     font-size: 14pt;
     color: white;
@@ -467,7 +467,7 @@ a:hover, a:active {
     font-family: "ChicagoFLF", "Helvetica", sans-serif;
     font-size: 600%;
     font-weight: bold;
-    text-shadow: 4px 4px 4px black;
+    text-shadow: 0.1em 0.1em 0.1em black;
     font-style: italic;
     opacity: 0.9;
 

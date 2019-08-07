@@ -105,6 +105,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
             <h1>Leaderboard</h1>
+            <p>This is the global ranking of all logged-in active players. See the <Link page="about">About page</Link> for more information about the rating system.</p>
             <div className="leaderboard">
                 {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
                 {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
