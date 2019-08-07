@@ -131,6 +131,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         const league = this.props.leagues ? rankings.getLeagueFromRating(player.acoExposure, this.props.leagues) : null;
 
         let className = classNames({
+            'rating-card': true,
             'leaderboard-row': true,
             'leaderboard-self': player.userId === this.props.myUserId,
         });

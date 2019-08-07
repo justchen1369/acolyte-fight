@@ -161,7 +161,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
         return <>
             <h2>What is the minimum rating for each league?</h2>
             <div className="leaderboard">
-                {this.props.leagues.map(x => <div className={`leaderboard-row ${x.name}`} key={x.name}>
+                {this.props.leagues.map(x => <div className={`leaderboard-row rating-card ${x.name}`} key={x.name}>
                     <RankIcon league={x.name} />
                     <span className="player-name">{x.name}</span>
                     <span className="win-count">{x.minRating} rating <span className="leaderboard-num-games">({x.minPercentile} percentile)</span></span>

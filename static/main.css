@@ -1497,6 +1497,21 @@ h3 {
     background: #555;
 }
 
+.stats-card-row .rating-card {
+    width: 100%;
+
+    margin: 20px;
+    padding: 25px;
+
+    font-size: 400%;
+
+    box-shadow: 5px 5px 5px black;
+
+    text-align: center;
+
+    transition: background-color 0.2s ease;
+}
+
 .stats-card-row .stats-card .label {
     font-size: 115%;
 }
@@ -1516,7 +1531,7 @@ h3 {
 .rank-icon {
     height: 1em;
     width: 1em;
-    vertical-align: bottom;
+    vertical-align: top;
     border: 1px rgba(255, 255, 255, 0.3) solid;
     border-radius: 0.25em;
     box-sizing: border-box;
@@ -1555,7 +1570,7 @@ h3 {
 }
 
 .Bronze {
-    background: rgb(235, 106, 0) var(--rank-gradient);
+    background: rgb(255, 115, 0) var(--rank-gradient);
 }
 
 .Wood {
@@ -1574,8 +1589,10 @@ h3 {
     padding: 10px;
 
     transition: background-color 0.2s ease;
+}
 
-    text-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px;
+.rating-card {
+    text-shadow: rgba(0, 0, 0, 0.5) 0.1em 0.1em 0.1em;
     --rank-gradient: linear-gradient(
         112.5deg,
         rgba(0, 0, 0, 0.8),
@@ -1586,7 +1603,11 @@ h3 {
         rgba(0, 0, 0, 0.9));
 }
 
-.leaderboard-row:hover {
+.rating-card .rank-icon {
+    box-shadow: rgba(0, 0, 0, 0.5) 0.1em 0.1em 0.1em;
+}
+
+.rating-card:hover {
     --rank-gradient: linear-gradient(
         112.5deg,
         rgba(0, 0, 0, 0.6),
@@ -1616,10 +1637,8 @@ h3 {
 }
 
 .leaderboard-row .rank-icon {
-    font-size: 120%;
+    font-size: 150%;
     margin-right: 0.5em;
-
-    box-shadow: rgba(0, 0, 0, 0.5) 2px 2px 2px;
 }
 
 .leaderboard-row .player-name {

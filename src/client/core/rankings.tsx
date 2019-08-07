@@ -62,19 +62,6 @@ export function getLeagueFromRating(exposure: number, leagues: m.League[]) {
     return leagues[leagues.length - 1];
 }
 
-export function getLeagueFromPercentile(percentile: number, leagues: m.League[]) {
-    for (const league of leagues) {
-        if (percentile >= league.minPercentile) {
-            return league;
-        }
-    }
-    return leagues[leagues.length - 1];
-}
-
-export function getLeagueNameFromPercentile(percentile: number, leagues: m.League[]) {
-    return getLeagueFromPercentile(percentile, leagues).name;
-}
-
 export async function retrieveMyStatsAsync() {
     const state = StoreProvider.getState();
     if (state.userId) {

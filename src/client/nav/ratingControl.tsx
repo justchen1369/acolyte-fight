@@ -101,9 +101,13 @@ class RatingControl extends React.PureComponent<Props> {
             return null;
         }
 
-        const league = rankings.getLeagueNameFromPercentile(rating.acoPercentile, this.props.leagues);
+        const league = rankings.getLeagueFromRating(rating.acoExposure, this.props.leagues);
+        if (!league) {
+            return null;
+        }
+
         return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
-            <b>{league}</b> {rating.acoExposure.toFixed(0)}
+            <b>{league.name}</b> {rating.acoExposure.toFixed(0)}
         </PageLink>
     }
 

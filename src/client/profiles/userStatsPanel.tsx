@@ -136,9 +136,8 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
     }
 
     private renderRating(profile: m.GetProfileResponse, rating: m.UserRating) {
-        const league = this.props.leagues ? rankings.getLeagueFromPercentile(rating.acoPercentile, this.props.leagues) : null;
         return <div className="user-stats-panel">
-            <h1>{this.props.showRanking && league && <RankIcon league={league.name} />}{profile.name}</h1>
+            <h1>{profile.name}</h1>
             {this.props.showBuild && <BuildPanel bindings={profile.bindings} />}
             {this.props.showNumGames && this.renderNumGames(rating)}
             {this.props.showRanking && this.renderRankingStats(profile, rating)}
@@ -164,17 +163,15 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         }
 
         const isMe = profile.userId === this.props.myUserId;
-        const leagueName = rankings.getLeagueNameFromPercentile(rating.acoPercentile, this.props.leagues);
+        const league = rankings.getLeagueFromRating(rating.acoExposure, this.props.leagues);
+        if (!league) {
+            return null;
+        }
 
         return <div>
             {<div className="stats-card-row">
-                <div className="stats-card">
-                    <div className="label">Rating</div>
-                    <div className="value">{rating.acoExposure.toFixed(0)}</div>
-                </div>
-                <div className="stats-card" title={`${rating.acoPercentile.toFixed(1)} percentile`}>
-                    <div className="label">League</div>
-                    <div className="value">{leagueName}</div>
+                <div className={`rating-card ${league.name}`} title={`${rating.acoPercentile.toFixed(1)} percentile`}>
+                    <RankIcon league={league.name} /> <b>{league.name}</b> {rating.acoExposure.toFixed(0)}
                 </div>
             </div>}
             {isMe && this.renderNextLeague(rating)}
@@ -191,10 +188,9 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        const leagueName = rankings.getLeagueNameFromPercentile(rating.acoPercentile, this.props.leagues);
         const pointsRemaining = nextLeague.minRating - rating.acoExposure;
         return <div className="points-to-next-league">
-            You are currently in the <b>{leagueName}</b> league. <b>+{Math.ceil(pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
+            <b>+{Math.ceil(pointsRemaining)}</b> points until you are promoted into the <b>{nextLeague.name}</b> league.
         </div>
     }
 
