@@ -1,7 +1,7 @@
 import moment from 'moment';
 import pl from 'planck-js';
 import * as Immutable from 'immutable';
-import * as c from './controls.model';
+import * as n from './networking.model';
 import * as shapes from './shapes';
 
 export namespace Actions {
@@ -58,11 +58,11 @@ export interface World {
 	shrink: number;
 	radius: number;
 
-	controlMessages: c.ControlMsg[];
+	controlMessages: n.ControlMsg[];
 	snapshots: Snapshot[];
 	syncs: Snapshot[];
 	actions: Map<string, Action>,
-	spellChanges: c.SpellsMsg[];
+	spellChanges: n.SpellsMsg[];
 
 	nextPositionId: number;
 	nextObjectId: number;

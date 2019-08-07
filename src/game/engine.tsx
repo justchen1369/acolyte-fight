@@ -4,9 +4,9 @@ import pl, { World } from 'planck-js';
 import wu from 'wu';
 import * as Immutable from 'immutable';
 import * as arrayUtils from '../utils/arrayUtils';
-import * as c from './controls.model';
 import * as colorWheel from './colorWheel';
 import * as constants from './constants';
+import * as n from './networking.model';
 import * as shapes from './shapes';
 import * as vector from './vector';
 import * as w from './world.model';
@@ -1052,19 +1052,19 @@ function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 }
 
 function handleOccurences(world: w.World) {
-	const newOccurences = new Array<c.ControlMsg>();
+	const newOccurences = new Array<n.ControlMsg>();
 
 	world.controlMessages.forEach(ev => {
 		let success = true;
-		if (ev.type === c.ActionType.CloseGame) {
+		if (ev.type === n.ActionType.CloseGame) {
 			success = handleClosing(ev, world);
-		} else if (ev.type === c.ActionType.Bot) {
+		} else if (ev.type === n.ActionType.Bot) {
 			success = handleBotting(ev, world);
-		} else if (ev.type === c.ActionType.Join) {
+		} else if (ev.type === n.ActionType.Join) {
 			success = handleJoining(ev, world);
-		} else if (ev.type === c.ActionType.Leave) {
+		} else if (ev.type === n.ActionType.Leave) {
 			success = handleLeaving(ev, world);
-		} else if (ev.type === c.ActionType.Environment) {
+		} else if (ev.type === n.ActionType.Environment) {
 			success = seedEnvironment(ev, world);
 		}
 
@@ -1085,7 +1085,7 @@ function handleOccurences(world: w.World) {
 	}
 }
 
-function seedEnvironment(ev: c.EnvironmentMsg, world: w.World) {
+function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 	if (world.seed !== null) {
 		return true;
 	}
@@ -1245,7 +1245,7 @@ function dequeueSnapshot(tick: number, world: w.World) {
 	return null;
 }
 
-function handleSpellChoosing(ev: c.SpellsMsg, world: w.World) {
+function handleSpellChoosing(ev: n.SpellsMsg, world: w.World) {
 	const ChangeCooldown = 15; // ticks
 
 	if (!allowSpellChoosing(world, ev.h)) {
@@ -1265,7 +1265,7 @@ function handleSpellChoosing(ev: c.SpellsMsg, world: w.World) {
 	return true;
 }
 
-function handleClosing(ev: c.CloseGameMsg, world: w.World) {
+function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	const isNew = ev.closeTick < world.startTick; // This message gets sent twice, don't respond to it multiple times
 	world.startTick = ev.closeTick;
 
@@ -1399,7 +1399,7 @@ function isPresentOrPastSelf(heroId: string, world: w.World) {
 	return false;
 }
 
-function handleBotting(ev: c.BotActionMsg, world: w.World) {
+function handleBotting(ev: n.BotActionMsg, world: w.World) {
 	const Visuals = world.settings.Visuals;
 	const World = world.settings.World;
 
@@ -1440,7 +1440,7 @@ function handleBotting(ev: c.BotActionMsg, world: w.World) {
 	return true;
 }
 
-function handleJoining(ev: c.JoinActionMsg, world: w.World) {
+function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
@@ -1519,7 +1519,7 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
  	return uiColor;	
 }
 
-function handleLeaving(ev: c.LeaveActionMsg, world: w.World) {
+function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 	console.log("Player left:", ev.heroId);
 	const player = world.players.get(ev.heroId);
 	if (!player) {

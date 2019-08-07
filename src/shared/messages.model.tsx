@@ -1,5 +1,5 @@
-import * as c from '../game/controls.model';
-export * from '../game/controls.model';
+import * as c from '../game/networking.model';
+export * from '../game/networking.model';
 
 export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
