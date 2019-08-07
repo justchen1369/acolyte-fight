@@ -71,10 +71,13 @@ export interface Game extends Replay {
 
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
+    controlKeys: Map<string, number>; // heroId -> number
     reconnectKeys: Map<string, string>; // key -> heroId
     playerNames: string[];
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
+
+    nextControlKey: number;
 
     tick: number;
     winTick: number | null;

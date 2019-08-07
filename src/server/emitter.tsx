@@ -597,7 +597,7 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 
 		const game = getStore().activeGames.get(data.g);
 		if (game) {
-			games.receiveAction(game, data.a, socket.id);
+			games.receiveAction(game, data.c, data.a, socket.id);
 		}
 	} catch (exception) {
 		logger.error(exception);

@@ -177,6 +177,7 @@ export interface HitSector {
 
 export interface Player {
 	heroId: string;
+	controlKey: number;
 	userId?: string;
 	userHash: string | null;
 	partyHash?: string;
@@ -328,6 +329,7 @@ export interface Joining {
 	userHash: string | null;
 	partyHash?: string;
 	heroId: string;
+	controlKey: number;
 	playerName: string;
 	keyBindings: KeyBindings;
 	isMobile: boolean;
@@ -336,12 +338,14 @@ export interface Joining {
 export interface Botting {
 	type: "botting";
 	heroId: string;
+	controlKey: number;
 	keyBindings: KeyBindings;
 }
 
 export interface Leaving {
 	type: "leave";
 	heroId: string;
+	controlKey: number;
 }
 
 export interface Syncing extends Snapshot {

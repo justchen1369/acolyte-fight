@@ -197,9 +197,14 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 }
 
 function send(gameId: string, msg: m.ActionMsg) {
+	const state = StoreProvider.getState();
+	const world = state.world;
+	const player = world.players.get(msg.h);
+
 	const packet: m.ActionMsgPacket = {
 		g: gameId,
 		a: msg,
+		c: player.controlKey,
 	};
 	sockets.getSocket().emit('action', packet);
 }

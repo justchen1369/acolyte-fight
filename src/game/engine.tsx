@@ -1411,6 +1411,7 @@ function handleBotting(ev: w.Botting, world: w.World) {
 
 	const player: w.Player = {
 		heroId: hero.id,
+		controlKey: ev.controlKey,
 		userId: null,
 		userHash: null,
 		name: World.BotName,
@@ -1451,6 +1452,7 @@ function handleJoining(ev: w.Joining, world: w.World) {
 
 	const player: w.Player = {
 		heroId: hero.id,
+		controlKey: ev.controlKey,
 		userId: ev.userId,
 		userHash: ev.userHash,
 		partyHash: ev.partyHash,
@@ -1534,6 +1536,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 			// Replace leaving hero with bot
 			const newPlayer = {
 				...player,
+				controlKey: ev.controlKey,
 				isBot: true,
 				isSharedBot: true,
 				isMobile: false,

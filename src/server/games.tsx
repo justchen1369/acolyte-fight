@@ -201,13 +201,22 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 	return totalPlayers / maxGames;
 }
 
-export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
+export function receiveAction(game: g.Game, controlKey: number, data: m.ActionMsg, socketId: string) {
 	const player = game.active.get(socketId);
 	if (!player) {
 		return;
 	}
 
-	if (data.h === player.heroId || takeBotControl(game, data.h, socketId)) {
+	const heroId = data.h;
+	if (!heroId) {
+		return;
+	}
+
+	if (game.controlKeys.get(heroId) !== controlKey) {
+		return;
+	}
+
+	if (heroId === player.heroId || takeBotControl(game, heroId, socketId)) {
 		queueAction(game, data);
 		++player.numActionMessages;
 	}
@@ -251,11 +260,13 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
+		controlKeys: new Map(),
 		reconnectKeys: new Map<string, string>(),
 		playerNames: new Array<string>(),
 		isRankedLookup: new Map<string, boolean>(),
 		socketIds: new Set<string>(),
 		numPlayers: 0,
+		nextControlKey: 0,
 		winTick: null,
 		syncTick: 0,
 		syncMessage: null,
@@ -266,7 +277,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		locked,
 		closeTick: Matchmaking.MaxHistoryLength,
 		ranked: false,
-		actions: new Map<string, m.ActionMsg>(),
+		actions: new Map(),
 		controlMessages: [],
 		history: [],
 	};
@@ -411,7 +422,8 @@ export function leaveGame(game: g.Game, socketId: string) {
 	game.active.delete(socketId);
 	reassignBots(game, player.heroId, socketId);
 
-	queueControlMessage(game, { hid: player.heroId, type: "leave" });
+	const controlKey = acquireControlKey(player.heroId, game);
+	queueControlMessage(game, { hid: player.heroId, controlKey: controlKey, type: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
@@ -579,8 +591,11 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		const player = game.active.get(params.socketId);
 		if (player) {
 			player.userId = userId;
+
+			const controlKey = acquireControlKey(heroId, game);
 			queueControlMessage(game, {
 				hid: heroId,
+				controlKey,
 				type: "join",
 				userId,
 				userHash,
@@ -593,6 +608,12 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	});
 
 	return { heroId, reconnectKey };
+}
+
+function acquireControlKey(heroId: string, game: g.Game) {
+	const controlKey = game.nextControlKey++;
+	game.controlKeys.set(heroId, controlKey);
+	return controlKey;
 }
 
 export function addBots(game: g.Game) {
@@ -615,7 +636,8 @@ export function addBot(game: g.Game) {
 	game.bots.set(heroId, null);
 
 	const keyBindings = {};
-	queueControlMessage(game, { hid: heroId, type: "bot", keyBindings });
+	const controlKey = acquireControlKey(heroId, game);
+	queueControlMessage(game, { hid: heroId, controlKey: controlKey, type: "bot", keyBindings });
 
 	return heroId;
 }

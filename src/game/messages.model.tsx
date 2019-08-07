@@ -75,6 +75,7 @@ export interface GameOptions {
 export interface ActionMsgPacket {
     g: string;
     a: ActionMsg;
+    c: number; // control key
 }
 
 export type ActionMsg =
@@ -106,6 +107,7 @@ export interface EnvironmentMsg extends ControlMsgBase {
 export interface JoinActionMsg extends ControlMsgBase {
     type: "join";
     hid: string;
+    controlKey: number;
     userId: string | null;
     userHash: string | null;
     partyHash?: string;
@@ -117,12 +119,14 @@ export interface JoinActionMsg extends ControlMsgBase {
 export interface BotActionMsg extends ControlMsgBase {
     type: "bot";
     hid: string;
+    controlKey: number;
     keyBindings: KeyBindings;
 }
 
 export interface LeaveActionMsg extends ControlMsgBase {
     type: "leave";
     hid: string;
+    controlKey: number; // control key for the bot that is left behind
 }
 
 export interface CloseGameMsg extends ControlMsgBase {

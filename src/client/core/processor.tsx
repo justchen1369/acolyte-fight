@@ -44,6 +44,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				world.occurrences.push({
 					type: "join",
 					heroId: actionData.hid,
+					controlKey: actionData.controlKey,
 					userId: actionData.userId,
 					userHash: actionData.userHash,
 					partyHash: actionData.partyHash,
@@ -55,12 +56,14 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				world.occurrences.push({
 					type: "botting",
 					heroId: actionData.hid,
+					controlKey: actionData.controlKey,
 					keyBindings: actionData.keyBindings,
 				});
 			} else if (actionData.type === m.ActionType.Leave) {
 				world.occurrences.push({
 					type: "leave",
 					heroId: actionData.hid,
+					controlKey: actionData.controlKey,
 				});
 			} else if (actionData.type === m.ActionType.Environment) {
 				world.occurrences.push({
