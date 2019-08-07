@@ -32,47 +32,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	}
 
 	if (tickData.c) {
-		tickData.c.forEach(actionData => {
-			if (actionData.type === m.ActionType.CloseGame) {
-				world.occurrences.push({
-					type: "closing",
-					startTick: actionData.closeTick,
-					ticksUntilClose: actionData.waitPeriod,
-					numTeams: actionData.numTeams,
-				});
-			} else if (actionData.type === m.ActionType.Join) {
-				world.occurrences.push({
-					type: "join",
-					heroId: actionData.hid,
-					controlKey: actionData.controlKey,
-					userId: actionData.userId,
-					userHash: actionData.userHash,
-					partyHash: actionData.partyHash,
-					playerName: actionData.playerName || "Acolyte",
-					keyBindings: actionData.keyBindings,
-					isMobile: actionData.isMobile,
-				});
-			} else if (actionData.type === m.ActionType.Bot) {
-				world.occurrences.push({
-					type: "botting",
-					heroId: actionData.hid,
-					controlKey: actionData.controlKey,
-					keyBindings: actionData.keyBindings,
-				});
-			} else if (actionData.type === m.ActionType.Leave) {
-				world.occurrences.push({
-					type: "leave",
-					heroId: actionData.hid,
-					controlKey: actionData.controlKey,
-				});
-			} else if (actionData.type === m.ActionType.Environment) {
-				world.occurrences.push({
-					type: "environment",
-					seed: actionData.seed,
-					layoutId: actionData.layoutId,
-				});
-			}
-		});
+		world.occurrences.push(...tickData.c);
 	}
 
 	if (tickData.a) {
@@ -84,11 +44,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 					release: actionData.r,
 				});
 			} else if (actionData.type === m.ActionType.Spells) {
-				world.occurrences.push({
-					type: "spells",
-					heroId: actionData.h,
-					keyBindings: actionData.keyBindings,
-				});
+				world.spellChanges.push(actionData);
 			}
 		});
 	}
@@ -101,8 +57,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 				pos: pl.Vec2(snapshot.x, snapshot.y),
 			});
 		});
-		world.occurrences.push({
-			type: "sync",
+		world.syncs.push({
 			tick: tickData.s.t,
 			objectLookup: heroLookup,
 		});

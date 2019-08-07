@@ -1,6 +1,7 @@
 import moment from 'moment';
 import pl from 'planck-js';
 import * as Immutable from 'immutable';
+import * as c from './controls.model';
 import * as shapes from './shapes';
 
 export namespace Actions {
@@ -57,9 +58,11 @@ export interface World {
 	shrink: number;
 	radius: number;
 
-	occurrences: Occurrence[];
+	occurrences: c.ControlMsg[];
 	snapshots: Snapshot[];
+	syncs: Snapshot[];
 	actions: Map<string, Action>,
+	spellChanges: c.SpellsMsg[];
 
 	nextPositionId: number;
 	nextObjectId: number;
@@ -293,63 +296,6 @@ export interface RatingAdjustmentNotification {
 	initialNumGames: number;
 	acoDelta: number;
 	category: string;
-}
-
-export type Occurrence =
-	Closing
-	| Botting
-	| Joining
-	| Leaving
-	| EnvironmentSeed
-	| ChoosingSpells
-	| Syncing
-
-export interface EnvironmentSeed {
-	type: "environment";
-	seed: number;
-	layoutId?: string;
-}
-
-export interface ChoosingSpells {
-	type: "spells";
-	heroId: string;
-	keyBindings: KeyBindings;
-}
-
-export interface Closing {
-	type: "closing";
-	startTick: number;
-	ticksUntilClose: number;
-	numTeams?: number;
-}
-
-export interface Joining {
-	type: "join";
-	userId?: string;
-	userHash: string | null;
-	partyHash?: string;
-	heroId: string;
-	controlKey: number;
-	playerName: string;
-	keyBindings: KeyBindings;
-	isMobile: boolean;
-}
-
-export interface Botting {
-	type: "botting";
-	heroId: string;
-	controlKey: number;
-	keyBindings: KeyBindings;
-}
-
-export interface Leaving {
-	type: "leave";
-	heroId: string;
-	controlKey: number;
-}
-
-export interface Syncing extends Snapshot {
-	type: "sync";
 }
 
 export interface Snapshot {

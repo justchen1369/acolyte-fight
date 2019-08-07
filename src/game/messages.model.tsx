@@ -1,3 +1,6 @@
+import * as c from './controls.model';
+export * from './controls.model';
+
 export const AuthHeader = "x-enigma-auth";
 export const AuthCookieName = "enigma-auth";
 
@@ -24,18 +27,6 @@ export namespace LockType {
     export const ModPreview = "mod-preview";
     export const Tutorial = "tutorial";
     export const Blocked = "blocked";
-}
-
-export namespace ActionType {
-    export const Environment = "environment";
-    export const Join = "join";
-    export const Bot = "bot";
-	export const Leave = "leave";
-	export const GameAction = "game";
-	export const CloseGame = "close";
-    export const Text = "text";
-    export const Spells = "spells";
-    export const Sync = "sync";
 }
 
 export interface GetUserSettingsRequest {
@@ -74,104 +65,13 @@ export interface GameOptions {
 
 export interface ActionMsgPacket {
     g: string;
-    a: ActionMsg;
+    a: c.ActionMsg;
     c: number; // control key
-}
-
-export type ActionMsg =
-    | GameActionMsg
-    | SpellsMsg
-
-export interface ActionMsgBase {
-    type: string;
-    h: string;
-}
-
-export type ControlMsg =
-    EnvironmentMsg
-    | JoinActionMsg
-    | BotActionMsg
-    | LeaveActionMsg
-    | CloseGameMsg
-
-export interface ControlMsgBase {
-    type: string;
-}
-
-export interface EnvironmentMsg extends ControlMsgBase {
-    type: "environment";
-    seed: number;
-    layoutId?: string;
-}
-
-export interface JoinActionMsg extends ControlMsgBase {
-    type: "join";
-    hid: string;
-    controlKey: number;
-    userId: string | null;
-    userHash: string | null;
-    partyHash?: string;
-    playerName: string;
-    keyBindings: KeyBindings;
-    isMobile: boolean;
-}
-
-export interface BotActionMsg extends ControlMsgBase {
-    type: "bot";
-    hid: string;
-    controlKey: number;
-    keyBindings: KeyBindings;
-}
-
-export interface LeaveActionMsg extends ControlMsgBase {
-    type: "leave";
-    hid: string;
-    controlKey: number; // control key for the bot that is left behind
-}
-
-export interface CloseGameMsg extends ControlMsgBase {
-    type: "close";
-    closeTick: number;
-    waitPeriod: number;
-    numTeams?: number;
-}
-
-export interface GameActionMsg extends ActionMsgBase {
-    type: "game";
-    s: string; // spell ID
-    x: number;
-    y: number;
-    r?: boolean; // is this a button release?
-}
-
-export interface SpellsMsg extends ActionMsgBase {
-    type: "spells";
-    keyBindings: KeyBindings;
 }
 
 export interface SyncMsgPacket {
     g: string;
-    s: SyncMsg;
-}
-
-export interface SyncMsg {
-    t: number;
-    o: ObjectSyncMsg[];
-}
-
-export interface ObjectSyncMsg {
-    id: string; // id
-    x: number;
-    y: number;
-    h: number;
-}
-
-export interface TickMsg {
-    g: string;
-    t: number;
-    a?: ActionMsg[];
-    c?: ControlMsg[];
-    s?: SyncMsg;
+    s: c.SyncMsg;
 }
 
 export interface JoinMsg {
@@ -300,7 +200,7 @@ export interface HeroMsg {
     mod: Object;
 
     live: boolean;
-    history: TickMsg[];
+    history: c.TickMsg[];
 }
 
 export interface CreatePartyRequest {

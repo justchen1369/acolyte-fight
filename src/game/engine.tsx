@@ -4,6 +4,7 @@ import pl, { World } from 'planck-js';
 import wu from 'wu';
 import * as Immutable from 'immutable';
 import * as arrayUtils from '../utils/arrayUtils';
+import * as c from './controls.model';
 import * as colorWheel from './colorWheel';
 import * as constants from './constants';
 import * as shapes from './shapes';
@@ -88,8 +89,11 @@ export function initialWorld(mod: Object): w.World {
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
-		occurrences: new Array<w.Occurrence>(),
+		occurrences: [],
 		snapshots: [],
+		syncs: [],
+		spellChanges: [],
+
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
 		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
@@ -1048,24 +1052,20 @@ function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 }
 
 function handleOccurences(world: w.World) {
-	const newOccurences = new Array<w.Occurrence>();
+	const newOccurences = new Array<c.ControlMsg>();
 
 	world.occurrences.forEach(ev => {
 		let success = true;
-		if (ev.type === "closing") {
+		if (ev.type === c.ActionType.CloseGame) {
 			success = handleClosing(ev, world);
-		} else if (ev.type === "botting") {
+		} else if (ev.type === c.ActionType.Bot) {
 			success = handleBotting(ev, world);
-		} else if (ev.type === "join") {
+		} else if (ev.type === c.ActionType.Join) {
 			success = handleJoining(ev, world);
-		} else if (ev.type === "leave") {
+		} else if (ev.type === c.ActionType.Leave) {
 			success = handleLeaving(ev, world);
-		} else if (ev.type === "environment") {
+		} else if (ev.type === c.ActionType.Environment) {
 			success = seedEnvironment(ev, world);
-		} else if (ev.type === "spells") {
-			success = handleSpellChoosing(ev, world);
-		} else if (ev.type === "sync") {
-			success = handleSync(ev, world);
 		}
 
 		if (!success) {
@@ -1073,9 +1073,19 @@ function handleOccurences(world: w.World) {
 		}
 	});
 	world.occurrences = newOccurences;
+
+	if (world.spellChanges.length > 0) {
+		world.spellChanges.forEach(ev => handleSpellChoosing(ev, world));
+		world.spellChanges.length = 0;
+	}
+
+	if (world.syncs.length > 0) {
+		world.syncs.forEach(ev => handleSync(ev, world));
+		world.syncs.length = 0;
+	}
 }
 
-function seedEnvironment(ev: w.EnvironmentSeed, world: w.World) {
+function seedEnvironment(ev: c.EnvironmentMsg, world: w.World) {
 	if (world.seed !== null) {
 		return true;
 	}
@@ -1176,7 +1186,7 @@ export function allowSpellChoosing(world: w.World, heroId: string) {
 	}
 }
 
-function handleSync(ev: w.Syncing, world: w.World) {
+function handleSync(ev: w.Snapshot, world: w.World) {
 	const mySnapshot = dequeueSnapshot(ev.tick, world);
 	const theirSnapshot: w.Snapshot = ev;
 
@@ -1235,14 +1245,14 @@ function dequeueSnapshot(tick: number, world: w.World) {
 	return null;
 }
 
-function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
+function handleSpellChoosing(ev: c.SpellsMsg, world: w.World) {
 	const ChangeCooldown = 15; // ticks
 
-	if (!allowSpellChoosing(world, ev.heroId)) {
+	if (!allowSpellChoosing(world, ev.h)) {
 		return true;
 	}
 
-	const hero = world.objects.get(ev.heroId);
+	const hero = world.objects.get(ev.h);
 	if (hero && hero.category === "hero") {
 		if (hero.casting && hero.casting.uninterruptible) {
 			return false;
@@ -1255,9 +1265,9 @@ function handleSpellChoosing(ev: w.ChoosingSpells, world: w.World) {
 	return true;
 }
 
-function handleClosing(ev: w.Closing, world: w.World) {
-	const isNew = ev.startTick < world.startTick; // This message gets sent twice, don't respond to it multiple times
-	world.startTick = ev.startTick;
+function handleClosing(ev: c.CloseGameMsg, world: w.World) {
+	const isNew = ev.closeTick < world.startTick; // This message gets sent twice, don't respond to it multiple times
+	world.startTick = ev.closeTick;
 
 	if (isNew) {
 		// Obstacles movable now
@@ -1270,7 +1280,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 		// Clear any stockpiled halos
 		world.objects.forEach(projectile => {
 			if (projectile.category === "projectile" && projectile.owner) { // Ignore environmental projectiles
-				projectile.expireTick = Math.min(projectile.expireTick, ev.startTick);
+				projectile.expireTick = Math.min(projectile.expireTick, ev.closeTick);
 			}
 		});
 
@@ -1305,7 +1315,7 @@ function handleClosing(ev: w.Closing, world: w.World) {
 
 	world.ui.notifications.push({
 		type: "closing",
-		ticksUntilClose: ev.ticksUntilClose,
+		ticksUntilClose: ev.waitPeriod,
 		teamSizes,
 	});
 
@@ -1389,22 +1399,22 @@ function isPresentOrPastSelf(heroId: string, world: w.World) {
 	return false;
 }
 
-function handleBotting(ev: w.Botting, world: w.World) {
+function handleBotting(ev: c.BotActionMsg, world: w.World) {
 	const Visuals = world.settings.Visuals;
 	const World = world.settings.World;
 
-	console.log("Bot joined:", ev.heroId);
+	console.log("Bot joined:", ev.hid);
 
-	let hero = world.objects.get(ev.heroId);
+	let hero = world.objects.get(ev.hid);
 	if (!hero) {
-		if (alreadyDead(ev.heroId, world)) {
-			console.log("Cannot revive dead player", ev.heroId);
+		if (alreadyDead(ev.hid, world)) {
+			console.log("Cannot revive dead player", ev.hid);
 			return true;
 		}
 
-		hero = addHero(world, ev.heroId);
+		hero = addHero(world, ev.hid);
 	} else if (hero.category !== "hero") {
-		throw "Player tried to join as non-hero: " + ev.heroId;
+		throw "Player tried to join as non-hero: " + ev.hid;
 	}
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world); 
@@ -1430,18 +1440,18 @@ function handleBotting(ev: w.Botting, world: w.World) {
 	return true;
 }
 
-function handleJoining(ev: w.Joining, world: w.World) {
-	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
-	let hero = world.objects.get(ev.heroId);
+function handleJoining(ev: c.JoinActionMsg, world: w.World) {
+	console.log("Player joined:", ev.hid, ev.playerName, ev.userHash, ev.userId);
+	let hero = world.objects.get(ev.hid);
 	if (!hero) {
-		if (alreadyDead(ev.heroId, world)) {
-			console.log("Cannot revive dead player", ev.heroId);
+		if (alreadyDead(ev.hid, world)) {
+			console.log("Cannot revive dead player", ev.hid);
 			return true;
 		}
 
-		hero = addHero(world, ev.heroId);
+		hero = addHero(world, ev.hid);
 	} else if (hero.category !== "hero") {
-		throw "Player tried to join as non-hero: " + ev.heroId;
+		throw "Player tried to join as non-hero: " + ev.hid;
 	}
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world);
@@ -1509,18 +1519,18 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
  	return uiColor;	
 }
 
-function handleLeaving(ev: w.Leaving, world: w.World) {
-	console.log("Player left:", ev.heroId);
-	const player = world.players.get(ev.heroId);
+function handleLeaving(ev: c.LeaveActionMsg, world: w.World) {
+	console.log("Player left:", ev.hid);
+	const player = world.players.get(ev.hid);
 	if (!player) {
 		return true;
 	}
 
-	world.activePlayers = world.activePlayers.delete(ev.heroId);
+	world.activePlayers = world.activePlayers.delete(ev.hid);
 
 	world.ui.notifications.push({ type: "leave", player });
 
-	const hero = world.objects.get(ev.heroId);
+	const hero = world.objects.get(ev.hid);
 	if (hero && hero.category == "hero") {
 		if (world.winner) {
 			hero.exitTick = world.tick;
@@ -1531,7 +1541,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 				dead: true,
 			};
 
-			world.players = world.players.set(ev.heroId, newPlayer);
+			world.players = world.players.set(ev.hid, newPlayer);
 		} else {
 			// Replace leaving hero with bot
 			const newPlayer = {
@@ -1542,7 +1552,7 @@ function handleLeaving(ev: w.Leaving, world: w.World) {
 				isMobile: false,
 			};
 
-			world.players = world.players.set(ev.heroId, newPlayer);
+			world.players = world.players.set(ev.hid, newPlayer);
 		}
 	}
 
