@@ -171,7 +171,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         return <div>
             {<div className="stats-card-row">
                 <div className={`rating-card ${league.name}`} title={`${rating.acoPercentile.toFixed(1)} percentile`}>
-                    <RankIcon league={league.name} /> <b>{league.name}</b> {rating.acoExposure.toFixed(0)}
+                    <RankIcon league={league.name} /> <span className="value"><b>{league.name}</b> {rating.acoExposure.toFixed(0)}</span>
                 </div>
             </div>}
             {isMe && this.renderNextLeague(rating)}

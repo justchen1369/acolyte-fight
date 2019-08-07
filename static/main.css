@@ -1498,6 +1498,9 @@ h3 {
 }
 
 .stats-card-row .rating-card {
+    display: flex;
+    flex-direction: row;
+
     width: 100%;
 
     margin: 20px;
@@ -1507,9 +1510,15 @@ h3 {
 
     box-shadow: 5px 5px 5px black;
 
-    text-align: center;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
 
     transition: background-color 0.2s ease;
+}
+
+.stats-card-row .rating-card .rank-icon {
+    margin-right: 0.35em;
 }
 
 .stats-card-row .stats-card .label {
