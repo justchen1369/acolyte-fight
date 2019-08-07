@@ -158,7 +158,7 @@ function sendSnapshot(world: w.World) {
 	sockets.getSocket().emit('sync', packet);
 }
 
-export function sendAction(gameId: string, heroId: string, action: w.Action) {
+export function sendAction(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
 	const Precision = 1.0 / 1024;
 
 	if (!(gameId && heroId)) {
@@ -180,10 +180,16 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 		y: Math.round(action.target.y / Precision) * Precision,
 		r: action.release,
 	}
-	send(gameId, actionMsg);
+
+	const packet: m.ActionMsgPacket = {
+		g: gameId,
+		a: actionMsg,
+		c: controlKey || lookupControlKey(heroId),
+	};
+	send(packet);
 }
 
-export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings) {
+export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
 	if (!(gameId && heroId)) {
 		return;
 	}
@@ -193,18 +199,22 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 		type: m.ActionType.Spells,
 		keyBindings,
 	}
-	send(gameId, actionMsg);
-}
-
-function send(gameId: string, msg: m.ActionMsg) {
-	const state = StoreProvider.getState();
-	const world = state.world;
-	const player = world.players.get(msg.h);
 
 	const packet: m.ActionMsgPacket = {
 		g: gameId,
-		a: msg,
-		c: player.controlKey,
+		a: actionMsg,
+		c: controlKey || lookupControlKey(heroId),
 	};
+	send(packet);
+}
+
+function lookupControlKey(heroId: string) {
+	const state = StoreProvider.getState();
+	const world = state.world;
+	const player = world.players.get(heroId);
+	return player.controlKey;
+}
+
+function send(packet: m.ActionMsgPacket) {
 	sockets.getSocket().emit('action', packet);
 }
