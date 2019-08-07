@@ -91,15 +91,6 @@ export function addBotToCurrentGame() {
 	}
 }
 
-export function startCurrentGame() {
-	const store = StoreProvider.getState();
-	const world = store.world;
-
-	if (world.ui.myGameId && world.ui.myHeroId) {
-		ticker.sendAction(world.ui.myGameId, world.ui.myHeroId, { type: w.Actions.Stop, target: vector.zero() });
-	}
-}
-
 export function leaveCurrentGame(close: boolean = true) {
 	const store = StoreProvider.getState();
 	const world = store.world;

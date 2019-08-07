@@ -13,8 +13,8 @@ const DefaultDelayMilliseconds = 400;
 const workers = new Map<string, AiWorker>();
 
 export interface SendContext {
-    action: (gameId: string, heroId: string, action: w.Action) => void;
-    spells: (gameId: string, heroId: string, keyBindings: KeyBindings) => void;
+    action: (gameId: string, heroId: string, action: w.Action, controlKey: number) => void;
+    spells: (gameId: string, heroId: string, keyBindings: KeyBindings, controlKey: number) => void;
 }
 
 export function onTick(world: w.World, send: SendContext) {
@@ -24,7 +24,7 @@ export function onTick(world: w.World, send: SendContext) {
 
     // Start any new bots
     if (world.ui.myHeroId) { // If not a replay
-        world.players.forEach(player => startBotIfNecessary(world, player.heroId, send));
+        world.players.forEach(player => startBotIfNecessary(world, player.heroId, player.controlKey, send));
     }
 
     // Process all bots
@@ -42,12 +42,12 @@ export function onTick(world: w.World, send: SendContext) {
     });
 }
 
-function startBotIfNecessary(world: w.World, heroId: string, send: SendContext) {
+function startBotIfNecessary(world: w.World, heroId: string, controlKey: number, send: SendContext) {
     if (isMyBot(world, heroId)) {
-        const key = workerKey(world.ui.myGameId, heroId);
+        const key = workerKey(world.ui.myGameId, heroId, controlKey);
         if (!workers.has(key)) {
             console.log("Starting bot", heroId);
-            const worker = new AiWorker(world, heroId, send);
+            const worker = new AiWorker(world, heroId, controlKey, send);
             workers.set(key, worker);
 
             worker.start(); // Don't await
@@ -55,8 +55,8 @@ function startBotIfNecessary(world: w.World, heroId: string, send: SendContext) 
     }
 }
 
-function workerKey(gameId: string, heroId: string) {
-    return `${gameId}/${heroId}`;
+function workerKey(gameId: string, heroId: string, controlKey: number) {
+    return `${gameId}/${heroId}/${controlKey}`;
 }
 
 function isMyBot(world: w.World, heroId: string) {
@@ -80,15 +80,17 @@ function isMyBot(world: w.World, heroId: string) {
 class AiWorker {
     private gameId: string;
     private heroId: string;
+    private controlKey: number;
     private settings: AcolyteFightSettings;
     private send: SendContext;
     private worker: Worker;
     private awaitingTick: number = null;
     private isTerminated = false;
 
-    constructor(world: w.World, heroId: string, send: SendContext) {
+    constructor(world: w.World, heroId: string, controlKey: number, send: SendContext) {
         this.gameId = world.ui.myGameId;
         this.heroId = heroId;
+        this.controlKey = controlKey;
         this.settings = world.settings;
         this.send = send;
 
@@ -165,7 +167,7 @@ class AiWorker {
                 if (output.spells) {
                     const world = StoreProvider.getState().world;
                     if (engine.allowSpellChoosing(world, this.heroId)) {
-                        this.send.spells(this.gameId, this.heroId, output.spells);
+                        this.send.spells(this.gameId, this.heroId, output.spells, this.controlKey);
                     }
                 } else if (output.spellId) {
                     const world = StoreProvider.getState().world;
@@ -177,7 +179,7 @@ class AiWorker {
                                 type: output.spellId,
                                 target: pl.Vec2(output.target),
                                 release: output.release,
-                            });
+                            }, this.controlKey);
                         }, delayMilliseconds);
                     }
                 } 
