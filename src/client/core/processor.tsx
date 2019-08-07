@@ -18,13 +18,7 @@ export function initialWorld(data: m.HeroMsg) {
 }
 
 export function isStartGameTick(tickData: m.TickMsg) {
-	let result = false;
-	tickData.actions.forEach(actionData => {
-		if (actionData.type === m.ActionType.CloseGame) {
-			result = true;
-		}
-	});
-	return result;
+	return tickData.c && tickData.c.some(x => x.type === m.ActionType.CloseGame);
 }
 
 export function applyTick(tickData: m.TickMsg, world: w.World) {
@@ -33,73 +27,81 @@ export function applyTick(tickData: m.TickMsg, world: w.World) {
 }
 
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
-	if (tickData.gameId !== world.ui.myGameId) {
+	if (tickData.g !== world.ui.myGameId) {
 		return;
 	}
 
-	tickData.actions.forEach(actionData => {
-		if (actionData.gid !== world.ui.myGameId) {
-			// Skip this action
-		} else if (actionData.type === m.ActionType.GameAction) {
-			world.actions.set(actionData.hid, {
-				type: actionData.sid,
-				target: pl.Vec2(actionData.x, actionData.y),
-				release: actionData.r,
-			});
-		} else if (actionData.type === m.ActionType.CloseGame) {
-			world.occurrences.push({
-				type: "closing",
-				startTick: actionData.closeTick,
-				ticksUntilClose: actionData.waitPeriod,
-				numTeams: actionData.numTeams,
-			});
-		} else if (actionData.type === m.ActionType.Join) {
-			world.occurrences.push({
-				type: "join",
-				heroId: actionData.hid,
-				userId: actionData.userId,
-				userHash: actionData.userHash,
-				partyHash: actionData.partyHash,
-				playerName: actionData.playerName || "Acolyte",
-				keyBindings: actionData.keyBindings,
-				isMobile: actionData.isMobile,
-			});
-		} else if (actionData.type === m.ActionType.Bot) {
-			world.occurrences.push({
-				type: "botting",
-				heroId: actionData.hid,
-				keyBindings: actionData.keyBindings,
-			});
-		} else if (actionData.type === m.ActionType.Leave) {
-			world.occurrences.push({
-				type: "leave",
-				heroId: actionData.hid,
-			});
-		} else if (actionData.type === m.ActionType.Environment) {
-			world.occurrences.push({
-				type: "environment",
-				seed: actionData.seed,
-				layoutId: actionData.layoutId,
-			});
-		} else if (actionData.type === m.ActionType.Spells) {
-			world.occurrences.push({
-				type: "spells",
-				heroId: actionData.hid,
-				keyBindings: actionData.keyBindings,
-			});
-		} else if (actionData.type === m.ActionType.Sync) {
-			const heroLookup = new Map<string, w.ObjectSnapshot>();
-			actionData.objects.forEach(snapshot => {
-				heroLookup.set(snapshot.id, {
-					health: snapshot.hp,
-					pos: pl.Vec2(snapshot.x, snapshot.y),
+	if (tickData.c) {
+		tickData.c.forEach(actionData => {
+			if (actionData.type === m.ActionType.CloseGame) {
+				world.occurrences.push({
+					type: "closing",
+					startTick: actionData.closeTick,
+					ticksUntilClose: actionData.waitPeriod,
+					numTeams: actionData.numTeams,
 				});
+			} else if (actionData.type === m.ActionType.Join) {
+				world.occurrences.push({
+					type: "join",
+					heroId: actionData.hid,
+					userId: actionData.userId,
+					userHash: actionData.userHash,
+					partyHash: actionData.partyHash,
+					playerName: actionData.playerName || "Acolyte",
+					keyBindings: actionData.keyBindings,
+					isMobile: actionData.isMobile,
+				});
+			} else if (actionData.type === m.ActionType.Bot) {
+				world.occurrences.push({
+					type: "botting",
+					heroId: actionData.hid,
+					keyBindings: actionData.keyBindings,
+				});
+			} else if (actionData.type === m.ActionType.Leave) {
+				world.occurrences.push({
+					type: "leave",
+					heroId: actionData.hid,
+				});
+			} else if (actionData.type === m.ActionType.Environment) {
+				world.occurrences.push({
+					type: "environment",
+					seed: actionData.seed,
+					layoutId: actionData.layoutId,
+				});
+			}
+		});
+	}
+
+	if (tickData.a) {
+		tickData.a.forEach(actionData => {
+			if (actionData.type === m.ActionType.GameAction) {
+				world.actions.set(actionData.h, {
+					type: actionData.s,
+					target: pl.Vec2(actionData.x, actionData.y),
+					release: actionData.r,
+				});
+			} else if (actionData.type === m.ActionType.Spells) {
+				world.occurrences.push({
+					type: "spells",
+					heroId: actionData.h,
+					keyBindings: actionData.keyBindings,
+				});
+			}
+		});
+	}
+
+	if (tickData.s) {
+		const heroLookup = new Map<string, w.ObjectSnapshot>();
+		tickData.s.o.forEach(snapshot => {
+			heroLookup.set(snapshot.id, {
+				health: snapshot.h,
+				pos: pl.Vec2(snapshot.x, snapshot.y),
 			});
-			world.occurrences.push({
-				type: "sync",
-				tick: actionData.tick,
-				objectLookup: heroLookup,
-			});
-		}
-	});
+		});
+		world.occurrences.push({
+			type: "sync",
+			tick: tickData.s.t,
+			objectLookup: heroLookup,
+		});
+	}
 }

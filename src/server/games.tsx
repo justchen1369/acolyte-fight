@@ -202,50 +202,24 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 }
 
 export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
-	if (!(
-		(
-			data.type === "game"
-			&& required(data.sid, "string")
-			&& required(data.x, "number")
-			&& required(data.y, "number")
-			&& optional(data.r, "boolean")
-		) || (
-			data.type === "spells"
-			&& required(data.keyBindings, "object")
-		) || (
-			data.type === m.ActionType.Sync
-			&& required(data.tick, "number")
-			&& required(data.objects, "object") && data.objects instanceof Array
-			&& data.objects.every(snapshot => 
-				required(snapshot, "object")
-				&& required(snapshot.id, "string")
-				&& required(snapshot.hp, "number")
-				&& required(snapshot.x, "number")
-				&& required(snapshot.y, "number"))
-		)
-	)) {
-		logger.info("Game [" + game.id + "]: action message received from socket " + socketId + " with wrong action type: " + data.type);
-		return;
-	}
-
 	const player = game.active.get(socketId);
 	if (!player) {
 		return;
 	}
 
-	if (data.hid === player.heroId || takeBotControl(game, data.hid, socketId)) {
-		if (data.type === m.ActionType.Sync) {
-			queueSyncMessage(game, data);
-		} else {
-			queueAction(game, data);
-		}
+	if (data.h === player.heroId || takeBotControl(game, data.h, socketId)) {
+		queueAction(game, data);
+		++player.numActionMessages;
+	}
+}
+
+export function receiveSync(game: g.Game, data: m.SyncMsg, socketId: string) {
+	const player = game.active.get(socketId);
+	if (!player) {
+		return;
 	}
 
-	if (data.hid === player.heroId) {
-		if (data.type === "game") {
-			++player.numActionMessages;
-		}
-	}
+	queueSyncMessage(game, data);
 }
 
 export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
@@ -305,8 +279,6 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	}
 
 	queueControlMessage(game, {
-		gid: game.id,
-		hid: null,
 		type: m.ActionType.Environment,
 		seed: gameIndex,
 		layoutId: layoutId,
@@ -370,25 +342,25 @@ function formatHeroId(index: number): string {
 }
 
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
-	let currentPrecedence = actionPrecedence(game.actions.get(actionData.hid));
+	let currentPrecedence = actionPrecedence(game.actions.get(actionData.h));
 	let newPrecedence = actionPrecedence(actionData);
 
 	if (newPrecedence >= currentPrecedence) {
-		game.actions.set(actionData.hid, actionData);
+		game.actions.set(actionData.h, actionData);
 	}
 
 	startTickProcessing();
 }
 
-function queueControlMessage(game: g.Game, actionData: m.ActionMsg) {
+function queueControlMessage(game: g.Game, actionData: m.ControlMsg) {
 	game.controlMessages.push(actionData);
 
 	startTickProcessing();
 }
 
 function queueSyncMessage(game: g.Game, actionData: m.SyncMsg) {
-	if (game.syncTick < actionData.tick) {
-		game.syncTick = actionData.tick;
+	if (game.syncTick < actionData.t) {
+		game.syncTick = actionData.t;
 		game.syncMessage = actionData;
 
 		startTickProcessing();
@@ -398,17 +370,15 @@ function queueSyncMessage(game: g.Game, actionData: m.SyncMsg) {
 function actionPrecedence(actionData: m.ActionMsg): number {
 	if (!actionData) {
 		return 0;
-	} else if (actionData.type === "join" || actionData.type === "leave" || actionData.type === "bot") {
-		return 1000;
 	} else if (actionData.type === "spells") {
 		return 101;
-	} else if (actionData.type === "game" && actionData.sid === w.Actions.Stop) {
+	} else if (actionData.type === "game" && actionData.s === w.Actions.Stop) {
 		return 12;
-	} else if (actionData.type === "game" && actionData.sid === w.Actions.MoveAndCancel) {
+	} else if (actionData.type === "game" && actionData.s === w.Actions.MoveAndCancel) {
 		return 11;
-	} else if (actionData.type === "game" && actionData.sid === w.Actions.Move) {
+	} else if (actionData.type === "game" && actionData.s === w.Actions.Move) {
 		return 10;
-	} else if (actionData.type === "game" && actionData.sid === w.Actions.Retarget) {
+	} else if (actionData.type === "game" && actionData.s === w.Actions.Retarget) {
 		return 1;
 	} else if (actionData.type === "game" && actionData.r) {
 		// Releasing key less important than casting new spell
@@ -420,7 +390,7 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 }
 
 function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.type === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.sid);
+	return actionData.type === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.s);
 }
 
 export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {
@@ -441,7 +411,7 @@ export function leaveGame(game: g.Game, socketId: string) {
 	game.active.delete(socketId);
 	reassignBots(game, player.heroId, socketId);
 
-	queueControlMessage(game, { gid: game.id, hid: player.heroId, type: "leave" });
+	queueControlMessage(game, { hid: player.heroId, type: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
@@ -525,29 +495,26 @@ function gameTick(game: g.Game): boolean {
 function gameTurn(game: g.Game) {
 	closeGameIfNecessary(game);
 
-	const actions = new Array<m.ActionMsg>();
+	const data = {
+		g: game.id,
+		t: game.tick++,
+	} as m.TickMsg;
 
 	if (game.controlMessages.length > 0) {
-		actions.push(...game.controlMessages);
-		game.controlMessages.length = 0;
+		data.c = game.controlMessages;
+		game.controlMessages = [];
 	}
 
 	if (game.syncMessage) {
-		actions.push(game.syncMessage);
+		data.s = game.syncMessage;
 		game.syncMessage = null;
 	}
 
 	if (game.actions.size > 0) {
-		game.actions.forEach(action => actions.push(action));
-		game.activeTick = game.tick;
+		data.a = wu(game.actions.values()).toArray();
 		game.actions.clear();
+		game.activeTick = game.tick;
 	}
-
-	const data = {
-		gameId: game.id,
-		tick: game.tick++,
-		actions,
-	} as m.TickMsg;
 
 	if (game.history) {
 		if (game.history.length < Matchmaking.MaxHistoryLength) {
@@ -613,7 +580,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		if (player) {
 			player.userId = userId;
 			queueControlMessage(game, {
-				gid: game.id,
 				hid: heroId,
 				type: "join",
 				userId,
@@ -649,7 +615,7 @@ export function addBot(game: g.Game) {
 	game.bots.set(heroId, null);
 
 	const keyBindings = {};
-	queueControlMessage(game, { gid: game.id, hid: heroId, type: "bot", keyBindings });
+	queueControlMessage(game, { hid: heroId, type: "bot", keyBindings });
 
 	return heroId;
 }
@@ -714,8 +680,6 @@ function closeGameIfNecessary(game: g.Game) {
 
 	if (waitPeriod !== null) {
 		queueControlMessage(game, {
-			gid: game.id,
-			hid: null,
 			type: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
 			waitPeriod,

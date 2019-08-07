@@ -72,30 +72,40 @@ export interface GameOptions {
     touchSurfacePixels?: number;
 }
 
+export interface ActionMsgPacket {
+    g: string;
+    a: ActionMsg;
+}
+
 export type ActionMsg =
+    | GameActionMsg
+    | SpellsMsg
+
+export interface ActionMsgBase {
+    type: string;
+    h: string;
+}
+
+export type ControlMsg =
     EnvironmentMsg
     | JoinActionMsg
     | BotActionMsg
     | LeaveActionMsg
     | CloseGameMsg
-    | GameActionMsg
-    | SpellsMsg
-    | SyncMsg
 
-export interface ActionMsgBase {
+export interface ControlMsgBase {
     type: string;
-    gid: string;
-    hid: string;
 }
 
-export interface EnvironmentMsg extends ActionMsgBase {
+export interface EnvironmentMsg extends ControlMsgBase {
     type: "environment";
     seed: number;
     layoutId?: string;
 }
 
-export interface JoinActionMsg extends ActionMsgBase {
+export interface JoinActionMsg extends ControlMsgBase {
     type: "join";
+    hid: string;
     userId: string | null;
     userHash: string | null;
     partyHash?: string;
@@ -104,16 +114,18 @@ export interface JoinActionMsg extends ActionMsgBase {
     isMobile: boolean;
 }
 
-export interface BotActionMsg extends ActionMsgBase {
+export interface BotActionMsg extends ControlMsgBase {
     type: "bot";
+    hid: string;
     keyBindings: KeyBindings;
 }
 
-export interface LeaveActionMsg extends ActionMsgBase {
+export interface LeaveActionMsg extends ControlMsgBase {
     type: "leave";
+    hid: string;
 }
 
-export interface CloseGameMsg extends ActionMsgBase {
+export interface CloseGameMsg extends ControlMsgBase {
     type: "close";
     closeTick: number;
     waitPeriod: number;
@@ -122,7 +134,7 @@ export interface CloseGameMsg extends ActionMsgBase {
 
 export interface GameActionMsg extends ActionMsgBase {
     type: "game";
-    sid: string; // spell ID
+    s: string; // spell ID
     x: number;
     y: number;
     r?: boolean; // is this a button release?
@@ -133,23 +145,29 @@ export interface SpellsMsg extends ActionMsgBase {
     keyBindings: KeyBindings;
 }
 
-export interface SyncMsg extends ActionMsgBase {
-    type: "sync";
-    tick: number;
-    objects: ObjectSyncMsg[];
+export interface SyncMsgPacket {
+    g: string;
+    s: SyncMsg;
+}
+
+export interface SyncMsg {
+    t: number;
+    o: ObjectSyncMsg[];
 }
 
 export interface ObjectSyncMsg {
-    id: string;
+    id: string; // id
     x: number;
     y: number;
-    hp: number;
+    h: number;
 }
 
 export interface TickMsg {
-    gameId: string;
-    tick: number;
-    actions: ActionMsg[];
+    g: string;
+    t: number;
+    a?: ActionMsg[];
+    c?: ControlMsg[];
+    s?: SyncMsg;
 }
 
 export interface JoinMsg {

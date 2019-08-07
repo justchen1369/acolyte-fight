@@ -29,7 +29,7 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
-	games.attachToTickEmitter(data => io.to(data.gameId).emit("tick", data));
+	games.attachToTickEmitter(data => io.to(data.g).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
 	online.attachOnlineEmitter(emitOnline);
 }
@@ -103,6 +103,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('score', data => onScoreMsg(socket, data));
 	socket.on('leave', data => onLeaveGameMsg(socket, data));
 	socket.on('action', data => onActionMsg(socket, data));
+	socket.on('sync', data => onSyncMsg(socket, data));
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
@@ -571,20 +572,59 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	}
 }
 
-function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
+function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 	try {
 		if (!(required(data, "object")
-			&& required(data.type, "string")
-			&& required(data.gid, "string")
-			&& required(data.hid, "string")
+			&& required(data.a, "object")
+			&& required(data.g, "string")
+			&& required(data.a.type, "string")
+			&& (
+				(
+					data.a.type === m.ActionType.GameAction
+					&& required(data.a.s, "string")
+					&& required(data.a.x, "number")
+					&& required(data.a.y, "number")
+					&& optional(data.a.r, "boolean")
+				) || (
+					data.a.type === m.ActionType.Spells
+					&& required(data.a.keyBindings, "object")
+				)
+			)
 		)) {
 			// callback({ success: false, error: "Bad request" });
 			return;
 		}
 
-		const game = getStore().activeGames.get(data.gid);
+		const game = getStore().activeGames.get(data.g);
 		if (game) {
-			games.receiveAction(game, data, socket.id);
+			games.receiveAction(game, data.a, socket.id);
+		}
+	} catch (exception) {
+		logger.error(exception);
+	}
+}
+
+function onSyncMsg(socket: SocketIO.Socket, data: m.SyncMsgPacket) {
+	try {
+		if (!(required(data, "object")
+			&& required(data.g, "string")
+			&& required(data.s, "object")
+			&& required(data.s.t, "number")
+			&& required(data.s.o, "object") && data.s.o instanceof Array
+			&& data.s.o.every(snapshot => 
+				required(snapshot, "object")
+				&& required(snapshot.id, "string")
+				&& required(snapshot.h, "number")
+				&& required(snapshot.x, "number")
+				&& required(snapshot.y, "number"))
+		)) {
+			// callback({ success: false, error: "Bad request" });
+			return;
+		}
+
+		const game = getStore().activeGames.get(data.g);
+		if (game) {
+			games.receiveSync(game, data.s, socket.id);
 		}
 	} catch (exception) {
 		logger.error(exception);

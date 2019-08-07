@@ -78,12 +78,12 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		incomingLoop(numFrames);
 	}
 
-	while (tickQueue.length > 0 && tickQueue[0].gameId != world.ui.myGameId) {
+	while (tickQueue.length > 0 && tickQueue[0].g != world.ui.myGameId) {
 		tickQueue.shift(); // Get rid of any leftover ticks from other games
 	}
-	while (tickQueue.length > 0 && tickQueue[0].tick <= world.tick) {
+	while (tickQueue.length > 0 && tickQueue[0].t <= world.tick) {
 		let tickData = tickQueue.shift();
-		if (tickData.tick < world.tick) {
+		if (tickData.t < world.tick) {
 			continue; // Received the same tick multiple times, skip over it
 		}
 
@@ -120,7 +120,7 @@ function aiTick(world: w.World) {
 
 export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
-	if (data.gameId === world.ui.myGameId) {
+	if (data.g === world.ui.myGameId) {
 		incomingQueue.push(data);
 	}
 }
@@ -140,20 +140,22 @@ function sendSnapshot(world: w.World) {
 	snapshot.objectLookup.forEach((heroSnapshot, heroId) => {
 		heroes.push({
 			id: heroId,
-			hp: heroSnapshot.health,
+			h: heroSnapshot.health,
 			x: heroSnapshot.pos.x,
 			y: heroSnapshot.pos.y,
 		});
 	});
 
 	const syncMsg: m.SyncMsg = {
-		type: m.ActionType.Sync,
-		gid: world.ui.myGameId,
-		hid: world.ui.myHeroId,
-		tick: snapshot.tick,
-		objects: heroes,
+		t: snapshot.tick,
+		o: heroes,
 	};
-	send(syncMsg);
+	const packet: m.SyncMsgPacket = {
+		g: world.ui.myGameId,
+		s: syncMsg,
+	};
+
+	sockets.getSocket().emit('sync', packet);
 }
 
 export function sendAction(gameId: string, heroId: string, action: w.Action) {
@@ -171,15 +173,14 @@ export function sendAction(gameId: string, heroId: string, action: w.Action) {
 	}
 
 	const actionMsg: m.ActionMsg = {
-		gid: gameId,
-		hid: heroId,
+		h: heroId,
 		type: m.ActionType.GameAction,
-		sid: action.type,
+		s: action.type,
 		x: Math.round(action.target.x / Precision) * Precision,
 		y: Math.round(action.target.y / Precision) * Precision,
 		r: action.release,
 	}
-	send(actionMsg);
+	send(gameId, actionMsg);
 }
 
 export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings) {
@@ -188,14 +189,17 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 	}
 
 	const actionMsg: m.ActionMsg = {
-		gid: gameId,
-		hid: heroId,
+		h: heroId,
 		type: m.ActionType.Spells,
 		keyBindings,
 	}
-	send(actionMsg);
+	send(gameId, actionMsg);
 }
 
-function send(msg: m.ActionMsg) {
-	sockets.getSocket().emit('action', msg);
+function send(gameId: string, msg: m.ActionMsg) {
+	const packet: m.ActionMsgPacket = {
+		g: gameId,
+		a: msg,
+	};
+	sockets.getSocket().emit('action', packet);
 }
