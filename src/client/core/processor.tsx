@@ -32,7 +32,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	}
 
 	if (tickData.c) {
-		world.occurrences.push(...tickData.c);
+		world.controlMessages.push(...tickData.c);
 	}
 
 	if (tickData.a) {

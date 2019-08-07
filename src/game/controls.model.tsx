@@ -46,7 +46,7 @@ export interface EnvironmentMsg extends ControlMsgBase {
 
 export interface JoinActionMsg extends ControlMsgBase {
     type: "join";
-    hid: string;
+    heroId: string;
     controlKey: number;
     userId: string | null;
     userHash: string | null;
@@ -58,14 +58,14 @@ export interface JoinActionMsg extends ControlMsgBase {
 
 export interface BotActionMsg extends ControlMsgBase {
     type: "bot";
-    hid: string;
+    heroId: string;
     controlKey: number;
     keyBindings: KeyBindings;
 }
 
 export interface LeaveActionMsg extends ControlMsgBase {
     type: "leave";
-    hid: string;
+    heroId: string;
     controlKey: number; // control key for the bot that is left behind
 }
 

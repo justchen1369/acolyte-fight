@@ -58,7 +58,7 @@ export interface World {
 	shrink: number;
 	radius: number;
 
-	occurrences: c.ControlMsg[];
+	controlMessages: c.ControlMsg[];
 	snapshots: Snapshot[];
 	syncs: Snapshot[];
 	actions: Map<string, Action>,

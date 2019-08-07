@@ -89,7 +89,7 @@ export function initialWorld(mod: Object): w.World {
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
-		occurrences: [],
+		controlMessages: [],
 		snapshots: [],
 		syncs: [],
 		spellChanges: [],
@@ -1054,7 +1054,7 @@ function projectileClearedHero(projectile: w.Projectile, hero: w.Hero) {
 function handleOccurences(world: w.World) {
 	const newOccurences = new Array<c.ControlMsg>();
 
-	world.occurrences.forEach(ev => {
+	world.controlMessages.forEach(ev => {
 		let success = true;
 		if (ev.type === c.ActionType.CloseGame) {
 			success = handleClosing(ev, world);
@@ -1072,7 +1072,7 @@ function handleOccurences(world: w.World) {
 			newOccurences.push(ev);
 		}
 	});
-	world.occurrences = newOccurences;
+	world.controlMessages = newOccurences;
 
 	if (world.spellChanges.length > 0) {
 		world.spellChanges.forEach(ev => handleSpellChoosing(ev, world));
@@ -1403,18 +1403,18 @@ function handleBotting(ev: c.BotActionMsg, world: w.World) {
 	const Visuals = world.settings.Visuals;
 	const World = world.settings.World;
 
-	console.log("Bot joined:", ev.hid);
+	console.log("Bot joined:", ev.heroId);
 
-	let hero = world.objects.get(ev.hid);
+	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
-		if (alreadyDead(ev.hid, world)) {
-			console.log("Cannot revive dead player", ev.hid);
+		if (alreadyDead(ev.heroId, world)) {
+			console.log("Cannot revive dead player", ev.heroId);
 			return true;
 		}
 
-		hero = addHero(world, ev.hid);
+		hero = addHero(world, ev.heroId);
 	} else if (hero.category !== "hero") {
-		throw "Player tried to join as non-hero: " + ev.hid;
+		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world); 
@@ -1441,17 +1441,17 @@ function handleBotting(ev: c.BotActionMsg, world: w.World) {
 }
 
 function handleJoining(ev: c.JoinActionMsg, world: w.World) {
-	console.log("Player joined:", ev.hid, ev.playerName, ev.userHash, ev.userId);
-	let hero = world.objects.get(ev.hid);
+	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
+	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
-		if (alreadyDead(ev.hid, world)) {
-			console.log("Cannot revive dead player", ev.hid);
+		if (alreadyDead(ev.heroId, world)) {
+			console.log("Cannot revive dead player", ev.heroId);
 			return true;
 		}
 
-		hero = addHero(world, ev.hid);
+		hero = addHero(world, ev.heroId);
 	} else if (hero.category !== "hero") {
-		throw "Player tried to join as non-hero: " + ev.hid;
+		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
 	assignKeyBindingsToHero(hero, ev.keyBindings, world);
@@ -1520,17 +1520,17 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 }
 
 function handleLeaving(ev: c.LeaveActionMsg, world: w.World) {
-	console.log("Player left:", ev.hid);
-	const player = world.players.get(ev.hid);
+	console.log("Player left:", ev.heroId);
+	const player = world.players.get(ev.heroId);
 	if (!player) {
 		return true;
 	}
 
-	world.activePlayers = world.activePlayers.delete(ev.hid);
+	world.activePlayers = world.activePlayers.delete(ev.heroId);
 
 	world.ui.notifications.push({ type: "leave", player });
 
-	const hero = world.objects.get(ev.hid);
+	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category == "hero") {
 		if (world.winner) {
 			hero.exitTick = world.tick;
@@ -1541,7 +1541,7 @@ function handleLeaving(ev: c.LeaveActionMsg, world: w.World) {
 				dead: true,
 			};
 
-			world.players = world.players.set(ev.hid, newPlayer);
+			world.players = world.players.set(ev.heroId, newPlayer);
 		} else {
 			// Replace leaving hero with bot
 			const newPlayer = {
@@ -1552,7 +1552,7 @@ function handleLeaving(ev: c.LeaveActionMsg, world: w.World) {
 				isMobile: false,
 			};
 
-			world.players = world.players.set(ev.hid, newPlayer);
+			world.players = world.players.set(ev.heroId, newPlayer);
 		}
 	}
 

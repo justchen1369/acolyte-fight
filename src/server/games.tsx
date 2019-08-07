@@ -423,7 +423,7 @@ export function leaveGame(game: g.Game, socketId: string) {
 	reassignBots(game, player.heroId, socketId);
 
 	const controlKey = acquireControlKey(player.heroId, game);
-	queueControlMessage(game, { hid: player.heroId, controlKey: controlKey, type: "leave" });
+	queueControlMessage(game, { heroId: player.heroId, controlKey: controlKey, type: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
@@ -594,7 +594,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 
 			const controlKey = acquireControlKey(heroId, game);
 			queueControlMessage(game, {
-				hid: heroId,
+				heroId: heroId,
 				controlKey,
 				type: "join",
 				userId,
@@ -637,7 +637,7 @@ export function addBot(game: g.Game) {
 
 	const keyBindings = {};
 	const controlKey = acquireControlKey(heroId, game);
-	queueControlMessage(game, { hid: heroId, controlKey: controlKey, type: "bot", keyBindings });
+	queueControlMessage(game, { heroId: heroId, controlKey: controlKey, type: "bot", keyBindings });
 
 	return heroId;
 }
