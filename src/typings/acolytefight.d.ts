@@ -1007,6 +1007,7 @@ interface VisualSettings {
 	DefaultGlowRadius: number;
 
 	// Map visuals
+	Background: string;
 	DefaultWorldColor: string;
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;

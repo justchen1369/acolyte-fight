@@ -1,18 +1,18 @@
-import Color from 'color';
 import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as textures from './images';
 import * as trails from './trails';
+import ColTuple from './colorTuple';
 
 export { atlas, image } from './images';
 export { circle, line, arc, convex } from './trails';
 
-export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect) {
+export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect, background: ColTuple) {
 	let context: r.GlContext = initGl(ctxStack);
 	const gl = context.gl;
 
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-	gl.clearColor(0, 0, 0, 1.0);
+	gl.clearColor(background.r, background.g, background.b, background.a);
 	gl.clear(gl.COLOR_BUFFER_BIT);
 
 	const uniforms: r.UniformData = {
