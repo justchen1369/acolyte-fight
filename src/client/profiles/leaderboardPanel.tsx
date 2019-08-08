@@ -7,17 +7,15 @@ import * as constants from '../../game/constants';
 import * as d from '../stats.model';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
+import * as loader from '../core/loader';
 import * as options from '../options';
 import * as pages from '../core/pages';
 import * as rankings from '../core/rankings';
 import * as url from '../url';
 import Link from '../controls/link';
 import RankIcon from '../controls/rankIcon';
-import UnrankedTogglePanel from './unrankedTogglePanel';
-import UserStatsPanel from './userStatsPanel';
 
 interface OwnProps {
-    category: string;
 }
 interface Props extends OwnProps {
     current: s.PathElements;
@@ -25,12 +23,11 @@ interface Props extends OwnProps {
     loggedIn: boolean;
     unranked: boolean;
     leagues: m.League[];
+    leaderboard: m.LeaderboardPlayer[];
+    profile: m.GetProfileResponse;
 }
 
 interface State {
-    category: string;
-    leaderboard: m.LeaderboardPlayer[];
-    profile: m.GetProfileResponse;
     error: string;
 }
 
@@ -40,6 +37,8 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         current: state.current,
         myUserId: state.userId,
         loggedIn: state.loggedIn,
+        leaderboard: state.leaderboard,
+        profile: state.profile,
         unranked: state.options.unranked,
         leagues: state.leagues,
     };
@@ -49,50 +48,29 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            category: null,
-            leaderboard: null,
-            profile: null,
             error: null,
         };
     }
 
     componentWillMount() {
-        this.loadDataAsync(this.props.category);
+        this.loadDataAsync();
+    }
+
+    private async loadDataAsync() {
+        await loader.loaded();
 
         if (!this.props.leagues) {
             rankings.downloadLeagues(); // Don't await
         }
-    }
 
-    componentWillReceiveProps(newProps: Props) {
-        const category = newProps.category;
-        this.loadDataAsync(category);
-    }
-
-    private async loadDataAsync(category: string) {
-        if (category !== this.state.category) {
-            this.setState({ category, leaderboard: null, error: null });
-            try {
-                const leaderboard = await rankings.retrieveLeaderboardAsync(category);
-                if (category === this.state.category) {
-                    this.setState({ leaderboard });
-                }
-
-                if (this.props.myUserId && this.props.loggedIn) {
-                    const profile = await rankings.retrieveUserStatsAsync(this.props.myUserId);
-                    this.setState({ profile });
-                }
-            } catch(error) {
-                console.error("LeaderboardPanel error", error);
-                this.setState({ error: `${error}` });
-            }
-        }
+        rankings.retrieveMyStatsAsync(); // Don't await
+        rankings.downloadLeaderboard(); // Don't await
     }
 
     render() {
         if (this.state.error) {
             return this.renderError();
-        } else if (!this.state.leaderboard) {
+        } else if (!this.props.leaderboard) {
             return this.renderLoading();
         } else {
             return this.renderLeaderboard();
@@ -101,14 +79,14 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
 
     private renderLeaderboard() {
         const a = options.getProvider();
-        const category = this.state.category;
-        const isOnLeaderboard = this.props.myUserId && this.state.leaderboard.some(p => p.userId === this.props.myUserId);
+        const category = m.GameCategory.PvP;
+        const isOnLeaderboard = this.props.myUserId && this.props.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
             <h1>Leaderboard</h1>
             <p>This is the global ranking of all logged-in active players. See the <Link page="about">About page</Link> for more information about the rating system.</p>
             <div className="leaderboard">
-                {this.state.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
-                {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.state.profile, category), null)}
+                {this.props.leaderboard.map((player, index) => this.renderRow(player, index + 1))}
+                {!isOnLeaderboard && this.props.loggedIn && this.renderRow(this.createSelfPlayer(this.props.profile, category), null)}
             </div>
         </div>
     }

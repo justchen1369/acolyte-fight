@@ -20,6 +20,11 @@ export async function downloadLeagues() {
     StoreProvider.dispatch({ type: "updateLeagues", leagues });
 }
 
+export async function downloadLeaderboard() {
+    const leaderboard = await retrieveLeaderboardAsync(m.GameCategory.PvP);
+    StoreProvider.dispatch({ type: "updateLeaderboard", leaderboard });
+}
+
 export function onNotification(notifs: w.Notification[]) {
     for (const notif of notifs) {
         if (notif.type === "ratingAdjustment") {

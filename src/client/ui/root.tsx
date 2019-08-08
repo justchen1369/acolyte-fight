@@ -141,7 +141,7 @@ class Root extends React.PureComponent<Props> {
             <TitleListener subtitle="Leaderboard" />
             <NavBar />
             <div className="page">
-                <LeaderboardPanel category={m.GameCategory.PvP} />
+                <LeaderboardPanel />
             </div>
         </div>;
     }
