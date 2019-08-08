@@ -119,6 +119,16 @@ const Visuals: VisualSettings = {
 	ButtonBarSize: 72,
     ButtonBarGap: 12,
 
+	CameraPanRate: 0.004,
+	CameraZoomRate: 0.004,
+
+	CameraMaxZoom: 2,
+	CameraMinPixelsForZoom: 640,
+	CameraSmoothRate: 0.5,
+
+	CameraCenterTolerance: 0.15,
+	CameraZoomTolerance: 0.2,
+
 	Colors: [
 		"#cb8fc1",
 		"#7db37d",

@@ -102,22 +102,14 @@ function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect 
 }
 
 export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
-	const CenterAlpha = 0.004;
-	const ZoomAlpha = 0.004;
-
-	const MaxZoom = 2;
-	const MinPixelsForZoom = 640;
-	const SelfAlpha = 0.5;
-
-	const CenterTolerance = 0.15;
-	const ZoomTolerance = 0.2;
+	const Visuals = world.settings.Visuals;
 
 	const mapCenter = pl.Vec2(0.5, 0.5);
 
 	// Calculate max zoom
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const pixels = Math.min(rect.width, rect.height);
-	const maxZoom = Math.max(1, Math.min(MaxZoom, MinPixelsForZoom / pixels));
+	const maxZoom = Math.max(1, Math.min(Visuals.CameraMaxZoom, Visuals.CameraMinPixelsForZoom / pixels));
 
 	// Load existing camera
 	const camera = world.ui.camera;
@@ -141,26 +133,26 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			if (maxZoom > 1) {
 				let distance = Math.max(vector.distance(target, camera.center), vector.distance(pos, camera.center));
 				let zoom = calculateZoom(distance, maxZoom);
-				cameraTarget.zoom = Math.abs(zoom - camera.zoom) <= ZoomTolerance ? camera.zoom : zoom;
+				cameraTarget.zoom = Math.abs(zoom - camera.zoom) <= Visuals.CameraZoomTolerance ? camera.zoom : zoom;
 			}
 
 			// New center - only pan if some zooming is involved or if can't see entire map
-			if (maxZoom > 1.1 || world.radius > 0.5) {
+			if (maxZoom > 1 || world.radius > 0.5) {
 				let center = pl.Vec2(
-					SelfAlpha * pos.x + (1 - SelfAlpha) * target.x,
-					SelfAlpha * pos.y + (1 - SelfAlpha) * target.y,
+					Visuals.CameraSmoothRate * pos.x + (1 - Visuals.CameraSmoothRate) * target.x,
+					Visuals.CameraSmoothRate * pos.y + (1 - Visuals.CameraSmoothRate) * target.y,
 				);
-				cameraTarget.center = vector.distance(center, camera.center) <= CenterTolerance ? camera.center : center;
+				cameraTarget.center = vector.distance(center, camera.center) <= Visuals.CameraCenterTolerance ? camera.center : center;
 			}
 		}
 	}
 
 	// Ease
 	const newCamera: w.Camera = {
-		zoom: Math.min(clampZoom, ZoomAlpha * cameraTarget.zoom + (1 - ZoomAlpha) * camera.zoom),
+		zoom: Math.min(clampZoom, Visuals.CameraZoomRate * cameraTarget.zoom + (1 - Visuals.CameraZoomRate) * camera.zoom),
 		center: pl.Vec2(
-			CenterAlpha * cameraTarget.center.x + (1 - CenterAlpha) * camera.center.x,
-			CenterAlpha * cameraTarget.center.y + (1 - CenterAlpha) * camera.center.y,
+			Visuals.CameraPanRate * cameraTarget.center.x + (1 - Visuals.CameraPanRate) * camera.center.x,
+			Visuals.CameraPanRate * cameraTarget.center.y + (1 - Visuals.CameraPanRate) * camera.center.y,
 		),
 	};
 	world.ui.camera = newCamera;

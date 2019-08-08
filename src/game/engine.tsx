@@ -975,8 +975,10 @@ function fixate(behaviour: w.FixateBehaviour, world: w.World) {
 	{
 		const pos = obj.body.getPosition();
 		const diff = vector.diff(behaviour.pos, pos);
-		const step = vector.truncate(diff, Math.max(behaviour.speed / TicksPerSecond, behaviour.proportion * vector.length(diff)));
-		obj.body.setPosition(pos.add(step));
+		if (diff.length() > 0) {
+			const step = vector.truncate(diff, Math.max(behaviour.speed / TicksPerSecond, behaviour.proportion * vector.length(diff)));
+			obj.body.setPosition(pos.add(step));
+		}
 	}
 
 
@@ -984,8 +986,10 @@ function fixate(behaviour: w.FixateBehaviour, world: w.World) {
 	{
 		const angle = obj.body.getAngle();
 		const diff = vector.angleDelta(angle, behaviour.angle);
-		const maxStep = Math.max(behaviour.proportion * Math.abs(diff), behaviour.turnRate);
-		obj.body.setAngle(vector.turnTowards(angle, behaviour.angle, maxStep));
+		if (Math.abs(diff) > 0) {
+			const maxStep = Math.max(behaviour.proportion * Math.abs(diff), behaviour.turnRate);
+			obj.body.setAngle(vector.turnTowards(angle, behaviour.angle, maxStep));
+		}
 	}
 
 	return true;

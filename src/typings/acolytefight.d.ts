@@ -1051,6 +1051,17 @@ interface VisualSettings {
 	ButtonBarSize: number;
 	ButtonBarGap: number;
 
+	// Camera
+	CameraPanRate: number;
+	CameraZoomRate: number;
+
+	CameraMaxZoom: number;
+	CameraMinPixelsForZoom: number;
+	CameraSmoothRate: number;
+
+	CameraCenterTolerance: number;
+	CameraZoomTolerance: number;
+
 	// Acolyte colors
 	MyHeroColor: string;
 	AllyColor: string;
