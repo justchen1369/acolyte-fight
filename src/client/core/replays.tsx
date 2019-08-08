@@ -65,6 +65,11 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
 }
 
 export async function watch(gameId: string, server: string = null) {
+    const joined = await matches.joinNewGame({ gameId, observe: true });
+    if (joined) {
+        return;
+    }
+
     const replay = await getReplay(gameId, server);
     if (replay) {
         matches.watchReplayFromObject(replay);
