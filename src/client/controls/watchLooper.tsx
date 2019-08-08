@@ -6,7 +6,6 @@ import * as watcher from '../core/watcher';
 
 interface Props {
     watching: boolean;
-    winner: boolean;
     finished: boolean;
 }
 interface State {
@@ -16,8 +15,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         watching: watcher.isWatching(state),
-        winner: !!state.world.winner,
-        finished: state.world.activePlayers.size === 0,
+        finished: !!state.world.winner || state.world.finished,
     };
 }
 
@@ -55,8 +53,7 @@ class WatchLooper extends React.PureComponent<Props, State> {
             return; // Already loading next game
         }
 
-        const ready = this.props.winner || this.props.finished;
-        if (!ready) {
+        if (!this.props.finished) {
             return;
         }
 

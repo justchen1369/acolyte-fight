@@ -1556,6 +1556,10 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 		}
 	}
 
+	if (world.activePlayers.size === 0) {
+		world.finished = true;
+	}
+
 	return true;
 }
 

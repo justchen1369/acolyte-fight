@@ -51,7 +51,7 @@ function stateToProps(state: s.State): Props {
         myGameId: world.ui.myGameId,
         myHeroId: world.ui.myHeroId,
         isDead: player && player.dead,
-        isFinished: !!world.winner,
+        isFinished: !!world.winner || world.finished,
         isWaiting: world.tick < state.world.startTick,
         numOnline: state.online.size,
         buttonBar: world.ui.buttonBar,

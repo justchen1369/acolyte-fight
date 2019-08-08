@@ -47,6 +47,7 @@ export interface World {
 	winner: string | null; // heroId
 	winners: string[] | null;
 	winTick?: number;
+	finished?: boolean;
 
 	objects: Map<string, WorldObject>,
 	behaviours: Behaviour[],

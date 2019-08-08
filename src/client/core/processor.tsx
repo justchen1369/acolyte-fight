@@ -22,7 +22,7 @@ export function isStartGameTick(tickData: m.TickMsg) {
 }
 
 export function applyTick(tickData: m.TickMsg, world: w.World) {
-    applyTickActions(tickData, world);
+	applyTickActions(tickData, world);
     engine.tick(world);
 }
 

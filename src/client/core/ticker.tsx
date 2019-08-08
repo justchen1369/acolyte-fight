@@ -9,6 +9,7 @@ import * as StoreProvider from '../storeProvider';
 import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
+import gameKeyCustomizer from '../play/gameKeyCustomizer';
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
@@ -33,36 +34,7 @@ export function reset(history: m.TickMsg[], live: boolean) {
 	}
 }
 
-function incomingLoop(minFramesToProcess: number) {
-	const world = StoreProvider.getState().world;
-
-	let numFramesToProcess;
-	if (world.ui.myHeroId) {
-		if (incomingQueue.length === 0) {
-			numFramesToProcess = 0;
-		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
-			numFramesToProcess = 1; // We're on time, process at normal rate
-		} else if (incomingQueue.length <= TicksPerSecond) {
-			numFramesToProcess = 2; // We're behind, but not by much, catch up slowly
-		} else {
-			// We're very behind, skip ahead
-			numFramesToProcess = incomingQueue.length;
-		}
-	} else {
-		// Don't catch up to live when watching a replay
-		numFramesToProcess = incomingQueue.length > 0 ? 1 : 0;
-	}
-
-	numFramesToProcess = Math.max(minFramesToProcess, numFramesToProcess);
-
-	for (let i = 0; i < numFramesToProcess; ++i) {
-		if (incomingQueue.length > 0) {
-			tickQueue.push(incomingQueue.shift());
-		}
-	}
-}
-
-export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
+function calculateTicksFromCurrentTime() {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {
 		// Try to handle the fact that the frame rate might not be a perfect multiple of the tick rate
@@ -75,12 +47,54 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		} else {
 			tickCounter += numFrames;
 		}
-		incomingLoop(numFrames);
+		return numFrames;
+	} else {
+		return 0;
 	}
+}
+
+function calculateCatchupTicks() {
+	const world = StoreProvider.getState().world;
+
+	if (world.ui.live) {
+		if (incomingQueue.length === 0) {
+			return 0;
+		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
+			return 1; // We're on time, process at normal rate
+		} else if (incomingQueue.length <= TicksPerSecond) {
+			return 2; // We're behind, but not by much, catch up slowly
+		} else {
+			// We're very behind, skip ahead
+			return incomingQueue.length;
+		}
+	} else {
+		// Don't catch up to live when watching a replay
+		return 0;
+	}
+}
+
+function queueTicks(numFramesToProcess: number) {
+	let unavailable = 0;
+	for (let i = 0; i < numFramesToProcess; ++i) {
+		if (incomingQueue.length > 0) {
+			tickQueue.push(incomingQueue.shift());
+		} else {
+			++unavailable;
+		}
+	}
+	return unavailable;
+}
+
+export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
+	const numTicks = Math.max(
+		calculateTicksFromCurrentTime(),
+		calculateCatchupTicks());
+	const unavailable = queueTicks(numTicks);
 
 	while (tickQueue.length > 0 && tickQueue[0].g != world.ui.myGameId) {
 		tickQueue.shift(); // Get rid of any leftover ticks from other games
 	}
+
 	while (tickQueue.length > 0 && tickQueue[0].t <= world.tick) {
 		let tickData = tickQueue.shift();
 		if (tickData.t < world.tick) {
@@ -93,6 +107,13 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		const hash = engine.hash(world);
 		console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
 		*/
+	}
+
+	if (world.finished) {
+		// Server is done, tick forward without server messages
+		for (let i = 0; i < unavailable; ++i) {
+			engine.tick(world);
+		}
 	}
 
 	direct(world, canvasStack, renderOptions);
