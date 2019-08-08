@@ -15,7 +15,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         watching: watcher.isWatching(state),
-        finished: !!state.world.winner || state.world.finished,
+        finished: !!state.world.winner || state.world.finished || state.world.activePlayers.size === 0,
     };
 }
 

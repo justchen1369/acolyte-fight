@@ -46,9 +46,10 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				numBots: opts.numBots || 0,
 			};
 			getSocket().emit('join', msg, (response: m.JoinResponseMsg) => {
-				if (response.success) {
+				if (response.success === true) {
 					resolve(true);
 				} else {
+					console.log("Could not join match", response.error);
 					StoreProvider.dispatch({ type: "leaveMatch" });
 					resolve(false);
 				}
