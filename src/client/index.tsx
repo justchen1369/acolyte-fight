@@ -148,7 +148,7 @@ async function start() {
         } else if (query.hash === "#watch" || query.page === "watch") {
             await matches.watchLiveGame();
         } else if (query.gameId) {
-            await replays.watch(query.gameId);
+            await matches.joinNewGame();
         }
     } catch (error) {
         console.error(error);

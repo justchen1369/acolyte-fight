@@ -75,7 +75,7 @@ export async function loadGame(id: string): Promise<g.Replay> {
         return replay;
     } catch (error) {
         // Replay does not exist
-        console.error(`Failed to read replay ${id}: ${error}`);
+        logger.info(`Failed to read replay ${id}: ${error}`);
         return null;
     }
 }
@@ -95,7 +95,7 @@ export async function saveGame(game: g.Game) {
         store.storedGameIds.add(game.id);
 
     } catch (error) {
-        console.error(`Error writing ${game.id} to file: ${error}`);
+        logger.error(`Error writing ${game.id} to file: ${error}`);
     }
 }
 

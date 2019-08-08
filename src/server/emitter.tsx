@@ -408,7 +408,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		&& optional(data.server, "string")
 		&& required(data.name, "string")
 		&& required(data.keyBindings, "object")
-		&& required(data.room, "string")
+		&& optional(data.room, "string")
 		&& optional(data.layoutId, "string")
 		&& optional(data.gameId, "string")
 		&& optional(data.isMobile, "boolean")
@@ -424,83 +424,88 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 	const store = getStore();
 	const location = mirroring.getLocation();
 
+	const playerName = PlayerName.sanitizeName(data.name);
+	const userHash = auth.getUserHashFromSocket(socket);
+
 	if (data.server !== location.server) {
+		logger.info(`Wrong server for ${playerName} (${authToken}) [${socket.id}]`);
 		socket.disconnect(); // Force disconnect so client re-downloads and re-connects with latest client codebase
 		return { success: false, error: "Wrong server" };
 	}
 
-	const playerName = PlayerName.sanitizeName(data.name);
-	const userHash = auth.getUserHashFromSocket(socket);
-
-	const room = store.rooms.get(data.room);
-	if (!room) {
-		return { success: false, error: `Unable to find room ${data.room}` };
-	}
-
-	let game: g.Replay;
+	let replay: g.Replay;
 	if (data.gameId) {
-		const replay = store.activeGames.get(data.gameId);
+		replay = store.activeGames.get(data.gameId);
 		if (!replay) {
-			game = await gameStorage.loadGame(data.gameId);
-		} else {
-			game = replay;
+			replay = await gameStorage.loadGame(data.gameId);
 		}
 	} else {
+		const room = store.rooms.get(data.room);
+		if (!room) {
+			logger.info(`Unable to find room ${data.room} for ${playerName} (${authToken}) [${socket.id}]`);
+			return { success: false, error: `Unable to find room ${data.room}` };
+		}
+
 		// This method is always used for public games
 		const partyId: string = null;
 		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
 		const isPrivate: boolean = !!locked;
 
 		if (data.observe) {
-			game = games.findExistingGame(data.version, room, partyId, isPrivate);
+			replay = games.findExistingGame(data.version, room, partyId, isPrivate);
 		} else if (locked) {
 			// The user wants a private game, create one
-			game = games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
+			replay = games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
 		} else {
-			game = games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
+			replay = games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
 		}
 	}
 
-	if (game) {
+	if (replay) {
 		let heroId: string = null;
 		let reconnectKey: string = null;
 		let live = data.live || false;
-		if (!data.observe && store.activeGames.has(game.id)) {
-			const joinResult = games.joinGame(game as g.Game, {
-				userHash,
-				name: playerName,
-				keyBindings: data.keyBindings,
-				isMobile: data.isMobile,
-				authToken,
-				unranked: data.unranked,
-				socketId: socket.id,
-				version: data.version,
-				reconnectKey: data.reconnectKey,
-			});
-			if (joinResult) {
-				heroId = joinResult.heroId;
-				reconnectKey = joinResult.reconnectKey;
-				live = true;
-			}
+		if (!data.observe) {
+			const game = store.activeGames.get(replay.id)
+			if (game) {
+				const joinResult = games.joinGame(game, {
+					userHash,
+					name: playerName,
+					keyBindings: data.keyBindings,
+					isMobile: data.isMobile,
+					authToken,
+					unranked: data.unranked,
+					socketId: socket.id,
+					version: data.version,
+					reconnectKey: data.reconnectKey,
+				});
+				if (joinResult) {
+					heroId = joinResult.heroId;
+					reconnectKey = joinResult.reconnectKey;
+					live = true;
+				}
 
-			if (data.numBots) {
-				const numBots = Math.min(room.Matchmaking.MaxPlayers, data.numBots);
-				for (let i = 0; i < numBots; ++i) {
-					games.addBot(game as g.Game);
+				if (data.numBots) {
+					const numBots = Math.min(game.matchmaking.MaxPlayers, data.numBots);
+					for (let i = 0; i < numBots; ++i) {
+						games.addBot(replay as g.Game);
+					}
 				}
 			}
 		}
 
-		emitHero(socket.id, game, heroId, reconnectKey, live);
+		emitHero(socket.id, replay, heroId, reconnectKey, live);
 
 		if (heroId) {
-			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.numPlayers} players`);
+			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${replay.numPlayers} players`);
+		} else if (data.live) {
+			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
 		} else {
-			logger.info(`Game [${game.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] watching replay`);
 		}
 		return { success: true };
 	} else {
-		// logger.info(`Unable to find game for ${playerName} (${authToken}) [${socket.id}]`);
+		logger.info(`Unable to find game [${data.gameId}] for ${playerName} (${authToken}) [${socket.id}]`);
 		return { success: false, error: `Unable to find game` };
 	}
 }
