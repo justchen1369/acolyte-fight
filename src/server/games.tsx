@@ -476,17 +476,16 @@ function rankGameIfNecessary(game: g.Game) {
 }
 
 function finishGameIfNecessary(game: g.Game) {
-	if (game.active.size === 0) {
-		game.bots.clear();
-		getStore().activeGames.delete(game.id);
-
-		gameStorage.saveGame(game);
-
-		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
-		return true;
-	} else {
-		return false;
+	if (game.finished) {
+		return;
 	}
+
+	if (game.active.size > 0) {
+		return;
+	}
+
+	game.finished = true;
+	game.controlMessages.push({ type: "finish" });
 }
 
 function gameTick(game: g.Game): boolean {
@@ -497,15 +496,16 @@ function gameTick(game: g.Game): boolean {
 		}
 	}
 
-	if (finishGameIfNecessary(game)) {
-		running = false;
-	}
-
 	return running;
 }
 
 function gameTurn(game: g.Game) {
+	if (game.finished) {
+		return;
+	}
+
 	closeGameIfNecessary(game);
+	finishGameIfNecessary(game);
 
 	const data = {
 		g: game.id,
@@ -536,6 +536,13 @@ function gameTurn(game: g.Game) {
 		}
 	}
 	emitTick(data);
+
+	if (game.finished) {
+		game.bots.clear();
+		getStore().activeGames.delete(game.id);
+		gameStorage.saveGame(game);
+		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
+	}
 }
 
 export function isGameRunning(game: g.Game) {

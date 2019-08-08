@@ -81,6 +81,7 @@ export interface Game extends Replay {
 
     tick: number;
     winTick: number | null;
+    finished?: boolean;
 
     scores: Map<string, m.GameStatsMsg>; // socketId -> final score
     joinable: boolean;

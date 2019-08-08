@@ -4,8 +4,8 @@ export namespace ActionType {
     export const Bot = "bot";
 	export const Leave = "leave";
 	export const GameAction = "game";
-	export const CloseGame = "close";
-    export const Text = "text";
+    export const CloseGame = "close";
+    export const Finish = "finish";
     export const Spells = "spells";
     export const Sync = "sync";
 }
@@ -33,6 +33,7 @@ export type ControlMsg =
     | BotActionMsg
     | LeaveActionMsg
     | CloseGameMsg
+    | FinishGameMsg
 
 export interface ControlMsgBase {
     type: string;
@@ -74,6 +75,10 @@ export interface CloseGameMsg extends ControlMsgBase {
     closeTick: number;
     waitPeriod: number;
     numTeams?: number;
+}
+
+export interface FinishGameMsg extends ControlMsgBase {
+    type: "finish";
 }
 
 export interface GameActionMsg extends ActionMsgBase {

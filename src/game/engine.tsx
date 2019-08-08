@@ -1066,6 +1066,8 @@ function handleOccurences(world: w.World) {
 			success = handleLeaving(ev, world);
 		} else if (ev.type === n.ActionType.Environment) {
 			success = seedEnvironment(ev, world);
+		} else if (ev.type === n.ActionType.Finish) {
+			success = handleFinishing(ev, world);
 		}
 
 		if (!success) {
@@ -1556,9 +1558,11 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 		}
 	}
 
-	if (world.activePlayers.size === 0) {
-		world.finished = true;
-	}
+	return true;
+}
+
+function handleFinishing(ev: n.FinishGameMsg, world: w.World) {
+	world.finished = true;
 
 	return true;
 }
@@ -3331,7 +3335,7 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	if (!isGameFinished(world)) {
+	if (!isGameWon(world)) {
 		return;
 	}
 
@@ -3411,7 +3415,7 @@ function notifyWin(world: w.World) {
 	removeBots(world);
 }
 
-function isGameFinished(world: w.World) {
+function isGameWon(world: w.World) {
 	const heroes = wu(world.objects.values()).filter(x => x.category === "hero").toArray() as w.Hero[];
 	if (heroes.length === 0) {
 		return true;
