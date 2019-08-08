@@ -117,11 +117,11 @@ export class PartyPanel extends React.PureComponent<Props, State> {
         const party = this.props.party;
         return <div>
             <h2>Party mode</h2>
-            <PartyMode selected={!party.isPrivate} onClick={() => this.updateSettings({ isPrivate: false })} >
-                <span className="party-mode-label"><b>Public</b>: your party will be matched with other players on the public server.</span>
-            </PartyMode>
             <PartyMode selected={party.isPrivate} onClick={() => this.updateSettings({ isPrivate: true })} >
-                <span className="party-mode-label"><b>Private</b>: your games will only contain the players in your party.</span>
+                <span className="party-mode-label"><b>Private</b> <i className="fas fa-lock" />: your games will only contain the players in your party.</span>
+            </PartyMode>
+            <PartyMode selected={!party.isPrivate} onClick={() => this.updateSettings({ isPrivate: false })} >
+                <span className="party-mode-label"><b>Public</b> <i className="fas fa-globe-americas" />: your party will be matched with other players on the public server.</span>
             </PartyMode>
         </div>
     }
@@ -142,30 +142,30 @@ export class PartyPanel extends React.PureComponent<Props, State> {
         const party = this.props.party;
         return <div>
             <>
-                <h3>Who can play?</h3>
-                <PartyMode selected={!party.isLocked} onClick={() => this.updateSettings({ isLocked: false })} >
-                    <span className="party-mode-label"><b>Everyone</b>: all players can freely change between playing and observing.</span>
+                <h3>Default to playing or observing?</h3>
+                <PartyMode selected={!party.initialObserver} onClick={() => this.updateSettings({ initialObserver: false })} >
+                    <span className="party-mode-label"><b>Playing</b> <i className="fas fa-gamepad" />: players who join the party begin as players.</span>
                 </PartyMode>
-                <PartyMode selected={party.isLocked} onClick={() => this.updateSettings({ isLocked: true })} >
-                    <span className="party-mode-label"><b>Leader decides</b>: only the party leader can decide who plays and observes.</span>
+                <PartyMode selected={party.initialObserver} onClick={() => this.updateSettings({ initialObserver: true })} >
+                    <span className="party-mode-label"><b>Observing</b> <i className="fas fa-eye" />: players who join the party begin as observers.</span>
                 </PartyMode>
             </>
             <>
-                <h3>Default to playing or observing?</h3>
-                <PartyMode selected={!party.initialObserver} onClick={() => this.updateSettings({ initialObserver: false })} >
-                    <span className="party-mode-label"><b>Playing</b>: players who join the party begin as players.</span>
+                <h3>Who can play?</h3>
+                <PartyMode selected={!party.isLocked} onClick={() => this.updateSettings({ isLocked: false })} >
+                    <span className="party-mode-label"><b>Everyone</b> <i className="fas fa-user-friends" />: all players can freely change between playing and observing.</span>
                 </PartyMode>
-                <PartyMode selected={party.initialObserver} onClick={() => this.updateSettings({ initialObserver: true })} >
-                    <span className="party-mode-label"><b>Observing</b>: players who join the party begin as observers.</span>
+                <PartyMode selected={party.isLocked} onClick={() => this.updateSettings({ isLocked: true })} >
+                    <span className="party-mode-label"><b>Leader decides</b> <i className="fas fa-crown" />: only the party leader can decide who plays and observes.</span>
                 </PartyMode>
             </>
             {party.isPrivate && <>
                 <h3>When to start games?</h3>
-                <PartyMode selected={!party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: false })} >
-                    <span className="party-mode-label"><b>Start immediately</b>: players join the game immediately. If they start playing, other players may have to wait until the next game.</span>
-                </PartyMode>
                 <PartyMode selected={party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: true })} >
-                    <span className="party-mode-label"><b>Wait for all players</b>: wait until all players are ready before adding them to the game. Useful for tournaments.</span>
+                    <span className="party-mode-label"><b>Wait for all players</b> <i className="fas fa-clock" />: wait until all players are ready before adding them to the game.</span>
+                </PartyMode>
+                <PartyMode selected={!party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: false })} >
+                    <span className="party-mode-label"><b>Start immediately</b> <i className="fas fa-sword" />: players join the game immediately. If they start playing, other players may have to wait until the next game. Useful if your party is too big to wait for everyone.</span>
                 </PartyMode>
             </>}
         </div>

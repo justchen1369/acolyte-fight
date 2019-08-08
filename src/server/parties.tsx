@@ -33,8 +33,8 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 		modified: moment(),
 		roomId,
 		active: new Map<string, g.PartyMember>(),
-        isPrivate: false,
-        waitForPlayers: false,
+        isPrivate: true,
+        waitForPlayers: true,
         isLocked: false,
         initialObserver: false,
 	};
