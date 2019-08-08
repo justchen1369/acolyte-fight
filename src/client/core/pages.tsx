@@ -2,6 +2,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as matches from './matches';
 import * as recording from './recording';
+import * as replays from './replays';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
@@ -25,7 +26,7 @@ export function reloadPageIfNecessary() {
 export function go(elems: s.PathElements) {
     const store = StoreProvider.getState();
     if (elems.gameId && store.world.ui.myGameId !== elems.gameId) {
-        matches.joinNewGame({ gameId: elems.gameId, observe: true });
+        replays.watch(elems.gameId);
     } else if (store.world.ui.myGameId) {
         matches.leaveCurrentGame();
     }
