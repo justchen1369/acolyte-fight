@@ -1604,12 +1604,12 @@ h3 {
     text-shadow: rgba(0, 0, 0, 0.5) 0.1em 0.1em 0.1em;
     --rank-gradient: linear-gradient(
         112.5deg,
-        rgba(0, 0, 0, 0.8),
-        rgba(0, 0, 0, 0.75) 5%,
-        rgba(0, 0, 0, 0.6) 15%,
-        rgba(0, 0, 0, 0.6) 55%,
-        rgba(0, 0, 0, 0.85) 85%,
-        rgba(0, 0, 0, 0.9));
+        rgba(0, 0, 0, 0.7),
+        rgba(0, 0, 0, 0.625) 5%,
+        rgba(0, 0, 0, 0.45) 15%,
+        rgba(0, 0, 0, 0.45) 55%,
+        rgba(0, 0, 0, 0.775) 85%,
+        rgba(0, 0, 0, 0.85));
 }
 
 .rating-card .rank-icon {
