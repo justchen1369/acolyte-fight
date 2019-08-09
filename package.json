@@ -83,7 +83,7 @@
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-motion": "^0.5.2",
-    "react-redux": "^5.0.7",
+    "react-redux": "^7.1.0",
     "redux": "^4.0.0",
     "reselect": "^3.0.1",
     "screenfull": "^3.3.2",
