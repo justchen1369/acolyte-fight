@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import msgpack from 'msgpack-lite';
+import wu from 'wu';
 import * as constants from '../../game/constants';
 import * as credentials from './credentials';
 import * as d from '../stats.model';
@@ -66,6 +67,17 @@ export function getLeagueFromRating(exposure: number, leagues: m.League[]) {
     }
     return leagues[leagues.length - 1];
 }
+
+export function getNextLeagueFromRating(exposure: number, leagues: m.League[]): m.League {
+    const higherLeagues = leagues.filter(x => x.minRating > exposure);
+    if (higherLeagues.length === 0) {
+        return null;
+    }
+
+    const nextLeague = _.minBy(higherLeagues, x => x.minRating);
+    return nextLeague;
+}
+
 
 export async function retrieveMyStatsAsync() {
     const state = StoreProvider.getState();

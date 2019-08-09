@@ -5,7 +5,9 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as matches from '../../core/matches';
 import * as mathUtils from '../../core/mathUtils';
+import * as rankings from '../../core/rankings';
 import * as StoreProvider from '../../storeProvider';
+import * as m from '../../../shared/messages.model';
 import * as s from '../../store.model';
 import * as w from '../../../game/world.model';
 
@@ -18,6 +20,7 @@ interface Props extends OwnProps {
     myGameId: string;
     userId: string;
     unranked: boolean;
+    leagues: m.League[];
 }
 interface State {
 }
@@ -27,18 +30,37 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         myGameId: state.world.ui.myGameId,
         userId: state.userId,
+        leagues: state.leagues,
         unranked: state.options.unranked,
     };
 }
 
 class RatingAdjustmentMessage extends React.PureComponent<Props, State> {
+    componentDidMount() {
+        rankings.downloadLeagues(); // Don't await
+    }
+
     render() {
+        if (!this.props.leagues) {
+            return null;
+        }
+
         const notification = this.props.notification;
 
         if (!this.props.unranked && notification.gameId === this.props.myGameId) {
             const delta = notification.acoDelta;
+            const finalAcoExposure = notification.initialAcoExposure + delta;
+            if (!finalAcoExposure) {
+                // Data unavailable for some reason
+                return null;
+            }
+
+            const league = rankings.getLeagueFromRating(finalAcoExposure, this.props.leagues);
+            const nextLeague = rankings.getNextLeagueFromRating(finalAcoExposure, this.props.leagues);
+
             return <div className="row rating-notification">
-                <div>Your rating has changed: {this.renderRatingAdjustment(delta)}.</div>
+                <div>Your rating has changed: <b>{league.name}</b> {Math.floor(finalAcoExposure)} ({this.renderRatingAdjustment(delta)}).</div>
+                {nextLeague && <div className="next-league-hint">Points remaining until next league: <b>+{Math.ceil(nextLeague.minRating - finalAcoExposure)}</b>.</div>}
                 <div className="unranked-hint"><Link page="profile" profileId={this.props.userId} onClick={() => matches.leaveCurrentGame()}>Go to your profile</Link> to changed to unranked mode.</div>
             </div>
         } else {

@@ -8,8 +8,9 @@ export interface NotificationListener {
 
 const ExpireInterval = 1000;
 const ExpiryMilliseconds = 15000;
+const RatingAdjustmentMilliseconds = 30000;
 const TeamsSplashMilliseconds = 4000;
-const TextMilliseconds = 30000;
+const TextMilliseconds = 60000;
 
 const listeners = new Array<NotificationListener>();
 let nextNotificationId = 0;
@@ -48,6 +49,7 @@ function calculateExpiryMilliseconds(notification: w.Notification): number {
         case "disconnected": return 1e9;
         case "teams": return TeamsSplashMilliseconds;
         case "text": return TextMilliseconds;
+        case "ratingAdjustment": return RatingAdjustmentMilliseconds;
         default: return ExpiryMilliseconds;
     }
 }

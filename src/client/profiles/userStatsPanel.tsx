@@ -49,16 +49,6 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-function calculateNextLeague(exposure: number, leagues: m.League[]): m.League {
-    const higherLeagues = leagues.filter(x => x.minRating > exposure);
-    if (higherLeagues.length === 0) {
-        return null;
-    }
-
-    const nextLeague = _.minBy(higherLeagues, x => x.minRating);
-    return nextLeague;
-}
-
 class UserStatsPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
@@ -183,7 +173,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        const nextLeague = calculateNextLeague(rating.acoExposure, this.props.leagues);
+        const nextLeague = rankings.getNextLeagueFromRating(rating.acoExposure, this.props.leagues);
         if (!nextLeague) {
             return null;
         }

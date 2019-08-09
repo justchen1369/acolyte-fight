@@ -118,7 +118,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
             <span className="position">{position}</span>
             {league && <RankIcon league={league.name} />}
             {this.renderPlayerName(player)}
-            <span className="win-count">{Math.round(player.acoExposure)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
+            <span className="win-count">{Math.floor(player.acoExposure)} rating <span className="leaderboard-num-games">({player.numGames} games)</span></span>
         </div>
     }
 

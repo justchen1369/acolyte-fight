@@ -844,14 +844,14 @@ table.player-list {
 #messages-panel .row {
     color: #ccc;
 
-    animation-name: fade-out;
-    animation-duration: 15s;
-    animation-fill-mode: both;
-
+    animation: fade-out 15s both;
     font-size: 75%;
 }
 
 #messages-panel .row.text-row {
+    animation-duration: 60s;
+}
+#messages-panel .row.rating-notification {
     animation-duration: 30s;
 }
 
@@ -905,9 +905,14 @@ table.player-list {
     margin: 0.5em 0;
 }
 
+#messages-panel .next-league-hint {
+    font-size: 75%;
+    color: #aaa;
+}
+
 #messages-panel .unranked-hint {
     font-size: 75%;
-    color: #888;
+    color: #aaa;
 }
 
 #messages-panel .game-started {

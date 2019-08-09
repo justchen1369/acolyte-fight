@@ -40,6 +40,8 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
             type: "ratingAdjustment",
             gameId: gameStats.id,
             initialNumGames: self.initialNumGames,
+            initialAco: self.initialAco,
+            initialAcoExposure: self.initialAcoExposure,
             acoDelta: self.acoDelta,
             category: gameStats.category,
         });

@@ -295,6 +295,8 @@ export interface RatingAdjustmentNotification {
 	type: "ratingAdjustment";
 	gameId: string;
 	initialNumGames: number;
+	initialAco: number;
+	initialAcoExposure: number;
 	acoDelta: number;
 	category: string;
 }

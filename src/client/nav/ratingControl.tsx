@@ -107,7 +107,7 @@ class RatingControl extends React.PureComponent<Props> {
         }
 
         return <PageLink shrink={true} key="rank" page="profile" className="nav-item-ranking" profileId={this.props.userId}>
-            <b>{league.name}</b> {rating.acoExposure.toFixed(0)}
+            <b>{league.name}</b> {Math.floor(rating.acoExposure)}
         </PageLink>
     }
 
