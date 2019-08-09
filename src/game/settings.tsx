@@ -383,7 +383,7 @@ const triplet: Spell = {
             {
                 type: "accelerate",
                 accelerationPerSecond: 0.3,
-                maxSpeed: 0.6,
+                maxSpeed: 0.75,
             }
         ],
 
