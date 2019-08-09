@@ -6,36 +6,29 @@ import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
 import * as options from '../options';
-import * as matches from '../core/matches';
-import * as mathUtils from '../core/mathUtils';
 import * as StoreProvider from '../storeProvider';
 import { Matchmaking, TicksPerSecond } from '../../game/constants';
-import Link from '../controls/link';
 import DeadMessage from './messages/deadMessage';
 import LeftMessage from './messages/leftMessage';
 import HelpMessage from './messages/helpMessage';
 import PlayButton from '../ui/playButton';
+import RatingAdjustmentMessage from './messages/RatingAdjustmentMessage';
 import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
 import PlayerName from './playerNameComponent';
 import WaitingMessage from './messages/waitingMessage';
 import WinMessage from './messages/winMessage';
-import { worldInterruptible } from '../core/matches';
 
 interface Props {
-    userId: string;
-    loggedIn: boolean;
     myGameId: string;
     myHeroId: string;
     isDead: boolean;
     isFinished: boolean;
     isWaiting: boolean;
-    numOnline: number;
     buttonBar: w.ButtonConfig;
     settings: AcolyteFightSettings;
     options: m.GameOptions;
-    exitable: boolean;
     items: s.NotificationItem[];
 }
 interface State {
@@ -46,18 +39,14 @@ function stateToProps(state: s.State): Props {
     const world = state.world;
     const player = world.players.get(world.ui.myHeroId);
     return {
-        userId: state.userId,
-        loggedIn: state.loggedIn,
         myGameId: world.ui.myGameId,
         myHeroId: world.ui.myHeroId,
         isDead: player && player.dead,
         isFinished: !!world.winner || world.finished,
         isWaiting: world.tick < state.world.startTick,
-        numOnline: state.online.size,
         buttonBar: world.ui.buttonBar,
         settings: world.settings,
         options: state.options,
-        exitable: worldInterruptible(world),
         items: state.items,
     };
 }
@@ -155,7 +144,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             case "leave": return <LeftMessage key={key} notification={notification} />
             case "kill": return this.renderKillNotification(key, notification);
             case "win": return <WinMessage key={key} notification={notification} />
-            case "ratingAdjustment": return this.renderRatingAdjustmentNotification(key, notification);
+            case "ratingAdjustment": return <RatingAdjustmentMessage key={key} notification={notification} />
             default: return null; // Ignore this notification
         }
     }
@@ -213,27 +202,6 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             </div>
         } else {
             return <div key={key} className="row"><PlayerName player={notification.killed} /> died</div>
-        }
-    }
-
-    private renderRatingAdjustmentNotification(key: string, notification: w.RatingAdjustmentNotification) {
-        if (!this.props.options.unranked && notification.gameId === this.props.myGameId) {
-            const delta = notification.acoDelta;
-            return <div key={key} className="row rating-notification">
-                <div>Your rating has changed: {this.renderRatingAdjustment(delta)}.</div>
-                <div className="unranked-hint"><Link page="profile" profileId={this.props.userId} onClick={() => matches.leaveCurrentGame()}>Go to your profile</Link> to changed to unranked mode.</div>
-            </div>
-        } else {
-            return null;
-        }
-    }
-
-
-    private renderRatingAdjustment(ratingDelta: number) {
-        if (ratingDelta >= 0) {
-            return <span className="rating rating-increase">{mathUtils.deltaPrecision(ratingDelta)}</span>
-        } else {
-            return <span className="rating rating-decrease">{mathUtils.deltaPrecision(ratingDelta)}</span>
         }
     }
 
