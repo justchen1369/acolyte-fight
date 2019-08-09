@@ -48,6 +48,7 @@ function act(input) {
     } else {
         action =
             chooseSpells(settings)
+            || dodge(state, hero, cooldowns)
             || move(state, hero);
     }
 
@@ -339,7 +340,8 @@ function dodge(state, hero, cooldowns) {
 
         var collisionPoint = vectorPlus(projectile.pos, vectorMultiply(projectile.velocity, timeToCollision));
         var distanceToCollision = vectorDistance(collisionPoint, hero.pos);
-        if (distanceToCollision > Math.max(DodgeRadius, projectile.radius) + hero.radius) {
+        var dodgeRadius = Math.max(DodgeRadius, projectile.radius) + hero.radius;
+        if (distanceToCollision > dodgeRadius) {
             // Won't hit us
         }
 
@@ -350,7 +352,7 @@ function dodge(state, hero, cooldowns) {
 
         // Run away from collision point
         var direction = vectorUnit(vectorNegate(vectorDiff(collisionPoint, hero.pos)));
-        var step = vectorMultiply(direction, projectile.radius + hero.radius);
+        var step = vectorMultiply(direction, dodgeRadius);
         var target = vectorPlus(hero.pos, step);
         return { spellId: "move", target };
     }
