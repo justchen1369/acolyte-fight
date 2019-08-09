@@ -14,8 +14,11 @@ var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     move: 200,
 };
 
+var SmoothTargetRate = 0.05;
+
 var alreadyChosenSpells = false;
 var nextSpell = 0;
+var previousTarget = center;
 
 // See ai.contracts.ts:
 // input is InputContract - contains information about the current state of the world
@@ -56,6 +59,10 @@ function act(input) {
         // Give the bot a reaction time otherwise it is OP
         var reactionMilliseconds = ReactionMillisecondsLookup[action.spellId] || DefaultReactionMilliseconds;
         action.delayMilliseconds = reactionMilliseconds;
+
+        if (action.target) {
+            previousTarget = action.target;
+        }
         return action;
     } else {
         return null;
@@ -309,7 +316,12 @@ function move(state, hero) {
         return null;
     }
 
-    return { spellId: "move", target };
+    var smoothed = {
+        x: SmoothTargetRate * target.x + (1 - SmoothTargetRate) * previousTarget.x,
+        y: SmoothTargetRate * target.y + (1 - SmoothTargetRate) * previousTarget.y,
+    };
+
+    return { spellId: "move", target: smoothed };
 }
 
 function dodge(state, hero, cooldowns) {
@@ -343,6 +355,7 @@ function dodge(state, hero, cooldowns) {
         var dodgeRadius = Math.max(DodgeRadius, projectile.radius) + hero.radius;
         if (distanceToCollision > dodgeRadius) {
             // Won't hit us
+            continue;
         }
 
         var deflectAction = deflect(state, hero, cooldowns, projectile);
