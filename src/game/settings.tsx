@@ -379,6 +379,14 @@ const triplet: Spell = {
             { type: "strike", ticks: 30, flash: true, numParticles: 2 },
         ],
 
+        behaviours: [
+            {
+                type: "accelerate",
+                accelerationPerSecond: 0.3,
+                maxSpeed: 0.6,
+            }
+        ],
+
         buffs: [
             {
                 type: "burn",
