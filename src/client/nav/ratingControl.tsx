@@ -39,7 +39,7 @@ class RatingControl extends React.PureComponent<Props> {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.loadData(); // Don't await
     }
 

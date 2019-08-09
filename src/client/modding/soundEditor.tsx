@@ -40,7 +40,7 @@ class SoundEditor extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.timerHandle = setInterval(() => this.onAudioTimer(), 16);
     }
     

@@ -110,7 +110,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         this.doubleTapKey = props.rebindings[w.SpecialKeys.DoubleTap];
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('keydown', this.keyDownListener);
         window.addEventListener('keyup', this.keyUpListener);
         window.addEventListener('resize', this.resizeListener);

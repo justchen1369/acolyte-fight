@@ -39,7 +39,7 @@ class WatchPanel extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.retrieveStatsIfNecessary();
     }
 

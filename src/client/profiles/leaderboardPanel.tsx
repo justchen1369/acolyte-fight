@@ -52,7 +52,7 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.loadDataAsync();
     }
 

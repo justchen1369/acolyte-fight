@@ -29,7 +29,7 @@ class WatchLooper extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.timerHandle = setInterval(() => this.recheck(), 5000);
     }
 

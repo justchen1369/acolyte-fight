@@ -29,7 +29,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if (!this.props.leagues) {
             rankings.downloadLeagues(); // Don't await
         }

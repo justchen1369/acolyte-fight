@@ -21,7 +21,7 @@ class CustomBar extends React.PureComponent<Props, State> {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('click', this.windowClickListener);
     }
 

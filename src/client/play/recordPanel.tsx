@@ -89,7 +89,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('resize', this.resizeListener);
         this.fullScreenCanvas();
 

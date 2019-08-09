@@ -44,7 +44,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener('keydown', this.keyDownListener);
 
     }

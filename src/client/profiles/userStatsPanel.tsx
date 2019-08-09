@@ -69,7 +69,7 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         this.loadDataAsync(this.props.profileId || this.props.myUserId);
 
         if (!this.props.leagues) {

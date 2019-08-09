@@ -59,7 +59,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillMount() {
+    componentDidMount() {
         if (!this.props.codeTree && this.props.roomId !== m.DefaultRoomId && Object.keys(this.props.roomMod).length > 0) {
             // Room is modded, load the settings from there when launching the mod editor
             StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
