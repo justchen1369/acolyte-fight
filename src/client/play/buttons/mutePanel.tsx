@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as cloud from '../../core/cloud';
 import * as s from '../../store.model';
 import * as w from '../../../game/world.model';
 import * as StoreProvider from '../../storeProvider';
@@ -34,11 +35,12 @@ class MutePanel extends React.PureComponent<Props, State> {
         }
     }
 
-    private onMuteClick(mute: boolean) {
+    private async onMuteClick(mute: boolean) {
         StoreProvider.dispatch({
             type: "updateOptions",
             options: { mute },
         });
+        await cloud.uploadSettings();
     }
 }
 
