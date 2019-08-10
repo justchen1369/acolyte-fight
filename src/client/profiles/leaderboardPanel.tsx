@@ -14,6 +14,8 @@ import * as rankings from '../core/rankings';
 import * as url from '../url';
 import Link from '../controls/link';
 import RankIcon from '../controls/rankIcon';
+import UnrankedTogglePanel from './unrankedTogglePanel';
+import UserStatsPanel from './userStatsPanel';
 
 interface OwnProps {
 }
@@ -82,6 +84,11 @@ class LeaderboardPanel extends React.PureComponent<Props, State> {
         const category = m.GameCategory.PvP;
         const isOnLeaderboard = this.props.myUserId && this.props.leaderboard.some(p => p.userId === this.props.myUserId);
         return <div>
+            {!!this.props.myUserId && <UnrankedTogglePanel />}	
+            {!this.props.unranked && <>	
+                <UserStatsPanel profileId={this.props.myUserId} category={category} showRanking={true} />	
+                <p className="view-more-ad">Go to <Link page="profile" profileId={this.props.myUserId}>your profile</Link> for more stats and replays</p>	
+            </>}
             <h1>Leaderboard</h1>
             <p>This is the global ranking of all logged-in active players. See the <Link page="about">About page</Link> for more information about the rating system.</p>
             <div className="leaderboard">
