@@ -18,8 +18,6 @@ import { Collections, Singleton } from './db.model';
 import { getFirestore } from './dbStorage';
 import { logger } from './logging';
 
-const MaxLeaderboardLength = 100;
-
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
 
@@ -406,7 +404,7 @@ export async function getLeaderboard(category: string): Promise<Buffer> {
         const leaderboardBuffer = msgpack.encode(leaderboard);
         leaderboardCache.set(category, {
             leaderboardBuffer,
-            expiry: moment().add(1, 'minute').unix(),
+            expiry: moment().add(constants.Placements.LeaderboardCacheMinutes, 'minute').unix(),
         });
         return leaderboardBuffer;
     }
@@ -415,6 +413,7 @@ export async function getLeaderboard(category: string): Promise<Buffer> {
 export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
 
+    const MaxLeaderboardLength = constants.Placements.MaxLeaderboardLength;
     const query = firestore.collection('user').orderBy(`ratings.${category}.acoExposure`, 'desc').limit(MaxLeaderboardLength);
     
     const now = Date.now();

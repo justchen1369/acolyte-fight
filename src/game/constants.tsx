@@ -55,6 +55,9 @@ export namespace Placements {
 	export const AcoMaxDeflate = 100;
 	export const AcoInflatePerGame = 1;
 
+	export const MaxLeaderboardLength = 100;
+	export const LeaderboardCacheMinutes = 5;
+
 	export const Grandmaster = 98;
 	export const Master = 90;
 	export const Diamond = 80;
