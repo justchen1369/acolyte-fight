@@ -39,6 +39,7 @@ export interface WorldObject {
 }
 
 export interface Hero extends WorldObject {
+	isBot: boolean; // Is this another bot?
 	isSelf: boolean; // Is the hero you are controlling
 	isAlly: boolean;
 	isEnemy: boolean;

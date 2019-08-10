@@ -199,10 +199,12 @@ function worldToState(world: w.World, myHeroId: string): AI.World {
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {
+            const player = world.players.get(obj.id);
             const alliance = engine.calculateAlliance(myHeroId, obj.id, world);
             const invisible = engine.isHeroInvisible(obj);
             contract.heroes[obj.id] = {
                 id: obj.id,
+                isBot: player.isBot,
                 isSelf: (alliance & constants.Alliances.Self) > 0,
                 isAlly: (alliance & constants.Alliances.Ally) > 0,
                 isEnemy: (alliance & constants.Alliances.Enemy) > 0,

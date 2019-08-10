@@ -30,8 +30,8 @@ function act(input) {
     var cooldowns = input.cooldowns;
     var settings = input.settings;
 
-    var strongest = findStrongestEnemy(state.heroes, heroId);
-    if (!(hero && strongest)) {
+    var opponent = findOpponent(state.heroes, heroId);
+    if (!(hero && opponent)) {
         // Either we're dead, or everyone else is, nothing to do
         return null;
     }
@@ -41,9 +41,9 @@ function act(input) {
         action =
             recovery(state, hero, cooldowns)
             || dodge(state, hero, cooldowns)
-            || castSpell(state, hero, strongest, cooldowns, settings)
-            || focus(hero, strongest)
-            || chase(state, hero, cooldowns, strongest)
+            || castSpell(state, hero, opponent, cooldowns, settings)
+            || focus(hero, opponent)
+            || chase(state, hero, cooldowns, opponent)
             || move(state, hero);
     } else {
         action =
@@ -98,7 +98,7 @@ function randomSpells(settings) {
 	return keyBindings;
 }
 
-function findStrongestEnemy(heroes, myHeroId) {
+function findOpponent(heroes, myHeroId) {
     var myHero = heroes[myHeroId];
     if (!myHero) {
         return null;
@@ -108,11 +108,16 @@ function findStrongestEnemy(heroes, myHeroId) {
     var mostHealth = 0;
     for (var heroId in heroes) {
         var hero = heroes[heroId];
-        if (hero.isEnemy) {
-            if (hero.health > mostHealth) {
-                mostHealth = hero.health;
-                choice = hero;
-            }
+
+        if (!hero.isEnemy) { continue; }
+
+        // Uncomment the line below to only target humans
+        // if (hero.isBot) { continue; }
+
+        if (hero.health > mostHealth) {
+            // Target the enemy with the most health
+            mostHealth = hero.health;
+            choice = hero;
         }
     }
     return choice;
