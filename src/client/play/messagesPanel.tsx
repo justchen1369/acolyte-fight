@@ -12,7 +12,7 @@ import DeadMessage from './messages/deadMessage';
 import LeftMessage from './messages/leftMessage';
 import HelpMessage from './messages/helpMessage';
 import PlayButton from '../ui/playButton';
-import RatingAdjustmentMessage from './messages/RatingAdjustmentMessage';
+import RatingAdjustmentMessage from './messages/ratingAdjustmentMessage';
 import TeamsMessage from './messages/teamsMessage';
 import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
