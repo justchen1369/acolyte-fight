@@ -104,8 +104,6 @@ function calculateWorldRect(viewRect: ClientRect, camera: w.Camera): ClientRect 
 export function direct(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
 	const Visuals = world.settings.Visuals;
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
-
 	// Calculate max zoom
 	const rect = canvasStack.ui.getBoundingClientRect();
 	const pixels = Math.min(rect.width, rect.height);
@@ -118,7 +116,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 	let clampZoom = maxZoom;
 	let cameraTarget: w.Camera = {
 		zoom: 1,
-		center: mapCenter,
+		center: MapCenter,
 	};
 	if (options.cameraFollow && world.ui.myHeroId && world.ui.nextTarget) {
 		const hero = world.objects.get(world.ui.myHeroId);
@@ -415,12 +413,11 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 	const ExplodeSpeed = 0.1;
 	const MaxParticleRadius = 0.01;
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
 	const particleRadius = Math.min(MaxParticleRadius, shapes.getMinExtent(obstacle.shape));
 
 	for (let i = 0; i < NumParticles; ++i) {
 		const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
-		const edgeOffset = vector.diff(pos, mapCenter);
+		const edgeOffset = vector.diff(pos, MapCenter);
 		edgeOffset.normalize();
 		edgeOffset.mul(ExplodeSpeed);
 		const velocity = particleVelocity(edgeOffset);
@@ -971,11 +968,10 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		return;
 	}
 
-	const mapCenter = pl.Vec2(0.5, 0.5);
 	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
 	let pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
-	const outward = vector.diff(pos, mapCenter);
+	const outward = vector.diff(pos, MapCenter);
 	outward.normalize();
 
 	const velocity = vector.zero();
@@ -995,7 +991,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 
 	if (params.ease > 0) {
 		const scale = 1 - params.ease;
-		pos = vector.scaleAround(pos, mapCenter, scale);
+		pos = vector.scaleAround(pos, MapCenter, scale);
 		particleRadius *= scale;
 	}
 
