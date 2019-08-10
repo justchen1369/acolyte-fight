@@ -2033,7 +2033,7 @@ const horcrux: Spell = {
                 radius: 0.0375,
                 tickInterval: 5,
                 maxHits: 6,
-                packet: { damage: 4.5, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                packet: { damage: 6, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
@@ -2106,8 +2106,8 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 1 * TicksPerSecond,
-    channelling: false,
+    maxTicks: 1.5 * TicksPerSecond,
+    channelling: true,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
@@ -2166,8 +2166,8 @@ const dualSaber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 1 * TicksPerSecond,
-    channelling: false,
+    maxTicks: 1.5 * TicksPerSecond,
+    channelling: true,
 
     categories: Categories.Shield,
     collidesWith: Categories.Hero | Categories.Projectile,
