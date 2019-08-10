@@ -374,8 +374,8 @@ const triplet: Spell = {
         color: '#ff0088',
         renderers: [
             { type: "bloom", radius: 0.02 },
-            { type: "projectile", ticks: 12, smoke: 0.05, vanish: 1 },
-            { type: "ray", ticks: 6, vanish: 0.5 },
+            { type: "projectile", ticks: 15, smoke: 0.05, vanish: 1 },
+            { type: "ray", ticks: 8, vanish: 0.5 },
             { type: "strike", ticks: 30, flash: true, numParticles: 2 },
         ],
 
@@ -383,7 +383,7 @@ const triplet: Spell = {
             {
                 type: "accelerate",
                 accelerationPerSecond: 0.3,
-                maxSpeed: 0.75,
+                maxSpeed: 0.6,
             }
         ],
 
