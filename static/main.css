@@ -490,19 +490,29 @@ a:hover, a:active {
     animation: fly-from-left 0.5s both ease-in;
 }
 
-@keyframes fly-from-left {
-    from { transform: translateX(-100vw) }
-    to { transform: translateX(0); }
-}
-
 .title-right {
     display: inline-block;
     animation: fly-from-right 0.5s both ease-in;
 }
 
+@keyframes fly-from-left {
+    from { transform: translateX(-100vw) }
+    to { transform: translateX(0); }
+}
+
 @keyframes fly-from-right {
     from { transform: translateX(100vw) }
     to { transform: translateX(0); }
+}
+
+@keyframes fly-from-top {
+    from { transform: translateY(-100vh) }
+    to { transform: translateY(0); }
+}
+
+@keyframes fly-from-bottom {
+    from { transform: translateY(100vh) }
+    to { transform: translateY(0); }
 }
 
 
@@ -857,6 +867,24 @@ table.player-list {
 
 #messages-panel .row.error {
     color: red;
+}
+
+.teams-splash-left {
+    display: inline-block;
+    animation: fly-from-left 0.5s both ease-in;
+}
+.teams-splash-middle {
+    display: inline-block;
+    animation: fly-from-top 0.5s both ease-in;
+}
+.teams-splash-right {
+    display: inline-block;
+    animation: fly-from-right 0.5s both ease-in;
+}
+
+.teams-splash-v {
+    display: inline-block;
+    animation: fly-from-bottom 0.5s both ease-in;
 }
 
 @keyframes fade-out {

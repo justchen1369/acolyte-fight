@@ -13,6 +13,7 @@ import LeftMessage from './messages/leftMessage';
 import HelpMessage from './messages/helpMessage';
 import PlayButton from '../ui/playButton';
 import RatingAdjustmentMessage from './messages/RatingAdjustmentMessage';
+import TeamsMessage from './messages/teamsMessage';
 import TextMessage from './messages/textMessage';
 import TextMessageBox from './textMessageBox';
 import { isMobile } from '../core/userAgent';
@@ -137,7 +138,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "text": return <TextMessage key={key} notification={notification} />
             case "new": return this.renderNewGameNotification(key, notification);
-            case "teams": return this.renderTeamsNotification(key, notification);
+            case "teams": return <TeamsMessage key={key} notification={notification} />;
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
             case "bot": return this.renderBotNotification(key, notification);
@@ -155,17 +156,6 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     private renderNewGameNotification(key: string, notification: w.NewGameNotification): React.ReactNode {
         return null;
-    }
-
-    private renderTeamsNotification(key: string, notification: w.TeamsNotification) {
-        if (notification.teamSizes) {
-            const vString = notification.teamSizes.join('v');
-            return <div key={key} className="splash-container">
-                <div className="splash">{vString}</div>
-            </div>
-        } else {
-            return null;
-        }
     }
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
