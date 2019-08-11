@@ -7,18 +7,18 @@ import * as StoreProvider from '../../storeProvider';
 import ButtonRow from './buttonRow';
 
 interface Props {
-    mute: boolean;
+    wheelOnRight: boolean;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        mute: state.options.mute,
+        wheelOnRight: state.options.wheelOnRight,
     };
 }
 
-class MutePanel extends React.PureComponent<Props, State> {
+class ActionWheelSidePanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -26,21 +26,20 @@ class MutePanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const muted = this.props.mute;
-        if (muted) {
-            return <ButtonRow label="Unmute" icon="fas fa-volume-mute" onClick={() => this.onMuteClick(false)} />
+        if (this.props.wheelOnRight) {
+            return <ButtonRow label="Right-handed mode" icon="fas fa-hand-point-right" onClick={() => this.onClick(false)} />
         } else {
-            return <ButtonRow label="Mute" icon="fas fa-volume" onClick={() => this.onMuteClick(true)} />
+            return <ButtonRow label="Left-handed mode" icon="fas fa-hand-point-left" onClick={() => this.onClick(true)} />
         }
     }
 
-    private async onMuteClick(mute: boolean) {
+    private async onClick(wheelOnRight: boolean) {
         StoreProvider.dispatch({
             type: "updateOptions",
-            options: { mute },
+            options: { wheelOnRight },
         });
         await cloud.uploadSettings();
     }
 }
 
-export default ReactRedux.connect(stateToProps)(MutePanel);
+export default ReactRedux.connect(stateToProps)(ActionWheelSidePanel);

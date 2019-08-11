@@ -10,7 +10,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { TicksPerSecond, Atlas } from '../../game/constants';
-import { CanvasStack, GraphicsLevel, resetRenderState } from '../graphics/render';
+import { CanvasStack, GraphicsLevel } from '../graphics/render';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
@@ -213,9 +213,6 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     private fullScreenCanvas() {
-        const world = this.props.world;
-        resetRenderState(world);
-
         this.setState({
             width: document.body.clientWidth,
             height: document.body.clientHeight,

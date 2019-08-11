@@ -148,8 +148,14 @@ export interface RenderDimensions {
 
 export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;
 
-export interface ButtonBarConfig {
+export interface ButtonConfigBase {
+	screenWidth: number;
+	screenHeight: number;
+}
+
+export interface ButtonBarConfig extends ButtonConfigBase {
 	view: "bar";
+
 	region: ClientRect;
 	scaleFactor: number;
 
@@ -159,9 +165,10 @@ export interface ButtonBarConfig {
 	buttons: Map<string, ButtonRenderState>;
 }
 
-export interface ButtonWheelConfig {
+export interface ButtonWheelConfig extends ButtonConfigBase {
 	view: "wheel";
 	region: ClientRect;
+	wheelOnRight: boolean;
 
 	center: pl.Vec2;
 	hitSectors: Map<string, HitSector>;

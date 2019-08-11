@@ -245,10 +245,10 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             </div>}
             <div className="row"></div>
             {isMobile && <div className="row">
-                <span className="label">Action wheel</span>
+                <span className="label">Layout</span>
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onUpdate({ actionWheelSide: ev.target.value })}>
-                    <option value={formatOption(Side.Left)}>Left</option>
-                    <option value={formatOption(Side.Right)}>Right</option>
+                    <option value={formatOption(Side.Left)}>Right-handed</option>
+                    <option value={formatOption(Side.Right)}>Left-handed</option>
                 </select>
             </div>}
             {isMobile && <>

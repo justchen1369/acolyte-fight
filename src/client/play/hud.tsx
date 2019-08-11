@@ -8,18 +8,21 @@ import * as matches from '../core/matches';
 import * as StoreProvider from '../storeProvider';
 
 import Layout from './layout';
+import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import Button from '../controls/button';
 import ExitLink from './exitLink';
+import GameKeyCustomizer from './gameKeyCustomizer';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
 import HelpMessage from './messages/helpMessage';
-import MessagesPanel from './messagesPanel';
 import HintPanel from './hintPanel';
-import GameKeyCustomizer from './gameKeyCustomizer';
-import ButtonPanel from './buttonPanel';
+import MessagesPanel from './messagesPanel';
+import MutePanel from './buttons/mutePanel';
+import RandomizePanel from './buttons/randomizePanel';
 import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import TextMessageBox from './textMessageBox';
+import VideoPanel from './buttons/videoPanel';
 
 import { isMobile } from '../core/userAgent';
 
@@ -73,8 +76,12 @@ class HUD extends React.PureComponent<Props, State> {
             </Layout>}
             {!modal && <Layout anchorTop={true} anchorLeft={true}>
                 <ExitLink />
-                <TextMessageBox />
-                <ButtonPanel />
+                <div className="button-panel">
+                    <TextMessageBox />
+                    <MutePanel />
+                    <ActionWheelSidePanel />
+                    <RandomizePanel />
+                </div>
             </Layout>}
             <Layout anchorTop={true}>
                 <HintPanel />
@@ -103,7 +110,11 @@ class HUD extends React.PureComponent<Props, State> {
             </Layout>}
             {!modal && <Layout anchorTop={true} anchorLeft={true}>
                 <ExitLink />
-                <ButtonPanel />
+                <div className="button-panel">
+                    <MutePanel />
+                    <RandomizePanel />
+                    <VideoPanel />
+                </div>
             </Layout>}
             <Layout anchorBottom={true}>
                 <HintPanel />

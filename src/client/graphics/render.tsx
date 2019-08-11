@@ -59,7 +59,7 @@ interface HighlightResult {
 }
 
 // Rendering
-export function resetRenderState(world: w.World) {
+function resetRenderState(world: w.World) {
 	world.ui.renderedTick = null;
 	world.ui.buttonBar = null;
 }
@@ -168,6 +168,10 @@ function calculateZoom(distance: number, maxZoom: number) {
 
 export function render(world: w.World, canvasStack: CanvasStack, options: RenderOptions) {
 	const rect = canvasStack.ui.getBoundingClientRect();
+	if (invalidRenderState(world, rect, options)) {
+		resetRenderState(world);
+	}
+
 	const viewRect = calculateViewRects(rect, options.wheelOnRight);
 	const worldRect = calculateWorldRect(viewRect, world.ui.camera);
 	const subpixel = 1 / Math.max(1, Math.min(canvasStack.gl.width, canvasStack.gl.height)) / world.ui.camera.zoom;
@@ -212,6 +216,18 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		viewRect,
 		worldRect,
 	};
+}
+
+function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOptions) {
+	const buttonBar = world.ui.buttonBar;
+	if (buttonBar) {
+		if (buttonBar.screenHeight !== rect.height || buttonBar.screenWidth !== rect.width) {
+			return true;
+		} else if (buttonBar.view === "wheel" && buttonBar.wheelOnRight !== options.wheelOnRight) {
+			return true;
+		}
+	}
+	return false;
 }
 
 function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
@@ -2325,6 +2341,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 
 	if (buttonStateLookup) {
 		if (!world.ui.buttonBar) {
+			ctx.clearRect(0, 0, rect.width, rect.height); // Rendering a new button bar, clear previous ones (e.g. from previous resizes of the window)
 			world.ui.buttonBar = calculateButtonLayout(world.settings.Choices.Keys, rect, world, options);
 		}
 
@@ -2480,6 +2497,8 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.
 
 	return {
 		view: "bar",
+		screenHeight: rect.height,
+		screenWidth: rect.width,
 		keys,
 		hitBoxes,
 		region,
@@ -2548,6 +2567,9 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, world: 
 
 	return {
 		view: "wheel",
+		screenWidth: rect.width,
+		screenHeight: rect.height,
+		wheelOnRight: options.wheelOnRight,
 		hitSectors,
 		region,
 		center,
