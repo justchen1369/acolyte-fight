@@ -9,6 +9,7 @@ import * as s from './store.model';
 import * as w from '../game/world.model';
 
 import * as ai from './ai/ai';
+import * as analytics from './core/analytics';
 import * as audio from './audio/audio';
 import * as cloud from './core/cloud';
 import * as loader from './core/loader';
@@ -57,6 +58,8 @@ export async function initialize() {
     sockets.listeners.onOnlineMsg = online.onOnlineMsg;
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
+    
+    tutor.attachTutorialCompletedListener(tracker.onTutorialCompleted);
 
     window.onpopstate = (ev) => {
         const elems: s.PathElements = ev.state;
@@ -94,7 +97,7 @@ async function loginAsync() {
     const userId = await cloud.downloadSettings();
     if (userId) {
         StoreProvider.dispatch({ type: "clearNewPlayerFlag" }); // This user is not new
-        tracker.setUserId(userId);
+        analytics.setUserId(userId);
         await parties.updatePartyAsync();
     }
 }

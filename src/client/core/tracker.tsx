@@ -1,7 +1,7 @@
+import * as analytics from './analytics';
+import * as storage from '../storage';
 
-export function setUserId(userId: string) {
-    const gtag = (window as any).gtag;
-    if (gtag && userId) {
-        gtag('set', {'user_id': userId});
-    }
+export async function onTutorialCompleted() {
+    const numGames = await storage.getNumGames();
+    analytics.send("completedTutorial", numGames);
 }
