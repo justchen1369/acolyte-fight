@@ -73,11 +73,21 @@ class CompileModListener extends React.PureComponent<Props, State> {
     }
 
     render(): React.ReactNode {
+        return null;
+    }
+
+    componentDidMount() {
+        this.compileModIfNecessary();
+    }
+
+    componentDidUpdate() {
+        this.compileModIfNecessary();
+    }
+
+    private compileModIfNecessary() {
         if (!this.props.mod || this.props.codeTree !== this.props.modBuiltFrom) {
             compileModDebounced();
         }
-
-        return null;
     }
 }
 

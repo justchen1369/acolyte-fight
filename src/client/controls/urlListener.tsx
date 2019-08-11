@@ -17,6 +17,18 @@ function stateToProps(state: s.State): Props {
 
 class UrlListener extends React.PureComponent<Props, State> {
     render(): JSX.Element {
+        return null;
+    }
+
+    componentDidMount() {
+        this.updateUrl();
+    }
+
+    componentDidUpdate() {
+        this.updateUrl();
+    }
+
+    private updateUrl() {
         const previous = window.history.state || url.parseLocation(window.location);
 
         const next = this.props.current;
@@ -33,7 +45,7 @@ class UrlListener extends React.PureComponent<Props, State> {
             gtag('config', gaTrackingId, {'page_path': path});
         }
 
-        return null;
+
     }
 }
 
