@@ -102,8 +102,10 @@ class GameList extends React.PureComponent<Props, State> {
         replays.checkForReplays(props.allGameStats);
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        replays.checkForReplays(newProps.allGameStats);
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.allGameStats !== this.props.allGameStats) {
+            replays.checkForReplays(this.props.allGameStats);
+        }
     }
 
     render() {

@@ -20,11 +20,11 @@ export class CodeEditor extends React.PureComponent<Props> {
         return <div key="code-area" className="code-area" ref={(el) => this.onRef(el)}></div>
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.code !== this.props.code) {
-            if (this.editor && this.code !== newProps.code) {
-                this.code = newProps.code;
-                this.editor.updateCode(newProps.code);
+    componentDidUpdate(prevProps: Props) {
+        if (this.code !== this.props.code) {
+            if (this.editor && this.code !== this.props.code) {
+                this.code = this.props.code;
+                this.editor.updateCode(this.props.code);
             }
         }
     }

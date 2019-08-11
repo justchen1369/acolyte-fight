@@ -68,9 +68,9 @@ class ProfileGameList extends React.PureComponent<Props, State> {
         this.retrieveData(this.props.profileId);
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.profileId !== this.state.profileId) {
-            this.retrieveData(newProps.profileId);
+    componentDidUpdate(prevProps: Props) {
+        if (this.props.profileId !== this.state.profileId) {
+            this.retrieveData(this.props.profileId);
         }
     }
 

@@ -67,8 +67,10 @@ class UserStatsPanel extends React.PureComponent<Props, State> {
         }
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        this.loadDataAsync(newProps.profileId || this.props.myUserId);
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.profileId !== this.props.profileId || prevProps.myUserId !== this.props.myUserId) {
+            this.loadDataAsync(this.props.profileId || this.props.myUserId);
+        }
     }
 
     private async loadDataAsync(profileId: string) {

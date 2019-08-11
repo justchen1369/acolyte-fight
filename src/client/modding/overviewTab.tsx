@@ -66,9 +66,9 @@ class OverviewTab extends React.PureComponent<Props, State> {
         }
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        if (newProps.currentMod && newProps.currentMod !== this.props.currentMod) {
-            this.setState({ code: stringifyMod(newProps.currentMod) });
+    componentDidUpdate(prevProps: Props) {
+        if (this.props.currentMod && this.props.currentMod !== prevProps.currentMod) {
+            this.setState({ code: stringifyMod(this.props.currentMod) });
         }
     }
 

@@ -180,8 +180,10 @@ class ControlsPanel extends React.PureComponent<Props, State> {
         };
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        this.setState(controlConfigToState(newProps.rebindings, newProps.options));
+    componentDidUpdate(prevProps: Props) {
+        if (prevProps.rebindings !== this.props.rebindings || prevProps.options !== this.props.options) {
+            this.setState(controlConfigToState(this.props.rebindings, this.props.options));
+        }
     }
 
     render() {

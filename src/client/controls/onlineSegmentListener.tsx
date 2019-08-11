@@ -21,19 +21,25 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-function requestUpdate(props: Props) {
-    online.start(segments.calculateSegment(props.roomId, props.partyId, props.isPrivate));
+function calculateSegment(props: Props) {
+    return segments.calculateSegment(props.roomId, props.partyId, props.isPrivate);
 }
 
 class OnlineSegmentListener extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
-
-        requestUpdate(props);
     }
 
-    componentWillReceiveProps(newProps: Props) {
-        requestUpdate(newProps);
+    componentDidMount() {
+        online.start(calculateSegment(this.props));
+    }
+
+    componentDidUpdate(prevProps: Props) {
+        const newSegment = calculateSegment(this.props);
+        const prevSegment = calculateSegment(prevProps);
+        if (prevSegment !== newSegment) {
+            online.start(newSegment);
+        }
     }
 
     render(): JSX.Element {
