@@ -16,21 +16,13 @@ import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
 
-import { isMobile } from '../core/userAgent';
-
 interface Props {
-    exitable: boolean;
-    wheelOnRight: boolean;
-    customizing: boolean;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        exitable: matches.worldInterruptible(state.world),
-        wheelOnRight: state.options.wheelOnRight,
-        customizing: state.customizing,
     };
 }
 
