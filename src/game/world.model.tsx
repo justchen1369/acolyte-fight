@@ -176,6 +176,7 @@ export interface ButtonWheelConfig extends ButtonConfigBase {
 	outerRadius: number;
 
 	targetSurfaceCenter: pl.Vec2;
+	targetSurfaceDrawn?: boolean;
 
 	buttons: Map<string, ButtonRenderState>;
 }

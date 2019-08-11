@@ -2459,6 +2459,41 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 
 	});
 	ctx.restore();
+
+	if (!config.targetSurfaceDrawn) {
+		const InnerRadiusBlend = 0.75;
+
+		config.targetSurfaceDrawn = true;
+
+		ctx.save();
+		ctx.translate(config.targetSurfaceCenter.x, config.targetSurfaceCenter.y);
+
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = "#ffffff44";
+		ctx.fillStyle = "#ffffff22";
+
+		const radius = InnerRadiusBlend * config.innerRadius + (1 - InnerRadiusBlend) * config.outerRadius;
+
+		ctx.beginPath();
+		ctx.arc(0, 0, radius, 0, 2 * Math.PI);
+		ctx.stroke();
+
+		for (let i = 0; i < 4; ++i) {
+			ctx.save();
+			ctx.rotate(i * Math.PI / 2);
+
+			ctx.beginPath();
+			ctx.moveTo(radius * -0.2, radius * 0.5);
+			ctx.lineTo(radius * 0.2, radius * 0.5);
+			ctx.lineTo(0, radius * 0.75);
+			ctx.closePath();
+			ctx.fill();
+
+			ctx.restore();
+		}
+
+		ctx.restore();
+	}
 }
 
 function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.World): w.ButtonBarConfig {
