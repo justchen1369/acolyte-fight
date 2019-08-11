@@ -878,7 +878,7 @@ table.player-list {
     pointer-events: none;
 
     max-height: 33vh;
-    max-width: 50vh;
+    max-width: 50vw;
     overflow: hidden;
 
     display: flex;
