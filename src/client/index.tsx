@@ -29,7 +29,6 @@ import * as storage from './storage';
 import * as StoreProvider from './storeProvider';
 import * as ticker from './core/ticker';
 import * as tutor from './core/tutor';
-import * as tracker from './core/tracker';
 import * as url from './url';
 import * as userAgent from './core/userAgent';
 
@@ -59,8 +58,6 @@ export async function initialize() {
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
     
-    tutor.attachTutorialCompletedListener(tracker.onTutorialCompleted);
-
     window.onpopstate = (ev) => {
         const elems: s.PathElements = ev.state;
         if (elems) {

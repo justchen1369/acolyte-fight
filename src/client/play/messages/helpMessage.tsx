@@ -9,6 +9,7 @@ import * as m from '../../../shared/messages.model';
 import * as matches from '../../core/matches';
 import * as s from '../../store.model';
 import * as seen from '../../core/seen';
+import * as tutor from '../../core/tutor';
 import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
 import { isMobile } from '../../core/userAgent';
@@ -121,9 +122,8 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private onExitTutorialClick() {
-        StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
+        tutor.exitTutorial();
         matches.joinNewGame({});
-        analytics.send('exitTutorial');
     }
 
     private onCloseHelpClicked(e: React.MouseEvent) {
