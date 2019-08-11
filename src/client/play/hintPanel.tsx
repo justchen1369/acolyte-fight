@@ -101,7 +101,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         }
 
         return <div className="customize-hint-container">
-            <div className="customize-hint"><span className="spell-name">{spellUtils.spellName(spell)}</span></div>
+            <div className="customize-hint spell-name">{spellUtils.spellName(spell)}</div>
         </div>;
     }
 
@@ -117,7 +117,7 @@ class HintPanel extends React.PureComponent<Props, State> {
 
     private renderTeamHint() {
         return <div className="customize-hint-container">
-            <div className="customize-hint">{this.props.teams.map(team => team.heroIds.length).join('v')}</div>
+            <div className="customize-hint team-hint">{this.props.teams.map(team => team.heroIds.length).join('v')}</div>
         </div>;
     }
 }

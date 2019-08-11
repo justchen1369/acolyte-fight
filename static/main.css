@@ -485,12 +485,12 @@ a:hover, a:active {
     font-style: italic;
     opacity: 0.9;
 
-    animation: title-flash alternate 1s infinite linear;
+    animation: emphasise-flash alternate 0.5s infinite linear;
 }
 
-@keyframes title-flash {
-    from { opacity: 0.85 }
-    to { opacity: 0.95 }
+@keyframes emphasise-flash {
+    from { opacity: 0.8 }
+    to { opacity: 1 }
 }
 
 @media (max-width: 768px) {
@@ -861,9 +861,9 @@ table.player-list {
     to { opacity: 0.0 }
 }
 
-@media (max-width: 1024px) {
+@media (min-height: 1080px) {
     .splash {
-        font-size: 300%;
+        font-size: 324px;
     }
 }
 
@@ -1188,8 +1188,13 @@ table.player-list {
     font-size: 120%;
 }
 
-#game-panel .customize-hint .spell-name {
-    font-weight: bold;
+#game-panel .customize-hint.spell-name {
+    font-size: 100%;
+}
+
+#game-panel .customize-hint.team-hint {
+    font-size: 200%;
+    animation: emphasise-flash alternate 0.5s infinite linear;
 }
 
 #game-panel .button-panel {
