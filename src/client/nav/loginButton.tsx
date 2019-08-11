@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as analytics from '../core/analytics';
 import * as constants from '../../game/constants';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
@@ -47,7 +48,11 @@ class LoginButton extends React.PureComponent<Props> {
             "login-btn": true,
             "logging-in": !this.props.loginAttempted,
         });
-        return <HrefItem key="login" className={className} href="login">Login</HrefItem>
+        return <HrefItem key="login" className={className} href="login" onClick={() => this.onLoginClicked()}>Login</HrefItem>
+    }
+
+    private onLoginClicked() {
+        analytics.send('login');
     }
 
     private renderProfileLink() {
