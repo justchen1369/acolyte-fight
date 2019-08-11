@@ -757,7 +757,7 @@ table.player-list {
 
 .text-message-container {
     position: relative;
-    margin: 8;
+    margin: 0.5em 8;
     border: transparent 1px solid;
 }
 
@@ -1170,12 +1170,11 @@ table.player-list {
 }
 
 #game-panel .button-panel {
-    margin: 8;
     font-size: 75%;
 }
 
 #game-panel .button-panel-row {
-    margin-top: 0.5em;
+    margin: 0.5em 8;
     font-style: italic;
 }
 
