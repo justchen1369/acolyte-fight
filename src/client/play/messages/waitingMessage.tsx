@@ -16,6 +16,8 @@ import Button from '../../controls/button';
 interface OwnProps {
 }
 interface Props extends OwnProps {
+    myHeroId: string;
+    isWaiting: boolean;
     segment: string;
     locked: string;
     numOnline: number;
@@ -26,7 +28,10 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
+    const world = state.world;
     return {
+        myHeroId: world.ui.myHeroId,
+        isWaiting: world.tick < state.world.startTick,
         segment: state.onlineSegment,
         locked: state.world.ui.locked,
         numOnline: state.online.size,
@@ -45,6 +50,10 @@ class WaitingMessage extends React.PureComponent<Props, State> {
     }
 
     private renderOnline() {
+        if (!(this.props.myHeroId && this.props.isWaiting)) {
+            return null;
+        }
+
         const numOnline = this.props.numOnline;
         const isPublic = this.props.segment === segments.publicSegment();
         return <div className="info-panel dialog-panel">

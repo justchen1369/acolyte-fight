@@ -10,26 +10,40 @@ import Button from '../../controls/button';
 import PlayButton from '../../ui/playButton';
 
 interface OwnProps {
-    onSpectateClick: () => void;
 }
 interface Props extends OwnProps {
+    myGameId: string;
     myHeroId: string;
     score: w.HeroScore;
 }
 interface State {
+    spectatingGameId: string;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const world = state.world;
     return {
         ...ownProps,
+        myGameId: world.ui.myGameId,
         myHeroId: world.ui.myHeroId,
         score: world.scores.get(world.ui.myHeroId),
     };
 }
 
 class DeadMessage extends React.PureComponent<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            spectatingGameId: null,
+        };
+    }
+
     render() {
+        if (this.props.myGameId === this.state.spectatingGameId) {
+            return null;
+        }
+
         const score = this.props.score;
         return <div className="winner dialog-panel">
             <div className="winner-row">You died.</div>
@@ -42,7 +56,7 @@ class DeadMessage extends React.PureComponent<Props, State> {
 
             <div className="action-row">
                 <div style={{ marginBottom: 12 }}>
-                    <b><Button className="link-btn" onClick={() => this.props.onSpectateClick()}>Continue Watching</Button></b> or
+                    <b><Button className="link-btn" onClick={() => this.setState({ spectatingGameId: this.props.myGameId })}>Continue Watching</Button></b> or
                 </div>
                 <div>
                     <PlayButton again={!!this.props.myHeroId} />

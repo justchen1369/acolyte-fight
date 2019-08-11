@@ -151,6 +151,12 @@ export function isGameStarting(world: w.World) {
 	return world.startTick < constants.Matchmaking.MaxHistoryLength;
 }
 
+export function isDead(heroId: string, world: w.World) {
+	// Use player.dead rather than check for hero in world.objects because the hero object may take a while to appear while their user ID is retrieved from the database
+	const player = world.players.get(heroId);
+	return player && player.dead;
+}
+
 export function takeNotifications(world: w.World): w.Notification[] {
 	const notifications = world.ui.notifications;
 	if (notifications.length > 0) {

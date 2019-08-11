@@ -3,11 +3,9 @@ import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
-import { isMobile } from '../core/userAgent';
 
 import MutePanel from './buttons/mutePanel';
 import RandomizePanel from './buttons/randomizePanel';
-import TextMessageBox from './textMessageBox';
 import VideoPanel from './buttons/videoPanel';
 
 interface Props {
@@ -32,7 +30,6 @@ class ButtonPanel extends React.PureComponent<Props, State> {
             <MutePanel />
             <RandomizePanel />
             <VideoPanel />
-            {isMobile && <TextMessageBox />}
         </div>
     }
 }

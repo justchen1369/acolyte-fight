@@ -7,20 +7,11 @@ import * as options from '../options';
 import * as matches from '../core/matches';
 import * as StoreProvider from '../storeProvider';
 
-import AnchoredPanel from './anchoredPanel';
-import Button from '../controls/button';
 import ControlSurface from './controlSurface';
-import ExitLink from './exitLink';
-import InfoPanel from './infoPanel';
-import MessagesPanel from './messagesPanel';
 import CanvasPanel from './canvasPanel';
-import HintPanel from './hintPanel';
-import GameKeyCustomizer from './gameKeyCustomizer';
+import HUD from './hud';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
-import ButtonPanel from './buttonPanel';
-import SocialBar from '../controls/socialBar';
 import SoundController from './soundController';
-import SpellInfoPanel from './spellInfoPanel';
 import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
@@ -55,37 +46,13 @@ class GamePanel extends React.PureComponent<Props, State> {
             <ControlSurface>
                 <TitleListener />
                 <CanvasPanel />
-                {this.renderPanels()}
+                <HUD />
                 <SoundController />
                 <OnlineSegmentListener />
                 <UrlListener />
                 <WatchLooper />
             </ControlSurface>
         );
-    }
-
-    private renderPanels() {
-        const a = options.getProvider();
-        const customizing = this.props.customizing;
-        return <>
-            {!customizing && <>
-                <InfoPanel />
-                <MessagesPanel />
-                <ExitLink />
-                {!a.noExternalLinks && !isMobile && this.props.exitable && <SocialBar />}
-                {<ButtonPanel />}
-            </>}
-            {customizing && <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
-                <i className="fas fa-times" />{!isMobile && "Choosing Spells"}
-            </Button>}
-            <SpellInfoPanel />
-            <HintPanel />
-            <GameKeyCustomizer />
-        </>
-    }
-
-    private onUncustomizeClicked(ev: React.MouseEvent) {
-        StoreProvider.dispatch({ type: "customizing", customizing: false });
     }
 }
 

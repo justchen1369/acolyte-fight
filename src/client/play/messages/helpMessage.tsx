@@ -4,6 +4,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as analytics from '../../core/analytics';
+import * as engine from '../../../game/engine';
 import * as m from '../../../shared/messages.model';
 import * as matches from '../../core/matches';
 import * as s from '../../store.model';
@@ -20,6 +21,7 @@ interface OwnProps {
 interface Props extends OwnProps {
     userId: string;
     myHeroId: string;
+    isDead: boolean;
     showingHelp: boolean;
     rebindings: KeyBindings;
     tutorial: boolean;
@@ -30,9 +32,11 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     const world = state.world;
+    const myHeroId = world.ui.myHeroId;
     return {
         userId: state.userId,
-        myHeroId: world.ui.myHeroId,
+        myHeroId,
+        isDead: engine.isDead(myHeroId, world),
         showingHelp: state.showingHelp,
         rebindings: state.rebindings,
         tutorial: state.world.ui.locked === m.LockType.Tutorial,
@@ -44,6 +48,10 @@ class HelpMessage extends React.PureComponent<Props, State> {
     render() {
         if (!this.props.myHeroId) {
             return null; // Observer doesn't need instructions
+        }
+
+        if (this.props.isDead) {
+            return null; // Let the "Play Again" message take precedence
         }
 
         const needsHelp = !this.props.userId; // Logged-in user doesn't need instructions

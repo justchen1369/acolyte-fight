@@ -75,10 +75,6 @@ body .page {
 }
 
 #game-panel .exit-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-
     color: white;
     font-size: 20px;
     padding: 15px 20px;
@@ -653,11 +649,17 @@ a:hover, a:active {
     margin: 5px;
 }
 
-#info-panel {
-    position: absolute;
-    top: 8;
-    right: 8;
+.anchored-panel {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+}
 
+.anchored-panel-left {
+    text-align: left;
+}
+
+.anchored-panel-right {
     text-align: right;
 }
 
@@ -755,7 +757,7 @@ table.player-list {
 
 .text-message-container {
     position: relative;
-    margin-top: 10px;
+    margin: 8;
     border: transparent 1px solid;
 }
 
@@ -833,15 +835,18 @@ table.player-list {
     }
 }
 
+#info-panel {
+    margin: 8;
+}
+
 #messages-panel {
-    position: absolute;
     margin: 8;
     min-width: 30%;
 
     pointer-events: none;
 }
 
-#messages-panel .messages-panel-rows {
+.messages .messages-panel-rows {
     max-height: 33vh;
     max-width: 50vh;
     overflow: hidden;
@@ -851,21 +856,22 @@ table.player-list {
     justify-content: flex-end;
 }
 
-#messages-panel .row {
+.messages .row {
     color: #ccc;
 
     animation: fade-out 15s both;
     font-size: 75%;
 }
 
-#messages-panel .row.text-row {
+.messages .row.text-row {
     animation-duration: 60s;
 }
-#messages-panel .row.rating-notification {
+
+.messages .row.rating-notification {
     animation-duration: 30s;
 }
 
-#messages-panel .row.error {
+.messages .row.error {
     color: red;
 }
 
@@ -893,143 +899,152 @@ table.player-list {
     to { opacity: 0.0 }
 }
 
-#messages-panel .text-row {
+.messages .text-row {
+    display: flex;
+    flex-direction: row;
+    align-content: flex-start;
+
     pointer-events: all;
     font-size: 120%;
 }
 
-#messages-panel span.text-message {
+.anchored-panel-right.messages .text-row {
+    flex-direction: row-reverse; /* silence button on left */
+}
+
+.messages .text-row .silence-btn {
+    opacity: 0;
+    cursor: hand;
+    margin: 0 8;
+
+    transition: opacity 0.2s ease;
+}
+
+.messages .text-row:hover .silence-btn {
+    opacity: 1;
+}
+
+.messages span.text-message {
     color: white;
     font-weight: bold;
 }
 
-#messages-panel .rating {
+.messages .rating {
     font-weight: bold;
 }
 
 @media (min-width: 1024px) {
-    #messages-panel .help-box {
+    .messages .help-box {
         font-size: 150%;
     }
 }
 
-#messages-panel .help-box .help-title {
+.messages .help-box .help-title {
     font-weight: bold;
     margin-bottom: 1em;
 }
 
-#messages-panel .help-box .help-row {
+.messages .help-box .help-row {
     margin: 0.1em 0px;
 }
 
-#messages-panel .help-box .icon-container {
+.messages .help-box .icon-container {
     display: inline-block;
     width: 30px;
     text-align: center;
     margin-right: 0.5em;
 }
 
-#messages-panel .rating-notification {
+.messages .rating-notification {
     margin: 0.5em 0;
 }
 
-#messages-panel .next-league-hint {
+.messages .next-league-hint {
     font-size: 75%;
     color: #aaa;
 }
 
-#messages-panel .unranked-hint {
+.messages .unranked-hint {
     font-size: 75%;
     color: #aaa;
 }
 
-#messages-panel .game-started {
+.messages .game-started {
     font-weight: bold;
 }
 
-#messages-panel .dialog-panel {
+.messages .dialog-panel {
     color: white;
     margin-top: 1em;
     padding: 0.5em;
     background: linear-gradient(to right, #111, rgba(0,0,0,0));
 }
 
-.wheel-on-left #messages-panel .dialog-panel {
+.wheel-on-left .messages .dialog-panel {
     background: linear-gradient(to left, #111, rgba(0,0,0,0));
 }
 
-#messages-panel .winner-row {
+.messages .winner-row {
     font-weight: bold;
     font-size: 150%;
     margin-bottom: 1em;
 }
 
-#messages-panel .award-group {
+.messages .award-group {
     margin-bottom: 1em;
 }
 
-#messages-panel .self-metric {
+.messages .self-metric {
     font-size: 75%;
     color: #888;
     font-style: italic;
 }
 
-#messages-panel .outlast-row {
+.messages .outlast-row {
     margin-top: 0.75em;
     color: #ccc;
     font-style: italic;
 }
 
-#messages-panel .action-row {
+.messages .action-row {
     margin-top: 1em;
     align-items: center;
 }
 
-#messages-panel .winner .action-row .btn {
+.messages .winner .action-row .btn {
     font-size: 150%;
 }
 
-#messages-panel .advert-row {
+.messages .community-advert {
     display: flex;
     align-items: center;
 
-    margin: 0.5em 0;
+    margin: 0.5em 8;
     animation: none;
 }
 
-#messages-panel .advert-row a {
+.messages .community-advert a {
     display: flex;
     align-items: center;
 }
 
-#messages-panel .advert-row .label {
-    font-size: 80%;
-}
-
-#messages-panel .advert-row i {
-    font-size: 150%;
-    margin-left: 0.25em;
-}
-
-#messages-panel .info-panel .body-row {
+.messages .community-advert .label {
     font-size: 75%;
 }
 
-#messages-panel .info-panel .header-row {
+.messages .community-advert i {
+    font-size: 150%;
+    margin: 0.25em;
+}
+
+.messages .info-panel .body-row {
+    font-size: 75%;
+}
+
+.messages .info-panel .header-row {
     font-size: 120%;
     font-weight: bold;
     margin-bottom: 0.5em;
-}
-
-#messages-panel .row .silence-btn {
-    opacity: 0;
-    cursor: hand;
-
-    transition: opacity 0.2s ease;
-}
-
-#messages-panel .row:hover .silence-btn {
-    opacity: 1;
 }
 
 .recording-status-panel {
@@ -1155,15 +1170,8 @@ table.player-list {
 }
 
 #game-panel .button-panel {
-    position: fixed;
-    top: 0;
-    left: 0;
-
-    margin-left: 1em;
-    margin-top: 50px;
-
+    margin: 8;
     font-size: 75%;
-    text-align: left;
 }
 
 #game-panel .button-panel-row {

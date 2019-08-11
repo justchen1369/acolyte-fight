@@ -4,6 +4,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 export interface OwnProps {
+    className?: string;
     anchorLeft?: boolean;
     anchorRight?: boolean;
     anchorBottom?: boolean;
@@ -30,32 +31,39 @@ class AnchoredPanel extends React.PureComponent<Props> {
     render() {
         const Visuals = this.props.Visuals;
 
-        let top: number = undefined;
-        let bottom: number = undefined;
-        let left: number = undefined;
-        let right: number = undefined;
+        let classNames = ["anchored-panel"];
+        let style: React.CSSProperties = {};
 
         if (this.props.anchorBottom) {
             const buttonBar = this.props.buttonBar;
             if (buttonBar && buttonBar.view === "bar") {
-                bottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
+                style.bottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
             } else {
-                bottom = 0;
+                style.bottom = 0;
             }
+
+            classNames.push("anchored-panel-bottom");
         }
 
         if (this.props.anchorLeft) {
-            left = 0;
+            style.left = 0;
+            classNames.push("anchored-panel-left");
         }
         if (this.props.anchorRight) {
-            right = 0;
+            style.right = 0;
+            classNames.push("anchored-panel-right");
         }
 
         if (this.props.anchorTop) {
-            top = 0;
+            style.top = 0;
+            classNames.push("anchored-panel-top");
         }
 
-        return <div className="anchored-panel" style={{ left, top, right, bottom }}>{this.props.children}</div>;
+        if (this.props.className) {
+            classNames.push(this.props.className);
+        }
+
+        return <div className={classNames.join(" ")} style={style}>{this.props.children}</div>;
     }
 }
 

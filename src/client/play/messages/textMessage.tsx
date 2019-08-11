@@ -40,7 +40,10 @@ class TextMessage extends React.PureComponent<Props, State> {
         if (this.props.silenced.has(notification.userHash)) {
             return null;
         } else {
-            return <div className="row text-row">{this.renderPlayerName()}: {this.renderMessage(notification.text)} {this.renderSilenceBtn()}</div>
+            return <div className="row text-row">
+                <span>{this.renderPlayerName()}: {this.renderMessage(notification.text)}</span>
+                {this.renderSilenceBtn()}
+            </div>
         }
     }
 
