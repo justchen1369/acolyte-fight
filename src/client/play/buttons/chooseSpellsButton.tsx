@@ -30,7 +30,7 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class RandomizePanel extends React.PureComponent<Props, State> {
+class ChooseSpellsButton extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -42,21 +42,21 @@ class RandomizePanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <ButtonRow label="Randomize Spells" icon="fas fa-dice" onClick={() => this.onRandomizeClick(true)} />
+        return <ButtonRow label="Choose Spells" icon="fas fa-wand-magic" onClick={() => this.onCustomizeClick(true)} />
     }
 
-    private onRandomizeClick(all: boolean = false) {
-        const config = { ...this.props.config };
-
-        const btns = all ? keyboardUtils.allKeys(this.props.settings) : [keyboardUtils.randomizeBtn(this.props.settings)];
-        btns.forEach(btn => {
-            config[btn] = keyboardUtils.randomizeSpellId(btn, this.props.config, this.props.settings);
+    private onCustomizeClick(mute: boolean) {
+        StoreProvider.dispatch({
+            type: "customizing",
+            customizing: true,
         });
 
-        keyboardUtils.updateKeyBindings(config);
-
-        sendKeyBindings(this.props.gameId, this.props.heroId, config);
+        // Clear hover - when in customize mode all the buttons disappear and a mouse out event never fires so have to clear it manually here
+        StoreProvider.dispatch({
+            type: "updateToolbar",
+            toolbar: { hoverControl: null },
+        });
     }
 }
 
-export default ReactRedux.connect(stateToProps)(RandomizePanel);
+export default ReactRedux.connect(stateToProps)(ChooseSpellsButton);

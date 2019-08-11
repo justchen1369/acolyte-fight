@@ -2,20 +2,20 @@ import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
-import * as w from '../../game/world.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as StoreProvider from '../storeProvider';
 
-import Layout from './layout';
 import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import Button from '../controls/button';
+import ChooseSpellsButton from './buttons/chooseSpellsButton';
 import ExitLink from './exitLink';
-import GameKeyCustomizer from './gameKeyCustomizer';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
+import GameKeyCustomizer from './gameKeyCustomizer';
 import HelpMessage from './messages/helpMessage';
 import HintPanel from './hintPanel';
+import Layout from './layout';
 import MessagesPanel from './messagesPanel';
 import MutePanel from './buttons/mutePanel';
 import RandomizePanel from './buttons/randomizePanel';
@@ -23,8 +23,16 @@ import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import TextMessageBox from './textMessageBox';
 import VideoPanel from './buttons/videoPanel';
+import WaitingMessage from './messages/waitingMessage';
 
 import { isMobile } from '../core/userAgent';
+
+namespace Tab {
+    export const Spells = "spells";
+    export const Options = "options";
+    export const Scoreboard = "scoreboard";
+    export const Chat = "chat";
+}
 
 interface Props {
     exitable: boolean;
@@ -32,6 +40,7 @@ interface Props {
     customizing: boolean;
 }
 interface State {
+    tab: string;
 }
 
 function stateToProps(state: s.State): Props {
@@ -46,6 +55,7 @@ class HUD extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            tab: Tab.Chat,
         };
     }
 
@@ -59,63 +69,95 @@ class HUD extends React.PureComponent<Props, State> {
 
     private renderMobile() {
         const a = options.getProvider();
-        const customizing = this.props.customizing;
+        const spells = this.props.customizing;
+        const tab = this.state.tab;
         const modal = this.props.customizing;
-        const wheelOnRight = this.props.wheelOnRight;
         return <>
-            {customizing && <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
-                <i className="fas fa-times" />{"Choosing Spells"}
-            </Button>}
             {!modal && <Layout anchorTop={true} anchorRight={true}>
-                <InfoPanel />
+                <div className="tab-switcher-panel">
+                    <Button className="tab-switcher-item" onClick={(ev) => this.onCustomizeClicked(ev) }>
+                        <i className="fas fa-wand-magic" />
+                    </Button>
+                    {this.renderTabSwitcherItem(Tab.Options, "fas fa-cog")}
+                    {this.renderTabSwitcherItem(Tab.Scoreboard, "fas fa-trophy")}
+                    {this.renderTabSwitcherItem(Tab.Chat, "fas fa-comments")}
+                </div>
+                {tab === Tab.Scoreboard && <>
+                    <InfoPanel />
+                </>}
+                {tab === Tab.Options && <>
+                    <MutePanel />
+                    <ActionWheelSidePanel />
+                </>}
+                {tab === Tab.Chat && <div className="messages">
+                    <TextMessageBox />
+                    <FinishedPanel />
+                    <HelpMessage />
+                    <WaitingMessage />
+                    <MessagesPanel />
+                </div>}
+                {!tab && <div className="messages">
+                    <FinishedPanel />
+                    <HelpMessage />
+                    <WaitingMessage />
+                </div>}
             </Layout>}
-            {!modal && <Layout className="messages" anchorBottom={true} anchorLeft={wheelOnRight} anchorRight={!wheelOnRight}>
-                <MessagesPanel />
-                <HelpMessage />
-                <FinishedPanel />
+            {spells && <Layout anchorTop={true} anchorRight={true}>
+                <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
+                    <span><i className="fas fa-times" /> Choosing Spells</span>
+                </Button>
+                <RandomizePanel />
             </Layout>}
             {!modal && <Layout anchorTop={true} anchorLeft={true}>
                 <ExitLink />
-                <div className="button-panel">
-                    <TextMessageBox />
-                    <MutePanel />
-                    <ActionWheelSidePanel />
-                    <RandomizePanel />
-                </div>
             </Layout>}
-            <Layout anchorTop={true}>
+            <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
             <GameKeyCustomizer />
         </>
     }
+    
+    private renderTabSwitcherItem(tab: string, icon: string) {
+        let className = "tab-switcher-item";
+        if (tab === this.state.tab) {
+            className += " tab-switcher-item-selected";
+        }
+        return <Button className={className} onClick={() => this.onTabClicked(tab)}>
+            <i className={icon} />
+        </Button>
+    }
+
+    private onTabClicked(tab: string) {
+        if (this.state.tab === tab) {
+            this.setState({ tab: null });
+        } else {
+            this.setState({ tab });
+        }
+    }
 
     private renderDesktop() {
         const a = options.getProvider();
-        const customizing = this.props.customizing;
-        const modal = this.props.customizing;
         return <>
             {!a.noExternalLinks && this.props.exitable && <SocialBar />}
-            {customizing && <Button className="nav-item customizing-bar" onClick={(ev) => this.onUncustomizeClicked(ev)}>
-                <i className="fas fa-times" />{"Choosing Spells"}
-            </Button>}
-            {!modal && <Layout anchorTop={true} anchorRight={true}>
+            <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
-            </Layout>}
-            {!modal && <Layout className="messages" anchorBottom={true} anchorLeft={true}>
+            </Layout>
+            <Layout className="messages" anchorBottom={true} anchorLeft={true}>
                 <MessagesPanel />
                 <HelpMessage />
                 <FinishedPanel />
+                <WaitingMessage />
                 <TextMessageBox />
-            </Layout>}
-            {!modal && <Layout anchorTop={true} anchorLeft={true}>
+            </Layout>
+            <Layout anchorTop={true} anchorLeft={true}>
                 <ExitLink />
                 <div className="button-panel">
                     <MutePanel />
                     <RandomizePanel />
                     <VideoPanel />
                 </div>
-            </Layout>}
+            </Layout>
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
@@ -124,6 +166,9 @@ class HUD extends React.PureComponent<Props, State> {
         </>
     }
 
+    private onCustomizeClicked(ev: React.MouseEvent) {
+        StoreProvider.dispatch({ type: "customizing", customizing: true });
+    }
     private onUncustomizeClicked(ev: React.MouseEvent) {
         StoreProvider.dispatch({ type: "customizing", customizing: false });
     }

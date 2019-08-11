@@ -13,7 +13,6 @@ import RatingAdjustmentMessage from './messages/ratingAdjustmentMessage';
 import TeamsMessage from './messages/teamsMessage';
 import TextMessage from './messages/textMessage';
 import PlayerName from './playerNameComponent';
-import WaitingMessage from './messages/waitingMessage';
 
 interface Props {
     myGameId: string;
@@ -60,11 +59,8 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             rows.push(row);
         });
 
-        return <div id="messages-panel">
-            <div className="messages-panel-rows">
-                {rows}
-            </div>
-            <WaitingMessage />
+        return <div className="messages-panel">
+            {rows}
         </div>;
     }
 
