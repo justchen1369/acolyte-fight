@@ -671,6 +671,8 @@ a:hover, a:active {
     position: fixed;
     display: flex;
     flex-direction: column;
+    max-height: 100vh;
+    box-sizing: border-box;
 }
 
 .anchored-panel-left {
@@ -877,7 +879,7 @@ table.player-list {
 
     pointer-events: none;
 
-    max-height: 33vh;
+    max-height: 75vh;
     max-width: 50vw;
     overflow: hidden;
 

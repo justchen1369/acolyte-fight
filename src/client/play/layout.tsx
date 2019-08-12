@@ -35,11 +35,11 @@ class AnchoredPanel extends React.PureComponent<Props> {
         let style: React.CSSProperties = {};
 
         if (this.props.anchorBottom) {
+            style.bottom = 0;
+
             const buttonBar = this.props.buttonBar;
             if (buttonBar && buttonBar.view === "bar") {
-                style.bottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
-            } else {
-                style.bottom = 0;
+                style.paddingBottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
             }
 
             classNames.push("anchored-panel-bottom");
