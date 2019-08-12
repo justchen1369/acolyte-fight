@@ -38,6 +38,7 @@ export interface RenderOptions {
 	rebindings: KeyBindings;
 	rtx: number;
 	retinaMultiplier: number;
+	customizingSpells: boolean;
 }
 
 export interface GlContext {

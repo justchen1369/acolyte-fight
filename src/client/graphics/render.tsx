@@ -2334,7 +2334,7 @@ function renderButtons(ctx: CanvasRenderingContext2D, rect: ClientRect, world: w
 		buttonStateLookup = calculateButtonStatesFromHero(world, hero, options);
 	} else if (world.ui.myHeroId) {
 		// Dead - display buttons so user can continue customising
-		buttonStateLookup = calculateButtonStatesFromKeyBindings(world, options.keysToSpells);
+		buttonStateLookup = calculateButtonStatesFromKeyBindings(world, options.keysToSpells, options.customizingSpells);
 	} else {
 		buttonStateLookup = null;
 	}
@@ -2373,7 +2373,7 @@ function calculateButtonStatesFromHero(world: w.World, hero: w.Hero, options: Re
 	return buttonStateLookup;
 }
 
-function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>) {
+function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>, customizingSpells: boolean) {
 	const keys = world.settings.Choices.Keys;
 	const hoverSpellId = world.ui.toolbar.hoverSpellId;
 
@@ -2388,9 +2388,14 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 		const spell = world.settings.Spells[spellId];
 		if (!spell) { continue }
 
+		let color = customizingSpells ? spell.color : '#444';
+		if (spell.id === hoverSpellId) {
+			color = ColTuple.parse(color).lighten(0.25).string();
+		}
+
 		const btnState: w.ButtonRenderState = {
 			key: null,
-			color: spell.id === hoverSpellId ? "#555555" : "#444444",
+			color,
 			icon: spell.icon,
 			cooldownText: null,
 			emphasis: 1,

@@ -24,6 +24,7 @@ interface Props {
     wheelOnRight: boolean;
     noTargetingIndicator: boolean;
     noCameraFollow: boolean;
+    customizingSpells: boolean;
     graphics?: number;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -113,6 +114,7 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         noTargetingIndicator: state.options.noTargetingIndicator,
         noCameraFollow: state.options.noCameraFollow,
+        customizingSpells: state.customizing,
         graphics: state.options.graphics,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
@@ -235,6 +237,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
                 cameraFollow: !this.props.noCameraFollow,
+                customizingSpells: this.props.customizingSpells,
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
                 retinaMultiplier: this.calculateRetinaMultiplier(),

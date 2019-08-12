@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as engine from '../../game/engine';
 import * as s from '../store.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
@@ -35,6 +36,7 @@ namespace Tab {
 }
 
 interface Props {
+    myHeroId: string;
     exitable: boolean;
     wheelOnRight: boolean;
     customizing: boolean;
@@ -45,6 +47,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        myHeroId: state.world.ui.myHeroId,
         exitable: matches.worldInterruptible(state.world),
         wheelOnRight: state.options.wheelOnRight,
         customizing: state.customizing,
@@ -75,9 +78,9 @@ class HUD extends React.PureComponent<Props, State> {
         return <>
             {!modal && <Layout anchorTop={true} anchorRight={true}>
                 <div className="tab-switcher-panel">
-                    <Button className="tab-switcher-item" onClick={(ev) => this.onCustomizeClicked(ev) }>
+                    {this.props.myHeroId && <Button className="tab-switcher-item" onClick={(ev) => this.onCustomizeClicked(ev) }>
                         <i className="fas fa-wand-magic" />
-                    </Button>
+                    </Button>}
                     {this.renderTabSwitcherItem(Tab.Options, "fas fa-cog")}
                     {this.renderTabSwitcherItem(Tab.Scoreboard, "fas fa-trophy")}
                     {this.renderTabSwitcherItem(Tab.Chat, "fas fa-comments")}
