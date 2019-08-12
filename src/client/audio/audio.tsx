@@ -331,7 +331,7 @@ function playSoundBite(bite: SoundBite, offset: Vec2 | null, env: AudioEnvironme
     let next: AudioNode = env.next;
 
     let panner: PannerNode = null;
-    if (!isMobile && offset) { // Only connect panner on desktop
+    if (offset) {
         panner = createPannerNode(offset, env, next);
         next = panner;
     }
