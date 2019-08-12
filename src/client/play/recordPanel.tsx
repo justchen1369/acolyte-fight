@@ -270,6 +270,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             targetingIndicator: false,
             cameraFollow: false,
             keysToSpells: new Map<string, string>(),
+            customizingSpells: false,
             rebindings: {},
             retinaMultiplier: 1,
         });
