@@ -105,7 +105,7 @@ export function initialWorld(mod: Object): w.World {
 		objects: new Map(),
 		behaviours: [],
 		physics: pl.World(def),
-		collisions: [],
+		collisions: new Map(),
 
 		actions: new Map(),
 		shrink: 1,
@@ -145,15 +145,15 @@ export function initialWorld(mod: Object): w.World {
 			},
 		},
 	};
-	world.physics.on('end-contact', (contact) => onEndContact(world, contact));
+	world.physics.on('post-solve', (contact) => onPostSolve(world, contact));
 
 	return world;
 }
 
-function onEndContact(world: w.World, contact: pl.Contact) {
+function onPostSolve(world: w.World, contact: pl.Contact) {
 	const collision = createCollisionFromContact(world, contact);
 	if (collision) {
-		world.collisions.push(collision);
+		world.collisions.set(contact, collision);
 	}
 }
 
@@ -1967,16 +1967,18 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 function handleCollisions(world: w.World) {
 	let contact = world.physics.getContactList();
 	while (contact) {
-		const collision = createCollisionFromContact(world, contact);
-		handleCollision(world, collision);
+		if (!world.collisions.has(contact)) {
+			// Sensors won't be in the collision array yet
+			const collision = createCollisionFromContact(world, contact);
+			if (collision) {
+				world.collisions.set(contact, collision);
+			}
+		}
 		contact = contact.getNext();
 	}
 
-	for (let i = 0; i < world.collisions.length; ++i) {
-		const collision = world.collisions[i];
-		handleCollision(world, collision);
-	}
-	world.collisions.length = 0;
+	world.collisions.forEach(collision => handleCollision(world, collision));
+	world.collisions.clear();
 }
 
 function handleCollision(world: w.World, collision: w.Collision) {

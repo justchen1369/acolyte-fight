@@ -53,7 +53,7 @@ export interface World {
 	behaviours: Behaviour[],
 
 	physics: pl.World;
-	collisions: Collision[]; // Only the collisions which ended this tick, the rest are in physics.getContactList()
+	collisions: Map<pl.Contact, Collision>;
 
 	mapPoints?: pl.Vec2[];
 	mapRadiusMultiplier: number;
