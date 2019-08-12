@@ -1,8 +1,8 @@
 var center = { x: 0.5, y: 0.5 };
 
-var CloseEnoughDistance = 0.05;
+var CloseEnoughDistance = 0.01;
 var MissRadius = 0.05;
-var DodgeRadius = 0.03;
+var DodgeRadius = 0.05;
 var SpellCastIntervalMilliseconds = 1000;
 var SpellCastJitterMilliseconds = 500;
 
@@ -10,8 +10,7 @@ var TicksPerSecond = 60;
 
 var DefaultReactionMilliseconds = 400;
 var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
-    retarget: 100,
-    move: 200,
+    retarget: 200,
 };
 
 var alreadyChosenSpells = false;
