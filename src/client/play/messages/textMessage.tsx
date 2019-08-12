@@ -13,6 +13,7 @@ interface OwnProps {
     notification: w.TextNotification;
 }
 interface Props extends OwnProps {
+    myUserHash: string;
     silenced: Set<string>;
     player: w.Player;
     live: boolean;
@@ -24,6 +25,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     const playerLookup = playerHelper.calculatePlayerLookup(state);
     return {
         ...ownProps,
+        myUserHash: state.world.ui.myUserHash,
         silenced: state.silenced,
         player: playerLookup.get(ownProps.notification.userHash),
         live: state.world.ui.live,
@@ -61,6 +63,10 @@ class TextMessage extends React.PureComponent<Props, State> {
     }
 
     private renderSilenceBtn() {
+        if (this.props.notification.userHash === this.props.myUserHash) {
+            return null; // Cannot self-silence
+        }
+
         return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onSilenceClick(this.props.notification.userHash)} title="Hide all messages from this player" />;
     }
 
