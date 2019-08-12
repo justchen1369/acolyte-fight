@@ -15,10 +15,20 @@ declare module "planck-js" {
             createBody(bodyDef: BodyDef): Body;
             destroyBody(body: Body): void;
             rayCast(from: Vec2, to: Vec2, callback: RayCastCallback): void;
-            on(eventName: string, callback : any): void;
             step(timeSpan: number): void;
             getContactList(): Contact;
+
+            on(name: 'begin-contact', listener: (contact: Contact) => void): World;
+            on(name: 'end-contact', listener: (contact: Contact) => void): World;
+            on(name: 'pre-solve', listener: (contact: Contact, oldManifold: Manifold) => void): World;
+            on(name: 'post-solve', listener: (contact: Contact, impulse: ContactImpulse) => void): World;
+            off(name: 'begin-contact', listener: (contact: Contact) => void): World;
+            off(name: 'end-contact', listener: (contact: Contact) => void): World;
+            off(name: 'pre-solve', listener: (contact: Contact, oldManifold: Manifold) => void): World;
+            off(name: 'post-solve', listener: (contact: Contact, impulse: ContactImpulse) => void): World;
         }
+
+        type ContactImpulse = any; // TODO
 
         interface Body {
             createFixture(shape: Shape, fixtureDef: FixtureDef): Fixture;

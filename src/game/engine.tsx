@@ -105,6 +105,8 @@ export function initialWorld(mod: Object): w.World {
 		objects: new Map(),
 		behaviours: [],
 		physics: pl.World(def),
+		collisions: [],
+
 		actions: new Map(),
 		shrink: 1,
 		radius: settings.World.InitialRadius,
@@ -143,8 +145,32 @@ export function initialWorld(mod: Object): w.World {
 			},
 		},
 	};
+	world.physics.on('end-contact', (contact) => onEndContact(world, contact));
 
 	return world;
+}
+
+function onEndContact(world: w.World, contact: pl.Contact) {
+	const collision = createCollisionFromContact(world, contact);
+	if (collision) {
+		world.collisions.push(collision);
+	}
+}
+
+function createCollisionFromContact(world: w.World, contact: pl.Contact): w.Collision {
+	if (!contact.isTouching()) {
+		return null;
+	}
+
+	const a = world.objects.get(contact.getFixtureA().getBody().getUserData());
+	const b = world.objects.get(contact.getFixtureB().getBody().getUserData());
+	if (!(a && b)) {
+		return null;
+	}
+
+	const manifold = contact.getWorldManifold(); // If no collision manifold, this is a sensor
+	const collisionPoint = manifold ? vector.average(manifold.points) : null;
+	return { a, b, point: collisionPoint };
 }
 
 export function isGameStarting(world: w.World) {
@@ -885,9 +911,7 @@ export function tick(world: w.World) {
 		detonate, // Detonate before objects switch owners so its predictable who owns the detonate
 	});
 
-	for (var contact = world.physics.getContactList(); !!contact; contact = contact.getNext()) {
-		handleContact(world, contact);
-	}
+	handleCollisions(world);
 
 	applySpeedLimit(world);
 	decayMitigation(world);
@@ -1940,24 +1964,29 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 	}
 }
 
-function handleContact(world: w.World, contact: pl.Contact) {
-	if (!contact.isTouching()) {
-		return;
+function handleCollisions(world: w.World) {
+	let contact = world.physics.getContactList();
+	while (contact) {
+		const collision = createCollisionFromContact(world, contact);
+		handleCollision(world, collision);
+		contact = contact.getNext();
 	}
 
-	const objA = world.objects.get(contact.getFixtureA().getBody().getUserData());
-	const objB = world.objects.get(contact.getFixtureB().getBody().getUserData());
+	for (let i = 0; i < world.collisions.length; ++i) {
+		const collision = world.collisions[i];
+		handleCollision(world, collision);
+	}
+	world.collisions.length = 0;
+}
 
-	const manifold = contact.getWorldManifold(); // If no collision manifold, this is a sensor
-	const collisionPoint = manifold ? vector.average(manifold.points) : null;
-
-	if (objA && objB) {
-		handleCollision(world, objA, objB, collisionPoint);
-		handleCollision(world, objB, objA, collisionPoint);
+function handleCollision(world: w.World, collision: w.Collision) {
+	if (collision) {
+		handleCollisionBetween(world, collision.a, collision.b, collision.point);
+		handleCollisionBetween(world, collision.b, collision.a, collision.point);
 	}
 }
 
-function handleCollision(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
+function handleCollisionBetween(world: w.World, object: w.WorldObject, hit: w.WorldObject, collisionPoint: pl.Vec2) {
 	if (object.category === "projectile") {
 		if (collisionPoint) {
 			object.uiPath.push(collisionPoint);

@@ -53,6 +53,7 @@ export interface World {
 	behaviours: Behaviour[],
 
 	physics: pl.World;
+	collisions: Collision[]; // Only the collisions which ended this tick, the rest are in physics.getContactList()
 
 	mapPoints?: pl.Vec2[];
 	mapRadiusMultiplier: number;
@@ -74,6 +75,12 @@ export interface World {
 
 	ui: UIState; // Temporary data which is visual-only and does not need to sync
 };
+
+export interface Collision {
+	a: WorldObject;
+	b: WorldObject;
+	point?: pl.Vec2;
+}
 
 export interface Team {
 	teamId: string;
