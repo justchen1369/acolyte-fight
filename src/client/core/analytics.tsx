@@ -14,4 +14,5 @@ export function send(name: string, value?: number) {
 
 function getGtag(): any {
     const gtag = (window as any).gtag;
+    return gtag;
 }
