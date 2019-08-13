@@ -1285,11 +1285,22 @@ h3 {
     box-sizing: border-box;
     display: flex;
     margin-bottom: 60px;
-    background: #333;
     height: 250px;
     align-items: center;
 
     box-shadow: 5px 5px 5px black;
+
+    background: #444 linear-gradient(120deg,
+        #222 0%,
+        #333 20%,
+        #444 30%,
+        #444 50%,
+        #333 70%,
+        #222 100%);
+}
+
+.spell-config .key:hover {
+    background: #555 linear-gradient(120deg, #222 0%, #444 20%, #555 30%, #555 50%, #444 70%, #222 100%);
 }
 
 .spell-config .key-name-container {
@@ -1394,6 +1405,8 @@ h3 {
     font-weight: bold;
     text-transform: capitalize;
     font-size: 250%;
+
+    text-shadow: 2px 4px #00000088;
 }
 
 .spell-config .spell-name {
