@@ -7,6 +7,7 @@ import * as StoreProvider from '../../storeProvider';
 import ButtonRow from './buttonRow';
 
 interface Props {
+    isPlaying: boolean;
     wheelOnRight: boolean;
 }
 interface State {
@@ -14,6 +15,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        isPlaying: !!state.world.ui.myHeroId,
         wheelOnRight: state.options.wheelOnRight,
     };
 }
@@ -26,6 +28,10 @@ class ActionWheelSidePanel extends React.PureComponent<Props, State> {
     }
 
     render() {
+        if (!this.props.isPlaying) {
+            return null;
+        }
+
         if (this.props.wheelOnRight) {
             return <ButtonRow label="Right-handed mode" icon="fas fa-hand-point-right" onClick={() => this.onClick(false)} />
         } else {
