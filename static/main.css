@@ -863,9 +863,9 @@ table.player-list {
     to { opacity: 0.0 }
 }
 
-@media (min-height: 1080px) {
+@media (max-width: 1024px) {
     .splash {
-        font-size: 324px;
+        font-size: 256px;
     }
 }
 
