@@ -60,7 +60,7 @@ function calculateCatchupTicks() {
 		if (incomingQueue.length === 0) {
 			return 0;
 		} else if (incomingQueue.length <= TicksPerTurn + allowedDelay) {
-			return 1; // We're on time, process at normal rate
+			return 0; // We're on time, process at normal rate
 		} else if (incomingQueue.length <= TicksPerSecond) {
 			return 2; // We're behind, but not by much, catch up slowly
 		} else {
