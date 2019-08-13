@@ -33,9 +33,9 @@ class ActionWheelSidePanel extends React.PureComponent<Props, State> {
         }
 
         if (this.props.wheelOnRight) {
-            return <ButtonRow label="Right-handed mode" icon="fas fa-hand-point-right" onClick={() => this.onClick(false)} />
+            return <ButtonRow label="Right-handed mode" icon="fas fa-hand-point-left" onClick={() => this.onClick(false)} />
         } else {
-            return <ButtonRow label="Left-handed mode" icon="fas fa-hand-point-left" onClick={() => this.onClick(true)} />
+            return <ButtonRow label="Left-handed mode" icon="fas fa-hand-point-right" onClick={() => this.onClick(true)} />
         }
     }
 
