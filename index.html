@@ -96,7 +96,7 @@
 
 				console.log("Attaching facebook...");
 				window.acolyteStartup = window.acolyteStartup
-					.then(function() { return loadScript("https://connect.facebook.net/en_US/fbinstant.6.2.js"); })
+					.then(function() { return loadScript("https://connect.facebook.net/en_US/fbinstant.6.3.js"); })
 					.then(function() { return FBInstant.initializeAsync(); })
 					.then(function() { return FBInstant.setLoadingProgress(0); })
 					.then(function() { console.log("Facebook attached.") })
