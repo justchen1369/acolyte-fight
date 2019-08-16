@@ -5,12 +5,14 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
+import * as url from '../url';
 import * as vector from '../../game/vector';
 import * as StoreProvider from '../storeProvider';
 
 const DefaultDelayMilliseconds = 400;
 
 const workers = new Map<string, AiWorker>();
+let workerCode: string = null;
 
 export interface SendContext {
     action: (gameId: string, heroId: string, action: w.Action, controlKey: number) => void;
@@ -77,6 +79,16 @@ function isMyBot(world: w.World, heroId: string) {
     }
 }
 
+async function fetchWorkerCode() {
+    if (workerCode) {
+        return workerCode;
+    }
+
+    const res = await fetch(`${url.base}/dist/aiWorker.js`);
+    workerCode = await res.text();
+    return workerCode;
+}
+
 class AiWorker {
     private gameId: string;
     private heroId: string;
@@ -93,16 +105,27 @@ class AiWorker {
         this.controlKey = controlKey;
         this.settings = world.settings;
         this.send = send;
-
-        const worker = new Worker("dist/aiWorker.js", { credentials: 'omit' });
-        worker.onmessage = (ev) => this.onWorkerMessage(ev);
-        this.worker = worker;
     }
 
     async start() {
-        const code = this.settings.Code;
-        const initMsg: AI.InitMsgContract = { type: "init", settings: this.settings, code };
-        this.worker.postMessage(JSON.stringify(initMsg));
+        try {
+            this.worker = await this.createWorker();
+
+            const code = this.settings.Code;
+            const initMsg: AI.InitMsgContract = { type: "init", settings: this.settings, code };
+            this.worker.postMessage(JSON.stringify(initMsg));
+        } catch (exception) {
+            console.error("Unable to start AI worker", exception);
+            this.worker = null;
+        }
+    }
+
+    private async createWorker() {
+        const code = await fetchWorkerCode();
+        const blobUrl = URL.createObjectURL(new Blob([code]));
+        const worker = new Worker(blobUrl, { credentials: 'omit' });
+        worker.onmessage = (ev) => this.onWorkerMessage(ev);
+        return worker;
     }
 
     /**
@@ -130,6 +153,12 @@ class AiWorker {
             return true;
         }
 
+        if (!this.worker) {
+            // Not ready to process any ticks yet
+            return true;
+        }
+
+
         let cooldowns: AI.CooldownsRemaining = {};
         hero.keysToSpells.forEach(spellId => {
             const next = hero.cooldowns[spellId] || 0;
@@ -150,7 +179,10 @@ class AiWorker {
     terminate() {
         console.log("Terminating bot", this.heroId);
         this.isTerminated = true;
-        this.worker.terminate();
+
+        if (this.worker) {
+            this.worker.terminate();
+        }
     }
 
     private onWorkerMessage(ev: MessageEvent) {
