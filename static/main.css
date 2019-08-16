@@ -174,7 +174,7 @@ canvas.atlas {
 
 canvas.game {
     background: transparent;
-    cursor: url("/cdn/Cursor2.png") 8 8, crosshair;
+    cursor: url("/cdn/cursors/Cursor2.png") 8 8, crosshair;
     position: absolute;
     top: 0;
     left: 0;
