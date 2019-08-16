@@ -20,7 +20,7 @@ export class FacebookProvider implements s.OptionsProvider {
     }
 
     async init() {
-        this.sdk.setLoadingProgress(90);
+        this.sdk.setLoadingProgress(50);
         this.authToken = await this.authenticate();
 
         this.sdk.setLoadingProgress(100);
