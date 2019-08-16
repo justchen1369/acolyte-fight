@@ -16,27 +16,17 @@
 			}
 
 			.loading-splash {
-				/* Size relative to screen height */
-				height: 256px;
-				width: 256px;
-
 				position: absolute;
-				top: 0;
 				bottom: 0;
 				left: 0;
-				right: 0;
-				margin: auto;
+				margin: 1em;
 
-				border: 8px solid transparent;
-				border-radius: 50%;
-				border-top-color: #222;
-
-				animation: loading-splash-animation 1s linear both infinite;
+				animation: loading-splash-animation 2s linear alternate both infinite;
 			}
 
 			@keyframes loading-splash-animation {
-				from {transform: rotate(0) }
-				to { transform: rotate(360deg) }
+				from { color: #444 }
+				to { color: #666 }
 			}
 
 		</style>
@@ -130,7 +120,7 @@
 	</head>
 	<body class="game">
 		<div id="root">
-			<div class="loading-splash"></div>
+			<div class="loading-splash">Loading...</div>
 		</div>
 		<script>
 			window.acolyteStartup.then(function() { window.acolyteInitialize(); });
