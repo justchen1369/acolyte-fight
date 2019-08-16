@@ -6,7 +6,7 @@ import { base } from '../url';
 export class KongregateProvider implements s.OptionsProvider {
     source = "kongregate";
     noLogin = true;
-    noAdvanced = true;
+    noModding = true;
 
     playerName: string = null;
     authToken: string = null;

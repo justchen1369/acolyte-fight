@@ -5,7 +5,7 @@ export class PokiProvider implements s.OptionsProvider {
     source = "poki";
     noLogin = true;
     noExternalLinks = true;
-    noAdvanced = true;
+    noModding = true;
     noDiscordAd = false;
 
     private sdk: Poki.SDK;

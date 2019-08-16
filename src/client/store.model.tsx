@@ -366,7 +366,7 @@ export interface OptionsProvider {
     noLogin?: boolean;
     noExternalLinks?: boolean;
     noMenu?: boolean;
-    noAdvanced?: boolean;
+    noModding?: boolean;
     noDiscordAd?: boolean;
     noPartyLink?: boolean;
 
