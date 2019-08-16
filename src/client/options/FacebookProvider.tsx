@@ -8,7 +8,6 @@ export class FacebookProvider implements s.OptionsProvider {
     noExternalLinks = true;
     noDiscordAd = true;
     noPartyLink = true;
-    noMenu = true;
     noModding = true;
 
     authToken: string = null;
