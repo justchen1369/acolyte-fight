@@ -1,17 +1,18 @@
 import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as options from '../options';
 import * as s from '../store.model';
 
 interface Props {
-    ads: string;
+    iconsLoaded: boolean;
 }
 interface State {
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        ads: state.ads,
+        iconsLoaded: state.iconsLoaded,
     };
 }
 
@@ -23,7 +24,16 @@ class SocialBar extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return this.props.ads ? null : this.renderSocialBar();
+        if (!this.props.iconsLoaded) {
+            return null;
+        }
+
+        const a = options.getProvider();
+        if (a.noExternalLinks) {
+            return null;
+        }
+
+        return this.renderSocialBar();
     }
 
     private renderSocialBar() {

@@ -11,6 +11,7 @@ interface OwnProps {
     settings: AcolyteFightSettings;
 }
 interface Props extends OwnProps {
+    iconsLoaded: boolean;
 }
 interface State {
 }
@@ -18,6 +19,7 @@ interface State {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
+        iconsLoaded: state.iconsLoaded,
     };
 }
 
@@ -38,6 +40,10 @@ class SpellStats extends React.PureComponent<Props, State> {
     }
 
     render() {
+        if (!this.props.iconsLoaded) {
+            return null;
+        }
+
         const spell = this.props.settings.Spells[this.props.spellId];
         if (!spell) {
             return null;

@@ -85,8 +85,12 @@ function reducer(state: s.State, action: s.Action): s.State {
                 activePlayers: state.world.activePlayers.clear(),
             },
         };
-    } else if (action.type === "updateAds") {
-        return { ...state, ads: action.ads };
+    } else if (action.type === "updateLoaded") {
+        let newState = { ...state };
+        if (action.iconsLoaded !== undefined) {
+            newState.iconsLoaded = action.iconsLoaded;
+        }
+        return newState;
     } else if (action.type === "seen") {
         return { ...state, seen: action.seen };
     } else if (action.type === "updateUserId") {

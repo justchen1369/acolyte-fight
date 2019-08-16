@@ -38,10 +38,11 @@ import Root from './ui/root';
 
 export async function initialize() {
     const mainCssLoaded = loadCSS(`${base}/static/main.css`);
-    loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`); // Don't await
 
     StoreProvider.init();
     audio.init().then(() => audio.cache(Sounds)); // Don't bother awaiting
+
+    loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`).then(() => StoreProvider.dispatch({ type: "updateLoaded", iconsLoaded: true })); // Don't await
 
     await options.init();
 

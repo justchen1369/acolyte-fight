@@ -7,7 +7,7 @@ import * as w from '../game/world.model';
 export interface State {
     current: PathElements;
     customizing: boolean;
-    ads?: string;
+    iconsLoaded?: boolean;
 
     touched?: boolean;
 
@@ -102,7 +102,7 @@ export interface PathElements {
 export type Action =
     DisconnectedAction
     | ServerPreparingToShutdownAction
-    | UpdateAdsAction
+    | UpdateLoadedAction
     | UpdateSeenAction
     | UpdateUserIdAction
     | LogoutAction
@@ -174,9 +174,9 @@ export interface DisconnectedAction {
     type: "disconnected";
 }
 
-export interface UpdateAdsAction {
-    type: "updateAds";
-    ads: string;
+export interface UpdateLoadedAction {
+    type: "updateLoaded";
+    iconsLoaded?: boolean;
 }
 
 export interface UpdateSeenAction {

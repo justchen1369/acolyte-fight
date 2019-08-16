@@ -14,6 +14,7 @@ import PageLink from './pageLink';
 import RatingControl from './ratingControl';
 
 interface Props {
+    iconsLoaded: boolean;
     page: string;
     userId: string;
     isModded: boolean;
@@ -25,6 +26,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        iconsLoaded: state.iconsLoaded,
         page: state.current.page,
         userId: state.userId,
         isModded: rooms.isModded(state.room),
@@ -56,6 +58,10 @@ class NavBar extends React.PureComponent<Props, State> {
     }
 
     private renderNavBar() {
+        if (!this.props.iconsLoaded) {
+            return null;
+        }
+
         const a = options.getProvider();
         const horizontal = <>
             <PageLink page="leaderboard" shrink={true}><i className="fas fa-star" title="Leaderboard" /><span className="shrink"> Leaderboard</span></PageLink>
