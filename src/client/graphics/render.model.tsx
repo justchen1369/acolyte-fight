@@ -32,13 +32,14 @@ export interface CanvasCtxStack {
 
 export interface RenderOptions {
 	targetingIndicator: boolean;
-	cameraFollow: boolean;
-	wheelOnRight: boolean;
-	keysToSpells: Map<string, string>;
+	cameraFollow?: boolean;
+	hideMap?: boolean;
+	wheelOnRight?: boolean;
+	keysToSpells?: Map<string, string>;
 	rebindings: KeyBindings;
 	rtx: number;
 	retinaMultiplier: number;
-	customizingSpells: boolean;
+	customizingSpells?: boolean;
 }
 
 export interface GlContext {

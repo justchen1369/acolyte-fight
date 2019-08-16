@@ -44,10 +44,10 @@ export class VideoRecorder {
     private started = false;
     private stopped = false;
 
-    constructor(stream: MediaStream) {
+    constructor(stream: MediaStream, qualityMultiplier: number = 1) {
         this.recorder = new MediaRecorder(stream, {
             mimeType: 'video/webm',
-            videoBitsPerSecond: 5000000,
+            videoBitsPerSecond: 5000000 * qualityMultiplier,
         });
         this.recorder.ondataavailable = (e) => {
             this.chunks.push(e.data);

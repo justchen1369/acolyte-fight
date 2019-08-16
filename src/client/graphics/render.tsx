@@ -268,7 +268,7 @@ function playSounds(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpt
 }
 
 function renderWorld(ctxStack: CanvasCtxStack, world: w.World, worldRect: ClientRect, options: RenderOptions) {
-	renderMap(ctxStack, world);
+	renderMap(ctxStack, world, options);
 
 	if (options.targetingIndicator) {
 		renderTargetingIndicator(ctxStack, world);
@@ -342,7 +342,7 @@ function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
 	if (obj.category === "hero") {
-		renderHero(ctxStack, obj, world);
+		renderHero(ctxStack, obj, world, options);
 		if (obj.gravity) {
 			renderGravityWell(ctxStack, obj, world);
 		}
@@ -697,7 +697,11 @@ function renderPush(ctxStack: CanvasCtxStack, ev: w.PushEvent, world: w.World) {
 	}
 }
 
-function renderMap(ctxStack: CanvasCtxStack, world: w.World) {
+function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
+	if (options.hideMap) {
+		return;
+	}
+
 	const Visuals = world.settings.Visuals;
 
 	const shake = takeShakes(world);
@@ -783,7 +787,9 @@ function takeHighlights(world: w.World): w.MapHighlight {
 }
 
 function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w.World, options: RenderOptions) {
-	const Visuals = world.settings.Visuals;
+	if (options.hideMap) {
+		return;
+	}
 
 	const highlight = applyHighlight(obstacle.activeTick, obstacle, world, obstacle.strike);
 	const healthProportion = obstacle.health / obstacle.maxHealth;
@@ -1086,7 +1092,7 @@ function modifyHighlight(activeTick: number, obj: w.HighlightSource, world: w.Wo
 	return true;
 }
 
-function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
+function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, options: RenderOptions) {
 	const Visuals = world.settings.Visuals;
 
 	if (hero.destroyedTick) {
@@ -1137,7 +1143,10 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World) {
 		}
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
-		renderHeroName(ctxStack, hero, pos, world);
+
+		if (!options.hideMap) {
+			renderHeroName(ctxStack, hero, pos, world);
+		}
 
 		if (!easeMultiplier) {
 			renderHeroBars(ctxStack, hero, pos, world);
@@ -2374,33 +2383,35 @@ function calculateButtonStatesFromHero(world: w.World, hero: w.Hero, options: Re
 }
 
 function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<string, string>, customizingSpells: boolean) {
-	const keys = world.settings.Choices.Keys;
-	const hoverSpellId = world.ui.toolbar.hoverSpellId;
-
 	const buttonStateLookup = new Map<string, w.ButtonRenderState>();
-	for (let i = 0; i < keys.length; ++i) {
-		const key = keys[i];
-		if (!key) { continue; }
+	if (keysToSpells) {
+		const keys = world.settings.Choices.Keys;
+		const hoverSpellId = world.ui.toolbar.hoverSpellId;
 
-		const spellId = keysToSpells.get(key.btn);
-		if (!spellId) { continue }
+		for (let i = 0; i < keys.length; ++i) {
+			const key = keys[i];
+			if (!key) { continue; }
 
-		const spell = world.settings.Spells[spellId];
-		if (!spell) { continue }
+			const spellId = keysToSpells.get(key.btn);
+			if (!spellId) { continue }
 
-		let color = customizingSpells ? spell.color : '#444';
-		if (spell.id === hoverSpellId) {
-			color = ColTuple.parse(color).lighten(0.25).string();
+			const spell = world.settings.Spells[spellId];
+			if (!spell) { continue }
+
+			let color = customizingSpells ? spell.color : '#444';
+			if (spell.id === hoverSpellId) {
+				color = ColTuple.parse(color).lighten(0.25).string();
+			}
+
+			const btnState: w.ButtonRenderState = {
+				key: null,
+				color,
+				icon: spell.icon,
+				cooldownText: null,
+				emphasis: 1,
+			};
+			buttonStateLookup.set(key.btn, btnState);
 		}
-
-		const btnState: w.ButtonRenderState = {
-			key: null,
-			color,
-			icon: spell.icon,
-			cooldownText: null,
-			emphasis: 1,
-		};
-		buttonStateLookup.set(key.btn, btnState);
 	}
 	return buttonStateLookup;
 }

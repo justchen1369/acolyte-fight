@@ -17,6 +17,8 @@ import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
 
+import ButtonRow from './buttons/ButtonRow';
+import Layout from './layout';
 import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 
@@ -44,6 +46,8 @@ interface State {
     blob: Blob;
     complete: boolean;
     error: string;
+
+    hideMap?: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -93,11 +97,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         window.addEventListener('resize', this.resizeListener);
         this.fullScreenCanvas();
 
-        if (!this.executingToken) {
-            const token: CancellationToken = {};
-            this.executingToken = token;
-            this.execute(token);
-        }
+        this.start();
     }
 
     componentWillUnmount() {
@@ -110,9 +110,14 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         return (
             <div id="game-panel" onClick={() => this.onGameClick()}>
                 <TitleListener subtitle="Recording" />
-                <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
-                    <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
-                </span>
+                <Layout anchorLeft={true} anchorTop={true}>
+                    <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
+                        <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
+                    </span>
+                    <div className="button-panel">
+                        {!this.state.hideMap && <ButtonRow label="Hide Map" icon="fas fa-eye" onClick={() => this.onHideMapClicked()} />}
+                    </div>
+                </Layout>
                 <div id="canvas-container">
                     <canvas
                         id="atlas" ref={c => this.canvasStack.atlas = c} className="atlas"
@@ -140,6 +145,11 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         audio.unlock();
     }
 
+    private onHideMapClicked() {
+        this.setState({ hideMap: true });
+        this.restart();
+    }
+
     private onDownloadClicked(ev: React.MouseEvent) {
         ev.preventDefault();
         this.download();
@@ -162,6 +172,19 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const left = Math.max(0, (clientWidth - size) / 2);
         const top = Math.max(0, (clientHeight - size) / 2);
         this.setState({ top, left, size });
+    }
+
+    private restart() {
+        this.cancel();
+        this.start();
+    }
+
+    private start() {
+        if (!this.executingToken) {
+            const token: CancellationToken = {};
+            this.executingToken = token;
+            this.execute(token); // Don't await
+        }
     }
 
     private async execute(token: CancellationToken) {
@@ -223,7 +246,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const audioStream = audio.record();
         const stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
 
-        const videoRecorder = new VideoRecorder(stream);
+        const qualityMultiplier = this.state.hideMap ? 2 : 1;
+        const videoRecorder = new VideoRecorder(stream, qualityMultiplier);
         try {
             await videoRecorder.start();
             console.log("Recording started...", replay.gameId);
@@ -266,13 +290,10 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         // Game is started
         render(world, canvasStack, {
             rtx: GraphicsLevel.Maximum,
-            wheelOnRight: false,
-            targetingIndicator: false,
-            cameraFollow: false,
-            keysToSpells: new Map<string, string>(),
-            customizingSpells: false,
+            targetingIndicator: true,
             rebindings: {},
             retinaMultiplier: 1,
+            hideMap: this.state.hideMap,
         });
     }
 }
