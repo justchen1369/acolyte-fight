@@ -64,7 +64,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
             <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
             <p className="share"><a href="http://reddit.com/r/acolytefight" target="_blank"><i className="fab fa-reddit-square" /><span>r/acolytefight</span></a></p>
             <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
-            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook" /><span>fb.com/acolytefight</span></a></p>
+            <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook-square" /><span>fb.com/acolytefight</span></a></p>
             <p className="share"><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank"><i className="fab fa-youtube-square" /><span>YouTube: Acolyte Fight!</span></a></p>
             <h1>How does the rating system work?</h1>
             <p>
