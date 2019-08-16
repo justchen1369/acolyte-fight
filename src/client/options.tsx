@@ -25,8 +25,6 @@ export async function init() {
     
     if (provider) {
         console.log("Initializing ads...", provider.source);
-        StoreProvider.dispatch({ type: "updateAds", ads: provider.source });
-
         await provider.init();
     }
 }
