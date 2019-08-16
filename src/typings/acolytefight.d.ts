@@ -88,6 +88,7 @@ declare interface WorldSettings {
 	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value
 
 	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
+	SlopRadius: number; // For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
 
 	BotName: string; // What to call the bot
 }

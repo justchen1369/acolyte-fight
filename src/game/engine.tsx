@@ -173,6 +173,25 @@ function createCollisionFromContact(world: w.World, contact: pl.Contact): w.Coll
 	return { a, b, point: collisionPoint };
 }
 
+function queryExtent(world: w.World, epicenter: pl.Vec2, radius: number, callback: (obj: w.WorldObject) => void) {
+	const topLeft = epicenter.clone();
+	topLeft.x -= radius;
+	topLeft.y -= radius;
+
+	const bottomRight = epicenter.clone();
+	bottomRight.x += radius;
+	bottomRight.y += radius;
+
+	const aabb = pl.AABB(topLeft, bottomRight);
+	world.physics.queryAABB(aabb, (fixture) => {
+		const obj = world.objects.get(fixture.getBody().getUserData());
+		if (obj) {
+			callback(obj);
+		}
+		return true;
+	});
+}
+
 export function isGameStarting(world: w.World) {
 	return world.startTick < constants.Matchmaking.MaxHistoryLength;
 }
@@ -2676,7 +2695,7 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 
 	const epicenter = orb.body.getPosition();
 
-	world.objects.forEach(obj => {
+	queryExtent(world, epicenter, attraction.radius, obj => {
 		if (!((obj.categories & attraction.categories) > 0 && (obj.categories & attraction.notCategories) === 0)) {
 			return;
 		}
@@ -2728,7 +2747,7 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 
 	let hit = false;
 	const packet = behaviour.remainingHits > 0 ? instantiateDamage(behaviour.packet, behaviour.owner, world) : null;
-	world.objects.forEach(obj => {
+	queryExtent(world, epicenter, behaviour.radius + world.settings.World.SlopRadius, obj => {
 		if (!(obj.category === "hero" && vector.distance(epicenter, obj.body.getPosition()) <= behaviour.radius + obj.radius)) {
 			return;
 		}
@@ -2740,6 +2759,7 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 		hit = true;
 		applyDamage(obj, packet, world);
 		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, { tag: behaviour.type });
+
 	});
 
 	if (hit) {
@@ -3146,7 +3166,7 @@ function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: s
 }
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
-	world.objects.forEach(other => {
+	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
 		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
 			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
@@ -3908,7 +3928,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const shift = swing.clone().mul(Math.max(0, saber.shiftMultiplier));
 
 	let hit = false
-	world.objects.forEach(obj => {
+	queryExtent(world, heroPos, saber.length + world.settings.World.SlopRadius, obj => {
 		if (obj.id === hero.id) {
 			return;
 		}

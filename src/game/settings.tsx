@@ -57,6 +57,8 @@ const World: WorldSettings = {
     SwatchHealth: 100,
 
     BotName: "AcolyteBot",
+
+    SlopRadius: 0.05,
 }
 
 const Obstacle: ObstacleSettings = {

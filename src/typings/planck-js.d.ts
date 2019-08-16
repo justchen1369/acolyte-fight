@@ -14,7 +14,10 @@ declare module "planck-js" {
         interface World {
             createBody(bodyDef: BodyDef): Body;
             destroyBody(body: Body): void;
+
             rayCast(from: Vec2, to: Vec2, callback: RayCastCallback): void;
+            queryAABB(aabb: AABB, queryCallback: (fixture: Fixture) => boolean): void;
+
             step(timeSpan: number): void;
             getContactList(): Contact;
 
@@ -196,6 +199,35 @@ declare module "planck-js" {
             upper(v: Vec2, w: Vec2): Vec2;
             lower(v: Vec2, w: Vec2): Vec2;
             clamp(v: Vec2, max: number): Vec2;
+        };
+
+        interface AABB {
+            lowerBound: Vec2;
+            upperBound: Vec2;
+
+            isValid(): boolean;
+            getCenter(): Vec2;
+            getExtents(): Vec2;
+            getPerimeter(): number;
+            combine(a: AABB, b: AABB): void;
+            combinePoints(a: Vec2, b: Vec2): void;
+            set(aabb: AABB): void;
+            contains(aabb: AABB): boolean;
+            extend(value: number): AABB;
+            // rayCast(output: RayCastOutput, input: RayCastInput): boolean;
+            toString(): string;
+        }
+
+        let AABB: {
+            new(lower?: Vec2, upper?: Vec2): AABB;
+                (lower?: Vec2, upper?: Vec2): AABB;
+
+            isValid(o: any): boolean;
+            assert(o: any): void;
+            extend(aabb: AABB, value: number): void;
+            testOverlap(a: AABB, b: AABB): boolean;
+            areEqual(a: AABB, b: AABB): boolean;
+            diff(a: AABB, b: AABB): number;
         };
     }
 
