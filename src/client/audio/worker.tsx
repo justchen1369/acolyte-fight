@@ -8,7 +8,7 @@ function init() {
 
 function onMessage(ev: MessageEvent) {
     const request = ev.data as r.Message;
-    if (request.key !== "acolyte") {
+    if (!(request && request.key === "acolyte")) {
         // Not meant for us
         return;
     }
@@ -44,7 +44,7 @@ async function onCacheRequest(req: r.CacheAudioRequest) {
         sampleRate: buffer.sampleRate,
         arrayBuffer: bytes.buffer,
     };
-    window.parent.postMessage(msg, "*", [msg.arrayBuffer]);
+    window.parent.postMessage(msg, "*");
 }
 
 function getOfflineAudioContextConstructor(): any {
