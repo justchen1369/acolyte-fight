@@ -17,7 +17,7 @@ import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
 
-import ButtonRow from './buttons/ButtonRow';
+import ButtonRow from './buttons/buttonRow';
 import Layout from './layout';
 import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
