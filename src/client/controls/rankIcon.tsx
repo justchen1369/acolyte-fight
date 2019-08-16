@@ -1,22 +1,23 @@
 import * as React from 'react';
 import * as m from '../../shared/messages.model';
+import { base } from '../url';
 
 interface Props extends React.HTMLAttributes<HTMLImageElement> {
     league: string;
 }
 
-const base = "https://storage.googleapis.com/acolytefight.io/ranks/";
+const prefix = `${base}/cdn/ranks/`;
 
 function leagueToImageUrl(league: string) {
     switch (league) {
-        case "Grandmaster": return base + "stars-stack.svg";
-        case "Master": return base + "rank-3.svg";
-        case "Diamond": return base + "rank-2.svg";
-        case "Platinum": return base + "rank-1.svg";
-        case "Gold": return base + "sergeant.svg";
-        case "Silver": return base + "corporal.svg";
-        case "Bronze": return base + "private.svg";
-        case "Wood": return base + "person.svg";
+        case "Grandmaster": return prefix + "stars-stack.svg";
+        case "Master": return prefix + "rank-3.svg";
+        case "Diamond": return prefix + "rank-2.svg";
+        case "Platinum": return prefix + "rank-1.svg";
+        case "Gold": return prefix + "sergeant.svg";
+        case "Silver": return prefix + "corporal.svg";
+        case "Bronze": return prefix + "private.svg";
+        case "Wood": return prefix + "person.svg";
         default: return null;
     }
 }
