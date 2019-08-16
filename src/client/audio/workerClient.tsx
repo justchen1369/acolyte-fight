@@ -1,5 +1,6 @@
 import defer from 'promise-defer';
 import * as r from './audio.model';
+import * as url from '../url';
 
 let workerElem: HTMLIFrameElement = null;
 let nextMsgId = 0;
@@ -18,7 +19,7 @@ export function init(): Promise<void> {
 
     // Create iframe worker
     const elem = document.createElement('iframe');
-    elem.src = "audioWorker.html";
+    elem.src = `${url.base}/audioWorker.html`;
     elem.className = "worker"
     elem.style.visibility = "hidden";
     elem.onload = onWorkerLoaded;
@@ -35,7 +36,7 @@ async function onWorkerLoaded() {
 
 function onMessage(ev: MessageEvent) {
     const msg = ev.data as r.Message;
-    if (msg.key !== "acolyte") {
+    if (!(msg && msg.key === "acolyte")) {
         // Not meant for us
         return;
     }
