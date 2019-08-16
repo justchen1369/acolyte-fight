@@ -1,8 +1,8 @@
-import * as s from '../store.model';
+import * as o from './options.model';
 import * as w from '../../game/world.model';
 import { base } from '../url';
 
-export class FacebookProvider implements s.OptionsProvider {
+export class FacebookProvider implements o.OptionsProvider {
     source = "fb";
     noLogin = true;
     noExternalLinks = true;

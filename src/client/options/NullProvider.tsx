@@ -1,7 +1,7 @@
-import * as s from '../store.model';
+import * as o from './options.model';
 import * as w from '../../game/world.model';
 
-export class NullProvider implements s.OptionsProvider {
+export class NullProvider implements o.OptionsProvider {
     async init() { }
 
     loadingProgress() { }

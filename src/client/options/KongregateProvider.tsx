@@ -1,12 +1,12 @@
 import * as m from '../../shared/messages.model';
-import * as s from '../store.model';
+import * as o from './options.model';
 import * as w from '../../game/world.model';
 import { base } from '../url';
 
-export class KongregateProvider implements s.OptionsProvider {
+export class KongregateProvider implements o.OptionsProvider {
     source = "kongregate";
     noLogin = true;
-    noModding = true;
+    noAdvanced = true;
 
     playerName: string = null;
     authToken: string = null;
