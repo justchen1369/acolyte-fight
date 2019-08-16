@@ -33,6 +33,7 @@ const program = require('commander');
 program.option('--port <port>', 'Port number');
 program.parse(process.argv);
 
+const CacheMaxAgeMilliseconds = 365 * 24 * 60 * 60 * 1000;
 const port = program.port || process.env.PORT || 7770;
 const enigmaSecret = process.env.ENIGMA_SECRET || null;
 const discordSecret = process.env.DISCORD_SECRET || null;
@@ -82,6 +83,7 @@ attachToSocket(io);
 
 app.get('/ping', (req, res) => res.send("OK"));
 
+app.use('/cdn', express.static('./cdn', { maxAge: CacheMaxAgeMilliseconds }));
 app.use('/static', express.static('./static'));
 app.use('/dist', express.static('./dist'));
 app.use('/logs', express.static('./logs'));

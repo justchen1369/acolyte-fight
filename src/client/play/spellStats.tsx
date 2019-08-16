@@ -47,7 +47,7 @@ class SpellStats extends React.PureComponent<Props, State> {
             const damage = this.calculateProjectileDamage(spell.projectile);
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{isMultiHit(spell.projectile) && " per hit"}</span>
+                <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{isMultiHit(spell.projectile) && " per hit"}</span>
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
@@ -57,13 +57,13 @@ class SpellStats extends React.PureComponent<Props, State> {
             const overTime = spell.lengthTicks >= 60 ? ` over ${formatTime(spell.lengthTicks)} s` : "";
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)}{overTime}</span>
+                <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{totalDamage}{totalDamage > 0 && this.renderScaling(spell.projectile.damageScaling)}{overTime}</span>
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
-                <span className="spell-stats-item" title="Damage"><i className="ra ra-sword" />{spell.detonate.damage}{spell.detonate.damage > 0 && this.renderScaling(spell.detonate.damageScaling)}</span>
+                <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{spell.detonate.damage}{spell.detonate.damage > 0 && this.renderScaling(spell.detonate.damageScaling)}</span>
                 <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />-{spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>

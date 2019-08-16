@@ -20,6 +20,7 @@ export function init(): Promise<void> {
     const elem = document.createElement('iframe');
     elem.src = "audioWorker.html";
     elem.className = "worker"
+    elem.style.visibility = "hidden";
     elem.onload = onWorkerLoaded;
     document.body.appendChild(elem);
     workerElem = elem;

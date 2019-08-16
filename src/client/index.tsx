@@ -37,7 +37,8 @@ import { Sounds } from '../game/sounds';
 import Root from './ui/root';
 
 export async function initialize() {
-    await loadDependencies();
+    const mainCssLoaded = loadCSS(`${base}/static/main.css`);
+    loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`); // Don't await
 
     StoreProvider.init();
     audio.init().then(() => audio.cache(Sounds)); // Don't bother awaiting
@@ -68,14 +69,12 @@ export async function initialize() {
     notifications.startTimers();
 
     start().then(() => loader.unblock()).catch(console.error); // Don't await
+
+    await mainCssLoaded;
     render();
 
     seen.loadSeenVersion(); // Don't bother awaiting
     storage.cleanupGameStats();
-}
-
-async function loadDependencies() {
-    await loadCSS(`${base}/static/main.css`);
 }
 
 function loadCSS(href: string): Promise<void> {
