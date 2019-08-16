@@ -16,9 +16,15 @@ function uploadSettings() {
     cloud.uploadSettings();
 }
 
+export interface RebindingsLookupInput {
+    settings: AcolyteFightSettings;
+    rebindings: KeyBindings;
+}
+
 export const getRebindingLookup = Reselect.createSelector(
-	(rebindings: KeyBindings) => rebindings,
-	(rebindings) => {
+	(input: RebindingsLookupInput) => input.rebindings,
+	(input: RebindingsLookupInput) => input.settings,
+	(rebindings, settings) => {
         const lookup = new Map<string, string>();
         for (const newKey in rebindings) {
             if (isSpecialKey(newKey)) {
@@ -28,7 +34,7 @@ export const getRebindingLookup = Reselect.createSelector(
 			lookup.set(initialKey, newKey);
         }
         
-        Object.keys(DefaultSettings.Choices.Options).forEach(key => {
+        Object.keys(settings.Choices.Options).forEach(key => {
             if (key && !lookup.has(key) && !rebindings[key]) {
                 lookup.set(key, key);
             }

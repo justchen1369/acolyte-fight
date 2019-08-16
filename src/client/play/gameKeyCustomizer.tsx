@@ -27,6 +27,8 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
+    const rebindings = state.rebindings;
+    const settings = state.world.settings;
     return {
         btn: state.world.ui.toolbar.customizingBtn,
         gameId: state.world.ui.myGameId,
@@ -34,8 +36,8 @@ function stateToProps(state: s.State): Props {
         gameStarted: state.world.tick >= state.world.startTick,
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
-        rebindingLookup: keyboardUtils.getRebindingLookup(state.rebindings),
-        settings: state.world.settings,
+        rebindingLookup: keyboardUtils.getRebindingLookup({ rebindings, settings }),
+        settings,
     };
 }
 

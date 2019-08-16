@@ -2686,7 +2686,8 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const spell = (world.settings.Spells as Spells)[spellId];
 	if (!spell) { return null; }
 
-	const rebindingLookup = keyboardUtils.getRebindingLookup(rebindings);
+	const settings = world.settings;
+	const rebindingLookup = keyboardUtils.getRebindingLookup({ rebindings, settings });
 	let button: w.ButtonRenderState = {
 		key: rebindingLookup.get(key) || "",
 		color: spell.color,

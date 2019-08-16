@@ -15,6 +15,7 @@ interface OwnProps {
 
 interface Props extends OwnProps {
     rebindings: KeyBindings;
+    settings: AcolyteFightSettings;
 }
 
 interface State {
@@ -24,6 +25,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         rebindings: state.rebindings,
+        settings: state.world.settings,
     };
 }
 
@@ -39,7 +41,7 @@ class KeyControl extends React.PureComponent<Props, State> {
     render() {
         const initialKey = this.props.initialKey;
 
-        const rebindingLookup = keyboardUtils.getRebindingLookup(this.props.rebindings);
+        const rebindingLookup = keyboardUtils.getRebindingLookup(this.props);
         const remappedKey = rebindingLookup.get(initialKey);
         const isSpecialKey = keyboardUtils.isSpecialKey(remappedKey);
         const isRebound = !!this.props.rebindings[remappedKey];
