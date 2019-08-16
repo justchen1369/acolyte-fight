@@ -74,13 +74,13 @@ export async function watch(gameId: string, server: string = null) {
 }
 
 export async function getReplay(gameId: string, server: string = null): Promise<m.HeroMsg> {
-    let prefix = '';
+    let prefix = url.base;
     if (server) {
         const region = regions.getRegion(server);
         const origin = regions.getOrigin(region);
-        prefix = `${origin}/`;
+        prefix = `${origin}`;
     }
-    const res = await fetch(`${prefix}api/games/${gameId}`, {
+    const res = await fetch(`${prefix}/api/games/${gameId}`, {
         ...credentials.headers(),
         credentials: 'same-origin',
     });

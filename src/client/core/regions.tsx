@@ -1,5 +1,6 @@
 import * as options from '../options';
 import * as sockets from './sockets';
+import * as url from '../url';
 
 export function getOrigin(region: string) {
     if (region) {
@@ -7,7 +8,7 @@ export function getOrigin(region: string) {
         return `https://${region}.acolytefight.io`;
     } else {
         // Dev
-        return window.location.origin;
+        return url.baseUrl || window.location.origin;
     }
 }
 

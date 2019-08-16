@@ -37,6 +37,8 @@ import { Sounds } from '../game/sounds';
 import Root from './ui/root';
 
 export async function initialize() {
+    console.log("Base URL", url.baseUrl);
+
     const mainCssLoaded = loadCSS(`${base}/static/main.css`);
     const iconsLoaded = loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`);
 

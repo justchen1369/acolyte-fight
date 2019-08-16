@@ -1,7 +1,8 @@
 import queryString from 'query-string';
 import * as s from './store.model';
 
-export const base = (window as any).baseUrl || "";
+export const baseUrl = (window as any).baseUrl;
+export const base = baseUrl || "";
 
 export function parseLocation(location: Location): s.PathElements {
     let path: string = null;
