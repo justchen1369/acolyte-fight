@@ -76,16 +76,7 @@
 				});
 			}
 
-			if (window.location.host === "localhost:8080") {
-				window.baseUrl = "https://dev.acolytefight.io:7770";
-			} else if (/\.fbsbx\.com/.test(window.location.origin)
-				|| /\.facebook\.com/.test(window.location.origin)) {
-
-				window.baseUrl = "https://acolytefight.io";
-			} else {
-				// URL is correct already
-			}
-			window.acolyteStartup = loadScript((window.baseUrl || "") + "/dist/client.js");
+			window.acolyteStartup = Promise.resolve();
 
 			if (window.location.pathname === "/poki") {
 				console.log("Attaching poki...");
@@ -123,7 +114,19 @@
 			<div class="loading-splash">Loading...</div>
 		</div>
 		<script>
-			window.acolyteStartup.then(function() { window.acolyteInitialize(); });
+			if (window.location.host === "localhost:8080") {
+				window.baseUrl = "https://dev.acolytefight.io:7770";
+			} else if (/\.fbsbx\.com/.test(window.location.origin)
+				|| /\.facebook\.com/.test(window.location.origin)) {
+
+				window.baseUrl = "https://acolytefight.io";
+			} else {
+				// URL is correct already
+			}
+
+			window.acolyteStartup
+				.then(function() { return loadScript((window.baseUrl || "") + "/dist/client.js") })
+				.then(function() { window.acolyteInitialize(); });
 		</script>
 	</body>
 </html>

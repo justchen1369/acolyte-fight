@@ -37,12 +37,11 @@ import { Sounds } from '../game/sounds';
 import Root from './ui/root';
 
 export async function initialize() {
-    StoreProvider.init();
-
     const mainCssLoaded = loadCSS(`${base}/static/main.css`);
     loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`).then(() => StoreProvider.dispatch({ type: "updateLoaded", iconsLoaded: true })); // Don't await
 
     await options.init();
+    StoreProvider.init();
 
     audio.init().then(() => audio.cache(Sounds)); // Don't bother awaiting
 
