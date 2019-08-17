@@ -843,6 +843,7 @@ declare interface WallSpell extends ShieldSpell {
 	maxTicks: number;
 
 	density?: number; // If set, the wall is moveable
+	ccd?: boolean; // Performance improvement: Whether to apply continuous collision detection to this wall. Small and fast projectiles will tunnel through other objects unless CCD is on. Defaults to true.
 	linearDamping?: number; // Higher means receives less knockback
 	angularDamping?: number; // Higher means less rotation on knockback
 

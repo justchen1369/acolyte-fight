@@ -342,6 +342,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		angle,
 		linearDamping: spell.linearDamping,
 		angularDamping: spell.angularDamping,
+		bullet: spell.ccd !== undefined ? spell.ccd : true,
 	});
 
 	body.createFixture(pl.Polygon(points), {
