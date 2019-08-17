@@ -434,6 +434,9 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private gameKeyDown(e: KeyboardEvent) {
+        e.stopPropagation(); // Stop Safari beeping in fullscreen mode
+        e.preventDefault();
+
         const world = this.props.world;
         if (!ControlSurface.interactive(world)) {
             return;
