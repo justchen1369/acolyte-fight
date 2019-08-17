@@ -537,6 +537,7 @@ const meteor: Spell = {
     throttle: true,
 
     projectile: {
+        ccd: false,
         density: 100,
         attractable: false,
         linkable: true,
@@ -574,6 +575,7 @@ const meteorite: Spell = {
     throttle: true,
 
     projectile: {
+        ccd: false,
         density: 100,
         attractable: false,
         linkable: true,
@@ -1533,6 +1535,7 @@ const gravity: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
+        ccd: false,
         density: 0.0001,
         attractable: false,
         radius: 0.0125,
@@ -1788,6 +1791,7 @@ const halo: Spell = {
 
 
     projectile: {
+        ccd: false,
         density: 1,
         radius: 0.002,
         speed: 0.5,
@@ -1850,6 +1854,7 @@ const mines: Spell = {
     jitterRatio: 1.0,
 
     projectile: {
+        ccd: false,
         density: 1,
         radius: 0.004,
         speed: 0.5,
@@ -1933,6 +1938,7 @@ const iceBomb: Spell = {
     jitterRatio: 0.6,
 
     projectile: {
+        ccd: false,
         density: 1,
         sensor: true,
         restitution: 0,

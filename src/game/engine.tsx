@@ -80,7 +80,6 @@ export function initialWorld(mod: Object): w.World {
 	const def: pl.WorldDef = {
 		positionIterations: 3,
 		velocityIterations: 3,
-		allowSleep: false,
 	};
 
 	let world: w.World = {
@@ -612,7 +611,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		position,
 		linearVelocity: velocity,
 		linearDamping: 0,
-		bullet: true,
+		bullet: projectileTemplate.ccd !== undefined ? projectileTemplate.ccd : true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
 		filterGroupIndex: config.filterGroupIndex,

@@ -369,6 +369,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	partialDetonateImpulse?: PartialDamageParameters; // Scale detonate impulse over time, only useful if detonate set
 	partialBuffDuration?: PartialDamageParameters; // Scale buff durations over time, only useful if buffs set
 
+	ccd?: boolean; // Performance improvement: Whether to apply continuous collision detection to this projectile. Small and fast projectiles will tunnel through other objects unless CCD is on. Defaults to true.
 	density: number;
     radius: number;
 	speed: number;
