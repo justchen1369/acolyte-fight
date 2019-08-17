@@ -227,7 +227,7 @@ function worldToState(world: w.World, myHeroId: string): AI.World {
         heroes: {},
         projectiles: {},
         obstacles: {},
-        radius: world.radius,
+        radius: engine.calculateWorldMinExtent(world),
     };
     world.objects.forEach(obj => {
         if (obj.category === "hero") {

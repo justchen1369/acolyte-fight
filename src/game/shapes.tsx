@@ -215,7 +215,18 @@ function insideLocal(shape: Shape, localPoint: pl.Vec2, hitRadius: number = 0): 
         return localPoint.length() <= shape.radius + hitRadius;
     } else if (shape.type === "radial") {
         // This is not 100% correct but close enough for our purposes
-        return localPoint.length() <= shape.extent + hitRadius;
+        if (localPoint.length() <= shape.extent + hitRadius) {
+            for (let i = 0; i < shape.points.length; ++i) {
+                const a = shape.points[i];
+                const b = shape.points[(i + 1) % shape.points.length];
+                if (!vector.insideLine(localPoint, hitRadius, a, b)) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return false;
+        }
     } else if (shape.type === "polygon") {
         const length = localPoint.length();
         if (length > shape.maxExtent) {

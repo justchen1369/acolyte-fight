@@ -75,6 +75,7 @@ export function version() {
 
 export function initialWorld(mod: Object): w.World {
 	const settings = modToSettings(mod);
+	const World = settings.World;
 	const Visuals = settings.Visuals;
 
 	const def: pl.WorldDef = {
@@ -107,9 +108,11 @@ export function initialWorld(mod: Object): w.World {
 		collisions: new Map(),
 
 		actions: new Map(),
+
+		initialRadius: World.InitialRadius,
 		shrink: 1,
-		radius: settings.World.InitialRadius,
-		mapRadiusMultiplier: 1.0,
+		angle: 0,
+		shape: shapes.createCircle(1),
 
 		nextPositionId: 0,
 		nextObjectId: 0,
@@ -1165,6 +1168,7 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 	world.seed = ev.seed;
 	console.log("Environment seed " + world.seed);
 
+	const World = world.settings.World;
 	const Layouts = world.settings.Layouts;
 
 	let layout: Layout = Layouts[ev.layoutId];
@@ -1177,20 +1181,15 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 		world.color = layout.color;
 	}
 	
-	const radiusMultiplier = layout.radiusMultiplier || (layout.numPoints ? shapes.calculateMaxExtentMultiplier(layout.numPoints) : 1.0);
-	if (radiusMultiplier) {
-		world.mapRadiusMultiplier = radiusMultiplier;
-	}
-
 	if (layout.numPoints) {
-		const angleOffsetInRevs = layout.angleOffsetInRevs || 0;
-		const points = new Array<pl.Vec2>();
-		for (let i = 0; i < layout.numPoints; ++i) {
-			const angle = (angleOffsetInRevs + i / layout.numPoints) * (2 * Math.PI);
-			points.push(vector.fromAngle(angle));
-		}
-		world.mapPoints = points;
+		// A polygon's extent needs to be larger than a circle's radius for them to look the same size
+		const radiusMultiplier = shapes.calculateMaxExtentMultiplier(layout.numPoints);
+		world.shape = shapes.createRadial(layout.numPoints, radiusMultiplier);
+	} else {
+		world.shape = shapes.createCircle(1);
 	}
+	world.initialRadius = (layout.radiusMultiplier || 1) * World.InitialRadius;
+	world.angle = vector.Tau * (layout.angleOffsetInRevs || 0);
 
 	layout.obstacles.forEach(obstacleTemplate => instantiateObstacles(obstacleTemplate, world));
 
@@ -3297,25 +3296,15 @@ function calculateKnockbackFromId(hero: w.Hero, world: w.World) {
 }
 
 export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
-	if (world.radius <= 0) {
+	if (world.shrink <= 0) {
 		return false;
 	}
 
-	const polygonRadius = world.mapRadiusMultiplier * world.radius;
-	if (world.mapPoints) {
-		const scaledDiff = vector.diff(pos, vectorCenter).mul(1 / polygonRadius);
-		const scaledExtent = -extent / polygonRadius;
-		for (let i = 0; i < world.mapPoints.length; ++i) {
-			const a = world.mapPoints[i];
-			const b = world.mapPoints[(i + 1) % world.mapPoints.length];
-			if (!vector.insideLine(scaledDiff, scaledExtent, a, b)) {
-				return false;
-			}
-		}
-		return true;
-	} else {
-		return vector.distance(pos, vectorCenter) < polygonRadius - extent;
-	}
+	// The world shape always stays the same, even though the world is shrinking. Project current object onto the world scale.
+	const scale = Math.max(1e-6, calculateWorldMinExtent(world));
+	const scaledDiff = vector.diff(pos, vectorCenter).mul(1 / scale);
+	const scaledExtent = -extent / scale;
+	return shapes.inside(world.shape, vectorZero, world.angle, scaledDiff, scaledExtent);
 }
 
 function shrink(world: w.World) {
@@ -3328,8 +3317,11 @@ function shrink(world: w.World) {
 		const powerAlpha = Math.min(1, world.players.size / Matchmaking.MaxPlayers);
 		const power = powerAlpha * World.ShrinkPowerMaxPlayers + (1 - powerAlpha) * World.ShrinkPowerMinPlayers;
 		world.shrink = Math.pow(proportion, power);
-		world.radius = World.InitialRadius * proportion;
 	}
+}
+
+export function calculateWorldMinExtent(world: w.World) {
+	return world.shrink * world.initialRadius;
 }
 
 function reap(world: w.World) {

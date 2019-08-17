@@ -135,7 +135,7 @@ export function direct(world: w.World, canvasStack: CanvasStack, options: Render
 			}
 
 			// New center - only pan if some zooming is involved or if can't see entire map
-			if (maxZoom > 1 || world.radius > 0.5) {
+			if (maxZoom > 1 || engine.calculateWorldMinExtent(world) > 0.5) {
 				let center = pl.Vec2(
 					Visuals.CameraSmoothRate * pos.x + (1 - Visuals.CameraSmoothRate) * target.x,
 					Visuals.CameraSmoothRate * pos.y + (1 - Visuals.CameraSmoothRate) * target.y,
@@ -731,27 +731,28 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const strokeStyle = color.clone().lighten(0.05);
 	const strokeProportion = 0.99;
 
-	const radius = world.radius * world.mapRadiusMultiplier;
+	const minExtent = engine.calculateWorldMinExtent(world);
+	if (world.shape.type === "radial") {
+		const maxExtentMultiplier = shapes.calculateMaxExtentMultiplier(world.shape.points.length);
+		glx.convex(ctxStack, pos, world.shape.points, world.angle, minExtent * scale, {
+			color: strokeStyle,
+			maxRadius: scale * minExtent * maxExtentMultiplier,
+		});
+		glx.convex(ctxStack, pos, world.shape.points, world.angle, minExtent * scale * strokeProportion, {
+			color,
+			maxRadius: scale * minExtent * maxExtentMultiplier,
+		});
+	} else if (world.shape.type === "circle") {
+		const radius = world.shape.radius;
+		glx.circle(ctxStack, pos, {
+			color: strokeStyle,
+			maxRadius: scale * radius * minExtent,
+		});
+		glx.circle(ctxStack, pos, {
+			color,
+			maxRadius: scale * radius * minExtent * strokeProportion,
+		});
 
-	const points = world.mapPoints;
-	if (points) {
-		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale, {
-			color: strokeStyle,
-			maxRadius: scale * radius,
-		});
-		glx.convex(ctxStack, pos, world.mapPoints, 0, radius * scale * strokeProportion, {
-			color,
-			maxRadius: scale * radius,
-		});
-	} else {
-		glx.circle(ctxStack, pos, {
-			color: strokeStyle,
-			maxRadius: scale * radius,
-		});
-		glx.circle(ctxStack, pos, {
-			color,
-			maxRadius: scale * radius * strokeProportion,
-		});
 	}
 }
 

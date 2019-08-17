@@ -55,10 +55,10 @@ export interface World {
 	physics: pl.World;
 	collisions: Map<pl.Contact, Collision>;
 
-	mapPoints?: pl.Vec2[];
-	mapRadiusMultiplier: number;
+	shape: shapes.Shape;
 	shrink: number;
-	radius: number;
+	initialRadius: number;
+	angle: number;
 
 	controlMessages: n.ControlMsg[];
 	snapshots: Snapshot[];
