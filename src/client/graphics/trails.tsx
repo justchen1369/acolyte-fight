@@ -10,6 +10,12 @@ const trailFragmentShader = require('./trailFragmentShader.glsl');
 const trailVertexShader = require('./trailVertexShader.glsl');
 
 const vectorZero = vector.zero();
+const quad = [
+	0 * vector.Tau / 4,
+	1 * vector.Tau / 4,
+	2 * vector.Tau / 4,
+	3 * vector.Tau / 4,
+];
 
 export function initData(): r.DrawTrailsData {
     return {
@@ -85,9 +91,10 @@ function appendCurveShape(data: Float32List, fill: r.Fill) {
 	}
 }
 
-function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fill: r.Fill) {
+function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, radius: number, fill: r.Fill) {
     let color: ColTuple = fill.color;
     if (fill.gradient) {
+		const rel = vector.fromAngle(angle, radius);
         const point = pos.clone().add(rel);
         const diff = vector.diff(point, fill.gradient.from);
         const axis = vector.diff(fill.gradient.to, fill.gradient.from);
@@ -101,28 +108,23 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, rel: pl.Vec2, fil
 
     const trails = shaders.getContext(ctxStack.gl).data.trails;
 	shaders.appendVec2(trails.attribs.a_pos, pos);
-	shaders.appendVec2(trails.attribs.a_rel, rel);
+	shaders.appendAngleRadius(trails.attribs.a_rel, angle, radius);
 	shaders.appendColTuple(trails.attribs.a_color, color);
 	appendCurveShape(trails.attribs.a_fill, fill);
 	++trails.numVertices;
 }
 
 export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
-	const extent = calculateExtent(ctxStack, fill);
-	const quad = [
-		pl.Vec2(-extent, -extent),
-		pl.Vec2(-extent, extent),
-		pl.Vec2(extent, extent),
-		pl.Vec2(extent, -extent),
-	];
+	// sqrt(2) because the shortest point on the edge of the quad has to fully enclose the radius of the circle
+	const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill);
 
-	appendTrail(ctxStack, pos, quad[0], fill);
-	appendTrail(ctxStack, pos, quad[1], fill);
-	appendTrail(ctxStack, pos, quad[2], fill);
+	appendTrail(ctxStack, pos, 0 * vector.Tau / 4, extent, fill);
+	appendTrail(ctxStack, pos, 1 * vector.Tau / 4, extent, fill);
+	appendTrail(ctxStack, pos, 2 * vector.Tau / 4, extent, fill);
 
-	appendTrail(ctxStack, pos, quad[2], fill);
-	appendTrail(ctxStack, pos, quad[3], fill);
-	appendTrail(ctxStack, pos, quad[0], fill);
+	appendTrail(ctxStack, pos, 2 * vector.Tau / 4, extent, fill);
+	appendTrail(ctxStack, pos, 3 * vector.Tau / 4, extent, fill);
+	appendTrail(ctxStack, pos, 0 * vector.Tau / 4, extent, fill);
 }
 
 export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.Fill, toFill: r.Fill = fromFill) {
@@ -131,16 +133,16 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fro
 		extent = Math.max(extent, calculateExtent(ctxStack, toFill));
 	}
 
-	const down = vector.relengthen(vector.rotateLeft(vector.diff(to, from)), extent);
-	const up = vector.negate(down);
+	const down = vector.angleDiff(to, from) - vector.Tau / 4;
+	const up = down + vector.Tau / 2;
 
-	appendTrail(ctxStack, from, up, fromFill);
-	appendTrail(ctxStack, from, down, fromFill);
-	appendTrail(ctxStack, to, up, toFill);
+	appendTrail(ctxStack, from, up, extent, fromFill);
+	appendTrail(ctxStack, from, down, extent, fromFill);
+	appendTrail(ctxStack, to, up, extent, toFill);
 
-	appendTrail(ctxStack, to, up, toFill);
-	appendTrail(ctxStack, from, down, fromFill);
-	appendTrail(ctxStack, to, down, toFill);
+	appendTrail(ctxStack, to, up, extent, toFill);
+	appendTrail(ctxStack, from, down, extent, fromFill);
+	appendTrail(ctxStack, to, down, extent, toFill);
 }
 
 export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.Fill) {
@@ -165,15 +167,13 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
             nextAngle = angle2;
         } else {
             nextAngle = currentAngle + step;
-        }
+		}
+
+		appendTrail(ctxStack, pos, 0, 0, fill);
+		appendTrail(ctxStack, pos, currentAngle, extent, fill);
+		appendTrail(ctxStack, pos, nextAngle, extent, fill);
 
         currentAngle = nextAngle;
-    }
-
-    for (let i = 0; i < rels.length - 1; ++i) {
-		appendTrail(ctxStack, pos, center, fill);
-		appendTrail(ctxStack, pos, rels[i], fill);
-		appendTrail(ctxStack, pos, rels[i + 1], fill);
     }
 }
 
@@ -181,16 +181,16 @@ export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2
 	const center = vectorZero;
 
     for (let i = 0; i < points.length; ++i) {
-        const a = vector.turnVectorBy(points[i], rotate).mul(scale);
-        const b = vector.turnVectorBy(points[(i + 1) % points.length], rotate).mul(scale);
+        const a = points[i]; //vector.turnVectorBy(points[i], rotate).mul(scale);
+        const b = points[(i + 1) % points.length]; // vector.turnVectorBy(points[(i + 1) % points.length], rotate).mul(scale);
         if ((a.x === center.x && a.y === center.x) || (b.x === center.y && b.y === center.y)) {
             // This will just draw zero-space triangles, so don't bother
             continue;
         }
 
-		appendTrail(ctxStack, pos, center, fill);
-		appendTrail(ctxStack, pos, a, fill);
-		appendTrail(ctxStack, pos, b, fill);
+		appendTrail(ctxStack, pos, 0, 0, fill);
+		appendTrail(ctxStack, pos, vector.angle(a) + rotate, a.length() * scale, fill);
+		appendTrail(ctxStack, pos, vector.angle(b) + rotate, b.length() * scale, fill);
     }
 }
 

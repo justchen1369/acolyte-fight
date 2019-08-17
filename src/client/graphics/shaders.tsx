@@ -74,6 +74,13 @@ export function appendVec2(data: Float32List, vec: pl.Vec2) {
 	data.push(vec.y);
 }
 
+export function appendAngleRadius(data: Float32List, angle: number, radius: number) {
+	const x = radius * Math.cos(angle);
+	const y = radius * Math.sin(angle);
+	data.push(x);
+	data.push(y);
+}
+
 export function appendColTuple(data: Float32List, col: ColTuple) {
 	data.push(col.tuple[0]);
 	data.push(col.tuple[1]);

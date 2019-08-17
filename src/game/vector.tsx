@@ -1,5 +1,7 @@
 import pl from 'planck-js';
 
+export const Tau = 2 * Math.PI;
+
 // Vector utils
 export function zero() {
 	return pl.Vec2(0, 0);
