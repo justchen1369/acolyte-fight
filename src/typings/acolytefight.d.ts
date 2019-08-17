@@ -85,10 +85,10 @@ declare interface WorldSettings {
 	ShrinkPowerMaxPlayers: number;
 	
 	ProjectileSpeedDecayFactorPerTick: number; // If a projectile is going faster or slower than its intended speed, correct it by this proportion per tick
-	ProjectileSpeedMaxError: number; // Only correct a projectile's speed if its error is more than this absolute value
 
 	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
 
+	SlopSpeed: number; // Performance improvement: When performing speed adjustments, if the speed is within this value consider it equal
 	SlopRadius: number; // Performance improvement: For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
 
 	BotName: string; // What to call the bot

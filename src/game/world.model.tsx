@@ -758,6 +758,9 @@ export type Behaviour =
 	DelayBehaviour
 	| ResetMassBehaviour
 	| FixateBehaviour
+	| DecaySpeedBehaviour
+	| LimitSpeedBehaviour
+	| DecayMitigationBehaviour
 	| HomingBehaviour
 	| AccelerateBehaviour
 	| DetonateBehaviour
@@ -807,6 +810,22 @@ export interface FixateBehaviour extends BehaviourBase {
 	proportion: number;
 	speed: number;
 	turnRate: number;
+}
+
+export interface DecaySpeedBehaviour extends BehaviourBase {
+	type: "decaySpeed";
+	projectileId: string;
+}
+
+export interface LimitSpeedBehaviour extends BehaviourBase {
+	type: "limitSpeed";
+	objId: string;
+	speedLimit: number;
+}
+
+export interface DecayMitigationBehaviour extends BehaviourBase {
+	type: "decayMitigation";
+	heroId: string;
 }
 
 export interface HomingBehaviour extends BehaviourBase {

@@ -523,8 +523,10 @@ function addHero(world: w.World, heroId: string) {
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
+	world.behaviours.push({ type: "limitSpeed", objId: hero.id, speedLimit: Hero.MaxSpeed });
 	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
 	world.behaviours.push({ type: "burn", heroId: hero.id });
+	world.behaviours.push({ type: "decayMitigation", heroId: hero.id });
 
 	world.behaviours.push({
 		type: "resetMass",
@@ -702,10 +704,13 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	};
 
 	world.objects.set(id, projectile);
+
+	if (projectile.fixedSpeed) {
+		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id });
+	}
 	if (projectile.detonate) {
 		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
 	}
-
 	if (!projectileTemplate.selfPassthrough) {
 		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	}
@@ -933,15 +938,15 @@ export function tick(world: w.World) {
 
 	handleCollisions(world);
 
-	applySpeedLimit(world);
-	decayMitigation(world);
-
 	handleBehaviours(world, {
 		fixate,
+		decaySpeed,
+		limitSpeed,
 		strafe,
 		burn,
 		removePassthrough,
 		thrustDecay,
+		decayMitigation,
 		expireBuffs,
 		expireOnOwnerDeath,
 		expireOnOwnerRetreat,
@@ -986,29 +991,41 @@ function physicsStep(world: w.World) {
 	world.physics.step(Math.floor(granularity / TicksPerSecond) / granularity);
 }
 
-function applySpeedLimit(world: w.World) {
-	world.objects.forEach(obj => {
-		if (obj.category === "projectile" && obj.fixedSpeed) {
-			const velocity = obj.body.getLinearVelocity();
-			const currentSpeed = velocity.length();
+function decaySpeed(behaviour: w.DecaySpeedBehaviour, world: w.World) {
+	const obj = world.objects.get(behaviour.projectileId);
+	if (!(obj && obj.category === "projectile")) {
+		return false;
+	}
 
-			const diff = obj.speed - currentSpeed;
-			if (Math.abs(diff) > world.settings.World.ProjectileSpeedMaxError) {
-				const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
-				if (currentSpeed > 0) {
-					velocity.mul(newSpeed / currentSpeed);
-				} else {
-					// Stationary - take direction from heading
-					velocity.set(vector.fromAngle(obj.body.getAngle()).mul(newSpeed));
-				}
-				obj.body.setLinearVelocity(velocity);
-			}
-		} else if (obj.category === "hero" && obj.maxSpeed) {
-			const velocity = obj.body.getLinearVelocity();
-			velocity.clamp(obj.maxSpeed);
-			obj.body.setLinearVelocity(velocity);
+	const velocity = obj.body.getLinearVelocity();
+	const currentSpeed = velocity.length();
+
+	const diff = obj.speed - currentSpeed;
+	if (Math.abs(diff) > world.settings.World.SlopSpeed) {
+		const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
+		if (currentSpeed > 0) {
+			velocity.mul(newSpeed / currentSpeed);
+		} else {
+			// Stationary - take direction from heading
+			velocity.set(vector.fromAngle(obj.body.getAngle()).mul(newSpeed));
 		}
-	});
+		obj.body.setLinearVelocity(velocity);
+	}
+	return true;
+}
+
+function limitSpeed(behaviour: w.LimitSpeedBehaviour, world: w.World) {
+	const obj = world.objects.get(behaviour.objId);
+	if (!obj) {
+		return false;
+	}
+
+	const velocity = obj.body.getLinearVelocity();
+	if (velocity.length() > behaviour.speedLimit + world.settings.World.SlopSpeed) {
+		velocity.clamp(behaviour.speedLimit);
+		obj.body.setLinearVelocity(velocity);
+	}
+	return true;
 }
 
 function fixate(behaviour: w.FixateBehaviour, world: w.World) {
@@ -2978,26 +2995,30 @@ function updateGroupIndex(fixture: pl.Fixture, newGroupIndex: number) {
 	}
 }
 
-function decayMitigation(world: w.World) {
-	world.objects.forEach(hero => {
-		if (hero.category === "hero" && hero.damageSourceHistory.length > 0) {
-			let newHistory = new Array<w.DamageSourceHistoryItem>();
-			hero.damageSourceHistory.forEach(item => {
-				if (world.tick >= item.expireTick) {
-					let amount = hero.damageSources.get(item.heroId);
-					amount -= item.amount;
-					if (amount > 0) {
-						hero.damageSources.set(item.heroId, amount);
-					} else {
-						hero.damageSources.delete(item.heroId);
-					}
+function decayMitigation(behaviour: w.DecayMitigationBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	if (hero.damageSourceHistory.length > 0) {
+		let newHistory = new Array<w.DamageSourceHistoryItem>();
+		hero.damageSourceHistory.forEach(item => {
+			if (world.tick >= item.expireTick) {
+				let amount = hero.damageSources.get(item.heroId);
+				amount -= item.amount;
+				if (amount > 0) {
+					hero.damageSources.set(item.heroId, amount);
 				} else {
-					newHistory.push(item);
+					hero.damageSources.delete(item.heroId);
 				}
-			});
-			hero.damageSourceHistory = newHistory;
-		}
-	});
+			} else {
+				newHistory.push(item);
+			}
+		});
+		hero.damageSourceHistory = newHistory;
+	}
+	return true;
 }
 
 function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {

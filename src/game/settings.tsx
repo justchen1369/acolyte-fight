@@ -52,7 +52,7 @@ const World: WorldSettings = {
     ShrinkPowerMaxPlayers: 0.75,
 
     ProjectileSpeedDecayFactorPerTick: 0.05,
-    ProjectileSpeedMaxError: 0.001,
+    SlopSpeed: 0.001,
 
     SwatchHealth: 100,
 
