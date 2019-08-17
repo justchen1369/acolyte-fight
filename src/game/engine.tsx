@@ -612,7 +612,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		position,
 		linearVelocity: velocity,
 		linearDamping: 0,
-		bullet: true,
+		bullet: projectileTemplate.speed >= calculateCcdThreshold(world),
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
 		filterGroupIndex: config.filterGroupIndex,
@@ -925,6 +925,7 @@ export function tick(world: w.World) {
 	});
 
 	move(world);
+	updateBullets(world);
 	physicsStep(world);
 
 	handleBehaviours(world, {
@@ -1009,6 +1010,23 @@ function applySpeedLimit(world: w.World) {
 			obj.body.setLinearVelocity(velocity);
 		}
 	});
+}
+
+function updateBullets(world: w.World) {
+	const threshold = calculateCcdThreshold(world);
+	const thresholdSquared = threshold * threshold;
+	world.objects.forEach(obj => {
+		if (obj.category === "projectile") {
+			const bullet = obj.body.getLinearVelocity().lengthSquared() > thresholdSquared;
+			if (obj.body.isBullet() !== bullet) {
+				obj.body.setBullet(bullet);
+			}
+		}
+	});
+}
+
+function calculateCcdThreshold(world: w.World) {
+	return world.settings.World.ContinuousCollisionDetectionDistance * TicksPerSecond;
 }
 
 function fixate(behaviour: w.FixateBehaviour, world: w.World) {
