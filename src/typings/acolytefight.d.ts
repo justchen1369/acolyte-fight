@@ -74,7 +74,7 @@ declare interface HeroSettings {
 
 declare interface WorldSettings {
 	InitialRadius: number; // Initial radius of the world
-	HeroLayoutRadius: number; // The radius at which to place heroes
+	HeroLayoutProportion: number; // The radius at which to place heroes - 1 means edge of map, 0 means at center
 
 	LavaLifestealProportion: number; // 0 for no lifesteal, 1 for 100% lifesteal
 	LavaDamagePerSecond: number;

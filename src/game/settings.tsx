@@ -41,7 +41,7 @@ const Hero: HeroSettings = {
 
 const World: WorldSettings = {
     InitialRadius: 0.4,
-    HeroLayoutRadius: 0.25,
+    HeroLayoutProportion: 0.625,
 
     LavaDamagePerSecond: 12.5,
     LavaLifestealProportion: lifeSteal,

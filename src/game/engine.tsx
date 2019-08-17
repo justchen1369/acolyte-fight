@@ -462,6 +462,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 function addHero(world: w.World, heroId: string) {
 	const Matchmaking = world.settings.Matchmaking;
 	const Hero = world.settings.Hero;
+	const World = world.settings.World;
 
 	const heroIndex = world.nextPositionId++;
 	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
@@ -469,12 +470,12 @@ function addHero(world: w.World, heroId: string) {
 	let position;
 	let angle;
 	{
-		const radius = world.settings.World.HeroLayoutRadius;
+		const offset =
+			shapes.proportionalEdgePoint(world.shape, vectorZero, world.angle, heroIndex / Matchmaking.MaxPlayers, World.HeroLayoutProportion)
+			.mul(calculateWorldMinExtent(world));
 
-		const posAngle = 2 * Math.PI * heroIndex / Matchmaking.MaxPlayers;
-		position = vector.fromAngle(posAngle).mul(radius).add(vectorCenter);
-
-		angle = posAngle + Math.PI; // Face inward
+		position = offset.clone().add(vectorCenter);
+		angle = vector.angle(offset) + Math.PI; // Face inward
 	}
 
 	let body = world.physics.createBody({
