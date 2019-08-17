@@ -432,7 +432,7 @@ function renderObstacleDestroyed(ctxStack: CanvasCtxStack, obstacle: w.Obstacle,
 	const particleRadius = Math.min(MaxParticleRadius, shapes.getMinExtent(obstacle.shape));
 
 	for (let i = 0; i < NumParticles; ++i) {
-		const pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+		const pos = shapes.proportionalEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), Math.random(), Math.random(), particleRadius);
 		const edgeOffset = vector.diff(pos, MapCenter);
 		edgeOffset.normalize();
 		edgeOffset.mul(ExplodeSpeed);
@@ -996,7 +996,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 
 	let particleRadius = Math.min(smoke.particleRadius, shapes.getMinExtent(obstacle.shape));
 
-	let pos = shapes.randomEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), particleRadius);
+	let pos = shapes.proportionalEdgePoint(obstacle.shape, obstacle.body.getPosition(), obstacle.body.getAngle(), Math.random(), Math.random(), particleRadius);
 	const outward = vector.diff(pos, MapCenter);
 	outward.normalize();
 
