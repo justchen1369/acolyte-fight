@@ -952,6 +952,12 @@ table.player-list {
 
     pointer-events: all;
     font-size: 120%;
+
+    max-width: 30vw;
+}
+
+.mobile .messages .text-row {
+    max-width: 50vw;
 }
 
 .anchored-panel-right .messages .text-row {
@@ -973,6 +979,7 @@ table.player-list {
 .messages span.text-message {
     color: white;
     font-weight: bold;
+    hyphens: auto;
 }
 
 .messages .rating {
