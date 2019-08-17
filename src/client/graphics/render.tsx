@@ -1213,19 +1213,14 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const guideDirection = vector.unit(diff);
 	const proportion = Math.min(1, diff.length() / guideLength);
 
-	const radius = vector.length(diff);
-	const angle = vector.angle(diff);
-	const circumference = 2 * Math.PI * radius;
-	const angularProportion = CrossWidth / circumference;
-	const startAngle = angle - (Math.PI * angularProportion);
-	const endAngle = angle + (Math.PI * angularProportion);
-
 	const lineWidth = hero.radius / 2;
 
 	const gradient: r.Gradient = {
-		from: pos,
+		angle: vector.angle(diff),
+		anchor: pos,
+		fromExtent: 0,
 		fromColor: ColTuple.parse("#000").alpha(MaxAlpha * proportion),
-		to: pos.clone().addMul(guideLength, guideDirection),
+		toExtent: guideLength,
 		toColor: ColTuple.parse("#000").alpha(0),
 	};
 
@@ -1406,18 +1401,12 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	{
 		let gradient: r.Gradient = null;
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
-			const from = pos.clone();
-			from.x += radius;
-			from.y += -radius;
-
-			const to = pos.clone();
-			to.x += -radius;
-			to.y += radius;
-
 			gradient = {
-				from,
+				angle: (3./8) * vector.Tau,
+				anchor: pos,
+				fromExtent: -radius,
 				fromColor: style.clone(),
-				to,
+				toExtent: radius,
 				toColor: style.clone().darken(0.5),
 			};
 		}

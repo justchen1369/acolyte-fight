@@ -94,16 +94,13 @@ function appendCurveShape(data: Float32List, fill: r.Fill) {
 function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, radius: number, fill: r.Fill) {
     let color: ColTuple = fill.color;
     if (fill.gradient) {
-		const rel = vector.fromAngle(angle, radius);
-        const point = pos.clone().add(rel);
-        const diff = vector.diff(point, fill.gradient.from);
-        const axis = vector.diff(fill.gradient.to, fill.gradient.from);
-        let range = axis.length();
-        if (range === 0.0) {
-            range = 1e-9;
-        }
-        const mix = Math.min(1, Math.max(0, vector.dot(diff, axis) / range / range));
-        color = fill.gradient.fromColor.clone().mix(fill.gradient.toColor, mix);
+		const gradient = fill.gradient;
+		const diff = vector.fromAngle(angle, radius).add(pos).sub(gradient.anchor); // Diff between anchor point and this point
+		const offset = diff.length() * Math.cos(vector.angle(diff) - gradient.angle); // Offset when projected onto the gradient axis
+		const alpha = (offset - gradient.fromExtent) / Math.max(1e-9, gradient.toExtent - gradient.fromExtent);
+
+        const mix = Math.min(1, Math.max(0, alpha));
+        color = gradient.fromColor.clone().mix(gradient.toColor, mix);
     }
 
     const trails = shaders.getContext(ctxStack.gl).data.trails;

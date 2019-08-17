@@ -155,9 +155,11 @@ export interface DrawTrails extends Draw {
 }
 
 export interface Gradient {
-	from: pl.Vec2;
+	angle: number;
+	anchor: pl.Vec2;
+	fromExtent: number;
 	fromColor: ColTuple;
-	to: pl.Vec2;
+	toExtent: number;
 	toColor: ColTuple;
 }
 
