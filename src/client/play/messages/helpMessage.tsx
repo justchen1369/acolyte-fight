@@ -110,7 +110,9 @@ class HelpMessage extends React.PureComponent<Props, State> {
         </div>
     }
 
-    private renderNewVersion() {
+    private renderNewVersion(): React.ReactNode {
+        return null;
+        /*
         return <div className="info-panel dialog-panel">
             <div className="header-row">Recent Updates</div>
             <div className="body-row">The recent changes to damage scaling have been reverted.</div>
@@ -119,6 +121,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
                 <Button className="btn" onClick={(e) => this.onCloseVersionClicked()}>OK</Button>
             </div>
         </div>
+        */
     }
 
     private onExitTutorialClick() {
