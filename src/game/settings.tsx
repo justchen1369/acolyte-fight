@@ -59,7 +59,6 @@ const World: WorldSettings = {
     BotName: "AcolyteBot",
 
     SlopRadius: 0.05,
-    ContinuousCollisionDetectionDistance: Hero.Radius,
 }
 
 const Obstacle: ObstacleSettings = {

@@ -90,7 +90,6 @@ declare interface WorldSettings {
 	SwatchHealth: number; // How quickly does a swatch (e.g. a boost pad) die in the void?
 
 	SlopRadius: number; // Performance improvement: For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
-	ContinuousCollisionDetectionDistance: number; // Performance improvement: Only apply continuous collision detection to projectiles that can travel faster than this distance per tick
 
 	BotName: string; // What to call the bot
 }
