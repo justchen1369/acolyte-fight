@@ -858,6 +858,7 @@ function instantiateStrafe(template: StrafeTemplate, projectile: w.Projectile, w
 		projectileId: projectile.id,
 		previousOwner: null,
 		previousPos: null,
+		maxSpeed: template.maxSpeed,
 	};
 }
 
@@ -3600,6 +3601,9 @@ function strafe(strafe: w.StrafeBehaviour, world: w.World) {
 
 	if (strafe.previousPos && strafe.previousOwner === projectile.owner) { // If owner changes, position will jump, don't make the projectile jump too
 		const delta = vector.diff(pos, strafe.previousPos);
+		if (strafe.maxSpeed) {
+			delta.clamp(strafe.maxSpeed);
+		}
 		projectile.body.setPosition(projectile.body.getPosition().add(delta));
 	}
 

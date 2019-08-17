@@ -881,6 +881,7 @@ export interface StrafeBehaviour extends BehaviourBase {
 	projectileId: string;
 	previousOwner: string;
 	previousPos: pl.Vec2;
+	maxSpeed?: number;
 }
 
 export interface ReflectFollowBehaviour extends BehaviourBase {

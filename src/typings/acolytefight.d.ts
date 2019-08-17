@@ -513,6 +513,7 @@ declare interface AuraTemplate extends BehaviourTemplateBase {
 declare interface StrafeTemplate extends BehaviourTemplateBase {
 	// Make this projectile follow the movements of its owner
 	type: "strafe";
+	maxSpeed?: number; // Cannot follow faster than this speed
 }
 
 declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {

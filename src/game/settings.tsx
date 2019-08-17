@@ -1806,7 +1806,10 @@ const halo: Spell = {
         },
 
         behaviours: [
-            { type: "strafe" },
+            {
+                type: "strafe",
+                maxSpeed: Hero.MoveSpeedPerSecond,
+            },
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
