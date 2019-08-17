@@ -1212,15 +1212,14 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	const diff = vector.diff(target, pos);
 	const guideLength = 0.5;
-	const guideDirection = vector.unit(diff);
-	const proportion = Math.min(1, diff.length() / guideLength);
+	const guideDirection = vector.angleDiff(target, pos);
+	const proportion = Math.min(1, vector.distance(target, pos) / guideLength);
 
 	const lineWidth = hero.radius / 2;
 
 	const gradient: r.Gradient = {
-		angle: vector.angle(diff),
+		angle: guideDirection,
 		anchor: pos,
 		fromExtent: 0,
 		fromColor: ColTuple.parse("#000").alpha(MaxAlpha * proportion),
@@ -1229,7 +1228,7 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	};
 
 	// Render line to target
-	glx.line(ctxStack, pos, pos.clone().addMul(guideLength, guideDirection), {
+	glx.line(ctxStack, pos, vector.fromAngle(guideDirection, guideLength).add(pos), {
 		gradient,
 		maxRadius: lineWidth / 2,
 	});
