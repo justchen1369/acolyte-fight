@@ -1199,7 +1199,6 @@ function ease(createTick: number, world: w.World): number {
 
 function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	const MaxAlpha = 0.5;
-	const CrossWidth = 0.05;
 
 	const hero = world.objects.get(world.ui.myHeroId);
 	if (!(hero && hero.category === "hero")) {
