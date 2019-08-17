@@ -20,6 +20,7 @@ import Layout from './layout';
 import MessagesPanel from './messagesPanel';
 import MutePanel from './buttons/mutePanel';
 import RandomizePanel from './buttons/randomizePanel';
+import FullScreenButton from './buttons/fullScreenButton';
 import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
 import TextMessageBox from './textMessageBox';
@@ -157,6 +158,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <ExitLink />
                 <div className="button-panel">
                     <MutePanel />
+                    <FullScreenButton />
                     <RandomizePanel />
                     <VideoPanel />
                 </div>
