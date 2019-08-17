@@ -2269,6 +2269,11 @@ findup-sync@3.0.0:
     micromatch "^3.0.4"
     resolve-dir "^1.0.1"
 
+flatted@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/flatted/-/flatted-2.0.1.tgz#69e57caa8f0eacbc281d2e2cb458d46fdb449e08"
+  integrity sha512-a1hQMktqW9Nmqr5aktAux3JMNqaucxGcjtjWnZLHX7yyPCmlSV3M54nGYbqT8K+0GhF3NBgmJCc3ma+WOgX8Jg==
+
 flush-write-stream@^1.0.0:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/flush-write-stream/-/flush-write-stream-1.1.1.tgz#8dd7d873a1babc207d94ead0c2e0e44276ebf2e8"
@@ -4128,10 +4133,12 @@ pkg-dir@^3.0.0:
   dependencies:
     find-up "^3.0.0"
 
-planck-js@^0.3.0-rc.2:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.6.tgz#a8695e6b65f159aa5ff8d7eb6cfd341aa4c6fbfb"
-  integrity sha512-bgQkbyvt2aGaxWYEVHXamDpRxASikTtOCb++4TSdeFaaWPeS2SfsTKsa5GuoSXbdDlKvbLuYCMSBl2K7DMUw+w==
+planck-js@^0.3.9:
+  version "0.3.9"
+  resolved "https://registry.yarnpkg.com/planck-js/-/planck-js-0.3.9.tgz#90a10faaebf2a73bf77452b747c69b1d4c5a4c4b"
+  integrity sha512-49uZFDSXTMOPpeqSsSES8AiGPCiDrpTfd+fqdrnbhJuHqDdvPcadFGseqv5i3rqhgif0/7HCc8qUovwmiNXYBw==
+  dependencies:
+    flatted "^2.0.1"
 
 posix-character-classes@^0.1.0:
   version "0.1.1"
