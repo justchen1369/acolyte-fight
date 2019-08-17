@@ -537,8 +537,8 @@ const meteor: Spell = {
     throttle: true,
 
     projectile: {
-        ccd: false,
         density: 100,
+        ccd: false,
         attractable: false,
         linkable: true,
         radius: 0.03,
@@ -575,8 +575,8 @@ const meteorite: Spell = {
     throttle: true,
 
     projectile: {
-        ccd: false,
         density: 100,
+        ccd: false,
         attractable: false,
         linkable: true,
         radius: 0.015,
@@ -1535,8 +1535,8 @@ const gravity: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        ccd: false,
         density: 0.0001,
+        ccd: false,
         attractable: false,
         radius: 0.0125,
         speed: 0.3,
@@ -1603,6 +1603,7 @@ const whirlwind: Spell = {
 
     projectile: {
         categories: Categories.Massive,
+        ccd: false,
         density: 0.0001,
         radius: 0.03,
         speed: 0.15,
@@ -1684,6 +1685,7 @@ const supernova: Spell = {
 
     projectile: {
         density: 5,
+        ccd: false,
         radius: 0.001,
         speed: 0.3,
         maxTicks: 1.05 * TicksPerSecond,
@@ -1791,8 +1793,8 @@ const halo: Spell = {
 
 
     projectile: {
-        ccd: false,
         density: 1,
+        ccd: false,
         radius: 0.002,
         speed: 0.5,
         maxTicks: 4 * TicksPerSecond,
@@ -1854,8 +1856,8 @@ const mines: Spell = {
     jitterRatio: 1.0,
 
     projectile: {
-        ccd: false,
         density: 1,
+        ccd: false,
         radius: 0.004,
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
@@ -1938,9 +1940,9 @@ const iceBomb: Spell = {
     jitterRatio: 0.6,
 
     projectile: {
-        ccd: false,
         density: 1,
         sensor: true,
+        ccd: false,
         restitution: 0,
         radius: 0.01,
         speed: 0.2,
