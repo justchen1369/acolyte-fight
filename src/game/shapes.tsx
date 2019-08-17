@@ -146,12 +146,16 @@ export function grow(shape: Shape, amount: number): Shape {
 }
 
 export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clearance: number = 0): pl.Vec2 {
+    return proportionalEdgePoint(shape, pos, angle, Math.random(), clearance);
+}
+
+export function proportionalEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, proportion: number, clearance: number = 0): pl.Vec2 {
     if (shape.type === "circle") {
-        const localPoint = vector.fromAngle(Math.random() * 2 * Math.PI, Math.max(0, shape.radius - clearance));
+        const localPoint = vector.fromAngle(proportion * vector.Tau, Math.max(0, shape.radius - clearance));
         return toWorldCoords(pos, angle, localPoint);
 
     } else if (shape.type === "radial" || shape.type === "polygon") {
-        const seed = Math.random() * shape.points.length;
+        const seed = proportion * shape.points.length;
         const before = Math.floor(seed);
         const after = Math.ceil(seed) % shape.points.length;
         const alpha = seed - before;
@@ -168,8 +172,15 @@ export function randomEdgePoint(shape: Shape, pos: pl.Vec2, angle: number, clear
         return toWorldCoords(pos, angle, localPoint);
 
     } else if (shape.type === "arc") {
-        const localAngle = (2 * Math.random() - 1) * shape.angularExtent;
-        const localRadius = shape.radius + (2 * Math.random() - 1) * Math.max(0, shape.radialExtent - clearance);
+        // First half means inside, second half means outside
+        const radialDirection = proportion < 0.5 ? -1 : 1;
+        let angleProportion = proportion * 2;
+        if (angleProportion >= 1) {
+            angleProportion /= 2;
+        }
+
+        const localAngle = (2 * angleProportion - 1) * shape.angularExtent;
+        const localRadius = shape.radius + radialDirection * Math.max(0, shape.radialExtent - clearance);
         const localPoint = vector.fromAngle(localAngle, localRadius).add(shape.localCenter);
         return toWorldCoords(pos, angle, localPoint);
 
