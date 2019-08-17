@@ -86,7 +86,7 @@
     "react-redux": "^7.1.0",
     "redux": "^4.0.0",
     "reselect": "^3.0.1",
-    "screenfull": "^3.3.2",
+    "screenfull": "^4.2.1",
     "scroll-into-view": "^1.9.3",
     "socket.io": "^2.2.0",
     "socket.io-client": "^2.1.1",
