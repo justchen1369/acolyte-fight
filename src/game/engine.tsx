@@ -1745,7 +1745,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			action: action,
 			color: spell.color,
 			stage: w.CastStage.Cooldown,
-			initialAngle: vector.angle(vector.diff(action.target, hero.body.getPosition())),
+			initialAngle: vector.angleDiff(action.target, hero.body.getPosition()),
 		};
 	}
 
@@ -1898,7 +1898,7 @@ function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
 		revsPerTick = hero.revolutionsPerTick;
 	}
 
-	const targetAngle = vector.angle(vector.diff(target, hero.body.getPosition()));
+	const targetAngle = vector.angleDiff(target, hero.body.getPosition());
 	const currentAngle = hero.body.getAngle();
 
 	const newAngle = vector.turnTowards(currentAngle, targetAngle, revsPerTick * 2 * Math.PI);
@@ -3912,7 +3912,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 	const heroPos = hero.body.getPosition();
 
 	const previousAngle = saber.body.getAngle();
-	const targetAngle = vector.angle(vector.diff(hero.target, heroPos)) + saber.angleOffset;
+	const targetAngle = vector.angleDiff(hero.target, heroPos) + saber.angleOffset;
 	const newAngle = vector.turnTowards(previousAngle, targetAngle, saber.turnRate);
 	if (previousAngle === newAngle) {
 		return true; // Nothing to do
