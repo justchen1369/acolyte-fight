@@ -877,11 +877,15 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
 		let drawShape = shape;
+		let growth = 0;
 		if (highlight && highlight.growth) {
-			drawShape = shapes.grow(drawShape, highlight.growth) as shapes.Polygon;
+			growth += highlight.growth;
 		}
 		if (fill.expand) {
-			drawShape = shapes.grow(drawShape, fill.expand) as shapes.Polygon;
+			growth += fill.expand;
+		}
+		if (growth !== 0) {
+			drawShape = shapes.grow(drawShape, growth) as shapes.Polygon;
 		}
 
 		let drawPos = vector.scaleAround(pos, MapCenter, scale);
