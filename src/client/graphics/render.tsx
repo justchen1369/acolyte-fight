@@ -726,6 +726,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const easeMultiplier = ease(world.ui.initialRenderTick, world);
 	if (easeMultiplier > 0) {
 		scale *= 1 - easeMultiplier;
+		color.darken(easeMultiplier);
 	}
 
 	const strokeStyle = color.clone().lighten(0.05);
