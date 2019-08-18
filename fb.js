@@ -52,7 +52,9 @@ archive.pipe(output);
 // append files
 archive.glob('index.html');
 archive.glob('fbapp-config.json');
-archive.glob('cdn/**');
+archive.glob('cdn/fonts/**');
+archive.glob('cdn/fontawesome-pro-5.10.1-web/css/**');
+archive.glob('cdn/fontawesome-pro-5.10.1-web/webfonts/**');
 archive.glob('icons/*');
  
 // finalize the archive (ie we are done appending files but streams have to finish yet)
