@@ -4,13 +4,6 @@ html, body {
     margin: 0;
 }
 
-@font-face {
-    font-family: 'ChicagoFLF';
-    src: url("../cdn/fonts/ChicagoFLF.ttf") format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
     background: #181818 linear-gradient(to right, #181818, #111 50%, #181818);
     font-family: "Helvetica", "Arial", sans-serif;
