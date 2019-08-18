@@ -6,7 +6,7 @@ html, body {
 
 @font-face {
     font-family: 'ChicagoFLF';
-    src: url('/cdn/fonts/ChicagoFLF.ttf') format('truetype');
+    src: url("../cdn/fonts/ChicagoFLF.ttf") format('truetype');
     font-weight: normal;
     font-style: normal;
 }
@@ -174,7 +174,7 @@ canvas.atlas {
 
 canvas.game {
     background: transparent;
-    cursor: url("/cdn/cursors/Cursor2.png") 8 8, crosshair;
+    cursor: url("../cdn/cursors/Cursor2.png") 8 8, crosshair;
     position: absolute;
     top: 0;
     left: 0;

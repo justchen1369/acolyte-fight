@@ -40,7 +40,6 @@ export async function initialize() {
     console.log("Base URL", url.baseUrl);
 
     const mainCssLoaded = loadCSS(`${base}/static/main.css`);
-    const iconsLoaded = loadCSS(`${base}/cdn/fontawesome-pro-5.10.1-web/css/all.css`);
 
     await options.init(); // Initialises the player's name
     StoreProvider.init(); // Must be after player's name initialised
@@ -78,7 +77,6 @@ export async function initialize() {
     seen.loadSeenVersion(); // Don't bother awaiting
     storage.cleanupGameStats();
 
-    await iconsLoaded;
     StoreProvider.dispatch({ type: "updateLoaded", iconsLoaded: true })
 }
 
