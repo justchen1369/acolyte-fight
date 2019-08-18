@@ -70,6 +70,9 @@ export function connect(
 						listeners.onReconnect(socket);
 					} else {
 						alreadyConnected = true;
+						if (currentSocket && currentSocket !== socket) {
+							currentSocket.disconnect(); // Disconnect from previous socket
+						}
 						currentSocket = socket; // The socket is ready, make it used globally
 						resolve(socket);
 					}
