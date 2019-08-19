@@ -22,6 +22,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     userId: string;
+    myGameId: string;
     myHeroId: string;
     isDead: boolean;
     showingHelpPage: number;
@@ -31,6 +32,7 @@ interface Props extends OwnProps {
     seenVersion: number;
 }
 interface State {
+    hidingTutorialGameId: string;
 }
 
 function stateToProps(state: s.State): Props {
@@ -38,6 +40,7 @@ function stateToProps(state: s.State): Props {
     const myHeroId = world.ui.myHeroId;
     return {
         userId: state.userId,
+        myGameId: world.ui.myGameId,
         myHeroId,
         isDead: engine.isDead(myHeroId, world),
         showingHelpPage: state.showingHelpPage,
@@ -49,6 +52,14 @@ function stateToProps(state: s.State): Props {
 }
 
 class HelpMessage extends React.PureComponent<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.state = {
+            hidingTutorialGameId: null,
+        };
+    }
+
     render() {
         if (!this.props.myHeroId) {
             return null; // Observer doesn't need instructions
@@ -58,7 +69,8 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null; // Let the "Play Again" message take precedence
         }
 
-        if (this.props.showingHelpPage !== null && this.props.showingHelpPage < NumHelpPages) {
+        const needsHelp = !this.props.userId; // Don't show help to users who have played enough games to have an account
+        if (needsHelp && this.props.showingHelpPage !== null && this.props.showingHelpPage < NumHelpPages) {
             return this.renderHelp();
         } else if (this.props.tutorial) {
             return this.renderTutorial();
@@ -151,14 +163,19 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderTutorial() {
+        if (this.props.myGameId === this.state.hidingTutorialGameId) {
+            return null;
+        }
+
         return <div className="help-box dialog-panel">
             <div className="help-title">Tutorial</div>
             <div className="help-row">
                 Defeat these bots! Prove you are ready to fight real enemies.
             </div>
             <div className="action-row">
-                <Button onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
+                <Button onClick={() => this.onHideTutorialClick()}>OK</Button>
                 <Button className="link-btn" onClick={(e) => this.onPreviousHelpClicked(e)}>Help</Button>
+                <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
             </div>
         </div>
     }
@@ -182,6 +199,10 @@ class HelpMessage extends React.PureComponent<Props, State> {
             </div>
         </div>
         */
+    }
+
+    private onHideTutorialClick() {
+        this.setState({ hidingTutorialGameId: this.props.myGameId });
     }
 
     private onExitTutorialClick() {

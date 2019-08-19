@@ -55,12 +55,8 @@ class DeadMessage extends React.PureComponent<Props, State> {
             </>}
 
             <div className="action-row">
-                <div style={{ marginBottom: 12 }}>
-                    <b><Button className="link-btn" onClick={() => this.setState({ spectatingGameId: this.props.myGameId })}>Continue Watching</Button></b> or
-                </div>
-                <div>
-                    <PlayButton again={!!this.props.myHeroId} />
-                </div>
+                <PlayButton again={!!this.props.myHeroId} />
+                <Button className="link-btn" onClick={() => this.setState({ spectatingGameId: this.props.myGameId })}>Spectate</Button>
             </div>
         </div>;
     }

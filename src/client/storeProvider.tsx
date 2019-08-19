@@ -26,7 +26,7 @@ function initialState(): s.State {
         customizing: false,
         seen: 0,
         loggedIn: false,
-        showingHelpPage: 0,
+        showingHelpPage: isNewPlayer ? 0 : null,
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
