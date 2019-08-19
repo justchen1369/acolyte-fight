@@ -61,7 +61,7 @@ class RatingAdjustmentMessage extends React.PureComponent<Props, State> {
             return <div className="row rating-notification">
                 <div>Your rating has changed: <b>{league.name}</b> {Math.floor(finalAcoExposure)} ({this.renderRatingAdjustment(delta)}).</div>
                 {nextLeague && <div className="next-league-hint">Points remaining until next league: <b>+{Math.ceil(nextLeague.minRating - finalAcoExposure)}</b>.</div>}
-                <div className="unranked-hint"><Link page="profile" profileId={this.props.userId} onClick={() => matches.leaveCurrentGame()}>Go to your profile</Link> to changed to unranked mode.</div>
+                <div className="unranked-hint"><Link page="profile" profileId={this.props.userId} onClick={() => matches.leaveCurrentGame()}>Go to your profile</Link> to change to unranked mode.</div>
             </div>
         } else {
             return null;
