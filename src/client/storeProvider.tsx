@@ -26,7 +26,7 @@ function initialState(): s.State {
         customizing: false,
         seen: 0,
         loggedIn: false,
-        showingHelp: true,
+        showingHelpPage: 0,
         isNewPlayer,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
@@ -97,6 +97,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         let newState: s.State = { ...state, userId: action.userId, loggedIn: action.loggedIn, profile: null };
         if (action.loggedIn) {
             newState.isNewPlayer = false;
+            newState.showingHelpPage = null;
         }
         return newState;
     } else if (action.type === "logout") {
@@ -237,7 +238,7 @@ function reducer(state: s.State, action: s.Action): s.State {
             return state;
         }
     } else if (action.type === "updateShowingHelp") {
-        return { ...state, showingHelp: action.showingHelp };
+        return { ...state, showingHelpPage: action.showingHelpPage };
     } else if (action.type === "clearNewPlayerFlag") {
         return { ...state, isNewPlayer: false };
     } else if (action.type === "updateToolbar") {

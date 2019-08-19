@@ -7,6 +7,7 @@ import * as matches from '../core/matches';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
+import * as tutor from '../core/tutor';
 import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
@@ -94,12 +95,7 @@ class PlayButton extends React.PureComponent<Props, State> {
 
         await loaded();
 
-        const joinParams: matches.JoinParams = {};
-        if (this.props.isNewPlayer) {
-            joinParams.locked = m.LockType.Tutorial;
-            joinParams.numBots = 1;
-        }
-        matches.joinNewGame(joinParams);
+        matches.joinNewGame(tutor.tutorialSettings() || {});
     }
 
     private onPartyReadyClicked(ready: boolean) {

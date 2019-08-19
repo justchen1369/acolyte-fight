@@ -24,6 +24,11 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
         return;
     }
 
+    if (state.isNewPlayer) {
+        // Still in tutorial, don't create account yet
+        return;
+    }
+
     const numGames = await storage.getNumGames();
     if (numGames >= constants.Placements.VerificationGames) {
         // Login anonymously

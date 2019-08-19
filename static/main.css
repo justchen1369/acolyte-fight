@@ -979,12 +979,6 @@ table.player-list {
     font-weight: bold;
 }
 
-@media (min-width: 1024px) {
-    .messages .help-box {
-        font-size: 150%;
-    }
-}
-
 .messages .help-box .help-title {
     font-weight: bold;
     margin-bottom: 1em;
@@ -992,6 +986,16 @@ table.player-list {
 
 .messages .help-box .help-row {
     margin: 0.1em 0px;
+    max-width: 30vw;
+}
+
+.mobile .messages .help-box .help-row {
+    max-width: 100vw;
+}
+
+.messages .help-box .help-row.help-info-row {
+    font-style: italic;
+    margin: 0.5em 0px;
 }
 
 .messages .help-box .icon-container {
@@ -1055,6 +1059,10 @@ table.player-list {
 .messages .action-row {
     margin-top: 1em;
     align-items: center;
+}
+
+.messages .action-row *:nth-child(n+2)  {
+    margin-left: 1em;
 }
 
 .messages .winner .action-row .btn {
