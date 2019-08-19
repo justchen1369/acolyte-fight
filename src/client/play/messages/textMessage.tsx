@@ -8,6 +8,7 @@ import * as StoreProvider from '../../storeProvider';
 import * as s from '../../store.model';
 import * as w from '../../../game/world.model';
 import PlayerName from '../playerNameComponent';
+import { isMobile } from '../../core/userAgent';
 
 interface OwnProps {
     notification: w.TextNotification;
@@ -63,6 +64,10 @@ class TextMessage extends React.PureComponent<Props, State> {
     }
 
     private renderSilenceBtn() {
+        if (isMobile) {
+            return null; // Too easy to click by mistake mid-game
+        }
+
         if (this.props.notification.userHash === this.props.myUserHash) {
             return null; // Cannot self-silence
         }
