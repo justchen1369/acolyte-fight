@@ -109,6 +109,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
     private renderHelpActions() {
         return <div className="action-row">
             <Button className="btn" onClick={(e) => this.onHideHelpClicked(e)}>OK</Button>
+            {this.props.tutorial && <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>}
         </div>
     }
 
