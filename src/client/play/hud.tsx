@@ -23,6 +23,7 @@ import RandomizePanel from './buttons/randomizePanel';
 import FullScreenButton from './buttons/fullScreenButton';
 import SocialBar from '../controls/socialBar';
 import SpellInfoPanel from './spellInfoPanel';
+import TeamsMessage from './messages/teamsMessage';
 import TextMessageBox from './textMessageBox';
 import VideoPanel from './buttons/videoPanel';
 import WaitingMessage from './messages/waitingMessage';
@@ -118,6 +119,7 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
+            <TeamsMessage />
             <GameKeyCustomizer />
         </>
     }
@@ -165,6 +167,7 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
+            <TeamsMessage />
             {!a.noExternalLinks && this.props.exitable && <SocialBar />}
             <SpellInfoPanel />
             <GameKeyCustomizer />

@@ -10,7 +10,6 @@ import * as StoreProvider from '../storeProvider';
 import { Matchmaking, TicksPerSecond } from '../../game/constants';
 import LeftMessage from './messages/leftMessage';
 import RatingAdjustmentMessage from './messages/ratingAdjustmentMessage';
-import TeamsMessage from './messages/teamsMessage';
 import TextMessage from './messages/textMessage';
 import PlayerName from './playerNameComponent';
 
@@ -68,7 +67,6 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         switch (notification.type) {
             case "disconnected": return this.renderDisconnectedNotification(key, notification);
             case "text": return <TextMessage key={key} notification={notification} />
-            case "teams": return <TeamsMessage key={key} notification={notification} />;
             case "closing": return this.renderClosingNotification(key, notification);
             case "join": return this.renderJoinNotification(key, notification);
             case "bot": return this.renderBotNotification(key, notification);
