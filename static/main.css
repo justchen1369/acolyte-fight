@@ -1030,7 +1030,7 @@ table.player-list {
 .messages .dialog-panel {
     color: white;
     margin-top: 1em;
-    padding: 0.5em;
+    padding: 1em;
     background: linear-gradient(to right, #222, rgba(0,0,0,0));
 }
 
