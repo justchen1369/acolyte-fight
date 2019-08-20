@@ -979,6 +979,12 @@ table.player-list {
     font-weight: bold;
 }
 
+@media (min-width: 1024px) {
+    .desktop .help-box {
+        font-size: 150%;
+    }
+}
+
 .messages .help-box .help-title {
     font-weight: bold;
     margin-bottom: 1em;

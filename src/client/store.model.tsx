@@ -15,7 +15,7 @@ export interface State {
     userId?: string;
     loggedIn: boolean;
     isNewPlayer: boolean;
-    showingHelpPage?: number; // null means not showing help
+    showingHelp?: boolean;
     playerName: string;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -274,7 +274,7 @@ export interface ClearNewPlayerFlagAction {
 
 export interface UpdateShowingHelpAction {
     type: "updateShowingHelp";
-    showingHelpPage: number;
+    showingHelp: boolean;
 }
 
 export interface UpdateHoverSpellAction {

@@ -20,14 +20,10 @@ export function onNotification(notifs: w.Notification[]) {
 export function tutorialSettings(): matches.JoinParams {
     const state = StoreProvider.getState();
     if (state.isNewPlayer && state.room.id === m.DefaultRoomId && !state.party) {
-        const settings = state.room.settings;
-        if ("circle" in settings.Layouts) {
-            return {
-                locked: m.LockType.Tutorial,
-                layoutId: "circle",
-                numBots: 2,
-            };
-        }
+        return {
+            locked: m.LockType.Tutorial,
+            numBots: 1,
+        };
     }
     return null;
 }
