@@ -140,8 +140,8 @@ body .page {
 }
 
 #game-panel .exit-link:hover {
-    background: #465;
-    color: #2e8;
+    background: #654;
+    color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -189,7 +189,7 @@ a, a:visited {
     transition: color 0.2s ease;
 }
 a:hover, a:active {
-    color: #2e8;
+    color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -200,7 +200,7 @@ a:hover, a:active {
     text-decoration: none;
 }
 .link-btn:hover, .link-btn:active {
-    color: #2e8;
+    color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -237,7 +237,7 @@ a:hover, a:active {
 }
 
 .btn:hover {
-    background: #2e8;
+    background: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -370,7 +370,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-item.login-btn:hover {
-    background: #2e8;
+    background: #f80;
     color: white;
     animation: shine-loop 0.5s alternate infinite linear;
 }
@@ -404,13 +404,13 @@ a:hover, a:active {
 }
 
 .navbar .nav-item:hover .nav-item-label .badge {
-    color: #2e8;
+    color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-item:hover {
-    background: #465;
-    color: #2e8;
+    background: #654;
+    color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -570,7 +570,7 @@ a:hover, a:active {
     background: linear-gradient(to bottom, #49c 0%, #49c 7%, #08b 7%, #08b 93%, #069 93%, #069);
 }
 .home .secondary-button-row .btn:hover {
-    background: #2e8;
+    background: #f80;
 }
 .home .btn.disabled {
     background-color: #ccc;
@@ -599,7 +599,7 @@ a:hover, a:active {
 }
 
 .more-io-games a:hover {
-    background-color: #465;
+    background-color: #654;
 }
 
 .social-bar {
@@ -1779,7 +1779,7 @@ h3 {
 }
 
 .leaderboard-row .player-name a:hover {
-    color: #2e8;
+    color: #f80;
 }
 
 .leaderboard-row .win-count {
@@ -1885,7 +1885,7 @@ h3 {
 }
 
 .game-list .player-cell .known:hover {
-    color: #2e8 !important;
+    color: #f80 !important;
 }
 
 .game-list .game-card:hover {
