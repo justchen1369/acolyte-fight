@@ -140,8 +140,8 @@ body .page {
 }
 
 #game-panel .exit-link:hover {
-    background: #555;
-    color: #ff8800;
+    background: #465;
+    color: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -189,7 +189,7 @@ a, a:visited {
     transition: color 0.2s ease;
 }
 a:hover, a:active {
-    color: #ff8800;
+    color: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -200,7 +200,7 @@ a:hover, a:active {
     text-decoration: none;
 }
 .link-btn:hover, .link-btn:active {
-    color: #ff8800;
+    color: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -237,7 +237,7 @@ a:hover, a:active {
 }
 
 .btn:hover {
-    background: #ff8800;
+    background: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -370,7 +370,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-item.login-btn:hover {
-    background: #ff8800;
+    background: #2e8;
     color: white;
     animation: shine-loop 0.5s alternate infinite linear;
 }
@@ -404,13 +404,13 @@ a:hover, a:active {
 }
 
 .navbar .nav-item:hover .nav-item-label .badge {
-    color: #ff8800;
+    color: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-item:hover {
-    background: #555;
-    color: #ff8800;
+    background: #465;
+    color: #2e8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -570,7 +570,7 @@ a:hover, a:active {
     background: linear-gradient(to bottom, #49c 0%, #49c 7%, #08b 7%, #08b 93%, #069 93%, #069);
 }
 .home .secondary-button-row .btn:hover {
-    background: #f80;
+    background: #2e8;
 }
 .home .btn.disabled {
     background-color: #ccc;
@@ -591,7 +591,7 @@ a:hover, a:active {
 
 .more-io-games a {
     display: inline-block;
-    background-color: #5554;
+    background-color: #4654;
     padding: 10px 10px;
     margin-right: 10px;
 
@@ -599,7 +599,7 @@ a:hover, a:active {
 }
 
 .more-io-games a:hover {
-    background-color: #555;
+    background-color: #465;
 }
 
 .social-bar {
@@ -1779,7 +1779,7 @@ h3 {
 }
 
 .leaderboard-row .player-name a:hover {
-    color: #ff8800;
+    color: #2e8;
 }
 
 .leaderboard-row .win-count {
@@ -1885,7 +1885,7 @@ h3 {
 }
 
 .game-list .player-cell .known:hover {
-    color: #ff8800 !important;
+    color: #2e8 !important;
 }
 
 .game-list .game-card:hover {
