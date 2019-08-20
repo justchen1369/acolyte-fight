@@ -49,7 +49,6 @@ class HomePanel extends React.PureComponent<Props, State> {
             <div className="home">
                 <TitleListener />
                 <NavBar />
-                <div className="spacer" />
                 <div className="title-row">
                     <video autoPlay muted loop>
                         <source src={`${url.base}/cdn/videos/AcolyteFight6.m4v`} type="video/mp4" />
