@@ -231,11 +231,9 @@ a:hover, a:active {
     text-align: center;
     box-shadow: 3px 3px 3px #0c0c0c;
     text-shadow: 1px 1px 1px black;
-    border-radius: 3px;
-    background: linear-gradient(to bottom, #00ccff, #00ccff 95%, #0088bb 95%, #0088bb);
+    border-radius: 0.25em;
+    background: linear-gradient(to bottom, #4df 0%, #4df 7%, #0cf 7%, #0cf 93%, #08b 93%, #08b);
     padding: 10px 40px;
-
-    transition: background-color 0.2s ease;
 }
 
 .btn:hover {
@@ -569,7 +567,7 @@ a:hover, a:active {
     font-size: 285%;
 }
 .home .secondary-button-row .btn {
-    background: linear-gradient(to bottom, #08b, #08b 90%, #045 90%, #045);
+    background: linear-gradient(to bottom, #49c 0%, #49c 7%, #08b 7%, #08b 93%, #069 93%, #069);
 }
 .home .secondary-button-row .btn:hover {
     background: #f80;
