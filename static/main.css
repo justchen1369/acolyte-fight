@@ -376,7 +376,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-profile-item {
-    background: #333;
+    background: #4448;
 }
 
 .navbar .nav-item .nav-item-label {
@@ -428,7 +428,7 @@ a:hover, a:active {
 }
 
 .navbar .nav-item-unranked-toggle {
-    background: #3334;
+    background: #2228;
     font-weight: normal;
 }
 
