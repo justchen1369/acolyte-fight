@@ -143,7 +143,6 @@ class HUD extends React.PureComponent<Props, State> {
     private renderDesktop() {
         const a = options.getProvider();
         return <>
-            {!a.noExternalLinks && this.props.exitable && <SocialBar />}
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
             </Layout>
@@ -166,6 +165,7 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
+            {!a.noExternalLinks && this.props.exitable && <SocialBar />}
             <SpellInfoPanel />
             <GameKeyCustomizer />
         </>
