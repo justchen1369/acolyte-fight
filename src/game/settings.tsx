@@ -2409,7 +2409,7 @@ const swap: Spell = {
 
     projectile: {
         density: 0.001,
-        radius: 0.005,
+        radius: 0.01,
         speed: 0.8,
         maxTicks: 0.75 * TicksPerSecond,
         damage: 0,
@@ -2452,7 +2452,7 @@ const swap: Spell = {
                 loopTicks: 15,
                 glow: 0.05,
             },
-            { type: "link", color: '#75e7ff', width: Pixel * 2.5, toWidth: Pixel * 5, glow: 0.2 },
+            { type: "link", color: '#75e7ff', width: 0.001, toWidth: 0.01, glow: 0.2 },
             { type: "strike", color: '#75e7ff', flash: true, ticks: 15, numParticles: 9 },
         ],
     },
