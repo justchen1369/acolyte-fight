@@ -2302,7 +2302,9 @@ const phaseOut: Spell = {
             maxTicks: 1 * TicksPerSecond,
         },
         {
-            type: "vanish",
+            type: "mass",
+            radius: 1 * Hero.Radius,
+            density: 1000,
             maxTicks: 1 * TicksPerSecond,
         },
         {
@@ -2402,8 +2404,6 @@ const thrust: Spell = {
     ],
 
     range: 0.4,
-    radiusMultiplier: 1.5,
-    density: 10,
     maxAngleDiffInRevs: 0.01,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
@@ -2420,9 +2420,10 @@ const thrust: Spell = {
     sound: "thrust",
 
     buffs: [
-        { // Only used for rendering
-            type: "movement",
-            movementProportion: 1,
+        {
+            type: "mass",
+            radius: 1.5 * Hero.Radius,
+            density: 10,
             maxTicks: 16,
             render: {
                 color: "#fff",

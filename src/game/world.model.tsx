@@ -395,6 +395,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	health: number;
 	maxHealth: number;
 	body: pl.Body;
+	initialRadius: number;
 	radius: number;
 	moveSpeedPerSecond: number;
 	maxSpeed: number;
@@ -563,9 +564,6 @@ export interface ThrustState {
 	ticks: number;
 	nullified: boolean;
 	alreadyHit: Set<string>;
-
-	initialRadius: number;
-	fixture: pl.Fixture;
 }
 
 export interface GravityState {
@@ -587,6 +585,7 @@ export type Buff =
 	| LifeStealBuff
 	| BurnBuff
 	| ArmorBuff
+	| MassBuff
 
 export interface BuffValues {
 	destroyedTick?: number;
@@ -652,6 +651,12 @@ export interface ArmorBuff extends BuffBase {
 	type: "armor";
 	fromHeroId?: string;
 	proportion: number;
+}
+
+export interface MassBuff extends BuffBase {
+	type: "mass";
+	fixture: pl.Fixture;
+	radius: number;
 }
 
 export interface Cooldowns {

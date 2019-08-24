@@ -503,6 +503,7 @@ function addHero(world: w.World, heroId: string) {
 		health: Hero.MaxHealth,
 		maxHealth: Hero.MaxHealth,
 		body,
+		initialRadius: Hero.Radius,
 		radius: Hero.Radius,
 		linearDamping: Hero.Damping,
 		damageSources: new Map<string, number>(),
@@ -1076,6 +1077,16 @@ function resetMass(behaviour: w.ResetMassBehaviour, world: w.World) {
 		obj.body.resetMassData();
 	}
 	return false;
+}
+
+function updateHeroRadius(hero: w.Hero, world: w.World) {
+	let radius = hero.initialRadius;
+	hero.buffs.forEach(b => {
+		if (b.type === "mass") {
+			radius = Math.max(radius, b.radius);
+		}
+	});
+	hero.radius = radius;
 }
 
 function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.World) {
@@ -3027,6 +3038,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 		return false;
 	}
 
+	let massChanged = false;
 	hero.buffs.forEach((buff, id) => {
 		if (isBuffExpired(buff, hero, world)) {
 			buff.destroyedTick = world.tick;
@@ -3035,9 +3047,16 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 
 			if (buff.type === "vanish") {
 				world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: true });
+			} else if (buff.type === "mass") {
+				hero.body.destroyFixture(buff.fixture);
+				massChanged = true;
 			}
 		}
 	});
+
+	if (massChanged) {
+		updateHeroRadius(hero, world);
+	}
 
 	return true;
 }
@@ -3825,24 +3844,14 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 
 		const ticks = Math.min(maxTicks, ticksToTarget);
 
-		const thrustRadius = hero.radius * spell.radiusMultiplier;
-		const fixture = hero.body.createFixture(pl.Circle(thrustRadius), {
-			density: spell.density || 0,
-			filterCategoryBits: Categories.Hero,
-			filterMaskBits: Categories.All,
-			filterGroupIndex: hero.filterGroupIndex,
-		});
 		let thrust: w.ThrustState = {
 			damageTemplate: spell.damageTemplate,
 			velocity,
 			ticks,
 			nullified: false,
 			alreadyHit: new Set<string>(),
-			initialRadius: hero.radius,
-			fixture,
 		};
 
-		hero.radius = thrustRadius;
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
 
@@ -3880,9 +3889,6 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 	--hero.thrust.ticks;
 	if (hero.thrust.ticks <= 0) {
 		hero.body.setLinearVelocity(vectorZero);
-		hero.radius = hero.thrust.initialRadius;
-
-		hero.body.destroyFixture(hero.thrust.fixture);
 		hero.thrust = null;
 		return false;
 	} else {
@@ -3890,7 +3896,6 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 		return true;
 	}
 }
-
 
 function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: SaberSpell) {
 	const saberTick = world.tick - hero.casting.channellingStartTick;
@@ -4162,6 +4167,19 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			...values, id, type: "armor",
 			proportion: template.proportion,
 			fromHeroId,
+		});
+	} else if (template.type === "mass") {
+		const fixture = hero.body.createFixture(pl.Circle(template.radius), {
+			density: template.density || 0,
+			filterCategoryBits: template.passthrough ? Categories.None : Categories.Hero,
+			filterMaskBits: template.passthrough ? Categories.None : Categories.All,
+			filterGroupIndex: hero.filterGroupIndex,
+		});
+
+		hero.buffs.set(id, {
+			...values, id, type: "mass",
+			fixture,
+			radius: template.radius,
 		});
 	} else if (template.type === "delink") {
 		if (hero.link) {
