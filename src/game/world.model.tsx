@@ -93,7 +93,6 @@ export interface HeroScore {
 	kills: number;
 	outlasts: number;
 	damage: number;
-	numSpellsCast: number;
 
 	deathTick: number | null;
 	rank: number | null;
@@ -205,6 +204,7 @@ export interface Player {
 	isSharedBot: boolean;
 	isBot: boolean;
 	isMobile: boolean;
+	nonIdle?: boolean;
 	dead?: boolean;
 
 	// Not synced across clients

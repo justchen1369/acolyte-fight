@@ -1790,8 +1790,10 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		};
 
 		if (!w.Actions.NonGameStarters.some(x => x === spell.id)) {
-			const score = world.scores.get(hero.id);
-			world.scores = world.scores.set(hero.id, { ...score, numSpellsCast: score.numSpellsCast + 1 });
+			const player = world.players.get(hero.id);
+			if (player) {
+				player.nonIdle = true;
+			}
 		}
 	}
 
@@ -4410,7 +4412,6 @@ export function initScore(heroId: string): w.HeroScore {
 		kills: 0,
 		outlasts: 0,
 		damage: 0,
-		numSpellsCast: 0,
 		deathTick: null,
 		rank: null,
 	};

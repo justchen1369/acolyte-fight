@@ -62,6 +62,7 @@ class PlayButton extends React.PureComponent<Props, State> {
 
     componentDidMount() {
         this.recheckInterval = setInterval(() => this.recheckAutoJoin(), 1000);
+        this.recheckAutoJoin();
     }
 
     componentWillUnmount() {
@@ -151,8 +152,8 @@ class PlayButton extends React.PureComponent<Props, State> {
             return false;
         }
 
-        const score = world.scores.get(world.ui.myHeroId);
-        if (!(score && score.numSpellsCast > 0)) {
+        const player = world.players.get(world.ui.myHeroId);
+        if (!(player && player.nonIdle)) {
             // Idle
             return false;
         }
