@@ -629,6 +629,7 @@ a:hover, a:active {
 
 .social-bar a:hover {
     color: #eee;
+    text-shadow: 0 0 8px #fff8;
 }
 
 .home .fold-indicator {
@@ -2197,7 +2198,9 @@ textarea.ai-js {
     transition: background-color 0.2s ease;
 }
 .entity-list-item:hover {
-    background: #555;
+    background-color: #0cf !important;
+    color: white !important;
+    box-shadow: 0 0 8px #0cf8;
 }
 .entity-list-item.unmodded {
     color: #888;
