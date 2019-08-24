@@ -2285,28 +2285,31 @@ const phaseOut: Spell = {
     maxChannellingTicks: 1 * TicksPerSecond,
 
     buffs: [
-        { type: "debuff" },
+        {
+            type: "debuff",
+            maxTicks: 1 * TicksPerSecond,
+        },
         {
             type: "armor",
-            proportion: -1, // Full immunity
             maxTicks: 1 * TicksPerSecond,
+            proportion: -1, // Full immunity
         },
         {
             type: "movement",
-            movementProportion: 0,
             maxTicks: 1 * TicksPerSecond,
+            movementProportion: 0,
         },
         {
             type: "lavaImmunity",
-            damageProportion: 0,
             maxTicks: 1 * TicksPerSecond,
+            damageProportion: 0,
         },
         {
             type: "mass",
+            maxTicks: 1 * TicksPerSecond,
             radius: 1 * Hero.Radius,
             density: 1000,
             collideWith: 0,
-            maxTicks: 1 * TicksPerSecond,
         },
         {
             type: "cooldown",

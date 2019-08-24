@@ -4088,7 +4088,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	}
 
 	if (template.type === "debuff") {
-		hero.cleanseTick = world.tick;
+		hero.cleanseTick = values.expireTick;
 	} else if (template.type === "movement") {
 		hero.buffs.set(id, {
 			...values, id, type: "movement",
