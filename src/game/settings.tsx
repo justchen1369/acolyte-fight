@@ -2285,7 +2285,13 @@ const phaseOut: Spell = {
     maxChannellingTicks: 1 * TicksPerSecond,
 
     buffs: [
-        { type: "delink" },
+        {
+            type: "mass",
+            maxTicks: 1 * TicksPerSecond,
+            radius: 1 * Hero.Radius,
+            density: 0,
+            restrictCollideWith: 0,
+        },
         {
             type: "armor",
             maxTicks: 1 * TicksPerSecond,
@@ -2301,13 +2307,6 @@ const phaseOut: Spell = {
             linearDampingMultiplier: 10,
         },
         {
-            type: "mass",
-            maxTicks: 1 * TicksPerSecond,
-            radius: 1 * Hero.Radius,
-            density: 0,
-            restrictCollideWith: 0,
-        },
-        {
             type: "vanish",
             maxTicks: 1 * TicksPerSecond,
         },
@@ -2315,6 +2314,7 @@ const phaseOut: Spell = {
             type: "cooldown",
             minCooldown: 1 * TicksPerSecond,
         },
+        { type: "delink" },
     ],
 
     icon: "sprint",

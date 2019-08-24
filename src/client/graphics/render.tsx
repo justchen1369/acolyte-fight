@@ -1287,7 +1287,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 
 	let velocity: pl.Vec2 = null;
 	if (render.smoke) {
-		velocity = particleVelocity(hero.thrust.velocity, render.smoke);
+		velocity = particleVelocity(hero.body.getLinearVelocity(), render.smoke);
 	} else {
 		// Normally hero not moving fast enough to create smoke
 		velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
