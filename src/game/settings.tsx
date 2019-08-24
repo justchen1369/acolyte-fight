@@ -2291,7 +2291,7 @@ const phaseOut: Spell = {
             cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             radius: 1 * Hero.Radius,
-            density: 0,
+            density: 1000000,
             restrictCollideWith: 0,
         },
         {
@@ -2309,7 +2309,7 @@ const phaseOut: Spell = {
         {
             type: "glide",
             cleansable: false,
-            linearDampingMultiplier: 100,
+            linearDampingMultiplier: 1000,
         },
         {
             type: "vanish",
