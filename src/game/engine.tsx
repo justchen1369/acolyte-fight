@@ -926,7 +926,6 @@ export function tick(world: w.World) {
 		gravityForce,
 		attract,
 		aura,
-		glide,
 		reflectFollow,
 		saberSwing,
 		thrustBounce,
@@ -2959,24 +2958,14 @@ function linkForce(behaviour: w.LinkBehaviour, world: w.World) {
 	return true;
 }
 
-function glide(behaviour: w.GlideBehaviour, world: w.World) {
-	// Must be idempotent because may have multiple repeated glide behaviours for same hero
-	const hero = world.objects.get(behaviour.heroId);
-	if (hero && hero.category === "hero") {
-		let keep = false;
-		let damping = hero.linearDamping;
-		hero.buffs.forEach(buff => {
-			if (buff.type === "glide") {
-				keep = true;
-				damping *= buff.linearDampingMultiplier;
-			}
-		});
-		hero.body.setLinearDamping(damping);
-
-		return keep;
-	} else {
-		return false;
-	}
+function updateHeroDamping(hero: w.Hero) {
+	let damping = hero.linearDamping;
+	hero.buffs.forEach(buff => {
+		if (buff.type === "glide") {
+			damping *= buff.linearDampingMultiplier;
+		}
+	});
+	hero.body.setLinearDamping(damping);
 }
 
 function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
@@ -3048,6 +3037,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 	}
 
 	let armorChanged = false;
+	let glideChanged = false;
 	let massChanged = false;
 	hero.buffs.forEach((buff, id) => {
 		if (isBuffExpired(buff, hero, world)) {
@@ -3062,12 +3052,17 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 				massChanged = true;
 			} else if (buff.type === "armor") {
 				armorChanged = true;
+			} else if (buff.type === "glide") {
+				glideChanged = true;
 			}
 		}
 	});
 
 	if (armorChanged) {
 		updateArmor(hero);
+	}
+	if (glideChanged) {
+		updateHeroDamping(hero);
 	}
 	if (massChanged) {
 		updateHeroMass(hero);
@@ -4069,7 +4064,7 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffS
 }
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const maxTicks = (template.maxTicks || 1) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
+	const maxTicks = (template.maxTicks || 0) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
 	const values: w.BuffValues = {
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
@@ -4099,7 +4094,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			...values, id, type: "glide",
 			linearDampingMultiplier: template.linearDampingMultiplier,
 		});
-		world.behaviours.push({ type: "glide", heroId: hero.id }); // In case hero receives multiple glide buffs, may have multiple glide behaviours, but that is okay because idempotent
+		updateHeroDamping(hero);
 	} else if (template.type === "lavaImmunity") {
 		hero.buffs.set(id, {
 			...values, id, type: "lavaImmunity",
@@ -4179,7 +4174,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		});
 		updateArmor(hero);
 	} else if (template.type === "mass") {
-		const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
+		const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
 		const fixture = hero.body.createFixture(pl.Circle(template.radius), {
 			density: template.density || 0,
 			filterCategoryBits: Categories.Hero,

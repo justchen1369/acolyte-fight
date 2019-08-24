@@ -2278,17 +2278,14 @@ const phaseOut: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 1 * TicksPerSecond,
     throttle: false,
     debuff: true,
 
     maxChannellingTicks: 1 * TicksPerSecond,
 
     buffs: [
-        {
-            type: "debuff",
-            maxTicks: 1 * TicksPerSecond,
-        },
+        { type: "delink" },
         {
             type: "armor",
             maxTicks: 1 * TicksPerSecond,
@@ -2300,16 +2297,19 @@ const phaseOut: Spell = {
             movementProportion: 0,
         },
         {
-            type: "lavaImmunity",
-            maxTicks: 1 * TicksPerSecond,
-            damageProportion: 0,
+            type: "glide",
+            linearDampingMultiplier: 10,
         },
         {
             type: "mass",
             maxTicks: 1 * TicksPerSecond,
             radius: 1 * Hero.Radius,
-            density: 1000,
-            collideWith: 0,
+            density: 0,
+            restrictCollideWith: 0,
+        },
+        {
+            type: "vanish",
+            maxTicks: 1 * TicksPerSecond,
         },
         {
             type: "cooldown",

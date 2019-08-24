@@ -797,7 +797,7 @@ declare interface ArmorTemplate extends BuffTemplateBase {
 declare interface MassTemplate extends BuffTemplateBase {
 	type: "mass";
 	radius: number; // Increase the radius of the hero to this value
-	collideWith?: number; // Restrict what the hero can collide with while this buff is active
+	restrictCollideWith?: number; // Restrict what the hero can collide with while this buff is active
 	density?: number; // Increase the density of the hero by amount
 }
 

@@ -776,7 +776,6 @@ export type Behaviour =
 	| ClearHitsBehaviour
 	| LinkBehaviour
 	| GravityBehaviour
-	| GlideBehaviour
 	| StrafeBehaviour
 	| ReflectFollowBehaviour
 	| ThrustBounceBehaviour
@@ -893,11 +892,6 @@ export interface LinkBehaviour extends BehaviourBase {
 
 export interface GravityBehaviour extends BehaviourBase {
 	type: "gravityForce";
-	heroId: string;
-}
-
-export interface GlideBehaviour extends BehaviourBase {
-	type: "glide";
 	heroId: string;
 }
 
