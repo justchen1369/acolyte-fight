@@ -83,7 +83,7 @@ class NavBar extends React.PureComponent<Props, State> {
             <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>
             <div className="spacer" />
             {!a.noModding && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}
-            {!a.noExternalLinks && <PageLink page="about"><i className="icon fas fa-info-circle" /> About</PageLink>}
+            <PageLink page="about"><i className="icon fas fa-info-circle" /> About</PageLink>
         </>;
         return <CustomBar vertical={vertical}>{horizontal}</CustomBar>
     }

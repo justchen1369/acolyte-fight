@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as options from '../options';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
@@ -8,6 +9,7 @@ import RankIcon from '../controls/rankIcon';
 import PrivacyPolicyPanel from './privacyPolicyPanel';
 
 interface Props {
+    noExternalLinks: boolean,
     settings: AcolyteFightSettings;
     leagues: m.League[];
 }
@@ -16,7 +18,9 @@ interface State {
 }
 
 function stateToProps(state: s.State): Props {
+    const a = options.getProvider();
     return {
+        noExternalLinks: a.noExternalLinks,
         settings: state.room.settings,
         leagues: state.leagues,
     };
@@ -36,14 +40,25 @@ export class AboutSection extends React.PureComponent<Props, State> {
     }
 
     render() {
-        const Hero = this.props.settings.Hero;
-        const World = this.props.settings.World;
         return <div>
             <h1 className="title">Acolyte Fight!</h1>
             <p>
                 Welcome <b>Acolyte</b>! Time to practice your skills.
                 In this arena, you'll find others just like you. Will you be the last one standing?
             </p>
+            {this.renderRules()}
+            {this.renderCommunity()}
+            {this.renderRating()}
+            {this.renderFAQ()}
+            {this.renderCredits()}
+            <PrivacyPolicyPanel />
+        </div>;
+    }
+
+    private renderRules() {
+        const Hero = this.props.settings.Hero;
+        const World = this.props.settings.World;
+        return <div key="rules">
             <p>
                 This game is skillshot arena. To hit your enemies, predict how your enemies will move and shoot to where they are going to be!
                 This game is about skill! Acolytes who use all the spells badly will be overpowered by those who only use a simple fireball accurately and dodge well.
@@ -60,15 +75,29 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 If multiple opponents attack you within <b>{Hero.DamageMitigationTicks / constants.TicksPerSecond} seconds</b>,
                 you will only take damage from the opponent who did the most damage.
             </p>
+        </div>
+    }
+
+    private renderCommunity() {
+        if (this.props.noExternalLinks) {
+            return null;
+        }
+
+        return <div key="community">
             <h1>Community</h1>
             <p className="share"><a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /><span>Join the chat on Discord!</span></a></p>
             <p className="share"><a href="http://reddit.com/r/acolytefight" target="_blank"><i className="fab fa-reddit-square" /><span>r/acolytefight</span></a></p>
             <p className="share"><a href="http://twitter.com/acolytefight" target="_blank"><i className="fab fa-twitter-square" /><span>@acolytefight</span></a></p>
             <p className="share"><a href="http://facebook.com/acolytefight" target="_blank"><i className="fab fa-facebook-square" /><span>fb.com/acolytefight</span></a></p>
             <p className="share"><a href="https://www.youtube.com/channel/UCJr11iCM_aigs5mCqhF_H2g" target="_blank"><i className="fab fa-youtube-square" /><span>YouTube: Acolyte Fight!</span></a></p>
+        </div>
+    }
+
+    private renderRating() {
+        return <div key="rating">
             <h1>How does the rating system work?</h1>
             <p>
-                The rating system is designed to measure your skill accurately, and is based on <a href="https://en.wikipedia.org/wiki/Elo_rating_system" target="_blank">Elo</a>.
+                The rating system is designed to measure your skill accurately, and is based on {this.renderLink("https://en.wikipedia.org/wiki/Elo_rating_system", "Elo")}.
                 The rating system looks at all games played in the past 7 days, and awards you points based on how your performance compares to other similar players of your rating.
                 For example, the rating might understand that when an 1800 player fights a 1300 player, on average they win 76% of the time.
                 If you win more often than that, then on average, you will move up.
@@ -118,39 +147,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 If you are a Master repeatedly beating newbies,
                 at some point you will rank up so high that you stop gaining any points from them.
             </p>
-            <h1>FAQ</h1>
-            <h2>When does the game start?</h2>
-            <p>
-                The game starts whenever you want it to - just start casting some spells.
-                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
-            </p>
-            <h2>How can I play this game on my phone?</h2>
-            <p>The game already works on mobile, just go to <a href="http://acolytefight.io" target="_blank">acolytefight.io</a> and click Play.</p>
-            <p>
-                To make the game more accessible, add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
-                On iPhone - tap the Share button, click Add to Home Screen.
-                On Android - tap the triple dot menu button, click Add to Home Screen.
-            </p>
-            <h2>How long are replays stored for?</h2>
-            <p>
-                Replays are stored until the server is updated. This can sometimes be days and sometimes it can be hours.
-                Replays cannot be stored across game updates as the game simulation changes with each update and that changes the meaning of the replay data.
-                If you want to keep your replay permanently, take a video of your game.
-            </p>
-            <h1>Credits</h1>
-            <p><b>Acolyte Fight!</b> was created by <b><a href="https://twitter.com/raysplacenspace" target="_blank">raysplaceinspace</a></b> and
-            was inspired by the <a href="http://us.blizzard.com/en-us/games/war3/" target="_blank">WarCraft III</a> map <a href="http://www.warlockbrawl.com/" target="_blank">Warlock</a>,
-            originally created by <b>Zymoran</b>, <b>Adynathos</b>, <b>Toraxxx</b> and <b>sides</b>.</p>
-            <ul>
-                <li><a href="http://piqnt.com/planck.js/" target="_blank">Planck.js</a> created by Erin Catto and Ali Shakiba and used under zlib license.</li>
-                <li>Icons created by <a href="http://lorcblog.blogspot.com/" target="_blank">Lorc</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                <li>Icons created by <a href="https://opengameart.org/content/95-game-icons" target="_blank">sbed</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                <li>Icons created by <a href="http://delapouite.com/" target="_blank">Delapouite</a> used under Creative Commons license from <a href="http://game-icons.net" target="_blank">Game-icons.net</a>.</li>
-                <li>RPG Awesome font used under <a href="https://github.com/nagoshiashumari/Rpg-Awesome" target="_blank">CC 3.0, SIL and MIT license</a>.</li>
-                <li>Font Awesome used under <a href="https://fontawesome.com/license" target="_blank">CC 4.0, SIL and MIT license</a>.</li>
-            </ul>
-            <PrivacyPolicyPanel />
-        </div>;
+        </div>
     }
 
     private renderLeagues() {
@@ -158,7 +155,7 @@ export class AboutSection extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <>
+        return <div>
             <h2>What is the minimum rating for each league?</h2>
             <div className="leaderboard">
                 {this.props.leagues.map(x => <div className={`leaderboard-row rating-card ${x.name}`} key={x.name}>
@@ -167,7 +164,56 @@ export class AboutSection extends React.PureComponent<Props, State> {
                     <span className="win-count">{x.minRating} rating <span className="leaderboard-num-games">({x.minPercentile} percentile)</span></span>
                 </div>)}
             </div>
-        </>
+        </div>
+    }
+
+    private renderFAQ() {
+        return <div key="faq">
+            <h1>FAQ</h1>
+            <h2>When does the game start?</h2>
+            <p>
+                The game starts whenever you want it to - just start casting some spells.
+                Within the first 3 seconds of the game, no damage can be done, and some players may still join.
+            </p>
+            {!this.props.noExternalLinks && <>
+                <h2>How can I play this game on my phone?</h2>
+                <p>The game already works on mobile, just go to {this.renderLink("http://acolytefight.io", "acolytefight.io")} and click Play.</p>
+                <p>
+                    To make the game more accessible, add <b>Acolyte Fight!</b> to your homescreen of your mobile device.
+                    On iPhone - tap the Share button, click Add to Home Screen.
+                    On Android - tap the triple dot menu button, click Add to Home Screen.
+                </p>
+            </>}
+            <h2>How long are replays stored for?</h2>
+            <p>
+                Replays are stored until the server is updated. This can sometimes be days and sometimes it can be hours.
+                Replays cannot be stored across game updates as the game simulation changes with each update and that changes the meaning of the replay data.
+                If you want to keep your replay permanently, take a video of your game.
+            </p>
+        </div>
+    }
+
+    private renderCredits() {
+        return <div key="credits">
+            <h1>Credits</h1>
+            <p><b>Acolyte Fight!</b> was created by <b>{this.renderLink("https://twitter.com/raysplacenspace", "raysplaceinspace")}</b> and
+            was inspired by the {this.renderLink("http://us.blizzard.com/en-us/games/war3/", "WarCraft III")} map {this.renderLink("http://www.warlockbrawl.com/", "Warlock")},
+            originally created by <b>Zymoran</b>, <b>Adynathos</b>, <b>Toraxxx</b> and <b>sides</b>.</p>
+            {!this.props.noExternalLinks && <ul>
+                <li>{this.renderLink("http://piqnt.com/planck.js/", "Planck.js")} created by Erin Catto and Ali Shakiba and used under zlib license.</li>
+                <li>Icons created by {this.renderLink("http://lorcblog.blogspot.com/", "Lorc")} used under Creative Commons license from {this.renderLink("http://game-icons.net", "Game-icons.net")}.</li>
+                <li>Icons created by {this.renderLink("https://opengameart.org/content/95-game-icons", "sbed")} used under Creative Commons license from {this.renderLink("http://game-icons.net", "Game-icons.net")}.</li>
+                <li>Icons created by {this.renderLink("http://delapouite.com/", "Delapouite")} used under Creative Commons license from {this.renderLink("http://game-icons.net", "Game-icons.net")}.</li>
+            </ul>}
+        </div>
+    }
+
+    private renderLink(href: string, text: string) {
+        if (this.props.noExternalLinks) {
+            return <b>{text}</b>;
+        } else {
+            return <a href={href} target="_blank">{text}</a>
+        }
     }
 }
 
