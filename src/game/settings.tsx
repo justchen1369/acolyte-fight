@@ -2309,6 +2309,7 @@ const phaseOut: Spell = {
         {
             type: "glide",
             cleansable: false,
+            maxTicks: 1 * TicksPerSecond,
             linearDampingMultiplier: 1000,
         },
         {
