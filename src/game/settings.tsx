@@ -188,6 +188,7 @@ const Choices: ChoiceSettings = {
 		"e": [
             ["shield", "icewall"],
             ["saber", "dualSaber"],
+            ["phaseOut"],
             ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
@@ -2267,6 +2268,53 @@ const shield: Spell = {
     action: "shield",
     sound: "shield",
 };
+const phaseOut: Spell = {
+    id: 'phaseOut',
+    name: 'Phase Out',
+    description: "For 1 second, disappear from the world. While phased out, you cannot be hurt, but you also cannot cast spells.",
+    effects: [
+        cleanse,
+    ],
+
+    untargeted: true,
+    maxAngleDiffInRevs: 1.0,
+    cooldown: 10 * TicksPerSecond,
+    throttle: false,
+    debuff: true,
+
+    maxChannellingTicks: 1 * TicksPerSecond,
+
+    buffs: [
+        { type: "debuff" },
+        {
+            type: "armor",
+            proportion: 0,
+            maxTicks: 1 * TicksPerSecond,
+        },
+        {
+            type: "movement",
+            movementProportion: 0,
+            maxTicks: 1 * TicksPerSecond,
+        },
+        {
+            type: "lavaImmunity",
+            damageProportion: 0,
+            maxTicks: 1 * TicksPerSecond,
+        },
+        {
+            type: "vanish",
+            maxTicks: 1 * TicksPerSecond,
+        },
+        {
+            type: "cooldown",
+            minCooldown: 1 * TicksPerSecond,
+        },
+    ],
+
+    icon: "sprint",
+    color: '#8800ff',
+    action: "buff",
+};
 const icewall: Spell = {
     id: 'icewall',
     name: 'Forcefield',
@@ -2567,6 +2615,7 @@ const Spells = {
     dualSaber,
     scourge,
     shield,
+    phaseOut,
     supernova,
     halo,
     mines,

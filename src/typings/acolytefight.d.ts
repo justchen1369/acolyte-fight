@@ -802,6 +802,7 @@ declare interface BuffSpell extends SpellBase {
     action: "buff";
 
 	buffs: BuffTemplate[];
+	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
 }
 
 declare interface ScourgeSpell extends SpellBase {

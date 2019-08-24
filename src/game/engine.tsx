@@ -4038,7 +4038,13 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 	return true;
 }
 
-function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell) {
+function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
+	const currentLength = world.tick - hero.casting.channellingStartTick;
+	const cutoff = spell.maxChannellingTicks;
+	if (currentLength < cutoff) {
+		return false;
+	}
+
 	return !wu(hero.buffs.values()).some(b => b.channellingSpellId === spell.id);
 }
 
