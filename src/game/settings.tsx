@@ -2305,6 +2305,7 @@ const phaseOut: Spell = {
             type: "mass",
             radius: 1 * Hero.Radius,
             density: 1000,
+            collideWith: 0,
             maxTicks: 1 * TicksPerSecond,
         },
         {

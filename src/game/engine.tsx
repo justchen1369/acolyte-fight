@@ -1079,14 +1079,22 @@ function resetMass(behaviour: w.ResetMassBehaviour, world: w.World) {
 	return false;
 }
 
-function updateHeroRadius(hero: w.Hero, world: w.World) {
+function updateHeroMass(hero: w.Hero, world: w.World) {
 	let radius = hero.initialRadius;
+	let collideWith = Categories.All;
 	hero.buffs.forEach(b => {
 		if (b.type === "mass") {
 			radius = Math.max(radius, b.radius);
+			collideWith &= b.collideWith;
 		}
 	});
 	hero.radius = radius;
+
+	let fixture = hero.body.getFixtureList();
+	while (fixture) {
+		updateMaskBits(fixture, collideWith);
+		fixture = fixture.getNext();
+	}
 }
 
 function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.World) {
@@ -3055,7 +3063,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 	});
 
 	if (massChanged) {
-		updateHeroRadius(hero, world);
+		updateHeroMass(hero, world);
 	}
 
 	return true;
@@ -4169,18 +4177,21 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			fromHeroId,
 		});
 	} else if (template.type === "mass") {
+		const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 		const fixture = hero.body.createFixture(pl.Circle(template.radius), {
 			density: template.density || 0,
-			filterCategoryBits: template.passthrough ? Categories.None : Categories.Hero,
-			filterMaskBits: template.passthrough ? Categories.None : Categories.All,
+			filterCategoryBits: Categories.Hero,
+			filterMaskBits: collideWith,
 			filterGroupIndex: hero.filterGroupIndex,
 		});
 
 		hero.buffs.set(id, {
 			...values, id, type: "mass",
 			fixture,
+			collideWith,
 			radius: template.radius,
 		});
+		updateHeroMass(hero, world);
 	} else if (template.type === "delink") {
 		if (hero.link) {
 			hero.link.expireTick = world.tick;

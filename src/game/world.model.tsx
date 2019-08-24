@@ -655,6 +655,7 @@ export interface ArmorBuff extends BuffBase {
 
 export interface MassBuff extends BuffBase {
 	type: "mass";
+	collideWith: number;
 	fixture: pl.Fixture;
 	radius: number;
 }
