@@ -1774,6 +1774,10 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		return; // Nothing to do
 	}
 	const spell = world.settings.Spells[action.type];
+	if (!spell) {
+		return; // Unknown spell
+	}
+
 	const uninterruptible = _.isNil(spell.interruptibleAfterTicks) || spell.interruptibleAfterTicks > 0;
 
 	// Start casting a new spell
@@ -1784,6 +1788,11 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			stage: w.CastStage.Cooldown,
 			initialAngle: vector.angleDiff(action.target, hero.body.getPosition()),
 		};
+
+		if (!w.Actions.NonGameStarters.some(x => x === spell.id)) {
+			const score = world.scores.get(hero.id);
+			world.scores = world.scores.set(hero.id, { ...score, numSpellsCast: score.numSpellsCast + 1 });
+		}
 	}
 
 	if (hero.casting.stage === w.CastStage.Cooldown) {
@@ -4401,6 +4410,7 @@ export function initScore(heroId: string): w.HeroScore {
 		kills: 0,
 		outlasts: 0,
 		damage: 0,
+		numSpellsCast: 0,
 		deathTick: null,
 		rank: null,
 	};

@@ -7,7 +7,9 @@ import * as matches from '../core/matches';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
+import * as StoreProvider from '../storeProvider';
 import * as tutor from '../core/tutor';
+import * as w from '../../game/world.model';
 import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
@@ -22,10 +24,7 @@ interface Props extends OwnProps {
     selfId: string;
     party: s.PartyState;
     isModded: boolean;
-    noAutoJoin: boolean;
-    isPlaying: boolean;
     maxPlayers: number;
-    winner: boolean;
 }
 interface State {
     joining: boolean;
@@ -46,10 +45,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         selfId: state.socketId,
         isModded: rooms.isModded(state.room),
         maxPlayers: state.room.settings.Matchmaking.MaxPlayers,
-        noAutoJoin: state.options.noAutoJoin,
-        isPlaying: !!state.world.ui.myHeroId,
         gameId: state.world.ui.myGameId,
-        winner: !!state.world.winner,
     };
 }
 
@@ -134,15 +130,34 @@ class PlayButton extends React.PureComponent<Props, State> {
                 this.setState({ autoJoin });
             }
         } else {
-            if (!this.props.noAutoJoin && !this.props.party && this.props.winner && this.props.isPlaying && !this.state.joining) {
+            const state = StoreProvider.getState();
+            const world = state.world;
+            if (!this.state.joining && !!world.winner) {
+                const join = !this.props.party && !state.options.noAutoJoin && this.shouldAutoJoin(world);
                 this.setState({
                     autoJoin: {
                         gameId: this.props.gameId,
                         secondsUntilAutoJoin: AutoJoinSeconds,
+                        cancelled: !join,
                     },
                 });
             }
         }
+    }
+
+    private shouldAutoJoin(world: w.World) {
+        if (!world.ui.myHeroId) {
+            // Observer
+            return false;
+        }
+
+        const score = world.scores.get(world.ui.myHeroId);
+        if (!(score && score.numSpellsCast > 0)) {
+            // Idle
+            return false;
+        }
+
+        return true;
     }
 
     private onCancelAutoJoin() {

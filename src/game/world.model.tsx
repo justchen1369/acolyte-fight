@@ -10,7 +10,7 @@ export namespace Actions {
 	export const Retarget = "retarget";
 	export const Stop = "stop";
 
-	export const NonGameStarters = [Move, MoveAndCancel, Retarget];
+	export const NonGameStarters = [Move, MoveAndCancel, Retarget, Stop];
 }
 
 export namespace SpecialKeys {
@@ -93,6 +93,7 @@ export interface HeroScore {
 	kills: number;
 	outlasts: number;
 	damage: number;
+	numSpellsCast: number;
 
 	deathTick: number | null;
 	rank: number | null;
