@@ -2278,12 +2278,16 @@ const phaseOut: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     debuff: true,
+    effects: [
+        cleanse,
+    ],
 
     maxChannellingTicks: 1 * TicksPerSecond,
 
     buffs: [
         {
             type: "mass",
+            cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             radius: 1 * Hero.Radius,
             density: 0,
@@ -2291,20 +2295,24 @@ const phaseOut: Spell = {
         },
         {
             type: "armor",
+            cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             proportion: -1, // Full immunity
         },
         {
             type: "movement",
+            cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             movementProportion: 0,
         },
         {
             type: "glide",
+            cleansable: false,
             linearDampingMultiplier: 10,
         },
         {
             type: "vanish",
+            cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             renderStart: {
                 numParticles: 10,
@@ -2329,9 +2337,14 @@ const phaseOut: Spell = {
         },
         {
             type: "cooldown",
+            cleansable: false,
             minCooldown: 1 * TicksPerSecond,
         },
-        { type: "delink" },
+        {
+            type: "debuff",
+            cleansable: false,
+            maxTicks: 1 * TicksPerSecond,
+        },
     ],
 
     icon: "resonance",
