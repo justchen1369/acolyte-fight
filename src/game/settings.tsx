@@ -2271,7 +2271,7 @@ const shield: Spell = {
 const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Out',
-    description: "For 1 second, disappear from the world. While phased out, you cannot be hurt, but you also cannot cast spells.",
+    description: "For 0.5 seconds, disappear from the world. While phased out, you cannot be hurt, but you also cannot cast spells.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2283,13 +2283,13 @@ const phaseOut: Spell = {
         cleanse,
     ],
 
-    maxChannellingTicks: 1 * TicksPerSecond,
+    maxChannellingTicks: 0.5 * TicksPerSecond,
 
     buffs: [
         {
             type: "mass",
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             radius: 1 * Hero.Radius,
             density: 1000000,
             restrictCollideWith: 0,
@@ -2297,26 +2297,26 @@ const phaseOut: Spell = {
         {
             type: "armor",
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             proportion: -1, // Full immunity
         },
         {
             type: "movement",
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             movementProportion: 0,
         },
         {
             type: "glide",
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             linearDampingMultiplier: 1000,
         },
         {
             type: "vanish",
             noTargetingIndicator: true,
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             sound: "phaseOut",
             renderStart: {
                 numParticles: 10,
@@ -2342,12 +2342,12 @@ const phaseOut: Spell = {
         {
             type: "cooldown",
             cleansable: false,
-            minCooldown: 1 * TicksPerSecond,
+            minCooldown: 0.5 * TicksPerSecond,
         },
         {
             type: "debuff",
             cleansable: false,
-            maxTicks: 1 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
         },
     ],
 
