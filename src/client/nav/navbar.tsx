@@ -76,7 +76,7 @@ class NavBar extends React.PureComponent<Props, State> {
         const vertical = a.noMenu ? null : <>
             <PageLink page=""><i className="icon fas fa-home" /> Home</PageLink>
             <PageLink page="leaderboard"><i className="icon fas fa-star" /> Leaderboard</PageLink>
-            <PageLink page="profile" className="nav-profile-item" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
+            <PageLink page="profile" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
             {<PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
             {!a.noPartyLink && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
             <PageLink page="watch"><i className="icon fas fa-eye" /> Spectate</PageLink>
