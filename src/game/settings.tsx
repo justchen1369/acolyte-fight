@@ -2309,6 +2309,26 @@ const phaseOut: Spell = {
         {
             type: "vanish",
             maxTicks: 1 * TicksPerSecond,
+            renderStart: {
+                numParticles: 10,
+                color: "#111",
+                ticks: 15,
+                particleRadius: Hero.Radius,
+                glow: 0.2,
+                shine: 1,
+                bloom: 0,
+                vanish: 1,
+            },
+            renderFinish: {
+                numParticles: 10,
+                color: "#111",
+                ticks: 15,
+                particleRadius: Hero.Radius,
+                glow: 0.2,
+                shine: 1,
+                bloom: 0,
+                vanish: 1,
+            },
         },
         {
             type: "cooldown",
