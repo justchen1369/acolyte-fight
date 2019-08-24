@@ -2272,13 +2272,10 @@ const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Out',
     description: "For 1 second, disappear from the world. While phased out, you cannot be hurt, but you also cannot cast spells.",
-    effects: [
-        cleanse,
-    ],
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 1 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: false,
     debuff: true,
 
