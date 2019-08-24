@@ -19,6 +19,13 @@ const RegionUrls = [
     regions.getOrigin("sg"),
 ];
 
+const RegionNames: { [key: string]: string } = {
+    au: "Oceania",
+    eu: "Europe",
+    sg: "Asia",
+    us: "North America",
+};
+
 interface Region {
     name: string;
     url: string;
@@ -41,7 +48,7 @@ function retrieveRegion(url: string): Promise<Region> {
     return fetch(`${url}/status`).then(res => res.json()).then((json: m.ExternalStatus) => {
         const pingMilliseconds = Date.now() - startMilliseconds;
         const region: Region = {
-            name: json.region,
+            name: RegionNames[json.region] || json.region,
             numPlayers: json.numPlayers,
             url,
             pingMilliseconds,
@@ -102,13 +109,13 @@ class RegionList extends React.PureComponent<Props, State> {
     render() {
         return <div className="region-list-section">
             <h1>Regions</h1>
-            <p>Normally, you are automatically connected to your closest server. If there is no one online on your home server, you can try connecting to other regions.</p>
-            {this.props.server && this.props.region && <p>You are currently connected to server <b>{this.props.server}</b> in region <b>{this.props.region}</b></p>}
+            <p>You are automatically connected to your closest region. If there is no one online on your home region, you can try connecting to other regions.</p>
+            {this.props.server && this.props.region && <p>You are currently connected to <b>{RegionNames[this.props.region] || this.props.region}</b></p>}
             {this.state.regions.size === 0 && <div className="loading">Loading regions...</div>}
             {this.state.error && <div className="error">{this.state.error}</div>}
-            {this.state.regions.valueSeq().map(region => <div className="region" key={region.name}>
-                <a href={region.url} onClick={(ev) => this.onRegionClick(ev, region)} className="region-name">Region {region.name}</a>: {region.numPlayers} players online, ping {region.pingMilliseconds} ms
-            </div>).toArray()}
+            {this.state.regions.valueSeq().map(region => <a className="region" key={region.name} href={region.url} onClick={(ev) => this.onRegionClick(ev, region)}>
+                <span className="region-name">{region.name}</span>: <span className="region-details">{region.numPlayers} players online, ping {region.pingMilliseconds} ms</span>
+            </a>).toArray()}
         </div>;
     }
 
