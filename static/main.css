@@ -191,6 +191,7 @@ a, a:visited {
 }
 a:hover, a:active {
     color: #f80;
+    text-shadow: 0 0 8px #f808;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -275,6 +276,7 @@ a:hover, a:active {
 
 .clickable:hover, .clickable:active, .clickable.selected {
     color: #eee;
+    text-shadow: 0 0 8px #fff8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
