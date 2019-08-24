@@ -229,15 +229,15 @@ a:hover, a:active {
     font-weight: bold;
     cursor: pointer;
     text-align: center;
-    box-shadow: 3px 3px 3px #0c0c0c;
+    box-shadow: 4px 4px #0008;
     text-shadow: 1px 1px 1px black;
     border-radius: 0.125em;
-    background: linear-gradient(to bottom, #4df 0%, #4df 7%, #0cf 7%, #0cf 93%, #08b 93%, #08b);
+    background: #0cf linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004);
     padding: 10px 40px;
 }
 
 .btn:hover {
-    background: #f80;
+    background-color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -566,10 +566,10 @@ a:hover, a:active {
     font-size: 285%;
 }
 .home .secondary-button-row .btn {
-    background: linear-gradient(to bottom, #49c 0%, #49c 7%, #08b 7%, #08b 93%, #069 93%, #069);
+    background-color: #08b;
 }
 .home .secondary-button-row .btn:hover {
-    background: #f80;
+    background-color: #f80;
 }
 .home .btn.disabled {
     background-color: #ccc;
@@ -2009,12 +2009,12 @@ textarea.ai-js {
 }
 
 .btn.auto-join-btn {
-    background: #22ee88;
+    background-color: #22ee88;
     transition: background-color 0.2s ease;
 }
 
 .btn.auto-join-btn:hover {
-    background: #ff0044;
+    background-color: #ff0044;
 }
 
 .party-invite {
