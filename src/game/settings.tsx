@@ -2334,8 +2334,8 @@ const phaseOut: Spell = {
         { type: "delink" },
     ],
 
-    icon: "sprint",
-    color: '#8800ff',
+    icon: "resonance",
+    color: '#ff00dd',
     action: "buff",
 };
 const icewall: Spell = {
