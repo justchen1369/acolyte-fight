@@ -722,11 +722,15 @@ declare interface BuffTemplateBase {
 	linkVictim?: boolean; // Cancel this buff if no longer the victim of a link
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
 
+	renderStart?: RenderBuff;
 	render?: RenderBuff;
+	renderFinish?: RenderBuff;
 	sound?: string;
 }
 
 declare interface RenderBuff {
+	numParticles?: number;
+	invisible?: boolean; // Only show this to players who can see the hero
 	color: string;
 	alpha?: number; // Semi-transparent
 	shine?: number; // Brighter initially

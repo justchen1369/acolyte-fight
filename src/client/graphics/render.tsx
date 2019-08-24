@@ -548,11 +548,9 @@ function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World)
 		renderTeleport(ctxStack, ev, world);
 	} else if (ev.type === "push") {
 		renderPush(ctxStack, ev, world);
-	} else if (ev.type === "vanish") {
-		renderVanish(ctxStack, ev, world);
 	} else if (ev.type === "cooldown") {
 		renderSetCooldown(ctxStack, ev, world);
-	 } else {
+	} else {
 		return;
 	}
 }
@@ -580,31 +578,6 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 			pos: ev.pos,
 		});
 	}
-}
-
-function renderVanish(ctxStack: CanvasCtxStack, ev: w.VanishEvent, world: w.World) {
-	const NumParticles = 10;
-
-	const hero = world.objects.get(ev.heroId);
-	if (hero && hero.category === "hero" && (world.tick - ev.tick) < constants.TicksPerSecond) {
-		for (let i = 0; i < NumParticles; ++i) {
-			renderVanishSmoke(ctxStack, hero, world, ev.pos);
-		}
-	}
-}
-
-function renderVanishSmoke(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, pos?: pl.Vec2) {
-	const velocity = particleVelocity(vector.fromAngle(hero.body.getAngle(), -hero.moveSpeedPerSecond));
-	pushTrail({
-		type: 'circle',
-		initialTick: world.tick,
-		max: 60,
-		pos: pos || hero.body.getPosition().clone(),
-		fillStyle: "#111",
-		vanish: 1,
-		radius: hero.radius,
-		velocity,
-	}, world);
 }
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
@@ -1137,16 +1110,11 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 	}
 
 	renderRangeIndicator(ctxStack, hero, pos, world);
-	renderBuffs(ctxStack, hero, pos, world); // Do this before applying translation
 
 	const invisible = engine.isHeroInvisible(hero);
 	if (invisible) {
-		if (world.ui.myHeroId && (engine.calculateAlliance(hero.id, world.ui.myHeroId, world) & Alliances.Enemy) > 0) {
-			// Enemy - render nothing
-		} else {
-			// Self or observer - render placeholder
-			renderHeroInvisible(ctxStack, hero, pos, invisible, world);
-		}
+		const visible = world.ui.myHeroId ? (engine.calculateAlliance(world.ui.myHeroId, hero.id, world) & Alliances.Friendly) > 0  : true;
+		renderBuffs(ctxStack, hero, pos, world, visible);
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
 
@@ -1157,6 +1125,8 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 		if (!easeMultiplier) {
 			renderHeroBars(ctxStack, hero, pos, world);
 		}
+
+		renderBuffs(ctxStack, hero, pos, world);
 	}
 
 	playHeroSounds(ctxStack, hero, pos, world);
@@ -1235,10 +1205,15 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	});
 }
 
-function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World, visible: boolean = true) {
 	hero.buffs.forEach(buff => {
+		if (buff.renderStart && !buff.uiStartRendered) {
+			buff.uiStartRendered = true;
+			renderBuffSmoke(ctxStack, buff.renderStart, buff, hero, pos, world, visible);
+		}
+
 		if (buff.render) {
-			renderBuffSmoke(ctxStack, buff.render, buff, hero, pos, world);
+			renderBuffSmoke(ctxStack, buff.render, buff, hero, pos, world, visible);
 		}
 
 		if (buff.sound) {
@@ -1255,6 +1230,10 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 			return;
 		}
 
+		if (buff.renderFinish) {
+			renderBuffSmoke(ctxStack, buff.renderFinish, buff, hero, pos, world, visible);
+		}
+
 		if (buff.sound) {
 			ctxStack.sounds.push({
 				id: `buff-${buff.id}-expired`,
@@ -1266,7 +1245,11 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 	hero.uiDestroyedBuffs = [];
 }
 
-function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
+function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World, visible: boolean = true) {
+	if (render.invisible && !visible) {
+		return;
+	}
+
 	let color = render.color;
 	if (render.heroColor) {
 		color = heroColor(hero.id, world);
@@ -1285,36 +1268,39 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		color = ColTuple.parse(color).alpha(alpha).string();
 	}
 
-	let velocity: pl.Vec2 = null;
-	if (render.smoke) {
-		velocity = particleVelocity(hero.body.getLinearVelocity(), render.smoke);
-	} else {
-		// Normally hero not moving fast enough to create smoke
-		velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
-	}
+	let numParticles = render.numParticles !== undefined ? render.numParticles : 1;
+	for (let i = 0; i < numParticles; ++i) {
+		let velocity: pl.Vec2 = null;
+		if (render.smoke) {
+			velocity = particleVelocity(hero.body.getLinearVelocity(), render.smoke);
+		} else {
+			// Normally hero not moving fast enough to create smoke
+			velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+		}
 
-	const pos = heroPos.clone();
-	if (render.emissionRadiusFactor) {
-		pos.addMul(render.emissionRadiusFactor * hero.radius, vector.fromAngle(Math.random() * 2 * Math.PI));
-	}
+		const pos = heroPos.clone();
+		if (render.emissionRadiusFactor) {
+			pos.addMul(render.emissionRadiusFactor * hero.radius, vector.fromAngle(Math.random() * 2 * Math.PI));
+		}
 
-	// Buffs on the bottom
-	unshiftTrail({
-		type: "circle",
-		pos,
-		velocity,
-		radius: render.particleRadius,
-		initialTick: world.tick,
-		max: render.ticks,
-		fillStyle: color,
-		glow: render.glow,
-		shine: render.shine,
-		fade: render.fade,
-		vanish: render.vanish,
-	}, world);
+		// Buffs on the bottom
+		unshiftTrail({
+			type: "circle",
+			pos,
+			velocity,
+			radius: render.particleRadius,
+			initialTick: world.tick,
+			max: render.ticks,
+			fillStyle: color,
+			glow: render.glow,
+			shine: render.shine,
+			fade: render.fade,
+			vanish: render.vanish,
+		}, world);
+	}
 
 	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
-		glx.circle(ctxStack, pos, {
+		glx.circle(ctxStack, heroPos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
 			feather: {
@@ -1437,10 +1423,6 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			maxRadius: radius,
 		});
 	}
-}
-
-function renderHeroInvisible(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, invisible: w.VanishBuff, world: w.World) {
-	renderVanishSmoke(ctxStack, hero, world, pos);
 }
 
 function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {

@@ -3045,9 +3045,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
 			hero.uiDestroyedBuffs.push(buff);
 
-			if (buff.type === "vanish") {
-				world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: vector.clone(hero.body.getPosition()), appear: true });
-			} else if (buff.type === "mass") {
+			if (buff.type === "mass") {
 				hero.body.destroyFixture(buff.fixture);
 				massChanged = true;
 			} else if (buff.type === "armor") {
@@ -4068,7 +4066,9 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	const values: w.BuffValues = {
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
+		renderStart: template.renderStart,
 		render: template.render,
+		renderFinish: template.renderFinish,
 		sound: template.sound,
 		maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
@@ -4106,8 +4106,6 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			initialPos: hero.body.getPosition().clone(),
 		};
 		hero.buffs.set(id, hero.invisible);
-
-		world.ui.events.push({ type: "vanish", tick: world.tick, heroId: hero.id, pos: hero.body.getPosition().clone(), appear: false });
 	} else if (template.type === "lifeSteal") {
 		hero.buffs.set(id, {
 			...values, id, type: "lifeSteal",

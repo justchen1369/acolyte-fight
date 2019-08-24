@@ -598,8 +598,12 @@ export interface BuffValues {
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
 
+	renderStart?: RenderBuff;
 	render?: RenderBuff;
+	renderFinish?: RenderBuff;
 	sound?: string;
+
+	uiStartRendered?: boolean;
 }
 
 export interface LinkChannellingBuffParams {
@@ -988,7 +992,6 @@ export type WorldEvent =
 	| LifeStealEvent
 	| TeleportEvent
 	| PushEvent
-	| VanishEvent
 	| SetCooldownEvent
 
 export interface WorldEventBase {
@@ -1016,13 +1019,6 @@ export interface TeleportEvent extends WorldEventBase {
 	toPos: pl.Vec2;
 	heroId: string;
 	sound?: string;
-}
-
-export interface VanishEvent extends WorldEventBase {
-	type: "vanish";
-	heroId: string;
-	pos: pl.Vec2;
-	appear: boolean;
 }
 
 export interface SetCooldownEvent extends WorldEventBase {
