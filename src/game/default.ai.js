@@ -164,6 +164,10 @@ function deflect(state, hero, cooldowns, projectile) {
         spellId = "meteor";
     } else if (cooldowns["meteorite"] === 0) {
         spellId = "meteorite";
+    } else if (cooldowns["whirlwind"] === 0) {
+        spellId = "whirlwind";
+    } else if (cooldowns["phaseOut"] === 0) {
+        spellId = "phaseOut";
     } else {
         spellId = null;
     }
