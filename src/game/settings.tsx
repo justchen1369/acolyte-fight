@@ -2452,6 +2452,7 @@ const swap: Spell = {
                 loopTicks: 15,
                 glow: 0.05,
             },
+            { type: "projectile", ticks: 1, radiusMultiplier: 0.5 },
             { type: "link", color: '#75e7ff', width: 0.001, toWidth: 0.01, glow: 0.2 },
             { type: "strike", color: '#75e7ff', flash: true, ticks: 15, numParticles: 9 },
         ],

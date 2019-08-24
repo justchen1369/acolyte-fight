@@ -2507,7 +2507,7 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 		return;
 	}
 
-	if (target && (target.categories & projectile.swapWith) > 0 && world.tick >= world.startTick) {
+	if (target && (target.categories & projectile.swapWith) > 0) {
 		const ownerPos = vector.clone(owner.body.getPosition());
 		const targetPos = vector.clone(target.body.getPosition());
 
