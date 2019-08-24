@@ -81,36 +81,36 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderHelp() {
+        return <div className="help-box dialog-panel">
+            <div className="help-title">{this.props.tutorial ? "Tutorial" : "How to play:"}</div>
+            {this.renderHelpContent()}
+            <div className="action-row">
+                <Button className="btn" onClick={(e) => this.onHideHelpClicked(e)}>OK</Button>
+                {this.props.tutorial && <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>}
+            </div>
+        </div>
+    }
+
+    private renderHelpContent() {
         if (isMobile) {
             const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
             const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
-            return <div className="help-box dialog-panel">
-                <div className="help-title">How to play:</div>
+            return <>
                 <div className="help-row"><span className="icon-container"><i className="fas fa-crosshairs" /></span> <b>Drag</b> to move/aim</div>
                 {isSingleTapShoot && <div className="help-row"><span className="icon-container"><i className="fas fa-hand-pointer" /></span> <b>Tap</b> to shoot</div>}
                 {isDoubleTapDash && <div className="help-row"><span className="icon-container"><i className="fas fa-forward" /></span> <b>Double-tap</b> to dash</div>}
-                {this.renderHelpActions()}
-            </div>
+            </>
         } else {
             const isLeftClickShoot = this.props.rebindings[w.SpecialKeys.LeftClick] === "q";
             const isRightClickDash = this.props.rebindings[w.SpecialKeys.RightClick] === "a";
             const showMouseHint = !(isLeftClickShoot || isRightClickDash);
-            return <div className="help-box dialog-panel">
-                <div className="help-title">How to play:</div>
+            return <>
                 {showMouseHint && <div className="help-row"><span className="icon-container"><i className="fa fa-crosshairs" /></span> <b>Mouse</b> to move/aim</div>}
                 {isLeftClickShoot && <div className="help-row"><span className="icon-container"><i className="fa fa-mouse-pointer" /></span> <b>Left-click</b> to shoot</div>}
                 {isRightClickDash && <div className="help-row"><span className="icon-container"><i className="fa fa-forward" /></span> <b>Right-click</b> to dash</div>}
                 <div className="help-row"><span className="icon-container"><i className="fa fa-keyboard" /></span> <b>Keyboard</b> to cast spells</div>
-                {this.renderHelpActions()}
-            </div>
+            </>
         }
-    }
-
-    private renderHelpActions() {
-        return <div className="action-row">
-            <Button className="btn" onClick={(e) => this.onHideHelpClicked(e)}>OK</Button>
-            {this.props.tutorial && <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>}
-        </div>
     }
 
     private renderTutorial() {
