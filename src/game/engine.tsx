@@ -1997,14 +1997,6 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 			hero.link = null;
 		}
 
-		if (spell.delink) {
-			world.objects.forEach(obj => {
-				if (obj.category === "hero" && obj.link && obj.link.targetId === hero.id) {
-					obj.link.expireTick = world.tick;
-				}
-			});
-		}
-
 		if (spell.debuff) {
 			hero.cleanseTick = world.tick;
 		}

@@ -2278,6 +2278,7 @@ const phaseOut: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     debuff: true,
+    unlink: true,
     effects: [
         cleanse,
     ],
