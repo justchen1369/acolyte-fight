@@ -635,6 +635,7 @@ export interface LavaImmunityBuff extends BuffBase {
 export interface VanishBuff extends BuffBase {
 	type: "vanish";
 	initialPos: pl.Vec2;
+	noTargetingIndicator?: boolean;
 }
 
 export interface LifeStealBuff extends BuffBase {

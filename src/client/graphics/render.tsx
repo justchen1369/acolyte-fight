@@ -1177,6 +1177,11 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
+	const invisible = engine.isHeroInvisible(hero);
+	if (invisible && invisible.noTargetingIndicator) {
+		return;
+	}
+
 	const pos = hero.body.getPosition();
 	const target = world.ui.nextTarget;
 	if (!(pos && target)) {

@@ -4105,6 +4105,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 		hero.invisible = {
 			...values, id, type: "vanish",
 			initialPos: hero.body.getPosition().clone(),
+			noTargetingIndicator: template.noTargetingIndicator,
 		};
 		hero.buffs.set(id, hero.invisible);
 	} else if (template.type === "lifeSteal") {

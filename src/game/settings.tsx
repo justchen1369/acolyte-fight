@@ -2312,6 +2312,7 @@ const phaseOut: Spell = {
         },
         {
             type: "vanish",
+            noTargetingIndicator: true,
             cleansable: false,
             maxTicks: 1 * TicksPerSecond,
             sound: "phaseOut",
