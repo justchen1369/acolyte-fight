@@ -408,6 +408,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	cleanseTick?: number;
 	exitTick?: number;
 
+	armorProportion: number;
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
 
@@ -649,7 +650,6 @@ export interface BurnBuff extends BuffBase {
 
 export interface ArmorBuff extends BuffBase {
 	type: "armor";
-	fromHeroId?: string;
 	proportion: number;
 }
 

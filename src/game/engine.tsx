@@ -506,6 +506,7 @@ function addHero(world: w.World, heroId: string) {
 		initialRadius: Hero.Radius,
 		radius: Hero.Radius,
 		linearDamping: Hero.Damping,
+		armorProportion: 0,
 		damageSources: new Map<string, number>(),
 		damageSourceHistory: [],
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
@@ -1079,7 +1080,7 @@ function resetMass(behaviour: w.ResetMassBehaviour, world: w.World) {
 	return false;
 }
 
-function updateHeroMass(hero: w.Hero, world: w.World) {
+function updateHeroMass(hero: w.Hero) {
 	let radius = hero.initialRadius;
 	let collideWith = Categories.All;
 	hero.buffs.forEach(b => {
@@ -3046,6 +3047,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 		return false;
 	}
 
+	let armorChanged = false;
 	let massChanged = false;
 	hero.buffs.forEach((buff, id) => {
 		if (isBuffExpired(buff, hero, world)) {
@@ -3058,12 +3060,17 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 			} else if (buff.type === "mass") {
 				hero.body.destroyFixture(buff.fixture);
 				massChanged = true;
+			} else if (buff.type === "armor") {
+				armorChanged = true;
 			}
 		}
 	});
 
+	if (armorChanged) {
+		updateArmor(hero);
+	}
 	if (massChanged) {
-		updateHeroMass(hero, world);
+		updateHeroMass(hero);
 	}
 
 	return true;
@@ -4166,16 +4173,11 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			heroId: hero.id,
 		});
 	} else if (template.type === "armor") {
-		let fromHeroId: string = null;
-		if (template.targetOnly) {
-			fromHeroId = config.otherId;
-		}
-
 		hero.buffs.set(id, {
 			...values, id, type: "armor",
 			proportion: template.proportion,
-			fromHeroId,
 		});
+		updateArmor(hero);
 	} else if (template.type === "mass") {
 		const collideWith = template.collideWith !== undefined ? template.collideWith : Categories.All;
 		const fixture = hero.body.createFixture(pl.Circle(template.radius), {
@@ -4191,7 +4193,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			collideWith,
 			radius: template.radius,
 		});
-		updateHeroMass(hero, world);
+		updateHeroMass(hero);
 	} else if (template.type === "delink") {
 		if (hero.link) {
 			hero.link.expireTick = world.tick;
@@ -4286,7 +4288,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 
 	// Apply damage
 	let amount = Math.max(0, packet.damage);
-	amount = applyArmor(fromHeroId, toHero, amount);
+	amount += amount * toHero.armorProportion;
 	if (!packet.noMitigate) {
 		amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	}
@@ -4350,15 +4352,14 @@ function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: 
 	return amount * redirect.selfProportion;
 }
 
-function applyArmor(fromHeroId: string, hero: w.Hero, damage: number) {
+function updateArmor(hero: w.Hero) {
 	let totalModifier = 0;
 	hero.buffs.forEach(buff => {
-		if (buff.type === "armor" && (!buff.fromHeroId || fromHeroId === buff.fromHeroId)) {
-			const modifier = damage * buff.proportion;
-			totalModifier += modifier;
+		if (buff.type === "armor") {
+			totalModifier += buff.proportion;
 		}
 	});
-	return damage + totalModifier;
+	hero.armorProportion = totalModifier;
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {

@@ -2288,7 +2288,7 @@ const phaseOut: Spell = {
         { type: "debuff" },
         {
             type: "armor",
-            proportion: 0,
+            proportion: -1, // Full immunity
             maxTicks: 1 * TicksPerSecond,
         },
         {
