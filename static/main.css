@@ -604,7 +604,9 @@ a:hover, a:active {
 }
 
 .more-io-games a:hover {
-    background-color: #654;
+    color: #fff;
+    background-color: #0cf;
+    box-shadow: 0 0 8px #0cf8;
 }
 
 .social-bar {
