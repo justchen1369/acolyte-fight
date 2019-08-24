@@ -2378,7 +2378,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 			const spell = world.settings.Spells[spellId];
 			if (!spell) { continue }
 
-			let color = customizingSpells ? spell.color : '#444';
+			let color = spell.color;
 			if (spell.id === hoverSpellId) {
 				color = ColTuple.parse(color).lighten(0.25).string();
 			}
