@@ -140,8 +140,9 @@ body .page {
 }
 
 #game-panel .exit-link:hover {
-    background: #654;
-    color: #f80;
+    background: #0cf;
+    color: #fff;
+    box-shadow: 0 0 8px #0cf8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -372,6 +373,7 @@ a:hover, a:active {
 
 .navbar .nav-item.login-btn:hover {
     background: #f80;
+    box-shadow: 0 0 8px #f808;
     color: white;
     animation: shine-loop 0.5s alternate infinite linear;
 }
@@ -405,13 +407,14 @@ a:hover, a:active {
 }
 
 .navbar .nav-item:hover .nav-item-label .badge {
-    color: #f80;
+    color: #fff;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .navbar .nav-item:hover {
-    background: #654;
-    color: #f80;
+    background: #0cf;
+    color: #fff;
+    box-shadow: 0 0 8px #0cf8;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -1252,6 +1255,7 @@ table.player-list {
 
 #game-panel .button-panel .clickable:hover {
     color: #00ccff;
+    text-shadow: 0 0 8px #0cfc;
 }
 
 #game-panel .in-progress-warning {
@@ -2118,7 +2122,7 @@ textarea.ai-js {
 .region-list-section .region {
     display: block;
     font-size: 120%;
-    background: #222 linear-gradient(
+    background: #333 linear-gradient(
         112.5deg,
         #fff0,
         #fff1 5%,
