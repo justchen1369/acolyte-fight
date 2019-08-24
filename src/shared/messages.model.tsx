@@ -56,6 +56,7 @@ export interface GameOptions {
     noTargetingIndicator?: boolean;
     noCameraFollow?: boolean;
     noRightClickChangeSpells?: boolean;
+    noAutoJoin?: boolean;
     mute?: boolean;
     noAudioCaching?: boolean;
     unranked?: boolean;

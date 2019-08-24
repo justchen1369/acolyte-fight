@@ -65,6 +65,7 @@ interface ControlState {
     actionWheelSide: string;
     touchTracking: string;
     targetingIndicator: string;
+    autoJoin: string;
     cameraFollow: string;
     changeSpellsWith: string;
     audioCaching: string;
@@ -97,6 +98,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         actionWheelSide: options.wheelOnRight ? Side.Right : Side.Left,
         touchTracking: formatTouchTracking(options.touchSurfacePixels),
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
+        autoJoin: options.noAutoJoin ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
         audioCaching: options.noAudioCaching ? Toggle.Off : Toggle.On,
@@ -310,6 +312,13 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <span className="value">Change spells in-game by {this.state.changeSpellsWith === ChangeSpellsWith.RightClick ? "right-clicking" : "ctrl+clicking"} the spell buttons.</span>
                 </div>
             </>}
+            <div className="row">
+                <span className="label">Auto-join next match</span>
+                <select className="value" value={this.state.autoJoin} onChange={ev => this.onUpdate({ autoJoin: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
             <h2>Performance</h2>
             <div className="row">
                 <span className="label">Graphics</span>
@@ -378,6 +387,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.wheelOnRight = state.actionWheelSide === Side.Right;
             options.mute = state.sounds === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
+            options.noAutoJoin = state.autoJoin === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
             options.noAudioCaching = state.audioCaching === Toggle.Off;

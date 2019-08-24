@@ -8,6 +8,7 @@ import * as matches from '../core/matches';
 import * as StoreProvider from '../storeProvider';
 
 import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
+import AutoJoinConfigButton from './buttons/autoJoinConfigButton';
 import Button from '../controls/button';
 import ChooseSpellsButton from './buttons/chooseSpellsButton';
 import ExitLink from './exitLink';
@@ -92,6 +93,7 @@ class HUD extends React.PureComponent<Props, State> {
                 </>}
                 {tab === Tab.Options && <>
                     <MutePanel />
+                    <AutoJoinConfigButton />
                     <ActionWheelSidePanel />
                 </>}
                 {tab === Tab.Chat && <div className="messages">
@@ -159,6 +161,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <ExitLink />
                 <div className="button-panel">
                     <MutePanel />
+                    <AutoJoinConfigButton />
                     <FullScreenButton />
                     <RandomizePanel />
                     <VideoPanel />

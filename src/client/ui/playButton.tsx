@@ -22,6 +22,7 @@ interface Props extends OwnProps {
     selfId: string;
     party: s.PartyState;
     isModded: boolean;
+    noAutoJoin: boolean;
     isPlaying: boolean;
     maxPlayers: number;
     winner: boolean;
@@ -45,6 +46,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         selfId: state.socketId,
         isModded: rooms.isModded(state.room),
         maxPlayers: state.room.settings.Matchmaking.MaxPlayers,
+        noAutoJoin: state.options.noAutoJoin,
         isPlaying: !!state.world.ui.myHeroId,
         gameId: state.world.ui.myGameId,
         winner: !!state.world.winner,
@@ -132,7 +134,7 @@ class PlayButton extends React.PureComponent<Props, State> {
                 this.setState({ autoJoin });
             }
         } else {
-            if (!this.props.party && this.props.winner && this.props.isPlaying && !this.state.joining) {
+            if (!this.props.noAutoJoin && !this.props.party && this.props.winner && this.props.isPlaying && !this.state.joining) {
                 this.setState({
                     autoJoin: {
                         gameId: this.props.gameId,
