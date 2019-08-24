@@ -12,7 +12,7 @@ interface Props {
     hoverHighlight?: boolean;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
-    style?: any;
+    style?: React.CSSProperties;
 }
 
 interface State {

@@ -132,7 +132,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             color = "#444";
         }
 
-        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig)}}>
+        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), }}>
             {style => <SpellIcon
                 key={spell.id}
                 icon={icons.getIcon(spell.icon, this.props.settings.Icons)}

@@ -1489,29 +1489,30 @@ h3 {
     top: 0;
 
     cursor: pointer;
-    border: 2px #333 solid;
     box-sizing: border-box;
     box-shadow: 4px 4px 2px #0004;
+    border: 1px #444 solid;
 
     transition: border 0.2s ease;
 }
 
 .spell-config .spell-icon-secondary {
-    border: 2px #444 solid;
+    border-color: #333;
 }
 
 .spell-config .spell-icon-chosen {
-    border: 2px #222 solid;
+    border-color: #555;
 }
 
 .spell-config .spell-icon:hover {
-    border: 2px #aaa solid;
+    border-color: #ccc;
+    box-shadow: 0 0 4px #fff8;
     animation: spell-hover-loop alternate 0.5s infinite linear;
 }
 
 @keyframes spell-hover-loop {
-    from { filter: brightness(1); border-color: #aaa }
-    to { filter: brightness(1.2); border-color: #bbb }
+    from { filter: brightness(1.5) }
+    to { filter: brightness(1) }
 }
 
 @media (max-width: 768px) {
