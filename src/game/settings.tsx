@@ -2314,6 +2314,7 @@ const phaseOut: Spell = {
             type: "vanish",
             cleansable: false,
             maxTicks: 1 * TicksPerSecond,
+            sound: "phaseOut",
             renderStart: {
                 numParticles: 10,
                 color: "#111",

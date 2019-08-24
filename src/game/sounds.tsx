@@ -172,6 +172,24 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "phaseOut": {
+        "start": [
+            {
+                "volume": 0.25,
+                "stopTime": 0.25,
+                "attack": 0.01,
+                "decay": 0.2,
+                "startFreq": 60,
+                "stopFreq": 40,
+                "highPass": 40,
+                "wave": "sine",
+                "ratios": [
+                    1,
+                    1.5
+                ]
+            }
+        ]
+    },
     "shield": {
         start: [
             {
