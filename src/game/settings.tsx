@@ -2308,7 +2308,7 @@ const phaseOut: Spell = {
         {
             type: "glide",
             cleansable: false,
-            linearDampingMultiplier: 10,
+            linearDampingMultiplier: 100,
         },
         {
             type: "vanish",
