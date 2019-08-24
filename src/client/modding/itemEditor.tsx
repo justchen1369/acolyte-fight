@@ -6,6 +6,7 @@ import * as e from './editor.model';
 import * as s from '../store.model';
 import * as editing from './editing';
 import * as StoreProvider from '../storeProvider';
+import Button from '../controls/button';
 import CodeEditor from './codeEditor';
 
 interface OwnProps {
@@ -65,6 +66,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
             <CodeEditor key="code" code={code} onChange={(code) => this.onCodeChange(id, code)} />
             <div className="editor-actions button-row">
                 {this.renderRevertButton()}
+                {this.renderCanonicalizeButton()}
                 {this.renderStatus(error)}
                 <div className="spacer"></div>
                 {this.props.children}
@@ -107,6 +109,16 @@ class ItemEditor extends React.PureComponent<Props, State> {
             editing.updateItem(this.props.sectionKey, selectedId, this.props.defaults[selectedId]);
         } else {
             editing.deleteItem(this.props.sectionKey, selectedId);
+        }
+    }
+
+    private renderCanonicalizeButton() {
+        return <Button title="Reformat" disabled={!this.props.currentMod} onClick={() => this.onCanonicalizeClick()}><i className="fas fa-align-left" /></Button>;
+    }
+
+    private onCanonicalizeClick() {
+        if (this.props.currentMod) {
+            editing.canonlicalize(this.props.currentMod);
         }
     }
 

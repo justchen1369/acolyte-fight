@@ -28,6 +28,10 @@ export function updateSelected(selectedId: string) {
     StoreProvider.dispatch({ type: "updateHash", hash: selectedId });
 }
 
+export function canonlicalize(mod: ModTree) {
+    StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(mod) });
+}
+
 export async function previewMod(mod: ModTree, layoutId: string = null) {
     if (mod) {
         const roomId = await rooms.createRoomAsync(mod)
