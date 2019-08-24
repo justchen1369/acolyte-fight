@@ -1305,7 +1305,7 @@ h3 {
 
 .spell-stats {
     font-size: 80%;
-    color: #aaa;
+    color: #ddd;
 }
 
 .spell-stats-item:hover .spell-stats-scaling {
@@ -1333,17 +1333,21 @@ h3 {
 
     box-shadow: 5px 5px 5px black;
 
-    background: #444 linear-gradient(120deg,
-        #222 0%,
-        #333 20%,
-        #444 30%,
-        #444 50%,
-        #333 70%,
-        #222 100%);
+    background: #888 linear-gradient(120deg,
+        #000c 0%,
+        #0008 20%,
+        #0004 30%,
+        #0004 50%,
+        #0008 70%,
+        #000c 100%);
+    transition: background-color 0.2s ease;
 }
 
 .spell-config .key:hover {
-    background: #555 linear-gradient(120deg, #222 0%, #444 20%, #555 30%, #555 50%, #444 70%, #222 100%);
+    background-color: #555;
+    background-color: var(--spell-color);
+    box-shadow: 0 0 8px var(--spell-color);
+    text-shadow: 1px 2px 1px #0004;
 }
 
 .spell-config .key-name-container {
@@ -1351,7 +1355,7 @@ h3 {
     min-width: 200px;
     height: 100%;
 
-    background:#222;
+    background:#0002;
     color: white;
 
     display: flex;
@@ -1364,7 +1368,8 @@ h3 {
 }
 
 .spell-config .key-name-container:hover {
-    background: #555;
+    background: #fff4;
+    box-shadow: 0 0 8px #fff4;
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
@@ -1463,7 +1468,7 @@ h3 {
 .spell-effect {
     font-size: 75%;
     margin-bottom: 0.5em;
-    color: #ccc;
+    color: #ddd;
     font-style: italic;
 }
 

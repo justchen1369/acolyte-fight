@@ -61,10 +61,15 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
 
         const displaying = hovering || chosen;
 
+        const style = {
+            "--spell-color": displaying.color, // Not part of React.CSSProperties
+        } as React.CSSProperties;
+
         return <div className="key"
             onTouchStart={ev => ev.stopPropagation()}
             onMouseDown={ev => ev.stopPropagation()}
-            onClick={ev => ev.stopPropagation()}>
+            onClick={ev => ev.stopPropagation()}
+            style={style}>
 
             <div className="key-options">
                 {options.map((row, index) => this.renderOptionsRow(index, row, chosen.id))}
@@ -167,7 +172,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
 
         keyboardUtils.updateKeyBindings(config);
 
-        this.setState({ saved: true, hovering: null });
+        this.setState({ saved: true });
 
         if (this.props.onChosen) {
             this.props.onChosen(config);
