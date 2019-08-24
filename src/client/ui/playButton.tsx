@@ -12,38 +12,65 @@ import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
 
+const AutoJoinSeconds = 5;
+
 interface OwnProps {
     again?: boolean;
 }
-interface Props {
-    again: boolean;
-    isNewPlayer: boolean;
+interface Props extends OwnProps {
+    gameId: string;
     selfId: string;
     party: s.PartyState;
     isModded: boolean;
+    isPlaying: boolean;
     maxPlayers: number;
+    winner: boolean;
 }
 interface State {
     joining: boolean;
+    autoJoin: AutoJoinState;
+}
+
+interface AutoJoinState {
+    gameId: string;
+    secondsUntilAutoJoin: number;
+    completed?: boolean;
+    cancelled?: boolean;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
-        again: ownProps.again || false,
-        isNewPlayer: state.isNewPlayer,
+        ...ownProps,
         party: state.party,
         selfId: state.socketId,
         isModded: rooms.isModded(state.room),
         maxPlayers: state.room.settings.Matchmaking.MaxPlayers,
+        isPlaying: !!state.world.ui.myHeroId,
+        gameId: state.world.ui.myGameId,
+        winner: !!state.world.winner,
     };
 }
 
 class PlayButton extends React.PureComponent<Props, State> {
+    private recheckInterval: NodeJS.Timeout = null;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             joining: false,
+            autoJoin: null,
         };
+    }
+
+    componentDidMount() {
+        this.recheckInterval = setInterval(() => this.recheckAutoJoin(), 1000);
+    }
+
+    componentWillUnmount() {
+        if (this.recheckInterval !== null) {
+            clearInterval(this.recheckInterval);
+            this.recheckInterval = null;
+        }
     }
 
     render() {
@@ -79,11 +106,57 @@ class PlayButton extends React.PureComponent<Props, State> {
                 </Button>
             }
         } else {
-            return <Button className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked(ev)}>{label}</Button>
+            const autoJoin = this.state.autoJoin;
+            if (autoJoin && autoJoin.gameId == this.props.gameId && !autoJoin.cancelled) {
+                return <Button className="btn auto-join-btn" onClick={(ev) => this.onCancelAutoJoin()}>Next match in {this.state.autoJoin.secondsUntilAutoJoin}</Button>
+            } else {
+                return <Button className={this.state.joining ? "btn btn-disabled" : "btn"} onClick={(ev) => this.onPlayClicked()}>{label}</Button>
+            }
         }
     }
 
-    private async onPlayClicked(ev: React.MouseEvent) {
+    private recheckAutoJoin() {
+        let autoJoin = this.state.autoJoin;
+        if (autoJoin && autoJoin.gameId === this.props.gameId) {
+            if (!autoJoin.cancelled) {
+                autoJoin = { ...autoJoin };
+                if (autoJoin.secondsUntilAutoJoin > 0) {
+                    --autoJoin.secondsUntilAutoJoin;
+                }
+
+                if (autoJoin.secondsUntilAutoJoin === 0) {
+                    autoJoin.completed = true;
+                    this.onPlayClicked();
+                }
+
+                this.setState({ autoJoin });
+            }
+        } else {
+            if (!this.props.party && this.props.winner && this.props.isPlaying && !this.state.joining) {
+                this.setState({
+                    autoJoin: {
+                        gameId: this.props.gameId,
+                        secondsUntilAutoJoin: AutoJoinSeconds,
+                    },
+                });
+            }
+        }
+    }
+
+    private onCancelAutoJoin() {
+        if (!this.state.autoJoin) {
+            return;
+        }
+
+        this.setState({
+            autoJoin: {
+                ...this.state.autoJoin,
+                cancelled: true,
+            }
+        });
+    }
+
+    private async onPlayClicked() {
         if (this.state.joining) {
             return;
         }
