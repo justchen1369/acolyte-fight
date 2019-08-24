@@ -8,6 +8,7 @@ import ButtonRow from './buttonRow';
 
 interface Props {
     noAutoJoin: boolean;
+    isPlaying: boolean;
 }
 interface State {
 }
@@ -15,6 +16,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         noAutoJoin: state.options.noAutoJoin,
+        isPlaying: !!state.world.ui.myHeroId,
     };
 }
 
@@ -26,6 +28,10 @@ class AutoJoinConfigButton extends React.PureComponent<Props, State> {
     }
 
     render() {
+        if (!this.props.isPlaying) {
+            return null;
+        }
+
         if (this.props.noAutoJoin) {
             return <ButtonRow label="No auto-join" icon="fas fa-times" onClick={() => this.onClick(false)} />
         } else {
