@@ -239,6 +239,7 @@ a:hover, a:active {
 .btn:hover {
     background-color: #f80;
     animation: shine-loop 0.5s alternate infinite linear;
+    box-shadow: 0 0 8px #f808;
 }
 
 @keyframes shine-loop {
