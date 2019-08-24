@@ -3072,7 +3072,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 	if (world.tick >= buff.expireTick) {
 		return true;
-	} else if (!buff.noCleanse && hero.cleanseTick && buff.initialTick < hero.cleanseTick) {
+	} else if (buff.cleansable && hero.cleanseTick && buff.initialTick < hero.cleanseTick) {
 		return true;
 	} else if (buff.hitTick && hero.hitTick > buff.hitTick) {
 		return true;
@@ -4066,7 +4066,7 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	const values: w.BuffValues = {
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
-		noCleanse: !template.cleansable,
+		cleansable: template.cleansable !== undefined ? template.cleansable : true,
 		renderStart: template.renderStart,
 		render: template.render,
 		renderFinish: template.renderFinish,

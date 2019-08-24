@@ -589,7 +589,7 @@ export type Buff =
 	| MassBuff
 
 export interface BuffValues {
-	noCleanse?: boolean;
+	cleansable?: boolean;
 	destroyedTick?: number;
 	maxTicks: number;
 	initialTick: number;
