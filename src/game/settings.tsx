@@ -2270,12 +2270,12 @@ const shield: Spell = {
 };
 const phaseOut: Spell = {
     id: 'phaseOut',
-    name: 'Phase Out',
-    description: "For 0.5 seconds, disappear from the world. While phased out, you cannot be hurt, but you also cannot cast spells.",
+    name: 'Phase Shift',
+    description: "For 0.5 seconds, disappear from the world, removing any leftover momentum or buffs in the process. While phased shifted, you cannot be hurt, but you also cannot cast spells.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: false,
     debuff: true,
     unlink: true,
