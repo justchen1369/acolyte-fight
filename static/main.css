@@ -251,6 +251,7 @@ a:hover, a:active {
 
 .btn:active {
     box-shadow: none;
+    background-image: none;
 }
 
 .btn-disabled, .btn-disabled:hover, .btn-disabled:active {
