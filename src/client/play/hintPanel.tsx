@@ -154,27 +154,32 @@ class HintPanel extends React.PureComponent<Props, State> {
 
     private renderAlternativeHint() {
         const spellKey = this.state.alternativeKey;
-        const spellId = this.state.alternativeId;
-        if (!(spellKey && spellId)) {
+        const alternativeId = this.state.alternativeId;
+        if (!(spellKey && alternativeId)) {
             return null;
         }
 
-        const spell = this.props.settings.Spells[spellId];
+        const Spells = this.props.settings.Spells;
+        const resolved = resolveKeys(this.props);
+        const chosenId = resolved.keysToSpells.get(spellKey);
+
+        const chosen = Spells[chosenId];
+        const alternative = Spells[alternativeId];
         return <div className="customize-hint-container">
-            <div className="customize-hint customize-option">Change to {spellUtils.spellName(spell)}? {this.renderSpell(spell)}</div>
+            <div className="customize-hint customize-option">Change {this.renderSpell(spellKey, chosen)} to {this.renderSpell(spellKey, alternative)}?</div>
         </div>;
     }
 
-    private renderSpell(spell: Spell) {
+    private renderSpell(spellKey: string, spell: Spell) {
         return <SpellIcon 
             icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
             hoverHighlight={true}
             color={spell.color}
             size={32}
             attr={{
-                onMouseEnter: () => this.onAlternativeEnter(),
+                onMouseEnter: () => this.onAlternativeEnter(spell.id),
                 onMouseLeave: () => this.onAlternativeLeave(),
-                onMouseDown: (ev) => this.onAlternativeMouseDown(ev),
+                onMouseDown: (ev) => this.onAlternativeMouseDown(ev, spell.id, spellKey),
             }}
         />
     }
@@ -220,10 +225,10 @@ class HintPanel extends React.PureComponent<Props, State> {
         </div>;
     }
 
-    private onAlternativeEnter() {
+    private onAlternativeEnter(spellId: string) {
         StoreProvider.dispatch({
             type: "updateToolbar",
-            toolbar: { alternativeSpellId: this.state.alternativeId },
+            toolbar: { alternativeSpellId: spellId },
         });
     }
 
@@ -234,12 +239,12 @@ class HintPanel extends React.PureComponent<Props, State> {
         });
     }
 
-    private onAlternativeMouseDown(ev: React.MouseEvent) {
+    private onAlternativeMouseDown(ev: React.MouseEvent, spellId: string, spellKey: string) {
         ev.stopPropagation();
         ev.preventDefault();
 
         const keyBindings = { ...this.props.keyBindings };
-        keyBindings[this.state.alternativeKey] = this.state.alternativeId;
+        keyBindings[spellKey] = spellId;
         keyboardUtils.updateKeyBindings(keyBindings);
 
         ticker.sendKeyBindings(this.props.myGameId, this.props.myHeroId, keyBindings);

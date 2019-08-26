@@ -1261,7 +1261,7 @@ table.player-list {
 }
 
 .customize-hint-container .customize-option .spell-icon {
-    margin-left: 0.5em;
+    margin: 0 0.5em;
 
     pointer-events: all;
     cursor: hand;
