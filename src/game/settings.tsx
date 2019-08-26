@@ -2340,11 +2340,6 @@ const phaseOut: Spell = {
             },
         },
         {
-            type: "cooldown",
-            cleansable: false,
-            minCooldown: 0.5 * TicksPerSecond,
-        },
-        {
             type: "debuff",
             cleansable: false,
             maxTicks: 0.5 * TicksPerSecond,

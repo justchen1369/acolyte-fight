@@ -3040,6 +3040,7 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 	}
 
 	let armorChanged = false;
+	let cleanseChanged = false;
 	let glideChanged = false;
 	let massChanged = false;
 	hero.buffs.forEach((buff, id) => {
@@ -3053,6 +3054,8 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 				massChanged = true;
 			} else if (buff.type === "armor") {
 				armorChanged = true;
+			} else if (buff.type === "cleanse") {
+				cleanseChanged = true;
 			} else if (buff.type === "glide") {
 				glideChanged = true;
 			}
@@ -3061,6 +3064,9 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 
 	if (armorChanged) {
 		updateArmor(hero);
+	}
+	if (cleanseChanged) {
+		updateCleanse(hero);
 	}
 	if (glideChanged) {
 		updateHeroDamping(hero);
@@ -4087,7 +4093,10 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	}
 
 	if (template.type === "debuff") {
-		hero.cleanseTick = values.expireTick;
+		hero.buffs.set(id, {
+			...values, id, type: "cleanse",
+		});
+		updateCleanse(hero);
 	} else if (template.type === "movement") {
 		hero.buffs.set(id, {
 			...values, id, type: "movement",
@@ -4197,6 +4206,16 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 			hero.link.expireTick = world.tick;
 		}
 	}
+}
+
+function updateCleanse(hero: w.Hero) {
+	let cleanseTick = 0;
+	hero.buffs.forEach(b => {
+		if (b.type === "cleanse") {
+			cleanseTick = Math.max(cleanseTick, b.expireTick);
+		}
+	});
+	hero.cleanseTick = cleanseTick;
 }
 
 function burn(burn: w.BurnBehaviour, world: w.World) {

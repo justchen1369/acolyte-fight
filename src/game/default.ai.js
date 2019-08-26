@@ -266,7 +266,7 @@ function focus(hero, opponent) { // When using a spell (e.g. Acolyte Beam, Spiri
         } else if (hero.casting.spellId === "grapple") {
             // Throw away to the right (TODO: be smarter about this)
             return { spellId: hero.casting.spellId, release: true, target: vectorPlus(hero.pos, vectorFromAngle(hero.heading + Math.PI / 2)) };
-        }  else if (hero.casting.spellId === "halo") {
+        } else if (hero.casting.spellId === "halo") {
             return { spellId: "move", target: opponent.pos };
         } else {
             return { spellId: "retarget", target: opponent.pos };

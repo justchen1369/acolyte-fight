@@ -581,6 +581,7 @@ export interface GravityState {
 
 export type Buff =
 	MovementBuff
+	| CleanseBuff
 	| GlideBuff
 	| LavaImmunityBuff
 	| VanishBuff
@@ -616,6 +617,10 @@ export interface LinkChannellingBuffParams {
 export interface BuffBase extends BuffValues {
 	id: string;
 	type: string;
+}
+
+export interface CleanseBuff extends BuffBase {
+	type: "cleanse";
 }
 
 export interface MovementBuff extends BuffBase {
