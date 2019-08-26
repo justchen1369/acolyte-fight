@@ -48,11 +48,11 @@ class DeadMessage extends React.PureComponent<Props, State> {
         return <div className="winner dialog-panel">
             <div className="winner-row">You died.</div>
 
-            {score && <>
+            {score && <div className="award-group">
                 <div className="award-row self-metric">Your damage: {score.damage.toFixed(0)}.</div>
                 <div className="award-row self-metric">Your kills: {score.kills}.</div>
                 <div className="award-row self-metric">You outlasted {score.outlasts} {score.outlasts === 1 ? "other" : "others"}.</div>
-            </>}
+            </div>}
 
             <div className="action-row">
                 <PlayButton again={!!this.props.myHeroId} />

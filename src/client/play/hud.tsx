@@ -10,7 +10,6 @@ import * as StoreProvider from '../storeProvider';
 import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import AutoJoinConfigButton from './buttons/autoJoinConfigButton';
 import Button from '../controls/button';
-import ChooseSpellsButton from './buttons/chooseSpellsButton';
 import ExitLink from './exitLink';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';

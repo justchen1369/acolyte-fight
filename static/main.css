@@ -1050,11 +1050,17 @@ table.player-list {
 .messages .winner-row {
     font-weight: bold;
     font-size: 150%;
-    margin-bottom: 1em;
 }
 
-.messages .award-group {
-    margin-bottom: 1em;
+.messages .dialog-panel .award-row {
+    vertical-align: middle;
+    transition: height 0.2s ease;
+    overflow: hidden;
+}
+
+.messages .dialog-panel .award-group {
+    margin-top: 1em;
+    transition: margin-top 0.2s ease;
 }
 
 .messages .self-metric {
@@ -1063,8 +1069,10 @@ table.player-list {
     font-style: italic;
 }
 
-.messages .outlast-row {
+.messages .dialog-panel .outlast-row {
     margin-top: 0.75em;
+    transition: margin-top 0.2s ease;
+
     color: #ccc;
     font-style: italic;
 }
@@ -1097,7 +1105,7 @@ table.player-list {
     display: flex;
     align-items: center;
 
-    margin: 0.5em 8;
+    margin: 0.25em 8;
     animation: none;
 }
 
@@ -1242,6 +1250,21 @@ table.player-list {
 #game-panel .customize-hint.team-hint {
     font-size: 200%;
     animation: emphasise-flash alternate 0.5s infinite linear;
+}
+
+.customize-hint-container .customize-option {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.customize-hint-container .customize-option .spell-icon {
+    margin-left: 0.5em;
+
+    pointer-events: all;
+    cursor: hand;
 }
 
 #game-panel .button-panel {

@@ -136,6 +136,7 @@ export interface UIState {
 }
 
 export interface ToolbarState {
+	alternativeSpellId?: string;
 	hoverSpellId?: string;
 	hoverBtn?: string;
 	hoverControl?: string;

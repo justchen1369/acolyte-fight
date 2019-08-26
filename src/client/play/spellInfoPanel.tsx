@@ -9,7 +9,7 @@ import { SpellIcon } from '../controls/spellIcon';
 import SpellStats from './spellStats';
 
 interface Props {
-    hoverSpellId: string;
+    spellId: string;
     buttonBar: w.ButtonConfig;
     settings: AcolyteFightSettings;
 }
@@ -18,7 +18,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        hoverSpellId: state.world.ui.toolbar.hoverSpellId,
+        spellId: state.world.ui.toolbar.alternativeSpellId || state.world.ui.toolbar.hoverSpellId,
         buttonBar: state.world.ui.buttonBar,
         settings: state.world.settings,
     };
@@ -32,7 +32,7 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (!this.props.hoverSpellId) {
+        if (!this.props.spellId) {
             return null; // Nothing to render
         }
 
@@ -51,7 +51,7 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
             return null; // No buttons to hover over
         }
 
-        const spell = this.props.settings.Spells[this.props.hoverSpellId];
+        const spell = this.props.settings.Spells[this.props.spellId];
         if (!spell) {
             return null;
         }
@@ -73,7 +73,7 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
                 {spell.description}
             </div>
             {this.renderEffects(spell.effects)}
-            <SpellStats spellId={this.props.hoverSpellId} settings={this.props.settings} />
+            <SpellStats spellId={this.props.spellId} settings={this.props.settings} />
         </div>;
     }
 

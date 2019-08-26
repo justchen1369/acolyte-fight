@@ -6,3 +6,11 @@ export function rotate(array: any[], startIndex: number) {
     }
     return result;
 }
+
+export function random<T>(array: T[]) {
+    if (array.length > 0) {
+        return array[Math.floor(Math.random() * array.length)];
+    } else {
+        return undefined;
+    }
+}

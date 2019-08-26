@@ -36,15 +36,17 @@ class WinMessage extends React.PureComponent<Props, State> {
         return <div className="winner dialog-panel">
             {this.renderWinnerRow(notification.winners)}
 
-            <div className="award-row">
-                Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)}). {score && <span className="self-metric">Your damage: {score.damage.toFixed(0)}.</span>}
-            </div>
+            <div className="award-group">
+                <div className="award-row">
+                    Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)}). {score && <span className="self-metric">Your damage: {score.damage.toFixed(0)}.</span>}
+                </div>
 
-            <div className="award-row">
-                Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills). {score && <span className="self-metric">Your kills: {score.kills}.</span>}
-            </div>
+                <div className="award-row">
+                    Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills). {score && <span className="self-metric">Your kills: {score.kills}.</span>}
+                </div>
 
-            {score && <div className="award-row outlast-row">You outlasted {score.outlasts} {score.outlasts === 1 ? "other" : "others"}.</div>}
+                {score && <div className="award-row outlast-row">You outlasted {score.outlasts} {score.outlasts === 1 ? "other" : "others"}.</div>}
+            </div>
 
             <div className="action-row">
                 <PlayButton again={!!this.props.myHeroId} />
