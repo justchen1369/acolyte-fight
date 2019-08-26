@@ -14,7 +14,7 @@ import * as StoreProvider from '../storeProvider';
 import * as ticker from '../core/ticker';
 
 import { isMobile } from '../core/userAgent';
-import SpellIcon from '../controls/SpellIcon';
+import SpellIcon from '../controls/spellIcon';
 
 interface Props {
     myGameId: string;
