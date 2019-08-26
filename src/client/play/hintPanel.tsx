@@ -30,6 +30,7 @@ interface Props {
     teams: Immutable.Map<string, w.Team>;
 }
 interface State {
+    alternativeGameId: string;
     alternativeKey: string;
     alternativeId: string;
 }
@@ -62,6 +63,7 @@ class HintPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            alternativeGameId: null,
             alternativeKey: null,
             alternativeId: null,
         };
@@ -80,7 +82,7 @@ class HintPanel extends React.PureComponent<Props, State> {
     }
 
     private isAlternativeInvalid() {
-        if (!this.state.alternativeKey && this.state.alternativeId) {
+        if (!(this.state.alternativeKey && this.state.alternativeId && this.state.alternativeGameId === this.props.myGameId)) {
             return true;
         }
 
@@ -103,6 +105,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         const alternativeId = arrayUtils.random(options);
 
         this.setState({
+            alternativeGameId: this.props.myGameId,
             alternativeKey: spellKey,
             alternativeId,
         });
