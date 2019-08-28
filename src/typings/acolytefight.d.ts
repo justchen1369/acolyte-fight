@@ -140,6 +140,7 @@ declare type SwatchRender =
 declare interface SwatchColor {
 	color: string;
 	deadColor?: string;
+	flash?: boolean; // Whether to flash when obstacle hit. Defaults to true.
 }
 
 declare interface SwatchFill extends SwatchColor {

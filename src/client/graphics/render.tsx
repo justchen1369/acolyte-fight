@@ -816,7 +816,10 @@ function calculateObstacleColor(obstacle: w.Obstacle, context: RenderObstacleCon
 	}
 
 	if (context.highlight && context.highlight.flash) {
-		color.lighten(context.highlight.flash);
+		const flash = fill.flash !== undefined ? fill.flash : true;
+		if (flash) {
+			color.lighten(context.highlight.flash);
+		}
 	}
 
 	return color;
