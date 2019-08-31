@@ -80,6 +80,7 @@ class HUD extends React.PureComponent<Props, State> {
         const tab = this.state.tab;
         const modal = this.props.customizing;
         return <>
+            <TeamsMessage />
             {!modal && <Layout anchorTop={true} anchorLeft={true}>
                 <PlayBar />
             </Layout>}
@@ -123,7 +124,6 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
-            <TeamsMessage />
             <GameKeyCustomizer />
         </>
     }
@@ -149,6 +149,7 @@ class HUD extends React.PureComponent<Props, State> {
     private renderDesktop() {
         const a = options.getProvider();
         return <>
+            <TeamsMessage />
             <PlayBar>
                 <MutePanel />
                 <AutoJoinConfigButton />
@@ -157,6 +158,9 @@ class HUD extends React.PureComponent<Props, State> {
                 <RandomizePanel />
                 <VideoPanel />
             </PlayBar>
+            <Layout anchorBottom={true} anchorRight={true}>
+                <SpellInfoPanel />
+            </Layout>
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
             </Layout>
@@ -170,11 +174,7 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
-            <Layout anchorBottom={true} anchorRight={true}>
-                <SpellInfoPanel />
-            </Layout>
             {!a.noExternalLinks && this.props.exitable && <SocialBar />}
-            <TeamsMessage />
             <GameKeyCustomizer />
         </>
     }
