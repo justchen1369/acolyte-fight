@@ -1193,11 +1193,9 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 	const World = world.settings.World;
 	const Layouts = world.settings.Layouts;
 
-	let layout: Layout = Layouts[ev.layoutId];
-	if (!layout) {
-		const layouts = Object.keys(Layouts).sort().map(key => Layouts[key]).filter(x => !!x);
-		layout = layouts[world.seed % layouts.length];
-	}
+	const layoutIds = World.Layouts || Object.keys(Layouts);
+	const layouts = layoutIds.sort().map(key => Layouts[key]).filter(x => !!x);
+	const layout = layouts[world.seed % layouts.length];
 
 	if (layout.color) {
 		world.color = layout.color;

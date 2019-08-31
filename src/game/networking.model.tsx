@@ -42,7 +42,6 @@ export interface ControlMsgBase {
 export interface EnvironmentMsg extends ControlMsgBase {
     type: "environment";
     seed: number;
-    layoutId?: string;
 }
 
 export interface JoinActionMsg extends ControlMsgBase {

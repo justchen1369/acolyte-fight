@@ -92,6 +92,8 @@ declare interface WorldSettings {
 	SlopRadius: number; // Performance improvement: For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
 
 	BotName: string; // What to call the bot
+
+	Layouts?: string[]; // Only allow this subset of layouts to be played. Used internally to preview a single map.
 }
 
 declare interface MatchmakingSettings {

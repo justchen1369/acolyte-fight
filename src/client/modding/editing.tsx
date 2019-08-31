@@ -34,8 +34,18 @@ export function canonlicalize(mod: ModTree) {
 
 export async function previewMod(mod: ModTree, layoutId: string = null) {
     if (mod) {
+        if (layoutId) {
+            mod = {
+                ...mod,
+                World: {
+                    ...mod.World,
+                    Layouts: [layoutId],
+                },
+            };
+        }
+
         const roomId = await rooms.createRoomAsync(mod)
-        await matches.joinNewGame({ layoutId, roomId, locked: m.LockType.ModPreview });
+        await matches.joinNewGame({ roomId, locked: m.LockType.ModPreview });
     }
 }
 

@@ -409,7 +409,6 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		&& required(data.name, "string")
 		&& required(data.keyBindings, "object")
 		&& optional(data.room, "string")
-		&& optional(data.layoutId, "string")
 		&& optional(data.gameId, "string")
 		&& optional(data.isMobile, "boolean")
 		&& optional(data.unranked, "boolean")
@@ -455,7 +454,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			replay = games.findExistingGame(data.version, room, partyId, isPrivate);
 		} else if (locked) {
 			// The user wants a private game, create one
-			replay = games.initGame(data.version, room, partyId, isPrivate, locked, data.layoutId);
+			replay = games.initGame(data.version, room, partyId, isPrivate, locked);
 		} else {
 			replay = games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
 		}

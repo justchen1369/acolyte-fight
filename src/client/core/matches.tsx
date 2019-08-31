@@ -15,7 +15,6 @@ export interface JoinParams {
 	gameId?: string;
 	observe?: boolean;
 	live?: boolean;
-	layoutId?: string;
 	roomId?: string;
 	locked?: string;
 	reconnectKey?: string;
@@ -36,7 +35,6 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				name: store.playerName,
 				keyBindings: store.keyBindings,
 				room: opts.roomId || store.room.id,
-				layoutId: opts.layoutId || null,
 				isMobile,
 				unranked: store.options.unranked || false,
 				observe,

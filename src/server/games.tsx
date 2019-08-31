@@ -245,7 +245,7 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 	}
 }
 
-export function initGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, locked: string = null, layoutId: string = null) {
+export function initGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, locked: string = null) {
 	const store = getStore();
 
 	const gameIndex = getStore().nextGameId++;
@@ -292,7 +292,6 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	queueControlMessage(game, {
 		type: m.ActionType.Environment,
 		seed: gameIndex,
-		layoutId: layoutId,
 	});
 
 	let gameName = game.id;
