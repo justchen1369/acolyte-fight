@@ -34,20 +34,30 @@ class ModLoader extends React.PureComponent<Props, State> {
 
     componentDidMount() {
         if (!this.props.codeTree) {
-            if (this.props.roomId !== m.DefaultRoomId && Object.keys(this.props.roomMod).length > 0) {
-                // Room is modded, load the settings from there when launching the mod editor
-                StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
-            } else {
-                this.detectAutoSaved();
-            }
+            this.loadMod();
         }
     }
 
-    private async detectAutoSaved() {
-        const autoSaved = await storage.loadMod();
-        if (!this.props.codeTree && autoSaved && autoSaved.mod) {
-            StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(autoSaved.mod) });
+    private async loadMod() {
+        try {
+            const mod = await this.findMod();
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(mod) });
+        } catch (exception) {
+            console.error("Error loading mod", exception);
         }
+    }
+
+    private async findMod() {
+        if (this.props.roomId !== m.DefaultRoomId && Object.keys(this.props.roomMod).length > 0) {
+            return this.props.roomMod;
+        }
+
+        const autoSaved = await storage.loadMod();
+        if (autoSaved && autoSaved.mod) {
+            return autoSaved.mod;
+        }
+
+        return null;
     }
 
     render(): React.ReactNode {
