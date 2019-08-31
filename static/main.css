@@ -1153,12 +1153,8 @@ table.player-list {
 }
 
 #spell-info-panel {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-
     min-width: 200px;
-    max-width: 25%;
+    max-width: 25vw;
     pointer-events: none;
 
     background: linear-gradient(to left, #111, rgba(0,0,0,0));
@@ -1280,6 +1276,14 @@ table.player-list {
     display: inline-block;
     min-width: 2em;
     text-align: center;
+}
+
+#game-panel.desktop .button-panel-row .button-panel-row-label {
+    opacity: 0;
+}
+
+#game-panel.desktop .button-panel-row:hover .button-panel-row-label {
+    opacity: 1;
 }
 
 #game-panel .button-panel .clickable:hover {

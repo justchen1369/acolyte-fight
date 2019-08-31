@@ -10,7 +10,6 @@ import SpellStats from './spellStats';
 
 interface Props {
     spellId: string;
-    buttonBar: w.ButtonConfig;
     settings: AcolyteFightSettings;
 }
 interface State {
@@ -19,7 +18,6 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         spellId: state.world.ui.toolbar.alternativeSpellId || state.world.ui.toolbar.hoverSpellId,
-        buttonBar: state.world.ui.buttonBar,
         settings: state.world.settings,
     };
 }
@@ -36,28 +34,13 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
             return null; // Nothing to render
         }
 
-        const Visuals = this.props.settings.Visuals;
-
-        // Offset the messages from the button bar
-        let marginBottom = 0;
-        const buttonBar = this.props.buttonBar;
-        if (buttonBar) {
-            if (buttonBar.view === "bar") {
-                marginBottom = Visuals.ButtonBarSize * buttonBar.scaleFactor + Visuals.ButtonBarMargin * 2;
-            } else if (buttonBar.view === "wheel") {
-                return null; // Simply don't display tooltip on mobile, not enough space
-            }
-        } else {
-            return null; // No buttons to hover over
-        }
-
         const spell = this.props.settings.Spells[this.props.spellId];
         if (!spell) {
             return null;
         }
 
         const name = spellUtils.spellName(spell);
-        return <div id="spell-info-panel" style={{ marginBottom }}>
+        return <div id="spell-info-panel">
             <div className="spell-title">
                 <div className="spacer"></div>
                 <span className="spell-name">{name}</span>

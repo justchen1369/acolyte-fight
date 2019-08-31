@@ -169,9 +169,11 @@ class HUD extends React.PureComponent<Props, State> {
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
-            <TeamsMessage />
+            <Layout anchorBottom={true} anchorRight={true}>
+                <SpellInfoPanel />
+            </Layout>
             {!a.noExternalLinks && this.props.exitable && <SocialBar />}
-            <SpellInfoPanel />
+            <TeamsMessage />
             <GameKeyCustomizer />
         </>
     }
