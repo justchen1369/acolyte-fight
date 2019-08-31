@@ -935,7 +935,7 @@ export interface ThrustDecayBehaviour extends BehaviourBase {
 	heroId: string;
 }
 
-export interface SaberBehaviour extends BehaviourBase {
+export interface SaberBehaviour extends BehaviourBase, HitSource {
 	type: "saberSwing";
 	shieldId: string;
 }
@@ -945,7 +945,7 @@ export interface BurnBehaviour extends BehaviourBase {
 	heroId: string;
 }
 
-export interface AttractBehaviour extends BehaviourBase {
+export interface AttractBehaviour extends BehaviourBase, HitSource {
 	type: "attract";
 	objectId: string;
 	owner: string;
@@ -959,14 +959,13 @@ export interface AttractBehaviour extends BehaviourBase {
 	maxSpeed?: number;
 }
 
-export interface AuraBehaviour extends BehaviourBase {
+export interface AuraBehaviour extends BehaviourBase, HitSource {
 	type: "aura";
 	objectId: string;
 	owner: string;
 	against: number;
 
 	radius: number;
-	tickInterval: number;
 	remainingHits: number;
 	packet?: DamagePacketTemplate;
 	buffs: BuffTemplate[];

@@ -176,6 +176,7 @@ function createCollisionFromContact(world: w.World, contact: pl.Contact): w.Coll
 	return { a, b, point: collisionPoint };
 }
 
+// Not guaranteed to return each object once
 function queryExtent(world: w.World, epicenter: pl.Vec2, radius: number, callback: (obj: w.WorldObject) => void) {
 	const topLeft = epicenter.clone();
 	topLeft.x -= radius;
@@ -849,6 +850,8 @@ function instantiateAttract(template: AttractTemplate, projectile: w.Projectile,
 		radius: template.radius,
 		accelerationPerTick: template.accelerationPerTick,
 		maxSpeed: template.maxSpeed,
+		hitInterval: 1,
+		hitTickLookup: new Map(),
 	};
 }
 
@@ -861,8 +864,9 @@ function instantiateAura(template: AuraTemplate, projectile: w.Projectile, world
 		remainingHits: template.maxHits !== undefined ? template.maxHits : NeverTicks,
 		packet: template.packet,
 		radius: template.radius,
-		tickInterval: template.tickInterval,
 		buffs: template.buffs,
+		hitInterval: template.tickInterval,
+		hitTickLookup: new Map(),
 	};
 }
 
@@ -2801,6 +2805,10 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 		}
 		acceleration.mul(attraction.accelerationPerTick / acceleration.length());
 
+		if (!takeHit(attraction, obj.id, world)) {
+			return;
+		}
+
 		const velocity = obj.body.getLinearVelocity();
 		velocity.add(acceleration);
 
@@ -2814,7 +2822,7 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 }
 
 function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
-	if (world.tick % behaviour.tickInterval !== 0) {
+	if (world.tick % behaviour.hitInterval !== 0) {
 		return true;
 	}
 
@@ -2833,6 +2841,10 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 		}
 
 		if ((calculateAlliance(behaviour.owner, obj.id, world) & behaviour.against) === 0) {
+			return;
+		}
+
+		if (!takeHit(behaviour, obj.id, world)) {
 			return;
 		}
 
@@ -3264,7 +3276,14 @@ function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: s
 }
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
+	const seen = new Set<string>(); // queryExtent not guaranteed to hit once
 	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
+		if (seen.has(other.id)) {
+			return;
+		} else {
+			seen.add(other.id);
+		}
+
 		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
 			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
@@ -3960,7 +3979,12 @@ function saberAction(world: w.World, hero: w.Hero, action: w.Action, spell: Sabe
 		spell.angleOffsetsInRevs.forEach(angleOffsetInRevs => {
 			const angleOffset = angleOffsetInRevs * 2 * Math.PI;
 			const saber = addSaber(world, hero, spell, angleOffset);
-			world.behaviours.push({ type: "saberSwing", shieldId: saber.id });
+			world.behaviours.push({
+				type: "saberSwing",
+				shieldId: saber.id,
+				hitInterval: 1,
+				hitTickLookup: new Map(),
+			});
 		});
 	}
 	return saberTick >= spell.maxTicks;
@@ -4028,6 +4052,10 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		const insidePrevious = vector.insideLine(diff, extent, vectorZero, previousTip, antiClockwise);
 		const insideNew = vector.insideLine(diff, extent, newTip, vectorZero, antiClockwise);
 		if (!(insidePrevious && insideNew)) {
+			return;
+		}
+
+		if (!takeHit(behaviour, obj.id, world)) {
 			return;
 		}
 
