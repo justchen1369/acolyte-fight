@@ -149,6 +149,14 @@ class HUD extends React.PureComponent<Props, State> {
     private renderDesktop() {
         const a = options.getProvider();
         return <>
+            <PlayBar>
+                <MutePanel />
+                <AutoJoinConfigButton />
+                <GraphicsLevelPanel />
+                <FullScreenButton />
+                <RandomizePanel />
+                <VideoPanel />
+            </PlayBar>
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
             </Layout>
@@ -159,14 +167,6 @@ class HUD extends React.PureComponent<Props, State> {
                 <WaitingMessage />
                 <TextMessageBox />
             </Layout>
-            <PlayBar>
-                <MutePanel />
-                <AutoJoinConfigButton />
-                <GraphicsLevelPanel />
-                <FullScreenButton />
-                <RandomizePanel />
-                <VideoPanel />
-            </PlayBar>
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>
