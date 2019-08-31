@@ -1874,8 +1874,7 @@ const mines: Spell = {
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
-        expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
-        bumpable: true,
+        expireOn: Categories.All ^ Categories.Shield,
         conveyable: true,
         destructible: {
         },
