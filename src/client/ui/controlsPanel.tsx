@@ -27,15 +27,6 @@ namespace Side {
     export const Right = "right";
 }
 
-namespace Graphics {
-    export const Auto = "auto";
-    export const Maximum = "maximum";
-    export const Ultra = "ultra";
-    export const High = "high";
-    export const Medium = "medium";
-    export const Low = "low";
-}
-
 namespace ChangeSpellsWith {
     export const RightClick = "right";
     export const CtrlClick = "ctrl";
@@ -101,7 +92,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
         sounds: options.mute ? Toggle.Off : Toggle.On,
-        graphics: formatGraphics(options.graphics),
+        graphics: r.formatGraphics(options.graphics),
     };
 }
 
@@ -114,28 +105,6 @@ function parseOption(value: string): string {
         return null;
     } else {
         return value;
-    }
-}
-
-function formatGraphics(graphics: number): string {
-    switch (graphics) {
-        case r.GraphicsLevel.Maximum: return Graphics.Maximum;
-        case r.GraphicsLevel.Ultra: return Graphics.Ultra;
-        case r.GraphicsLevel.High: return Graphics.High;
-        case r.GraphicsLevel.Medium: return Graphics.Medium;
-        case r.GraphicsLevel.Low: return Graphics.Low;
-        default: return Graphics.Auto;
-    }
-}
-
-function parseGraphics(graphics: string): number {
-    switch (graphics) {
-        case Graphics.Maximum: return r.GraphicsLevel.Maximum;
-        case Graphics.Ultra: return r.GraphicsLevel.Ultra;
-        case Graphics.High: return r.GraphicsLevel.High;
-        case Graphics.Medium: return r.GraphicsLevel.Medium;
-        case Graphics.Low: return r.GraphicsLevel.Low;
-        default: return null;
     }
 }
 
@@ -322,11 +291,11 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 <span className="label">Graphics</span>
                 <select className="value" value={this.state.graphics} onChange={ev => this.onUpdate({ graphics: ev.target.value })}>
                     <option value={formatOption(null)}>Auto</option>
-                    <option value={Graphics.Maximum}>Maximum</option>
-                    <option value={Graphics.Ultra}>Ultra</option>
-                    <option value={Graphics.High}>High</option>
-                    <option value={Graphics.Medium}>Medium</option>
-                    <option value={Graphics.Low}>Low</option>
+                    <option value={r.Graphics.Maximum}>Maximum</option>
+                    <option value={r.Graphics.Ultra}>Ultra</option>
+                    <option value={r.Graphics.High}>High</option>
+                    <option value={r.Graphics.Medium}>Medium</option>
+                    <option value={r.Graphics.Low}>Low</option>
                 </select>
             </div>
             {this.state.changed && <div className="status-row">
@@ -389,7 +358,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
             options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
-            options.graphics = parseGraphics(state.graphics);
+            options.graphics = r.parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);
         }

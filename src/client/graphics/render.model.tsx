@@ -12,6 +12,41 @@ export namespace GraphicsLevel {
 	export const Low = 1;
 }
 
+export namespace Graphics {
+    export const Auto = "auto";
+    export const Maximum = "maximum";
+    export const Ultra = "ultra";
+    export const High = "high";
+    export const Medium = "medium";
+    export const Low = "low";
+}
+
+export function isAutoGraphics(graphics: number) {
+	return !graphics;
+}
+
+export function formatGraphics(graphics: number): string {
+    switch (graphics) {
+        case GraphicsLevel.Maximum: return Graphics.Maximum;
+        case GraphicsLevel.Ultra: return Graphics.Ultra;
+        case GraphicsLevel.High: return Graphics.High;
+        case GraphicsLevel.Medium: return Graphics.Medium;
+        case GraphicsLevel.Low: return Graphics.Low;
+        default: return Graphics.Auto;
+    }
+}
+
+export function parseGraphics(graphics: string): number {
+    switch (graphics) {
+        case Graphics.Maximum: return GraphicsLevel.Maximum;
+        case Graphics.Ultra: return GraphicsLevel.Ultra;
+        case Graphics.High: return GraphicsLevel.High;
+        case Graphics.Medium: return GraphicsLevel.Medium;
+        case Graphics.Low: return GraphicsLevel.Low;
+        default: return null;
+    }
+}
+
 export interface CanvasStack {
 	gl: HTMLCanvasElement;
 	ui: HTMLCanvasElement;

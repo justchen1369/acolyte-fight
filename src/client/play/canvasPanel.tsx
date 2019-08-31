@@ -25,7 +25,8 @@ interface Props {
     noTargetingIndicator: boolean;
     noCameraFollow: boolean;
     customizingSpells: boolean;
-    graphics?: number;
+    globalGraphics: number;
+    currentGraphics: number;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
 }
@@ -33,7 +34,6 @@ interface State {
     width: number;
     height: number;
     touchMultiplier: number;
-    rtx: number;
 }
 
 class AnimationLoop {
@@ -43,10 +43,7 @@ class AnimationLoop {
     private isRunning = false;
 
     private slow: () => void;
-    private numWaitFrames = 0;
     private timeOfLastFrame = 0;
-
-    private numSlowFrames = 0;
 
     private renderIntervals = new Array<number>();
 
@@ -110,7 +107,8 @@ function stateToProps(state: s.State): Props {
         noTargetingIndicator: state.options.noTargetingIndicator,
         noCameraFollow: state.options.noCameraFollow,
         customizingSpells: state.customizing,
-        graphics: state.options.graphics,
+        globalGraphics: state.options.graphics,
+        currentGraphics: state.graphics,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
     };
@@ -146,7 +144,6 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             width: 0,
             height: 0,
             touchMultiplier: 1,
-            rtx: GraphicsLevel.Maximum,
         };
     }
 
@@ -166,9 +163,9 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     reduceGraphics() {
-        if (autoGraphics(this.props.graphics) && this.state.rtx > GraphicsLevel.Low) {
-            const newLevel = this.state.rtx - 1;
-            this.setState({ rtx: newLevel });
+        if (autoGraphics(this.props.globalGraphics) && this.props.currentGraphics > GraphicsLevel.Low) {
+            const newLevel = this.props.currentGraphics - 1;
+            StoreProvider.dispatch({ type: "graphics", graphics: newLevel });
             console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
         }
     }
@@ -178,7 +175,6 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         return (
             <div
                 id="canvas-container"
-                className={this.state.rtx ? "rtx-on" : "rtx-off"}
 
                 ref={c => {
                     if (c) { // React can't attach non-passive listeners, which means we can't prevent the pinch-zoom/scroll unless we do this
@@ -216,8 +212,12 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         });
     }
 
+    private getGraphics() {
+        return this.props.globalGraphics || this.props.currentGraphics;
+    }
+
     private calculateRetinaMultiplier() {
-        if (this.state.rtx >= GraphicsLevel.Maximum) {
+        if (this.getGraphics() >= GraphicsLevel.Maximum) {
             return window.devicePixelRatio;
         } else {
             return 1;
@@ -228,7 +228,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
             frame(this.canvasStack, this.props.world, {
-                rtx: this.props.graphics || this.state.rtx,
+                rtx: this.getGraphics(),
                 wheelOnRight: this.props.wheelOnRight,
                 targetingIndicator: !this.props.noTargetingIndicator,
                 cameraFollow: !this.props.noCameraFollow,

@@ -2,6 +2,7 @@ import Immutable from 'immutable';
 import * as Redux from 'redux';
 import * as d from './stats.model';
 import * as m from '../shared/messages.model';
+import * as r from './graphics/render.model';
 import * as s from './store.model';
 import * as w from '../game/world.model';
 import * as storage from './storage';
@@ -32,6 +33,7 @@ function initialState(): s.State {
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
         options: storage.getOptionsOrDefaults(),
+        graphics: r.GraphicsLevel.Maximum,
         modErrors: {},
         current: { page: "", profileId: null },
         socketId: null,
@@ -121,6 +123,8 @@ function reducer(state: s.State, action: s.Action): s.State {
                 ...action.options,
             },
         };
+    } else if (action.type === "graphics") {
+        return { ...state, graphics: action.graphics };
     } else if (action.type === "updateUrl") {
         return { ...state, current: action.current };
     } else if (action.type === "updateHash") {

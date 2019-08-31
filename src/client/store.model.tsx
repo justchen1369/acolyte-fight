@@ -20,6 +20,7 @@ export interface State {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
     options: m.GameOptions;
+    graphics?: number;
 
     codeTree?: e.CodeTree;
 
@@ -110,6 +111,7 @@ export type Action =
     | UpdateKeyBindingsAction
     | UpdateCustomizingAction
     | UpdateOptionsAction
+    | UpdateGraphicsAction
     | UpdateUrlAction
     | UpdateHashAction
     | UpdatePageAction
@@ -207,6 +209,11 @@ export interface UpdateKeyBindingsAction {
 export interface UpdateOptionsAction {
     type: "updateOptions";
     options: Partial<m.GameOptions>;
+}
+
+export interface UpdateGraphicsAction {
+    type: "graphics";
+    graphics: number;
 }
 
 export interface UpdateUrlAction {

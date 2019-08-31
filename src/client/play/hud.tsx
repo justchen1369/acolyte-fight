@@ -14,6 +14,7 @@ import ButtonPanelLabel from './buttons/buttonPanelLabel';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
+import GraphicsLevelPanel from './buttons/graphicsLevelPanel';
 import HelpMessage from './messages/helpMessage';
 import HintPanel from './hintPanel';
 import Layout from './layout';
@@ -97,6 +98,7 @@ class HUD extends React.PureComponent<Props, State> {
                 {tab === Tab.Options && <>
                     <MutePanel />
                     <AutoJoinConfigButton />
+                    <GraphicsLevelPanel />
                     <ActionWheelSidePanel />
                 </>}
                 {tab === Tab.Chat && <div className="messages">
@@ -160,6 +162,7 @@ class HUD extends React.PureComponent<Props, State> {
             <PlayBar>
                 <MutePanel />
                 <AutoJoinConfigButton />
+                <GraphicsLevelPanel />
                 <FullScreenButton />
                 <RandomizePanel />
                 <VideoPanel />
