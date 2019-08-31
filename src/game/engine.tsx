@@ -1514,7 +1514,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	assignKeyBindingsToHero(hero, ev.keyBindings, world); 
+	activateHero(hero, ev.keyBindings, world); 
 
 	const player: w.Player = {
 		heroId: hero.id,
@@ -1551,7 +1551,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	assignKeyBindingsToHero(hero, ev.keyBindings, world);
+	activateHero(hero, ev.keyBindings, world);
 
 	const preferredColor = colorWheel.getPreferredColor(ev.userHash);
 	const uiBaseColor = chooseNewPlayerColor(preferredColor, world);
@@ -1577,6 +1577,15 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	world.ui.notifications.push({ type: "join", player });
 
 	return true;
+}
+
+function activateHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
+	assignKeyBindingsToHero(hero, keyBindings, world);
+
+	if (world.tick < world.startTick) {
+		// Cleanse when a new player replaces another
+		hero.cleanseTick = world.tick;
+	}
 }
 
 function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
