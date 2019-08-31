@@ -6,6 +6,7 @@ import * as engine from '../../game/engine';
 export function initialWorld(data: m.HeroMsg) {
 	let world = engine.initialWorld(data.mod);
 
+	world.ui.myRoomId = data.room;
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;

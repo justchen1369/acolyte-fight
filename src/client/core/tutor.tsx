@@ -2,6 +2,7 @@ import _ from 'lodash';
 import * as analytics from './analytics';
 import * as m from '../../shared/messages.model';
 import * as matches from './matches';
+import * as s from '../store.model';
 import * as storage from '../storage';
 import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
@@ -17,15 +18,15 @@ export function onNotification(notifs: w.Notification[]) {
     }
 }
 
+export function needsTutorial(state: s.State): boolean {
+    return state.isNewPlayer && state.room.id === m.DefaultRoomId && !state.party;
+}
+
 export function tutorialSettings(): matches.JoinParams {
-    const state = StoreProvider.getState();
-    if (state.isNewPlayer && state.room.id === m.DefaultRoomId && !state.party) {
-        return {
-            locked: m.LockType.Tutorial,
-            numBots: 1,
-        };
-    }
-    return null;
+    return {
+        locked: m.LockType.Tutorial,
+        numBots: 1,
+    };
 }
 
 export function exitTutorial() {

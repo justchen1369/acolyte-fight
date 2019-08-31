@@ -123,6 +123,7 @@ export function initialWorld(mod: Object): w.World {
 
 		ui: {
 			createTime: moment(),
+			myRoomId: null,
 			myGameId: null,
 			myHeroId: null,
 			myPartyId: null,

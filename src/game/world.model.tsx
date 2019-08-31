@@ -101,6 +101,7 @@ export interface HeroScore {
 export interface UIState {
 	createTime: moment.Moment;
 
+	myRoomId: string | null;
 	myGameId: string | null;
 	myHeroId: string | null;
 	myPartyId: string | null;

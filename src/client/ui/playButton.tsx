@@ -190,7 +190,20 @@ class PlayButton extends React.PureComponent<Props, State> {
 
         await loaded();
 
-        matches.joinNewGame(tutor.tutorialSettings() || {});
+        let joinParams: matches.JoinParams = {};
+
+        const state = StoreProvider.getState();
+        if (state.world.ui.locked === m.LockType.ModPreview) {
+            // Try to re-preview same mod
+            joinParams = {
+                roomId: state.world.ui.myRoomId,
+                locked: m.LockType.ModPreview,
+            }
+        } else if (tutor.needsTutorial(state)) {
+            joinParams = tutor.tutorialSettings();
+        }
+
+        matches.joinNewGame(joinParams);
     }
 
     private onPartyReadyClicked(ready: boolean) {
