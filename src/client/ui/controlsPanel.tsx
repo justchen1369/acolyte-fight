@@ -68,7 +68,6 @@ interface ControlState {
     autoJoin: string;
     cameraFollow: string;
     changeSpellsWith: string;
-    audioCaching: string;
     sounds: string;
     graphics: string;
 }
@@ -101,7 +100,6 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         autoJoin: options.noAutoJoin ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
-        audioCaching: options.noAudioCaching ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: formatGraphics(options.graphics),
     };
@@ -390,7 +388,6 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noAutoJoin = state.autoJoin === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
-            options.noAudioCaching = state.audioCaching === Toggle.Off;
             options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
             options.graphics = parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });

@@ -58,7 +58,6 @@ export interface GameOptions {
     noRightClickChangeSpells?: boolean;
     noAutoJoin?: boolean;
     mute?: boolean;
-    noAudioCaching?: boolean;
     unranked?: boolean;
     graphics?: number;
     touchSurfacePixels?: number;

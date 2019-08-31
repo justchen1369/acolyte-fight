@@ -22,7 +22,6 @@ namespace SettingsKeys {
     export const Known = "known";
     export const NumGames = "num-games";
     export const SeenVersion = "seen-version";
-    export const OfflineCrashingUnix = "offline-crashing-unix";
     export const LatestGameStatUnixTimestamp = "latest-game-unix";
 }
 
@@ -169,18 +168,6 @@ export async function getSeenVersion() {
 
 export async function setSeenVersion(version: number) {
     await settingsStorage.setItem(SettingsKeys.SeenVersion, version);
-}
-
-export async function getOfflineCrashing() {
-    return await settingsStorage.getItem<number>(SettingsKeys.OfflineCrashingUnix) || 0;
-}
-
-export async function setOfflineCrashing(unix: number) {
-    await settingsStorage.setItem(SettingsKeys.OfflineCrashingUnix, unix);
-}
-
-export async function clearOfflineCrashing() {
-    await settingsStorage.setItem(SettingsKeys.OfflineCrashingUnix, 0);
 }
 
 function migrateGame(game: d.GameStats): d.GameStats {
