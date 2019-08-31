@@ -58,7 +58,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
             return null;
         }
 
-        let className = "text-message-container button-panel-row";
+        let className = "text-message-container";
         if (this.state.focus) {
             className += " text-message-focus";
         }
@@ -86,11 +86,11 @@ class TextMessageBox extends React.PureComponent<Props, State> {
 
     private renderHint() {
         if (this.state.focus) {
-            return <div className="hint"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> <span>Send message</span></div>;
+            return <div className="hint"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Send message</span></div>;
         } else if (isMobile) {
-            return <div className="hint clickable"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> <span>Tap here to chat {this.renderNumPlayers()}</span></div>;
+            return <div className="hint clickable"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Tap here to chat {this.renderNumPlayers()}</span></div>;
         } else {
-            return <div className="hint"><span className="button-panel-row-icon"><i className="fas fa-comment" /></span> <span>Press <span className="hint-enter-key">ENTER</span> to chat {this.renderNumPlayers()}</span></div>;
+            return <div className="hint"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Press <span className="hint-enter-key">ENTER</span> to chat {this.renderNumPlayers()}</span></div>;
         }
     }
 

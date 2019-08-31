@@ -844,6 +844,12 @@ table.player-list {
     border: #ffffff44 1px solid;
 }
 
+.text-message-container .text-message-row-icon {
+    display: inline-block;
+    min-width: 2em;
+    text-align: center;
+}
+
 .text-message-container .error {
     font-size: 75%;
 }
@@ -1275,17 +1281,14 @@ table.player-list {
     font-size: 75%;
 }
 
-#game-panel .button-panel-row {
-    pointer-events: all;
-    cursor: hand;
-}
-
 #game-panel.mobile .button-panel-row:hover {
     color: #0cf;
     text-shadow: 0 0 8px #0cfc;
 }
 
 #game-panel.mobile .button-panel-row {
+    pointer-events: all;
+    cursor: hand;
     margin: 0.5em 8;
     font-style: italic;
 }
@@ -1315,11 +1318,6 @@ table.player-list {
     padding: 0 0.5em;
     color: #fff;
     text-shadow: #fff4 0 0 8px;
-}
-
-#game-panel.desktop .button-panel-row:hover {
-    background-color: #0cf;
-    box-shadow: 0 0 8px #0cfc;
 }
 
 #game-panel .in-progress-warning {
