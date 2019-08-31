@@ -103,41 +103,59 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             chosenIndex = 0;
         }
 
+        const length = spells.length;
+
         return <div key={rowIndex} className="key-options-row">
-            {spells.map((spell, index) => this.renderSpellIcon(spell, chosenId, index - chosenIndex))}
+            {spells.map((spell, index) => this.renderSpellIcon(spell, chosenId, this.calculateOffset(index, chosenIndex, length)))}
         </div>
     }
 
-    private renderSpellIcon(spell: Spell, chosenId: string, index: number) {
+    private calculateOffset(index: number, chosenIndex: number, length: number) {
+        const maxElementsToRight = 1; // elements to right overlap text, only allow 1
+        const maxElementsToLeft = Math.max(1, length - 2); // 2 elements - 1 center and 1 right - ensure we always fill space to right first
+
+        let offset = index - chosenIndex;
+
+        if (offset > maxElementsToRight) {
+            offset -= length;
+        }
+
+        if (offset < -maxElementsToLeft) {
+            offset += length;
+        }
+
+        return offset;
+    }
+
+    private renderSpellIcon(spell: Spell, chosenId: string, offset: number) {
         const MaxSize = 48;
         const SmallSize = 32;
         const Margin = 4;
 
-        let left = index * (Margin + SmallSize);
-        let size = index === 0 ? MaxSize : SmallSize;
-        if (index > 0) {
+        let left = offset * (Margin + SmallSize);
+        let size = offset === 0 ? MaxSize : SmallSize;
+        if (offset > 0) {
             left += MaxSize - SmallSize; // shift past the primary selection
         }
 
-        const btn = this.props.btn;
         const chosen = spell.id === chosenId;
         const hovering = this.state.hovering === spell.id;
         const className = classNames({
             "spell-icon-chosen": chosen,
             "spell-icon-not-chosen": !chosen,
-            "spell-icon-secondary": index !== 0 && !hovering,
+            "spell-icon-secondary": offset !== 0 && !hovering,
         });
 
         let color: string;
         if (chosenId === spell.id || this.state.hovering === spell.id) {
             color = spell.color;
-        } else if (index === 0) {
+        } else if (offset === 0) {
             color = "#888";
         } else {
             color = "#444";
         }
 
-        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), }}>
+        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), zIndex: chosen ? 1 : 0 }}>
             {style => <SpellIcon
                 key={spell.id}
                 icon={icons.getIcon(spell.icon, this.props.settings.Icons)}

@@ -186,9 +186,8 @@ const Choices: ChoiceSettings = {
             ["lightning"],
         ],
 		"e": [
-            ["shield", "icewall"],
+            ["shield", "icewall", "phaseOut"],
             ["saber", "dualSaber"],
-            ["phaseOut"],
             ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
