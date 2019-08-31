@@ -16,7 +16,7 @@ import { isMobile } from '../core/userAgent';
 
 const CheckInterval = 1000;
 const HiddenRenderInterval = 1000;
-const MinFrames = 10;
+const MinFrames = 30;
 const FpsThreshold = 0.9;
 
 interface Props {
@@ -94,8 +94,8 @@ class AnimationLoop {
 
         if (this.renderIntervals.length >= MinFrames) {
             this.renderIntervals.sort();
-            const upperQuartileFPS = 1000 / this.renderIntervals[Math.floor(0.75 * this.renderIntervals.length)];
-            if (upperQuartileFPS < FpsThreshold * TicksPerSecond) {
+            const medianFPS = 1000 / this.renderIntervals[Math.floor(0.5 * this.renderIntervals.length)];
+            if (medianFPS < FpsThreshold * TicksPerSecond) {
                 this.slow();
             }
             this.renderIntervals.length = 0;
