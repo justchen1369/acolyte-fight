@@ -1708,6 +1708,11 @@ function handleActions(world: w.World) {
 		}
 
 		if (hero.casting) {
+			if (action && hero.casting.action !== action) {
+				// Casting something new counts as releasing
+				hero.casting.releaseTick = world.tick;
+			}
+
 			if (!action || hero.casting.uninterruptible) {
 				// Wait until casting action is completed
 				nextActions.set(hero.id, action);
