@@ -361,7 +361,6 @@ const bumper: ObstacleTemplate = {
         },
     ],
 
-    hitInterval: 15,
     "impulse": 0.00015,
 };
 

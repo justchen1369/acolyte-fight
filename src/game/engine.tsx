@@ -654,6 +654,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
+		bumpable: projectileTemplate.bumpable,
 		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
 
@@ -2128,7 +2129,7 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 			obstacle.activeTick = world.tick;
 		}
 
-		if (obstacle.impulse > 0) {
+		if (obstacle.impulse > 0 && (hit.category !== "projectile" || hit.bumpable)) {
 			const Hero = world.settings.Hero;
 
 			const impulse = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())

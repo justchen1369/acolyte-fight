@@ -825,6 +825,7 @@ const boomerang: Spell = {
         speed: 0.8,
         maxTicks: 5 * TicksPerSecond,
         damage: 20,
+        bumpable: true,
         lifeSteal,
         expireOn: Categories.Hero | Categories.Massive,
         expireAgainstHeroes: Alliances.Enemy,
@@ -969,6 +970,7 @@ const backlash: Spell = {
         expireAgainstHeroes: Alliances.Self,
         shieldTakesOwnership: false,
         noKnockback: true,
+        bumpable: true,
 
         behaviours: [
             {
@@ -1206,6 +1208,7 @@ const link: Spell = {
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
         shieldTakesOwnership: false,
+        bumpable: true,
 
         link: {
             linkWith: Categories.Hero,
@@ -1384,6 +1387,7 @@ const bouncer: Spell = {
         radius: 0.001,
         speed: 1,
         fixedSpeed: true,
+        bumpable: true,
         maxTicks: 3.0 * TicksPerSecond,
         hitInterval: 15,
         damage: 10,
@@ -1871,6 +1875,7 @@ const mines: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         expireOn: Categories.All ^ Categories.Shield ^ Categories.Obstacle,
+        bumpable: true,
         conveyable: true,
         destructible: {
         },
@@ -2026,6 +2031,7 @@ const horcrux: Spell = {
         expireOn: Categories.Hero | Categories.Massive,
         destructible: {},
         conveyable: true,
+        bumpable: true,
 
         horcrux: {},
 

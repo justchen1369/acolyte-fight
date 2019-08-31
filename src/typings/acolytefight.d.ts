@@ -376,6 +376,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
 	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
+	bumpable?: boolean; // Whether this projectile gets knocked back by a bumper obstacle
 	conveyable?: boolean; // Whether this projectile is moved by a conveyor belt. (Collision flags must allow the projectile collide with obstacles to work.)
 	linkable?: boolean; // Whether a link can attach to this projectile
 

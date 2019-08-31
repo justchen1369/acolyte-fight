@@ -357,6 +357,7 @@ function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.Wor
 		playSpellSounds(ctxStack, obj, world);
 	} else if (obj.category === "obstacle") {
 		renderObstacle(ctxStack, obj, world, options);
+		playObstacleSounds(ctxStack, obj, world);
 	}
 }
 
@@ -792,15 +793,13 @@ function renderObstacle(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, world: w
 			renderObstacleSmoke(ctxStack, obstacle, params, render, world)
 		}
 	});
-
-	playObstacleSounds(ctxStack, obstacle, world);
 }
 
 function playObstacleSounds(ctxStack: CanvasCtxStack, obj: w.Obstacle, world: w.World) {
 	if (obj.sound) {
-		if (obj.touchTick) {
+		if (obj.activeTick) {
 			ctxStack.sounds.push({
-				id: `${obj.id}-touch-${obj.touchTick}`, // Each touch has a unique ID
+				id: `${obj.id}-touch-${obj.activeTick}`, // Each touch has a unique ID
 				sound: obj.sound,
 				pos: obj.body.getPosition().clone(),
 			});
