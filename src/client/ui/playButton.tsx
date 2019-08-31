@@ -152,6 +152,10 @@ class PlayButton extends React.PureComponent<Props, State> {
             return false;
         }
 
+        if (world.ui.locked === m.LockType.ModPreview) {
+            return false;
+        }
+
         const player = world.players.get(world.ui.myHeroId);
         if (!(player && player.nonIdle)) {
             // Idle
