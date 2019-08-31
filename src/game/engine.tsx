@@ -2089,9 +2089,60 @@ function recheckObstacleHit(obstacle: w.Obstacle, target: pl.Vec2, targetRadius:
 }
 
 function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObject) {
+	if (hit.category === "projectile" || hit.category === "hero") {
+		if (!recheckObstacleHit(obstacle, hit.body.getPosition(), hit.radius)) {
+			return;
+		}
+	}
+
+	if (hit.category === "obstacle" && hit.sensor) {
+		// Cannot hit sensors
+		return;
+	}
+
 	if (world.tick > world.startTick && (obstacle.expireOn & hit.categories) > 0) {
 		obstacle.health = 0;
 	}
+
+	if (takeHit(obstacle, hit.id, world)) {
+		if (obstacle.damage > 0 && (hit.category === "hero" || hit.category === "obstacle")) {
+			const packet: w.DamagePacket = {
+				damage: obstacle.damage,
+				lifeSteal: 0,
+				fromHeroId: hit.category === "hero" ? calculateKnockbackFromId(hit, world) : null,
+				isLava: true,
+				noKnockback: true,
+			};
+			if (hit.category === "hero") {
+				applyDamage(hit, packet, world);
+			} else if (hit.category === "obstacle") {
+				applyDamageToObstacle(hit, packet, world);
+			}
+			obstacle.activeTick = world.tick;
+		}
+
+		if (obstacle.buffs && obstacle.buffs.length > 0) {
+			applyBuffsFrom(obstacle.buffs, null, hit, world, {
+				tag: `swatch-${obstacle.type}`,
+			});
+			obstacle.activeTick = world.tick;
+		}
+
+		if (obstacle.impulse > 0) {
+			const Hero = world.settings.Hero;
+
+			const impulse = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())
+			const typicalHeroMass = Hero.Density * Math.PI * Hero.Radius * Hero.Radius; // Scale the impulse to the mass so it always looks the same
+			const massNormalizer = hit.body.getMass() / typicalHeroMass;
+			impulse.mul(massNormalizer * obstacle.impulse / impulse.length());
+			applyImpulseDelta(hit, impulse);
+			obstacle.activeTick = world.tick;
+		}
+	}
+
+	conveyor(world, hit, obstacle);
+
+	obstacle.touchTick = world.tick;
 }
 
 function handleShieldHit(world: w.World, shield: w.Shield, hit: w.WorldObject) {
@@ -2181,65 +2232,39 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 		obstacle.activeTick = world.tick;
 		hero.thrust.nullified = true;
 	}
-
-	if (obstacle.impulse > 0) {
-		const impulse = vector.diff(hero.body.getPosition(), obstacle.body.getPosition())
-		impulse.mul(obstacle.impulse / impulse.length());
-		applyImpulseDelta(hero, impulse);
-		obstacle.activeTick = world.tick;
-	}
-
-	if (takeHit(obstacle, hero.id, world)) {
-		if (obstacle.damage > 0) {
-			const packet: w.DamagePacket = {
-				damage: obstacle.damage,
-				lifeSteal: 0,
-				fromHeroId: calculateKnockbackFromId(hero, world),
-				isLava: true,
-				noKnockback: true,
-			};
-			applyDamage(hero, packet, world);
-			obstacle.activeTick = world.tick;
-		}
-
-		if (obstacle.buffs && obstacle.buffs.length > 0) {
-			obstacle.buffs.forEach(buff => {
-				// Same id for all buffs from swatches so cannot get two buffs standing on two swatches
-				const id = `swatch-${obstacle.type}-${buff.type}`;
-				instantiateBuff(id, buff, hero, world, {});
-			});
-			obstacle.activeTick = world.tick;
-		}
-	}
-
-	conveyor(world, hero, obstacle);
-
-	obstacle.touchTick = world.tick;
 }
 
 function conveyor(world: w.World, obj: w.WorldObject, obstacle: w.Obstacle) {
-	if (obstacle.conveyor) {
-		const outward = vector.diff(obj.body.getPosition(), vectorCenter);
-		outward.normalize();
-
-		let step = vector.zero();
-		if (obstacle.conveyor.lateralSpeed) {
-			step.addMul(obstacle.conveyor.lateralSpeed / TicksPerSecond, vector.rotateRight(outward));
-		}
-
-		if (obstacle.conveyor.radialSpeed) {
-			step.addMul(obstacle.conveyor.radialSpeed / TicksPerSecond, outward);
-		}
-
-		applyPosDelta(obj, step);
+	if (!obstacle.conveyor) {
+		return;
 	}
+
+	if (obj.category === "projectile" && !obj.conveyable) {
+		// Not conveyable
+		return;
+	}
+
+	if (obj.category === "obstacle" && obj.sensor) {
+		// Cannot move sensors
+		return;
+	}
+
+	const outward = vector.diff(obj.body.getPosition(), vectorCenter);
+	outward.normalize();
+
+	let step = vector.zero();
+	if (obstacle.conveyor.lateralSpeed) {
+		step.addMul(obstacle.conveyor.lateralSpeed / TicksPerSecond, vector.rotateRight(outward));
+	}
+
+	if (obstacle.conveyor.radialSpeed) {
+		step.addMul(obstacle.conveyor.radialSpeed / TicksPerSecond, outward);
+	}
+
+	applyPosDelta(obj, step);
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
-	if (projectile.conveyable) {
-		conveyor(world, projectile, obstacle);
-	}
-
 	if (obstacle.sensor) {
 		// Cannot hit sensors
 		return;
@@ -2598,7 +2623,7 @@ function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObjec
 }
 
 function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.WorldObject, world: w.World, config: BuffContext = {}) {
-	if (!(buffs && fromHeroId && target)) {
+	if (!(buffs && buffs.length > 0 && target)) {
 		return;
 	}
 

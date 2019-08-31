@@ -5,7 +5,7 @@ const ConveyorSpeed = 0.15;
 export const volcano: ObstacleTemplate = {
     health: 50,
 
-    collideWith: Categories.Hero,
+    collideWith: Categories.Hero | Categories.Obstacle,
     sensor: true,
     static: true,
     undamageable: true,
@@ -41,6 +41,7 @@ export const volcano: ObstacleTemplate = {
         {
             type: "burn",
             maxTicks: 15,
+            collideWith: Categories.All,
             packet: { damage: 3, lifeSteal: 0, noKnockback: true, noHit: true, isLava: true },
             hitInterval: 5,
             stack: "volcano",
@@ -170,7 +171,7 @@ export const fast: ObstacleTemplate = {
 export const conveyorBase: ObstacleTemplate = {
     health: 50,
 
-    collideWith: Categories.Hero | Categories.Projectile,
+    collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
     sensor: true,
     static: true,
     undamageable: true,
