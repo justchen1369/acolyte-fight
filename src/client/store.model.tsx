@@ -82,7 +82,7 @@ export interface PartyMemberState {
 
 export interface RoomState {
     id: string;
-    mod: Object;
+    mod: ModTree;
     settings: AcolyteFightSettings;
 }
 

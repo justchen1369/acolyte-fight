@@ -5,6 +5,7 @@ import * as s from '../store.model';
 import CodeEditor from './codeEditor';
 import CompileModListener from './compileModListener';
 import ModBar from './modBar';
+import ModLoader from './modLoader';
 import NavBar from '../nav/navbar';
 import TitleListener from '../controls/titleListener';
 import { isLocal } from '../core/userAgent';
@@ -13,7 +14,7 @@ interface OwnProps {
     expand?: boolean;
 }
 interface Props extends OwnProps {
-    mod: Object;
+    mod: ModTree;
     selfId: string;
     party: s.PartyState;
     isLoggedIn: boolean;
@@ -80,6 +81,7 @@ class EditorPage extends React.PureComponent<Props, State> {
             return <div className="content-container full-height-page">
                 <TitleListener subtitle="Modding" />
                 <CompileModListener />
+                <ModLoader />
                 <ModBar />
                 {this.props.children}
             </div>
@@ -87,6 +89,7 @@ class EditorPage extends React.PureComponent<Props, State> {
             return <div className="content-container">
                 <TitleListener subtitle="Modding" />
                 <CompileModListener />
+                <ModLoader />
                 <ModBar />
                 <div className="page">
                     {this.props.children}

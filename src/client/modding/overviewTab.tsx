@@ -8,7 +8,9 @@ import * as s from '../store.model';
 import * as convert from './convert';
 import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
+import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
+import Button from '../controls/button';
 import EditorPage from './editorPage';
 import CodeEditor from './codeEditor';
 import PreviewButton from './previewButton';
@@ -63,6 +65,15 @@ class OverviewTab extends React.PureComponent<Props, State> {
         if (!this.props.codeTree && this.props.roomId !== m.DefaultRoomId && Object.keys(this.props.roomMod).length > 0) {
             // Room is modded, load the settings from there when launching the mod editor
             StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(this.props.roomMod) });
+        } else {
+            this.detectAutoSaved();
+        }
+    }
+
+    private async detectAutoSaved() {
+        const autoSaved = await storage.loadMod();
+        if (!this.props.codeTree && autoSaved && autoSaved.mod) {
+            StoreProvider.dispatch({ type: "updateCodeTree", codeTree: convert.modToCode(autoSaved.mod) });
         }
     }
 
@@ -222,6 +233,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private onDiscardMod() {
         StoreProvider.dispatch({ type: "updateCodeTree", codeTree: null });
+        storage.clearMod(); // Don't await
     }
 
     private onSaveModFile(currentMod: ModTree, json: string) {

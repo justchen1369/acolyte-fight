@@ -23,6 +23,12 @@ namespace SettingsKeys {
     export const NumGames = "num-games";
     export const SeenVersion = "seen-version";
     export const LatestGameStatUnixTimestamp = "latest-game-unix";
+    export const ModAutoSave = "mod-auto-save";
+}
+
+export interface ModEnvelope {
+    mod: ModTree;
+    unix: number;
 }
 
 export async function clear() {
@@ -137,6 +143,36 @@ export async function getStatsLoadedUntil(): Promise<moment.Moment> {
 
 export async function setStatsLoadedUntil(until: moment.Moment) {
     await settingsStorage.setItem(SettingsKeys.LatestGameStatUnixTimestamp, until.unix());
+}
+
+
+export async function loadMod(): Promise<ModEnvelope> {
+    const json = await settingsStorage.getItem<string>(SettingsKeys.ModAutoSave);
+    if (json) {
+        try {
+            const envelope = JSON.parse(json) as ModEnvelope;
+            return envelope;
+        } catch (exception) {
+            console.error(exception);
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
+export async function saveMod(mod: ModTree) {
+    if (mod) {
+        const envelope: ModEnvelope = {
+            mod,
+            unix: moment().unix(),
+        };
+        await settingsStorage.setItem(SettingsKeys.ModAutoSave, JSON.stringify(envelope));
+    }
+}
+
+export async function clearMod() {
+    await settingsStorage.removeItem(SettingsKeys.ModAutoSave);
 }
 
 export async function getNumGames() {

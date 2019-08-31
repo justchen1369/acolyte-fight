@@ -10,6 +10,7 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as settings from '../../game/settings';
+import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
 export { stringify, modToCode } from './convert';
@@ -49,6 +50,10 @@ export async function previewMod(mod: ModTree, layoutId: string = null) {
     }
 }
 
+export async function autoSaveMod(mod: ModTree) {
+    storage.saveMod(mod); // Don't await
+}
+
 export async function exitEditor(mod: ModTree, nextPage: string = "") {
     let roomId: string = null;
     if (mod) {
@@ -61,6 +66,8 @@ export async function exitEditor(mod: ModTree, nextPage: string = "") {
     await parties.movePartyAsync(roomId);
     await pages.changePage(nextPage);
     StoreProvider.dispatch({ type: "updateHash", hash: null });
+
+    await storage.clearMod();
 }
 
 export const modToSettings = Reselect.createSelector(

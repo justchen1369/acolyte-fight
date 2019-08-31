@@ -34,6 +34,9 @@ const compileModDebounced = _.debounce(() => {
         modBuiltFrom: codeTree,
         modErrors: modResult.errors,
     });
+    if (modResult.mod) {
+        editing.autoSaveMod(modResult.mod);
+    }
 }, 1000);
 
 const codeToMod = Reselect.createSelector(
