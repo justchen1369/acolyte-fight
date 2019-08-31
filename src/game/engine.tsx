@@ -654,6 +654,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
+		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
 
 		target,
@@ -2216,9 +2217,9 @@ function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacl
 	obstacle.touchTick = world.tick;
 }
 
-function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
+function conveyor(world: w.World, obj: w.WorldObject, obstacle: w.Obstacle) {
 	if (obstacle.conveyor) {
-		const outward = vector.diff(hero.body.getPosition(), vectorCenter);
+		const outward = vector.diff(obj.body.getPosition(), vectorCenter);
 		outward.normalize();
 
 		let step = vector.zero();
@@ -2230,11 +2231,20 @@ function conveyor(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 			step.addMul(obstacle.conveyor.radialSpeed / TicksPerSecond, outward);
 		}
 
-		applyPosDelta(hero, step);
+		applyPosDelta(obj, step);
 	}
 }
 
 function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, obstacle: w.Obstacle) {
+	if (projectile.conveyable) {
+		conveyor(world, projectile, obstacle);
+	}
+
+	if (obstacle.sensor) {
+		// Cannot hit sensors
+		return;
+	}
+
 	if (takeHit(projectile, obstacle.id, world)) {
 		if (!obstacle.undamageable) {
 			let packet: w.DamagePacket = instantiateDamage(projectile.damageTemplate, projectile.owner, world);

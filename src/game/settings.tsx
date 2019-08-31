@@ -1871,6 +1871,7 @@ const mines: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         expireOn: Categories.All ^ Categories.Shield,
+        conveyable: true,
         destructible: {
         },
 
@@ -2024,6 +2025,7 @@ const horcrux: Spell = {
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
         expireOn: Categories.Hero | Categories.Massive,
         destructible: {},
+        conveyable: true,
 
         horcrux: {},
 
