@@ -1,18 +1,26 @@
+import _ from 'lodash';
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as matches from '../core/matches';
-import * as pages from '../core/pages';
 import * as s from '../store.model';
+import * as pages from '../core/pages';
+import * as StoreProvider from '../storeProvider';
 import * as screenLifecycle from '../ui/screenLifecycle';
 import * as w from '../../game/world.model';
 import * as watcher from '../core/watcher';
 
-import Button from '../controls/button';
+import ButtonPanelLabel from './buttons/buttonPanelLabel';
+import CustomBar from '../nav/customBar';
+import HrefItem from '../nav/hrefItem';
+import { isMobile } from '../core/userAgent';
 
 interface Props {
     connected: boolean;
     party: s.PartyState;
     world: w.World;
+}
+interface State {
 }
 
 function stateToProps(state: s.State): Props {
@@ -24,20 +32,29 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-class ExitLink extends React.PureComponent<Props> {
-    render() {
-        const exitable = matches.worldInterruptible(this.props.world);
-        const allowExit = exitable || !this.props.connected;
-        if (!allowExit) {
-            return null;
-        }
+class PlayBar extends React.PureComponent<Props, State> {
+    constructor(props: Props) {
+        super(props);
 
-        return <Button className="nav-item exit-link" onClick={(ev) => this.onExitClicked(ev)}>
-            <i className="fa fa-chevron-left" /> Back to Home
-        </Button>
+        this.state = {
+        };
     }
 
-    private onExitClicked(ev: React.MouseEvent) {
+    render() {
+        return <CustomBar>
+            <HrefItem disabled={!this.allowExit()} onClick={() => this.onExitClicked()}><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</HrefItem>
+            {this.props.children}
+            <ButtonPanelLabel />
+        </CustomBar>
+    }
+
+    private allowExit() {
+        const exitable = matches.worldInterruptible(this.props.world);
+        const allowExit = exitable || !this.props.connected;
+        return allowExit;
+    }
+
+    private onExitClicked() {
         if (!(this.props.party)) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();
@@ -49,4 +66,4 @@ class ExitLink extends React.PureComponent<Props> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(ExitLink);
+export default ReactRedux.connect(stateToProps)(PlayBar);

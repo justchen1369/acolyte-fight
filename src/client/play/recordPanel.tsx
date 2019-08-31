@@ -1,4 +1,4 @@
-import pl from 'planck-js';
+import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 
@@ -13,12 +13,15 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
+import { isMobile } from '../core/userAgent';
 import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
 
 import ButtonRow from './buttons/buttonRow';
+import HrefItem from '../nav/hrefItem';
 import Layout from './layout';
+import RecordBar from './recordBar';
 import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 
@@ -106,9 +109,13 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const className = classNames({
+            'mobile': isMobile,
+            'desktop': !isMobile,
+        });
         const style = { top: this.state.top, left: this.state.left, width: this.state.size, height: this.state.size };
         return (
-            <div id="game-panel" onClick={() => this.onGameClick()}>
+            <div id="game-panel" className={className} onClick={() => this.onGameClick()}>
                 <TitleListener subtitle="Recording" />
                 <div id="canvas-container">
                     <canvas
@@ -123,14 +130,10 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                         width={Size} height={Size}
                         style={style} />
                 </div>
-                <Layout anchorLeft={true} anchorTop={true}>
-                    <span className="nav-item exit-link" onClick={() => this.onExitClicked()}>
-                        <i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}
-                    </span>
-                    <div className="button-panel">
-                        {!this.state.hideMap && <ButtonRow label="Hide Map" icon="fas fa-eye" onClick={() => this.onHideMapClicked()} />}
-                    </div>
-                </Layout>
+                <RecordBar>
+                    <HrefItem onClick={() => this.onExitClicked()}><i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}</HrefItem>
+                    {!this.state.hideMap && <ButtonRow label="Hide Map" icon="fas fa-eye" onClick={() => this.onHideMapClicked()} />}
+                </RecordBar>
                 <div className="recording-status-panel">
                     {!this.state.complete && <div className="recording-status"><span className="recording">Recording video {(100 * this.state.progress).toFixed(0)}%</span> - do not switch tabs or minimise this window</div>}
                     {this.state.blob && <div className="recording-status">Recording complete - <a href="#" onClick={(ev) => this.onDownloadClicked(ev)}>click here to download your video if it has not already</a></div>}

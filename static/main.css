@@ -80,19 +80,6 @@ body .page {
     height: 100%;
 }
 
-#game-panel .exit-link {
-    color: white;
-    font-size: 20px;
-    padding: 15px 20px;
-    text-align: center;
-    vertical-align: middle;
-    cursor: pointer;
-    font-weight: bold;
-    text-decoration: none;
-
-    transition: background-color 0.2s ease;
-}
-
 .customizing #gl {
     opacity: 0.5;
 }
@@ -137,6 +124,19 @@ body .page {
 #game-panel .customizing-bar i {
     width: 1.5em;
     text-align: center;
+}
+
+#game-panel .exit-link {
+    color: white;
+    font-size: 20px;
+    padding: 15px 20px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+
+    transition: background-color 0.2s ease;
 }
 
 #game-panel .exit-link:hover {
@@ -1265,6 +1265,12 @@ table.player-list {
     cursor: hand;
 }
 
+#game-panel .navbar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
 #game-panel .button-panel {
     font-size: 75%;
 }
@@ -1290,11 +1296,13 @@ table.player-list {
     text-align: center;
 }
 
+#game-panel.mobile .button-panel-label {
+    display: none;
+}
+
 #game-panel.desktop .button-panel-row {
     color: #ccc;
-    display: inline-block;
     padding: 0.5em;
-    min-width: 1.5em;
     text-align: center;
 }
 
@@ -1302,16 +1310,11 @@ table.player-list {
     display: none;
 }
 
-#game-panel.desktop .button-panel {
-    margin: 0 8;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
 #game-panel.desktop .button-panel-label {
     display: inline-block;
     padding: 0 0.5em;
+    color: #fff;
+    text-shadow: #fff4 0 0 8px;
 }
 
 #game-panel.desktop .button-panel-row:hover {

@@ -11,7 +11,6 @@ import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import AutoJoinConfigButton from './buttons/autoJoinConfigButton';
 import Button from '../controls/button';
 import ButtonPanelLabel from './buttons/buttonPanelLabel';
-import ExitLink from './exitLink';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
@@ -20,6 +19,7 @@ import HintPanel from './hintPanel';
 import Layout from './layout';
 import MessagesPanel from './messagesPanel';
 import MutePanel from './buttons/mutePanel';
+import PlayBar from './playBar';
 import RandomizePanel from './buttons/randomizePanel';
 import FullScreenButton from './buttons/fullScreenButton';
 import SocialBar from '../controls/socialBar';
@@ -79,6 +79,9 @@ class HUD extends React.PureComponent<Props, State> {
         const tab = this.state.tab;
         const modal = this.props.customizing;
         return <>
+            {!modal && <Layout anchorTop={true} anchorLeft={true}>
+                <PlayBar />
+            </Layout>}
             {!modal && <Layout anchorTop={true} anchorRight={true}>
                 <div className="tab-switcher-panel">
                     {this.props.myHeroId && <Button className="tab-switcher-item" onClick={(ev) => this.onCustomizeClicked(ev) }>
@@ -114,9 +117,6 @@ class HUD extends React.PureComponent<Props, State> {
                     <span><i className="fas fa-times" /> Choosing Spells</span>
                 </Button>
                 <RandomizePanel />
-            </Layout>}
-            {!modal && <Layout anchorTop={true} anchorLeft={true}>
-                <ExitLink />
             </Layout>}
             <Layout anchorBottom={true}>
                 <HintPanel />
@@ -157,17 +157,13 @@ class HUD extends React.PureComponent<Props, State> {
                 <WaitingMessage />
                 <TextMessageBox />
             </Layout>
-            <Layout anchorTop={true} anchorLeft={true}>
-                <ExitLink />
-                <div className="button-panel">
-                    <MutePanel />
-                    <AutoJoinConfigButton />
-                    <FullScreenButton />
-                    <RandomizePanel />
-                    <VideoPanel />
-                    <ButtonPanelLabel />
-                </div>
-            </Layout>
+            <PlayBar>
+                <MutePanel />
+                <AutoJoinConfigButton />
+                <FullScreenButton />
+                <RandomizePanel />
+                <VideoPanel />
+            </PlayBar>
             <Layout anchorBottom={true}>
                 <HintPanel />
             </Layout>

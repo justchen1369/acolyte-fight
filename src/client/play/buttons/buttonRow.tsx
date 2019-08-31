@@ -47,7 +47,7 @@ class ButtonRow extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <Button className="button-panel-row" onMouseEnter={() => this.hover()} onMouseLeave={() => this.unhover()} onClick={this.props.onClick}>
+        return <Button className="button-panel-row nav-item" onMouseEnter={() => this.hover()} onMouseLeave={() => this.unhover()} onClick={this.props.onClick}>
             <span className="button-panel-row-icon"><i className={this.props.icon} /></span>
             <span className="button-panel-row-label">{this.props.label}</span>
         </Button>
