@@ -14,8 +14,6 @@ import WatchLooper from '../controls/watchLooper';
 interface Props {
     profile: m.GetProfileResponse;
     isLoggedIn: boolean;
-    allowedToWatch: boolean;
-    numMatches: number;
     numOnline: number;
 }
 interface State {
@@ -25,8 +23,6 @@ function stateToProps(state: s.State): Props {
     return {
         profile: state.profile,
         isLoggedIn: state.loggedIn,
-        numMatches: watcher.numMatches(state),
-        allowedToWatch: watcher.allowedToWatch(state),
         numOnline: state.online.size,
     };
 }
@@ -55,10 +51,8 @@ class WatchPanel extends React.PureComponent<Props, State> {
         if (this.props.isLoggedIn) {
             if (!this.props.profile) {
                 return this.renderLoadingStats();
-            } else if (this.props.allowedToWatch) {
-                return this.renderWatching();
             } else {
-                return this.renderNotAllowedYet();
+                return this.renderWatching();
             }
         } else {
             return this.renderNotLoggedIn();
@@ -76,14 +70,6 @@ class WatchPanel extends React.PureComponent<Props, State> {
         return <div>
             <h1>Spectate</h1>
             <p className="loading-text">Loading...</p>
-        </div>;
-    }
-
-    private renderNotAllowedYet() {
-        return <div>
-            <h1>Spectate</h1>
-            <p>Watch all live games here!</p>
-            <p>Spectator mode is only available to players who have played more than 1000 PvP matches. <Link page="profile">You have played {this.props.numMatches} matches.</Link></p>
         </div>;
     }
 
