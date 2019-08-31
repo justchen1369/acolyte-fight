@@ -109,6 +109,7 @@ export interface UIState {
 	reconnectKey: string | null;
 	live: boolean;
 	locked?: string;
+	autoJoin?: boolean;
 
 	nextTarget?: pl.Vec2;
 	nextSpellId?: string;

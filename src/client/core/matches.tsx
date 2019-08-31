@@ -15,6 +15,7 @@ export interface JoinParams {
 	gameId?: string;
 	observe?: boolean;
 	live?: boolean;
+	autoJoin?: boolean;
 	roomId?: string;
 	locked?: string;
 	reconnectKey?: string;
@@ -40,6 +41,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				observe,
 				live,
 				locked,
+				autoJoin: opts.autoJoin,
 				version: engine.version(),
 				numBots: opts.numBots || 0,
 			};
@@ -65,8 +67,8 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 	});
 }
 
-export async function watchLiveGame() {
-	return await joinNewGame({ observe: true, live: true });
+export async function watchLiveGame(autoJoin?: boolean) {
+	return await joinNewGame({ observe: true, live: true, autoJoin });
 }
 
 export async function reconnectToGame() {

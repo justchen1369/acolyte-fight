@@ -46,7 +46,7 @@ export async function previewMod(mod: ModTree, layoutId: string = null) {
         }
 
         const roomId = await rooms.createRoomAsync(mod)
-        await matches.joinNewGame({ roomId, locked: m.LockType.ModPreview });
+        await matches.joinNewGame({ roomId, locked: m.LockType.ModPreview, autoJoin: false });
     }
 }
 

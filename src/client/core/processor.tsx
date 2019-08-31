@@ -14,6 +14,7 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.reconnectKey = data.reconnectKey;
 	world.ui.live = data.live;
 	world.ui.locked = data.locked;
+	world.ui.autoJoin = data.autoJoin;
 
 	return world;
 }

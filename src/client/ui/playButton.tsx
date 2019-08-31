@@ -147,12 +147,12 @@ class PlayButton extends React.PureComponent<Props, State> {
     }
 
     private shouldAutoJoin(world: w.World) {
-        if (!world.ui.myHeroId) {
-            // Observer
-            return false;
+        if (world.ui.autoJoin !== undefined) {
+            return world.ui.autoJoin;
         }
 
-        if (world.ui.locked === m.LockType.ModPreview) {
+        if (!world.ui.myHeroId) {
+            // Observer
             return false;
         }
 

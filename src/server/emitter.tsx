@@ -413,6 +413,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		&& optional(data.isMobile, "boolean")
 		&& optional(data.unranked, "boolean")
 		&& optional(data.locked, "string")
+		&& optional(data.autoJoin, "boolean")
 		&& optional(data.observe, "boolean")
 		&& optional(data.reconnectKey, "string")
 		&& optional(data.numBots, "number")
@@ -493,7 +494,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			}
 		}
 
-		emitHero(socket.id, replay, heroId, reconnectKey, live);
+		emitHero(socket.id, replay, heroId, reconnectKey, live, data.autoJoin);
 
 		if (heroId) {
 			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${replay.numPlayers} players`);
@@ -704,7 +705,7 @@ function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameLi
 	}
 }
 
-function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey: string, live: boolean = false) {
+function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey: string, live: boolean = false, autoJoin?: boolean) {
 	try {
 		const socket = io.sockets.connected[socketId];
 		if (!socket) {
@@ -726,6 +727,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 			room: game.roomId,
 			mod: game.mod,
 			live,
+			autoJoin,
 			history: game.history,
 		};
 		socket.emit('hero', msg);

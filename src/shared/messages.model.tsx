@@ -83,6 +83,7 @@ export interface JoinMsg {
     isMobile: boolean;
     observe: boolean;
     live: boolean;
+    autoJoin: boolean;
     locked: string;
     version: string;
     unranked: boolean;
@@ -195,6 +196,7 @@ export interface HeroMsg {
     partyId: string;
     room: string | null;
     locked: string | null;
+    autoJoin?: boolean;
 
     mod: Object;
 
