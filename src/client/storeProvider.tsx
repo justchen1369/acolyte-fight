@@ -245,6 +245,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, showingHelp: action.showingHelp };
     } else if (action.type === "clearNewPlayerFlag") {
         return { ...state, isNewPlayer: false };
+    } else if (action.type === "tutorialComplete") {
+        return { ...state, tutorialComplete: true };
     } else if (action.type === "updateToolbar") {
         state.world.ui.toolbar = {
             ...state.world.ui.toolbar,

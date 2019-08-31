@@ -27,6 +27,7 @@ interface Props extends OwnProps {
     showingHelp: boolean;
     rebindings: KeyBindings;
     tutorial: boolean;
+    tutorialComplete: boolean;
     numSpells: number;
     seenVersion: number;
 }
@@ -45,6 +46,7 @@ function stateToProps(state: s.State): Props {
         showingHelp: state.showingHelp,
         rebindings: state.rebindings,
         tutorial: state.world.ui.locked === m.LockType.Tutorial,
+        tutorialComplete: state.tutorialComplete,
         numSpells: Object.keys(state.world.settings.Spells).length,
         seenVersion: state.seen,
     };
@@ -118,16 +120,29 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <div className="help-box dialog-panel">
-            <div className="help-title">Tutorial</div>
-            <div className="help-row">
-                Defeat this bot! Prove you are ready to fight real enemies.
+        if (this.props.tutorialComplete) {
+            return <div className="help-box dialog-panel">
+                <div className="help-title">Tutorial</div>
+                <div className="help-row">
+                    Are you ready to fight real enemies?
+                </div>
+                <div className="action-row">
+                    <Button onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
+                    <Button className="link-btn" onClick={() => this.onHideTutorialClick()}>Continue Playing</Button>
+                </div>
             </div>
-            <div className="action-row">
-                <Button onClick={() => this.onHideTutorialClick()}>OK</Button>
-                <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
+        } else {
+            return <div className="help-box dialog-panel">
+                <div className="help-title">Tutorial</div>
+                <div className="help-row">
+                    Defeat this bot! Prove you are ready to fight real enemies.
+                </div>
+                <div className="action-row">
+                    <Button onClick={() => this.onHideTutorialClick()}>OK</Button>
+                    <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>
+                </div>
             </div>
-        </div>
+        }
     }
 
     private renderNewVersion(): React.ReactNode {
