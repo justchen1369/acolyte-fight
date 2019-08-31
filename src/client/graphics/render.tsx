@@ -245,7 +245,7 @@ function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstructio
 			type: "text",
 			text: player.name,
 			color: 'rgba(255, 255, 255, 0.3)',
-			font: `${Visuals.NameFontPixels * options.retinaMultiplier}px Raleway,Helvetica,Arial,sans-serif`,
+			font: `${Visuals.NameFontPixels * options.retinaMultiplier}px 'Maven Pro',Helvetica,Arial,sans-serif`,
 			height: Math.ceil(options.retinaMultiplier * Visuals.NameHeightPixels),
 			width: Math.ceil(options.retinaMultiplier * Visuals.NameWidthPixels),
 		});
@@ -2748,7 +2748,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 			// Cooldown
 			let cooldownText = buttonState.cooldownText
 
-			ctx.font = 'bold ' + (size * 0.75 - 1) + 'px sans-serif';
+			ctx.font = 'bold ' + (size * 0.6 - 1) + 'px "Maven Pro",sans-serif';
 			renderTextWithShadow(ctx, cooldownText, size / 2, size / 2, emphasis);
 		} else {
 			const key = buttonState.key;
@@ -2756,7 +2756,7 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 				// Keyboard shortcut
 				ctx.save();
 
-				ctx.font = 'bold ' + (size / 2 - 1) + 'px sans-serif';
+				ctx.font = 'bold ' + (size / 2 - 1) + 'px "Maven Pro",sans-serif';
 
 				renderTextWithShadow(ctx, key.toUpperCase(), size / 4, size * 3 / 4, emphasis);
 
