@@ -14,8 +14,7 @@ export interface State {
     seen: number;
     userId?: string;
     loggedIn: boolean;
-    isNewPlayer: boolean;
-    tutorialComplete?: boolean;
+    tutorialLevel: number;
     showingHelp?: boolean;
     playerName: string;
     keyBindings: KeyBindings;
@@ -128,7 +127,6 @@ export type Action =
     | UpdateObservingPartyAction
     | LeavePartyAction
     | ClearNewPlayerFlagAction
-    | TutorialCompleteAction
     | UpdateShowingHelpAction
     | UpdateToolbarAction
     | UpdateRebindingsAction
@@ -278,11 +276,8 @@ export interface LeavePartyAction {
 }
 
 export interface ClearNewPlayerFlagAction {
-    type: "clearNewPlayerFlag";
-}
-
-export interface TutorialCompleteAction {
-    type: "tutorialComplete";
+    type: "tutorial";
+    tutorialLevel: number;
 }
 
 export interface UpdateShowingHelpAction {

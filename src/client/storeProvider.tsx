@@ -28,7 +28,7 @@ function initialState(): s.State {
         seen: 0,
         loggedIn: false,
         showingHelp: isNewPlayer,
-        isNewPlayer,
+        tutorialLevel: isNewPlayer ? 1 : null,
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
@@ -98,7 +98,6 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "updateUserId") {
         let newState: s.State = { ...state, userId: action.userId, loggedIn: action.loggedIn, profile: null };
         if (action.loggedIn) {
-            newState.isNewPlayer = false;
             newState.showingHelp = false;
         }
         return newState;
@@ -243,10 +242,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         }
     } else if (action.type === "updateShowingHelp") {
         return { ...state, showingHelp: action.showingHelp };
-    } else if (action.type === "clearNewPlayerFlag") {
-        return { ...state, isNewPlayer: false };
-    } else if (action.type === "tutorialComplete") {
-        return { ...state, tutorialComplete: true };
+    } else if (action.type === "tutorial") {
+        return { ...state, tutorialLevel: action.tutorialLevel };
     } else if (action.type === "updateToolbar") {
         state.world.ui.toolbar = {
             ...state.world.ui.toolbar,

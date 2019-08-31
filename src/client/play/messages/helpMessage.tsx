@@ -26,8 +26,7 @@ interface Props extends OwnProps {
     isFinished: boolean;
     showingHelp: boolean;
     rebindings: KeyBindings;
-    tutorial: boolean;
-    tutorialComplete: boolean;
+    tutorialLevel: number;
     numSpells: number;
     seenVersion: number;
 }
@@ -45,8 +44,7 @@ function stateToProps(state: s.State): Props {
         isFinished: !!world.winner,
         showingHelp: state.showingHelp,
         rebindings: state.rebindings,
-        tutorial: state.world.ui.locked === m.LockType.Tutorial,
-        tutorialComplete: state.tutorialComplete,
+        tutorialLevel: state.world.ui.locked === m.LockType.Tutorial ? state.tutorialLevel : null,
         numSpells: Object.keys(state.world.settings.Spells).length,
         seenVersion: state.seen,
     };
@@ -73,7 +71,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
         const needsHelp = !this.props.userId; // Don't show help to users who have played enough games to have an account
         if (needsHelp && this.props.showingHelp) {
             return this.renderHelp();
-        } else if (this.props.tutorial) {
+        } else if (this.props.tutorialLevel) {
             return this.renderTutorial();
         } else if (this.props.seenVersion < NewVersion) {
             return this.renderNewVersion();
@@ -84,11 +82,11 @@ class HelpMessage extends React.PureComponent<Props, State> {
 
     private renderHelp() {
         return <div className="help-box dialog-panel">
-            <div className="help-title">{this.props.tutorial ? "Tutorial" : "How to play:"}</div>
+            <div className="help-title">{this.props.tutorialLevel ? "Tutorial" : "How to play:"}</div>
             {this.renderHelpContent()}
             <div className="action-row">
                 <Button className="btn" onClick={(e) => this.onHideHelpClicked(e)}>OK</Button>
-                {this.props.tutorial && <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>}
+                {this.props.tutorialLevel && <Button className="link-btn" onClick={() => this.onExitTutorialClick()}>Exit Tutorial</Button>}
             </div>
         </div>
     }
@@ -120,7 +118,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
             return null;
         }
 
-        if (this.props.tutorialComplete) {
+        if (this.props.tutorialLevel > 1) {
             return <div className="help-box dialog-panel">
                 <div className="help-title">Tutorial</div>
                 <div className="help-row">

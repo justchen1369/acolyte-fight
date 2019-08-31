@@ -11,33 +11,30 @@ export function onNotification(notifs: w.Notification[]) {
     if (notifs.some(n => n.type === "win")) {
         const state = StoreProvider.getState();
         const world = state.world;
-        if (state.isNewPlayer && world.winner && world.ui.myHeroId && world.winner === world.ui.myHeroId) {
-            StoreProvider.dispatch({ type: "tutorialComplete" });
+        if (state.tutorialLevel && world.winner && world.ui.myHeroId && world.winner === world.ui.myHeroId) {
+            StoreProvider.dispatch({ type: "tutorial", tutorialLevel: state.tutorialLevel + 1 });
         }
     }
 }
 
 export function needsTutorial(state: s.State): boolean {
-    return state.isNewPlayer && state.room.id === m.DefaultRoomId && !state.party;
+    return state.tutorialLevel && state.room.id === m.DefaultRoomId && !state.party;
 }
 
 export function tutorialSettings(): matches.JoinParams {
+    const state = StoreProvider.getState();
     return {
         locked: m.LockType.Tutorial,
-        numBots: 1,
+        numBots: Math.min(3, state.tutorialLevel || 1),
     };
 }
 
 export function exitTutorial() {
-    StoreProvider.dispatch({ type: "clearNewPlayerFlag" });
-    trackTutorialExit(false); // Don't await
+    StoreProvider.dispatch({ type: "tutorial", tutorialLevel: null });
+    trackTutorialExit(); // Don't await
 }
 
-async function trackTutorialExit(completed: boolean) {
+async function trackTutorialExit() {
     const numGames = await storage.getNumGames();
-    if (completed) {
-        analytics.send("exitTutorial", numGames);
-    } else {
-        analytics.send("completedTutorial", numGames);
-    }
+    analytics.send("exitTutorial", numGames);
 }

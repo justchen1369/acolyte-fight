@@ -24,7 +24,7 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
         return;
     }
 
-    if (state.isNewPlayer) {
+    if (state.tutorialLevel) {
         // Still in tutorial, don't create account yet
         return;
     }
