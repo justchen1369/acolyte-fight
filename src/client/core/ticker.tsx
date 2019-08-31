@@ -15,7 +15,7 @@ let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
 
-const interval = Math.floor(1000 / TicksPerSecond);
+export const interval = Math.floor(1000 / TicksPerSecond);
 let tickEpoch = Date.now();
 let tickCounter = 0;
 

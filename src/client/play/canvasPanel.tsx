@@ -14,9 +14,9 @@ import { CanvasStack, GraphicsLevel } from '../graphics/render';
 import { frame } from '../core/ticker';
 import { isMobile } from '../core/userAgent';
 
-const HiddenRenderTimeoutMiliseconds = 1000;
-const MaxSlowFrames = 10;
-const SlowFrameWaitInterval = 60;
+const CheckInterval = 1000;
+const HiddenRenderInterval = 1000;
+const MinFrames = 10;
 const FpsThreshold = 0.9;
 
 interface Props {
@@ -48,6 +48,8 @@ class AnimationLoop {
 
     private numSlowFrames = 0;
 
+    private renderIntervals = new Array<number>();
+
     constructor(animate: (display: boolean) => void, slow: () => void) {
         this.animate = animate;
         this.slow = slow;
@@ -62,7 +64,7 @@ class AnimationLoop {
         const handle = ++this.currentHandle;
         this.isRunning = true;
         window.requestAnimationFrame(() => this.loop(handle));
-        this.currentInterval = window.setInterval(() => this.hiddenRenderLoop(), HiddenRenderTimeoutMiliseconds);
+        this.currentInterval = window.setInterval(() => this.checkRender(), CheckInterval);
     }
 
     stop() {
@@ -76,34 +78,27 @@ class AnimationLoop {
 
         const timeOfThisFrame = Date.now();
         const renderingMilliseconds = timeOfThisFrame - this.timeOfLastFrame;
-        if (this.numWaitFrames > 0) {
-            --this.numWaitFrames;
-        } else if (renderingMilliseconds < 1000) {
-            const targetMilliseconds = 1000 / TicksPerSecond;
-            const isSlow = renderingMilliseconds > targetMilliseconds / FpsThreshold;
-            if (isSlow) {
-                ++this.numSlowFrames;
-            } else {
-                this.numSlowFrames = 0;
-            }
-
-            if (this.numSlowFrames >= MaxSlowFrames) {
-                this.numSlowFrames = 0;
-                this.numWaitFrames = SlowFrameWaitInterval;
-                this.slow();
-            }
-        }
         this.timeOfLastFrame = timeOfThisFrame;
+        this.renderIntervals.push(renderingMilliseconds);
         
         if (this.isRunning && this.currentHandle === handle) {
             window.requestAnimationFrame(() => this.loop(handle));
         }
     }
 
-    private hiddenRenderLoop() {
+    private checkRender() {
         const renderAge = Date.now() - this.timeOfLastFrame;
-        if (renderAge >= HiddenRenderTimeoutMiliseconds) {
+        if (renderAge >= HiddenRenderInterval) {
             this.animate(false);
+        }
+
+        if (this.renderIntervals.length >= MinFrames) {
+            this.renderIntervals.sort();
+            const upperQuartileFPS = 1000 / this.renderIntervals[Math.floor(0.75 * this.renderIntervals.length)];
+            if (upperQuartileFPS < FpsThreshold * TicksPerSecond) {
+                this.slow();
+            }
+            this.renderIntervals.length = 0;
         }
     }
 }
@@ -171,7 +166,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     reduceGraphics() {
-        if (!autoGraphics(this.props.graphics) && this.state.rtx > GraphicsLevel.Low) {
+        if (autoGraphics(this.props.graphics) && this.state.rtx > GraphicsLevel.Low) {
             const newLevel = this.state.rtx - 1;
             this.setState({ rtx: newLevel });
             console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
