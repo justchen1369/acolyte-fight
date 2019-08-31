@@ -14,7 +14,6 @@ interface Props {
     items: s.NotificationItem[];
     sounds: Sounds;
     myHeroId: string;
-    noAudioCaching: boolean;
 }
 interface State {
 }
@@ -26,7 +25,6 @@ function stateToProps(state: s.State): Props {
         items: state.items,
         sounds: state.world.settings.Sounds,
         myHeroId: state.world.ui.myHeroId,
-        noAudioCaching: state.options.noAudioCaching,
     };
 }
 
@@ -38,9 +36,7 @@ class SoundController extends React.PureComponent<Props, State> {
     }
 
     render(): React.ReactNode {
-        if (!this.props.noAudioCaching) {
-            audio.cache(this.props.sounds);
-        }
+        audio.cache(this.props.sounds);
 
         if (!this.props.mute) {
             audio.unmute();
