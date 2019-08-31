@@ -141,6 +141,7 @@ export interface ToolbarState {
 	hoverSpellId?: string;
 	hoverBtn?: string;
 	hoverControl?: string;
+	hoverButtonPanel?: string;
 	customizingBtn?: string;
 }
 

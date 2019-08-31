@@ -689,10 +689,12 @@ a:hover, a:active {
 }
 
 .anchored-panel-left {
+    align-items: flex-start;
     text-align: left;
 }
 
 .anchored-panel-right {
+    align-items: flex-end;
     text-align: right;
 }
 
@@ -1268,27 +1270,53 @@ table.player-list {
 }
 
 #game-panel .button-panel-row {
+    pointer-events: all;
+    cursor: hand;
+}
+
+#game-panel.mobile .button-panel-row:hover {
+    color: #0cf;
+    text-shadow: 0 0 8px #0cfc;
+}
+
+#game-panel.mobile .button-panel-row {
     margin: 0.5em 8;
     font-style: italic;
 }
 
-#game-panel .button-panel-row-icon {
+#game-panel.mobile .button-panel-row-icon {
     display: inline-block;
     min-width: 2em;
     text-align: center;
 }
 
+#game-panel.desktop .button-panel-row {
+    color: #ccc;
+    display: inline-block;
+    padding: 0.5em;
+    min-width: 1.5em;
+    text-align: center;
+}
+
 #game-panel.desktop .button-panel-row .button-panel-row-label {
-    opacity: 0;
+    display: none;
 }
 
-#game-panel.desktop .button-panel-row:hover .button-panel-row-label {
-    opacity: 1;
+#game-panel.desktop .button-panel {
+    margin: 0 8;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
-#game-panel .button-panel .clickable:hover {
-    color: #00ccff;
-    text-shadow: 0 0 8px #0cfc;
+#game-panel.desktop .button-panel-label {
+    display: inline-block;
+    padding: 0 0.5em;
+}
+
+#game-panel.desktop .button-panel-row:hover {
+    background-color: #0cf;
+    box-shadow: 0 0 8px #0cfc;
 }
 
 #game-panel .in-progress-warning {
