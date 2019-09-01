@@ -150,6 +150,13 @@ class HUD extends React.PureComponent<Props, State> {
         const a = options.getProvider();
         return <>
             <TeamsMessage />
+            <Layout className="messages" anchorBottom={true} anchorLeft={true}>
+                <MessagesPanel />
+                <HelpMessage />
+                <FinishedPanel />
+                <WaitingMessage />
+                <TextMessageBox />
+            </Layout>
             <PlayBar>
                 <MutePanel />
                 <AutoJoinConfigButton />
@@ -163,13 +170,6 @@ class HUD extends React.PureComponent<Props, State> {
             </Layout>
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
-            </Layout>
-            <Layout className="messages" anchorBottom={true} anchorLeft={true}>
-                <MessagesPanel />
-                <HelpMessage />
-                <FinishedPanel />
-                <WaitingMessage />
-                <TextMessageBox />
             </Layout>
             <Layout anchorBottom={true}>
                 <HintPanel />
