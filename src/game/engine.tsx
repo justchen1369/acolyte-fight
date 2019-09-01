@@ -1899,6 +1899,10 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			hero.casting.chargeStartTick = world.tick;
 			hero.casting.uninterruptible = uninterruptible;
 			hero.casting.movementProportion = spell.movementProportionWhileCharging;
+
+			applyBuffsFrom(spell.chargeBuffs, hero.id, hero, world, {
+				spellId: spell.id,
+			});
 		}
 		// Orientate during charging
 		if (spell.revsPerTickWhileCharging > 0 && hero.target) {

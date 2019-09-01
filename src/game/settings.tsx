@@ -2226,6 +2226,14 @@ const scourge: Spell = {
     description: "Release a melee-range explosion that will send your enemies flying. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
 
+    effects: [
+        {
+            icon: "fas fa-shield",
+            title: "Heavy",
+            text: "While casting Overload, knockback is reduced 75%.",
+        },
+    ],
+
     detonate: {
         damage: 30,
         radius: Hero.Radius * 4,
@@ -2233,7 +2241,7 @@ const scourge: Spell = {
         maxImpulse: 0.002,
         renderTicks: 30,
     },
-    chargeTicks: 0.5 * TicksPerSecond,
+    chargeTicks: 5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
@@ -2243,6 +2251,16 @@ const scourge: Spell = {
 
     selfDamage: 10,
     minSelfHealth: 1,
+
+    chargeBuffs: [
+        {
+            type: "mass",
+            maxTicks: 5 * TicksPerSecond,
+            channelling: true,
+            radius: Hero.Radius,
+            density: 3 * Hero.Density,
+        },
+    ],
 
     icon: "deadlyStrike",
 

@@ -286,7 +286,8 @@ declare interface SpellBase {
     movementCancel?: boolean; // Whether moving cancels the spell.
 	strikeCancel?: SpellCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
 	
-	buffs?: BuffTemplate[]
+	chargeBuffs?: BuffTemplate[]; // Apply these buffs at the start of charging the spell
+	buffs?: BuffTemplate[]; // Apply these buffs at the start of channelling the spell
 
     icon?: string;
 
