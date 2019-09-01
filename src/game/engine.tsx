@@ -4118,27 +4118,6 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffS
 }
 
 function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const maxTicks = (template.maxTicks || 0) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
-	const values: w.BuffValues = {
-		initialTick: world.tick,
-		expireTick: world.tick + maxTicks,
-		cleansable: template.cleansable !== undefined ? template.cleansable : true,
-		renderStart: template.renderStart,
-		render: template.render,
-		renderFinish: template.renderFinish,
-		sound: template.sound,
-		maxTicks,
-		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
-		channellingSpellId: template.channelling && config.spellId,
-		numStacks: 1,
-	};
-
-	if (template.linkOwner) {
-		values.link = { owner: hero.id, spellId: config.spellId };
-	} else if (template.linkVictim) {
-		values.link = { owner: config.otherId, spellId: config.spellId };
-	}
-
 	if (template.type === "debuff") {
 		attachCleanse(id, template, hero, world, config);
 	} else if (template.type === "movement") {
