@@ -21,9 +21,8 @@ const vectorZero = vector.zero();
 const vectorCenter = pl.Vec2(0.5, 0.5);
 
 interface BuffContext {
-	otherId?: string;
+	fromHeroId?: string;
 	spellId?: string;
-	source?: string;
 	durationMultiplier?: number;
 }
 
@@ -117,6 +116,7 @@ export function initialWorld(mod: Object): w.World {
 		nextPositionId: 0,
 		nextObjectId: 0,
 		nextColorId: 0,
+		nextBuffId: 0,
 
 		settings,
 		mod,
@@ -245,6 +245,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 	const health = layout.health || template.health;
 	const obstacle: w.Obstacle = {
 		id: obstacleId,
+		owner: null,
 		type: layout.type,
 		category: "obstacle",
 		categories: Categories.Obstacle,
@@ -499,6 +500,7 @@ function addHero(world: w.World, heroId: string) {
 
 	let hero: w.Hero = {
 		id: heroId,
+		owner: heroId,
 		category: "hero",
 		filterGroupIndex,
 		categories: Categories.Hero,
@@ -2033,7 +2035,6 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 
 		if (spell.buffs) {
 			applyBuffsFrom(spell.buffs, hero.id, hero, world, {
-				source: `${hero.id}/${spell.id}`,
 				spellId: spell.id,
 			});
 		}
@@ -2139,7 +2140,6 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 
 		if (obstacle.buffs && obstacle.buffs.length > 0) {
 			applyBuffsFrom(obstacle.buffs, null, hit, world, {
-				source: `swatch`,
 			});
 			obstacle.activeTick = world.tick;
 		}
@@ -2181,9 +2181,8 @@ function handleSaberHit(saber: w.Saber, obj: w.WorldObject, world: w.World) {
 
 			if (saber.hitBuffs) {
 				applyBuffsFrom(saber.hitBuffs, saber.owner, obj, world, {
-					otherId: saber.owner,
+					fromHeroId: saber.owner,
 					spellId: saber.spellId,
-					source: `${saber.owner}/${saber.spellId}`,
 				});
 			}
 		} else if (obj.category === "projectile") {
@@ -2632,7 +2631,6 @@ function swapOnExpiry(projectile: w.Projectile, world: w.World) {
 function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	const durationMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialBuffDuration);
 	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, {
-		source: `${projectile.owner}/${projectile.type}`,
 		spellId: projectile.type,
 		durationMultiplier,
 	});
@@ -2650,7 +2648,7 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Wor
 		}
 
 		const receiver = template.owner ? world.objects.get(fromHeroId) : target;
-		const otherId = template.owner ? (target && target.id) : fromHeroId;
+		const giver = template.owner ? (target && target.owner) : fromHeroId;
 		if (!receiver) {
 			return;
 		} else if (receiver.category === "hero") {
@@ -2662,15 +2660,14 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Wor
 				}
 			}
 
-			const id = `${config.source || "buff"}/${template.type}`;
-			instantiateBuff(id, template, receiver, world, {
+			instantiateBuff(template, receiver, world, {
 				...config,
-				otherId,
+				fromHeroId: giver,
 			});
 		} else if (receiver.category === "obstacle") {
 			applyBuffToObstacle(template, receiver, world, {
 				...config,
-				otherId,
+				fromHeroId: giver,
 			});
 		}
 	});
@@ -2680,7 +2677,7 @@ function applyBuffToObstacle(template: BuffTemplate, obstacle: w.Obstacle, world
 	if (template.type === "burn") {
 		if (!obstacle.undamageable) {
 			const numHits = template.maxTicks / template.hitInterval;
-			const packet = instantiateDamage(template.packet, config.otherId, world);
+			const packet = instantiateDamage(template.packet, config.fromHeroId, world);
 			packet.damage *= numHits;
 			applyDamageToObstacle(obstacle, packet, world);
 		}
@@ -2858,7 +2855,6 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 		hit = true;
 		applyDamage(obj, packet, world);
 		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, {
-			source: `${behaviour.owner}/aura`
 		});
 
 	});
@@ -4117,29 +4113,29 @@ function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffS
 	return !wu(hero.buffs.values()).some(b => b.channellingSpellId === spell.id);
 }
 
-function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function instantiateBuff(template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	if (template.type === "debuff") {
-		attachCleanse(id, template, hero, world, config);
+		attachCleanse(template, hero, world, config);
 	} else if (template.type === "movement") {
-		attachMovementBuff(id, template, hero, world, config);
+		attachMovementBuff(template, hero, world, config);
 	} else if (template.type === "glide") {
-		attachGlide(id, template, hero, world, config);
+		attachGlide(template, hero, world, config);
 	} else if (template.type === "lavaImmunity") {
-		attachLavaImmunity(id, template, hero, world, config);
+		attachLavaImmunity(template, hero, world, config);
 	} else if (template.type === "vanish") {
-		attachVanish(id, template, hero, world, config);
+		attachVanish(template, hero, world, config);
 	} else if (template.type === "lifeSteal") {
-		attachLifesteal(id, template, hero, world, config);
+		attachLifesteal(template, hero, world, config);
 	} else if (template.type === "burn") {
-		attachBurn(id, template, hero, world, config);
+		attachBurn(template, hero, world, config);
 	} else if (template.type === "cooldown") {
-		attachSilence(id, template, hero, world, config);
+		attachSilence(template, hero, world, config);
 	} else if (template.type === "armor") {
-		attachArmor(id, template, hero, world, config);
+		attachArmor(template, hero, world, config);
 	} else if (template.type === "mass") {
-		attachMass(id, template, hero, world, config);
+		attachMass(template, hero, world, config);
 	} else if (template.type === "delink") {
-		attachDelink(id, template, hero, world, config);
+		attachDelink(template, hero, world, config);
 	}
 }
 
@@ -4178,13 +4174,14 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 	if (template.linkOwner) {
 		values.link = { owner: hero.id, spellId: config.spellId };
 	} else if (template.linkVictim) {
-		values.link = { owner: config.otherId, spellId: config.spellId };
+		values.link = { owner: config.fromHeroId, spellId: config.spellId };
 	}
 
 	return values;
 }
 
-function attachCleanse(id: string, template: DebuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachCleanse(template: DebuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4207,7 +4204,8 @@ function updateCleanse(hero: w.Hero) {
 	hero.cleanseTick = cleanseTick;
 }
 
-function attachMovementBuff(id: string, template: MovementBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4216,7 +4214,8 @@ function attachMovementBuff(id: string, template: MovementBuffTemplate, hero: w.
 	});
 }
 
-function attachGlide(id: string, template: GlideTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachGlide(template: GlideTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4230,7 +4229,8 @@ function detachGlide(buff: w.GlideBuff, hero: w.Hero, world: w.World) {
 	updateHeroDamping(hero);
 }
 
-function attachLavaImmunity(id: string, template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachLavaImmunity(template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4239,7 +4239,8 @@ function attachLavaImmunity(id: string, template: LavaImmunityBuffTemplate, hero
 	});
 }
 
-function attachVanish(id: string, template: VanishTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = "vanish"; // Only one vanish at a time allowed
 	hero.invisible = {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4250,7 +4251,8 @@ function attachVanish(id: string, template: VanishTemplate, hero: w.Hero, world:
 	hero.buffs.set(id, hero.invisible);
 }
 
-function attachLifesteal(id: string, template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4262,14 +4264,15 @@ function attachLifesteal(id: string, template: LifestealTemplate, hero: w.Hero, 
 	});
 }
 
-function attachBurn(id: string, template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${config.fromHeroId || "environment"}/burn`; // Only one burn per enemy
 	const values = calculateBuffValues(template, hero, world, config);
 
 	let stack: w.BurnBuff = null;
 	if (template.stack) {
 		// Extend existing stacks
 		hero.buffs.forEach(buff => {
-			if (buff && buff.type === "burn" && buff.fromHeroId === config.otherId && buff.stack === template.stack) {
+			if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
 				stack = buff;
 			}
 		});
@@ -4285,7 +4288,7 @@ function attachBurn(id: string, template: BurnTemplate, hero: w.Hero, world: w.W
 	} else {
 		hero.buffs.set(id, {
 			...values, id, type: "burn",
-			fromHeroId: config.otherId,
+			fromHeroId: config.fromHeroId,
 			hitInterval: template.hitInterval,
 			packet: { ...template.packet },
 			stack: template.stack,
@@ -4309,7 +4312,7 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	return true;
 }
 
-function attachSilence(id: string, template: SetCooldownTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	hero.keysToSpells.forEach(spellId => {
 		if (!template.spellId || spellId === template.spellId) {
 			const initialCooldown = cooldownRemaining(world, hero, spellId);
@@ -4335,7 +4338,8 @@ function attachSilence(id: string, template: SetCooldownTemplate, hero: w.Hero, 
 	});
 }
 
-function attachArmor(id: string, template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4350,7 +4354,9 @@ function detachArmor(buff: w.ArmorBuff, hero: w.Hero, world: w.World) {
 }
 
 
-function attachMass(id: string, template: MassTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachMass(template: MassTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
+
 	const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
 	const fixture = hero.body.createFixture(pl.Circle(template.radius), {
 		density: template.density || 0,
@@ -4375,7 +4381,7 @@ function detachMass(buff: w.MassBuff, hero: w.Hero, world: w.World) {
 	updateHeroMass(hero);
 }
 
-function attachDelink(id: string, template: DelinkTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+function attachDelink(template: DelinkTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	if (hero.link) {
 		hero.link.expireTick = world.tick;
 	}

@@ -68,6 +68,7 @@ export interface World {
 
 	nextPositionId: number;
 	nextObjectId: number;
+	nextBuffId: number;
 	nextColorId: number;
 	
 	settings: AcolyteFightSettings;
@@ -334,6 +335,7 @@ export interface ObjectSnapshot {
 
 export interface WorldObjectBase {
 	id: string;
+	owner: string;
 	category: string;
 	categories: number;
 	body: pl.Body;
