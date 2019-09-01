@@ -729,6 +729,7 @@ declare interface BuffTemplateBase {
 	linkOwner?: boolean; // Cancel this buff if no longer the owner of a link
 	linkVictim?: boolean; // Cancel this buff if no longer the victim of a link
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
+	cancelOnBump?: boolean; // Cancel this buff if the hero bumps another
 	passive?: boolean; // Cancel this buff if the hero stops choosing this spell
 
 	renderStart?: RenderBuff;

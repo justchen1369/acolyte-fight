@@ -607,6 +607,7 @@ export interface BuffValues {
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
 	passiveSpellId?: string; // If the hero stops choosing this spell, remove the buff
 	link?: LinkChannellingBuffParams;
+	cancelOnBump?: boolean;
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
 

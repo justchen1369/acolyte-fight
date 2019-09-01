@@ -3147,6 +3147,8 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 		return true;
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
+	} else if (buff.cancelOnBump && buff.initialTick < hero.bumpTick) {
+		return true;
 	} else 
 
 	if (buff.link) {
@@ -4212,6 +4214,7 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.spellId,
 		passiveSpellId: template.passive && config.spellId,
+		cancelOnBump: template.cancelOnBump,
 		numStacks: 1,
 	};
 

@@ -2619,6 +2619,7 @@ const vanish: Spell = {
             type: "vanish",
             maxTicks: 2.5 * TicksPerSecond,
             channelling: true,
+            cancelOnBump: true,
             sound: "vanish",
 
             renderStart: {
