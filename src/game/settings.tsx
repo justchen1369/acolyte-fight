@@ -2708,8 +2708,8 @@ const boost: Spell = {
         },
     ],
 
-    icon: "embracedEnergy",
-    color: '#fc0',
+    icon: "dodging",
+    color: '#6f0',
     action: "buff",
 };
 
