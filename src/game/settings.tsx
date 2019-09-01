@@ -2761,7 +2761,7 @@ const bump: Spell = {
             type: "bump",
             passive: true,
             hitInterval: 15,
-            impulse: 0.00018,
+            impulse: 0.00015,
         },
     ],
 
