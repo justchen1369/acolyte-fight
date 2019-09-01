@@ -3100,41 +3100,11 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 		return false;
 	}
 
-	let armorChanged = false;
-	let cleanseChanged = false;
-	let glideChanged = false;
-	let massChanged = false;
 	hero.buffs.forEach((buff, id) => {
 		if (isBuffExpired(buff, hero, world)) {
-			buff.destroyedTick = world.tick;
-			hero.buffs.delete(id); // Yes you can delete from a map while iterating it
-			hero.uiDestroyedBuffs.push(buff);
-
-			if (buff.type === "mass") {
-				hero.body.destroyFixture(buff.fixture);
-				massChanged = true;
-			} else if (buff.type === "armor") {
-				armorChanged = true;
-			} else if (buff.type === "cleanse") {
-				cleanseChanged = true;
-			} else if (buff.type === "glide") {
-				glideChanged = true;
-			}
+			detachBuff(buff, hero, world);
 		}
 	});
-
-	if (armorChanged) {
-		updateArmor(hero);
-	}
-	if (cleanseChanged) {
-		updateCleanse(hero);
-	}
-	if (glideChanged) {
-		updateHeroDamping(hero);
-	}
-	if (massChanged) {
-		updateHeroMass(hero);
-	}
 
 	return true;
 }
@@ -4170,119 +4140,82 @@ function instantiateBuff(id: string, template: BuffTemplate, hero: w.Hero, world
 	}
 
 	if (template.type === "debuff") {
-		hero.buffs.set(id, {
-			...values, id, type: "cleanse",
-		});
-		updateCleanse(hero);
+		attachCleanse(id, template, hero, world, config);
 	} else if (template.type === "movement") {
-		hero.buffs.set(id, {
-			...values, id, type: "movement",
-			movementProportion: template.movementProportion,
-		});
+		attachMovementBuff(id, template, hero, world, config);
 	} else if (template.type === "glide") {
-		hero.buffs.set(id, {
-			...values, id, type: "glide",
-			linearDampingMultiplier: template.linearDampingMultiplier,
-		});
-		updateHeroDamping(hero);
+		attachGlide(id, template, hero, world, config);
 	} else if (template.type === "lavaImmunity") {
-		hero.buffs.set(id, {
-			...values, id, type: "lavaImmunity",
-			damageProportion: template.damageProportion,
-		});
+		attachLavaImmunity(id, template, hero, world, config);
 	} else if (template.type === "vanish") {
-		hero.invisible = {
-			...values, id, type: "vanish",
-			initialPos: hero.body.getPosition().clone(),
-			noTargetingIndicator: template.noTargetingIndicator,
-		};
-		hero.buffs.set(id, hero.invisible);
+		attachVanish(id, template, hero, world, config);
 	} else if (template.type === "lifeSteal") {
-		hero.buffs.set(id, {
-			...values, id, type: "lifeSteal",
-			lifeSteal: template.lifeSteal,
-			damageMultiplier: template.damageMultiplier,
-			minHealth: template.minHealth,
-			decay: template.decay,
-		});
+		attachLifesteal(id, template, hero, world, config);
 	} else if (template.type === "burn") {
-		let stack: w.BurnBuff = null;
-		if (template.stack) {
-			// Extend existing stacks
-			hero.buffs.forEach(buff => {
-				if (buff && buff.type === "burn" && buff.fromHeroId === config.otherId && buff.stack === template.stack) {
-					stack = buff;
-				}
-			});
-		}
-
-		if (stack) {
-			stack.expireTick = values.expireTick;
-
-			if (!template.maxStacks || stack.numStacks < template.maxStacks) {
-				stack.packet.damage += template.packet.damage;
-				++stack.numStacks;
-			}
-		} else {
-			hero.buffs.set(id, {
-				...values, id, type: "burn",
-				fromHeroId: config.otherId,
-				hitInterval: template.hitInterval,
-				packet: { ...template.packet },
-				stack: template.stack,
-			});
-		}
+		attachBurn(id, template, hero, world, config);
 	} else if (template.type === "cooldown") {
-		hero.keysToSpells.forEach(spellId => {
-			if (!template.spellId || spellId === template.spellId) {
-				const initialCooldown = cooldownRemaining(world, hero, spellId);
-				let cooldown = initialCooldown;
-				if (template.maxCooldown !== undefined) {
-					cooldown = Math.min(template.maxCooldown, cooldown);
-				}
-				if (template.minCooldown !== undefined) {
-					cooldown = Math.max(template.minCooldown, cooldown);
-				}
-				if (cooldown !== initialCooldown) {
-					setCooldown(world, hero, spellId, cooldown);
-				}
-			}
-		});
-
-		world.ui.events.push({
-			type: "cooldown",
-			tick: world.tick,
-			color: template.color,
-			sound: template.sound,
-			heroId: hero.id,
-		});
+		attachSilence(id, template, hero, world, config);
 	} else if (template.type === "armor") {
-		hero.buffs.set(id, {
-			...values, id, type: "armor",
-			proportion: template.proportion,
-		});
-		updateArmor(hero);
+		attachArmor(id, template, hero, world, config);
 	} else if (template.type === "mass") {
-		const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
-		const fixture = hero.body.createFixture(pl.Circle(template.radius), {
-			density: template.density || 0,
-			filterCategoryBits: Categories.Hero,
-			filterMaskBits: collideWith,
-			filterGroupIndex: hero.filterGroupIndex,
-		});
-
-		hero.buffs.set(id, {
-			...values, id, type: "mass",
-			fixture,
-			collideWith,
-			radius: template.radius,
-		});
-		updateHeroMass(hero);
+		attachMass(id, template, hero, world, config);
 	} else if (template.type === "delink") {
-		if (hero.link) {
-			hero.link.expireTick = world.tick;
-		}
+		attachDelink(id, template, hero, world, config);
 	}
+}
+
+function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
+	buff.destroyedTick = world.tick;
+	hero.buffs.delete(buff.id);
+	hero.uiDestroyedBuffs.push(buff);
+
+	if (buff.type === "mass") {
+		detachMass(buff, hero, world);
+	} else if (buff.type === "armor") {
+		detachArmor(buff, hero, world);
+	} else if (buff.type === "cleanse") {
+		detachCleanse(buff, hero, world);
+	} else if (buff.type === "glide") {
+		detachGlide(buff, hero, world);
+	}
+}
+
+function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const maxTicks = (template.maxTicks || 0) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
+	const values: w.BuffValues = {
+		initialTick: world.tick,
+		expireTick: world.tick + maxTicks,
+		cleansable: template.cleansable !== undefined ? template.cleansable : true,
+		renderStart: template.renderStart,
+		render: template.render,
+		renderFinish: template.renderFinish,
+		sound: template.sound,
+		maxTicks,
+		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
+		channellingSpellId: template.channelling && config.spellId,
+		numStacks: 1,
+	};
+
+	if (template.linkOwner) {
+		values.link = { owner: hero.id, spellId: config.spellId };
+	} else if (template.linkVictim) {
+		values.link = { owner: config.otherId, spellId: config.spellId };
+	}
+
+	return values;
+}
+
+function attachCleanse(id: string, template: DebuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "cleanse",
+	});
+	updateCleanse(hero);
+}
+
+function detachCleanse(buff: w.CleanseBuff, hero: w.Hero, world: w.World) {
+	updateCleanse(hero);
 }
 
 function updateCleanse(hero: w.Hero) {
@@ -4293,6 +4226,92 @@ function updateCleanse(hero: w.Hero) {
 		}
 	});
 	hero.cleanseTick = cleanseTick;
+}
+
+function attachMovementBuff(id: string, template: MovementBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "movement",
+		movementProportion: template.movementProportion,
+	});
+}
+
+function attachGlide(id: string, template: GlideTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "glide",
+		linearDampingMultiplier: template.linearDampingMultiplier,
+	});
+	updateHeroDamping(hero);
+}
+
+function detachGlide(buff: w.GlideBuff, hero: w.Hero, world: w.World) {
+	updateHeroDamping(hero);
+}
+
+function attachLavaImmunity(id: string, template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "lavaImmunity",
+		damageProportion: template.damageProportion,
+	});
+}
+
+function attachVanish(id: string, template: VanishTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.invisible = {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "vanish",
+		initialPos: hero.body.getPosition().clone(),
+		noTargetingIndicator: template.noTargetingIndicator,
+	};
+	hero.buffs.set(id, hero.invisible);
+}
+
+function attachLifesteal(id: string, template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "lifeSteal",
+		lifeSteal: template.lifeSteal,
+		damageMultiplier: template.damageMultiplier,
+		minHealth: template.minHealth,
+		decay: template.decay,
+	});
+}
+
+function attachBurn(id: string, template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const values = calculateBuffValues(template, hero, world, config);
+
+	let stack: w.BurnBuff = null;
+	if (template.stack) {
+		// Extend existing stacks
+		hero.buffs.forEach(buff => {
+			if (buff && buff.type === "burn" && buff.fromHeroId === config.otherId && buff.stack === template.stack) {
+				stack = buff;
+			}
+		});
+	}
+
+	if (stack) {
+		stack.expireTick = values.expireTick;
+
+		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+			stack.packet.damage += template.packet.damage;
+			++stack.numStacks;
+		}
+	} else {
+		hero.buffs.set(id, {
+			...values, id, type: "burn",
+			fromHeroId: config.otherId,
+			hitInterval: template.hitInterval,
+			packet: { ...template.packet },
+			stack: template.stack,
+		});
+	}
 }
 
 function burn(burn: w.BurnBehaviour, world: w.World) {
@@ -4309,6 +4328,78 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 	});
 
 	return true;
+}
+
+function attachSilence(id: string, template: SetCooldownTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.keysToSpells.forEach(spellId => {
+		if (!template.spellId || spellId === template.spellId) {
+			const initialCooldown = cooldownRemaining(world, hero, spellId);
+			let cooldown = initialCooldown;
+			if (template.maxCooldown !== undefined) {
+				cooldown = Math.min(template.maxCooldown, cooldown);
+			}
+			if (template.minCooldown !== undefined) {
+				cooldown = Math.max(template.minCooldown, cooldown);
+			}
+			if (cooldown !== initialCooldown) {
+				setCooldown(world, hero, spellId, cooldown);
+			}
+		}
+	});
+
+	world.ui.events.push({
+		type: "cooldown",
+		tick: world.tick,
+		color: template.color,
+		sound: template.sound,
+		heroId: hero.id,
+	});
+}
+
+function attachArmor(id: string, template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "armor",
+		proportion: template.proportion,
+	});
+	updateArmor(hero);
+}
+
+function detachArmor(buff: w.ArmorBuff, hero: w.Hero, world: w.World) {
+	updateArmor(hero);
+}
+
+
+function attachMass(id: string, template: MassTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
+	const fixture = hero.body.createFixture(pl.Circle(template.radius), {
+		density: template.density || 0,
+		filterCategoryBits: Categories.Hero,
+		filterMaskBits: collideWith,
+		filterGroupIndex: hero.filterGroupIndex,
+	});
+
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "mass",
+		fixture,
+		collideWith,
+		radius: template.radius,
+	});
+	updateHeroMass(hero);
+}
+
+function detachMass(buff: w.MassBuff, hero: w.Hero, world: w.World) {
+	hero.body.destroyFixture(buff.fixture);
+	updateHeroMass(hero);
+}
+
+function attachDelink(id: string, template: DelinkTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	if (hero.link) {
+		hero.link.expireTick = world.tick;
+	}
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {
