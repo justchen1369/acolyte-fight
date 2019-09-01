@@ -23,7 +23,7 @@ const vectorCenter = pl.Vec2(0.5, 0.5);
 interface BuffContext {
 	otherId?: string;
 	spellId?: string;
-	tag?: string;
+	source?: string;
 	durationMultiplier?: number;
 }
 
@@ -2033,7 +2033,7 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 
 		if (spell.buffs) {
 			applyBuffsFrom(spell.buffs, hero.id, hero, world, {
-				tag: spell.id,
+				source: `${hero.id}/${spell.id}`,
 				spellId: spell.id,
 			});
 		}
@@ -2139,7 +2139,7 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 
 		if (obstacle.buffs && obstacle.buffs.length > 0) {
 			applyBuffsFrom(obstacle.buffs, null, hit, world, {
-				tag: `swatch-${obstacle.type}`,
+				source: `swatch`,
 			});
 			obstacle.activeTick = world.tick;
 		}
@@ -2183,7 +2183,7 @@ function handleSaberHit(saber: w.Saber, obj: w.WorldObject, world: w.World) {
 				applyBuffsFrom(saber.hitBuffs, saber.owner, obj, world, {
 					otherId: saber.owner,
 					spellId: saber.spellId,
-					tag: "saber",
+					source: `${saber.owner}/${saber.spellId}`,
 				});
 			}
 		} else if (obj.category === "projectile") {
@@ -2632,7 +2632,7 @@ function swapOnExpiry(projectile: w.Projectile, world: w.World) {
 function applyBuffsFromProjectile(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	const durationMultiplier = calculatePartialDamageMultiplier(world, projectile, projectile.partialBuffDuration);
 	applyBuffsFrom(projectile.buffs, projectile.owner, target, world, {
-		tag: projectile.type,
+		source: `${projectile.owner}/${projectile.type}`,
 		spellId: projectile.type,
 		durationMultiplier,
 	});
@@ -2662,7 +2662,7 @@ function applyBuffsFrom(buffs: BuffTemplate[], fromHeroId: string, target: w.Wor
 				}
 			}
 
-			const id = `${config.tag || "buff"}-${template.type}`;
+			const id = `${config.source || "buff"}/${template.type}`;
 			instantiateBuff(id, template, receiver, world, {
 				...config,
 				otherId,
@@ -2857,7 +2857,9 @@ function aura(behaviour: w.AuraBehaviour, world: w.World): boolean {
 
 		hit = true;
 		applyDamage(obj, packet, world);
-		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, { tag: behaviour.type });
+		applyBuffsFrom(behaviour.buffs, orb.owner, obj, world, {
+			source: `${behaviour.owner}/aura`
+		});
 
 	});
 
