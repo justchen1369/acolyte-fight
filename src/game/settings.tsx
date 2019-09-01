@@ -180,25 +180,28 @@ const Choices: ChoiceSettings = {
             ["whip"],
         ],
 		"w": [
+            ["boost"],
             ["homing", "boomerang"],
             ["gravity", "whirlwind"],
             ["link", "grapple"],
             ["lightning"],
         ],
 		"e": [
-            ["shield", "icewall", "phaseOut"],
+            ["armor", "shield", "icewall"],
             ["saber", "dualSaber"],
+            ["phaseOut"],
             ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
+            ["empower"],
             ["supernova", "rocket"],
             ["bouncer", "repeater"],
             ["kamehameha", "blast"],
         ],
 		"f": [
+            ["bump", "scourge"],
             ["firespray", "iceBomb"],
-            ["scourge"],
             ["mines"],
             ["halo"],
         ],
@@ -2652,6 +2655,95 @@ const vanish: Spell = {
     action: "buff",
 };
 
+const armor: Spell = {
+    id: 'armor',
+    name: 'Battle Armor',
+    description: "Passive ability. Reduce all incoming damage by 15%. Applies to all forms of damage - from enemies and from the environment.",
+
+    passive: true,
+    untargeted: true,
+    cooldown: 1,
+
+    buffs: [
+        {
+            type: "armor",
+            passive: true,
+            proportion: -0.15,
+        },
+    ],
+
+    icon: "wingedShield",
+    color: '#8800ff',
+    action: "buff",
+};
+
+const boost: Spell = {
+    id: 'boost',
+    name: 'Energize',
+    description: "Passive ability. Increase your movement speed by 10%.",
+
+    passive: true,
+    untargeted: true,
+    cooldown: 1,
+
+    buffs: [
+        {
+            type: "movement",
+            passive: true,
+            movementProportion: 1.1,
+        },
+    ],
+
+    icon: "embracedEnergy",
+    color: '#fc0',
+    action: "buff",
+};
+
+const empower: Spell = {
+    id: 'empower',
+    name: 'Serum',
+    description: "Passive ability. Increase all damage dealt by 20%.",
+
+    passive: true,
+    untargeted: true,
+    cooldown: 1,
+
+    buffs: [
+        {
+            type: "lifeSteal",
+            passive: true,
+            damageMultiplier: 1.2,
+        },
+    ],
+
+    icon: "dna1",
+    color: '#40f',
+    action: "buff",
+};
+
+const bump: Spell = {
+    id: 'bump',
+    name: 'Bump',
+    description: "Passive ability. Bump back any enemies who touch you.",
+
+    passive: true,
+    untargeted: true,
+    cooldown: 1,
+
+    buffs: [
+        {
+            type: "bump",
+            passive: true,
+            hitInterval: 15,
+            impulse: 0.0002,
+        },
+    ],
+
+    icon: "aura",
+    color: '#f40',
+    action: "buff",
+};
+
 const Spells = {
     move,
     go,
@@ -2696,6 +2788,10 @@ const Spells = {
     swap,
     voidRush,
     vanish,
+    armor,
+    empower,
+    boost,
+    bump,
 };
 
 export const Mod: ModSettings = {

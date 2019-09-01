@@ -73,6 +73,9 @@ class SpellStats extends React.PureComponent<Props, State> {
                 <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />-{spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
+        } else if (spell.passive) {
+            return <div className="spell-stats">
+            </div>
         } else {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>

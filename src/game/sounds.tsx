@@ -1467,6 +1467,29 @@ export const Sounds: Sounds = {
             },
         ],
     },
+    "bump": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "volume": 0.1,
+                "stopTime": 0.2,
+                "attack": 0.001,
+                "decay": 0.19,
+                "startFreq": 80,
+                "stopFreq": 80,
+                "lowPass": 120,
+                "highPass": 40,
+                "modStartFreq": 240,
+                "modStopFreq": 240,
+                "modStartStrength": 80,
+                "modStopStrength": 80,
+                "wave": "square",
+                "ratios": [
+                    1
+                ]
+            }
+        ]
+    },
     "bumper": {
         "cutoffEarly": false,
         "start": [

@@ -412,6 +412,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	createTick: number;
 	hitTick?: number; // hit by anything (lava or non-lava)
 	strikeTick?: number; // hit by something (not lava)
+	bumpTick?: number; // bumped another hero
 	cleanseTick?: number;
 	exitTick?: number;
 
@@ -595,6 +596,7 @@ export type Buff =
 	| BurnBuff
 	| ArmorBuff
 	| MassBuff
+	| BumpBuff
 
 export interface BuffValues {
 	cleansable?: boolean;
@@ -603,6 +605,7 @@ export interface BuffValues {
 	initialTick: number;
 	expireTick: number;
 	channellingSpellId?: string; // If the hero stops casting this spell, remove the buff
+	passiveSpellId?: string; // If the hero stops choosing this spell, remove the buff
 	link?: LinkChannellingBuffParams;
 	hitTick?: number; // If the hero gets hit, remove the buff
 	numStacks: number;
@@ -676,6 +679,11 @@ export interface MassBuff extends BuffBase {
 	collideWith: number;
 	fixture: pl.Fixture;
 	radius: number;
+}
+
+export interface BumpBuff extends BuffBase, HitSource {
+	type: "bump";
+	impulse: number;
 }
 
 export interface Cooldowns {

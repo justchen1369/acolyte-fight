@@ -1456,6 +1456,15 @@ function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2
 			}
 		}
 	}
+
+	// Bump sounds
+	if (hero.bumpTick) {
+		ctxStack.sounds.push({
+			id: `${hero.id}-bump-${hero.bumpTick}`,
+			sound: "bump",
+			pos: heroPos.clone(),
+		});
+	}
 }
 
 function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
@@ -2380,7 +2389,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 			const spell = world.settings.Spells[spellId];
 			if (!spell) { continue }
 
-			let color = spell.color;
+			let color = spell.passive ? "#000" : spell.color;
 			if (spell.id === hoverSpellId) {
 				color = ColTuple.parse(color).lighten(0.25).string();
 			}
@@ -2390,7 +2399,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 				color,
 				icon: spell.icon,
 				cooldownText: null,
-				emphasis: 1,
+				emphasis: spell.passive ? 0.5 : 1,
 			};
 			buttonStateLookup.set(key.btn, btnState);
 		}
@@ -2682,7 +2691,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	const settings = world.settings;
 	const rebindingLookup = keyboardUtils.getRebindingLookup({ rebindings, settings });
 	let button: w.ButtonRenderState = {
-		key: rebindingLookup.get(key) || "",
+		key: spell.passive ? "" : (rebindingLookup.get(key) || ""),
 		color: spell.color,
 		icon: spell.icon,
 		cooldownText: null,
@@ -2696,6 +2705,9 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 
 	if (isSelected) {
 		button.color = '#f0f0f0';
+	} else if (spell.passive) {
+		button.color = '#000';
+		button.emphasis = 0.5;
 	} else if (remainingInSeconds > 1) {
 		button.color = '#222';
 		button.emphasis = 0.7;
@@ -2714,7 +2726,7 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 		button.color = ColTuple.parse(button.color).lighten(0.25).string();
 	} 
 
-	if (remainingInSeconds > 0) {
+	if (!spell.passive && remainingInSeconds > 0) {
 		// Cooldown
 		let cooldownText = remainingInSeconds > 1 ? remainingInSeconds.toFixed(0) : remainingInSeconds.toFixed(1);
 		button.cooldownText = cooldownText;

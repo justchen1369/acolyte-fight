@@ -309,7 +309,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
         const spellId = this.keyToSpellId(key);
         const spell = world.settings.Spells[spellId];
-        if (spell) {
+        if (spell && !spell.passive) {
             if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             } else {
@@ -400,7 +400,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 if (!spell) {
                     spell = Spells.move;
                 }
-                if (spell) {
+                if (spell && !spell.passive) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
 
                     if (spell.id !== Spells.move.id) {
@@ -461,7 +461,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             if (e.ctrlKey || e.altKey || e.shiftKey) {
                 this.handleCustomizeBtn(key);
             } else {
-                if (world.ui.nextTarget) {
+                if (!spell.passive && world.ui.nextTarget) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
                 }
             }
@@ -491,8 +491,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
         const spellType = this.keyToSpellId(key);
         const spell = world.settings.Spells[spellType];
-        if (spell) {
-            if (world.ui.nextTarget) {
+        if (spell && spell.release) {
+            if (!spell.passive && world.ui.nextTarget) {
                 sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
             }
         }

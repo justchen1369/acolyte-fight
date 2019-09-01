@@ -1757,7 +1757,17 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 	const changedSpellIds = _.difference(newSpellIds, previousSpellIds);
 	changedSpellIds.forEach(spellId => {
 		hero.spellChangedTick.set(spellId, world.tick);
+		attachSpell(spellId, hero, world);
 	});
+}
+
+function attachSpell(spellId: string, hero: w.Hero, world: w.World) {
+	const spell = world.settings.Spells[spellId];
+	if (spell.passive) {
+		applyBuffsFrom(spell.buffs, hero.id, hero, world, {
+			spellId,
+		});
+	}
 }
 
 export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFightSettings): ResolvedKeyBindings {
@@ -2211,10 +2221,27 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 
 	// Push back other heroes
 	{
-		const impulse = vector.diff(hero.body.getPosition(), other.body.getPosition());
-		const magnitude = Math.max(0, Hero.Radius * 2 - impulse.length()) * Hero.SeparationImpulsePerTick;
+		const impulse = vector.diff(other.body.getPosition(), hero.body.getPosition(),);
+		let magnitude = Math.max(0, Hero.Radius * 2 - impulse.length()) * Hero.SeparationImpulsePerTick;
+
+		let bumper = false;
+		hero.buffs.forEach(bump => {
+			if (bump.type === "bump") {
+				if (takeHit(bump, other.id, world)) {
+					magnitude += bump.impulse;
+					bumper = true;
+				}
+			}
+		});
+
 		impulse.mul(magnitude / impulse.length());
-		applyImpulseDelta(hero, impulse);
+		applyImpulseDelta(other, impulse);
+
+		if (bumper) {
+			hero.bumpTick = world.tick;
+			hero.hitTick = world.tick;
+			other.hitTick = world.tick;
+		}
 	}
 
 	// If using thrust, cause damage
@@ -3106,6 +3133,11 @@ function expireBuffs(behaviour: w.ExpireBuffsBehaviour, world: w.World) {
 }
 
 function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
+	if (buff.passiveSpellId) {
+		// Passive buffs never expire, cannot be cleansed
+		return !hero.spellsToKeys.has(buff.passiveSpellId)
+	}
+
 	if (world.tick >= buff.expireTick) {
 		return true;
 	} else if (buff.cleansable && hero.cleanseTick && buff.initialTick < hero.cleanseTick) {
@@ -3114,7 +3146,7 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 		return true;
 	} else if (buff.channellingSpellId && (!hero.casting || hero.casting.action.type !== buff.channellingSpellId)) {
 		return true;
-	}
+	} else 
 
 	if (buff.link) {
 		const hero = world.objects.get(buff.link.owner);
@@ -4136,6 +4168,8 @@ function instantiateBuff(template: BuffTemplate, hero: w.Hero, world: w.World, c
 		attachMass(template, hero, world, config);
 	} else if (template.type === "delink") {
 		attachDelink(template, hero, world, config);
+	} else if (template.type === "bump") {
+		attachBump(template, hero, world, config);
 	}
 }
 
@@ -4168,6 +4202,7 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		maxTicks,
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.spellId,
+		passiveSpellId: template.passive && config.spellId,
 		numStacks: 1,
 	};
 
@@ -4384,6 +4419,18 @@ function attachDelink(template: DelinkTemplate, hero: w.Hero, world: w.World, co
 	if (hero.link) {
 		hero.link.expireTick = world.tick;
 	}
+}
+
+function attachBump(template: BumpTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const id = `${template.type}-${world.nextBuffId++}`;
+	hero.buffs.set(id, {
+		...calculateBuffValues(template, hero, world, config),
+		id,
+		type: "bump",
+		impulse: template.impulse,
+		hitInterval: template.hitInterval,
+		hitTickLookup: new Map(),
+	});
 }
 
 function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, world: w.World): w.DamagePacket {

@@ -268,6 +268,7 @@ declare interface SpellBase {
 	action: string; // Which action function to use
 	sound?: string; // Which sound to use for charging/channelling
 	untargeted?: boolean; // No target required. i.e. cast instantly when you click the button
+	passive?: boolean; // Apply the buffs immediately
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
@@ -711,6 +712,7 @@ declare type BuffTemplate =
 	| BurnTemplate
 	| ArmorTemplate
 	| MassTemplate
+	| BumpTemplate
 	| DelinkTemplate
 
 declare interface BuffTemplateBase {
@@ -726,6 +728,7 @@ declare interface BuffTemplateBase {
 	linkOwner?: boolean; // Cancel this buff if no longer the owner of a link
 	linkVictim?: boolean; // Cancel this buff if no longer the victim of a link
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
+	passive?: boolean; // Cancel this buff if the hero stops choosing this spell
 
 	renderStart?: RenderBuff;
 	render?: RenderBuff;
@@ -809,6 +812,12 @@ declare interface MassTemplate extends BuffTemplateBase {
 	radius: number; // Increase the radius of the hero to this value
 	restrictCollideWith?: number; // Restrict what the hero can collide with while this buff is active
 	density?: number; // Increase the density of the hero by amount
+}
+
+declare interface BumpTemplate extends BuffTemplateBase {
+	type: "bump";
+	impulse: number;
+	hitInterval: number;
 }
 
 declare interface DelinkTemplate extends BuffTemplateBase {
