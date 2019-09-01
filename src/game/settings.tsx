@@ -1119,6 +1119,7 @@ const whip: Spell = {
     buffs: [
         {
             type: "movement",
+            stack: "whip",
             maxTicks: 3 * TicksPerSecond,
             movementProportion: 1.2,
             render: {
@@ -1638,6 +1639,7 @@ const whirlwind: Spell = {
         buffs: [
             {
                 type: "movement",
+                stack: "whirlwind",
                 movementProportion: 0.5,
                 maxTicks: 2 * TicksPerSecond,
                 against: Alliances.NotFriendly,
@@ -1967,6 +1969,7 @@ const iceBomb: Spell = {
         buffs: [
             {
                 type: "movement",
+                stack: "iceBomb",
                 movementProportion: 0.1,
                 maxTicks: 0.75 * TicksPerSecond,
                 against: Alliances.NotFriendly,
@@ -2061,6 +2064,7 @@ const horcrux: Spell = {
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
+                        stack: "horcrux",
                         maxTicks: 10,
                         movementProportion: 1,
                         render: {
