@@ -2657,7 +2657,7 @@ const vanish: Spell = {
 
 const armor: Spell = {
     id: 'armor',
-    name: 'Disruption',
+    name: 'Disrupt',
     description: "Passive ability. Disrupt incoming attacks, reducing their effectiveness.",
     effects: [
         {
