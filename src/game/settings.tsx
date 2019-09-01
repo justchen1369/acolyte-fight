@@ -2721,7 +2721,7 @@ const empower: Spell = {
         {
             icon: "fas fa-sword",
             title: "Empowered",
-            text: "Increase damage dealt by 20%.",
+            text: "Increase damage dealt by 15%.",
         },
     ],
 
@@ -2733,7 +2733,7 @@ const empower: Spell = {
         {
             type: "lifeSteal",
             passive: true,
-            damageMultiplier: 1.2,
+            damageMultiplier: 1.15,
         },
     ],
 
