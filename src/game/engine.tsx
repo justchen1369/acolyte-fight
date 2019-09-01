@@ -4271,11 +4271,10 @@ function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config
 	let stack: w.BurnBuff = null;
 	if (template.stack) {
 		// Extend existing stacks
-		hero.buffs.forEach(buff => {
-			if (buff && buff.type === "burn" && buff.fromHeroId === config.fromHeroId && buff.stack === template.stack) {
-				stack = buff;
-			}
-		});
+		const candidate = hero.buffs.get(id);
+		if (candidate && candidate.type === "burn") {
+			stack = candidate;
+		}
 	}
 
 	if (stack) {
