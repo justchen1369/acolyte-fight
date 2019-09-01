@@ -2227,7 +2227,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		let bumper = false;
 		hero.buffs.forEach(bump => {
 			if (bump.type === "bump") {
-				if (takeHit(bump, other.id, world)) {
+				if (takeHit(bump, other.id, world) && (calculateAlliance(hero.id, other.id, world) & Alliances.Enemy) > 0) {
 					magnitude += bump.impulse;
 					bumper = true;
 				}
