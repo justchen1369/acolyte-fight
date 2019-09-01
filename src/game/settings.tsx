@@ -2241,7 +2241,7 @@ const scourge: Spell = {
         maxImpulse: 0.002,
         renderTicks: 30,
     },
-    chargeTicks: 5 * TicksPerSecond,
+    chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
@@ -2255,7 +2255,7 @@ const scourge: Spell = {
     chargeBuffs: [
         {
             type: "mass",
-            maxTicks: 5 * TicksPerSecond,
+            maxTicks: 0.5 * TicksPerSecond,
             channelling: true,
             radius: Hero.Radius,
             density: 3 * Hero.Density,
