@@ -2059,8 +2059,8 @@ const horcrux: Spell = {
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
                 tickInterval: 5,
-                maxHits: 6,
-                packet: { damage: 6, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                maxHits: 9,
+                packet: { damage: 4, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
@@ -2761,7 +2761,7 @@ const bump: Spell = {
             type: "bump",
             passive: true,
             hitInterval: 15,
-            impulse: 0.000175,
+            impulse: 0.0002,
         },
     ],
 
