@@ -4190,6 +4190,14 @@ function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
 	}
 }
 
+function calculateBuffId(template: BuffTemplate, world: w.World, config: BuffContext) {
+	if (template.stack) {
+		return `${config.fromHeroId || "environment"}/${template.stack}`;
+	} else {
+		return `${template.type}-${world.nextBuffId++}`;
+	}
+}
+
 function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const maxTicks = (template.maxTicks || 0) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
 	const values: w.BuffValues = {
@@ -4241,7 +4249,7 @@ function updateCleanse(hero: w.Hero) {
 }
 
 function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4251,7 +4259,7 @@ function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world:
 }
 
 function attachGlide(template: GlideTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4266,7 +4274,7 @@ function detachGlide(buff: w.GlideBuff, hero: w.Hero, world: w.World) {
 }
 
 function attachLavaImmunity(template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4288,7 +4296,7 @@ function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, co
 }
 
 function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4301,7 +4309,7 @@ function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.Wor
 }
 
 function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${config.fromHeroId || "environment"}/burn`; // Only one burn per enemy
+	const id = calculateBuffId(template, world, config);
 	const values = calculateBuffValues(template, hero, world, config);
 
 	let stack: w.BurnBuff = null;
@@ -4374,7 +4382,7 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 }
 
 function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,
@@ -4390,7 +4398,7 @@ function detachArmor(buff: w.ArmorBuff, hero: w.Hero, world: w.World) {
 
 
 function attachMass(template: MassTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = `mass/${world.nextBuffId++}`; // always add a unique buff, never replace
 
 	const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
 	const fixture = hero.body.createFixture(pl.Circle(template.radius), {
@@ -4423,7 +4431,7 @@ function attachDelink(template: DelinkTemplate, hero: w.Hero, world: w.World, co
 }
 
 function attachBump(template: BumpTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = `${template.type}-${world.nextBuffId++}`;
+	const id = calculateBuffId(template, world, config);
 	hero.buffs.set(id, {
 		...calculateBuffValues(template, hero, world, config),
 		id,

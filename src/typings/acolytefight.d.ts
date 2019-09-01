@@ -717,6 +717,7 @@ declare type BuffTemplate =
 
 declare interface BuffTemplateBase {
 	type: string;
+	stack?: string; // If there is another buff with the same stack name as this, replace it, don't add another buff
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	cleansable?: boolean; // Whether this buff can be cleansed, defaults to true
 
