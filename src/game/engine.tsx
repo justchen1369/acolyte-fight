@@ -2241,6 +2241,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			hero.bumpTick = world.tick;
 			hero.hitTick = world.tick;
 			other.hitTick = world.tick;
+			other.strikeTick = world.tick;
 		}
 	}
 

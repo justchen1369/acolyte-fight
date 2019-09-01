@@ -1462,7 +1462,7 @@ const repeater: Spell = {
 };
 const drain: Spell = {
     id: 'drain',
-    description: "Steal some life from another player. They probably didn't need it anyway.",
+    description: "Steal some life from your enemy. They probably didn't need it anyway.",
     action: "projectile",
 
     color: '#22ee88',
@@ -2657,8 +2657,15 @@ const vanish: Spell = {
 
 const armor: Spell = {
     id: 'armor',
-    name: 'Battle Armor',
-    description: "Passive ability. Reduce all incoming damage by 15%. Applies to all forms of damage - from enemies and from the environment.",
+    name: 'Disruption',
+    description: "Passive ability. Disrupt incoming attacks, reducing their effectiveness.",
+    effects: [
+        {
+            icon: "fas fa-shield",
+            title: "Resistant",
+            text: "Reduce damage received by 20%. Applies to all forms of damage, including void damage.",
+        },
+    ],
 
     passive: true,
     untargeted: true,
@@ -2668,7 +2675,7 @@ const armor: Spell = {
         {
             type: "armor",
             passive: true,
-            proportion: -0.15,
+            proportion: -0.2,
         },
     ],
 
@@ -2679,8 +2686,15 @@ const armor: Spell = {
 
 const boost: Spell = {
     id: 'boost',
-    name: 'Energize',
-    description: "Passive ability. Increase your movement speed by 10%.",
+    name: 'Arcane Agility',
+    description: "Passive ability. Dodge even more effectively using your knowledge of the arcane.",
+    effects: [
+        {
+            icon: "fas fa-running",
+            title: "Fast",
+            text: "Increase movement speed by 10%.",
+        },
+    ],
 
     passive: true,
     untargeted: true,
@@ -2701,8 +2715,15 @@ const boost: Spell = {
 
 const empower: Spell = {
     id: 'empower',
-    name: 'Serum',
-    description: "Passive ability. Increase all damage dealt by 20%.",
+    name: 'Apex Acolyte',
+    description: "Passive ability. Your superior talents allow you to attack with increased effectiveness.",
+    effects: [
+        {
+            icon: "fas fa-sword",
+            title: "Empowered",
+            text: "Increase damage dealt by 20%.",
+        },
+    ],
 
     passive: true,
     untargeted: true,
@@ -2723,8 +2744,8 @@ const empower: Spell = {
 
 const bump: Spell = {
     id: 'bump',
-    name: 'Bump',
-    description: "Passive ability. Bump back any enemies who touch you.",
+    name: 'Reverberate',
+    description: "Passive ability. Reverberate sonic waves throughout your body. Knockback anyone you touch.",
 
     passive: true,
     untargeted: true,

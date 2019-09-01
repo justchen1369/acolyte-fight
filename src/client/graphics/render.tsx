@@ -2389,7 +2389,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 			const spell = world.settings.Spells[spellId];
 			if (!spell) { continue }
 
-			let color = spell.passive ? "#000" : spell.color;
+			let color = spell.passive ? "#111" : spell.color;
 			if (spell.id === hoverSpellId) {
 				color = ColTuple.parse(color).lighten(0.25).string();
 			}
@@ -2399,7 +2399,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 				color,
 				icon: spell.icon,
 				cooldownText: null,
-				emphasis: spell.passive ? 0.5 : 1,
+				emphasis: spell.passive ? 0.4 : 1,
 			};
 			buttonStateLookup.set(key.btn, btnState);
 		}
@@ -2706,8 +2706,8 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	if (isSelected) {
 		button.color = '#f0f0f0';
 	} else if (spell.passive) {
-		button.color = '#000';
-		button.emphasis = 0.5;
+		button.color = '#111';
+		button.emphasis = 0.4;
 	} else if (remainingInSeconds > 1) {
 		button.color = '#222';
 		button.emphasis = 0.7;
