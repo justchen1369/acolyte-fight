@@ -2667,7 +2667,7 @@ const armor: Spell = {
         {
             icon: "fas fa-shield",
             title: "Resistant",
-            text: "Reduce damage received by 20%. Applies to all forms of damage, including void damage.",
+            text: "Reduce damage received by 30%. Applies to all forms of damage, including void damage.",
         },
     ],
 
@@ -2679,7 +2679,7 @@ const armor: Spell = {
         {
             type: "armor",
             passive: true,
-            proportion: -0.2,
+            proportion: -0.3,
         },
     ],
 
@@ -2725,7 +2725,7 @@ const empower: Spell = {
         {
             icon: "fas fa-sword",
             title: "Empowered",
-            text: "Increase damage dealt by 20%.",
+            text: "Increase damage dealt by 30%.",
         },
     ],
 
@@ -2737,7 +2737,7 @@ const empower: Spell = {
         {
             type: "lifeSteal",
             passive: true,
-            damageMultiplier: 1.2,
+            damageMultiplier: 1.3,
         },
     ],
 
