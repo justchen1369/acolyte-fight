@@ -2032,11 +2032,9 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 		}
 
 		if (spell.buffs) {
-			spell.buffs.forEach(template => {
-				const id = `${spell.id}/${template.type}`;
-				instantiateBuff(id, template, hero, world, {
-					spellId: spell.id,
-				});
+			applyBuffsFrom(spell.buffs, hero.id, hero, world, {
+				tag: spell.id,
+				spellId: spell.id,
 			});
 		}
 	}
