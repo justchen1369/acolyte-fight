@@ -13,7 +13,7 @@ import { logger } from './logging';
 import { getStore } from './serverStore';
 
 const OnlineExpirySeconds = 20 * 60;
-const TextExpirySeconds = 2 * 60;
+const TextExpirySeconds = 1 * 60;
 
 let emitOnline: OnlineChangeListener = (diff) => {};
 
