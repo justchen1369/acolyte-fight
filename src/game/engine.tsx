@@ -66,7 +66,7 @@ type BehaviourHandlers = {
 	settings.linearSlop = 0.0001; // Must be smaller than every impulse used in the game
 	settings.linearSlopSquared = Math.pow(settings.linearSlop, 2.0);
 	settings.polygonRadius = (2.0 * settings.linearSlop);
-	settings.aabbExtension = 0.01;
+	settings.aabbExtension = 20 * settings.linearSlop;
 }
 
 export function version() {
