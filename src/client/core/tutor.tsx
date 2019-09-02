@@ -22,10 +22,9 @@ export function needsTutorial(state: s.State): boolean {
 }
 
 export function tutorialSettings(): matches.JoinParams {
-    const state = StoreProvider.getState();
     return {
         locked: m.LockType.Tutorial,
-        numBots: Math.min(3, state.tutorialLevel || 1),
+        numBots: 1,
     };
 }
 
