@@ -17,8 +17,7 @@ import { isMobile } from '../core/userAgent';
 
 interface Props {
     connected: boolean;
-    party: s.PartyState;
-    world: w.World;
+    exitable: boolean;
 }
 interface State {
 }
@@ -26,8 +25,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     const world = state.world;
     return {
-        world,
-        party: state.party,
+        exitable: matches.worldInterruptible(world),
         connected: !!state.socketId,
     };
 }
@@ -49,13 +47,12 @@ class PlayBar extends React.PureComponent<Props, State> {
     }
 
     private allowExit() {
-        const exitable = matches.worldInterruptible(this.props.world);
-        const allowExit = exitable || !this.props.connected;
-        return allowExit;
+        return this.props.exitable || !this.props.connected;
     }
 
     private onExitClicked() {
-        if (!(this.props.party)) {
+        const state = StoreProvider.getState();
+        if (!state.party) {
             // If in party, might get called back in at any time, so stay in fullscreen mode
             screenLifecycle.exitGame();
         }
