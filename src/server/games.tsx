@@ -307,6 +307,33 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	return game;
 }
 
+function cloneGame(template: g.Game): g.Game {
+	const gameIndex = getStore().nextGameId++;
+	const newId = uniqid("g" + gameIndex + "-");
+	let game: g.Game = {
+		...template,
+		id: newId,
+		active: new Map(template.active),
+		bots: new Map(template.bots),
+		controlKeys: new Map(template.controlKeys),
+		reconnectKeys: new Map(template.reconnectKeys),
+		playerNames: [...template.playerNames],
+		isRankedLookup: new Map(template.isRankedLookup),
+		socketIds: new Set(template.socketIds),
+		scores: new Map(template.scores),
+		actions: new Map(template.actions),
+		controlMessages: [...template.controlMessages],
+		history: template.history.map(tickMsg => ({ ...tickMsg, g: newId })),
+	};
+	return game;
+}
+
+// TODO
+function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
+	const other = cloneGame(initial);
+	return other;
+}
+
 export function assignPartyToGames(party: g.Party) {
 	const assignments = new Array<g.PartyGameAssignment>();
 	const store = getStore();
