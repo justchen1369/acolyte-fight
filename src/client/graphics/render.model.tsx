@@ -102,6 +102,7 @@ export interface AttribInfo {
 	buffer: WebGLBuffer;
 	size: number; // e.g. vec2 -> 2
 	type: number; // e.g. gl.FLOAT
+	allocated?: number;
 }
 
 export interface Texture2DInfo {

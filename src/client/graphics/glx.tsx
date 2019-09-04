@@ -49,10 +49,19 @@ function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.Uni
 
 	for (const attribName in draw.attribs) {
 		const attrib = draw.attribs[attribName];
+		const buffer = data.attribs[attribName].asArray();
+
 		gl.bindAttribLocation(draw.program, 0, attribName);
 		gl.enableVertexAttribArray(attrib.loc);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, data.attribs[attribName].asArray(), gl.STATIC_DRAW);
+
+		if (attrib.allocated && buffer.length <= attrib.allocated) {
+			gl.bufferSubData(gl.ARRAY_BUFFER, 0, buffer);
+		} else {
+			gl.bufferData(gl.ARRAY_BUFFER, buffer, gl.STATIC_DRAW);
+			attrib.allocated = buffer.length;
+		}
+
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
 	}
 
