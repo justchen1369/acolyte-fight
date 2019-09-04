@@ -91,22 +91,17 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		calculateCatchupTicks());
 	const unavailable = queueTicks(numTicks);
 
-	while (tickQueue.length > 0 && tickQueue[0].g != world.ui.myGameId) {
-		tickQueue.shift(); // Get rid of any leftover ticks from other games
-	}
+	while (tickQueue.length > 0) {
+		const next = tickQueue.shift();
+		if (next.g === world.ui.myGameId && next.t === world.tick) {
+			// Drain ticks from other queues or repeated ticks
+			processor.applyTick(next, world);
 
-	while (tickQueue.length > 0 && tickQueue[0].t <= world.tick) {
-		let tickData = tickQueue.shift();
-		if (tickData.t < world.tick) {
-			continue; // Received the same tick multiple times, skip over it
+			/*
+			const hash = engine.hash(world);
+			console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
+			*/
 		}
-
-		processor.applyTick(tickData, world);
-
-		/*
-		const hash = engine.hash(world);
-		console.log(`tick ${world.ui.myGameId} ${world.tick} ${hash}`);
-		*/
 	}
 
 	if (world.finished) {
