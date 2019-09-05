@@ -211,6 +211,7 @@ export interface Player {
 	isMobile: boolean;
 	nonIdle?: boolean;
 	dead?: boolean;
+	left?: boolean; // This was a human player who left
 
 	// Not synced across clients
 	uiBaseColor: string;

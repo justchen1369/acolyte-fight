@@ -439,29 +439,36 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 	}
 }
 
-export function leaveGame(game: g.Game, socketId: string) {
+export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true) {
 	let player = game.active.get(socketId);
 	if (!player) {
 		return;
 	}
 
 	game.active.delete(socketId);
-	reassignBots(game, player.heroId, socketId);
+	reassignBots(game, socketId);
 
-	const controlKey = acquireControlKey(player.heroId, game);
-	queueControlMessage(game, { heroId: player.heroId, controlKey: controlKey, type: "leave" });
+	let controlKey: number = null;
+	if (replaceWithBot) {
+		// Give the bot a new control key to avoid applying human messages to bot character or vice versa
+		// (particularly spell change actions which are permanent)
+		game.bots.set(player.heroId, null);
+		controlKey = acquireControlKey(player.heroId, game);
+	}
+
+	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave" });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }
 
-function reassignBots(game: g.Game, leavingHeroId: string, leftSocketId: string) {
+function reassignBots(game: g.Game, leftSocketId: string) {
 	if (game.active.size === 0) {
 		// No one to simulate the bots
 		game.bots.clear();
 		return;
 	}
 
-	const botsToReassign = [leavingHeroId];
+	const botsToReassign = new Array<string>();
 	game.bots.forEach((socketId, heroId) => {
 		if (socketId === leftSocketId) {
 			botsToReassign.push(heroId);

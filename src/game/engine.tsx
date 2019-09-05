@@ -1583,12 +1583,15 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 }
 
 function activateHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
+	hero.exitTick = null; // If previous hero was splitting, cancel
+
 	assignKeyBindingsToHero(hero, keyBindings, world);
 
 	if (world.tick < world.startTick) {
 		// Cleanse when a new player replaces another
 		hero.cleanseTick = world.tick;
 	}
+
 }
 
 function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
@@ -1645,20 +1648,31 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 			hero.exitTick = world.tick;
 
 			// Mark player as dead so they cannot reconnect to this game
-			const newPlayer = {
+			const newPlayer: w.Player = {
 				...player,
 				dead: true,
 			};
 
 			world.players = world.players.set(ev.heroId, newPlayer);
-		} else {
+		} else if (ev.controlKey) {
 			// Replace leaving hero with bot
-			const newPlayer = {
+			const newPlayer: w.Player = {
 				...player,
 				controlKey: ev.controlKey,
 				isBot: true,
 				isSharedBot: true,
 				isMobile: false,
+			};
+
+			world.players = world.players.set(ev.heroId, newPlayer);
+		} else {
+			// This player split off from this game
+			hero.exitTick = world.tick;
+
+			// Mark player as left so they don't get rated
+			const newPlayer: w.Player = {
+				...player,
+				left: true,
 			};
 
 			world.players = world.players.set(ev.heroId, newPlayer);
