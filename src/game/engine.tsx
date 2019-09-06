@@ -468,7 +468,7 @@ function addHero(world: w.World, heroId: string) {
 	const Hero = world.settings.Hero;
 	const World = world.settings.World;
 
-	const heroIndex = world.nextPositionId++;
+	const heroIndex = generateHeroIndex(world);
 	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
 
 	let position;
@@ -547,6 +547,23 @@ function addHero(world: w.World, heroId: string) {
 
 
 	return hero;
+}
+
+function generateHeroIndex(world: w.World) {
+	const Matchmaking = world.settings.Matchmaking;
+	for (let i = 0; i < Matchmaking.MaxPlayers; ++i) {
+		const heroId = formatHeroId(i);
+		if (!world.objects.has(heroId)) {
+			return i;
+		}
+	}
+
+	// Should never happen - more heroes than maximum allowed
+	return wu(world.objects.values()).filter(x => x.category === "hero").toArray().length;
+}
+
+export function formatHeroId(index: number): string {
+	return "hero" + index;
 }
 
 function applyPosDelta(obj: w.WorldObject, delta: pl.Vec2) {

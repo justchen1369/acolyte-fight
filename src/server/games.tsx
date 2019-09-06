@@ -11,16 +11,14 @@ import * as auth from './auth';
 import * as blacklist from './blacklist';
 import * as segments from '../shared/segments';
 import * as constants from '../game/constants';
+import * as engine from '../game/engine';
 import * as gameStorage from './gameStorage';
-import * as modder from './modder';
 import * as online from './online';
 import * as results from './results';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
-import { DefaultSettings } from '../game/settings';
-import { required, optional } from './schema';
 
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
@@ -374,10 +372,6 @@ export function assignPartyToGames(party: g.Party) {
 	return assignments;
 }
 
-function formatHeroId(index: number): string {
-	return "hero" + index;
-}
-
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
 	let currentPrecedence = actionPrecedence(game.actions.get(actionData.h));
 	let newPrecedence = actionPrecedence(actionData);
@@ -595,7 +589,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 	// No existing slots, create a new one
 	const newPlayersAllowed = game.joinable && game.active.size < game.matchmaking.MaxPlayers;
 	if (!heroId && newPlayersAllowed) {
-		heroId = formatHeroId(game.numPlayers++);
+		heroId = engine.formatHeroId(game.numPlayers++);
 	}
 
 	if (!heroId) {
@@ -671,7 +665,7 @@ export function addBot(game: g.Game) {
 	}
 
 	const replaceBots = false;
-	const heroId = findExistingSlot(game, replaceBots) || formatHeroId(game.numPlayers++);
+	const heroId = findExistingSlot(game, replaceBots) || engine.formatHeroId(game.numPlayers++);
 
 	game.bots.set(heroId, null);
 
@@ -690,7 +684,7 @@ function findExistingSlot(game: g.Game, replaceBots: boolean = true): string {
 	}
 
 	for (let i = 0; i < game.numPlayers; ++i) {
-		let candidate = formatHeroId(i);
+		let candidate = engine.formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {
 			return candidate;
 		}
