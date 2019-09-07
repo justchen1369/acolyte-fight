@@ -34,6 +34,11 @@ export function reset(history: m.TickMsg[], live: boolean) {
 	}
 }
 
+export function purge(universeId: number) {
+	tickQueue = tickQueue.filter(t => t.u !== universeId);
+	incomingQueue = incomingQueue.filter(t => t.u !== universeId);
+}
+
 function calculateTicksFromCurrentTime() {
 	const tickTarget = Math.floor((Date.now() - tickEpoch) / interval);
 	if (tickTarget > tickCounter) {

@@ -106,6 +106,11 @@ export function leaveCurrentGame(close: boolean = true) {
 			getSocket().emit('leave', leaveMsg);
 		}
 
+		const universeId = world.ui.universeId;
+		if (universeId) {
+			ticker.purge(world.ui.universeId);
+		}
+
 		if (close) {
 			StoreProvider.dispatch({ type: "leaveMatch" });
 		}
