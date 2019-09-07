@@ -67,6 +67,7 @@ export interface LeaveActionMsg extends ControlMsgBase {
     type: "leave";
     heroId: string;
     controlKey: number | null; // control key for the bot that is left behind, or null if should remove player
+    split?: boolean;
 }
 
 export interface CloseGameMsg extends ControlMsgBase {

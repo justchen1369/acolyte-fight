@@ -1602,7 +1602,11 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 }
 
 function activateHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
-	hero.exitTick = null; // If previous hero was splitting, cancel
+	if (hero.exitTick) {
+		// If previous hero was splitting, cancel
+		hero.exitTick = null;
+		hero.createTick = world.tick; // Re-animate arrival
+	}
 
 	assignKeyBindingsToHero(hero, keyBindings, world);
 

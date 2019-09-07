@@ -31,6 +31,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
 	games.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
+	games.attachToSplitEmitter(emitSplit);
 	games.attachFinishedGameListener(emitGameResult);
 	online.attachOnlineEmitter(emitOnline);
 }
@@ -798,6 +799,10 @@ function partyMembersToContract(party: g.Party) {
 		members.push(contract);
 	});
 	return members;
+}
+
+function emitSplit(oldGameId: string, newGameId: string, socketIds: Set<string>) {
+	correlations.split(oldGameId, newGameId, socketIds);
 }
 
 function emitGameResult(game: g.Game, result: m.GameStatsMsg) {

@@ -25,12 +25,17 @@ const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
 let emitTick: TickEmitter = null;
+let emitSplit: SplitEmitter = null;
 let ticksProcessing = false;
 
 const finishedGameListeners = new Array<FinishedGameListener>();
 
 export interface TickEmitter {
 	(gameId: string, data: m.TickMsg): void;
+}
+
+export interface SplitEmitter {
+	(oldGameId: string, newGameId: string, socketIds: Set<string>): void;
 }
 
 export interface FinishedGameListener {
@@ -42,8 +47,12 @@ export interface JoinResult {
 	reconnectKey: string;
 }
 
-export function attachToTickEmitter(_emit: TickEmitter) {
-	emitTick = _emit;
+export function attachToTickEmitter(emit: TickEmitter) {
+	emitTick = emit;
+}
+
+export function attachToSplitEmitter(emit: SplitEmitter) {
+	emitSplit = emit;
 }
 
 export function attachFinishedGameListener(listener: FinishedGameListener) {
@@ -330,8 +339,21 @@ function cloneGame(template: g.Game): g.Game {
 
 // TODO
 function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
-	const other = cloneGame(initial);
-	return other;
+	const allSocketIds = new Set(initial.active.keys());
+
+	const fork = cloneGame(initial);
+
+	const replaceWithBot = false;
+	allSocketIds.forEach(socketId => {
+		const split = splitSocketIds.has(socketId);
+		let prime = split ? fork : initial;
+		let other = split ? initial : fork;
+		leaveGame(other, socketId, replaceWithBot, true);
+	});
+
+	emitSplit(initial.id, fork.id, splitSocketIds);
+
+	return fork;
 }
 
 export function assignPartyToGames(party: g.Party) {
@@ -435,7 +457,7 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 	}
 }
 
-export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true) {
+export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split: boolean = false) {
 	let player = game.active.get(socketId);
 	if (!player) {
 		return;
@@ -452,7 +474,7 @@ export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolea
 		controlKey = acquireControlKey(player.heroId, game);
 	}
 
-	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave" });
+	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split });
 
 	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
 }

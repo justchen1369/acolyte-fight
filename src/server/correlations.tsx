@@ -28,3 +28,11 @@ export function reap(aliveSocketIds: Set<string>) {
         }
     });
 }
+
+export function split(oldGameId: string, newGameId: string, socketIds: Set<string>) {
+    correlations.forEach(correlation => {
+        if (correlation.gameId === oldGameId && socketIds.has(correlation.socketId)) {
+            correlation.gameId = newGameId;
+        }
+    });
+}
