@@ -130,7 +130,7 @@ export function onHeroMsg(data: m.HeroMsg) {
 
 	ticker.reset(data.history, data.live);
 
-	console.log("Joined game " + world.ui.myGameId + " as hero id " + world.ui.myHeroId, data.mod);
+	console.log("Joined game", world.ui.myGameId, world.ui.universeId, world.ui.myHeroId, data.mod);
 
 	StoreProvider.dispatch({ type: "joinMatch", world });
 	notify({

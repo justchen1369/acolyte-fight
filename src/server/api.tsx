@@ -278,6 +278,7 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
         // Found game locally
         const response: m.HeroMsg = {
             gameId: replay.id,
+            universeId: replay.universe,
             heroId: null,
             reconnectKey: null,
             userHash,

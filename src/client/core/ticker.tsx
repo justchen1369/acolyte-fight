@@ -93,7 +93,7 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 
 	while (tickQueue.length > 0) {
 		const next = tickQueue.shift();
-		if (next.g === world.ui.myGameId && next.t === world.tick) {
+		if (next.u === world.ui.universeId && next.t === world.tick) {
 			// Drain ticks from other queues or repeated ticks
 			processor.applyTick(next, world);
 
@@ -136,7 +136,7 @@ function aiTick(world: w.World) {
 
 export function onTickMsg(data: m.TickMsg) {
 	const world = StoreProvider.getState().world;
-	if (data.g === world.ui.myGameId) {
+	if (data.u === world.ui.universeId) {
 		incomingQueue.push(data);
 	}
 }

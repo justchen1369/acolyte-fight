@@ -108,6 +108,7 @@ export interface UIState {
 	myPartyId: string | null;
 	myUserHash: string | null;
 	reconnectKey: string | null;
+	universeId: number;
 	live: boolean;
 	locked?: string;
 	autoJoin?: boolean;

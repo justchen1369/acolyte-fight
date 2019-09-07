@@ -12,6 +12,7 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.myPartyId = data.partyId;
 	world.ui.myUserHash = data.userHash;
 	world.ui.reconnectKey = data.reconnectKey;
+	world.ui.universeId = data.universeId;
 	world.ui.live = data.live;
 	world.ui.locked = data.locked;
 	world.ui.autoJoin = data.autoJoin;
@@ -29,7 +30,7 @@ export function applyTick(tickData: m.TickMsg, world: w.World) {
 }
 
 function applyTickActions(tickData: m.TickMsg, world: w.World) {
-	if (tickData.g !== world.ui.myGameId) {
+	if (tickData.u !== world.ui.universeId) {
 		return;
 	}
 

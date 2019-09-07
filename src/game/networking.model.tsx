@@ -11,8 +11,8 @@ export namespace ActionType {
 }
 
 export interface TickMsg {
-    g: string;
-    t: number;
+    u: number; // universe ID
+    t: number; // tick
     a?: ActionMsg[];
     c?: ControlMsg[];
     s?: SyncMsg;
@@ -24,7 +24,7 @@ export type ActionMsg =
 
 export interface ActionMsgBase {
     type: string;
-    h: string;
+    h: string; // hero ID
 }
 
 export type ControlMsg =

@@ -51,6 +51,7 @@ export interface UserRating {
 
 export interface Replay {
     id: string;
+    universe: number;
     segment: string;
 
     roomId: string | null;

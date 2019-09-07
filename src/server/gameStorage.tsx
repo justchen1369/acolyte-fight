@@ -106,6 +106,7 @@ function gamePath(id: string) {
 function extractReplay(game: g.Game): g.Replay {
     const replay: g.Replay = {
         id: game.id,
+        universe: game.universe,
         segment: game.segment,
         roomId: game.roomId,
         partyId: game.partyId,

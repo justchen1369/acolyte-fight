@@ -16,6 +16,7 @@ import * as gameStorage from './gameStorage';
 import * as online from './online';
 import * as results from './results';
 import * as statsStorage from './statsStorage';
+import * as transientIds from './transientIds';
 import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
@@ -23,13 +24,13 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
-let emitTick: Emitter<m.TickMsg> = null;
+let emitTick: TickEmitter = null;
 let ticksProcessing = false;
 
 const finishedGameListeners = new Array<FinishedGameListener>();
 
-export interface Emitter<T> {
-	(data: T): void;
+export interface TickEmitter {
+	(gameId: string, data: m.TickMsg): void;
 }
 
 export interface FinishedGameListener {
@@ -41,7 +42,7 @@ export interface JoinResult {
 	reconnectKey: string;
 }
 
-export function attachToTickEmitter(_emit: Emitter<m.TickMsg>) {
+export function attachToTickEmitter(_emit: TickEmitter) {
 	emitTick = _emit;
 }
 
@@ -249,6 +250,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
+		universe: transientIds.generate(),
 		segment: segments.calculateSegment(room.id, partyId, isPrivate),
 		matchmaking: { ...room.Matchmaking },
 		roomId: room.id,
@@ -535,7 +537,7 @@ function gameTurn(game: g.Game) {
 	finishGameIfNecessary(game);
 
 	const data = {
-		g: game.id,
+		u: game.universe,
 		t: game.tick++,
 	} as m.TickMsg;
 
@@ -562,7 +564,7 @@ function gameTurn(game: g.Game) {
 			game.closeTick = Math.min(game.closeTick, game.tick); // New players cannot join without the full history
 		}
 	}
-	emitTick(data);
+	emitTick(game.id, data);
 
 	if (game.finished) {
 		game.bots.clear();

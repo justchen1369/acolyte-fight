@@ -29,7 +29,7 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
-	games.attachToTickEmitter(data => io.to(data.g).emit("tick", data));
+	games.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
 	games.attachFinishedGameListener(emitGameResult);
 	online.attachOnlineEmitter(emitOnline);
 }
@@ -718,6 +718,7 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 		const publicSegment = segments.publicSegment();
 		const msg: m.HeroMsg = {
 			gameId: game.id,
+			universeId: game.universe,
 			heroId,
 			userHash,
 			reconnectKey,
