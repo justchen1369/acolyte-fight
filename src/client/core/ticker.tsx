@@ -174,16 +174,16 @@ function sendSnapshot(world: w.World) {
 	sockets.getSocket().emit('sync', packet);
 }
 
-export function sendAction(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
+export function sendAction(correlationId: number, heroId: string, action: w.Action, controlKey?: number) {
 	const Precision = 1.0 / 1024;
 
-	if (!(gameId && heroId)) {
+	if (!(correlationId && heroId)) {
 		return;
 	}
 
 	const state = StoreProvider.getState();
 	const world = state.world;
-	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
+	if (!(world.ui.correlationId === correlationId && world.objects.has(heroId))) {
 		// Don't send any actions for dead heroes
 		return;
 	}
@@ -198,15 +198,15 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 	}
 
 	const packet: m.ActionMsgPacket = {
-		g: gameId,
+		r: correlationId,
 		a: actionMsg,
 		c: controlKey || lookupControlKey(heroId),
 	};
 	send(packet);
 }
 
-export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
-	if (!(gameId && heroId)) {
+export function sendKeyBindings(correlationId: number, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
+	if (!(correlationId && heroId)) {
 		return;
 	}
 
@@ -217,7 +217,7 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 	}
 
 	const packet: m.ActionMsgPacket = {
-		g: gameId,
+		r: correlationId,
 		a: actionMsg,
 		c: controlKey || lookupControlKey(heroId),
 	};

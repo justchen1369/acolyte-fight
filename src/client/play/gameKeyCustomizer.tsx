@@ -16,6 +16,7 @@ import { sendKeyBindings } from '../core/ticker';
 interface Props {
     btn: string;
     gameId: string;
+    correlationId: number;
     heroId: string;
     gameStarted: boolean;
     wheelOnRight: boolean;
@@ -32,6 +33,7 @@ function stateToProps(state: s.State): Props {
     return {
         btn: state.world.ui.toolbar.customizingBtn,
         gameId: state.world.ui.myGameId,
+        correlationId: state.world.ui.correlationId,
         heroId: state.world.ui.myHeroId,
         gameStarted: state.world.tick >= state.world.startTick,
         wheelOnRight: state.options.wheelOnRight,
@@ -75,7 +77,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private onChosen(keyBindings: KeyBindings, random?: boolean) {
-        sendKeyBindings(this.props.gameId, this.props.heroId, keyBindings);
+        sendKeyBindings(this.props.correlationId, this.props.heroId, keyBindings);
         this.close();
     }
 

@@ -15,8 +15,8 @@ const workers = new Map<string, AiWorker>();
 let workerCode: string = null;
 
 export interface SendContext {
-    action: (gameId: string, heroId: string, action: w.Action, controlKey: number) => void;
-    spells: (gameId: string, heroId: string, keyBindings: KeyBindings, controlKey: number) => void;
+    action: (correlationId: number, heroId: string, action: w.Action, controlKey: number) => void;
+    spells: (correlationId: number, heroId: string, keyBindings: KeyBindings, controlKey: number) => void;
 }
 
 export function onTick(world: w.World, send: SendContext) {
@@ -91,6 +91,7 @@ async function fetchWorkerCode() {
 
 class AiWorker {
     private gameId: string;
+    private correlationId: number;
     private heroId: string;
     private controlKey: number;
     private settings: AcolyteFightSettings;
@@ -101,6 +102,7 @@ class AiWorker {
 
     constructor(world: w.World, heroId: string, controlKey: number, send: SendContext) {
         this.gameId = world.ui.myGameId;
+        this.correlationId = world.ui.correlationId;
         this.heroId = heroId;
         this.controlKey = controlKey;
         this.settings = world.settings;
@@ -199,7 +201,7 @@ class AiWorker {
                 if (output.spells) {
                     const world = StoreProvider.getState().world;
                     if (engine.allowSpellChoosing(world, this.heroId)) {
-                        this.send.spells(this.gameId, this.heroId, output.spells, this.controlKey);
+                        this.send.spells(this.correlationId, this.heroId, output.spells, this.controlKey);
                     }
                 } else if (output.spellId) {
                     const world = StoreProvider.getState().world;
@@ -207,7 +209,7 @@ class AiWorker {
                     if (spellsAllowed || w.Actions.NonGameStarters.indexOf(output.spellId) !== -1) {
                         const delayMilliseconds = output.delayMilliseconds || DefaultDelayMilliseconds;
                         setTimeout(() => {
-                            this.send.action(this.gameId, this.heroId, {
+                            this.send.action(this.correlationId, this.heroId, {
                                 type: output.spellId,
                                 target: pl.Vec2(output.target),
                                 release: output.release,

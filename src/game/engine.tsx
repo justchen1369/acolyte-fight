@@ -129,6 +129,7 @@ export function initialWorld(mod: Object): w.World {
 			myHeroId: null,
 			myPartyId: null,
 			myUserHash: null,
+			correlationId: null,
 			universeId: null,
 			reconnectKey: null,
 			live: false,

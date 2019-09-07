@@ -3,6 +3,7 @@ import uniqid from 'uniqid';
 import wu from 'wu';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
+import * as correlations from './correlations';
 import * as segments from '../shared/segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
@@ -107,6 +108,11 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
+}
+
+export function cleanupCorrelations() {
+	const socketIds = new Set(Object.keys(io.sockets.connected));
+	correlations.reap(socketIds);
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
@@ -566,12 +572,27 @@ function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
 
 function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	try {
-		socket.leave(data.gameId);
+		if (!(required(data, "object")
+			&& required(data.correlationId, "number")
+		)) {
+			// callback({ success: false, error: "Bad request" });
+			return;
+		}
 
-		const game = getStore().activeGames.get(data.gameId);
+		const correlation = correlations.get(data.correlationId);
+		if (!(correlation && correlation.socketId === socket.id)) {
+			// Unauthorised
+			return;
+		}
+
+		socket.leave(correlation.gameId);
+
+		const game = getStore().activeGames.get(correlation.gameId);
 		if (game) {
 			games.leaveGame(game, socket.id);
 		}
+
+		correlations.destroy(correlation.id);
 	} catch (exception) {
 		logger.error(exception);
 	}
@@ -581,8 +602,8 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 	try {
 		if (!(required(data, "object")
 			&& required(data.a, "object")
-			&& required(data.g, "string")
 			&& required(data.a.type, "string")
+			&& required(data.r, "number")
 			&& (
 				(
 					data.a.type === m.ActionType.GameAction
@@ -600,10 +621,17 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 			return;
 		}
 
-		const game = getStore().activeGames.get(data.g);
-		if (game) {
-			games.receiveAction(game, data.c, data.a, socket.id);
+		const correlation = correlations.get(data.r);
+		if (!(correlation && correlation.socketId === socket.id)) {
+			return;
 		}
+
+		const game = getStore().activeGames.get(correlation.gameId);
+		if (!game) {
+			return;
+		}
+
+		games.receiveAction(game, data.c, data.a, socket.id);
 	} catch (exception) {
 		logger.error(exception);
 	}
@@ -712,13 +740,16 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 			return;
 		}
 
+		const correlation = correlations.create(socket.id, game.id);
 		socket.join(game.id);
+
 		const userHash = auth.getUserHashFromSocket(socket);
 
 		const publicSegment = segments.publicSegment();
 		const msg: m.HeroMsg = {
 			gameId: game.id,
 			universeId: game.universe,
+			correlationId: correlation.id,
 			heroId,
 			userHash,
 			reconnectKey,

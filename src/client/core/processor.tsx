@@ -11,6 +11,7 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;
 	world.ui.myUserHash = data.userHash;
+	world.ui.correlationId = data.correlationId;
 	world.ui.reconnectKey = data.reconnectKey;
 	world.ui.universeId = data.universeId;
 	world.ui.live = data.live;

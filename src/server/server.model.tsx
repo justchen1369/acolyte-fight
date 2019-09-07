@@ -109,6 +109,12 @@ export interface Player {
     numActionMessages: number;
 }
 
+export interface Correlation {
+    id: number;
+    socketId: string;
+    gameId: string;
+}
+
 export interface Room {
     id: string;
     created: moment.Moment;
