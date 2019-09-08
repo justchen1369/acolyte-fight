@@ -86,7 +86,7 @@ function startTickProcessing() {
 		const milliseconds = tickTimer.time(() => {
 			const running = new Array<g.Game>();
 			getStore().activeGames.forEach(game => {
-				const isGameRunning = gameTick(game);
+				const isGameRunning = gameTurn(game);
 				if (isGameRunning) {
 					running.push(game);
 				}
@@ -571,18 +571,18 @@ function finishGameIfNecessary(game: g.Game) {
 	game.controlMessages.push({ type: "finish" });
 }
 
-function gameTick(game: g.Game): boolean {
+function gameTurn(game: g.Game): boolean {
 	let running = isGameRunning(game) || game.actions.size > 0 || game.controlMessages.length > 0;
 	if (running) {
 		for (let i = 0; i < TicksPerTurn; ++i) {
-			gameTurn(game);
+			gameTick(game);
 		}
 	}
 
 	return running;
 }
 
-function gameTurn(game: g.Game) {
+function gameTick(game: g.Game) {
 	if (game.finished) {
 		return;
 	}
