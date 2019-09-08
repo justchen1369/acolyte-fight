@@ -202,6 +202,8 @@ export interface HeroMsg {
 
     live: boolean;
     history: c.TickMsg[];
+
+    splits?: c.SplitMsg[];
 }
 
 export interface CreatePartyRequest {

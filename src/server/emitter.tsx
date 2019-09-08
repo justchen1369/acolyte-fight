@@ -762,6 +762,7 @@ function emitHero(join: g.JoinResult) {
 			live: join.live,
 			autoJoin: join.autoJoin,
 			history: game.history,
+			splits: join.splits,
 		};
 		socket.emit('hero', msg);
 	} catch (exception) {

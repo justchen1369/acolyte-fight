@@ -124,12 +124,20 @@ export function watchReplayFromObject(data: m.HeroMsg) {
 export function onHeroMsg(data: m.HeroMsg) {
 	const store = StoreProvider.getState();
 
-	let world: w.World;
-	if (store.world.ui.myGameId === data.gameId) {
+	let world: w.World = null;
+	const existing = store.world;
+	if (existing.ui.myGameId === data.gameId) {
 		// Reconnect to game
 		console.log("Reconnecting to game", data.gameId);
-		world = store.world;
-	} else {
+		world = existing;
+	} else if (data.splits && data.splits.some(split => split.gameId === existing.ui.myGameId && existing.tick <= split.tick)) {
+		// Split the current game we are already in
+		console.log("Fast-forwarding to split game");
+
+		leaveCurrentGame(false);
+		world = existing;
+		processor.connectToWorld(world, data);
+	} else if (!world) {
 		leaveCurrentGame(false);
 		world = processor.initialWorld(data);
 	}

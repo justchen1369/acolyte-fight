@@ -105,3 +105,8 @@ export interface ObjectSyncMsg {
     y: number;
     h: number;
 }
+
+export interface SplitMsg {
+    gameId: string;
+    tick: number;
+}

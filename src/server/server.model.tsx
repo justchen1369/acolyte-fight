@@ -91,6 +91,7 @@ export interface Game extends Replay {
     controlMessages: m.ControlMsg[];
     syncMessage: m.SyncMsg;
 
+    splits: m.SplitMsg[];
     syncTick: number;
 }
 
@@ -173,7 +174,8 @@ export interface JoinResult {
 
 	heroId?: string;
 	reconnectKey?: string;
-	autoJoin?: boolean;
+    autoJoin?: boolean;
+    splits?: m.SplitMsg[];
 }
 
 export interface Scoreboard {

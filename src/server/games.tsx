@@ -283,6 +283,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		actions: new Map(),
 		controlMessages: [],
 		history: [],
+		splits: [],
 	};
 	if (room) {
 		room.accessed = moment();
@@ -341,7 +342,9 @@ function cloneGame(template: g.Game): g.Game {
 		actions: new Map(template.actions),
 		controlMessages: [...template.controlMessages],
 		history: template.history.map(t => ({ ...t, u: universe })),
+		splits: [...template.splits],
 	};
+	game.splits.push({ gameId: template.id, tick: template.tick });
 	registerGame(game);
 	return game;
 }
@@ -706,6 +709,8 @@ function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
 			heroId: player.heroId,
 			reconnectKey,
 			autoJoin: player.autoJoin,
+			
+			splits: game.splits,
 		};
 		emitJoin(join);
 		return join;

@@ -5,7 +5,11 @@ import * as engine from '../../game/engine';
 
 export function initialWorld(data: m.HeroMsg) {
 	let world = engine.initialWorld(data.mod);
+	connectToWorld(world, data);
+	return world;
+}
 
+export function connectToWorld(world: w.World, data: m.HeroMsg) {
 	world.ui.myRoomId = data.room;
 	world.ui.myGameId = data.gameId;
 	world.ui.myHeroId = data.heroId;
@@ -16,8 +20,6 @@ export function initialWorld(data: m.HeroMsg) {
 	world.ui.live = data.live;
 	world.ui.locked = data.locked;
 	world.ui.autoJoin = data.autoJoin;
-
-	return world;
 }
 
 export function isStartGameTick(tickData: m.TickMsg) {

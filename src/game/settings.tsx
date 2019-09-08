@@ -14,7 +14,7 @@ const lifeSteal = 0.25;
 const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
     MaxBots: 2,
-    MaxPlayers: 7,
+    MaxPlayers: 2, // TODO: undo
     TeamGameProbability: 0.5,
     AllowBotTeams: false,
 };
