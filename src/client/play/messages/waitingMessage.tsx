@@ -21,6 +21,7 @@ interface Props extends OwnProps {
     segment: string;
     locked: string;
     numOnline: number;
+    numHumans: number;
     numPlayers: number;
     exitable: boolean;
 }
@@ -35,6 +36,7 @@ function stateToProps(state: s.State): Props {
         segment: state.onlineSegment,
         locked: state.world.ui.locked,
         numOnline: state.online.size,
+        numHumans: state.world.activePlayers.size,
         numPlayers: state.world.players.size,
         exitable: worldInterruptible(state.world),
     };
@@ -50,7 +52,7 @@ class WaitingMessage extends React.PureComponent<Props, State> {
     }
 
     private renderOnline() {
-        if (!(this.props.myHeroId && this.props.isWaiting)) {
+        if (!(this.props.myHeroId && this.props.isWaiting && this.props.numHumans <= 1)) {
             return null;
         }
 
