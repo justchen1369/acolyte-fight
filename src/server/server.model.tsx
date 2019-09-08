@@ -76,6 +76,7 @@ export interface Game extends Replay {
     reconnectKeys: Map<string, string>; // key -> heroId
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
+    observers: Map<string, Observer>; // socketIds
 
     tick: number;
     winTick: number | null;
@@ -106,6 +107,15 @@ export interface Player {
     autoJoin?: boolean;
 
     numActionMessages: number;
+}
+
+export interface Observer {
+    socketId: string;
+    partyId: string;
+    userHash: string;
+    userId?: string;
+    name: string;
+    autoJoin?: boolean;
 }
 
 export interface Correlation {
@@ -154,6 +164,7 @@ export interface JoinParameters {
     version: string;
     reconnectKey?: string;
     autoJoin?: boolean;
+    live?: boolean;
 }
 
 export interface PartyMemberStatus {

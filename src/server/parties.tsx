@@ -128,7 +128,7 @@ export function isPartyReady(party: g.Party): boolean {
 export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignment[]) {
     for (const assignment of assignments) {
         const member = assignment.partyMember;
-        if (assignment.join) {
+        if (assignment.join && assignment.join.heroId) {
             // Unready after each game
             member.ready = false;
         }

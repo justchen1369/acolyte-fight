@@ -266,6 +266,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		created: moment(),
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
+		observers: new Map(),
 		controlKeys: new Map(),
 		reconnectKeys: new Map<string, string>(),
 		isRankedLookup: new Map<string, boolean>(),
@@ -334,6 +335,7 @@ function cloneGame(template: g.Game): g.Game {
 		universe,
 		active: new Map(template.active),
 		bots: new Map(template.bots),
+		observers: new Map(template.observers),
 		controlKeys: new Map(template.controlKeys),
 		reconnectKeys: new Map(template.reconnectKeys),
 		isRankedLookup: new Map(template.isRankedLookup),
@@ -349,10 +351,23 @@ function cloneGame(template: g.Game): g.Game {
 	return game;
 }
 
+function unassignBots(game: g.Game): g.Game {
+	// Open up all bots for reassignment
+	wu(game.bots.keys()).toArray().forEach((heroId) => {
+		game.bots.set(heroId, null);
+	});
+
+	return game;
+}
+
 function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 	// Create a copy of the initial game
 	const fork = cloneGame(initial);
 	const remainder = cloneGame(initial);
+
+	// Unassign bots as simulating players may need to change
+	unassignBots(fork);
+	unassignBots(remainder);
 
 	// Remove players from alternate game
 	const allSocketIds = new Set(initial.active.keys());
@@ -372,8 +387,14 @@ function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 		emitJoinForSocket(prime, socketId);
 	});
 
+	// Move observers
+	remainder.observers.clear();
+	fork.observers.forEach(observer => {
+		emitJoinForSocket(fork, observer.socketId);
+	});
+
 	// Destroy initial game
-	unregisterGame(initial);
+	initial.active.clear();
 
 	logger.info(`Game [${initial.id}] split into ${fork.id} (${fork.active.size} players) and ${remainder.id} (${remainder.active.size} players) at ${initial.tick} ticks`);
 
@@ -414,11 +435,7 @@ export function assignPartyToGames(party: g.Party) {
 		if (template) {
 			const observers = wu(party.active.values()).filter(p => p.ready && p.isObserver).toArray();
 			for (const observer of observers) {
-				const join: g.JoinResult = {
-					socketId: observer.socketId,
-					game: template.game,
-					live: template.live,
-				};
+				const join: g.JoinResult = observeGame(template.game as g.Game, observer);
 				assignments.push({ partyMember: observer, join });
 			}
 		}
@@ -489,28 +506,31 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 }
 
 export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split: string = null) {
-	let player = game.active.get(socketId);
-	if (!player) {
-		return;
+	const player = game.active.get(socketId);
+	if (player) {
+		game.active.delete(socketId);
+		reassignBots(game, socketId);
+
+		let controlKey: number = null;
+		if (replaceWithBot) {
+			// Give the bot a new control key to avoid applying human messages to bot character or vice versa
+			// (particularly spell change actions which are permanent)
+			game.bots.set(player.heroId, null);
+			controlKey = acquireControlKey(player.heroId, game);
+		}
+
+		queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split: !!split });
+
+		if (split) {
+			logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] split to ${split} after ${game.tick} ticks`);
+		} else {
+			logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] left after ${game.tick} ticks`);
+		}
 	}
-
-	game.active.delete(socketId);
-	reassignBots(game, socketId);
-
-	let controlKey: number = null;
-	if (replaceWithBot) {
-		// Give the bot a new control key to avoid applying human messages to bot character or vice versa
-		// (particularly spell change actions which are permanent)
-		game.bots.set(player.heroId, null);
-		controlKey = acquireControlKey(player.heroId, game);
-	}
-
-	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split: !!split });
-
-	if (split) {
-		logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] split to ${split} after ${game.tick} ticks`);
-	} else {
-		logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] left after ${game.tick} ticks`);
+	
+	const observer = game.observers.get(socketId);
+	if (observer) {
+		game.observers.delete(socketId);
 	}
 }
 
@@ -714,11 +734,44 @@ function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
 		};
 		emitJoin(join);
 		return join;
-	} else {
-		return null;
 	}
+	
+	const observer = game.observers.get(socketId);
+	if (observer) {
+		const join: g.JoinResult = {
+			socketId,
+			game,
+			live: true,
+
+			autoJoin: observer.autoJoin,
+			
+			splits: game.splits,
+		};
+		emitJoin(join);
+		return join;
+	}
+
+	return null;
 }
 
+export function observeGame(game: g.Game, params: g.JoinParameters): g.JoinResult {
+	game.observers.set(params.socketId, {
+		socketId: params.socketId,
+		userHash: params.userHash,
+		partyId: null,
+		name: params.name,
+		autoJoin: params.autoJoin,
+	});
+	return emitJoinForSocket(game, params.socketId);
+}
+
+export function replayGame(replay: g.Replay, params: g.JoinParameters) {
+	emitJoin({
+		socketId: params.socketId,
+		game: replay,
+		live: params.live,
+	});
+}
 
 function assignReconnectKey(game: g.Game, heroId: string) {
 	// Remove existing keys

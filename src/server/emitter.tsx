@@ -465,20 +465,24 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 	}
 
 	if (replay) {
+		const joinParams: g.JoinParameters = {
+			userHash,
+			name: playerName,
+			keyBindings: data.keyBindings,
+			isMobile: data.isMobile,
+			authToken,
+			unranked: data.unranked,
+			socketId: socket.id,
+			version: data.version,
+			reconnectKey: data.reconnectKey,
+			autoJoin: data.autoJoin,
+			live: data.live,
+		};
+
 		if (!data.observe) {
 			const game = store.activeGames.get(replay.id)
 			if (game) {
-				games.joinGame(game, {
-					userHash,
-					name: playerName,
-					keyBindings: data.keyBindings,
-					isMobile: data.isMobile,
-					authToken,
-					unranked: data.unranked,
-					socketId: socket.id,
-					version: data.version,
-					reconnectKey: data.reconnectKey,
-				});
+				games.joinGame(game, joinParams);
 
 				if (data.numBots) {
 					const numBots = Math.min(game.matchmaking.MaxPlayers, data.numBots);
@@ -492,15 +496,12 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] not found, cannot join`);
 			}
 		} else {
-			emitHero({
-				socketId: socket.id,
-				game: replay,
-				live: data.live,
-			});
-
-			if (data.live) {
-				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			const game = store.activeGames.get(replay.id)
+			if (game && data.live) {
+				games.observeGame(game, joinParams);
+				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] observing`);
 			} else {
+				games.replayGame(game, joinParams);
 				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] watching replay`);
 			}
 		}
