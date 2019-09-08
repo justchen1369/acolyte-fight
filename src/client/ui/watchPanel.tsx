@@ -12,8 +12,6 @@ import OnlineSegmentListener from '../controls/onlineSegmentListener';
 import WatchLooper from '../controls/watchLooper';
 
 interface Props {
-    profile: m.GetProfileResponse;
-    isLoggedIn: boolean;
     numOnline: number;
 }
 interface State {
@@ -21,8 +19,6 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        profile: state.profile,
-        isLoggedIn: state.loggedIn,
         numOnline: state.online.size,
     };
 }
@@ -31,49 +27,10 @@ class WatchPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            statsRetrieved: false,
         };
     }
 
-    componentDidMount() {
-        this.retrieveStatsIfNecessary();
-    }
-
-    private async retrieveStatsIfNecessary() {
-        if (!this.props.profile) {
-            await loader.loaded();
-            await rankings.retrieveMyStatsAsync();
-            this.setState({ statsRetrieved: true });
-        }
-    }
-
     render() {
-        if (this.props.isLoggedIn) {
-            if (!this.props.profile) {
-                return this.renderLoadingStats();
-            } else {
-                return this.renderWatching();
-            }
-        } else {
-            return this.renderNotLoggedIn();
-        }
-    }
-
-    private renderNotLoggedIn() {
-        return <div>
-            <h1>Spectate</h1>
-            <p className="login-ad"><div className="btn" onClick={() => window.location.href = "login"}>Login</div> to spectate live matches.</p>
-        </div>;
-    }
-
-    private renderLoadingStats() {
-        return <div>
-            <h1>Spectate</h1>
-            <p className="loading-text">Loading...</p>
-        </div>;
-    }
-
-    private renderWatching() {
         return <div>
             <h1>Spectate</h1>
             <p>{this.props.numOnline} players online.</p>
