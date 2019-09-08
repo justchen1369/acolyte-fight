@@ -11,7 +11,7 @@ import ButtonRow from './buttonRow';
 import { sendKeyBindings } from '../../core/ticker';
 
 interface Props {
-    correlationId: number;
+    gameId: string;
     heroId: string;
     allowSpellChoosing: boolean;
     config: KeyBindings;
@@ -22,7 +22,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        correlationId: state.world.ui.correlationId,
+        gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         config: state.keyBindings,
@@ -55,7 +55,7 @@ class RandomizePanel extends React.PureComponent<Props, State> {
 
         keyboardUtils.updateKeyBindings(config);
 
-        sendKeyBindings(this.props.correlationId, this.props.heroId, config);
+        sendKeyBindings(this.props.gameId, this.props.heroId, config);
     }
 }
 

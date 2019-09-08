@@ -115,7 +115,6 @@ function extractReplay(game: g.Game): g.Replay {
 
         mod: game.mod,
 
-        numPlayers: game.numPlayers,
         history: game.history,
     };
     return replay;

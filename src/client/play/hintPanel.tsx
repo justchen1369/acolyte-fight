@@ -18,7 +18,6 @@ import SpellIcon from '../controls/spellIcon';
 
 interface Props {
     myGameId: string;
-    correlationId: number;
     myHeroId: string;
     isFinished: boolean;
     customizingBtn: string;
@@ -41,7 +40,6 @@ function stateToProps(state: s.State): Props {
     const myHeroId = world.ui.myHeroId;
     return {
         myGameId: world.ui.myGameId,
-        correlationId: world.ui.correlationId,
         myHeroId,
         isFinished: !!world.winner || engine.isDead(myHeroId, world),
         customizingBtn: state.world.ui.toolbar.customizingBtn,
@@ -252,7 +250,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         keyBindings[spellKey] = spellId;
         keyboardUtils.updateKeyBindings(keyBindings);
 
-        ticker.sendKeyBindings(this.props.correlationId, this.props.myHeroId, keyBindings);
+        ticker.sendKeyBindings(this.props.myGameId, this.props.myHeroId, keyBindings);
         this.chooseRandomSpell();
     }
 }

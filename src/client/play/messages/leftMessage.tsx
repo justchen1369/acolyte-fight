@@ -27,13 +27,17 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 
 class LeftMessage extends React.PureComponent<Props, State> {
     render() {
-        if (this.props.isOnline) {
-            // If they left this match but still online, they didn't leave
-            return null;
-        }
-
         const notification = this.props.notification;
-        return <div className="row"><PlayerName player={notification.player} /> left</div>
+        if (notification.split) {
+            return <div className="row"><PlayerName player={notification.player} /> split</div>
+        } else {
+            if (this.props.isOnline) {
+                // If they left this match but still online, they didn't leave
+                return null;
+            } else {
+                return <div className="row"><PlayerName player={notification.player} /> left</div>
+            }
+        }
     }
 }
 

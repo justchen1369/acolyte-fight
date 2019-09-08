@@ -100,11 +100,8 @@ export function leaveCurrentGame(close: boolean = true) {
 	stats.save(store.world, store.server); // Note, this is async, but we don't care about waiting for it to finish
 
 	if (world.ui.myGameId) {
-		const correlationId = world.ui.correlationId;
-		if (correlationId) {
-			const leaveMsg: m.LeaveMsg = { correlationId };
-			getSocket().emit('leave', leaveMsg);
-		}
+		const leaveMsg: m.LeaveMsg = { gameId: world.ui.myGameId };
+		getSocket().emit('leave', leaveMsg);
 
 		const universeId = world.ui.universeId;
 		if (universeId) {

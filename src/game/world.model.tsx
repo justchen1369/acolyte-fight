@@ -108,7 +108,6 @@ export interface UIState {
 	myPartyId: string | null;
 	myUserHash: string | null;
 	reconnectKey: string | null;
-	correlationId: number;
 	universeId: number;
 	live: boolean;
 	locked?: string;
@@ -271,6 +270,7 @@ export interface BotNotification {
 export interface LeaveNotification {
 	type: "leave";
 	player: Player;
+	split?: boolean;
 }
 
 export interface KillNotification {

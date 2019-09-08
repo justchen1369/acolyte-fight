@@ -279,7 +279,6 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
         const response: m.HeroMsg = {
             gameId: replay.id,
             universeId: replay.universe,
-            correlationId: null,
             heroId: null,
             reconnectKey: null,
             userHash,

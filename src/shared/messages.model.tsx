@@ -66,7 +66,6 @@ export interface GameOptions {
 export interface ActionMsgPacket {
     a: c.ActionMsg;
     c: number; // control key
-    r: number; // correlation id
 }
 
 export interface SyncMsgPacket {
@@ -101,7 +100,7 @@ export interface BotMsg {
 }
 
 export interface LeaveMsg {
-    correlationId: number;
+    gameId: string;
 }
 
 export interface OnlineControlMsg {
@@ -188,7 +187,6 @@ export type JoinRoomResponseMsg = JoinRoomResponse | ErrorResponseMsg;
 
 export interface HeroMsg {
     gameId: string;
-    correlationId: number;
     universeId: number;
     heroId: string | null; // null means observer
     reconnectKey: string | null; // Use this to reconnect to the same hero ID

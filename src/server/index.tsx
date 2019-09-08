@@ -145,7 +145,6 @@ setInterval(async () => {
 		}
 
 		online.cleanupScoreboards();
-		emitter.cleanupCorrelations();
 	} catch (exception) {
 		logger.error(exception);
 	}

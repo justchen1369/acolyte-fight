@@ -311,7 +311,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const spell = world.settings.Spells[spellId];
         if (spell && !spell.passive) {
             if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
-                sendAction(world.ui.correlationId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             } else {
                 world.ui.nextSpellId = spellId;
             }
@@ -401,7 +401,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     spell = Spells.move;
                 }
                 if (spell && !spell.passive) {
-                    sendAction(world.ui.correlationId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
+                    sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
 
                     if (spell.id !== Spells.move.id) {
                         world.ui.nextSpellId = null;
@@ -416,7 +416,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                         target = this.clampToArena(target, hero, world);
                     }
                 }
-                sendAction(world.ui.correlationId, world.ui.myHeroId, { type: spellId, target });
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
             }
         }
     }
@@ -462,7 +462,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 this.handleCustomizeBtn(key);
             } else {
                 if (!spell.passive && world.ui.nextTarget) {
-                    sendAction(world.ui.correlationId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
+                    sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
                 }
             }
         }
@@ -493,7 +493,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const spell = world.settings.Spells[spellType];
         if (spell && spell.release) {
             if (!spell.passive && world.ui.nextTarget) {
-                sendAction(world.ui.correlationId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
+                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
             }
         }
     }

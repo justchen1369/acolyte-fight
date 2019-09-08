@@ -119,10 +119,9 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	direct(world, canvasStack, renderOptions);
 	render(world, canvasStack, renderOptions);
 
-	// Don't have to happen in animation frame
-	setTimeout(() => sendSnapshot(world), 1);
-	setTimeout(() => notificationTick(world), 1);
-	setTimeout(() => aiTick(world), 1);
+	sendSnapshot(world);
+	notificationTick(world);
+	aiTick(world);
 }
 
 function notificationTick(world: w.World) {
@@ -179,16 +178,16 @@ function sendSnapshot(world: w.World) {
 	sockets.getSocket().emit('sync', packet);
 }
 
-export function sendAction(correlationId: number, heroId: string, action: w.Action, controlKey?: number) {
+export function sendAction(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
 	const Precision = 1.0 / 1024;
 
-	if (!(correlationId && heroId)) {
+	if (!(gameId && heroId)) {
 		return;
 	}
 
 	const state = StoreProvider.getState();
 	const world = state.world;
-	if (!(world.ui.correlationId === correlationId && world.objects.has(heroId))) {
+	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
 		// Don't send any actions for dead heroes
 		return;
 	}
@@ -203,15 +202,14 @@ export function sendAction(correlationId: number, heroId: string, action: w.Acti
 	}
 
 	const packet: m.ActionMsgPacket = {
-		r: correlationId,
 		a: actionMsg,
 		c: controlKey || lookupControlKey(heroId),
 	};
 	send(packet);
 }
 
-export function sendKeyBindings(correlationId: number, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
-	if (!(correlationId && heroId)) {
+export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
+	if (!(gameId && heroId)) {
 		return;
 	}
 
@@ -222,7 +220,6 @@ export function sendKeyBindings(correlationId: number, heroId: string, keyBindin
 	}
 
 	const packet: m.ActionMsgPacket = {
-		r: correlationId,
 		a: actionMsg,
 		c: controlKey || lookupControlKey(heroId),
 	};

@@ -12,6 +12,7 @@ let store: g.ServerStore = {
     parties: new Map<string, g.Party>(),
     joinableGames: new Set<string>(),
     activeGames: new Map<string, g.Game>(),
+    assignments: new Map(),
     storedGameIds: new Set<string>(),
     recentTickMilliseconds: [],
 };

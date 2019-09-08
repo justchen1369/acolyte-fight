@@ -3,7 +3,6 @@ import uniqid from 'uniqid';
 import wu from 'wu';
 import * as auth from './auth';
 import * as blacklist from './blacklist';
-import * as correlations from './correlations';
 import * as segments from '../shared/segments';
 import * as games from './games';
 import { getAuthTokenFromSocket } from './auth';
@@ -30,6 +29,7 @@ const instanceId = uniqid('s-');
 export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
+	games.attachToJoinEmitter(emitHero);
 	games.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
 	games.attachToSplitEmitter(emitSplit);
 	games.attachFinishedGameListener(emitGameResult);
@@ -70,18 +70,22 @@ function onConnection(socket: SocketIO.Socket) {
     games.onConnect(socket.id, authToken);
 
 	socket.on('disconnect', () => {
+		const store = getStore();
+
 		const upstream = upstreams.get(socket.id);
 		if (upstream) {
 			upstream.disconnect();
 			upstreams.delete(socket.id);
 		}
 
-		--getStore().numConnections;
-		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
+		--store.numConnections;
+		store.assignments.delete(socket.id);
 
 		games.onDisconnect(socket.id, authToken);
 		const changedParties = parties.onDisconnect(socket.id);
 		changedParties.forEach(party => emitParty(party));
+
+		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
 	});
 
 	socket.use((packet: SocketIO.Packet, next) => {
@@ -109,11 +113,6 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
-}
-
-export function cleanupCorrelations() {
-	const socketIds = new Set(Object.keys(io.sockets.connected));
-	correlations.reap(socketIds);
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
@@ -379,9 +378,6 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 			logger.info(`Party ${party.id} started with ${party.active.size} players`);
 			const assignments = games.assignPartyToGames(party);
 			parties.onPartyStarted(party, assignments);
-			assignments.forEach(assignment => {
-				emitHero(assignment.partyMember.socketId, assignment.game, assignment.heroId, assignment.reconnectKey, true);
-			});
 		}
 
 		const result: m.PartyStatusResponse = {
@@ -469,13 +465,10 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 	}
 
 	if (replay) {
-		let heroId: string = null;
-		let reconnectKey: string = null;
-		let live = data.live || false;
 		if (!data.observe) {
 			const game = store.activeGames.get(replay.id)
 			if (game) {
-				const joinResult = games.joinGame(game, {
+				games.joinGame(game, {
 					userHash,
 					name: playerName,
 					keyBindings: data.keyBindings,
@@ -486,30 +479,32 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 					version: data.version,
 					reconnectKey: data.reconnectKey,
 				});
-				if (joinResult) {
-					heroId = joinResult.heroId;
-					reconnectKey = joinResult.reconnectKey;
-					live = true;
-				}
 
 				if (data.numBots) {
 					const numBots = Math.min(game.matchmaking.MaxPlayers, data.numBots);
 					for (let i = 0; i < numBots; ++i) {
-						games.addBot(replay as g.Game);
+						games.addBot(game);
 					}
 				}
+
+				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${game.active.size} players`);
+			} else {
+				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] not found, cannot join`);
+			}
+		} else {
+			emitHero({
+				socketId: socket.id,
+				game: replay,
+				live: data.live,
+			});
+
+			if (data.live) {
+				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
+			} else {
+				logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] watching replay`);
 			}
 		}
 
-		emitHero(socket.id, replay, heroId, reconnectKey, live, data.autoJoin);
-
-		if (heroId) {
-			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined, now ${replay.numPlayers} players`);
-		} else if (data.live) {
-			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] joined as observer`);
-		} else {
-			logger.info(`Game [${replay.id}]: player ${playerName} (${authToken}) [${socket.id}] watching replay`);
-		}
 		return { success: true };
 	} else {
 		logger.info(`Unable to find game [${data.gameId}] for ${playerName} (${authToken}) [${socket.id}]`);
@@ -574,26 +569,25 @@ function onScoreMsg(socket: SocketIO.Socket, data: m.GameStatsMsg) {
 function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	try {
 		if (!(required(data, "object")
-			&& required(data.correlationId, "number")
+			&& required(data.gameId, "string")
 		)) {
 			// callback({ success: false, error: "Bad request" });
 			return;
 		}
 
-		const correlation = correlations.get(data.correlationId);
-		if (!(correlation && correlation.socketId === socket.id)) {
-			// Unauthorised
-			return;
-		}
+		const gameId = data.gameId;
+		const store = getStore();
 
-		socket.leave(correlation.gameId);
+		socket.leave(gameId);
 
-		const game = getStore().activeGames.get(correlation.gameId);
+		const game = store.activeGames.get(gameId);
 		if (game) {
 			games.leaveGame(game, socket.id);
 		}
 
-		correlations.destroy(correlation.id);
+		if (store.assignments.get(socket.id) === gameId) {
+			store.assignments.delete(socket.id);
+		}
 	} catch (exception) {
 		logger.error(exception);
 	}
@@ -604,7 +598,6 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 		if (!(required(data, "object")
 			&& required(data.a, "object")
 			&& required(data.a.type, "string")
-			&& required(data.r, "number")
 			&& (
 				(
 					data.a.type === m.ActionType.GameAction
@@ -622,12 +615,13 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 			return;
 		}
 
-		const correlation = correlations.get(data.r);
-		if (!(correlation && correlation.socketId === socket.id)) {
+		const store = getStore();
+		const gameId = store.assignments.get(socket.id);
+		if (!gameId) {
 			return;
 		}
 
-		const game = getStore().activeGames.get(correlation.gameId);
+		const game = getStore().activeGames.get(gameId);
 		if (!game) {
 			return;
 		}
@@ -734,15 +728,22 @@ function onReplaysMsg(socket: SocketIO.Socket, authToken: string, data: m.GameLi
 	}
 }
 
-function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey: string, live: boolean = false, autoJoin?: boolean) {
+function emitHero(join: g.JoinResult) {
 	try {
-		const socket = io.sockets.connected[socketId];
+		if (!join) {
+			return;
+		}
+
+		const socket = io.sockets.connected[join.socketId];
 		if (!socket) {
 			return;
 		}
 
-		const correlation = correlations.create(socket.id, game.id);
+		const store = getStore();
+
+		const game = join.game;
 		socket.join(game.id);
+		store.assignments.set(socket.id, game.id);
 
 		const userHash = auth.getUserHashFromSocket(socket);
 
@@ -750,17 +751,16 @@ function emitHero(socketId: string, game: g.Replay, heroId: string, reconnectKey
 		const msg: m.HeroMsg = {
 			gameId: game.id,
 			universeId: game.universe,
-			correlationId: correlation.id,
-			heroId,
+			heroId: join.heroId,
 			userHash,
-			reconnectKey,
+			reconnectKey: join.reconnectKey,
 			locked: game.locked,
 			isPrivate: game.segment !== publicSegment,
 			partyId: game.partyId,
 			room: game.roomId,
 			mod: game.mod,
-			live,
-			autoJoin,
+			live: join.live,
+			autoJoin: join.autoJoin,
 			history: game.history,
 		};
 		socket.emit('hero', msg);
@@ -801,8 +801,11 @@ function partyMembersToContract(party: g.Party) {
 	return members;
 }
 
-function emitSplit(oldGameId: string, newGameId: string, socketIds: Set<string>) {
-	correlations.split(oldGameId, newGameId, socketIds);
+function emitSplit(socketId: string, oldGameId: string, newGameId: string) {
+	const store = getStore();
+	if (store.assignments.get(socketId) === oldGameId) {
+		store.assignments.set(socketId, newGameId);
+	}
 }
 
 function emitGameResult(game: g.Game, result: m.GameStatsMsg) {

@@ -10,6 +10,7 @@ export interface ServerStore {
     parties: Map<string, Party>; // id -> party
     joinableGames: Set<string>; // game ids
     activeGames: Map<string, Game>; // id -> game
+    assignments: Map<string, string>; // socketId -> gameId
     storedGameIds: Set<string>;
     recentTickMilliseconds: number[];
 }
@@ -61,7 +62,6 @@ export interface Replay {
 
     mod: Object;
 
-    numPlayers: number;
 	history: m.TickMsg[];
 }
 
@@ -74,11 +74,8 @@ export interface Game extends Replay {
     bots: Map<string, string>; // heroId -> socketId
     controlKeys: Map<string, number>; // heroId -> number
     reconnectKeys: Map<string, string>; // key -> heroId
-    playerNames: string[];
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
-
-    nextControlKey: number;
 
     tick: number;
     winTick: number | null;
@@ -105,6 +102,7 @@ export interface Player {
     userId?: string;
     name: string;
     unranked: boolean;
+    autoJoin?: boolean;
 
     numActionMessages: number;
 }
@@ -154,6 +152,7 @@ export interface JoinParameters {
     unranked: boolean;
     version: string;
     reconnectKey?: string;
+    autoJoin?: boolean;
 }
 
 export interface PartyMemberStatus {
@@ -163,10 +162,18 @@ export interface PartyMemberStatus {
 }
 
 export interface PartyGameAssignment {
-	partyMember: PartyMember;
-	game: Game;
-    heroId: string;
-    reconnectKey: string;
+    partyMember: PartyMember;
+    join: JoinResult;
+}
+
+export interface JoinResult {
+	socketId: string;
+	game: Replay;
+	live: boolean;
+
+	heroId?: string;
+	reconnectKey?: string;
+	autoJoin?: boolean;
 }
 
 export interface Scoreboard {

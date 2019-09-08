@@ -129,7 +129,6 @@ export function initialWorld(mod: Object): w.World {
 			myHeroId: null,
 			myPartyId: null,
 			myUserHash: null,
-			correlationId: null,
 			universeId: null,
 			reconnectKey: null,
 			live: false,
@@ -1575,6 +1574,10 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 
 	activateHero(hero, ev.keyBindings, world);
 
+	// Temporarily remove from active players to make the old color available
+	// so if a player is re-connecting, we can re-use their preferred color.
+	world.activePlayers = world.activePlayers.delete(hero.id);
+
 	const preferredColor = colorWheel.getPreferredColor(ev.userHash);
 	const uiBaseColor = chooseNewPlayerColor(preferredColor, world);
 	colorWheel.setPreferredColor(ev.userHash, uiBaseColor);
@@ -1655,7 +1658,7 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 }
 
 function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
-	console.log("Player left:", ev.heroId);
+	console.log(`Player left: ${ev.heroId} split=${ev.split} controlKey=${ev.controlKey}`);
 	const player = world.players.get(ev.heroId);
 	if (!player) {
 		return true;
@@ -1663,7 +1666,7 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 
 	world.activePlayers = world.activePlayers.delete(ev.heroId);
 
-	world.ui.notifications.push({ type: "leave", player });
+	world.ui.notifications.push({ type: "leave", player, split: ev.split });
 
 	const hero = world.objects.get(ev.heroId);
 	if (hero && hero.category == "hero") {
@@ -3639,14 +3642,18 @@ function notifyWin(world: w.World) {
 }
 
 function isGameWon(world: w.World) {
-	const heroes = wu(world.objects.values()).filter(x => x.category === "hero").toArray() as w.Hero[];
-	if (heroes.length === 0) {
+	if (world.tick < world.startTick) {
+		return false;
+	}
+
+	const aliveHeroIds = world.players.keySeq().filter(heroId => world.objects.has(heroId)).toArray();
+	if (aliveHeroIds.length === 0) {
 		return true;
 	}
 
-	const firstTeamId = getTeam(heroes[0].id, world);
-	for (let i = 1; i < heroes.length; ++i) {
-		if (getTeam(heroes[i].id, world) !== firstTeamId) {
+	const firstTeamId = getTeam(aliveHeroIds[0], world);
+	for (let i = 1; i < aliveHeroIds.length; ++i) {
+		if (getTeam(aliveHeroIds[i], world) !== firstTeamId) {
 			// Multiple teams are alive, no winner
 			return false;
 		}

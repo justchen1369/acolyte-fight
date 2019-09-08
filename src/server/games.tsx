@@ -24,27 +24,31 @@ import { logger } from './logging';
 const NanoTimer = require('nanotimer');
 const tickTimer = new NanoTimer();
 
+let emitJoin: JoinEmitter = null;
 let emitTick: TickEmitter = null;
 let emitSplit: SplitEmitter = null;
 let ticksProcessing = false;
 
 const finishedGameListeners = new Array<FinishedGameListener>();
 
+export interface JoinEmitter {
+	(join: g.JoinResult): void;
+}
+
 export interface TickEmitter {
 	(gameId: string, data: m.TickMsg): void;
 }
 
 export interface SplitEmitter {
-	(oldGameId: string, newGameId: string, socketIds: Set<string>): void;
+	(socketId: string, oldGameId: string, newGameId: string): void;
 }
 
 export interface FinishedGameListener {
 	(game: g.Game, result: m.GameStatsMsg): void;
 }
 
-export interface JoinResult {
-	heroId: string;
-	reconnectKey: string;
+export function attachToJoinEmitter(emit: JoinEmitter) {
+	emitJoin = emit;
 }
 
 export function attachToTickEmitter(emit: TickEmitter) {
@@ -103,48 +107,24 @@ function startTickProcessing() {
 export function findNewGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
-	const store = getStore();
-	const MaxPlayers = room.Matchmaking.MaxPlayers;
 
-	let numPlayers = 0;
-	const scoreboard = store.scoreboards.get(segment);
-	if (scoreboard) {
-		numPlayers = scoreboard.online.size;
-		newUserHashes.forEach(userHash => {
-			if (!scoreboard.online.has(userHash)) {
-				++numPlayers;
-			}
-		});
-	}
-
-	let openGames = new Array<g.Game>();
-	store.joinableGames.forEach(gameId => {
-		const g = store.activeGames.get(gameId);
-		if (g && g.joinable) {
-			if (g.segment === segment && (g.active.size + newUserHashes.length) <= MaxPlayers) {
-				openGames.push(g);
-			}
-		} else {
-			// This entry shouldn't be in here - perhaps it was terminated before it could be removed
-			store.joinableGames.delete(gameId);
-		}
-	});
-
-	const targetPlayersPerGame = numPlayers > MaxPlayers ? apportionPerGame(numPlayers, MaxPlayers) : MaxPlayers;
+	const numJoining = newUserHashes.length;
+	const openGames = findJoinableGames(segment);
 
 	let game: g.Game = null;
 	if (openGames.length > 0) {
-		let minSize = Infinity;
-		openGames.forEach(g => {
-			const size = g.active.size;
-			if (size < MaxPlayers && size < minSize) {
-				minSize = size;
-				game = g;
-			}
-		});
+		// TODO: Choose game with closest skill level
+		game = _.minBy(openGames, game => game.active.size);
+
 	}
-	if (game && game.active.size >= targetPlayersPerGame && openGames.length <= 1) {
-		// Start a new game early to stop a single player ending up in the same game
+
+	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
+		// Game too full to add one more player, split it
+		game = autoSplitGame(game, numJoining);
+	}
+
+	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
+		// Still too big
 		game = null;
 	}
 
@@ -152,6 +132,25 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 		game = initGame(version, room, partyId, isPrivate);
 	}
 	return game;
+}
+
+function findJoinableGames(segment: string) {
+	const store = getStore();
+
+	const openGames = new Array<g.Game>();
+	store.joinableGames.forEach(gameId => {
+		const g = store.activeGames.get(gameId);
+		if (g && g.joinable) {
+			if (g.segment === segment) {
+				openGames.push(g);
+			}
+		}
+		else {
+			// This entry shouldn't be in here - perhaps it was terminated before it could be removed
+			store.joinableGames.delete(gameId);
+		}
+	});
+	return openGames;
 }
 
 export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean): g.Game {
@@ -254,8 +253,6 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 }
 
 export function initGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, locked: string = null) {
-	const store = getStore();
-
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
@@ -271,11 +268,8 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		bots: new Map<string, string>(),
 		controlKeys: new Map(),
 		reconnectKeys: new Map<string, string>(),
-		playerNames: new Array<string>(),
 		isRankedLookup: new Map<string, boolean>(),
 		socketIds: new Set<string>(),
-		numPlayers: 0,
-		nextControlKey: 0,
 		winTick: null,
 		syncTick: 0,
 		syncMessage: null,
@@ -290,14 +284,11 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		controlMessages: [],
 		history: [],
 	};
-	store.activeGames.set(game.id, game);
-	if (!locked) {
-		store.joinableGames.add(game.id);
-	}
 	if (room) {
 		room.accessed = moment();
 	}
 
+	registerGame(game);
 	queueControlMessage(game, {
 		type: m.ActionType.Environment,
 		seed: gameIndex,
@@ -316,42 +307,72 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	return game;
 }
 
+function registerGame(game: g.Game) {
+	const store = getStore();
+
+	store.activeGames.set(game.id, game);
+	if (game.joinable && !game.locked) {
+		store.joinableGames.add(game.id);
+	}
+}
+
+function unregisterGame(game: g.Game) {
+	const store = getStore();
+
+	store.activeGames.delete(game.id);
+	store.joinableGames.delete(game.id);
+}
+
 function cloneGame(template: g.Game): g.Game {
 	const gameIndex = getStore().nextGameId++;
 	const newId = uniqid("g" + gameIndex + "-");
-	let game: g.Game = {
+	const universe = transientIds.generate();
+	const game: g.Game = {
 		...template,
 		id: newId,
+		universe,
 		active: new Map(template.active),
 		bots: new Map(template.bots),
 		controlKeys: new Map(template.controlKeys),
 		reconnectKeys: new Map(template.reconnectKeys),
-		playerNames: [...template.playerNames],
 		isRankedLookup: new Map(template.isRankedLookup),
 		socketIds: new Set(template.socketIds),
 		scores: new Map(template.scores),
 		actions: new Map(template.actions),
 		controlMessages: [...template.controlMessages],
-		history: template.history.map(tickMsg => ({ ...tickMsg, g: newId })),
+		history: template.history.map(t => ({ ...t, u: universe })),
 	};
+	registerGame(game);
 	return game;
 }
 
-// TODO
 function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
-	const allSocketIds = new Set(initial.active.keys());
-
+	// Create a copy of the initial game
 	const fork = cloneGame(initial);
+	const remainder = cloneGame(initial);
 
+	// Remove players from alternate game
+	const allSocketIds = new Set(initial.active.keys());
 	const replaceWithBot = false;
 	allSocketIds.forEach(socketId => {
 		const split = splitSocketIds.has(socketId);
-		let prime = split ? fork : initial;
-		let other = split ? initial : fork;
-		leaveGame(other, socketId, replaceWithBot, true);
+		const prime = split ? fork : remainder;
+		const other = split ? remainder : fork;
+		leaveGame(other, socketId, replaceWithBot, prime.id);
 	});
 
-	emitSplit(initial.id, fork.id, splitSocketIds);
+	// Move players to new game
+	allSocketIds.forEach(socketId => {
+		const split = splitSocketIds.has(socketId);
+		const prime = split ? fork : remainder;
+		emitSplit(socketId, initial.id, prime.id);
+		emitJoinForSocket(prime, socketId);
+	});
+
+	// Destroy initial game
+	unregisterGame(initial);
+
+	logger.info(`Game [${initial.id}] split into ${fork.id} (${fork.active.size} players) and ${remainder.id} (${remainder.active.size} players) at ${initial.tick} ticks`);
 
 	return fork;
 }
@@ -380,16 +401,23 @@ export function assignPartyToGames(party: g.Party) {
 		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, group.map(p => p.userHash));
 		for (const member of group) {
 			const joinParams: g.JoinParameters = { ...member, partyHash };
-			const joinResult = joinGame(game, joinParams);
-			assignments.push({ partyMember: member, game, ...joinResult });
+			const join = joinGame(game, joinParams);
+			assignments.push({ partyMember: member, join });
 		}
 	}
 
 	if (assignments.length > 0) {
-		const observers = wu(party.active.values()).filter(p => p.ready && p.isObserver).toArray();
-		const game = assignments[0].game;
-		for (const observer of observers) {
-			assignments.push({ game, partyMember: observer, heroId: null, reconnectKey: null });
+		const template = assignments[0].join;
+		if (template) {
+			const observers = wu(party.active.values()).filter(p => p.ready && p.isObserver).toArray();
+			for (const observer of observers) {
+				const join: g.JoinResult = {
+					socketId: observer.socketId,
+					game: template.game,
+					live: template.live,
+				};
+				assignments.push({ partyMember: observer, join });
+			}
 		}
 	}
 
@@ -457,7 +485,7 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 	}
 }
 
-export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split: boolean = false) {
+export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split: string = null) {
 	let player = game.active.get(socketId);
 	if (!player) {
 		return;
@@ -474,9 +502,13 @@ export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolea
 		controlKey = acquireControlKey(player.heroId, game);
 	}
 
-	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split });
+	queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split: !!split });
 
-	logger.info("Game [" + game.id + "]: player " + player.name + " [" + socketId + "] left after " + game.tick + " ticks");
+	if (split) {
+		logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] split to ${split} after ${game.tick} ticks`);
+	} else {
+		logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] left after ${game.tick} ticks`);
+	}
 }
 
 function reassignBots(game: g.Game, leftSocketId: string) {
@@ -590,7 +622,7 @@ function gameTurn(game: g.Game) {
 
 	if (game.finished) {
 		game.bots.clear();
-		getStore().activeGames.delete(game.id);
+		unregisterGame(game);
 		gameStorage.saveGame(game);
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 	}
@@ -600,20 +632,23 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
-	leaveGame(game, params.socketId);
-
+export function joinGame(game: g.Game, params: g.JoinParameters): g.JoinResult {
 	let heroId: string = null;
 	if (params.reconnectKey) {
-		heroId = game.reconnectKeys.get(params.reconnectKey);
-	} else {
-		heroId = findExistingSlot(game);
+		const candidate = game.reconnectKeys.get(params.reconnectKey);
+		if (candidate && !game.active.has(candidate)) {
+			// Reconnect
+			heroId = candidate;
+		}
 	}
 
-	// No existing slots, create a new one
-	const newPlayersAllowed = game.joinable && game.active.size < game.matchmaking.MaxPlayers;
-	if (!heroId && newPlayersAllowed) {
-		heroId = engine.formatHeroId(game.numPlayers++);
+	if (!heroId && !game.joinable) {
+		// Not allowed to join a game in-progress
+		return null;
+	}
+
+	if (!heroId) {
+		heroId = findSlot(game);
 	}
 
 	if (!heroId) {
@@ -628,19 +663,10 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		partyId: null,
 		name: params.name,
 		unranked: params.unranked,
+		autoJoin: params.autoJoin,
 		numActionMessages: 0,
 	});
 	game.bots.delete(heroId);
-	game.playerNames.push(params.name);
-
-	// Replace reconnectKey
-	game.reconnectKeys.forEach((otherHeroId, otherReconnectKey) => {
-		if (otherHeroId === heroId) {
-			game.reconnectKeys.delete(otherReconnectKey);
-		}
-	});
-	const reconnectKey = uniqid("k-");
-	game.reconnectKeys.set(reconnectKey, heroId);
 
 	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
 		game.isRankedLookup.set(userId, !params.unranked);
@@ -665,18 +691,62 @@ export function joinGame(game: g.Game, params: g.JoinParameters): JoinResult {
 		}
 	});
 
-	return { heroId, reconnectKey };
+	return emitJoinForSocket(game, params.socketId);
+}
+
+function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
+	const player = game.active.get(socketId);
+	if (player) {
+		const reconnectKey = assignReconnectKey(game, player.heroId);
+		const join: g.JoinResult = {
+			socketId,
+			game,
+			live: true,
+
+			heroId: player.heroId,
+			reconnectKey,
+			autoJoin: player.autoJoin,
+		};
+		emitJoin(join);
+		return join;
+	} else {
+		return null;
+	}
+}
+
+
+function assignReconnectKey(game: g.Game, heroId: string) {
+	// Remove existing keys
+	game.reconnectKeys.forEach((otherHeroId, otherReconnectKey) => {
+		if (otherHeroId === heroId) {
+			game.reconnectKeys.delete(otherReconnectKey);
+		}
+	});
+
+	// Assign new key
+	const reconnectKey = uniqid("k-");
+	game.reconnectKeys.set(reconnectKey, heroId);
+
+	return reconnectKey;
+}
+
+function autoSplitGame(game: g.Game, numJoining: number): g.Game {
+	const playerLimit = apportionPerGame(game.active.size + numJoining, game.matchmaking.MaxPlayers);
+	const toRemove = Math.max(numJoining, game.active.size - playerLimit);
+	const splitSocketIds = new Set<string>(wu(game.active.keys()).take(toRemove).toArray());
+	return splitGame(game, splitSocketIds);
 }
 
 function acquireControlKey(heroId: string, game: g.Game) {
-	const controlKey = game.nextControlKey++;
+	const controlKey = transientIds.generate();
 	game.controlKeys.set(heroId, controlKey);
 	return controlKey;
 }
 
 export function addBots(game: g.Game) {
 	const targetGameSize = 1 + game.matchmaking.MinBots + Math.round(Math.random() * (game.matchmaking.MaxBots - game.matchmaking.MinBots));
-	const botsToAdd = Math.max(1, targetGameSize - game.numPlayers);
+	const numPlayers = game.active.size + game.bots.size;
+	const botsToAdd = Math.max(1, targetGameSize - numPlayers);
 	for (let i = 0; i < botsToAdd; ++i) {
 		addBot(game);
 	}
@@ -684,12 +754,13 @@ export function addBots(game: g.Game) {
 }
 
 export function addBot(game: g.Game) {
-	if (game.numPlayers >= game.matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
+	const numPlayers = game.active.size + game.bots.size;
+	if (numPlayers >= game.matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
 		return null;
 	}
 
 	const replaceBots = false;
-	const heroId = findExistingSlot(game, replaceBots) || engine.formatHeroId(game.numPlayers++);
+	const heroId = findSlot(game, replaceBots);
 
 	game.bots.set(heroId, null);
 
@@ -700,14 +771,15 @@ export function addBot(game: g.Game) {
 	return heroId;
 }
 
-function findExistingSlot(game: g.Game, replaceBots: boolean = true): string {
+function findSlot(game: g.Game, replaceBots: boolean = true): string {
 	// Take an existing slot, if possible
 	let activeHeroIds = new Set<string>(wu(game.active.values()).map(x => x.heroId));
 	if (!replaceBots) {
 		wu(game.bots.keys()).forEach(heroId => activeHeroIds.add(heroId));
 	}
 
-	for (let i = 0; i < game.numPlayers; ++i) {
+	const maxPlayers = game.matchmaking.MaxPlayers;
+	for (let i = 0; i < maxPlayers; ++i) {
 		let candidate = engine.formatHeroId(i);
 		if (!activeHeroIds.has(candidate)) {
 			return candidate;
