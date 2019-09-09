@@ -77,6 +77,7 @@ export interface JoinMsg {
     server: string;
     gameId: string | null;
     room: string | null;
+    partyId: string | null;
     name: string;
     keyBindings: KeyBindings;
     isMobile: boolean;

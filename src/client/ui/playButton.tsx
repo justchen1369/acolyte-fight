@@ -4,6 +4,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as options from '../options';
 import * as matches from '../core/matches';
+import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as rooms from '../core/rooms';
 import * as screenLifecycle from './screenLifecycle';
@@ -212,7 +213,15 @@ class PlayButton extends React.PureComponent<Props, State> {
             if (ready) {
                 screenLifecycle.enterGame();
             }
-            parties.updateReadyStatusAsync(ready);
+
+            const self = party.members.find(m => m.socketId === this.props.selfId);
+            if (self && self.isObserver && ready) {
+                // Doesn't mean anything for an observer to be ready, they just watch
+                pages.changePage("watch");
+                matches.leaveCurrentGame(true);
+            } else {
+                parties.updateReadyStatusAsync(ready);
+            }
         }
     }
 }

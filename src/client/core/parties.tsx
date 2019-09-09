@@ -151,7 +151,7 @@ export async function makeObserverAsync(memberId: string, isObserver: boolean): 
 		return;
 	}
 
-	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isObserver });
+	return updatePartyStatusAsync({ partyId: store.party.id, memberId, isObserver, isReady: false });
 }
 
 export async function updateReadyStatusAsync(isReady: boolean): Promise<void> {

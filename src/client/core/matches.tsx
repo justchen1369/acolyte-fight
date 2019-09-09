@@ -36,6 +36,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				name: store.playerName,
 				keyBindings: store.keyBindings,
 				room: opts.roomId || store.room.id,
+				partyId: store.party ? store.party.id : null,
 				isMobile,
 				unranked: store.options.unranked || false,
 				observe,

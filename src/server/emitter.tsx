@@ -33,6 +33,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	games.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
 	games.attachToSplitEmitter(emitSplit);
 	games.attachFinishedGameListener(emitGameResult);
+	parties.attachToPartyEmitter(emitParty);
 	online.attachOnlineEmitter(emitOnline);
 }
 
@@ -82,8 +83,7 @@ function onConnection(socket: SocketIO.Socket) {
 		store.assignments.delete(socket.id);
 
 		games.onDisconnect(socket.id, authToken);
-		const changedParties = parties.onDisconnect(socket.id);
-		changedParties.forEach(party => emitParty(party));
+		parties.onDisconnect(socket.id);
 
 		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
 	});
@@ -371,12 +371,6 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 			parties.removePartyMember(party, memberId);
 		}
 
-		if (parties.isPartyReady(party)) {
-			logger.info(`Party ${party.id} started with ${party.active.size} players`);
-			const assignments = games.assignPartyToGames(party);
-			parties.onPartyStarted(party, assignments);
-		}
-
 		const result: m.PartyStatusResponse = {
 			success: true,
 		};
@@ -390,6 +384,8 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 				memberSocket.leave(party.id);
 			}
 		}
+
+		parties.startPartyIfReady(party);
 	} catch (exception) {
 		logger.error(exception);
 		callback({ success: false, error: `${exception}` });
@@ -446,8 +442,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			return { success: false, error: `Unable to find room ${data.room}` };
 		}
 
-		// This method is always used for public games
-		const partyId: string = null;
+		const partyId: string = data.partyId;
 		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
 
 		if (data.observe) {

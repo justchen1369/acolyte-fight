@@ -400,49 +400,6 @@ function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 	return fork;
 }
 
-export function assignPartyToGames(party: g.Party) {
-	const assignments = new Array<g.PartyGameAssignment>();
-	const store = getStore();
-
-
-	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
-	const room = store.rooms.get(party.roomId);
-	const remaining = _.shuffle(wu(party.active.values()).filter(p => p.ready && !p.isObserver).toArray());
-	const maxPlayersPerGame = apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
-	while (remaining.length > 0) {
-		const group = new Array<g.PartyMember>();
-		for (let i = 0; i < maxPlayersPerGame; ++i) {
-			if (remaining.length > 0) {
-				const next = remaining.shift();
-				group.push(next);
-			} else {
-				break;
-			}
-		}
-
-		// Assume all party members on same engine version
-		const game = findNewGame(group[0].version, room, party.id, group.map(p => p.userHash));
-		for (const member of group) {
-			const joinParams: g.JoinParameters = { ...member, partyHash };
-			const join = joinGame(game, joinParams);
-			assignments.push({ partyMember: member, join });
-		}
-	}
-
-	if (assignments.length > 0) {
-		const template = assignments[0].join;
-		if (template) {
-			const observers = wu(party.active.values()).filter(p => p.ready && p.isObserver).toArray();
-			for (const observer of observers) {
-				const join: g.JoinResult = observeGame(template.game as g.Game, observer);
-				assignments.push({ partyMember: observer, join });
-			}
-		}
-	}
-
-	return assignments;
-}
-
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
 	let currentPrecedence = actionPrecedence(game.actions.get(actionData.h));
 	let newPrecedence = actionPrecedence(actionData);

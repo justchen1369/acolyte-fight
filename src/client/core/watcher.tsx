@@ -4,7 +4,18 @@ import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 
 export function isWatching(state: s.State) {
-    return state.current.page === "watch";
+    if (state.current.page === "watch") {
+        return true;
+    }
+
+    if (state.party) {
+        const self = state.party.members.find(m => m.socketId === state.socketId);
+        if (self && self.isObserver && self.ready) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 export function stopWatching() {

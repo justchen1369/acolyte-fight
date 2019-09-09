@@ -171,11 +171,6 @@ export interface PartyMemberStatus {
     isLeader: boolean;
 }
 
-export interface PartyGameAssignment {
-    partyMember: PartyMember;
-    join: JoinResult;
-}
-
 export interface JoinResult {
 	socketId: string;
 	game: Replay;

@@ -9,10 +9,12 @@ import * as rankings from '../core/rankings';
 import * as watcher from '../core/watcher';
 import Link from '../controls/link';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
+import PartyList from './partyList';
 import WatchLooper from '../controls/watchLooper';
 
 interface Props {
     numOnline: number;
+    party: s.PartyState;
 }
 interface State {
 }
@@ -20,6 +22,7 @@ interface State {
 function stateToProps(state: s.State): Props {
     return {
         numOnline: state.online.size,
+        party: state.party,
     };
 }
 
@@ -31,17 +34,35 @@ class WatchPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
+        return this.props.party ? this.renderParty() : this.renderNoParty();
+    }
+
+    private renderParty() {
         return <div>
             <h1>Spectate</h1>
-            <p>{this.props.numOnline} players online.</p>
-            {this.props.numOnline > 0 ? <>
-                <p className="loading-text">Searching for match to spectate...</p>
-            </> : <>
-                <p>There are no live games to watch at the moment in this region, perhaps try another <Link page="regions">region</Link>?</p>
-            </>}
+            <PartyList />
+            {this.props.numOnline > 0 && <p className="loading-text">Searching for match to spectate...</p>} 
             <OnlineSegmentListener />
             <WatchLooper />
         </div>;
+    }
+
+    private renderNoParty() {
+        return <div>
+            <h1>Spectate</h1>
+            <p>{this.props.numOnline} players online.</p>
+            {this.renderStatus()}
+            <OnlineSegmentListener />
+            <WatchLooper />
+        </div>;
+    }
+
+    private renderStatus() {
+        if (this.props.numOnline > 0) {
+            return <p className="loading-text">Searching for match to spectate...</p>
+        } else {
+            return <p>There are no live games to watch at the moment in this region, perhaps try another <Link page="regions">region</Link>?</p>
+        }
     }
 }
 

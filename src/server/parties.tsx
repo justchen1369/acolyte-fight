@@ -11,7 +11,17 @@ import * as games from './games';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
-export function onDisconnect(socketId: string): g.Party[] {
+let emitParty: PartyEmitter = null;
+
+export interface PartyEmitter {
+	(party: g.Party): void;
+}
+
+export function attachToPartyEmitter(emit: PartyEmitter) {
+	emitParty = emit;
+}
+
+export function onDisconnect(socketId: string) {
     const store = getStore();
 
 	const changedParties = new Array<g.Party>();
@@ -22,7 +32,9 @@ export function onDisconnect(socketId: string): g.Party[] {
 		}
 	});
 
-	return changedParties;
+	changedParties.forEach(party => {
+        emitParty(party);
+    });
 }
 
 export function initParty(leaderSocketId: string, roomId: string = null): g.Party {
@@ -111,27 +123,56 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 	}
 }
 
-export function isPartyReady(party: g.Party): boolean {
-    if (!party.waitForPlayers) {
-        // Start private party games immediately
-        return wu(party.active.values()).some(p => p.ready && !p.isObserver);
+export async function startPartyIfReady(party: g.Party) {
+    if (party.waitForPlayers) {
+        await startWaitingParty(party);
     } else {
-        const relevant = wu(party.active.values()).filter(p => !p.isObserver).toArray();
-        const leaders = wu(party.active.values()).filter(p => p.isLeader).toArray();
-        const room = getStore().rooms.get(party.roomId);
-        const required = games.apportionPerGame(relevant.length, room.Matchmaking.MaxPlayers);
-        return relevant.length > 0 && relevant.filter(p => p.ready).length >= required && leaders.every(l => l.ready);
+        await startImmediateParty(party);
     }
 }
 
-export function onPartyStarted(party: g.Party, assignments: g.PartyGameAssignment[]) {
-    for (const assignment of assignments) {
-        const member = assignment.partyMember;
-        if (assignment.join && assignment.join.heroId) {
-            // Unready after each game
+async function startImmediateParty(party: g.Party) {
+    const ready = wu(party.active.values()).filter(p => p.ready && !p.isObserver).toArray();
+
+    if (ready.length > 0) {
+        const store = getStore();
+        const room = store.rooms.get(party.roomId);
+        ready.forEach(member => {
+            const game = games.findNewGame(member.version, room, party.id, [member.userHash]);
+            games.joinGame(game, member);
             member.ready = false;
-        }
+
+            logger.info(`Game [${game.id}]: player ${member.name} (${member.authToken}) [${member.socketId}] joined, now ${game.active.size} players`);
+        });
+
+        emitParty(party);
     }
+}
+
+async function startWaitingParty(party: g.Party) {
+    const ready = findReadyPlayers(party);
+    if (ready) {
+        logger.info(`Party ${party.id} started with ${ready.length} players`);
+        assignPartyToGames(party, ready);
+        emitParty(party);
+    }
+}
+
+function findReadyPlayers(party: g.Party): g.PartyMember[] {
+    const relevant = wu(party.active.values()).filter(p => !p.isObserver).toArray();
+    if (relevant.length === 0) {
+        return null;
+    }
+
+    const room = getStore().rooms.get(party.roomId);
+    const required = games.apportionPerGame(relevant.length, room.Matchmaking.MaxPlayers);
+
+    const ready = relevant.filter(p => p.ready);
+    if (ready.length < required) {
+        return null;
+    }
+
+    return ready;
 }
 
 export function removePartyMember(party: g.Party, socketId: string) {
@@ -150,5 +191,35 @@ export function removePartyMember(party: g.Party, socketId: string) {
 		const store = getStore();
 		store.parties.delete(party.id);
 		logger.info(`Party ${party.id} deleted`);
+	}
+}
+
+function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
+	const store = getStore();
+
+	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
+	const room = store.rooms.get(party.roomId);
+	const remaining = _.shuffle(ready);
+	const maxPlayersPerGame = games.apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
+	while (remaining.length > 0) {
+		const group = new Array<g.PartyMember>();
+		for (let i = 0; i < maxPlayersPerGame; ++i) {
+			if (remaining.length > 0) {
+				const next = remaining.shift();
+				group.push(next);
+			} else {
+				break;
+			}
+		}
+
+		// Assume all party members on same engine version
+		const game = games.initGame(group[0].version, room, party.id);
+		for (const member of group) {
+			const joinParams: g.JoinParameters = { ...member, partyHash };
+            games.joinGame(game, joinParams);
+            
+            // Unready once assigned to a game so they don't immediately get assigned to another
+            member.ready = false;
+		}
 	}
 }
