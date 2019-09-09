@@ -47,9 +47,10 @@ class HomePanel extends React.PureComponent<Props, State> {
     }
 
     private renderMember(member: s.PartyMemberState) {
-        if (!member.isObserver || member.socketId == this.props.selfId || member.isLeader) {
+        const isSelf = member.socketId == this.props.selfId;
+        if (!member.isObserver || isSelf || member.isLeader) {
             // Don't render any observers, unless they are myself or a leader
-            return <PartyMemberControl key={member.socketId} member={member} />
+            return <PartyMemberControl key={member.socketId} member={member} editable={isSelf} />
         } else {
             return null;
         }

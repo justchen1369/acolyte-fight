@@ -12,7 +12,7 @@ import * as screenLifecycle from './screenLifecycle';
 import * as url from '../url';
 import Link from '../controls/link';
 import PartyGameList from './partyGameList';
-import PartyMemberControl from './partyMemberControl';
+import PartyMemberList from './partyMemberList';
 
 interface Props {
     selfId: string
@@ -94,15 +94,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
             {this.renderAdvancedIndicator()}
             {this.state.advanced && this.renderAdvancedSettings()}
             <h1>Players</h1>
-            <div className="party-list">
-                {party.members.map(m => <PartyMemberControl
-                    key={m.socketId}
-                    member={m}
-                    editable={self.isLeader || (!party.isLocked && m.socketId === self.socketId)}
-                    isSelf={m.socketId === self.socketId}
-                    showAll={true}
-                />)}
-            </div>
+            <PartyMemberList />
             <h1>Games</h1>
             <PartyGameList partyId={party.id} />
         </div>

@@ -3,16 +3,17 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as loader from '../core/loader';
 import * as m from '../../shared/messages.model';
+import * as parties from '../core/parties';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
-import * as rankings from '../core/rankings';
 import * as watcher from '../core/watcher';
 import Link from '../controls/link';
 import OnlineSegmentListener from '../controls/onlineSegmentListener';
-import PartyList from './partyList';
+import PartyMemberList from './partyMemberList';
 import WatchLooper from '../controls/watchLooper';
 
 interface Props {
+    selfId: string;
     numOnline: number;
     party: s.PartyState;
 }
@@ -21,6 +22,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        selfId: state.socketId,
         numOnline: state.online.size,
         party: state.party,
     };
@@ -33,6 +35,10 @@ class WatchPanel extends React.PureComponent<Props, State> {
         };
     }
 
+    componentDidMount() {
+        this.activateObserverMode();
+    }
+
     render() {
         return this.props.party ? this.renderParty() : this.renderNoParty();
     }
@@ -40,7 +46,10 @@ class WatchPanel extends React.PureComponent<Props, State> {
     private renderParty() {
         return <div>
             <h1>Spectate</h1>
-            <PartyList />
+            <div className="party-panel">
+                <PartyMemberList />
+            </div>
+            <p>{this.props.numOnline} people playing right now.</p>
             {this.props.numOnline > 0 && <p className="loading-text">Searching for match to spectate...</p>} 
             <OnlineSegmentListener />
             <WatchLooper />
@@ -62,6 +71,16 @@ class WatchPanel extends React.PureComponent<Props, State> {
             return <p className="loading-text">Searching for match to spectate...</p>
         } else {
             return <p>There are no live games to watch at the moment in this region, perhaps try another <Link page="regions">region</Link>?</p>
+        }
+    }
+
+    private async activateObserverMode() {
+        if (this.props.party) {
+            try {
+                await parties.makeObserverAsync(this.props.selfId, true);
+            } catch (exception) {
+                console.error("Failed to activate observer mode", exception);
+            }
         }
     }
 }
