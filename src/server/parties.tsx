@@ -125,7 +125,7 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 
 export async function startPartyIfReady(party: g.Party) {
     if (party.waitForPlayers) {
-        await startWaitingParty(party);
+        startWaitingParty(party);
     } else {
         await startImmediateParty(party);
     }
