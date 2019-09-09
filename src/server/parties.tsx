@@ -113,7 +113,7 @@ export function createOrUpdatePartyMember(party: g.Party, newSettings: g.JoinPar
 export function updatePartyMemberStatus(party: g.Party, socketId: string, newStatus: Partial<g.PartyMemberStatus>) {
 	let member = party.active.get(socketId);
 	if (member) {
-        if (newStatus.isObserver === false) { // When setting the player to playing, unready them as they need to accept the change
+        if (newStatus.isObserver !== undefined && newStatus.isObserver !== member.isObserver) { // When setting the player to playing, unready them as they need to accept the change
             newStatus.ready = false;
         }
 
