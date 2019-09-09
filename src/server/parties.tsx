@@ -7,7 +7,9 @@ import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
+import * as auth from './auth';
 import * as games from './games';
+import * as matchmaking from './matchmaking';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
@@ -125,7 +127,7 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 
 export async function startPartyIfReady(party: g.Party) {
     if (party.waitForPlayers) {
-        startWaitingParty(party);
+        await startWaitingParty(party);
     } else {
         await startImmediateParty(party);
     }
@@ -137,13 +139,15 @@ async function startImmediateParty(party: g.Party) {
     if (ready.length > 0) {
         const store = getStore();
         const room = store.rooms.get(party.roomId);
-        ready.forEach(member => {
-            const game = games.findNewGame(member.version, room, party.id, [member.userHash]);
-            games.joinGame(game, member);
+        await Promise.all(ready.map(async (member) => {
+            const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
+            const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, member.unranked);
+            const game = games.findNewGame(member.version, room, party.id, aco);
+            games.joinGame(game, member, userId, aco);
             member.ready = false;
 
             logger.info(`Game [${game.id}]: player ${member.name} (${member.authToken}) [${member.socketId}] joined, now ${game.active.size} players`);
-        });
+        }));
 
         emitParty(party);
     }
@@ -153,7 +157,7 @@ async function startWaitingParty(party: g.Party) {
     const ready = findReadyPlayers(party);
     if (ready) {
         logger.info(`Party ${party.id} started with ${ready.length} players`);
-        assignPartyToGames(party, ready);
+        await assignPartyToGames(party, ready);
         emitParty(party);
     }
 }
@@ -194,7 +198,7 @@ export function removePartyMember(party: g.Party, socketId: string) {
 	}
 }
 
-function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
+async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
 	const store = getStore();
 
 	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
@@ -213,13 +217,15 @@ function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
 		}
 
 		// Assume all party members on same engine version
-		const game = games.initGame(group[0].version, room, party.id);
-		for (const member of group) {
-			const joinParams: g.JoinParameters = { ...member, partyHash };
-            games.joinGame(game, joinParams);
+        const game = games.initGame(group[0].version, room, party.id);
+        await Promise.all(group.map(async (member) => {
+            const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
+            const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, member.unranked);
+            const joinParams: g.JoinParameters = { ...member, partyHash };
+            games.joinGame(game, joinParams, userId, aco);
             
             // Unready once assigned to a game so they don't immediately get assigned to another
             member.ready = false;
-		}
+        }));
 	}
 }

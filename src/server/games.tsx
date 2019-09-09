@@ -104,11 +104,11 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room, partyId: string | null, newUserHashes: string[]): g.Game {
+export function findNewGame(version: string, room: g.Room, partyId: string | null, newAco: number): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId);
 
-	const numJoining = newUserHashes.length;
+	const numJoining = 1;
 	const openGames = findJoinableGames(segment);
 
 	let game: g.Game = null;
@@ -120,7 +120,7 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
 		// Game too full to add one more player, split it
-		game = autoSplitGame(game, numJoining);
+		game = autoSplitGame(game, newAco);
 	}
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
@@ -396,7 +396,6 @@ function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 	initial.active.clear();
 
 	logger.info(`Game [${initial.id}] split into ${fork.id} (${fork.active.size} players) and ${remainder.id} (${remainder.active.size} players) at ${initial.tick} ticks`);
-
 	return fork;
 }
 
@@ -611,7 +610,7 @@ export function isGameRunning(game: g.Game) {
 	return (game.tick - game.activeTick) < MaxIdleTicks;
 }
 
-export function joinGame(game: g.Game, params: g.JoinParameters): g.JoinResult {
+export function joinGame(game: g.Game, params: g.JoinParameters, userId: string, aco: number): g.JoinResult {
 	let heroId: string = null;
 	if (params.reconnectKey) {
 		const candidate = game.reconnectKeys.get(params.reconnectKey);
@@ -638,36 +637,33 @@ export function joinGame(game: g.Game, params: g.JoinParameters): g.JoinResult {
 	game.active.set(params.socketId, {
 		socketId: params.socketId,
 		userHash,
+		userId,
 		heroId,
 		partyId: null,
 		name: params.name,
 		unranked: params.unranked,
 		autoJoin: params.autoJoin,
+		aco,
 		numActionMessages: 0,
 	});
 	game.bots.delete(heroId);
+	game.socketIds.add(params.socketId);
 
-	auth.getUserIdFromAccessKey(auth.enigmaAccessKey(params.authToken)).then(userId => {
+	if (userId) {
 		game.isRankedLookup.set(userId, !params.unranked);
-		game.socketIds.add(params.socketId);
+	}
 
-		const player = game.active.get(params.socketId);
-		if (player) {
-			player.userId = userId;
-
-			const controlKey = acquireControlKey(heroId, game);
-			queueControlMessage(game, {
-				heroId: heroId,
-				controlKey,
-				type: "join",
-				userId,
-				userHash,
-				partyHash: params.partyHash,
-				playerName: params.name,
-				keyBindings: params.keyBindings,
-				isMobile: params.isMobile,
-			});
-		}
+	const controlKey = acquireControlKey(heroId, game);
+	queueControlMessage(game, {
+		heroId: heroId,
+		controlKey,
+		type: "join",
+		userId,
+		userHash,
+		partyHash: params.partyHash,
+		playerName: params.name,
+		keyBindings: params.keyBindings,
+		isMobile: params.isMobile,
 	});
 
 	return emitJoinForSocket(game, params.socketId);
@@ -744,11 +740,73 @@ function assignReconnectKey(game: g.Game, heroId: string) {
 	return reconnectKey;
 }
 
-function autoSplitGame(game: g.Game, numJoining: number): g.Game {
-	const playerLimit = apportionPerGame(game.active.size + numJoining, game.matchmaking.MaxPlayers);
-	const toRemove = Math.max(numJoining, game.active.size - playerLimit);
-	const splitSocketIds = new Set<string>(wu(game.active.keys()).take(toRemove).toArray());
-	return splitGame(game, splitSocketIds);
+function autoSplitGame(game: g.Game, newAco: number): g.Game {
+	const minPlayers = 1; // TODO: Change to 2
+
+	const ratings = wu(game.active.values()).map(p => p.aco).toArray();
+	ratings.push(newAco);
+	ratings.sort();
+
+	const threshold = calculateSplitThreshold(ratings, minPlayers);
+	if (threshold === null) {
+		// Cannot split
+		return game;
+	}
+
+	const primeIsBelow = newAco < threshold;
+
+	logger.info(formatSplit(ratings, threshold));
+
+	const primeSocketIds = new Set<string>();
+	game.active.forEach(player => {
+		const playerIsBelow = player.aco < threshold;
+		const isPrime = playerIsBelow == primeIsBelow;
+		if (isPrime) {
+			primeSocketIds.add(player.socketId);
+		}
+	});
+
+	return splitGame(game, primeSocketIds);
+}
+
+function formatSplit(ratings: number[], threshold: number) {
+	let result = `Split (${threshold.toFixed(0)}): `;
+	let reachedThreshold = false;
+	for (let i = 0; i < ratings.length; ++i) {
+		const rating = ratings[i];
+		if (i > 0) {
+			result += ' ';
+		}
+		if (!reachedThreshold && rating >= threshold) {
+			reachedThreshold = true;
+			result += '| ';
+		}
+		result += rating.toFixed(0);
+	}
+	return result;
+}
+
+function calculateSplitThreshold(sortedRatings: number[], minPlayers: number) {
+	minPlayers = Math.max(1, minPlayers);
+
+	const start = minPlayers;
+	const end = sortedRatings.length - minPlayers;
+	if (end < start) {
+		return null;
+	}
+
+	let maxDistance = 0;
+	let bestSplit = start;
+	for (let i = start; i <= end; ++i) {
+		const splitDistance = sortedRatings[i] - sortedRatings[i-1];
+		if (splitDistance > maxDistance) {
+			maxDistance = splitDistance;
+			bestSplit = i;
+		}
+	}
+
+	const threshold = sortedRatings[bestSplit];
+	return threshold;
 }
 
 function acquireControlKey(heroId: string, game: g.Game) {

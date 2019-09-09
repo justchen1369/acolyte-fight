@@ -104,6 +104,7 @@ export interface Player {
     name: string;
     unranked: boolean;
     autoJoin?: boolean;
+    aco: number;
 
     numActionMessages: number;
 }

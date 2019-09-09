@@ -15,6 +15,7 @@ import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as constants from '../game/constants';
 import * as gameStorage from './gameStorage';
+import * as matchmaking from './matchmaking';
 import * as mirroring from './mirroring';
 import * as modder from './modder';
 import * as online from './online';
@@ -429,6 +430,9 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		return { success: false, error: "Wrong server" };
 	}
 
+	const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
+	const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, data.unranked);
+
 	let replay: g.Replay;
 	if (data.gameId) {
 		replay = store.activeGames.get(data.gameId);
@@ -451,7 +455,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			// The user wants a private game, create one
 			replay = games.initGame(data.version, room, partyId, locked);
 		} else {
-			replay = games.findNewGame(data.version, room, partyId, [userHash]);
+			replay = games.findNewGame(data.version, room, partyId, aco);
 		}
 	}
 
@@ -473,7 +477,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		if (!data.observe) {
 			const game = store.activeGames.get(replay.id)
 			if (game) {
-				games.joinGame(game, joinParams);
+				games.joinGame(game, joinParams, userId, aco);
 
 				if (data.numBots) {
 					const numBots = Math.min(game.matchmaking.MaxPlayers, data.numBots);

@@ -77,7 +77,7 @@ interface LeaderboardCacheItem {
 
 const leaderboardCache = new Map<string, LeaderboardCacheItem>();
 
-function initialRating(): g.UserRating {
+export function initialRating(): g.UserRating {
     return {
         numGames: 0,
         killsPerGame: 0,
@@ -639,6 +639,12 @@ export async function getProfile(userId: string): Promise<m.GetProfileResponse> 
     const doc = await firestore.collection('user').doc(userId).get();
     const profile = dbToProfile(userId, doc.data() as db.User);
     return profile;
+}
+
+export async function getUserRating(userId: string, category: string): Promise<g.UserRating> {
+    const firestore = getFirestore();
+    const doc = await firestore.collection('user').doc(userId).get();
+    return dbToUserRating(doc.data() as db.User, category);
 }
 
 async function updateRatingsIfNecessary(gameStats: m.GameStatsMsg, isRankedLookup: Map<string, boolean>): Promise<UpdateRatingsResult> {
