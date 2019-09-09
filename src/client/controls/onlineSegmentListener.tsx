@@ -8,7 +8,6 @@ import * as s from '../store.model';
 interface Props {
     roomId: string;
     partyId: string;
-    isPrivate: boolean;
 }
 interface State {
 }
@@ -17,12 +16,11 @@ function stateToProps(state: s.State): Props {
     return {
         roomId: state.room && state.room.id,
         partyId: state.party && state.party.id,
-        isPrivate: state.party && state.party.isPrivate,
     };
 }
 
 function calculateSegment(props: Props) {
-    return segments.calculateSegment(props.roomId, props.partyId, props.isPrivate);
+    return segments.calculateSegment(props.roomId, props.partyId);
 }
 
 class OnlineSegmentListener extends React.PureComponent<Props, State> {

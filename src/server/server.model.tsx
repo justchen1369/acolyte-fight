@@ -57,7 +57,6 @@ export interface Replay {
 
     roomId: string | null;
     partyId: string | null;
-    isPrivate: boolean;
     locked: string | null;
 
     mod: Object;
@@ -143,7 +142,6 @@ export interface Party extends PartyStatus {
 
 export interface PartyStatus {
     roomId: string;
-    isPrivate: boolean;
     waitForPlayers: boolean;
     isLocked: boolean;
     initialObserver: boolean;

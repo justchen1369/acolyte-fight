@@ -218,7 +218,6 @@ function reducer(state: s.State, action: s.Action): s.State {
                     ...state.party,
                     roomId: action.roomId,
                     members: action.members,
-                    isPrivate: action.isPrivate,
                     isLocked: action.isLocked,
                     initialObserver: action.initialObserver,
                     waitForPlayers: action.waitForPlayers,

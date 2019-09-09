@@ -219,7 +219,6 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 	try {
 		if (!(required(data, "object")
 			&& required(data.partyId, "string")
-			&& optional(data.isPrivate, "boolean")
 			&& optional(data.isLocked, "boolean")
 			&& optional(data.waitForPlayers, "boolean")
 			&& optional(data.roomId, "string")
@@ -245,7 +244,6 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 
 		const newStatus: Partial<g.PartyStatus> = _.omitBy({
 			roomId: data.roomId,
-			isPrivate: data.isPrivate,
 			isLocked: data.isLocked,
 			waitForPlayers: data.waitForPlayers,
 			initialObserver: data.initialObserver,
@@ -256,7 +254,6 @@ function onPartySettingsMsg(socket: SocketIO.Socket, authToken: string, data: m.
 			success: true,
 			partyId: party.id,
 			roomId: party.roomId,
-			isPrivate: party.isPrivate,
 			waitForPlayers: party.waitForPlayers,
 		};
 		callback(result);
@@ -452,15 +449,14 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		// This method is always used for public games
 		const partyId: string = null;
 		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
-		const isPrivate: boolean = !!locked;
 
 		if (data.observe) {
-			replay = games.findExistingGame(data.version, room, partyId, isPrivate);
+			replay = games.findExistingGame(data.version, room, partyId);
 		} else if (locked) {
 			// The user wants a private game, create one
-			replay = games.initGame(data.version, room, partyId, isPrivate, locked);
+			replay = games.initGame(data.version, room, partyId, locked);
 		} else {
-			replay = games.findNewGame(data.version, room, partyId, isPrivate, [userHash]);
+			replay = games.findNewGame(data.version, room, partyId, [userHash]);
 		}
 	}
 
@@ -756,7 +752,6 @@ function emitHero(join: g.JoinResult) {
 			userHash,
 			reconnectKey: join.reconnectKey,
 			locked: game.locked,
-			isPrivate: game.segment !== publicSegment,
 			partyId: game.partyId,
 			room: game.roomId,
 			mod: game.mod,
@@ -780,7 +775,6 @@ function partyToMsg(party: g.Party): m.PartyMsg {
 		partyId: party.id,
 		roomId: party.roomId,
 		members: partyMembersToContract(party),
-		isPrivate: party.isPrivate,
 		isLocked: party.isLocked,
 		initialObserver: party.initialObserver,
 		waitForPlayers: party.waitForPlayers,

@@ -285,7 +285,6 @@ export interface NewGameNotification {
 	gameId: string;
 	heroId: string;
 	room: string | null;
-	isPrivate: boolean;
 }
 
 export interface CloseGameNotification {

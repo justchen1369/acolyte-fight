@@ -91,7 +91,6 @@ export class PartyPanel extends React.PureComponent<Props, State> {
             {this.props.party.members.length >= this.props.maxPlayers && <p>If your party is larger than {this.props.maxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             <div className="clear" />
-            {this.renderPartyMode()}
             {this.renderAdvancedIndicator()}
             {this.state.advanced && this.renderAdvancedSettings()}
             <h1>Players</h1>
@@ -111,19 +110,6 @@ export class PartyPanel extends React.PureComponent<Props, State> {
 
     private renderQR(element: HTMLCanvasElement, partyUrl: string) {
         new QRious({ element, value: partyUrl, size: 192 });
-    }
-
-    private renderPartyMode() {
-        const party = this.props.party;
-        return <div>
-            <h2>Party mode</h2>
-            <PartyMode selected={party.isPrivate} onClick={() => this.updateSettings({ isPrivate: true })} >
-                <span className="party-mode-label"><b>Private</b> <i className="fas fa-lock" />: your games will only contain the players in your party.</span>
-            </PartyMode>
-            <PartyMode selected={!party.isPrivate} onClick={() => this.updateSettings({ isPrivate: false })} >
-                <span className="party-mode-label"><b>Public</b> <i className="fas fa-globe-americas" />: your party will be matched with other players on the public server.</span>
-            </PartyMode>
-        </div>
     }
 
     private renderAdvancedIndicator() {
@@ -159,7 +145,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
                     <span className="party-mode-label"><b>Leader decides</b> <i className="fas fa-crown" />: only the party leader can decide who plays and observes.</span>
                 </PartyMode>
             </>
-            {party.isPrivate && <>
+            <>
                 <h3>When to start games?</h3>
                 <PartyMode selected={party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: true })} >
                     <span className="party-mode-label"><b>Wait for all players</b> <i className="fas fa-clock" />: wait until all players are ready before adding them to the game.</span>
@@ -167,7 +153,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
                 <PartyMode selected={!party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: false })} >
                     <span className="party-mode-label"><b>Start immediately</b> <i className="fas fa-sword" />: players join the game immediately. If they start playing, other players may have to wait until the next game. Useful if your party is too big to wait for everyone.</span>
                 </PartyMode>
-            </>}
+            </>
         </div>
     }
 

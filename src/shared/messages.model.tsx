@@ -192,7 +192,6 @@ export interface HeroMsg {
     reconnectKey: string | null; // Use this to reconnect to the same hero ID
     userHash: string | null;
 
-    isPrivate: boolean;
     partyId: string;
     room: string | null;
     locked: string | null;
@@ -259,7 +258,6 @@ export type PartyStatusResponseMsg = PartyStatusResponse | ErrorResponseMsg;
 export interface PartySettingsRequest {
     partyId: string;
     roomId?: string;
-    isPrivate?: boolean;
     isLocked?: boolean;
     waitForPlayers?: boolean;
 
@@ -269,7 +267,6 @@ export interface PartySettingsResponse {
     success: true;
     partyId: string;
     roomId: string;
-    isPrivate: boolean;
     waitForPlayers: boolean;
 }
 export type PartySettingsResponseMsg = PartySettingsResponse | ErrorResponseMsg;
@@ -279,7 +276,6 @@ export interface PartyMsg {
     partyId: string;
     roomId: string;
     members: PartyMemberMsg[];
-    isPrivate: boolean;
     isLocked: boolean;
     initialObserver: boolean;
     waitForPlayers: boolean;

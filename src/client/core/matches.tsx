@@ -152,7 +152,6 @@ export function onHeroMsg(data: m.HeroMsg) {
 		gameId: world.ui.myGameId,
 		heroId: world.ui.myHeroId,
 		room: data.room,
-		isPrivate: data.isPrivate,
 	});
 }
 

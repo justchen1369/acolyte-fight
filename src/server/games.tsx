@@ -104,9 +104,9 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, newUserHashes: string[]): g.Game {
+export function findNewGame(version: string, room: g.Room, partyId: string | null, newUserHashes: string[]): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
+	const segment = segments.calculateSegment(roomId, partyId);
 
 	const numJoining = newUserHashes.length;
 	const openGames = findJoinableGames(segment);
@@ -129,7 +129,7 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 	}
 
 	if (!game) {
-		game = initGame(version, room, partyId, isPrivate);
+		game = initGame(version, room, partyId);
 	}
 	return game;
 }
@@ -153,9 +153,9 @@ function findJoinableGames(segment: string) {
 	return openGames;
 }
 
-export function findExistingGame(version: string, room: g.Room | null, partyId: string | null, isPrivate: boolean): g.Game {
+export function findExistingGame(version: string, room: g.Room | null, partyId: string | null): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId, isPrivate);
+	const segment = segments.calculateSegment(roomId, partyId);
 	const store = getStore();
 
 	const candidates = wu(store.activeGames.values()).filter(x => x.segment === segment && isGameRunning(x)).toArray();
@@ -252,16 +252,15 @@ export function takeBotControl(game: g.Game, heroId: string, socketId: string) {
 	}
 }
 
-export function initGame(version: string, room: g.Room, partyId: string | null, isPrivate: boolean, locked: string = null) {
+export function initGame(version: string, room: g.Room, partyId: string | null, locked: string = null) {
 	const gameIndex = getStore().nextGameId++;
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
 		universe: transientIds.generate(),
-		segment: segments.calculateSegment(room.id, partyId, isPrivate),
+		segment: segments.calculateSegment(room.id, partyId),
 		matchmaking: { ...room.Matchmaking },
 		roomId: room.id,
 		partyId,
-		isPrivate,
 		mod: room ? room.mod : {},
 		created: moment(),
 		active: new Map<string, g.Player>(),
@@ -422,7 +421,7 @@ export function assignPartyToGames(party: g.Party) {
 		}
 
 		// Assume all party members on same engine version
-		const game = findNewGame(group[0].version, room, party.id, party.isPrivate, group.map(p => p.userHash));
+		const game = findNewGame(group[0].version, room, party.id, group.map(p => p.userHash));
 		for (const member of group) {
 			const joinParams: g.JoinParameters = { ...member, partyHash };
 			const join = joinGame(game, joinParams);

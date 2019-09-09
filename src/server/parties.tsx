@@ -33,7 +33,6 @@ export function initParty(leaderSocketId: string, roomId: string = null): g.Part
 		modified: moment(),
 		roomId,
 		active: new Map<string, g.PartyMember>(),
-        isPrivate: true,
         waitForPlayers: true,
         isLocked: false,
         initialObserver: false,
@@ -79,7 +78,7 @@ export function isAuthorizedToAdmin(party: g.Party, initiatorId: string) {
 
 export function updatePartyStatus(party: g.Party, status: Partial<g.PartyStatus>) {
     Object.assign(party, status);
-    logger.info(`Party ${party.id} changed to room=${party.roomId} isPrivate=${party.isPrivate} waitForPlayers=${party.waitForPlayers} isLocked=${party.isLocked} initialObserver=${party.initialObserver}`);
+    logger.info(`Party ${party.id} changed to room=${party.roomId} waitForPlayers=${party.waitForPlayers} isLocked=${party.isLocked} initialObserver=${party.initialObserver}`);
 }
 
 export function createOrUpdatePartyMember(party: g.Party, newSettings: g.JoinParameters) {
@@ -113,7 +112,7 @@ export function updatePartyMemberStatus(party: g.Party, socketId: string, newSta
 }
 
 export function isPartyReady(party: g.Party): boolean {
-    if (party.isPrivate && !party.waitForPlayers) {
+    if (!party.waitForPlayers) {
         // Start private party games immediately
         return wu(party.active.values()).some(p => p.ready && !p.isObserver);
     } else {

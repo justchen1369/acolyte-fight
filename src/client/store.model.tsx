@@ -66,7 +66,6 @@ export interface PartyState {
     server: string;
     region: string;
     roomId: string;
-    isPrivate: boolean;
     isLocked: boolean;
     initialObserver: boolean;
     waitForPlayers: boolean;
@@ -258,7 +257,6 @@ export interface UpdatePartyAction {
     partyId: string;
     roomId: string;
     members: PartyMemberState[];
-    isPrivate: boolean;
     isLocked: boolean;
     initialObserver: boolean;
     waitForPlayers: boolean;
