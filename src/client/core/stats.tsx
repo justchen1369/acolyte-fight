@@ -165,7 +165,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     world.scores.forEach((score, heroId) => {
         const player = world.players.get(heroId);
         if (player) {
-            if (player.userHash) {
+            if (player.userHash && !player.left) {
                 ++numHumans;
                 const teamId = engine.getTeam(player.heroId, world);
                 players.push(playerStatsFromScore(player, teamId, score));
