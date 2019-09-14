@@ -10,6 +10,7 @@ import { getStore } from './serverStore';
 import { logger } from './logging';
 
 const ChoicePower = 2;
+const EvenPreference = 1.2;
 
 export interface RatedPlayer {
     socketId: string;
@@ -106,7 +107,7 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
     const [split, remainder] = games.splitGame(game, splitSocketIds);
 
-    logger.info(`Split (${choice.threshold.toFixed(0)}): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
+    logger.info(`Split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
     return split;
 }
 
@@ -115,7 +116,7 @@ function chooseCandidate(candidates: SplitCandidate[]): SplitCandidate {
         return undefined;
     }
 
-    const weightings = candidates.map(p => Math.pow(p.worstWinProbability, ChoicePower));
+    const weightings = candidates.map(evaluateChoiceWeight);
     const total = _(weightings).sum();
     const selector = total * Math.random();
 
@@ -129,6 +130,14 @@ function chooseCandidate(candidates: SplitCandidate[]): SplitCandidate {
 
     // Should never get here
     return candidates[candidates.length - 1];
+}
+
+function evaluateChoiceWeight(candidate: SplitCandidate): number {
+    let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
+    if (candidate.lower.length % 2 === 0 || candidate.upper.length % 2 === 0) {
+        weight *= EvenPreference;
+    }
+    return weight;
 }
 
 function extractRatings(game: g.Game) {
