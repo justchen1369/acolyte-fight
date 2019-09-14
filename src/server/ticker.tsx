@@ -93,10 +93,10 @@ function gameTick(game: g.Game) {
 	closeGameIfNecessary(game);
 	finishGameIfNecessary(game);
 
-	const data = {
+	const data: m.TickMsg = {
 		u: game.universe,
 		t: game.tick++,
-	} as m.TickMsg;
+	};
 
 	if (game.controlMessages.length > 0) {
 		data.c = game.controlMessages;
