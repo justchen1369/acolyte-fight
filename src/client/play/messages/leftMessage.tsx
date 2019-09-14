@@ -29,7 +29,7 @@ class LeftMessage extends React.PureComponent<Props, State> {
     render() {
         const notification = this.props.notification;
         if (notification.split) {
-            return <div className="row"><PlayerName player={notification.player} /> split</div>
+            return <div className="row"><PlayerName player={notification.player} /> rematched</div>
         } else {
             if (this.props.isOnline) {
                 // If they left this match but still online, they didn't leave
