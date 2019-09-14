@@ -215,11 +215,17 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
 			}
 		}
 
-		// Assume all party members on same engine version
-        const game = games.initGame(group[0].version, room, party.id);
+        let game: g.Game = null;
         await Promise.all(group.map(async (member) => {
             const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
             const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, member.unranked);
+
+            if (!game) {
+                // Need to be able to add a player to the game immediately after it is created, so only create once we are ready to add
+                // Assume all party members on same engine version
+                game = games.initGame(member.version, room, party.id);
+            }
+
             games.joinGame(game, member, userId, aco);
             
             // Unready once assigned to a game so they don't immediately get assigned to another
