@@ -276,7 +276,7 @@ function watchPriority(game: g.Game): number {
 
 export function apportionPerGame(totalPlayers: number, maxPlayers: number) {
 	// Round up to nearest even number
-	return Math.min(maxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers, maxPlayers) / 2) * 2);
+	return Math.min(totalPlayers, Math.min(maxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers, maxPlayers) / 2) * 2));
 }
 
 export function minPerGame(totalPlayers: number, maxPlayers: number) {
