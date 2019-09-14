@@ -46,7 +46,7 @@ export class Aco {
     }
 
     // IMPORTANT: dataPoints must be sorted!
-    estimateWinProbability(diff: number, dataPoints: ActualWinRate[]) {
+    estimateWinProbability(diff: number, dataPoints: ActualWinRate[] = []) {
         const acoWinRate = calculateEloWinRate(diff, this.r)
 
         let winRate = acoWinRate;

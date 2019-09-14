@@ -326,6 +326,10 @@ export async function updateWinRateDistribution(category: string) {
     winRates.set(category, dataPoints);
 }
 
+export function getWinRateDistribution(category: string) {
+    return winRates.get(category);
+}
+
 export async function calculateWinRateDistribution(category: string) {
     const BucketRange = 50;
 

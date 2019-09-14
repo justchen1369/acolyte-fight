@@ -455,7 +455,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			// The user wants a private game, create one
 			replay = games.initGame(data.version, room, partyId, locked);
 		} else {
-			replay = matchmaking.findNewGame(data.version, room, partyId, aco);
+			replay = matchmaking.findNewGame(data.version, room, partyId, { aco, socketId: socket.id });
 		}
 	}
 

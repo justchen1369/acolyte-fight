@@ -142,7 +142,7 @@ async function startImmediateParty(party: g.Party) {
         await Promise.all(ready.map(async (member) => {
             const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
             const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, member.unranked);
-            const game = matchmaking.findNewGame(member.version, room, party.id, aco);
+            const game = matchmaking.findNewGame(member.version, room, party.id, { aco, socketId: member.socketId });
             games.joinGame(game, member, userId, aco);
             member.ready = false;
 

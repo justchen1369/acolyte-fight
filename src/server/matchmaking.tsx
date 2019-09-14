@@ -1,12 +1,27 @@
 import _ from 'lodash';
 import wu from 'wu';
-import * as auth from './auth';
+import * as aco from './aco';
 import * as g from './server.model';
 import * as games from './games';
+import * as m from '../shared/messages.model';
 import * as segments from '../shared/segments';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
+
+const ChoicePower = 2;
+
+export interface RatedPlayer {
+    socketId: string;
+    aco: number;
+}
+
+interface SplitCandidate {
+    threshold: number;
+    lower: RatedPlayer[];
+    upper: RatedPlayer[];
+    worstWinProbability: number;
+}
 
 export async function retrieveRating(userId: string, category: string, unranked: boolean): Promise<number> {
     const userRating = await retrieveUserRatingOrDefault(userId, category);
@@ -26,7 +41,7 @@ async function retrieveUserRatingOrDefault(userId: string, category: string): Pr
     return userRating || statsStorage.initialRating();
 }
 
-export function findNewGame(version: string, room: g.Room, partyId: string | null, newAco: number): g.Game {
+export function findNewGame(version: string, room: g.Room, partyId: string | null, newPlayer: RatedPlayer): g.Game {
 	const roomId = room ? room.id : null;
 	const segment = segments.calculateSegment(roomId, partyId);
 
@@ -35,14 +50,14 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 
 	let game: g.Game = null;
 	if (openGames.length > 0) {
-		// TODO: Choose game with closest skill level
-		game = _.minBy(openGames, game => game.active.size);
+        // Choose game with closest skill level
+		game = _.minBy(openGames, game => evaluateJoinDistance(game, newPlayer));
 
 	}
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
 		// Game too full to add one more player, split it
-		game = splitGameForNewPlayer(game, newAco);
+		game = splitGameForNewPlayer(game, newPlayer);
 	}
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
@@ -54,6 +69,10 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 		game = games.initGame(version, room, partyId);
 	}
 	return game;
+}
+
+function evaluateJoinDistance(game: g.Game, newPlayer: RatedPlayer): number {
+    return _(wu(game.active.values()).toArray()).map(p => Math.abs(newPlayer.aco - p.aco)).min();
 }
 
 function findJoinableGames(segment: string) {
@@ -75,73 +94,102 @@ function findJoinableGames(segment: string) {
 	return openGames;
 }
 
-function splitGameForNewPlayer(game: g.Game, newAco: number): g.Game {
-	const minPlayers = 1; // TODO: Change to 2
+function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
+    const ratings = extractRatings(game);
+    ratings.push(newPlayer);
+    ratings.sort();
 
-	const ratings = wu(game.active.values()).map(p => p.aco).toArray();
-	ratings.push(newAco);
-	ratings.sort();
+    const candidates = generateSplitCandidates(ratings);
+    const choice = chooseCandidate(candidates);
+    
+    const prime = choice.lower.some(p => p === newPlayer) ? choice.lower : choice.upper;
+    const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
+    const [split, remainder] = games.splitGame(game, splitSocketIds);
 
-	const threshold = calculateSplitThreshold(ratings, minPlayers);
-	if (threshold === null) {
-		// Cannot split
-		return game;
-	}
-
-	const primeIsBelow = newAco < threshold;
-
-	logger.info(formatSplit(ratings, threshold));
-
-	const primeSocketIds = new Set<string>();
-	game.active.forEach(player => {
-		const playerIsBelow = player.aco < threshold;
-		const isPrime = playerIsBelow == primeIsBelow;
-		if (isPrime) {
-			primeSocketIds.add(player.socketId);
-		}
-	});
-
-	return games.splitGame(game, primeSocketIds);
+    logger.info(`Split (${choice.threshold.toFixed(0)}): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
+    return split;
 }
 
-function formatSplit(ratings: number[], threshold: number) {
-	let result = `Split (${threshold.toFixed(0)}): `;
-	let reachedThreshold = false;
-	for (let i = 0; i < ratings.length; ++i) {
-		const rating = ratings[i];
-		if (i > 0) {
-			result += ' ';
-		}
-		if (!reachedThreshold && rating >= threshold) {
-			reachedThreshold = true;
-			result += '| ';
-		}
-		result += rating.toFixed(0);
-	}
-	return result;
+function chooseCandidate(candidates: SplitCandidate[]): SplitCandidate {
+    if (candidates.length <= 0) {
+        return undefined;
+    }
+
+    const weightings = candidates.map(p => Math.pow(p.worstWinProbability, ChoicePower));
+    const total = _(weightings).sum();
+    const selector = total * Math.random();
+
+    let progress = 0;
+    for (let i = 0; i < weightings.length; ++i) {
+        progress += weightings[i];
+        if (selector < progress) {
+            return candidates[i];
+        }
+    }
+
+    // Should never get here
+    return candidates[candidates.length - 1];
 }
 
-function calculateSplitThreshold(sortedRatings: number[], minPlayers: number) {
-	minPlayers = Math.max(1, minPlayers);
+function extractRatings(game: g.Game) {
+    return wu(game.active.values()).map(p => ({ aco: p.aco, socketId: p.socketId } as RatedPlayer)).toArray();
+}
 
-	const start = minPlayers;
-	const end = sortedRatings.length - minPlayers;
+function generateSplitCandidates(sortedRatings: RatedPlayer[]): SplitCandidate[] {
+    const minPlayers = 1; // TODO: Change to 2
+    const maxCandidates = 9; // If the max players is modded, don't increase search beyond this limit
+
+	let start = minPlayers;
+	let end = sortedRatings.length - minPlayers;
 	if (end < start) {
 		return null;
 	}
 
+    // Find best split
 	let maxDistance = 0;
 	let bestSplit = start;
 	for (let i = start; i <= end; ++i) {
-		const splitDistance = sortedRatings[i] - sortedRatings[i-1];
+		const splitDistance = sortedRatings[i].aco - sortedRatings[i-1].aco;
 		if (splitDistance > maxDistance) {
 			maxDistance = splitDistance;
 			bestSplit = i;
 		}
-	}
+    }
+    
+    // Search around the best split
+    const searchRadius = Math.floor(maxCandidates / 2);
+    start = Math.max(start, bestSplit - searchRadius);
+    end = Math.min(end, bestSplit + searchRadius);
 
-	const threshold = sortedRatings[bestSplit];
-	return threshold;
+    const candidates = new Array<SplitCandidate>();
+	for (let i = start; i <= end; ++i) {
+        const lower = sortedRatings.slice(0, i);
+        const upper = sortedRatings.slice(i);
+
+        const worstWinProbability = Math.min(
+            evaluateWinProbability(lower),
+            evaluateWinProbability(upper));
+
+        candidates.push({
+            threshold: sortedRatings[i].aco,
+            lower,
+            upper,
+            worstWinProbability,
+        });
+    }
+
+    return candidates;
+}
+
+function evaluateWinProbability(ratings: RatedPlayer[]) {
+    if (ratings.length > 0) {
+        const diff = aco.AcoRanked.calculateDiff(
+            _(ratings).map(p => p.aco).min(),
+            _(ratings).map(p => p.aco).max());
+        return aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+    } else {
+        return 0;
+    }
 }
 
 export function findExistingGame(version: string, room: g.Room | null, partyId: string | null): g.Game {

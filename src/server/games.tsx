@@ -278,7 +278,7 @@ function unassignBots(game: g.Game): g.Game {
 	return game;
 }
 
-export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
+export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game[] {
 	// Create a copy of the initial game
 	const fork = cloneGame(initial);
 	const remainder = cloneGame(initial);
@@ -318,7 +318,7 @@ export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game 
 	initial.active.clear();
 
 	logger.info(`Game [${initial.id}] split into ${fork.id} (${fork.active.size} players) and ${remainder.id} (${remainder.active.size} players) at ${initial.tick} ticks`);
-	return fork;
+	return [fork, remainder];
 }
 
 function queueAction(game: g.Game, actionData: m.ActionMsg) {
