@@ -15,7 +15,6 @@ const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
     MaxBots: 2,
     MaxPlayers: 7,
-    TeamGameProbability: 0.5,
     AllowBotTeams: false,
     BotRating: 1500,
 };
