@@ -79,8 +79,9 @@ function gameTurn(game: g.Game): boolean {
 	if (running) {
 		for (let i = 0; i < TicksPerTurn; ++i) {
 			gameTick(game);
-		}
-	}
+        }
+        finalizeMatchupIfNecessary(game); // Needs to be outside of tick processing because it may split the game
+    }
 
 	return running;
 }
@@ -131,6 +132,26 @@ function gameTick(game: g.Game) {
 	}
 }
 
+function finalizeMatchupIfNecessary(game: g.Game) {
+    if (game.matched) {
+        return;
+    }
+
+    if (game.tick < game.closeTick) {
+        return;
+    }
+
+    game.matched = true;
+
+    const teams = matchmaking.assignTeams(game);
+    if (teams) {
+		games.queueControlMessage(game, {
+            type: m.ActionType.Teams,
+            teams,
+        });
+    }
+}
+
 function closeGameIfNecessary(game: g.Game) {
 	if (!game.joinable) {
 		return;
@@ -150,14 +171,11 @@ function closeGameIfNecessary(game: g.Game) {
 		}
 	}
 
-    let teams: string[][] = null;
 	if (game.tick >= game.closeTick) {
-        teams = matchmaking.assignTeams(game);
-
 		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
 		waitPeriod = 0;
-		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players (" + (teams ? teams.length : 1) + " teams) after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players after " + game.tick + " ticks");
 	}
 
 	if (waitPeriod !== null) {
@@ -165,7 +183,6 @@ function closeGameIfNecessary(game: g.Game) {
 			type: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
 			waitPeriod,
-			teams,
 		});
 	}
 }

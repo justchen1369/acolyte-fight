@@ -117,7 +117,7 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
     const [split, remainder] = games.splitGame(game, splitSocketIds);
 
-    logger.info(`Split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
+    logger.info(`Game [${game.id}]: Split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
     return split;
 }
 
@@ -263,8 +263,11 @@ export function assignTeams(game: g.Game): string[][] {
         const candidates = generateTeamCandidates(game);
         if (candidates && candidates.length > 1) {
             const choice = chooseCandidate(candidates, weightTeamCandidate);
-            logger.info(`Teams (${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
             if (choice.teams) {
+                const noTeamCandidate = candidates.find(p => p.teams === null);
+                if (noTeamCandidate) {
+                    logger.info(`Game [${game.id}]: teams (${(noTeamCandidate.worstWinProbability * 100).toFixed(0)}% -> ${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
+                }
                 return choice.teams.map(team => team.map(p => p.heroId));
             } else {
                 return null;

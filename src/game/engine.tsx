@@ -1180,6 +1180,8 @@ function handleOccurences(world: w.World) {
 		let success = true;
 		if (ev.type === n.ActionType.CloseGame) {
 			success = handleClosing(ev, world);
+		} else if (ev.type === n.ActionType.Teams) {
+			success = handleTeams(ev, world);
 		} else if (ev.type === n.ActionType.Bot) {
 			success = handleBotting(ev, world);
 		} else if (ev.type === n.ActionType.Join) {
@@ -1415,14 +1417,7 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 		});
 	}
 
-	let teamSizes: number[] = null;
-	if (world.tick >= world.startTick && ev.teams) {
-		assignTeams(ev.teams, world);
-		world.ui.notifications.push({
-			type: "teams",
-			teamSizes: ev.teams.map(x => x.length),
-		});
-
+	if (world.tick >= world.startTick) {
 		// Close any customising dialogs as they cannot be used anymore now the game has started
 		world.ui.toolbar.customizingBtn = null;
 	}
@@ -1430,8 +1425,19 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	world.ui.notifications.push({
 		type: "closing",
 		ticksUntilClose: ev.waitPeriod,
-		teamSizes,
 	});
+
+	return true;
+}
+
+function handleTeams(ev: n.TeamsMsg, world: w.World) {
+	if (ev.teams) {
+		assignTeams(ev.teams, world);
+		world.ui.notifications.push({
+			type: "teams",
+			teamSizes: ev.teams.map(x => x.length),
+		});
+	}
 
 	return true;
 }
