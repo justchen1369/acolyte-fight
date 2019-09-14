@@ -201,7 +201,6 @@ export function removePartyMember(party: g.Party, socketId: string) {
 async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
 	const store = getStore();
 
-	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
 	const remaining = _.shuffle(ready);
 	const maxPlayersPerGame = matchmaking.apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
