@@ -1547,7 +1547,6 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 		controlKey: ev.controlKey,
 		userId: ev.userId,
 		userHash: ev.userHash,
-		partyHash: ev.partyHash,
 		name: ev.playerName,
 		uiBaseColor,
 		uiColor: choosePlayerColor(hero.id, ev.userHash, uiBaseColor, world),

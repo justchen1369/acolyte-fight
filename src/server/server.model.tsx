@@ -156,7 +156,6 @@ export interface PartyMember extends JoinParameters, PartyMemberStatus {
 export interface JoinParameters {
     socketId: string;
     userHash: string;
-    partyHash?: string;
     name: string;
     authToken: string;
     keyBindings: KeyBindings;

@@ -221,8 +221,7 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
         await Promise.all(group.map(async (member) => {
             const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
             const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, member.unranked);
-            const joinParams: g.JoinParameters = { ...member, partyHash };
-            games.joinGame(game, joinParams, userId, aco);
+            games.joinGame(game, member, userId, aco);
             
             // Unready once assigned to a game so they don't immediately get assigned to another
             member.ready = false;

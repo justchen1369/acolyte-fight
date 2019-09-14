@@ -50,7 +50,6 @@ export interface JoinActionMsg extends ControlMsgBase {
     controlKey: number;
     userId: string | null;
     userHash: string | null;
-    partyHash?: string;
     playerName: string;
     keyBindings: KeyBindings;
     isMobile: boolean;

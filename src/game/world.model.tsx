@@ -205,7 +205,6 @@ export interface Player {
 	controlKey: number;
 	userId?: string;
 	userHash: string | null;
-	partyHash?: string;
 	name: string;
 	isSharedBot: boolean;
 	isBot: boolean;
