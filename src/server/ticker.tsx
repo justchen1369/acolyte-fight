@@ -143,13 +143,7 @@ function finalizeMatchupIfNecessary(game: g.Game) {
 
     game.matched = true;
 
-    const teams = matchmaking.assignTeams(game);
-    if (teams) {
-		games.queueControlMessage(game, {
-            type: m.ActionType.Teams,
-            teams,
-        });
-    }
+    matchmaking.finalizeMatchmaking(game);
 }
 
 function closeGameIfNecessary(game: g.Game) {

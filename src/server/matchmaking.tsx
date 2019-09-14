@@ -10,18 +10,18 @@ import { getStore } from './serverStore';
 import { logger } from './logging';
 
 const ChoicePower = 2;
-const EvenPreference = 1.2;
+const OddPenalty = 0.6;
 
 export interface RatedPlayer {
     socketId: string;
     aco: number;
 }
 
-interface SplitCandidate {
+interface SplitCandidate extends CandidateBase {
+    type: "split";
     threshold: number;
     lower: RatedPlayer[];
     upper: RatedPlayer[];
-    worstWinProbability: number;
 }
 
 interface TeamPlayer {
@@ -29,8 +29,24 @@ interface TeamPlayer {
     aco: number;
 }
 
-interface TeamsCandidate {
+type CandidatePlayer = RatedPlayer | TeamPlayer;
+
+interface TeamsCandidate extends CandidateBase {
+    type: "teams";
     teams: TeamPlayer[][];
+}
+
+interface NoopCandidate extends CandidateBase {
+    type: "noop";
+}
+
+type Candidate =
+    NoopCandidate
+    | SplitCandidate
+    | TeamsCandidate
+
+interface CandidateBase {
+    type: string;
     worstWinProbability: number;
 }
 
@@ -106,22 +122,22 @@ function findJoinableGames(segment: string) {
 }
 
 function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
-    let ratings = extractRatings(game);
-    ratings.push(newPlayer);
-    ratings = _.orderBy(ratings, p => p.aco);
+    const candidates = generateSplitCandidates(game, [newPlayer]);
+    if (candidates.length === 0) {
+        return game;
+    }
 
-    const candidates = generateSplitCandidates(ratings);
-    const choice = chooseCandidate(candidates, weightSplitCandidate);
+    const choice = chooseCandidate(candidates);
     
     const prime = choice.lower.some(p => p === newPlayer) ? choice.lower : choice.upper;
     const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
     const [split, remainder] = games.splitGame(game, splitSocketIds);
 
-    logger.info(`Game [${game.id}]: Split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
+    logger.info(`Game [${game.id}]: split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
     return split;
 }
 
-function chooseCandidate<T>(candidates: T[], weightCandidate: (candidate: T) => number): T {
+function chooseCandidate<T extends Candidate>(candidates: T[]): T {
     if (candidates.length <= 0) {
         return undefined;
     }
@@ -142,10 +158,12 @@ function chooseCandidate<T>(candidates: T[], weightCandidate: (candidate: T) => 
     return candidates[candidates.length - 1];
 }
 
-function weightSplitCandidate(candidate: SplitCandidate): number {
+function weightCandidate(candidate: Candidate): number {
     let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
-    if (candidate.lower.length % 2 === 0 || candidate.upper.length % 2 === 0) {
-        weight *= EvenPreference;
+    if (candidate.type === "split") {
+        if (candidate.lower.length % 2 !== 0 || candidate.upper.length % 2 !== 0) {
+            weight *= OddPenalty;
+        }
     }
     return weight;
 }
@@ -154,14 +172,21 @@ function extractRatings(game: g.Game) {
     return wu(game.active.values()).map(p => ({ aco: p.aco, socketId: p.socketId } as RatedPlayer)).toArray();
 }
 
-function generateSplitCandidates(sortedRatings: RatedPlayer[]): SplitCandidate[] {
+function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): SplitCandidate[] {
     const minPlayers = 2;
     const maxCandidates = 9; // If the max players is modded, don't increase search beyond this limit
+
+    let sortedRatings = extractRatings(game);
+    if (newPlayers) {
+        sortedRatings.push(...newPlayers);
+    }
+    sortedRatings = _.orderBy(sortedRatings, p => p.aco);
+
 
 	let start = minPlayers;
 	let end = sortedRatings.length - minPlayers;
 	if (end < start) {
-		return null;
+		return [];
 	}
 
     // Find best split
@@ -190,6 +215,7 @@ function generateSplitCandidates(sortedRatings: RatedPlayer[]): SplitCandidate[]
             evaluateWinProbability(upper));
 
         candidates.push({
+            type: "split",
             threshold: sortedRatings[i].aco,
             lower,
             upper,
@@ -257,53 +283,71 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 	return totalPlayers / maxGames;
 }
 
-export function assignTeams(game: g.Game): string[][] {
-    const candidates = generateTeamCandidates(game);
-    if (candidates && candidates.length > 1) {
-        const choice = chooseCandidate(candidates, weightTeamCandidate);
-        if (choice.teams) {
-            const noTeamCandidate = candidates.find(p => p.teams === null);
-            if (noTeamCandidate) {
-                logger.info(`Game [${game.id}]: teams (${(noTeamCandidate.worstWinProbability * 100).toFixed(0)}% -> ${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
-            }
-            return choice.teams.map(team => team.map(p => p.heroId));
-        }
+export function finalizeMatchmaking(game: g.Game) {
+    const noopCandidate = generateNoopCandidate(game);
+    const candidates: Candidate[] = [
+        noopCandidate,
+        ...generateSplitCandidates(game),
+        ...generateTeamCandidates(game)
+    ];
+
+    // TODO: Remove
+    candidates.forEach(candidate => {
+        logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
+    });
+
+    const choice = chooseCandidate(candidates);
+
+    if (choice.type === "split") {
+        const splitSocketIds = new Set<string>(choice.lower.map(p => p.socketId));
+        games.splitGame(game, splitSocketIds);
+    } else if (choice.type === "teams") {
+		games.queueControlMessage(game, {
+            type: m.ActionType.Teams,
+            teams: choice.teams.map(team => team.map(p => p.heroId)),
+        });
     }
-    return null;
+
+    logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.worstWinProbability)} -> ${formatCandidate(choice)}`);
 }
 
-function weightTeamCandidate(candidate: TeamsCandidate): number {
-    let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
-    return weight;
+function formatCandidate(choice: Candidate) {
+    if (choice.type === "split") {
+        return `split (${formatPercent(choice.worstWinProbability)}): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`;
+    } else if (choice.type === "teams") {
+        return `teams (${formatPercent(choice.worstWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
+    } else {
+        return `noop (${formatPercent(choice.worstWinProbability)})`;
+    }
+}
+
+function formatPercent(proportion: number) {
+    return (proportion * 100).toFixed(1) + '%';
 }
 
 function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
     if (!((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId))) {
         // Everyone must be logged in to activate team mode
-        return null;
+        return [];
     }
 
     let players = extractTeamPlayers(game);
 
     const potentialNumTeams = calculatePotentialNumTeams(players.length);
     if (potentialNumTeams.length <= 0) {
-        return null;
+        return [];
     }
 
-    const candidates = new Array<TeamsCandidate>();
-    candidates.push(generateNoTeamsCandidate(players));
-    potentialNumTeams.forEach(numTeams => {
-        candidates.push(generateTeamCandidate(players, numTeams));
-    });
-    return candidates;
+    return potentialNumTeams.map(numTeams => generateTeamCandidate(players, numTeams));
 }
 
-function generateNoTeamsCandidate(players: TeamPlayer[]): TeamsCandidate {
+function generateNoopCandidate(game: g.Game): NoopCandidate {
+    const ratings = wu(game.active.values()).map(p => p.aco).toArray();
     const diff = aco.AcoRanked.calculateDiff(
-        _(players).map(p => p.aco).min(),
-        _(players).map(p => p.aco).max());
+        _.min(ratings),
+        _.max(ratings));
     return {
-        teams: null,
+        type: "noop",
         worstWinProbability: aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP)),
     };
 }
@@ -325,6 +369,7 @@ function generateTeamCandidate(players: TeamPlayer[], numTeams: number): TeamsCa
     }
 
     return {
+        type: "teams",
         teams,
         worstWinProbability: evaluateTeamCandidate(teams),
     };
