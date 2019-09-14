@@ -304,11 +304,6 @@ export function finalizeMatchmaking(initial: g.Game) {
             ...generateTeamCandidates(game)
         ];
 
-        // TODO: Remove
-        candidates.forEach(candidate => {
-            logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
-        });
-
         const choice = chooseCandidate(candidates);
 
         if (choice.type === "split") {
