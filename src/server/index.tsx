@@ -148,7 +148,6 @@ setInterval(async () => {
 		}
 
 		online.cleanupScoreboards();
-		matchmaking.cleanupRatingCache();
 	} catch (exception) {
 		logger.error(exception);
 	}
