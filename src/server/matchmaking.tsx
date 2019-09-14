@@ -130,8 +130,8 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     const choice = chooseCandidate(candidates);
     
     const prime = choice.lower.some(p => p === newPlayer) ? choice.lower : choice.upper;
-    const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
-    const [split, remainder] = games.splitGame(game, splitSocketIds);
+    const splitSocketIds = prime.map(p => p.socketId);
+    const [split] = games.splitGame(game, [splitSocketIds]);
 
     logger.info(`Game [${game.id}]: split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
     return split;
@@ -299,8 +299,8 @@ export function finalizeMatchmaking(game: g.Game) {
     const choice = chooseCandidate(candidates);
 
     if (choice.type === "split") {
-        const splitSocketIds = new Set<string>(choice.lower.map(p => p.socketId));
-        games.splitGame(game, splitSocketIds);
+        const splitSocketIds = choice.lower.map(p => p.socketId);
+        games.splitGame(game, [splitSocketIds]);
     } else if (choice.type === "teams") {
 		games.queueControlMessage(game, {
             type: m.ActionType.Teams,

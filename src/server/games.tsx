@@ -233,47 +233,82 @@ function unassignBots(game: g.Game): g.Game {
 	return game;
 }
 
-export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game[] {
+export function splitGame(initial: g.Game, requestedSocketIds: string[][]): g.Game[] {
+	// Calculate which sockets are actually going in which game
+	const allSocketIds = wu(initial.active.keys()).toArray();
+	const remainingSocketIds = new Set(initial.active.keys());
+	const forkSocketIds = new Array<Set<string>>();
+	for (let i = 0; i < requestedSocketIds.length; ++i) {
+		const socketIds = new Set<string>();
+		requestedSocketIds[i].forEach(socketId => {
+			if (remainingSocketIds.has(socketId)) {
+				remainingSocketIds.delete(socketId);
+				socketIds.add(socketId);
+			}
+		});
+		forkSocketIds.push(socketIds);
+	}
+	if (remainingSocketIds.size > 0) {
+		forkSocketIds.push(remainingSocketIds);
+	}
+
 	// Create a copy of the initial game
-	const fork = cloneGame(initial);
-	const remainder = cloneGame(initial);
+	const forks = _.range(0, forkSocketIds.length).map(_ => cloneGame(initial));
 
 	// Unassign bots as simulating players may need to change
-	unassignBots(fork);
-	unassignBots(remainder);
+	forks.forEach(fork => unassignBots(fork));
 
 	// Remove players from alternate game
-	const allSocketIds = new Set(initial.active.keys());
 	const replaceWithBot = false;
-	allSocketIds.forEach(socketId => {
-		const split = splitSocketIds.has(socketId);
-		const prime = split ? fork : remainder;
-		const other = split ? remainder : fork;
-		leaveGame(other, socketId, replaceWithBot, prime.id);
+	const isSplit = true;
+	for (let i = 0; i < forks.length; ++i) {
+		const fork = forks[i];
+		const socketIds = forkSocketIds[i];
 
-		other.socketIds.delete(socketId);
-		other.isRankedLookup.delete(socketId);
-	});
+		allSocketIds.forEach(socketId => {
+			if (!socketIds.has(socketId)) {
+				// Remove the player from this fork
+				leaveGame(fork, socketId, replaceWithBot, isSplit);
+				fork.socketIds.delete(socketId);
+				fork.isRankedLookup.delete(socketId);
+			}
+		});
+	}
 
 	// Move players to new game
-	allSocketIds.forEach(socketId => {
-		const split = splitSocketIds.has(socketId);
-		const prime = split ? fork : remainder;
-		emitSplit(socketId, initial.id, prime.id);
-		emitJoinForSocket(prime, socketId);
-	});
+	for (let i = 0; i < forks.length; ++i) {
+		const fork = forks[i];
+		const socketIds = forkSocketIds[i];
 
-	// Move observers
-	remainder.observers.clear();
-	fork.observers.forEach(observer => {
-		emitJoinForSocket(fork, observer.socketId);
-	});
+
+		socketIds.forEach(socketId => {
+			emitSplit(socketId, initial.id, fork.id);
+			emitJoinForSocket(fork, socketId);
+		});
+	}
+
+	// Move observers to first game
+	for (let i = 0; i < forks.length; ++i) {
+		const fork = forks[i];
+
+		if (i === 0) {
+			fork.observers.forEach(observer => {
+				emitJoinForSocket(fork, observer.socketId);
+			});
+		} else {
+			fork.observers.clear();
+		}
+	}
 
 	// Destroy initial game
 	initial.active.clear();
 
-	logger.info(`Game [${initial.id}] split into ${fork.id} (${fork.active.size} players) and ${remainder.id} (${remainder.active.size} players) at ${initial.tick} ticks`);
-	return [fork, remainder];
+	logger.info(`Game [${initial.id}] split into ${formatForks(forks)} at ${initial.tick} ticks`);
+	return forks;
+}
+
+function formatForks(forks: g.Game[]): string {
+	return forks.map(fork => `${fork.id} (${fork.active.size})`).join(', ');
 }
 
 export function queueAction(game: g.Game, actionData: m.ActionMsg) {
@@ -333,7 +368,7 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 	}
 }
 
-export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split: string = null) {
+export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split?: boolean) {
 	const player = game.active.get(socketId);
 	if (player) {
 		game.active.delete(socketId);
@@ -347,7 +382,7 @@ export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolea
 			controlKey = acquireControlKey(player.heroId, game);
 		}
 
-		queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split: !!split });
+		queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split });
 
 		if (split) {
 			logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] split to ${split} after ${game.tick} ticks`);

@@ -84,7 +84,7 @@ function onConnection(socket: SocketIO.Socket) {
 		--store.numConnections;
 		store.assignments.delete(socket.id);
 
-		games.onDisconnect(socket.id, authToken);
+		disconnectFromGames(socket.id);
 		parties.onDisconnect(socket.id);
 
 		logger.info(`socket ${socket.id} disconnected${upstream ? " + upstream" : ""}`);
@@ -115,6 +115,21 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
+}
+
+function disconnectFromGames(socketId: string) {
+	const store = getStore();
+
+	store.activeGames.forEach(game => {
+		if (game.active.has(socketId)) {
+			const player = game.active.get(socketId);
+			games.leaveGame(game, socketId);
+
+			if (player) {
+				logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] disconnected after ${game.tick} ticks`);
+			}
+		}
+	});
 }
 
 function onInstanceMsg(socket: SocketIO.Socket, authToken: string, data: m.ServerInstanceRequest, callback: (output: m.ServerInstanceResponseMsg) => void) {
@@ -579,7 +594,12 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 
 		const game = store.activeGames.get(gameId);
 		if (game) {
+			const player = game.active.get(socket.id);
 			games.leaveGame(game, socket.id);
+
+			if (player) {
+				logger.info(`Game [${game.id}]: player ${player.name} [${socket.id}] left after ${game.tick} ticks`);
+			}
 		}
 
 		if (store.assignments.get(socket.id) === gameId) {
