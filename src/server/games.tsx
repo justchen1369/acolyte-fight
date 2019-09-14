@@ -21,13 +21,10 @@ import { getStore } from './serverStore';
 import { addTickMilliseconds } from './loadMetrics';
 import { logger } from './logging';
 
-const NanoTimer = require('nanotimer');
-const tickTimer = new NanoTimer();
-
 let emitJoin: JoinEmitter = null;
-let emitTick: TickEmitter = null;
 let emitSplit: SplitEmitter = null;
-let ticksProcessing = false;
+
+let queuedMessageListener: QueuedMessageListener = null;
 
 const finishedGameListeners = new Array<FinishedGameListener>();
 
@@ -35,12 +32,12 @@ export interface JoinEmitter {
 	(join: g.JoinResult): void;
 }
 
-export interface TickEmitter {
-	(gameId: string, data: m.TickMsg): void;
-}
-
 export interface SplitEmitter {
 	(socketId: string, oldGameId: string, newGameId: string): void;
+}
+
+export interface QueuedMessageListener {
+	(game: g.Game): void;
 }
 
 export interface FinishedGameListener {
@@ -51,12 +48,12 @@ export function attachToJoinEmitter(emit: JoinEmitter) {
 	emitJoin = emit;
 }
 
-export function attachToTickEmitter(emit: TickEmitter) {
-	emitTick = emit;
-}
-
 export function attachToSplitEmitter(emit: SplitEmitter) {
 	emitSplit = emit;
+}
+
+export function attachQueuedMessageListener(listener: QueuedMessageListener) {
+	queuedMessageListener = listener;
 }
 
 export function attachFinishedGameListener(listener: FinishedGameListener) {
@@ -76,34 +73,6 @@ export function onDisconnect(socketId: string, authToken: string) {
 	});
 }
 
-function startTickProcessing() {
-	if (ticksProcessing) {
-		return;
-	}
-	ticksProcessing = true;
-
-	tickTimer.setInterval(() => {
-		const milliseconds = tickTimer.time(() => {
-			const running = new Array<g.Game>();
-			getStore().activeGames.forEach(game => {
-				const isGameRunning = gameTurn(game);
-				if (isGameRunning) {
-					running.push(game);
-				}
-			});
-
-			online.updateOnlinePlayers(running);
-
-			if (running.length === 0) {
-				ticksProcessing = false;
-				tickTimer.clearInterval();
-				logger.info("Stopped processing ticks");
-			}
-		}, '', 'm');
-		addTickMilliseconds(milliseconds);
-	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
-}
-
 export function calculateRoomStats(segment: string): number {
 	const scoreboard = getStore().scoreboards.get(segment);
 	if (scoreboard) {
@@ -111,20 +80,6 @@ export function calculateRoomStats(segment: string): number {
 	} else {
 		return 0;
 	}
-}
-
-export function apportionPerGame(totalPlayers: number, maxPlayers: number) {
-	// Round up to nearest even number
-	return Math.min(maxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers, maxPlayers) / 2) * 2);
-}
-
-export function minPerGame(totalPlayers: number, maxPlayers: number) {
-	return Math.floor(averagePlayersPerGame(totalPlayers, maxPlayers));
-}
-
-export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) {
-	const maxGames = Math.ceil(totalPlayers / maxPlayers);
-	return totalPlayers / maxGames;
 }
 
 export function receiveAction(game: g.Game, controlKey: number, data: m.ActionMsg, socketId: string) {
@@ -236,7 +191,7 @@ function registerGame(game: g.Game) {
 	}
 }
 
-function unregisterGame(game: g.Game) {
+export function unregisterGame(game: g.Game) {
 	const store = getStore();
 
 	store.activeGames.delete(game.id);
@@ -321,7 +276,7 @@ export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game[
 	return [fork, remainder];
 }
 
-function queueAction(game: g.Game, actionData: m.ActionMsg) {
+export function queueAction(game: g.Game, actionData: m.ActionMsg) {
 	let currentPrecedence = actionPrecedence(game.actions.get(actionData.h));
 	let newPrecedence = actionPrecedence(actionData);
 
@@ -329,21 +284,21 @@ function queueAction(game: g.Game, actionData: m.ActionMsg) {
 		game.actions.set(actionData.h, actionData);
 	}
 
-	startTickProcessing();
+	queuedMessageListener(game);
 }
 
-function queueControlMessage(game: g.Game, actionData: m.ControlMsg) {
+export function queueControlMessage(game: g.Game, actionData: m.ControlMsg) {
 	game.controlMessages.push(actionData);
 
-	startTickProcessing();
+	queuedMessageListener(game);
 }
 
-function queueSyncMessage(game: g.Game, actionData: m.SyncMsg) {
+export function queueSyncMessage(game: g.Game, actionData: m.SyncMsg) {
 	if (game.syncTick < actionData.t) {
 		game.syncTick = actionData.t;
 		game.syncMessage = actionData;
 
-		startTickProcessing();
+		queuedMessageListener(game);
 	}
 }
 
@@ -367,10 +322,6 @@ function actionPrecedence(actionData: m.ActionMsg): number {
 		// Casting spell
 		return 100;
 	}
-}
-
-function isSpell(actionData: m.ActionMsg): boolean {
-	return actionData.type === "game" && !w.Actions.NonGameStarters.some(x => x === actionData.s);
 }
 
 export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsMsg) {
@@ -455,76 +406,6 @@ function rankGameIfNecessary(game: g.Game) {
 			}
 			online.incrementStats(game.segment, result);
 		});
-	}
-}
-
-function finishGameIfNecessary(game: g.Game) {
-	if (game.finished) {
-		return;
-	}
-
-	if (game.active.size > 0) {
-		return;
-	}
-
-	game.finished = true;
-	game.controlMessages.push({ type: "finish" });
-}
-
-function gameTurn(game: g.Game): boolean {
-	let running = isGameRunning(game) || game.actions.size > 0 || game.controlMessages.length > 0;
-	if (running) {
-		for (let i = 0; i < TicksPerTurn; ++i) {
-			gameTick(game);
-		}
-	}
-
-	return running;
-}
-
-function gameTick(game: g.Game) {
-	if (game.finished) {
-		return;
-	}
-
-	closeGameIfNecessary(game);
-	finishGameIfNecessary(game);
-
-	const data = {
-		u: game.universe,
-		t: game.tick++,
-	} as m.TickMsg;
-
-	if (game.controlMessages.length > 0) {
-		data.c = game.controlMessages;
-		game.controlMessages = [];
-	}
-
-	if (game.syncMessage) {
-		data.s = game.syncMessage;
-		game.syncMessage = null;
-	}
-
-	if (game.actions.size > 0) {
-		data.a = wu(game.actions.values()).toArray();
-		game.actions.clear();
-		game.activeTick = game.tick;
-	}
-
-	if (game.history) {
-		if (game.history.length < Matchmaking.MaxHistoryLength) {
-			game.history.push(data);
-		} else {
-			game.closeTick = Math.min(game.closeTick, game.tick); // New players cannot join without the full history
-		}
-	}
-	emitTick(game.id, data);
-
-	if (game.finished) {
-		game.bots.clear();
-		unregisterGame(game);
-		gameStorage.saveGame(game);
-		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 	}
 }
 
@@ -711,71 +592,4 @@ function findSlot(game: g.Game, replaceBots: boolean = true): string {
 		}
 	}
 	return null;
-}
-
-function closeGameIfNecessary(game: g.Game) {
-	if (!game.joinable) {
-		return;
-	}
-
-	let waitPeriod: number = null;
-	let numTeams: number = null;
-
-	const numPlayers = game.active.size + game.bots.size;
-	if (numPlayers > 1 && wu(game.actions.values()).some(action => isSpell(action))) {
-		// Casting any spell closes the game
-		const joinPeriod = calculateJoinPeriod(game.segment, game.active.size, game.locked, game.matchmaking.MaxPlayers);
-
-		const newCloseTick = game.tick + joinPeriod;
-		if (newCloseTick < game.closeTick) {
-			game.closeTick = newCloseTick;
-			waitPeriod = joinPeriod;
-		}
-	}
-
-	if (game.tick >= game.closeTick) {
-		if ((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId)) {
-			// Everyone must be logged in to activate team mode
-			if (numPlayers >= 4 && Math.random() < game.matchmaking.TeamGameProbability) {
-				const candidates = new Array<number>();
-				for (let candidateTeams = 2; candidateTeams <= numPlayers / 2; ++candidateTeams) {
-					if ((numPlayers % candidateTeams) === 0) {
-						candidates.push(candidateTeams);
-					}
-				}
-				if (candidates.length > 0) {
-					numTeams = candidates[Math.floor(Math.random() * candidates.length)];
-				}
-			}
-		}
-
-		getStore().joinableGames.delete(game.id);
-		game.joinable = false;
-		waitPeriod = 0;
-		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players (" + (numTeams || 1) + " teams) after " + game.tick + " ticks");
-	}
-
-	if (waitPeriod !== null) {
-		queueControlMessage(game, {
-			type: m.ActionType.CloseGame,
-			closeTick: game.closeTick,
-			waitPeriod,
-			numTeams,
-		});
-	}
-}
-
-function calculateJoinPeriod(segment: string, numHumans: number, locked: string, maxPlayers: number): number {
-	if (locked) {
-		return Matchmaking.JoinPeriod;
-	}
-
-	const numInRoom = calculateRoomStats(segment);
-	const targetPerGame = minPerGame(numInRoom, maxPlayers);
-
-	if (numHumans < targetPerGame) {
-		return Matchmaking.WaitForMorePeriod;
-	} else {
-		return Matchmaking.JoinPeriod;
-	}
 }

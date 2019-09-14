@@ -26,6 +26,7 @@ import * as online from './online';
 import * as percentiles from './percentiles';
 import * as serverStore from './serverStore';
 import * as statsStorage from './statsStorage';
+import * as ticker from './ticker';
 
 const rootDir = path.resolve('.');
 
@@ -56,6 +57,7 @@ kongregate.init(kongregateSecret);
 gameStorage.initStorage(replaysBasePath);
 modder.init();
 percentiles.init();
+ticker.init();
 if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
 }

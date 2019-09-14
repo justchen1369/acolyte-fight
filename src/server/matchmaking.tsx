@@ -232,3 +232,17 @@ function watchPriority(game: g.Game): number {
 		return 100 + game.active.size;
 	}
 }
+
+export function apportionPerGame(totalPlayers: number, maxPlayers: number) {
+	// Round up to nearest even number
+	return Math.min(maxPlayers, Math.ceil(averagePlayersPerGame(totalPlayers, maxPlayers) / 2) * 2);
+}
+
+export function minPerGame(totalPlayers: number, maxPlayers: number) {
+	return Math.floor(averagePlayersPerGame(totalPlayers, maxPlayers));
+}
+
+export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) {
+	const maxGames = Math.ceil(totalPlayers / maxPlayers);
+	return totalPlayers / maxGames;
+}

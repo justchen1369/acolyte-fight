@@ -20,6 +20,7 @@ import * as mirroring from './mirroring';
 import * as modder from './modder';
 import * as online from './online';
 import * as parties from './parties';
+import * as ticker from './ticker';
 
 let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -31,7 +32,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	io = _io;
     io.on('connection', onConnection);
 	games.attachToJoinEmitter(emitHero);
-	games.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
+	ticker.attachToTickEmitter((gameId, data) => io.to(gameId).emit("tick", data));
 	games.attachToSplitEmitter(emitSplit);
 	games.attachFinishedGameListener(emitGameResult);
 	parties.attachToPartyEmitter(emitParty);

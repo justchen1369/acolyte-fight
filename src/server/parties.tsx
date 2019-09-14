@@ -169,7 +169,7 @@ function findReadyPlayers(party: g.Party): g.PartyMember[] {
     }
 
     const room = getStore().rooms.get(party.roomId);
-    const required = games.apportionPerGame(relevant.length, room.Matchmaking.MaxPlayers);
+    const required = matchmaking.apportionPerGame(relevant.length, room.Matchmaking.MaxPlayers);
 
     const ready = relevant.filter(p => p.ready);
     if (ready.length < required) {
@@ -204,7 +204,7 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
 	const partyHash = crypto.createHash('md5').update(party.id).digest('hex');
 	const room = store.rooms.get(party.roomId);
 	const remaining = _.shuffle(ready);
-	const maxPlayersPerGame = games.apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
+	const maxPlayersPerGame = matchmaking.apportionPerGame(remaining.length, room.Matchmaking.MaxPlayers);
 	while (remaining.length > 0) {
 		const group = new Array<g.PartyMember>();
 		for (let i = 0; i < maxPlayersPerGame; ++i) {
