@@ -9,6 +9,14 @@ import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
+const RatingCacheExpireMilliseconds = 10 * 60 * 1000;
+const ratingCache = new Map<string, RatingCacheItem>();
+
+interface RatingCacheItem {
+    userRating: g.UserRating;
+    expire: number;
+}
+
 export interface RatedPlayer {
     socketId: string;
     aco: number;
@@ -45,7 +53,15 @@ interface CandidateBase {
 }
 
 export async function retrieveRating(userId: string, category: string, unranked: boolean): Promise<number> {
-    const userRating = await retrieveUserRatingOrDefault(userId, category);
+    const key = category + '/' + userId;
+
+    const cacheItem = ratingCache.get(key);
+    let userRating = cacheItem ? cacheItem.userRating : await retrieveUserRatingOrDefault(userId, category);
+    ratingCache.set(key, {
+        userRating,
+        expire: Date.now() + RatingCacheExpireMilliseconds,
+    });
+
     if (unranked) {
         return userRating.acoUnranked;
     } else {
@@ -60,6 +76,15 @@ async function retrieveUserRatingOrDefault(userId: string, category: string): Pr
 
     const userRating = await statsStorage.getUserRating(userId, category);
     return userRating || statsStorage.initialRating();
+}
+
+export function cleanupRatingCache() {
+    const now = Date.now();
+    ratingCache.forEach((item, key) => {
+        if (now >= item.expire) {
+            ratingCache.delete(key);
+        }
+    });
 }
 
 export function findNewGame(version: string, room: g.Room, partyId: string | null, newPlayer: RatedPlayer): g.Game {

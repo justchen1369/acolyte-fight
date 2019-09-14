@@ -21,6 +21,7 @@ import * as emitter from './emitter';
 import * as facebook from './facebook';
 import * as kongregate from './kongregate';
 import * as gameStorage from './gameStorage';
+import * as matchmaking from './matchmaking';
 import * as modder from './modder';
 import * as online from './online';
 import * as percentiles from './percentiles';
@@ -147,6 +148,7 @@ setInterval(async () => {
 		}
 
 		online.cleanupScoreboards();
+		matchmaking.cleanupRatingCache();
 	} catch (exception) {
 		logger.error(exception);
 	}
