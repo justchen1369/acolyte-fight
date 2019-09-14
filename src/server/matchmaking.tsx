@@ -258,20 +258,15 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 }
 
 export function assignTeams(game: g.Game): string[][] {
-    if ((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId)) {
-        // Everyone must be logged in to activate team mode
-        const candidates = generateTeamCandidates(game);
-        if (candidates && candidates.length > 1) {
-            const choice = chooseCandidate(candidates, weightTeamCandidate);
-            if (choice.teams) {
-                const noTeamCandidate = candidates.find(p => p.teams === null);
-                if (noTeamCandidate) {
-                    logger.info(`Game [${game.id}]: teams (${(noTeamCandidate.worstWinProbability * 100).toFixed(0)}% -> ${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
-                }
-                return choice.teams.map(team => team.map(p => p.heroId));
-            } else {
-                return null;
+    const candidates = generateTeamCandidates(game);
+    if (candidates && candidates.length > 1) {
+        const choice = chooseCandidate(candidates, weightTeamCandidate);
+        if (choice.teams) {
+            const noTeamCandidate = candidates.find(p => p.teams === null);
+            if (noTeamCandidate) {
+                logger.info(`Game [${game.id}]: teams (${(noTeamCandidate.worstWinProbability * 100).toFixed(0)}% -> ${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
             }
+            return choice.teams.map(team => team.map(p => p.heroId));
         }
     }
     return null;
@@ -283,6 +278,11 @@ function weightTeamCandidate(candidate: TeamsCandidate): number {
 }
 
 function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
+    if (!((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId))) {
+        // Everyone must be logged in to activate team mode
+        return null;
+    }
+
     let players = extractTeamPlayers(game);
 
     const potentialNumTeams = calculatePotentialNumTeams(players.length);
