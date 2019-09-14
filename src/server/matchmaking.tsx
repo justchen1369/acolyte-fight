@@ -299,7 +299,7 @@ export function finalizeMatchmaking(game: g.Game) {
     ];
 
     let choice: Candidate = noopCandidate;
-    do {
+    while (true) {
         // TODO: Remove
         candidates.forEach(candidate => {
             logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
@@ -314,13 +314,16 @@ export function finalizeMatchmaking(game: g.Game) {
 
         if (choice.type === "split") {
             // Try subsplits
+            logger.info(`Game [${game.id}]: subsplitting`); // TODO: remove
             candidates = [
                 choice,
                 ...generateSubSplitCandidates(choice.splits),
             ];
             continue;
         }
-    } while(false);
+
+        break;
+    }
 
     if (choice.type === "split") {
         const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
