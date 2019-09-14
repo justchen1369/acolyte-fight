@@ -50,6 +50,7 @@ export interface UserRating {
     winRate: number;
 }
 
+// Don't forget to deep clone in games.cloneGame(...)
 export interface Replay {
     id: string;
     universe: number;
@@ -64,6 +65,7 @@ export interface Replay {
 	history: m.TickMsg[];
 }
 
+// Don't forget to deep clone in games.cloneGame(...)
 export interface Game extends Replay {
     created: moment.Moment;
 

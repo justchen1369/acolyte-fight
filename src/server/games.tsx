@@ -376,6 +376,9 @@ function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 		const prime = split ? fork : remainder;
 		const other = split ? remainder : fork;
 		leaveGame(other, socketId, replaceWithBot, prime.id);
+
+		other.socketIds.delete(socketId);
+		other.isRankedLookup.delete(socketId);
 	});
 
 	// Move players to new game
