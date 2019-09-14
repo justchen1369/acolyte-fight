@@ -168,19 +168,19 @@ function weightCandidate(candidate: Candidate): number {
     return weight;
 }
 
-function extractRatings(game: g.Game) {
-    return wu(game.active.values()).map(p => ({ aco: p.aco, socketId: p.socketId } as RatedPlayer)).toArray();
+function extractSplitRatings(game: g.Game, newPlayers?: RatedPlayer[]) {
+    const ratings = wu(game.active.values()).map(p => ({ aco: p.aco, socketId: p.socketId } as RatedPlayer)).toArray();
+    if (newPlayers) {
+        ratings.push(...newPlayers);
+    }
+    return _.orderBy(ratings, p => p.aco);
 }
 
 function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): SplitCandidate[] {
     const minPlayers = 2;
     const maxCandidates = 9; // If the max players is modded, don't increase search beyond this limit
 
-    let sortedRatings = extractRatings(game);
-    if (newPlayers) {
-        sortedRatings.push(...newPlayers);
-    }
-    sortedRatings = _.orderBy(sortedRatings, p => p.aco);
+    const sortedRatings = extractSplitRatings(game, newPlayers);
 
 
 	let start = minPlayers;
@@ -331,14 +331,19 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
         return [];
     }
 
-    let players = extractTeamPlayers(game);
+    const sortedRatings = extractTeamPlayers(game);
 
-    const potentialNumTeams = calculatePotentialNumTeams(players.length);
+    const potentialNumTeams = calculatePotentialNumTeams(sortedRatings.length);
     if (potentialNumTeams.length <= 0) {
         return [];
     }
 
-    return potentialNumTeams.map(numTeams => generateTeamCandidate(players, numTeams));
+    const shuffledRatings = _.shuffle(sortedRatings);
+
+    const candidates = new Array<TeamsCandidate>();
+    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(sortedRatings, numTeams)));
+    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(shuffledRatings, numTeams)));
+    return candidates;
 }
 
 function generateNoopCandidate(game: g.Game): NoopCandidate {
@@ -352,20 +357,20 @@ function generateNoopCandidate(game: g.Game): NoopCandidate {
     };
 }
 
-function generateTeamCandidate(players: TeamPlayer[], numTeams: number): TeamsCandidate {
+function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number): TeamsCandidate {
     const teams = new Array<TeamPlayer[]>();
     for (let i = 0; i < numTeams; ++i) {
         teams.push([]);
     }
 
-    for (let i = 0; i < players.length; ++i) {
+    for (let i = 0; i < sortedRatings.length; ++i) {
         const round = Math.floor(i / numTeams);
         const offset = i % numTeams;
         const even = round % 2 === 0;
 
         // Assign in this repeating pattern: 0, 1, 2, 2, 1, 0, etc
         const team = even ? offset : (numTeams - offset - 1);
-        teams[team].push(players[i]);
+        teams[team].push(sortedRatings[i]);
     }
 
     return {
@@ -399,7 +404,8 @@ function extractTeamPlayers(game: g.Game): TeamPlayer[] {
             teamPlayers.push({ heroId, aco: botRating });
         });
     }
-    return teamPlayers;
+
+    return _.orderBy(teamPlayers, p => p.aco);
 }
 
 function calculatePotentialNumTeams(numPlayers: number): number[] {
