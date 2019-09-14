@@ -42,7 +42,7 @@ export function findNewGame(version: string, room: g.Room, partyId: string | nul
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
 		// Game too full to add one more player, split it
-		game = autoSplitGame(game, newAco);
+		game = splitGameForNewPlayer(game, newAco);
 	}
 
 	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
@@ -75,7 +75,7 @@ function findJoinableGames(segment: string) {
 	return openGames;
 }
 
-function autoSplitGame(game: g.Game, newAco: number): g.Game {
+function splitGameForNewPlayer(game: g.Game, newAco: number): g.Game {
 	const minPlayers = 1; // TODO: Change to 2
 
 	const ratings = wu(game.active.values()).map(p => p.aco).toArray();

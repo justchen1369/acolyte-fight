@@ -21,12 +21,6 @@ import { logger } from './logging';
 const AcoDecayLength = constants.Placements.AcoDecayLengthDays * 24 * 60 * 60;
 const AcoDecayInterval = 8 * 60 * 60;
 
-const AcoK = 10;
-const AcoR = 800;
-const AcoPower = 1;
-const AcoNumGamesConfidence = 1000;
-
-const Aco = new aco.Aco(AcoK, AcoR, AcoPower, AcoNumGamesConfidence);
 const winRates = new Map<string, aco.ActualWinRate[]>();
 
 export interface WinRateBucket {
@@ -878,9 +872,9 @@ function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.Pl
             const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            const diff = Aco.calculateDiff(selfAco, otherAco);
-            const winRate = Aco.estimateWinRate(diff, winRates.get(category) || []);
-            const adjustment = Aco.adjustment(winRate, score, multiplier);
+            const diff = aco.AcoRanked.calculateDiff(selfAco, otherAco);
+            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRates.get(category) || []);
+            const adjustment = aco.AcoRanked.adjustment(winProbability, score, multiplier);
             const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
             if (change.delta >= 0) {
                 if (!deltaGain || deltaGain.delta < change.delta) { // Largest gain

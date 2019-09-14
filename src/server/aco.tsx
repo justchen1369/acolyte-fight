@@ -1,3 +1,10 @@
+export interface AcoConfig {
+    k: number;
+    r: number;
+    power: number;
+    numGamesConfidence: number;
+}
+
 export interface ActualWinRate {
     midpoint: number;
     winRate: number;
@@ -20,18 +27,18 @@ export class Aco {
     power: number;
     numGamesConfidence: number;
 
-    constructor(k: number, r: number, power: number, numGamesConfidence: number) {
-        this.k = k;
-        this.r = r;
-        this.power = power;
-        this.numGamesConfidence = numGamesConfidence;
+    constructor(config: AcoConfig) {
+        this.k = config.k;
+        this.r = config.r;
+        this.power = config.power;
+        this.numGamesConfidence = config.numGamesConfidence;
     }
 
-    adjustment(winRate: number, score: number, weight: number = 1): AcoAdjustment {
-        const learnRate = Math.pow(1 - winRate, this.power) * weight;
-        const delta = this.k * (score - winRate) * learnRate;
+    adjustment(winProbability: number, score: number, weight: number = 1): AcoAdjustment {
+        const learnRate = Math.pow(1 - winProbability, this.power) * weight;
+        const delta = this.k * (score - winProbability) * learnRate;
 
-        return { delta, e: winRate, learnRate };
+        return { delta, e: winProbability, learnRate };
     }
 
     calculateDiff(selfRating: number, otherRating: number): number { 
@@ -39,7 +46,7 @@ export class Aco {
     }
 
     // IMPORTANT: dataPoints must be sorted!
-    estimateWinRate(diff: number, dataPoints: ActualWinRate[]) {
+    estimateWinProbability(diff: number, dataPoints: ActualWinRate[]) {
         const acoWinRate = calculateEloWinRate(diff, this.r)
 
         let winRate = acoWinRate;
@@ -101,3 +108,10 @@ export class Aco {
         }
     }
 }
+
+export const AcoRanked = new Aco({
+    k: 10,
+    r: 800,
+    power: 1,
+    numGamesConfidence: 1000,
+});
