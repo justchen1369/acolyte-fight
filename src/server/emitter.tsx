@@ -450,12 +450,12 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
 
 		if (data.observe) {
-			replay = games.findExistingGame(data.version, room, partyId);
+			replay = matchmaking.findExistingGame(data.version, room, partyId);
 		} else if (locked) {
 			// The user wants a private game, create one
 			replay = games.initGame(data.version, room, partyId, locked);
 		} else {
-			replay = games.findNewGame(data.version, room, partyId, aco);
+			replay = matchmaking.findNewGame(data.version, room, partyId, aco);
 		}
 	}
 

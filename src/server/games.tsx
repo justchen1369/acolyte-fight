@@ -104,87 +104,6 @@ function startTickProcessing() {
 	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
 }
 
-export function findNewGame(version: string, room: g.Room, partyId: string | null, newAco: number): g.Game {
-	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId);
-
-	const numJoining = 1;
-	const openGames = findJoinableGames(segment);
-
-	let game: g.Game = null;
-	if (openGames.length > 0) {
-		// TODO: Choose game with closest skill level
-		game = _.minBy(openGames, game => game.active.size);
-
-	}
-
-	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
-		// Game too full to add one more player, split it
-		game = autoSplitGame(game, newAco);
-	}
-
-	if (game && game.active.size + numJoining > game.matchmaking.MaxPlayers) {
-		// Still too big
-		game = null;
-	}
-
-	if (!game) {
-		game = initGame(version, room, partyId);
-	}
-	return game;
-}
-
-function findJoinableGames(segment: string) {
-	const store = getStore();
-
-	const openGames = new Array<g.Game>();
-	store.joinableGames.forEach(gameId => {
-		const g = store.activeGames.get(gameId);
-		if (g && g.joinable) {
-			if (g.segment === segment) {
-				openGames.push(g);
-			}
-		}
-		else {
-			// This entry shouldn't be in here - perhaps it was terminated before it could be removed
-			store.joinableGames.delete(gameId);
-		}
-	});
-	return openGames;
-}
-
-export function findExistingGame(version: string, room: g.Room | null, partyId: string | null): g.Game {
-	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId);
-	const store = getStore();
-
-	const candidates = wu(store.activeGames.values()).filter(x => x.segment === segment && isGameRunning(x)).toArray();
-	if (candidates.length === 0) {
-		return null;
-	}
-
-	return _.maxBy(candidates, x => watchPriority(x));
-}
-
-function watchPriority(game: g.Game): number {
-	if (!(game.active.size && isGameRunning(game))) {
-		// Discourage watching finished game
-		return 0;
-	} else if (game.locked) {
-		// Discourage watching locked games
-		return game.active.size;
-	} else if (game.winTick) {
-		// Discourage watching a game which is not live
-		return game.active.size;
-	} else if (!game.joinable) {
-		// Encourage watching a game in-progress
-		return 1000 + game.active.size;
-	} else {
-		// Watch a game that is only starting
-		return 100 + game.active.size;
-	}
-}
-
 export function calculateRoomStats(segment: string): number {
 	const scoreboard = getStore().scoreboards.get(segment);
 	if (scoreboard) {
@@ -359,7 +278,7 @@ function unassignBots(game: g.Game): g.Game {
 	return game;
 }
 
-function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
+export function splitGame(initial: g.Game, splitSocketIds: Set<string>): g.Game {
 	// Create a copy of the initial game
 	const fork = cloneGame(initial);
 	const remainder = cloneGame(initial);
@@ -741,75 +660,6 @@ function assignReconnectKey(game: g.Game, heroId: string) {
 	game.reconnectKeys.set(reconnectKey, heroId);
 
 	return reconnectKey;
-}
-
-function autoSplitGame(game: g.Game, newAco: number): g.Game {
-	const minPlayers = 1; // TODO: Change to 2
-
-	const ratings = wu(game.active.values()).map(p => p.aco).toArray();
-	ratings.push(newAco);
-	ratings.sort();
-
-	const threshold = calculateSplitThreshold(ratings, minPlayers);
-	if (threshold === null) {
-		// Cannot split
-		return game;
-	}
-
-	const primeIsBelow = newAco < threshold;
-
-	logger.info(formatSplit(ratings, threshold));
-
-	const primeSocketIds = new Set<string>();
-	game.active.forEach(player => {
-		const playerIsBelow = player.aco < threshold;
-		const isPrime = playerIsBelow == primeIsBelow;
-		if (isPrime) {
-			primeSocketIds.add(player.socketId);
-		}
-	});
-
-	return splitGame(game, primeSocketIds);
-}
-
-function formatSplit(ratings: number[], threshold: number) {
-	let result = `Split (${threshold.toFixed(0)}): `;
-	let reachedThreshold = false;
-	for (let i = 0; i < ratings.length; ++i) {
-		const rating = ratings[i];
-		if (i > 0) {
-			result += ' ';
-		}
-		if (!reachedThreshold && rating >= threshold) {
-			reachedThreshold = true;
-			result += '| ';
-		}
-		result += rating.toFixed(0);
-	}
-	return result;
-}
-
-function calculateSplitThreshold(sortedRatings: number[], minPlayers: number) {
-	minPlayers = Math.max(1, minPlayers);
-
-	const start = minPlayers;
-	const end = sortedRatings.length - minPlayers;
-	if (end < start) {
-		return null;
-	}
-
-	let maxDistance = 0;
-	let bestSplit = start;
-	for (let i = start; i <= end; ++i) {
-		const splitDistance = sortedRatings[i] - sortedRatings[i-1];
-		if (splitDistance > maxDistance) {
-			maxDistance = splitDistance;
-			bestSplit = i;
-		}
-	}
-
-	const threshold = sortedRatings[bestSplit];
-	return threshold;
 }
 
 function acquireControlKey(heroId: string, game: g.Game) {
