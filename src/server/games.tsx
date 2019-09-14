@@ -267,24 +267,15 @@ export function splitGame(initial: g.Game, requestedSocketIds: string[][]): g.Ga
 		const fork = forks[i];
 		const socketIds = forkSocketIds[i];
 
-
 		socketIds.forEach(socketId => {
 			emitSplit(socketId, initial.id, fork.id);
-			emitJoinForSocket(fork, socketId);
 		});
 	}
 
-	// Move observers to first game
-	for (let i = 0; i < forks.length; ++i) {
+	// Move observers to first game - remove from others
+	for (let i = 1; i < forks.length; ++i) {
 		const fork = forks[i];
-
-		if (i === 0) {
-			fork.observers.forEach(observer => {
-				emitJoinForSocket(fork, observer.socketId);
-			});
-		} else {
-			fork.observers.clear();
-		}
+		fork.observers.clear();
 	}
 
 	// Destroy initial game
@@ -292,6 +283,17 @@ export function splitGame(initial: g.Game, requestedSocketIds: string[][]): g.Ga
 
 	logger.info(`Game [${initial.id}] split into ${formatForks(forks)} at ${initial.tick} ticks`);
 	return forks;
+}
+
+export function emitForks(forks: g.Game[]) {
+	forks.forEach(fork => {
+		fork.active.forEach(player => {
+			emitJoinForSocket(fork, player.socketId);
+		});
+		fork.observers.forEach(observer => {
+			emitJoinForSocket(fork, observer.socketId);
+		});
+	});
 }
 
 function formatForks(forks: g.Game[]): string {

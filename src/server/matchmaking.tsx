@@ -128,6 +128,7 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     
     const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
     const forks = games.splitGame(game, splitSocketIds);
+    games.emitForks(forks);
 
     logger.info(`Game [${game.id}]: ${formatCandidate(choice)}`);
 
@@ -290,52 +291,42 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 	return totalPlayers / maxGames;
 }
 
-export function finalizeMatchmaking(game: g.Game) {
-    const noopCandidate = generateNoopCandidate(game);
-    let candidates: Candidate[] = [
-        noopCandidate,
-        ...generateSplitCandidates(game),
-        ...generateTeamCandidates(game)
-    ];
+export function finalizeMatchmaking(initial: g.Game) {
+    const queue = [initial];
+    const allForks = new Array<g.Game>();
+    while (queue.length > 0) {
+        const game = queue.shift();
 
-    let choice: Candidate = noopCandidate;
-    while (true) {
+        const noopCandidate = generateNoopCandidate(game);
+        let candidates: Candidate[] = [
+            noopCandidate,
+            ...generateSplitCandidates(game),
+            ...generateTeamCandidates(game)
+        ];
+
         // TODO: Remove
         candidates.forEach(candidate => {
             logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
         });
 
-        const candidate = chooseCandidate(candidates);
-        if (candidate === choice) {
-            // Unchanged, stop
-            break;
-        }
-        choice = candidate;
+        const choice = chooseCandidate(candidates);
 
         if (choice.type === "split") {
-            // Try subsplits
-            logger.info(`Game [${game.id}]: subsplitting`); // TODO: remove
-            candidates = [
-                choice,
-                ...generateSubSplitCandidates(choice.splits),
-            ];
-            continue;
+            const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
+            const forks = games.splitGame(game, splitSocketIds);
+            allForks.push(...forks); // Ensure to emit the forks
+            queue.push(...forks); // Perhaps may split further
+        } else if (choice.type === "teams") {
+            games.queueControlMessage(game, {
+                type: m.ActionType.Teams,
+                teams: choice.teams.map(team => team.map(p => p.heroId)),
+            });
         }
 
-        break;
+        logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.worstWinProbability)} -> ${formatCandidate(choice)}`);
     }
 
-    if (choice.type === "split") {
-        const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
-        games.splitGame(game, splitSocketIds);
-    } else if (choice.type === "teams") {
-		games.queueControlMessage(game, {
-            type: m.ActionType.Teams,
-            teams: choice.teams.map(team => team.map(p => p.heroId)),
-        });
-    }
-
-    logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.worstWinProbability)} -> ${formatCandidate(choice)}`);
+    games.emitForks(allForks);
 }
 
 function formatCandidate(choice: Candidate) {
