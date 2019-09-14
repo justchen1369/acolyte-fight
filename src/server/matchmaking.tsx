@@ -20,16 +20,13 @@ export interface RatedPlayer {
 interface SplitCandidate extends CandidateBase {
     type: "split";
     threshold: number;
-    lower: RatedPlayer[];
-    upper: RatedPlayer[];
+    splits: RatedPlayer[][];
 }
 
 interface TeamPlayer {
     heroId: string;
     aco: number;
 }
-
-type CandidatePlayer = RatedPlayer | TeamPlayer;
 
 interface TeamsCandidate extends CandidateBase {
     type: "teams";
@@ -129,12 +126,13 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
 
     const choice = chooseCandidate(candidates);
     
-    const prime = choice.lower.some(p => p === newPlayer) ? choice.lower : choice.upper;
-    const splitSocketIds = prime.map(p => p.socketId);
-    const [split] = games.splitGame(game, [splitSocketIds]);
+    const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
+    const forks = games.splitGame(game, splitSocketIds);
 
-    logger.info(`Game [${game.id}]: split (${(choice.worstWinProbability * 100).toFixed(1)}%): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`);
-    return split;
+    logger.info(`Game [${game.id}]: ${formatCandidate(choice)}`);
+
+    const index = choice.splits.findIndex(split => split.some(player => player === newPlayer));
+    return forks[index];
 }
 
 function chooseCandidate<T extends Candidate>(candidates: T[]): T {
@@ -161,9 +159,8 @@ function chooseCandidate<T extends Candidate>(candidates: T[]): T {
 function weightCandidate(candidate: Candidate): number {
     let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
     if (candidate.type === "split") {
-        if (candidate.lower.length % 2 !== 0 || candidate.upper.length % 2 !== 0) {
-            weight *= OddPenalty;
-        }
+        const numOdd = candidate.splits.filter(s => s.length % 2 !== 0).length;
+        weight *= Math.pow(OddPenalty, numOdd);
     }
     return weight;
 }
@@ -207,18 +204,17 @@ function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): Spli
 
     const candidates = new Array<SplitCandidate>();
 	for (let i = start; i <= end; ++i) {
-        const lower = sortedRatings.slice(0, i);
-        const upper = sortedRatings.slice(i);
+        const splits = [
+            sortedRatings.slice(0, i),
+            sortedRatings.slice(i)
+        ];
 
-        const worstWinProbability = Math.min(
-            evaluateWinProbability(lower),
-            evaluateWinProbability(upper));
+        const worstWinProbability = _(splits).map(p => evaluateWinProbability(p)).min();
 
         candidates.push({
             type: "split",
             threshold: sortedRatings[i].aco,
-            lower,
-            upper,
+            splits,
             worstWinProbability,
         });
     }
@@ -299,8 +295,8 @@ export function finalizeMatchmaking(game: g.Game) {
     const choice = chooseCandidate(candidates);
 
     if (choice.type === "split") {
-        const splitSocketIds = choice.lower.map(p => p.socketId);
-        games.splitGame(game, [splitSocketIds]);
+        const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
+        games.splitGame(game, splitSocketIds);
     } else if (choice.type === "teams") {
 		games.queueControlMessage(game, {
             type: m.ActionType.Teams,
@@ -313,7 +309,7 @@ export function finalizeMatchmaking(game: g.Game) {
 
 function formatCandidate(choice: Candidate) {
     if (choice.type === "split") {
-        return `split (${formatPercent(choice.worstWinProbability)}): ${choice.lower.map(p => p.aco.toFixed(0)).join(' ')} | ${choice.upper.map(p => p.aco.toFixed(0)).join(' ')}`;
+        return `split (${formatPercent(choice.worstWinProbability)}): ${choice.splits.map(s => s.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else if (choice.type === "teams") {
         return `teams (${formatPercent(choice.worstWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else {
