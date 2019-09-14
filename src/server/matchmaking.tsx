@@ -24,6 +24,16 @@ interface SplitCandidate {
     worstWinProbability: number;
 }
 
+interface TeamPlayer {
+    heroId: string;
+    aco: number;
+}
+
+interface TeamsCandidate {
+    teams: TeamPlayer[][];
+    worstWinProbability: number;
+}
+
 export async function retrieveRating(userId: string, category: string, unranked: boolean): Promise<number> {
     const userRating = await retrieveUserRatingOrDefault(userId, category);
     if (unranked) {
@@ -96,12 +106,12 @@ function findJoinableGames(segment: string) {
 }
 
 function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
-    const ratings = extractRatings(game);
+    let ratings = extractRatings(game);
     ratings.push(newPlayer);
-    ratings.sort();
+    ratings = _.orderBy(ratings, p => p.aco);
 
     const candidates = generateSplitCandidates(ratings);
-    const choice = chooseCandidate(candidates);
+    const choice = chooseCandidate(candidates, weightSplitCandidate);
     
     const prime = choice.lower.some(p => p === newPlayer) ? choice.lower : choice.upper;
     const splitSocketIds = new Set<string>(wu(prime).map(p => p.socketId));
@@ -111,12 +121,12 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     return split;
 }
 
-function chooseCandidate(candidates: SplitCandidate[]): SplitCandidate {
+function chooseCandidate<T>(candidates: T[], weightCandidate: (candidate: T) => number): T {
     if (candidates.length <= 0) {
         return undefined;
     }
 
-    const weightings = candidates.map(evaluateChoiceWeight);
+    const weightings = candidates.map(weightCandidate);
     const total = _(weightings).sum();
     const selector = total * Math.random();
 
@@ -132,7 +142,7 @@ function chooseCandidate(candidates: SplitCandidate[]): SplitCandidate {
     return candidates[candidates.length - 1];
 }
 
-function evaluateChoiceWeight(candidate: SplitCandidate): number {
+function weightSplitCandidate(candidate: SplitCandidate): number {
     let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
     if (candidate.lower.length % 2 === 0 || candidate.upper.length % 2 === 0) {
         weight *= EvenPreference;
@@ -145,7 +155,7 @@ function extractRatings(game: g.Game) {
 }
 
 function generateSplitCandidates(sortedRatings: RatedPlayer[]): SplitCandidate[] {
-    const minPlayers = 1; // TODO: Change to 2
+    const minPlayers = 2;
     const maxCandidates = 9; // If the max players is modded, don't increase search beyond this limit
 
 	let start = minPlayers;
@@ -245,4 +255,115 @@ export function minPerGame(totalPlayers: number, maxPlayers: number) {
 export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) {
 	const maxGames = Math.ceil(totalPlayers / maxPlayers);
 	return totalPlayers / maxGames;
+}
+
+export function assignTeams(game: g.Game): string[][] {
+    if ((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId)) {
+        // Everyone must be logged in to activate team mode
+        const candidates = generateTeamCandidates(game);
+        if (candidates && candidates.length > 1) {
+            const choice = chooseCandidate(candidates, weightTeamCandidate);
+            logger.info(`Teams (${(choice.worstWinProbability * 100).toFixed(0)}%): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`);
+            if (choice.teams) {
+                return choice.teams.map(team => team.map(p => p.heroId));
+            } else {
+                return null;
+            }
+        }
+    }
+    return null;
+}
+
+function weightTeamCandidate(candidate: TeamsCandidate): number {
+    let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
+    return weight;
+}
+
+function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
+    let players = extractTeamPlayers(game);
+
+    const potentialNumTeams = calculatePotentialNumTeams(players.length);
+    if (potentialNumTeams.length <= 0) {
+        return null;
+    }
+
+    const candidates = new Array<TeamsCandidate>();
+    candidates.push(generateNoTeamsCandidate(players));
+    potentialNumTeams.forEach(numTeams => {
+        candidates.push(generateTeamCandidate(players, numTeams));
+    });
+    return candidates;
+}
+
+function generateNoTeamsCandidate(players: TeamPlayer[]): TeamsCandidate {
+    const diff = aco.AcoRanked.calculateDiff(
+        _(players).map(p => p.aco).min(),
+        _(players).map(p => p.aco).max());
+    return {
+        teams: null,
+        worstWinProbability: aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP)),
+    };
+}
+
+function generateTeamCandidate(players: TeamPlayer[], numTeams: number): TeamsCandidate {
+    const teams = new Array<TeamPlayer[]>();
+    for (let i = 0; i < numTeams; ++i) {
+        teams.push([]);
+    }
+
+    for (let i = 0; i < players.length; ++i) {
+        const round = Math.floor(i / numTeams);
+        const offset = i % numTeams;
+        const even = round % 2 === 0;
+
+        // Assign in this repeating pattern: 0, 1, 2, 2, 1, 0, etc
+        const team = even ? offset : (numTeams - offset - 1);
+        teams[team].push(players[i]);
+    }
+
+    return {
+        teams,
+        worstWinProbability: evaluateTeamCandidate(teams),
+    };
+}
+
+function evaluateTeamCandidate(teams: TeamPlayer[][]): number {
+    const averageRatings = teams.map(team => _(team).map(p => p.aco).mean());
+    const diff = aco.AcoRanked.calculateDiff(
+        _.min(averageRatings),
+        _.max(averageRatings));
+    return aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+}
+
+function extractTeamPlayers(game: g.Game): TeamPlayer[] {
+    const teamPlayers = new Array<TeamPlayer>();
+    game.active.forEach(player => {
+        teamPlayers.push({ heroId: player.heroId, aco: player.aco });
+    });
+    if (game.matchmaking.AllowBotTeams) {
+        let botRating = game.matchmaking.BotRating;
+        if (!_.isInteger(botRating)) {
+            // Since this is moddable, ensure this doesn't crash the server
+            botRating = 0;
+        }
+
+        game.bots.forEach((socketId, heroId) => {
+            teamPlayers.push({ heroId, aco: botRating });
+        });
+    }
+    return teamPlayers;
+}
+
+function calculatePotentialNumTeams(numPlayers: number): number[] {
+    if (numPlayers >= 4) {
+        const candidates = new Array<number>();
+        for (let candidateTeams = 2; candidateTeams <= numPlayers / 2; ++candidateTeams) {
+            if ((numPlayers % candidateTeams) === 0) {
+                candidates.push(candidateTeams);
+            }
+        }
+        return candidates;
+    } else {
+        return [];
+    }
 }

@@ -74,7 +74,7 @@ export interface CloseGameMsg extends ControlMsgBase {
     type: "close";
     closeTick: number;
     waitPeriod: number;
-    numTeams?: number;
+    teams?: string[][]; // heroIds
 }
 
 export interface FinishGameMsg extends ControlMsgBase {

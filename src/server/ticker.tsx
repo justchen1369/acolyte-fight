@@ -137,7 +137,6 @@ function closeGameIfNecessary(game: g.Game) {
 	}
 
 	let waitPeriod: number = null;
-	let numTeams: number = null;
 
 	const numPlayers = game.active.size + game.bots.size;
 	if (numPlayers > 1 && wu(game.actions.values()).some(action => isSpell(action))) {
@@ -151,26 +150,14 @@ function closeGameIfNecessary(game: g.Game) {
 		}
 	}
 
+    let teams: string[][] = null;
 	if (game.tick >= game.closeTick) {
-		if ((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId)) {
-			// Everyone must be logged in to activate team mode
-			if (numPlayers >= 4 && Math.random() < game.matchmaking.TeamGameProbability) {
-				const candidates = new Array<number>();
-				for (let candidateTeams = 2; candidateTeams <= numPlayers / 2; ++candidateTeams) {
-					if ((numPlayers % candidateTeams) === 0) {
-						candidates.push(candidateTeams);
-					}
-				}
-				if (candidates.length > 0) {
-					numTeams = candidates[Math.floor(Math.random() * candidates.length)];
-				}
-			}
-		}
+        teams = matchmaking.assignTeams(game);
 
 		getStore().joinableGames.delete(game.id);
 		game.joinable = false;
 		waitPeriod = 0;
-		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players (" + (numTeams || 1) + " teams) after " + game.tick + " ticks");
+		logger.info("Game [" + game.id + "]: now unjoinable with " + game.active.size + " players (" + (teams ? teams.length : 1) + " teams) after " + game.tick + " ticks");
 	}
 
 	if (waitPeriod !== null) {
@@ -178,7 +165,7 @@ function closeGameIfNecessary(game: g.Game) {
 			type: m.ActionType.CloseGame,
 			closeTick: game.closeTick,
 			waitPeriod,
-			numTeams,
+			teams,
 		});
 	}
 }

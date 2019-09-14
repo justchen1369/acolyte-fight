@@ -1416,16 +1416,12 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	}
 
 	let teamSizes: number[] = null;
-	if (world.tick >= world.startTick) {
-		const teams = assignTeams(ev.numTeams, world);
-		if (teams) {
-			teamSizes = teams.map(x => x.length);
-
-			world.ui.notifications.push({
-				type: "teams",
-				teamSizes,
-			});
-		}
+	if (world.tick >= world.startTick && ev.teams) {
+		assignTeams(ev.teams, world);
+		world.ui.notifications.push({
+			type: "teams",
+			teamSizes: ev.teams.map(x => x.length),
+		});
 
 		// Close any customising dialogs as they cannot be used anymore now the game has started
 		world.ui.toolbar.customizingBtn = null;
@@ -1440,43 +1436,8 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	return true;
 }
 
-function assignTeams(numTeams: number, world: w.World): string[][] {
+function assignTeams(teams: string[][], world: w.World) {
 	const Visuals = world.settings.Visuals;
-
-	if (numTeams <= 1) {
-		return null;
-	}
-
-	const perTeam = Math.ceil(world.players.size / numTeams);
-	const teams = new Array<string[]>();
-
-	// assign people in parties first. do it this weird way to ensure a stable sort on all machines
-	const players = _.reverse(_.sortBy(world.players.valueSeq().toArray(), p => p.partyHash));
-	for (const player of players) {
-		let team: string[] = null;
-		for (const t of teams) {
-			if (t.length >= perTeam) {
-				continue;
-			}
-			const partyHash = world.players.get(t[0]).partyHash;
-			if (partyHash === player.partyHash) {
-				// Find the first team with the same party as me (even if I'm in no party)
-				team = t;
-				break;
-			}
-		}
-		if (!team && teams.length < numTeams) {
-			// Start a new team
-			team = [];
-			teams.push(team);
-		}
-		if (!team) {
-			// Add myself to the smallest team
-			team = _.minBy(teams, t => t.length);
-		}
-
-		team.push(player.heroId);
-	}
 
 	for (let i = 0; i < teams.length; ++i) {
 		const team = teams[i];
@@ -1501,7 +1462,6 @@ function assignTeams(numTeams: number, world: w.World): string[][] {
 	world.teamAssignments.forEach((teamId, heroId) => {
 		console.log("Team", teamId, heroId);
 	});
-	return teams;
 }
 
 function isPresentOrPastSelf(heroId: string, world: w.World) {
