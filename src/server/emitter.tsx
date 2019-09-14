@@ -70,8 +70,6 @@ function onConnection(socket: SocketIO.Socket) {
 
     ++getStore().numConnections;
     
-    games.onConnect(socket.id, authToken);
-
 	socket.on('disconnect', () => {
 		const store = getStore();
 

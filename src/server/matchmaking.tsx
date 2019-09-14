@@ -174,51 +174,62 @@ function extractSplitRatings(game: g.Game, newPlayers?: RatedPlayer[]) {
 }
 
 function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): SplitCandidate[] {
+    const ratings = extractSplitRatings(game, newPlayers);
+    return generateSubSplitCandidates([ratings]);
+}
+
+function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate[] {
     const minPlayers = 2;
-    const maxCandidates = 9; // If the max players is modded, don't increase search beyond this limit
-
-    const sortedRatings = extractSplitRatings(game, newPlayers);
-
-
-	let start = minPlayers;
-	let end = sortedRatings.length - minPlayers;
-	if (end < start) {
-		return [];
-	}
-
-    // Find best split
-	let maxDistance = 0;
-	let bestSplit = start;
-	for (let i = start; i <= end; ++i) {
-		const splitDistance = sortedRatings[i].aco - sortedRatings[i-1].aco;
-		if (splitDistance > maxDistance) {
-			maxDistance = splitDistance;
-			bestSplit = i;
-		}
-    }
-    
-    // Search around the best split
-    const searchRadius = Math.floor(maxCandidates / 2);
-    start = Math.max(start, bestSplit - searchRadius);
-    end = Math.min(end, bestSplit + searchRadius);
+    const maxCandidates = 3; // If the max players is modded, don't increase search beyond this limit
 
     const candidates = new Array<SplitCandidate>();
-	for (let i = start; i <= end; ++i) {
-        const splits = [
-            sortedRatings.slice(0, i),
-            sortedRatings.slice(i)
-        ];
 
-        const worstWinProbability = _(splits).map(p => evaluateWinProbability(p)).min();
+    for (let partition = 0; partition < partitions.length; ++partition) {
+        const sortedRatings = _.orderBy(partitions[partition], p => p.aco);
 
-        candidates.push({
-            type: "split",
-            threshold: sortedRatings[i].aco,
-            splits,
-            worstWinProbability,
-        });
+        let start = minPlayers;
+        let end = sortedRatings.length - minPlayers;
+        if (end < start) {
+            continue;
+        }
+
+        // Find best split
+        let maxDistance = 0;
+        let bestSplit = start;
+        for (let i = start; i <= end; ++i) {
+            const splitDistance = sortedRatings[i].aco - sortedRatings[i-1].aco;
+            if (splitDistance > maxDistance) {
+                maxDistance = splitDistance;
+                bestSplit = i;
+            }
+        }
+        
+        // Search around the best split
+        const searchRadius = Math.floor(maxCandidates / 2);
+        start = Math.max(start, bestSplit - searchRadius);
+        end = Math.min(end, bestSplit + searchRadius);
+
+        const otherPartitions = [...partitions];
+        otherPartitions.splice(partition, 1);
+
+        for (let i = start; i <= end; ++i) {
+            const splits = [
+                ...otherPartitions,
+                sortedRatings.slice(0, i),
+                sortedRatings.slice(i),
+            ];
+
+            const worstWinProbability = _(splits).map(p => evaluateWinProbability(p)).min();
+
+            candidates.push({
+                type: "split",
+                threshold: sortedRatings[i].aco,
+                splits,
+                worstWinProbability,
+            });
+        }
+
     }
-
     return candidates;
 }
 
@@ -281,18 +292,35 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 
 export function finalizeMatchmaking(game: g.Game) {
     const noopCandidate = generateNoopCandidate(game);
-    const candidates: Candidate[] = [
+    let candidates: Candidate[] = [
         noopCandidate,
         ...generateSplitCandidates(game),
         ...generateTeamCandidates(game)
     ];
 
-    // TODO: Remove
-    candidates.forEach(candidate => {
-        logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
-    });
+    let choice: Candidate = noopCandidate;
+    do {
+        // TODO: Remove
+        candidates.forEach(candidate => {
+            logger.info(`Game [${game.id}]: candidate ${formatCandidate(candidate)}`);
+        });
 
-    const choice = chooseCandidate(candidates);
+        const candidate = chooseCandidate(candidates);
+        if (candidate === choice) {
+            // Unchanged, stop
+            break;
+        }
+        choice = candidate;
+
+        if (choice.type === "split") {
+            // Try subsplits
+            candidates = [
+                choice,
+                ...generateSubSplitCandidates(choice.splits),
+            ];
+            continue;
+        }
+    } while(false);
 
     if (choice.type === "split") {
         const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));

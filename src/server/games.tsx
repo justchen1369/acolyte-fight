@@ -60,19 +60,6 @@ export function attachFinishedGameListener(listener: FinishedGameListener) {
 	finishedGameListeners.push(listener);
 }
 
-export function onConnect(socketId: string, authToken: string) {
-}
-
-export function onDisconnect(socketId: string, authToken: string) {
-	const store = getStore();
-
-	store.activeGames.forEach(game => {
-		if (game.active.has(socketId)) {
-			leaveGame(game, socketId);
-		}
-	});
-}
-
 export function calculateRoomStats(segment: string): number {
 	const scoreboard = getStore().scoreboards.get(segment);
 	if (scoreboard) {
@@ -383,12 +370,6 @@ export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolea
 		}
 
 		queueControlMessage(game, { heroId: player.heroId, controlKey, type: "leave", split });
-
-		if (split) {
-			logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] split to ${split} after ${game.tick} ticks`);
-		} else {
-			logger.info(`Game [${game.id}]: player ${player.name} [${socketId}] left after ${game.tick} ticks`);
-		}
 	}
 	
 	const observer = game.observers.get(socketId);
