@@ -100,8 +100,12 @@ declare interface MatchmakingSettings {
 	MinBots: number; // minimum number of bots to add when Play vs AI clicked
 	MaxBots: number; // maximum number of bots to add when Play vs AI clicked
 	MaxPlayers: number; // Maximum number of players in one game
+
 	AllowBotTeams: boolean; // Allow teams even when bots are in the game
 	BotRating: number; // If the bot is being matched into teams, consider it to be a player with this rating
+
+	RatingPower: number; // Higher means the matchmaker will try harder to match players of similar skill and there will be less random variation
+	OddPenalty: number; // Discourage non-even splits by this proportion
 }
 
 declare interface Layouts {

@@ -15,12 +15,6 @@ import { optional } from './schema';
 
 const CustomRoomPrefix = "c-";
 
-const roomUpdateListeners = new Array<RoomUpdateListener>();
-
-export interface RoomUpdateListener {
-    (room: g.Room): void;
-}
-
 export function init() {
     // Create an initial default room
     const store = getStore();
@@ -47,7 +41,13 @@ export function initRoom(mod: ModTree, authToken: string): g.Room {
         // Apply mod to matchmaker
         const matchmakingMod = mod.Matchmaking as Partial<MatchmakingSettings>;
         if (matchmakingMod
-            && optional(matchmakingMod.MaxPlayers, "number")) {
+            && optional(matchmakingMod.MaxPlayers, "number")
+            && optional(matchmakingMod.RatingPower, "number")
+            && optional(matchmakingMod.OddPenalty, "number")
+            && optional(matchmakingMod.AllowBotTeams, "boolean")
+            && optional(matchmakingMod.BotRating, "number")
+            && optional(matchmakingMod.MinBots, "number")
+            && optional(matchmakingMod.MaxBots, "number")) {
 
             Matchmaking = modder.merge(Matchmaking, mod.Matchmaking);
         }

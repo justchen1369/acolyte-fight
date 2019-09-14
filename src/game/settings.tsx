@@ -17,6 +17,8 @@ const Matchmaking: MatchmakingSettings = {
     MaxPlayers: 7,
     AllowBotTeams: false,
     BotRating: 1500,
+    RatingPower: 2,
+    OddPenalty: 0.6,
 };
 
 const Hero: HeroSettings = {

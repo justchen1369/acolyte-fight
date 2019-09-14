@@ -9,9 +9,6 @@ import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
-const ChoicePower = 2;
-const OddPenalty = 0.6;
-
 export interface RatedPlayer {
     socketId: string;
     aco: number;
@@ -124,7 +121,7 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
         return game;
     }
 
-    const choice = chooseCandidate(candidates);
+    const choice = chooseCandidate(candidates, game.matchmaking);
     
     const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
     const forks = games.splitGame(game, splitSocketIds);
@@ -136,12 +133,12 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     return forks[index];
 }
 
-function chooseCandidate<T extends Candidate>(candidates: T[]): T {
+function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: MatchmakingSettings): T {
     if (candidates.length <= 0) {
         return undefined;
     }
 
-    const weightings = candidates.map(weightCandidate);
+    const weightings = candidates.map(candidate => weightCandidate(candidate, matchmaking));
     const total = _(weightings).sum();
     const selector = total * Math.random();
 
@@ -157,11 +154,11 @@ function chooseCandidate<T extends Candidate>(candidates: T[]): T {
     return candidates[candidates.length - 1];
 }
 
-function weightCandidate(candidate: Candidate): number {
-    let weight = Math.pow(candidate.worstWinProbability, ChoicePower);
+function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings): number {
+    let weight = Math.pow(candidate.worstWinProbability, matchmaking.RatingPower);
     if (candidate.type === "split") {
         const numOdd = candidate.splits.filter(s => s.length % 2 !== 0).length;
-        weight *= Math.pow(OddPenalty, numOdd);
+        weight *= Math.pow(matchmaking.OddPenalty, numOdd);
     }
     return weight;
 }
@@ -181,7 +178,7 @@ function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): Spli
 
 function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate[] {
     const minPlayers = 2;
-    const maxCandidates = 3; // If the max players is modded, don't increase search beyond this limit
+    const maxCandidates = 5; // If the max players is modded, don't increase search beyond this limit
 
     const candidates = new Array<SplitCandidate>();
 
@@ -304,7 +301,7 @@ export function finalizeMatchmaking(initial: g.Game) {
             ...generateTeamCandidates(game)
         ];
 
-        const choice = chooseCandidate(candidates);
+        const choice = chooseCandidate(candidates, initial.matchmaking);
 
         if (choice.type === "split") {
             const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
@@ -407,14 +404,8 @@ function extractTeamPlayers(game: g.Game): TeamPlayer[] {
         teamPlayers.push({ heroId: player.heroId, aco: player.aco });
     });
     if (game.matchmaking.AllowBotTeams) {
-        let botRating = game.matchmaking.BotRating;
-        if (!_.isInteger(botRating)) {
-            // Since this is moddable, ensure this doesn't crash the server
-            botRating = 0;
-        }
-
         game.bots.forEach((socketId, heroId) => {
-            teamPlayers.push({ heroId, aco: botRating });
+            teamPlayers.push({ heroId, aco: game.matchmaking.BotRating });
         });
     }
 
