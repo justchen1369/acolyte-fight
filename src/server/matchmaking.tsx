@@ -106,8 +106,7 @@ function findJoinableGames(segment: string) {
 			if (g.segment === segment) {
 				openGames.push(g);
 			}
-		}
-		else {
+		} else {
 			// This entry shouldn't be in here - perhaps it was terminated before it could be removed
 			store.joinableGames.delete(gameId);
 		}

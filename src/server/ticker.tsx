@@ -137,7 +137,7 @@ function finalizeMatchupIfNecessary(game: g.Game) {
         return;
     }
 
-    if (game.tick < game.closeTick) {
+    if (game.joinable || game.tick < game.closeTick) {
         return;
     }
 
