@@ -75,6 +75,8 @@ class WatchPanel extends React.PureComponent<Props, State> {
     }
 
     private async activateObserverMode() {
+        await loader.loaded();
+
         if (this.props.party) {
             try {
                 await parties.makeObserverAsync(this.props.selfId, true);

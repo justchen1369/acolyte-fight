@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as loader from '../core/loader';
 import * as online from '../core/online';
 import * as segments from '../../shared/segments';
 import * as s from '../store.model';
@@ -29,19 +30,24 @@ class OnlineSegmentListener extends React.PureComponent<Props, State> {
     }
 
     componentDidMount() {
-        online.start(calculateSegment(this.props));
+        this.resendSegment();
     }
 
     componentDidUpdate(prevProps: Props) {
         const newSegment = calculateSegment(this.props);
         const prevSegment = calculateSegment(prevProps);
         if (prevSegment !== newSegment) {
-            online.start(newSegment);
+            this.resendSegment();
         }
     }
 
     render(): JSX.Element {
         return null;
+    }
+
+    private async resendSegment() {
+        await loader.loaded();
+        online.start(calculateSegment(this.props));
     }
 }
 
