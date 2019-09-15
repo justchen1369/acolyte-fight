@@ -12,7 +12,7 @@ export function onNotification(notifs: w.Notification[]) {
         const state = StoreProvider.getState();
         const world = state.world;
         if (state.tutorialLevel && world.winner && world.ui.myHeroId && world.winner === world.ui.myHeroId) {
-            StoreProvider.dispatch({ type: "tutorial", tutorialLevel: state.tutorialLevel + 1 });
+            exitTutorial(true);
         }
     }
 }
@@ -28,12 +28,16 @@ export function tutorialSettings(): matches.JoinParams {
     };
 }
 
-export function exitTutorial() {
+export function exitTutorial(completed: boolean = false) {
     StoreProvider.dispatch({ type: "tutorial", tutorialLevel: null });
-    trackTutorialExit(); // Don't await
+    trackTutorialExit(completed); // Don't await
 }
 
-async function trackTutorialExit() {
+async function trackTutorialExit(completed: boolean) {
     const numGames = await storage.getNumGames();
-    analytics.send("exitTutorial", numGames);
+    if (completed) {
+        analytics.send("completedTutorial", numGames);	
+    } else {	
+        analytics.send("exitTutorial", numGames);
+    }
 }
