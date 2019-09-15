@@ -3,6 +3,7 @@ import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as processor from './processor';
 import * as stats from './stats';
+import * as storage from '../storage';
 import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
@@ -23,6 +24,7 @@ export interface JoinParams {
 }
 
 export async function joinNewGame(opts: JoinParams): Promise<boolean> {
+	const numGames = await storage.getNumGames();
 	return new Promise<boolean>(resolve => {
 		const live = opts.live || false;
 		const observe = opts.observe || false;
@@ -45,6 +47,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				autoJoin: opts.autoJoin,
 				version: engine.version(),
 				numBots: opts.numBots || 0,
+				numGames,
 			};
 			getSocket().emit('join', msg, (response: m.JoinResponseMsg) => {
 				if (response.success === true) {

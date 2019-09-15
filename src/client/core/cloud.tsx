@@ -29,24 +29,32 @@ export async function loginAnonymouslyIfNecessary(): Promise<void> {
         return;
     }
 
-    const numGames = await storage.getNumGames();
-    if (numGames >= constants.Placements.VerificationGames) {
+    if (await shouldCreate()) {
         // Login anonymously
         await downloadSettings();
     }
 }
 
+async function shouldCreate() {
+    const numGames = await storage.getNumGames();
+    const known = await storage.getKnownUser();
+    return !known && numGames >= constants.Placements.VerificationGames;
+}
+
 export async function downloadSettings(): Promise<string> {
     const state = StoreProvider.getState();
 
-    const numGames = await storage.getNumGames();
-    const known = await storage.getKnownUser();
-    console.log(`Downloading settings... numGames=${numGames} known=${known}`);
+    let create = false;
 
     let url = `${base}/api/settings?cachebuster=${Date.now()}`;
-    if (!known && numGames >= constants.Placements.VerificationGames) {
+    if (await shouldCreate()) {
         url += `&create=${encodeURIComponent(state.playerName)}`;
+        create = true;
     }
+
+    const numGames = await storage.getNumGames();
+    const known = await storage.getKnownUser();
+    console.log(`Downloading settings... numGames=${numGames} known=${known} create=${create}`);
 
     const res = await fetch(url, {
         headers: credentials.headers(),
@@ -194,6 +202,5 @@ export async function logout(): Promise<void> {
     });
     StoreProvider.dispatch({ type: "logout" });
 
-    await storage.resetNumGames();
     await storage.setKnownUser(true);
 }

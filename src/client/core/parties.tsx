@@ -3,6 +3,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as engine from '../../game/engine';
 import * as rooms from './rooms';
+import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import { getSocket } from './sockets';
@@ -11,6 +12,7 @@ import { isMobile } from './userAgent';
 
 export async function createPartyAsync(): Promise<void> {
 	await loaded(); // Ensure the correct room has been joined
+	const numGames = await storage.getNumGames();
 
 	const store = StoreProvider.getState();
 	return new Promise<string>((resolve, reject) => {
@@ -21,6 +23,7 @@ export async function createPartyAsync(): Promise<void> {
 			isMobile,
 			unranked: store.options.unranked || false,
 			version: engine.version(),
+			numGames,
 		};
 		getSocket().emit('party.create', msg, (response: m.CreatePartyResponseMsg) => {
 			if (response.success === false) {
@@ -32,9 +35,10 @@ export async function createPartyAsync(): Promise<void> {
 	}).then(partyId => joinPartyAsync(partyId));
 }
 
-export function joinPartyAsync(partyId: string): Promise<void> {
+export async function joinPartyAsync(partyId: string): Promise<void> {
 	const store = StoreProvider.getState();
 	if (partyId) {
+		const numGames = await storage.getNumGames();
 		let response: m.PartyResponse;
 		return new Promise<void>((resolve, reject) => {
 			let msg: m.PartyRequest = {
@@ -45,6 +49,7 @@ export function joinPartyAsync(partyId: string): Promise<void> {
 				isMobile,
 				unranked: store.options.unranked || false,
 				version: engine.version(),
+				numGames,
 			};
 			getSocket().emit('party', msg, (_response: m.PartyResponseMsg) => {
 				if (_response.success === false) {
@@ -101,12 +106,13 @@ export function updatePartySettingsAsync(request: m.PartySettingsRequest) {
 	});
 }
 
-export function updatePartyAsync(): Promise<void> {
+export async function updatePartyAsync(): Promise<void> {
 	const store = StoreProvider.getState();
 	if (!store.party) {
 		return Promise.resolve();
 	}
 
+	const numGames = await storage.getNumGames();
 	return new Promise<void>((resolve, reject) => {
 		let msg: m.PartyRequest = {
 			joining: false,
@@ -116,6 +122,7 @@ export function updatePartyAsync(): Promise<void> {
 			isMobile,
 			unranked: store.options.unranked,
 			version: engine.version(),
+			numGames,
 		};
 		getSocket().emit('party', msg, (response: m.PartyResponseMsg) => {
 			if (response.success === false) {

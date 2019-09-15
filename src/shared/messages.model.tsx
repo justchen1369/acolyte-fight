@@ -89,6 +89,7 @@ export interface JoinMsg {
     unranked: boolean;
     reconnectKey?: string;
     numBots?: number;
+    numGames: number;
 }
 
 export interface JoinResponse {
@@ -214,6 +215,7 @@ export interface CreatePartyRequest {
     isMobile: boolean;
     unranked: boolean;
     version: string;
+    numGames: number;
 }
 export interface CreatePartyResponse {
     success: true;
@@ -232,6 +234,7 @@ export interface PartyRequest {
     isMobile: boolean;
     unranked: boolean;
     version: string;
+    numGames: number;
 }
 export interface PartyResponse extends PartyMsg {
     success: true;

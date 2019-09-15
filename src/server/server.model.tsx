@@ -167,6 +167,7 @@ export interface JoinParameters {
     reconnectKey?: string;
     autoJoin?: boolean;
     live?: boolean;
+    numGames: number;
 }
 
 export interface PartyMemberStatus {

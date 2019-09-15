@@ -143,7 +143,6 @@ async function onKongregateLoginAsync(req: express.Request, res: express.Respons
         && required(input.signature, "string")
         && required(input.kongregateId, "number")
     )) {
-        console.log(input);
         res.status(400).send("Bad request");
         return;
     }

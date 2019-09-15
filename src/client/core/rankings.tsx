@@ -8,6 +8,7 @@ import * as d from '../stats.model';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
+import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
@@ -102,12 +103,23 @@ export async function retrieveUserStatsAsync(profileId: string) {
         const state = StoreProvider.getState();
         if (state.userId === profile.userId) {
             StoreProvider.dispatch({ type: "updateProfile", profile });
+            updateNumGames(profile); // Don't await
         }
 
         return profile;
     } else {
         throw await res.text();
     }
+}
+
+async function updateNumGames(profile: m.GetProfileResponse) {
+    let numGames = 0;
+    for (const category in profile.ratings) {
+        const rating = profile.ratings[category];
+        numGames += rating.numGames;
+    }
+
+    storage.increaseNumGames(numGames);
 }
 
 export async function retrieveLeagues(category: string): Promise<m.League[]> {

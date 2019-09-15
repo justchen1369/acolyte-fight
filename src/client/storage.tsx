@@ -185,8 +185,9 @@ export async function incrementNumGames() {
     await settingsStorage.setItem(SettingsKeys.NumGames, numGames + 1);
 }
 
-export async function resetNumGames() {
-    await settingsStorage.setItem(SettingsKeys.NumGames, 0);
+export async function increaseNumGames(minNumGames: number) {
+    const numGames = Math.max(minNumGames, await getNumGames());
+    await settingsStorage.setItem(SettingsKeys.NumGames, numGames);
 }
 
 export async function getKnownUser() {

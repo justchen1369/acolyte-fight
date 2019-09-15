@@ -210,6 +210,7 @@ function onPartyCreateMsg(socket: SocketIO.Socket, authToken: string, data: m.Cr
 			isMobile: data.isMobile,
 			unranked: data.unranked,
 			version: data.version,
+			numGames: data.numGames,
 		};
 
 		const party = parties.initParty(socket.id, data.roomId);
@@ -324,6 +325,7 @@ function onPartyMsg(socket: SocketIO.Socket, authToken: string, data: m.PartyReq
 			isMobile: data.isMobile,
 			unranked: data.unranked,
 			version: data.version,
+			numGames: data.numGames,
 		};
 		parties.createOrUpdatePartyMember(party, partyMember);
 
@@ -428,6 +430,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		&& optional(data.observe, "boolean")
 		&& optional(data.reconnectKey, "string")
 		&& optional(data.numBots, "number")
+		&& required(data.numGames, "number")
 	)) {
 		return { success: false, error: "Bad request" };
 	}
@@ -445,7 +448,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 	}
 
 	const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
-	const aco = await matchmaking.retrieveRating(userId, m.GameCategory.PvP, data.unranked);
+	const aco = await matchmaking.retrieveRating(userId, data.numGames, m.GameCategory.PvP, data.unranked);
 
 	let replay: g.Replay;
 	if (data.gameId) {
@@ -486,6 +489,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 			reconnectKey: data.reconnectKey,
 			autoJoin: data.autoJoin,
 			live: data.live,
+			numGames: data.numGames,
 		};
 
 		if (!data.observe) {

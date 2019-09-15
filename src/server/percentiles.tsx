@@ -60,10 +60,10 @@ export function estimateRatingAtPercentile(category: string, percentile: number)
     return minRating || 0;
 }
 
-export function estimateRatingFromNumGames(category: string, numGames: number): number {
+export function estimateAcoFromNumGames(category: string, numGames: number): number {
     const distribution = numGamesToAcoCache.get(cacheKey(category));
     if (!distribution) {
-        return 0;
+        return constants.Placements.InitialAco;
     }
 
     const bin = numGamesBin(numGames);

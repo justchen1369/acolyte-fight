@@ -4,6 +4,7 @@ import * as aco from './aco';
 import * as g from './server.model';
 import * as games from './games';
 import * as m from '../shared/messages.model';
+import * as percentiles from './percentiles';
 import * as segments from '../shared/segments';
 import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
@@ -32,6 +33,7 @@ interface TeamsCandidate extends CandidateBase {
 
 interface NoopCandidate extends CandidateBase {
     type: "noop";
+    all: RatedPlayer[];
 }
 
 type Candidate =
@@ -44,12 +46,16 @@ interface CandidateBase {
     worstWinProbability: number;
 }
 
-export async function retrieveRating(userId: string, category: string, unranked: boolean): Promise<number> {
-    const userRating = await retrieveUserRatingOrDefault(userId, category);
-    if (unranked) {
-        return userRating.acoUnranked;
+export async function retrieveRating(userId: string, numGames: number, category: string, unranked: boolean): Promise<number> {
+    if (userId) {
+        const userRating = await retrieveUserRatingOrDefault(userId, category);
+        if (unranked) {
+            return userRating.acoUnranked;
+        } else {
+            return userRating.aco;
+        }
     } else {
-        return userRating.aco;
+        return percentiles.estimateAcoFromNumGames(category, numGames);
     }
 }
 
@@ -326,7 +332,7 @@ function formatCandidate(choice: Candidate) {
     } else if (choice.type === "teams") {
         return `teams (${formatPercent(choice.worstWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else {
-        return `noop (${formatPercent(choice.worstWinProbability)})`;
+        return `noop (${formatPercent(choice.worstWinProbability)}): ${choice.all.map(p => p.aco.toFixed(0))}`;
     }
 }
 
@@ -356,12 +362,13 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
 }
 
 function generateNoopCandidate(game: g.Game): NoopCandidate {
-    const ratings = wu(game.active.values()).map(p => p.aco).toArray();
+    const ratings = extractSplitRatings(game);
     const diff = aco.AcoRanked.calculateDiff(
-        _.min(ratings),
-        _.max(ratings));
+        _(ratings).map(p => p.aco).min(),
+        _(ratings).map(p => p.aco).max());
     return {
         type: "noop",
+        all: ratings,
         worstWinProbability: aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP)),
     };
 }

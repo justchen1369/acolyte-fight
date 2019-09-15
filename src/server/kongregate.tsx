@@ -28,7 +28,6 @@ export async function getPlayerName(kongregateId: number, signature: string): Pr
         user_id: kongregateId,
         game_auth_token: signature,
     };
-    console.log(req);
 
     const res = await fetch("https://api.kongregate.com/api/authenticate.json", {
         method: "POST",
@@ -41,7 +40,6 @@ export async function getPlayerName(kongregateId: number, signature: string): Pr
         throw "Kongregate API error: " + await res.statusText
     }
     const json: KAuthResponse = await res.json();
-    console.log(json);
     if (json.success) {
         return json.username;
     } else {
