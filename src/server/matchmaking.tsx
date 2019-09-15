@@ -332,7 +332,7 @@ function formatCandidate(choice: Candidate) {
     } else if (choice.type === "teams") {
         return `teams (${formatPercent(choice.worstWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else {
-        return `noop (${formatPercent(choice.worstWinProbability)}): ${choice.all.map(p => p.aco.toFixed(0))}`;
+        return `noop (${formatPercent(choice.worstWinProbability)}): ${choice.all.map(p => p.aco.toFixed(0)).join(' ')}`;
     }
 }
 
