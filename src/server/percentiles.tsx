@@ -17,11 +17,18 @@ import { logger } from './logging';
 
 interface DbFrequenciesResult {
     frequencies: Map<string, FixedIntegerArray>;
+    numGamesToAco: Map<string, FixedIntegerArray>;
     numUsers: number;
 }
 
-let cumulativeFrequenciesCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
-let distributionCache: Map<string, FixedIntegerArray> = new Map<string, FixedIntegerArray>();
+interface MeanItem {
+    total: number;
+    count: number;
+}
+
+let cumulativeFrequenciesCache = new Map<string, FixedIntegerArray>();
+let distributionCache = new Map<string, FixedIntegerArray>();
+let numGamesToAcoCache = new Map<string, FixedIntegerArray>();
 let numUsersCache: number = 0;
 
 export const ready = deferred<void>();
@@ -33,6 +40,10 @@ export async function init() {
 
 function cacheKey(category: string) {
     return `${category}`;
+}
+
+function numGamesBin(numGames: number): number {
+    return Math.floor(Math.log2(1 + numGames));
 }
 
 export function estimatePercentile(ratingLB: number, category: string): number {
@@ -47,6 +58,20 @@ export function estimateRatingAtPercentile(category: string, percentile: number)
 
     const minRating = distribution.at(Math.floor(percentile));
     return minRating || 0;
+}
+
+export function estimateRatingFromNumGames(category: string, numGames: number): number {
+    const distribution = numGamesToAcoCache.get(cacheKey(category));
+    if (!distribution) {
+        return 0;
+    }
+
+    const bin = numGamesBin(numGames);
+    if (bin >= distribution.length) {
+        return distribution.length > 0 ? distribution.at(distribution.length - 1) : 0;
+    } else {
+        return distribution.at(bin) || constants.Placements.InitialAco;
+    }
 }
 
 export function estimateNumUsers(): number {
@@ -73,6 +98,11 @@ export async function refreshCumulativeFrequencies() {
 
     cumulativeFrequenciesCache.forEach((cumulativeFrequency, key) => {
         distributionCache.set(key, calculateDistribution(cumulativeFrequency));
+    });
+
+    numGamesToAcoCache = result.numGamesToAco;
+    result.numGamesToAco.forEach((distribution, category) => {
+        logger.info(`Num games to aco distribution (${category}): ${distribution.toArray().map(v => v.toFixed(0)).join(' ')}`);
     });
 
     logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
@@ -123,6 +153,7 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
 
     let numUsers = 0;
     const frequencies = new Map<string, number[]>();
+    const numGamesToAco = new Map<string, MeanItem[]>();
     await dbStorage.stream(query, doc => {
         ++numUsers;
 
@@ -137,32 +168,76 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
                 continue;
             }
 
-            let value: number = null;
             if (userRating.aco) {
-                value = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
-            }
+                const acoExposure = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
 
-            if (!value) {
-                continue;
-            }
+                // Count acoExposure frequency
+                {
+                    const bin = Math.ceil(acoExposure);
+                    const frequency = getOrCreateDistribution<number>(frequencies, category);
+                    frequency[bin] = (frequency[bin] || 0) + 1;
+                }
 
-            const bin = Math.ceil(value);
-
-            const key = cacheKey(category);
-            let frequency = frequencies.get(key);
-            if (!frequency) {
-                frequency = [];
-                frequencies.set(key, frequency);
+                // Count numGamesToAco
+                {
+                    const bin = numGamesBin(userRating.numGames);
+                    const distribution = getOrCreateDistribution<MeanItem>(numGamesToAco, category);
+                    incrementMeanItem(distribution, bin, userRating.aco);
+                }
             }
-            frequency[bin] = (frequency[bin] || 0) + 1;
         }
     });
 
+    return {
+        frequencies: fixDistribution(frequencies),
+        numGamesToAco: meanDistribution(numGamesToAco, constants.Placements.InitialAco),
+        numUsers,
+    };
+}
+
+function getOrCreateDistribution<T>(frequencies: Map<string, T[]>, category: string): T[] {
+    const key = cacheKey(category);
+
+    let frequency = frequencies.get(key);
+    if (!frequency) {
+        frequency = [];
+        frequencies.set(key, frequency);
+    }
+    return frequency;
+}
+
+function incrementMeanItem(distribution: MeanItem[], bin: number, value: number) {
+    let item = distribution[bin];
+    if (!item) {
+        item = distribution[bin] = { total: 0, count: 0 };
+    }
+    item.total += value;
+    item.count++;
+}
+
+function fixDistribution(frequencies: Map<string, number[]>): Map<string, FixedIntegerArray> {
     const frequenciesFixed = new Map<string, FixedIntegerArray>();
     frequencies.forEach((frequency, key) => {
         frequenciesFixed.set(key, new FixedIntegerArray(frequency));
     });
-    return { frequencies: frequenciesFixed, numUsers };
+    return frequenciesFixed;
+}
+
+function meanDistribution(frequencies: Map<string, MeanItem[]>, defaultValue: number): Map<string, FixedIntegerArray> {
+    const frequenciesFixed = new Map<string, FixedIntegerArray>();
+    frequencies.forEach((frequency, key) => {
+        const means = new Array<number>();
+        for (let i = 0; i < frequency.length; ++i) {
+            const item = frequency[i];
+            if (item) {
+                means[i] = item.total / item.count;
+            } else {
+                means[i] = defaultValue;
+            }
+        }
+        frequenciesFixed.set(key, new FixedIntegerArray(means));
+    });
+    return frequenciesFixed;
 }
 
 function calculateCumulativeFrequency(frequencies: Map<string, FixedIntegerArray>): Map<string, FixedIntegerArray> {

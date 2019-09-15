@@ -384,9 +384,13 @@ export async function calculateWinRateDistribution(category: string) {
         }
     });
     const elapsed = Date.now() - start;
-    logger.info(`Calculated win rate distribution in ${elapsed} ms: ${buckets.map(b => b.weightedExpected / b.weightedGames).join(' ')}`);
+    logger.info(`Calculated win rate distribution in ${elapsed} ms: ${formatBuckets(buckets)}`);
 
     return buckets.filter(b => !!b);
+}
+
+function formatBuckets(buckets: WinRateBucket[]) {
+    return buckets.map(b => `${b.maxDiff}:${(100 * (b.weightedExpected / b.weightedGames)).toFixed(1)}%`).join(' ');
 }
 
 function leaderboardCacheKey(category: string) {
