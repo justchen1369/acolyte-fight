@@ -7,7 +7,7 @@ export const calculatePlayerLookup = Reselect.createSelector(
     (players) => {
         const playerLookup = new Map<string, w.Player>();
         players.valueSeq().forEach(player => {
-            if (player.userHash) {
+            if (!player.left && player.userHash) {
                 playerLookup.set(player.userHash, player);
             }
         });

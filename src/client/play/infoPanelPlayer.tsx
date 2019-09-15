@@ -33,7 +33,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     let color = Visuals.OnlineColor;
     if (userHash === state.world.ui.myUserHash) {
         color = Visuals.MyHeroColor;
-    } else if (player && !player.dead && !player.left) {
+    } else if (player && !player.dead) {
         color = heroColor(player.heroId, state.world);
     }
 
