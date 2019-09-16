@@ -43,7 +43,7 @@ type Candidate =
 
 interface CandidateBase {
     type: string;
-    worstWinProbability: number;
+    avgWinProbability: number;
 }
 
 export async function retrieveRating(userId: string, numGames: number, category: string, unranked: boolean): Promise<number> {
@@ -160,7 +160,7 @@ function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: Matc
 }
 
 function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings): number {
-    let weight = Math.pow(candidate.worstWinProbability, matchmaking.RatingPower);
+    let weight = Math.pow(candidate.avgWinProbability, matchmaking.RatingPower);
     if (candidate.type === "split") {
         const numOdd = candidate.splits.filter(s => s.length % 2 !== 0).length;
         weight *= Math.pow(matchmaking.OddPenalty, numOdd);
@@ -222,13 +222,21 @@ function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate
                 sortedRatings.slice(i),
             ];
 
-            const worstWinProbability = _(splits).map(p => evaluateWinProbability(p)).min();
+            let total = 0;
+            let count = 0;
+            for (let j = 0; j < splits.length; ++j) {
+                const split = splits[j];
+                const winProbability = evaluateWinProbability(split.map(p => p.aco));
+                total += split.length * winProbability;
+                count += split.length;
+            }
+            const avgWinProbability = count > 0 ? total / count : 0;
 
             candidates.push({
                 type: "split",
                 threshold: sortedRatings[i].aco,
                 splits,
-                worstWinProbability,
+                avgWinProbability,
             });
         }
 
@@ -236,14 +244,25 @@ function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate
     return candidates;
 }
 
-function evaluateWinProbability(ratings: RatedPlayer[]) {
-    if (ratings.length > 0) {
-        const diff = aco.AcoRanked.calculateDiff(
-            _(ratings).map(p => p.aco).min(),
-            _(ratings).map(p => p.aco).max());
-        return aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+function evaluateWinProbability(acoList: number[]) {
+    if (acoList.length >= 2) {
+        const sorted = _.sortBy(acoList, x => -x);
+
+        const best = sorted[0];
+        let total = 0;
+        let count = 0;
+        for (let i = 1; i < sorted.length; ++i) { // Compare everyone else against the best
+            const diff = aco.AcoRanked.calculateDiff(sorted[i], best);
+            const winProbability = aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+            total += winProbability;
+            count++;
+        }
+
+        const avgWinProbability = total / count;
+        return avgWinProbability;
     } else {
-        return 0;
+        // Single player - bound to win
+        return 1;
     }
 }
 
@@ -320,7 +339,7 @@ export function finalizeMatchmaking(initial: g.Game) {
             });
         }
 
-        logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.worstWinProbability)} -> ${formatCandidate(choice)}`);
+        logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.avgWinProbability)} -> ${formatCandidate(choice)}`);
     }
 
     games.emitForks(allForks);
@@ -328,11 +347,11 @@ export function finalizeMatchmaking(initial: g.Game) {
 
 function formatCandidate(choice: Candidate) {
     if (choice.type === "split") {
-        return `split (${formatPercent(choice.worstWinProbability)}): ${choice.splits.map(s => s.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
+        return `split (${formatPercent(choice.avgWinProbability)}): ${choice.splits.map(s => s.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else if (choice.type === "teams") {
-        return `teams (${formatPercent(choice.worstWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
+        return `teams (${formatPercent(choice.avgWinProbability)}): ${choice.teams.map(t => t.map(p => p.aco.toFixed(0)).join(' ')).join(' | ')}`;
     } else {
-        return `noop (${formatPercent(choice.worstWinProbability)}): ${choice.all.map(p => p.aco.toFixed(0)).join(' ')}`;
+        return `noop (${formatPercent(choice.avgWinProbability)}): ${choice.all.map(p => p.aco.toFixed(0)).join(' ')}`;
     }
 }
 
@@ -363,13 +382,10 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
 
 function generateNoopCandidate(game: g.Game): NoopCandidate {
     const ratings = extractSplitRatings(game);
-    const diff = aco.AcoRanked.calculateDiff(
-        _(ratings).map(p => p.aco).min(),
-        _(ratings).map(p => p.aco).max());
     return {
         type: "noop",
         all: ratings,
-        worstWinProbability: aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP)),
+        avgWinProbability: evaluateWinProbability(ratings.map(p => p.aco)),
     };
 }
 
@@ -392,16 +408,13 @@ function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number): T
     return {
         type: "teams",
         teams,
-        worstWinProbability: evaluateTeamCandidate(teams),
+        avgWinProbability: evaluateTeamCandidate(teams),
     };
 }
 
 function evaluateTeamCandidate(teams: TeamPlayer[][]): number {
     const averageRatings = teams.map(team => _(team).map(p => p.aco).mean());
-    const diff = aco.AcoRanked.calculateDiff(
-        _.min(averageRatings),
-        _.max(averageRatings));
-    return aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+    return evaluateWinProbability(averageRatings);
 }
 
 function extractTeamPlayers(game: g.Game): TeamPlayer[] {
