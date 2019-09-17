@@ -3530,7 +3530,12 @@ function notifyWin(world: w.World) {
 		return;
 	}
 
-	let scores = world.scores.valueSeq().toArray();
+	let scores =
+		world.players.valueSeq()
+		.filter(p => !p.left)
+		.map(p => world.scores.get(p.heroId))
+		.filter(s => !!s) // Shouldn't happen, but check anyway
+		.toArray();
 	scores.sort((a, b) => {
 		const deathA = a.deathTick || Infinity;
 		const deathB = b.deathTick || Infinity;
@@ -3611,7 +3616,7 @@ function isGameWon(world: w.World) {
 		return false;
 	}
 
-	const aliveHeroIds = world.players.keySeq().filter(heroId => world.objects.has(heroId)).toArray();
+	const aliveHeroIds = wu(world.objects.values()).filter(h => h.category === "hero").map(h => h.id).toArray();
 	if (aliveHeroIds.length === 0) {
 		return true;
 	}
