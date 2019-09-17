@@ -161,11 +161,22 @@ function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: Matc
 
 function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings): number {
     let weight = Math.pow(candidate.avgWinProbability, matchmaking.RatingPower);
-    if (candidate.type === "split") {
-        const numOdd = candidate.splits.filter(s => s.length % 2 !== 0).length;
-        weight *= Math.pow(matchmaking.OddPenalty, numOdd);
+
+    let numOdd = 0;
+    if (candidate.type === "noop") {
+        numOdd = isOdd(candidate.all.length) ? 1 : 0;
+    } else if (candidate.type === "split") {
+        numOdd = candidate.splits.filter(s => isOdd(s.length)).length;
+    } else if (candidate.type === "teams") {
+        numOdd = isOdd(_(candidate.teams).map(t => t.length).sum()) ? 1 : 0;
     }
+    weight *= Math.pow(matchmaking.OddPenalty, numOdd);
+
     return weight;
+}
+
+function isOdd(value: number) {
+    return value % 2 !== 0;
 }
 
 function extractSplitRatings(game: g.Game, newPlayers?: RatedPlayer[]) {
