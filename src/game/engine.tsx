@@ -1366,8 +1366,6 @@ function dequeueSnapshot(tick: number, world: w.World) {
 }
 
 function handleSpellChoosing(ev: n.SpellsMsg, world: w.World) {
-	const ChangeCooldown = 15; // ticks
-
 	if (!allowSpellChoosing(world, ev.h)) {
 		return true;
 	}
@@ -1659,6 +1657,7 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 		} else {
 			// This player split off from this game
 			hero.exitTick = world.tick;
+			removeProjectilesForHero(hero.id, world); // Don't let their leftover projectiles affect the game
 
 			// Mark player as left so they don't get rated
 			const newPlayer: w.Player = {
@@ -1801,6 +1800,14 @@ export function resolveKeyBindings(keyBindings: KeyBindings, settings: AcolyteFi
 function removeUnknownProjectilesFromHero(hero: w.Hero, world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "projectile" && obj.owner === hero.id && !hero.spellsToKeys.has(obj.type)) {
+			obj.expireTick = world.tick;
+		}
+	});
+}
+
+function removeProjectilesForHero(heroId: string, world: w.World) {
+	world.objects.forEach(obj => {
+		if (obj.category === "projectile" && obj.owner === heroId) {
 			obj.expireTick = world.tick;
 		}
 	});
