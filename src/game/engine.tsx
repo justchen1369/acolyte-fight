@@ -1705,6 +1705,7 @@ function handleActions(world: w.World) {
 			}
 		}
 	});
+	world.actionMessages.length = 0;
 }
 
 function act(world: w.World) {
