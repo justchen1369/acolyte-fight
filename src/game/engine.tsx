@@ -1540,13 +1540,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
-	// Temporarily remove from active players to make the old color available
-	// so if a player is re-connecting, we can re-use their preferred color.
-	world.activePlayers = world.activePlayers.delete(hero.id);
-
-	const preferredColor = colorWheel.getPreferredColor(ev.userHash);
-	const uiBaseColor = chooseNewPlayerColor(preferredColor, world);
-	colorWheel.setPreferredColor(ev.userHash, uiBaseColor);
+	const uiBaseColor = chooseNewPlayerColor(ev.userHash, world);
 
 	const player: w.Player = {
 		heroId: hero.id,
@@ -1584,15 +1578,21 @@ function choosePlayerColor(heroId: string, userHash: string, baseColor: string, 
 	}
 }
 
-function chooseNewPlayerColor(preferredColor: string, world: w.World) {
+function chooseNewPlayerColor(userHash: string, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
+	const preferredColor = colorWheel.getPreferredColor(userHash);
+
 	let alreadyUsedColors = new Set<string>();	
-	world.players.forEach(player => {
-		if (world.activePlayers.has(player.heroId)) {
-			alreadyUsedColors.add(player.uiColor);	
+	world.objects.forEach(hero => {
+		if (hero && hero.category === "hero") {
+			const player = world.players.get(hero.id);
+			if (player && player.userHash !== userHash) {
+				// If player reconnecting, allow their color to be reused
+				alreadyUsedColors.add(player.uiBaseColor);
+			}
 		}
-	});	
+	});
  	let uiColor: string = null;
 	if (preferredColor) {
 		uiColor = colorWheel.takeColor(preferredColor, alreadyUsedColors, Visuals.Colors)
@@ -1604,6 +1604,7 @@ function chooseNewPlayerColor(preferredColor: string, world: w.World) {
 		uiColor = Visuals.Colors[0];
 	}
 
+	colorWheel.setPreferredColor(userHash, uiColor);
  	return uiColor;	
 }
 
