@@ -63,6 +63,7 @@ export interface Game extends m.Replay {
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
     observers: Map<string, Observer>; // socketIds
+    nextPlayerId: number;
 
     tick: number;
     winTick: number | null;

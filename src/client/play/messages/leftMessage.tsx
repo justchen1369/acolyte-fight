@@ -28,7 +28,10 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 class LeftMessage extends React.PureComponent<Props, State> {
     render() {
         const notification = this.props.notification;
-        if (notification.split) {
+        if (notification.player.isBot) {
+            // Don't care about bots leaving
+            return null;
+        } else if (notification.split) {
             return <div className="row"><PlayerName player={notification.player} /> rematched</div>
         } else {
             if (this.props.isOnline) {

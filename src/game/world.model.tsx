@@ -399,6 +399,7 @@ export interface CircleShape {
 
 export interface Hero extends WorldObjectBase, HighlightSource {
 	category: "hero";
+	heroIndex: number;
 	filterGroupIndex: number;
 
 	health: number;
@@ -1060,6 +1061,12 @@ export interface PushEvent extends WorldEventBase {
 	objectId: string;
 	direction: pl.Vec2;
 	color?: string;
+}
+
+export interface LeaveEvent extends WorldEventBase {
+	type: "leave";
+	heroId: string;
+	pos: pl.Vec2;
 }
 
 export interface Action {

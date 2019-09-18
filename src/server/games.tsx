@@ -123,6 +123,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 		active: new Map<string, g.Player>(),
 		bots: new Map<string, string>(),
 		observers: new Map(),
+		nextPlayerId: 0,
 		controlKeys: new Map(),
 		reconnectKeys: new Map<string, string>(),
 		isRankedLookup: new Map<string, boolean>(),
@@ -440,16 +441,17 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 		if (candidate && !game.active.has(candidate)) {
 			// Reconnect
 			heroId = candidate;
+		} else {
+			return null;
 		}
-	}
-
-	if (!heroId && !game.joinable) {
-		// Not allowed to join a game in-progress
-		return null;
-	}
-
-	if (!heroId) {
-		heroId = findSlot(game);
+	} else {
+		if (game.joinable) {
+			removeBot(game);
+			heroId = generateHeroId(game);
+		} else {
+			// Not allowed to join a game in-progress
+			return null;
+		}
 	}
 
 	if (!heroId) {
@@ -587,8 +589,7 @@ export function addBot(game: g.Game) {
 		return null;
 	}
 
-	const replaceBots = false;
-	const heroId = findSlot(game, replaceBots);
+	const heroId = generateHeroId(game);
 
 	game.bots.set(heroId, null);
 
@@ -599,19 +600,36 @@ export function addBot(game: g.Game) {
 	return heroId;
 }
 
-function findSlot(game: g.Game, replaceBots: boolean = true): string {
-	// Take an existing slot, if possible
-	let activeHeroIds = new Set<string>(wu(game.active.values()).map(x => x.heroId));
-	if (!replaceBots) {
-		wu(game.bots.keys()).forEach(heroId => activeHeroIds.add(heroId));
+export function removeBot(game: g.Game) {
+	if (game.bots.size > 0) {
+		const heroId = game.bots.keys().next().value; // Take first bot
+		const controlKey = findControlKey(game, heroId);
+
+		game.controlKeys.delete(controlKey);
+		game.bots.delete(heroId);
+
+		queueControlMessage(game, { heroId: heroId, controlKey: null, type: "leave" });
+		return heroId;
+	} else {
+		return null;
+	}
+}
+
+function findControlKey(game: g.Game, heroId: string): number {
+	let controlKey: number = undefined;
+	game.controlKeys.forEach((h, c) => {
+		if (h === heroId) {
+			controlKey = c;
+		}
+	});
+	return controlKey;
+}
+
+function generateHeroId(game: g.Game): string {
+	const numPlayers = game.active.size + game.bots.size;
+	if (numPlayers >= game.matchmaking.MaxPlayers) {
+		return null;
 	}
 
-	const maxPlayers = game.matchmaking.MaxPlayers;
-	for (let i = 0; i < maxPlayers; ++i) {
-		let candidate = engine.formatHeroId(i);
-		if (!activeHeroIds.has(candidate)) {
-			return candidate;
-		}
-	}
-	return null;
+	return engine.formatHeroId(game.nextPlayerId++);
 }

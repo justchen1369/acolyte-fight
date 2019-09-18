@@ -506,6 +506,7 @@ function addHero(world: w.World, heroId: string) {
 		id: heroId,
 		owner: heroId,
 		category: "hero",
+		heroIndex,
 		filterGroupIndex,
 		categories: Categories.Hero,
 		health: Hero.MaxHealth,
@@ -548,21 +549,24 @@ function addHero(world: w.World, heroId: string) {
 		tick: world.tick + Hero.InitialStaticSeconds * TicksPerSecond,
 	});
 
-
+	console.log("Adding hero", heroId, heroIndex);
 	return hero;
 }
 
 function generateHeroIndex(world: w.World) {
+	const usedIndexes = new Set(
+		wu(world.objects.values())
+		.filter(x => x.category === "hero" && (!x.exitTick || world.tick < x.exitTick))
+		.map(x => (x as w.Hero).heroIndex));
 	const Matchmaking = world.settings.Matchmaking;
 	for (let i = 0; i < Matchmaking.MaxPlayers; ++i) {
-		const heroId = formatHeroId(i);
-		if (!world.objects.has(heroId)) {
+		if (!usedIndexes.has(i)) {
 			return i;
 		}
 	}
 
 	// Should never happen - more heroes than maximum allowed
-	return wu(world.objects.values()).filter(x => x.category === "hero").toArray().length;
+	return usedIndexes.size;
 }
 
 export function formatHeroId(index: number): string {
@@ -1488,17 +1492,16 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
-		if (alreadyDead(ev.heroId, world)) {
-			console.log("Cannot revive dead player", ev.heroId);
+		if (world.players.has(ev.heroId)) {
+			console.log("Cannot revive player", ev.heroId);
 			return true;
 		}
 
 		hero = addHero(world, ev.heroId);
+		activateHero(hero, ev.keyBindings, world); 
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
-
-	activateHero(hero, ev.keyBindings, world); 
 
 	const player: w.Player = {
 		heroId: hero.id,
@@ -1526,17 +1529,16 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
-		if (alreadyDead(ev.heroId, world)) {
-			console.log("Cannot revive dead player", ev.heroId);
+		if (world.players.has(ev.heroId)) {
+			console.log("Cannot revive player", ev.heroId);
 			return true;
 		}
 
 		hero = addHero(world, ev.heroId);
+		activateHero(hero, ev.keyBindings, world);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
-
-	activateHero(hero, ev.keyBindings, world);
 
 	// Temporarily remove from active players to make the old color available
 	// so if a player is re-connecting, we can re-use their preferred color.
@@ -3541,11 +3543,6 @@ function captureSnapshot(world: w.World) {
 		}
 	});
 	world.snapshots.push(snapshot);
-}
-
-function alreadyDead(heroId: string, world: w.World) {
-	const existingPlayer = world.players.get(heroId);
-	return existingPlayer && existingPlayer.dead;
 }
 
 function notifyWin(world: w.World) {
