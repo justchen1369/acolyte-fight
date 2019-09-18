@@ -67,24 +67,30 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
 export async function watch(gameId: string, server: string = null) {
     const replay = await getReplay(gameId, server);
     if (replay) {
-        const state = StoreProvider.getState();
-        const join: m.HeroMsg = {
-            gameId: replay.id,
-            universeId: replay.universe,
-            heroId: null,
-            reconnectKey: null,
-            userHash: state.userHash,
-            partyId: replay.partyId,
-            locked: replay.locked,
-            room: replay.roomId,
-            mod: replay.mod,
-            live: false,
-            history: replay.history,
-        };
+        const join = replayToJoinMsg(replay);
         matches.watchReplayFromObject(join);
     } else {
         throw "Replay not found";
     }
+}
+
+export function replayToJoinMsg(replay: m.Replay): m.HeroMsg {
+    const state = StoreProvider.getState();
+    const join: m.HeroMsg = {
+        gameId: replay.id,
+        universeId: replay.universe,
+        heroId: null,
+        controlKey: null,
+        reconnectKey: null,
+        userHash: state.userHash,
+        partyId: replay.partyId,
+        locked: replay.locked,
+        room: replay.roomId,
+        mod: replay.mod,
+        live: false,
+        history: replay.history,
+    };
+    return join;
 }
 
 export async function getReplay(gameId: string, server: string = null): Promise<m.Replay> {

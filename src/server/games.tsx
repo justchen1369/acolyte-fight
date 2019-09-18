@@ -492,6 +492,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
 	const player = game.active.get(socketId);
 	if (player) {
+		const controlKey = game.controlKeys.get(player.heroId);
 		const reconnectKey = assignReconnectKey(game, player.heroId);
 		const join: g.JoinResult = {
 			socketId,
@@ -499,6 +500,7 @@ function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
 			live: true,
 
 			heroId: player.heroId,
+			controlKey,
 			reconnectKey,
 			autoJoin: player.autoJoin,
 			

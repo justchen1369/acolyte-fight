@@ -166,7 +166,8 @@ export interface JoinResult {
 	game: m.Replay;
 	live: boolean;
 
-	heroId?: string;
+    heroId?: string;
+    controlKey?: number;
 	reconnectKey?: string;
     autoJoin?: boolean;
     splits?: m.SplitMsg[];

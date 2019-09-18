@@ -203,13 +203,19 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 
 	const packet: m.ActionMsgPacket = {
 		a: actionMsg,
-		c: controlKey || lookupControlKey(heroId),
+		c: controlKey || world.ui.controlKey,
 	};
 	send(packet);
 }
 
 export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
 	if (!(gameId && heroId)) {
+		return;
+	}
+
+	const state = StoreProvider.getState();
+	const world = state.world;
+	if (!(world.ui.myGameId === gameId)) {
 		return;
 	}
 
@@ -221,16 +227,9 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 
 	const packet: m.ActionMsgPacket = {
 		a: actionMsg,
-		c: controlKey || lookupControlKey(heroId),
+		c: controlKey || world.ui.controlKey,
 	};
 	send(packet);
-}
-
-function lookupControlKey(heroId: string) {
-	const state = StoreProvider.getState();
-	const world = state.world;
-	const player = world.players.get(heroId);
-	return player.controlKey;
 }
 
 function send(packet: m.ActionMsgPacket) {

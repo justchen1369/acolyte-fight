@@ -107,6 +107,7 @@ export interface UIState {
 	myHeroId: string | null;
 	myPartyId: string | null;
 	myUserHash: string | null;
+	controlKey: number | null;
 	reconnectKey: string | null;
 	universeId: number;
 	live: boolean;

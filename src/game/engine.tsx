@@ -130,6 +130,7 @@ export function initialWorld(mod: Object): w.World {
 			myPartyId: null,
 			myUserHash: null,
 			universeId: null,
+			controlKey: null,
 			reconnectKey: null,
 			live: false,
 			renderedTick: null,

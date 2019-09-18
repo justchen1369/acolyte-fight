@@ -766,12 +766,12 @@ function emitHero(join: g.JoinResult) {
 
 		const userHash = auth.getUserHashFromSocket(socket);
 
-		const publicSegment = segments.publicSegment();
 		const msg: m.HeroMsg = {
 			gameId: game.id,
 			universeId: game.universe,
 			heroId: join.heroId,
 			userHash,
+			controlKey: join.controlKey,
 			reconnectKey: join.reconnectKey,
 			locked: game.locked,
 			partyId: game.partyId,

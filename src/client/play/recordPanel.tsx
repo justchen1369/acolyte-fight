@@ -229,12 +229,12 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         }
     }
 
-    private async recordVideo(replay: m.HeroMsg, canvasStack: CanvasStack, token: CancellationToken) {
+    private async recordVideo(replay: m.Replay, canvasStack: CanvasStack, token: CancellationToken) {
         if (token.cancelled) { throw token; }
 
-        console.log("Initialising recording...", replay.gameId);
+        console.log("Initialising recording...", replay.id);
         const remaining = [...replay.history];
-        const world: w.World = processor.initialWorld(replay);
+        const world: w.World = processor.initialWorld(replays.replayToJoinMsg(replay));
         console.log("Replay started...", world.ui.myGameId, world.ui.myUserHash);
 
         while (remaining.length > 0 && world.tick < world.startTick) {
@@ -253,7 +253,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const videoRecorder = new VideoRecorder(stream, qualityMultiplier);
         try {
             await videoRecorder.start();
-            console.log("Recording started...", replay.gameId);
+            console.log("Recording started...", replay.id);
 
             const numFrames = remaining.length;
             const epoch = Date.now();
@@ -280,7 +280,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 await nextFrame();
             }
         } finally {
-            console.log("Recording finished.", replay.gameId);
+            console.log("Recording finished.", replay.id);
             await videoRecorder.stop();
 
             audio.unrecord();
