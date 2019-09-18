@@ -58,7 +58,7 @@ export interface Game extends m.Replay {
 
     active: Map<string, Player>; // socketId -> Player
     bots: Map<string, string>; // heroId -> socketId
-    controlKeys: Map<string, number>; // heroId -> number
+    controlKeys: Map<number, string>; // controlKey -> heroId
     reconnectKeys: Map<string, string>; // key -> heroId
     isRankedLookup: Map<string, boolean>; // userId -> boolean
     socketIds: Set<string>;
@@ -95,6 +95,7 @@ export interface Player {
     autoJoin?: boolean;
     aco: number;
 
+    controlKey: number;
     numActionMessages: number;
 }
 

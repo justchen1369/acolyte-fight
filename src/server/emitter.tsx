@@ -612,21 +612,21 @@ function onLeaveGameMsg(socket: SocketIO.Socket, data: m.LeaveMsg) {
 	}
 }
 
-function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
+function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsg) {
 	try {
 		if (!(required(data, "object")
-			&& required(data.a, "object")
-			&& required(data.a.type, "string")
+			&& required(data.type, "string")
 			&& (
 				(
-					data.a.type === m.ActionType.GameAction
-					&& required(data.a.s, "string")
-					&& required(data.a.x, "number")
-					&& required(data.a.y, "number")
-					&& optional(data.a.r, "boolean")
+					data.type === m.ActionType.GameAction
+					&& required(data.c, "number")
+					&& required(data.s, "string")
+					&& required(data.x, "number")
+					&& required(data.y, "number")
+					&& optional(data.r, "boolean")
 				) || (
-					data.a.type === m.ActionType.Spells
-					&& required(data.a.keyBindings, "object")
+					data.type === m.ActionType.Spells
+					&& required(data.keyBindings, "object")
 				)
 			)
 		)) {
@@ -645,7 +645,7 @@ function onActionMsg(socket: SocketIO.Socket, data: m.ActionMsgPacket) {
 			return;
 		}
 
-		games.receiveAction(game, data.c, data.a, socket.id);
+		games.receiveAction(game, data, socket.id);
 	} catch (exception) {
 		logger.error(exception);
 	}

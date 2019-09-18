@@ -193,7 +193,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 	}
 
 	const actionMsg: m.ActionMsg = {
-		h: heroId,
+		c: controlKey || world.ui.controlKey,
 		type: m.ActionType.GameAction,
 		s: action.type,
 		x: Math.round(action.target.x / Precision) * Precision,
@@ -201,11 +201,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 		r: action.release,
 	}
 
-	const packet: m.ActionMsgPacket = {
-		a: actionMsg,
-		c: controlKey || world.ui.controlKey,
-	};
-	send(packet);
+	send(actionMsg);
 }
 
 export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
@@ -215,23 +211,20 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 
 	const state = StoreProvider.getState();
 	const world = state.world;
-	if (!(world.ui.myGameId === gameId)) {
+	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
+		// Don't send any actions for dead heroes
 		return;
 	}
 
 	const actionMsg: m.ActionMsg = {
-		h: heroId,
+		c: controlKey || world.ui.controlKey,
 		type: m.ActionType.Spells,
 		keyBindings,
 	}
 
-	const packet: m.ActionMsgPacket = {
-		a: actionMsg,
-		c: controlKey || world.ui.controlKey,
-	};
-	send(packet);
+	send(actionMsg);
 }
 
-function send(packet: m.ActionMsgPacket) {
-	sockets.getSocket().emit('action', packet);
+function send(actionMsg: m.ActionMsg) {
+	sockets.getSocket().emit('action', actionMsg);
 }

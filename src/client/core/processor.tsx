@@ -42,17 +42,7 @@ function applyTickActions(tickData: m.TickMsg, world: w.World) {
 	}
 
 	if (tickData.a) {
-		tickData.a.forEach(actionData => {
-			if (actionData.type === m.ActionType.GameAction) {
-				world.actions.set(actionData.h, {
-					type: actionData.s,
-					target: pl.Vec2(actionData.x, actionData.y),
-					release: actionData.r,
-				});
-			} else if (actionData.type === m.ActionType.Spells) {
-				world.spellChanges.push(actionData);
-			}
-		});
+		world.actionMessages.push(...tickData.a);
 	}
 
 	if (tickData.s) {

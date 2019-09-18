@@ -69,18 +69,14 @@ export function calculateRoomStats(segment: string): number {
 	}
 }
 
-export function receiveAction(game: g.Game, controlKey: number, data: m.ActionMsg, socketId: string) {
+export function receiveAction(game: g.Game, data: m.ActionMsg, socketId: string) {
 	const player = game.active.get(socketId);
 	if (!player) {
 		return;
 	}
 
-	const heroId = data.h;
+	const heroId = game.controlKeys.get(data.c);
 	if (!heroId) {
-		return;
-	}
-
-	if (game.controlKeys.get(heroId) !== controlKey) {
 		return;
 	}
 
@@ -301,11 +297,16 @@ function formatForks(forks: g.Game[]): string {
 }
 
 export function queueAction(game: g.Game, actionData: m.ActionMsg) {
-	let currentPrecedence = actionPrecedence(game.actions.get(actionData.h));
+	const heroId = game.controlKeys.get(actionData.c);
+	if (!heroId) {
+		return;
+	}
+
+	let currentPrecedence = actionPrecedence(game.actions.get(heroId));
 	let newPrecedence = actionPrecedence(actionData);
 
 	if (newPrecedence >= currentPrecedence) {
-		game.actions.set(actionData.h, actionData);
+		game.actions.set(heroId, actionData);
 	}
 
 	queuedMessageListener(game);
@@ -360,6 +361,7 @@ export function receiveScore(game: g.Game, socketId: string, stats: m.GameStatsM
 export function leaveGame(game: g.Game, socketId: string, replaceWithBot: boolean = true, split?: boolean) {
 	const player = game.active.get(socketId);
 	if (player) {
+		game.controlKeys.delete(player.controlKey);
 		game.active.delete(socketId);
 		reassignBots(game, socketId);
 
@@ -455,6 +457,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 	}
 
 	const userHash = params.userHash;
+	const controlKey = acquireControlKey(heroId, game);
 	game.active.set(params.socketId, {
 		socketId: params.socketId,
 		userHash,
@@ -465,6 +468,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 		unranked: params.unranked,
 		autoJoin: params.autoJoin,
 		aco,
+		controlKey,
 		numActionMessages: 0,
 	});
 	game.bots.delete(heroId);
@@ -474,7 +478,6 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 		game.isRankedLookup.set(userId, !params.unranked);
 	}
 
-	const controlKey = acquireControlKey(heroId, game);
 	queueControlMessage(game, {
 		heroId: heroId,
 		controlKey,
@@ -492,7 +495,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 function emitJoinForSocket(game: g.Game, socketId: string): g.JoinResult {
 	const player = game.active.get(socketId);
 	if (player) {
-		const controlKey = game.controlKeys.get(player.heroId);
+		const controlKey = player.controlKey;
 		const reconnectKey = assignReconnectKey(game, player.heroId);
 		const join: g.JoinResult = {
 			socketId,
@@ -564,7 +567,7 @@ function assignReconnectKey(game: g.Game, heroId: string) {
 
 function acquireControlKey(heroId: string, game: g.Game) {
 	const controlKey = transientIds.generate();
-	game.controlKeys.set(heroId, controlKey);
+	game.controlKeys.set(controlKey, heroId);
 	return controlKey;
 }
 

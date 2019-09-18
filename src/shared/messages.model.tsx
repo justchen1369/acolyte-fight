@@ -65,11 +65,6 @@ export interface GameOptions {
     touchSurfacePixels?: number;
 }
 
-export interface ActionMsgPacket {
-    a: c.ActionMsg;
-    c: number; // control key
-}
-
 export interface SyncMsgPacket {
     g: string;
     s: c.SyncMsg;

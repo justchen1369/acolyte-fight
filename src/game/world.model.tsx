@@ -41,6 +41,7 @@ export interface World {
 
 	activePlayers: Immutable.Set<string>; // Set<heroId: string>
 	players: Immutable.Map<string, Player>; // heroId -> Player
+	controlKeys: Map<number, string>; // controlKey -> heroId
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
 	teamAssignments: Immutable.Map<string, string>; // heroId -> teamId
 	teams: Immutable.Map<string, Team>; // teamId -> Team
@@ -60,11 +61,11 @@ export interface World {
 	initialRadius: number;
 	angle: number;
 
+	actionMessages: n.ActionMsg[];
 	controlMessages: n.ControlMsg[];
 	snapshots: Snapshot[];
 	syncs: Snapshot[];
 	actions: Map<string, Action>,
-	spellChanges: n.SpellsMsg[];
 
 	nextPositionId: number;
 	nextObjectId: number;

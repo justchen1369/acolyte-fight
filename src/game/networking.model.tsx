@@ -25,7 +25,7 @@ export type ActionMsg =
 
 export interface ActionMsgBase {
     type: string;
-    h: string; // hero ID
+    c: number; // controlKey
 }
 
 export type ControlMsg =

@@ -89,13 +89,14 @@ export function initialWorld(mod: Object): w.World {
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
+		actionMessages: [],
 		controlMessages: [],
 		snapshots: [],
 		syncs: [],
-		spellChanges: [],
 
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
+		controlKeys: new Map(),
 		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
 		teamAssignments: Immutable.Map<string, string>(), // hero ID -> team ID
 		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
@@ -947,6 +948,8 @@ export function tick(world: w.World) {
 	handleOccurences(world);
 	handleActions(world);
 
+	act(world);
+
 	handleBehaviours(world, {
 		delayBehaviour,
 		homing,
@@ -1201,11 +1204,6 @@ function handleOccurences(world: w.World) {
 	});
 	world.controlMessages = newOccurences;
 
-	if (world.spellChanges.length > 0) {
-		world.spellChanges.forEach(ev => handleSpellChoosing(ev, world));
-		world.spellChanges.length = 0;
-	}
-
 	if (world.syncs.length > 0) {
 		world.syncs.forEach(ev => handleSync(ev, world));
 		world.syncs.length = 0;
@@ -1366,12 +1364,12 @@ function dequeueSnapshot(tick: number, world: w.World) {
 	return null;
 }
 
-function handleSpellChoosing(ev: n.SpellsMsg, world: w.World) {
-	if (!allowSpellChoosing(world, ev.h)) {
+function handleSpellChoosing(ev: n.SpellsMsg, heroId: string, world: w.World) {
+	if (!allowSpellChoosing(world, heroId)) {
 		return true;
 	}
 
-	const hero = world.objects.get(ev.h);
+	const hero = world.objects.get(heroId);
 	if (hero && hero.category === "hero") {
 		if (hero.casting && hero.casting.uninterruptible) {
 			return false;
@@ -1517,6 +1515,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.delete(hero.id);
+	world.controlKeys.set(ev.controlKey, hero.id);
 
 	world.ui.notifications.push({ type: "bot", player });
 
@@ -1562,6 +1561,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.add(hero.id);
+	world.controlKeys.set(ev.controlKey, hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
 
@@ -1628,6 +1628,7 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 		return true;
 	}
 
+	world.controlKeys.delete(player.controlKey);
 	world.activePlayers = world.activePlayers.delete(ev.heroId);
 
 	world.ui.notifications.push({ type: "leave", player, split: ev.split });
@@ -1655,6 +1656,7 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 			};
 
 			world.players = world.players.set(ev.heroId, newPlayer);
+			world.controlKeys.set(newPlayer.controlKey, ev.heroId);
 		} else {
 			// This player split off from this game
 			hero.exitTick = world.tick;
@@ -1702,6 +1704,23 @@ function removeBots(world: w.World) {
 }
 
 function handleActions(world: w.World) {
+	world.actionMessages.forEach(actionData => {
+		const heroId = world.controlKeys.get(actionData.c);
+		if (heroId) {
+			if (actionData.type === n.ActionType.GameAction) {
+				world.actions.set(heroId, {
+					type: actionData.s,
+					target: pl.Vec2(actionData.x, actionData.y),
+					release: actionData.r,
+				});
+			} else if (actionData.type === n.ActionType.Spells) {
+				handleSpellChoosing(actionData, heroId, world);
+			}
+		}
+	});
+}
+
+function act(world: w.World) {
 	const nextActions = new Map<string, w.Action>();
 	world.objects.forEach(hero => {
 		if (hero.category !== "hero") { return; }
