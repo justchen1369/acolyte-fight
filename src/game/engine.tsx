@@ -1498,7 +1498,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		}
 
 		hero = addHero(world, ev.heroId);
-		activateHero(hero, ev.keyBindings, world); 
+		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
@@ -1535,7 +1535,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 		}
 
 		hero = addHero(world, ev.heroId);
-		activateHero(hero, ev.keyBindings, world);
+		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
@@ -1568,22 +1568,6 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 	world.ui.notifications.push({ type: "join", player });
 
 	return true;
-}
-
-function activateHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
-	if (hero.exitTick) {
-		// If previous hero was splitting, cancel
-		hero.exitTick = null;
-		hero.createTick = world.tick; // Re-animate arrival
-	}
-
-	assignKeyBindingsToHero(hero, keyBindings, world);
-
-	if (world.tick < world.startTick) {
-		// Cleanse when a new player replaces another
-		hero.cleanseTick = world.tick;
-	}
-
 }
 
 function choosePlayerColor(heroId: string, userHash: string, baseColor: string, world: w.World) {
