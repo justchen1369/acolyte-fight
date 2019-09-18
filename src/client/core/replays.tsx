@@ -67,13 +67,27 @@ async function listReplays(gameIds: string[], server: string): Promise<string[]>
 export async function watch(gameId: string, server: string = null) {
     const replay = await getReplay(gameId, server);
     if (replay) {
-        matches.watchReplayFromObject(replay);
+        const state = StoreProvider.getState();
+        const join: m.HeroMsg = {
+            gameId: replay.id,
+            universeId: replay.universe,
+            heroId: null,
+            reconnectKey: null,
+            userHash: state.userHash,
+            partyId: replay.partyId,
+            locked: replay.locked,
+            room: replay.roomId,
+            mod: replay.mod,
+            live: false,
+            history: replay.history,
+        };
+        matches.watchReplayFromObject(join);
     } else {
         throw "Replay not found";
     }
 }
 
-export async function getReplay(gameId: string, server: string = null): Promise<m.HeroMsg> {
+export async function getReplay(gameId: string, server: string = null): Promise<m.Replay> {
     let prefix = url.base;
     if (server) {
         const region = regions.getRegion(server);
@@ -85,7 +99,7 @@ export async function getReplay(gameId: string, server: string = null): Promise<
         credentials: 'same-origin',
     });
     if (res.status === 200) {
-        const response: m.HeroMsg = await res.json();
+        const response: m.Replay = await res.json();
         return response;
     } else {
         return null;

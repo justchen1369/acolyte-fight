@@ -12,6 +12,7 @@ export interface State {
     touched?: boolean;
 
     seen: number;
+    userHash?: string;
     userId?: string;
     loggedIn: boolean;
     tutorialLevel: number;
@@ -187,6 +188,7 @@ export interface UpdateSeenAction {
 
 export interface UpdateUserIdAction {
     type: "updateUserId";
+    userHash: string;
     userId: string;
     loggedIn: boolean;
 }

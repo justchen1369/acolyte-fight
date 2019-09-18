@@ -96,7 +96,7 @@ function reducer(state: s.State, action: s.Action): s.State {
     } else if (action.type === "seen") {
         return { ...state, seen: action.seen };
     } else if (action.type === "updateUserId") {
-        let newState: s.State = { ...state, userId: action.userId, loggedIn: action.loggedIn, profile: null };
+        let newState: s.State = { ...state, userHash: action.userHash, userId: action.userId, loggedIn: action.loggedIn, profile: null };
         if (action.loggedIn) {
             newState.showingHelp = false;
         }

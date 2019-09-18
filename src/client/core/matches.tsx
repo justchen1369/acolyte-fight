@@ -141,7 +141,7 @@ export function onHeroMsg(data: m.HeroMsg) {
 		leaveCurrentGame(false);
 		world = existing;
 		processor.connectToWorld(world, data);
-	} else if (!world) {
+	} else {
 		leaveCurrentGame(false);
 		world = processor.initialWorld(data);
 	}

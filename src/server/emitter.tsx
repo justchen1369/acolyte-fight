@@ -450,7 +450,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 	const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(authToken));
 	const aco = await matchmaking.retrieveRating(userId, data.numGames, m.GameCategory.PvP, data.unranked);
 
-	let replay: g.Replay;
+	let replay: m.Replay;
 	if (data.gameId) {
 		replay = store.activeGames.get(data.gameId);
 		if (!replay) {

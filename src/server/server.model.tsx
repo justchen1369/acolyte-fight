@@ -51,22 +51,7 @@ export interface UserRating {
 }
 
 // Don't forget to deep clone in games.cloneGame(...)
-export interface Replay {
-    id: string;
-    universe: number;
-    segment: string;
-
-    roomId: string | null;
-    partyId: string | null;
-    locked: string | null;
-
-    mod: Object;
-
-	history: m.TickMsg[];
-}
-
-// Don't forget to deep clone in games.cloneGame(...)
-export interface Game extends Replay {
+export interface Game extends m.Replay {
     created: moment.Moment;
 
     matchmaking: MatchmakingSettings;
@@ -178,7 +163,7 @@ export interface PartyMemberStatus {
 
 export interface JoinResult {
 	socketId: string;
-	game: Replay;
+	game: m.Replay;
 	live: boolean;
 
 	heroId?: string;

@@ -537,7 +537,7 @@ export function observeGame(game: g.Game, params: g.JoinParameters): g.JoinResul
 	return emitJoinForSocket(game, params.socketId);
 }
 
-export function replayGame(replay: g.Replay, params: g.JoinParameters) {
+export function replayGame(replay: m.Replay, params: g.JoinParameters) {
 	emitJoin({
 		socketId: params.socketId,
 		game: replay,

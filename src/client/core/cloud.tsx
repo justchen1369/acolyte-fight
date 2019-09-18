@@ -64,43 +64,47 @@ export async function downloadSettings(): Promise<string> {
     if (res.status === 200) {
         const json: m.GetUserSettingsResponse = await res.json();
 
-        let upload = false;
-        StoreProvider.dispatch({ type: "updateUserId", userId: json.userId, loggedIn: json.loggedIn });
-        if (json.name && json.name.length > 0) {
-            StoreProvider.dispatch({ type: "updatePlayerName", playerName: json.name });
+        if (json.userId) {
+            let upload = false;
+            StoreProvider.dispatch({ type: "updateUserId", userHash: json.userHash, userId: json.userId, loggedIn: json.loggedIn });
+            if (json.name && json.name.length > 0) {
+                StoreProvider.dispatch({ type: "updatePlayerName", playerName: json.name });
+            } else {
+                upload = true;
+            }
+
+            if (json.buttons) {
+                StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: json.buttons });
+            } else {
+                upload = true;
+            }
+
+            if (json.rebindings) {
+                StoreProvider.dispatch({ type: "updateRebindings", rebindings: json.rebindings });
+            } else {
+                upload = true;
+            }
+
+            if (json.options) {
+                StoreProvider.dispatch({ type: "updateOptions", options: json.options });
+            } else {
+                upload = true;
+            }
+
+            console.log(`Logged in as ${json.userId} - ${json.name}`);
+
+            if (upload) {
+                await uploadSettings();
+            }
+
+            return json.userId;
         } else {
-            upload = true;
+            // This user is not logged in
+            StoreProvider.dispatch({ type: "updateUserId", userHash: json.userHash, userId: null, loggedIn: false });
+            return null;
         }
-
-        if (json.buttons) {
-            StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: json.buttons });
-        } else {
-            upload = true;
-        }
-
-        if (json.rebindings) {
-            StoreProvider.dispatch({ type: "updateRebindings", rebindings: json.rebindings });
-        } else {
-            upload = true;
-        }
-
-        if (json.options) {
-            StoreProvider.dispatch({ type: "updateOptions", options: json.options });
-        } else {
-            upload = true;
-        }
-
-        console.log(`Logged in as ${json.userId} - ${json.name}`);
-
-        if (upload) {
-            await uploadSettings();
-        }
-
-        return json.userId;
     } else {
-        // This user is not logged in
-        StoreProvider.dispatch({ type: "updateUserId", userId: null, loggedIn: false });
-        return null;
+        throw await res.text();
     }
 }
 

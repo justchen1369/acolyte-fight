@@ -33,12 +33,14 @@ export interface GetUserSettingsRequest {
 }
 
 export interface GetUserSettingsResponse {
-    userId: string;
-    loggedIn: boolean;
-    name: string;
-    buttons: KeyBindings;
-    rebindings: KeyBindings;
-    options: GameOptions;
+    userHash: string;
+    userId?: string;
+    loggedIn?: boolean;
+
+    name?: string;
+    buttons?: KeyBindings;
+    rebindings?: KeyBindings;
+    options?: GameOptions;
 }
 
 export interface UpdateUserSettingsRequest {
@@ -443,4 +445,19 @@ export interface KongregateLoginRequest {
 export interface KongregateLoginResponse {
     authToken: string;
     name: string;
+}
+
+// Don't forget to deep clone in games.cloneGame(...)
+export interface Replay {
+    id: string;
+    universe: number;
+    segment: string;
+
+    roomId: string | null;
+    partyId: string | null;
+    locked: string | null;
+
+    mod: ModTree;
+
+	history: c.TickMsg[];
 }

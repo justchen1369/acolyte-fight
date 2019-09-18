@@ -269,26 +269,10 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
         return;
     }
 
-    const userHash = auth.getUserHashFromAuthToken(auth.getAuthToken(req));
-
     const store = getStore();
     const replay = store.activeGames.get(gameId) || await gameStorage.loadGame(gameId);
     if (replay) {
-        // Found game locally
-        const response: m.HeroMsg = {
-            gameId: replay.id,
-            universeId: replay.universe,
-            heroId: null,
-            reconnectKey: null,
-            userHash,
-            partyId: replay.partyId,
-            locked: replay.locked,
-            room: replay.roomId,
-            mod: replay.mod,
-            live: false,
-            history: replay.history,
-        };
-        res.send(response);
+        res.send(replay);
     } else {
         const game = await retrieveGameRemotely(gameId);
         if (game) {
@@ -299,7 +283,7 @@ export async function onGetGameAsync(req: express.Request, res: express.Response
     }
 }
 
-async function retrieveGameRemotely(gameId: string): Promise<m.HeroMsg> {
+async function retrieveGameRemotely(gameId: string): Promise<m.Replay> {
     if (!mirroring.isMirrored()) {
         return null;
     }
@@ -318,7 +302,7 @@ async function retrieveGameRemotely(gameId: string): Promise<m.HeroMsg> {
     try {
         const fetchResponse = await fetch(mirroring.getUpstreamUrl(game.server) + `/api/games/${gameId}`);
         if (fetchResponse.status === 200) {
-            const replay: m.HeroMsg = await fetchResponse.json();
+            const replay: m.Replay = await fetchResponse.json();
             return replay;
         } else if (fetchResponse.status === 404) {
             return null;
@@ -447,9 +431,11 @@ function handleError(error: any, res: express.Response) {
 
 export async function onGetUserSettingsAsync(req: express.Request, res: express.Response): Promise<void> {
     const authToken = getAuthToken(req);
+    const userHash = auth.getUserHashFromAuthToken(authToken);
     const user = await auth.getUserFromAccessKey(auth.enigmaAccessKey(authToken));
     if (user) {
         const result: m.GetUserSettingsResponse = {
+            userHash,
             userId: user.userId,
             loggedIn: user.loggedIn,
             name: user.settings && user.settings.name,
@@ -487,6 +473,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
         await userStorage.createUser(userSettings, auth.enigmaAccessKey(authToken));
 
         const result: m.GetUserSettingsResponse = {
+            userHash,
             userId: userId,
             loggedIn,
             name,
@@ -498,7 +485,12 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
         res.header("Content-Type", "application/json");
         res.send(result);
     } else {
-        res.status(404).send("User not found");
+        const result: m.GetUserSettingsResponse = {
+            userHash,
+        };
+
+        res.header("Content-Type", "application/json");
+        res.send(result);
     }
 }
 
