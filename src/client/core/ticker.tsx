@@ -9,7 +9,6 @@ import * as StoreProvider from '../storeProvider';
 import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
-import gameKeyCustomizer from '../play/gameKeyCustomizer';
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
@@ -87,7 +86,18 @@ function queueTicks(numFramesToProcess: number) {
 			++unavailable;
 		}
 	}
+	tickQueue.sort(tickComparer);
 	return unavailable;
+}
+
+function tickComparer(a: m.TickMsg, b: m.TickMsg) {
+	if (a.t < b.t) {
+		return -1;
+	} else if (a.t > b.t) {
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {

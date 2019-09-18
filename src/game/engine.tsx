@@ -2184,8 +2184,10 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 			const impulse = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())
 			const typicalHeroMass = Hero.Density * Math.PI * Hero.Radius * Hero.Radius; // Scale the impulse to the mass so it always looks the same
 			const massNormalizer = hit.body.getMass() / typicalHeroMass;
+
 			impulse.mul(massNormalizer * obstacle.impulse / impulse.length());
 			applyImpulseDelta(hit, impulse);
+
 			obstacle.activeTick = world.tick;
 		}
 	}
