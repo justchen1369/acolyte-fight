@@ -351,6 +351,7 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 			&& optional(data.memberId, "string")
 			&& optional(data.isLeader, "boolean")
 			&& optional(data.isObserver, "boolean")
+			&& optional(data.team, "number")
 			&& optional(data.kick, "boolean")
 		)) {
 			callback({ success: false, error: "Bad request" });
@@ -376,6 +377,9 @@ function onPartyStatusMsg(socket: SocketIO.Socket, authToken: string, data: m.Pa
 		}
 		if (data.isReady !== undefined) {
 			newStatus.ready = data.isReady;
+		}
+		if (data.team !== undefined) {
+			newStatus.team = data.team;
 		}
 		if (!parties.isAuthorizedToChange(party, socket.id, memberId, newStatus)) {
 			logger.info(`Party ${data.partyId} ${socket.id} [${authToken}] unauthorized to modify ${memberId} ${JSON.stringify(newStatus)}`);
@@ -813,6 +817,7 @@ function partyMembersToContract(party: g.Party) {
 			ready: member.ready,
 			isObserver: member.isObserver,
 			isLeader: member.isLeader,
+			team: member.team,
 		}
 		members.push(contract);
 	});

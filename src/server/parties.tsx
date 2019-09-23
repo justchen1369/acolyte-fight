@@ -65,7 +65,7 @@ export function isAuthorizedToChange(party: g.Party, initiatorId: string, member
             return false;
         }
     }
-    if (newStatus.isObserver !== undefined) {
+    if (newStatus.isObserver !== undefined || newStatus.team !== undefined) {
         if (party.isLocked) {
             if (!isLeader) {
                 return false;
@@ -105,6 +105,7 @@ export function createOrUpdatePartyMember(party: g.Party, newSettings: g.JoinPar
             isObserver: party.initialObserver,
             isLeader: false,
             ready: false,
+            team: null,
         };
 		logger.info(`Party ${party.id} joined by user ${member.name} [${member.authToken}]]`);
 	}
@@ -223,7 +224,7 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
             if (!game) {
                 // Need to be able to add a player to the game immediately after it is created, so only create once we are ready to add
                 // Assume all party members on same engine version
-                game = games.initGame(member.version, room, party.id);
+                game = games.initGame(member.version, room, party.id, m.LockType.AssignedParty);
             }
 
             games.joinGame(game, member, userId, aco);
@@ -231,5 +232,6 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
             // Unready once assigned to a game so they don't immediately get assigned to another
             member.ready = false;
         }));
+        matchmaking.forceTeams(game, group);
 	}
 }

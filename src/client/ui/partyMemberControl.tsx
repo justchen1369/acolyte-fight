@@ -6,11 +6,23 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as url from '../url';
 
-interface Props {
+const MaxTeam = 4;
+
+interface OwnProps {
     member: s.PartyMemberState;
     editable?: boolean;
     showAll?: boolean;
     isSelf?: boolean;
+}
+interface Props extends OwnProps {
+    teamColors: string[];
+}
+
+function stateToProps(state: s.State, ownProps: OwnProps): Props {
+    return {
+        ...ownProps,
+        teamColors: state.room.settings.Visuals.TeamColors,
+    }
 }
 
 export class PartyMemberControl extends React.PureComponent<Props> {
@@ -35,10 +47,34 @@ export class PartyMemberControl extends React.PureComponent<Props> {
             {showAll && !member.isLeader && <i className="settings-icon fas fa-user" title={`${member.name} is not the party leader`} onClick={() => editable && parties.makeLeaderAsync(member.socketId)} />}
             {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => editable && parties.makeObserverAsync(member.socketId, false)} />}
             {showAll && !member.isObserver && <i className="settings-icon fas fa-gamepad" title={`${member.name} is playing (not observing)`} onClick={() => editable && parties.makeObserverAsync(member.socketId, true)} />}
+            {showAll && member.team && <i className="settings-icon fas fa-flag" style={{color: this.teamColor(member.team)}} title={`${member.name} is on a team ${member.team}`} onClick={() => editable && this.onTeamClick()} />}
+            {showAll && !member.team && <i className="settings-icon far fa-flag" title={`${member.name} is not on a team`} onClick={() => editable && this.onTeamClick()} />}
             <div className="spacer" />
             {showAll && (editable || isSelf) && <i className="settings-icon fas fa-times" title={`Remove ${member.name} from party`} onClick={() => parties.kick(member.socketId)} />}
         </div>
     }
+
+    private teamColor(team: number): string {
+        const teamColors = this.props.teamColors;
+
+        let index = team - 1; // We never allocate team 0, so give team 1 their color, but wrap around just in case
+        if (index < 0) {
+            index += teamColors.length;
+        }
+        index = index % teamColors.length;
+
+        return teamColors[index];
+    }
+
+    private onTeamClick() {
+        const member = this.props.member;
+        let nextTeam = (member.team || 0) + 1;
+        if (nextTeam > MaxTeam) {
+            nextTeam = null;
+        }
+
+        parties.updateTeamStatusAsync(member.socketId, nextTeam);
+    }
 }
 
-export default PartyMemberControl;
+export default ReactRedux.connect(stateToProps)(PartyMemberControl);

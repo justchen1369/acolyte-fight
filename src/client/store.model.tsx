@@ -79,6 +79,7 @@ export interface PartyMemberState {
 	ready: boolean;
     isObserver: boolean;
     isLeader: boolean;
+    team: number;
 }
 
 export interface RoomState {

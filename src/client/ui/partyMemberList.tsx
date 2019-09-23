@@ -33,6 +33,10 @@ export class PartyMemberList extends React.PureComponent<Props, State> {
 
     render() {
         const party = this.props.party;
+        if (!party) {
+            return null;
+        }
+
         const self = party.members.find(m => m.socketId === this.props.selfId);
         if (!self) {
             return null;

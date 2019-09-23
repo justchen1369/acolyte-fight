@@ -161,6 +161,7 @@ export interface PartyMemberStatus {
     ready: boolean;
     isObserver: boolean;
     isLeader: boolean;
+    team: number;
 }
 
 export interface JoinResult {

@@ -80,7 +80,7 @@ function gameTurn(game: g.Game): boolean {
 		for (let i = 0; i < TicksPerTurn; ++i) {
 			gameTick(game);
         }
-        finalizeMatchupIfNecessary(game); // Needs to be outside of tick processing because it may split the game
+        matchmaking.finalizeMatchupIfNecessary(game); // Needs to be outside of tick processing because it may split the game
     }
 
 	return running;
@@ -130,20 +130,6 @@ function gameTick(game: g.Game) {
 		gameStorage.saveGame(game);
 		logger.info("Game [" + game.id + "]: finished after " + game.tick + " ticks");
 	}
-}
-
-function finalizeMatchupIfNecessary(game: g.Game) {
-    if (game.matched) {
-        return;
-    }
-
-    if (game.joinable || game.tick < game.closeTick) {
-        return;
-    }
-
-    game.matched = true;
-
-    matchmaking.finalizeMatchmaking(game);
 }
 
 function closeGameIfNecessary(game: g.Game) {

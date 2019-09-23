@@ -27,6 +27,7 @@ export namespace LockType {
     export const ModPreview = "mod-preview";
     export const Tutorial = "tutorial";
     export const Blocked = "blocked";
+    export const AssignedParty = "assigned-party"; // Private parties that wait for everyone to join
 }
 
 export interface GetUserSettingsRequest {
@@ -249,6 +250,7 @@ export interface PartyStatusRequest {
     isLeader?: boolean;
     isObserver?: boolean;
     isReady?: boolean;
+    team?: number;
     kick?: boolean;
 }
 export interface PartyStatusResponse {
@@ -289,6 +291,7 @@ export interface PartyMemberMsg {
     ready: boolean;
     isObserver: boolean;
     isLeader: boolean;
+    team: number;
 }
 
 export interface ExternalStatus {

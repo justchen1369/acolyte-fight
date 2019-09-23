@@ -10,6 +10,11 @@ import * as statsStorage from './statsStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 
+export interface SocketTeam {
+    socketId: string;
+    team?: number;
+}
+
 export interface RatedPlayer {
     socketId: string;
     aco: number;
@@ -323,7 +328,61 @@ export function averagePlayersPerGame(totalPlayers: number, maxPlayers: number) 
 	return totalPlayers / maxGames;
 }
 
-export function finalizeMatchmaking(initial: g.Game) {
+export function forceTeams(game: g.Game, socketTeams: SocketTeam[]) {
+    if (game.matched) {
+        return;
+    }
+    game.matched = true; // Don't allow normal matchmaking to run
+
+    const [withTeams, withoutTeams] = _.partition(socketTeams, x => !!x.team);
+    if (withTeams.length === 0) {
+        // Nothing to do
+        return;
+    }
+
+    const teams =
+        _(withTeams)
+        .groupBy(p => p.team)
+        .map(group => findTeam(game, group))
+        .value();
+
+    withoutTeams.forEach(socketTeam => {
+        teams.push(findTeam(game, [socketTeam]));
+    });
+
+    games.queueControlMessage(game, {
+        type: m.ActionType.Teams,
+        teams,
+    });
+}
+
+function findTeam(game: g.Game, socketTeams: SocketTeam[]) {
+    return socketTeams.map(socketTeam => {
+        const player = game.active.get(socketTeam.socketId);
+        return player && player.heroId;
+    }).filter(x => !!x);
+}
+
+export function finalizeMatchupIfNecessary(game: g.Game) {
+    if (game.matched) {
+        return;
+    }
+
+    if (game.joinable || game.tick < game.closeTick) {
+        return;
+    }
+
+    game.matched = true;
+
+    finalizeMatchmaking(game);
+}
+
+function finalizeMatchmaking(initial: g.Game) {
+    if (initial.locked) {
+        // Private game, don't do any matchmaking
+        return;
+    }
+
     const queue = [initial];
     const allForks = new Array<g.Game>();
     while (queue.length > 0) {
