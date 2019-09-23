@@ -17,7 +17,7 @@ export function merge(base: any, mod: any) {
     } else if (typeof base === "object") {
         if (base === null || mod === null) {
             return mod; // Nothing to merge
-        } else if (base instanceof Array) {
+        } else if (base instanceof Array || mod instanceof Array) {
             return [ ...mod ]; // Replace arrays entirely, no merging
         } else {
             let result: any = {};
