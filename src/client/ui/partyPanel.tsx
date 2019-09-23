@@ -99,7 +99,8 @@ export class PartyPanel extends React.PureComponent<Props, State> {
             {this.props.party.members.length >= this.props.maxPlayers && <p>If your party is larger than {this.props.maxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             <div className="clear" />
-            {this.renderAdvancedSettings(self.isLeader)}
+            {this.renderPartySettings(self.isLeader)}
+            {this.renderObserving(self)}
             <h1>Players</h1>
             <PartyMemberList />
             <h1>Games</h1>
@@ -111,7 +112,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
         new QRious({ element, value: partyUrl, size: 192 });
     }
 
-    private renderAdvancedSettings(showAll: boolean) {
+    private renderPartySettings(showAll: boolean) {
         const party = this.props.party;
 
         let partyMode: PartyModeType;
@@ -137,6 +138,27 @@ export class PartyPanel extends React.PureComponent<Props, State> {
                 </PartyMode>
             </>
         </div>
+    }
+
+    private renderObserving(self: s.PartyMemberState) {
+        const party = this.props.party;
+        if (!party.isLocked || self.isLeader) {
+            if (self.isObserver) {
+                return <div>
+                    <h2>Observer Mode: On <i className="fas fa-eye" /></h2>
+                    <p>You are <b>observing</b>.</p>
+                    <p><span className="btn" onClick={() => parties.makeObserverAsync(self.socketId, false)}><i className="fas fa-gamepad" /> Switch to Playing Mode</span></p>
+                </div>
+            } else {
+                return <div>
+                    <h2>Observer Mode: Off <i className="fas fa-gamepad" /></h2>
+                    <p>You are <b>playing</b>.</p>
+                    <p><span className="btn" onClick={() => parties.makeObserverAsync(self.socketId, true)}><i className="fas fa-eye" /> Switch to Observer Mode</span></p>
+                </div>
+            }
+        } else {
+            return null;
+        }
     }
 
     private async updateSettings(settings: Partial<m.PartySettingsRequest>) {

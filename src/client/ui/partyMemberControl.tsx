@@ -49,8 +49,8 @@ export class PartyMemberControl extends React.PureComponent<Props> {
             {showAll && !member.isLeader && <i className="settings-icon fas fa-user" title={`${member.name} is not the party leader`} onClick={() => editable && parties.makeLeaderAsync(member.socketId)} />}
             {member.isObserver && <i className="settings-icon fas fa-eye" title={`${member.name} is observing`} onClick={() => editable && parties.makeObserverAsync(member.socketId, false)} />}
             {showAll && !member.isObserver && <i className="settings-icon fas fa-gamepad" title={`${member.name} is playing (not observing)`} onClick={() => editable && parties.makeObserverAsync(member.socketId, true)} />}
-            {showAll && allowTeams && member.team && <i className="settings-icon fas fa-flag" style={{color: this.teamColor(member.team)}} title={`${member.name} is on a team ${member.team}`} onClick={() => editable && this.onTeamClick()} />}
-            {showAll && allowTeams && !member.team && <i className="settings-icon far fa-flag" title={`${member.name} is not on a team`} onClick={() => editable && this.onTeamClick()} />}
+            {showAll && !member.isObserver && allowTeams && member.team && <i className="settings-icon fas fa-flag" style={{color: this.teamColor(member.team)}} title={`${member.name} is on a team ${member.team}`} onClick={() => editable && this.onTeamClick()} />}
+            {showAll && !member.isObserver && allowTeams && !member.team && <i className="settings-icon far fa-flag" title={`${member.name} is not on a team`} onClick={() => editable && this.onTeamClick()} />}
             <div className="spacer" />
             {showAll && (editable || isSelf) && <i className="settings-icon fas fa-times" title={`Remove ${member.name} from party`} onClick={() => parties.kick(member.socketId)} />}
         </div>
