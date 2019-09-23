@@ -92,7 +92,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return effects.map(effect => <div className="spell-effect" key={effect.title}><i className={effect.icon} /> <b>{effect.title}:</b> {effect.text}</div>);
+        return effects.map((effect, i) => <div key={i} className="spell-effect"><i className={effect.icon} /> <b>{effect.title}:</b> {effect.text}</div>);
     }
 
     private renderOptionsRow(rowIndex: number, row: string[], chosenId: string) {
