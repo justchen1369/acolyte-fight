@@ -14,6 +14,12 @@ import Link from '../controls/link';
 import PartyGameList from './partyGameList';
 import PartyMemberList from './partyMemberList';
 
+enum PartyModeType {
+    Room = "room",
+    Teams = "party",
+    Tournament = "tournament",
+}
+
 interface Props {
     selfId: string
     current: s.PathElements;
@@ -22,7 +28,6 @@ interface Props {
 }
 interface State {
     loading: boolean;
-    advanced: boolean;
     error: string;
 }
 
@@ -35,7 +40,11 @@ function stateToProps(state: s.State): Props {
     };
 }
 
-function PartyMode(props: { selected: boolean, onClick: () => void, children?: React.ReactFragment }) {
+function PartyMode(props: { showAll: boolean, selected: boolean, onClick: () => void, children?: React.ReactFragment }) {
+    if (!(props.showAll || props.selected)) {
+        return null;
+    }
+
     const className = classNames({
         'party-mode-row': true,
         'party-mode-selected': props.selected,
@@ -52,7 +61,6 @@ export class PartyPanel extends React.PureComponent<Props, State> {
         super(props);
         this.state = {
             loading: false,
-            advanced: false,
             error: null,
         };
     }
@@ -91,8 +99,7 @@ export class PartyPanel extends React.PureComponent<Props, State> {
             {this.props.party.members.length >= this.props.maxPlayers && <p>If your party is larger than {this.props.maxPlayers} players, the party will be split across multiple games.</p>}
             {this.props.party.roomId !== m.DefaultRoomId && <p>A <Link page="modding">mod</Link> is active for your party. This can be controlled by the party leader.</p>}
             <div className="clear" />
-            {this.renderAdvancedIndicator()}
-            {this.state.advanced && this.renderAdvancedSettings()}
+            {this.renderAdvancedSettings(self.isLeader)}
             <h1>Players</h1>
             <PartyMemberList />
             <h1>Games</h1>
@@ -104,46 +111,29 @@ export class PartyPanel extends React.PureComponent<Props, State> {
         new QRious({ element, value: partyUrl, size: 192 });
     }
 
-    private renderAdvancedIndicator() {
-        if (this.state.advanced) {
-            return <div className="btn" onClick={() => this.setState({ advanced: false })}>
-                <i className="fas fa-chevron-up" /> Hide Advanced Settings
-            </div>
-        } else {
-            return <div className="btn" onClick={() => this.setState({ advanced: true })}>
-                <i className="fas fa-chevron-down" /> Show Advanced Settings
-            </div>
-        }
-    }
-
-    private renderAdvancedSettings() {
+    private renderAdvancedSettings(showAll: boolean) {
         const party = this.props.party;
+
+        let partyMode: PartyModeType;
+        if (!party.waitForPlayers) {
+            partyMode = PartyModeType.Room;
+        } else if (!party.isLocked) {
+            partyMode = PartyModeType.Teams;
+        } else {
+            partyMode = PartyModeType.Tournament;
+        }
+
         return <div>
             <>
-                <h3>Default to playing or observing?</h3>
-                <PartyMode selected={!party.initialObserver} onClick={() => this.updateSettings({ initialObserver: false })} >
-                    <span className="party-mode-label"><b>Playing</b> <i className="fas fa-gamepad" />: players who join the party begin as players.</span>
+                <h2>Party mode</h2>
+                <PartyMode showAll={showAll} selected={partyMode === PartyModeType.Room} onClick={() => this.updateSettings({ initialObserver: false, isLocked: false, waitForPlayers: false })} >
+                    <span className="party-mode-label"><b>Open</b> <i className="fas fa-sword" />: players join the game immediately, no waiting.</span>
                 </PartyMode>
-                <PartyMode selected={party.initialObserver} onClick={() => this.updateSettings({ initialObserver: true })} >
-                    <span className="party-mode-label"><b>Observing</b> <i className="fas fa-eye" />: players who join the party begin as observers.</span>
+                <PartyMode showAll={showAll} selected={partyMode === PartyModeType.Teams} onClick={() => this.updateSettings({ initialObserver: false, isLocked: false, waitForPlayers: true })} >
+                    <span className="party-mode-label"><b>Teams</b> <i className="fas fa-flag" />: wait until all players are ready before adding them to the game. Players may choose their teams.</span>
                 </PartyMode>
-            </>
-            <>
-                <h3>Who can play?</h3>
-                <PartyMode selected={!party.isLocked} onClick={() => this.updateSettings({ isLocked: false })} >
-                    <span className="party-mode-label"><b>Everyone</b> <i className="fas fa-user-friends" />: all players can freely change between playing and observing.</span>
-                </PartyMode>
-                <PartyMode selected={party.isLocked} onClick={() => this.updateSettings({ isLocked: true })} >
-                    <span className="party-mode-label"><b>Leader decides</b> <i className="fas fa-crown" />: only the party leader can decide who plays and observes.</span>
-                </PartyMode>
-            </>
-            <>
-                <h3>When to start games?</h3>
-                <PartyMode selected={party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: true })} >
-                    <span className="party-mode-label"><b>Wait for all players</b> <i className="fas fa-clock" />: wait until all players are ready before adding them to the game.</span>
-                </PartyMode>
-                <PartyMode selected={!party.waitForPlayers} onClick={() => this.updateSettings({ waitForPlayers: false })} >
-                    <span className="party-mode-label"><b>Start immediately</b> <i className="fas fa-sword" />: players join the game immediately. If they start playing, other players may have to wait until the next game. Useful if your party is too big to wait for everyone.</span>
+                <PartyMode showAll={showAll} selected={partyMode === PartyModeType.Tournament} onClick={() => this.updateSettings({ initialObserver: true, isLocked: true, waitForPlayers: true })} >
+                    <span className="party-mode-label"><b>Tournament</b> <i className="fas fa-trophy" />: only the party leader decides who can play and what the teams are. Everyone else observes.</span>
                 </PartyMode>
             </>
         </div>

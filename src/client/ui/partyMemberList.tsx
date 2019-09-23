@@ -42,12 +42,15 @@ export class PartyMemberList extends React.PureComponent<Props, State> {
             return null;
         }
 
+        const allowTeams = party.waitForPlayers;
+
         return <div className="party-list">
             {party.members.map(m => <PartyMemberControl
                 key={m.socketId}
                 member={m}
                 editable={self.isLeader || (!party.isLocked && m.socketId === self.socketId)}
                 isSelf={m.socketId === self.socketId}
+                allowTeams={allowTeams}
                 showAll={true}
             />)}
         </div>
