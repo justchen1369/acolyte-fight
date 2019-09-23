@@ -12,7 +12,7 @@ export function merge(base: any, mod: any) {
         return base;
     } else if (base === undefined) {
         return mod;
-    } else if (typeof mod === "object" && mod[DeleteKey]) {
+    } else if (mod && typeof mod === "object" && mod[DeleteKey]) {
         return undefined;
     } else if (typeof base === "object") {
         if (base === null || mod === null) {
