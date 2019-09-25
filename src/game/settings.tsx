@@ -2490,7 +2490,7 @@ const thrust: Spell = {
 const blaze: Spell = {
     id: 'blaze',
     name: 'Blaze',
-    description: "Dash a short distance, leaving behind a trail of fire.",
+    description: "Dash a short distance, phasing through all obstacles, and leaving behind a trail of fire.",
     effects: [
         cleanse,
     ],
@@ -2525,7 +2525,7 @@ const blaze: Spell = {
         selfPassthrough: true,
         radius: 0.005,
         speed: 0.1,
-        maxTicks: 2 * TicksPerSecond,
+        maxTicks: 3 * TicksPerSecond,
         damage: 0,
         hitInterval: 15,
         destructible: {},
