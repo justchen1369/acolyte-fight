@@ -3685,16 +3685,29 @@ function destroyObject(world: w.World, object: w.WorldObject) {
 }
 
 function calculateMovementProportion(hero: w.Hero, world: w.World): number {
-	let multiplier = 1.0;
+	let buffIncrease = 1;
+	let buffDecrease = 1;
+
 	if (hero.casting) {
-		multiplier *= hero.casting.movementProportion || 0.0;
+		if (_.isNumber(hero.casting.movementProportion)) {
+			if (hero.casting.movementProportion > 1) {
+				buffIncrease = Math.max(buffIncrease, hero.casting.movementProportion);
+			} else if (hero.casting.movementProportion < 1) {
+				buffDecrease = Math.min(buffDecrease, hero.casting.movementProportion);
+			}
+		}
 	}
+
 	hero.buffs.forEach(buff => {
 		if (buff.type === "movement") {
-			multiplier *= buff.movementProportion;
+			if (buff.movementProportion > 1) {
+				buffIncrease = Math.max(buffIncrease, buff.movementProportion);
+			} else if (buff.movementProportion < 1) {
+				buffDecrease = Math.min(buffDecrease, buff.movementProportion);
+			}
 		}
 	});
-	return multiplier;
+	return buffIncrease * buffDecrease;
 }
 
 function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {
