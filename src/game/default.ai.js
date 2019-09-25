@@ -230,6 +230,8 @@ function validAttack(state, hero, opponent, spell) {
     } else if (spell.action === "scourge") {
         var range = spell.radius + opponent.radius;
         return distance <= range;
+    } else if (spell.id === "blaze") {
+        return true;
     } else {
         return false;
     }
