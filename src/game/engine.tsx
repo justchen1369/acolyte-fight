@@ -3689,12 +3689,11 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 	let buffDecrease = 1;
 
 	if (hero.casting) {
-		if (_.isNumber(hero.casting.movementProportion)) {
-			if (hero.casting.movementProportion > 1) {
-				buffIncrease = Math.max(buffIncrease, hero.casting.movementProportion);
-			} else if (hero.casting.movementProportion < 1) {
-				buffDecrease = Math.min(buffDecrease, hero.casting.movementProportion);
-			}
+		const movementProportion = hero.casting.movementProportion || 0;
+		if (movementProportion > 1) {
+			buffIncrease = Math.max(buffIncrease, movementProportion);
+		} else if (movementProportion < 1) {
+			buffDecrease = Math.min(buffDecrease, movementProportion);
 		}
 	}
 
