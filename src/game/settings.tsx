@@ -2490,7 +2490,7 @@ const thrust: Spell = {
 const blaze: Spell = {
     id: 'blaze',
     name: 'Blaze',
-    description: "Dash a short distance, phasing through all obstacles, and leaving behind a trail of fire. Your trail of fire will consume all projectiles.",
+    description: "Dash a short distance, phasing through all obstacles, and leaving behind a trail of fire.",
     effects: [
         cleanse,
     ],
@@ -2519,7 +2519,6 @@ const blaze: Spell = {
     projectile: {
         density: 1,
         ccd: false,
-        categories: Categories.Projectile | Categories.Massive,
         collideWith: Categories.All,
         expireOn: Categories.Shield | Categories.Obstacle | Categories.Massive,
         sensor: true,
