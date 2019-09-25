@@ -2499,7 +2499,7 @@ const blaze: Spell = {
     cooldown: 7.5 * TicksPerSecond,
     throttle: false,
 
-    icon: "fireDash",
+    icon: "fireWave",
     color: '#ff00cc',
     action: "buff",
 
