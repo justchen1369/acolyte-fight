@@ -2527,6 +2527,7 @@ const blaze: Spell = {
         speed: 0.1,
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
+        hitInterval: 15,
         destructible: {},
         lifeSteal,
 
