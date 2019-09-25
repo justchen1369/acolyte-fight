@@ -295,7 +295,7 @@ const fireball: Spell = {
 const flamestrike: Spell = {
     id: 'flamestrike',
     name: 'Fireboom',
-    description: "It's slower than fireball - harder to aim, but does more damage. Takes 0.5 seconds to grow to full damage, so keep a little bit of distance for maximum effect.",
+    description: "It's slower than fireball - harder to aim, but does more damage. Takes 1 second to grow to full damage, so keep a little bit of distance for maximum effect.",
     action: "projectile",
 
     color: '#ff4400',
@@ -332,13 +332,14 @@ const flamestrike: Spell = {
 
         partialDamage: {
             initialMultiplier: 0.5,
-            ticks: 0.5 * TicksPerSecond,
+            ticks: 1 * TicksPerSecond,
         },
 
         sound: "flamestrike",
         color: '#ff4400', 
         renderers: [
             { type: "bloom" },
+            { type: "reticule", color: 'rgba(64, 16, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },

@@ -1890,7 +1890,7 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	}
 
 	if (reticule.usePartialDamageMultiplier) {
-		proportion *= engine.calculatePartialDamageMultiplier(world, projectile);
+		proportion *= engine.calculatePartialDamageMultiplier(world, projectile, projectile.partialDetonateRadius);
 	}
 	if (proportion <= 0) {
 		return;
