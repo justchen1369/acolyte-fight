@@ -2311,7 +2311,7 @@ const phaseOut: Spell = {
 
     release: {
         interrupt: true,
-        interruptibleAfterTicks: 0.5 * TicksPerSecond,
+        interruptibleAfterTicks: 0.25 * TicksPerSecond,
     },
 
     buffs: [
