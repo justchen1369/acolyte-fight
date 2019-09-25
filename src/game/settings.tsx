@@ -2062,8 +2062,8 @@ const horcrux: Spell = {
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
                 tickInterval: 5,
-                maxHits: 9,
-                packet: { damage: 4, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                maxHits: 12,
+                packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
@@ -2254,16 +2254,6 @@ const scourge: Spell = {
 
     selfDamage: 10,
     minSelfHealth: 1,
-
-    chargeBuffs: [
-        {
-            type: "mass",
-            maxTicks: 0.5 * TicksPerSecond,
-            channelling: true,
-            radius: Hero.Radius,
-            density: 3 * Hero.Density,
-        },
-    ],
 
     icon: "deadlyStrike",
 
