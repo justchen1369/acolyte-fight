@@ -2295,7 +2295,7 @@ const shield: Spell = {
 const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Shift',
-    description: "For 0.5 seconds, disappear from the world. While phased shifted, you cannot be hurt, but you also cannot cast spells.",
+    description: "Hold down the button to disappear from the world for up to 1 second. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cleanses all negative effects and cancels all knockback.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2307,13 +2307,19 @@ const phaseOut: Spell = {
         cleanse,
     ],
 
-    maxChannellingTicks: 0.5 * TicksPerSecond,
+    maxChannellingTicks: 1.0 * TicksPerSecond,
+
+    release: {
+        interrupt: true,
+        interruptibleAfterTicks: 0.5 * TicksPerSecond,
+    },
 
     buffs: [
         {
             type: "mass",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
             radius: 1 * Hero.Radius,
             density: 1000000,
             restrictCollideWith: 0,
@@ -2321,26 +2327,30 @@ const phaseOut: Spell = {
         {
             type: "armor",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
             proportion: -1, // Full immunity
         },
         {
             type: "movement",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
             movementProportion: 0,
         },
         {
             type: "glide",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
             linearDampingMultiplier: 1000,
         },
         {
             type: "vanish",
             noTargetingIndicator: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
             sound: "phaseOut",
             renderStart: {
                 numParticles: 10,
@@ -2366,7 +2376,8 @@ const phaseOut: Spell = {
         {
             type: "debuff",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            maxTicks: 1.0 * TicksPerSecond,
         },
     ],
 

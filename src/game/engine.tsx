@@ -1899,21 +1899,6 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		++hero.casting.stage;
 	}
 
-	if (spell.strikeCancel && hero.strikeTick && hero.casting.chargeStartTick && hero.strikeTick >= hero.casting.chargeStartTick) {
-		// Spell cancelled by getting struck
-		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
-		const maxChannellingTicks = spell.strikeCancel.maxChannelingTicks ? spell.strikeCancel.maxChannelingTicks : Infinity;
-		if (spell.strikeCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
-			setCooldown(world, hero, spell.id, spell.strikeCancel.cooldownTicks);
-		}
-		hero.casting.stage = w.CastStage.Complete;
-	}
-
-	if (spell.release && spell.release.interrupt && hero.casting.releaseTick) {
-		// Spell cancelled by releasing button
-		hero.casting.stage = w.CastStage.Complete;
-	}
-
 	if (hero.casting.stage === w.CastStage.Charging) {
 		// Entering charging stage
 		if (!hero.casting.chargeStartTick) {
@@ -1950,6 +1935,21 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		hero.casting.uninterruptible = false;
 		hero.casting.movementProportion = 0.0;
 		++hero.casting.stage;
+	}
+
+	if (spell.strikeCancel && hero.strikeTick && hero.strikeTick >= hero.casting.chargeStartTick) {
+		// Spell cancelled by getting struck
+		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
+		const maxChannellingTicks = spell.strikeCancel.maxChannelingTicks ? spell.strikeCancel.maxChannelingTicks : Infinity;
+		if (spell.strikeCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
+			setCooldown(world, hero, spell.id, spell.strikeCancel.cooldownTicks);
+		}
+		hero.casting.stage = w.CastStage.Complete;
+	}
+
+	if (spell.release && spell.release.interrupt && hero.casting.releaseTick && world.tick >= hero.casting.chargeStartTick + (spell.release.interruptibleAfterTicks || 0)) {
+		// Spell cancelled by releasing button
+		hero.casting.stage = w.CastStage.Complete;
 	}
 
 	if (hero.casting.stage === w.CastStage.Channelling) {

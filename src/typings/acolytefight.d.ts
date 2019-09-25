@@ -308,6 +308,7 @@ declare interface EffectInfo {
 declare interface ReleaseParams {
 	maxChargeTicks?: number; // Don't finish charging until button is released or until this number of ticks
 	interrupt?: boolean; // Whether releasing the button interrupts the spell
+	interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
 }
 
 declare interface SpellCancelParams {
