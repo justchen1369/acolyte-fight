@@ -2552,6 +2552,7 @@ const blaze: Spell = {
                 maxStacks: 1,
                 render: {
                     color: "#f04",
+                    selfColor: true,
                     alpha: 0.3,
                     ticks: 30,
                     emissionRadiusFactor: 1,

@@ -602,6 +602,7 @@ export type Buff =
 	| BumpBuff
 
 export interface BuffValues {
+	owner: string;
 	cleansable?: boolean;
 	destroyedTick?: number;
 	maxTicks: number;

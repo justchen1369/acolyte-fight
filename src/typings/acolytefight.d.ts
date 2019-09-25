@@ -755,7 +755,7 @@ declare interface RenderBuff {
 	numParticles?: number;
 	invisible?: boolean; // Only show this to players who can see the hero
 	color: string;
-	selfColor?: boolean;
+	selfColor?: boolean; // View own buffs in the self color
 	alpha?: number; // Semi-transparent
 	shine?: number; // Brighter initially
 	glow?: number; // How much alpha to apply to the bloom

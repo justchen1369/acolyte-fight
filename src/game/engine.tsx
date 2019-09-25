@@ -4253,6 +4253,7 @@ function calculateBuffId(template: BuffTemplate, world: w.World, config: BuffCon
 function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const maxTicks = (template.maxTicks || 0) * (config.durationMultiplier !== undefined ? config.durationMultiplier : 1);
 	const values: w.BuffValues = {
+		owner: config.fromHeroId,
 		initialTick: world.tick,
 		expireTick: world.tick + maxTicks,
 		cleansable: template.cleansable !== undefined ? template.cleansable : true,

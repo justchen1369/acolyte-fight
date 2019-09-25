@@ -1254,12 +1254,16 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 }
 
 function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World, visible: boolean = true) {
+	const Visuals = world.settings.Visuals;
+
 	if (render.invisible && !visible) {
 		return;
 	}
 
 	let color = render.color;
-	if (render.heroColor) {
+	if (render.selfColor && buff.owner === world.ui.myHeroId) {
+		color = Visuals.MyHeroColor;
+	} else if (render.heroColor) {
 		color = heroColor(hero.id, world);
 	}
 
