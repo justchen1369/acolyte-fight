@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import * as pl from 'planck-js';
 import * as atlasController from './atlasController';
 import * as audio from '../audio/audio';
@@ -1282,7 +1283,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 			velocity = particleVelocity(hero.body.getLinearVelocity(), render.smoke);
 		} else {
 			// Normally hero not moving fast enough to create smoke
-			velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), -hero.moveSpeedPerSecond);
+			velocity = particleVelocity(vector.fromAngle(hero.body.getAngle()), hero.moveSpeedPerSecond, -1);
 		}
 
 		const pos = heroPos.clone();
@@ -1318,10 +1319,29 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 	}
 }
 
-function particleVelocity(primaryVelocity: pl.Vec2, multiplier: number = 1) {
+function particleVelocity(primaryVelocity: pl.Vec2, config?: RenderSmoke, multiplier: number = 1) {
+	let axisMultiplier = 1;
+	let isotropicSpeed = 0;
+	if (_.isNumber(config)) {
+		axisMultiplier = config;
+	} else if (_.isObject(config)) {
+		axisMultiplier = config.axisMultiplier;
+		isotropicSpeed = config.isotropicSpeed;
+	}
+
 	const velocity = vector.fromAngle(2 * Math.PI * Math.random());
-	const speed = multiplier * Math.random() * vector.dot(velocity, primaryVelocity); // can be negative
-	velocity.mul(speed);
+
+	let speed = 0;
+
+	if (axisMultiplier) {
+		speed += axisMultiplier * Math.random() * vector.dot(velocity, primaryVelocity); // can be negative
+	}
+
+	if (isotropicSpeed) {
+		speed += isotropicSpeed * Math.random();
+	}
+
+	velocity.mul(multiplier * speed);
 	return velocity;
 }
 
@@ -1832,7 +1852,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 	const numParticles = swirl.numParticles;
 
 	const angleOffset = (2 * Math.PI) * (world.tick % animationLength) / animationLength;
-	const velocity = swirl.smoke ? particleVelocity(context.baseVelocity, -swirl.smoke) : null;
+	const velocity = swirl.smoke ? particleVelocity(context.baseVelocity, swirl.smoke, -1) : null;
 	
 	const multiplier = context.multiplier !== undefined ? context.multiplier : 1;
 	const fillStyle = context.color || swirl.color;
@@ -1940,7 +1960,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 	// Particles
 	if (strike.numParticles && ctxStack.rtx >= r.GraphicsLevel.High) {
 		for (let i = 0; i < strike.numParticles; ++i) {
-			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.speedMultiplier || 1);
+			const velocity = particleVelocity(projectile.body.getLinearVelocity(), strike.speedMultiplier);
 			pushTrail({
 				type: "circle",
 				initialTick: projectile.hitTick,
@@ -2053,7 +2073,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 
 function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderProjectile) {
 	let ticks = render.ticks;
-	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), -render.smoke) : null;
+	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), render.smoke, -1) : null;
 
 	const last = projectile.body.getPosition();
 	const first = projectile.uiPath[0] || last;
@@ -2083,7 +2103,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderPolygon) {
 	let ticks = render.ticks;
 	const angle = ((world.tick % render.revolutionInterval) / render.revolutionInterval) * 2 * Math.PI;
-	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), -render.smoke) : null;
+	const velocity = render.smoke ? particleVelocity(projectile.body.getLinearVelocity(), render.smoke, -1) : null;
 
 	const points = new Array<pl.Vec2>();
 	for (let i = 0; i < render.numPoints; ++i) {

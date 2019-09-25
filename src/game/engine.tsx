@@ -3949,7 +3949,8 @@ function shouldCollide(a: w.WorldObject, b: w.WorldObject) {
 function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: ThrustSpell) {
 	if (!action.target) { return true; }
 
-	if (world.tick == hero.casting.channellingStartTick) {
+	const castingTicks = world.tick - hero.casting.channellingStartTick;
+	if (castingTicks === 0) {
 		const availableRange = spell.range;
 		const speed = spell.speed;
 		const maxTicks = TicksPerSecond * availableRange / speed;
@@ -4171,6 +4172,11 @@ function shieldAction(world: w.World, hero: w.Hero, action: w.Action, spell: Ref
 
 function buffAction(world: w.World, hero: w.Hero, action: w.Action, spell: BuffSpell) {
 	const currentLength = world.tick - hero.casting.channellingStartTick;
+
+	if (spell.projectile && spell.projectileInterval && currentLength % spell.projectileInterval === 0) {
+		addProjectile(world, hero, action.target, spell, spell.projectile);
+	}
+
 	const cutoff = spell.maxChannellingTicks;
 	if (currentLength < cutoff) {
 		return false;

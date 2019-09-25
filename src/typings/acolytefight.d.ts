@@ -606,7 +606,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	ticks: number; // How long is the trail?
 	fade?: string;
 	vanish?: number;
-	smoke?: number;
+	smoke?: RenderSmoke;
 	glow?: number;
 	bloom?: number;
 	shine?: number;
@@ -624,7 +624,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	revolutionInterval: number;
 	fade?: string;
 	vanish?: number;
-	smoke?: number;
+	smoke?: RenderSmoke;
 	glow?: number;
 	bloom?: number;
 	shine?: number;
@@ -645,7 +645,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	particleRadius: number;
 
 	shine?: number;
-	smoke?: number;
+	smoke?: RenderSmoke;
 	fade?: string;
 	vanish?: number;
 	glow?: number;
@@ -707,6 +707,13 @@ declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {
 	radius?: number;
 }
 
+declare type RenderSmoke = number | RenderSmokeConfig;
+
+declare interface RenderSmokeConfig {
+	axisMultiplier?: number; // Follow direction of movement with this multiplier
+	isotropicSpeed?: number; // Smoke in all directions at this speed
+}
+
 declare type BuffTemplate =
 	DebuffTemplate
 	| MovementBuffTemplate
@@ -753,7 +760,7 @@ declare interface RenderBuff {
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // Bloom radius
 	fade?: string; // Decay to this color
-	smoke?: number; // Move smoke trail
+	smoke?: RenderSmokeConfig; // Move smoke trail
 	vanish?: number; // Decay to transparent
 	heroColor?: boolean;
 	decay?: boolean;
@@ -837,6 +844,9 @@ declare interface BuffSpell extends SpellBase {
 
 	buffs: BuffTemplate[];
 	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
+
+	projectileInterval?: number;
+	projectile?: ProjectileTemplate;
 }
 
 declare interface ScourgeSpell extends SpellBase {

@@ -203,7 +203,7 @@ const Choices: ChoiceSettings = {
 		"f": [
             ["bump", "scourge"],
             ["firespray", "iceBomb"],
-            ["mines"],
+            ["mines", "blaze"],
             ["halo"],
         ],
 	},
@@ -2487,6 +2487,88 @@ const thrust: Spell = {
         }
     ],
 };
+const blaze: Spell = {
+    id: 'blaze',
+    name: 'Blaze',
+    description: "Dash a short distance, leaving behind a trail of fire.",
+    effects: [
+        cleanse,
+    ],
+
+    untargeted: true,
+    cooldown: 7.5 * TicksPerSecond,
+    throttle: false,
+
+    icon: "fireDash",
+    color: '#ff00cc',
+    action: "buff",
+
+    movementProportionWhileChannelling: 4,
+    maxChannellingTicks: 10,
+    buffs: [
+        {
+            type: "mass",
+            cleansable: false,
+            maxTicks: 0.5 * TicksPerSecond,
+            radius: 1 * Hero.Radius,
+            restrictCollideWith: Categories.Shield,
+        },
+    ],
+
+    projectileInterval: 1,
+    projectile: {
+        density: 1,
+        ccd: false,
+        collideWith: Categories.All,
+        expireOn: Categories.Shield | Categories.Obstacle | Categories.Massive,
+        sensor: true,
+        selfPassthrough: true,
+        radius: 0.005,
+        speed: 0.1,
+        maxTicks: 1 * TicksPerSecond,
+        damage: 0,
+        hitInterval: 15,
+        destructible: {},
+        lifeSteal,
+
+        behaviours: [
+            {
+                type: "homing",
+                targetType: "cursor",
+                trigger: { afterTicks: 6 },
+                newSpeed: 0,
+                redirect: true,
+            },
+        ],
+
+        buffs: [
+            {
+                type: "burn",
+                maxTicks: 15,
+                collideWith: Categories.All,
+                packet: { damage: 10, lifeSteal, noKnockback: true, noHit: true },
+                hitInterval: 15, // Don't hit twice
+                stack: "blaze",
+                maxStacks: 1,
+                render: {
+                    color: "#f04",
+                    alpha: 0.3,
+                    ticks: 30,
+                    emissionRadiusFactor: 1,
+                    particleRadius: 0.005,
+                    shine: 0.2,
+                    glow: 0.2,
+                },
+            },
+        ],
+
+        color: '#ff0044',
+        renderers: [
+            { type: "projectile", ticks: 30, radiusMultiplier: 0.5, smoke: { isotropicSpeed: 0.1 }, vanish: 1 },
+            { type: "strike", ticks: 30, flash: true },
+        ],
+    },
+};
 const swap: Spell = {
     id: 'swap',
     name: 'Swap',
@@ -2813,6 +2895,7 @@ const Spells = {
     iceBomb,
     teleport,
     thrust,
+    blaze,
     swap,
     voidRush,
     vanish,
