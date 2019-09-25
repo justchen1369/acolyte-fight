@@ -325,20 +325,20 @@ const flamestrike: Spell = {
         },
 
         partialDetonateRadius: {
-            initialMultiplier: 0.3,
-            ticks: 1.3333 * TicksPerSecond,
+            initialMultiplier: 0.2,
+            ticks: 1.5 * TicksPerSecond,
         },
 
         partialDamage: {
             initialMultiplier: 0.5,
-            ticks: 1 * TicksPerSecond,
+            ticks: 0.5 * TicksPerSecond,
         },
 
         sound: "flamestrike",
         color: '#ff4400', 
         renderers: [
             { type: "bloom" },
-            { type: "reticule", color: 'rgba(64, 16, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
+            { type: "reticule", color: 'rgba(128, 32, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 30 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
