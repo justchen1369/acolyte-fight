@@ -2525,9 +2525,8 @@ const blaze: Spell = {
         selfPassthrough: true,
         radius: 0.005,
         speed: 0.1,
-        maxTicks: 1 * TicksPerSecond,
+        maxTicks: 2 * TicksPerSecond,
         damage: 0,
-        hitInterval: 15,
         destructible: {},
         lifeSteal,
 
@@ -2544,9 +2543,9 @@ const blaze: Spell = {
         buffs: [
             {
                 type: "burn",
-                maxTicks: 15,
+                maxTicks: 60,
                 collideWith: Categories.All,
-                packet: { damage: 10, lifeSteal, noKnockback: true, noHit: true },
+                packet: { damage: 5, lifeSteal, noKnockback: true, noHit: true },
                 hitInterval: 15, // Don't hit twice
                 stack: "blaze",
                 maxStacks: 1,
