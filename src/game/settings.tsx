@@ -183,16 +183,15 @@ const Choices: ChoiceSettings = {
         ],
 		"w": [
             ["boost"],
-            ["homing", "boomerang"],
+            ["homing", "boomerang", "drain"],
             ["gravity", "whirlwind"],
-            ["link", "grapple"],
+            ["link", "grapple", "horcrux"],
             ["lightning"],
         ],
 		"e": [
             ["armor", "shield", "icewall"],
             ["saber", "dualSaber"],
             ["phaseOut"],
-            ["drain", "horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
@@ -1483,7 +1482,7 @@ const drain: Spell = {
         radius: 0.002,
         speed: 0.2,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 24,
+        damage: 16,
         lifeSteal: 1,
 
         behaviours: [
@@ -2061,9 +2060,9 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
-                tickInterval: 5,
-                maxHits: 12,
-                packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                tickInterval: 8,
+                maxHits: 6,
+                packet: { damage: 4, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
