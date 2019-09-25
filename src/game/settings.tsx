@@ -22,7 +22,7 @@ const Matchmaking: MatchmakingSettings = {
 };
 
 const Hero: HeroSettings = {
-    MoveSpeedPerSecond: 0.11,
+    MoveSpeedPerSecond: 0.12,
     MaxSpeed: 1.0,
     Radius: 0.0125,
     Density: 0.72,
