@@ -9,7 +9,7 @@ import { Actions, SpecialKeys, HomingTargets } from './world.model';
 // @ts-ignore
 import Code from '!!raw-loader!./default.ai.js';
 
-const lifeSteal = 0.25;
+const lifeSteal = 0.3;
 
 const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
