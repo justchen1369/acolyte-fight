@@ -2523,6 +2523,7 @@ const blaze: Spell = {
         categories: Categories.Projectile | Categories.Massive,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Hero,
+        expireOnMirror: true,
         sensor: true,
         selfPassthrough: true,
         radius: 0.005,
