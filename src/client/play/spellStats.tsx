@@ -49,7 +49,12 @@ class SpellStats extends React.PureComponent<Props, State> {
             return null;
         }
 
-        if (spell.action === "projectile" || spell.action === "focus" || spell.action === "charge" || (spell.action === "spray" && isMultiHit(spell.projectile))) {
+        if (spell.action === "projectile"
+        || spell.action === "focus"
+        || spell.action === "charge"
+        || (spell.action === "spray" && isMultiHit(spell.projectile))
+        || (spell.action === "buff" && spell.projectile)) {
+
             const damage = this.calculateProjectileDamage(spell.projectile);
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
             return <div className="spell-stats">
@@ -57,6 +62,7 @@ class SpellStats extends React.PureComponent<Props, State> {
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
+
         } else if (spell.action === "spray") {
             const hits = Math.floor(spell.lengthTicks / spell.intervalTicks);
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
@@ -67,19 +73,23 @@ class SpellStats extends React.PureComponent<Props, State> {
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
+
         } else if (spell.action === "scourge") {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{spell.detonate.damage}{spell.detonate.damage > 0 && this.renderScaling(spell.detonate.damageScaling)}</span>
                 <span className="spell-stats-item" title="Damage to self"><i className="fas fa-heart" />-{spell.selfDamage}</span>
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
+
         } else if (spell.passive) {
             return <div className="spell-stats">
             </div>
+
         } else {
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Cooldown"><i className="fas fa-clock" />{formatTime(spell.cooldown)} s</span>
             </div>
+
         }
     }
 
