@@ -1,6 +1,6 @@
 import { TicksPerSecond, Categories, Pixel, Alliances } from './constants';
 
-const ConveyorSpeed = 0.15;
+const ConveyorSpeed = 0.05;
 
 export const volcano: ObstacleTemplate = {
     health: 50,
@@ -181,21 +181,21 @@ export const conveyorBase: ObstacleTemplate = {
     render: [
         {
             type: "solid",
-            "color": "rgba(64, 64, 64, 0.75)",
-            deadColor: "rgba(64, 64, 64, 0.25)",
+            "color": "rgba(64, 64, 64, 0.25)",
+            deadColor: "rgba(64, 64, 64, 0.1)",
             glow: 0.2,
         },
         {
             type: "smoke",
-            "color": "rgba(128, 128, 128, 1)",
+            "color": "rgba(255, 255, 255, 0.25)",
             particleRadius: 0.002,
             bloom: 0.01,
             glow: 0.025,
             vanish: 1,
-            "ticks": 20,
-            "interval": 4,
+            "ticks": 45,
+            "interval": 6,
             speed: 0,
-            conveyor: 0.25,
+            conveyor: 1,
         }
     ],
 }

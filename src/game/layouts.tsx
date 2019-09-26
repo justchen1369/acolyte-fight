@@ -164,7 +164,7 @@ export const Layouts: Layouts = {
                 "extent": 0.075,
                 "numObstacles": 3,
                 "layoutAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.005,
+                "angularWidthInRevs": 0.16667,
                 "health": 200
             },
             {
