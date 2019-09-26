@@ -66,8 +66,6 @@ export async function exitEditor(mod: ModTree, nextPage: string = "") {
     await parties.movePartyAsync(roomId);
     await pages.changePage(nextPage);
     StoreProvider.dispatch({ type: "updateHash", hash: null });
-
-    await storage.clearMod();
 }
 
 export const modToSettings = Reselect.createSelector(
