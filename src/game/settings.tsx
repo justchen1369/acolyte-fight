@@ -2490,7 +2490,7 @@ const thrust: Spell = {
 const blaze: Spell = {
     id: 'blaze',
     name: 'Blaze',
-    description: "Dash a short distance, phasing through all obstacles, and leaving behind a trail of fire which blocks projectiles.",
+    description: "Dash a short distance, phasing through obstacles, leaving behind a trail of fire which blocks projectiles.",
     effects: [
         cleanse,
     ],
