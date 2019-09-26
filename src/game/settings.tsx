@@ -2511,7 +2511,7 @@ const blaze: Spell = {
             cleansable: false,
             maxTicks: 0.5 * TicksPerSecond,
             radius: 1 * Hero.Radius,
-            restrictCollideWith: Categories.Shield,
+            restrictCollideWith: Categories.Shield | Categories.Massive,
         },
     ],
 
@@ -2519,13 +2519,13 @@ const blaze: Spell = {
     projectile: {
         density: 1,
         ccd: false,
-        collideWith: Categories.All,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
         expireOn: Categories.Shield | Categories.Obstacle | Categories.Massive,
         sensor: true,
         selfPassthrough: true,
         radius: 0.005,
         speed: 0.1,
-        maxTicks: 2 * TicksPerSecond,
+        maxTicks: 3 * TicksPerSecond,
         damage: 0,
         hitInterval: 15,
         destructible: {},
@@ -2549,7 +2549,7 @@ const blaze: Spell = {
         buffs: [
             {
                 type: "burn",
-                maxTicks: 30,
+                maxTicks: 60,
                 collideWith: Categories.All,
                 packet: { damage: 5, lifeSteal, noKnockback: true, noHit: true },
                 hitInterval: 15, // Don't hit twice
@@ -2558,12 +2558,13 @@ const blaze: Spell = {
                 render: {
                     color: "#f04",
                     selfColor: true,
-                    alpha: 0.3,
+                    vanish: 1,
                     ticks: 30,
                     emissionRadiusFactor: 1,
-                    particleRadius: 0.005,
+                    particleRadius: 0.0025,
                     shine: 0.2,
                     glow: 0.2,
+                    smoke: { isotropicSpeed: 0.1 },
                 },
             },
         ],
