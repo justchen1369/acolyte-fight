@@ -2519,7 +2519,8 @@ const blaze: Spell = {
     projectile: {
         density: 1,
         ccd: false,
-        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
+        categories: Categories.Projectile | Categories.Massive,
+        collideWith: Categories.All,
         expireOn: Categories.Shield | Categories.Obstacle | Categories.Massive,
         sensor: true,
         selfPassthrough: true,
@@ -2551,7 +2552,7 @@ const blaze: Spell = {
                 type: "burn",
                 maxTicks: 60,
                 collideWith: Categories.All,
-                packet: { damage: 5, lifeSteal, noKnockback: true, noHit: true },
+                packet: { damage: 4, lifeSteal, noKnockback: true, noHit: true },
                 hitInterval: 15, // Don't hit twice
                 stack: "blaze",
                 maxStacks: 1,
