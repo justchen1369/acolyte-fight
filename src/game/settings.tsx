@@ -1973,7 +1973,7 @@ const iceBomb: Spell = {
                 type: "movement",
                 stack: "iceBomb",
                 movementProportion: 0.1,
-                maxTicks: 0.75 * TicksPerSecond,
+                maxTicks: 1.25 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
