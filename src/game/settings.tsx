@@ -2502,6 +2502,7 @@ const blaze: Spell = {
     icon: "fireWave",
     color: '#ff00cc',
     action: "buff",
+    sound: "blaze",
 
     movementProportionWhileChannelling: 4,
     maxChannellingTicks: 10,

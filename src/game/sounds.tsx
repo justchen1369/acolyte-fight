@@ -737,6 +737,27 @@ export const Sounds: Sounds = {
             }
         ]
     },
+    "blaze-channelling": {
+        "cutoffEarly": false,
+        "start": [
+            {
+                "stopTime": 0.17,
+                "attack": 0.01,
+                "decay": 0.16,
+                "highPass": 100,
+                "lowPass": 103,
+                "wave": "brown-noise"
+            },
+            {
+                "stopTime": 0.17,
+                "attack": 0.01,
+                "decay": 0.16,
+                "highPass": 150,
+                "lowPass": 153,
+                "wave": "brown-noise"
+            }
+        ]
+    },
     "blast-charging": {
         "start": [
             {
