@@ -738,9 +738,10 @@ export const Sounds: Sounds = {
         ]
     },
     "blaze-channelling": {
-        "cutoffEarly": false,
+        cutoffEarly: false,
         "start": [
             {
+                "volume": 0.25,
                 "stopTime": 0.17,
                 "attack": 0.01,
                 "decay": 0.16,
@@ -749,11 +750,21 @@ export const Sounds: Sounds = {
                 "wave": "brown-noise"
             },
             {
+                "volume": 0.25,
                 "stopTime": 0.17,
                 "attack": 0.01,
                 "decay": 0.16,
                 "highPass": 150,
                 "lowPass": 153,
+                "wave": "brown-noise"
+            },
+            {
+                "volume": 0.25,
+                "stopTime": 0.17,
+                "attack": 0.01,
+                "decay": 0.16,
+                "highPass": 300,
+                "lowPass": 300,
                 "wave": "brown-noise"
             }
         ]
