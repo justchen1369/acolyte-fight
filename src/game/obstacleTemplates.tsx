@@ -173,7 +173,7 @@ export const fast: ObstacleTemplate = {
 export const conveyorBase: ObstacleTemplate = {
     health: 50,
 
-    collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
+    collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle | Categories.Shield,
     sensor: true,
     static: true,
     undamageable: true,

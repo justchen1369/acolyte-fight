@@ -2388,6 +2388,9 @@ const icewall: Spell = {
     angularDamping: 100,
 
     categories: Categories.Shield | Categories.Obstacle,
+    collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
+    conveyable: true,
+    bumpable: false,
     selfPassthrough: true,
 
     icon: "woodenFence",

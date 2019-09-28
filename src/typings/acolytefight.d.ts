@@ -888,12 +888,15 @@ declare interface WallSpell extends ShieldSpell {
 	growthTicks: number;
 	maxTicks: number;
 
+	conveyable?: boolean; // The wall is affected by conveyor belts
+	bumpable?: boolean; // The wall is affected by bumpers
 	density?: number; // If set, the wall is moveable
 	ccd?: boolean; // Performance improvement: Whether to apply continuous collision detection to this wall. Small and fast projectiles will tunnel through other objects unless CCD is on. Defaults to true.
 	linearDamping?: number; // Higher means receives less knockback
 	angularDamping?: number; // Higher means less rotation on knockback
 
 	categories?: number; // Use this to make a wall an impassable obstacle
+	collideWith?: number;
 	selfPassthrough?: boolean; // Whether to always allow the owner to pass through the wall
 
 	strike?: RenderStrikeParams;

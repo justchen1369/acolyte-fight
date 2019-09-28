@@ -357,7 +357,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 
 	body.createFixture(pl.Polygon(points), {
 		filterCategoryBits: spell.categories !== undefined ? spell.categories : Categories.Shield,
-		filterMaskBits: Categories.Hero | Categories.Projectile,
+		filterMaskBits: spell.collideWith !== undefined ? spell.collideWith : Categories.Hero | Categories.Projectile,
 		filterGroupIndex: spell.selfPassthrough ? hero.filterGroupIndex : undefined,
 		density: spell.density,
 	});
@@ -374,6 +374,8 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		growthTicks: spell.growthTicks,
 		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
+		conveyable: spell.conveyable,
+		bumpable: spell.bumpable,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		points,
@@ -2180,7 +2182,7 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 			obstacle.activeTick = world.tick;
 		}
 
-		if (obstacle.impulse > 0 && (hit.category !== "projectile" || hit.bumpable)) {
+		if (obstacle.impulse > 0 && isBumpable(hit)) {
 			const Hero = world.settings.Hero;
 
 			const impulse = vector.diff(hit.body.getPosition(), obstacle.body.getPosition())
@@ -2197,6 +2199,15 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 	conveyor(world, hit, obstacle);
 
 	obstacle.touchTick = world.tick;
+}
+
+function isBumpable(obj: w.WorldObject) {
+	if (obj.category === "projectile") {
+		return obj.bumpable;
+	} else if (obj.category === "shield") {
+		return obj.bumpable;
+	}
+	return true;
 }
 
 function handleShieldHit(world: w.World, shield: w.Shield, hit: w.WorldObject) {
@@ -2311,6 +2322,11 @@ function conveyor(world: w.World, obj: w.WorldObject, obstacle: w.Obstacle) {
 	}
 
 	if (obj.category === "projectile" && !obj.conveyable) {
+		// Not conveyable
+		return;
+	}
+
+	if (obj.category === "shield" && !obj.conveyable) {
 		// Not conveyable
 		return;
 	}
