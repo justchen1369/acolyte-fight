@@ -530,6 +530,7 @@ export interface CastState {
 	uninterruptible?: boolean;
 	movementProportion?: number;
 
+	castStartTick?: number;
 	chargeStartTick?: number;
 	channellingStartTick?: number;
 	releaseTick?: number;
