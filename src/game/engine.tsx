@@ -4515,13 +4515,13 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
 				}
 
-				if (buff.lifeSteal) {
+				if (_.isNumber(buff.lifeSteal)) {
 					lifeSteal = Math.max(lifeSteal, buff.lifeSteal * proportion);
 				}
-				if (buff.damageMultiplier) {
+				if (_.isNumber(buff.damageMultiplier)) {
 					damage *= proportion * buff.damageMultiplier + (1 - proportion) * 1;
 				}
-				if (buff.minHealth) {
+				if (_.isNumber(buff.minHealth)) {
 					minHealth = Math.max(minHealth || 0, buff.minHealth);
 				}
 			}
