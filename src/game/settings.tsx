@@ -2547,10 +2547,10 @@ const blaze: Spell = {
         buffs: [
             {
                 type: "burn",
-                maxTicks: 15,
+                maxTicks: 10,
                 collideWith: Categories.All,
                 packet: { damage: 16, lifeSteal, noKnockback: true, noHit: true },
-                hitInterval: 15, // Don't hit twice
+                hitInterval: 10, // Don't hit twice
                 stack: "blaze",
                 maxStacks: 1,
             },
