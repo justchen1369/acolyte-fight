@@ -201,9 +201,9 @@ const Choices: ChoiceSettings = {
             ["kamehameha", "blast"],
         ],
 		"f": [
-            ["bump", "scourge"],
+            ["bump", "scourge", "blaze"],
             ["firespray", "iceBomb"],
-            ["mines", "blaze"],
+            ["mines"],
             ["halo"],
         ],
 	},
@@ -2490,10 +2490,7 @@ const thrust: Spell = {
 const blaze: Spell = {
     id: 'blaze',
     name: 'Blaze',
-    description: "Dash a short distance, phasing through obstacles, leaving behind a trail of fire which blocks projectiles.",
-    effects: [
-        cleanse,
-    ],
+    description: "Dash a short distance, phasing through obstacles and burning through anyone in your path.",
 
     untargeted: true,
     cooldown: 7.5 * TicksPerSecond,
@@ -2520,17 +2517,15 @@ const blaze: Spell = {
     projectile: {
         density: 1,
         ccd: false,
-        categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All,
-        expireOn: Categories.All ^ Categories.Hero,
+        collideWith: Categories.Hero | Categories.Shield,
+        expireOn: Categories.All,
         expireOnMirror: true,
         sensor: true,
         selfPassthrough: true,
         radius: 0.005,
         speed: 0.1,
-        maxTicks: 3 * TicksPerSecond,
+        maxTicks: 10,
         damage: 0,
-        hitInterval: 15,
         destructible: {},
         lifeSteal,
 
@@ -2552,30 +2547,19 @@ const blaze: Spell = {
         buffs: [
             {
                 type: "burn",
-                maxTicks: 60,
+                maxTicks: 15,
                 collideWith: Categories.All,
-                packet: { damage: 4, lifeSteal, noKnockback: true, noHit: true },
+                packet: { damage: 16, lifeSteal, noKnockback: true, noHit: true },
                 hitInterval: 15, // Don't hit twice
                 stack: "blaze",
                 maxStacks: 1,
-                render: {
-                    color: "#f04",
-                    selfColor: true,
-                    vanish: 1,
-                    ticks: 30,
-                    emissionRadiusFactor: 1,
-                    particleRadius: 0.0025,
-                    shine: 0.2,
-                    glow: 0.2,
-                    smoke: { isotropicSpeed: 0.1 },
-                },
             },
         ],
 
         color: '#ff0044',
         renderers: [
-            { type: "projectile", ticks: 30, radiusMultiplier: 0.5, smoke: { isotropicSpeed: 0.1 }, vanish: 1, selfColor: true },
-            { type: "strike", ticks: 30, flash: true },
+            { type: "projectile", ticks: 15, radiusMultiplier: 0.5, smoke: { isotropicSpeed: 0.1 }, vanish: 1, ownerColor: true },
+            { type: "strike", ticks: 30, flash: true, detonate: 0.01 },
         ],
     },
 };
