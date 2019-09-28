@@ -185,13 +185,14 @@ const Choices: ChoiceSettings = {
             ["boost"],
             ["homing", "boomerang", "drain"],
             ["gravity", "whirlwind"],
-            ["link", "grapple", "horcrux"],
+            ["link", "grapple"],
             ["lightning"],
         ],
 		"e": [
             ["armor", "shield", "icewall"],
             ["saber", "dualSaber"],
             ["phaseOut"],
+            ["horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
@@ -2060,8 +2061,8 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
-                tickInterval: 8,
-                maxHits: 6,
+                tickInterval: 5,
+                maxHits: 9,
                 packet: { damage: 4, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
