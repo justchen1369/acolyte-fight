@@ -2506,7 +2506,7 @@ const blaze: Spell = {
     sound: "blaze",
 
     movementProportionWhileChannelling: 4,
-    maxChannellingTicks: 10,
+    maxChannellingTicks: 12,
     buffs: [
         {
             type: "mass",
