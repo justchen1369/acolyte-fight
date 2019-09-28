@@ -2061,9 +2061,9 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
-                tickInterval: 9,
-                maxHits: 5,
-                packet: { damage: 6, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                tickInterval: 6,
+                maxHits: 10,
+                packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
