@@ -15,7 +15,7 @@ import * as w from '../../../game/world.model';
 import { isMobile } from '../../core/userAgent';
 import Button from '../../controls/button';
 
-const NewVersion = 4;
+const NewVersion = 5;
 
 interface OwnProps {
 }
@@ -144,24 +144,14 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderNewVersion(): React.ReactNode {
-        return null;
-        /*
-                <p>This game is about:</p>
-                <ul>
-                    <li><b>Skillshots and dodging:</b> Aim where your enemy is going to be.</li>
-                    <li><b>Knockback and recovery:</b> Move out of the way.</li>
-                    <li><b>Free for all:</b> Move out of the way.</li>
-                </ul>
-
         return <div className="info-panel dialog-panel">
             <div className="header-row">Recent Updates</div>
-            <div className="body-row">The recent changes to damage scaling have been reverted.</div>
-            <div className="body-row">For more updates, check the <a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /> Discord</a>.</div>
+            <div className="body-row">Movement speed increased 10%.</div>
+            <div className="body-row">For more updates, check <a href="https://discord.gg/sZvgpZk" target="_blank"><i className="fab fa-discord" /> Discord</a>.</div>
             <div className="action-row">
                 <Button className="btn" onClick={(e) => this.onCloseVersionClicked()}>OK</Button>
             </div>
         </div>
-        */
     }
 
     private onHideTutorialClick() {
