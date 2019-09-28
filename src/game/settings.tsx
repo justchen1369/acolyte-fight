@@ -442,7 +442,7 @@ const difire: Spell = {
     projectile: {
         density: 10,
         radius: 0.002,
-        speed: 0.9,
+        speed: 0.45,
         maxTicks: 1.5 * TicksPerSecond,
         damage: 0,
         lifeSteal,
@@ -2499,9 +2499,9 @@ const blaze: Spell = {
     action: "thrust",
     sound: "blaze",
 
-    range: 0.025,
-    speed: 0.15,
-    movementProportionWhileChannelling: 4,
+    range: 0.12,
+    speed: 0.8,
+    followCursor: true,
     damageTemplate: {
         damage: 24,
         lifeSteal,

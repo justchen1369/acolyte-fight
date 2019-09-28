@@ -4066,6 +4066,8 @@ function thrustFollow(behaviour: w.ThrustFollowBehaviour, world: w.World) {
 
 		return true;
 	} else {
+		hero.body.setLinearVelocity(vectorZero);
+
 		return false;
 	}
 }
