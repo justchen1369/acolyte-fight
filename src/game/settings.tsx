@@ -2287,7 +2287,7 @@ const shield: Spell = {
 const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Shift',
-    description: "For 0.5 seconds, disappear from the world. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cleanses all negative effects and cancels all knockback.",
+    description: "For 0.5 seconds, disappear from the world. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cancels all knockback.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2295,9 +2295,6 @@ const phaseOut: Spell = {
     throttle: false,
     debuff: true,
     unlink: true,
-    effects: [
-        cleanse,
-    ],
 
     maxChannellingTicks: 0.5 * TicksPerSecond,
 
@@ -2331,6 +2328,7 @@ const phaseOut: Spell = {
         {
             type: "vanish",
             noTargetingIndicator: true,
+            noBuffs: true,
             cleansable: false,
             maxTicks: 0.5 * TicksPerSecond,
             sound: "phaseOut",
@@ -2354,11 +2352,6 @@ const phaseOut: Spell = {
                 bloom: 0,
                 vanish: 1,
             },
-        },
-        {
-            type: "debuff",
-            cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
         },
     ],
 

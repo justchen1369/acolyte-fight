@@ -661,6 +661,7 @@ export interface VanishBuff extends BuffBase {
 	type: "vanish";
 	initialPos: pl.Vec2;
 	noTargetingIndicator?: boolean;
+	noBuffs?: boolean; // Hide buff smoke
 }
 
 export interface LifeStealBuff extends BuffBase {

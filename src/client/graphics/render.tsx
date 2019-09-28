@@ -1117,7 +1117,9 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 	const invisible = engine.isHeroInvisible(hero);
 	if (invisible) {
 		const visible = world.ui.myHeroId ? (engine.calculateAlliance(world.ui.myHeroId, hero.id, world) & Alliances.Friendly) > 0  : true;
-		renderBuffs(ctxStack, hero, pos, world, visible);
+		if (!invisible.noBuffs) {
+			renderBuffs(ctxStack, hero, pos, world, visible);
+		}
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
 

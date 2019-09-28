@@ -4399,6 +4399,7 @@ function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, co
 		type: "vanish",
 		initialPos: hero.body.getPosition().clone(),
 		noTargetingIndicator: template.noTargetingIndicator,
+		noBuffs: template.noBuffs,
 	};
 	hero.buffs.set(id, hero.invisible);
 }

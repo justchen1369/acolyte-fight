@@ -792,6 +792,7 @@ declare interface LavaImmunityBuffTemplate extends BuffTemplateBase {
 declare interface VanishTemplate extends BuffTemplateBase {
 	type: "vanish";
 	noTargetingIndicator?: boolean;
+	noBuffs?: boolean;
 }
 
 declare interface LifestealTemplate extends BuffTemplateBase { // Does more than lifesteal now...
