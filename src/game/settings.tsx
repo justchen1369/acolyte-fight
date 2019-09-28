@@ -2560,7 +2560,7 @@ const blaze: Spell = {
         color: '#ff0044',
         renderers: [
             { type: "projectile", ticks: 15, radiusMultiplier: 0.5, smoke: { isotropicSpeed: 0.1 }, vanish: 1, ownerColor: true },
-            { type: "strike", ticks: 30, flash: true, detonate: 0.01 },
+            { type: "strike", ticks: 30, flash: true, detonate: 0.02 },
         ],
     },
 };
