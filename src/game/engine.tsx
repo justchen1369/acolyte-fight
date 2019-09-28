@@ -496,9 +496,10 @@ function addHero(world: w.World, heroId: string) {
 		angularDamping: Hero.AngularDamping,
 		allowSleep: false,
 	} as pl.BodyDef);
+	const collideWith = Categories.All ^ Categories.Shield;
 	body.createFixture(pl.Circle(Hero.Radius), {
 		filterCategoryBits: Categories.Hero,
-		filterMaskBits: Categories.All ^ Categories.Shield,
+		filterMaskBits: collideWith,
 		filterGroupIndex,
 		density: Hero.Density,
 		restitution: 1.0,
@@ -510,6 +511,8 @@ function addHero(world: w.World, heroId: string) {
 		category: "hero",
 		heroIndex,
 		filterGroupIndex,
+		initialCollideWith: collideWith,
+		collideWith,
 		categories: Categories.Hero,
 		health: Hero.MaxHealth,
 		maxHealth: Hero.MaxHealth,
@@ -966,7 +969,8 @@ export function tick(world: w.World) {
 		aura,
 		reflectFollow,
 		saberSwing,
-		thrustBounce,
+		thrustVelocity,
+		thrustFollow,
 		updateCollideWith,
 		clearHits,
 		resetMass,
@@ -1119,20 +1123,28 @@ function resetMass(behaviour: w.ResetMassBehaviour, world: w.World) {
 
 function updateHeroMass(hero: w.Hero) {
 	let radius = hero.initialRadius;
-	let collideWith = Categories.All;
+	let restrictCollideWith = Categories.All;
+	let appendCollideWith = Categories.None;
 	hero.buffs.forEach(b => {
 		if (b.type === "mass") {
 			radius = Math.max(radius, b.radius);
-			collideWith &= b.collideWith;
+			restrictCollideWith &= b.restrictCollideWith;
+			appendCollideWith |= b.appendCollideWith;
 		}
 	});
 	hero.radius = radius;
 
+	const collideWith = (hero.initialCollideWith | appendCollideWith) & restrictCollideWith;
+
 	let fixture = hero.body.getFixtureList();
 	while (fixture) {
-		updateMaskBits(fixture, collideWith);
+		if (!fixture.isSensor()) { // Exclude sensors, just do physical collisions
+			updateMaskBits(fixture, collideWith);
+		}
 		fixture = fixture.getNext();
 	}
+
+	hero.collideWith = collideWith;
 }
 
 function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.World) {
@@ -2259,7 +2271,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const Hero = world.settings.Hero;
 
 	// Push back other heroes
-	{
+	if ((hero.collideWith & Categories.Hero) > 0 && (other.collideWith & Categories.Hero) > 0) {
 		const impulse = vector.diff(other.body.getPosition(), hero.body.getPosition(),);
 		let magnitude = Math.max(0, Hero.Radius * 2 - impulse.length()) * Hero.SeparationImpulsePerTick;
 
@@ -3984,16 +3996,24 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		const speed = spell.speed;
 		const maxTicks = TicksPerSecond * availableRange / speed;
 
-		const diff = vector.diff(action.target, hero.body.getPosition());
-		const distancePerTick = speed / TicksPerSecond;
-		const ticksToTarget = Math.floor(diff.length() / distancePerTick);
-		const velocity = vector.unit(diff).mul(speed);
+		let ticks = maxTicks;
 
-		const ticks = Math.min(maxTicks, ticksToTarget);
+		if (spell.followCursor) {
+			world.behaviours.push({ type: "thrustFollow", heroId: hero.id, speed });
+		} else {
+			const diff = vector.diff(action.target, hero.body.getPosition());
+			const distancePerTick = speed / TicksPerSecond;
+			const ticksToTarget = Math.floor(diff.length() / distancePerTick);
+
+			const velocity = vector.unit(diff).mul(speed);
+			world.behaviours.push({ type: "thrustVelocity", heroId: hero.id, velocity });
+
+			// If not following cursor, stop as soon as we reach the initial target
+			ticks = Math.min(maxTicks, ticksToTarget);
+		}
 
 		let thrust: w.ThrustState = {
 			damageTemplate: spell.damageTemplate,
-			velocity,
 			ticks,
 			nullified: false,
 			alreadyHit: new Set<string>(),
@@ -4002,27 +4022,46 @@ function thrustAction(world: w.World, hero: w.Hero, action: w.Action, spell: Thr
 		hero.thrust = thrust;
 		hero.moveTo = action.target;
 
-		world.behaviours.push({ type: "thrustBounce", heroId: hero.id });
 		world.behaviours.push({ type: "thrustDecay", heroId: hero.id });
+	}
+
+	if (spell.projectile && spell.projectileInterval && castingTicks % spell.projectileInterval === 0) {
+		addProjectile(world, hero, action.target, spell, spell.projectile);
 	}
 
 	return !hero.thrust;
 }
 
-function thrustBounce(behaviour: w.ThrustBounceBehaviour, world: w.World) {
+function thrustVelocity(behaviour: w.ThrustVelocityBehaviour, world: w.World) {
 	const hero = world.objects.get(behaviour.heroId);
 	if (!(hero && hero.category === "hero")) {
 		return false;
 	}
 
 	if (hero.thrust) {
-		updateMaskBits(hero.body.getFixtureList(), Categories.All);
-
-		hero.body.setLinearVelocity(hero.thrust.velocity);
+		hero.body.setLinearVelocity(behaviour.velocity);
 
 		return true;
 	} else {
-		updateMaskBits(hero.body.getFixtureList(), Categories.All ^ Categories.Shield);
+		hero.body.setLinearVelocity(vectorZero);
+
+		return false;
+	}
+}
+
+function thrustFollow(behaviour: w.ThrustFollowBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	if (hero.thrust && hero.target) {
+		const diff = vector.diff(hero.target, hero.body.getPosition());
+		const velocity = diff.mul(TicksPerSecond).clamp(behaviour.speed);
+		hero.body.setLinearVelocity(velocity);
+
+		return true;
+	} else {
 		return false;
 	}
 }
@@ -4035,7 +4074,6 @@ function thrustDecay(behaviour: w.ThrustDecayBehaviour, world: w.World) {
 
 	--hero.thrust.ticks;
 	if (hero.thrust.ticks <= 0) {
-		hero.body.setLinearVelocity(vectorZero);
 		hero.thrust = null;
 		return false;
 	} else {
@@ -4470,8 +4508,15 @@ function detachArmor(buff: w.ArmorBuff, hero: w.Hero, world: w.World) {
 function attachMass(template: MassTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const id = `mass/${world.nextBuffId++}`; // always add a unique buff, never replace
 
-	const collideWith = template.restrictCollideWith !== undefined ? template.restrictCollideWith : Categories.All;
+	let collideWith: number;
+	if (_.isNumber(template.sense)) {
+		collideWith = template.sense;
+	} else {
+		collideWith = hero.collideWith;
+	}
+
 	const fixture = hero.body.createFixture(pl.Circle(template.radius), {
+		isSensor: _.isNumber(template.sense),
 		density: template.density || 0,
 		filterCategoryBits: Categories.Hero,
 		filterMaskBits: collideWith,
@@ -4483,7 +4528,8 @@ function attachMass(template: MassTemplate, hero: w.Hero, world: w.World, config
 		id,
 		type: "mass",
 		fixture,
-		collideWith,
+		appendCollideWith: template.appendCollideWith,
+		restrictCollideWith: template.restrictCollideWith,
 		radius: template.radius,
 	});
 	updateHeroMass(hero);

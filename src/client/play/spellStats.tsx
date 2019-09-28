@@ -53,10 +53,17 @@ class SpellStats extends React.PureComponent<Props, State> {
         || spell.action === "focus"
         || spell.action === "charge"
         || (spell.action === "spray" && isMultiHit(spell.projectile))
-        || (spell.action === "buff" && spell.projectile)) {
+        || (spell.action === "buff" && spell.projectile)
+        || spell.action === "thrust") {
 
-            const damage = this.calculateProjectileDamage(spell.projectile);
-            const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
+            let damage = this.calculateProjectileDamage(spell.projectile);
+            let lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
+
+            if (spell.action === "thrust" && spell.damageTemplate) {
+                damage += spell.damageTemplate.damage;
+                lifeSteal = Math.max(lifeSteal, spell.damageTemplate.lifeSteal || 0);
+            }
+
             return <div className="spell-stats">
                 <span className="spell-stats-item" title="Damage"><i className="fas fa-sword" />{damage}{damage > 0 && this.renderScaling(spell.projectile.damageScaling)}{isMultiHit(spell.projectile) && " per hit"}</span>
                 {lifeSteal && <span className="spell-stats-item" title="Lifesteal"><i className="fas fa-heart" />{lifeSteal * 100}%</span>}
@@ -98,6 +105,10 @@ class SpellStats extends React.PureComponent<Props, State> {
     }
 
     private calculateProjectileDamage(projectile: ProjectileTemplate) {
+        if (!projectile) {
+            return 0;
+        }
+
         let damage = projectile.damage + (projectile.detonate ? projectile.detonate.damage : 0);
         if (projectile.buffs) {
             projectile.buffs.forEach(buff => {
@@ -121,6 +132,10 @@ class SpellStats extends React.PureComponent<Props, State> {
     }
 
     private calculateProjectileLifeSteal(projectile: ProjectileTemplate) {
+        if (!projectile) {
+            return 0;
+        }
+
         let lifeSteal = Math.max((projectile.lifeSteal || 0), (projectile.detonate ? (projectile.detonate.lifeSteal || 0) : 0));
         if (projectile.buffs) {
             projectile.buffs.forEach(buff => {

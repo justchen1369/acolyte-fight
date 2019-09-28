@@ -2477,6 +2477,7 @@ const thrust: Spell = {
             radius: 1.5 * Hero.Radius,
             density: 10,
             maxTicks: 16,
+            appendCollideWith: Categories.Shield,
             render: {
                 color: "#fff",
                 heroColor: true,
@@ -2502,18 +2503,25 @@ const blaze: Spell = {
 
     icon: "fireWave",
     color: '#ff00cc',
-    action: "buff",
+    action: "thrust",
     sound: "blaze",
 
+    range: 0.03,
+    speed: 0.15,
     movementProportionWhileChannelling: 4,
-    maxChannellingTicks: 12,
+    damageTemplate: {
+        damage: 24,
+        lifeSteal,
+    },
     buffs: [
         {
             type: "mass",
             cleansable: false,
             maxTicks: 0.5 * TicksPerSecond,
             radius: 1 * Hero.Radius,
-            restrictCollideWith: Categories.Shield | Categories.Massive,
+            restrictCollideWith: Categories.Massive,
+            appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
+            sense: Categories.Hero,
         },
     ],
 
@@ -2545,18 +2553,6 @@ const blaze: Spell = {
                 type: "expireOnOwnerRetreat",
                 maxDistance: 0.15,
                 trigger: { afterTicks: 60 },
-            },
-        ],
-
-        buffs: [
-            {
-                type: "burn",
-                maxTicks: 10,
-                collideWith: Categories.All,
-                packet: { damage: 24, lifeSteal, noKnockback: true, noHit: true },
-                hitInterval: 10, // Don't hit twice
-                stack: "blaze",
-                maxStacks: 1,
             },
         ],
 

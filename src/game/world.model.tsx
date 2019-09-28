@@ -401,6 +401,8 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	category: "hero";
 	heroIndex: number;
 	filterGroupIndex: number;
+	initialCollideWith: number;
+	collideWith: number;
 
 	health: number;
 	maxHealth: number;
@@ -575,8 +577,8 @@ export interface LinkState extends HighlightSource {
 
 export interface ThrustState {
 	damageTemplate: DamagePacketTemplate;
-	velocity: pl.Vec2;
 	ticks: number;
+
 	nullified: boolean;
 	alreadyHit: Set<string>;
 }
@@ -684,7 +686,8 @@ export interface ArmorBuff extends BuffBase {
 
 export interface MassBuff extends BuffBase {
 	type: "mass";
-	collideWith: number;
+	restrictCollideWith: number;
+	appendCollideWith: number;
 	fixture: pl.Fixture;
 	radius: number;
 }
@@ -814,7 +817,8 @@ export type Behaviour =
 	| GravityBehaviour
 	| StrafeBehaviour
 	| ReflectFollowBehaviour
-	| ThrustBounceBehaviour
+	| ThrustVelocityBehaviour
+	| ThrustFollowBehaviour
 	| ThrustDecayBehaviour
 	| SaberBehaviour
 	| BurnBehaviour
@@ -944,9 +948,16 @@ export interface ReflectFollowBehaviour extends BehaviourBase {
 	shieldId: string;
 }
 
-export interface ThrustBounceBehaviour extends BehaviourBase {
-	type: "thrustBounce";
+export interface ThrustVelocityBehaviour extends BehaviourBase {
+	type: "thrustVelocity";
 	heroId: string;
+	velocity: pl.Vec2;
+}
+
+export interface ThrustFollowBehaviour extends BehaviourBase {
+	type: "thrustFollow";
+	heroId: string;
+	speed: number;
 }
 
 export interface ThrustDecayBehaviour extends BehaviourBase {

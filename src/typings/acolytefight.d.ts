@@ -826,7 +826,9 @@ declare interface ArmorTemplate extends BuffTemplateBase {
 declare interface MassTemplate extends BuffTemplateBase {
 	type: "mass";
 	radius: number; // Increase the radius of the hero to this value
+	appendCollideWith?: number; // Expand what the hero can collide with while this buff is active - e.g. collide with shields
 	restrictCollideWith?: number; // Restrict what the hero can collide with while this buff is active
+	sense?: number; // Don't physically collide with these objects, but perform all other collision effects
 	density?: number; // Increase the density of the hero by amount
 }
 
@@ -941,8 +943,13 @@ declare interface ThrustSpell extends SpellBase {
 
 	range: number;
 	speed: number;
+	followCursor?: boolean;
 
 	damageTemplate: DamagePacketTemplate;
+
+	// Create a projectile at this interval
+	projectileInterval?: number;
+	projectile?: ProjectileTemplate;
 }
 
 declare interface RenderThrust {
