@@ -1128,8 +1128,12 @@ function updateHeroMass(hero: w.Hero) {
 	hero.buffs.forEach(b => {
 		if (b.type === "mass") {
 			radius = Math.max(radius, b.radius);
-			restrictCollideWith &= b.restrictCollideWith;
-			appendCollideWith |= b.appendCollideWith;
+			if (_.isNumber(b.restrictCollideWith)) {
+				restrictCollideWith &= b.restrictCollideWith;
+			}
+			if (_.isNumber(b.appendCollideWith)) {
+				appendCollideWith |= b.appendCollideWith;
+			}
 		}
 	});
 	hero.radius = radius;
