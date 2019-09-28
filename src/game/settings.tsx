@@ -2506,7 +2506,7 @@ const blaze: Spell = {
     action: "thrust",
     sound: "blaze",
 
-    range: 0.03,
+    range: 0.025,
     speed: 0.15,
     movementProportionWhileChannelling: 4,
     damageTemplate: {
@@ -2517,8 +2517,9 @@ const blaze: Spell = {
         {
             type: "mass",
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
-            radius: 1 * Hero.Radius,
+            channelling: true,
+            maxTicks: 1 * TicksPerSecond, // Limited by channelling
+            radius: 0.005, // Radius of the projectile
             restrictCollideWith: Categories.Massive,
             appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
             sense: Categories.Hero,
