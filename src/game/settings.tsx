@@ -2550,7 +2550,7 @@ const blaze: Spell = {
                 type: "burn",
                 maxTicks: 10,
                 collideWith: Categories.All,
-                packet: { damage: 16, lifeSteal, noKnockback: true, noHit: true },
+                packet: { damage: 24, lifeSteal, noKnockback: true, noHit: true },
                 hitInterval: 10, // Don't hit twice
                 stack: "blaze",
                 maxStacks: 1,
