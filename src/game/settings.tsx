@@ -1483,7 +1483,7 @@ const drain: Spell = {
         radius: 0.002,
         speed: 0.2,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 16,
+        damage: 20,
         lifeSteal: 1,
 
         behaviours: [
@@ -2061,9 +2061,9 @@ const horcrux: Spell = {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.0375,
-                tickInterval: 5,
-                maxHits: 9,
-                packet: { damage: 4, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                tickInterval: 9,
+                maxHits: 5,
+                packet: { damage: 6, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
