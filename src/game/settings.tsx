@@ -2053,14 +2053,14 @@ const horcrux: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 60, atCursor: true, minTicks: 20 },
+                trigger: { afterTicks: 60, atCursor: true, minTicks: 15 },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
                 trigger: { afterTicks: 60, atCursor: true },
-                radius: 0.0375,
+                radius: 0.035,
                 tickInterval: 6,
                 maxHits: 10,
                 packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
