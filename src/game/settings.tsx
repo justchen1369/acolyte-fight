@@ -2026,7 +2026,7 @@ const horcrux: Spell = {
     projectile: {
         density: 10,
         restitution: 0,
-        radius: 0.003,
+        radius: 0.0035,
         speed: 0.35,
 
         maxTicks: 2 * TicksPerSecond,
