@@ -84,6 +84,9 @@ class HUD extends React.PureComponent<Props, State> {
             {!modal && <Layout anchorTop={true} anchorLeft={true}>
                 <PlayBar />
             </Layout>}
+            <Layout anchorBottom={true}>
+                <HintPanel />
+            </Layout>
             {!modal && <Layout anchorTop={true} anchorRight={true}>
                 <div className="tab-switcher-panel">
                     {this.props.myHeroId && <Button className="tab-switcher-item" onClick={(ev) => this.onCustomizeClicked(ev) }>
@@ -121,9 +124,6 @@ class HUD extends React.PureComponent<Props, State> {
                 </Button>
                 <RandomizePanel />
             </Layout>}
-            <Layout anchorBottom={true}>
-                <HintPanel />
-            </Layout>
             <GameKeyCustomizer />
         </>
     }
