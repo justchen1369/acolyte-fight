@@ -26,11 +26,11 @@ import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './core/matchmaking';
 import * as modder from './core/modder';
 import * as online from './core/online';
-import * as percentiles from './ratings/percentiles';
+import * as percentilesProvider from './ratings/percentilesProvider';
 import * as serverStore from './serverStore';
 import * as statsStorage from './storage/statsStorage';
 import * as ticker from './core/ticker';
-import * as winRates from './ratings/winRates';
+import * as winRateProvider from './ratings/winRateProvider';
 
 const rootDir = path.resolve('.');
 
@@ -60,7 +60,6 @@ facebook.init(facebookSecret);
 kongregate.init(kongregateSecret);
 gameStorage.initStorage(replaysBasePath);
 modder.init();
-percentiles.init();
 ticker.init();
 if (mirrored) {
 	setLocation(os.hostname(), process.env.UPSTREAM_SUFFIX || `:${port}`);
@@ -125,10 +124,12 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
 
+percentilesProvider.init().catch(logger.error);
+winRateProvider.init().catch(logger.error);
 setInterval(() => {
-	winRates.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
+	percentilesProvider.update().catch(logger.error);
+	winRateProvider.update().catch(logger.error);
 }, 24 * 60 * 60 * 1000); // slow-changing data
-winRates.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 
 setInterval(async () => {
 	try {

@@ -4,10 +4,10 @@ import * as aco from './aco';
 import * as g from '../server.model';
 import * as games from './games';
 import * as m from '../../shared/messages.model';
-import * as percentiles from '../ratings/percentiles';
+import * as percentilesProvider from '../ratings/percentilesProvider';
 import * as segments from '../../shared/segments';
 import * as statsStorage from '../storage/statsStorage';
-import * as winRates from '../ratings/winRates';
+import * as winRateProvider from '../ratings/winRateProvider';
 import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
 
@@ -61,7 +61,7 @@ export async function retrieveRating(userId: string, numGames: number, category:
             return userRating.aco;
         }
     } else {
-        return percentiles.estimateAcoFromNumGames(category, numGames);
+        return percentilesProvider.estimateAcoFromNumGames(category, numGames);
     }
 }
 
@@ -270,7 +270,7 @@ function evaluateWinProbability(acoList: number[]) {
         let count = 0;
         for (let i = 1; i < sorted.length; ++i) { // Compare everyone else against the best
             const diff = aco.AcoRanked.calculateDiff(sorted[i], best);
-            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRates.getWinRateDistribution(m.GameCategory.PvP));
+            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRateProvider.getWinRateDistribution(m.GameCategory.PvP));
             total += winProbability;
             count++;
         }

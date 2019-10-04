@@ -12,6 +12,14 @@ import { Collections } from '../storage/db.model';
 import { FixedIntegerArray } from '../utils/fixedIntegerArray';
 import { logger } from '../status/logging';
 
+export interface PercentilesCache {
+    frequencies: Map<string, FixedIntegerArray>;
+    cumulativeFrequencies: Map<string, FixedIntegerArray>;
+    distributions: Map<string, FixedIntegerArray>;
+    numGamesToAco: Map<string, FixedIntegerArray>;
+    numUsers: number;
+}
+
 interface DbFrequenciesResult {
     frequencies: Map<string, FixedIntegerArray>;
     numGamesToAco: Map<string, FixedIntegerArray>;
@@ -23,98 +31,36 @@ interface MeanItem {
     count: number;
 }
 
-let cumulativeFrequenciesCache = new Map<string, FixedIntegerArray>();
-let distributionCache = new Map<string, FixedIntegerArray>();
-let numGamesToAcoCache = new Map<string, FixedIntegerArray>();
-let numUsersCache: number = 0;
-
-export const ready = deferred<void>();
-let isReady = false;
-
-export async function init() {
-    refreshCumulativeFrequenciesLoop();
+export function emptyCache(): PercentilesCache {
+    return {
+        frequencies: new Map<string, FixedIntegerArray>(),
+        cumulativeFrequencies: new Map<string, FixedIntegerArray>(),
+        distributions: new Map<string, FixedIntegerArray>(),
+        numGamesToAco: new Map<string, FixedIntegerArray>(),
+        numUsers: 0,
+    };
 }
 
-function cacheKey(category: string) {
-    return `${category}`;
-}
-
-function numGamesBin(numGames: number): number {
+export function numGamesBin(numGames: number): number {
     return Math.floor(Math.log2(1 + numGames));
 }
 
-export function estimatePercentile(ratingLB: number, category: string): number {
-    return estimatePercentileFrom(ratingLB, cumulativeFrequenciesCache.get(cacheKey(category)));
-}
-
-export function estimateRatingAtPercentile(category: string, percentile: number): number {
-    const distribution = distributionCache.get(cacheKey(category));
-    if (!distribution) {
-        return 0;
-    }
-
-    const minRating = distribution.at(Math.floor(percentile));
-    return minRating || 0;
-}
-
-export function estimateAcoFromNumGames(category: string, numGames: number): number {
-    const distribution = numGamesToAcoCache.get(cacheKey(category));
-    if (!distribution) {
-        return constants.Placements.InitialAco;
-    }
-
-    const bin = numGamesBin(numGames);
-    if (bin >= distribution.length) {
-        return distribution.length > 0 ? distribution.at(distribution.length - 1) : 0;
-    } else {
-        return distribution.at(bin) || constants.Placements.InitialAco;
-    }
-}
-
-export function estimateNumUsers(): number {
-    return numUsersCache;
-}
-
-async function refreshCumulativeFrequenciesLoop() {
-    await refreshCumulativeFrequencies();
-    if (!isReady) {
-        isReady = true;
-        ready.resolve();
-    }
-
-    const delayMilliseconds = calculateNextRefresh(numUsersCache);
-    setTimeout(() => refreshCumulativeFrequenciesLoop(), delayMilliseconds);
-}
-
-export async function refreshCumulativeFrequencies() {
-    const start = Date.now();
-
+export async function calculatePercentiles(): Promise<PercentilesCache> {
     const result = await calculateFrequencies();
-    numUsersCache = result.numUsers;
-    cumulativeFrequenciesCache = calculateCumulativeFrequency(result.frequencies);
+    const cumulativeFrequencies = calculateCumulativeFrequency(result.frequencies);
 
-    cumulativeFrequenciesCache.forEach((cumulativeFrequency, key) => {
-        distributionCache.set(key, calculateDistribution(cumulativeFrequency));
+    const distributions = new Map<string, FixedIntegerArray>();
+    cumulativeFrequencies.forEach((cumulativeFrequency, key) => {
+        distributions.set(key, calculateDistribution(cumulativeFrequency));
     });
 
-    numGamesToAcoCache = result.numGamesToAco;
-    result.numGamesToAco.forEach((distribution, category) => {
-        logger.info(`Num games to aco distribution (${category}): ${distribution.toArray().map(v => v.toFixed(0)).join(' ')}`);
-    });
-
-    logger.info(`Calculated cumulative frequencies in ${(Date.now() - start).toFixed(0)} ms`);
-}
-
-function calculateNextRefresh(numUsers: number) {
-    if (!numUsers || numUsers < 100) {
-        return 5 * 60 * 1000;
-    } else if (numUsers < 1000) {
-        return 20 * 60 * 1000;
-    } else if (numUsers < 10000) {
-        return 60 * 60 * 1000;
-    } else {
-        return 24 * 60 * 60 * 1000;
-    }
+    return {
+        frequencies: result.frequencies,
+        cumulativeFrequencies,
+        distributions,
+        numGamesToAco: result.numGamesToAco,
+        numUsers: result.numUsers,
+    };
 }
 
 // Returns the rating required to reach each percentile
@@ -192,9 +138,7 @@ async function calculateFrequencies(): Promise<DbFrequenciesResult> {
     };
 }
 
-function getOrCreateDistribution<T>(frequencies: Map<string, T[]>, category: string): T[] {
-    const key = cacheKey(category);
-
+function getOrCreateDistribution<T>(frequencies: Map<string, T[]>, key: string): T[] {
     let frequency = frequencies.get(key);
     if (!frequency) {
         frequency = [];
@@ -254,6 +198,10 @@ function calculateCumulativeFrequency(frequencies: Map<string, FixedIntegerArray
     return cumulativeFrequencies;
 }
 
+export function estimatePercentile(ratingLB: number, category: string, cache: PercentilesCache): number {
+    return estimatePercentileFrom(ratingLB, cache.cumulativeFrequencies.get(category));
+}
+
 function estimatePercentileFrom(ratingLB: number, cumulativeFrequency: FixedIntegerArray): number {
     if (!cumulativeFrequency || cumulativeFrequency.length <= 0) {
         return 100;
@@ -277,4 +225,32 @@ function clampRead(index: number, array: FixedIntegerArray): number {
         index = Math.max(0, Math.min(array.length - 1, index));
         return array.at(index);
     }
+}
+
+export function estimateRatingAtPercentile(category: string, percentile: number, cache: PercentilesCache): number {
+    const distribution = cache.distributions.get(category);
+    if (!distribution) {
+        return 0;
+    }
+
+    const minRating = distribution.at(Math.floor(percentile));
+    return minRating || 0;
+}
+
+export function estimateAcoFromNumGames(category: string, numGames: number, cache: PercentilesCache): number {
+    const distribution = cache.numGamesToAco.get(category);
+    if (!distribution) {
+        return constants.Placements.InitialAco;
+    }
+
+    const bin = numGamesBin(numGames);
+    if (bin >= distribution.length) {
+        return distribution.length > 0 ? distribution.at(distribution.length - 1) : 0;
+    } else {
+        return distribution.at(bin) || constants.Placements.InitialAco;
+    }
+}
+
+export function estimateNumUsers(cache: PercentilesCache): number {
+    return cache.numUsers;
 }

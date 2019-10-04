@@ -17,10 +17,10 @@ import * as facebook from '../auth/facebook';
 import * as games from '../core/games';
 import * as gameStorage from '../storage/gameStorage';
 import * as kongregate from '../auth/kongregate';
-import * as leaderboards from '../ratings/leaderboards';
+import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
-import * as percentiles from '../ratings/percentiles';
+import * as percentilesProvider from '../ratings/percentilesProvider';
 import * as ratings from '../ratings/ratings';
 import * as sanitize from '../../shared/sanitize';
 import * as statsStorage from '../storage/statsStorage';
@@ -63,7 +63,7 @@ export function getInternalStatus() {
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
-        numUsers: percentiles.estimateNumUsers(),
+        numUsers: percentilesProvider.estimateNumUsers(),
         numGames: store.activeGames.size,
         numPlayers: wu(store.scoreboards.values()).map(scoreboard => scoreboard.online.size).reduce((a, b) => a + b, 0),
         numConnections: store.numConnections,
@@ -357,7 +357,7 @@ export async function onGetRatingAtPercentileAsync(req: express.Request, res: ex
         return;
     }
 
-    const rating = percentiles.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
+    const rating = percentilesProvider.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
     const response: m.GetRatingAtPercentileResponse = { rating };
     res.send(response);
 }
@@ -373,7 +373,7 @@ export async function onGetLeaguesAsync(req: express.Request, res: express.Respo
         return;
     }
 
-    await percentiles.ready.promise;
+    await percentilesProvider.ready.promise;
 
     const category = req.params.category;
 
@@ -396,7 +396,7 @@ function estimateLeague(category: string, name: string, minPercentile: number): 
     return {
         name,
         minPercentile,
-        minRating: percentiles.estimateRatingAtPercentile(category, minPercentile),
+        minRating: percentilesProvider.estimateRatingAtPercentile(category, minPercentile),
     };
 }
 
@@ -411,7 +411,7 @@ export async function onGetProfileAsync(req: express.Request, res: express.Respo
         return;
     }
 
-    const profile = await statsStorage.getProfile(userId, percentiles.estimatePercentile);
+    const profile = await statsStorage.getProfile(userId, percentilesProvider.estimatePercentile);
     if (profile) {
         res.send(profile);
     } else {
@@ -556,7 +556,7 @@ export async function onGetLeaderboardAsync(req: express.Request, res: express.R
 
     const category = req.query.category;
 
-    const leaderboardBuffer = await leaderboards.getLeaderboard(category);
+    const leaderboardBuffer = await leaderboardProvider.getLeaderboard(category);
     res.send(leaderboardBuffer);
 }
 
@@ -623,6 +623,6 @@ export async function onRecalculateDistributionsAsync(req: express.Request, res:
         return;
     }
 
-    await percentiles.refreshCumulativeFrequencies();
+    await percentilesProvider.refreshCumulativeFrequencies();
     res.send('OK');
 }

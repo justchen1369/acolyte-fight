@@ -11,7 +11,7 @@ import * as dbStorage from '../storage/dbStorage';
 import * as decaying from './decaying';
 import * as statsStorage from '../storage/statsStorage';
 import * as userStorage from '../storage/userStorage';
-import * as winRates from './winRates';
+import * as winRateProvider from './winRateProvider';
 import { Collections, Singleton } from '../storage/db.model';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
@@ -313,7 +313,7 @@ function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.Pl
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
             const diff = aco.AcoRanked.calculateDiff(selfAco, otherAco);
-            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRates.getWinRateDistribution(category) || []);
+            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRateProvider.getWinRateDistribution(category) || []);
             const adjustment = aco.AcoRanked.adjustment(winProbability, score, multiplier);
             const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
             if (change.delta >= 0) {

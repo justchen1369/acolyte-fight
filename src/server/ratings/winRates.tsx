@@ -7,7 +7,7 @@ import { Collections, Singleton } from '../storage/db.model';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 
-export interface WinRateBucket {
+interface WinRateBucket {
     minDiff: number;
     maxDiff: number;
 
@@ -23,23 +23,7 @@ interface WinRateItem {
     numGames: number;
 }
 
-const winRates = new Map<string, aco.ActualWinRate[]>();
-
-export function getWinRateDistribution(category: string) {
-    return winRates.get(category);
-}
-
-export async function updateWinRateDistribution(category: string) {
-    const distribution = await calculateWinRateDistribution(category);
-    const dataPoints: aco.ActualWinRate[] = distribution.map(p => ({
-        midpoint: (p.maxDiff + p.minDiff) / 2,
-        winRate: p.weightedExpected / p.weightedGames,
-        numGames: p.numGames,
-    }));
-    winRates.set(category, dataPoints);
-}
-
-export async function calculateWinRateDistribution(category: string) {
+export async function calculateWinRateDistribution(category: string): Promise<aco.ActualWinRate[]> {
     const BucketRange = 50;
 
     const start = Date.now();
@@ -95,7 +79,11 @@ export async function calculateWinRateDistribution(category: string) {
     const elapsed = Date.now() - start;
     logger.info(`Calculated win rate distribution in ${elapsed} ms: ${formatBuckets(buckets)}`);
 
-    return buckets.filter(b => !!b);
+    return buckets.filter(b => !!b).map(p => ({
+        midpoint: (p.maxDiff + p.minDiff) / 2,
+        winRate: p.weightedExpected / p.weightedGames,
+        numGames: p.numGames,
+    }));
 }
 
 function formatBuckets(buckets: WinRateBucket[]) {

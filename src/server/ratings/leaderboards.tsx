@@ -13,33 +13,6 @@ import { Collections, Singleton } from '../storage/db.model';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 
-interface LeaderboardCacheItem {
-    leaderboardBuffer: Buffer; // m.GetLeaderboardResponse
-    expiry: number; // unix timestamp
-}
-
-const leaderboardCache = new Map<string, LeaderboardCacheItem>();
-
-
-function leaderboardCacheKey(category: string) {
-    return `${category}`;
-}
-
-export async function getLeaderboard(category: string): Promise<Buffer> {
-    const cached = leaderboardCache.get(leaderboardCacheKey(category));
-    if (cached && moment().unix() < cached.expiry) {
-        return cached.leaderboardBuffer;
-    } else {
-        const leaderboard = await retrieveLeaderboard(category);
-        const leaderboardBuffer = msgpack.encode(leaderboard);
-        leaderboardCache.set(category, {
-            leaderboardBuffer,
-            expiry: moment().add(constants.Placements.LeaderboardCacheMinutes, 'minute').unix(),
-        });
-        return leaderboardBuffer;
-    }
-}
-
 export async function retrieveLeaderboard(category: string): Promise<m.GetLeaderboardResponse> {
     const firestore = getFirestore();
 
