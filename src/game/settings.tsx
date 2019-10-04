@@ -908,7 +908,7 @@ const retractor: Spell = {
         detonate: {
             damage: 0,
             lifeSteal,
-            radius: 0.025,
+            radius: 0.015,
 
             minImpulse: 0,
             maxImpulse: 0,
