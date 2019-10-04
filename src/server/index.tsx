@@ -15,6 +15,8 @@ import { authMiddleware } from './auth/auth';
 import { attachToSocket } from './facade/emitter';
 import { setLocation } from './core/mirroring';
 import { logger } from './status/logging';
+import * as decaying from './core/decaying';
+import * as deflating from './core/deflating';
 import * as dbStorage from './storage/dbStorage';
 import * as discord from './auth/discord';
 import * as emitter from './facade/emitter';
@@ -28,6 +30,7 @@ import * as percentiles from './core/percentiles';
 import * as serverStore from './serverStore';
 import * as statsStorage from './storage/statsStorage';
 import * as ticker from './core/ticker';
+import * as winRates from './core/winRates';
 
 const rootDir = path.resolve('.');
 
@@ -123,22 +126,22 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 online.init().catch(logger.error);
 
 setInterval(() => {
-	statsStorage.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
+	winRates.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 }, 24 * 60 * 60 * 1000); // slow-changing data
-statsStorage.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
+winRates.updateWinRateDistribution(m.GameCategory.PvP).catch(logger.error);
 
 setInterval(async () => {
 	try {
 		modder.cleanupOldRooms(1);
 		await statsStorage.cleanupGames(7);
-		await statsStorage.decrementAco();
-		await statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP);
+		await decaying.decrementAco();
+		await deflating.deflateAcoIfNecessary(m.GameCategory.PvP);
 	} catch (exception) {
 		logger.error(exception);
 	}
 }, cleanupIntervalMinutes * 60 * 1000);
-statsStorage.deflateAcoIfNecessary(m.GameCategory.PvP).catch(logger.error);
-statsStorage.decrementAco().catch(logger.error);
+deflating.deflateAcoIfNecessary(m.GameCategory.PvP).catch(logger.error);
+decaying.decrementAco().catch(logger.error);
 
 setInterval(async () => {
 	try {

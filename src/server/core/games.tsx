@@ -11,6 +11,7 @@ import * as segments from '../../shared/segments';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as online from './online';
+import * as ratings from './ratings';
 import * as results from './results';
 import * as statsStorage from '../storage/statsStorage';
 import * as transientIds from '../utils/transientIds';
@@ -415,7 +416,7 @@ function rankGameIfNecessary(game: g.Game) {
 
 	let result = results.calculateResult(game);
 	if (result) {
-		statsStorage.saveGame(game, result).then(newResult => {
+		ratings.saveGame(game, result).then(newResult => {
 			result = newResult || result;
 
 			for (const listener of finishedGameListeners) {

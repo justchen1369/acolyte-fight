@@ -7,6 +7,7 @@ import * as m from '../../shared/messages.model';
 import * as percentiles from './percentiles';
 import * as segments from '../../shared/segments';
 import * as statsStorage from '../storage/statsStorage';
+import * as winRates from './winRates';
 import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
 
@@ -269,7 +270,7 @@ function evaluateWinProbability(acoList: number[]) {
         let count = 0;
         for (let i = 1; i < sorted.length; ++i) { // Compare everyone else against the best
             const diff = aco.AcoRanked.calculateDiff(sorted[i], best);
-            const winProbability = aco.AcoRanked.estimateWinProbability(diff, statsStorage.getWinRateDistribution(m.GameCategory.PvP));
+            const winProbability = aco.AcoRanked.estimateWinProbability(diff, winRates.getWinRateDistribution(m.GameCategory.PvP));
             total += winProbability;
             count++;
         }

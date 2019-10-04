@@ -17,12 +17,15 @@ import * as facebook from '../auth/facebook';
 import * as games from '../core/games';
 import * as gameStorage from '../storage/gameStorage';
 import * as kongregate from '../auth/kongregate';
+import * as leaderboards from '../core/leaderboards';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
 import * as percentiles from '../core/percentiles';
+import * as ratings from '../core/ratings';
 import * as sanitize from '../../shared/sanitize';
 import * as statsStorage from '../storage/statsStorage';
 import * as userStorage from '../storage/userStorage';
+import * as winRates from '../core/winRates';
 
 import { getAuthToken } from '../auth/auth';
 import { getLocation } from '../core/mirroring';
@@ -553,7 +556,7 @@ export async function onGetLeaderboardAsync(req: express.Request, res: express.R
 
     const category = req.query.category;
 
-    const leaderboardBuffer = await statsStorage.getLeaderboard(category);
+    const leaderboardBuffer = await leaderboards.getLeaderboard(category);
     res.send(leaderboardBuffer);
 }
 
@@ -571,7 +574,7 @@ export async function onGetWinRateDistributionAsync(req: express.Request, res: e
         return;
     }
 
-    const distribution = await statsStorage.calculateWinRateDistribution(m.GameCategory.PvP);
+    const distribution = await winRates.calculateWinRateDistribution(m.GameCategory.PvP);
     if (req.header('content-type') === "application/json") {
         res.send(distribution);
     } else {
@@ -606,7 +609,7 @@ export async function onReevaluateAcoAsync(req: express.Request, res: express.Re
         return;
     }
 
-    const numAffected = await statsStorage.reevaluteAco();
+    const numAffected = await ratings.reevaluteAco();
     res.send(`${numAffected} rows affected`);
 }
 
