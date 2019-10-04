@@ -1,5 +1,5 @@
 import * as Firestore from '@google-cloud/firestore';
-import * as m from '../shared/messages.model';
+import * as m from '../../shared/messages.model';
 
 export const Singleton = 'singleton';
 

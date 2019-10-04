@@ -8,7 +8,7 @@ import * as discord from './discord';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as sanitize from '../shared/sanitize';
-import * as userStorage from './userStorage';
+import * as userStorage from './storage/userStorage';
 
 import { logger } from './logging';
 

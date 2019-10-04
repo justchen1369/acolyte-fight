@@ -8,7 +8,7 @@ import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
 import * as games from './games';
-import * as gameStorage from './gameStorage';
+import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './matchmaking';
 import * as online from './online';
 import { getStore } from './serverStore';

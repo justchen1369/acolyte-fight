@@ -6,7 +6,7 @@ import * as games from './games';
 import * as m from '../shared/messages.model';
 import * as percentiles from './percentiles';
 import * as segments from '../shared/segments';
-import * as statsStorage from './statsStorage';
+import * as statsStorage from './storage/statsStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 

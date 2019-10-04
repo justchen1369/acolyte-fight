@@ -1,13 +1,13 @@
 import _ from 'lodash';
 import crypto from 'crypto';
 import moment from 'moment';
-import * as db from './db.model';
+import * as db from './storage/db.model';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as modder from '../game/modder';
 import * as w from '../game/world.model';
 import * as settings from '../game/settings';
-import { getFirestore } from './dbStorage';
+import { getFirestore } from './storage/dbStorage';
 import { getStore } from './serverStore';
 import { logger } from './logging';
 import { DefaultSettings } from '../game/settings';

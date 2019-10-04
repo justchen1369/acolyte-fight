@@ -5,10 +5,10 @@ import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as Firestore from '@google-cloud/firestore';
-import * as db from './db.model';
-import * as dbStorage from './dbStorage';
+import * as db from './storage/db.model';
+import * as dbStorage from './storage/dbStorage';
 import * as mirroring from './mirroring';
-import { getFirestore } from './dbStorage';
+import { getFirestore } from './storage/dbStorage';
 import { logger } from './logging';
 import { getStore } from './serverStore';
 

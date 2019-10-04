@@ -1,10 +1,10 @@
 import fs from 'fs';
 import msgpack from 'msgpack-lite';
 import zlib from 'zlib';
-import * as g from './server.model';
-import * as m from '../shared/messages.model';
-import { getStore } from './serverStore';
-import { logger } from './logging';
+import * as g from '../server.model';
+import * as m from '../../shared/messages.model';
+import { getStore } from '../serverStore';
+import { logger } from '../logging';
 
 let basePath: string = null;
 

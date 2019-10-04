@@ -1,7 +1,7 @@
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
-import * as s from './server.model';
-import { logger } from './logging';
+import * as s from '../server.model';
+import { logger } from '../logging';
 
 const MaxFirestoreAgeHours = 0.25;
 

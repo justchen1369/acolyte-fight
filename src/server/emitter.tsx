@@ -14,7 +14,7 @@ import * as PlayerName from '../shared/sanitize';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as constants from '../game/constants';
-import * as gameStorage from './gameStorage';
+import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './matchmaking';
 import * as mirroring from './mirroring';
 import * as modder from './modder';

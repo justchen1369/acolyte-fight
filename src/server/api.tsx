@@ -15,14 +15,14 @@ import * as constants from '../game/constants';
 import * as discord from './discord';
 import * as facebook from './facebook';
 import * as games from './games';
-import * as gameStorage from './gameStorage';
+import * as gameStorage from './storage/gameStorage';
 import * as kongregate from './kongregate';
 import * as loadMetrics from './loadMetrics';
 import * as mirroring from './mirroring';
 import * as percentiles from './percentiles';
 import * as sanitize from '../shared/sanitize';
-import * as statsStorage from './statsStorage';
-import * as userStorage from './userStorage';
+import * as statsStorage from './storage/statsStorage';
+import * as userStorage from './storage/userStorage';
 
 import { getAuthToken } from './auth';
 import { getLocation } from './mirroring';
