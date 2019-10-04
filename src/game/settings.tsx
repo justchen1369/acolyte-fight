@@ -891,7 +891,7 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        damage: 0,
+        damage: 40,
         lifeSteal,
         density: 15,
         radius: 0.007,
@@ -906,7 +906,7 @@ const retractor: Spell = {
         },
 
         detonate: {
-            damage: 40,
+            damage: 0,
             lifeSteal,
             radius: 0.025,
 
