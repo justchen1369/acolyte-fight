@@ -2514,7 +2514,7 @@ const blaze: Spell = {
             radius: 0.005, // Radius of the projectile
             restrictCollideWith: Categories.Massive,
             appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
-            sense: Categories.Hero,
+            sense: Categories.Hero | Categories.Projectile,
         },
     ],
 
