@@ -201,15 +201,13 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
     return games;
 }
 
-export async function loadAllGames(category: string, callback: (game: m.GameStatsMsg) => void) {
+export async function loadAllGames(callback: (game: m.GameStatsMsg) => void) {
     const firestore = getFirestore();
     let query = firestore.collection(Collections.Game);
 
     await dbStorage.stream(query, gameDoc => {
         const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
-        if (game.category === category) {
-            callback(game);
-        }
+        callback(game);
     });
 }
 

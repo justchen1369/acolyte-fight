@@ -2,6 +2,7 @@ import _ from 'lodash';
 import wu from 'wu';
 import * as m from '../../shared/messages.model';
 import * as aco from '../core/aco';
+import * as accumulatorHelpers from './accumulatorHelpers';
 import * as constants from '../../game/constants';
 import * as statsStorage from '../storage/statsStorage';
 import { Collections, Singleton } from '../storage/db.model';
@@ -38,12 +39,8 @@ export class WinRateAccumulator {
     }
 
     accept(game: m.GameStatsMsg) {
-        if (game.partyId) {
-            return; // Ignore private games
-        }
-
-        if (game.winners && game.winners.length > 1) {
-            return; // Ignore team games
+        if (!accumulatorHelpers.acceptGame(game, this.category)) {
+            return;
         }
 
         const ratings = _.orderBy(game.players.filter(p => p.initialAco && p.initialNumGames && p.rank), p => p.rank).map(p => {

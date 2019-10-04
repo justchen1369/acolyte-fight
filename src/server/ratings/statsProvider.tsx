@@ -62,12 +62,11 @@ async function updateFromUsers() {
 
 async function updateFromGames() {
     const start = Date.now();
-    const category = m.GameCategory.PvP;
 
-    const winRateAccumulator = new winRates.WinRateAccumulator(category);
+    const winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
 
     let numGames = 0;
-    await statsStorage.loadAllGames(category, game => {
+    await statsStorage.loadAllGames(game => {
         winRateAccumulator.accept(game);
 
         ++numGames;

@@ -24,3 +24,19 @@ export function getUserRating(user: db.User, category: string) {
 
     return userRating;
 }
+
+export function acceptGame(game: m.GameStatsMsg, category: string) {
+    if (game.category !== category) {
+        return false;
+    }
+
+    if (game.partyId) {
+        return false; // Ignore private games
+    }
+
+    if (game.winners && game.winners.length > 1) {
+        return false; // Ignore team games
+    }
+
+    return true;
+}
