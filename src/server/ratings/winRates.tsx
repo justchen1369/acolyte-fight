@@ -1,11 +1,19 @@
 import _ from 'lodash';
 import wu from 'wu';
+import * as m from '../../shared/messages.model';
 import * as aco from '../core/aco';
 import * as constants from '../../game/constants';
 import * as statsStorage from '../storage/statsStorage';
 import { Collections, Singleton } from '../storage/db.model';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
+
+const BucketRange = 50;
+
+export interface WinRateCache {
+    category: string;
+    distribution: aco.ActualWinRate[];
+}
 
 interface WinRateBucket {
     minDiff: number;
@@ -23,12 +31,13 @@ interface WinRateItem {
     numGames: number;
 }
 
-export async function calculateWinRateDistribution(category: string): Promise<aco.ActualWinRate[]> {
-    const BucketRange = 50;
+export class WinRateAccumulator {
+    private buckets = new Array<WinRateBucket>();
 
-    const start = Date.now();
-    const buckets = new Array<WinRateBucket>();
-    await statsStorage.loadAllGames(category, game => {
+    constructor(public readonly category: string) {
+    }
+
+    accept(game: m.GameStatsMsg) {
         if (game.partyId) {
             return; // Ignore private games
         }
@@ -55,9 +64,9 @@ export async function calculateWinRateDistribution(category: string): Promise<ac
                 const distance = Math.abs(diff);
 
                 const index = Math.floor(distance / BucketRange);
-                let bucket = buckets[index];
+                let bucket = this.buckets[index];
                 if (!bucket) {
-                    bucket = buckets[index] = {
+                    bucket = this.buckets[index] = {
                         minDiff: index * BucketRange,
                         maxDiff: (index + 1) * BucketRange,
                         numGames: 0,
@@ -75,15 +84,22 @@ export async function calculateWinRateDistribution(category: string): Promise<ac
                 }
             }
         }
-    });
-    const elapsed = Date.now() - start;
-    logger.info(`Calculated win rate distribution in ${elapsed} ms: ${formatBuckets(buckets)}`);
+    }
 
-    return buckets.filter(b => !!b).map(p => ({
-        midpoint: (p.maxDiff + p.minDiff) / 2,
-        winRate: p.weightedExpected / p.weightedGames,
-        numGames: p.numGames,
-    }));
+    finish(): WinRateCache {
+        logger.info(`Calculated win rate distribution: ${formatBuckets(this.buckets)}`);
+
+        const distribution = this.buckets.filter(b => !!b).map(p => ({
+            midpoint: (p.maxDiff + p.minDiff) / 2,
+            winRate: p.weightedExpected / p.weightedGames,
+            numGames: p.numGames,
+        } as aco.ActualWinRate));
+
+        return {
+            category: this.category,
+            distribution,
+        };
+    }
 }
 
 function formatBuckets(buckets: WinRateBucket[]) {

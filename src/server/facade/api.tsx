@@ -20,9 +20,9 @@ import * as kongregate from '../auth/kongregate';
 import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
-import * as percentilesProvider from '../ratings/percentilesProvider';
 import * as reevaluating from '../ratings/reevaluating';
 import * as sanitize from '../../shared/sanitize';
+import * as statsProvider from '../ratings/statsProvider';
 import * as statsStorage from '../storage/statsStorage';
 import * as userStorage from '../storage/userStorage';
 import * as winRates from '../ratings/winRates';
@@ -63,7 +63,7 @@ export function getInternalStatus() {
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
-        numUsers: percentilesProvider.estimateNumUsers(),
+        numUsers: statsProvider.estimateNumUsers(),
         numGames: store.activeGames.size,
         numPlayers: wu(store.scoreboards.values()).map(scoreboard => scoreboard.online.size).reduce((a, b) => a + b, 0),
         numConnections: store.numConnections,
@@ -357,7 +357,7 @@ export async function onGetRatingAtPercentileAsync(req: express.Request, res: ex
         return;
     }
 
-    const rating = percentilesProvider.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
+    const rating = statsProvider.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
     const response: m.GetRatingAtPercentileResponse = { rating };
     res.send(response);
 }
@@ -373,7 +373,7 @@ export async function onGetLeaguesAsync(req: express.Request, res: express.Respo
         return;
     }
 
-    await percentilesProvider.ready.promise;
+    await statsProvider.ready.promise;
 
     const category = req.params.category;
 
@@ -396,7 +396,7 @@ function estimateLeague(category: string, name: string, minPercentile: number): 
     return {
         name,
         minPercentile,
-        minRating: percentilesProvider.estimateRatingAtPercentile(category, minPercentile),
+        minRating: statsProvider.estimateRatingAtPercentile(category, minPercentile),
     };
 }
 
@@ -411,7 +411,7 @@ export async function onGetProfileAsync(req: express.Request, res: express.Respo
         return;
     }
 
-    const profile = await statsStorage.getProfile(userId, percentilesProvider.estimatePercentile);
+    const profile = await statsStorage.getProfile(userId, statsProvider.estimatePercentile);
     if (profile) {
         res.send(profile);
     } else {
@@ -574,7 +574,7 @@ export async function onGetWinRateDistributionAsync(req: express.Request, res: e
         return;
     }
 
-    const distribution = await winRates.calculateWinRateDistribution(m.GameCategory.PvP);
+    const distribution = await statsProvider.getWinRateDistribution(m.GameCategory.PvP);
     if (req.header('content-type') === "application/json") {
         res.send(distribution);
     } else {
@@ -623,6 +623,6 @@ export async function onRecalculateDistributionsAsync(req: express.Request, res:
         return;
     }
 
-    await percentilesProvider.refreshCumulativeFrequencies();
+    await statsProvider.update();
     res.send('OK');
 }

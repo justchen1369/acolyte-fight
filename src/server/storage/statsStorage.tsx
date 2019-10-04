@@ -213,6 +213,16 @@ export async function loadAllGames(category: string, callback: (game: m.GameStat
     });
 }
 
+export async function loadAllUserRatings(callback: (user: db.User) => void) {
+    const firestore = getFirestore();
+    const query = firestore.collection(db.Collections.User).select('ratings');
+
+    await dbStorage.stream(query, doc => {
+        const user = doc.data() as db.User;
+        callback(user);
+    });
+}
+
 export async function saveGameStats(gameStats: m.GameStatsMsg) {
     const firestore = getFirestore();
     const data = gameStatsToDb(gameStats);

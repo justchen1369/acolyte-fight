@@ -26,11 +26,10 @@ import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './core/matchmaking';
 import * as modder from './core/modder';
 import * as online from './core/online';
-import * as percentilesProvider from './ratings/percentilesProvider';
 import * as serverStore from './serverStore';
+import * as statsProvider from './ratings/statsProvider';
 import * as statsStorage from './storage/statsStorage';
 import * as ticker from './core/ticker';
-import * as winRateProvider from './ratings/winRateProvider';
 
 const rootDir = path.resolve('.');
 
@@ -124,11 +123,9 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
 
-percentilesProvider.init().catch(logger.error);
-winRateProvider.init().catch(logger.error);
+statsProvider.init().catch(logger.error);
 setInterval(() => {
-	percentilesProvider.update().catch(logger.error);
-	winRateProvider.update().catch(logger.error);
+	statsProvider.update().catch(logger.error);
 }, 24 * 60 * 60 * 1000); // slow-changing data
 
 setInterval(async () => {

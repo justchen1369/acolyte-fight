@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as Firestore from '@google-cloud/firestore';
 import * as db from './db.model';
+import * as dbStorage from './dbStorage';
 import * as s from '../server.model';
 import uniqid from 'uniqid';
 import { getFirestore } from './dbStorage';
