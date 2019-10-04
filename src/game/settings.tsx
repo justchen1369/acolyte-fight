@@ -2053,7 +2053,7 @@ const horcrux: Spell = {
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 60, atCursor: true, minTicks: 15 },
+                trigger: { afterTicks: 60, atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
