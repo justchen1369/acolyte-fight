@@ -86,9 +86,6 @@ function calculateCumulativeFrequency(frequency: FixedIntegerArray): FixedIntege
 }
 
 export function estimatePercentile(ratingLB: number, cache: PercentilesCache): number {
-    if (!cache) {
-        return 100;
-    }
     return estimatePercentileFrom(ratingLB, cache.cumulativeFrequency);
 }
 
@@ -114,10 +111,6 @@ function clampRead(index: number, array: FixedIntegerArray): number {
 }
 
 export function estimateRatingAtPercentile(percentile: number, cache: PercentilesCache): number {
-    if (!cache) {
-        return 0;
-    }
-
     const distribution = cache.distribution;
     const minRating = distribution.at(Math.floor(percentile));
     return minRating || 0;

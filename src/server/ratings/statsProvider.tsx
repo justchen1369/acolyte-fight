@@ -81,19 +81,39 @@ async function updateFromGames() {
 }
 
 export function estimateAcoFromNumGames(category: string, numGames: number): number {
-    return acoEstimator.estimateAcoFromNumGames(numGames, acoEstimatorCaches.get(category));
+    const cache = acoEstimatorCaches.get(category);
+    if (cache) {
+        return acoEstimator.estimateAcoFromNumGames(numGames, cache);
+    } else {
+        return constants.Placements.InitialAco;
+    }
 }
 
 export function estimatePercentile(ratingLB: number, category: string): number {
-    return percentiles.estimatePercentile(ratingLB, percentileCaches.get(category));
+    const cache = percentileCaches.get(category);
+    if (cache) {
+        return percentiles.estimatePercentile(ratingLB, cache);
+    } else {
+        return 100;
+    }
 }
 
 export function estimateRatingAtPercentile(category: string, percentile: number): number {
-    return percentiles.estimateRatingAtPercentile(percentile, percentileCaches.get(category));
+    const cache = percentileCaches.get(category);
+    if (cache) {
+        return percentiles.estimateRatingAtPercentile(percentile, cache);
+    } else {
+        return 0;
+    }
 }
 
 export function estimateNumUsers(): number {
-    return population.estimateNumUsers(populationCache);
+    const cache = populationCache;
+    if (cache) {
+        return population.estimateNumUsers(cache);
+    } else {
+        return 0;
+    }
 }
 
 export function getWinRateDistribution(category: string) {

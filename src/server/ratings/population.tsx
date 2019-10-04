@@ -19,9 +19,5 @@ export class NumUsersAccumulator {
 }
 
 export function estimateNumUsers(cache: PopulationCache): number {
-    if (cache) {
-        return cache.numUsers;
-    } else {
-        return 0;
-    }
+    return cache.numUsers;
 }
