@@ -1,21 +1,19 @@
 import _ from 'lodash';
 import moment from 'moment';
-import msgpack from 'msgpack-lite';
 import wu from 'wu';
-import * as Firestore from '@google-cloud/firestore';
-import * as aco from '../core/aco';
 import * as constants from '../../game/constants';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
-import * as mirroring from '../core/mirroring';
-import * as percentiles from '../ratings/percentiles';
-import * as userStorage from './userStorage';
 import * as s from '../server.model';
 import { Collections, Singleton } from './db.model';
 import { getFirestore } from './dbStorage';
 import { logger } from '../status/logging';
+
+export interface EstimatePercentile {
+    (ratingLB: number, category: string): number
+}
 
 export function initialRating(): g.UserRating {
     return {
@@ -136,7 +134,7 @@ export function dbToUserRating(user: db.User, category: string): g.UserRating {
     return result;
 }
 
-export function dbToProfile(userId: string, data: db.User): m.GetProfileResponse {
+export function dbToProfile(userId: string, data: db.User, estimatePercentile: EstimatePercentile): m.GetProfileResponse {
     if (!data) {
         return null;
     }
@@ -155,7 +153,7 @@ export function dbToProfile(userId: string, data: db.User): m.GetProfileResponse
                 aco: rating.aco,
                 acoGames: rating.acoGames,
                 acoExposure,
-                acoPercentile: percentiles.estimatePercentile(acoExposure, category),
+                acoPercentile: estimatePercentile(acoExposure, category),
             };
         }
     }
@@ -237,10 +235,10 @@ export async function cleanupGames(maxAgeDays: number) {
     }
 }
 
-export async function getProfile(userId: string): Promise<m.GetProfileResponse> {
+export async function getProfile(userId: string, estimatePercentile: EstimatePercentile): Promise<m.GetProfileResponse> {
     const firestore = getFirestore();
     const doc = await firestore.collection('user').doc(userId).get();
-    const profile = dbToProfile(userId, doc.data() as db.User);
+    const profile = dbToProfile(userId, doc.data() as db.User, estimatePercentile);
     return profile;
 }
 

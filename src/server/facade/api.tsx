@@ -411,7 +411,7 @@ export async function onGetProfileAsync(req: express.Request, res: express.Respo
         return;
     }
 
-    const profile = await statsStorage.getProfile(userId);
+    const profile = await statsStorage.getProfile(userId, percentiles.estimatePercentile);
     if (profile) {
         res.send(profile);
     } else {
