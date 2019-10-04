@@ -2293,7 +2293,6 @@ const phaseOut: Spell = {
     maxAngleDiffInRevs: 1.0,
     cooldown: 5 * TicksPerSecond,
     throttle: false,
-    debuff: true,
     unlink: true,
 
     maxChannellingTicks: 0.5 * TicksPerSecond,
