@@ -13,21 +13,21 @@ import * as api from './facade/api';
 import * as auth from './auth/auth';
 import { authMiddleware } from './auth/auth';
 import { attachToSocket } from './facade/emitter';
-import { setLocation } from './mirroring';
-import { logger } from './logging';
+import { setLocation } from './core/mirroring';
+import { logger } from './status/logging';
 import * as dbStorage from './storage/dbStorage';
 import * as discord from './auth/discord';
 import * as emitter from './facade/emitter';
 import * as facebook from './auth/facebook';
 import * as kongregate from './auth/kongregate';
 import * as gameStorage from './storage/gameStorage';
-import * as matchmaking from './matchmaking';
-import * as modder from './modder';
-import * as online from './online';
-import * as percentiles from './percentiles';
+import * as matchmaking from './core/matchmaking';
+import * as modder from './core/modder';
+import * as online from './core/online';
+import * as percentiles from './core/percentiles';
 import * as serverStore from './serverStore';
 import * as statsStorage from './storage/statsStorage';
-import * as ticker from './ticker';
+import * as ticker from './core/ticker';
 
 const rootDir = path.resolve('.');
 

@@ -10,7 +10,7 @@ import * as m from '../../shared/messages.model';
 import * as sanitize from '../../shared/sanitize';
 import * as userStorage from '../storage/userStorage';
 
-import { logger } from '../logging';
+import { logger } from '../status/logging';
 
 interface CreateUserArgs {
     accessKey: string;

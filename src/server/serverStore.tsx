@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import * as g from './server.model';
-import { logger } from './logging';
+import { logger } from './status/logging';
 
 let store: g.ServerStore = {
     nextPartyId: 0,

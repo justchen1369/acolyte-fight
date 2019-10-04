@@ -4,7 +4,7 @@ import zlib from 'zlib';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
 import { getStore } from '../serverStore';
-import { logger } from '../logging';
+import { logger } from '../status/logging';
 
 let basePath: string = null;
 

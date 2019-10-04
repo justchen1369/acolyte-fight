@@ -1,16 +1,16 @@
 import _ from 'lodash';
 import moment from 'moment';
 import wu from 'wu';
-import * as constants from '../game/constants';
-import * as g from './server.model';
-import * as m from '../shared/messages.model';
+import * as constants from '../../game/constants';
+import * as g from '../server.model';
+import * as m from '../../shared/messages.model';
 import * as Firestore from '@google-cloud/firestore';
-import * as db from './storage/db.model';
-import * as dbStorage from './storage/dbStorage';
+import * as db from '../storage/db.model';
+import * as dbStorage from '../storage/dbStorage';
 import * as mirroring from './mirroring';
-import { getFirestore } from './storage/dbStorage';
-import { logger } from './logging';
-import { getStore } from './serverStore';
+import { getFirestore } from '../storage/dbStorage';
+import { logger } from '../status/logging';
+import { getStore } from '../serverStore';
 
 const OnlineExpirySeconds = 20 * 60;
 const TextExpirySeconds = 1 * 60;

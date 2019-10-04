@@ -14,21 +14,21 @@ import * as categories from '../../shared/segments';
 import * as constants from '../../game/constants';
 import * as discord from '../auth/discord';
 import * as facebook from '../auth/facebook';
-import * as games from '../games';
+import * as games from '../core/games';
 import * as gameStorage from '../storage/gameStorage';
 import * as kongregate from '../auth/kongregate';
-import * as loadMetrics from '../loadMetrics';
-import * as mirroring from '../mirroring';
-import * as percentiles from '../percentiles';
+import * as loadMetrics from '../status/loadMetrics';
+import * as mirroring from '../core/mirroring';
+import * as percentiles from '../core/percentiles';
 import * as sanitize from '../../shared/sanitize';
 import * as statsStorage from '../storage/statsStorage';
 import * as userStorage from '../storage/userStorage';
 
 import { getAuthToken } from '../auth/auth';
-import { getLocation } from '../mirroring';
+import { getLocation } from '../core/mirroring';
 import { getStore } from '../serverStore';
-import { logger } from '../logging';
-import { required, optional } from '../schema';
+import { logger } from '../status/logging';
+import { required, optional } from '../utils/schema';
 import { DefaultSettings } from '../../game/settings';
 
 let port: number = null;

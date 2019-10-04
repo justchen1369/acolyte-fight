@@ -3,17 +3,17 @@ import crypto from 'crypto';
 import deferred from 'promise-defer';
 import moment from 'moment';
 import * as Firestore from '@google-cloud/firestore';
-import * as categories from '../shared/segments';
-import * as constants from '../game/constants';
-import * as db from './storage/db.model';
-import * as dbStorage from './storage/dbStorage';
-import * as g from './server.model';
-import * as m from '../shared/messages.model';
+import * as categories from '../../shared/segments';
+import * as constants from '../../game/constants';
+import * as db from '../storage/db.model';
+import * as dbStorage from '../storage/dbStorage';
+import * as g from '../server.model';
+import * as m from '../../shared/messages.model';
 import * as mirroring from './mirroring';
-import * as s from './server.model';
-import { Collections } from './storage/db.model';
-import { FixedIntegerArray } from './fixedIntegerArray';
-import { logger } from './logging';
+import * as s from '../server.model';
+import { Collections } from '../storage/db.model';
+import { FixedIntegerArray } from '../utils/fixedIntegerArray';
+import { logger } from '../status/logging';
 
 interface DbFrequenciesResult {
     frequencies: Map<string, FixedIntegerArray>;

@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 import formUrlEncoded from 'form-urlencoded';
-import { logger } from '../logging';
+import { logger } from '../status/logging';
 import urlJoin from 'url-join';
 
 export interface DiscordUser {

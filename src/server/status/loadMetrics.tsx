@@ -1,7 +1,7 @@
 import _ from 'lodash';
-import { getStore } from './serverStore';
-import { TicksPerTurn, TicksPerSecond } from '../game/constants';
-import * as m from '../shared/messages.model';
+import { getStore } from '../serverStore';
+import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
+import * as m from '../../shared/messages.model';
 
 export function addTickMilliseconds(milliseconds: number) {
     getStore().recentTickMilliseconds.push(milliseconds);

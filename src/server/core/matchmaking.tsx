@@ -1,14 +1,14 @@
 import _ from 'lodash';
 import wu from 'wu';
 import * as aco from './aco';
-import * as g from './server.model';
+import * as g from '../server.model';
 import * as games from './games';
-import * as m from '../shared/messages.model';
+import * as m from '../../shared/messages.model';
 import * as percentiles from './percentiles';
-import * as segments from '../shared/segments';
-import * as statsStorage from './storage/statsStorage';
-import { getStore } from './serverStore';
-import { logger } from './logging';
+import * as segments from '../../shared/segments';
+import * as statsStorage from '../storage/statsStorage';
+import { getStore } from '../serverStore';
+import { logger } from '../status/logging';
 
 export interface SocketTeam {
     socketId: string;

@@ -3,15 +3,15 @@ import crypto from 'crypto';
 import moment from 'moment';
 import uniqid from 'uniqid';
 import wu from 'wu';
-import * as constants from '../game/constants';
-import * as g from './server.model';
-import * as m from '../shared/messages.model';
-import * as w from '../game/world.model';
-import * as auth from './auth/auth';
+import * as constants from '../../game/constants';
+import * as g from '../server.model';
+import * as m from '../../shared/messages.model';
+import * as w from '../../game/world.model';
+import * as auth from '../auth/auth';
 import * as games from './games';
 import * as matchmaking from './matchmaking';
-import { getStore } from './serverStore';
-import { logger } from './logging';
+import { getStore } from '../serverStore';
+import { logger } from '../status/logging';
 
 let emitParty: PartyEmitter = null;
 

@@ -2,25 +2,24 @@ import _ from 'lodash';
 import uniqid from 'uniqid';
 import wu from 'wu';
 import * as auth from '../auth/auth';
-import * as blacklist from '../blacklist';
 import * as segments from '../../shared/segments';
-import * as games from '../games';
+import * as games from '../core/games';
 import { getAuthTokenFromSocket } from '../auth/auth';
 import { getStore } from '../serverStore';
-import { getLocation } from '../mirroring';
-import { logger } from '../logging';
-import { required, optional } from '../schema';
+import { getLocation } from '../core/mirroring';
+import { logger } from '../status/logging';
+import { required, optional } from '../utils/schema';
 import * as PlayerName from '../../shared/sanitize';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
 import * as constants from '../../game/constants';
 import * as gameStorage from '../storage/gameStorage';
-import * as matchmaking from '../matchmaking';
-import * as mirroring from '../mirroring';
-import * as modder from '../modder';
-import * as online from '../online';
-import * as parties from '../parties';
-import * as ticker from '../ticker';
+import * as matchmaking from '../core/matchmaking';
+import * as mirroring from '../core/mirroring';
+import * as modder from '../core/modder';
+import * as online from '../core/online';
+import * as parties from '../core/parties';
+import * as ticker from '../core/ticker';
 
 let shuttingDown = false;
 let upstreams = new Map<string, SocketIOClient.Socket>(); // socketId -> upstream
@@ -468,7 +467,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		}
 
 		const partyId: string = data.partyId;
-		const locked = data.locked || (blacklist.isBlocked(socket.id) ? m.LockType.Blocked : null);
+		const locked = data.locked;
 
 		if (data.observe) {
 			replay = matchmaking.findExistingGame(data.version, room, partyId);
