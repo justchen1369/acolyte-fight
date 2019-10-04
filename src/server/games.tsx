@@ -7,7 +7,7 @@ import { Matchmaking, TicksPerSecond, MaxIdleTicks, TicksPerTurn } from '../game
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
-import * as auth from './auth';
+import * as auth from './auth/auth';
 import * as blacklist from './blacklist';
 import * as segments from '../shared/segments';
 import * as constants from '../game/constants';

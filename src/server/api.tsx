@@ -9,14 +9,14 @@ import * as http from 'http';
 
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
-import * as auth from './auth';
+import * as auth from './auth/auth';
 import * as categories from '../shared/segments';
 import * as constants from '../game/constants';
-import * as discord from './discord';
-import * as facebook from './facebook';
+import * as discord from './auth/discord';
+import * as facebook from './auth/facebook';
 import * as games from './games';
 import * as gameStorage from './storage/gameStorage';
-import * as kongregate from './kongregate';
+import * as kongregate from './auth/kongregate';
 import * as loadMetrics from './loadMetrics';
 import * as mirroring from './mirroring';
 import * as percentiles from './percentiles';
@@ -24,7 +24,7 @@ import * as sanitize from '../shared/sanitize';
 import * as statsStorage from './storage/statsStorage';
 import * as userStorage from './storage/userStorage';
 
-import { getAuthToken } from './auth';
+import { getAuthToken } from './auth/auth';
 import { getLocation } from './mirroring';
 import { getStore } from './serverStore';
 import { logger } from './logging';

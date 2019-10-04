@@ -7,7 +7,7 @@ import * as constants from '../game/constants';
 import * as g from './server.model';
 import * as m from '../shared/messages.model';
 import * as w from '../game/world.model';
-import * as auth from './auth';
+import * as auth from './auth/auth';
 import * as games from './games';
 import * as matchmaking from './matchmaking';
 import { getStore } from './serverStore';

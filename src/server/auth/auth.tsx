@@ -5,12 +5,12 @@ import express from 'express';
 import uniqid from 'uniqid';
 
 import * as discord from './discord';
-import * as g from './server.model';
-import * as m from '../shared/messages.model';
-import * as sanitize from '../shared/sanitize';
-import * as userStorage from './storage/userStorage';
+import * as g from '../server.model';
+import * as m from '../../shared/messages.model';
+import * as sanitize from '../../shared/sanitize';
+import * as userStorage from '../storage/userStorage';
 
-import { logger } from './logging';
+import { logger } from '../logging';
 
 interface CreateUserArgs {
     accessKey: string;

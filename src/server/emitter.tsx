@@ -1,11 +1,11 @@
 import _ from 'lodash';
 import uniqid from 'uniqid';
 import wu from 'wu';
-import * as auth from './auth';
+import * as auth from './auth/auth';
 import * as blacklist from './blacklist';
 import * as segments from '../shared/segments';
 import * as games from './games';
-import { getAuthTokenFromSocket } from './auth';
+import { getAuthTokenFromSocket } from './auth/auth';
 import { getStore } from './serverStore';
 import { getLocation } from './mirroring';
 import { logger } from './logging';
