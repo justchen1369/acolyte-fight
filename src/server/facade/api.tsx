@@ -21,7 +21,7 @@ import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
 import * as percentilesProvider from '../ratings/percentilesProvider';
-import * as ratings from '../ratings/ratings';
+import * as reevaluating from '../ratings/reevaluating';
 import * as sanitize from '../../shared/sanitize';
 import * as statsStorage from '../storage/statsStorage';
 import * as userStorage from '../storage/userStorage';
@@ -609,7 +609,7 @@ export async function onReevaluateAcoAsync(req: express.Request, res: express.Re
         return;
     }
 
-    const numAffected = await ratings.reevaluteAco();
+    const numAffected = await reevaluating.reevaluteAco();
     res.send(`${numAffected} rows affected`);
 }
 
