@@ -1483,7 +1483,7 @@ const drain: Spell = {
         radius: 0.002,
         speed: 0.2,
         maxTicks: 2.0 * TicksPerSecond,
-        damage: 12,
+        damage: 15,
         lifeSteal: 1,
 
         behaviours: [
