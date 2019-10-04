@@ -202,10 +202,10 @@ const Choices: ChoiceSettings = {
             ["kamehameha", "blast"],
         ],
 		"f": [
-            ["bump", "scourge", "blaze"],
+            ["bump", "scourge"],
             ["firespray", "iceBomb"],
             ["mines"],
-            ["halo"],
+            ["halo", "blaze"],
         ],
 	},
     Special: {
