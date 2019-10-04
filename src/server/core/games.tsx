@@ -11,7 +11,7 @@ import * as segments from '../../shared/segments';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
 import * as online from './online';
-import * as ratings from './ratings';
+import * as ratings from '../ratings/ratings';
 import * as results from './results';
 import * as statsStorage from '../storage/statsStorage';
 import * as transientIds from '../utils/transientIds';

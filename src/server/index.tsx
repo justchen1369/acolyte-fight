@@ -15,8 +15,8 @@ import { authMiddleware } from './auth/auth';
 import { attachToSocket } from './facade/emitter';
 import { setLocation } from './core/mirroring';
 import { logger } from './status/logging';
-import * as decaying from './core/decaying';
-import * as deflating from './core/deflating';
+import * as decaying from './ratings/decaying';
+import * as deflating from './ratings/deflating';
 import * as dbStorage from './storage/dbStorage';
 import * as discord from './auth/discord';
 import * as emitter from './facade/emitter';
@@ -26,11 +26,11 @@ import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './core/matchmaking';
 import * as modder from './core/modder';
 import * as online from './core/online';
-import * as percentiles from './core/percentiles';
+import * as percentiles from './ratings/percentiles';
 import * as serverStore from './serverStore';
 import * as statsStorage from './storage/statsStorage';
 import * as ticker from './core/ticker';
-import * as winRates from './core/winRates';
+import * as winRates from './ratings/winRates';
 
 const rootDir = path.resolve('.');
 

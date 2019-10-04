@@ -4,10 +4,10 @@ import * as aco from './aco';
 import * as g from '../server.model';
 import * as games from './games';
 import * as m from '../../shared/messages.model';
-import * as percentiles from './percentiles';
+import * as percentiles from '../ratings/percentiles';
 import * as segments from '../../shared/segments';
 import * as statsStorage from '../storage/statsStorage';
-import * as winRates from './winRates';
+import * as winRates from '../ratings/winRates';
 import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
 

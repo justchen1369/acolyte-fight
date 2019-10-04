@@ -10,7 +10,7 @@ import * as dbStorage from './dbStorage';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
 import * as mirroring from '../core/mirroring';
-import * as percentiles from '../core/percentiles';
+import * as percentiles from '../ratings/percentiles';
 import * as userStorage from './userStorage';
 import * as s from '../server.model';
 import { Collections, Singleton } from './db.model';

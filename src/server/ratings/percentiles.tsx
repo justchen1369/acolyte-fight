@@ -9,7 +9,7 @@ import * as db from '../storage/db.model';
 import * as dbStorage from '../storage/dbStorage';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
-import * as mirroring from './mirroring';
+import * as mirroring from '../core/mirroring';
 import * as s from '../server.model';
 import { Collections } from '../storage/db.model';
 import { FixedIntegerArray } from '../utils/fixedIntegerArray';
