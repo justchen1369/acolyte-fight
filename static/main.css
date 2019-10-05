@@ -2380,7 +2380,7 @@ textarea {
 }
 
 .spell-frequencies-icon canvas {
-    box-shadow: 0.2em 0.2em #0004;
+    box-shadow: 0.1em 0.1em #0004;
 }
 
 .spell-frequencies-name {
@@ -2424,7 +2424,7 @@ textarea {
     align-items: flex-start;
     background-color: #333;
 
-    box-shadow: 0.2em 0.2em #0004;
+    box-shadow: 0.1em 0.1em #0004;
 }
 
 .percentage-bar-fill {
