@@ -106,8 +106,6 @@ app.get('/api/leagues/:category', (req, res) => api.onGetLeagues(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/profile', (req, res) => api.onGetProfile(req, res));
 app.get('/api/ratingAtPercentile', (req, res) => api.onGetRatingAtPercentile(req, res));
-app.post('/api/ratings/recalculatePercentiles', (req, res) => api.onRecalculateDistributions(req, res));
-app.post('/api/ratings/reevaluate', (req, res) => api.onReevaluateAco(req, res));
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));
 app.post('/api/settings', (req, res) => api.onUpdateUserSettings(req, res));
@@ -123,10 +121,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
 
-statsProvider.init().catch(logger.error);
-setInterval(() => {
-	statsProvider.update().catch(logger.error);
-}, 24 * 60 * 60 * 1000); // slow-changing data
+statsProvider.startUpdateLoop().catch(logger.error);
 
 setInterval(async () => {
 	try {

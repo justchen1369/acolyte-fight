@@ -20,7 +20,6 @@ import * as kongregate from '../auth/kongregate';
 import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
-import * as reevaluating from '../ratings/reevaluating';
 import * as sanitize from '../../shared/sanitize';
 import * as statsProvider from '../ratings/statsProvider';
 import * as statsStorage from '../storage/statsStorage';
@@ -597,32 +596,4 @@ function jsonToCsv(array: any[]) {
     }
 
     return rows.join("\n");
-}
-
-export function onReevaluateAco(req: express.Request, res: express.Response) {
-    onReevaluateAcoAsync(req, res).catch(error => handleError(error, res));
-}
-
-export async function onReevaluateAcoAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
-        res.status(403).send("Forbidden");
-        return;
-    }
-
-    const numAffected = await reevaluating.reevaluteAco();
-    res.send(`${numAffected} rows affected`);
-}
-
-export function onRecalculateDistributions(req: express.Request, res: express.Response) {
-    onRecalculateDistributionsAsync(req, res).catch(error => handleError(error, res));
-}
-
-export async function onRecalculateDistributionsAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.a && req.query.a === auth.getEnigmaSecret())) {
-        res.status(403).send("Forbidden");
-        return;
-    }
-
-    await statsProvider.update();
-    res.send('OK');
 }

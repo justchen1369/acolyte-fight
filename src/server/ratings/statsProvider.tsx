@@ -15,72 +15,113 @@ import * as statsStorage from '../storage/statsStorage';
 import * as winRates from './winRates';
 import { logger } from '../status/logging';
 
-export const ready = deferred<void>();
+const IncrementalUpdateInterval = 60 * 1000;
+const FullUpdateInterval = 24 * 60 * 60 * 1000;
 
-const acoEstimatorCaches = new Map<string, acoEstimator.AcoEstimatorCache>();
-const percentileCaches = new Map<string, percentiles.PercentilesCache>();
-const winRateCaches = new Map<string, winRates.WinRateCache>();
-let populationCache: population.PopulationCache = null;
+let nextFullUpdate = Date.now() + FullUpdateInterval;
 
-export async function init() {
+class GameAccumulator {
+    readonly winRateCaches = new Map<string, winRates.WinRateCache>();
+
+    private latestGameUnix = 0;
+    private winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
+
+    constructor() {
+    }
+
+    // performs incremental update
+    async update() {
+        const start = Date.now();
+
+        let numGames = 0;
+        await statsStorage.streamAllGamesAfter(this.latestGameUnix, game => {
+            this.winRateAccumulator.accept(game);
+
+            ++numGames;
+
+            if (game.unixTimestamp) {
+                this.latestGameUnix = Math.max(this.latestGameUnix, game.unixTimestamp);
+            }
+        });
+
+        const winRateCache = this.winRateAccumulator.calculate();
+        this.winRateCaches.set(winRateCache.category, winRateCache);
+
+        const elapsed = Date.now() - start;
+        logger.info(`Processed ${numGames} games in ${elapsed.toFixed(0)} ms`);
+    }
+}
+
+class UserAccumulator {
+    acoEstimatorCaches = new Map<string, acoEstimator.AcoEstimatorCache>();
+    percentileCaches = new Map<string, percentiles.PercentilesCache>();
+    populationCache: population.PopulationCache = null;
+
+    // performs non-incremental update
+    async update() {
+        const start = Date.now();
+
+        const populationAccumulator = new population.NumUsersAccumulator();
+        const percentileAccumulator = new percentiles.PercentilesAccumulator(m.GameCategory.PvP);
+        const acoEstimationAccumulator = new acoEstimator.NumGamesToAcoAccumulator(m.GameCategory.PvP);
+
+        let numUsers = 0;
+        await statsStorage.streamAllUserRatings(user => {
+            populationAccumulator.accept(user);
+            percentileAccumulator.accept(user);
+            acoEstimationAccumulator.accept(user);
+
+            ++numUsers;
+        });
+
+        this.populationCache = populationAccumulator.finish();
+
+        const acoEstimatorCache = acoEstimationAccumulator.finish();
+        this.acoEstimatorCaches.set(acoEstimatorCache.category, acoEstimatorCache);
+
+        const percentileCache = percentileAccumulator.finish();
+        this.percentileCaches.set(percentileCache.category, percentileCache);
+
+        const elapsed = Date.now() - start;
+        logger.info(`Processed ${numUsers} users in ${elapsed.toFixed(0)} ms`);
+    }
+}
+
+export async function startUpdateLoop() {
     await update();
     ready.resolve();
+    updateLoop();
 }
 
-export async function update() {
-    await updateFromUsers();
-    await updateFromGames();
+function updateLoop() {
+    setTimeout(async () => {
+        await update();
+        updateLoop();
+    }, IncrementalUpdateInterval);
 }
 
-async function updateFromUsers() {
-    const start = Date.now();
+async function update() {
+    try {
+        if (Date.now() < nextFullUpdate) {
+            await gameAccumulator.update(); // Performs incremental update
 
-    const populationAccumulator = new population.NumUsersAccumulator();
-    const percentileAccumulator = new percentiles.PercentilesAccumulator(m.GameCategory.PvP);
-    const acoEstimationAccumulator = new acoEstimator.NumGamesToAcoAccumulator(m.GameCategory.PvP);
+            // Don't update users because that is non-incremental
+        } else {
+            const newUserAccumulator = new UserAccumulator();
+            await newUserAccumulator.update();
+            userAccumulator = newUserAccumulator;
 
-    let numUsers = 0;
-    await statsStorage.loadAllUserRatings(user => {
-        populationAccumulator.accept(user);
-        percentileAccumulator.accept(user);
-        acoEstimationAccumulator.accept(user);
-
-        ++numUsers;
-    });
-
-    populationCache = populationAccumulator.finish();
-
-    const acoEstimatorCache = acoEstimationAccumulator.finish();
-    acoEstimatorCaches.set(acoEstimatorCache.category, acoEstimatorCache);
-
-    const percentileCache = percentileAccumulator.finish();
-    percentileCaches.set(percentileCache.category, percentileCache);
-
-    const elapsed = Date.now() - start;
-    logger.info(`Processed ${numUsers} users in ${elapsed.toFixed(0)} ms`);
-}
-
-async function updateFromGames() {
-    const start = Date.now();
-
-    const winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
-
-    let numGames = 0;
-    await statsStorage.loadAllGames(game => {
-        winRateAccumulator.accept(game);
-
-        ++numGames;
-    });
-
-    const winRateCache = winRateAccumulator.finish();
-    winRateCaches.set(winRateCache.category, winRateCache);
-
-    const elapsed = Date.now() - start;
-    logger.info(`Processed ${numGames} games in ${elapsed.toFixed(0)} ms`);
+            const newGameAccumulator = new GameAccumulator();
+            await newGameAccumulator.update();
+            gameAccumulator = newGameAccumulator;
+        }
+    } catch (exception) {
+        logger.error("statsProvider failed to update", exception);
+    }
 }
 
 export function estimateAcoFromNumGames(category: string, numGames: number): number {
-    const cache = acoEstimatorCaches.get(category);
+    const cache = userAccumulator.acoEstimatorCaches.get(category);
     if (cache) {
         return acoEstimator.estimateAcoFromNumGames(numGames, cache);
     } else {
@@ -89,7 +130,7 @@ export function estimateAcoFromNumGames(category: string, numGames: number): num
 }
 
 export function estimatePercentile(ratingLB: number, category: string): number {
-    const cache = percentileCaches.get(category);
+    const cache = userAccumulator.percentileCaches.get(category);
     if (cache) {
         return percentiles.estimatePercentile(ratingLB, cache);
     } else {
@@ -98,7 +139,7 @@ export function estimatePercentile(ratingLB: number, category: string): number {
 }
 
 export function estimateRatingAtPercentile(category: string, percentile: number): number {
-    const cache = percentileCaches.get(category);
+    const cache = userAccumulator.percentileCaches.get(category);
     if (cache) {
         return percentiles.estimateRatingAtPercentile(percentile, cache);
     } else {
@@ -107,7 +148,7 @@ export function estimateRatingAtPercentile(category: string, percentile: number)
 }
 
 export function estimateNumUsers(): number {
-    const cache = populationCache;
+    const cache = userAccumulator.populationCache;
     if (cache) {
         return population.estimateNumUsers(cache);
     } else {
@@ -116,10 +157,15 @@ export function estimateNumUsers(): number {
 }
 
 export function getWinRateDistribution(category: string) {
-    const cache = winRateCaches.get(category);
+    const cache = gameAccumulator.winRateCaches.get(category);
     if (cache) {
         return cache.distribution;
     } else {
         return [];
     }
 }
+
+export const ready = deferred<void>();
+
+let gameAccumulator = new GameAccumulator();
+let userAccumulator = new UserAccumulator();

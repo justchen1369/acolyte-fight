@@ -201,9 +201,9 @@ export async function loadGamesForUser(userId: string, after: number | null, bef
     return games;
 }
 
-export async function loadAllGames(callback: (game: m.GameStatsMsg) => void) {
+export async function streamAllGamesAfter(afterUnix: number, callback: (game: m.GameStatsMsg) => void) {
     const firestore = getFirestore();
-    let query = firestore.collection(Collections.Game);
+    let query = firestore.collection(Collections.Game).where('unixTimestamp', '>', afterUnix);
 
     await dbStorage.stream(query, gameDoc => {
         const game = dbToGameStats(gameDoc.id, gameDoc.data() as db.Game);
@@ -211,7 +211,7 @@ export async function loadAllGames(callback: (game: m.GameStatsMsg) => void) {
     });
 }
 
-export async function loadAllUserRatings(callback: (user: db.User) => void) {
+export async function streamAllUserRatings(callback: (user: db.User) => void) {
     const firestore = getFirestore();
     const query = firestore.collection(db.Collections.User).select('ratings');
 
