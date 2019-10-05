@@ -1077,7 +1077,6 @@ const rocket: Spell = {
         },
 
         behaviours: [
-            { type: "strafe" },
             {
                 type: "homing",
                 targetType: "follow",
