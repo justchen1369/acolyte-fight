@@ -43,6 +43,7 @@ export interface World {
 	players: Immutable.Map<string, Player>; // heroId -> Player
 	controlKeys: Map<number, string>; // controlKey -> heroId
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
+	spellRecords: Map<string, string[]>; // heroId -> spellId[]
 	teamAssignments: Immutable.Map<string, string>; // heroId -> teamId
 	teams: Immutable.Map<string, Team>; // teamId -> Team
 	winner: string | null; // heroId

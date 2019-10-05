@@ -95,6 +95,8 @@ export interface PlayerStats {
     ticks: number;
     rank: number;
 
+    spellIds?: string[];
+
     initialNumGames?: number;
     initialAco?: number;
     initialAcoGames?: number;

@@ -62,6 +62,8 @@ export function playerToDb(p: m.PlayerStatsMsg): db.PlayerStats {
         ticks: p.ticks,
         rank: p.rank,
 
+        spellIds: p.spellIds,
+
         initialNumGames: p.initialNumGames,
 
         initialAco: p.initialAco,
@@ -113,6 +115,7 @@ export function dbToPlayer(player: db.PlayerStats): m.PlayerStatsMsg {
         outlasts: player.outlasts,
         ticks: player.ticks || 0, // Might not be present in old data
         rank: player.rank || 0, // Might not be present in old data
+        spellIds: player.spellIds || [], // Might not be present in old data
         initialNumGames: player.initialNumGames,
         initialAco: player.initialAco,
         initialAcoGames: player.initialAcoGames,

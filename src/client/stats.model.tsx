@@ -25,6 +25,8 @@ export interface PlayerStats {
     damage: number;
     rank: number;
     ticks: number;
+
+    spellIds?: string[];
     
     initialNumGames?: number;
 

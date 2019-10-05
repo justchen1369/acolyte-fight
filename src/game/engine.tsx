@@ -97,6 +97,7 @@ export function initialWorld(mod: Object): w.World {
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
 		controlKeys: new Map(),
+		spellRecords: new Map(),
 		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
 		teamAssignments: Immutable.Map<string, string>(), // hero ID -> team ID
 		scores: Immutable.Map<string, w.HeroScore>(), // hero ID -> score
@@ -1790,6 +1791,11 @@ function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: 
 		hero.spellChangedTick.set(spellId, world.tick);
 		attachSpell(spellId, hero, world);
 	});
+
+	if (world.tick < world.startTick) {
+		// Record which spells were used for stats later
+		world.spellRecords.set(hero.id, newSpellIds);
+	}
 }
 
 function attachSpell(spellId: string, hero: w.Hero, world: w.World) {

@@ -353,6 +353,8 @@ export interface PlayerStatsMsg {
     rank: number;
     ticks: number;
     
+    spellIds?: string[];
+    
     initialNumGames?: number;
     initialAco?: number;
     initialAcoGames?: number;

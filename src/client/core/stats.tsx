@@ -87,6 +87,7 @@ function playerStatsToMessage(playerStats: d.PlayerStats): m.PlayerStatsMsg {
         damage: playerStats.damage,
         ticks: playerStats.ticks,
         rank: playerStats.rank,
+        spellIds: playerStats.spellIds,
     };
 }
 
@@ -104,6 +105,8 @@ export function messageToGameStats(msg: m.GameStatsMsg, userId: string): d.GameS
             outlasts: p.outlasts,
             rank: p.rank,
             ticks: p.ticks,
+
+            spellIds: p.spellIds,
 
             initialNumGames: p.initialNumGames,
 
@@ -168,7 +171,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
             if (player.userHash && !player.left) {
                 ++numHumans;
                 const teamId = engine.getTeam(player.heroId, world);
-                players.push(playerStatsFromScore(player, teamId, score));
+                players.push(playerStatsFromScore(player, teamId, score, world.spellRecords.get(player.heroId)));
             } else {
                 ++numAI;
             }
@@ -216,7 +219,7 @@ function gameStatsFromWorld(world: w.World, server: string): d.GameStats {
     return stats;
 }
 
-function playerStatsFromScore(player: w.Player, teamId: string, score: w.HeroScore): d.PlayerStats {
+function playerStatsFromScore(player: w.Player, teamId: string, score: w.HeroScore, spellIds: string[]): d.PlayerStats {
     return {
         userId: player.userId,
         userHash: player.userHash,
@@ -227,5 +230,6 @@ function playerStatsFromScore(player: w.Player, teamId: string, score: w.HeroSco
         damage: Math.round(score.damage),
         ticks: score.deathTick,
         rank: score.rank,
+        spellIds: spellIds || [],
     };
 }
