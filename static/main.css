@@ -2354,6 +2354,10 @@ textarea {
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
+.spell-frequencies-table tr:hover .percentage-bar-label {
+    color: #fff;
+}
+
 .spell-frequencies-table td {
     padding: 0.5em;
     vertical-align: middle;
@@ -2368,11 +2372,11 @@ textarea {
 }
 
 .spell-frequencies-col-popularity {
-    width: 15em;
+    min-width: 15em;
 }
 
 .spell-frequencies-col-win-rate {
-    width: 15em;
+    min-width: 15em;
 }
 
 .spell-frequencies-icon canvas {
@@ -2397,6 +2401,18 @@ textarea {
 
 .spell-frequencies-win-rate .percentage-bar-fill {
     background-color: #f0c;
+}
+
+.percentage-bar-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.percentage-bar-label {
+    font-size: 75%;
+    margin-left: 1em;
+    color: #999;
 }
 
 .percentage-bar {

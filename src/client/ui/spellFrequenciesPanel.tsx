@@ -142,8 +142,14 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderPercentage(proportion: number) {
-        return <div className="percentage-bar">
-            <div className="percentage-bar-fill" style={{ width: `${(proportion * 100).toFixed(1)}%` }}></div>
+        const percentageFormatted = `${((proportion || 0) * 100).toFixed(1)}%`;
+        return <div className="percentage-bar-container">
+            <div className="percentage-bar">
+                <div className="percentage-bar-fill" style={{ width: percentageFormatted }}></div>
+            </div>
+            <div className="percentage-bar-label">
+                {percentageFormatted}
+            </div>
         </div>
     }
 
