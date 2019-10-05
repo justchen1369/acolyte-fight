@@ -30,7 +30,6 @@ function stateToProps(state: s.State): Props {
 
 function groupFrequencies(frequencies: m.SpellFrequency[]): SpellBtnStats[] {
     const frequencyLookup = _.keyBy(frequencies, x => x.spellId);
-    console.log(frequencies, frequencyLookup);
     const choices = DefaultSettings.Choices;
 
     const allStats = new Array<SpellBtnStats>();
@@ -40,7 +39,6 @@ function groupFrequencies(frequencies: m.SpellFrequency[]): SpellBtnStats[] {
         }
 
         const spellIds = _.flatten(choices.Options[btnConfig.btn]);
-        console.log("spells", btnConfig.btn, spellIds);
         let frequencies = spellIds.map(spellId => frequencyLookup[spellId]).filter(x => !!x);
         frequencies = _.orderBy(frequencies, x => -x.usages);
         const stats: SpellBtnStats = {
