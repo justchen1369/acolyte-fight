@@ -328,7 +328,7 @@ function applyRanked(playerDelta: PlayerDelta, initialRating: g.UserRating, self
     const finalExposure = statsStorage.calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
 
     return {
-        isRanked: false,
+        isRanked: true,
         initialNumGames: initialRating.numGames,
         initialAco: initialRating.aco,
         initialAcoGames: initialRating.acoGames,
