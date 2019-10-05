@@ -144,6 +144,8 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderNewVersion(): React.ReactNode {
+        return null;
+        /*
         return <div className="info-panel dialog-panel">
             <div className="header-row">Recent Updates</div>
             <div className="body-row">Movement speed increased 10%.</div>
@@ -152,6 +154,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
                 <Button className="btn" onClick={(e) => this.onCloseVersionClicked()}>OK</Button>
             </div>
         </div>
+        */
     }
 
     private onHideTutorialClick() {
