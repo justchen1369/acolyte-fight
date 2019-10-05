@@ -1,6 +1,6 @@
 import _ from 'lodash';
+import wu from 'wu';
 import deferred from 'promise-defer';
-import moment from 'moment';
 import * as db from '../storage/db.model';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
@@ -167,6 +167,15 @@ export function getWinRateDistribution(category: string) {
     const cache = gameAccumulator.winRateCaches.get(category);
     if (cache) {
         return cache.distribution;
+    } else {
+        return [];
+    }
+}
+
+export function getSpellFrequencies(category: string): m.SpellFrequency[] {
+    const cache = gameAccumulator.spellFrequencyCaches.get(category);
+    if (cache) {
+        return wu(cache.distribution.values()).toArray() as m.SpellFrequency[];
     } else {
         return [];
     }

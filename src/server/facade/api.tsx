@@ -577,6 +577,7 @@ export async function onGetWinRateDistributionAsync(req: express.Request, res: e
     if (req.header('content-type') === "application/json") {
         res.send(distribution);
     } else {
+        res.header('Content-Type', 'text/csv');
         res.send(jsonToCsv(distribution));
     }
 }
@@ -596,4 +597,23 @@ function jsonToCsv(array: any[]) {
     }
 
     return rows.join("\n");
+}
+
+export function onGetSpellFrequencies(req: express.Request, res: express.Response) {
+    onGetSpellFrequenciesAsync(req, res).catch(error => handleError(error, res));
+}
+
+export async function onGetSpellFrequenciesAsync(req: express.Request, res: express.Response): Promise<void> {
+    if (!(req.query.category)) {
+        res.status(400).send("Bad request");
+        return;
+    }
+
+    const distribution = await statsProvider.getSpellFrequencies(m.GameCategory.PvP);
+    if (req.header('content-type') === "application/json") {
+        res.send(distribution);
+    } else {
+        res.header('Content-Type', 'text/csv');
+        res.send(jsonToCsv(distribution));
+    }
 }
