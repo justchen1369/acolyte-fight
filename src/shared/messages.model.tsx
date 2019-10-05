@@ -430,9 +430,6 @@ export interface UserRating {
     winRate: number;
 }
 
-export interface SpellFrequencyRequest {
-    category: string;
-}
 export interface SpellFrequencyResponse {
     category: string;
     frequencies: SpellFrequency[];

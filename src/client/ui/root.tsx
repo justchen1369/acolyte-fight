@@ -15,6 +15,7 @@ import PrivacyPolicyPanel from './privacyPolicyPanel';
 import ProfilePanel from '../profiles/profilePanel';
 import RecordPanel from '../play/recordPanel';
 import SettingsPanel from './settingsPanel';
+import SpellFrequenciesPanel from './spellFrequenciesPanel';
 import TitleListener from '../controls/titleListener';
 import NavBar from '../nav/navbar';
 import RegionsPanel from './regionsPanel';
@@ -78,6 +79,7 @@ class Root extends React.PureComponent<Props> {
                 {page === "about" && this.renderAbout()}
                 {page === "profile" && this.renderProfile()}
                 {page === "settings" && this.renderSettings()}
+                {page === "statistics" && this.renderStatistics()}
                 {page === "watch" && this.renderWatch()}
                 {page === "privacy" && this.renderPrivacy()}
                 {page === "modding" && <ModdingOverviewTab />}
@@ -162,6 +164,16 @@ class Root extends React.PureComponent<Props> {
             <NavBar />
             <div className="page">
                 <SettingsPanel />
+            </div>
+        </div>;
+    }
+
+    private renderStatistics() {
+        return <div className="content-container">
+            <TitleListener subtitle="Statistics" />
+            <NavBar />
+            <div className="page">
+                <SpellFrequenciesPanel />
             </div>
         </div>;
     }

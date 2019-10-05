@@ -81,7 +81,7 @@ export class WinRateAccumulator {
     }
 
     calculate(): WinRateCache {
-        logger.info(`Calculated win rate distribution: ${formatBuckets(this.buckets)}`);
+        logger.info(`Calculated win rate distribution ${this.category}: ${formatBuckets(this.buckets)}`);
 
         const distribution = this.buckets.filter(b => !!b).map(p => ({
             midpoint: (p.maxDiff + p.minDiff) / 2,

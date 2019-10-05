@@ -604,16 +604,21 @@ export function onGetSpellFrequencies(req: express.Request, res: express.Respons
 }
 
 export async function onGetSpellFrequenciesAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.category)) {
+    const category = req.query.category;
+    if (!(category)) {
         res.status(400).send("Bad request");
         return;
     }
 
-    const distribution = await statsProvider.getSpellFrequencies(m.GameCategory.PvP);
+    const frequencies = await statsProvider.getSpellFrequencies(category);
     if (req.header('content-type') === "application/json") {
-        res.send(distribution);
+        const msg: m.SpellFrequencyResponse = {
+            category: req.query.category,
+            frequencies,
+        };
+        res.send(msg);
     } else {
         res.header('Content-Type', 'text/csv');
-        res.send(jsonToCsv(distribution));
+        res.send(jsonToCsv(frequencies));
     }
 }

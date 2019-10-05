@@ -68,6 +68,10 @@ export namespace Placements {
 	export const Wood = 0;
 }
 
+export namespace SpellFrequencies {
+	export const MinGames = 100;
+}
+
 export namespace Atlas {
 	export const Width = 1024;
 	export const Height = 1024;

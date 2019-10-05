@@ -6,8 +6,6 @@ import * as accumulatorHelpers from './accumulatorHelpers';
 import * as constants from '../../game/constants';
 import { logger } from '../status/logging';
 
-const MinGames = 100;
-
 export interface SpellFrequency {
     spellId: string;
     wins: number;
@@ -30,7 +28,7 @@ export class SpellUsageAccumulator {
             return;
         }
 
-        let spellPlayers = game.players.filter(p => p.initialNumGames >= MinGames && !!p.spellIds);
+        let spellPlayers = game.players.filter(p => p.initialNumGames >= constants.SpellFrequencies.MinGames && !!p.spellIds);
         if (spellPlayers.length <= 1) {
             // Not enough data
             return;
@@ -52,7 +50,7 @@ export class SpellUsageAccumulator {
     }
 
     calculate(): SpellFrequencyCache {
-        logger.info(`Calculated spell distribution: ${formatSpells(this.distribution)}`);
+        logger.info(`Calculated spell distribution (${this.category}): ${formatSpells(this.distribution)}`);
 
         return {
             category: this.category,
