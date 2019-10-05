@@ -4,9 +4,6 @@ import * as m from '../../shared/messages.model';
 import * as aco from '../core/aco';
 import * as accumulatorHelpers from './accumulatorHelpers';
 import * as constants from '../../game/constants';
-import * as statsStorage from '../storage/statsStorage';
-import { Collections, Singleton } from '../storage/db.model';
-import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 
 const BucketRange = 50;

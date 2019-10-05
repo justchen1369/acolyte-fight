@@ -11,6 +11,7 @@ import * as categories from '../../shared/segments';
 import * as constants from '../../game/constants';
 import * as percentiles from './percentiles';
 import * as population from './population';
+import * as spellFrequencies from './spellFrequencies';
 import * as statsStorage from '../storage/statsStorage';
 import * as winRates from './winRates';
 import { logger } from '../status/logging';
@@ -21,9 +22,11 @@ const FullUpdateInterval = 24 * 60 * 60 * 1000;
 let nextFullUpdate = Date.now() + FullUpdateInterval;
 
 class GameAccumulator {
+    readonly spellFrequencyCaches = new Map<string, spellFrequencies.SpellFrequencyCache>();
     readonly winRateCaches = new Map<string, winRates.WinRateCache>();
 
     private latestGameUnix = 0;
+    private spellFrequencyAccumulator = new spellFrequencies.SpellUsageAccumulator(m.GameCategory.PvP);
     private winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
 
     constructor() {
@@ -35,6 +38,7 @@ class GameAccumulator {
 
         let numGames = 0;
         await statsStorage.streamAllGamesAfter(this.latestGameUnix, game => {
+            this.spellFrequencyAccumulator.accept(game);
             this.winRateAccumulator.accept(game);
 
             ++numGames;
@@ -46,6 +50,9 @@ class GameAccumulator {
 
         const winRateCache = this.winRateAccumulator.calculate();
         this.winRateCaches.set(winRateCache.category, winRateCache);
+
+        const spellFrequencyCache = this.spellFrequencyAccumulator.calculate();
+        this.spellFrequencyCaches.set(spellFrequencyCache.category, spellFrequencyCache);
 
         const elapsed = Date.now() - start;
         logger.info(`Processed ${numGames} games in ${elapsed.toFixed(0)} ms`);
