@@ -5,7 +5,10 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
 import * as spellFrequencies from '../core/spellFrequencies';
+import * as spellUtils from '../core/spellUtils'
 import { DefaultSettings } from '../../game/settings';
+import { Icons } from '../../game/icons';
+import SpellIcon from '../controls/spellIcon';
 
 interface SpellBtnStats {
     btn: string;
@@ -83,27 +86,65 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
             <h1>Statistics</h1>
             {allStats.map(stats => this.renderBtn(stats))}
             <h2>About</h2>
-            <p>Calculated from players who have played {constants.SpellFrequencies.MinGames}+ games</p>
+            <p>Calculated from players who have played {constants.SpellFrequencies.MinGames} or more games.</p>
         </div>;
     }
 
     private renderBtn(stats: SpellBtnStats) {
-        return <table key={stats.btn} className="spell-frequencies-btn">
+        return <table key={stats.btn} className="spell-frequencies-table">
+            <colgroup>
+                <col className="spell-frequencies-col-icon" />
+                <col className="spell-frequencies-col-name" />
+                <col className="spell-frequencies-col-popularity" />
+                <col className="spell-frequencies-col-win-rate" />
+                <col className="spell-frequencies-col-spacer" />
+            </colgroup>
             <thead>
                 <tr>
+                    <th></th>
                     <th>Spell</th>
                     <th>Popularity</th>
                     <th>Win rate</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
-                {stats.frequencies.map(f => <tr>
-                    <td>{f.spellId}</td>
-                    <td>{f.usages}</td>
-                    <td>{f.wins}</td>
-                </tr>)}
+                {stats.frequencies.map(f => this.renderSpellRow(stats, f))}
             </tbody>
         </table>
+    }
+
+    private renderSpellRow(stats: SpellBtnStats, freq: m.SpellFrequency) {
+        const Spells = DefaultSettings.Spells;
+
+        const spellId = freq.spellId;
+        const spell = Spells[spellId];
+        if (!spell) {
+            return null;
+        }
+
+        return <tr key={freq.spellId}>
+            <td className="spell-frequencies-icon">{this.renderSpellIcon(spell)}</td>
+            <td className="spell-frequencies-name">{spellUtils.spellName(spell)}</td>
+            <td className="spell-frequencies-popularity">{this.renderPercentage(freq.usages / stats.maxUsages)}</td>
+            <td className="spell-frequencies-win-rate">{this.renderPercentage(freq.wins / freq.usages)}</td>
+            <td></td>
+        </tr>
+    }
+
+    private renderSpellIcon(spell: Spell) {
+        const icon = Icons[spell.icon];
+        if (!icon) {
+            return null;
+        }
+        const path = new Path2D(icon.path);
+        return <SpellIcon icon={path} color={spell.color} size={32} />
+    }
+
+    private renderPercentage(proportion: number) {
+        return <div className="percentage-bar">
+            <div className="percentage-bar-fill" style={{ width: `${(proportion * 100).toFixed(1)}%` }}></div>
+        </div>
     }
 
     private renderNoData() {
