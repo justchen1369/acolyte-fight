@@ -19,7 +19,7 @@ import { logger } from '../status/logging';
 const IncrementalUpdateInterval = 60 * 1000;
 const FullUpdateInterval = 24 * 60 * 60 * 1000;
 
-let nextFullUpdate = Date.now() + FullUpdateInterval;
+let nextFullUpdate = 0;
 
 class GameAccumulator {
     readonly spellFrequencyCaches = new Map<string, spellFrequencies.SpellFrequencyCache>();
@@ -114,6 +114,8 @@ async function update() {
 
             // Don't update users because that is non-incremental
         } else {
+            nextFullUpdate = Date.now() + FullUpdateInterval;
+
             const newUserAccumulator = new UserAccumulator();
             await newUserAccumulator.update();
             userAccumulator = newUserAccumulator;
