@@ -104,7 +104,7 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
                     <th></th>
                     <th>Spell</th>
                     <th>Popularity</th>
-                    <th>Win rate</th>
+                    <th>Outlast rate</th>
                     <th></th>
                 </tr>
             </thead>
@@ -123,9 +123,10 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
             return null;
         }
 
-        return <tr key={freq.spellId}>
+        const spellName = spellUtils.spellName(spell);
+        return <tr key={freq.spellId} title={`${spellName}: ${freq.usages} games`}>
             <td className="spell-frequencies-icon">{this.renderSpellIcon(spell)}</td>
-            <td className="spell-frequencies-name">{spellUtils.spellName(spell)}</td>
+            <td className="spell-frequencies-name">{spellName}</td>
             <td className="spell-frequencies-popularity">{this.renderPercentage(freq.usages / stats.maxUsages)}</td>
             <td className="spell-frequencies-win-rate">{this.renderPercentage(freq.wins / freq.usages)}</td>
             <td></td>
