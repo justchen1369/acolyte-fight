@@ -79,8 +79,8 @@ class NavBar extends React.PureComponent<Props, State> {
             <PageLink page="profile" profileId={this.props.userId}><i className="icon fas fa-video" /> Replays</PageLink>
             {<PageLink page="regions"><i className="icon fas fa-globe-americas" /> Regions</PageLink>}
             {!a.noPartyLink && <PageLink page="party" badge={this.props.inParty}><i className="icon fas fa-user-friends" /> Party</PageLink>}
-            <PageLink page="watch"><i className="icon fas fa-eye" /> Spectate</PageLink>
             <PageLink page="statistics"><i className="icon fas fa-chart-pie" /> Statistics</PageLink>
+            <PageLink page="watch"><i className="icon fas fa-eye" /> Spectate</PageLink>
             <PageLink page="settings"><i className="icon fas fa-cog" /> Settings</PageLink>
             <div className="spacer" />
             {!a.noModding && <PageLink page="modding" badge={this.props.isModded}><i className="icon fas fa-wrench" /> Modding</PageLink>}
