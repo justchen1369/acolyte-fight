@@ -96,17 +96,17 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
     }
 
     private renderOptionsRow(rowIndex: number, row: string[], chosenId: string) {
-        const spells = row.map(spellId => this.props.settings.Spells[spellId]);
+        const Spells = this.props.settings.Spells;
 
         let chosenIndex = row.indexOf(chosenId);
         if (chosenIndex === -1) {
             chosenIndex = 0;
         }
 
-        const length = spells.length;
+        const length = row.length;
 
         return <div key={rowIndex} className="key-options-row">
-            {spells.map((spell, index) => this.renderSpellIcon(spell, chosenId, this.calculateOffset(index, chosenIndex, length)))}
+            {row.map((spellId, index) => this.renderSpellIcon(Spells[spellId], chosenId, this.calculateOffset(index, chosenIndex, length)))}
         </div>
     }
 
@@ -128,6 +128,10 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
     }
 
     private renderSpellIcon(spell: Spell, chosenId: string, offset: number) {
+        if (!spell) {
+            return null;
+        }
+
         const MaxSize = 48;
         const SmallSize = 32;
         const Margin = 4;

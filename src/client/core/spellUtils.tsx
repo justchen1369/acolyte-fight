@@ -9,7 +9,9 @@ function capitalize(str: string) {
 }
 
 export function resolveSpellForKey(key: string, keyBindings: KeyBindings, settings: AcolyteFightSettings): Spell {
-    const options = _.flatten(settings.Choices.Options[key]);
+    const Spells = settings.Spells;
+
+    const options = _.flatten(settings.Choices.Options[key]).filter(spellId => spellId in Spells);
 
     let chosenId = keyBindings[key];
     if (!(options.indexOf(chosenId) >= 0)) {
