@@ -1420,7 +1420,7 @@ const bouncer: Spell = {
 };
 const repeater: Spell = {
     id: 'repeater',
-    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Takes 0.25 seconds to grow to full damage, so hit from a distance for maximum damage.",
+    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Takes 0.4 seconds to grow to full damage, so hit from a distance for maximum damage.",
     action: "projectile",
 
     color: '#00ff00',
