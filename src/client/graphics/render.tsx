@@ -1475,7 +1475,7 @@ function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2
 				const pos = heroPos.clone().addMul(hero.radius, vector.fromAngle(hero.body.getAngle()));
 				const key = `${spell.sound}-${stage}`;
 				ctxStack.sounds.push({
-					id: `${hero.id}-${key}`,
+					id: `${hero.id}-casting${hero.casting.id}-${key}`,
 					sound: key,
 					pos,
 				});

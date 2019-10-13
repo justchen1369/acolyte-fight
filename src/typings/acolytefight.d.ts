@@ -342,6 +342,7 @@ declare interface SpraySpell extends SpellBase {
 
 	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
 
+	numProjectilesPerTick?: number; // Number of projectiles to shoot per tick. Defaults to 1.
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 90 degrees either side. Weird units, I know.

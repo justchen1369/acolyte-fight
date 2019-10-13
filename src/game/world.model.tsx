@@ -527,6 +527,7 @@ export interface Saber extends ShieldBase, HighlightSource, HitSource {
 export type Shield = Reflect | Wall | Saber;
 
 export interface CastState {
+	id: number;
 	action: Action;
 
 	initialAngle: number;
@@ -717,6 +718,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	body: pl.Body;
 	collideWith: number;
 	sensor?: boolean;
+	filterGroupIndex: number;
 
 	collidedTick?: number;
 	hit?: number;

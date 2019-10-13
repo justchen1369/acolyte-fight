@@ -362,8 +362,9 @@ const triplet: Spell = {
 
     movementProportionWhileChannelling: 1.0,
 
+    numProjectilesPerTick: 3,
     intervalTicks: 1,
-    lengthTicks: 3,
+    lengthTicks: 1,
 
     jitterRatio: 0.1,
 
@@ -434,8 +435,9 @@ const difire: Spell = {
 
     movementProportionWhileChannelling: 1.0,
 
+    numProjectilesPerTick: 2,
     intervalTicks: 1,
-    lengthTicks: 2,
+    lengthTicks: 1,
 
     jitterRatio: 1.0,
 

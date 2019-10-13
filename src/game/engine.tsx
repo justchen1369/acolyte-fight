@@ -28,6 +28,7 @@ interface BuffContext {
 
 interface ProjectileConfig {
 	owner?: string;
+	initialFilterGroupIndex?: number;
 	filterGroupIndex?: number;
 	direction?: pl.Vec2;
 }
@@ -630,7 +631,7 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 	const projectile = addProjectileAt(world, position, angle, target, spell.id, projectileTemplate, {
 		...config,
 		owner: hero.id,
-		filterGroupIndex: hero.filterGroupIndex,
+		initialFilterGroupIndex: hero.filterGroupIndex,
 	});
 
 	if (projectileTemplate.horcrux) {
@@ -641,12 +642,15 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 }
 
 function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, target: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
-	let id = type + (world.nextObjectId++);
+	const index = world.nextObjectId++;
+	const id = type + index;
 	const velocity = vector.fromAngle(angle).mul(projectileTemplate.speed);
 	const diff = vector.diff(target, position);
 
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
+
+	const filterGroupIndex = config.filterGroupIndex || -(index + 1); // +1 because 0 means group index doesn't apply
 
 	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
 	let body = world.physics.createBody({
@@ -658,7 +662,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		bullet: projectileTemplate.ccd !== undefined ? projectileTemplate.ccd : true,
 	});
 	body.createFixture(pl.Circle(projectileTemplate.radius), {
-		filterGroupIndex: config.filterGroupIndex,
+		filterGroupIndex: config.initialFilterGroupIndex || filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
 		density: projectileTemplate.density * knockbackScaling,
@@ -668,7 +672,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	if (projectileTemplate.sense) {
 		body.createFixture(pl.Circle(projectileTemplate.radius), {
-		filterGroupIndex: config.filterGroupIndex,
+			filterGroupIndex: config.initialFilterGroupIndex || filterGroupIndex,
 			filterCategoryBits: categories,
 			filterMaskBits: projectileTemplate.sense,
 			density: 1e-6,
@@ -686,6 +690,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		categories,
 		type,
 		body,
+		filterGroupIndex,
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
@@ -1164,9 +1169,10 @@ function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.W
 	if (!hero || (hero.category === "hero" && projectileClearedHero(projectile, hero))) {
 		let fixture = projectile.body.getFixtureList();
 		while (fixture) {
-			updateGroupIndex(fixture, 0);
+			updateGroupIndex(fixture, projectile.filterGroupIndex);
 			fixture = fixture.getNext();
 		}
+		console.log(`Now filtered ${projectile.id} to ${projectile.filterGroupIndex}`);
 		return false;
 	} else {
 		return true;
@@ -1859,6 +1865,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
 		hero.casting = {
+			id: world.nextObjectId++,
 			action: action,
 			color: spell.color,
 			stage: w.CastStage.Cooldown,
@@ -3881,18 +3888,23 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 			currentAngle = hero.body.getAngle();
 		}
 
-		const projectileIndex = Math.floor(currentLength / spell.intervalTicks);
-		const numProjectiles = spell.lengthTicks / spell.intervalTicks;
+		const numProjectilesPerTick = spell.numProjectilesPerTick || 1;
+		const numProjectiles = numProjectilesPerTick * spell.lengthTicks / spell.intervalTicks;
 		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
-		const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
-		const direction = vector.fromAngle(currentAngle);
-		const jitterRadius = direction.length() * spell.jitterRatio;
-		const jitterDirection = vector.plus(direction, vector.fromAngle(newAngle).mul(jitterRadius));
+		for (let i = 0; i < numProjectilesPerTick; ++i) {
+			const projectileIndex = Math.floor((i + numProjectilesPerTick * currentLength) / spell.intervalTicks);
+			const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
-		addProjectile(world, hero, action.target, spell, spell.projectile, {
-			direction: jitterDirection,
-		});
+			const direction = vector.fromAngle(currentAngle);
+			const jitterRadius = direction.length() * spell.jitterRatio;
+			const jitterDirection = vector.plus(direction, vector.fromAngle(newAngle).mul(jitterRadius));
+
+			addProjectile(world, hero, action.target, spell, spell.projectile, {
+				direction: jitterDirection,
+				filterGroupIndex: -(hero.casting.id + 1), // +1 because 0 means no filter
+			});
+		}
 	}
 
 	const cutoff = spell.maxChannellingTicks || spell.lengthTicks;
