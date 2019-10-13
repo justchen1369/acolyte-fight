@@ -2312,8 +2312,12 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 		if (bumper) {
 			hero.bumpTick = world.tick;
 			hero.hitTick = world.tick;
-			other.hitTick = world.tick;
-			other.strikeTick = world.tick;
+
+			applyDamage(other, {
+				fromHeroId: hero.id,
+				damage: 0,
+				lifeSteal: 0,
+			}, world);
 		}
 	}
 
