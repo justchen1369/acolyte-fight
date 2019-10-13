@@ -16,7 +16,6 @@ export namespace Categories {
 	export const Obstacle = 0x8;
 	export const Shield = 0x10;
 	export const Blocker = 0x20;
-	export const Crater = 0x40;
 	export const None = 0;
 }
 

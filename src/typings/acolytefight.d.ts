@@ -10,6 +10,8 @@ Units - general conventions:
 * Lifesteal: Fraction of damage translated into lifesteal. e.g. 1.0 for drain, 0.5 for link.
 * Densities, forces, impulses: These are a bit arbitrary and don't really have units. Heroes have a density of 0.5 and everything has been set relative to that.
 
+The collision and alliance flags are bitmasks: https://en.wikipedia.org/wiki/Mask_(computing)
+
 Collision category flags (categories, expireOn and collideWith):
 * All = 0xFFFF
 * Hero = 0x1
@@ -19,6 +21,12 @@ Collision category flags (categories, expireOn and collideWith):
 * Shield = 0x10
 * Blocker = 0x20 // all projectiles except Fireball/Fireboom are solid
 * None = 0
+
+Alliance flags (against, expireAgainstHeroes, expireAgainstObjects):
+* Self = 0x01
+* Ally = 0x02
+* Enemy = 0x04
+* Neutral = 0x08
 
 */
 
@@ -554,7 +562,7 @@ declare interface ExpireOnChannellingEndTemplate extends BehaviourTemplateBase {
 }
 
 declare interface DetonateParametersTemplate extends DamagePacketTemplate {
-	against?: number;
+	against?: number; // Alliance flags
 
 	radius: number; // The radius of the explosion
 	
