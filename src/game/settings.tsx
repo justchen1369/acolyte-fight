@@ -2104,7 +2104,7 @@ const horcrux: Spell = {
 const saber: Spell = {
     id: 'saber',
     name: 'Lightsaber',
-    description: "Swing your lightsaber to deflect projectiles and knockback enemies!",
+    description: "For 1 second, swing your lightsaber to deflect projectiles and knockback enemies!",
     effects: [
         {
             icon: "fas fa-unlink",
@@ -2136,7 +2136,7 @@ const saber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 1.25 * TicksPerSecond,
+    maxTicks: 1 * TicksPerSecond,
     channelling: true,
 
     categories: Categories.Shield,
@@ -2165,7 +2165,7 @@ const saber: Spell = {
 const dualSaber: Spell = {
     id: 'dualSaber',
     name: 'Dualsaber',
-    description: "Swing dual lightsabers to deflect projectiles and knockback enemies!",
+    description: "For 1.5 seconds, swing dual lightsabers to deflect projectiles and knockback enemies!",
     effects: [
         {
             icon: "fas fa-unlink",
@@ -2196,7 +2196,7 @@ const dualSaber: Spell = {
 
     icon: "waveStrike",
 
-    maxTicks: 1.25 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     channelling: true,
 
     categories: Categories.Shield,
