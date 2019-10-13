@@ -1939,6 +1939,11 @@ const iceBomb: Spell = {
             title: "Freeze",
             text: "Freeze nearby enemies for 1 second.",
         },
+        {
+            icon: "fas fa-sword",
+            title: "Vulnerable",
+            text: "Enemies receive 25% more damage for 1 second.",
+        },
     ],
     sound: "iceBomb",
 
@@ -1949,8 +1954,9 @@ const iceBomb: Spell = {
     cooldown: 5 * TicksPerSecond,
     throttle: true,
 
+    numProjectilesPerTick: 2,
     intervalTicks: 1,
-    lengthTicks: 6,
+    lengthTicks: 3,
 
     jitterRatio: 0.6,
 
@@ -1987,6 +1993,12 @@ const iceBomb: Spell = {
                     glow: 0.2,
                     bloom: 0.03,
                 },
+            },
+            {
+                type: "armor",
+                maxTicks: 1 * TicksPerSecond,
+                proportion: 0.25, // more damage
+                against: Alliances.NotFriendly,
             }
         ],
 
