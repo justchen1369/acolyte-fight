@@ -344,6 +344,7 @@ export interface WorldObjectBase {
 	body: pl.Body;
 	destroyedTick?: number;
 	blocksTeleporters?: boolean;
+	swappable?: boolean;
 
 	posDelta?: pl.Vec2;
 	velocityDelta?: pl.Vec2;

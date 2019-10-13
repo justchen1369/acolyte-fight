@@ -386,6 +386,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
 	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
+	swappable?: boolean; // Whether this projectile can be swapped with
 	bumpable?: boolean; // Whether this projectile gets knocked back by a bumper obstacle
 	conveyable?: boolean; // Whether this projectile is moved by a conveyor belt. (Collision flags must allow the projectile collide with obstacles to work.)
 	linkable?: boolean; // Whether a link can attach to this projectile
@@ -894,6 +895,7 @@ declare interface WallSpell extends ShieldSpell {
 
 	conveyable?: boolean; // The wall is affected by conveyor belts
 	bumpable?: boolean; // The wall is affected by bumpers
+	swappable?: boolean; // Swap affects the wall
 	density?: number; // If set, the wall is moveable
 	ccd?: boolean; // Performance improvement: Whether to apply continuous collision detection to this wall. Small and fast projectiles will tunnel through other objects unless CCD is on. Defaults to true.
 	linearDamping?: number; // Higher means receives less knockback

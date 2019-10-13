@@ -262,6 +262,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		collideWith,
 		expireOn: template.expireOn || Categories.None,
 		undamageable: template.undamageable,
+		swappable: !sensor,
 
 		render: template.render || [],
 		strike: template.strike,
@@ -378,6 +379,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		takesOwnership: spell.takesOwnership,
 		conveyable: spell.conveyable,
 		bumpable: spell.bumpable,
+		swappable: spell.swappable,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		points,
@@ -519,6 +521,7 @@ function addHero(world: w.World, heroId: string) {
 		health: Hero.MaxHealth,
 		maxHealth: Hero.MaxHealth,
 		body,
+		swappable: true,
 		initialRadius: Hero.Radius,
 		radius: Hero.Radius,
 		linearDamping: Hero.Damping,
@@ -697,6 +700,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		bumpable: projectileTemplate.bumpable,
 		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
+		swappable: projectileTemplate.swappable,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -2680,12 +2684,18 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 		return;
 	}
 
-	if (target && (target.categories & projectile.swapWith) > 0) {
+	if (target && (target.categories & projectile.swapWith) > 0 && target.swappable) {
 		const ownerPos = vector.clone(owner.body.getPosition());
 		const targetPos = vector.clone(target.body.getPosition());
 
+		const ownerVelocity = owner.body.getLinearVelocity().clone();
+		const targetVelocity = target.body.getLinearVelocity().clone();
+
 		owner.body.setPosition(targetPos);
 		target.body.setPosition(ownerPos);
+
+		owner.body.setLinearVelocity(targetVelocity);
+		target.body.setLinearVelocity(ownerVelocity);
 
 		world.ui.events.push({
 			type: "teleport",

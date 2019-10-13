@@ -550,6 +550,7 @@ const meteor: Spell = {
         ccd: false,
         attractable: false,
         linkable: true,
+        swappable: true,
         radius: 0.03,
         speed: 0.2,
         restitution: 0,
@@ -587,6 +588,7 @@ const meteorite: Spell = {
         density: 100,
         ccd: false,
         attractable: false,
+        swappable: true,
         linkable: true,
         radius: 0.015,
         speed: 0.3,
@@ -752,6 +754,7 @@ const blast: Spell = {
         minTicks: 3, // Enough ticks to clear any obstacles the player is touching
         lifeSteal,
         maxTicks: 2 * TicksPerSecond,
+        swappable: true,
         damage: 40,
 
         detonate: {
@@ -2396,6 +2399,7 @@ const icewall: Spell = {
     collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
     conveyable: true,
     bumpable: false,
+    swappable: true,
     selfPassthrough: true,
 
     icon: "woodenFence",
@@ -2599,6 +2603,7 @@ const swap: Spell = {
         expireAfterCursorTicks: 0,
         shieldTakesOwnership: false,
         selfPassthrough: true,
+        sensor: true,
 
         swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
 
