@@ -1551,7 +1551,7 @@ const gravity: Spell = {
         density: 0.0001,
         ccd: false,
         attractable: false,
-        radius: 0.0125,
+        radius: 0.02,
         speed: 0.3,
         maxTicks: 5.0 * TicksPerSecond,
         damage: 0,
