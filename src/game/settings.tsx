@@ -1937,7 +1937,7 @@ const iceBomb: Spell = {
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 0.75 seconds.",
+            text: "Freeze nearby enemies for 1 second.",
         },
     ],
     sound: "iceBomb",
