@@ -644,7 +644,7 @@ const kamehameha: Spell = {
     jitterRatio: 0.0,
 
     intervalTicks: 6,
-    lengthTicks: 3 * TicksPerSecond,
+    lengthTicks: 2 * TicksPerSecond,
 
     projectile: {
         density: 0.0001,
@@ -652,7 +652,7 @@ const kamehameha: Spell = {
         radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
-        damage: 5,
+        damage: 7.5,
         lifeSteal,
         categories: Categories.Projectile | Categories.Massive,
 
