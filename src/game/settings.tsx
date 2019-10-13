@@ -752,7 +752,7 @@ const blast: Spell = {
         minTicks: 3, // Enough ticks to clear any obstacles the player is touching
         lifeSteal,
         maxTicks: 2 * TicksPerSecond,
-        damage: 30,
+        damage: 40,
 
         detonate: {
             radius: 0.025,
