@@ -3367,7 +3367,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 			seen.add(other.id);
 		}
 
-		if (other.category === "hero" || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
+		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
 			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
 			const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
