@@ -96,6 +96,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <ul>
                 <li><a href="api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript file that defines the schema of settings</li>
                 <li><a href="api/ai.contracts.ts">ai.contracts.ts</a> - this is a TypeScript file that defines the inputs and outputs of the AI code</li>
+                <li><a href="api/default.acolytefight.json">default.acolytefight.json</a> - this is a JSON file containing all the default settings of the game</li>
             </ul>
         </div>
     }

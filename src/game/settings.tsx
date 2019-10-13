@@ -277,7 +277,7 @@ const fireball: Spell = {
         radius: 0.003,
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
-        damage: 20,
+        damage: 18,
         lifeSteal,
         categories: Categories.Projectile,
 
@@ -2079,7 +2079,7 @@ const horcrux: Spell = {
                 radius: 0.035,
                 tickInterval: 6,
                 maxHits: 10,
-                packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                packet: { damage: 2.5, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
