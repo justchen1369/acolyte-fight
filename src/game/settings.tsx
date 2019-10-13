@@ -308,7 +308,7 @@ const flamestrike: Spell = {
     projectile: {
         density: 5,
         radius: 0.005,
-        speed: 0.18,
+        speed: 0.21,
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         lifeSteal,
@@ -340,9 +340,9 @@ const flamestrike: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "reticule", color: 'rgba(128, 32, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
-            { type: "projectile", ticks: 30, smoke: 0.4, fade: "#333" },
-            { type: "ray", ticks: 30 },
-            { type: "strike", ticks: 30, flash: true, numParticles: 5 },
+            { type: "projectile", ticks: 18, smoke: 0.4, fade: "#333" },
+            { type: "ray", ticks: 18 },
+            { type: "strike", ticks: 18, flash: true, numParticles: 5 },
         ],
     },
 };
