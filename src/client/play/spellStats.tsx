@@ -74,7 +74,7 @@ class SpellStats extends React.PureComponent<Props, State> {
             </div>
 
         } else if (spell.action === "spray") {
-            const hits = Math.floor(spell.lengthTicks / spell.intervalTicks);
+            const hits = (spell.numProjectilesPerTick || 1) * Math.floor(spell.lengthTicks / spell.intervalTicks);
             const totalDamage = this.calculateProjectileDamage(spell.projectile) * hits;
             const overTime = spell.lengthTicks >= 60 ? ` over ${formatTime(spell.lengthTicks)} s` : "";
             const lifeSteal = this.calculateProjectileLifeSteal(spell.projectile);
