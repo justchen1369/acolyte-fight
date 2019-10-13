@@ -2079,7 +2079,7 @@ const horcrux: Spell = {
                 radius: 0.035,
                 tickInterval: 6,
                 maxHits: 10,
-                packet: { damage: 2.5, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
+                packet: { damage: 3, lifeSteal: 1, minHealth: 1, noHit: true, noKnockback: true },
                 buffs: [
                     { // Just used for graphics
                         type: "movement",
