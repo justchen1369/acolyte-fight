@@ -1116,7 +1116,7 @@ const whip: Spell = {
     icon: "electricWhip",
 
     maxAngleDiffInRevs: 0.01,
-    chargeTicks: 10,
+    chargeTicks: 5,
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
 
