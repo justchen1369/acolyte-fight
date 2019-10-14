@@ -87,6 +87,7 @@ export function initialWorld(mod: Object): w.World {
 	let world: w.World = {
 		seed: null,
 		color: Visuals.DefaultWorldColor,
+		background: Visuals.Background,
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
@@ -1259,6 +1260,9 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 
 	if (layout.color) {
 		world.color = layout.color;
+	}
+	if (layout.background) {
+		world.background = layout.background;
 	}
 	
 	if (layout.numPoints) {
