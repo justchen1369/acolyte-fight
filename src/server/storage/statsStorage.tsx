@@ -230,9 +230,9 @@ export async function saveGameStats(gameStats: m.GameStatsMsg) {
     await firestore.collection(Collections.Game).doc(gameStats.gameId).set(data);
 }
 
-export async function cleanupGames(maxAgeDays: number) {
+export async function cleanupGames() {
     const firestore = getFirestore();
-    const cutoff = moment().subtract(maxAgeDays, 'days').unix();
+    const cutoff = moment().subtract(constants.MaxGameAgeInDays, 'days').unix();
     const query = firestore.collection(Collections.Game).where('unixTimestamp', '<', cutoff);
 
     let numDeleted = 0;

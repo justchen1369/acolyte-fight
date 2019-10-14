@@ -84,7 +84,7 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
             <h1>Statistics</h1>
             {allStats.map(stats => this.renderBtn(stats))}
             <h2>About</h2>
-            <p>Calculated from players who have played {constants.SpellFrequencies.MinGames} or more games.</p>
+            <p>Calculated from matches over the past {constants.MaxGameAgeInDays} days. Only includes players who have played {constants.SpellFrequencies.MinGames} or more games.</p>
         </div>;
     }
 

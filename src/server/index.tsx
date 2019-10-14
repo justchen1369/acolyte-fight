@@ -127,7 +127,7 @@ statsProvider.startUpdateLoop().catch(logger.error);
 setInterval(async () => {
 	try {
 		modder.cleanupOldRooms(1);
-		await statsStorage.cleanupGames(7);
+		await statsStorage.cleanupGames();
 		await decaying.decrementAco();
 		await deflating.deflateAcoIfNecessary(m.GameCategory.PvP);
 	} catch (exception) {

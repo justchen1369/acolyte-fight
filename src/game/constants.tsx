@@ -6,6 +6,7 @@ export const ObstacleSnapshotTicks = 30;
 export const MaxCooldownWait = 0;
 export const MaxTextMessageLength = 240;
 export const MaxGamesToKeep = 50;
+export const MaxGameAgeInDays = 7;
 export const Pixel = 0.001;
 
 export namespace Categories {
