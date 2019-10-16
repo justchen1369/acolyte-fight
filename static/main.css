@@ -637,31 +637,6 @@ a:hover, a:active {
     text-shadow: 0 0 8px #fff8;
 }
 
-.home .fold-indicator {
-    position: relative;
-    animation: fold-animation alternate 1s infinite;
-    cursor: pointer;
-}
-
-.home .fold-indicator .fold-info {
-    font-size: 80%;
-}
-
-.home .fold-arrow {
-    font-size: 170%;
-    font-weight: bold;
-}
-
-.home .fold-indicator:hover {
-    color: white;
-    animation: none;
-}
-
-@keyframes fold-animation {
-    from { color: #888; bottom: 5px }
-    to { color: white; bottom: 0 }
-}
-
 .view-more-ad {
     text-align: center;
     font-size: 120%;
