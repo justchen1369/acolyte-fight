@@ -896,17 +896,17 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        damage: 40,
+        damage: 30,
         lifeSteal,
-        density: 15,
-        radius: 0.007,
+        density: 60,
+        radius: 0.0035,
         speed: 0.3,
         maxTicks: 2.0 * TicksPerSecond,
         categories: Categories.Projectile,
         shieldTakesOwnership: false,
 
         partialDamage: {
-            initialMultiplier: 0.01,
+            initialMultiplier: 0.3333,
             ticks: 1.5 * TicksPerSecond,
         },
 
@@ -937,7 +937,7 @@ const retractor: Spell = {
                 type: "swirl",
                 color: '#00ff7f',
                 ticks: 30,
-                radius: 0.009,
+                radius: 0.007,
                 particleRadius: 0.001,
                 glow: 0.05,
                 smoke: 0.3,
