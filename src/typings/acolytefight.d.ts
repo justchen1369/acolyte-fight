@@ -755,6 +755,7 @@ declare interface BuffTemplateBase {
 	cancelOnHit?: boolean; // Cancel this buff if the hero gets hit
 	cancelOnBump?: boolean; // Cancel this buff if the hero bumps another
 	passive?: boolean; // Cancel this buff if the hero stops choosing this spell
+	resetOnGameStart?: boolean; // Cancel this buff when the game starts
 
 	renderStart?: RenderBuff;
 	render?: RenderBuff;
@@ -814,7 +815,7 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 	decay?: boolean; // The damage multiplier linearly decays over time.
 
 	stack?: string; // If there is another lifesteal/damage buff with the same name as this, then add to it
-	maxStacks?: number; // Don't add any more than this many stacks
+	maxStacks?: number;
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {

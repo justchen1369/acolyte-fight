@@ -1422,37 +1422,20 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	const isNew = ev.closeTick < world.startTick; // This message gets sent twice, don't respond to it multiple times
 	world.startTick = ev.closeTick;
 
-	if (isNew) {
-		// Obstacles movable now
-		world.objects.forEach(obstacle => {
-			if (obstacle.category === "obstacle") {
-				obstacle.body.resetMassData();
-			}
-		});
-
-		// Clear any stockpiled halos
-		world.objects.forEach(projectile => {
-			if (projectile.category === "projectile" && projectile.owner) { // Ignore environmental projectiles
-				projectile.expireTick = Math.min(projectile.expireTick, ev.closeTick);
-			}
-		});
+	if (world.tick >= world.startTick) {
+		// Close any customising dialogs as they cannot be used anymore now the game has started
+		world.ui.toolbar.customizingBtn = null;
 
 		// Clear any stockpiled burns
 		world.objects.forEach(hero => {
-			if (hero.category === "hero") { // Ignore environmental projectiles
+			if (hero.category === "hero") {
 				hero.buffs.forEach(buff => {
-					if (buff.type === "burn" && buff.numStacks > 1) {
-						buff.packet.damage /= buff.numStacks;
-						buff.numStacks = 1;
+					if (buff.resetOnGameStart) {
+						buff.expireTick = Math.min(buff.expireTick, ev.closeTick);
 					}
 				});
 			}
 		});
-	}
-
-	if (world.tick >= world.startTick) {
-		// Close any customising dialogs as they cannot be used anymore now the game has started
-		world.ui.toolbar.customizingBtn = null;
 	}
 
 	world.ui.notifications.push({
@@ -4360,6 +4343,7 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 		hitTick: template.cancelOnHit ? (hero.hitTick || 0) : null,
 		channellingSpellId: template.channelling && config.spellId,
 		passiveSpellId: template.passive && config.spellId,
+		resetOnGameStart: template.resetOnGameStart,
 		cancelOnBump: template.cancelOnBump,
 		numStacks: 1,
 	};
