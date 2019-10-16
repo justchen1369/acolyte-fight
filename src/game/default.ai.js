@@ -2,7 +2,7 @@ var center = { x: 0.5, y: 0.5 };
 
 var CloseEnoughDistance = 0.01;
 var MissRadius = 0.05;
-var DodgeRadius = 0.05;
+var DodgeRadius = 0.15;
 var SpellCastIntervalMilliseconds = 1000;
 var SpellCastJitterMilliseconds = 500;
 
