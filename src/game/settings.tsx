@@ -898,7 +898,7 @@ const retractor: Spell = {
     ],
 
     projectile: {
-        damage: 30,
+        damage: 40,
         lifeSteal,
         density: 60,
         radius: 0.0035,
@@ -908,7 +908,7 @@ const retractor: Spell = {
         shieldTakesOwnership: false,
 
         partialDamage: {
-            initialMultiplier: 0.3333,
+            initialMultiplier: 0.2,
             ticks: 1.5 * TicksPerSecond,
         },
 
