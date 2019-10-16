@@ -126,8 +126,10 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		}
 	}
 
-	direct(world, canvasStack, renderOptions);
-	render(world, canvasStack, renderOptions);
+	if (world.tick > 0) { // Tick 0 does not have the map yet, don't render it otherwise the screen flashes
+		direct(world, canvasStack, renderOptions);
+		render(world, canvasStack, renderOptions);
+	}
 
 	sendSnapshot(world);
 	notificationTick(world);
