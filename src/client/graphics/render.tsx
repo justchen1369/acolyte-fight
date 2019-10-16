@@ -202,7 +202,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
 
-	const background = ColTuple.parse(world.background);
+	const background = ColTuple.parse(options.hideMap ? '#000' : world.background);
 	glx.renderGl(ctxStack, worldRect, rect, background);
 
 	playSounds(ctxStack, world, options);
