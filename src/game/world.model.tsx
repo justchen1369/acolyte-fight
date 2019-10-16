@@ -674,6 +674,8 @@ export interface LifeStealBuff extends BuffBase {
 	damageMultiplier?: number;
 	minHealth?: number;
 	decay?: boolean;
+
+	stack?: string;
 }
 
 export interface BurnBuff extends BuffBase {

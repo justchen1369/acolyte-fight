@@ -810,8 +810,11 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 	type: "lifeSteal";
 	damageMultiplier?: number;
 	lifeSteal?: number;
-	minHealth?: number;
-	decay?: boolean;
+	minHealth?: number; // Don't leave the enemy with less health than this. For example, don't kill an enemy.
+	decay?: boolean; // The damage multiplier linearly decays over time.
+
+	stack?: string; // If there is another lifesteal/damage buff with the same name as this, then add to it
+	maxStacks?: number; // Don't add any more than this many stacks
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
@@ -1011,6 +1014,8 @@ declare interface DamagePacketTemplate {
 	noHit?: boolean; // Don't count this as a hit - no hero flashing and no halo stripping
 	noKnockback?: boolean; // Don't count as knockback - will not attribute future void damage to this hero
 	minHealth?: number; // Never reduce the enemy below this level of health
+
+	stack?: string; // Damage/Lifesteal Buffs which have the same stack will be applied to this
 }
 
 declare interface Vec2 {

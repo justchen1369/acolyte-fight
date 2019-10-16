@@ -1177,7 +1177,6 @@ function removePassthrough(passthrough: w.RemovePassthroughBehaviour, world: w.W
 			updateGroupIndex(fixture, projectile.filterGroupIndex);
 			fixture = fixture.getNext();
 		}
-		console.log(`Now filtered ${projectile.id} to ${projectile.filterGroupIndex}`);
 		return false;
 	} else {
 		return true;
@@ -4448,15 +4447,38 @@ function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, co
 
 function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const id = calculateBuffId(template, world, config);
-	hero.buffs.set(id, {
-		...calculateBuffValues(template, hero, world, config),
-		id,
-		type: "lifeSteal",
-		lifeSteal: template.lifeSteal,
-		damageMultiplier: template.damageMultiplier,
-		minHealth: template.minHealth,
-		decay: template.decay,
-	});
+	const values = calculateBuffValues(template, hero, world, config);
+
+	let stack: w.LifeStealBuff = null;
+	if (template.stack) {
+		const candidate = hero.buffs.get(id);
+		if (candidate && candidate.type === "lifeSteal") {
+			stack = candidate;
+		}
+	}
+
+	if (stack) {
+		stack.expireTick = values.expireTick;
+
+		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+			if (typeof template.damageMultiplier === 'number') {
+				const delta = template.damageMultiplier - 1;
+				stack.damageMultiplier = (stack.damageMultiplier || 1) + delta;
+				++stack.numStacks;
+				console.log(`Damage multiplier ${stack.damageMultiplier}`, stack);
+			}
+		}
+	} else {
+		hero.buffs.set(id, {
+			...values,
+			id,
+			type: "lifeSteal",
+			lifeSteal: template.lifeSteal,
+			damageMultiplier: template.damageMultiplier,
+			minHealth: template.minHealth,
+			decay: template.decay,
+		});
+	}
 }
 
 function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
@@ -4615,7 +4637,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	const fromHero = world.objects.get(fromHeroId);
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
-			if (buff.type === "lifeSteal") {
+			if (buff.type === "lifeSteal" && (!buff.stack || buff.stack === template.stack)) {
 				let proportion = 1;
 				if (buff.decay) {
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
