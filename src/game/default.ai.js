@@ -8,7 +8,7 @@ var SpellCastJitterMilliseconds = 500;
 
 var TicksPerSecond = 60;
 
-var DefaultReactionMilliseconds = 400;
+var DefaultReactionMilliseconds = 600;
 var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     retarget: 200,
 };
