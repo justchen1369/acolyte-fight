@@ -2732,7 +2732,7 @@ const vanish: Spell = {
             },
             render: {
                 invisible: true,
-                color: "#111",
+                color: "#181818",
                 ticks: 60,
                 particleRadius: Hero.Radius,
                 glow: 0.2,
