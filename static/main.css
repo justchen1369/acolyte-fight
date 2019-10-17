@@ -570,8 +570,6 @@ a:hover, a:active {
 }
 .home .primary-button-row .btn {
     font-size: 285%;
-
-    animation: shine-loop 0.7s alternate infinite linear;
 }
 .home .secondary-button-row .btn {
     background-color: #08b;
@@ -581,6 +579,15 @@ a:hover, a:active {
 }
 .home .btn.disabled {
     background-color: #ccc;
+}
+
+.home .primary-button-row .btn:not(:hover) {
+    animation: shine-loop 0.7s alternate infinite linear, glow-loop 0.7s alternate infinite linear;
+}
+
+@keyframes glow-loop {
+    from { box-shadow: 0 0 0.1em #0cf8 }
+    to {  box-shadow: 0 0 0.2em #0cf }
 }
 
 @media (max-width: 768px) {
