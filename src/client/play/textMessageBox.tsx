@@ -1,4 +1,4 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -8,7 +8,14 @@ import * as constants from '../../game/constants';
 import * as online from '../core/online';
 import { isMobile } from '../core/userAgent';
 
-const MaxCharsPerSecond = 10;
+const MaxCharsPerSecond = 5;
+const MinCharsPerMessage = 10;
+const RecentMessageSeconds = 5;
+
+interface RecentMessage {
+    timestamp: number;
+    length: number;
+}
 
 interface Props {
     live: boolean;
@@ -32,7 +39,7 @@ function stateToProps(state: s.State): Props {
 class TextMessageBox extends React.PureComponent<Props, State> {
     private keyDownListener = this.onWindowKeyDown.bind(this);
     private textMessageBox: HTMLInputElement = null;
-    private previousSendMs = 0;
+    private recentMessages = new Array<RecentMessage>();
 
     constructor(props: Props) {
         super(props);
@@ -111,11 +118,11 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         ev.stopPropagation();
         if (ev.keyCode === 13) {
             if (this.state.text && this.state.text.length > 0) {
-                if (this.isTooMany(this.state.text.length)) {
-                    this.blur("Too many messages, try again");
+                if (this.isTooMany()) {
+                    this.blur("Too many messages, please wait");
                 } else {
                     online.sendTextMessage(this.state.text);
-                    this.previousSendMs = Date.now();
+                    this.recentMessages.push({ timestamp: Date.now(), length: this.state.text.length });
                     this.blur();
                 }
             } else {
@@ -126,9 +133,14 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         }
     }
 
-    private isTooMany(length: number) {
-        const next = this.previousSendMs + 1000 * (length / MaxCharsPerSecond);
-        return next > Date.now();
+    private isTooMany() {
+        const cutoff = Date.now() - RecentMessageSeconds * 1000;
+        while (this.recentMessages.length > 0 && this.recentMessages[0].timestamp < cutoff) {
+            this.recentMessages.shift();
+        }
+
+        const total = _(this.recentMessages).map(x => Math.max(MinCharsPerMessage, x.length)).sum();
+        return total >= RecentMessageSeconds * MaxCharsPerSecond;
     }
 
     private onWindowKeyDown(ev: KeyboardEvent) {
