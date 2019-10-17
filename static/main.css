@@ -570,6 +570,8 @@ a:hover, a:active {
 }
 .home .primary-button-row .btn {
     font-size: 285%;
+
+    animation: shine-loop 0.7s alternate infinite linear;
 }
 .home .secondary-button-row .btn {
     background-color: #08b;
