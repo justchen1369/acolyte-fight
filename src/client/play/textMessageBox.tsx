@@ -33,7 +33,6 @@ class TextMessageBox extends React.PureComponent<Props, State> {
     private keyDownListener = this.onWindowKeyDown.bind(this);
     private textMessageBox: HTMLInputElement = null;
     private previousSendMs = 0;
-    private previousMessage = "";
 
     constructor(props: Props) {
         super(props);
@@ -112,13 +111,10 @@ class TextMessageBox extends React.PureComponent<Props, State> {
         ev.stopPropagation();
         if (ev.keyCode === 13) {
             if (this.state.text && this.state.text.length > 0) {
-                if (this.state.text === this.previousMessage) {
-                    this.blur("Duplicate message");
-                } else if (this.isTooMany(this.state.text.length)) {
+                if (this.isTooMany(this.state.text.length)) {
                     this.blur("Too many messages, try again");
                 } else {
                     online.sendTextMessage(this.state.text);
-                    this.previousMessage = this.state.text;
                     this.previousSendMs = Date.now();
                     this.blur();
                 }
