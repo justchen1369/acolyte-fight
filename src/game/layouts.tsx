@@ -21,7 +21,7 @@ export const Layouts: Layouts = {
             {
                 "type": "slow",
                 layoutRadius: 0.0725,
-                extent: 0.0025,
+                extent: 0.002,
                 "numObstacles": 3,
                 layoutAngleOffsetInRevs: 0.1666666666667,
                 angularWidthInRevs: 0.2
@@ -31,7 +31,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.0725,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
-                "extent": 0.0125,
+                "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0
             },
             {
