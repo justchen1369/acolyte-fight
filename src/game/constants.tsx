@@ -1,5 +1,5 @@
 export const TicksPerSecond = 60;
-export const TicksPerTurn = 2;
+export const TicksPerTurn = 1;
 export const MaxIdleTicks = 30 * TicksPerSecond;
 export const SnapshotTicks = 10;
 export const ObstacleSnapshotTicks = 30;
