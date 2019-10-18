@@ -198,7 +198,7 @@ function calculateDeltas(snapshot: UpdateRatingsSnapshot) {
         const isRanked = snapshot.isRankedLookup.get(userId);
         ratingValues.set(userId, isRanked ? userRating.aco : userRating.acoUnranked);
     });
-    const deltas = acoUpdater.calculateNewAcoRatings(ratingValues, snapshot.knownPlayers, snapshot.category);
+    const deltas = acoUpdater.calculateNewAcoRatings(ratingValues, snapshot.knownPlayers, snapshot.category, aco.AcoRanked);
     return deltas;
 }
 
@@ -227,7 +227,7 @@ function applyRanked(playerDelta: acoUpdater.PlayerDelta, initialRating: g.UserR
 
     const initialExposure = statsStorage.calculateAcoExposure(selfRating.aco, selfRating.acoGames, selfRating.acoDeflate);
 
-    for (const change of playerDelta.changes) {
+    for (const change of changes) {
         selfRating.aco += change.delta;
 
         if (selfRating.acoUnranked <= selfRating.aco) {

@@ -18,7 +18,7 @@ export interface PlayerDelta {
     changes: m.AcoChangeMsg[];
 }
 
-export function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[], category: string): Map<string, PlayerDelta> {
+export function calculateNewAcoRatings(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[], category: string, system: aco.Aco): Map<string, PlayerDelta> {
     const deltas = new Map<string, PlayerDelta>(); // user ID -> PlayerDelta
 
     if (players.length <= 0) {
@@ -66,9 +66,9 @@ export function calculateNewAcoRatings(ratingValues: Map<string, number>, player
             const otherAco = averageRatingPerTeam[otherTeamId];
 
             const score = i < j ? 1 : 0; // win === 1, loss === 0
-            const diff = aco.AcoRanked.calculateDiff(selfAco, otherAco);
-            const winProbability = aco.AcoRanked.estimateWinProbability(diff, statsProvider.getWinRateDistribution(category) || []);
-            const adjustment = aco.AcoRanked.adjustment(winProbability, score, multiplier);
+            const diff = system.calculateDiff(selfAco, otherAco);
+            const winProbability = system.estimateWinProbability(diff, statsProvider.getWinRateDistribution(category) || []);
+            const adjustment = system.adjustment(winProbability, score, multiplier);
             const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
             if (change.delta >= 0) {
                 if (!deltaGain || deltaGain.delta < change.delta) { // Largest gain

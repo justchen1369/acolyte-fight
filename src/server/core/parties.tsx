@@ -142,7 +142,7 @@ async function startImmediateParty(party: g.Party) {
         const room = store.rooms.get(party.roomId);
         await Promise.all(ready.map(async (member) => {
             const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
-            const aco = await matchmaking.retrieveRating(userId, member.numGames, m.GameCategory.PvP, member.unranked);
+            const aco = await matchmaking.getRating(userId, member.numGames, m.GameCategory.PvP);
             const game = matchmaking.findNewGame(member.version, room, party.id, { aco, socketId: member.socketId });
             games.joinGame(game, member, userId, aco);
             member.ready = false;
@@ -219,7 +219,7 @@ async function assignPartyToGames(party: g.Party, ready: g.PartyMember[]) {
         let game: g.Game = null;
         await Promise.all(group.map(async (member) => {
             const userId = await auth.getUserIdFromAccessKey(auth.enigmaAccessKey(member.authToken));
-            const aco = await matchmaking.retrieveRating(userId, member.numGames, m.GameCategory.PvP, member.unranked);
+            const aco = await matchmaking.getRating(userId, member.numGames, m.GameCategory.PvP);
 
             if (!game) {
                 // Need to be able to add a player to the game immediately after it is created, so only create once we are ready to add

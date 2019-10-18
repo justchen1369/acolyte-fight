@@ -58,6 +58,7 @@ discord.init(discordSecret);
 facebook.init(facebookSecret);
 kongregate.init(kongregateSecret);
 gameStorage.initStorage(replaysBasePath);
+matchmaking.init();
 modder.init();
 ticker.init();
 if (mirrored) {

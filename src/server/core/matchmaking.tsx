@@ -1,6 +1,9 @@
 import _ from 'lodash';
 import wu from 'wu';
 import * as aco from './aco';
+import * as acoUpdater from '../ratings/acoUpdater';
+import * as auth from '../auth/auth';
+import * as categories from '../../shared/segments';
 import * as g from '../server.model';
 import * as games from './games';
 import * as m from '../../shared/messages.model';
@@ -51,14 +54,26 @@ interface CandidateBase {
     avgWinProbability: number;
 }
 
-export async function retrieveRating(userId: string, numGames: number, category: string, unranked: boolean): Promise<number> {
+const matchmakingRatings = new Map<string, number>(); // userId -> aco
+
+export function init() {
+    games.attachFinishedGameListener(onGameFinished);
+}
+
+export async function getRating(userId: string, numGames: number, category: string): Promise<number> {
+    let aco = matchmakingRatings.get(userId);
+    if (!aco) {
+        aco = await retrieveRating(userId, numGames, category);
+        matchmakingRatings.set(userId, aco);
+    }
+
+    return aco;
+}
+
+export async function retrieveRating(userId: string, numGames: number, category: string): Promise<number> {
     if (userId) {
         const userRating = await retrieveUserRatingOrDefault(userId, category);
-        if (unranked) {
-            return userRating.acoUnranked;
-        } else {
-            return userRating.aco;
-        }
+        return Math.max(userRating.aco, userRating.acoUnranked);
     } else {
         return statsProvider.estimateAcoFromNumGames(category, numGames);
     }
@@ -71,6 +86,41 @@ async function retrieveUserRatingOrDefault(userId: string, category: string): Pr
 
     const userRating = await statsStorage.getUserRating(userId, category);
     return userRating || statsStorage.initialRating();
+}
+
+function onGameFinished(game: g.Game, gameStats: m.GameStatsMsg): void {
+    try {
+        updateRatingsIfNecessary(game, gameStats);
+    } catch (error) {
+        logger.error("Unable to update matchmaking ratings:");
+        logger.error(error);
+        return null;
+    }
+}
+
+async function updateRatingsIfNecessary(game: g.Game, gameStats: m.GameStatsMsg) {
+    if (!(gameStats && game.segment === categories.publicSegment())) { // Private games don't count towards ranking
+        return;
+    }
+
+    const ratingValues = new Map<string, number>(); // userId -> aco
+    for (const player of gameStats.players) {
+        if (player.userId) {
+            const aco = await getRating(player.userId, player.initialNumGames || 0, gameStats.category);
+            ratingValues.set(player.userId, aco);
+        }
+    }
+
+    const deltas = acoUpdater.calculateNewAcoRatings(ratingValues, gameStats.players, gameStats.category, aco.AcoMatchmaking);
+
+    deltas.forEach(delta => {
+        let aco = matchmakingRatings.get(delta.userId);
+        if (aco) {
+            const change = _(delta.changes).map(c => c.delta).sum();
+            aco += change;
+        }
+        matchmakingRatings.set(delta.userId, aco);
+    });
 }
 
 export function findNewGame(version: string, room: g.Room, partyId: string | null, newPlayer: RatedPlayer): g.Game {
