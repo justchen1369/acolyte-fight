@@ -1472,11 +1472,11 @@ const repeater: Spell = {
 
                 render: {
                     color: "#0f0",
-                    alpha: 0.15, // 3 projectiles
+                    alpha: 0.15,
                     ticks: 15,
                     emissionRadiusFactor: 0,
                     particleRadius: Hero.Radius,
-                    shine: 0.2,
+                    shine: 1,
                     glow: 0.2,
                 },
             },
