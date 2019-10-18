@@ -38,6 +38,10 @@ export default class TimedCache<K, V> {
         this.items.set(key, new CacheItem(value));
     }
 
+    delete(key: K): void {
+        this.items.delete(key);
+    }
+
     cleanup() {
         let cleaned = 0;
         this.items.forEach((item, key) => {

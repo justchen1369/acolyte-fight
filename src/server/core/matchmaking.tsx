@@ -12,7 +12,7 @@ import * as statsProvider from '../ratings/statsProvider';
 import * as statsStorage from '../storage/statsStorage';
 import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
-import TimedCache from '../../utils/TimedCache';
+import TimedCache from '../../utils/timedCache';
 
 const MatchmakingExpiryMilliseconds = 20 * 60 * 1000;
 

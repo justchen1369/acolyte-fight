@@ -12,18 +12,26 @@ import * as userStorage from '../storage/userStorage';
 
 import { logger } from '../status/logging';
 
+import TimedCache from '../../utils/timedCache';
+
 interface CreateUserArgs {
     accessKey: string;
     username: string;
 }
 
+const UserIdCacheExpiryMilliseconds = 20 * 60 * 1000;
+
 let enigmaSecret: string = "Unknown";
 const ipAddressRegex = /^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$/;
 
-const accessKeyToUserIdCache = new Map<string, string>();
+const accessKeyToUserIdCache = new TimedCache<string, string>(UserIdCacheExpiryMilliseconds);
 
 export function init(_enigmaSecret: string) {
     enigmaSecret = _enigmaSecret;
+}
+
+export function cleanupUserCache() {
+    accessKeyToUserIdCache.cleanup();
 }
 
 export function getEnigmaSecret() {

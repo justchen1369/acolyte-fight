@@ -145,6 +145,7 @@ setInterval(async () => {
 			logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
 		}
 
+		auth.cleanupUserCache();
 		online.cleanupScoreboards();
 		matchmaking.cleanupRatings();
 	} catch (exception) {
