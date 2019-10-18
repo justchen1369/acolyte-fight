@@ -837,6 +837,8 @@ declare interface BurnTemplate extends BuffTemplateBase {
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
+
+	source?: string; // Only affect damage packets with the same source
 }
 
 declare interface MassTemplate extends BuffTemplateBase {
