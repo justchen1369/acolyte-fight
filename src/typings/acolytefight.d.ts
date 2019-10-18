@@ -743,7 +743,7 @@ declare interface BuffTemplateBase {
 	type: string;
 
 	stack?: string; // If there is another buff with the same stack name as this, replace it, don't add another buff
-	maxStacks?: number; // No more stacks than this many
+	maxStacks?: number; // Cannot have more than this many stacks. Defaults to 1.
 
 	owner?: boolean; // If this is a projectile that hit, apply the buff to the owner, not to the target
 	cleansable?: boolean; // Whether this buff can be cleansed, defaults to true

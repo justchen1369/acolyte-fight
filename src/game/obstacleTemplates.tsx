@@ -98,6 +98,7 @@ export const slow: ObstacleTemplate = {
         {
             type: "movement",
             stack: "slow",
+            maxStacks: 1,
             maxTicks: 15,
             movementProportion: 0.8,
             render: {
@@ -153,6 +154,7 @@ export const fast: ObstacleTemplate = {
         {
             type: "movement",
             stack: "fast",
+            maxStacks: 1,
             maxTicks: 15,
             movementProportion: 1.5,
             render: {

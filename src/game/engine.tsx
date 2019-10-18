@@ -4365,7 +4365,8 @@ function attachStack<T extends w.Buff>(
 	world: w.World,
 	config: BuffContext,
 	attach: (id: string, values: w.BuffValues) => T,
-	update: (stack: T) => void) {
+	update: (stack: T) => void,
+	defaultMaxStacks: number = 1) {
 
 	const id = calculateBuffId(template, world, config);
 	const values = calculateBuffValues(template, hero, world, config);
@@ -4382,7 +4383,8 @@ function attachStack<T extends w.Buff>(
 	if (stack) {
 		stack.expireTick = values.expireTick;
 
-		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+		let maxStacks = template.maxStacks !== undefined ? template.maxStacks : defaultMaxStacks;
+		if (!maxStacks || stack.numStacks < maxStacks) {
 			update(stack);
 			++stack.numStacks;
 		}
@@ -4492,6 +4494,7 @@ function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.Wor
 }
 
 function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	const defaultMaxStacks = 1e6;
 	attachStack<w.BurnBuff>(
 		template, hero, world, config,
 		(id, values) => ({
@@ -4504,6 +4507,7 @@ function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config
 		(stack) => {
 			stack.packet.damage += template.packet.damage;
 		},
+		defaultMaxStacks,
 	);
 }
 
