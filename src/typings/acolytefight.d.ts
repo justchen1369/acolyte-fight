@@ -818,7 +818,6 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 	decay?: boolean; // The damage multiplier linearly decays over time.
 
 	source?: string; // Only affect damage packets with the same source
-	maxStacks?: number;
 }
 
 declare interface SetCooldownTemplate extends BuffTemplateBase {
@@ -833,16 +832,11 @@ declare interface BurnTemplate extends BuffTemplateBase {
 	type: "burn";
 	hitInterval: number;
 	packet: DamagePacketTemplate;
-	stack?: string; // If there is another burn with the same stack name as this, then add to it.
-	maxStacks?: number; // Don't add any more than this many stacks
 }
 
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
-
-	source?: string; // Only affect damage packets with the same source
-	maxStacks?: number;
 }
 
 declare interface MassTemplate extends BuffTemplateBase {
