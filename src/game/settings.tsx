@@ -1422,7 +1422,7 @@ const bouncer: Spell = {
 };
 const repeater: Spell = {
     id: 'repeater',
-    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Damage increases +15 with every consecutive hit, up to 45 damage. Only does 50% damage at close range, so hit from a distance for maximum effect.",
+    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Damage increases +15 with every consecutive hit, up to 45 damage.",
     action: "projectile",
 
     color: '#00ff00',
@@ -1443,11 +1443,6 @@ const repeater: Spell = {
         lifeSteal,
         collideWith: Categories.All ^ Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
-
-        partialDamage: {
-            initialMultiplier: 0.5,
-            ticks: 0.4 * TicksPerSecond,
-        },
 
         buffs: [
             {
