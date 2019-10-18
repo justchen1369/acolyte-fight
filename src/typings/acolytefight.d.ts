@@ -814,7 +814,7 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 	minHealth?: number; // Don't leave the enemy with less health than this. For example, don't kill an enemy.
 	decay?: boolean; // The damage multiplier linearly decays over time.
 
-	stack?: string; // If there is another lifesteal/damage buff with the same name as this, then add to it
+	source?: string; // Only affect damage packets with the same source
 	maxStacks?: number;
 }
 
@@ -837,6 +837,9 @@ declare interface BurnTemplate extends BuffTemplateBase {
 declare interface ArmorTemplate extends BuffTemplateBase {
 	type: "armor";
 	proportion: number; // Positive increases damage received, negative negates damage received
+
+	source?: string; // Only affect damage packets with the same source
+	maxStacks?: number;
 }
 
 declare interface MassTemplate extends BuffTemplateBase {
@@ -1016,7 +1019,7 @@ declare interface DamagePacketTemplate {
 	noKnockback?: boolean; // Don't count as knockback - will not attribute future void damage to this hero
 	minHealth?: number; // Never reduce the enemy below this level of health
 
-	stack?: string; // Damage/Lifesteal Buffs which have the same stack will be applied to this
+	source?: string; // Damage/Lifesteal Buffs which have the same stack will be applied to this
 }
 
 declare interface Vec2 {

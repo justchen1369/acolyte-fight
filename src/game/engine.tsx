@@ -527,6 +527,7 @@ function addHero(world: w.World, heroId: string) {
 		radius: Hero.Radius,
 		linearDamping: Hero.Damping,
 		armorProportion: 0,
+		armorModifiers: new Map(),
 		damageSources: new Map<string, number>(),
 		damageSourceHistory: [],
 		moveSpeedPerSecond: Hero.MoveSpeedPerSecond,
@@ -714,6 +715,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 			lifeSteal: projectileTemplate.lifeSteal,
 			noHit: projectileTemplate.noHit,
 			noKnockback: projectileTemplate.noKnockback,
+			source: projectileTemplate.source,
 		},
 		partialDamage: projectileTemplate.partialDamage,
 		partialDetonateImpulse: projectileTemplate.partialDetonateImpulse,
@@ -4461,6 +4463,7 @@ function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.Wor
 			damageMultiplier: template.damageMultiplier,
 			minHealth: template.minHealth,
 			decay: template.decay,
+			source: template.source,
 		});
 	}
 }
@@ -4540,12 +4543,33 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 
 function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const id = calculateBuffId(template, world, config);
-	hero.buffs.set(id, {
-		...calculateBuffValues(template, hero, world, config),
-		id,
-		type: "armor",
-		proportion: template.proportion,
-	});
+	const values = calculateBuffValues(template, hero, world, config);
+
+	let stack: w.ArmorBuff = null;
+	if (template.stack) {
+		// Extend existing stacks
+		const candidate = hero.buffs.get(id);
+		if (candidate && candidate.type === "armor") {
+			stack = candidate;
+		}
+	}
+
+	if (stack) {
+		stack.expireTick = values.expireTick;
+
+		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+			stack.proportion += template.proportion;
+			++stack.numStacks;
+		}
+	} else {
+		hero.buffs.set(id, {
+			...values,
+			id,
+			type: "armor",
+			proportion: template.proportion,
+			source: template.source,
+		});
+	}
 	updateArmor(hero);
 }
 
@@ -4621,7 +4645,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 	const fromHero = world.objects.get(fromHeroId);
 	if (fromHero && fromHero.category === "hero") {
 		fromHero.buffs.forEach(buff => {
-			if (buff.type === "lifeSteal" && (!buff.stack || buff.stack === template.stack)) {
+			if (buff.type === "lifeSteal" && (!buff.source || buff.source === template.source)) {
 				let proportion = 1;
 				if (buff.decay) {
 					proportion = Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks);
@@ -4647,6 +4671,7 @@ function instantiateDamage(template: DamagePacketTemplate, fromHeroId: string, w
 		noHit: template.noHit,
 		noKnockback: template.noKnockback,
 		minHealth,
+		source: template.source,
 	};
 }
 
@@ -4678,7 +4703,9 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 
 	// Apply damage
 	let amount = Math.max(0, packet.damage);
-	amount += amount * toHero.armorProportion;
+
+	amount = applyArmor(toHero, packet.source, amount);
+
 	if (!packet.noMitigate) {
 		amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	}
@@ -4715,6 +4742,16 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	}
 }
 
+function applyArmor(toHero: w.Hero, source: string, amount: number) {
+	let armor = toHero.armorProportion;
+	if (source) {
+		armor += toHero.armorModifiers.get(source) || 0;
+	}
+
+	amount += amount * armor;
+	return amount;
+}
+
 function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: w.World): number {
 	if (!(amount && toHero && toHero.link && toHero.link.redirectDamage)) {
 		return amount;
@@ -4743,13 +4780,19 @@ function redirectDamage(toHero: w.Hero, amount: number, isLava: boolean, world: 
 }
 
 function updateArmor(hero: w.Hero) {
-	let totalModifier = 0;
+	hero.armorModifiers.clear();
+	hero.armorProportion = 0;
+
 	hero.buffs.forEach(buff => {
 		if (buff.type === "armor") {
-			totalModifier += buff.proportion;
+			if (buff.source) {
+				const current = hero.armorModifiers.get(buff.source) || 0;
+				hero.armorModifiers.set(buff.source, current + buff.proportion);
+			} else {
+				hero.armorProportion += buff.proportion;
+			}
 		}
 	});
-	hero.armorProportion = totalModifier;
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {

@@ -425,6 +425,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	exitTick?: number;
 
 	armorProportion: number;
+	armorModifiers: Map<string, number>;
 	damageSources: Map<string, number>;
 	damageSourceHistory: DamageSourceHistoryItem[];
 
@@ -677,6 +678,7 @@ export interface LifeStealBuff extends BuffBase {
 	decay?: boolean;
 
 	stack?: string;
+	source?: string;
 }
 
 export interface BurnBuff extends BuffBase {
@@ -690,6 +692,9 @@ export interface BurnBuff extends BuffBase {
 export interface ArmorBuff extends BuffBase {
 	type: "armor";
 	proportion: number;
+
+	stack?: string;
+	source?: string;
 }
 
 export interface MassBuff extends BuffBase {
@@ -781,6 +786,7 @@ export interface DamagePacket {
 	noMitigate?: boolean;
 	noRedirect?: boolean;
 	noKnockback?: boolean;
+	source?: string;
 }
 
 export interface DetonateParameters extends DamagePacket {
