@@ -12,6 +12,9 @@ import * as statsProvider from '../ratings/statsProvider';
 import * as statsStorage from '../storage/statsStorage';
 import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
+import TimedCache from '../../utils/TimedCache';
+
+const MatchmakingExpiryMilliseconds = 20 * 60 * 1000;
 
 export interface SocketTeam {
     socketId: string;
@@ -54,10 +57,17 @@ interface CandidateBase {
     avgWinProbability: number;
 }
 
-const matchmakingRatings = new Map<string, number>(); // userId -> aco
+const matchmakingRatings = new TimedCache<string, number>(MatchmakingExpiryMilliseconds); // userId -> aco
 
 export function init() {
     games.attachFinishedGameListener(onGameFinished);
+}
+
+export function cleanupRatings() {
+    const cleaned = matchmakingRatings.cleanup();
+    if (cleaned > 0) {
+        logger.info(`Cleaned ${cleaned} matchmaking ratings`);
+    }
 }
 
 export async function getRating(userId: string, numGames: number, category: string): Promise<number> {
