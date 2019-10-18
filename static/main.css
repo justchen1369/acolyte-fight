@@ -5,7 +5,7 @@ html, body {
 }
 
 body {
-    background: #181818 linear-gradient(to right, #222, #111 50%, #222);
+    background: #181818 linear-gradient(to right, #242424, #181818 50%, #242424);
     font-family: "Maven Pro", "Helvetica", "Arial", sans-serif;
     font-size: 14pt;
     color: white;
