@@ -4324,9 +4324,9 @@ function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
 
 function calculateBuffId(template: BuffTemplate, world: w.World, config: BuffContext) {
 	if (template.stack) {
-		return `${config.fromHeroId || "environment"}/${template.stack}`;
+		return `${config.fromHeroId || "environment"}/${template.type}/${template.stack}`;
 	} else {
-		return `${template.type}-${world.nextBuffId++}`;
+		return `${template.type}${world.nextBuffId++}`;
 	}
 }
 
@@ -4359,6 +4359,38 @@ function calculateBuffValues(template: BuffTemplate, hero: w.Hero, world: w.Worl
 	return values;
 }
 
+function attachStack<T extends w.Buff>(
+	template: BuffTemplate,
+	hero: w.Hero,
+	world: w.World,
+	config: BuffContext,
+	attach: (id: string, values: w.BuffValues) => T,
+	update: (stack: T) => void) {
+
+	const id = calculateBuffId(template, world, config);
+	const values = calculateBuffValues(template, hero, world, config);
+
+	let stack: T = null;
+	if (template.stack) {
+		// Extend existing stacks
+		const candidate = hero.buffs.get(id);
+		if (candidate && candidate.type === template.type) {
+			stack = candidate as T;
+		}
+	}
+
+	if (stack) {
+		stack.expireTick = values.expireTick;
+
+		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
+			update(stack);
+			++stack.numStacks;
+		}
+	} else {
+		hero.buffs.set(id, attach(id, values));
+	}
+}
+
 function attachCleanse(template: DebuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
 	const id = `${template.type}-${world.nextBuffId++}`;
 	hero.buffs.set(id, {
@@ -4384,23 +4416,30 @@ function updateCleanse(hero: w.Hero) {
 }
 
 function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	hero.buffs.set(id, {
-		...calculateBuffValues(template, hero, world, config),
-		id,
-		type: "movement",
-		movementProportion: template.movementProportion,
-	});
+	attachStack<w.MovementBuff>(
+		template, hero, world, config,
+		(id, values) => ({
+			...values, id, type: "movement",
+			movementProportion: template.movementProportion,
+		}),
+		(stack) => {
+			stack.movementProportion *= template.movementProportion;
+		},
+	);
 }
 
 function attachGlide(template: GlideTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	hero.buffs.set(id, {
-		...calculateBuffValues(template, hero, world, config),
-		id,
-		type: "glide",
-		linearDampingMultiplier: template.linearDampingMultiplier,
-	});
+	attachStack<w.GlideBuff>(
+		template, hero, world, config,
+		(id, values) => ({
+			...values, id, type: "glide",
+			linearDampingMultiplier: template.linearDampingMultiplier,
+		}),
+		(stack) => {
+			stack.linearDampingMultiplier *= template.linearDampingMultiplier;
+		},
+	);
+
 	updateHeroDamping(hero);
 }
 
@@ -4409,13 +4448,16 @@ function detachGlide(buff: w.GlideBuff, hero: w.Hero, world: w.World) {
 }
 
 function attachLavaImmunity(template: LavaImmunityBuffTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	hero.buffs.set(id, {
-		...calculateBuffValues(template, hero, world, config),
-		id,
-		type: "lavaImmunity",
-		damageProportion: template.damageProportion,
-	});
+	attachStack<w.LavaImmunityBuff>(
+		template, hero, world, config,
+		(id, values) => ({
+			...values, id, type: "lavaImmunity",
+			damageProportion: template.damageProportion,
+		}),
+		(stack) => {
+			stack.damageProportion *= template.damageProportion;
+		},
+	);
 }
 
 function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
@@ -4432,71 +4474,37 @@ function attachVanish(template: VanishTemplate, hero: w.Hero, world: w.World, co
 }
 
 function attachLifesteal(template: LifestealTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	const values = calculateBuffValues(template, hero, world, config);
-
-	let stack: w.LifeStealBuff = null;
-	if (template.stack) {
-		const candidate = hero.buffs.get(id);
-		if (candidate && candidate.type === "lifeSteal") {
-			stack = candidate;
-		}
-	}
-
-	if (stack) {
-		stack.expireTick = values.expireTick;
-
-		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
-			if (typeof template.damageMultiplier === 'number') {
-				const delta = template.damageMultiplier - 1;
-				stack.damageMultiplier = (stack.damageMultiplier || 1) + delta;
-				++stack.numStacks;
-				console.log(`Damage multiplier ${stack.damageMultiplier}`, stack);
-			}
-		}
-	} else {
-		hero.buffs.set(id, {
-			...values,
-			id,
-			type: "lifeSteal",
+	attachStack<w.LifeStealBuff>(
+		template, hero, world, config,
+		(id, values) => ({
+			...values, id, type: "lifeSteal",
 			lifeSteal: template.lifeSteal,
 			damageMultiplier: template.damageMultiplier,
 			minHealth: template.minHealth,
 			decay: template.decay,
 			source: template.source,
-		});
-	}
+		}),
+		(stack) => {
+			const delta = template.damageMultiplier - 1;
+			stack.damageMultiplier = (stack.damageMultiplier || 1) + delta;
+		},
+	);
 }
 
 function attachBurn(template: BurnTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	const values = calculateBuffValues(template, hero, world, config);
-
-	let stack: w.BurnBuff = null;
-	if (template.stack) {
-		// Extend existing stacks
-		const candidate = hero.buffs.get(id);
-		if (candidate && candidate.type === "burn") {
-			stack = candidate;
-		}
-	}
-
-	if (stack) {
-		stack.expireTick = values.expireTick;
-
-		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
-			stack.packet.damage += template.packet.damage;
-			++stack.numStacks;
-		}
-	} else {
-		hero.buffs.set(id, {
+	attachStack<w.BurnBuff>(
+		template, hero, world, config,
+		(id, values) => ({
 			...values, id, type: "burn",
 			fromHeroId: config.fromHeroId,
 			hitInterval: template.hitInterval,
 			packet: { ...template.packet },
 			stack: template.stack,
-		});
-	}
+		}),
+		(stack) => {
+			stack.packet.damage += template.packet.damage;
+		},
+	);
 }
 
 function burn(burn: w.BurnBehaviour, world: w.World) {
@@ -4542,34 +4550,19 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 }
 
 function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
-	const id = calculateBuffId(template, world, config);
-	const values = calculateBuffValues(template, hero, world, config);
-
-	let stack: w.ArmorBuff = null;
-	if (template.stack) {
-		// Extend existing stacks
-		const candidate = hero.buffs.get(id);
-		if (candidate && candidate.type === "armor") {
-			stack = candidate;
-		}
-	}
-
-	if (stack) {
-		stack.expireTick = values.expireTick;
-
-		if (!template.maxStacks || stack.numStacks < template.maxStacks) {
-			stack.proportion += template.proportion;
-			++stack.numStacks;
-		}
-	} else {
-		hero.buffs.set(id, {
+	attachStack<w.ArmorBuff>(
+		template, hero, world, config,
+		(id: string, values: w.BuffValues) => ({ // Create
 			...values,
 			id,
 			type: "armor",
 			proportion: template.proportion,
 			source: template.source,
+		}),
+		(stack) => { // Update
+			stack.proportion += template.proportion;
 		});
-	}
+
 	updateArmor(hero);
 }
 
