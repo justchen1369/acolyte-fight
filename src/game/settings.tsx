@@ -91,8 +91,8 @@ const Visuals: VisualSettings = {
 	ShakeTicks: 3,
 
     HighlightFactor: 0.01,
-    HighlightHexFactor: 0.08,
-	HighlightTicks: 10,
+    HighlightHexFactor: 0.1,
+	HighlightTicks: 30,
 
 	EaseTicks: 30,
 	EaseInDistance: 0.5,
