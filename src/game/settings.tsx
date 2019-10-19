@@ -1422,7 +1422,7 @@ const bouncer: Spell = {
 };
 const repeater: Spell = {
     id: 'repeater',
-    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Damage increases +9 with every consecutive hit, up to 36 damage. Takes 0.4 seconds to grow to maximum damage, so hit from a distance for maximum effect.",
+    description: "Every time Repeater hits, the cooldown resets and you can shoot it again immediately. Hitting the same enemy again will do 150% damage, and the third time it will do 200% damage (the maximum). Repeater takes 0.4 seconds to grow to full damage, so hit from a distance for maximum effect.",
     action: "projectile",
 
     color: '#00ff00',
@@ -1471,13 +1471,15 @@ const repeater: Spell = {
                 resetOnGameStart: true,
 
                 render: {
-                    color: "#0f0",
-                    alpha: 0.15,
-                    ticks: 15,
-                    emissionRadiusFactor: 0,
-                    particleRadius: Hero.Radius,
-                    shine: 1,
-                    glow: 0.2,
+                    "color": "#0f0",
+                    "alpha": 1,
+                    "ticks": 1,
+                    "emissionRadiusFactor": 0,
+                    "particleRadius": 0,
+                    "shine": 0.2,
+                    "glow": 0.4,
+                    "bloom": 0.02,
+                    "decay": true
                 },
             },
         ],
