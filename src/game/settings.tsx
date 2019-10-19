@@ -2035,7 +2035,9 @@ const iceBomb: Spell = {
             },
             {
                 type: "armor",
+                stack: "frostsplatter",
                 maxTicks: 1 * TicksPerSecond,
+                maxStacks: 1,
                 proportion: 0.25, // more damage
                 against: Alliances.NotFriendly,
             }
