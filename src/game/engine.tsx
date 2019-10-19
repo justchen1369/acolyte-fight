@@ -2480,7 +2480,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 			packet = scaleForPartialDamage(world, projectile, packet);
 			applyDamage(hero, packet, world);
 
-			emitPush(projectile, hero, world);
+			emitPushFromProjectile(projectile, hero, world);
 		}
 		projectile.hit = world.tick;
 	}
@@ -2497,7 +2497,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 	}
 }
 
-function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
+function emitPushFromProjectile(projectile: w.Projectile, toHero: w.Hero, world: w.World) {
 	let direction = projectile.body.getLinearVelocity();
 	const owner = world.objects.get(projectile.owner);
 	if (owner && owner.category === "hero") {
@@ -2505,13 +2505,17 @@ function emitPush(projectile: w.Projectile, hero: w.Hero, world: w.World) {
 		direction = vector.diff(projectile.body.getPosition(), owner.body.getPosition());
 	}
 
+	emitPush(projectile.owner, direction, projectile.color, toHero.id, world);
+}
+
+function emitPush(fromHeroId: string, direction: pl.Vec2, color: string, toObjectId: string, world: w.World) {
 	const push: w.PushEvent = {
 		type: "push",
 		tick: world.tick,
-		owner: projectile.owner,
-		objectId: hero.id,
+		owner: fromHeroId,
+		objectId: toObjectId,
 		direction,
-		color: projectile.color,
+		color,
 	};
 	world.ui.events.push(push);
 }
@@ -3389,6 +3393,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 					applyBuffsFrom(detonate.buffs, owner, other, world, {
 						durationMultiplier: config.buffDurationMultiplier,
 					});
+					emitPush(owner, diff, config.color, other.id, world);
 
 					applyKnockback = true;
 				}
@@ -3405,7 +3410,6 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 				const magnitude = (detonate.minImpulse + proportion * (detonate.maxImpulse - detonate.minImpulse));
 				const direction = vector.relengthen(diff, magnitude);
 				applyImpulseDelta(other, direction);
-				world.ui.events.push({ type: "push", tick: world.tick, owner, objectId: other.id, color: config.color, direction });
 			}
 		}
 	});
@@ -4199,8 +4203,7 @@ function saberSwing(behaviour: w.SaberBehaviour, world: w.World) {
 		const currentSpeed = obj.body.getLinearVelocity().length();
 		if (currentSpeed < swingSpeed) {
 			applyVelocityDelta(obj, swingVelocity);
-
-			world.ui.events.push({ type: "push", tick: world.tick, owner: hero.id, objectId: obj.id, direction: swingVelocity });
+			emitPush(saber.owner, swingVelocity, saber.color, obj.id, world);
 		}
 
 		handleSaberHit(saber, obj, world);
