@@ -1106,6 +1106,7 @@ interface VisualSettings {
 	// How much to flash the map when projectiles hit
 	HighlightFactor: number;
 	HighlightHexFactor: number; // Highlight the hexes on the map when hit
+	HighlightHexShineFactor: number; // Brighter color for hexes on map when hit
 	HighlightTicks: number;
 
 	// Controls the rate at which acolytes arrive/depart

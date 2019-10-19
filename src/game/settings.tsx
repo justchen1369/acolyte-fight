@@ -92,6 +92,7 @@ const Visuals: VisualSettings = {
 
     HighlightFactor: 0.01,
     HighlightHexFactor: 0.1,
+    HighlightHexShineFactor: 0.1,
 	HighlightTicks: 30,
 
 	EaseTicks: 30,

@@ -700,7 +700,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
 
 			color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
-			hexColor.mix(ColTuple.parse(highlight.color), Visuals.HighlightHexFactor * proportion);
+			hexColor.mix(ColTuple.parse(highlight.color).lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
 		}
 	}
 
