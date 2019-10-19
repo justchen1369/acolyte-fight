@@ -6,6 +6,7 @@ import ColTuple from './colorTuple';
 export interface CommonUniforms {
 	u_translate: r.UniformInfo;
 	u_scale: r.UniformInfo;
+	u_subpixel: r.UniformInfo;
 	u_pixel: r.UniformInfo;
 	u_rtx: r.UniformInfo;
 	u_tick: r.UniformInfo;
@@ -51,6 +52,11 @@ export function commonUniforms(gl: WebGLRenderingContext, program: WebGLProgram)
 			loc: gl.getUniformLocation(program, "u_scale"),
 			type: gl.FLOAT,
 			size: 2,
+		},
+		u_subpixel: {
+			loc: gl.getUniformLocation(program, "u_subpixel"),
+			type: gl.FLOAT,
+			size: 1,
 		},
 		u_pixel: {
 			loc: gl.getUniformLocation(program, "u_pixel"),

@@ -178,6 +178,7 @@ export interface DrawImages extends Draw {
 	uniforms: {
 		u_scale: UniformInfo;
 		u_translate: UniformInfo;
+		u_subpixel: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;
@@ -193,6 +194,7 @@ export interface DrawTrails extends Draw {
 	uniforms: {
 		u_scale: UniformInfo;
 		u_translate: UniformInfo;
+		u_subpixel: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;
@@ -209,6 +211,7 @@ export interface DrawPlates extends Draw {
 	uniforms: {
 		u_scale: UniformInfo;
 		u_translate: UniformInfo;
+		u_subpixel: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;

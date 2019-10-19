@@ -1,23 +1,28 @@
 precision highp float;
 
+uniform float u_subpixel;
 uniform float u_pixel;
 uniform int u_rtx;
 uniform int u_tick;
 
+varying vec2 v_draw;
 varying vec2 v_rel;
 varying vec4 v_color;
 varying vec4 v_strokeColor;
 varying vec2 v_range;
 
-#define HexColSize 20.0
-#define HexRowSize 15.0
+#define HexColSize 10.0
+#define HexRowSize 7.0
 #define HexTopProportion 0.577
 #define HexHalfProportion (HexTopProportion / 2.0)
 #define Hex1 (0.5 - HexHalfProportion)
 
 bool isHex(vec2 p) {
-	float row = mod(p.y, HexRowSize * 2.0) / (HexRowSize * 2.0); // Two quads per hex down so that it tesselates
-	float col = mod(p.x, HexColSize) / (HexColSize); // One squad per hex across so that it tesselates
+	float hexRowSize = u_pixel * HexRowSize;
+	float hexColSize = u_pixel * HexColSize;
+
+	float row = mod(p.y, hexRowSize * 2.0) / (hexRowSize * 2.0); // Two quads per hex down so that it tesselates
+	float col = mod(p.x, hexColSize) / (hexColSize); // One squad per hex across so that it tesselates
 
 	float halfCol = 1.0 - 2.0 * abs(col - 0.5); // 0.0 (side col) - 1.0 (middle col)
 	float hexRow1 = mix(Hex1 / 2.0, -Hex1 / 2.0, halfCol);
@@ -56,6 +61,10 @@ void main() {
 		// Smooth
 		float alpha = smoothstep(0.0, u_pixel, outside);
 		color = mix(color, strokeColor, alpha);
+	} else {
+		if (isHex(v_draw)) {
+			color.rgb *= 0.95;
+		}
 	}
 
 	if (radius > strokeRange) {
@@ -68,10 +77,6 @@ void main() {
 		if (fade == 0.0) {
 			discard;
 		}
-	}
-
-	if (isHex(gl_FragCoord.xy)) {
-		color.rgb *= 0.9;
 	}
 
 	gl_FragColor = color;

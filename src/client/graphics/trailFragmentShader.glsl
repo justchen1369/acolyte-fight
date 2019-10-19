@@ -1,5 +1,6 @@
 precision highp float;
 
+uniform float u_subpixel;
 uniform float u_pixel;
 uniform int u_rtx;
 
@@ -23,7 +24,7 @@ void main() {
 
 	if (outside > 0.0) {
 		// Antialias
-		float fade = 1.0 - smoothstep(0.0, u_pixel, outside);
+		float fade = 1.0 - smoothstep(0.0, u_subpixel, outside);
 
 		if (feather > 0.0) {
 			// Gaussian blur
