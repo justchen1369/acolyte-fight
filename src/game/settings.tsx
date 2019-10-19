@@ -369,8 +369,8 @@ const triplet: Spell = {
     jitterRatio: 0.1,
 
     projectile: {
-        density: 7,
-        radius: 0.0025,
+        density: 10,
+        radius: 0.002,
         speed: 0.3,
         maxTicks: 2.25 * TicksPerSecond,
         damage: 0,
