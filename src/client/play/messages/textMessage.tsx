@@ -51,7 +51,11 @@ class TextMessage extends React.PureComponent<Props, State> {
     }
 
     private renderMessage(text: string) {
-        return <span className="text-message">{text}</span>
+        if (text.startsWith("http")) {
+            return <a href={text} target="_blank" className="text-message">{text}</a>
+        } else {
+            return <span className="text-message">{text}</span>
+        }
     }
 
     private renderPlayerName() {
