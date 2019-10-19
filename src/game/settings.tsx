@@ -1097,7 +1097,7 @@ const rocket: Spell = {
             {
                 type: "homing",
                 targetType: "follow",
-                revolutionsPerSecond: 0.0068,
+                revolutionsPerSecond: 0.0075,
             },
             { type: "expireOnChannellingEnd" },
         ],
