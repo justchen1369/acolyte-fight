@@ -14,9 +14,11 @@ varying vec2 v_draw;
 varying vec2 v_rel;
 varying vec2 v_range;
 
+// The width of a hexagon at its top, compared to a square of the same height
 #define HexTopProportion 0.577	
-#define HexHalfProportion (HexTopProportion / 2.0)	
-#define Hex1 (0.5 - HexHalfProportion)	
+
+// The x position of the start of the hexagon at the top, compared to a square of the same height
+#define Hex1 (0.5 - (HexTopProportion / 2.0))	
 
 // Vertical hexagons - pointy end at the top
 float isHexEdge(vec2 p, vec2 hexSize) {
