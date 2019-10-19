@@ -227,6 +227,8 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 			return true;
 		} else if (buttonBar.view === "wheel" && buttonBar.wheelOnRight !== options.wheelOnRight) {
 			return true;
+		} else if (touchControls(buttonBar) !== options.mobile) {
+			return true;
 		}
 	}
 	return false;
