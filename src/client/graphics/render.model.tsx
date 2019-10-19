@@ -148,11 +148,15 @@ export interface DrawTrailsData extends DrawData {
 }
 
 export interface DrawPlatesData extends DrawData {
+	uniforms: {
+		u_color: number[];
+		u_strokeColor: number[];
+		u_hexSizing: number[];
+		u_hexMask: number[];
+	},
 	attribs: {
 		a_draw: Float32List;
 		a_rel: Float32List;
-		a_color: Float32List;
-		a_strokeColor: Float32List;
 		a_range: Float32List;
 	};
 }
@@ -215,12 +219,16 @@ export interface DrawPlates extends Draw {
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;
+
+		u_color: UniformInfo;
+		u_strokeColor: UniformInfo;
+
+		u_hexSizing: UniformInfo;
+		u_hexMask: UniformInfo;
 	};
 	attribs: {
 		a_draw: AttribInfo;
 		a_rel: AttribInfo;
-		a_color: AttribInfo;
-		a_strokeColor: AttribInfo;
 		a_range: AttribInfo;
 	};
 }
@@ -249,6 +257,14 @@ export interface PlateFill {
 
 	stroke: number;
 	strokeColor: ColTuple;
+
+	hex: HexConfig;
+}
+
+export interface HexConfig {
+	heightPixels: number;
+	widthPixels: number;
+	mask: number;
 }
 
 export interface AtlasState {

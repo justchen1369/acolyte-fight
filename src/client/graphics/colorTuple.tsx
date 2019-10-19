@@ -87,6 +87,16 @@ export default class ColTuple {
         return this;
     }
 
+    adjust(fraction: number) {
+        if (fraction > 0) {
+            return this.lighten(fraction);
+        } else if (fraction < 0) {
+            return this.darken(-fraction);
+        } else {
+            return this;
+        }
+    }
+
     lighten(fraction: number) {
         this.tuple[0] = (1 - fraction) * this.tuple[0] + fraction * 1;
         this.tuple[1] = (1 - fraction) * this.tuple[1] + fraction * 1;

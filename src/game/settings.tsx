@@ -76,6 +76,12 @@ const Visuals: VisualSettings = {
     Background: '#000',
     DefaultWorldColor: '#222',
     WorldStrokeProportion: 0.01,
+    WorldStrokeBrightness: 0.05,
+
+    WorldHexHeight: 7,
+    WorldHexWidth: 10,
+    WorldHexMask: 0.9, // < 1 for darker, > 1 for brighter
+
 	WorldAnimateWinTicks: 15,
 	WorldWinGrowth: 0.05,
 	DefaultGlowRadius: 4 * Pixel,

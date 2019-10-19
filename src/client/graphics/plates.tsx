@@ -19,12 +19,14 @@ const quad = [
 export function initData(): r.DrawPlatesData {
     return {
         uniforms: {
+            u_color: [0, 0, 0, 0],
+            u_strokeColor: [0, 0, 0, 0],
+            u_hexSizing: [1, 1],
+            u_hexMask: [1],
         },
         attribs: {
             a_draw: new Float32List(),
             a_rel: new Float32List(),
-            a_color: new Float32List(),
-            a_strokeColor: new Float32List(),
             a_range: new Float32List(),
         },
         textures2D: [],
@@ -47,7 +49,29 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
 	const program = shaders.compileProgram(gl, plateVertexShader, plateFragmentShader);
 	return {
 		program,
-		uniforms: shaders.commonUniforms(gl, program),
+		uniforms: {
+            ...shaders.commonUniforms(gl, program),
+            u_color: {
+                loc: gl.getUniformLocation(program, "u_color"),
+                type: gl.FLOAT,
+                size: 4,
+            },
+            u_strokeColor: {
+                loc: gl.getUniformLocation(program, "u_strokeColor"),
+                type: gl.FLOAT,
+                size: 4,
+            },
+            u_hexSizing: {
+                loc: gl.getUniformLocation(program, "u_hexSizing"),
+                type: gl.FLOAT,
+                size: 2,
+            },
+            u_hexMask: {
+                loc: gl.getUniformLocation(program, "u_hexMask"),
+                type: gl.FLOAT,
+                size: 1,
+            },
+        },
 		attribs: {
 			a_draw: {
 				loc: gl.getAttribLocation(program, "a_draw"),
@@ -60,18 +84,6 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
-			},
-			a_color: {
-				loc: gl.getAttribLocation(program, "a_color"),
-				buffer: gl.createBuffer(),
-				type: gl.FLOAT,
-				size: 4,
-			},
-			a_strokeColor: {
-				loc: gl.getAttribLocation(program, "a_strokeColor"),
-				buffer: gl.createBuffer(),
-				type: gl.FLOAT,
-				size: 4,
 			},
 			a_range: {
 				loc: gl.getAttribLocation(program, "a_range"),
@@ -86,7 +98,7 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
 
 export function circlePlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.PlateFill) {
 	// sqrt(2) because the shortest point on the edge of the quad has to fully enclose the radius of the circle
-	const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill.radius);
+    const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill.radius);
 
     const circular = true;
 	appendPoint(ctxStack, pos, 0 * vector.Tau / 4, circular, extent, fill);
@@ -96,6 +108,18 @@ export function circlePlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Pl
 	appendPoint(ctxStack, pos, 2 * vector.Tau / 4, circular, extent, fill);
 	appendPoint(ctxStack, pos, 3 * vector.Tau / 4, circular, extent, fill);
 	appendPoint(ctxStack, pos, 0 * vector.Tau / 4, circular, extent, fill);
+
+    applyFill(ctxStack, fill);
+}
+
+function applyFill(ctxStack: r.CanvasCtxStack, fill: r.PlateFill) {
+    const plates = shaders.getContext(ctxStack.gl).data.plates;
+
+    plates.uniforms.u_color = [...fill.color.tuple];
+    plates.uniforms.u_strokeColor = [...fill.strokeColor.tuple];
+
+    plates.uniforms.u_hexSizing = [fill.hex.widthPixels, fill.hex.heightPixels];
+    plates.uniforms.u_hexMask = [fill.hex.mask];
 }
 
 function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, circular: boolean, extent: number, fill: r.PlateFill) {
@@ -106,10 +130,7 @@ function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, ci
     shaders.appendVec2(plates.attribs.a_draw, drawPos);
 
     const relAngle = circular ? angle : 0;
-	shaders.appendAngleRadius(plates.attribs.a_rel, relAngle, extent); // Draw polygons with same shader
-
-    shaders.appendColTuple(plates.attribs.a_color, fill.color);
-    shaders.appendColTuple(plates.attribs.a_strokeColor, fill.strokeColor);
+    shaders.appendAngleRadius(plates.attribs.a_rel, relAngle, extent); // Draw polygons with same shader
 
     appendRanges(plates.attribs.a_range, fill);
 
@@ -133,6 +154,8 @@ export function convexPlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl
 		appendPoint(ctxStack, pos, vector.angle(a) + rotate, circular, a.length() * scale, fill);
 		appendPoint(ctxStack, pos, vector.angle(b) + rotate, circular, b.length() * scale, fill);
     }
+
+    applyFill(ctxStack, fill);
 }
 
 function calculateExtent(ctxStack: r.CanvasCtxStack, radius: number) {

@@ -705,7 +705,12 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 		color.darken(easeMultiplier);
 	}
 
-	const strokeStyle = color.clone().lighten(0.05);
+	const strokeStyle = color.clone().adjust(Visuals.WorldStrokeBrightness);
+	const hex: r.HexConfig = {
+		heightPixels: Visuals.WorldHexHeight,
+		widthPixels: Visuals.WorldHexWidth,
+		mask: Visuals.WorldHexMask,
+	};
 
 	const minExtent = engine.calculateWorldMinExtent(world);
 	const strokeExtent = Visuals.WorldStrokeProportion * minExtent;
@@ -716,6 +721,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 			radius: scale * minExtent * maxExtentMultiplier,
 			strokeColor: strokeStyle,
 			stroke: strokeExtent,
+			hex,
 		});
 	} else if (world.shape.type === "circle") {
 		const radius = world.shape.radius;
@@ -724,6 +730,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 			stroke: strokeExtent,
 			strokeColor: strokeStyle,
 			radius: scale * radius * minExtent,
+			hex,
 		});
 	}
 }

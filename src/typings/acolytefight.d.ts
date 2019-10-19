@@ -1089,7 +1089,12 @@ interface VisualSettings {
 	// Map visuals
 	Background: string;
 	DefaultWorldColor: string;
-	WorldStrokeProportion: number; // The width of the stroke (the bright part on the edge of the map)
+	WorldStrokeProportion: number; // The width of the edge of the map
+	WorldStrokeBrightness: number;
+	WorldHexHeight: number; // Height in number of pixels for hexagons
+	WorldHexWidth: number; // Height in number of pixels for hexagons
+	WorldHexMask: number;
+
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;
 
