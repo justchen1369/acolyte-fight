@@ -8,6 +8,7 @@ import * as w from '../game/world.model';
 import * as storage from './storage';
 import * as engine from '../game/engine';
 import * as settings from '../game/settings';
+import { isMobile } from './userAgent';
 
 let store: Redux.Store<s.State> = null;
 
@@ -27,6 +28,7 @@ function initialState(): s.State {
         customizing: false,
         seen: 0,
         loggedIn: false,
+        touched: isMobile,
         showingHelp: isNewPlayer,
         tutorialLevel: isNewPlayer ? 1 : null,
         playerName: storage.getOrCreatePlayerName(),
@@ -108,6 +110,8 @@ function reducer(state: s.State, action: s.Action): s.State {
             loggedIn: false,
             profile: null,
         };
+    } else if (action.type === "touched") {
+        return { ...state, touched: action.touched };
     } else if (action.type === "updatePlayerName") {
         return { ...state, playerName: action.playerName };
     } else if (action.type === "updateKeyBindings") {

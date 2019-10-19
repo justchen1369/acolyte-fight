@@ -6,7 +6,6 @@ import * as Reselect from 'reselect';
 import * as s from '../../store.model';
 import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
-import { isMobile } from '../../core/userAgent';
 import PlayButton from '../../ui/playButton';
 import PlayerName from '../playerNameComponent';
 

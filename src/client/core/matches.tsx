@@ -8,7 +8,6 @@ import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import * as vector from '../../game/vector';
-import { isMobile } from './userAgent';
 import { notify } from './notifications';
 import { getSocket } from './sockets';
 
@@ -39,7 +38,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				keyBindings: store.keyBindings,
 				room: opts.roomId || store.room.id,
 				partyId: store.party ? store.party.id : null,
-				isMobile,
+				isMobile: store.touched,
 				unranked: store.options.unranked || false,
 				observe,
 				live,

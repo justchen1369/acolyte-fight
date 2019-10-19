@@ -10,7 +10,6 @@ import * as cloud from '../core/cloud';
 import * as spellUtils from '../core/spellUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
-import { isMobile } from '../core/userAgent';
 
 namespace Toggle {
     export const On = "on";
@@ -45,6 +44,7 @@ interface Props {
     rebindings: KeyBindings;
     settings: AcolyteFightSettings;
     options: m.GameOptions;
+    touched: boolean;
 }
 
 interface ControlState {
@@ -75,6 +75,7 @@ function stateToProps(state: s.State): Props {
         rebindings: state.rebindings,
         settings: state.room.settings,
         options: state.options,
+        touched: state.touched,
     };
 }
 
@@ -158,16 +159,17 @@ class ControlsPanel extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const touched = this.props.touched;
         return <div className="controls-panel" onClick={ev => this.onClick(ev)}>
             <h2>Controls</h2>
-            {!isMobile && <div className="row">
+            {!touched && <div className="row">
                 <span className="label">Move with</span>
                 <select className="value" value={this.state.moveWith} onChange={ev => this.onUpdate({ moveWith: ev.target.value })}>
                     <option value={MoveWith.Click}>Click</option>
                     <option value={MoveWith.FollowCursor}>Follow cursor</option>
                 </select>
             </div>}
-            {!isMobile && <div className="row">
+            {!touched && <div className="row">
                 <span className="label">Left click</span>
                 <select
                     className="value"
@@ -179,7 +181,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
             </div>}
-            {!isMobile && <div className="row">
+            {!touched && <div className="row">
                 <span className="label">Right click</span>
                 <select
                     className="value"
@@ -192,7 +194,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
             </div>}
-            {isMobile && <div className="row">
+            {touched && <div className="row">
                 <span className="label">Single tap</span>
                 <select
                     className="value"
@@ -204,7 +206,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
             </div>}
-            {isMobile && <div className="row">
+            {touched && <div className="row">
                 <span className="label">Double tap</span>
                 <select
                     className="value"
@@ -217,14 +219,14 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 </select>
             </div>}
             <div className="row"></div>
-            {isMobile && <div className="row">
+            {touched && <div className="row">
                 <span className="label">Layout</span>
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onUpdate({ actionWheelSide: ev.target.value })}>
                     <option value={formatOption(Side.Left)}>Right-handed</option>
                     <option value={formatOption(Side.Right)}>Left-handed</option>
                 </select>
             </div>}
-            {isMobile && <>
+            {touched && <>
                 <div className="row">
                     <span className="label">Touch tracking speed</span>
                     <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
@@ -268,7 +270,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <span className="value">Whether to zoom and pan if the screen is too small.</span>
                 </div>
             </>
-            {!isMobile && <>
+            {!touched && <>
                 <div className="row">
                     <span className="label">Change spells with</span>
                     <select className="value" value={this.state.changeSpellsWith} onChange={ev => this.onUpdate({ changeSpellsWith: ev.target.value })}>

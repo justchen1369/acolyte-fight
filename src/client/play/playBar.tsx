@@ -13,7 +13,6 @@ import * as watcher from '../core/watcher';
 import ButtonPanelLabel from './buttons/buttonPanelLabel';
 import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
-import { isMobile } from '../core/userAgent';
 
 interface Props {
     connected: boolean;

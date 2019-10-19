@@ -12,13 +12,13 @@ import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import HrefItem from './hrefItem';
 import PageLink from './pageLink';
-import { isMobile } from '../core/userAgent';
 
 interface Props {
     userId: string;
     profile: m.GetProfileResponse;
     unranked: boolean;
     leagues: m.League[];
+    touched: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -27,6 +27,7 @@ function stateToProps(state: s.State): Props {
         profile: state.profile,
         unranked: state.options.unranked,
         leagues: state.leagues,
+        touched: state.touched,
     };
 }
 
@@ -131,7 +132,7 @@ class RatingControl extends React.PureComponent<Props> {
 
     private onUnrankedToggleClick(ev: React.MouseEvent) {
         ev.preventDefault();
-        if (isMobile) { // Can't display tooltips on mobile so take them to the relevant page instead
+        if (this.props.touched) { // Can't display tooltips on mobile so take them to the relevant page instead
             pages.changePage("profile", this.props.userId);
         } else {
             StoreProvider.dispatch({

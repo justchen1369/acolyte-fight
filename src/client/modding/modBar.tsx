@@ -13,12 +13,12 @@ import CustomBar from '../nav/customBar';
 import HrefItem from '../nav/hrefItem';
 import PageLink from '../nav/pageLink';
 import PreviewButton from './previewButton';
-import { isMobile } from '../core/userAgent';
 
 interface Props {
     codeTree: e.CodeTree;
     currentMod: ModTree;
     errors: e.ErrorTree;
+    touched: boolean;
 }
 interface State {
 }
@@ -28,6 +28,7 @@ function stateToProps(state: s.State): Props {
         codeTree: state.codeTree,
         currentMod: state.mod,
         errors: state.modErrors,
+        touched: state.touched,
     };
 }
 
@@ -54,24 +55,25 @@ class ModBar extends React.PureComponent<Props, State> {
     }
 
     private renderEditing() {
-        const horizontal = isMobile ? <>
+        const touched = this.props.touched;
+        const horizontal = touched ? <>
             <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-home" /> Home</HrefItem>
             <div className="spacer">{this.props.children}</div>
             <PreviewButton>Preview Mod</PreviewButton>
         </> : <>
             <HrefItem disabled={!this.props.currentMod} onClick={() => this.onHomeClick()}><i className="fas fa-chevron-left" /> Home</HrefItem>
-            <PageLink page="modding" shrink={isMobile}>Overview</PageLink>
-            <PageLink page="modding-spells" shrink={isMobile} error={"spells" in this.props.errors}>Spells</PageLink>
-            <PageLink page="modding-sounds" shrink={isMobile} error={"sounds" in this.props.errors}>Sounds</PageLink>
-            <PageLink page="modding-icons" shrink={isMobile} error={"icons" in this.props.errors}>Icons</PageLink>
-            <PageLink page="modding-maps" shrink={isMobile} error={"maps" in this.props.errors}>Maps</PageLink>
-            <PageLink page="modding-obstacles" shrink={isMobile} error={"obstacles" in this.props.errors}>Obstacles</PageLink>
-            <PageLink page="modding-constants" shrink={isMobile} error={"constants" in this.props.errors}>Constants</PageLink>
+            <PageLink page="modding" shrink={touched}>Overview</PageLink>
+            <PageLink page="modding-spells" shrink={touched} error={"spells" in this.props.errors}>Spells</PageLink>
+            <PageLink page="modding-sounds" shrink={touched} error={"sounds" in this.props.errors}>Sounds</PageLink>
+            <PageLink page="modding-icons" shrink={touched} error={"icons" in this.props.errors}>Icons</PageLink>
+            <PageLink page="modding-maps" shrink={touched} error={"maps" in this.props.errors}>Maps</PageLink>
+            <PageLink page="modding-obstacles" shrink={touched} error={"obstacles" in this.props.errors}>Obstacles</PageLink>
+            <PageLink page="modding-constants" shrink={touched} error={"constants" in this.props.errors}>Constants</PageLink>
             <div className="spacer">{this.props.children}</div>
             <PreviewButton>Preview</PreviewButton>
         </>
 
-        const vertical = isMobile && <>
+        const vertical = touched && <>
             <PageLink page="modding">Overview</PageLink>
             <PageLink page="modding-spells" error={"spells" in this.props.errors}>Spells</PageLink>
             <PageLink page="modding-sounds" error={"sounds" in this.props.errors}>Sounds</PageLink>

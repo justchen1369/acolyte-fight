@@ -5,6 +5,8 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
+import * as StoreProvider from '../storeProvider';
+
 import AboutSection from './aboutSection';
 import DebugPanel from './debugPanel';
 import GamePanel from '../play/gamePanel';
@@ -33,12 +35,14 @@ import ConstantEditor from '../modding/constantEditor';
 interface Props {
     myGameId: string;
     current: s.PathElements;
+    touched: boolean;
 }
 
 function stateToProps(state: s.State): Props {
     return {
         myGameId: state.world.ui.myGameId,
         current: state.current,
+        touched: state.touched,
     };
 }
 
@@ -70,7 +74,7 @@ class Root extends React.PureComponent<Props> {
     private renderPage() {
         const page = this.props.current.page;
         return (
-            <div className="root-panel">
+            <div className="root-panel" onTouchStart={() => this.onTouchStart()}>
                 {page === "" && this.renderHome()}
                 {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
@@ -92,6 +96,12 @@ class Root extends React.PureComponent<Props> {
                 <UrlListener />
             </div>
         );
+    }
+
+    private onTouchStart() {
+        if (!this.props.touched) {
+            StoreProvider.dispatch({ type: "touched", touched: true });
+        }
     }
 
     private renderHome() {

@@ -16,7 +16,6 @@ import { Alliances } from '../../game/constants';
 import { CanvasStack, CanvasCtxStack, RenderOptions } from './render.model';
 import ColTuple from './colorTuple';
 import { renderIconOnly } from './renderIcon';
-import { isMobile, isEdge } from '../core/userAgent';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
@@ -187,6 +186,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		subpixel,
 		pixel,
 		tick: world.tick,
+		mobile: options.mobile,
 	};
 	if (!(ctxStack.gl && ctxStack.ui)) {
 		throw "Error getting context";
@@ -325,7 +325,7 @@ function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	if (!isMobile) {
+	if (!ctxStack.mobile) {
 		return;
 	}
 
@@ -1508,7 +1508,7 @@ function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2
 }
 
 function renderRangeIndicator(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
-	if (!(hero.id === world.ui.myHeroId && world.ui.toolbar.hoverSpellId && !isMobile)) {
+	if (!(hero.id === world.ui.myHeroId && world.ui.toolbar.hoverSpellId && !ctxStack.mobile)) {
 		return;
 	}
 
@@ -2448,7 +2448,7 @@ function calculateButtonStatesFromKeyBindings(world: w.World, keysToSpells: Map<
 }
 
 function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, world: w.World, options: RenderOptions): w.ButtonConfig {
-	if (isMobile) {
+	if (options.mobile) {
 		return calculateButtonWheelLayout(keys, rect, world, options);
 	} else {
 		return calculateButtonBarLayout(keys, rect, world);

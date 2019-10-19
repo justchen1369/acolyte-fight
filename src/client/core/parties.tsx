@@ -8,7 +8,6 @@ import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import { getSocket } from './sockets';
 import { loaded } from './loader';
-import { isMobile } from './userAgent';
 
 export async function createPartyAsync(): Promise<void> {
 	await loaded(); // Ensure the correct room has been joined
@@ -20,7 +19,7 @@ export async function createPartyAsync(): Promise<void> {
 			roomId: store.room.id,
 			playerName: store.playerName,
 			keyBindings: store.keyBindings,
-			isMobile,
+			isMobile: store.touched,
 			unranked: store.options.unranked || false,
 			version: engine.version(),
 			numGames,
@@ -46,7 +45,7 @@ export async function joinPartyAsync(partyId: string): Promise<void> {
 				partyId,
 				playerName: store.playerName,
 				keyBindings: store.keyBindings,
-				isMobile,
+				isMobile: store.touched,
 				unranked: store.options.unranked || false,
 				version: engine.version(),
 				numGames,
@@ -119,7 +118,7 @@ export async function updatePartyAsync(): Promise<void> {
 			partyId: store.party.id,
 			playerName: store.playerName,
 			keyBindings: store.keyBindings,
-			isMobile,
+			isMobile: store.touched,
 			unranked: store.options.unranked,
 			version: engine.version(),
 			numGames,

@@ -8,7 +8,7 @@ import ModBar from './modBar';
 import ModLoader from './modLoader';
 import NavBar from '../nav/navbar';
 import TitleListener from '../controls/titleListener';
-import { isLocal } from '../core/userAgent';
+import { isLocal } from '../userAgent';
 
 interface OwnProps {
     expand?: boolean;

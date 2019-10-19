@@ -13,7 +13,6 @@ import * as spellUtils from '../core/spellUtils';
 import * as StoreProvider from '../storeProvider';
 import * as ticker from '../core/ticker';
 
-import { isMobile } from '../core/userAgent';
 import SpellIcon from '../controls/spellIcon';
 
 interface Props {
@@ -28,6 +27,7 @@ interface Props {
     keyBindings: KeyBindings;
     settings: AcolyteFightSettings;
     teams: Immutable.Map<string, w.Team>;
+    touched: boolean;
 }
 interface State {
     alternativeGameId: string;
@@ -50,6 +50,7 @@ function stateToProps(state: s.State): Props {
         keyBindings: state.keyBindings,
         settings: state.world.settings,
         teams: state.world.teams,
+        touched: state.touched,
     };
 }
 
@@ -121,7 +122,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         } else if (this.props.customizingMode) {
             return this.renderCustomizingMode();
         } else if (this.props.allowSpellChoosing) {
-            if (isMobile) {
+            if (this.props.touched) {
                 if (this.props.toolbar.hoverBtn && this.props.toolbar.hoverSpellId) {
                     return this.renderMobileHint(this.props.toolbar.hoverBtn, this.props.toolbar.hoverSpellId);
                 } else {
@@ -144,7 +145,7 @@ class HintPanel extends React.PureComponent<Props, State> {
     }
     
     private renderCustomizingMode() {
-        if (isMobile) {
+        if (this.props.touched) {
             return <div className="customize-hint-container">
                 <div className="customize-hint">Tap a spell button to change</div>
             </div>
@@ -188,7 +189,7 @@ class HintPanel extends React.PureComponent<Props, State> {
     }
 
     private renderChangeSpellHint() {
-        if (isMobile) {
+        if (this.props.touched) {
             return null;
         }
 

@@ -13,7 +13,6 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { isMobile } from '../core/userAgent';
 import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
@@ -39,6 +38,7 @@ interface Props {
     recordId: string;
     server: string;
     sounds: Sounds;
+    touched: boolean;
 }
 interface State {
     top: number;
@@ -59,6 +59,7 @@ function stateToProps(state: s.State): Props {
         recordId: state.current.recordId,
         server: state.current.server,
         sounds: state.world.settings.Sounds,
+        touched: state.touched,
     };
 }
 
@@ -111,8 +112,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
 
     render() {
         const className = classNames({
-            'mobile': isMobile,
-            'desktop': !isMobile,
+            'mobile': this.props.touched,
+            'desktop': !this.props.touched,
         });
         const style = { top: this.state.top, left: this.state.left, width: this.state.size, height: this.state.size };
         return (

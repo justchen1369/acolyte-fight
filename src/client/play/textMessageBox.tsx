@@ -6,7 +6,6 @@ import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
 import * as online from '../core/online';
-import { isMobile } from '../core/userAgent';
 
 const MaxCharsPerSecond = 5;
 const MinCharsPerMessage = 10;
@@ -21,6 +20,7 @@ interface Props {
     live: boolean;
     numOnline: number;
     isPlaying: boolean;
+    touched: boolean;
 }
 interface State {
     text: string;
@@ -33,6 +33,7 @@ function stateToProps(state: s.State): Props {
         live: state.world.ui.live,
         numOnline: state.online.size,
         isPlaying: !!state.world.ui.myHeroId,
+        touched: state.touched,
     };
 }
 
@@ -93,7 +94,7 @@ class TextMessageBox extends React.PureComponent<Props, State> {
     private renderHint() {
         if (this.state.focus) {
             return <div className="hint"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Send message</span></div>;
-        } else if (isMobile) {
+        } else if (this.props.touched) {
             return <div className="hint clickable"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Tap here to chat {this.renderNumPlayers()}</span></div>;
         } else {
             return <div className="hint"><span className="text-message-row-icon"><i className="fas fa-comment" /></span> <span>Press <span className="hint-enter-key">ENTER</span> to chat {this.renderNumPlayers()}</span></div>;

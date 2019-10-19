@@ -12,7 +12,6 @@ import * as seen from '../../core/seen';
 import * as tutor from '../../core/tutor';
 import * as StoreProvider from '../../storeProvider';
 import * as w from '../../../game/world.model';
-import { isMobile } from '../../core/userAgent';
 import Button from '../../controls/button';
 
 const NewVersion = 5;
@@ -29,6 +28,7 @@ interface Props extends OwnProps {
     tutorialLevel: number;
     numSpells: number;
     seenVersion: number;
+    touched: boolean;
 }
 interface State {
     hidingTutorialGameId: string;
@@ -47,6 +47,7 @@ function stateToProps(state: s.State): Props {
         tutorialLevel: state.world.ui.locked === m.LockType.Tutorial ? state.tutorialLevel : null,
         numSpells: Object.keys(state.world.settings.Spells).length,
         seenVersion: state.seen,
+        touched: state.touched,
     };
 }
 
@@ -92,7 +93,7 @@ class HelpMessage extends React.PureComponent<Props, State> {
     }
 
     private renderHelpContent() {
-        if (isMobile) {
+        if (this.props.touched) {
             const isSingleTapShoot = this.props.rebindings[w.SpecialKeys.SingleTap] === "q";
             const isDoubleTapDash = this.props.rebindings[w.SpecialKeys.DoubleTap] === "a";
             return <>

@@ -30,8 +30,6 @@ import TextMessageBox from './textMessageBox';
 import VideoPanel from './buttons/videoPanel';
 import WaitingMessage from './messages/waitingMessage';
 
-import { isMobile } from '../core/userAgent';
-
 namespace Tab {
     export const Spells = "spells";
     export const Options = "options";
@@ -44,6 +42,7 @@ interface Props {
     exitable: boolean;
     wheelOnRight: boolean;
     customizing: boolean;
+    touched: boolean;
 }
 interface State {
     tab: string;
@@ -55,6 +54,7 @@ function stateToProps(state: s.State): Props {
         exitable: matches.worldInterruptible(state.world),
         wheelOnRight: state.options.wheelOnRight,
         customizing: state.customizing,
+        touched: state.touched,
     };
 }
 
@@ -67,7 +67,7 @@ class HUD extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (isMobile) {
+        if (this.props.touched) {
             return this.renderMobile();
         } else {
             return this.renderDesktop();

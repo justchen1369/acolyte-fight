@@ -10,7 +10,6 @@ import * as StoreProvider from '../storeProvider';
 import Button from '../controls/button';
 import SpellBtnConfig from './spellBtnConfig';
 
-import { isMobile } from '../core/userAgent';
 import { sendKeyBindings } from '../core/ticker';
 
 interface Props {
@@ -22,6 +21,7 @@ interface Props {
     config: KeyBindings;
     rebindingLookup: Map<string, string>;
     settings: AcolyteFightSettings;
+    touched: boolean;
 }
 interface State {
 }
@@ -37,6 +37,7 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         config: state.keyBindings,
         rebindingLookup: keyboardUtils.getRebindingLookup({ rebindings, settings }),
+        touched: state.touched,
         settings,
     };
 }
@@ -67,7 +68,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
                 <SpellBtnConfig btn={btn} onChosen={(keyBindings, random) => this.onChosen(keyBindings, random)} settings={this.props.settings} />
                 <div className="accept-row">
                     {!this.props.wheelOnRight && <div className="spacer" />}
-                    {isMobile && <Button onClick={() => this.close()}>OK</Button>}
+                    {this.props.touched && <Button onClick={() => this.close()}>OK</Button>}
                     {this.props.wheelOnRight && <div className="spacer" />}
                 </div>
             </div>

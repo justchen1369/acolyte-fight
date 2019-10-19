@@ -8,7 +8,6 @@ import { SpellIcon } from '../controls/spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as icons from '../core/icons';
 import * as spellUtils from '../core/spellUtils';
-import { isMobile } from '../core/userAgent';
 
 import Button from '../controls/button';
 import KeyControl from './keyControl';
@@ -22,6 +21,7 @@ interface OwnProps {
 }
 interface Props extends OwnProps {
     config: KeyBindings;
+    touched: boolean;
 }
 
 interface State {
@@ -33,6 +33,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         config: state.keyBindings,
+        touched: state.touched,
     };
 }
 
@@ -83,7 +84,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                 <SpellStats spellId={hovering ? hovering.id : chosen.id} settings={this.props.settings} />
                 <Button className="clickable randomize-btn" onClick={() => this.onRandomizeClick()}><i className="fas fa-dice" /> Randomize</Button>
             </div>
-            {!isMobile && this.props.rebinding && <KeyControl initialKey={btn} />}
+            {!this.props.touched && this.props.rebinding && <KeyControl initialKey={btn} />}
         </div>;
     }
 

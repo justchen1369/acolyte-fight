@@ -108,6 +108,7 @@ export type Action =
     | UpdateSeenAction
     | UpdateUserIdAction
     | LogoutAction
+    | UpdateTouchedAction
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
     | UpdateCustomizingAction
@@ -196,6 +197,11 @@ export interface UpdateUserIdAction {
 
 export interface LogoutAction {
     type: "logout";
+}
+
+export interface UpdateTouchedAction {
+    type: "touched";
+    touched: boolean;
 }
 
 export interface UpdatePlayerNameAction {

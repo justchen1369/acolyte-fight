@@ -8,7 +8,6 @@ import * as StoreProvider from '../../storeProvider';
 import * as s from '../../store.model';
 import * as w from '../../../game/world.model';
 import PlayerName from '../playerNameComponent';
-import { isMobile } from '../../core/userAgent';
 
 interface OwnProps {
     notification: w.TextNotification;
@@ -18,6 +17,7 @@ interface Props extends OwnProps {
     silenced: Set<string>;
     player: w.Player;
     live: boolean;
+    touched: boolean;
 }
 interface State {
 }
@@ -30,6 +30,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         silenced: state.silenced,
         player: playerLookup.get(ownProps.notification.userHash),
         live: state.world.ui.live,
+        touched: state.touched,
     };
 }
 
@@ -68,7 +69,7 @@ class TextMessage extends React.PureComponent<Props, State> {
     }
 
     private renderSilenceBtn() {
-        if (isMobile) {
+        if (this.props.touched) {
             return null; // Too easy to click by mistake mid-game
         }
 

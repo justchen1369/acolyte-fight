@@ -61,6 +61,8 @@ export interface CanvasCtxStack {
 	ui: CanvasRenderingContext2D;
 	rtx: number;
 
+	mobile: boolean;
+
 	pixel: number;
 	subpixel: number;
 	tick: number;
@@ -77,6 +79,7 @@ export interface RenderOptions {
 	rtx: number;
 	retinaMultiplier: number;
 	customizingSpells?: boolean;
+	mobile?: boolean;
 }
 
 export interface GlContext {

@@ -12,7 +12,6 @@ import * as w from '../../game/world.model';
 import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel } from '../graphics/render';
 import { frame } from '../core/ticker';
-import { isMobile } from '../core/userAgent';
 
 const CheckInterval = 1000;
 const HiddenRenderInterval = 1000;
@@ -30,6 +29,7 @@ interface Props {
     currentGraphics: number;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
+    touched: boolean;
 }
 interface State {
     width: number;
@@ -113,6 +113,7 @@ function stateToProps(state: s.State): Props {
         currentGraphics: state.graphics,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
+        touched: state.touched,
     };
 }
 
@@ -239,6 +240,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
                 retinaMultiplier: this.calculateRetinaMultiplier(),
+                mobile: this.props.touched,
             });
         }
     }

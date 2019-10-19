@@ -15,7 +15,6 @@ import * as w from '../../game/world.model';
 
 import { worldPointFromInterfacePoint, whichKeyClicked, touchControls } from '../graphics/render';
 import { sendAction } from '../core/ticker';
-import { isMobile } from '../core/userAgent';
 
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
@@ -31,6 +30,7 @@ interface Props {
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
+    touched: boolean;
 }
 interface State {
     touchMultiplier: number;
@@ -72,12 +72,11 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
         rebindings: state.rebindings,
+        touched: state.touched,
     };
 }
 
 class ControlSurface extends React.PureComponent<Props, State> {
-    private touched: boolean = isMobile;
-
     private currentTouch: TouchState = null;
     private previousTouchStart: PointInfo = null;
     private actionSurface: ActionSurfaceState = null;
@@ -125,11 +124,12 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     render() {
+        const touched = this.props.touched;
         const className = classNames({
-            'mobile': isMobile,
-            'desktop': !isMobile,
-            'wheel-on-left': isMobile && !this.props.wheelOnRight,
-            'wheel-on-right': isMobile && this.props.wheelOnRight,
+            'mobile': touched,
+            'desktop': !touched,
+            'wheel-on-left': touched && !this.props.wheelOnRight,
+            'wheel-on-right': touched && this.props.wheelOnRight,
             'customizing': this.props.customizing,
         });
         return (
@@ -138,13 +138,13 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 className={className}
 
                 // If touched, we're going to receive duplicate events from the mouse, so ignore the mouse
-                onMouseDown={(ev) => !this.touched && this.touchStartHandler(this.takeMousePoint(ev))}
-                onMouseEnter={(ev) => !this.touched && this.touchMoveHandler(this.takeMousePoint(ev))}
-                onMouseMove={(ev) => !this.touched && this.touchMoveHandler(this.takeMousePoint(ev))}
-                onMouseLeave={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
-                onMouseUp={(ev) => !this.touched && this.touchEndHandler(this.takeMousePoint(ev))}
+                onMouseDown={(ev) => !touched && this.touchStartHandler(this.takeMousePoint(ev))}
+                onMouseEnter={(ev) => !touched && this.touchMoveHandler(this.takeMousePoint(ev))}
+                onMouseMove={(ev) => !touched && this.touchMoveHandler(this.takeMousePoint(ev))}
+                onMouseLeave={(ev) => !touched && this.touchEndHandler(this.takeMousePoint(ev))}
+                onMouseUp={(ev) => !touched && this.touchEndHandler(this.takeMousePoint(ev))}
 
-                onTouchStart={(ev) => { this.touched = true; this.touchStartHandler(...this.takeTouchPoint(ev)) }}
+                onTouchStart={(ev) => { this.onTouchStart(); this.touchStartHandler(...this.takeTouchPoint(ev)) }}
                 onTouchMove={(ev) => this.touchMoveHandler(...this.takeTouchPoint(ev))}
                 onTouchEnd={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
                 onTouchCancel={(ev) => this.touchEndHandler(...this.takeTouchPoint(ev))}
@@ -155,6 +155,13 @@ class ControlSurface extends React.PureComponent<Props, State> {
             </div>
         );
     }
+
+    private onTouchStart() {
+        if (!this.props.touched) {
+            StoreProvider.dispatch({ type: "touched", touched: true });
+        }
+    }
+
 
     private takeMousePoint(e: React.MouseEvent<HTMLElement>): PointInfo {
         const secondaryBtn = !!e.button;
@@ -215,7 +222,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
                         this.currentTouch = { id: p.touchId, stack: 1 };
                     }
 
-                    if (touchControls(world.ui.buttonBar)) {
+                    const usingTouch = touchControls(world.ui.buttonBar);
+                    if (usingTouch) {
                         if (!world.ui.nextTarget) {
                             const hero = world.objects.get(world.ui.myHeroId);
                             if (hero) {
@@ -234,7 +242,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     }
 
                     let key: string = null;
-                    if (isMobile) {
+                    if (usingTouch) {
                         if (this.isDoubleClick(p)) {
                             if (this.doubleTapKey === undefined) {
                                 this.autoBindDoubleTap();

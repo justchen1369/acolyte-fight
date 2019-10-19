@@ -9,7 +9,6 @@ import AccountPanel from '../profiles/accountPanel';
 import ControlsPanel from './controlsPanel';
 import NameConfig from './nameConfig';
 import SpellBtnConfig from './spellConfig';
-import { isMobile } from '../core/userAgent';
 
 interface Props {
     current: s.PathElements;

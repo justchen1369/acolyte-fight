@@ -30,7 +30,6 @@ import * as StoreProvider from './storeProvider';
 import * as ticker from './core/ticker';
 import * as tutor from './core/tutor';
 import * as url from './url';
-import * as userAgent from './core/userAgent';
 
 import { base } from './url';
 import { Sounds } from '../game/sounds';
@@ -60,7 +59,7 @@ export async function initialize() {
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
     
-    window.onpopstate = (ev) => {
+    window.onpopstate = (ev: PopStateEvent) => {
         const elems: s.PathElements = ev.state;
         if (elems) {
             pages.go(elems);

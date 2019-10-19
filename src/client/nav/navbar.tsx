@@ -7,7 +7,6 @@ import * as options from '../options';
 import * as pages from '../core/pages';
 import * as rooms from '../core/rooms';
 import * as url from '../url';
-import { isMobile } from '../core/userAgent';
 import LoginButton from './loginButton';
 import CustomBar from './customBar';
 import PageLink from './pageLink';

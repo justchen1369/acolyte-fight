@@ -6,8 +6,6 @@ import * as options from '../options';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
-import { isMobile } from '../core/userAgent';
-
 import DeadMessage from './messages/deadMessage';
 import PlayButton from '../ui/playButton';
 import WinMessage from './messages/winMessage';
@@ -17,6 +15,7 @@ interface Props {
     isDead: boolean;
     isFinished: boolean;
     items: s.NotificationItem[];
+    touched: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -27,6 +26,7 @@ function stateToProps(state: s.State): Props {
         isDead: engine.isDead(myHeroId, world),
         isFinished: !!world.winner || world.finished,
         items: state.items,
+        touched: state.touched,
     };
 }
 
@@ -53,7 +53,7 @@ class FinishedPanel extends React.PureComponent<Props> {
     }
 
     private renderDiscordAd() {
-        if (!options.getProvider().noDiscordAd && !isMobile) { // Don't show on mobile because it's easy to misclick
+        if (!options.getProvider().noDiscordAd && !this.props.touched) { // Don't show on mobile because it's easy to misclick
             return <div className="community-advert">
                 <span className="label" style={{ marginRight: 5 }}>Like this game?</span>
                 <a href="https://discord.gg/sZvgpZk" target="_blank" title="Chat on Discord!"><span className="label">Join the community on Discord</span><i className="fab fa-discord" /></a>

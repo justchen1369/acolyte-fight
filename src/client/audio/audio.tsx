@@ -1,7 +1,6 @@
 import * as r from './audio.model';
 import * as synth from './synth';
 import * as workerClient from './workerClient';
-import { isMobile } from '../core/userAgent';
 import { TicksPerSecond } from '../../game/constants';
 import { AudioElement, SampleRate, Vec2 } from './audio.model';
 export { AudioElement } from './audio.model';

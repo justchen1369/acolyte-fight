@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../../store.model';
 import * as StoreProvider from '../../storeProvider';
-import { isMobile } from '../../core/userAgent';
+import { isMobile } from '../../userAgent';
 
 import ButtonRow from './buttonRow';
 
