@@ -7,6 +7,7 @@ uniform int u_tick;
 
 uniform vec4 u_color;
 uniform vec4 u_strokeColor;
+uniform vec4 u_hexColor;
 uniform vec2 u_hexSizing;
 uniform float u_hexMask;
 uniform float u_hexInterval;
@@ -79,7 +80,7 @@ void main() {
 		if (hexEdge > 0.0) {
 			float offset = dot(v_draw, vec2(1.0));
 			float modifier = 1.0 + u_hexMask * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0));
-			color = mix(color, color * modifier, hexEdge);
+			color = mix(color, u_hexColor * modifier, hexEdge);
 		}
 	}
 

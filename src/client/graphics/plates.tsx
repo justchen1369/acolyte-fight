@@ -21,6 +21,7 @@ export function initData(): r.DrawPlatesData {
         uniforms: {
             u_color: [0, 0, 0, 0],
             u_strokeColor: [0, 0, 0, 0],
+            u_hexColor: [0, 0, 0, 0],
             u_hexSizing: [1, 1],
             u_hexMask: [1],
             u_hexInterval: [1],
@@ -59,6 +60,11 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
             },
             u_strokeColor: {
                 loc: gl.getUniformLocation(program, "u_strokeColor"),
+                type: gl.FLOAT,
+                size: 4,
+            },
+            u_hexColor: {
+                loc: gl.getUniformLocation(program, "u_hexColor"),
                 type: gl.FLOAT,
                 size: 4,
             },
@@ -123,6 +129,7 @@ function applyFill(ctxStack: r.CanvasCtxStack, fill: r.PlateFill) {
 
     plates.uniforms.u_color = [...fill.color.tuple];
     plates.uniforms.u_strokeColor = [...fill.strokeColor.tuple];
+    plates.uniforms.u_hexColor = [...fill.hex.color.tuple];
 
     plates.uniforms.u_hexSizing = [fill.hex.widthPixels, fill.hex.heightPixels];
     plates.uniforms.u_hexMask = [fill.hex.mask];

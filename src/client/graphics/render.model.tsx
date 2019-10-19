@@ -151,6 +151,7 @@ export interface DrawPlatesData extends DrawData {
 	uniforms: {
 		u_color: number[];
 		u_strokeColor: number[];
+		u_hexColor: number[];
 		u_hexSizing: number[];
 		u_hexMask: number[];
 		u_hexInterval: number[];
@@ -223,6 +224,7 @@ export interface DrawPlates extends Draw {
 
 		u_color: UniformInfo;
 		u_strokeColor: UniformInfo;
+		u_hexColor: UniformInfo;
 
 		u_hexSizing: UniformInfo;
 		u_hexMask: UniformInfo;
@@ -264,6 +266,8 @@ export interface PlateFill {
 }
 
 export interface HexConfig {
+	color: ColTuple;
+
 	heightPixels: number;
 	widthPixels: number;
 	mask: number;
