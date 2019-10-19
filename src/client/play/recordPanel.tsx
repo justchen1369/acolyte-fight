@@ -296,7 +296,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         // Game is started
         render(world, canvasStack, {
             rtx: GraphicsLevel.Maximum,
-            targetingIndicator: true,
+            targetingIndicator: false,
+            shake: true,
             rebindings: {},
             retinaMultiplier: 1,
             hideMap: this.state.hideMap,
