@@ -685,17 +685,22 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 
 	let scale = 1;
 	let color: ColTuple;
+	let hexColor: ColTuple;
 	if (world.winner) {
 		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / Visuals.WorldAnimateWinTicks);
 		scale *= 1 + Visuals.WorldWinGrowth * proportion;
 		color = ColTuple.parse(heroColor(world.winner, world)).darken(0.5 * (1 - proportion));
+		hexColor = color.clone();
 	} else {
 		color = ColTuple.parse(world.color);
+		hexColor = color.clone();
 
 		const highlight = takeHighlights(world);
 		if (highlight) {
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
+
 			color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
+			hexColor.mix(ColTuple.parse(highlight.color), Visuals.HighlightHexFactor * proportion);
 		}
 	}
 
@@ -703,6 +708,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	if (easeMultiplier > 0) {
 		scale *= 1 - easeMultiplier;
 		color.darken(easeMultiplier);
+		hexColor.darken(easeMultiplier);
 	}
 
 	const strokeStyle = color.clone().adjust(Visuals.WorldStrokeBrightness);
@@ -711,7 +717,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 		widthPixels: Visuals.WorldHexWidth,
 		mask: Visuals.WorldHexMask,
 		interval: Visuals.WorldHexInterval,
-		color,
+		color: hexColor,
 	};
 
 	const minExtent = engine.calculateWorldMinExtent(world);

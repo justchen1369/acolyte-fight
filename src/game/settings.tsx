@@ -81,7 +81,7 @@ const Visuals: VisualSettings = {
     WorldHexHeight: 7,
     WorldHexWidth: 10,
     WorldHexMask: 0.05,
-    WorldHexInterval: 10 * TicksPerSecond,
+    WorldHexInterval: 7 * TicksPerSecond,
 
 	WorldAnimateWinTicks: 15,
 	WorldWinGrowth: 0.05,
@@ -90,7 +90,8 @@ const Visuals: VisualSettings = {
 	ShakeDistance: 0.02,
 	ShakeTicks: 3,
 
-	HighlightFactor: 0.01,
+    HighlightFactor: 0.01,
+    HighlightHexFactor: 0.08,
 	HighlightTicks: 10,
 
 	EaseTicks: 30,
