@@ -80,7 +80,7 @@ void main() {
 			float hexEdge = isHexEdge(v_draw, u_hexSizing);
 			if (hexEdge > 0.0) {
 				float offset = dot(v_draw, vec2(1.0));
-				float modifier = 1.0 + u_hexMask * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0));
+				float modifier = 1.0 + u_hexMask * (0.5 + 0.5 * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0)));
 				color = mix(color, u_hexColor * modifier, hexEdge);
 			}
 		}

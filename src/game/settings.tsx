@@ -80,7 +80,7 @@ const Visuals: VisualSettings = {
 
     WorldHexHeight: 7,
     WorldHexWidth: 10,
-    WorldHexMask: 0.05,
+    WorldHexMask: 0.1,
     WorldHexInterval: 7 * TicksPerSecond,
 
 	WorldAnimateWinTicks: 15,
