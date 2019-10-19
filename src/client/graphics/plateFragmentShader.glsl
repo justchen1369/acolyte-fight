@@ -5,31 +5,31 @@ uniform int u_rtx;
 
 varying vec2 v_rel;
 varying vec4 v_color;
-varying vec4 v_fill;
+varying vec4 v_strokeColor;
+varying vec2 v_range;
 
 void main() {
 	vec4 color = vec4(v_color);
 
-	float minRadius = v_fill.x;
-	float maxRadius = v_fill.y;
-	float feather = v_fill.z;
-	float featherAlpha = v_fill.w;
+	vec4 strokeColor = v_strokeColor;
+	float strokeRange = v_range[0];
+	float fillRange = v_range[1];
 
 	float radius = length(v_rel);
-	float outside = max(
-		max(0.0, radius - maxRadius),
-		max(0.0, minRadius - radius)
-	);
 
-	if (outside > 0.0) {
+	if (radius > fillRange) {
+		float outside = radius - fillRange;
+
+		// Smooth
+		float alpha = smoothstep(0.0, u_pixel, outside);
+		color = mix(color, strokeColor, alpha);
+	}
+
+	if (radius > strokeRange) {
+		float outside = radius - strokeRange;
+
 		// Antialias
 		float fade = 1.0 - smoothstep(0.0, u_pixel, outside);
-
-		if (feather > 0.0) {
-			// Gaussian blur
-			fade = max(fade, featherAlpha * exp(-(outside * outside) / (2.0 * feather * feather)));
-		}
-
 		color.w *= fade;
 
 		if (fade == 0.0) {

@@ -705,30 +705,25 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	}
 
 	const strokeStyle = color.clone().lighten(0.05);
-	const strokeProportion = 0.99;
 
 	const minExtent = engine.calculateWorldMinExtent(world);
+	const strokeExtent = 0.01 * minExtent;
 	if (world.shape.type === "radial") {
 		const maxExtentMultiplier = shapes.calculateMaxExtentMultiplier(world.shape.points.length);
 		glx.convexPlate(ctxStack, pos, world.shape.points, world.angle, minExtent * scale, {
-			color: strokeStyle,
-			maxRadius: scale * minExtent * maxExtentMultiplier,
-		});
-		glx.convexPlate(ctxStack, pos, world.shape.points, world.angle, minExtent * scale * strokeProportion, {
 			color,
-			maxRadius: scale * minExtent * maxExtentMultiplier,
+			radius: scale * minExtent * maxExtentMultiplier,
+			strokeColor: strokeStyle,
+			stroke: strokeExtent,
 		});
 	} else if (world.shape.type === "circle") {
 		const radius = world.shape.radius;
 		glx.circlePlate(ctxStack, pos, {
-			color: strokeStyle,
-			maxRadius: scale * radius * minExtent,
-		});
-		glx.circlePlate(ctxStack, pos, {
 			color,
-			maxRadius: scale * radius * minExtent * strokeProportion,
+			stroke: strokeExtent,
+			strokeColor: strokeStyle,
+			radius: scale * radius * minExtent,
 		});
-
 	}
 }
 

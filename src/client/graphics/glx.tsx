@@ -154,4 +154,5 @@ export function clearGl(ctxStack: r.CanvasCtxStack) {
 	const context = initGl(ctxStack);
 	textures.clearData(context.data.images);
 	trails.clearData(context.data.trails);
+	plates.clearData(context.data.plates);
 }

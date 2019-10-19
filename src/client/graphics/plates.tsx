@@ -5,7 +5,6 @@ import * as vector from '../../game/vector';
 import { Float32List } from './list';
 import ColTuple from './colorTuple';
 
-const FeatherFactor = 5; // Render up to this radius to ensure the Gaussian blur reaches close to zero
 const plateFragmentShader = require('./plateFragmentShader.glsl');
 const plateVertexShader = require('./plateVertexShader.glsl');
 
@@ -22,10 +21,11 @@ export function initData(): r.DrawPlatesData {
         uniforms: {
         },
         attribs: {
-            a_pos: new Float32List(),
+            a_draw: new Float32List(),
             a_rel: new Float32List(),
             a_color: new Float32List(),
-            a_fill: new Float32List(),
+            a_strokeColor: new Float32List(),
+            a_range: new Float32List(),
         },
         textures2D: [],
         numVertices: 0,
@@ -49,8 +49,8 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
 		program,
 		uniforms: shaders.commonUniforms(gl, program),
 		attribs: {
-			a_pos: {
-				loc: gl.getAttribLocation(program, "a_pos"),
+			a_draw: {
+				loc: gl.getAttribLocation(program, "a_draw"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
@@ -67,66 +67,60 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
 				type: gl.FLOAT,
 				size: 4,
 			},
-			a_fill: {
-				loc: gl.getAttribLocation(program, "a_fill"),
+			a_strokeColor: {
+				loc: gl.getAttribLocation(program, "a_strokeColor"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 4,
+			},
+			a_range: {
+				loc: gl.getAttribLocation(program, "a_range"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 2,
 			},
 		},
         textures2D: [],
 	};
 }
 
-function appendCurveShape(data: Float32List, fill: r.TrailFill) {
-	data.push(fill.minRadius || 0.0);
-	data.push(fill.maxRadius);
-
-	if (fill.feather) {
-		data.push(fill.feather.sigma);
-		data.push(fill.feather.alpha);
-	} else {
-		data.push(0);
-		data.push(0);
-	}
-}
-
-function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, radius: number, fill: r.TrailFill) {
-    let color: ColTuple = fill.color;
-    if (fill.gradient) {
-		const gradient = fill.gradient;
-		const diff = vector.fromAngle(angle, radius).add(pos).sub(gradient.anchor); // Diff between anchor point and this point
-		const offset = diff.length() * Math.cos(vector.angle(diff) - gradient.angle); // Offset when projected onto the gradient axis
-		const alpha = (offset - gradient.fromExtent) / Math.max(1e-9, gradient.toExtent - gradient.fromExtent);
-
-        const mix = Math.min(1, Math.max(0, alpha));
-        color = gradient.fromColor.clone().mix(gradient.toColor, mix);
-    }
-
-    const trails = shaders.getContext(ctxStack.gl).data.trails;
-	shaders.appendVec2(trails.attribs.a_pos, pos);
-	shaders.appendAngleRadius(trails.attribs.a_rel, angle, radius);
-	shaders.appendColTuple(trails.attribs.a_color, color);
-	appendCurveShape(trails.attribs.a_fill, fill);
-	++trails.numVertices;
-}
-
-export function circlePlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.TrailFill) {
+export function circlePlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.PlateFill) {
 	// sqrt(2) because the shortest point on the edge of the quad has to fully enclose the radius of the circle
-	const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill);
+	const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill.radius);
 
-	appendTrail(ctxStack, pos, 0 * vector.Tau / 4, extent, fill);
-	appendTrail(ctxStack, pos, 1 * vector.Tau / 4, extent, fill);
-	appendTrail(ctxStack, pos, 2 * vector.Tau / 4, extent, fill);
+    const circular = true;
+	appendPoint(ctxStack, pos, 0 * vector.Tau / 4, circular, extent, fill);
+	appendPoint(ctxStack, pos, 1 * vector.Tau / 4, circular, extent, fill);
+	appendPoint(ctxStack, pos, 2 * vector.Tau / 4, circular, extent, fill);
 
-	appendTrail(ctxStack, pos, 2 * vector.Tau / 4, extent, fill);
-	appendTrail(ctxStack, pos, 3 * vector.Tau / 4, extent, fill);
-	appendTrail(ctxStack, pos, 0 * vector.Tau / 4, extent, fill);
+	appendPoint(ctxStack, pos, 2 * vector.Tau / 4, circular, extent, fill);
+	appendPoint(ctxStack, pos, 3 * vector.Tau / 4, circular, extent, fill);
+	appendPoint(ctxStack, pos, 0 * vector.Tau / 4, circular, extent, fill);
 }
 
-export function convexPlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.TrailFill) {
+function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, circular: boolean, extent: number, fill: r.PlateFill) {
+    const plates = shaders.getContext(ctxStack.gl).data.plates;
+
+    const drawPos = vector.fromAngle(angle, extent).add(pos);
+
+    shaders.appendVec2(plates.attribs.a_draw, drawPos);
+
+    const relAngle = circular ? angle : 0;
+	shaders.appendAngleRadius(plates.attribs.a_rel, relAngle, extent); // Draw polygons with same shader
+
+    shaders.appendColTuple(plates.attribs.a_color, fill.color);
+    shaders.appendColTuple(plates.attribs.a_strokeColor, fill.strokeColor);
+
+    appendRanges(plates.attribs.a_range, fill);
+
+	++plates.numVertices;
+}
+
+
+export function convexPlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.PlateFill) {
 	const center = vectorZero;
 
+    const circular = false;
     for (let i = 0; i < points.length; ++i) {
         const a = points[i]; //vector.turnVectorBy(points[i], rotate).mul(scale);
         const b = points[(i + 1) % points.length]; // vector.turnVectorBy(points[(i + 1) % points.length], rotate).mul(scale);
@@ -135,16 +129,21 @@ export function convexPlate(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl
             continue;
         }
 
-		appendTrail(ctxStack, pos, 0, 0, fill);
-		appendTrail(ctxStack, pos, vector.angle(a) + rotate, a.length() * scale, fill);
-		appendTrail(ctxStack, pos, vector.angle(b) + rotate, b.length() * scale, fill);
+		appendPoint(ctxStack, pos, 0, circular, 0, fill);
+		appendPoint(ctxStack, pos, vector.angle(a) + rotate, circular, a.length() * scale, fill);
+		appendPoint(ctxStack, pos, vector.angle(b) + rotate, circular, b.length() * scale, fill);
     }
 }
 
-function calculateExtent(ctxStack: r.CanvasCtxStack, fill: r.TrailFill) {
-    let extent = fill.maxRadius + ctxStack.subpixel;
-    if (fill.feather) {
-        extent += fill.feather.sigma * FeatherFactor;
-    }
+function calculateExtent(ctxStack: r.CanvasCtxStack, radius: number) {
+    let extent = radius + ctxStack.subpixel;
     return extent;
+}
+
+function appendRanges(data: Float32List, fill: r.PlateFill) {
+    const strokeRange = fill.radius;
+    const fillRange = Math.max(0, fill.radius - fill.stroke);
+
+	data.push(strokeRange);
+	data.push(fillRange);
 }

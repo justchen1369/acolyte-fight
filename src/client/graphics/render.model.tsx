@@ -148,10 +148,11 @@ export interface DrawTrailsData extends DrawData {
 
 export interface DrawPlatesData extends DrawData {
 	attribs: {
-		a_pos: Float32List;
+		a_draw: Float32List;
 		a_rel: Float32List;
 		a_color: Float32List;
-		a_fill: Float32List;
+		a_strokeColor: Float32List;
+		a_range: Float32List;
 	};
 }
 
@@ -209,10 +210,11 @@ export interface DrawPlates extends Draw {
 		u_rtx: UniformInfo;
 	};
 	attribs: {
-		a_pos: AttribInfo;
+		a_draw: AttribInfo;
 		a_rel: AttribInfo;
 		a_color: AttribInfo;
-		a_fill: AttribInfo;
+		a_strokeColor: AttribInfo;
+		a_range: AttribInfo;
 	};
 }
 
@@ -232,6 +234,14 @@ export interface TrailFill {
 	minRadius?: number;
 	maxRadius: number;
 	feather?: FeatherConfig;
+}
+
+export interface PlateFill {
+	radius: number;
+	color: ColTuple;
+
+	stroke: number;
+	strokeColor: ColTuple;
 }
 
 export interface AtlasState {
