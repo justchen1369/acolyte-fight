@@ -28,6 +28,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 		],
 		u_pixel: [ctxStack.subpixel],
 		u_rtx: [ctxStack.rtx],
+		u_tick: [ctxStack.tick],
 	};
 
 	runProgram(context, context.plates, uniforms, context.data.plates);

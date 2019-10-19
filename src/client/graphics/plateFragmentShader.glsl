@@ -2,6 +2,7 @@ precision highp float;
 
 uniform float u_pixel;
 uniform int u_rtx;
+uniform int u_tick;
 
 varying vec2 v_rel;
 varying vec4 v_color;

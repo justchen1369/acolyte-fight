@@ -63,6 +63,7 @@ export interface CanvasCtxStack {
 
 	pixel: number;
 	subpixel: number;
+	tick: number;
 }
 
 export interface RenderOptions {
@@ -179,6 +180,7 @@ export interface DrawImages extends Draw {
 		u_translate: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
+		u_tick: UniformInfo;
 	};
 	attribs: {
 		a_pos: AttribInfo;
@@ -193,6 +195,7 @@ export interface DrawTrails extends Draw {
 		u_translate: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
+		u_tick: UniformInfo;
 	};
 	attribs: {
 		a_pos: AttribInfo;
@@ -208,6 +211,7 @@ export interface DrawPlates extends Draw {
 		u_translate: UniformInfo;
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
+		u_tick: UniformInfo;
 	};
 	attribs: {
 		a_draw: AttribInfo;

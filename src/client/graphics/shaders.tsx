@@ -8,6 +8,7 @@ export interface CommonUniforms {
 	u_scale: r.UniformInfo;
 	u_pixel: r.UniformInfo;
 	u_rtx: r.UniformInfo;
+	u_tick: r.UniformInfo;
 }
 
 export function compileProgram(gl: WebGLRenderingContext, vertexShaderCode: string, fragmentShaderCode: string) {
@@ -58,6 +59,11 @@ export function commonUniforms(gl: WebGLRenderingContext, program: WebGLProgram)
 		},
 		u_rtx: {
 			loc: gl.getUniformLocation(program, "u_rtx"),
+			type: gl.INT,
+			size: 1,
+		},
+		u_tick: {
+			loc: gl.getUniformLocation(program, "u_tick"),
 			type: gl.INT,
 			size: 1,
 		},

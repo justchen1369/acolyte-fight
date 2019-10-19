@@ -186,6 +186,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 		rtx: options.rtx,
 		subpixel,
 		pixel,
+		tick: world.tick,
 	};
 	if (!(ctxStack.gl && ctxStack.ui)) {
 		throw "Error getting context";
