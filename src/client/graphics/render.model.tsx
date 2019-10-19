@@ -199,7 +199,7 @@ export interface Gradient {
 	toColor: ColTuple;
 }
 
-export interface Fill {
+export interface TrailFill {
 	color?: ColTuple;
 	gradient?: Gradient;
 

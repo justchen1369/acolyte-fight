@@ -5,7 +5,7 @@ import * as trails from './trails';
 import ColTuple from './colorTuple';
 
 export { atlas, image } from './images';
-export { circle, line, arc, convex } from './trails';
+export { circleTrail as circle, lineTrail as line, arcTrail as arc, convexTrail as convex } from './trails';
 
 export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect, background: ColTuple) {
 	let context: r.GlContext = initGl(ctxStack);

@@ -78,7 +78,7 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 	};
 }
 
-function appendCurveShape(data: Float32List, fill: r.Fill) {
+function appendCurveShape(data: Float32List, fill: r.TrailFill) {
 	data.push(fill.minRadius || 0.0);
 	data.push(fill.maxRadius);
 
@@ -91,7 +91,7 @@ function appendCurveShape(data: Float32List, fill: r.Fill) {
 	}
 }
 
-function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, radius: number, fill: r.Fill) {
+function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, radius: number, fill: r.TrailFill) {
     let color: ColTuple = fill.color;
     if (fill.gradient) {
 		const gradient = fill.gradient;
@@ -111,7 +111,7 @@ function appendTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, ra
 	++trails.numVertices;
 }
 
-export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
+export function circleTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.TrailFill) {
 	// sqrt(2) because the shortest point on the edge of the quad has to fully enclose the radius of the circle
 	const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill);
 
@@ -124,7 +124,7 @@ export function circle(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.Fill) {
 	appendTrail(ctxStack, pos, 0 * vector.Tau / 4, extent, fill);
 }
 
-export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.Fill, toFill: r.Fill = fromFill) {
+export function lineTrail(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.TrailFill, toFill: r.TrailFill = fromFill) {
 	let extent = calculateExtent(ctxStack, fromFill);
 	if (fromFill !== toFill) {
 		extent = Math.max(extent, calculateExtent(ctxStack, toFill));
@@ -142,7 +142,7 @@ export function line(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fro
 	appendTrail(ctxStack, to, down, extent, toFill);
 }
 
-export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.Fill) {
+export function arcTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.TrailFill) {
     const extent = Math.sqrt(2) * calculateExtent(ctxStack, fill); // sqrt(2) ensures the triangle always fully enclosees the arc
 
 	const center = vectorZero;
@@ -174,7 +174,7 @@ export function arc(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, an
     }
 }
 
-export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.Fill) {
+export function convexTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.TrailFill) {
 	const center = vectorZero;
 
     for (let i = 0; i < points.length; ++i) {
@@ -191,7 +191,7 @@ export function convex(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2
     }
 }
 
-function calculateExtent(ctxStack: r.CanvasCtxStack, fill: r.Fill) {
+function calculateExtent(ctxStack: r.CanvasCtxStack, fill: r.TrailFill) {
     let extent = fill.maxRadius + ctxStack.subpixel;
     if (fill.feather) {
         extent += fill.feather.sigma * FeatherFactor;

@@ -333,7 +333,7 @@ function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	const fill: r.Fill = {
+	const fill: r.TrailFill = {
 		color: ColTuple.parse("#fff"),
 		maxRadius: 1 * ctxStack.pixel,
 	};
@@ -2021,7 +2021,7 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 		}
 	}
 
-	const fromFill: r.Fill = {
+	const fromFill: r.TrailFill = {
 		color,
 		maxRadius: scale * render.width / 2,
 		feather: (render.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) ? {
