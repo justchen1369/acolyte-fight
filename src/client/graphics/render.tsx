@@ -715,7 +715,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const hex: r.HexConfig = {
 		heightPixels: Visuals.WorldHexHeight,
 		widthPixels: Visuals.WorldHexWidth,
-		mask: Visuals.WorldHexMask,
+		mask: ctxStack.rtx >= r.GraphicsLevel.Ultra ? Visuals.WorldHexMask : 0,
 		interval: Visuals.WorldHexInterval,
 		color: hexColor,
 	};

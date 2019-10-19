@@ -76,11 +76,13 @@ void main() {
 		float alpha = smoothstep(0.0, u_subpixel, outside);
 		color = mix(color, strokeColor, alpha);
 	} else {
-		float hexEdge = isHexEdge(v_draw, u_hexSizing);
-		if (hexEdge > 0.0) {
-			float offset = dot(v_draw, vec2(1.0));
-			float modifier = 1.0 + u_hexMask * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0));
-			color = mix(color, u_hexColor * modifier, hexEdge);
+		if (u_hexMask > 0.0) {
+			float hexEdge = isHexEdge(v_draw, u_hexSizing);
+			if (hexEdge > 0.0) {
+				float offset = dot(v_draw, vec2(1.0));
+				float modifier = 1.0 + u_hexMask * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0));
+				color = mix(color, u_hexColor * modifier, hexEdge);
+			}
 		}
 	}
 
