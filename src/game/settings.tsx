@@ -74,7 +74,8 @@ const Obstacle: ObstacleSettings = {
 
 const Visuals: VisualSettings = {
     Background: '#000',
-	DefaultWorldColor: '#222',
+    DefaultWorldColor: '#222',
+    WorldStrokeProportion: 0.01,
 	WorldAnimateWinTicks: 15,
 	WorldWinGrowth: 0.05,
 	DefaultGlowRadius: 4 * Pixel,

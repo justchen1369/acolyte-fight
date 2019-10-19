@@ -708,7 +708,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const strokeStyle = color.clone().lighten(0.05);
 
 	const minExtent = engine.calculateWorldMinExtent(world);
-	const strokeExtent = 0.01 * minExtent;
+	const strokeExtent = Visuals.WorldStrokeProportion * minExtent;
 	if (world.shape.type === "radial") {
 		const maxExtentMultiplier = shapes.calculateMaxExtentMultiplier(world.shape.points.length);
 		glx.convexPlate(ctxStack, pos, world.shape.points, world.angle, minExtent * scale, {

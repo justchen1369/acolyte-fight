@@ -1089,6 +1089,7 @@ interface VisualSettings {
 	// Map visuals
 	Background: string;
 	DefaultWorldColor: string;
+	WorldStrokeProportion: number; // The width of the stroke (the bright part on the edge of the map)
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;
 
