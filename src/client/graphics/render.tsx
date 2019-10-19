@@ -697,14 +697,14 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	} else {
 		color = ColTuple.parse(world.color);
 		hexColor = color.clone();
+	}
 
-		const highlight = takeHighlights(world);
-		if (highlight && options.shake) {
-			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
+	const highlight = takeHighlights(world);
+	if (highlight && options.shake) {
+		const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
 
-			color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
-			hexColor.mix(ColTuple.parse(highlight.color).lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
-		}
+		color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
+		hexColor.mix(ColTuple.parse(highlight.color).lighten(Visuals.HighlightHexShineFactor * proportion), Visuals.HighlightHexFactor * proportion);
 	}
 
 	const easeMultiplier = ease(world.ui.initialRenderTick, world);
