@@ -69,6 +69,7 @@ export interface CanvasCtxStack {
 export interface RenderOptions {
 	targetingIndicator: boolean;
 	cameraFollow?: boolean;
+	shake?: boolean;
 	hideMap?: boolean;
 	wheelOnRight?: boolean;
 	keysToSpells?: Map<string, string>;

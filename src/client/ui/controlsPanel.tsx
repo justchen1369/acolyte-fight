@@ -61,6 +61,7 @@ interface ControlState {
     changeSpellsWith: string;
     sounds: string;
     graphics: string;
+    shake: string;
 }
 interface State extends ControlState {
     changed: boolean;
@@ -93,6 +94,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: r.formatGraphics(options.graphics),
+        shake: options.noShake ? Toggle.Off : Toggle.On,
     };
 }
 
@@ -286,7 +288,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <h2>Performance</h2>
+            <h2>Graphics</h2>
             <div className="row">
                 <span className="label">Graphics</span>
                 <select className="value" value={this.state.graphics} onChange={ev => this.onUpdate({ graphics: ev.target.value })}>
@@ -296,6 +298,13 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={r.Graphics.High}>High</option>
                     <option value={r.Graphics.Medium}>Medium</option>
                     <option value={r.Graphics.Low}>Low</option>
+                </select>
+            </div>
+            <div className="row">
+                <span className="label">Screen shake</span>
+                <select className="value" value={this.state.shake} onChange={ev => this.onUpdate({ shake: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
             {this.state.changed && <div className="status-row">
@@ -358,6 +367,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
             options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
+            options.noShake = state.shake === Toggle.Off;
             options.graphics = r.parseGraphics(state.graphics);
             StoreProvider.dispatch({ type: "updateOptions", options });
             Storage.saveOptions(options);

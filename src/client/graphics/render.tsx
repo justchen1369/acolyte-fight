@@ -681,7 +681,10 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const Visuals = world.settings.Visuals;
 
 	const shake = takeShakes(world);
-	const pos = pl.Vec2(0.5 + shake.x, 0.5 + shake.y);
+	const pos = pl.Vec2(0.5, 0.5);
+	if (options.shake) {
+		pos.add(shake);
+	}
 
 	let scale = 1;
 	let color: ColTuple;
@@ -696,7 +699,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 		hexColor = color.clone();
 
 		const highlight = takeHighlights(world);
-		if (highlight) {
+		if (highlight && options.shake) {
 			const proportion = Math.max(0, 1 - (world.tick - highlight.fromTick) / highlight.maxTicks);
 
 			color.mix(ColTuple.parse(highlight.color), Visuals.HighlightFactor * proportion);
