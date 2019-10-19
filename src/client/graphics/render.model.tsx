@@ -153,6 +153,7 @@ export interface DrawPlatesData extends DrawData {
 		u_strokeColor: number[];
 		u_hexSizing: number[];
 		u_hexMask: number[];
+		u_hexInterval: number[];
 	},
 	attribs: {
 		a_draw: Float32List;
@@ -225,6 +226,7 @@ export interface DrawPlates extends Draw {
 
 		u_hexSizing: UniformInfo;
 		u_hexMask: UniformInfo;
+		u_hexInterval: UniformInfo;
 	};
 	attribs: {
 		a_draw: AttribInfo;
@@ -265,6 +267,7 @@ export interface HexConfig {
 	heightPixels: number;
 	widthPixels: number;
 	mask: number;
+	interval: number;
 }
 
 export interface AtlasState {

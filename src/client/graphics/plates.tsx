@@ -23,6 +23,7 @@ export function initData(): r.DrawPlatesData {
             u_strokeColor: [0, 0, 0, 0],
             u_hexSizing: [1, 1],
             u_hexMask: [1],
+            u_hexInterval: [1],
         },
         attribs: {
             a_draw: new Float32List(),
@@ -68,6 +69,11 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
             },
             u_hexMask: {
                 loc: gl.getUniformLocation(program, "u_hexMask"),
+                type: gl.FLOAT,
+                size: 1,
+            },
+            u_hexInterval: {
+                loc: gl.getUniformLocation(program, "u_hexInterval"),
                 type: gl.FLOAT,
                 size: 1,
             },
@@ -120,6 +126,7 @@ function applyFill(ctxStack: r.CanvasCtxStack, fill: r.PlateFill) {
 
     plates.uniforms.u_hexSizing = [fill.hex.widthPixels, fill.hex.heightPixels];
     plates.uniforms.u_hexMask = [fill.hex.mask];
+    plates.uniforms.u_hexInterval = [fill.hex.interval];
 }
 
 function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, circular: boolean, extent: number, fill: r.PlateFill) {

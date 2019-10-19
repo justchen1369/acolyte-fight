@@ -9,10 +9,13 @@ uniform vec4 u_color;
 uniform vec4 u_strokeColor;
 uniform vec2 u_hexSizing;
 uniform float u_hexMask;
+uniform float u_hexInterval;
 
 varying vec2 v_draw;
 varying vec2 v_rel;
 varying vec2 v_range;
+
+#define PI 3.141592654
 
 // The width of a hexagon at its top, compared to a square of the same height
 #define HexTopProportion 0.577	
@@ -23,10 +26,10 @@ varying vec2 v_range;
 // Vertical hexagons - pointy end at the top
 float isHexEdge(vec2 p, vec2 hexSize) {
 	float hexRowSize = 2.0 * u_pixel * hexSize.y; // Two quads per hex down so that it tesselates
-	float row = mod(p.y, hexRowSize) / (hexRowSize);
+	float row = mod(p.y / hexRowSize, 1.0);
 
 	float hexColSize = u_pixel * hexSize.x; // One squad per hex across so that it tesselates
-	float col = mod(p.x, hexColSize) / (hexColSize);
+	float col = mod(p.x / hexColSize, 1.0);
 
 	float halfCol = 1.0 - 2.0 * abs(col - 0.5); // 0.0 (side col) - 1.0 (middle col)
 	float hexRow1 = mix(Hex1 / 2.0, -Hex1 / 2.0, halfCol);
@@ -74,7 +77,9 @@ void main() {
 	} else {
 		float hexEdge = isHexEdge(v_draw, u_hexSizing);
 		if (hexEdge > 0.0) {
-			color = mix(color, color * u_hexMask, hexEdge);
+			float offset = dot(v_draw, vec2(1.0));
+			float modifier = 1.0 + u_hexMask * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0));
+			color = mix(color, color * modifier, hexEdge);
 		}
 	}
 

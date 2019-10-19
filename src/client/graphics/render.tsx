@@ -710,6 +710,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 		heightPixels: Visuals.WorldHexHeight,
 		widthPixels: Visuals.WorldHexWidth,
 		mask: Visuals.WorldHexMask,
+		interval: Visuals.WorldHexInterval,
 	};
 
 	const minExtent = engine.calculateWorldMinExtent(world);

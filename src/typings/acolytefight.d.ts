@@ -1094,6 +1094,7 @@ interface VisualSettings {
 	WorldHexHeight: number; // Height in number of pixels for hexagons
 	WorldHexWidth: number; // Height in number of pixels for hexagons
 	WorldHexMask: number;
+	WorldHexInterval: number; // Length of the hex light/dark cycle in ticks
 
 	WorldAnimateWinTicks: number;
 	WorldWinGrowth: number;
