@@ -224,13 +224,11 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
                     const usingTouch = touchControls(world.ui.buttonBar);
                     if (usingTouch) {
-                        if (!world.ui.nextTarget) {
-                            const hero = world.objects.get(world.ui.myHeroId);
-                            if (hero) {
-                                world.ui.nextTarget = hero.body.getPosition();
-                            } else {
-                                world.ui.nextTarget = pl.Vec2(0.5, 0.5);
-                            }
+                        const hero = world.objects.get(world.ui.myHeroId);
+                        if (hero) {
+                            world.ui.nextTarget = hero.body.getPosition();
+                        } else {
+                            world.ui.nextTarget = pl.Vec2(0.5, 0.5);
                         }
 
                         this.targetSurface = {
