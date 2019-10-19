@@ -1,11 +1,13 @@
 import * as pl from 'planck-js';
 import * as r from './render.model';
+import * as plates from './plates';
 import * as textures from './images';
 import * as trails from './trails';
 import ColTuple from './colorTuple';
 
 export { atlas, image } from './images';
-export { circleTrail as circle, lineTrail as line, arcTrail as arc, convexTrail as convex } from './trails';
+export { circleTrail, lineTrail, arcTrail, convexTrail } from './trails';
+export { circlePlate, convexPlate } from './plates';
 
 export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect, background: ColTuple) {
 	let context: r.GlContext = initGl(ctxStack);
@@ -28,6 +30,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 		u_rtx: [ctxStack.rtx],
 	};
 
+	runProgram(context, context.plates, uniforms, context.data.plates);
 	runProgram(context, context.trails, uniforms, context.data.trails);
 	runProgram(context, context.images, uniforms, context.data.images);
 }
@@ -138,9 +141,11 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		gl,
 		images: textures.initImages(gl),
 		trails: trails.initTrails(gl),
+		plates: plates.initPlates(gl),
 		data: {
 			images: textures.initData(),
 			trails: trails.initData(),
+			plates: plates.initData(),
 		},
 	};
 }

@@ -81,6 +81,7 @@ export interface GlContext {
 	gl: WebGLRenderingContext;
 	images: DrawImages;
 	trails: DrawTrails;
+	plates: DrawPlates;
 	data: DrawDataLookup;
 }
 
@@ -117,6 +118,7 @@ export interface Texture2DInfo {
 export interface DrawDataLookup {
 	images: DrawImagesData;
 	trails: DrawTrailsData;
+	plates: DrawPlatesData;
 	[program: string]: DrawData;
 }
 
@@ -136,6 +138,15 @@ export interface DrawImagesData extends DrawData {
 }
 
 export interface DrawTrailsData extends DrawData {
+	attribs: {
+		a_pos: Float32List;
+		a_rel: Float32List;
+		a_color: Float32List;
+		a_fill: Float32List;
+	};
+}
+
+export interface DrawPlatesData extends DrawData {
 	attribs: {
 		a_pos: Float32List;
 		a_rel: Float32List;
@@ -190,7 +201,22 @@ export interface DrawTrails extends Draw {
 	};
 }
 
-export interface Gradient {
+export interface DrawPlates extends Draw {
+	uniforms: {
+		u_scale: UniformInfo;
+		u_translate: UniformInfo;
+		u_pixel: UniformInfo;
+		u_rtx: UniformInfo;
+	};
+	attribs: {
+		a_pos: AttribInfo;
+		a_rel: AttribInfo;
+		a_color: AttribInfo;
+		a_fill: AttribInfo;
+	};
+}
+
+export interface TrailGradient {
 	angle: number;
 	anchor: pl.Vec2;
 	fromExtent: number;
@@ -201,7 +227,7 @@ export interface Gradient {
 
 export interface TrailFill {
 	color?: ColTuple;
-	gradient?: Gradient;
+	gradient?: TrailGradient;
 
 	minRadius?: number;
 	maxRadius: number;
