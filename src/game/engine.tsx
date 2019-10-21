@@ -3999,7 +3999,7 @@ function shieldCollisionLimit(hero: w.Hero, to: pl.Vec2, world: w.World): number
 	});
 
 	if (hit) {
-		return Math.max(0, vector.distance(hit, from) - constants.Pixel); // -Pixel so we are on this side of the shield
+		return Math.max(0, vector.distance(hit, from) - hero.radius); // -hero.radius so we are on this side of the shield
 	} else {
 		return vector.distance(to, from);
 	}
