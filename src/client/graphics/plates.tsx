@@ -27,8 +27,9 @@ export function initData(): r.DrawPlatesData {
             u_hexInterval: [1],
         },
         attribs: {
-            a_draw: new Float32List(),
+            a_pos: new Float32List(),
             a_rel: new Float32List(),
+            a_extent: new Float32List(),
             a_range: new Float32List(),
         },
         textures2D: [],
@@ -85,14 +86,20 @@ export function initPlates(gl: WebGLRenderingContext): r.DrawPlates {
             },
         },
 		attribs: {
-			a_draw: {
-				loc: gl.getAttribLocation(program, "a_draw"),
+			a_pos: {
+				loc: gl.getAttribLocation(program, "a_pos"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
 			},
 			a_rel: {
 				loc: gl.getAttribLocation(program, "a_rel"),
+				buffer: gl.createBuffer(),
+				type: gl.FLOAT,
+				size: 2,
+			},
+			a_extent: {
+				loc: gl.getAttribLocation(program, "a_extent"),
 				buffer: gl.createBuffer(),
 				type: gl.FLOAT,
 				size: 2,
@@ -139,12 +146,12 @@ function applyFill(ctxStack: r.CanvasCtxStack, fill: r.PlateFill) {
 function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, circular: boolean, extent: number, fill: r.PlateFill) {
     const plates = shaders.getContext(ctxStack.gl).data.plates;
 
-    const drawPos = vector.fromAngle(angle, extent).add(pos);
+    shaders.appendVec2(plates.attribs.a_pos, pos);
 
-    shaders.appendVec2(plates.attribs.a_draw, drawPos);
+    shaders.appendAngleRadius(plates.attribs.a_rel, angle, extent); // Draw polygons with same shader
 
-    const relAngle = circular ? angle : 0;
-    shaders.appendAngleRadius(plates.attribs.a_rel, relAngle, extent); // Draw polygons with same shader
+    const extentAngle = circular ? angle : 0;
+    shaders.appendAngleRadius(plates.attribs.a_extent, extentAngle, extent); // Draw polygons with same shader
 
     appendRanges(plates.attribs.a_range, fill);
 

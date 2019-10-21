@@ -161,8 +161,9 @@ export interface DrawPlatesData extends DrawData {
 		u_hexInterval: number[];
 	},
 	attribs: {
-		a_draw: Float32List;
+		a_pos: Float32List;
 		a_rel: Float32List;
+		a_extent: Float32List;
 		a_range: Float32List;
 	};
 }
@@ -235,8 +236,9 @@ export interface DrawPlates extends Draw {
 		u_hexInterval: UniformInfo;
 	};
 	attribs: {
-		a_draw: AttribInfo;
+		a_pos: AttribInfo;
 		a_rel: AttribInfo;
+		a_extent: AttribInfo;
 		a_range: AttribInfo;
 	};
 }

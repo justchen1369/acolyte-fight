@@ -749,6 +749,8 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 }
 
 function takeShakes(world: w.World) {
+	const Visuals = world.settings.Visuals;
+
 	let offset = vector.zero();
 	const keep = new Array<w.Shake>();
 	world.ui.shakes.forEach(shake => {
@@ -756,7 +758,7 @@ function takeShakes(world: w.World) {
 		if (proportion > 0) {
 			keep.push(shake);
 
-			const magnitude = Math.pow(proportion, 2) * Math.cos(5 * proportion * 2 * Math.PI);
+			const magnitude = Math.pow(proportion, Visuals.ShakeDampening) * Math.cos(Visuals.ShakeCycles * proportion * 2 * Math.PI);
 			offset.addMul(magnitude, shake.direction);
 		}
 	});

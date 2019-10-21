@@ -1102,6 +1102,8 @@ interface VisualSettings {
 	// How much to shake the map when projectiles hit
 	ShakeDistance: number;
 	ShakeTicks: number;
+	ShakeCycles: number; // Shake back and forth this many times
+	ShakeDampening: number; // Dampen the shaking cycles with this power
 
 	// How much to flash the map when projectiles hit
 	HighlightFactor: number;

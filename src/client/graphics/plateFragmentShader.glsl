@@ -7,13 +7,14 @@ uniform int u_tick;
 
 uniform vec4 u_color;
 uniform vec4 u_strokeColor;
+
 uniform vec4 u_hexColor;
 uniform vec2 u_hexSizing;
 uniform float u_hexMask;
 uniform float u_hexInterval;
 
-varying vec2 v_draw;
 varying vec2 v_rel;
+varying vec2 v_extent;
 varying vec2 v_range;
 
 #define PI 3.141592654
@@ -67,7 +68,7 @@ void main() {
 	float strokeRange = v_range[0];
 	float fillRange = v_range[1];
 
-	float radius = length(v_rel);
+	float radius = length(v_extent);
 
 	if (radius > fillRange) {
 		float outside = radius - fillRange;
@@ -77,9 +78,9 @@ void main() {
 		color = mix(color, strokeColor, alpha);
 	} else {
 		if (u_hexMask > 0.0) {
-			float hexEdge = isHexEdge(v_draw, u_hexSizing);
+			float hexEdge = isHexEdge(v_rel, u_hexSizing);
 			if (hexEdge > 0.0) {
-				float offset = dot(v_draw, vec2(1.0));
+				float offset = dot(v_rel, vec2(1.0));
 				float modifier = 1.0 + u_hexMask * (0.5 + 0.5 * sin(2.0 * PI * mod(offset + (float(u_tick) / u_hexInterval), 1.0)));
 				color = mix(color, u_hexColor * modifier, hexEdge);
 			}
