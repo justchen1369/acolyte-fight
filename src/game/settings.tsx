@@ -2347,7 +2347,7 @@ const phaseOut: Spell = {
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     throttle: false,
     unlink: true,
 
