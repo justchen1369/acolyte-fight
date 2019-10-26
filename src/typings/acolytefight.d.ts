@@ -775,6 +775,7 @@ declare interface RenderBuff {
 	shine?: number; // Brighter initially
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // Bloom radius
+	bloomLow?: number; // Bloom radius when on low graphics
 	fade?: string; // Decay to this color
 	smoke?: RenderSmokeConfig; // Move smoke trail
 	vanish?: number; // Decay to transparent

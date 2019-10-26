@@ -1331,12 +1331,13 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		}, world);
 	}
 
-	if (render.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
+	let bloom = ctxStack.rtx >= r.GraphicsLevel.Ultra ? render.bloom : render.bloomLow;
+	if (bloom) {
 		glx.circleTrail(ctxStack, heroPos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
 			feather: {
-				sigma: render.bloom,
+				sigma: bloom,
 				alpha: render.glow !== undefined ? render.glow : DefaultGlow,
 			},
 		});
