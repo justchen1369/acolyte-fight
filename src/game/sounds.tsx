@@ -195,9 +195,9 @@ export const Sounds: Sounds = {
             {
                 volume: 0.25,
 
-                stopTime: 3,
+                stopTime: 1.25,
                 attack: 0.25,
-                decay: 2.9,
+                decay: 1,
 
                 startFreq: 90,
                 stopFreq: 90,
