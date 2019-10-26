@@ -361,7 +361,7 @@ const flamestrike: Spell = {
 const triplet: Spell = {
     id: 'triplet',
     name: 'Trifire',
-    description: "Each bolt of Trifire will add another stack of 2.5 damage per second to your enemy. There is no limit to the number of stacks, but you must hit them with Trifire at least once every 4 seconds to keep the fire burning.",
+    description: "Each bolt of Trifire will add another stack of 2 damage per second to your enemy. There is no limit to the number of stacks, but you must hit them with Trifire at least once every 4 seconds to keep the fire burning.",
     action: "spray",
     sound: "triplet",
 
@@ -415,7 +415,7 @@ const triplet: Spell = {
                 against: Alliances.NotFriendly,
                 stack: "fire",
                 hitInterval: TicksPerSecond / 3,
-                packet: { damage: 30 / 3 / 4 / 3, lifeSteal, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
+                packet: { damage: 24 / 3 / 4 / 3, lifeSteal, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 resetOnGameStart: true,
                 render: {
