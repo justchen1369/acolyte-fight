@@ -2315,7 +2315,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 			hero.thrust.alreadyHit.add(other.id);
 
 			const alliance = calculateAlliance(hero.id, other.id, world);
-			if ((alliance && Alliances.NotFriendly) > 0) {
+			if ((alliance & Alliances.NotFriendly) > 0) {
 				const damagePacket = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
 				applyDamage(other, damagePacket, world);
 			}
