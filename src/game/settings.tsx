@@ -2317,7 +2317,7 @@ const shield: Spell = {
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
     untargeted: true,
 
-    maxTicks: 1.5 * TicksPerSecond,
+    maxTicks: 1.25 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     radius: Hero.Radius * 1.8,
