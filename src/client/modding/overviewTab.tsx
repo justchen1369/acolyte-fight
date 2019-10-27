@@ -117,16 +117,12 @@ class OverviewTab extends React.PureComponent<Props, State> {
     private renderEmptyMod() {
         return <div className="modding-overview">
             <p>
-                Mods allow you to change the rules of the game for your party.
-                This feature is experimental and will be subject to a lot of change!
-                Forward compatibility is not guaranteed - functional mods in the current version may be broken by future releases.
+                Mods allow you to change the rules of the game.
             </p>
-            <h2>Create new</h2>
-            <p>Create a new mod from scratch.</p>
-            <div className="btn" onClick={() => this.onCreateMod()}>Create mod</div>
-            <h2>Open file</h2>
-            <p>Load an existing mod.</p>
-            <div className="btn" onClick={() => this.onLoadFileClick()}>Load from file</div>
+            <div className="button-row">
+                <div className="btn" onClick={() => this.onCreateMod()}>Create new mod</div>
+                <div className="btn" onClick={() => this.onLoadFileClick()}>Load from file</div>
+            </div>
             <input
                 className="file-selector" type="file"
                 style={{ visibility: "hidden" }}
@@ -139,6 +135,11 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 <li><a href="static/acolyteBeamFiesta.mod.json" onClick={(ev) => this.onLoadModHref(ev)}>acolyteBeamFiesta.acolytefight.json</a> - this example mod decreases Acolyte Beam cooldown and removes other spells.</li>
                 <li><a href="static/noMove.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>noMove.acolytefight.json</a> - this example mod disables normal movement but reduces the speed of teleport.</li>
             </ul>
+            <h2>Note</h2>
+            <p>
+                Mods are subject to a lot of change!
+                Forward compatibility is not guaranteed - functional mods in the current version may be broken by future releases.
+            </p>
         </div>
     }
     
