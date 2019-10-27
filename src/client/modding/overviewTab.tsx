@@ -34,7 +34,6 @@ interface Props {
 interface State {
     code: string;
     codeError: string;
-    selectedFile: File;
     loadFromFileError: string;
 }
 
@@ -51,12 +50,13 @@ function stateToProps(state: s.State): Props {
 }
 
 class OverviewTab extends React.PureComponent<Props, State> {
+    private modFileSelector: HTMLInputElement;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             code: stringifyMod(props.currentMod),
             codeError: null,
-            selectedFile: null,
             loadFromFileError: null,
         };
     }
@@ -124,8 +124,13 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <p>Create a new mod from scratch.</p>
             <div className="btn" onClick={() => this.onCreateMod()}>Create mod</div>
             <h2>Open file</h2>
-            <p>Choose a mod file: <input className="file-selector" type="file" onChange={e => this.setState({ selectedFile: e.target.files.item(0) })} /></p>
-            <div className={this.state.selectedFile ? "btn" : "btn btn-disabled"} onClick={() => this.onLoadModFile(this.state.selectedFile)}>Load from file</div>
+            <p>Load an existing mod.</p>
+            <div className="btn" onClick={() => this.onLoadFileClick()}>Load from file</div>
+            <input
+                className="file-selector" type="file"
+                style={{ visibility: "hidden" }}
+                ref={elem => this.modFileSelector = elem}
+                onChange={e => this.onFileChanged(e)} />
             {this.state.loadFromFileError && <p className="error">{this.state.loadFromFileError}</p>}
             <h2>Examples</h2>
             <ul>
@@ -134,6 +139,19 @@ class OverviewTab extends React.PureComponent<Props, State> {
                 <li><a href="static/noMove.acolytefight.json" onClick={(ev) => this.onLoadModHref(ev)}>noMove.acolytefight.json</a> - this example mod disables normal movement but reduces the speed of teleport.</li>
             </ul>
         </div>
+    }
+    
+    private onLoadFileClick() {
+        if (this.modFileSelector) {
+            this.modFileSelector.click();
+        }
+    }
+
+    private async onFileChanged(e: React.ChangeEvent<HTMLInputElement>) {
+        if (e && e.target && e.target.files) {
+            const file = e.target.files.item(0);
+            this.onLoadModFile(file);
+        }
     }
 
     private renderCurrentMod() {
