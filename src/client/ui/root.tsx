@@ -5,6 +5,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
+import * as modding from '../modding';
 import * as StoreProvider from '../storeProvider';
 
 import AboutSection from './aboutSection';
@@ -74,7 +75,12 @@ class Root extends React.PureComponent<Props> {
     private renderPage() {
         const page = this.props.current.page;
         return (
-            <div className="root-panel" onTouchStart={() => this.onTouchStart()}>
+            <div className="root-panel"
+                onTouchStart={() => this.onTouchStart()}
+                onDragOver={ev => this.onDragOver(ev)}
+                onDrop={ev => this.onDrop(ev)}
+                >
+
                 {page === "" && this.renderHome()}
                 {page === "debug" && this.renderDebug()}
                 {page === "leaderboard" && this.renderLeaderboard()}
@@ -97,6 +103,32 @@ class Root extends React.PureComponent<Props> {
             </div>
         );
     }
+
+    private async onDragOver(ev: React.DragEvent) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
+
+    private async onDrop(ev: React.DragEvent) {
+        ev.preventDefault();
+        ev.stopPropagation();
+
+        if (ev.dataTransfer.items && ev.dataTransfer.items[0]) {
+            const file = ev.dataTransfer.items[0].getAsFile();
+            await this.onLoadModFile(file);
+        }
+    }
+
+    private async onLoadModFile(file: File) {
+        try {
+            const mod = await modding.loadModFile(file);
+            await modding.loadModIntoGame(mod);
+            await modding.loadModIntoEditor(mod);
+        } catch (exception) {
+            console.error("Error loading mod from file", exception);
+        }
+    }
+
 
     private onTouchStart() {
         if (!this.props.touched) {

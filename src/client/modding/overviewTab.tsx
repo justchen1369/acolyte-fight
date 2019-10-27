@@ -8,6 +8,7 @@ import * as s from '../store.model';
 import * as convert from './convert';
 import * as editing from './editing';
 import * as fileUtils from '../core/fileUtils';
+import * as loadHandler from './loadHandler';
 import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import Button from '../controls/button';
@@ -150,7 +151,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
     private async onFileChanged(e: React.ChangeEvent<HTMLInputElement>) {
         if (e && e.target && e.target.files) {
             const file = e.target.files.item(0);
-            this.onLoadModFile(file);
+            await this.onLoadModFile(file);
         }
     }
 
@@ -233,17 +234,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
 
     private async onLoadModFile(file: File) {
         try {
-            const json = await fileUtils.readFileAsync(file);
-            const mod = JSON.parse(json);
-            if (!(mod && typeof mod === "object")) {
-                throw "Invalid mod";
-            }
-            if (!(mod.Mod && mod.Mod.name)) {
-                mod.Mod = mod.Mod || {};
-                mod.Mod.name = file.name;
-            }
-            const codeTree = convert.modToCode(mod);
-            StoreProvider.dispatch({ type: "updateCodeTree", codeTree });
+            const mod = await loadHandler.loadModFile(file);
+            await loadHandler.loadModIntoEditor(mod);
         } catch (exception) {
             console.error("Error loading mod from file", exception);
             this.setState({ loadFromFileError: `${exception}` });

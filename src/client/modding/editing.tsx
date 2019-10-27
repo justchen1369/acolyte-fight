@@ -4,6 +4,7 @@ import * as e from './editor.model';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as convert from './convert';
+import * as loadHandler from './loadHandler';
 import * as matches from '../core/matches';
 import * as modder from '../../game/modder';
 import * as pages from '../core/pages';
@@ -55,15 +56,7 @@ export async function autoSaveMod(mod: ModTree) {
 }
 
 export async function exitEditor(mod: ModTree, nextPage: string = "") {
-    let roomId: string = null;
-    if (mod) {
-        roomId = await rooms.createRoomAsync(mod);
-    } else {
-        roomId = rooms.DefaultRoom;
-    }
-
-    await rooms.joinRoomAsync(roomId);
-    await parties.movePartyAsync(roomId);
+    await loadHandler.loadModIntoGame(mod);
     await pages.changePage(nextPage);
     StoreProvider.dispatch({ type: "updateHash", hash: null });
 }
