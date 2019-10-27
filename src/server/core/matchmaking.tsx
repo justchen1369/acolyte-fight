@@ -55,6 +55,7 @@ type Candidate =
 interface CandidateBase {
     type: string;
     avgWinProbability: number;
+    weight: number;
 }
 
 const matchmakingRatings = new TimedCache<string, number>(MatchmakingExpiryMilliseconds); // userId -> aco
@@ -252,12 +253,12 @@ function extractSplitRatings(game: g.Game, newPlayers?: RatedPlayer[]) {
     return _.orderBy(ratings, p => p.aco);
 }
 
-function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): SplitCandidate[] {
+function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[], weight: number = 1): SplitCandidate[] {
     const ratings = extractSplitRatings(game, newPlayers);
-    return generateSubSplitCandidates([ratings]);
+    return generateSubSplitCandidates([ratings], weight);
 }
 
-function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate[] {
+function generateSubSplitCandidates(partitions: RatedPlayer[][], weight: number = 1): SplitCandidate[] {
     const minPlayers = 2;
     const maxCandidates = 5; // If the max players is modded, don't increase search beyond this limit
 
@@ -313,6 +314,7 @@ function generateSubSplitCandidates(partitions: RatedPlayer[][]): SplitCandidate
                 threshold: sortedRatings[i].aco,
                 splits,
                 avgWinProbability,
+                weight,
             });
         }
 
@@ -504,22 +506,25 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
 
     const shuffledRatings = _.shuffle(sortedRatings);
 
+    const teamCandidateWeight = 1.0 / 2; // Half weight because we generate twice as many options, so don't artificially increase chance of teams
+
     const candidates = new Array<TeamsCandidate>();
-    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(sortedRatings, numTeams)));
-    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(shuffledRatings, numTeams)));
+    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(sortedRatings, numTeams, teamCandidateWeight)));
+    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(shuffledRatings, numTeams, teamCandidateWeight)));
     return candidates;
 }
 
-function generateNoopCandidate(game: g.Game): NoopCandidate {
+function generateNoopCandidate(game: g.Game, weight: number = 1): NoopCandidate {
     const ratings = extractSplitRatings(game);
     return {
         type: "noop",
         all: ratings,
         avgWinProbability: evaluateWinProbability(ratings.map(p => p.aco)),
+        weight,
     };
 }
 
-function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number): TeamsCandidate {
+function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number, weight: number = 1): TeamsCandidate {
     const teams = new Array<TeamPlayer[]>();
     for (let i = 0; i < numTeams; ++i) {
         teams.push([]);
@@ -539,6 +544,7 @@ function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number): T
         type: "teams",
         teams,
         avgWinProbability: evaluateTeamCandidate(teams),
+        weight,
     };
 }
 
