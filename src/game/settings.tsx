@@ -2548,7 +2548,7 @@ const blaze: Spell = {
     description: "Dash a short distance, phasing through obstacles and burning through anyone in your path.",
 
     untargeted: true,
-    cooldown: 9 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: false,
 
     icon: "fireWave",
