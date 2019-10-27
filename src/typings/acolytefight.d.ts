@@ -70,6 +70,7 @@ declare interface HeroSettings {
 	
 	DamageMitigationTicks: number; // Within these many ticks, damage does not stack between multiple players
 
+	MaxCooldownWaitTicks: number; // If cast a spell and it is almost finished cooling down within this time, just wait to cast it
 	ThrottleTicks: number; // Within these many ticks, disallow multiple spells to be cast by the same hero
 
     MaxHealth: number;

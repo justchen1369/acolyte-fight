@@ -3,7 +3,6 @@ export const TicksPerTurn = 1;
 export const MaxIdleTicks = 30 * TicksPerSecond;
 export const SnapshotTicks = 10;
 export const ObstacleSnapshotTicks = 30;
-export const MaxCooldownWait = 0;
 export const MaxTextMessageLength = 240;
 export const MaxGamesToKeep = 50;
 export const MaxGameAgeInDays = 7;

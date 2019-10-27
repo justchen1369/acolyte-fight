@@ -1878,7 +1878,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		if (spell.cooldown) {
 			const cooldown = cooldownRemaining(world, hero, spell.id);
 			if (cooldown > 0) {
-				if (cooldown > constants.MaxCooldownWait) {
+				if (cooldown > world.settings.Hero.MaxCooldownWaitTicks) {
 					// Just cancel spells if they're too far off cooldown
 					hero.casting = null;
 				}
