@@ -31,7 +31,7 @@ const Hero: HeroSettings = {
     Damping: 3,
 
     DamageMitigationTicks: 5 * TicksPerSecond,
-    ThrottleTicks: 15,
+    ThrottleTicks: 0,
 
     MaxHealth: 100,
     SeparationImpulsePerTick: 0.01,
