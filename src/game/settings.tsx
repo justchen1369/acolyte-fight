@@ -1228,7 +1228,7 @@ const link: Spell = {
         radius: 0.005,
         speed: 0.5,
         restitution: 0,
-        maxTicks: 85,
+        maxTicks: 82, // Just enough so it doesn't knockback self
         damage: 0,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
