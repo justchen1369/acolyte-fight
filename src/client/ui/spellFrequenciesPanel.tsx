@@ -130,8 +130,10 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
         const leagueNames = getLeagueNames(leagues);
         const allStats = leagueStats.allStats;
         return <div className="spell-frequencies-panel">
-            <h1>Statistics</h1>
-            <CategorySelector categories={leagueNames} category={leagueStats.league.name} onCategoryChange={league => this.setState({ league })} />
+            <div className="spell-frequencies-title">
+                <h1>Statistics</h1>
+                <CategorySelector categories={leagueNames} category={leagueStats.league.name} onCategoryChange={league => this.setState({ league })} />
+            </div>
             {allStats.map(stats => this.renderBtn(stats))}
             <h2>About</h2>
             <p>Calculated from matches over the past {constants.MaxGameAgeInDays} days. Only includes players who have played {constants.SpellFrequencies.MinGames} or more games.</p>
