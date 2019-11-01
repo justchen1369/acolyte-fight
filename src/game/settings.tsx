@@ -1226,9 +1226,9 @@ const link: Spell = {
     projectile: {
         density: 1,
         radius: 0.005,
-        speed: 0.3,
+        speed: 0.5,
         restitution: 0,
-        maxTicks: 1.75 * TicksPerSecond,
+        maxTicks: 85,
         damage: 0,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
@@ -1253,8 +1253,8 @@ const link: Spell = {
             render: {
                 type: "link",
                 color: '#4444ff',
-                width: 2.5 * Pixel,
-                toWidth: 5 * Pixel,
+                width: 1.5 * Pixel,
+                toWidth: 3 * Pixel,
                 glow: 0.2,
                 shine: 0.25,
 
@@ -1279,9 +1279,16 @@ const link: Spell = {
             { type: "strafe" },
             {
                 type: "homing",
-                trigger: { afterTicks: 45 },
+                trigger: { afterTicks: 40 },
                 targetType: HomingTargets.self,
-                newSpeed: 0.4,
+                newSpeed: 0,
+                redirect: true,
+            },
+            {
+                type: "homing",
+                trigger: { afterTicks: 60 },
+                targetType: HomingTargets.self,
+                newSpeed: 0.75,
                 redirect: true,
             },
             {
@@ -1297,8 +1304,8 @@ const link: Spell = {
             {
                 type: "link",
                 color: '#4444ff',
-                width: 2.5 * Pixel,
-                toWidth: 5 * Pixel,
+                width: 1.5 * Pixel,
+                toWidth: 3 * Pixel,
                 glow: 0.2,
                 shine: 0.25,
             },
