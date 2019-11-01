@@ -14,13 +14,14 @@ export interface SpellFrequency {
 
 export interface SpellFrequencyCache {
     category: string;
+    minAco: number;
     distribution: Map<string, SpellFrequency>; // spellId -> SpellFrequency
 }
 
 export class SpellUsageAccumulator {
     private distribution = new Map<string, SpellFrequency>();
 
-    constructor(public readonly category: string) {
+    constructor(public readonly category: string, public readonly minAco: number) {
     }
 
     accept(game: m.GameStatsMsg) {
@@ -28,7 +29,10 @@ export class SpellUsageAccumulator {
             return;
         }
 
-        let spellPlayers = game.players.filter(p => p.initialNumGames >= constants.SpellFrequencies.MinGames && !!p.spellIds);
+        let spellPlayers = game.players.filter(p =>
+            !!p.spellIds
+            && p.initialNumGames >= constants.SpellFrequencies.MinGames
+            && p.initialAco >= this.minAco);
         if (spellPlayers.length <= 1) {
             // Not enough data
             return;
@@ -50,10 +54,11 @@ export class SpellUsageAccumulator {
     }
 
     calculate(): SpellFrequencyCache {
-        logger.info(`Calculated spell distribution (${this.category}): ${formatSpells(this.distribution)}`);
+        logger.info(`Calculated spell distribution (${this.category}, ${this.minAco}): ${formatSpells(this.distribution)}`);
 
         return {
             category: this.category,
+            minAco: this.minAco,
             distribution: this.distribution,
         };
     }

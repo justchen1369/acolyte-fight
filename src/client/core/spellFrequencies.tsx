@@ -10,8 +10,8 @@ import * as storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 
-export async function retrieveSpellFrequencies(category: string) {
-    const res = await fetch(`${url.base}/api/spellFrequencies?category=${encodeURIComponent(category)}`, {
+export async function retrieveSpellFrequencies(category: string, minAco: number) {
+    const res = await fetch(`${url.base}/api/spellFrequencies?category=${encodeURIComponent(category)}&minAco=${encodeURIComponent(minAco)}`, {
         headers: {
             ...credentials.headers(),
             'Content-Type': 'application/json',

@@ -65,7 +65,7 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
     }
 
     private async refreshData() {
-        const frequencies = await spellFrequencies.retrieveSpellFrequencies(m.GameCategory.PvP);
+        const frequencies = await spellFrequencies.retrieveSpellFrequencies(m.GameCategory.PvP, 0);
         const allStats = groupFrequencies(frequencies);
         this.setState({ allStats });
     }

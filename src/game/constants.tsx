@@ -69,6 +69,16 @@ export namespace Placements {
 
 export namespace SpellFrequencies {
 	export const MinGames = 100;
+	export const MinAcoPercentiles = [
+		Placements.Grandmaster,
+		Placements.Master,
+		Placements.Diamond,
+		Placements.Platinum,
+		Placements.Gold,
+		Placements.Silver,
+		Placements.Bronze,
+		Placements.Wood,
+	];
 }
 
 export namespace Atlas {

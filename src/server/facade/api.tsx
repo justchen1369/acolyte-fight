@@ -605,12 +605,13 @@ export function onGetSpellFrequencies(req: express.Request, res: express.Respons
 
 export async function onGetSpellFrequenciesAsync(req: express.Request, res: express.Response): Promise<void> {
     const category = req.query.category;
-    if (!(category)) {
+    const minAco = parseInt(req.query.minAco);
+    if (!(required(category, "string") && required(minAco, "number") && !_.isNaN(minAco))) {
         res.status(400).send("Bad request");
         return;
     }
 
-    const frequencies = await statsProvider.getSpellFrequencies(category);
+    const frequencies = await statsProvider.getSpellFrequencies(category, minAco);
     if (req.header('content-type') === "application/json") {
         const msg: m.SpellFrequencyResponse = {
             category: req.query.category,

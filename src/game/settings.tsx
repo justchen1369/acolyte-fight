@@ -2557,7 +2557,7 @@ const blaze: Spell = {
     action: "thrust",
     sound: "blaze",
 
-    range: 0.1,
+    range: 0.075,
     speed: 0.8,
     followCursor: true,
     damageTemplate: {

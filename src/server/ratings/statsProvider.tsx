@@ -22,14 +22,17 @@ const FullUpdateInterval = 24 * 60 * 60 * 1000;
 let nextFullUpdate = 0;
 
 class GameAccumulator {
-    readonly spellFrequencyCaches = new Map<string, spellFrequencies.SpellFrequencyCache>();
+    readonly spellFrequencyCaches = new Map<string, spellFrequencies.SpellFrequencyCache[]>();
     readonly winRateCaches = new Map<string, winRates.WinRateCache>();
 
     private latestGameUnix = 0;
-    private spellFrequencyAccumulator = new spellFrequencies.SpellUsageAccumulator(m.GameCategory.PvP);
+    private spellFrequencyAccumulators = new Array<spellFrequencies.SpellUsageAccumulator>();
     private winRateAccumulator = new winRates.WinRateAccumulator(m.GameCategory.PvP);
 
-    constructor() {
+    constructor(minAcos: number[]) {
+        minAcos.forEach(minAco => {
+            this.spellFrequencyAccumulators.push(new spellFrequencies.SpellUsageAccumulator(m.GameCategory.PvP, minAco));
+        });
     }
 
     // performs incremental update
@@ -38,8 +41,9 @@ class GameAccumulator {
 
         let numGames = 0;
         await statsStorage.streamAllGamesAfter(this.latestGameUnix, game => {
-            this.spellFrequencyAccumulator.accept(game);
             this.winRateAccumulator.accept(game);
+
+            this.spellFrequencyAccumulators.forEach(accumulator => accumulator.accept(game));
 
             ++numGames;
 
@@ -51,8 +55,13 @@ class GameAccumulator {
         const winRateCache = this.winRateAccumulator.calculate();
         this.winRateCaches.set(winRateCache.category, winRateCache);
 
-        const spellFrequencyCache = this.spellFrequencyAccumulator.calculate();
-        this.spellFrequencyCaches.set(spellFrequencyCache.category, spellFrequencyCache);
+        const spellFrequencyGroups =
+            _(this.spellFrequencyAccumulators)
+            .map(accumulator => accumulator.calculate())
+            .groupBy(cache => cache.category).value();
+        for (const category in spellFrequencyGroups) {
+            this.spellFrequencyCaches.set(category, spellFrequencyGroups[category]);
+        }
 
         const elapsed = Date.now() - start;
         logger.info(`Processed ${numGames} games in ${elapsed.toFixed(0)} ms`);
@@ -120,7 +129,10 @@ async function update() {
             await newUserAccumulator.update();
             userAccumulator = newUserAccumulator;
 
-            const newGameAccumulator = new GameAccumulator();
+            const percentileCache = userAccumulator.percentileCaches.get(m.GameCategory.PvP);
+            const minAcos = constants.SpellFrequencies.MinAcoPercentiles.map(percentile => percentiles.estimateRatingAtPercentile(percentile, percentileCache));
+
+            const newGameAccumulator = new GameAccumulator(minAcos);
             await newGameAccumulator.update();
             gameAccumulator = newGameAccumulator;
         }
@@ -174,10 +186,16 @@ export function getWinRateDistribution(category: string) {
     }
 }
 
-export function getSpellFrequencies(category: string): m.SpellFrequency[] {
-    const cache = gameAccumulator.spellFrequencyCaches.get(category);
-    if (cache) {
-        return wu(cache.distribution.values()).toArray() as m.SpellFrequency[];
+export function getSpellFrequencies(category: string, minAco: number): m.SpellFrequency[] {
+    const caches = gameAccumulator.spellFrequencyCaches.get(category);
+    if (caches) {
+        // Find closest cache
+        const cache = _.minBy(caches, cache => Math.abs(minAco - cache.minAco));
+        if (cache) {
+            return wu(cache.distribution.values()).toArray() as m.SpellFrequency[];
+        } else {
+            return [];
+        }
     } else {
         return [];
     }
@@ -185,5 +203,5 @@ export function getSpellFrequencies(category: string): m.SpellFrequency[] {
 
 export const ready = deferred<void>();
 
-let gameAccumulator = new GameAccumulator();
+let gameAccumulator = new GameAccumulator([]);
 let userAccumulator = new UserAccumulator();
