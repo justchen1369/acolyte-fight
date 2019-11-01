@@ -379,7 +379,7 @@ const triplet: Spell = {
     intervalTicks: 1,
     lengthTicks: 1,
 
-    jitterRatio: 0.12,
+    jitterRatio: 0.13,
 
     projectile: {
         density: 10,
