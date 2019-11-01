@@ -2651,10 +2651,9 @@ const swap: Spell = {
         expireOnMirror: true,
         expireAfterCursorTicks: 0,
         shieldTakesOwnership: false,
-        selfPassthrough: true,
         sensor: true,
 
-        swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive,
+        swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
 
         behaviours: [
             { type: "expireOnOwnerDeath" },
