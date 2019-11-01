@@ -8,11 +8,17 @@ import * as cloud from '../core/cloud';
 import * as pages from '../core/pages';
 import * as url from '../url';
 import AccountPanel from './accountPanel';
-import CategorySelector from './categorySelector';
+import CategorySelector from '../controls/categorySelector';
 import ProfileGameList from './profileGameList';
 import RecentGamesList from './recentGameList';
 import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
+
+const categories = [
+    m.GameCategory.PvP,
+    m.GameCategory.PvAI,
+    m.GameCategory.AllCategory,
+];
 
 interface Props {
     current: s.PathElements;
@@ -48,7 +54,7 @@ export class ProfilePanel extends React.PureComponent<Props, State> {
 
         const category = isMe ? this.state.category : m.GameCategory.PvP;
         return <div className="profile-panel">
-            {isMe && <CategorySelector category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
+            {isMe && <CategorySelector categories={categories} category={this.state.category} onCategoryChange={category => this.setState({ category })} />}
             {!a.noLogin && isMe && this.props.loggedIn && <div>
                 <h1>Your Account</h1>
                 <AccountPanel />

@@ -1,14 +1,27 @@
 import _ from 'lodash';
+import wu from 'wu';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
+import * as Reselect from 'reselect';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as constants from '../../game/constants';
+import * as rankings from '../core/rankings';
 import * as spellFrequencies from '../core/spellFrequencies';
 import * as spellUtils from '../core/spellUtils'
 import { DefaultSettings } from '../../game/settings';
 import { Icons } from '../../game/icons';
+import CategorySelector from '../controls/categorySelector';
 import SpellIcon from '../controls/spellIcon';
+
+interface LeagueStatsLookup {
+    [league: string]: LeagueStats;
+}
+
+interface LeagueStats {
+    league: m.League;
+    allStats: SpellBtnStats[];
+}
 
 interface SpellBtnStats {
     btn: string;
@@ -20,8 +33,19 @@ interface Props {
 }
 
 interface State {
-    allStats?: SpellBtnStats[];
+    statsLookup?: LeagueStatsLookup;
+    league: string;
 }
+
+const getLeagues = Reselect.createSelector(
+    (statsLookup: LeagueStatsLookup) => statsLookup,
+    (statsLookup) => wu(Object.values(statsLookup)).toArray().map(x => x.league),
+);
+
+const getLeagueNames = Reselect.createSelector(
+    (leagues: m.League[]) => leagues,
+    (leagues) => leagues.map(l => l.name),
+);
 
 function stateToProps(state: s.State): Props {
     return {
@@ -55,33 +79,59 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
+            league: null,
         };
     }
 
     componentDidMount() {
-        if (!this.state.allStats) {
+        if (!this.state.statsLookup) {
             this.refreshData(); // Don't await
         }
     }
 
     private async refreshData() {
-        const frequencies = await spellFrequencies.retrieveSpellFrequencies(m.GameCategory.PvP, 0);
-        const allStats = groupFrequencies(frequencies);
-        this.setState({ allStats });
+        const InitialPercentile = 50;
+
+        const leagues = await rankings.downloadLeagues();
+        const availablePercentiles = new Set(constants.SpellFrequencies.MinAcoPercentiles);
+        const availableLeagues = leagues.filter(l => availablePercentiles.has(l.minPercentile));
+
+        const statsLookup: LeagueStatsLookup = {};
+        for (const league of availableLeagues) {
+            const frequencies = await spellFrequencies.retrieveSpellFrequencies(m.GameCategory.PvP, league.minAco);
+            const allStats = groupFrequencies(frequencies);
+            statsLookup[league.name] = {
+                league,
+                allStats,
+            };
+        }
+
+        // Initialise with closest league
+        const league = _.minBy(availableLeagues, l => Math.abs(InitialPercentile - l.minPercentile)).name;
+
+        this.setState({ statsLookup, league });
     }
 
     render() {
-        const allStats = this.state.allStats;
-        if (allStats) {
-            return this.renderData(allStats);
-        } else {
-            return this.renderNoData();
+        const league = this.state.league;
+        const statsLookup = this.state.statsLookup;
+        if (statsLookup && league) {
+            const leagues = getLeagues(statsLookup);
+            const leagueStats = statsLookup[league];
+            if (leagues && leagueStats) {
+                return this.renderData(leagues, leagueStats);
+            }
         }
+
+        return this.renderNoData();
     }
 
-    private renderData(allStats: SpellBtnStats[]) {
+    private renderData(leagues: m.League[], leagueStats: LeagueStats) {
+        const leagueNames = getLeagueNames(leagues);
+        const allStats = leagueStats.allStats;
         return <div className="spell-frequencies-panel">
             <h1>Statistics</h1>
+            <CategorySelector categories={leagueNames} category={leagueStats.league.name} onCategoryChange={league => this.setState({ league })} />
             {allStats.map(stats => this.renderBtn(stats))}
             <h2>About</h2>
             <p>Calculated from matches over the past {constants.MaxGameAgeInDays} days. Only includes players who have played {constants.SpellFrequencies.MinGames} or more games.</p>

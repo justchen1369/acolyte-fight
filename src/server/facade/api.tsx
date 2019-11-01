@@ -392,10 +392,12 @@ export async function onGetLeaguesAsync(req: express.Request, res: express.Respo
 }
 
 function estimateLeague(category: string, name: string, minPercentile: number): m.League {
+    const minExposure = statsProvider.estimateRatingAtPercentile(category, minPercentile);
     return {
         name,
         minPercentile,
-        minRating: statsProvider.estimateRatingAtPercentile(category, minPercentile),
+        minRating: minExposure,
+        minAco: minExposure - constants.Placements.MaxBonus, // No activity bonus, everyone gets the maximum all the time
     };
 }
 

@@ -26,7 +26,8 @@ export class PercentilesAccumulator {
     accept(user: db.User) {
         const userRating = accumulatorHelpers.getUserRating(user, this.category);
         if (userRating) {
-            const acoExposure = userRating.aco + constants.Placements.ActivityBonusPerGame * constants.Placements.MaxActivityGames;
+            // There is no longer an activity bonus - everyone gets the maximum all the time
+            const acoExposure = userRating.aco + constants.Placements.MaxBonus;
             const bin = Math.ceil(acoExposure);
             this.frequency[bin] = (this.frequency[bin] || 0) + 1;
         }

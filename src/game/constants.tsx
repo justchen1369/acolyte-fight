@@ -46,6 +46,7 @@ export namespace Placements {
 	export const InitialAco = 1000;
 	export const ActivityBonusPerGame = 3;
 	export const MaxActivityGames = 100;
+	export const MaxBonus = ActivityBonusPerGame * MaxActivityGames;
 
 	export const AcoDecayLengthDays = 21;
 
@@ -73,10 +74,7 @@ export namespace SpellFrequencies {
 		Placements.Grandmaster,
 		Placements.Master,
 		Placements.Diamond,
-		Placements.Platinum,
 		Placements.Gold,
-		Placements.Silver,
-		Placements.Bronze,
 		Placements.Wood,
 	];
 }

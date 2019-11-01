@@ -15,11 +15,13 @@ import * as url from '../url';
 export async function downloadLeagues() {
     const state = StoreProvider.getState();
     if (state.leagues) {
-        return;
+        return state.leagues;
     }
 
     const leagues = await retrieveLeagues(m.GameCategory.PvP);
     StoreProvider.dispatch({ type: "updateLeagues", leagues });
+
+    return leagues;
 }
 
 export async function downloadLeaderboard() {

@@ -406,6 +406,7 @@ export interface League {
     name: string;
     minPercentile: number;
     minRating: number;
+    minAco: number;
 }
 
 export interface GetProfileResponse {

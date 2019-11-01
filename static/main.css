@@ -1850,13 +1850,13 @@ h3 {
     position: relative;
 }
 
-.profile-panel .category-selector {
+.category-selector {
     position: absolute;
     top: 0;
     right: 0;
 }
 
-.profile-panel .category {
+.category-selector .category {
     display: inline-block;
     text-align: center;
     font-weight: bold;
@@ -1868,24 +1868,24 @@ h3 {
     transition: background-color 0.2s ease;
 }
 
-.profile-panel .category:hover {
+.category-selector .category:hover {
     background: #555;
     cursor: hand;
 }
 
-.profile-panel .category-selected {
+.category-selector .category-selected {
     background: #444;
     color: #00ccff;
 }
 
 @media (max-width: 768px) {
-    .profile-panel .category-selector {
+    .category-selector {
         display: flex;
         position: static;
         margin-top: 2em;
     }
 
-    .profile-panel .category {
+    .category-selector .category {
         flex-grow: 1;
     }
 }
@@ -2311,6 +2311,10 @@ textarea {
     -moz-tab-size : 2;
       -o-tab-size : 2;
          tab-size : 2;
+}
+
+.spell-frequencies-panel {
+    position: relative;
 }
 
 .spell-frequencies-table {
