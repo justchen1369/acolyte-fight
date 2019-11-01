@@ -106,7 +106,6 @@ app.get('/api/leaderboard', (req, res) => api.onGetLeaderboard(req, res));
 app.get('/api/leagues/:category', (req, res) => api.onGetLeagues(req, res));
 app.get('/api/logout', (req, res) => api.onLogout(req, res));
 app.get('/api/profile', (req, res) => api.onGetProfile(req, res));
-app.get('/api/ratingAtPercentile', (req, res) => api.onGetRatingAtPercentile(req, res));
 app.get('/api/spellFrequencies', (req, res) => api.onGetSpellFrequencies(req, res));
 app.get('/api/status', (req, res) => api.onInternalStatus(req, res));
 app.get('/api/settings', (req, res) => api.onGetUserSettings(req, res));

@@ -346,21 +346,6 @@ export async function onGetGameStatsAsync(req: express.Request, res: express.Res
     res.send(buffer);
 }
 
-export function onGetRatingAtPercentile(req: express.Request, res: express.Response) {
-    onGetRatingAtPercentileAsync(req, res).catch(error => handleError(error, res));
-}
-
-export async function onGetRatingAtPercentileAsync(req: express.Request, res: express.Response): Promise<void> {
-    if (!(req.query.category && req.query.percentile)) {
-        res.status(400).send("Bad request");
-        return;
-    }
-
-    const rating = statsProvider.estimateRatingAtPercentile(req.query.category, parseInt(req.query.percentile));
-    const response: m.GetRatingAtPercentileResponse = { rating };
-    res.send(response);
-}
-
 export function onGetLeagues(req: express.Request, res: express.Response) {
     onGetLeaguesAsync(req, res).catch(error => handleError(error, res));
 }
@@ -392,12 +377,12 @@ export async function onGetLeaguesAsync(req: express.Request, res: express.Respo
 }
 
 function estimateLeague(category: string, name: string, minPercentile: number): m.League {
-    const minExposure = statsProvider.estimateRatingAtPercentile(category, minPercentile);
+    const rating = statsProvider.estimateRatingAtPercentile(category, minPercentile);
     return {
         name,
         minPercentile,
-        minRating: minExposure,
-        minAco: minExposure - constants.Placements.MaxBonus, // No activity bonus, everyone gets the maximum all the time
+        minRating: rating.exposure,
+        minAco: rating.aco,
     };
 }
 

@@ -54,13 +54,15 @@ export class SpellUsageAccumulator {
     }
 
     calculate(): SpellFrequencyCache {
-        logger.info(`Calculated spell distribution (${this.category}, ${this.minAco}): ${formatSpells(this.distribution)}`);
-
         return {
             category: this.category,
             minAco: this.minAco,
             distribution: this.distribution,
         };
+    }
+
+    log() {
+        logger.info(`Calculated spell distribution (${this.category}, ${this.minAco}): ${formatSpells(this.distribution)}`);
     }
 }
 

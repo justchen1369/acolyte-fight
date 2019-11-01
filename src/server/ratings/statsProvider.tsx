@@ -15,6 +15,7 @@ import * as spellFrequencies from './spellFrequencies';
 import * as statsStorage from '../storage/statsStorage';
 import * as winRates from './winRates';
 import { logger } from '../status/logging';
+import { RatingAtPercentile } from './ratings.model';
 
 const IncrementalUpdateInterval = 60 * 1000;
 const FullUpdateInterval = 24 * 60 * 60 * 1000;
@@ -65,6 +66,11 @@ class GameAccumulator {
 
         const elapsed = Date.now() - start;
         logger.info(`Processed ${numGames} games in ${elapsed.toFixed(0)} ms`);
+    }
+
+    log() {
+        this.winRateAccumulator.log();
+        this.spellFrequencyAccumulators.forEach(accumulator => accumulator.log());
     }
 }
 
@@ -130,11 +136,13 @@ async function update() {
             userAccumulator = newUserAccumulator;
 
             const percentileCache = userAccumulator.percentileCaches.get(m.GameCategory.PvP);
-            const minAcos = constants.SpellFrequencies.MinAcoPercentiles.map(percentile => percentiles.estimateRatingAtPercentile(percentile, percentileCache));
+            const minRatings = constants.SpellFrequencies.MinAcoPercentiles.map(percentile => percentiles.estimateRatingAtPercentile(percentile, percentileCache));
 
-            const newGameAccumulator = new GameAccumulator(minAcos);
+            const newGameAccumulator = new GameAccumulator(minRatings.map(rating => rating.aco));
             await newGameAccumulator.update();
             gameAccumulator = newGameAccumulator;
+
+            gameAccumulator.log();
         }
     } catch (exception) {
         logger.error("statsProvider failed to update", exception);
@@ -159,12 +167,12 @@ export function estimatePercentile(ratingLB: number, category: string): number {
     }
 }
 
-export function estimateRatingAtPercentile(category: string, percentile: number): number {
+export function estimateRatingAtPercentile(category: string, percentile: number): RatingAtPercentile {
     const cache = userAccumulator.percentileCaches.get(category);
     if (cache) {
         return percentiles.estimateRatingAtPercentile(percentile, cache);
     } else {
-        return 0;
+        return { exposure: 0, aco: 0 };
     }
 }
 

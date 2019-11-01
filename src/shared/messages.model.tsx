@@ -395,10 +395,6 @@ export interface LeaderboardPlayer {
     killsPerGame: number;
 }
 
-export interface GetRatingAtPercentileResponse {
-    rating: number;
-}
-
 export interface GetLeaguesResponse {
     leagues: League[];
 }

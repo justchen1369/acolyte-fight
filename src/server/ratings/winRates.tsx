@@ -81,8 +81,6 @@ export class WinRateAccumulator {
     }
 
     calculate(): WinRateCache {
-        logger.info(`Calculated win rate distribution ${this.category}: ${formatBuckets(this.buckets)}`);
-
         const distribution = this.buckets.filter(b => !!b).map(p => ({
             midpoint: (p.maxDiff + p.minDiff) / 2,
             winRate: p.weightedExpected / p.weightedGames,
@@ -94,6 +92,11 @@ export class WinRateAccumulator {
             distribution,
         };
     }
+
+    log() {
+        logger.info(`Calculated win rate distribution ${this.category}: ${formatBuckets(this.buckets)}`);
+    }
+
 }
 
 function formatBuckets(buckets: WinRateBucket[]) {

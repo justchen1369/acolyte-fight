@@ -9,12 +9,23 @@ import * as m from '../../shared/messages.model';
 import * as s from '../server.model';
 import { Collections } from '../storage/db.model';
 import { FixedIntegerArray } from '../utils/fixedIntegerArray';
+import { RatingAtPercentile } from './ratings.model';
 import { logger } from '../status/logging';
 
 export interface PercentilesCache {
     category: string;
     cumulativeFrequency: FixedIntegerArray;
     distribution: FixedIntegerArray;
+}
+
+function acoToExposure(aco: number): number {
+    // There is no longer an activity bonus - everyone gets the maximum all the time
+    return aco + constants.Placements.MaxBonus;
+}
+
+function exposureToAco(exposure: number): number {
+    // There is no longer an activity bonus - everyone gets the maximum all the time
+    return exposure - constants.Placements.MaxBonus;
 }
 
 export class PercentilesAccumulator {
@@ -26,8 +37,7 @@ export class PercentilesAccumulator {
     accept(user: db.User) {
         const userRating = accumulatorHelpers.getUserRating(user, this.category);
         if (userRating) {
-            // There is no longer an activity bonus - everyone gets the maximum all the time
-            const acoExposure = userRating.aco + constants.Placements.MaxBonus;
+            const acoExposure = acoToExposure(userRating.aco);
             const bin = Math.ceil(acoExposure);
             this.frequency[bin] = (this.frequency[bin] || 0) + 1;
         }
@@ -131,8 +141,12 @@ function clampRead(index: number, array: FixedIntegerArray): number {
     }
 }
 
-export function estimateRatingAtPercentile(percentile: number, cache: PercentilesCache): number {
+export function estimateRatingAtPercentile(percentile: number, cache: PercentilesCache): RatingAtPercentile {
     const distribution = cache.distribution;
-    const minRating = distribution.at(Math.floor(percentile));
-    return minRating || 0;
+    const minExposure = distribution.at(Math.floor(percentile)) || 0;
+    const minAco = exposureToAco(minExposure);
+    return {
+        exposure: minExposure,
+        aco: minAco,
+    };
 }
