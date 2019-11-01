@@ -89,7 +89,7 @@ const Visuals: VisualSettings = {
 	DefaultGlowRadius: 4 * Pixel,
 
 	ShakeDistance: 0.02,
-    ShakeTicks: 15,
+    ShakeTicks: 11,
     ShakeCycles: 5,
     ShakeDampening: 3,
 
