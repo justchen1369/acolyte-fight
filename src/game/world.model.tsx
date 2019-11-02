@@ -378,6 +378,7 @@ export interface Obstacle extends WorldObjectBase, HitSource, HighlightSource {
 	shape: shapes.Shape;
 
 	damage: number;
+	selfDamage: number;
 	buffs: BuffTemplate[];
 	detonate?: DetonateParametersTemplate;
 	mirror?: boolean;

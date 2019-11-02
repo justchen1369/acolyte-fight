@@ -277,6 +277,7 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		createTick: world.tick,
 
 		damage: template.damage || 0,
+		selfDamage: template.selfDamage || 0,
 		buffs: template.buffs || [],
 		detonate: template.detonate,
 		mirror: template.mirror,
@@ -2181,20 +2182,34 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 	}
 
 	if (takeHit(obstacle, hit.id, world)) {
-		if (obstacle.damage > 0 && (hit.category === "hero" || hit.category === "obstacle")) {
-			const packet: w.DamagePacket = {
-				damage: obstacle.damage,
-				lifeSteal: 0,
-				fromHeroId: hit.category === "hero" ? calculateKnockbackFromId(hit, world) : null,
-				isLava: true,
-				noKnockback: true,
-			};
-			if (hit.category === "hero") {
-				applyDamage(hit, packet, world);
-			} else if (hit.category === "obstacle") {
-				applyDamageToObstacle(hit, packet, world);
+		if (hit.category === "hero" || hit.category === "obstacle") {
+			if (obstacle.damage) {
+				const packet: w.DamagePacket = {
+					damage: obstacle.damage,
+					lifeSteal: 0,
+					fromHeroId: hit.category === "hero" ? calculateKnockbackFromId(hit, world) : null,
+					isLava: true,
+					noKnockback: true,
+				};
+				if (hit.category === "hero") {
+					applyDamage(hit, packet, world);
+				} else if (hit.category === "obstacle") {
+					applyDamageToObstacle(hit, packet, world);
+				}
+				obstacle.activeTick = world.tick;
 			}
-			obstacle.activeTick = world.tick;
+
+			if (obstacle.selfDamage) {
+				const selfPacket: w.DamagePacket = {
+					damage: obstacle.selfDamage,
+					lifeSteal: 0,
+					fromHeroId: null,
+					isLava: true,
+					noKnockback: true,
+				};
+				applyDamageToObstacle(obstacle, selfPacket, world);
+				obstacle.activeTick = world.tick;
+			}
 		}
 
 		if (obstacle.buffs && obstacle.buffs.length > 0) {
@@ -4702,10 +4717,8 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 	}
 
 	// Apply damage
-	let amount = Math.max(0, packet.damage);
-
+	let amount = packet.damage;
 	amount = applyArmor(toHero, packet.source, amount);
-
 	if (!packet.noMitigate) {
 		amount = mitigateDamage(toHero, amount, fromHeroId, world);
 	}
@@ -4716,7 +4729,7 @@ function applyDamage(toHero: w.Hero, packet: w.DamagePacket, world: w.World) {
 		const maxDamage = Math.max(0, toHero.health - packet.minHealth);
 		amount = Math.min(amount, maxDamage);
 	}
-	toHero.health -= amount;
+	toHero.health = Math.min(toHero.maxHealth, toHero.health - amount);
 
 	// Apply lifesteal
 	if (fromHero && packet.lifeSteal) {
@@ -4826,7 +4839,7 @@ function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, worl
 
 function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, world: w.World) {
 	// Register hit
-	if (packet.damage > 0) {
+	if (packet.damage) {
 		if (packet.isLava) {
 			obstacle.lavaTick = world.tick;
 		} else {
@@ -4838,7 +4851,8 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 		// No damage until game started
 		return;
 	}
-	obstacle.health = Math.max(0, obstacle.health - packet.damage);
+
+	obstacle.health = Math.min(obstacle.maxHealth, Math.max(0, obstacle.health - packet.damage));
 }
 
 export function initScore(heroId: string): w.HeroScore {

@@ -59,6 +59,60 @@ export const volcano: ObstacleTemplate = {
     ],
 }
 
+export const healing: ObstacleTemplate = {
+    health: 50,
+
+    collideWith: Categories.Hero | Categories.Obstacle,
+    sensor: true,
+    static: true,
+    undamageable: true,
+
+    strike: {
+        ticks: 15,
+        flash: true,
+    },
+
+    hitInterval: 15,
+
+    "selfDamage": 1,
+    "render": [
+        {
+            "type": "solid",
+            "color": "rgba(0, 255, 64, 0.9)",
+            "deadColor": "rgba(0, 255, 64, 0.25)",
+            "glow": 0.2
+        },
+        {
+            "type": "smoke",
+            "color": "rgba(0, 255, 64, 1)",
+            "particleRadius": 0.003,
+            "fade": "rgba(0, 0, 0, 0)",
+            "bloom": 0.01,
+            "glow": 0.05,
+            "ticks": 30,
+            "interval": 8,
+            "speed": 0.1
+        }
+    ],
+    "buffs": [
+        {
+            "type": "burn",
+            "maxTicks": 15,
+            "collideWith": 65535,
+            "packet": {
+                "damage": -1,
+                "lifeSteal": 0,
+                "noKnockback": true,
+                "noHit": true,
+                "isLava": true
+            },
+            "hitInterval": 5,
+            "stack": "healing",
+            "maxStacks": 1,
+        }
+    ]
+}
+
 export const slow: ObstacleTemplate = {
     health: 50,
 
@@ -408,6 +462,7 @@ export const ObstacleTemplates: ObstacleTemplateLookup = {
     mirror,
     spinner,
     volcano,
+    healing,
     slow,
     fast,
     right,

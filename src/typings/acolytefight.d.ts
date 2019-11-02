@@ -229,6 +229,7 @@ declare interface ObstacleTemplate {
 
 	hitInterval?: number; // How many ticks between reapplying the buffs
 	damage?: number;
+	selfDamage?: number;
 	buffs?: BuffTemplate[];
 	detonate?: DetonateParametersTemplate;
 	mirror?: boolean;

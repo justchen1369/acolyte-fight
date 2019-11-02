@@ -206,6 +206,40 @@ export const Layouts: Layouts = {
         ],
         "numPoints": 0
     },
+    "heal": {
+        "color": "#1d2e26",
+        "background": "#0d2118",
+        "obstacles": [
+            {
+                "type": "healing",
+                "layoutRadius": 0,
+                "extent": 0.02,
+                "numObstacles": 1,
+                "layoutAngleOffsetInRevs": 0.08333333,
+                "numPoints": 6
+            },
+            {
+                "type": "fast",
+                "numObstacles": 6,
+                "layoutRadius": 0.085,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 6,
+                "extent": 0.003,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.166667
+            },
+            {
+                "numObstacles": 6,
+                "layoutRadius": 0.25,
+                "layoutAngleOffsetInRevs": 0,
+                "numPoints": 6,
+                "extent": 0.004,
+                "orientationAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.03
+            }
+        ],
+        "numPoints": 6
+	},
     "snowflake": {
         "color": "#261a29",
         "background": "#130a19",
@@ -397,6 +431,32 @@ export const Layouts: Layouts = {
                 "angularWidthInRevs": 0.02
             }
         ],
+    },
+    "spiral": {
+        "color": "#20262c",
+        "background": "#101416",
+        "obstacles": [
+            {
+                "type": "inward",
+                "layoutRadius": 0.175,
+                "extent": 0.0015,
+                "numObstacles": 5,
+                "layoutAngleOffsetInRevs": 0,
+                "orientationAngleOffsetInRevs": -0.15,
+                "angularWidthInRevs": 0.25
+            },
+            {
+                "type": "bumper",
+                "numObstacles": 1,
+                "layoutRadius": 0,
+                "layoutAngleOffsetInRevs": 0.125,
+                "numPoints": 4,
+                "extent": 0.015,
+                "orientationAngleOffsetInRevs": 0.125
+            }
+        ],
+        "numPoints": 5,
+        "angleOffsetInRevs": 0
     },
     "triplet": {
         "color": "#192128",
