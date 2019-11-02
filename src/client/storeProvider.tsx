@@ -193,6 +193,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, items: action.items }
     } else if (action.type === "performance") {
         return { ...state, performance: action.performance }
+    } else if (action.type === "showingPerformance") {
+        return { ...state, showingPerformance: action.showingPerformance }
     } else if (action.type === "updateSilence") {
         const silenced = new Set<string>(state.silenced);
         if (action.add) {

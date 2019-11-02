@@ -22,6 +22,7 @@ export interface State {
     rebindings: KeyBindings;
     options: m.GameOptions;
     graphics?: number;
+    showingPerformance?: boolean;
 
     codeTree?: e.CodeTree;
 
@@ -130,6 +131,7 @@ export type Action =
     | JoinMatchAction
     | LeaveMatchAction
     | UpdatePerformanceAction
+    | UpdateShowingPerformanceAction
     | UpdateNotificationsAction
     | UpdateSilencedAction
     | UpdateRoomAction
@@ -182,6 +184,11 @@ export interface LeaveMatchAction {
 export interface UpdatePerformanceAction {
     type: "performance";
     performance: PerformanceState;
+}
+
+export interface UpdateShowingPerformanceAction {
+    type: "showingPerformance";
+    showingPerformance: boolean;
 }
 
 export interface ServerPreparingToShutdownAction {

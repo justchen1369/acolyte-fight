@@ -1,6 +1,5 @@
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
-import * as cloud from '../../core/cloud';
 import * as s from '../../store.model';
 import * as StoreProvider from '../../storeProvider';
 
@@ -14,7 +13,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        performance: state.options.performance,
+        performance: state.showingPerformance,
     };
 }
 
@@ -33,12 +32,8 @@ class PerformanceButton extends React.PureComponent<Props, State> {
         }
     }
 
-    private async onClick(performance: boolean) {
-        StoreProvider.dispatch({
-            type: "updateOptions",
-            options: { performance },
-        });
-        await cloud.uploadSettings();
+    private async onClick(showingPerformance: boolean) {
+        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance });
     }
 }
 

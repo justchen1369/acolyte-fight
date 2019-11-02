@@ -34,6 +34,7 @@ import WaitingMessage from './messages/waitingMessage';
 
 namespace Tab {
     export const Spells = "spells";
+    export const Performance = "performance";
     export const Options = "options";
     export const Scoreboard = "scoreboard";
     export const Chat = "chat";
@@ -45,6 +46,7 @@ interface Props {
     wheelOnRight: boolean;
     customizing: boolean;
     touched: boolean;
+    showingPerformance: boolean;
 }
 interface State {
     tab: string;
@@ -57,6 +59,7 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         customizing: state.customizing,
         touched: state.touched,
+        showingPerformance: state.showingPerformance,
     };
 }
 
@@ -95,6 +98,7 @@ class HUD extends React.PureComponent<Props, State> {
                         <i className="fas fa-wand-magic" />
                     </Button>}
                     {this.renderTabSwitcherItem(Tab.Options, "fas fa-cog")}
+                    {this.renderTabSwitcherItem(Tab.Performance, "fas fa-stopwatch")}
                     {this.renderTabSwitcherItem(Tab.Scoreboard, "fas fa-trophy")}
                     {this.renderTabSwitcherItem(Tab.Chat, "fas fa-comments")}
                 </div>
@@ -106,11 +110,12 @@ class HUD extends React.PureComponent<Props, State> {
                     <AutoJoinConfigButton />
                     <GraphicsLevelPanel />
                     <ActionWheelSidePanel />
-                    <PerformanceButton />
+                </>}
+                {tab === Tab.Performance && <>
+                    <PerformancePanel />
                 </>}
                 {tab === Tab.Chat && <div className="messages">
                     <TextMessageBox />
-                    <PerformancePanel />
                     <FinishedPanel />
                     <HelpMessage />
                     <WaitingMessage />
@@ -159,7 +164,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <HelpMessage />
                 <FinishedPanel />
                 <WaitingMessage />
-                <PerformancePanel />
+                {this.props.showingPerformance && <PerformancePanel />}
                 <TextMessageBox />
             </Layout>
             <PlayBar>

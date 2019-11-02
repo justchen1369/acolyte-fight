@@ -13,7 +13,6 @@ import PercentageBar from '../../controls/percentageBar';
 interface OwnProps {
 }
 interface Props extends OwnProps {
-    performance: boolean;
     cpuLag: number;
     gpuLag: number;
     networkLag: number;
@@ -23,7 +22,6 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        performance: state.options.performance,
         cpuLag: state.performance.cpuLag,
         gpuLag: state.performance.gpuLag,
         networkLag: state.performance.networkLag,
@@ -38,14 +36,6 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     }
 
     render() {
-        if (this.props.performance) {
-            return this.renderPerformance();
-        } else {
-            return null;
-        }
-    }
-
-    private renderPerformance() {
         return <div className="info-panel dialog-panel performance-panel">
             <div className="body-row">
                 <table className="performance-table">

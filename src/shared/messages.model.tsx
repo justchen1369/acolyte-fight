@@ -61,7 +61,6 @@ export interface GameOptions {
     noCameraFollow?: boolean;
     noRightClickChangeSpells?: boolean;
     noAutoJoin?: boolean;
-    performance?: boolean;
     mute?: boolean;
     unranked?: boolean;
     graphics?: number;
