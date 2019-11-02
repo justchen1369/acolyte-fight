@@ -83,7 +83,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
 
     private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
         if (notification.ticksUntilClose <= 0) {
-            return <div key={key} className="row game-started">Game started. Defeat your enemies!</div>;
+            return <div key={key} className="row game-started">{notification.message}</div>;
         } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
         } else {

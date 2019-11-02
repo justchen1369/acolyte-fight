@@ -207,6 +207,7 @@ export const Layouts: Layouts = {
         "numPoints": 0
     },
     "heal": {
+        "startMessage": "Game started. Fight over this healing pool!",
         "color": "#1d2e26",
         "background": "#0d2118",
         "obstacles": [

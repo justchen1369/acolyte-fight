@@ -60,6 +60,7 @@ const World: WorldSettings = {
     SwatchHealth: 100,
 
     BotName: "AcolyteBot",
+    DefaultGameStartMessage: "Game started. Defeat your enemies!",
 
     SlopRadius: 0.05,
 }

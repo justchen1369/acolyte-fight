@@ -88,6 +88,8 @@ export function initialWorld(mod: Object): w.World {
 		seed: null,
 		color: Visuals.DefaultWorldColor,
 		background: Visuals.Background,
+		startMessage: World.DefaultGameStartMessage,
+
 		tick: 0,
 		startTick: constants.Matchmaking.MaxHistoryLength,
 
@@ -1260,6 +1262,10 @@ function seedEnvironment(ev: n.EnvironmentMsg, world: w.World) {
 	const layouts = layoutIds.sort().map(key => Layouts[key]).filter(x => !!x);
 	const layout = layouts[world.seed % layouts.length];
 
+	if (layout.startMessage) {
+		world.startMessage = layout.startMessage;
+	}
+
 	if (layout.color) {
 		world.color = layout.color;
 	}
@@ -1444,6 +1450,7 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	world.ui.notifications.push({
 		type: "closing",
 		ticksUntilClose: ev.waitPeriod,
+		message: world.startMessage,
 	});
 
 	return true;

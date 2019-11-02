@@ -37,6 +37,8 @@ export interface World {
 	seed: number | null;
 	color: string;
 	background: string;
+	startMessage: string;
+
 	tick: number;
 	startTick: number;
 
@@ -293,6 +295,7 @@ export interface NewGameNotification {
 export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
+	message: string;
 }
 
 export interface TeamsNotification {

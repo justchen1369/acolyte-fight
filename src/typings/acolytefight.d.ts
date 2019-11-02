@@ -101,6 +101,7 @@ declare interface WorldSettings {
 	SlopRadius: number; // Performance improvement: For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
 
 	BotName: string; // What to call the bot
+	DefaultGameStartMessage: string;
 
 	Layouts?: string[]; // Only allow this subset of layouts to be played. Used internally to preview a single map.
 }
@@ -122,6 +123,8 @@ declare interface Layouts {
 }
 
 declare interface Layout {
+	startMessage?: string; // Message to display on game start
+
 	color?: string; // Color of the map
 	background?: string; // Color of the void
 	obstacles: ObstacleLayout[];
