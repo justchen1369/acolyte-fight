@@ -64,7 +64,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
         } else if (this.props.cpuLag > 0.1) {
             return "It appears your CPU is not keeping up.";
         } else {
-            return "This is the proportion of missed frames in the past 10 seconds.";
+            return `This is the proportion of missed frames in the past ${performance.MaxHistorySeconds} seconds.`;
         }
     }
 

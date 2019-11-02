@@ -14,7 +14,7 @@ export interface PerformanceCounters {
     calculation: PerformanceSlice;
 }
 
-const MaxHistoryLength = 10;
+const MaxHistoryLength = 60;
 const SlowMultiplier = 2.0; // 2x late => slow
 const SliceMilliseconds = 1000;
 
