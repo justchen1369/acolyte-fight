@@ -22,7 +22,6 @@ let tickCounter = 0;
 let previousFrameTime = 0;
 
 export function reset(history: m.TickMsg[], live: boolean) {
-	performance.reset();
 	if (live) {
 		tickQueue = [...history];
 		incomingQueue = [];

@@ -26,11 +26,6 @@ const SlowInterval = interval * SlowMultiplier;
 let current = initCounters();
 let history = new Array<PerformanceCounters>();
 
-export function reset() {
-    history = [];
-    current = initCounters();
-}
-
 export function tick() {
     const elapsed = Date.now() - current.start;
     if (elapsed >= SliceMilliseconds) {
