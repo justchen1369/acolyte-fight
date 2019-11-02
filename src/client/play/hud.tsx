@@ -170,10 +170,12 @@ class HUD extends React.PureComponent<Props, State> {
             <PlayBar>
                 <MutePanel />
                 <AutoJoinConfigButton />
-                <GraphicsLevelPanel />
                 <FullScreenButton />
-                <PerformanceButton />
                 <RandomizePanel />
+                <div className="separator"></div>
+                <GraphicsLevelPanel />
+                <PerformanceButton />
+                <div className="separator"></div>
                 <VideoPanel />
             </PlayBar>
             <Layout anchorBottom={true} anchorRight={true}>

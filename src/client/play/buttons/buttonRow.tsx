@@ -8,6 +8,7 @@ import Button from '../../controls/button';
 interface OwnProps {
     label: string;
     icon: string;
+    secondary?: boolean;
     onClick: () => void;
 }
 interface Props extends OwnProps {
@@ -47,7 +48,11 @@ class ButtonRow extends React.PureComponent<Props, State> {
     }
 
     render() {
-        return <Button className="button-panel-row nav-item" onMouseEnter={() => this.hover()} onMouseLeave={() => this.unhover()} onClick={this.props.onClick}>
+        let className = "button-panel-row nav-item";
+        if (this.props.secondary) {
+            className += " button-panel-secondary";
+        }
+        return <Button className={className} onMouseEnter={() => this.hover()} onMouseLeave={() => this.unhover()} onClick={this.props.onClick}>
             <span className="button-panel-row-icon"><i className={this.props.icon} /></span>
             <span className="button-panel-row-label">{this.props.label}</span>
         </Button>

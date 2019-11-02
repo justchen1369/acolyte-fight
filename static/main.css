@@ -352,6 +352,10 @@ a:hover, a:active {
     font-size: 100%;
 }
 
+.navbar .separator {
+    padding: 0.5em;
+}
+
 @media (max-width: 768px) {
     .navbar .nav-item.nav-optional {
         display: none;
@@ -1289,6 +1293,9 @@ table.player-list {
     color: #ccc;
     padding: 0.5em;
     text-align: center;
+}
+#game-panel.desktop .button-panel-row.button-panel-secondary {
+    color: #aaa;
 }
 
 #game-panel.desktop .button-panel-row .button-panel-row-label {

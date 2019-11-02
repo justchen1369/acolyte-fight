@@ -26,9 +26,9 @@ class PerformanceButton extends React.PureComponent<Props, State> {
 
     render() {
         if (this.props.performance) {
-            return <ButtonRow label="Hide Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(false)} />
+            return <ButtonRow secondary={true} label="Hide Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(false)} />
         } else {
-            return <ButtonRow label="Show Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(true)} />
+            return <ButtonRow secondary={true} label="Show Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(true)} />
         }
     }
 
