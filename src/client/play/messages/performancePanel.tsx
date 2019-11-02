@@ -6,7 +6,7 @@ import * as m from '../../../shared/messages.model';
 import * as s from '../../store.model';
 import * as cloud from '../../core/cloud';
 import * as StoreProvider from '../../storeProvider';
-import Button from '../../controls/Button';
+import Button from '../../controls/button';
 import PercentageBar from '../../controls/percentageBar';
 
 interface OwnProps {
