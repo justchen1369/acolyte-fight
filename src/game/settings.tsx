@@ -1940,7 +1940,7 @@ const mines: Spell = {
 
         partialDamage: {
             initialMultiplier: 0.001,
-            ticks: 6,
+            ticks: 7,
             step: true,
         },
 
