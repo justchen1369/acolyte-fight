@@ -433,8 +433,8 @@ export const Layouts: Layouts = {
         ],
     },
     "spiral": {
-        "color": "#20262c",
-        "background": "#101416",
+        "color": "#161c29",
+        "background": "#0b1019",
         "obstacles": [
             {
                 "type": "inward",
@@ -453,10 +453,17 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.125
+            },
+            {
+                "type": "mirror",
+                "numObstacles": 5,
+                "layoutRadius": 0.35,
+                "layoutAngleOffsetInRevs": 0.2,
+                "numPoints": 3,
+                "extent": 0.0075,
+                "orientationAngleOffsetInRevs": 0.166667
             }
-        ],
-        "numPoints": 5,
-        "angleOffsetInRevs": 0
+        ]
     },
     "triplet": {
         "color": "#192128",
