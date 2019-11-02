@@ -39,7 +39,7 @@ export interface State {
     items: NotificationItem[];
     silenced: Set<string>;
 
-    performance: m.PerformanceStatsMsg;
+    performance: PerformanceState;
 
     profile: m.GetProfileResponse;
     leaderboard?: m.LeaderboardPlayer[];
@@ -63,6 +63,12 @@ export interface NotificationItem {
     key: string;
     notification: w.Notification;
     expiryTime: number;
+}
+
+export interface PerformanceState {
+    cpuLag: number;
+    gpuLag: number;
+    networkLag: number;
 }
 
 export interface PartyState {
@@ -177,7 +183,7 @@ export interface LeaveMatchAction {
 
 export interface UpdatePerformanceAction {
     type: "performance";
-    performance: m.PerformanceStatsMsg;
+    performance: PerformanceState;
 }
 
 export interface UpdateShowingPerformanceAction {

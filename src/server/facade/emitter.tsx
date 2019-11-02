@@ -737,15 +737,20 @@ async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {
 async function onPerformanceMsg(socket: SocketIO.Socket, data: m.PerformanceStatsMsg) {
 	try {
 		if (!(required(data, "object")
-			&& required(data.cpuLag, "number")
-			&& required(data.gpuLag, "number")
-			&& required(data.networkLag, "number")
+			&& required(data.c, "number")
+			&& required(data.g, "number")
+			&& required(data.n, "number")
 		)) {
 			// callback({ success: false, error: "Bad request" });
 			return;
 		}
 
-		performance.receivePerformanceStats(data);
+		const stats: performance.PerformanceStats = {
+			cpuLag: data.c,
+			gpuLag: data.g,
+			networkLag: data.n,
+		};
+		performance.receivePerformanceStats(stats);
 	} catch (exception) {
 		logger.error(exception);
 	}

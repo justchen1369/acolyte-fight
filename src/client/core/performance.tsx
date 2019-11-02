@@ -56,7 +56,7 @@ export function calculate() {
     return aggregate(history);
 }
 
-function flatten(performance: PerformanceCounters): m.PerformanceStatsMsg {
+function flatten(performance: PerformanceCounters): s.PerformanceState {
     return {
         cpuLag: flattenSlice(performance.calculation),
         gpuLag: flattenSlice(performance.graphics),
@@ -122,7 +122,16 @@ function record(slice: PerformanceSlice, success: boolean) {
     ++slice.total;
 }
 
-function send(data: m.PerformanceStatsMsg) {
+function send(data: s.PerformanceState) {
     const socket = sockets.getSocket();
-    socket.emit('performance', data);
+    const msg = statsToMsg(data);
+    socket.emit('performance', msg);
+}
+
+function statsToMsg(data: s.PerformanceState): m.PerformanceStatsMsg {
+    return {
+        c: data.cpuLag,
+        g: data.gpuLag,
+        n: data.networkLag,
+    };
 }

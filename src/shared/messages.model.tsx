@@ -144,9 +144,9 @@ export interface TextMsg {
 }
 
 export interface PerformanceStatsMsg {
-    cpuLag: number;
-    gpuLag: number;
-    networkLag: number;
+    c: number; // CPU lag
+    g: number; // GPU lag
+    n: number; // Network lag
 }
 
 export interface ErrorResponseMsg {
