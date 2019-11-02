@@ -18,6 +18,8 @@ const MaxHistoryLength = 10;
 const SlowMultiplier = 2.0; // 2x late => slow
 const SliceMilliseconds = 1000;
 
+export const MaxHistorySeconds = MaxHistoryLength * SliceMilliseconds / 1000;
+
 const interval = Math.floor(1000 / TicksPerSecond);
 const SlowInterval = interval * SlowMultiplier;
 

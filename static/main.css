@@ -2313,12 +2313,36 @@ textarea {
          tab-size : 2;
 }
 
-.performance-panel .close-btn {
-    opacity: 0;
-    padding-left: 0.1em;
+.performance-panel {
+    position: relative;
+    max-width: 30vw;
 }
 
-.performance-panel:hover .close-btn {
+.performance-panel:hover .body-row {
+    visibility: hidden;
+}
+
+.performance-panel .info-row {
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    padding: 1em;
+    font-size: 75%;
+    color: #ccc;
+}
+
+.performance-panel:hover .info-row {
+    visibility: visible;
+}
+
+.performance-panel .control-row .clickable {
+    opacity: 0;
+    padding: 0 0.2em;
+}
+
+.performance-panel:hover .control-row .clickable {
     opacity: 1;
 }
 
