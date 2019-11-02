@@ -1118,7 +1118,7 @@ table.player-list {
 }
 
 .messages .info-panel .header-row {
-    font-size: 120%;
+    font-size: 100%;
     font-weight: bold;
     margin-bottom: 0.5em;
 }
@@ -2318,7 +2318,7 @@ textarea {
 }
 
 table.performance-table td {
-    padding: 0.5em;
+    padding: 0.1em 0.5em;
 }
 
 .performance-table-label {
