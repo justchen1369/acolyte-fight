@@ -455,12 +455,12 @@ export const Layouts: Layouts = {
                 "orientationAngleOffsetInRevs": 0.125
             },
             {
-                "type": "mirror",
+                "type": "explosive",
                 "numObstacles": 5,
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.2,
                 "numPoints": 3,
-                "extent": 0.0075,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0.166667
             }
         ]
