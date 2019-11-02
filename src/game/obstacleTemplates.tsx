@@ -85,7 +85,7 @@ export const healing: ObstacleTemplate = {
         {
             "type": "smoke",
             "color": "rgba(0, 255, 64, 1)",
-            "particleRadius": 0.003,
+            "particleRadius": 0.005,
             "fade": "rgba(0, 0, 0, 0)",
             "bloom": 0.01,
             "glow": 0.05,
