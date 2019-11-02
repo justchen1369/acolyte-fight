@@ -40,13 +40,18 @@ export function tick() {
             history.shift();
         }
 
-        const performance = aggregate(history);
+        const performance = calculate();
         // console.log(formatPerformance(performance));
+
         StoreProvider.dispatch({
             type: "performance",
             performance: flatten(performance),
         });
     }
+}
+
+export function calculate() {
+    return aggregate(history);
 }
 
 function flatten(performance: PerformanceCounters): s.PerformanceState {

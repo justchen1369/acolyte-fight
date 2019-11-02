@@ -5,6 +5,7 @@ import * as Reselect from 'reselect';
 
 import * as StoreProvider from '../storeProvider';
 import * as engine from '../../game/engine';
+import * as performance from '../core/performance';
 import * as vector from '../../game/vector';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
@@ -16,6 +17,7 @@ import { frame } from '../core/ticker';
 const CheckInterval = 1000;
 const HiddenRenderInterval = 1000;
 const MinFrames = 30;
+const MinStalls = 10;
 const FpsThreshold = 0.9;
 
 interface Props {
@@ -94,7 +96,11 @@ class AnimationLoop {
             this.renderIntervals.sort();
             const medianFPS = 1000 / this.renderIntervals[Math.floor(0.5 * this.renderIntervals.length)];
             if (medianFPS < FpsThreshold * TicksPerSecond) {
-                this.slow();
+                const counters = performance.calculate();
+                if (counters.graphics.stalls >= MinStalls) {
+                    // Also check that the slowness is caused by the GPU and not the CPU
+                    this.slow();
+                }
             }
             this.renderIntervals.length = 0;
         }
