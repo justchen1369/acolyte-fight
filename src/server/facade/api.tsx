@@ -20,6 +20,7 @@ import * as kongregate from '../auth/kongregate';
 import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
 import * as mirroring from '../core/mirroring';
+import * as performance from '../core/performance';
 import * as sanitize from '../../shared/sanitize';
 import * as statsProvider from '../ratings/statsProvider';
 import * as statsStorage from '../storage/statsStorage';
@@ -59,6 +60,7 @@ export function onInternalStatus(req: express.Request, res: express.Response) {
 export function getInternalStatus() {
     const store = getStore();
     const location = getLocation();
+    const performanceStats = performance.getPerformanceStats();
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
@@ -67,6 +69,9 @@ export function getInternalStatus() {
         numPlayers: wu(store.scoreboards.values()).map(scoreboard => scoreboard.online.size).reduce((a, b) => a + b, 0),
         numConnections: store.numConnections,
         serverLoad: loadMetrics.getLoadAverage(),
+        cpuLag: performanceStats.cpuLag,
+        gpuLag: performanceStats.gpuLag,
+        networkLag: performanceStats.networkLag,
     };
     return status;
 }

@@ -19,6 +19,7 @@ import * as mirroring from '../core/mirroring';
 import * as modder from '../core/modder';
 import * as online from '../core/online';
 import * as parties from '../core/parties';
+import * as performance from '../core/performance';
 import * as ticker from '../core/ticker';
 
 let shuttingDown = false;
@@ -111,6 +112,7 @@ function onConnection(socket: SocketIO.Socket) {
 	socket.on('sync', data => onSyncMsg(socket, data));
 	socket.on('online', data => onOnlineMsg(socket, data));
 	socket.on('text', data => onTextMsg(socket, data));
+	socket.on('performance', data => onPerformanceMsg(socket, data));
 	socket.on('replays', (data, callback) => onReplaysMsg(socket, authToken, data, callback));
 }
 
@@ -727,6 +729,23 @@ async function onTextMsg(socket: SocketIO.Socket, data: m.SendTextMsg) {
 		if (name.length > 0) {
 			online.receiveTextMessage(data.segment, userHash, name, data.text);
 		}
+	} catch (exception) {
+		logger.error(exception);
+	}
+}
+
+async function onPerformanceMsg(socket: SocketIO.Socket, data: m.PerformanceStatsMsg) {
+	try {
+		if (!(required(data, "object")
+			&& required(data.cpuLag, "number")
+			&& required(data.gpuLag, "number")
+			&& required(data.networkLag, "number")
+		)) {
+			// callback({ success: false, error: "Bad request" });
+			return;
+		}
+
+		performance.receivePerformanceStats(data);
 	} catch (exception) {
 		logger.error(exception);
 	}

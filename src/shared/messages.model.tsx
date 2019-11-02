@@ -143,6 +143,11 @@ export interface TextMsg {
     text: string;
 }
 
+export interface PerformanceStatsMsg {
+    cpuLag: number;
+    gpuLag: number;
+    networkLag: number;
+}
 
 export interface ErrorResponseMsg {
     success: false;
@@ -309,6 +314,9 @@ export interface InternalStatus {
     numPlayers: number;
     numConnections: number;
     serverLoad: number;
+    cpuLag: number;
+    gpuLag: number;
+    networkLag: number;
 }
 
 export interface GameListRequest {

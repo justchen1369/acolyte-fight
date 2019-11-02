@@ -4,8 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as m from '../../../shared/messages.model';
 import * as s from '../../store.model';
-import * as cloud from '../../core/cloud';
-import * as performance from '../../core/performance';
+import * as constants from '../../../game/constants';
 import * as StoreProvider from '../../storeProvider';
 import Button from '../../controls/button';
 import PercentageBar from '../../controls/percentageBar';
@@ -64,7 +63,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
         } else if (this.props.cpuLag > 0.1) {
             return "It appears your CPU is not keeping up.";
         } else {
-            return `This is the proportion of missed frames in the past ${performance.MaxHistorySeconds} seconds.`;
+            return `This is the proportion of missed frames in the past ${constants.PerformanceStats.MaxHistoryLengthMilliseconds / 1000} seconds.`;
         }
     }
 

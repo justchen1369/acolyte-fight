@@ -19,6 +19,7 @@ import * as online from './core/online';
 import * as options from './options';
 import * as pages from './core/pages';
 import * as parties from './core/parties';
+import * as performance from './core/performance';
 import * as rankings from './core/rankings';
 import * as replays from './core/replays';
 import * as rooms from './core/rooms';

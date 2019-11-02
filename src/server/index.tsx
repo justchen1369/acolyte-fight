@@ -25,6 +25,7 @@ import * as kongregate from './auth/kongregate';
 import * as gameStorage from './storage/gameStorage';
 import * as matchmaking from './core/matchmaking';
 import * as modder from './core/modder';
+import * as performance from './core/performance';
 import * as online from './core/online';
 import * as serverStore from './serverStore';
 import * as statsProvider from './ratings/statsProvider';
@@ -123,6 +124,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 online.init().catch(logger.error);
 
 statsProvider.startUpdateLoop().catch(logger.error);
+performance.startLoop();
 
 setInterval(async () => {
 	try {

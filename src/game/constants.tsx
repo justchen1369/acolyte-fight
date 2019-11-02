@@ -83,3 +83,7 @@ export namespace Atlas {
 	export const Width = 1024;
 	export const Height = 1024;
 }
+
+export namespace PerformanceStats {
+	export const MaxHistoryLengthMilliseconds = 15000;
+}
