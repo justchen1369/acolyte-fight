@@ -4,6 +4,9 @@ import * as ReactRedux from 'react-redux';
 import * as Reselect from 'reselect';
 import * as m from '../../../shared/messages.model';
 import * as s from '../../store.model';
+import * as cloud from '../../core/cloud';
+import * as StoreProvider from '../../storeProvider';
+import Button from '../../controls/Button';
 import PercentageBar from '../../controls/percentageBar';
 
 interface OwnProps {
@@ -37,13 +40,14 @@ class PerformancePanel extends React.PureComponent<Props, State> {
 
     private renderPerformance() {
         return <div className="info-panel dialog-panel performance-panel">
-            <div className="header-row">Missed Frames</div>
+            <div className="header-row">Performance <Button className="close-btn clickable" onClick={() => this.onHideClick()}><i className="fas fa-times" /></Button></div>
             <div className="body-row">
                 <table className="performance-table">
                     <colgroup>
                         <col className="performance-table-label-col" />
                         <col className="performance-table-percent-col" />
                     </colgroup>
+                    <caption>Frames missed:</caption>
                     <tbody>
                         {this.renderPerformanceRow("CPU", this.props.cpuLag)}
                         {this.renderPerformanceRow("GPU", this.props.gpuLag)}
@@ -59,6 +63,14 @@ class PerformancePanel extends React.PureComponent<Props, State> {
             <td className="performance-table-label">{label}</td>
             <td className="performance-table-percent"><PercentageBar proportion={proportion} /></td>
         </tr>
+    }
+
+    private async onHideClick() {
+        StoreProvider.dispatch({
+            type: "updateOptions",
+            options: { performance: false },
+        });
+        await cloud.uploadSettings();
     }
 }
 

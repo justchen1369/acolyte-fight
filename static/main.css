@@ -1118,7 +1118,7 @@ table.player-list {
 }
 
 .messages .info-panel .header-row {
-    font-size: 100%;
+    font-size: 110%;
     font-weight: bold;
     margin-bottom: 0.5em;
 }
@@ -2313,9 +2313,25 @@ textarea {
          tab-size : 2;
 }
 
+.performance-panel .close-btn {
+    opacity: 0;
+    padding-left: 0.1em;
+}
+
+.performance-panel:hover .close-btn {
+    opacity: 1;
+}
+
 .performance-table {
     border-collapse: collapse;
 }
+
+.performance-table caption {
+    text-align: left;
+    padding: 0.5em 0;
+    color: #ccc;
+}
+
 
 table.performance-table td {
     padding: 0.1em 0.5em;

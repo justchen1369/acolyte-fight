@@ -106,9 +106,11 @@ class HUD extends React.PureComponent<Props, State> {
                     <AutoJoinConfigButton />
                     <GraphicsLevelPanel />
                     <ActionWheelSidePanel />
+                    <PerformanceButton />
                 </>}
                 {tab === Tab.Chat && <div className="messages">
                     <TextMessageBox />
+                    <PerformancePanel />
                     <FinishedPanel />
                     <HelpMessage />
                     <WaitingMessage />
