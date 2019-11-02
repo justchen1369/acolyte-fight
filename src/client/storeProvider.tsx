@@ -46,6 +46,7 @@ function initialState(): s.State {
         world: engine.initialWorld(room.mod),
         items: [],
         silenced: new Set<string>(),
+        performance: { cpuLag: 0, gpuLag: 0, networkLag: 0 },
         profile: null,
         leagues: null,
         allGameStats: new Map<string, d.GameStats>(),
@@ -190,6 +191,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         };
     } else if (action.type === "updateNotifications") {
         return { ...state, items: action.items }
+    } else if (action.type === "performance") {
+        return { ...state, performance: action.performance }
     } else if (action.type === "updateSilence") {
         const silenced = new Set<string>(state.silenced);
         if (action.add) {

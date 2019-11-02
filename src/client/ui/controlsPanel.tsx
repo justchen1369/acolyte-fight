@@ -290,7 +290,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <h2>Graphics</h2>
+            <h2>Performance</h2>
             <div className="row">
                 <span className="label">Graphics</span>
                 <select className="value" value={this.state.graphics} onChange={ev => this.onUpdate({ graphics: ev.target.value })}>

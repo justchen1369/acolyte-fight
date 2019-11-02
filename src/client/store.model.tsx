@@ -38,6 +38,8 @@ export interface State {
     items: NotificationItem[];
     silenced: Set<string>;
 
+    performance: PerformanceState;
+
     profile: m.GetProfileResponse;
     leaderboard?: m.LeaderboardPlayer[];
     leagues: m.League[];
@@ -60,6 +62,12 @@ export interface NotificationItem {
     key: string;
     notification: w.Notification;
     expiryTime: number;
+}
+
+export interface PerformanceState {
+    cpuLag: number;
+    gpuLag: number;
+    networkLag: number;
 }
 
 export interface PartyState {
@@ -121,6 +129,7 @@ export type Action =
     | UpdateOnlineSegmentAction
     | JoinMatchAction
     | LeaveMatchAction
+    | UpdatePerformanceAction
     | UpdateNotificationsAction
     | UpdateSilencedAction
     | UpdateRoomAction
@@ -168,6 +177,11 @@ export interface JoinMatchAction {
 
 export interface LeaveMatchAction {
     type: "leaveMatch";
+}
+
+export interface UpdatePerformanceAction {
+    type: "performance";
+    performance: PerformanceState;
 }
 
 export interface ServerPreparingToShutdownAction {

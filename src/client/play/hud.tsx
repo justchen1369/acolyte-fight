@@ -20,6 +20,8 @@ import HintPanel from './hintPanel';
 import Layout from './layout';
 import MessagesPanel from './messagesPanel';
 import MutePanel from './buttons/mutePanel';
+import PerformanceButton from './buttons/performanceButton';
+import PerformancePanel from './messages/performancePanel';
 import PlayBar from './playBar';
 import RandomizePanel from './buttons/randomizePanel';
 import FullScreenButton from './buttons/fullScreenButton';
@@ -155,6 +157,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <HelpMessage />
                 <FinishedPanel />
                 <WaitingMessage />
+                <PerformancePanel />
                 <TextMessageBox />
             </Layout>
             <PlayBar>
@@ -162,6 +165,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <AutoJoinConfigButton />
                 <GraphicsLevelPanel />
                 <FullScreenButton />
+                <PerformanceButton />
                 <RandomizePanel />
                 <VideoPanel />
             </PlayBar>

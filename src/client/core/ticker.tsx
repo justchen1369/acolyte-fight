@@ -3,6 +3,7 @@ import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as ai from '../ai/ai';
 import * as engine from '../../game/engine';
+import * as performance from './performance';
 import * as processor from './processor';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
@@ -18,7 +19,10 @@ export const interval = Math.floor(1000 / TicksPerSecond);
 let tickEpoch = Date.now();
 let tickCounter = 0;
 
+let previousFrameTime = 0;
+
 export function reset(history: m.TickMsg[], live: boolean) {
+	performance.reset();
 	if (live) {
 		tickQueue = [...history];
 		incomingQueue = [];
@@ -69,7 +73,7 @@ function calculateCatchupTicks() {
 			return 2; // We're behind, but not by much, catch up slowly
 		} else {
 			// We're very behind, skip ahead
-			return incomingQueue.length;
+			return Math.max(0, incomingQueue.length - allowedDelay);
 		}
 	} else {
 		// Don't catch up to live when watching a replay
@@ -101,16 +105,26 @@ function tickComparer(a: m.TickMsg, b: m.TickMsg) {
 }
 
 export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
+	if (world.ui.renderedTick && previousFrameTime) {
+		// Only count if rendered before
+		const now = Date.now();
+		const renderMilliseconds = now - previousFrameTime;
+		performance.recordGraphics(renderMilliseconds);
+	}
+
+	const start = Date.now();
 	const numTicks = Math.max(
 		calculateTicksFromCurrentTime(),
 		calculateCatchupTicks());
 	const unavailable = queueTicks(numTicks);
 
+	let numTicksProcessed = 0;
 	while (tickQueue.length > 0) {
 		const next = tickQueue.shift();
 		if (next.u === world.ui.universeId && next.t === world.tick) {
 			// Drain ticks from other queues or repeated ticks
 			processor.applyTick(next, world);
+			++numTicksProcessed;
 
 			/*
 			const hash = engine.hash(world);
@@ -119,11 +133,15 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 		}
 	}
 
-	if (world.finished) {
+	if (world.finished || !world.ui.myGameId) {
 		// Server is done, tick forward without server messages
 		for (let i = 0; i < unavailable; ++i) {
 			engine.tick(world);
+			++numTicksProcessed;
 		}
+	} else {
+		const success = !unavailable;
+		performance.recordNetwork(success);
 	}
 
 	if (world.tick > 0) { // Tick 0 does not have the map yet, don't render it otherwise the screen flashes
@@ -134,6 +152,15 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	sendSnapshot(world);
 	notificationTick(world);
 	aiTick(world);
+
+	if (numTicksProcessed > 0) {
+		const calculationMilliseconds = Date.now() - start; 
+		performance.recordCalculation(calculationMilliseconds / numTicksProcessed);
+	}
+
+	// Only update this after CPU processing is complete so we can measure graphics by itself
+	performance.tick();
+	previousFrameTime = Date.now();
 }
 
 function notificationTick(world: w.World) {

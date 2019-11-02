@@ -2313,6 +2313,27 @@ textarea {
          tab-size : 2;
 }
 
+.performance-table {
+    border-collapse: collapse;
+}
+
+table.performance-table td {
+    padding: 0.5em;
+}
+
+.performance-table-label {
+    text-align: right;
+}
+
+.performance-table-percent {
+    min-width: 10em;
+}
+
+.performance-table .percentage-bar-fill {
+    background-color: #f04;
+}
+
+
 .spell-frequencies-title {
     position: relative;
 }

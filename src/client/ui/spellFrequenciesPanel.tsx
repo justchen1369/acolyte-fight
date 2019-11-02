@@ -12,6 +12,7 @@ import * as spellUtils from '../core/spellUtils'
 import { DefaultSettings } from '../../game/settings';
 import { Icons } from '../../game/icons';
 import CategorySelector from '../controls/categorySelector';
+import PercentageBar from '../controls/percentageBar';
 import SpellIcon from '../controls/spellIcon';
 
 interface LeagueStatsLookup {
@@ -193,15 +194,7 @@ export class SpellFrequenciesPanel extends React.PureComponent<Props, State> {
     }
 
     private renderPercentage(proportion: number) {
-        const percentageFormatted = `${((proportion || 0) * 100).toFixed(1)}%`;
-        return <div className="percentage-bar-container">
-            <div className="percentage-bar">
-                <div className="percentage-bar-fill" style={{ width: percentageFormatted }}></div>
-            </div>
-            <div className="percentage-bar-label">
-                {percentageFormatted}
-            </div>
-        </div>
+        return <PercentageBar proportion={proportion} />
     }
 
     private renderNoData() {
