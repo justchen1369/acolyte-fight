@@ -22,7 +22,7 @@ export interface State {
     rebindings: KeyBindings;
     options: m.GameOptions;
     graphics?: number;
-    showingPerformance?: boolean;
+    showingPerformance?: PerformanceTab;
 
     codeTree?: e.CodeTree;
 
@@ -50,6 +50,13 @@ export interface State {
 
     online: Immutable.Map<string, m.OnlinePlayerMsg>;
     onlineSegment: string;
+}
+
+export enum PerformanceTab {
+    None = "None",
+    CPU = "CPU",
+    GPU = "GPU",
+    Network = "Network",
 }
 
 export namespace ScoreboardMetric {
@@ -195,7 +202,7 @@ export interface UpdateGlobalPerformanceAction {
 
 export interface UpdateShowingPerformanceAction {
     type: "showingPerformance";
-    showingPerformance: boolean;
+    showingPerformance: PerformanceTab;
 }
 
 export interface ServerPreparingToShutdownAction {

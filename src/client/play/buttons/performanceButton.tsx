@@ -13,7 +13,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
-        performance: state.showingPerformance,
+        performance: !!state.showingPerformance,
     };
 }
 
@@ -26,14 +26,18 @@ class PerformanceButton extends React.PureComponent<Props, State> {
 
     render() {
         if (this.props.performance) {
-            return <ButtonRow secondary={true} label="Hide Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(false)} />
+            return <ButtonRow secondary={true} label="Hide Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onHide()} />
         } else {
-            return <ButtonRow secondary={true} label="Show Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(true)} />
+            return <ButtonRow secondary={true} label="Show Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onShow()} />
         }
     }
 
-    private async onClick(showingPerformance: boolean) {
-        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance });
+    private async onHide() {
+        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance: null });
+    }
+
+    private async onShow() {
+        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance: s.PerformanceTab.None });
     }
 }
 

@@ -59,7 +59,7 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         customizing: state.customizing,
         touched: state.touched,
-        showingPerformance: state.showingPerformance,
+        showingPerformance: !!state.showingPerformance,
     };
 }
 

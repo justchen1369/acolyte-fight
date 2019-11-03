@@ -11,13 +11,6 @@ import PercentageBar from '../../controls/percentageBar';
 
 const HistorySeconds = constants.PerformanceStats.MaxHistoryLengthMilliseconds / 1000;
 
-enum Tab {
-    None = "None",
-    CPU = "CPU",
-    GPU = "GPU",
-    Network = "Network",
-}
-
 interface OwnProps {
 }
 interface Props extends OwnProps {
@@ -28,9 +21,10 @@ interface Props extends OwnProps {
     globalCpuLag: number;
     globalGpuLag: number;
     globalNetworkLag: number;
+
+    tab: s.PerformanceTab;
 }
 interface State {
-    tab: Tab;
 }
 
 interface DetailProps {
@@ -65,6 +59,7 @@ function stateToProps(state: s.State): Props {
         globalCpuLag: state.globalPerformance.cpuLag,
         globalGpuLag: state.globalPerformance.gpuLag,
         globalNetworkLag: state.globalPerformance.networkLag,
+        tab: state.showingPerformance,
     };
 }
 
@@ -72,42 +67,40 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {
-            tab: Tab.None,
         };
     }
 
     render() {
-        const tab = this.state.tab;
-        switch (this.state.tab) {
-            case Tab.CPU: return this.renderCPU();
-            case Tab.GPU: return this.renderGPU();
-            case Tab.Network: return this.renderNetwork();
+        switch (this.props.tab) {
+            case s.PerformanceTab.CPU: return this.renderCPU();
+            case s.PerformanceTab.GPU: return this.renderGPU();
+            case s.PerformanceTab.Network: return this.renderNetwork();
             default: return this.renderSummary();
         }
     }
 
     private renderSummary() {
         return <PerformanceTable>
-            {this.renderPerformanceRow(Tab.CPU, "CPU lag", this.props.cpuLag)}
-            {this.renderPerformanceRow(Tab.GPU, "GPU lag", this.props.gpuLag)}
-            {this.renderPerformanceRow(Tab.Network, "Network lag", this.props.networkLag)}
+            {this.renderPerformanceRow(s.PerformanceTab.CPU, "CPU lag", this.props.cpuLag)}
+            {this.renderPerformanceRow(s.PerformanceTab.GPU, "GPU lag", this.props.gpuLag)}
+            {this.renderPerformanceRow(s.PerformanceTab.Network, "Network lag", this.props.networkLag)}
         </PerformanceTable>
     }
 
-    private renderPerformanceRow(tab: Tab, label: string, proportion: number) {
+    private renderPerformanceRow(tab: s.PerformanceTab, label: string, proportion: number) {
         return <tr className="performance-summary-row" onClick={() => this.onTabSelect(tab)}>
             <td className="performance-table-label"><Button className="clickable" onClick={() => this.onTabSelect(tab)}>{label}</Button></td>
             <td className="performance-table-percent"><PercentageBar proportion={proportion} /></td>
         </tr>
     }
 
-    private onTabSelect(tab: Tab) {
-        this.setState({ tab });
+    private onTabSelect(tab: s.PerformanceTab) {
+        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance: tab });
     }
 
     private renderCPU() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> CPU</Button>;
-        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your CPU was late at simulating.</caption>;
+        const caption = <caption>Proportion of time your CPU was late over the past {HistorySeconds} seconds:</caption>;
         return <PerformanceTable header={header} caption={caption}>
             {this.renderDetailRow("Your lag", this.props.cpuLag)}
             {this.renderDetailRow("Others lag", this.props.globalCpuLag)}
@@ -116,7 +109,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     
     private renderGPU() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> GPU</Button>;
-        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your GPU was late at rendering.</caption>;
+        const caption = <caption>Proportion of time your GPU was late over the past {HistorySeconds} seconds:</caption>;
         return <PerformanceTable header={header} caption={caption}>
             {this.renderDetailRow("Your lag", this.props.gpuLag)}
             {this.renderDetailRow("Others lag", this.props.globalGpuLag)}
@@ -125,7 +118,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     
     private renderNetwork() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> Network</Button>;
-        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your network received late.</caption>;
+        const caption = <caption>Proportion of time your Network was late over the past {HistorySeconds} seconds:</caption>;
         return <PerformanceTable header={header} caption={caption}>
             {this.renderDetailRow("Your lag", this.props.networkLag)}
             {this.renderDetailRow("Others lag", this.props.globalNetworkLag)}
@@ -140,7 +133,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     }
 
     private onTabClear() {
-        this.setState({ tab: null });
+        StoreProvider.dispatch({ type: "showingPerformance", showingPerformance: s.PerformanceTab.None });
     }
 }
 
