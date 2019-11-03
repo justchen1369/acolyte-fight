@@ -1043,7 +1043,7 @@ const rocket: Spell = {
     icon: "mightyForce",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 5 * TicksPerSecond,
     focusDelaysCooldown: false,
     throttle: true,
 
