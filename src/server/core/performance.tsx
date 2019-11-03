@@ -42,6 +42,8 @@ export function startLoop() {
 }
 
 function tick() {
+    current.cleanup();
+
     // Reset average
     average = aggregate();
     if (isKnown(average)) {
