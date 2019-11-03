@@ -117,7 +117,7 @@ export const AcoRanked = new Aco({
 });
 
 export const AcoMatchmaking = new Aco({
-    k: 50,
+    k: 100,
     r: 800,
     power: 1,
     numGamesConfidence: 1000,
