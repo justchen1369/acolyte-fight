@@ -2,6 +2,10 @@ import * as constants from '../../game/constants';
 import * as m from '../../shared/messages.model';
 import { logger } from '../status/logging';
 
+export interface PerformanceListener {
+    (stats: PerformanceStats): void;
+}
+
 export interface PerformanceStats {
     cpuLag: number;
     gpuLag: number;
@@ -19,6 +23,8 @@ let current = initialPerformanceStats();
 let history = new Array<PerformanceStats>();
 let nextLogTime = Date.now();
 
+let emitPerformance: PerformanceListener = () => {};
+
 function initialPerformanceStats(): PerformanceStats {
     return {
         cpuLag: UnknownLag,
@@ -27,24 +33,34 @@ function initialPerformanceStats(): PerformanceStats {
     };
 }
 
+export function attachPerformanceEmitter(listener: PerformanceListener) {
+    emitPerformance = listener;
+}
+
 export function startLoop() {
     setInterval(tick, SliceLengthMilliseconds);
 }
 
 function tick() {
+    // Shift history
     history.push(current);
     while (history.length > MaxSlices) {
         history.shift();
     }
-
     current = initialPerformanceStats();
 
+    // Reset average
     average = aggregate(history);
+    if (isKnown(average)) {
+        // Send to clients
+        emitPerformance(average);
 
-    const now = Date.now();
-    if (now > nextLogTime) {
-        nextLogTime = now + HistoryLengthMilliseconds;
-        log(average);
+        // Log
+        const now = Date.now();
+        if (now > nextLogTime) {
+            nextLogTime = now + HistoryLengthMilliseconds;
+            log(average);
+        }
     }
 }
 
@@ -69,8 +85,10 @@ function accumulate(accumulator: PerformanceStats, performance: PerformanceStats
     accumulator.networkLag = Math.min(accumulator.networkLag, performance.networkLag);
 }
 
+function isKnown(performance: PerformanceStats) {
+    return performance.cpuLag < UnknownLag && performance.gpuLag < UnknownLag && performance.networkLag < UnknownLag;
+}
+
 function log(performance: PerformanceStats) {
-    if (performance.cpuLag < UnknownLag && performance.gpuLag < UnknownLag && performance.networkLag < UnknownLag) {
-        logger.info(`Performance: CPU=${performance.cpuLag.toFixed(2)} GPU=${performance.gpuLag.toFixed(2)} Network=${performance.networkLag.toFixed(2)}`);
-    }
+    logger.info(`Performance: CPU=${performance.cpuLag.toFixed(2)} GPU=${performance.gpuLag.toFixed(2)} Network=${performance.networkLag.toFixed(2)}`);
 }

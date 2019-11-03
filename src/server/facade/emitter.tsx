@@ -37,6 +37,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 	games.attachFinishedGameListener(emitGameResult);
 	parties.attachToPartyEmitter(emitParty);
 	online.attachOnlineEmitter(emitOnline);
+	performance.attachPerformanceEmitter(emitPerformance);
 }
 
 export function shutdown() {
@@ -873,6 +874,15 @@ function emitGameResult(game: g.Game, result: m.GameStatsMsg) {
 
 function emitOnline(msg: m.OnlineMsg) {
 	io.to(segmentRoom(msg.segment)).emit('online', msg);
+}
+
+function emitPerformance(stats: performance.PerformanceStats) {
+	const msg: m.PerformanceStatsMsg = {
+		c: stats.cpuLag,
+		g: stats.gpuLag,
+		n: stats.networkLag,
+	};
+	io.emit('performance', msg);
 }
 
 function segmentRoom(segment: string) {

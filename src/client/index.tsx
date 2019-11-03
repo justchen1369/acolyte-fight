@@ -57,6 +57,7 @@ export async function initialize() {
     sockets.listeners.onPartyMsg = parties.onPartyMsg;
     sockets.listeners.onTickMsg = ticker.onTickMsg;
     sockets.listeners.onOnlineMsg = online.onOnlineMsg;
+    sockets.listeners.onPerformanceMsg = performance.onPerformanceMsg;
     sockets.listeners.onReconnect = onReconnect;
     sockets.listeners.onDisconnect = onDisconnect;
     

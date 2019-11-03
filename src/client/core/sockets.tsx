@@ -13,6 +13,7 @@ export let listeners: Listeners = {
 	onGameMsg: () => { },
 	onHeroMsg: () => { },
 	onOnlineMsg: () => { },
+	onPerformanceMsg: () => { },
 	onReconnect: (socket) => { },
 	onDisconnect: () => { },
 };
@@ -23,6 +24,7 @@ export interface Listeners {
 	onGameMsg: (msg: m.GameStatsMsg) => void;
 	onHeroMsg: (msg: m.HeroMsg) => void;
 	onOnlineMsg: (msg: m.OnlineMsg) => void;
+	onPerformanceMsg: (msg: m.PerformanceStatsMsg) => void;
 	onReconnect: (socket: SocketIOClient.Socket) => void;
 	onDisconnect: () => void;
 }
@@ -115,6 +117,7 @@ export function connect(
 		socket.on('game', (msg: m.GameStatsMsg) => listeners.onGameMsg(msg));
 		socket.on('hero', (msg: m.HeroMsg) => listeners.onHeroMsg(msg));
 		socket.on('online', (msg: m.OnlineMsg) => listeners.onOnlineMsg(msg));
+		socket.on('performance', (msg: m.PerformanceStatsMsg) => listeners.onPerformanceMsg(msg));
 		socket.on('shutdown', (msg: any) => onServerPreparingToShutdown());
 	});
 }

@@ -40,6 +40,7 @@ export interface State {
     silenced: Set<string>;
 
     performance: PerformanceState;
+    globalPerformance: PerformanceState;
 
     profile: m.GetProfileResponse;
     leaderboard?: m.LeaderboardPlayer[];
@@ -131,6 +132,7 @@ export type Action =
     | JoinMatchAction
     | LeaveMatchAction
     | UpdatePerformanceAction
+    | UpdateGlobalPerformanceAction
     | UpdateShowingPerformanceAction
     | UpdateNotificationsAction
     | UpdateSilencedAction
@@ -183,7 +185,12 @@ export interface LeaveMatchAction {
 
 export interface UpdatePerformanceAction {
     type: "performance";
-    performance: PerformanceState;
+    performance?: PerformanceState;
+}
+
+export interface UpdateGlobalPerformanceAction {
+    type: "globalPerformance";
+    globalPerformance?: PerformanceState;
 }
 
 export interface UpdateShowingPerformanceAction {

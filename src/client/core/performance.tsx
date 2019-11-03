@@ -128,10 +128,26 @@ function send(data: s.PerformanceState) {
     socket.emit('performance', msg);
 }
 
+export function onPerformanceMsg(msg: m.PerformanceStatsMsg) {
+    const stats = msgToStats(msg);
+    StoreProvider.dispatch({
+        type: "globalPerformance",
+        globalPerformance: stats,
+    });
+}
+
 function statsToMsg(data: s.PerformanceState): m.PerformanceStatsMsg {
     return {
         c: data.cpuLag,
         g: data.gpuLag,
         n: data.networkLag,
+    };
+}
+
+function msgToStats(msg: m.PerformanceStatsMsg): s.PerformanceState {
+    return {
+        cpuLag: msg.c,
+        gpuLag: msg.g,
+        networkLag: msg.n,
     };
 }
