@@ -2,6 +2,7 @@ import pl from 'planck-js';
 import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as ai from '../ai/ai';
+import * as activated from './activated';
 import * as engine from '../../game/engine';
 import * as performance from './performance';
 import * as processor from './processor';
@@ -10,8 +11,6 @@ import * as StoreProvider from '../storeProvider';
 import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
-
-const ActiveMilliseconds = 5000; // Only track performance is user has interacted within this many seconds
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
@@ -22,7 +21,6 @@ let tickEpoch = Date.now();
 let tickCounter = 0;
 
 let previousFrameTime = 0;
-let sentTime = 0;
 
 export function reset(history: m.TickMsg[], live: boolean) {
 	if (live) {
@@ -107,9 +105,7 @@ function tickComparer(a: m.TickMsg, b: m.TickMsg) {
 }
 
 export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions, visible: boolean = true) {
-	const now = Date.now();
-	const sentElapsed = now - sentTime;
-	const active = visible && (!world.ui.myHeroId || sentElapsed < ActiveMilliseconds); // If playing, must be playing actively
+	const active = visible && (activated.isActive() || !world.ui.myHeroId); // If playing, must be playing actively
 
 	if (active && world.ui.renderedTick && previousFrameTime) {
 		// If have rendered before so the initial render overhead is not counted
@@ -250,7 +246,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 		r: action.release,
 	}
 
-	send(actionMsg);
+	send(gameId, heroId, actionMsg);
 }
 
 export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
@@ -260,21 +256,21 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 
 	const state = StoreProvider.getState();
 	const world = state.world;
-	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
-		// Don't send any actions for dead heroes
-		return;
-	}
-
 	const actionMsg: m.ActionMsg = {
 		c: controlKey || world.ui.controlKey,
 		type: m.ActionType.Spells,
 		keyBindings,
 	}
 
-	send(actionMsg);
+	send(gameId, heroId, actionMsg);
 }
 
-function send(actionMsg: m.ActionMsg) {
-	sentTime = Date.now();
+function send(gameId: string, heroId: string, actionMsg: m.ActionMsg) {
+	const state = StoreProvider.getState();
+	const world = state.world;
+	if (!(world.ui.myGameId === gameId && world.objects.has(heroId))) {
+		// Don't send any actions for dead heroes
+		return;
+	}
 	sockets.getSocket().emit('action', actionMsg);
 }

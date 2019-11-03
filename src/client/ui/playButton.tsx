@@ -2,6 +2,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
+import * as activated from '../core/activated';
 import * as options from '../options';
 import * as matches from '../core/matches';
 import * as pages from '../core/pages';
@@ -148,6 +149,11 @@ class PlayButton extends React.PureComponent<Props, State> {
     }
 
     private shouldAutoJoin(world: w.World) {
+        if (!activated.isActive()) {
+            // Don't auto-join inactive players because that will annoy others
+            return false;
+        }
+
         if (world.ui.autoJoin !== undefined) {
             return world.ui.autoJoin;
         }

@@ -7,6 +7,7 @@ import * as Reselect from 'reselect';
 
 import * as keyboardUtils from '../core/keyboardUtils';
 import * as StoreProvider from '../storeProvider';
+import * as activated from '../core/activated';
 import * as audio from '../audio/audio';
 import * as engine from '../../game/engine';
 import * as vector from '../../game/vector';
@@ -194,6 +195,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private touchStartHandler(...points: PointInfo[]) {
         audio.unlock();
+        activated.touch();
 
         const world = this.props.world;
         if (!ControlSurface.interactive(world)) {
@@ -350,6 +352,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private touchMoveHandler(...points: PointInfo[]) {
+        activated.touch();
+
         const world = this.props.world;
         points.forEach(p => {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
@@ -382,6 +386,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private touchEndHandler(...points: PointInfo[]) {
+        activated.touch();
+
         points.forEach(p => {
             if (this.actionSurface && this.actionSurface.touchId === p.touchId) {
                 this.releaseKey(this.actionSurface.activeKey);
