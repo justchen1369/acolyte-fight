@@ -109,10 +109,10 @@ function tickComparer(a: m.TickMsg, b: m.TickMsg) {
 export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions, visible: boolean = true) {
 	const now = Date.now();
 	const sentElapsed = now - sentTime;
-	const active = visible && sentElapsed < ActiveMilliseconds;
+	const active = visible && (!world.ui.myHeroId || sentElapsed < ActiveMilliseconds); // If playing, must be playing actively
 
 	if (active && world.ui.renderedTick && previousFrameTime) {
-		// Only count if the window is visible and have rendered before
+		// If have rendered before so the initial render overhead is not counted
 		const now = Date.now();
 		const renderMilliseconds = now - previousFrameTime;
 		performance.recordGraphics(renderMilliseconds);
