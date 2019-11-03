@@ -64,14 +64,14 @@ function formatLeagues(cache: PercentilesCache): string {
     const Placements = constants.Placements;
 
     const result = new Array<string>();
-    result.push(`Grandmaster: ${estimateRatingAtPercentile(Placements.Grandmaster, cache)}`);
-    result.push(`Master: ${estimateRatingAtPercentile(Placements.Master, cache)}`);
-    result.push(`Diamond: ${estimateRatingAtPercentile(Placements.Diamond, cache)}`);
-    result.push(`Platinum: ${estimateRatingAtPercentile(Placements.Platinum, cache)}`);
-    result.push(`Gold: ${estimateRatingAtPercentile(Placements.Gold, cache)}`);
-    result.push(`Silver: ${estimateRatingAtPercentile(Placements.Silver, cache)}`);
-    result.push(`Bronze: ${estimateRatingAtPercentile(Placements.Bronze, cache)}`);
-    result.push(`Wood: ${estimateRatingAtPercentile(Placements.Wood, cache)}`);
+    result.push(`Grandmaster: ${estimateRatingAtPercentile(Placements.Grandmaster, cache).exposure}`);
+    result.push(`Master: ${estimateRatingAtPercentile(Placements.Master, cache).exposure}`);
+    result.push(`Diamond: ${estimateRatingAtPercentile(Placements.Diamond, cache).exposure}`);
+    result.push(`Platinum: ${estimateRatingAtPercentile(Placements.Platinum, cache).exposure}`);
+    result.push(`Gold: ${estimateRatingAtPercentile(Placements.Gold, cache).exposure}`);
+    result.push(`Silver: ${estimateRatingAtPercentile(Placements.Silver, cache).exposure}`);
+    result.push(`Bronze: ${estimateRatingAtPercentile(Placements.Bronze, cache).exposure}`);
+    result.push(`Wood: ${estimateRatingAtPercentile(Placements.Wood, cache).exposure}`);
 
     return result.join(' ');
 }

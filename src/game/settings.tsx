@@ -1043,7 +1043,7 @@ const rocket: Spell = {
     icon: "mightyForce",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 6 * TicksPerSecond,
     focusDelaysCooldown: false,
     throttle: true,
 
@@ -1101,7 +1101,7 @@ const rocket: Spell = {
             {
                 type: "homing",
                 targetType: "follow",
-                revolutionsPerSecond: 0.006,
+                revolutionsPerSecond: 0.0075,
             },
             { type: "expireOnChannellingEnd" },
         ],
