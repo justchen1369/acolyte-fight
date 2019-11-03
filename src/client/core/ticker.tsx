@@ -11,6 +11,8 @@ import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
 import { notify } from './notifications';
 
+const ActiveMilliseconds = 5000; // Only track performance is user has interacted within this many seconds
+
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
 let allowedDelay = 1;
@@ -20,6 +22,7 @@ let tickEpoch = Date.now();
 let tickCounter = 0;
 
 let previousFrameTime = 0;
+let sentTime = 0;
 
 export function reset(history: m.TickMsg[], live: boolean) {
 	if (live) {
@@ -103,9 +106,13 @@ function tickComparer(a: m.TickMsg, b: m.TickMsg) {
 	}
 }
 
-export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions) {
-	if (world.ui.renderedTick && previousFrameTime) {
-		// Only count if rendered before
+export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: RenderOptions, visible: boolean = true) {
+	const now = Date.now();
+	const sentElapsed = now - sentTime;
+	const active = visible && sentElapsed < ActiveMilliseconds;
+
+	if (active && world.ui.renderedTick && previousFrameTime) {
+		// Only count if the window is visible and have rendered before
 		const now = Date.now();
 		const renderMilliseconds = now - previousFrameTime;
 		performance.recordGraphics(renderMilliseconds);
@@ -139,8 +146,10 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 			++numTicksProcessed;
 		}
 	} else {
-		const success = !unavailable;
-		performance.recordNetwork(success);
+		if (active) {
+			const success = !unavailable;
+			performance.recordNetwork(success);
+		}
 	}
 
 	if (world.tick > 0) { // Tick 0 does not have the map yet, don't render it otherwise the screen flashes
@@ -158,7 +167,9 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 	}
 
 	// Only update this after CPU processing is complete so we can measure graphics by itself
-	performance.tick();
+	if (active) {
+		performance.tick();
+	}
 	previousFrameTime = Date.now();
 }
 
@@ -264,5 +275,6 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 }
 
 function send(actionMsg: m.ActionMsg) {
+	sentTime = Date.now();
 	sockets.getSocket().emit('action', actionMsg);
 }

@@ -247,7 +247,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 rebindings: this.props.rebindings,
                 retinaMultiplier: this.calculateRetinaMultiplier(),
                 mobile: this.props.touched,
-            });
+            }, display);
         }
     }
 }

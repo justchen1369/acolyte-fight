@@ -6,6 +6,7 @@ import * as StoreProvider from '../../storeProvider';
 import ButtonRow from './buttonRow';
 
 interface Props {
+    playing: boolean;
     performance: boolean;
 }
 interface State {
@@ -13,6 +14,7 @@ interface State {
 
 function stateToProps(state: s.State): Props {
     return {
+        playing: !!state.world.ui.myHeroId,
         performance: state.showingPerformance,
     };
 }
@@ -25,6 +27,11 @@ class PerformanceButton extends React.PureComponent<Props, State> {
     }
 
     render() {
+        if (!this.props.playing) {
+            // Not available in replays
+            return null;
+        }
+
         if (this.props.performance) {
             return <ButtonRow secondary={true} label="Hide Performance Stats" icon="fas fa-stopwatch" onClick={() => this.onClick(false)} />
         } else {
