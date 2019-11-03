@@ -1,6 +1,7 @@
 import * as constants from '../../game/constants';
 import * as m from '../../shared/messages.model';
 import { logger } from '../status/logging';
+import TimedCache from '../../utils/timedCache';
 
 export interface PerformanceListener {
     (stats: PerformanceStats): void;
@@ -16,20 +17,19 @@ export const UnknownLag = 99;
 
 const HistoryLengthMilliseconds = constants.PerformanceStats.MaxHistoryLengthMilliseconds;
 const SliceLengthMilliseconds = 5000;
-const MaxSlices = Math.ceil(HistoryLengthMilliseconds / SliceLengthMilliseconds);
 
+let current = new TimedCache<string, PerformanceStats>(HistoryLengthMilliseconds);
 let average = initialPerformanceStats();
-let current = initialPerformanceStats();
-let history = new Array<PerformanceStats>();
+
 let nextLogTime = Date.now();
 
 let emitPerformance: PerformanceListener = () => {};
 
-function initialPerformanceStats(): PerformanceStats {
+function initialPerformanceStats(value: number = 0): PerformanceStats {
     return {
-        cpuLag: UnknownLag,
-        gpuLag: UnknownLag,
-        networkLag: UnknownLag,
+        cpuLag: value,
+        gpuLag: value,
+        networkLag: value,
     };
 }
 
@@ -42,15 +42,8 @@ export function startLoop() {
 }
 
 function tick() {
-    // Shift history
-    history.push(current);
-    while (history.length > MaxSlices) {
-        history.shift();
-    }
-    current = initialPerformanceStats();
-
     // Reset average
-    average = aggregate(history);
+    average = aggregate();
     if (isKnown(average)) {
         // Send to clients
         emitPerformance(average);
@@ -64,19 +57,26 @@ function tick() {
     }
 }
 
-export function receivePerformanceStats(performance: PerformanceStats) {
-    accumulate(current, performance);
-    accumulate(average, performance);
+export function receivePerformanceStats(socketId: string, performance: PerformanceStats) {
+    current.set(socketId, performance);
 }
 
 export function getPerformanceStats() {
     return average;
 }
 
-function aggregate(items: PerformanceStats[]): PerformanceStats {
-    const result = initialPerformanceStats();
-    items.forEach(item => accumulate(result, item));
-    return result;
+function aggregate(): PerformanceStats {
+    const result = initialPerformanceStats(UnknownLag);
+    current.forEach(item => {
+        accumulate(result, item);
+    });
+
+    if (isKnown(result)) {
+        return result;
+    } else {
+        // No connections, no lag
+        return initialPerformanceStats(0);
+    }
 }
 
 function accumulate(accumulator: PerformanceStats, performance: PerformanceStats) {

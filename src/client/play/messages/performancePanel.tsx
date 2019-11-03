@@ -107,28 +107,28 @@ class PerformancePanel extends React.PureComponent<Props, State> {
 
     private renderCPU() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> CPU</Button>;
-        const caption = <caption>Proportion of frames your CPU failed to simulate in time over the past {HistorySeconds} seconds.</caption>;
+        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your CPU was late at simulating.</caption>;
         return <PerformanceTable header={header} caption={caption}>
-            {this.renderDetailRow("Your CPU lag", this.props.cpuLag)}
-            {this.renderDetailRow("Others CPU lag", this.props.globalCpuLag)}
+            {this.renderDetailRow("Your lag", this.props.cpuLag)}
+            {this.renderDetailRow("Others lag", this.props.globalCpuLag)}
         </PerformanceTable>
     }
     
     private renderGPU() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> GPU</Button>;
-        const caption = <caption>Proportion of frames your GPU failed to render in time over the past {HistorySeconds} seconds.</caption>;
+        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your GPU was late at rendering.</caption>;
         return <PerformanceTable header={header} caption={caption}>
-            {this.renderDetailRow("Your GPU lag", this.props.gpuLag)}
-            {this.renderDetailRow("Others GPU lag", this.props.globalGpuLag)}
+            {this.renderDetailRow("Your lag", this.props.gpuLag)}
+            {this.renderDetailRow("Others lag", this.props.globalGpuLag)}
         </PerformanceTable>
     }
     
     private renderNetwork() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> Network</Button>;
-        const caption = <caption>Proportion of frames your network failed to receive on time over the past {HistorySeconds} seconds.</caption>;
+        const caption = <caption>Over the past {HistorySeconds} seconds, the proportion of frames your network received late.</caption>;
         return <PerformanceTable header={header} caption={caption}>
-            {this.renderDetailRow("Your network lag", this.props.networkLag)}
-            {this.renderDetailRow("Others network lag", this.props.globalNetworkLag)}
+            {this.renderDetailRow("Your lag", this.props.networkLag)}
+            {this.renderDetailRow("Others lag", this.props.globalNetworkLag)}
         </PerformanceTable>
     }
 

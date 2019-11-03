@@ -42,6 +42,10 @@ export default class TimedCache<K, V> {
         this.items.delete(key);
     }
 
+    forEach(callback: (value: V, key: K) => void) {
+        this.items.forEach((item, key) => callback(item.value, key));
+    }
+
     cleanup() {
         let cleaned = 0;
         this.items.forEach((item, key) => {

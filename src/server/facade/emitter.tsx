@@ -751,7 +751,7 @@ async function onPerformanceMsg(socket: SocketIO.Socket, data: m.PerformanceStat
 			gpuLag: data.g,
 			networkLag: data.n,
 		};
-		performance.receivePerformanceStats(stats);
+		performance.receivePerformanceStats(socket.id, stats);
 	} catch (exception) {
 		logger.error(exception);
 	}
