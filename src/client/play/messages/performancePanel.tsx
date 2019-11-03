@@ -88,14 +88,14 @@ class PerformancePanel extends React.PureComponent<Props, State> {
 
     private renderSummary() {
         return <PerformanceTable>
-            {this.renderPerformanceRow(Tab.CPU, "CPU lag", this.props.cpuLag, this.props.globalCpuLag)}
-            {this.renderPerformanceRow(Tab.GPU, "GPU lag", this.props.gpuLag, this.props.globalGpuLag)}
-            {this.renderPerformanceRow(Tab.Network, "Network lag", this.props.networkLag, this.props.globalNetworkLag)}
+            {this.renderPerformanceRow(Tab.CPU, "CPU lag", this.props.cpuLag)}
+            {this.renderPerformanceRow(Tab.GPU, "GPU lag", this.props.gpuLag)}
+            {this.renderPerformanceRow(Tab.Network, "Network lag", this.props.networkLag)}
         </PerformanceTable>
     }
 
-    private renderPerformanceRow(tab: Tab, label: string, proportion: number, globalProportion: number) {
-        return <tr title={`${label}: ${(proportion * 100).toFixed(1)}%, other players are seeing ${(globalProportion * 100).toFixed(1)}%`}>
+    private renderPerformanceRow(tab: Tab, label: string, proportion: number) {
+        return <tr className="performance-summary-row" onClick={() => this.onTabSelect(tab)}>
             <td className="performance-table-label"><Button className="clickable" onClick={() => this.onTabSelect(tab)}>{label}</Button></td>
             <td className="performance-table-percent"><PercentageBar proportion={proportion} /></td>
         </tr>
@@ -125,7 +125,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
     
     private renderNetwork() {
         const header = <Button className="clickable header-row" onClick={() => this.onTabClear()}><i className="fas fa-chevron-left" /> Network</Button>;
-        const caption = <caption>Proportion of frames your Network failed to receive in time over the past {HistorySeconds} seconds.</caption>;
+        const caption = <caption>Proportion of frames your network failed to receive on time over the past {HistorySeconds} seconds.</caption>;
         return <PerformanceTable header={header} caption={caption}>
             {this.renderDetailRow("Your network lag", this.props.networkLag)}
             {this.renderDetailRow("Others network lag", this.props.globalNetworkLag)}

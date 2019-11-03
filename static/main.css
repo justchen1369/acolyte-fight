@@ -270,7 +270,7 @@ a:hover, a:active {
 
 .clickable {
     color: #ccc;
-    cursor: hand;
+    cursor: pointer;
 
     transition: color 0.2s ease;
 }
@@ -739,7 +739,7 @@ table.player-list {
     margin-left: 4px;
     color: #888;
     pointer-events: all;
-    cursor: hand;
+    cursor: pointer;
 
     transition: color 0.2s ease;
 }
@@ -784,7 +784,7 @@ table.player-list {
 }
 
 .mobile .text-message-container {
-    cursor: hand;
+    cursor: pointer;
     pointer-events: all;
 }
 
@@ -960,7 +960,7 @@ table.player-list {
 
 .messages .text-row .silence-btn {
     opacity: 0;
-    cursor: hand;
+    cursor: pointer;
     margin: 0 8;
 
     transition: opacity 0.2s ease;
@@ -1254,7 +1254,7 @@ table.player-list {
     margin: 0 0.5em;
 
     pointer-events: all;
-    cursor: hand;
+    cursor: pointer;
 }
 
 #game-panel .navbar-container {
@@ -1274,7 +1274,7 @@ table.player-list {
 
 #game-panel.mobile .button-panel-row {
     pointer-events: all;
-    cursor: hand;
+    cursor: pointer;
     margin: 0.5em 8;
     font-style: italic;
 }
@@ -1410,7 +1410,7 @@ h3 {
     align-items: center;
 
     pointer-events: all;
-    cursor: hand;
+    cursor: pointer;
 
     transition: background-color 0.2s ease, color 0.2s ease;
 }
@@ -1460,7 +1460,7 @@ h3 {
 }
 
 .spell-config .key-detail-container .randomize-btn {
-    cursor: hand;
+    cursor: pointer;
     position: absolute;
     right: 0;
     bottom: 0;
@@ -1877,7 +1877,7 @@ h3 {
 
 .category-selector .category:hover {
     background: #555;
-    cursor: hand;
+    cursor: pointer;
 }
 
 .category-selector .category-selected {
@@ -2342,6 +2342,7 @@ textarea {
     text-align: left;
     padding: 0.5em 0;
     color: #ccc;
+    font-size: 75%;
 }
 
 
@@ -2351,6 +2352,7 @@ table.performance-table td {
 
 .performance-table-label {
     text-align: right;
+    font-size: 75%;
 }
 
 .performance-table-percent {
@@ -2359,6 +2361,16 @@ table.performance-table td {
 
 .performance-table .percentage-bar-fill {
     background-color: #f04;
+}
+
+.performance-summary-row {
+    cursor: pointer;
+}
+
+.performance-summary-row:hover {
+    background-color: #282828;
+    box-shadow: 0 0 1em #fff1;
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 
