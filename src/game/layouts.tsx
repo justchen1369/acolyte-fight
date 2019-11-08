@@ -444,7 +444,7 @@ export const Layouts: Layouts = {
                 "numObstacles": 5,
                 "layoutAngleOffsetInRevs": 0,
                 "orientationAngleOffsetInRevs": -0.15,
-                "angularWidthInRevs": 0.25
+                "angularWidthInRevs": 0.24
             },
             {
                 "type": "bumper",
