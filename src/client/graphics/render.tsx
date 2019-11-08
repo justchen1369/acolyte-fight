@@ -587,32 +587,44 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 
 function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.World) {
 	const Hero = world.settings.Hero;
-	const MaxTicks = 30;
+	const MaxTicks = 15;
 
 	const color = heroColor(ev.heroId, world);
 
 	if (ev.fromPos) {
 		renderJumpSmoke(ctxStack, color, ev.fromPos, world, ev.tick);
+
+		pushTrail({
+			type: "ripple",
+			max: MaxTicks,
+			initialTick: ev.tick,
+			pos: ev.toPos,
+			fillStyle: color,
+			shine: DefaultShine,
+			glow: DefaultGlow,
+			vanish: 1,
+			bloom: 0.05,
+			initialRadius: Hero.Radius * 4,
+			finalRadius: Hero.Radius,
+		}, world);
 	}
 
 	if (ev.toPos) {
 		renderJumpSmoke(ctxStack, color, ev.toPos, world, ev.tick);
 
-		if (ev.heroId === world.ui.myHeroId) {
-			// Clearly indicate yourself
-			pushTrail({
-				type: "ripple",
-				max: MaxTicks,
-				initialTick: ev.tick,
-				pos: ev.toPos,
-				fillStyle: '#ccc',
-				shine: DefaultShine,
-				vanish: 1,
-				bloom: 0.05,
-				initialRadius: Hero.Radius,
-				finalRadius: Hero.Radius * 4,
-			}, world);
-		}
+		pushTrail({
+			type: "ripple",
+			max: MaxTicks,
+			initialTick: ev.tick,
+			pos: ev.toPos,
+			fillStyle: color,
+			shine: DefaultShine,
+			glow: DefaultGlow,
+			vanish: 1,
+			bloom: 0.05,
+			initialRadius: Hero.Radius,
+			finalRadius: Hero.Radius * 4,
+		}, world);
 
 		if (ev.sound) {
 			ctxStack.sounds.push({
@@ -2281,11 +2293,8 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 			feather,
 		});
 	} else if (trail.type === "ripple") {
-		const radius = proportion * trail.initialRadius + (1 - proportion) * trail.finalRadius;
-		const lineWidth = proportion * trail.initialRadius / 2;
-		
-		const minRadius = Math.max(0, radius - lineWidth / 2);
-		const maxRadius = radius + lineWidth / 2;
+		const maxRadius = trail.initialRadius * proportion + trail.finalRadius * (1 - proportion);
+		const minRadius = maxRadius * (1 - proportion);
 		glx.circleTrail(ctxStack, trail.pos, {
 			color,
 			minRadius,
