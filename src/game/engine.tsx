@@ -558,12 +558,6 @@ function addHero(world: w.World, heroId: string) {
 	world.behaviours.push({ type: "burn", heroId: hero.id });
 	world.behaviours.push({ type: "decayMitigation", heroId: hero.id });
 
-	world.behaviours.push({
-		type: "resetMass",
-		objId: hero.id,
-		tick: world.tick + Hero.InitialStaticSeconds * TicksPerSecond,
-	});
-
 	console.log("Adding hero", heroId, heroIndex);
 	return hero;
 }
@@ -1003,7 +997,6 @@ export function tick(world: w.World) {
 		updateCollideWith,
 		updatePartial,
 		clearHits,
-		resetMass,
 	});
 
 	move(world);
@@ -1137,18 +1130,6 @@ function fixate(behaviour: w.FixateBehaviour, world: w.World) {
 	}
 
 	return true;
-}
-
-function resetMass(behaviour: w.ResetMassBehaviour, world: w.World) {
-	if (world.tick < behaviour.tick) {
-		return true;
-	}
-
-	const obj = world.objects.get(behaviour.objId);
-	if (obj) {
-		obj.body.resetMassData();
-	}
-	return false;
 }
 
 function updateHeroMass(hero: w.Hero) {

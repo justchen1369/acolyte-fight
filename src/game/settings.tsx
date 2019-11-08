@@ -40,8 +40,6 @@ const Hero: HeroSettings = {
     SeparationImpulsePerTick: 0.01,
 
     RevolutionsPerTick: 1.0,
-
-    InitialStaticSeconds: 0.5,
 }
 
 const World: WorldSettings = {

@@ -77,8 +77,6 @@ declare interface HeroSettings {
     SeparationImpulsePerTick: number; // The force which stops heroes going inside each other
 
 	RevolutionsPerTick: number; // Hero turn rate
-
-	InitialStaticSeconds: number; // How many seconds a new player at the start of the game that a player cannot be knocked back
 }
 
 declare interface WorldSettings {
