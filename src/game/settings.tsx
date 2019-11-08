@@ -2344,7 +2344,7 @@ const shield: Spell = {
     untargeted: true,
 
     maxTicks: 1.25 * TicksPerSecond,
-    cooldown: 12.5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: false,
     radius: Hero.Radius * 1.8,
     takesOwnership: true,
