@@ -810,7 +810,6 @@ export interface DetonateParameters extends DamagePacket {
 	partialImpulse?: PartialDamageParameters; // Scale the impulse over time
 }
 
-
 export namespace HomingTargets {
 	export const enemy = "enemy";
 	export const self = "self";
@@ -830,6 +829,7 @@ export type Behaviour =
 	| DetonateBehaviour
 	| RetractorBehaviour
 	| RemovePassthroughBehaviour
+	| UpdatePartialBehaviour
 	| UpdateCollideWithBehaviour
 	| ClearHitsBehaviour
 	| LinkBehaviour
@@ -937,6 +937,16 @@ export interface UpdateCollideWithBehaviour extends BehaviourBase {
 	type: "updateCollideWith";
 	projectileId: string;
 	collideWith: number;
+}
+
+export interface UpdatePartialBehaviour extends BehaviourBase {
+	type: "updatePartial";
+	projectileId: string;
+
+	partialDamage?: PartialDamageParameters;
+	partialDetonateRadius?: PartialDamageParameters;
+	partialDetonateImpulse?: PartialDamageParameters;
+	partialBuffDuration?: PartialDamageParameters;
 }
 
 export interface ClearHitsBehaviour extends BehaviourBase {

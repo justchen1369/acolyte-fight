@@ -445,6 +445,8 @@ declare interface DestructibleParameters {
 
 declare interface PartialDamageParameters {
 	initialMultiplier: number; // Initially, the projectile initially does this multiplier
+	finalMultiplier?: number;
+	afterTicks?: number; // Only start increasing damage after this many ticks
 	ticks: number; // The projectile grows to full damage when it reaches this lifetime
 	step?: boolean; // Grow from initial to full damage at ticks in one step, rather than linear growth
 }
@@ -471,6 +473,7 @@ declare type BehaviourTemplate =
 	| AuraTemplate
 	| StrafeTemplate
 	| UpdateCollideWithTemplate
+	| UpdatePartialTemplate
 	| ClearHitsTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
@@ -554,6 +557,15 @@ declare interface UpdateCollideWithTemplate extends BehaviourTemplateBase {
 
 declare interface ClearHitsTemplate extends BehaviourTemplateBase {
 	type: "clearHits";
+}
+
+declare interface UpdatePartialTemplate extends BehaviourTemplateBase {
+	type: "partial";
+
+	partialDamage?: PartialDamageParameters;
+	partialDetonateRadius?: PartialDamageParameters;
+	partialDetonateImpulse?: PartialDamageParameters;
+	partialBuffDuration?: PartialDamageParameters;
 }
 
 declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {

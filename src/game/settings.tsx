@@ -889,7 +889,7 @@ const boomerang: Spell = {
 const retractor: Spell = {
     id: 'retractor',
     name: 'Refract',
-    description: "Refract can turn corners - hold the button down, then release the button to redirect. Damage increases with distance travelled, so take an indirect path to do maximum damage.",
+    description: "Refract can turn corners - hold the button down, then release the button to redirect. After it refracts, damage increases with distance travelled, so take an indirect path to do maximum damage.",
     action: "focus",
 
     color: '#00ff7f',
@@ -910,21 +910,30 @@ const retractor: Spell = {
             revolutionsPerSecond: 1,
             redirect: true,
         },
+        {
+            type: "partial",
+            partialDamage: {
+                initialMultiplier: 0.5,
+                finalMultiplier: 1,
+                ticks: 1 * TicksPerSecond,
+            },
+        },
     ],
 
     projectile: {
         damage: 40,
         lifeSteal,
-        density: 200,
-        radius: 0.002,
+        density: 60,
+        radius: 0.0035,
         speed: 0.3,
         maxTicks: 2.0 * TicksPerSecond,
         categories: Categories.Projectile,
         shieldTakesOwnership: false,
 
         partialDamage: {
-            initialMultiplier: 0.25,
-            ticks: 1.5 * TicksPerSecond,
+            initialMultiplier: 0.5,
+            finalMultiplier: 0.5,
+            ticks: 1,
         },
 
         detonate: {

@@ -814,6 +814,8 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			behaviour = instantiateStrafe(template, projectile, world);
 		} else if (template.type === "updateCollideWith") {
 			behaviour = instantiateUpdateProjectileFilter(template, projectile, world);
+		} else if (template.type === "partial") {
+			behaviour = instantiateUpdatePartial(template, projectile, world);
 		} else if (template.type === "clearHits") {
 			behaviour = { type: "clearHits", projectileId: projectile.id };
 		} else if (template.type === "expireOnOwnerDeath") {
@@ -936,6 +938,17 @@ function instantiateUpdateProjectileFilter(template: UpdateCollideWithTemplate, 
 	};
 }
 
+function instantiateUpdatePartial(template: UpdatePartialTemplate, projectile: w.Projectile, world: w.World): w.UpdatePartialBehaviour {
+	return {
+		type: "updatePartial",
+		projectileId: projectile.id,
+		partialDamage: template.partialDamage,
+		partialDetonateRadius: template.partialDetonateRadius,
+		partialDetonateImpulse: template.partialDetonateImpulse,
+		partialBuffDuration: template.partialBuffDuration,
+	};
+}
+
 function instantiateExpireOnOwnerDeath(template: ExpireOnOwnerDeathTemplate, projectile: w.Projectile, world: w.World): w.ExpireOnOwnerDeathBehaviour {
 	return {
 		type: "expireOnOwnerDeath",
@@ -988,6 +1001,7 @@ export function tick(world: w.World) {
 		thrustVelocity,
 		thrustFollow,
 		updateCollideWith,
+		updatePartial,
 		clearHits,
 		resetMass,
 	});
@@ -1197,6 +1211,37 @@ function updateCollideWith(behaviour: w.UpdateCollideWithBehaviour, world: w.Wor
 	projectile.collideWith = behaviour.collideWith;
 	updateMaskBits(projectile.body.getFixtureList(), behaviour.collideWith);
 	return false;
+}
+
+function updatePartial(behaviour: w.UpdatePartialBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	} 
+
+	const afterTicks = world.tick - projectile.createTick; // Only start the growth from now
+	if (behaviour.partialDamage !== undefined) {
+		projectile.partialDamage = instantiatePartial(behaviour.partialDamage, afterTicks);
+	}
+	if (behaviour.partialDetonateImpulse !== undefined) {
+		projectile.partialDetonateImpulse = instantiatePartial(behaviour.partialDetonateImpulse, afterTicks);
+	}
+	if (behaviour.partialDetonateRadius !== undefined) {
+		projectile.partialDetonateRadius = instantiatePartial(behaviour.partialDetonateRadius, afterTicks);
+	}
+	if (behaviour.partialBuffDuration !== undefined) {
+		projectile.partialBuffDuration = instantiatePartial(behaviour.partialBuffDuration, afterTicks);
+	}
+
+	return false;
+}
+
+function instantiatePartial(partial: PartialDamageParameters, afterTicks: number): PartialDamageParameters {
+	if (partial) {
+		return { ...partial, afterTicks };
+	} else {
+		return null;
+	}
 }
 
 function clearHits(behaviour: w.ClearHitsBehaviour, world: w.World) {
@@ -2545,15 +2590,18 @@ function emitPush(fromHeroId: string, direction: pl.Vec2, color: string, toObjec
 function calculatePartialMultiplier(lifetime: number, partialDamage: PartialDamageParameters): number {
 	let multiplier = 1;
 	if (partialDamage) {
+		const progress = Math.max(0, lifetime - (partialDamage.afterTicks || 0));
 		let proportion = 1;
-		if (lifetime < partialDamage.ticks) {
+		if (progress < partialDamage.ticks) {
 			if (partialDamage.step) {
 				proportion = 0;
 			} else {
-				proportion = lifetime / partialDamage.ticks;
+				proportion = progress / partialDamage.ticks;
 			}
 		}
-		multiplier = partialDamage.initialMultiplier + (1 - partialDamage.initialMultiplier) * proportion;
+
+		const finalMultiplier = typeof partialDamage.finalMultiplier === 'number' ? partialDamage.finalMultiplier : 1;
+		multiplier = partialDamage.initialMultiplier * (1 - proportion) + finalMultiplier * proportion;
 	}
 	return multiplier;
 }
