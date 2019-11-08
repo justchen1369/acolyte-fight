@@ -1229,7 +1229,7 @@ const link: Spell = {
         radius: 0.005,
         speed: 0.5,
         restitution: 0,
-        maxTicks: 82, // Just enough so it doesn't knockback self
+        maxTicks: 90, // Just enough so it doesn't knockback self
         damage: 0,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.Hero | Categories.Massive,
@@ -1289,7 +1289,7 @@ const link: Spell = {
                 type: "homing",
                 trigger: { afterTicks: 60 },
                 targetType: HomingTargets.self,
-                newSpeed: 0.75,
+                newSpeed: 0.6,
                 redirect: true,
             },
             {
