@@ -918,7 +918,7 @@ const retractor: Spell = {
             partialDamage: {
                 initialMultiplier: 0.5,
                 finalMultiplier: 1,
-                ticks: 1 * TicksPerSecond,
+                ticks: 1.5 * TicksPerSecond,
             },
         },
     ],
