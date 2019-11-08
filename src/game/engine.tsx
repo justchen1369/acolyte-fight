@@ -705,7 +705,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		bumpable: projectileTemplate.bumpable,
 		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
-		swappable: projectileTemplate.swappable,
+		swappable: projectileTemplate.swappable !== undefined ? projectileTemplate.swappable : true,
 
 		target,
 		targetId: targetObj ? targetObj.id : null,
@@ -2741,63 +2741,56 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 }
 
 function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
-	if (!projectile.swapWith) {
+	if (!(projectile && projectile.swapWith && target)) {
 		return;
 	}
 
-	const owner = world.objects.get(projectile.owner);
+	if ((target.categories & projectile.swapWith) > 0) {
+		const epicenter = target.body.getPosition();
+		applySwapAt(epicenter, projectile.owner, [target], projectile.sound, world);
+	}
+
+	// You only swap once
+	projectile.swapWith = 0;
+}
+
+function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject[], sound: string, world: w.World) {
+	const owner = world.objects.get(ownerId);
 	if (!(owner && owner.category === "hero")) {
 		return;
 	}
 
-	if (target && (target.categories & projectile.swapWith) > 0 && target.swappable) {
-		const ownerPos = vector.clone(owner.body.getPosition());
+	const ownerPos = vector.clone(owner.body.getPosition());
+	targets.forEach(target => {
+		if (!target.swappable) {
+			return;
+		}
 		const targetPos = vector.clone(target.body.getPosition());
-
-		const ownerVelocity = owner.body.getLinearVelocity().clone();
-		const targetVelocity = target.body.getLinearVelocity().clone();
-
-		owner.body.setPosition(targetPos);
-		target.body.setPosition(ownerPos);
-
-		owner.body.setLinearVelocity(targetVelocity);
-		target.body.setLinearVelocity(ownerVelocity);
-
-		world.ui.events.push({
-			type: "teleport",
-			tick: world.tick,
-			sound: projectile.sound,
-			fromPos: ownerPos,
-			toPos: targetPos,
-			heroId: owner.id,
-		});
+		target.body.setPosition(vector.diff(targetPos, epicenter).add(ownerPos));
 
 		if (target.category === "hero") {
 			world.ui.events.push({
 				type: "teleport",
 				tick: world.tick,
-				sound: projectile.sound,
+				sound,
 				fromPos: targetPos,
 				toPos: ownerPos,
 				heroId: target.id,
 			});
 		}
-	} else {
-		const initialPos = vector.clone(owner.body.getPosition());
-		owner.body.setPosition(projectile.body.getPosition());
+	});
 
-		world.ui.events.push({
-			type: "teleport",
-			tick: world.tick,
-			sound: projectile.sound,
-			fromPos: initialPos,
-			toPos: vector.clone(owner.body.getPosition()),
-			heroId: owner.id,
-		});
-	}
+	const initialPos = vector.clone(owner.body.getPosition());
+	owner.body.setPosition(epicenter);
 
-	// You only swap once
-	projectile.swapWith = 0;
+	world.ui.events.push({
+		type: "teleport",
+		tick: world.tick,
+		sound,
+		fromPos: initialPos,
+		toPos: vector.clone(owner.body.getPosition()),
+		heroId: owner.id,
+	});
 }
 
 function swapOnExpiry(projectile: w.Projectile, world: w.World) {
@@ -3435,7 +3428,10 @@ function instantiateDetonate(template: DetonateParametersTemplate, fromHeroId: s
 }
 
 function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParameters, world: w.World, config: DetonateConfig) {
+	const sound = detonate.sound || config.defaultSound;
+
 	const seen = new Set<string>(); // queryExtent not guaranteed to hit once
+	const swapTargets = new Array<w.WorldObject>();
 	queryExtent(world, epicenter, detonate.radius + world.settings.World.SlopRadius, other => {
 		if (seen.has(other.id)) {
 			return;
@@ -3443,7 +3439,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 			seen.add(other.id);
 		}
 
-		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || (other.category === "obstacle" && !other.undamageable)) {
+		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || other.category === "obstacle") {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
 			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
 			const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
@@ -3473,7 +3469,17 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 					other.expireTick = world.tick;
 				}
 			} else if (other.category === "obstacle") {
-				applyDamageToObstacle(other, detonate, world);
+				if (other.undamageable) {
+					applyDamageToObstacle(other, detonate, world);
+				}
+
+				if (!other.static) {
+					applyKnockback = true;
+				}
+			}
+
+			if (detonate.swapWith > 0 && (other.categories & detonate.swapWith) > 0 && other.swappable) {
+				swapTargets.push(other);
 			}
 
 			if (applyKnockback && detonate.maxImpulse) {
@@ -3484,11 +3490,15 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 		}
 	});
 
+	if (detonate.swapWith > 0) {
+		applySwapAt(epicenter, owner, swapTargets, sound, world);
+	}
+
 	world.ui.events.push({
 		type: "detonate",
 		tick: world.tick,
 		sourceId: config.sourceId,
-		sound: detonate.sound || config.defaultSound,
+		sound,
 		pos: vector.clone(epicenter),
 		radius: detonate.radius,
 		explosionTicks: detonate.renderTicks,

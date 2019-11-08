@@ -593,6 +593,7 @@ declare interface DetonateParametersTemplate extends DamagePacketTemplate {
 	sound?: string;
 
 	buffs?: BuffTemplate[];
+	swapWith?: number;
 }
 
 declare type RenderParams =

@@ -674,6 +674,7 @@ const kamehameha: Spell = {
         damage: 6,
         lifeSteal,
         categories: Categories.Projectile | Categories.Massive,
+        swappable: false,
 
         sound: "kamehameha",
         color: '#ffffff',
@@ -702,6 +703,7 @@ const lightning: Spell = {
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         collideWith: Categories.All ^ Categories.Projectile,
+        swappable: false,
         damage: 0,
 
         sound: "lightning",
@@ -1179,6 +1181,7 @@ const whip: Spell = {
         categories: Categories.Projectile,
         collideWith: Categories.Obstacle | Categories.Shield | Categories.Massive,
         expireOn: Categories.None,
+        swappable: false,
         shieldTakesOwnership: false,
 
         detonate: {
@@ -1685,6 +1688,7 @@ const whirlwind: Spell = {
         damage: 0,
         collideWith: Categories.Hero,
         expireOn: Categories.None,
+        swappable: false,
         sensor: true,
         noKnockback: true,
 
@@ -1880,6 +1884,7 @@ const halo: Spell = {
         expireOn: Categories.Massive,
         expireAgainstHeroes: Alliances.NotFriendly,
         expireAgainstObjects: Alliances.NotFriendly,
+        swappable: false,
         selfPassthrough: true,
         shieldTakesOwnership: false,
         destructible: {
@@ -2032,6 +2037,7 @@ const iceBomb: Spell = {
         minTicks: 1,
         damage: 0,
         noKnockback: true,
+        swappable: false,
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
@@ -2603,6 +2609,7 @@ const blaze: Spell = {
         expireOn: Categories.All,
         expireOnMirror: true,
         sensor: true,
+        swappable: false,
         selfPassthrough: true,
         radius: 0.005,
         speed: 0.1,
@@ -2657,14 +2664,25 @@ const swap: Spell = {
         maxTicks: 0.75 * TicksPerSecond,
         damage: 0,
         categories: Categories.Projectile,
-        collideWith: Categories.All ^ Categories.Projectile,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
         expireOn: Categories.All, // Expire on a shield, don't bounce off it
         expireOnMirror: true,
         expireAfterCursorTicks: 0,
+        swappable: false,
         shieldTakesOwnership: false,
-        sensor: true,
 
-        swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+        detonate: {
+            damage: 0,
+            lifeSteal,
+            radius: 0.04,
+
+            minImpulse: 0,
+            maxImpulse: 0,
+
+            swapWith: Categories.Hero | Categories.Obstacle | Categories.Massive | Categories.Shield,
+
+            renderTicks: 15,
+        },
 
         behaviours: [
             { type: "expireOnOwnerDeath" },

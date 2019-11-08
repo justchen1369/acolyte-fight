@@ -808,6 +808,8 @@ export interface DetonateParameters extends DamagePacket {
 
 	partialRadius?: PartialDamageParameters; // Scale the radius over time
 	partialImpulse?: PartialDamageParameters; // Scale the impulse over time
+
+	swapWith?: number;
 }
 
 export namespace HomingTargets {
