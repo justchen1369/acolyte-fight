@@ -115,8 +115,10 @@ declare interface MatchmakingSettings {
 	BotRating: number; // If the bot is being matched into teams, consider it to be a player with this rating
 
 	RatingPower: number; // Higher means the matchmaker will try harder to match players of similar skill and there will be less random variation
+
 	OddPenalty: number; // Discourage non-even splits by this proportion
 	SmallPenalty: number; // Discourage small games by this proportion
+	TeamPenaltyPower: number; // Discourage teams of unbalanced skill (e.g. newbies and GMs) with this power
 }
 
 declare interface Layouts {

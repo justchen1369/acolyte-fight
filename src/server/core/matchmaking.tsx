@@ -240,6 +240,12 @@ function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings)
         const numPlayers = _(candidate.teams).map(t => t.length).sum();
         numOdd = isOdd(numPlayers) ? 1 : 0;
         minSize = Math.min(minSize, numPlayers);
+
+        const intraWinProbability = _(candidate.teams).map(t => evaluateWinProbability(t.map(p => p.aco))).mean();
+        const teamWeight = Math.pow(
+            Math.min(1, intraWinProbability * 2), // *2 because the win probability is 0-0.5 and we want 0.0-1.0
+            matchmaking.TeamPenaltyPower) || 0; // || 0 because we might get NaN
+        weight *= teamWeight;
     }
     weight *= Math.pow(matchmaking.OddPenalty, numOdd);
 
@@ -532,20 +538,20 @@ function generateNoopCandidate(game: g.Game, weight: number = 1): NoopCandidate 
     };
 }
 
-function generateTeamCandidate(sortedRatings: TeamPlayer[], numTeams: number, weight: number = 1): TeamsCandidate {
+function generateTeamCandidate(playerSequence: TeamPlayer[], numTeams: number, weight: number = 1): TeamsCandidate {
     const teams = new Array<TeamPlayer[]>();
     for (let i = 0; i < numTeams; ++i) {
         teams.push([]);
     }
 
-    for (let i = 0; i < sortedRatings.length; ++i) {
+    for (let i = 0; i < playerSequence.length; ++i) {
         const round = Math.floor(i / numTeams);
         const offset = i % numTeams;
         const even = round % 2 === 0;
 
         // Assign in this repeating pattern: 0, 1, 2, 2, 1, 0, etc
         const team = even ? offset : (numTeams - offset - 1);
-        teams[team].push(sortedRatings[i]);
+        teams[team].push(playerSequence[i]);
     }
 
     return {

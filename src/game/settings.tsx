@@ -20,6 +20,7 @@ const Matchmaking: MatchmakingSettings = {
     RatingPower: 2,
     OddPenalty: 0.75,
     SmallPenalty: 0.5,
+    TeamPenaltyPower: 0.25,
 };
 
 const Hero: HeroSettings = {
