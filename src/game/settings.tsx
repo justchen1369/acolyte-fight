@@ -2328,7 +2328,7 @@ const shield: Spell = {
     untargeted: true,
 
     maxTicks: 1.25 * TicksPerSecond,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 12.5 * TicksPerSecond,
     throttle: false,
     radius: Hero.Radius * 1.8,
     takesOwnership: true,
@@ -2431,7 +2431,7 @@ const icewall: Spell = {
 
     maxRange: 0.25,
     movementProportionWhileCharging: 1.0,
-    maxTicks: 1.75 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
