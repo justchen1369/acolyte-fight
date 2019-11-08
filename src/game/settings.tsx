@@ -19,6 +19,7 @@ const Matchmaking: MatchmakingSettings = {
     BotRating: 1500,
     RatingPower: 2,
     OddPenalty: 0.75,
+    SmallPenalty: 0.5,
 };
 
 const Hero: HeroSettings = {

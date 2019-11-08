@@ -116,6 +116,7 @@ declare interface MatchmakingSettings {
 
 	RatingPower: number; // Higher means the matchmaker will try harder to match players of similar skill and there will be less random variation
 	OddPenalty: number; // Discourage non-even splits by this proportion
+	SmallPenalty: number; // Discourage small games by this proportion
 }
 
 declare interface Layouts {

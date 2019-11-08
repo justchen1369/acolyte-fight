@@ -229,14 +229,22 @@ function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings)
     let weight = Math.pow(candidate.avgWinProbability, matchmaking.RatingPower);
 
     let numOdd = 0;
+    let minSize = matchmaking.MaxPlayers;
     if (candidate.type === "noop") {
         numOdd = isOdd(candidate.all.length) ? 1 : 0;
+        minSize = Math.min(minSize, candidate.all.length);
     } else if (candidate.type === "split") {
         numOdd = candidate.splits.filter(s => isOdd(s.length)).length;
+        minSize = Math.min(minSize, _(candidate.splits).map(s => s.length).min());
     } else if (candidate.type === "teams") {
-        numOdd = isOdd(_(candidate.teams).map(t => t.length).sum()) ? 1 : 0;
+        const numPlayers = _(candidate.teams).map(t => t.length).sum();
+        numOdd = isOdd(numPlayers) ? 1 : 0;
+        minSize = Math.min(minSize, numPlayers);
     }
     weight *= Math.pow(matchmaking.OddPenalty, numOdd);
+
+    const largeAlpha = minSize / Math.max(1, matchmaking.MaxPlayers);
+    weight *= 1 * largeAlpha + matchmaking.SmallPenalty * (1 - largeAlpha);
 
     return weight;
 }
