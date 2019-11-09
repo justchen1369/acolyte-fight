@@ -1,8 +1,8 @@
 import * as pl from 'planck-js';
-import * as r from './render.model';
-import * as shaders from './shaders';
-import * as vector from '../../game/vector';
-import { Float32List } from './list';
+import * as r from '../render.model';
+import * as shaders from '../shaders';
+import * as vector from '../../../game/vector';
+import { Float32List } from '../list';
 
 const imageFragmentShader = require('./imageFragmentShader.glsl');
 const imageVertexShader = require('./imageVertexShader.glsl');

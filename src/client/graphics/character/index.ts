@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
-import * as r from './render.model';
-import * as vector from '../../game/vector';
-import ColTuple from './colorTuple';
+import * as r from '../render.model';
+import * as vector from '../../../game/vector';
+import ColTuple from '../colorTuple';
 
 const glyphPoints = [
     pl.Vec2(0, 0),

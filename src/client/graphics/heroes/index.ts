@@ -1,9 +1,9 @@
 import * as pl from 'planck-js';
-import * as r from './render.model';
-import * as shaders from './shaders';
-import * as vector from '../../game/vector';
-import { Float32List } from './list';
-import ColTuple from './colorTuple';
+import * as r from '../render.model';
+import * as shaders from '../shaders';
+import * as vector from '../../../game/vector';
+import { Float32List } from '../list';
+import ColTuple from '../colorTuple';
 
 const heroesFragmentShader = require('./heroesFragmentShader.glsl');
 const heroesVertexShader = require('./heroesVertexShader.glsl');
