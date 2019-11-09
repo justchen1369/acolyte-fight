@@ -5,6 +5,7 @@ import * as loader from '../core/loader';
 import * as online from '../core/online';
 import * as segments from '../../shared/segments';
 import * as s from '../store.model';
+import version from '../../game/version';
 
 interface Props {
     roomId: string;
@@ -21,7 +22,7 @@ function stateToProps(state: s.State): Props {
 }
 
 function calculateSegment(props: Props) {
-    return segments.calculateSegment(props.roomId, props.partyId);
+    return segments.calculateSegment(version, props.roomId, props.partyId);
 }
 
 class OnlineSegmentListener extends React.PureComponent<Props, State> {

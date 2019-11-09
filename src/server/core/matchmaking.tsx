@@ -136,7 +136,7 @@ async function updateRatingsIfNecessary(game: g.Game, gameStats: m.GameStatsMsg)
 
 export function findNewGame(version: string, room: g.Room, partyId: string | null, newPlayer: RatedPlayer): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId);
+	const segment = segments.calculateSegment(version, roomId, partyId);
 
 	const numJoining = 1;
 	const openGames = findJoinableGames(segment);
@@ -360,7 +360,7 @@ function evaluateWinProbability(acoList: number[]) {
 
 export function findExistingGame(version: string, room: g.Room | null, partyId: string | null): g.Game {
 	const roomId = room ? room.id : null;
-	const segment = segments.calculateSegment(roomId, partyId);
+	const segment = segments.calculateSegment(version, roomId, partyId);
 	const store = getStore();
 
 	const candidates = wu(store.activeGames.values()).filter(x => x.segment === segment && games.isGameRunning(x)).toArray();

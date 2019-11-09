@@ -111,7 +111,7 @@ export function initGame(version: string, room: g.Room, partyId: string | null, 
 	let game: g.Game = {
 		id: uniqid("g" + gameIndex + "-"),
 		universe: transientIds.generate(),
-		segment: segments.calculateSegment(room.id, partyId),
+		segment: segments.calculateSegment(version, room.id, partyId),
 		matchmaking: { ...room.Matchmaking },
 		roomId: room.id,
 		partyId,
