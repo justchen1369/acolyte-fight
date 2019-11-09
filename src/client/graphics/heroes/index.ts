@@ -66,7 +66,16 @@ export function initHeroes(gl: WebGLRenderingContext): r.DrawHeroes {
 	};
 }
 
-function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, extent: number, mask: ColTuple, texCoord: pl.Vec2) {
+function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, extent: number, texCoord: pl.Vec2, fill: r.HeroFill) {
+	let mask = fill.color;
+	if (fill.gradient) {
+		const gradient = fill.gradient;
+
+		const cosineDiff = Math.cos(gradient.angle - angle);
+		const alpha = (cosineDiff + 1) / 2; // Scale to 0-1
+		mask = gradient.fromColor.clone().mix(gradient.toColor, alpha);
+	}
+
     const heroes = shaders.getContext(ctxStack.gl).data.heroes;
 	shaders.appendVec2(heroes.attribs.a_pos, pos);
     shaders.appendAngleRadius(heroes.attribs.a_rel, angle, extent);
@@ -75,17 +84,17 @@ function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, ex
 	++heroes.numVertices;
 }
 
-export function hero(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, drawRadius: number, mask: ColTuple, texRect: ClientRect) {
+export function hero(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle: number, drawRadius: number, texRect: ClientRect, fill: r.HeroFill) {
 	// sqrt(2) because the shortest point on the edge of the quad has to fully enclose the radius
 	const extent = Math.sqrt(2) * drawRadius;
 
     // Top left triangle
-    appendPoint(ctxStack, pos, (vector.Tau * 5 / 8) + angle, extent, mask, pl.Vec2(texRect.left, texRect.top));
-    appendPoint(ctxStack, pos, (vector.Tau * 7 / 8) + angle, extent, mask, pl.Vec2(texRect.right, texRect.top));
-    appendPoint(ctxStack, pos, (vector.Tau * 3 / 8) + angle, extent, mask, pl.Vec2(texRect.left, texRect.bottom));
+    appendPoint(ctxStack, pos, (vector.Tau * 5 / 8) + angle, extent, pl.Vec2(texRect.left, texRect.top), fill);
+    appendPoint(ctxStack, pos, (vector.Tau * 7 / 8) + angle, extent, pl.Vec2(texRect.right, texRect.top), fill);
+    appendPoint(ctxStack, pos, (vector.Tau * 3 / 8) + angle, extent, pl.Vec2(texRect.left, texRect.bottom), fill);
 
     // Bottom right triangle
-    appendPoint(ctxStack, pos, (vector.Tau * 3 / 8) + angle, extent, mask, pl.Vec2(texRect.left, texRect.bottom));
-    appendPoint(ctxStack, pos, (vector.Tau * 7 / 8) + angle, extent, mask, pl.Vec2(texRect.right, texRect.top));
-    appendPoint(ctxStack, pos, (vector.Tau * 1 / 8) + angle, extent, mask, pl.Vec2(texRect.right, texRect.bottom));
+    appendPoint(ctxStack, pos, (vector.Tau * 3 / 8) + angle, extent, pl.Vec2(texRect.left, texRect.bottom), fill);
+    appendPoint(ctxStack, pos, (vector.Tau * 7 / 8) + angle, extent, pl.Vec2(texRect.right, texRect.top), fill);
+    appendPoint(ctxStack, pos, (vector.Tau * 1 / 8) + angle, extent, pl.Vec2(texRect.right, texRect.bottom), fill);
 }

@@ -1,55 +1,39 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
-import * as r from '../render.model';
+import * as h from './character.model';
 import * as vector from '../../../game/vector';
-import ColTuple from '../colorTuple';
 
-const glyphPoints = [
-    pl.Vec2(0, 0),
-    pl.Vec2(-1, -1),
-    pl.Vec2(0, -1),
-    pl.Vec2(0.5, 0),
-    pl.Vec2(0, 1),
-    pl.Vec2(-1, 1),
-];
-
-export function render(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, config: r.HeroConfig) {
+export function renderBody(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin) {
     ctx.save();
     ctx.translate(pos.x, pos.y);
     ctx.scale(radius, radius);
 
-    // Body
-    {
-        const angle = (3./8) * vector.Tau;
+    ctx.fillStyle = '#fff';
 
-        const from = vector.fromAngle(angle, radius).neg().add(pos);
-        const to = vector.fromAngle(angle, radius).add(pos);
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, vector.Tau);
+    ctx.fill();
 
-        const fromStyle = ColTuple.parse(config.color);
-        const toStyle = ColTuple.parse(config.color).darken(0.5);
+    ctx.restore();
+}
 
-        const gradient = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
-        gradient.addColorStop(0, fromStyle.string());
-        gradient.addColorStop(1, toStyle.string());
+export function renderGlyph(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: number, skin: h.Skin) {
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.scale(radius, radius);
 
-        ctx.fillStyle = gradient;
+    ctx.fillStyle = '#fff';
 
-        ctx.beginPath();
-        ctx.arc(0, 0, 1, 0, vector.Tau);
-        ctx.fill();
-    }
+    // Clip to body
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, vector.Tau);
     ctx.clip();
 
     // Glyph
-    {
-        const glyphColor = ColTuple.parse(config.color).mix(ColTuple.parse('#fff'), 0.5);
-        ctx.fillStyle = glyphColor.string();
-
-        ctx.beginPath();
-        renderPath(ctx, glyphPoints);
-        ctx.closePath();
-        ctx.fill();
-    }
+    ctx.beginPath();
+    renderPath(ctx, skin.glyph);
+    ctx.closePath();
+    ctx.fill();
     
     ctx.restore();
 }

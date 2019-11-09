@@ -19,7 +19,7 @@ import { renderIconOnly } from './renderIcon';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
-const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
+const HeroAtlasSizeMultiplier = 1; // Draw larger than the hero to ensure the edges are not cut off
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
@@ -36,6 +36,15 @@ const ShadowOffset = pl.Vec2(0, 0.005);
 const ShadowFeatherRadius = 0.001;
 
 const EaseDecay = 0.9;
+
+const GlyphPoints = [
+    pl.Vec2(0, 0),
+    pl.Vec2(-1, -1),
+    pl.Vec2(0, -1),
+    pl.Vec2(0.5, 0),
+    pl.Vec2(0, 1),
+    pl.Vec2(-1, 1),
+];
 
 interface SwirlContext {
 	color?: string;
@@ -246,7 +255,7 @@ function prepareAtlas(ctxStack: CanvasCtxStack, world: w.World): r.AtlasInstruct
 
 	world.players.forEach(player => {
 		instructions.push(heroNameInstruction(ctxStack, player, world));
-		instructions.push(heroBodyInstruction(ctxStack, player, world));
+		instructions.push(...heroBodyInstructions(ctxStack, player, world));
 	});
 
 	return instructions;
@@ -1381,6 +1390,7 @@ function particleVelocity(primaryVelocity: pl.Vec2, config?: RenderSmoke, multip
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
+	const drawRadius = HeroAtlasSizeMultiplier * hero.radius;
 	let color = heroColor(hero.id, world);
 
 	const highlight = applyHighlight(hero.hitTick, hero, world, Visuals.Damage);
@@ -1449,23 +1459,36 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 	*/
 
-	// Body
-	const texRect: ClientRect = atlas.lookup(ctxStack, heroBodyTextureId(hero.id));
-	if (texRect) {
-		const drawRadius = HeroAtlasSizeMultiplier * hero.radius;
 
+	// Body
+	const bodyTexRect: ClientRect = atlas.lookup(ctxStack, heroBodyTextureId(hero.id));
+	if (bodyTexRect) {
 		// Shadow
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
-			const mask = ColTuple.parse('#000c');
-			glx.hero(ctxStack, pos.clone().add(ShadowOffset), angle, drawRadius, mask, texRect);
+			glx.hero(ctxStack, pos.clone().add(ShadowOffset), angle, drawRadius, bodyTexRect, {
+				color: ColTuple.parse('#000c'),
+			});
 		}
 
 		// Fill
-		{
-			const mask = ColTuple.parse('#fff');
-			glx.hero(ctxStack, pos, angle, drawRadius, mask, texRect);
-		}
+		glx.hero(ctxStack, pos, angle, drawRadius, bodyTexRect, {
+			color: style,
+			gradient: {
+				fromColor: style,
+				toColor: style.clone().darken(0.5),
+				angle: vector.Tau * 3 / 8,
+			},
+		});
 	}
+
+	const glyphTexRect: ClientRect = atlas.lookup(ctxStack, heroGlyphTextureId(hero.id));
+	if (glyphTexRect) {
+		// Glyph
+		glx.hero(ctxStack, pos, angle, drawRadius, glyphTexRect, {
+			color: ColTuple.parse('#fff8'),
+		});
+	}
+
 
 	// Fill
 	/*
@@ -1509,28 +1532,36 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	*/
 }
 
-function heroBodyInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction {
+function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction[] {
 	const Hero = world.settings.Hero;
 
 	const heroId = player.heroId;
-	const color = heroColor(heroId, world);
 	const radiusPixels = Hero.Radius / ctxStack.subpixel;
 	const atlasPixels = Math.ceil(2 * radiusPixels * HeroAtlasSizeMultiplier); // 2x because need to fit diameter in the atlas not the radius
 
-	return {
-		id: heroBodyTextureId(heroId),
+	const template: r.AtlasHeroInstruction = {
+		id: null,
 		type: "hero",
 		radius: radiusPixels,
-		config: {
-			color,
+		skin: {
+			glyph: GlyphPoints,
 		},
 		height: atlasPixels,
 		width: atlasPixels,
 	};
+
+	return [
+		{...template, id: heroBodyTextureId(heroId), body: true },
+		{...template, id: heroGlyphTextureId(heroId), glyph: true },
+	];
 }
 
 function heroBodyTextureId(heroId: string) {
 	return `${heroId}-body`;
+}
+
+function heroGlyphTextureId(heroId: string) {
+	return `${heroId}-glyph`;
 }
 
 function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {

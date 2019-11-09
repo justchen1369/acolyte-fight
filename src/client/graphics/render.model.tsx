@@ -1,8 +1,10 @@
 import * as pl from 'planck-js';
+import * as h from './character/character.model';
 import { Float32List } from './list';
 import ColTuple from './colorTuple';
 import { AudioElement } from '../audio/audio.model';
 export { AudioElement } from '../audio/audio.model';
+export * from './character/character.model';
 
 export namespace GraphicsLevel {
 	export const Maximum = 5;
@@ -310,6 +312,17 @@ export interface PlateFill {
 	hex: HexConfig;
 }
 
+export interface HeroFill {
+	color: ColTuple;
+	gradient?: HeroGradient;
+}
+
+export interface HeroGradient {
+	fromColor: ColTuple;
+	toColor: ColTuple;
+	angle: number;
+}
+
 export interface HexConfig {
 	color: ColTuple;
 
@@ -353,10 +366,9 @@ export interface AtlasIconInstruction extends AtlasInstructionBase {
 
 export interface AtlasHeroInstruction extends AtlasInstructionBase {
 	type: "hero";
-	config: HeroConfig;
+	skin: h.Skin;
 	radius: number;
-}
 
-export interface HeroConfig {
-    color: string;
+	body?: boolean;
+	glyph?: boolean;
 }

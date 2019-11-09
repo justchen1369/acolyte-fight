@@ -11,6 +11,8 @@ import { CanvasCtxStack } from './render.model';
 import { Icons } from '../../game/icons';
 import { renderIconOnly } from './renderIcon';
 
+const Margin = 1;
+
 interface AtlasStateProvider {
     atlasState: r.AtlasState;
 }
@@ -38,8 +40,9 @@ export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstr
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     instructions.forEach(instruction => {
+        state.height += Margin;
         const coords = renderInstruction(ctxStack, state.height, instruction);
-        state.height += coords.height;
+        state.height += coords.height + Margin;
         state.width = Math.max(state.width, coords.width);
         state.coords.set(instruction.id, coords);
         state.instructions.push(instruction);
@@ -86,12 +89,13 @@ function renderInstruction(ctxStack: CanvasCtxStack, top: number, instruction: r
 
 	ctx.restore();
 
+    const left = Margin;
     return { 
         top,
         bottom: top + instruction.height,
         height: instruction.height,
-        left: 0,
-        right: instruction.width,
+        left,
+        right: left + instruction.width,
         width: instruction.width,
     };
 }
@@ -134,7 +138,13 @@ function renderHero(ctxStack: CanvasCtxStack, instruction: r.AtlasHeroInstructio
 	const ctx = ctxStack.atlas;
 
     const center = pl.Vec2(instruction.width / 2, instruction.height / 2);
-    character.render(ctx, center, instruction.radius, instruction.config);
+
+    if (instruction.body) {
+        character.renderBody(ctx, center, instruction.radius, instruction.skin);
+    }
+    if (instruction.glyph) {
+        character.renderGlyph(ctx, center, instruction.radius, instruction.skin);
+    }
 
     return instruction;
 }
