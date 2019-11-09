@@ -2537,7 +2537,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		applyGravity(projectile, hero, world);
 	}
 	if (projectile.bounce) {
-		bounceToNext(projectile, hero.id, world);
+		bounceToNext(projectile, hero, world);
 	}
 	if (expireOn(world, projectile, hero)) {
 		detonateProjectile(projectile, world);
@@ -2875,13 +2875,24 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
 }
 
-function bounceToNext(projectile: w.Projectile, hitId: string, world: w.World) {
-	if (!projectile.bounce) {
+function bounceToNext(projectile: w.Projectile, hit: w.Hero, world: w.World) {
+	if (!(projectile.bounce && hit)) {
 		return;
 	}
 
 	// Always bounce between owner and another target
-	const nextTargetId = hitId === projectile.targetId ? projectile.owner : projectile.targetId;
+	let nextTargetId: string;
+
+	if (hit.id === projectile.owner) {
+		nextTargetId = projectile.targetId;
+	} else {
+		if ((calculateAlliance(projectile.owner, hit.id, world) & Alliances.NotFriendly) > 0) {
+			// Bouncer will now target the hero that it just hit
+			projectile.targetId = hit.id;
+		}
+		nextTargetId = projectile.owner;
+	}
+
 	const nextTarget: w.WorldObject = world.objects.get(nextTargetId);
 	if (!(nextTarget && nextTarget.category === "hero")) {
 		return;

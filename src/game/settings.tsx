@@ -1428,9 +1428,9 @@ const bouncer: Spell = {
     throttle: true,
 
     projectile: {
-        density: 3,
+        density: 2.4,
         radius: 0.001,
-        speed: 1.2,
+        speed: 1.5,
         fixedSpeed: true,
         bumpable: true,
         maxTicks: 3.0 * TicksPerSecond,
