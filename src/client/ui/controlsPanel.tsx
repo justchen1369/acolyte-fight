@@ -39,6 +39,11 @@ namespace TouchTracking {
     export const Slowest = "slowest";
 }
 
+namespace FontSize {
+    export const Normal = "normal";
+    export const Large = "large";
+}
+
 interface Props {
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
@@ -59,6 +64,7 @@ interface ControlState {
     autoJoin: string;
     cameraFollow: string;
     changeSpellsWith: string;
+    fontSize: string;
     sounds: string;
     graphics: string;
     shake: string;
@@ -92,6 +98,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         targetingIndicator: options.noTargetingIndicator ? Toggle.Off : Toggle.On,
         autoJoin: options.noAutoJoin ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
+        fontSize: formatFontSize(options.fontSizeMultiplier),
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: r.formatGraphics(options.graphics),
@@ -135,6 +142,21 @@ function parseTouchTracking(tracking: string): number {
         case TouchTracking.Slow: return 420;
         case TouchTracking.Slowest: return 600;
         default: return null;
+    }
+}
+
+function formatFontSize(multiplier: number): string {
+    if (multiplier > 1) {
+        return FontSize.Large;
+    } else {
+        return FontSize.Normal;
+    }
+}
+
+function parseFontSize(fontSize: string): number {
+    switch (fontSize) {
+        case FontSize.Large: return 2;
+        default: return 1;
     }
 }
 
@@ -270,6 +292,13 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <span className="value">Whether to zoom and pan if the screen is too small.</span>
                 </div>
             </>
+            <div className="row">
+                <span className="label">Font size</span>
+                <select className="value" value={this.state.fontSize} onChange={ev => this.onUpdate({ fontSize: ev.target.value })}>
+                    <option value={FontSize.Normal}>Normal</option>
+                    <option value={FontSize.Large}>Large</option>
+                </select>
+            </div>
             {!touched && <>
                 <div className="row">
                     <span className="label">Change spells with</span>
@@ -368,6 +397,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noAutoJoin = state.autoJoin === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
             options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
+            options.fontSizeMultiplier = parseFontSize(state.fontSize);
             options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
             options.noShake = state.shake === Toggle.Off;
             options.graphics = r.parseGraphics(state.graphics);

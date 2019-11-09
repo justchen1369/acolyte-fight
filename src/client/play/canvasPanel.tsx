@@ -26,6 +26,7 @@ interface Props {
     noTargetingIndicator: boolean;
     noCameraFollow: boolean;
     noShake: boolean;
+    fontSizeMultiplier: number;
     customizingSpells: boolean;
     globalGraphics: number;
     currentGraphics: number;
@@ -114,6 +115,7 @@ function stateToProps(state: s.State): Props {
         noTargetingIndicator: state.options.noTargetingIndicator,
         noCameraFollow: state.options.noCameraFollow,
         noShake: state.options.noShake,
+        fontSizeMultiplier: state.options.fontSizeMultiplier,
         customizingSpells: state.customizing,
         globalGraphics: state.options.graphics,
         currentGraphics: state.graphics,
@@ -246,6 +248,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
                 retinaMultiplier: this.calculateRetinaMultiplier(),
+                fontSizeMultiplier: this.props.fontSizeMultiplier || 1,
                 mobile: this.props.touched,
             }, display);
         }

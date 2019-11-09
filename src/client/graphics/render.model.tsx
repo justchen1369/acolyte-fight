@@ -80,6 +80,7 @@ export interface RenderOptions {
 	rebindings: KeyBindings;
 	rtx: number;
 	retinaMultiplier: number;
+	fontSizeMultiplier: number;
 	customizingSpells?: boolean;
 	mobile?: boolean;
 }

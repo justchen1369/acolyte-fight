@@ -301,6 +301,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             shake: true,
             rebindings: {},
             retinaMultiplier: 1,
+            fontSizeMultiplier: 1,
             hideMap: this.state.hideMap,
         });
     }

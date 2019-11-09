@@ -209,7 +209,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	glx.initGl(ctxStack);
 	glx.clearGl(ctxStack);
 
-	renderAtlas(ctxStack, world);
+	renderAtlas(ctxStack, world, options);
 	renderWorld(ctxStack, world, worldRect, options);
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
@@ -245,16 +245,16 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 	return false;
 }
 
-function renderAtlas(ctxStack: CanvasCtxStack, world: w.World) {
-	const instructions = prepareAtlas(ctxStack, world);
+function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
+	const instructions = prepareAtlas(ctxStack, world, options);
 	atlas.renderAtlas(ctxStack, instructions);
 }
 
-function prepareAtlas(ctxStack: CanvasCtxStack, world: w.World): r.AtlasInstruction[] {
+function prepareAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions): r.AtlasInstruction[] {
 	const instructions = new Array<r.AtlasInstruction>();
 
 	world.players.forEach(player => {
-		instructions.push(heroNameInstruction(ctxStack, player, world));
+		instructions.push(heroNameInstruction(ctxStack, player, world, options));
 		instructions.push(...heroBodyInstructions(ctxStack, player, world));
 	});
 
@@ -1158,7 +1158,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 		renderHeroCharacter(ctxStack, hero, pos, world);
 
 		if (!options.hideMap) {
-			renderHeroName(ctxStack, hero, pos, world);
+			renderHeroName(ctxStack, hero, pos, world, options);
 		}
 
 		if (!easeMultiplier) {
@@ -1717,7 +1717,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 	}
 }
 
-function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World, options: RenderOptions) {
 	const Visuals = world.settings.Visuals;
 
 	const texRect: ClientRect = atlas.lookup(ctxStack, heroNameTextureId(hero.id));
@@ -1725,9 +1725,10 @@ function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 		return;
 	}
 
+	const fontSizeMultiplier = options.fontSizeMultiplier || 1;
 	const yOffset = hero.radius + Visuals.NameMargin;
-	const drawWidth = Visuals.NameWidthPixels * ctxStack.pixel;
-	const drawHeight = Visuals.NameHeightPixels * ctxStack.pixel;
+	const drawWidth = fontSizeMultiplier * Visuals.NameWidthPixels * ctxStack.pixel;
+	const drawHeight = fontSizeMultiplier * Visuals.NameHeightPixels * ctxStack.pixel;
 	const drawRect: ClientRect = {
 		left: pos.x - drawWidth / 2,
 		right: pos.x + drawWidth / 2,
@@ -1739,18 +1740,19 @@ function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 	glx.image(ctxStack, drawRect, texRect);
 }
 
-function heroNameInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasTextInstruction {
+function heroNameInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: w.World, options: RenderOptions): r.AtlasTextInstruction {
 	const Visuals = world.settings.Visuals;
 	const retinaMultiplier = ctxStack.pixel / ctxStack.subpixel;
+	const fontSizeMultiplier = retinaMultiplier * options.fontSizeMultiplier;
 
 	return {
 		id: heroNameTextureId(player.heroId),
 		type: "text",
 		text: player.name,
 		color: 'rgba(255, 255, 255, 0.3)',
-		font: `${Visuals.NameFontPixels * retinaMultiplier}px 'Maven Pro',Helvetica,Arial,sans-serif`,
-		height: Math.ceil(retinaMultiplier * Visuals.NameHeightPixels),
-		width: Math.ceil(retinaMultiplier * Visuals.NameWidthPixels),
+		font: `${Visuals.NameFontPixels * fontSizeMultiplier}px 'Maven Pro',Helvetica,Arial,sans-serif`,
+		height: Math.ceil(fontSizeMultiplier * Visuals.NameHeightPixels),
+		width: Math.ceil(fontSizeMultiplier * Visuals.NameWidthPixels),
 	};
 }
 
