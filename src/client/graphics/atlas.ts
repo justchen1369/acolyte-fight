@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
 import * as constants from '../../game/constants';
-import * as glx from './glx';
 import * as r from './render.model';
+import * as textures from './textures';
 import * as vector from '../../game/vector';
 import * as w from '../../game/world.model';
 
@@ -23,7 +23,7 @@ export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstr
         return;
     }
 
-    console.log("Redrawing texture atlas");
+    const start = Date.now();
 
     const state: r.AtlasState = {
         instructions: [],
@@ -45,9 +45,12 @@ export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstr
     });
 
 	const image = ctx.getImageData(0, 0, state.width, state.height);
-    glx.atlas(ctxStack, image);
+    textures.uploadTexture(ctxStack, image);
     
     provider.atlasState = state;
+
+    const elapsed = Date.now() - start;
+    console.log(`Texture atlas redrawn in ${elapsed} ms`);
 }
 
 function getStateProvider(ctxStack: CanvasCtxStack): AtlasStateProvider {

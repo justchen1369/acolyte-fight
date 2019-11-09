@@ -84,17 +84,29 @@ export interface RenderOptions {
 
 export interface GlContext {
 	gl: WebGLRenderingContext;
+
+	textures: UploadTextures;
+	textureData: UploadTexturesData;
+
 	images: DrawImages;
 	trails: DrawTrails;
 	plates: DrawPlates;
+
 	data: DrawDataLookup;
+}
+
+export interface UploadTextures {
+	textures2D: Texture2DInfo[];
+}
+
+export interface UploadTexturesData {
+	textures2D: ImageData[];
 }
 
 export interface Draw {
 	program: WebGLProgram;
 	uniforms: { [key: string]: UniformInfo };
 	attribs: { [key: string]: AttribInfo };
-	textures2D: Texture2DInfo[];
 }
 
 export interface UniformInfo {
@@ -130,7 +142,6 @@ export interface DrawDataLookup {
 export interface DrawData {
 	uniforms: UniformData;
 	attribs: AttributeData;
-	textures2D: ImageData[]; // null means keep the same texture as last frame
 	numVertices: number;
 }
 
@@ -139,7 +150,6 @@ export interface DrawImagesData extends DrawData {
 		a_pos: Float32List;
 		a_texCoord: Float32List;
 	};
-	textures2D: ImageData[];
 }
 
 export interface DrawTrailsData extends DrawData {
@@ -198,7 +208,6 @@ export interface DrawImages extends Draw {
 		a_pos: AttribInfo;
 		a_texCoord: AttribInfo;
 	};
-	textures2D: Texture2DInfo[];
 }
 
 export interface DrawTrails extends Draw {

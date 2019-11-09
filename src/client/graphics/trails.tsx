@@ -27,7 +27,6 @@ export function initData(): r.DrawTrailsData {
             a_color: new Float32List(),
             a_fill: new Float32List(),
         },
-        textures2D: [],
         numVertices: 0,
     };
 }
@@ -39,7 +38,6 @@ export function clearData(data: r.DrawData) {
 		data.attribs[key].clear();
 	}
 
-	data.textures2D = [];
 	data.numVertices = 0;
 }
 
@@ -74,7 +72,6 @@ export function initTrails(gl: WebGLRenderingContext): r.DrawTrails {
 				size: 4,
 			},
 		},
-        textures2D: [],
 	};
 }
 

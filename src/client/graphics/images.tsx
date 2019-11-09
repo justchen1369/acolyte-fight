@@ -15,9 +15,6 @@ export function initData(): r.DrawImagesData {
             a_pos: new Float32List(),
             a_texCoord: new Float32List(),
         },
-        textures2D: [
-            null,
-        ],
         numVertices: 0,
     };
 }
@@ -29,7 +26,6 @@ export function clearData(data: r.DrawData) {
 		data.attribs[key].clear();
 	}
 
-	data.textures2D = [null];
 	data.numVertices = 0;
 }
 
@@ -52,15 +48,6 @@ export function initImages(gl: WebGLRenderingContext): r.DrawImages {
 				size: 2,
 			},
 		},
-        textures2D: [
-            {
-                buffer: gl.createTexture(),
-                wrapS: gl.CLAMP_TO_EDGE,
-                wrapT: gl.CLAMP_TO_EDGE,
-                minFilter: gl.NEAREST,
-                magFilter: gl.NEAREST,
-            }
-        ],
 	};
 }
 
@@ -69,11 +56,6 @@ function appendPoint(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, texCoord: pl.Vec2
 	shaders.appendVec2(images.attribs.a_pos, pos);
 	shaders.appendVec2(images.attribs.a_texCoord, texCoord);
 	++images.numVertices;
-}
-
-export function atlas(ctxStack: r.CanvasCtxStack, image: ImageData) {
-    const images = shaders.getContext(ctxStack.gl).data.images;
-    images.textures2D[0] = image;
 }
 
 export function image(ctxStack: r.CanvasCtxStack, drawRect: ClientRect, texRect: ClientRect) {

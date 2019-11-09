@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
-import * as atlasController from './atlasController';
+import * as atlasController from './atlas';
 import * as audio from '../audio/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';

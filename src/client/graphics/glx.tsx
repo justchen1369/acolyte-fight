@@ -1,11 +1,13 @@
 import * as pl from 'planck-js';
 import * as r from './render.model';
 import * as plates from './plates';
-import * as textures from './images';
+import * as images from './images';
+import * as textures from './textures';
 import * as trails from './trails';
 import ColTuple from './colorTuple';
 
-export { atlas, image } from './images';
+export { image } from './images';
+export { uploadTexture } from './textures';
 export { circleTrail, lineTrail, arcTrail, convexTrail } from './trails';
 export { circlePlate, convexPlate } from './plates';
 
@@ -16,6 +18,8 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 	gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 	gl.clearColor(background.r, background.g, background.b, background.a);
 	gl.clear(gl.COLOR_BUFFER_BIT);
+
+	sendTextures(context, context.textures, context.textureData);
 
 	const uniforms: r.UniformData = {
 		u_scale: [
@@ -35,6 +39,28 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 	runProgram(context, context.plates, uniforms, context.data.plates);
 	runProgram(context, context.trails, uniforms, context.data.trails);
 	runProgram(context, context.images, uniforms, context.data.images);
+}
+
+function sendTextures(context: r.GlContext, draw: r.UploadTextures, data: r.UploadTexturesData) {
+	const gl = context.gl;
+
+	for (const textureIndex in draw.textures2D) {
+		const texture = draw.textures2D[textureIndex];
+		const textureData = data.textures2D[textureIndex];
+
+		if (textureData) {
+			gl.bindTexture(gl.TEXTURE_2D, texture.buffer);
+
+			// Set the parameters so we can render any size image.
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texture.wrapS);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texture.wrapT);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.minFilter);
+			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.magFilter);
+
+			// Upload the image into the texture.
+			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.textures2D[textureIndex]);
+		}
+	}
 }
 
 function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.UniformData, data: r.DrawData) {
@@ -68,24 +94,6 @@ function runProgram(context: r.GlContext, draw: r.Draw, globalUniformData: r.Uni
 		}
 
 		gl.vertexAttribPointer(attrib.loc, attrib.size, attrib.type, false, 0, 0);
-	}
-
-	for (const textureIndex in draw.textures2D) {
-		const texture = draw.textures2D[textureIndex];
-		const textureData = data.textures2D[textureIndex];
-
-		if (textureData) {
-			gl.bindTexture(gl.TEXTURE_2D, texture.buffer);
-
-			// Set the parameters so we can render any size image.
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, texture.wrapS);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, texture.wrapT);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, texture.minFilter);
-			gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, texture.magFilter);
-
-			// Upload the image into the texture.
-			gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data.textures2D[textureIndex]);
-		}
 	}
 
 	gl.drawArrays(gl.TRIANGLES, 0, data.numVertices);
@@ -141,11 +149,15 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 
 	return {
 		gl,
-		images: textures.initImages(gl),
+
+		textures: textures.initTextures(gl),
+		textureData: textures.initData(),
+
+		images: images.initImages(gl),
 		trails: trails.initTrails(gl),
 		plates: plates.initPlates(gl),
 		data: {
-			images: textures.initData(),
+			images: images.initData(),
 			trails: trails.initData(),
 			plates: plates.initData(),
 		},
@@ -154,7 +166,8 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 
 export function clearGl(ctxStack: r.CanvasCtxStack) {
 	const context = initGl(ctxStack);
-	textures.clearData(context.data.images);
+	textures.clearData(context.textureData);
+	images.clearData(context.data.images);
 	trails.clearData(context.data.trails);
 	plates.clearData(context.data.plates);
 }
