@@ -932,8 +932,8 @@ const retractor: Spell = {
         shieldTakesOwnership: false,
 
         partialDamage: {
-            initialMultiplier: 0.5,
-            finalMultiplier: 0.5,
+            initialMultiplier: 0.35,
+            finalMultiplier: 0.35,
             ticks: 1,
         },
 
