@@ -88,10 +88,11 @@ export interface GlContext {
 	textures: UploadTextures;
 	textureData: UploadTexturesData;
 
+	plates: DrawPlates;
+	swatches: DrawTrails;
 	heroes: DrawHeroes;
 	images: DrawImages;
 	trails: DrawTrails;
-	plates: DrawPlates;
 
 	data: DrawDataLookup;
 }
@@ -134,10 +135,11 @@ export interface Texture2DInfo {
 }
 
 export interface DrawDataLookup {
+	plates: DrawPlatesData;
+	swatches: DrawTrailsData;
 	heroes: DrawHeroesData;
 	images: DrawImagesData;
 	trails: DrawTrailsData;
-	plates: DrawPlatesData;
 	[program: string]: DrawData;
 }
 

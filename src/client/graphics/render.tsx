@@ -896,7 +896,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 			drawPos = drawPos.clone().add(ShadowOffset);
 		}
 
-		glx.convexTrail(ctxStack, drawPos, drawShape.points, angle, scale, {
+		glx.convexSwatch(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
 			maxRadius: 1,
 			feather,
@@ -915,7 +915,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		const drawPos = vector.scaleAround(center, MapCenter, scale);
 		const fromAngle = angle - shape.angularExtent;
 		const toAngle = angle + shape.angularExtent;
-		glx.arcTrail(ctxStack, drawPos, fromAngle, toAngle, false, {
+		glx.arcSwatch(ctxStack, drawPos, fromAngle, toAngle, false, {
 			color,
 			minRadius: scale * (shape.radius - radialExtent),
 			maxRadius: scale * (shape.radius + radialExtent),
@@ -934,7 +934,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		if (fill.shadow) {
 			drawPos = drawPos.clone().add(ShadowOffset);
 		}
-		glx.circleTrail(ctxStack, drawPos, {
+		glx.circleSwatch(ctxStack, drawPos, {
 			color,
 			maxRadius: scale * radius,
 			feather,
@@ -1234,9 +1234,8 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	};
 
 	// Render line to target
-	const from = vector.fromAngle(guideDirection, hero.radius).add(pos);
 	const to = vector.fromAngle(guideDirection, guideLength).add(pos);
-	glx.lineTrail(ctxStack, from, to, {
+	glx.lineSwatch(ctxStack, pos, to, {
 		gradient,
 		maxRadius: lineWidth / 2,
 	});
@@ -1398,7 +1397,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 
 		// Hit flash
 		if (highlight.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
-			glx.circleTrail(ctxStack, pos, {
+			glx.circleSwatch(ctxStack, pos, {
 				color: style,
 				maxRadius: 0,
 				feather: {
@@ -1412,7 +1411,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	// Charging
 	if (hero.casting && hero.casting.color && hero.casting.proportion > 0) {
 		const strokeColor = ColTuple.parse(hero.casting.color).alpha(hero.casting.proportion);
-		glx.circleTrail(ctxStack, pos, {
+		glx.circleSwatch(ctxStack, pos, {
 			color: strokeColor,
 			minRadius: radius,
 			maxRadius: radius + Visuals.ChargingRadius,
@@ -1425,7 +1424,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.CastingFlashTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
-			glx.circleTrail(ctxStack, pos, {
+			glx.circleSwatch(ctxStack, pos, {
 				color: strokeColor,
 				maxRadius: 0,
 				feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
