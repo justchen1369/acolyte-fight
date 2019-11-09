@@ -4,8 +4,8 @@ import * as shaders from '../shaders';
 import * as vector from '../../../game/vector';
 import { Float32List } from '../list';
 
-const imageFragmentShader = require('./imageFragmentShader.glsl');
-const imageVertexShader = require('./imageVertexShader.glsl');
+const imageFragmentShader = require('./image.fragment.glsl');
+const imageVertexShader = require('./image.vertex.glsl');
 
 export function initData(): r.DrawImagesData {
     return {
