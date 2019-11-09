@@ -3,15 +3,15 @@ import * as r from './render.model';
 import * as heroes from './heroes';
 import * as images from './images';
 import * as plates from './plates';
+import * as primitives from './primitives';
 import * as textures from './textures';
-import * as trails from './trails';
 import ColTuple from './colorTuple';
 
 export { hero } from './heroes';
 export { image } from './images';
 export { uploadTexture } from './textures';
-export { circleSwatch, lineSwatch, arcSwatch, convexSwatch } from './trails';
-export { circleTrail, lineTrail, arcTrail, convexTrail } from './trails';
+export { circleSwatch, lineSwatch, arcSwatch, convexSwatch } from './primitives';
+export { circleTrail, lineTrail, arcTrail, convexTrail } from './primitives';
 export { circlePlate, convexPlate } from './plates';
 
 export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect: ClientRect, background: ColTuple) {
@@ -159,16 +159,16 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		textureData: textures.initData(),
 
 		plates: plates.initPlates(gl),
-		swatches: trails.initTrails(gl),
+		swatches: primitives.initPrimitives(gl),
 		heroes: heroes.initHeroes(gl),
 		images: images.initImages(gl),
-		trails: trails.initTrails(gl),
+		trails: primitives.initPrimitives(gl),
 		data: {
 			plates: plates.initData(),
-			swatches: trails.initData(),
+			swatches: primitives.initData(),
 			heroes: heroes.initData(),
 			images: images.initData(),
-			trails: trails.initData(),
+			trails: primitives.initData(),
 		},
 	};
 }
@@ -177,8 +177,8 @@ export function clearGl(ctxStack: r.CanvasCtxStack) {
 	const context = initGl(ctxStack);
 	textures.clearData(context.textureData);
 	plates.clearData(context.data.plates);
-	trails.clearData(context.data.swatches);
+	primitives.clearData(context.data.swatches);
 	heroes.clearData(context.data.heroes);
 	images.clearData(context.data.images);
-	trails.clearData(context.data.trails);
+	primitives.clearData(context.data.trails);
 }

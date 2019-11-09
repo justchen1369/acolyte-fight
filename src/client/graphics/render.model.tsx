@@ -89,10 +89,10 @@ export interface GlContext {
 	textureData: UploadTexturesData;
 
 	plates: DrawPlates;
-	swatches: DrawTrails;
+	swatches: DrawPrimitives;
 	heroes: DrawHeroes;
 	images: DrawImages;
-	trails: DrawTrails;
+	trails: DrawPrimitives;
 
 	data: DrawDataLookup;
 }
@@ -136,10 +136,10 @@ export interface Texture2DInfo {
 
 export interface DrawDataLookup {
 	plates: DrawPlatesData;
-	swatches: DrawTrailsData;
+	swatches: DrawPrimitivesData;
 	heroes: DrawHeroesData;
 	images: DrawImagesData;
-	trails: DrawTrailsData;
+	trails: DrawPrimitivesData;
 	[program: string]: DrawData;
 }
 
@@ -165,7 +165,7 @@ export interface DrawImagesData extends DrawData {
 	};
 }
 
-export interface DrawTrailsData extends DrawData {
+export interface DrawPrimitivesData extends DrawData {
 	attribs: {
 		a_pos: Float32List;
 		a_rel: Float32List;
@@ -240,7 +240,7 @@ export interface DrawImages extends Draw {
 	};
 }
 
-export interface DrawTrails extends Draw {
+export interface DrawPrimitives extends Draw {
 	uniforms: {
 		u_scale: UniformInfo;
 		u_translate: UniformInfo;
