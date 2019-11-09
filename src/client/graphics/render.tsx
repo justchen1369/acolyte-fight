@@ -1485,7 +1485,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	if (glyphTexRect) {
 		// Glyph
 		glx.hero(ctxStack, pos, angle, drawRadius, glyphTexRect, {
-			color: ColTuple.parse('#fff8'),
+			color: style.clone().lighten(0.5),
 		});
 	}
 
