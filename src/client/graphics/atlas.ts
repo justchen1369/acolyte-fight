@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
+import * as character from './character';
 import * as constants from '../../game/constants';
 import * as r from './render.model';
 import * as textures from './textures';
@@ -99,6 +100,7 @@ function renderInstructionAtOrigin(ctxStack: CanvasCtxStack, instruction: r.Atla
     switch (instruction.type) {
         case "text": return renderText(ctxStack, instruction);
         case "icon": return renderIcon(ctxStack, instruction);
+        case "hero": return renderHero(ctxStack, instruction);
         default: throw `Unknown atlas instruction`;
     }
 }
@@ -128,7 +130,16 @@ function renderIcon(ctxStack: CanvasCtxStack, instruction: r.AtlasIconInstructio
     return instruction;
 }
 
-export function lookupImage(ctxStack: CanvasCtxStack, textureId: string): ClientRect {
+function renderHero(ctxStack: CanvasCtxStack, instruction: r.AtlasHeroInstruction) {
+	const ctx = ctxStack.atlas;
+
+    const center = pl.Vec2(instruction.width / 2, instruction.height / 2);
+    character.render(ctx, center, instruction.radius, instruction.config);
+
+    return instruction;
+}
+
+export function lookup(ctxStack: CanvasCtxStack, textureId: string): ClientRect {
     const provider = getStateProvider(ctxStack);
     const state = provider.atlasState;
     if (!state) {

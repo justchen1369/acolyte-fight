@@ -23,8 +23,8 @@ export function initTextures(gl: WebGLRenderingContext): r.UploadTextures {
                 buffer: gl.createTexture(),
                 wrapS: gl.CLAMP_TO_EDGE,
                 wrapT: gl.CLAMP_TO_EDGE,
-                minFilter: gl.NEAREST,
-                magFilter: gl.NEAREST,
+                minFilter: gl.LINEAR,
+                magFilter: gl.LINEAR,
             }
         ],
 	};

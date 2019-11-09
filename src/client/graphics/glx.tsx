@@ -1,11 +1,13 @@
 import * as pl from 'planck-js';
 import * as r from './render.model';
-import * as plates from './plates';
+import * as heroes from './heroes';
 import * as images from './images';
+import * as plates from './plates';
 import * as textures from './textures';
 import * as trails from './trails';
 import ColTuple from './colorTuple';
 
+export { hero } from './heroes';
 export { image } from './images';
 export { uploadTexture } from './textures';
 export { circleTrail, lineTrail, arcTrail, convexTrail } from './trails';
@@ -37,6 +39,7 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 	};
 
 	runProgram(context, context.plates, uniforms, context.data.plates);
+	runProgram(context, context.heroes, uniforms, context.data.heroes);
 	runProgram(context, context.trails, uniforms, context.data.trails);
 	runProgram(context, context.images, uniforms, context.data.images);
 }
@@ -153,10 +156,12 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		textures: textures.initTextures(gl),
 		textureData: textures.initData(),
 
+		heroes: heroes.initHeroes(gl),
 		images: images.initImages(gl),
 		trails: trails.initTrails(gl),
 		plates: plates.initPlates(gl),
 		data: {
+			heroes: heroes.initData(),
 			images: images.initData(),
 			trails: trails.initData(),
 			plates: plates.initData(),
@@ -167,6 +172,7 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 export function clearGl(ctxStack: r.CanvasCtxStack) {
 	const context = initGl(ctxStack);
 	textures.clearData(context.textureData);
+	heroes.clearData(context.data.heroes);
 	images.clearData(context.data.images);
 	trails.clearData(context.data.trails);
 	plates.clearData(context.data.plates);

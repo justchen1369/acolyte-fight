@@ -88,6 +88,7 @@ export interface GlContext {
 	textures: UploadTextures;
 	textureData: UploadTexturesData;
 
+	heroes: DrawHeroes;
 	images: DrawImages;
 	trails: DrawTrails;
 	plates: DrawPlates;
@@ -133,6 +134,7 @@ export interface Texture2DInfo {
 }
 
 export interface DrawDataLookup {
+	heroes: DrawHeroesData;
 	images: DrawImagesData;
 	trails: DrawTrailsData;
 	plates: DrawPlatesData;
@@ -143,6 +145,15 @@ export interface DrawData {
 	uniforms: UniformData;
 	attribs: AttributeData;
 	numVertices: number;
+}
+
+export interface DrawHeroesData extends DrawData {
+	attribs: {
+		a_pos: Float32List;
+		a_rel: Float32List;
+		a_mask: Float32List;
+		a_texCoord: Float32List;
+	};
 }
 
 export interface DrawImagesData extends DrawData {
@@ -193,6 +204,23 @@ export interface Texture2DData {
 export interface FeatherConfig {
 	sigma: number;
 	alpha: number;
+}
+
+export interface DrawHeroes extends Draw {
+	uniforms: {
+		u_scale: UniformInfo;
+		u_translate: UniformInfo;
+		u_subpixel: UniformInfo;
+		u_pixel: UniformInfo;
+		u_rtx: UniformInfo;
+		u_tick: UniformInfo;
+	};
+	attribs: {
+		a_pos: AttribInfo;
+		a_rel: AttribInfo;
+		a_mask: AttribInfo;
+		a_texCoord: AttribInfo;
+	};
 }
 
 export interface DrawImages extends Draw {
@@ -299,6 +327,7 @@ export interface AtlasState {
 export type AtlasInstruction =
 	AtlasTextInstruction
 	| AtlasIconInstruction
+	| AtlasHeroInstruction
 
 export interface AtlasInstructionBase {
 	id: string;
@@ -318,4 +347,14 @@ export interface AtlasIconInstruction extends AtlasInstructionBase {
 	type: "icon";
 	icon: string;
 	color: string;
+}
+
+export interface AtlasHeroInstruction extends AtlasInstructionBase {
+	type: "hero";
+	config: HeroConfig;
+	radius: number;
+}
+
+export interface HeroConfig {
+    color: string;
 }

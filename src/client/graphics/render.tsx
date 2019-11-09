@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import * as pl from 'planck-js';
-import * as atlasController from './atlas';
+import * as atlas from './atlas';
 import * as audio from '../audio/audio';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
@@ -18,6 +18,8 @@ import ColTuple from './colorTuple';
 import { renderIconOnly } from './renderIcon';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
+
+const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
@@ -198,7 +200,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 	glx.initGl(ctxStack);
 	glx.clearGl(ctxStack);
 
-	renderAtlas(ctxStack, world, options);
+	renderAtlas(ctxStack, world);
 	renderWorld(ctxStack, world, worldRect, options);
 	renderCursor(ctxStack, world);
 	renderInterface(ctxStack.ui, world, rect, options);
@@ -234,26 +236,19 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 	return false;
 }
 
-function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
-	const instructions = prepareAtlas(world, options);
-	atlasController.renderAtlas(ctxStack, instructions);
+function renderAtlas(ctxStack: CanvasCtxStack, world: w.World) {
+	const instructions = prepareAtlas(ctxStack, world);
+	atlas.renderAtlas(ctxStack, instructions);
 }
 
-function prepareAtlas(world: w.World, options: RenderOptions): r.AtlasInstruction[] {
-	const Visuals = world.settings.Visuals;
+function prepareAtlas(ctxStack: CanvasCtxStack, world: w.World): r.AtlasInstruction[] {
 	const instructions = new Array<r.AtlasInstruction>();
 
 	world.players.forEach(player => {
-		instructions.push({
-			id: player.heroId,
-			type: "text",
-			text: player.name,
-			color: 'rgba(255, 255, 255, 0.3)',
-			font: `${Visuals.NameFontPixels * options.retinaMultiplier}px 'Maven Pro',Helvetica,Arial,sans-serif`,
-			height: Math.ceil(options.retinaMultiplier * Visuals.NameHeightPixels),
-			width: Math.ceil(options.retinaMultiplier * Visuals.NameWidthPixels),
-		});
+		instructions.push(heroNameInstruction(ctxStack, player, world));
+		instructions.push(heroBodyInstruction(ctxStack, player, world));
 	});
+
 	return instructions;
 }
 
@@ -1239,7 +1234,9 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	};
 
 	// Render line to target
-	glx.lineTrail(ctxStack, pos, vector.fromAngle(guideDirection, guideLength).add(pos), {
+	const from = vector.fromAngle(guideDirection, hero.radius).add(pos);
+	const to = vector.fromAngle(guideDirection, guideLength).add(pos);
+	glx.lineTrail(ctxStack, from, to, {
 		gradient,
 		maxRadius: lineWidth / 2,
 	});
@@ -1440,6 +1437,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 
 	// Shadow
+	/*
 	if (ctxStack.rtx > r.GraphicsLevel.Low) {
 		glx.circleTrail(ctxStack, pos.clone().add(ShadowOffset), {
 			color: ColTuple.parse("rgba(0, 0, 0, 0.75)"),
@@ -1450,8 +1448,28 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			},
 		});
 	}
+	*/
+
+	// Body
+	const texRect: ClientRect = atlas.lookup(ctxStack, heroBodyTextureId(hero.id));
+	if (texRect) {
+		const drawRadius = HeroAtlasSizeMultiplier * hero.radius;
+
+		// Shadow
+		if (ctxStack.rtx > r.GraphicsLevel.Low) {
+			const mask = ColTuple.parse('#000c');
+			glx.hero(ctxStack, pos.clone().add(ShadowOffset), angle, drawRadius, mask, texRect);
+		}
+
+		// Fill
+		{
+			const mask = ColTuple.parse('#fff');
+			glx.hero(ctxStack, pos, angle, drawRadius, mask, texRect);
+		}
+	}
 
 	// Fill
+	/*
 	{
 		let gradient: r.TrailGradient = null;
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
@@ -1470,8 +1488,10 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			maxRadius: radius,
 		});
 	}
+	*/
 
 	// Orientation
+	/*
 	{
 		const points = [
 			pl.Vec2(0, 0),
@@ -1487,6 +1507,31 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			maxRadius: radius,
 		});
 	}
+	*/
+}
+
+function heroBodyInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction {
+	const Hero = world.settings.Hero;
+
+	const heroId = player.heroId;
+	const color = heroColor(heroId, world);
+	const radiusPixels = Hero.Radius / ctxStack.subpixel;
+	const atlasPixels = Math.ceil(2 * radiusPixels * HeroAtlasSizeMultiplier); // 2x because need to fit diameter in the atlas not the radius
+
+	return {
+		id: heroBodyTextureId(heroId),
+		type: "hero",
+		radius: radiusPixels,
+		config: {
+			color,
+		},
+		height: atlasPixels,
+		width: atlasPixels,
+	};
+}
+
+function heroBodyTextureId(heroId: string) {
+	return `${heroId}-body`;
 }
 
 function playHeroSounds(ctxStack: CanvasCtxStack, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
@@ -1645,7 +1690,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
-	const texRect: ClientRect = atlasController.lookupImage(ctxStack, hero.id);
+	const texRect: ClientRect = atlas.lookup(ctxStack, heroNameTextureId(hero.id));
 	if (!texRect) {
 		return;
 	}
@@ -1662,6 +1707,25 @@ function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 		height: drawHeight,
 	};
 	glx.image(ctxStack, drawRect, texRect);
+}
+
+function heroNameInstruction(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasTextInstruction {
+	const Visuals = world.settings.Visuals;
+	const retinaMultiplier = ctxStack.pixel / ctxStack.subpixel;
+
+	return {
+		id: heroNameTextureId(player.heroId),
+		type: "text",
+		text: player.name,
+		color: 'rgba(255, 255, 255, 0.3)',
+		font: `${Visuals.NameFontPixels * retinaMultiplier}px 'Maven Pro',Helvetica,Arial,sans-serif`,
+		height: Math.ceil(retinaMultiplier * Visuals.NameHeightPixels),
+		width: Math.ceil(retinaMultiplier * Visuals.NameWidthPixels),
+	};
+}
+
+function heroNameTextureId(heroId: string) {
+	return `${heroId}-name`;
 }
 
 function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World) {
