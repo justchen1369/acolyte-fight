@@ -16,7 +16,7 @@ import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
 
-const AutoJoinSeconds = 5;
+const AutoJoinSeconds = 3;
 
 interface OwnProps {
     again?: boolean;
