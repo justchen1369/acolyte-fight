@@ -1596,7 +1596,7 @@ const gravity: Spell = {
         {
             icon: "fas fa-hourglass-half",
             title: "Silence",
-            text: "Your enemy will be unable to cast spells for 0.5 seconds.",
+            text: "Your enemy will be unable to cast spells for 0.75 seconds.",
         }
     ],
     action: "projectile",
