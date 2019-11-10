@@ -10,8 +10,7 @@ export function renderBody(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: 
 
     ctx.fillStyle = '#fff';
 
-    ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, vector.Tau);
+    body(ctx, skin);
     ctx.fill();
 
     ctx.restore();
@@ -25,20 +24,23 @@ export function renderGlyph(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius:
     ctx.fillStyle = '#fff';
 
     // Clip to body
-    ctx.beginPath();
-    ctx.arc(0, 0, 1, 0, vector.Tau);
+    body(ctx, skin);
     ctx.clip();
 
     // Glyph
-    ctx.beginPath();
-    renderPath(ctx, skin.glyph);
-    ctx.closePath();
+    path(ctx, skin.glyph);
     ctx.fill();
     
     ctx.restore();
 }
 
-function renderPath(ctx: CanvasRenderingContext2D, points: pl.Vec2[]) {
+function body(ctx: CanvasRenderingContext2D, skin: h.Skin) {
+    ctx.beginPath();
+    ctx.arc(0, 0, 1, 0, vector.Tau);
+}
+
+function path(ctx: CanvasRenderingContext2D, points: pl.Vec2[]) {
+    ctx.beginPath();
     if (points.length === 0) {
         return;
     }
@@ -47,4 +49,5 @@ function renderPath(ctx: CanvasRenderingContext2D, points: pl.Vec2[]) {
     for (let i = 1; i < points.length; ++i) {
         ctx.lineTo(points[i].x, points[i].y);
     }
+    ctx.closePath();
 }
