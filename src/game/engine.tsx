@@ -3461,7 +3461,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 					other.expireTick = world.tick;
 				}
 			} else if (other.category === "obstacle") {
-				if (other.undamageable) {
+				if (!other.undamageable) {
 					applyDamageToObstacle(other, detonate, world);
 				}
 
