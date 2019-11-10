@@ -89,7 +89,7 @@ class PerformancePanel extends React.PureComponent<Props, State> {
 
     private renderPerformanceRow(tab: s.PerformanceTab, label: string, proportion: number) {
         return <tr className="performance-summary-row" onClick={() => this.onTabSelect(tab)}>
-            <td className="performance-table-label"><Button className="clickable" onClick={() => this.onTabSelect(tab)}>{label}</Button></td>
+            <td className="performance-table-label"><Button className="link-btn" onClick={() => this.onTabSelect(tab)}>{label}</Button></td>
             <td className="performance-table-percent"><PercentageBar proportion={proportion} /></td>
         </tr>
     }
