@@ -420,7 +420,6 @@ const triplet: Spell = {
                 packet: { damage: 24 / 3 / 4 / 3, lifeSteal, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 resetOnGameStart: true,
-                cleansable: false,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 3, // 3 projectiles
@@ -498,7 +497,6 @@ const difire: Spell = {
                 packet: { damage: 20 / 2 / 4 / 3, lifeSteal, noHit: true }, // 2 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
                 resetOnGameStart: true,
-                cleansable: false,
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 2, // 2 projectiles
