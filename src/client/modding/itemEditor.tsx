@@ -96,7 +96,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
         const isModded = this.props.section[selectedId] !== this.props.defaults[selectedId];
         const disabled = !(selectedId && hasDefault && isModded);
         const className = classNames({ 'btn': true, 'btn-disabled': disabled });
-        return <div className={className} title="Revert to default settings" onClick={() => !disabled && this.onRevertClick()}><i className="fas fa-history" /></div>;
+        return <div className={className} title="Revert to default settings" onClick={() => !disabled && this.onRevertClick()}><i className="fas fa-history" /> Revert</div>;
     }
 
     private onRevertClick() {
@@ -113,7 +113,7 @@ class ItemEditor extends React.PureComponent<Props, State> {
     }
 
     private renderCanonicalizeButton() {
-        return <Button title="Reformat" disabled={!this.props.currentMod} onClick={() => this.onCanonicalizeClick()}><i className="fas fa-align-left" /></Button>;
+        return <Button title="Reformat" disabled={!this.props.currentMod} onClick={() => this.onCanonicalizeClick()}><i className="fas fa-align-left" /> Format</Button>;
     }
 
     private onCanonicalizeClick() {

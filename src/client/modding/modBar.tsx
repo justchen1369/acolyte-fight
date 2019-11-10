@@ -70,7 +70,7 @@ class ModBar extends React.PureComponent<Props, State> {
             <PageLink page="modding-obstacles" shrink={touched} error={"obstacles" in this.props.errors}>Obstacles</PageLink>
             <PageLink page="modding-constants" shrink={touched} error={"constants" in this.props.errors}>Constants</PageLink>
             <div className="spacer">{this.props.children}</div>
-            <PreviewButton>Preview</PreviewButton>
+            <PreviewButton><i className="fas fa-play" /> Preview</PreviewButton>
         </>
 
         const vertical = touched && <>
