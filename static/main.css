@@ -2372,6 +2372,14 @@ table.performance-table td {
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
+.performance-info-icon {
+    visibility: hidden;
+}
+
+.performance-summary-row:hover .performance-info-icon {
+    visibility: visible;
+}
+
 
 .spell-frequencies-title {
     position: relative;
