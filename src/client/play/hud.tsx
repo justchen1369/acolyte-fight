@@ -159,6 +159,9 @@ class HUD extends React.PureComponent<Props, State> {
         const a = options.getProvider();
         return <>
             <TeamsMessage />
+            <Layout anchorBottom={true}>
+                <HintPanel />
+            </Layout>
             <Layout className="messages" anchorBottom={true} anchorLeft={true}>
                 <MessagesPanel />
                 <HelpMessage />
@@ -183,9 +186,6 @@ class HUD extends React.PureComponent<Props, State> {
             </Layout>
             <Layout anchorTop={true} anchorRight={true}>
                 <InfoPanel />
-            </Layout>
-            <Layout anchorBottom={true}>
-                <HintPanel />
             </Layout>
             {!a.noExternalLinks && this.props.exitable && <SocialBar />}
             <GameKeyCustomizer />
