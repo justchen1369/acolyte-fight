@@ -80,8 +80,8 @@ export namespace SpellFrequencies {
 }
 
 export namespace Atlas {
-	export const Width = 1024;
-	export const Height = 1024;
+	export const Width = 2048;
+	export const Height = 2048;
 }
 
 export namespace PerformanceStats {

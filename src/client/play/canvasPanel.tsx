@@ -197,6 +197,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
 
                 <canvas
                     id="atlas" ref={c => this.canvasStack.atlas = c} className="atlas"
+                    style={{ visibility: 'hidden' }}
                     width={Atlas.Width} height={Atlas.Height}
                 />
 

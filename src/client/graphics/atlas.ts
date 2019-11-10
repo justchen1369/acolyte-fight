@@ -39,11 +39,23 @@ export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstr
 
 	ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
+    let leftCursor = 0;
+    let topCursor = 0;
     instructions.forEach(instruction => {
-        state.height += Margin;
-        const coords = renderInstruction(ctxStack, state.height, instruction);
-        state.height += coords.height + Margin;
-        state.width = Math.max(state.width, coords.width);
+        let newRight = leftCursor + Margin + instruction.width + Margin;
+        if (newRight >= ctx.canvas.width) {
+            // Start a new row
+            leftCursor = 0;
+            topCursor = state.height + Margin;
+        }
+
+        const coords = renderInstruction(ctxStack, leftCursor + Margin, topCursor + Margin, instruction);
+
+        leftCursor = Math.max(leftCursor, coords.right + Margin);
+
+        state.height = Math.max(state.height, coords.bottom + Margin);
+        state.width = Math.max(state.width, coords.right + Margin);
+
         state.coords.set(instruction.id, coords);
         state.instructions.push(instruction);
     });
@@ -75,12 +87,12 @@ function alreadyDrawn(state: r.AtlasState, instructions: r.AtlasInstruction[]): 
     return true;
 }
 
-function renderInstruction(ctxStack: CanvasCtxStack, top: number, instruction: r.AtlasInstruction): ClientRect {
+function renderInstruction(ctxStack: CanvasCtxStack, left: number, top: number, instruction: r.AtlasInstruction): ClientRect {
 	const ctx = ctxStack.atlas;
 
     ctx.save();
 
-    ctx.translate(0, top);
+    ctx.translate(left, top);
 
     ctx.rect(0, 0, instruction.width, instruction.height);
     ctx.clip();
@@ -89,7 +101,6 @@ function renderInstruction(ctxStack: CanvasCtxStack, top: number, instruction: r
 
 	ctx.restore();
 
-    const left = Margin;
     return { 
         top,
         bottom: top + instruction.height,
@@ -166,7 +177,7 @@ export function lookup(ctxStack: CanvasCtxStack, textureId: string): ClientRect 
         bottom: coords.bottom / state.height,
         height: coords.height / state.height,
         left: coords.left / state.width,
-        right: coords.width / state.width,
+        right: coords.right / state.width,
         width: coords.width / state.width,
     };
 }
