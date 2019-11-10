@@ -1137,6 +1137,12 @@ interface VisualSettings {
 	EasePower: number;
 	ExitTicks: number;
 
+	// Flash when acolytes turn
+	TurnHighlightTicks: number; // How long to flash for
+	TurnHighlightRevs: number; // Maximum flash when turning this many revolutions in a single tick
+	TurnHighlightGrowth: number; // Acolyte becomes bigger when turning
+	TurnHighlightFlash: number; // Acolyte flashes when turning
+
 	// Spell casting visuals
 	ChargingRadius: number;
 	CastingFlashTicks: number;

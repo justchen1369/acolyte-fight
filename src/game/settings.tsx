@@ -103,7 +103,12 @@ const Visuals: VisualSettings = {
 	EaseInDistance: 0.5,
 	EasePower: 2.0,
 
-	ExitTicks: 30,
+    ExitTicks: 30,
+
+    TurnHighlightTicks: 15,
+    TurnHighlightRevs: 0.125,
+	TurnHighlightGrowth: 0.15,
+    TurnHighlightFlash: 0.1,
 
 	MyHeroColor: '#00ccff',
 	AllyColor: '#00a3cc',

@@ -1390,13 +1390,13 @@ function particleVelocity(primaryVelocity: pl.Vec2, config?: RenderSmoke, multip
 function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
-	const drawRadius = HeroAtlasSizeMultiplier * hero.radius;
 	let color = heroColor(hero.id, world);
 
 	const highlight = applyHighlight(hero.hitTick, hero, world, Visuals.Damage);
 
 	const angle = hero.body.getAngle();
 	let radius = hero.radius;
+
 	if (highlight && highlight.growth) {
 		radius += highlight.growth * radius;
 	}
@@ -1416,6 +1416,31 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 				},
 			});
 		}
+	}
+
+	// Turn highlight
+	{
+		const TurnHighlightTicks = Visuals.TurnHighlightTicks;
+		const MaxAngleDelta = Visuals.TurnHighlightRevs * vector.Tau;
+
+		let previousAngle = angle;
+		if (hero.uiPreviousAngle !== undefined) {
+			previousAngle = hero.uiPreviousAngle;
+		}
+
+		const angleDelta = vector.angleDelta(angle, previousAngle);
+
+		let ticks = TurnHighlightTicks * Math.min(1, Math.abs(angleDelta) / MaxAngleDelta);
+		ticks = Math.max(ticks, hero.uiTurnHighlightTicks || 0);
+
+		if (ticks > 0) {
+			const proportion = ticks / TurnHighlightTicks;
+			radius *= 1 + Visuals.TurnHighlightGrowth * proportion;
+			style.lighten(Visuals.TurnHighlightFlash * proportion);
+		}
+
+		hero.uiPreviousAngle = angle;
+		hero.uiTurnHighlightTicks = Math.max(0, ticks - 1);
 	}
 
 	// Charging
@@ -1459,6 +1484,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	}
 	*/
 
+	// Dimensions
+	const drawRadius = HeroAtlasSizeMultiplier * radius;
 
 	// Body
 	const bodyTexRect: ClientRect = atlas.lookup(ctxStack, heroBodyTextureId(hero.id));

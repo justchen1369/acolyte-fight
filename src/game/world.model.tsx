@@ -460,6 +460,8 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	// These fields are not synced
 	uiHealth: number;
 	uiDestroyedBuffs: Buff[];
+	uiPreviousAngle?: number;
+	uiTurnHighlightTicks?: number;
 }
 
 export interface DamageSourceHistoryItem {
