@@ -49,11 +49,12 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 function sendTextures(context: r.GlContext, draw: r.UploadTextures, data: r.UploadTexturesData) {
 	const gl = context.gl;
 
-	for (const textureIndex in draw.textures2D) {
+	for (let textureIndex = 0; textureIndex < draw.textures2D.length; ++textureIndex) {
 		const texture = draw.textures2D[textureIndex];
 		const textureData = data.textures2D[textureIndex];
 
 		if (textureData) {
+			gl.activeTexture(gl.TEXTURE0 + textureIndex);
 			gl.bindTexture(gl.TEXTURE_2D, texture.buffer);
 
 			// Set the parameters so we can render any size image.

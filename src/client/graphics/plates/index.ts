@@ -37,8 +37,6 @@ export function initData(): r.DrawPlatesData {
 }
 
 export function clearData(data: r.DrawData) {
-	data.uniforms = {};
-
 	for (const key in data.attribs) {
 		data.attribs[key].clear();
 	}

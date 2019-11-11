@@ -6,6 +6,11 @@ import { AudioElement } from '../audio/audio.model';
 export { AudioElement } from '../audio/audio.model';
 export * from './character/character.model';
 
+export enum Texture {
+	Images = 0,
+	Text = 1,
+}
+
 export namespace GraphicsLevel {
 	export const Maximum = 5;
 	export const Ultra = 4; // Blooms
@@ -106,6 +111,7 @@ export interface UploadTextures {
 
 export interface UploadTexturesData {
 	textures2D: ImageData[];
+	states2D: AtlasState[];
 }
 
 export interface Draw {
@@ -153,6 +159,9 @@ export interface DrawData {
 }
 
 export interface DrawHeroesData extends DrawData {
+	uniforms: {
+		u_texture: number[],
+	},
 	attribs: {
 		a_pos: Float32List;
 		a_rel: Float32List;
@@ -162,6 +171,9 @@ export interface DrawHeroesData extends DrawData {
 }
 
 export interface DrawImagesData extends DrawData {
+	uniforms: {
+		u_texture: number[],
+	},
 	attribs: {
 		a_pos: Float32List;
 		a_texCoord: Float32List;
@@ -219,6 +231,7 @@ export interface DrawHeroes extends Draw {
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;
+		u_texture: UniformInfo;
 	};
 	attribs: {
 		a_pos: AttribInfo;
@@ -236,6 +249,7 @@ export interface DrawImages extends Draw {
 		u_pixel: UniformInfo;
 		u_rtx: UniformInfo;
 		u_tick: UniformInfo;
+		u_texture: UniformInfo;
 	};
 	attribs: {
 		a_pos: AttribInfo;

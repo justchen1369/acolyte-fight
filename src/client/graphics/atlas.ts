@@ -13,15 +13,10 @@ import { renderIconOnly } from './renderIcon';
 
 const Margin = 1;
 
-interface AtlasStateProvider {
-    atlasState: r.AtlasState;
-}
-
-export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstruction[]) {
+export function renderAtlas(ctxStack: CanvasCtxStack, texture: r.Texture, instructions: r.AtlasInstruction[]) {
     const ctx = ctxStack.atlas;
-    const provider = getStateProvider(ctxStack);
 
-	const previousState = provider.atlasState;
+	const previousState: r.AtlasState = textures.getState(ctxStack, texture);
 	if (previousState && alreadyDrawn(previousState, instructions)) {
         return;
     }
@@ -61,16 +56,10 @@ export function renderAtlas(ctxStack: CanvasCtxStack, instructions: r.AtlasInstr
     });
 
 	const image = ctx.getImageData(0, 0, state.width, state.height);
-    textures.uploadTexture(ctxStack, image);
-    
-    provider.atlasState = state;
+    textures.uploadTexture(ctxStack, image, state, texture);
 
     const elapsed = Date.now() - start;
-    console.log(`Texture atlas redrawn in ${elapsed} ms`);
-}
-
-function getStateProvider(ctxStack: CanvasCtxStack): AtlasStateProvider {
-    return ctxStack.atlas.canvas as any as AtlasStateProvider;
+    console.log(`Texture atlas (${state.width}, ${state.height}) ${texture} redrawn in ${elapsed} ms`);
 }
 
 function alreadyDrawn(state: r.AtlasState, instructions: r.AtlasInstruction[]): boolean {
@@ -160,9 +149,8 @@ function renderHero(ctxStack: CanvasCtxStack, instruction: r.AtlasHeroInstructio
     return instruction;
 }
 
-export function lookup(ctxStack: CanvasCtxStack, textureId: string): ClientRect {
-    const provider = getStateProvider(ctxStack);
-    const state = provider.atlasState;
+export function lookup(ctxStack: CanvasCtxStack, texture: r.Texture, textureId: string): ClientRect {
+    const state = textures.getState(ctxStack, texture);
     if (!state) {
         return undefined;
     }

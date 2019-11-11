@@ -246,15 +246,24 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 }
 
 function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
-	const instructions = prepareAtlas(ctxStack, world, options);
-	atlas.renderAtlas(ctxStack, instructions);
+	atlas.renderAtlas(ctxStack, r.Texture.Images, prepareHeroAtlas(ctxStack, world, options));
+	atlas.renderAtlas(ctxStack, r.Texture.Text, prepareTextAtlas(ctxStack, world, options));
 }
 
-function prepareAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions): r.AtlasInstruction[] {
+function prepareTextAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions): r.AtlasInstruction[] {
 	const instructions = new Array<r.AtlasInstruction>();
 
 	world.players.forEach(player => {
 		instructions.push(heroNameInstruction(ctxStack, player, world, options));
+	});
+
+	return instructions;
+}
+
+function prepareHeroAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions): r.AtlasInstruction[] {
+	const instructions = new Array<r.AtlasInstruction>();
+
+	world.players.forEach(player => {
 		instructions.push(...heroBodyInstructions(ctxStack, player, world));
 	});
 
@@ -717,8 +726,6 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	const easeMultiplier = ease(world.ui.initialRenderTick, world);
 	if (easeMultiplier > 0) {
 		scale *= 1 - easeMultiplier;
-		color.darken(easeMultiplier);
-		hexColor.darken(easeMultiplier);
 	}
 
 	const strokeStyle = color.clone().adjust(Visuals.WorldStrokeBrightness);
@@ -1477,7 +1484,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	const drawRadius = HeroAtlasSizeMultiplier * radius;
 
 	// Body
-	const bodyTexRect: ClientRect = atlas.lookup(ctxStack, heroBodyTextureId(hero.id));
+	const bodyTexRect: ClientRect = atlas.lookup(ctxStack, r.Texture.Images, heroBodyTextureId(hero.id));
 	if (bodyTexRect) {
 		// Shadow
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
@@ -1497,7 +1504,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		});
 	}
 
-	const glyphTexRect: ClientRect = atlas.lookup(ctxStack, heroGlyphTextureId(hero.id));
+	const glyphTexRect: ClientRect = atlas.lookup(ctxStack, r.Texture.Images, heroGlyphTextureId(hero.id));
 	if (glyphTexRect) {
 		// Glyph
 		glx.hero(ctxStack, pos, angle, drawRadius, glyphTexRect, {
@@ -1736,7 +1743,7 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 function renderHeroName(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World, options: RenderOptions) {
 	const Visuals = world.settings.Visuals;
 
-	const texRect: ClientRect = atlas.lookup(ctxStack, heroNameTextureId(hero.id));
+	const texRect: ClientRect = atlas.lookup(ctxStack, r.Texture.Text, heroNameTextureId(hero.id));
 	if (!texRect) {
 		return;
 	}

@@ -11,6 +11,7 @@ const heroesVertexShader = require('./hero.vertex.glsl');
 export function initData(): r.DrawHeroesData {
     return {
         uniforms: {
+			u_texture: [r.Texture.Images],
         },
         attribs: {
             a_pos: new Float32List(),
@@ -23,8 +24,6 @@ export function initData(): r.DrawHeroesData {
 }
 
 export function clearData(data: r.DrawData) {
-	data.uniforms = {};
-
 	for (const key in data.attribs) {
 		data.attribs[key].clear();
 	}
@@ -36,7 +35,14 @@ export function initHeroes(gl: WebGLRenderingContext): r.DrawHeroes {
 	const program = shaders.compileProgram(gl, heroesVertexShader, heroesFragmentShader);
 	return {
 		program,
-		uniforms: shaders.commonUniforms(gl, program),
+		uniforms: {
+			...shaders.commonUniforms(gl, program),
+			u_texture: {
+				loc: gl.getUniformLocation(program, "u_texture"),
+				type: gl.INT,
+				size: 1,
+			},
+		},
 		attribs: {
 			a_pos: {
 				loc: gl.getAttribLocation(program, "a_pos"),

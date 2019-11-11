@@ -10,6 +10,7 @@ const imageVertexShader = require('./image.vertex.glsl');
 export function initData(): r.DrawImagesData {
     return {
         uniforms: {
+			u_texture: [r.Texture.Text],
         },
         attribs: {
             a_pos: new Float32List(),
@@ -20,8 +21,6 @@ export function initData(): r.DrawImagesData {
 }
 
 export function clearData(data: r.DrawData) {
-	data.uniforms = {};
-
 	for (const key in data.attribs) {
 		data.attribs[key].clear();
 	}
@@ -33,7 +32,14 @@ export function initImages(gl: WebGLRenderingContext): r.DrawImages {
 	const program = shaders.compileProgram(gl, imageVertexShader, imageFragmentShader);
 	return {
 		program,
-		uniforms: shaders.commonUniforms(gl, program),
+		uniforms: {
+			...shaders.commonUniforms(gl, program),
+			u_texture: {
+				loc: gl.getUniformLocation(program, "u_texture"),
+				type: gl.INT,
+				size: 1,
+			},
+		},
 		attribs: {
 			a_pos: {
 				loc: gl.getAttribLocation(program, "a_pos"),

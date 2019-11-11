@@ -26,8 +26,6 @@ export function initData(): r.DrawPrimitivesData {
 }
 
 export function clearData(data: r.DrawData) {
-	data.uniforms = {};
-
 	for (const key in data.attribs) {
 		data.attribs[key].clear();
 	}
