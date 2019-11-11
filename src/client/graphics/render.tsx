@@ -19,7 +19,7 @@ import { renderIconOnly } from './renderIcon';
 
 export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
-const HeroAtlasSizeMultiplier = 1; // Draw larger than the hero to ensure the edges are not cut off
+const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
 
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
@@ -36,15 +36,6 @@ const ShadowOffset = pl.Vec2(0, 0.005);
 const ShadowFeatherRadius = 0.001;
 
 const EaseDecay = 0.9;
-
-const GlyphPoints = [
-    pl.Vec2(0, 0),
-    pl.Vec2(-1, -1),
-    pl.Vec2(0, -1),
-    pl.Vec2(0.5, 0),
-    pl.Vec2(0, 1),
-    pl.Vec2(-1, 1),
-];
 
 interface SwirlContext {
 	color?: string;
@@ -246,8 +237,8 @@ function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOpt
 }
 
 function renderAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions) {
-	atlas.renderAtlas(ctxStack, r.Texture.Images, prepareHeroAtlas(ctxStack, world, options));
 	atlas.renderAtlas(ctxStack, r.Texture.Text, prepareTextAtlas(ctxStack, world, options));
+	atlas.renderAtlas(ctxStack, r.Texture.Images, prepareHeroAtlas(ctxStack, world, options));
 }
 
 function prepareTextAtlas(ctxStack: CanvasCtxStack, world: w.World, options: RenderOptions): r.AtlasInstruction[] {
@@ -1567,7 +1558,14 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 		type: "hero",
 		radius: radiusPixels,
 		skin: {
-			glyph: GlyphPoints,
+			body: {
+				numPoints: 0,
+			},
+			glyph: {
+				rise: 0.5,
+				fall: 1,
+				extent: 1,
+			},
 		},
 		height: atlasPixels,
 		width: atlasPixels,
