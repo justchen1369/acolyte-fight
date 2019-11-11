@@ -75,6 +75,7 @@ export const healing: ObstacleTemplate = {
     hitInterval: 15,
 
     "selfDamage": 1,
+    decayPerSecond: 2,
     "render": [
         {
             "type": "solid",

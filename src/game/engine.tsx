@@ -302,6 +302,14 @@ function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: sh
 		turnRate: Obstacle.ReturnTurnRate * 2 * Math.PI,
 	});
 
+	if (template.decayPerSecond > 0) {
+		world.behaviours.push({
+			type: "decayHealth",
+			objId: obstacleId,
+			decayPerTick: template.decayPerSecond / TicksPerSecond,
+		});
+	}
+
 	world.objects.set(obstacle.id, obstacle);
 	return obstacle;
 }
@@ -1012,6 +1020,7 @@ export function tick(world: w.World) {
 		fixate,
 		decaySpeed,
 		limitSpeed,
+		decayHealth,
 		strafe,
 		burn,
 		removePassthrough,
@@ -1059,6 +1068,21 @@ function delayBehaviour(behaviour: w.DelayBehaviour, world: w.World) {
 function physicsStep(world: w.World) {
 	const granularity = 1000;
 	world.physics.step(Math.floor(granularity / TicksPerSecond) / granularity);
+}
+
+function decayHealth(behaviour: w.DecayHealthBehaviour, world: w.World) {
+	const obj = world.objects.get(behaviour.objId);
+	if (!(obj && (obj.category === "obstacle" || obj.category === "hero"))) {
+		return false;
+	}
+
+	if (world.tick >= world.startTick) {
+		if (obj.health > 0) {
+			obj.health -= behaviour.decayPerTick;
+		}
+	}
+
+	return true;
 }
 
 function decaySpeed(behaviour: w.DecaySpeedBehaviour, world: w.World) {

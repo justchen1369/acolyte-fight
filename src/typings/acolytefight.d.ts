@@ -235,7 +235,8 @@ declare interface ObstacleTemplate {
 
 	hitInterval?: number; // How many ticks between reapplying the buffs
 	damage?: number;
-	selfDamage?: number;
+	selfDamage?: number; // Touching the obstacle causes it to lose health
+	decayPerSecond?: number; // This obstacle will naturally lose this much health per second
 	buffs?: BuffTemplate[];
 	detonate?: DetonateParametersTemplate;
 	mirror?: boolean;

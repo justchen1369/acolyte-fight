@@ -827,6 +827,7 @@ export type Behaviour =
 	| FixateBehaviour
 	| DecaySpeedBehaviour
 	| LimitSpeedBehaviour
+	| DecayHealthBehaviour
 	| DecayMitigationBehaviour
 	| HomingBehaviour
 	| AccelerateBehaviour
@@ -883,6 +884,12 @@ export interface FixateBehaviour extends BehaviourBase {
 export interface DecaySpeedBehaviour extends BehaviourBase {
 	type: "decaySpeed";
 	projectileId: string;
+}
+
+export interface DecayHealthBehaviour extends BehaviourBase {
+	type: "decayHealth";
+	objId: string;
+	decayPerTick: number;
 }
 
 export interface LimitSpeedBehaviour extends BehaviourBase {
