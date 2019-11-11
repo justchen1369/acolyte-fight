@@ -1076,10 +1076,16 @@ function decayHealth(behaviour: w.DecayHealthBehaviour, world: w.World) {
 		return false;
 	}
 
-	if (world.tick >= world.startTick) {
-		if (obj.health > 0) {
-			obj.health -= behaviour.decayPerTick;
-		}
+	const packet: w.DamagePacket = {
+		fromHeroId: null,
+		damage: behaviour.decayPerTick,
+		lifeSteal: 0,
+		isLava: true,
+	};
+	if (obj.category === "obstacle") {
+		applyDamageToObstacle(obj, packet, world);
+	} else if (obj.category === "hero") {
+		applyDamage(obj, packet, world);
 	}
 
 	return true;
