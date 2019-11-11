@@ -63,6 +63,7 @@ const World: WorldSettings = {
     DefaultGameStartMessage: "Game started. Defeat your enemies!",
 
     SlopRadius: 0.05,
+    SwapDistanceReduction: 0.01,
 }
 
 const Obstacle: ObstacleSettings = {

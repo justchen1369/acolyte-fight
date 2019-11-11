@@ -2736,6 +2736,8 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 }
 
 function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject[], sound: string, world: w.World) {
+	const SwapReduction = world.settings.World.SwapDistanceReduction;
+
 	const owner = world.objects.get(ownerId);
 	if (!(owner && owner.category === "hero")) {
 		return;
@@ -2743,11 +2745,11 @@ function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject
 
 	const ownerPos = vector.clone(owner.body.getPosition());
 	targets.forEach(target => {
-		if (!target.swappable) {
-			return;
-		}
+		if (!target.swappable) { return; }
+		if (target.id === ownerId) { return; }
+
 		const targetPos = vector.clone(target.body.getPosition());
-		target.body.setPosition(vector.diff(targetPos, epicenter).add(ownerPos));
+		target.body.setPosition(vector.diff(targetPos, epicenter).mul(SwapReduction).add(ownerPos));
 
 		if (target.category === "hero") {
 			world.ui.events.push({

@@ -98,6 +98,8 @@ declare interface WorldSettings {
 	SlopSpeed: number; // Performance improvement: When performing speed adjustments, if the speed is within this value consider it equal
 	SlopRadius: number; // Performance improvement: For detonate, sabers, auras, attracts, etc to collide correctly, no object must be larger than this radius.
 
+	SwapDistanceReduction: number; // When a swap detonate is cast, everything within the AOE is moved to the new location except is brought closer by this factor
+
 	BotName: string; // What to call the bot
 	DefaultGameStartMessage: string;
 
