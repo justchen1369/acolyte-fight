@@ -597,38 +597,27 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 
 	if (ev.fromPos) {
 		renderJumpSmoke(ctxStack, color, ev.fromPos, world, ev.tick);
-
-		pushTrail({
-			type: "ripple",
-			max: MaxTicks,
-			initialTick: ev.tick,
-			pos: ev.toPos,
-			fillStyle: color,
-			shine: DefaultShine,
-			glow: DefaultGlow,
-			vanish: 1,
-			bloom: 0.05,
-			initialRadius: Hero.Radius * 4,
-			finalRadius: Hero.Radius,
-		}, world);
 	}
 
 	if (ev.toPos) {
 		renderJumpSmoke(ctxStack, color, ev.toPos, world, ev.tick);
 
-		pushTrail({
-			type: "ripple",
-			max: MaxTicks,
-			initialTick: ev.tick,
-			pos: ev.toPos,
-			fillStyle: color,
-			shine: DefaultShine,
-			glow: DefaultGlow,
-			vanish: 1,
-			bloom: 0.05,
-			initialRadius: Hero.Radius,
-			finalRadius: Hero.Radius * 4,
-		}, world);
+		if (ctxStack.rtx > r.GraphicsLevel.Low) {
+			pushTrail({
+				type: "ripple",
+				max: MaxTicks,
+				initialTick: ev.tick,
+				pos: ev.toPos,
+				fillStyle: color,
+				shine: DefaultShine,
+				glow: DefaultGlow,
+				vanish: 1,
+				bloom: 0.05,
+
+				initialRadius: Hero.Radius,
+				finalRadius: Hero.Radius * 4,
+			}, world);
+		}
 
 		if (ev.sound) {
 			ctxStack.sounds.push({
