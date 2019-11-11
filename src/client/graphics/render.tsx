@@ -1560,11 +1560,16 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 		skin: {
 			body: {
 				numPoints: 0,
+				bend: 1,
 			},
 			glyph: {
 				rise: 0.5,
+				inflect: 0,
+
+				attack: 0,
 				fall: 1,
-				extent: 1,
+
+				span: 1,
 			},
 		},
 		height: atlasPixels,

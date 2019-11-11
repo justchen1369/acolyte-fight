@@ -147,6 +147,10 @@ export function turnVectorBy(currentVector: pl.Vec2, deltaAngle: number) {
 	return fromAngle(newAngle, length(currentVector));
 }
 
+export function mid(a: pl.Vec2, b: pl.Vec2): pl.Vec2 {
+	return pl.Vec2((a.x + b.x) / 2, (a.y + b.y) / 2);
+}
+
 export function average(points: pl.Vec2[]) {
 	let totalX = 0.0;
 	let totalY = 0.0;

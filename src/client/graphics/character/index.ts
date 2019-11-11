@@ -47,27 +47,29 @@ function applyStyle(ctx: CanvasRenderingContext2D, style: h.Style) {
 
 function applyGlyphPath(ctx: CanvasRenderingContext2D, glyph: h.Glyph) {
     const points = [
-        pl.Vec2(0, 0),
-        pl.Vec2(-glyph.fall, -glyph.extent),
-        pl.Vec2(0, -glyph.extent),
+        pl.Vec2(glyph.inflect, 0),
+        pl.Vec2(-glyph.fall, -glyph.span),
+        pl.Vec2(-glyph.attack, -glyph.span),
         pl.Vec2(glyph.rise, 0),
-        pl.Vec2(0, glyph.extent),
-        pl.Vec2(-glyph.fall, glyph.extent),
+        pl.Vec2(-glyph.attack, glyph.span),
+        pl.Vec2(-glyph.fall, glyph.span),
     ];
     applyPath(ctx, points);
 }
 
 function applyBodyPath(ctx: CanvasRenderingContext2D, body: h.Body) {
     if (body.numPoints >= 3) {
-        applyPath(ctx, calculateRadialPolygonPoints(body.numPoints));
+        const bend = body.bend;
+        const extentMultiplier = 1 / Math.max(0.5, Math.sqrt(bend));
+        applyQuadraticPath(ctx, bend, calculateRadialPolygonPoints(body.numPoints, extentMultiplier));
     } else {
         ctx.arc(0, 0, 1, 0, vector.Tau);
     }
 }
 
-function calculateRadialPolygonPoints(numPoints: number): pl.Vec2[] {
+function calculateRadialPolygonPoints(numPoints: number, extentMultiplier: number = 1): pl.Vec2[] {
     const points = new Array<pl.Vec2>();
-    const extent = 1 + (1 / numPoints); // Extreme points on polygon need to be bigger so that innermost edges can be at the required radius
+    const extent = extentMultiplier * (1 + (1 / numPoints)); // Extreme points on polygon need to be bigger so that innermost edges can be at the required radius
 
     for (let i = 0; i < numPoints; ++i) {
         const angle = vector.Tau * i / numPoints;
@@ -87,4 +89,21 @@ function applyPath(ctx: CanvasRenderingContext2D, points: pl.Vec2[]) {
         ctx.lineTo(points[i].x, points[i].y);
     }
     ctx.closePath();
+}
+
+function applyQuadraticPath(ctx: CanvasRenderingContext2D, bend: number, points: pl.Vec2[]) {
+    if (points.length === 0) {
+        return;
+    }
+
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 0; i < points.length; ++i) {
+        let current = points[i];
+        let next = points[(i + 1) % points.length];
+
+        const mid = vector.mid(current, next);
+        mid.mul(bend); // negative will become 0-1 and will end up moving towards center
+
+        ctx.quadraticCurveTo(mid.x, mid.y, next.x, next.y);
+    }
 }
