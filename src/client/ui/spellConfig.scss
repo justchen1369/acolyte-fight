@@ -7,13 +7,17 @@
     height: 250px;
     align-items: center;
 
-    background: #888 linear-gradient(120deg,
-        #000c 0%,
+    background: var(--spell-color) linear-gradient(120deg,
+        #0008 0%,
         #0008 20%,
+        #0006 20%,
+        #0006 30%,
         #0004 30%,
         #0004 50%,
-        #0008 70%,
-        #000c 100%);
+        #0006 50%,
+        #0006 60%,
+        #0008 60%,
+        #0008 100%);
     transition: background-color 0.2s ease;
 
     border: 1px black solid;
@@ -23,9 +27,6 @@
 }
 
 .spell-config .key:hover {
-    background-color: #555;
-    background-color: var(--spell-color);
-
     border: 1px var(--spell-color) solid;
 
     @include floatShadow(0 0 8px var(--spell-color));
