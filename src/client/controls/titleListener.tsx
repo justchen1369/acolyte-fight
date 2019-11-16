@@ -26,7 +26,7 @@ class TitleListener extends React.PureComponent<Props, State> {
         if (this.props.subtitle) {
             document.title = `Acolyte Fight! - ${this.props.subtitle}`;
         } else {
-            document.title = `Acolyte Fight! - spellcaster royale`;
+            document.title = `Acolyte Fight! - skillshot arena`;
         }
     }
 }
