@@ -30,7 +30,7 @@
 
     font-weight: bold;
 
-    @include strokeShadow(0.1em 0.1em 0 #000c);
+    @include strokeShadow(0 0 0.1em #fff4, 0.1em 0.1em 0 #000c);
 }
 
 .home .title {
