@@ -823,7 +823,7 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	DelayBehaviour
-	| ResetMassBehaviour
+	| CooldownBehaviour
 	| FixateBehaviour
 	| DecaySpeedBehaviour
 	| LimitSpeedBehaviour
@@ -863,10 +863,9 @@ export interface DelayBehaviour extends BehaviourBase {
 	delayed: Behaviour;
 }
 
-export interface ResetMassBehaviour extends BehaviourBase {
-	type: "resetMass";
-	tick: number;
-	objId: string;
+export interface CooldownBehaviour extends BehaviourBase {
+	type: "cooldown";
+	heroId: string;
 }
 
 export interface FixateBehaviour extends BehaviourBase {

@@ -561,6 +561,7 @@ function addHero(world: w.World, heroId: string) {
 	world.objects.set(heroId, hero);
 	world.scores = world.scores.set(heroId, initScore(heroId));
 
+	world.behaviours.push({ type: "cooldown", heroId: hero.id });
 	world.behaviours.push({ type: "limitSpeed", objId: hero.id, speedLimit: Hero.MaxSpeed });
 	world.behaviours.push({ type: "expireBuffs", heroId: hero.id });
 	world.behaviours.push({ type: "burn", heroId: hero.id });
@@ -615,16 +616,29 @@ function applyImpulseDelta(obj: w.WorldObject, delta: pl.Vec2) {
 }
 
 export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string) {
-	return calculateCooldown(world, hero, spellId);
-}
-
-function calculateCooldown(world: w.World, hero: w.Hero, slot: string) {
-	let next = hero.cooldowns[slot] || 0;
-	return Math.max(0, next - world.tick);
+	return Math.max(0, hero.cooldowns[spellId] || 0);
 }
 
 function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: number) {
-	hero.cooldowns[spell] = world.tick + waitTime;
+	hero.cooldowns[spell] = waitTime;
+}
+
+function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
+	const hero = world.objects.get(behaviour.heroId);
+	if (!(hero && hero.category === "hero")) {
+		return false;
+	}
+
+	for (const spellId in hero.cooldowns) {
+		const cooldown = hero.cooldowns[spellId];
+		if (cooldown > 0) {
+			hero.cooldowns[spellId] = cooldown - 1;
+		} else {
+			delete hero.cooldowns[spellId];
+		}
+	}
+
+	return true;
 }
 
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
@@ -1017,6 +1031,7 @@ export function tick(world: w.World) {
 	handleCollisions(world);
 
 	handleBehaviours(world, {
+		cooldown,
 		fixate,
 		decaySpeed,
 		limitSpeed,
