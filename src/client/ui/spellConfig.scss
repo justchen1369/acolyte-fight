@@ -7,17 +7,14 @@
     height: 250px;
     align-items: center;
 
-    background: var(--spell-color) linear-gradient(120deg,
-        #0008 0%,
-        #0008 20%,
-        #0006 20%,
-        #0006 30%,
-        #0004 30%,
-        #0004 50%,
-        #0006 50%,
-        #0006 60%,
-        #0008 60%,
-        #0008 100%);
+    background: var(--spell-color) linear-gradient(160deg,
+        #0007 0%,
+        #0005 20%,
+        #0007 20%,
+        #0004 70%,
+        #0006 70%,
+        #0005 100%
+    );
     transition: background-color 0.2s ease;
 
     border: 1px black solid;
