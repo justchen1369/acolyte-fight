@@ -45,6 +45,7 @@ class LoginButton extends React.PureComponent<Props> {
         }
 
         const className = classNames({
+            "btn": true,
             "login-btn": true,
             "logging-in": !this.props.loginAttempted,
         });

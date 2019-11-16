@@ -80,19 +80,6 @@
     padding: 10px 20px;
 }
 
-.navbar .login-btn {
-    background: #00ccff;
-    cursor: pointer;
-    box-shadow: 3px 3px 3px #0c0c0c;
-}
-
-.navbar .nav-item.login-btn:hover {
-    background: #f80;
-    box-shadow: 0 0 8px #f808;
-    color: white;
-    animation: shine-loop 0.5s alternate infinite linear;
-}
-
 .navbar .nav-profile-item {
     background: #4448;
 }
@@ -126,7 +113,7 @@
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
-.navbar .nav-item:hover {
+.navbar .nav-item:hover:not(.btn) {
     background: #0cf;
     color: #fff;
     box-shadow: 0 0 8px #0cf8;
