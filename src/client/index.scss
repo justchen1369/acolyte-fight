@@ -161,6 +161,9 @@ a:hover, a:active {
     border: 1px black solid;
     padding: 10px 40px;
 
+    transform: scale(1);
+    transition: transform 0.2s ease;
+
     @include floatShadow();
 }
 
@@ -170,6 +173,7 @@ a:hover, a:active {
     border: 1px #fff4 solid;
 
     animation: shine-loop 0.5s alternate infinite linear;
+    transform: scale(1.05);
 
     @include floatShadow(0 0 8px var(--btn-color));
 }

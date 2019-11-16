@@ -19,14 +19,24 @@
     bottom: 20px;
     right: 20px;
 
-    a, a:visited {
-        color: #eee4;
+    a {
         font-size: 250%;
         margin-left: 0.2em;
+
+        transition: transform 0.2s ease;
+        transform: scale(1);
+    }
+
+    a, a:visited {
+        color: #eee4;
     }
 
     a:hover, a:active {
         color: #eee;
         text-shadow: 0 0 8px #fff8;
+    }
+
+    a:hover {
+        transform: scale(1.2);
     }
 }
