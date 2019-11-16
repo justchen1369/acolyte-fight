@@ -61,8 +61,10 @@ class HomePanel extends React.PureComponent<Props, State> {
                     </video>
                     <div className="spacer" />
                     <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
-                    <div className="spacer" style={{ flexGrow: 0.1 }} />
-                    <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
+                    {!_.isEmpty(this.props.subtitleLeft) && !_.isEmpty(this.props.subtitleRight) && <>
+                        <div className="spacer" style={{ flexGrow: 0.1 }} />
+                        <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
+                    </>}
                     <div className="spacer" />
                     <div className="mask"></div>
                 </div>
