@@ -1502,48 +1502,6 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			color: style.clone().lighten(0.5),
 		});
 	}
-
-
-	// Fill
-	/*
-	{
-		let gradient: r.TrailGradient = null;
-		if (ctxStack.rtx > r.GraphicsLevel.Low) {
-			gradient = {
-				angle: (3./8) * vector.Tau,
-				anchor: pos,
-				fromExtent: -radius,
-				fromColor: style.clone(),
-				toExtent: radius,
-				toColor: style.clone().darken(0.5),
-			};
-		}
-		glx.circleTrail(ctxStack, pos, {
-			color: style.clone().darken(0.25),
-			gradient,
-			maxRadius: radius,
-		});
-	}
-	*/
-
-	// Orientation
-	/*
-	{
-		const points = [
-			pl.Vec2(0, 0),
-			pl.Vec2(-1, 1),
-			pl.Vec2(0, 1),
-			pl.Vec2(0.5, 0),
-			pl.Vec2(0, -1),
-			pl.Vec2(-1, -1),
-		];
-		let glyphColor = style.clone().mix(ColTuple.parse('#fff'), 0.5);
-		glx.convexTrail(ctxStack, pos, points, angle, radius, {
-			color: glyphColor,
-			maxRadius: radius,
-		});
-	}
-	*/
 }
 
 function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction[] {
@@ -1561,6 +1519,9 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 			body: {
 				numPoints: 0,
 				bend: 1,
+
+				stroke: 0.15,
+				strokeMask: '#000c',
 			},
 			glyph: {
 				rise: 0.5,
@@ -1716,9 +1677,9 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 		const barShine = pl.Vec2(barLeft.x + shineProportion * 2 * barHalfWidth, barY);
 		const barRight = pl.Vec2(pos.x + barHalfWidth, barY);
 
-		glx.lineTrail(ctxStack, barLeft, barRight, {
+		glx.lineTrail(ctxStack, pl.Vec2(barLeft.x - constants.Pixel, barLeft.y), pl.Vec2(barRight.x + constants.Pixel, barRight.y), {
 			color: ColTuple.parse("#111"),
-			maxRadius: barHalfHeight,
+			maxRadius: barHalfHeight + 2 * constants.Pixel,
 		});
 		glx.lineTrail(ctxStack, barLeft, barMid, {
 			color,

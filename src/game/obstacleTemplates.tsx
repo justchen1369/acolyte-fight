@@ -284,7 +284,7 @@ export const inward: ObstacleTemplate = {
 
 const shadow: SwatchFill = {
     type: "solid",
-    color: 'rgba(0, 0, 0, 0.75)',
+    color: "#000c",
     shadow: true,
     flash: false,
 };
@@ -307,8 +307,14 @@ const defaultTemplate: ObstacleTemplate = {
         },
         {
             type: "solid",
+            color: '#000c',
+            flash: false,
+        },
+        {
+            type: "solid",
             color: '#ccc',
             deadColor: '#c33',
+            expand: -0.003,
         },
         {
             type: "solid",
@@ -335,14 +341,20 @@ const explosive: ObstacleTemplate = {
         shadow,
         {
             type: "solid",
+            color: "#000c",
+            flash: false,
+        },
+        {
+            type: "solid",
             color: "#fc0",
             deadColor: "#fc0",
+            expand: -0.002,
         },
         {
             type: "solid",
             color: "#c94",
             deadColor: "#fc8",
-            expand: -0.002,
+            expand: -0.003,
         },
     ],
 
@@ -377,13 +389,19 @@ const mirror: ObstacleTemplate = {
         },
         {
             type: "solid",
+            "color": "#000c",
+            flash: false,
+        },
+        {
+            type: "solid",
             "color": "#0cf",
+            expand: -0.003,
         },
         {
             type: "solid",
             "color": "#0ad",
             "deadColor": "#48f",
-            "expand": -0.003,
+            "expand": -0.005,
         },
     ],
 
@@ -410,13 +428,19 @@ const bumper: ObstacleTemplate = {
         },
         {
             type: "solid",
+            color: "#000c",
+            flash: false,
+        },
+        {
+            type: "solid",
             color: "#fc0",
+            expand: -0.003,
         },
         {
             type: "solid",
             "color": "#c94",
             "deadColor": "#753",
-            expand: -0.004,
+            expand: -0.005,
         },
     ],
 
@@ -442,8 +466,14 @@ const spinner: ObstacleTemplate = {
         },
         {
             type: "solid",
+            color: '#000c',
+            flash: false,
+        },
+        {
+            type: "solid",
             color: '#ccc',
             deadColor: '#c33',
+            expand: -0.003,
         },
         {
             type: "solid",

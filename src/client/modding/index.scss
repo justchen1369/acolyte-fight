@@ -81,10 +81,14 @@
 .code-area {
     display: flex;
     flex-direction: column;
-}
 
-.code-area .codeflask {
-    flex-grow: 1;
-    position: relative;
-    height: auto;
+    .codeflask {
+        flex-grow: 1;
+        position: relative;
+        height: auto;
+    }
+
+    textarea, pre {
+        text-shadow: none;
+    }
 }

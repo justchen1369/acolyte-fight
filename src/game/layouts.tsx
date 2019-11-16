@@ -234,7 +234,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
-                "extent": 0.004,
+                "extent": 0.007,
                 "orientationAngleOffsetInRevs": 0,
                 "angularWidthInRevs": 0.03
             }
