@@ -183,13 +183,13 @@
     cursor: pointer;
     box-sizing: border-box;
     box-shadow: 4px 4px 2px #0004;
-    border: 1px #444 solid;
+    border: 1px #000c solid;
 
     transition: border 0.2s ease;
 }
 
 .spell-config .spell-icon-secondary {
-    border-color: #444;
+    border-color: #000c;
 }
 
 .spell-config .spell-icon-chosen {
@@ -197,8 +197,8 @@
 }
 
 .spell-config .spell-icon:hover {
-    border-color: #ccc;
-    box-shadow: 0 0 4px #fff8;
+    border-color: #fff6;
+    box-shadow: 0 0 4px var(--spell-color);
     animation: spell-hover-loop alternate 0.5s infinite linear;
 }
 

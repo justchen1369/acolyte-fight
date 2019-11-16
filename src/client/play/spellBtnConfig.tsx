@@ -2,7 +2,8 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
-import { Motion, spring, SpringHelperConfig } from 'react-motion';
+import * as ReactMotion from 'react-motion';
+import { Motion, spring } from 'react-motion';
 import * as s from '../store.model';
 import { SpellIcon } from '../controls/spellIcon';
 import * as keyboardUtils from '../core/keyboardUtils';
@@ -37,7 +38,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-const springConfig: SpringHelperConfig = {
+const springConfig: ReactMotion.SpringHelperConfig = {
     stiffness: 300,
     damping: 30,
 };
@@ -160,7 +161,7 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             color = "#444";
         }
 
-        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig), zIndex: chosen ? 1 : 0 }}>
+        return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig)}}>
             {style => <SpellIcon
                 key={spell.id}
                 icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
@@ -175,7 +176,11 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                     onMouseEnter: () => this.onMouseHoverSpell(spell.id),
                     onMouseLeave: () => this.onMouseLeaveSpell(),
                 }}
-                style={style}
+                style={{
+                    ...style,
+                    zIndex: chosen ? 1 : 0,
+                    "--spell-color": spell.color,
+                } as React.CSSProperties}
                 />}
         </Motion>
     }
