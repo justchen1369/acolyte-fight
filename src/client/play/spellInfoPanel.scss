@@ -1,9 +1,10 @@
+@import '../common.scss';
+
 #spell-info-panel {
     min-width: 200px;
     max-width: 25vw;
     pointer-events: none;
 
-    background: linear-gradient(to left, #111, rgba(0,0,0,0));
     padding: 20px;
     text-align: right;
 }

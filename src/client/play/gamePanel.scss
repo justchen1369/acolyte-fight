@@ -452,69 +452,76 @@ table.player-list {
     font-weight: bold;
 }
 
-.messages .dialog-panel {
+#game-panel .dialog-panel {
     color: white;
     margin-top: 1em;
     padding: 1em;
-    background: linear-gradient(to right, #222, rgba(0,0,0,0));
+    background: #222 linear-gradient(
+        160deg,
+        #fff0 0%,
+        #fff1 15%,
+        #fff0 15%,
+        #fff0 45%,
+        #fff1 85%,
+        #fff0 85%,
+        #fff1 100%,
+    );
+    border: 1px black solid;
+    @include floatShadow();
+
+    .winner-row {
+        font-weight: bold;
+        font-size: 150%;
+    }
+
+    .award-row {
+        vertical-align: middle;
+        transition: height 0.2s ease;
+        overflow: hidden;
+    }
+
+    .award-group {
+        margin-top: 1em;
+        transition: margin-top 0.2s ease;
+    }
+
+    .self-metric {
+        font-size: 75%;
+        color: #888;
+        font-style: italic;
+    }
+
+    .outlast-row {
+        margin-top: 0.75em;
+        transition: margin-top 0.2s ease;
+
+        color: #ccc;
+        font-style: italic;
+    }
+
+    .action-row {
+        margin-top: 1em;
+        align-items: center;
+        display: flex;
+        flex-direction: row;
+
+        *:nth-child(n+2)  {
+            margin-left: 1.5em;
+        }
+    }
+
+    .winner .action-row .btn {
+        font-size: 150%;
+    }
 }
 
-.anchored-panel-right .messages .dialog-panel {
-    background: linear-gradient(to left, #222, rgba(0,0,0,0));
-}
-
-.messages .winner-row {
-    font-weight: bold;
-    font-size: 150%;
-}
-
-.messages .dialog-panel .award-row {
-    vertical-align: middle;
-    transition: height 0.2s ease;
-    overflow: hidden;
-}
-
-.messages .dialog-panel .award-group {
-    margin-top: 1em;
-    transition: margin-top 0.2s ease;
-}
-
-.messages .self-metric {
-    font-size: 75%;
-    color: #888;
-    font-style: italic;
-}
-
-.messages .dialog-panel .outlast-row {
-    margin-top: 0.75em;
-    transition: margin-top 0.2s ease;
-
-    color: #ccc;
-    font-style: italic;
-}
-
-.messages .action-row {
-    margin-top: 1em;
-    align-items: center;
-    display: flex;
-    flex-direction: row;
-}
-
-.mobile.wheel-on-left .messages .action-row {
+#game-panel.mobile.wheel-on-left .action-row {
     flex-direction: row-reverse;
 }
 
-.messages .action-row *:nth-child(n+2)  {
-    margin-left: 1.5em;
-}
-
-.mobile.wheel-on-left .messages .action-row *:nth-child(n+2)  {
+#game-panel.mobile.wheel-on-left .action-row *:nth-child(n+2)  {
     margin-left: 0;
     margin-right: 1.5em;
-}
-
-.messages .winner .action-row .btn {
-    font-size: 150%;
 }
 
 .messages .community-advert {

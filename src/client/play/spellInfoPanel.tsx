@@ -42,7 +42,7 @@ class SpellInfoPanel extends React.PureComponent<Props, State> {
         }
 
         const name = spellUtils.spellName(spell);
-        return <div id="spell-info-panel">
+        return <div id="spell-info-panel" className="dialog-panel">
             <div className="spell-title">
                 <div className="spacer"></div>
                 <span className="spell-name">{name}</span>
