@@ -257,7 +257,7 @@ const cleanse: EffectInfo = {
 const voidRecharge: EffectInfo = {
     icon: "fas fa-clock",
     title: "Void recharge",
-    text: "Cooldown twice as fast when in the void.",
+    text: "Cools down 2x faster when in the void.",
 };
 
 const move: MoveSpell = {
