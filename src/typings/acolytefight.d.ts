@@ -303,7 +303,8 @@ declare interface SpellBase {
 	movementProportionWhileChannelling?: number; // Proportion of movement to allow during the channelling of the spell
 	revsPerTickWhileCharging?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while charging
 	revsPerTickWhileChannelling?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while channelling
-    cooldown: number;
+	cooldown: number;
+	voidCooldownMultiplier?: number; // Cooldown ticks at this rate while in the void
     interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
     movementCancel?: boolean; // Whether moving cancels the spell.
 	strikeCancel?: SpellCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
@@ -846,8 +847,10 @@ declare interface LifestealTemplate extends BuffTemplateBase { // Does more than
 declare interface SetCooldownTemplate extends BuffTemplateBase {
 	type: "cooldown";
 	spellId?: string;
+	spellIds?: string[];
 	minCooldown?: number;
 	maxCooldown?: number;
+	cooldownRate?: number; // Whether cooldown ticks faster or slower
 	color?: string;
 }
 

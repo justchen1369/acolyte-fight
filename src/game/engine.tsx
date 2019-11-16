@@ -630,9 +630,19 @@ function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
 	}
 
 	for (const spellId in hero.cooldowns) {
-		const cooldown = hero.cooldowns[spellId];
+		let cooldown = hero.cooldowns[spellId];
+
+		let cooldownRate = 1;
+		hero.buffs.forEach(buff => {
+			if (buff.type === "cooldown" && (!buff.spellIds || buff.spellIds.has(spellId))) {
+				cooldownRate *= buff.cooldownRate;
+			}
+		});
+
+		cooldown = Math.max(0, cooldown - cooldownRate);
+
 		if (cooldown > 0) {
-			hero.cooldowns[spellId] = cooldown - 1;
+			hero.cooldowns[spellId] = cooldown;
 		} else {
 			delete hero.cooldowns[spellId];
 		}
@@ -4650,29 +4660,49 @@ function burn(burn: w.BurnBehaviour, world: w.World) {
 }
 
 function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.World, config: BuffContext) {
+	let spellIds: Set<string> = null;
+	if (template.spellIds) {
+		spellIds = new Set<string>(template.spellIds);
+	} else if (template.spellId) {
+		spellIds = new Set<string>([template.spellId]);
+	}
+
+	const cooldownRate = template.cooldownRate !== undefined ? template.cooldownRate : 1;
+	attachStack<w.CooldownBuff>(
+		template, hero, world, config,
+		(id: string, values: w.BuffValues) => ({ // Create
+			...values,
+			id,
+			type: "cooldown",
+			spellIds,
+			cooldownRate,
+		}),
+		(stack) => { // Update
+			stack.cooldownRate *= cooldownRate;
+		});
+
 	hero.keysToSpells.forEach(spellId => {
 		if (!template.spellId || spellId === template.spellId) {
-			const initialCooldown = cooldownRemaining(world, hero, spellId);
-			let cooldown = initialCooldown;
+			let cooldown = hero.cooldowns[spellId] || 0;
 			if (template.maxCooldown !== undefined) {
 				cooldown = Math.min(template.maxCooldown, cooldown);
 			}
 			if (template.minCooldown !== undefined) {
 				cooldown = Math.max(template.minCooldown, cooldown);
 			}
-			if (cooldown !== initialCooldown) {
-				setCooldown(world, hero, spellId, cooldown);
-			}
+			hero.cooldowns[spellId] = cooldown;
 		}
 	});
 
-	world.ui.events.push({
-		type: "cooldown",
-		tick: world.tick,
-		color: template.color,
-		sound: template.sound,
-		heroId: hero.id,
-	});
+	if (template.color || template.sound) {
+		world.ui.events.push({
+			type: "cooldown",
+			tick: world.tick,
+			color: template.color,
+			sound: template.sound,
+			heroId: hero.id,
+		});
+	}
 }
 
 function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {

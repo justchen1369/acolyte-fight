@@ -608,6 +608,7 @@ export interface GravityState {
 export type Buff =
 	MovementBuff
 	| CleanseBuff
+	| CooldownBuff
 	| GlideBuff
 	| LavaImmunityBuff
 	| VanishBuff
@@ -657,6 +658,13 @@ export interface CleanseBuff extends BuffBase {
 export interface MovementBuff extends BuffBase {
 	type: "movement";
 	movementProportion: number;
+}
+
+export interface CooldownBuff extends BuffBase {
+	type: "cooldown";
+
+	spellIds?: Set<string>;
+	cooldownRate: number;
 }
 
 export interface GlideBuff extends BuffBase {
