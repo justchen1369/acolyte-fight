@@ -1,5 +1,6 @@
 @mixin strokeShadow($shadow...) {
     text-shadow:
+         $shadow,
          1px  1px  0px #000,
         -1px -1px  0px #000,
         -1px  1px  0px #000,
@@ -11,6 +12,13 @@
          1px  1px  1px #000c,
          2px  2px  1px #000c,
          3px  3px  2px #000c,
-         $shadow
         ;
+}
+
+@mixin floatShadow($shadow...) {
+    box-shadow:
+        $shadow,
+        4px 4px 2px #000,
+        ;
+
 }

@@ -137,21 +137,29 @@ a:hover, a:active {
 }
 
 .btn {
+    --btn-color: #0cf;
+
     pointer-events: all;
     display: inline-block;
     font-weight: bold;
     cursor: pointer;
     text-align: center;
-    box-shadow: 4px 4px #0008;
     border-radius: 0.125em;
-    background: #0cf linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004);
+    background: var(--btn-color) linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004);
+    border: 1px black solid;
     padding: 10px 40px;
+
+    @include floatShadow();
 }
 
 .btn:hover {
-    background-color: #f80;
+    --btn-color: #f80;
+
+    border: 1px var(--btn-color) solid;
+
     animation: shine-loop 0.5s alternate infinite linear;
-    box-shadow: 0 0 8px #f808;
+
+    @include floatShadow(0 0 8px var(--btn-color));
 }
 
 @keyframes shine-loop {
@@ -165,6 +173,8 @@ a:hover, a:active {
 }
 
 .btn-disabled, .btn-disabled:hover, .btn-disabled:active {
+    --btn-color: #888;
+
     pointer-events: none;
     background: #888;
     color: #ccc;

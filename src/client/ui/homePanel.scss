@@ -113,16 +113,17 @@
     font-size: 285%;
 }
 .home .secondary-button-row .btn {
-    background-color: #08b;
+    --btn-color: #08b;
 }
 .home .secondary-button-row .btn:hover {
-    background-color: #f80;
+    --btn-color: #f80;
 }
 .home .btn.disabled {
-    background-color: #ccc;
+    --btn-color: #ccc;
 }
 
 .home .primary-button-row .btn:not(:hover) {
+    border: 1px var(--btn-color) solid;
     animation: shine-loop 0.7s alternate infinite linear, glow-loop 0.7s alternate infinite linear;
 }
 

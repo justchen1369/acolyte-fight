@@ -7,8 +7,6 @@
     height: 250px;
     align-items: center;
 
-    box-shadow: 5px 5px 5px black;
-
     background: #888 linear-gradient(120deg,
         #000c 0%,
         #0008 20%,
@@ -17,12 +15,20 @@
         #0008 70%,
         #000c 100%);
     transition: background-color 0.2s ease;
+
+    border: 1px black solid;
+
+    @include floatShadow();
+
 }
 
 .spell-config .key:hover {
     background-color: #555;
     background-color: var(--spell-color);
-    box-shadow: 0 0 8px var(--spell-color);
+
+    border: 1px var(--spell-color) solid;
+
+    @include floatShadow(0 0 8px var(--spell-color));
 }
 
 .spell-config .key-name-container {
