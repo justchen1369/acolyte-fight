@@ -210,7 +210,9 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                     ref={c => {
                         this.canvasStack.ui = c;
                     }}
-                    className="game" width={this.state.width} height={this.state.height} 
+                    className="game"
+                    width={Math.round(this.state.width * retinaMultiplier)} height={Math.round(this.state.height * retinaMultiplier)}
+                    style={{ width: this.state.width, height: this.state.height }}
                 />
             </div>
         );

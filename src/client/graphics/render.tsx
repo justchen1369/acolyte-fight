@@ -2401,8 +2401,11 @@ function calculateHighlightProportion(highlight: w.TrailHighlight, world: w.Worl
 }
 
 function renderInterface(ctx: CanvasRenderingContext2D, world: w.World, rect: ClientRect, options: RenderOptions) {
+	ctx.save();
+	ctx.scale(options.retinaMultiplier, options.retinaMultiplier);
 	const myHero = world.objects.get(world.ui.myHeroId) as w.Hero;
 	renderButtons(ctx, rect, world, myHero, options);
+	ctx.restore();
 }
 
 export function whichKeyClicked(pos: pl.Vec2, config: w.ButtonConfig): string {
@@ -2882,17 +2885,29 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 	const emphasis = buttonState.emphasis;
 	if (buttonState) {
 		ctx.save();
+
+		// Shadow
+		ctx.fillStyle = '#000';
+        ctx.beginPath();
+		ctx.rect(1, 1, size + 1, size + 1);
+		ctx.fill();
+
+		// Button
 		ctx.textAlign = 'center';
 		ctx.textBaseline = 'middle';
+
+		ctx.strokeStyle = '#000';
+		ctx.lineWidth = 1;
 
         const gradient = ctx.createLinearGradient(0, 0, size, size);
         gradient.addColorStop(0, buttonState.color);
         gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.2).string());
-        ctx.fillStyle = gradient;
+		ctx.fillStyle = gradient;
 		
         ctx.beginPath();
         ctx.rect(0, 0, size, size);
-        ctx.fill();
+		ctx.fill();
+		ctx.stroke();
 
 		ctx.clip();
 
@@ -2998,7 +3013,10 @@ function renderTextWithShadow(ctx: CanvasRenderingContext2D, text: string, x: nu
 	ctx.fillText(text, x + 1, y + 1);
 
 	ctx.fillStyle = ColTuple.parse('#fff').darken(1 - emphasis).string();
+	ctx.strokeStyle = '#000c';
+	ctx.lineWidth = 1;
 	ctx.fillText(text, x, y);
+	ctx.strokeText(text, x, y);
 
 	ctx.restore();
 }
