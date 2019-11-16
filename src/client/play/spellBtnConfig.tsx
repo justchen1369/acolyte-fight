@@ -179,7 +179,6 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
                 style={{
                     ...style,
                     zIndex: chosen ? 1 : 0,
-                    "--spell-color": spell.color,
                 } as React.CSSProperties}
                 />}
         </Motion>

@@ -182,7 +182,9 @@
     box-shadow: 4px 4px 2px #0004;
     border: 1px #000c solid;
 
-    transition: border 0.2s ease;
+    transform: scale(1);
+
+    transition: border 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
 .spell-config .spell-icon-secondary {
@@ -197,6 +199,8 @@
     border-color: #fff6;
     box-shadow: 0 0 4px var(--spell-color);
     animation: spell-hover-loop alternate 0.5s infinite linear;
+    z-index: 100 !important; /* there is an inline style for z-level from the carousel that we have to override */
+    transform: scale(1.2);
 }
 
 @keyframes spell-hover-loop {

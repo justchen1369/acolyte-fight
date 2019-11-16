@@ -56,7 +56,7 @@ class BuildPanel extends React.PureComponent<Props, State> {
 
         const spellName = spellUtils.spellName(spell);
         const path2D = new Path2D(icon.path);
-        return <SpellIcon key={spellId} icon={path2D} color={spell.color} size={56} attr={{ title: spellName }} hoverHighlight={true} />
+        return <SpellIcon key={spellId} icon={path2D} color={spell.color} size={56} attr={{ title: spellName }} />
     }
 }
 

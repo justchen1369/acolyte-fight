@@ -649,6 +649,18 @@ table.player-list {
 
     pointer-events: all;
     cursor: pointer;
+
+    border: 1px black solid;
+    @include floatShadow();
+
+    transform: scale(1);
+    transition: transform 0.2s ease;
+}
+
+.customize-hint-container .customize-option .spell-icon:hover {
+    border: 1px #fff4 solid;
+    @include floatShadow(0 0 8px var(--spell-color));
+    transform: scale(1.2);
 }
 
 #game-panel .navbar-container {

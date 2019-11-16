@@ -177,7 +177,6 @@ class HintPanel extends React.PureComponent<Props, State> {
     private renderSpell(spellKey: string, spell: Spell) {
         return <SpellIcon 
             icon={icons.getIcon(spell.icon, this.props.settings.Icons)}
-            hoverHighlight={true}
             color={spell.passive ? "#444" : spell.color}
             size={32}
             attr={{

@@ -16,6 +16,8 @@
 
 .user-stats-panel .character-build .spell-icon {
     box-sizing: border-box;
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .user-stats-panel .character-build .spell-icon:nth-child(n+2)  {

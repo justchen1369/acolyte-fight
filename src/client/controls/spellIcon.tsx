@@ -1,7 +1,8 @@
 import Color from 'color';
 import * as React from 'react';
 import * as icons from '../core/icons';
-import { renderIconButton } from '../graphics/renderIcon';
+import { renderIconOnly } from '../graphics/renderIcon';
+import './spellIcon.scss';
 
 interface Props {
     icon: Path2D;
@@ -9,7 +10,6 @@ interface Props {
     size: number;
     width?: number;
     height?: number;
-    hoverHighlight?: boolean;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
     style?: React.CSSProperties;
@@ -32,9 +32,9 @@ export class SpellIcon extends React.PureComponent<Props, State> {
 
     render() {
         const attr = this.props.attr || {};
-        const style = this.props.style || {};
         const width = this.props.width || this.props.size;
         const height = this.props.height || this.props.size;
+        const retinaMultiplier = window.devicePixelRatio || 1;
 
         let className = "spell-icon";
         if (attr.className) {
@@ -43,13 +43,20 @@ export class SpellIcon extends React.PureComponent<Props, State> {
 
         this.redrawCanvas(); // Redraw previous canvas in response to state changes
 
+        const allStyles = {
+            width,
+            height,
+            "--spell-color": this.props.color,
+            ...this.props.style,
+        } as React.CSSProperties;
+
         return <canvas
             {...attr}
-            style={{ width, height, ...style }}
+            style={allStyles}
             className={className}
             ref={(elem: HTMLCanvasElement) => this.onCanvasElem(elem)}
-            width={width}
-            height={height}
+            width={width * retinaMultiplier}
+            height={height * retinaMultiplier}
             onMouseEnter={(ev) => this.onMouseEnter(ev)}
             onMouseLeave={(ev) => this.onMouseLeave(ev)}
         />
@@ -81,15 +88,22 @@ export class SpellIcon extends React.PureComponent<Props, State> {
 
         const icon = this.props.icon;
         if (icon) {
-            const ctx = this.elem.getContext('2d');
-            const rect = this.elem.getBoundingClientRect();
+            const ctx = this.elem.getContext('2d', { alpha: true });
+            ctx.save();
 
-            let color = this.props.color;
-            if (this.props.hoverHighlight && this.state.hovering) {
-                color = Color(color).mix(Color("white"), 0.5).string();
-            }
+            const width = this.elem.width;
+            const height = this.elem.height;
+            ctx.clearRect(0, 0, width, height);
 
-            renderIconButton(ctx, icon, color, 0.9, rect.width, rect.height);
+            const size = Math.min(width, height);
+
+            // Icon
+            const left = (width - size) / 2;
+            const top = (height - size) / 2;
+            ctx.translate(left, top);
+            renderIconOnly(ctx, icon, 0.9, size);
+
+            ctx.restore();
         }
     }
 }
