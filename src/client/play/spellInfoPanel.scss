@@ -7,10 +7,15 @@
 
     padding: 20px;
     text-align: right;
-}
 
-#spell-info-panel .spell-title {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+    .spell-title {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .spell-icon {
+        border: 1px #000c solid;
+        @include floatShadow();
+    }
 }
