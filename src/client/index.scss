@@ -305,17 +305,13 @@ h3 {
 
 .rating-card {
     background: var(--rating-color) linear-gradient(
-        112.5deg,
-        #0004,
-        #0004 15%,
-        #0005 15%,
-        #0005 30%,
+        176deg,
+        #0006,
+        #0004 30%,
         #0006 30%,
-        #0006 55%,
-        #0007 55%,
-        #0007 75%,
-        #0008 75%,
-        #0008);
+        #0003 85%,
+        #0005 85%,
+        #0004);
     
     border: 1px black solid;
     @include strokeShadow(#0008 0.1em 0.1em 0.1em);
@@ -328,17 +324,13 @@ h3 {
 
 .rating-card:hover {
     background: var(--rating-color) linear-gradient(
-        112.5deg,
-        #0002,
-        #0002 15%,
-        #0003 15%,
+        176deg,
+        #0005,
         #0003 30%,
-        #0004 30%,
-        #0004 55%,
-        #0005 55%,
-        #0005 75%,
-        #0006 75%,
-        #0006);
+        #0005 30%,
+        #0002 85%,
+        #0004 85%,
+        #0003);
     border: 1px #fff4 solid;
     @include floatShadow(0 0 8px var(--rating-color));
 }
