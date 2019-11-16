@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .region-list-section .region {
     display: block;
     font-size: 120%;
@@ -9,18 +11,25 @@
         #fff2 55%,
         #fff1 85%,
         #fff0);
-    box-shadow: 5px 5px 5px black;
     padding: 20px;
     margin: 12px 0;
     animation: shine-in 0.5s;
     transition: background-color 0.2s;
+
+    border: 1px black solid;
+
+    @include floatShadow();
 }
 
 .region-list-section .region:hover {
     background-color: #0cf;
+
     color: white;
-    box-shadow: 0 0 8px #0cf4;
     animation: shine-loop 0.5s alternate infinite linear;
+
+    border: 1px #0cf solid;
+
+    @include floatShadow(0 0 8px #0cf4);
 }
 
 @keyframes shine-in {
