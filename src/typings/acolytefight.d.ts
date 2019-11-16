@@ -57,6 +57,9 @@ declare interface ModSettings {
 
 	titleLeft: string; // On the homepage, this text flies in from left
 	titleRight: string; // On the homepage, this text flies in from right
+
+	subtitleLeft: string;
+	subtitleRight: string;
 }
 
 declare interface HeroSettings {

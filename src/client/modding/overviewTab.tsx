@@ -209,6 +209,8 @@ class OverviewTab extends React.PureComponent<Props, State> {
             description: new Date().toUTCString(),
             titleLeft: `${this.props.playerName}'s`,
             titleRight: "Mod!",
+            subtitleLeft: "",
+            subtitleRight: "",
         };
         const initialMod: ModTree = {
             Mod: meta,

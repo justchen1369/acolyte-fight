@@ -3023,6 +3023,9 @@ export const Mod: ModSettings = {
 
     titleLeft: "Acolyte",
     titleRight: "Fight!",
+
+    subtitleLeft: "skillshot",
+    subtitleRight: "arena",
 };
 
 export const DefaultSettings: AcolyteFightSettings = {

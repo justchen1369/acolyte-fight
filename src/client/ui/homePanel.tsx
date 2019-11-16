@@ -23,6 +23,8 @@ interface Props {
     isLoggedIn: boolean;
     titleLeft: string;
     titleRight: string;
+    subtitleLeft: string;
+    subtitleRight: string;
 }
 interface State {
 }
@@ -32,6 +34,8 @@ function stateToProps(state: s.State): Props {
         isLoggedIn: state.loggedIn,
         titleLeft: state.room.settings.Mod.titleLeft,
         titleRight: state.room.settings.Mod.titleRight,
+        subtitleLeft: state.room.settings.Mod.subtitleLeft,
+        subtitleRight: state.room.settings.Mod.subtitleRight,
     };
 }
 
@@ -55,7 +59,11 @@ class HomePanel extends React.PureComponent<Props, State> {
                     <video autoPlay muted loop>
                         <source src={`${url.base}/cdn/videos/g2515.m4v`} type="video/mp4" />
                     </video>
+                    <div className="spacer" />
                     <div className="title"><span className="title-left">{this.props.titleLeft}</span> <span className="title-right">{this.props.titleRight}</span></div>
+                    <div className="spacer" style={{ flexGrow: 0.1 }} />
+                    <div className="subtitle"><span className="subtitle-left">{this.props.subtitleLeft}</span> <span className="subtitle-right">{this.props.subtitleRight}</span></div>
+                    <div className="spacer" />
                     <div className="mask"></div>
                 </div>
                 <div className="spacer" />
