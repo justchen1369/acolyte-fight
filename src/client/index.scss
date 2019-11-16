@@ -1,3 +1,5 @@
+@import './common.scss';
+
 html, body {
     overflow: hidden;
     padding: 0;
@@ -14,6 +16,8 @@ body {
     height: 100%;
     padding: 0;
     margin: 0;
+
+    @include strokeShadow();
 }
 
 iframe.worker {
@@ -97,8 +101,9 @@ a, a:visited {
 }
 a:hover, a:active {
     color: #f80;
-    text-shadow: 0 0 8px #f808;
     animation: shine-loop 0.5s alternate infinite linear;
+
+    @include strokeShadow(0 0 8px #f808);
 }
 
 .link-btn, .link-btn:visited {
@@ -138,7 +143,6 @@ a:hover, a:active {
     cursor: pointer;
     text-align: center;
     box-shadow: 4px 4px #0008;
-    text-shadow: 1px 1px 1px black;
     border-radius: 0.125em;
     background: #0cf linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004);
     padding: 10px 40px;
@@ -183,8 +187,9 @@ a:hover, a:active {
 
 .clickable:hover, .clickable:active, .clickable.selected {
     color: #eee;
-    text-shadow: 0 0 8px #fff8;
     animation: shine-loop 0.5s alternate infinite linear;
+
+    @include strokeShadow(0 0 8px #fff8);
 }
 
 .error {
@@ -289,7 +294,6 @@ h3 {
 }
 
 .rating-card {
-    text-shadow: rgba(0, 0, 0, 0.5) 0.1em 0.1em 0.1em;
     --rank-gradient: linear-gradient(
         112.5deg,
         rgba(0, 0, 0, 0.7),
@@ -298,6 +302,8 @@ h3 {
         rgba(0, 0, 0, 0.45) 55%,
         rgba(0, 0, 0, 0.775) 85%,
         rgba(0, 0, 0, 0.85));
+    
+    @include strokeShadow(#0008 0.1em 0.1em 0.1em);
 }
 
 .rating-card .rank-icon {

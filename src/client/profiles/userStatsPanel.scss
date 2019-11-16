@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .user-stats-panel {
     position: relative;
 }
@@ -92,7 +94,8 @@
 .stats-card-row .stats-card .value {
     font-size: 500%;
     font-weight: bold;
-    text-shadow: 2px 2px 2px black;
+
+    @include strokeShadow(2px 2px 2px black);
 }
 
 @media (max-width: 768px) {

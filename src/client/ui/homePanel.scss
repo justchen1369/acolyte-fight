@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .home {
     height: 100%;
     position: relative;
@@ -29,11 +31,12 @@
     font-family: "ChicagoFLF", "Helvetica", sans-serif;
     font-size: 600%;
     font-weight: bold;
-    text-shadow: 0.1em 0.1em 0.1em black;
     font-style: italic;
     opacity: 0.9;
 
     animation: emphasise-flash alternate 0.5s infinite linear;
+
+    @include strokeShadow(0.1em 0.1em 0.1em black);
 }
 
 @keyframes emphasise-flash {

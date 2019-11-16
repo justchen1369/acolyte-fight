@@ -12,15 +12,15 @@
     position: absolute;
     bottom: 20px;
     right: 20px;
-}
 
-.social-bar a {
-    color: #eee4;
-    font-size: 250%;
-    margin-left: 0.2em;
-}
+    a, a:visited {
+        color: #eee4;
+        font-size: 250%;
+        margin-left: 0.2em;
+    }
 
-.social-bar a:hover {
-    color: #eee;
-    text-shadow: 0 0 8px #fff8;
+    a:hover, a:active {
+        color: #eee;
+        text-shadow: 0 0 8px #fff8;
+    }
 }

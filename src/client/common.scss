@@ -1,0 +1,16 @@
+@mixin strokeShadow($shadow...) {
+    text-shadow:
+         1px  1px  0px #000,
+        -1px -1px  0px #000,
+        -1px  1px  0px #000,
+         1px -1px  0px #000,
+         0px  1px  0px #000,
+         0px -1px  0px #000,
+         1px  0px  0px #000,
+        -1px  0px  0px #000,
+         1px  1px  1px #000c,
+         2px  2px  1px #000c,
+         3px  3px  2px #000c,
+         $shadow
+        ;
+}

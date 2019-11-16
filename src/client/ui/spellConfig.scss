@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .spell-config .key {
     box-sizing: border-box;
     display: flex;
@@ -21,7 +23,6 @@
     background-color: #555;
     background-color: var(--spell-color);
     box-shadow: 0 0 8px var(--spell-color);
-    text-shadow: 1px 2px 1px #0004;
 }
 
 .spell-config .key-name-container {
@@ -39,6 +40,8 @@
     cursor: pointer;
 
     transition: background-color 0.2s ease, color 0.2s ease;
+
+    @include strokeShadow(4px 4px #0008);
 }
 
 .spell-config .key-name-container:hover {
@@ -128,7 +131,7 @@
     text-transform: capitalize;
     font-size: 250%;
 
-    text-shadow: 2px 4px #00000088;
+    @include strokeShadow(4px 4px #0008);
 }
 
 .spell-config .spell-name {

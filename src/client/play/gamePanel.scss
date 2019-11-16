@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 #game-panel .tab-switcher {
     display: flex;
     flex-direction: row;
@@ -654,7 +656,8 @@ table.player-list {
 
 #game-panel.mobile .button-panel-row:hover {
     color: #0cf;
-    text-shadow: 0 0 8px #0cfc;
+
+    @include strokeShadow(0 0 8px #0cfc);
 }
 
 #game-panel.mobile .button-panel-row {
@@ -691,7 +694,8 @@ table.player-list {
     display: inline-block;
     padding: 0 0.5em;
     color: #fff;
-    text-shadow: #fff4 0 0 8px;
+
+    @include strokeShadow(#fff4 0 0 8px);
 }
 
 #game-panel .in-progress-warning {
