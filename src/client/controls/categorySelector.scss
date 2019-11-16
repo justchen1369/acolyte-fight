@@ -1,0 +1,39 @@
+.category-selector {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.category-selector .category {
+    display: inline-block;
+    text-align: center;
+    font-weight: bold;
+    font-size: 120%;
+    padding: 10px 20px;
+    background: #333;
+    border: 1px #444 solid;
+
+    transition: background-color 0.2s ease;
+}
+
+.category-selector .category:hover {
+    background: #555;
+    cursor: pointer;
+}
+
+.category-selector .category-selected {
+    background: #444;
+    color: #00ccff;
+}
+
+@media (max-width: 768px) {
+    .category-selector {
+        display: flex;
+        position: static;
+        margin-top: 2em;
+    }
+
+    .category-selector .category {
+        flex-grow: 1;
+    }
+}

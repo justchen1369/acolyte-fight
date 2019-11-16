@@ -1,0 +1,32 @@
+.party-mode-row {
+    display: flex;
+    align-items: center;
+
+    font-size: 120%;
+    background: #333;
+    box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin: 12px 0;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s ease;
+}
+
+.party-mode-row:hover {
+    background: #555;
+}
+
+.party-mode-row .party-mode-label {
+    margin-left: 0.5em;
+;
+}
+
+.party-mode-row.party-mode-selected {
+    background: #22ee88;
+    color: #444;
+}
+
+.party-qr {
+    float: right;
+}

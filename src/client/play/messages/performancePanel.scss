@@ -1,0 +1,61 @@
+.performance-panel {
+    position: relative;
+    max-width: 30vw;
+}
+
+.performance-panel .control-row .clickable {
+    opacity: 0;
+    padding: 0 0.2em;
+}
+
+.performance-panel:hover .control-row .clickable {
+    opacity: 1;
+}
+
+.performance-table {
+    border-collapse: collapse;
+}
+
+.performance-table caption {
+    text-align: left;
+    padding: 0.5em 0;
+    color: #ccc;
+    font-size: 75%;
+}
+
+
+table.performance-table td {
+    padding: 0.1em 0.5em;
+}
+
+.performance-table-label {
+    text-align: right;
+    font-size: 75%;
+}
+
+.performance-table-percent {
+    min-width: 10em;
+}
+
+.performance-table .percentage-bar-fill {
+    background-color: #f04;
+}
+
+.performance-summary-row {
+    cursor: pointer;
+}
+
+.performance-summary-row:hover {
+    background-color: #282828;
+    box-shadow: 0 0 1em #fff1;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+.performance-info-icon {
+    visibility: hidden;
+}
+
+.performance-summary-row:hover .performance-info-icon {
+    visibility: visible;
+}
+

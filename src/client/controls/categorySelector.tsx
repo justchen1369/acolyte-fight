@@ -1,9 +1,10 @@
-
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as d from '../stats.model';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
+
+import './categorySelector.scss';
 
 interface Props {
     categories: string[];

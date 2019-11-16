@@ -1,6 +1,7 @@
 import * as React from 'react';
 import * as m from '../../shared/messages.model';
 import { base } from '../url';
+import './rankIcon.scss';
 
 interface Props extends React.HTMLAttributes<HTMLImageElement> {
     league: string;

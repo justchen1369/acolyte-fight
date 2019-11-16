@@ -7,6 +7,7 @@ import * as constants from '../../game/constants';
 import * as rankings from '../core/rankings';
 import RankIcon from '../controls/rankIcon';
 import PrivacyPolicyPanel from './privacyPolicyPanel';
+import './aboutSection.scss';
 
 interface Props {
     noExternalLinks: boolean,

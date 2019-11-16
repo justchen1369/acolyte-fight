@@ -3,6 +3,7 @@ import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as options from '../options';
 import * as s from '../store.model';
+import './socialBar.scss';
 
 interface Props {
     iconsLoaded: boolean;

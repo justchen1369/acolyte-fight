@@ -5,6 +5,8 @@ import * as s from '../store.model';
 
 import SpellBtnConfig from '../play/spellBtnConfig';
 
+import './spellConfig.scss';
+
 interface Props {
     config: KeyBindings;
     settings: AcolyteFightSettings;

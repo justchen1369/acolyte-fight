@@ -16,6 +16,8 @@ import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 import WatchLooper from '../controls/watchLooper';
 
+import './gamePanel.scss';
+
 interface Props {
 }
 interface State {

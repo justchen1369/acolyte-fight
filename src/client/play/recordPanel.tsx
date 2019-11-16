@@ -24,6 +24,8 @@ import RecordBar from './recordBar';
 import TitleListener from '../controls/titleListener';
 import UrlListener from '../controls/urlListener';
 
+import './recordPanel.scss';
+
 const FileSaver = require('../../lib/file-saver');
 
 const Size = 1080;

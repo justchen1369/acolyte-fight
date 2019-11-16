@@ -12,6 +12,8 @@ import CustomBar from './customBar';
 import PageLink from './pageLink';
 import RatingControl from './ratingControl';
 
+import './navbar.scss';
+
 interface Props {
     iconsLoaded: boolean;
     page: string;

@@ -15,6 +15,7 @@ import * as w from '../../game/world.model';
 import * as watcher from '../core/watcher';
 import { loaded } from '../core/loader';
 import Button from '../controls/button';
+import './playButton.scss';
 
 const AutoJoinSeconds = 3;
 

@@ -1,0 +1,719 @@
+#game-panel .tab-switcher {
+    display: flex;
+    flex-direction: row;
+}
+
+#game-panel .tab-switcher-item {
+    display: inline-block;
+    padding: 16;
+    font-size: 150%;
+    color: #ccc;
+    transition: color 0.2s ease, background-color 0.2s ease;
+}
+
+#game-panel .tab-switcher-item-selected {
+    font-size: 150%;
+    background: #333;
+    color: #0cf;
+}
+
+#game-panel .customizing-bar {
+    box-sizing: border-box;
+    width: 100vw;
+    text-align: left;
+
+    display: flex;
+
+    background: #00ccff;
+    color: #fff;
+
+    cursor: pointer;
+
+    font-size: 20px;
+    padding: 15px 20px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#game-panel .customizing-bar i {
+    width: 1.5em;
+    text-align: center;
+}
+
+#game-panel .exit-link {
+    color: white;
+    font-size: 20px;
+    padding: 15px 20px;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    font-weight: bold;
+    text-decoration: none;
+
+    transition: background-color 0.2s ease;
+}
+
+#game-panel .exit-link:hover {
+    background: #0cf;
+    color: #fff;
+    box-shadow: 0 0 8px #0cf8;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+
+.return-home-subtext {
+    color: #ccc;
+    font-size: 80%;
+    font-weight: normal;
+}
+
+#canvas-container {
+    width: 100%;
+    height: 100%;
+    background: black;
+}
+
+canvas.atlas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    visibility: hidden;
+}
+
+canvas.game {
+    background: transparent;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.anchored-panel {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    max-height: 100vh;
+    box-sizing: border-box;
+}
+
+.anchored-panel-left {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.anchored-panel-right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.settings-link {
+    font-size: 80%;
+}
+
+.control-bar {
+    margin-right: 5px;
+}
+
+.info-title {
+    font-size: 80%;
+}
+
+.player-list-header {
+    margin-bottom: 0.2em;
+}
+
+.player-list-options {
+    margin: 0.25em 0;
+}
+
+.player-list-title {
+    font-weight: bold;
+    font-size: 125%;
+}
+
+.player-list-options .clickable {
+    margin-left: 0.5em;
+    opacity: 0.5;
+}
+
+.player-list-options:hover .clickable, .player-list-options .clickable.selected {
+    opacity: 0.75;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+table.player-list {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.player-list .player-icons {
+    margin-right: 4px;
+}
+
+.player-list .team-title {
+    margin-top: 1em;
+    font-weight: bold;
+    font-size: 120%;
+}
+
+.player-list .silence-btn {
+    margin-left: 4px;
+    color: #888;
+    pointer-events: all;
+    cursor: pointer;
+
+    transition: color 0.2s ease;
+}
+
+.player-list .silence-btn:hover {
+    color: #eee;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+.player-list .player-list-row {
+    font-size: 75%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.player-list .player-list-name {
+    color: #ccc;
+}
+
+.player-list .player-list-metric {
+    padding-left: 0.5em;
+    color: #ccc;
+    text-align: right;
+}
+
+.player-list .player-metric-icon {
+    padding-right: 0.25em;
+}
+
+.player-list .player-rank {
+    color: #888;
+}
+
+#info-panel .play-vs-ai-btn {
+    margin-top: 10px;
+}
+
+.text-message-container {
+    position: relative;
+    margin: 0.5em 8;
+    border: none;
+}
+
+.mobile .text-message-container {
+    cursor: pointer;
+    pointer-events: all;
+}
+
+.text-message-container .hint {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.anchored-panel-right .text-message-container .hint {
+    flex-direction: row-reverse;
+}
+
+
+.desktop .text-message-container {
+    font-size: 75%;
+    font-style: italic;
+}
+
+.desktop .text-message-container .hint {
+    color: #888;
+}
+
+.text-message-container .hint .hint-enter-key {
+    color: #ccc;
+    font-weight: bold;
+}
+
+.text-message-container .text-message-box {
+    background: transparent;
+    color: white;
+    border: none;
+    font-style: normal;
+    padding: 8px;
+    border: transparent 1px solid;
+    min-width: 30vw;
+}
+
+.text-message-container.text-message-focus .text-message-box:focus {
+    border: #ffffff44 1px solid;
+}
+
+.text-message-container .text-message-row-icon {
+    display: inline-block;
+    min-width: 2em;
+    text-align: center;
+}
+
+.text-message-container .error {
+    font-size: 75%;
+}
+
+.splash-container {
+    position: fixed;
+
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    display: flex;
+    align-items: center;
+    align-content: center;
+
+    animation: splash-out 4s both ease-out;
+}
+
+.splash {
+    text-align: center;
+    width: 100%;
+    font-size: 30vh;
+    font-weight: bold;
+}
+
+@keyframes splash-out {
+    from { opacity: 1.0 }
+    to { opacity: 0.0 }
+}
+
+@media (max-width: 1024px) {
+    .splash {
+        font-size: 256px;
+    }
+}
+
+#info-panel {
+    margin: 8;
+}
+
+.messages-panel {
+    margin: 8;
+    min-width: 30%;
+
+    pointer-events: none;
+
+    max-height: 75vh;
+    max-width: 50vw;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+.messages .row {
+    color: #ccc;
+
+    animation: fade-out 15s both;
+    font-size: 75%;
+}
+
+.messages .row.text-row {
+    animation-duration: 60s;
+}
+
+.messages .row.rating-notification {
+    animation-duration: 30s;
+}
+
+.messages .row.error {
+    color: red;
+}
+
+.teams-splash-left {
+    display: inline-block;
+    animation: fly-from-left 0.5s both ease-in;
+}
+.teams-splash-middle {
+    display: inline-block;
+    animation: fly-from-top 0.5s both ease-in;
+}
+.teams-splash-right {
+    display: inline-block;
+    animation: fly-from-right 0.5s both ease-in;
+}
+
+.teams-splash-v {
+    display: inline-block;
+    animation: fly-from-bottom 0.5s both ease-in;
+}
+
+@keyframes fade-out {
+    from { opacity: 1.0 }
+    75% { opacity: 1.0 }
+    to { opacity: 0.0 }
+}
+
+.messages .text-row {
+    display: flex;
+    flex-direction: row;
+    align-content: flex-start;
+    justify-content: flex-start;
+
+    pointer-events: all;
+    font-size: 120%;
+
+    max-width: 30vw;
+}
+
+.mobile .messages .text-row {
+    max-width: 50vw;
+}
+
+.anchored-panel-right .messages .text-row {
+    flex-direction: row-reverse; /* silence button on left */
+}
+
+.messages .text-row .silence-btn {
+    opacity: 0;
+    cursor: pointer;
+    margin: 0 8;
+
+    transition: opacity 0.2s ease;
+}
+
+.messages .text-row:hover .silence-btn {
+    opacity: 1;
+}
+
+.messages span.text-message {
+    color: white;
+    font-weight: bold;
+    hyphens: auto;
+}
+
+.messages .rating {
+    font-weight: bold;
+}
+
+@media (min-width: 1024px) {
+    .desktop .help-box {
+        font-size: 150%;
+    }
+}
+
+.messages .help-box .help-title {
+    font-weight: bold;
+    margin-bottom: 1em;
+}
+
+.messages .help-box .help-row {
+    margin: 0.1em 0px;
+    max-width: 30vw;
+}
+
+.mobile .messages .help-box .help-row {
+    max-width: 60vw;
+}
+
+.messages .help-box .help-row.help-info-row {
+    font-style: italic;
+    margin: 0.5em 0px;
+}
+
+.messages .help-box .icon-container {
+    display: inline-block;
+    width: 30px;
+    text-align: center;
+    margin-right: 0.5em;
+}
+
+.messages .rating-notification {
+    margin: 0.5em 0;
+}
+
+.messages .next-league-hint {
+    font-size: 75%;
+    color: #aaa;
+}
+
+.messages .unranked-hint {
+    font-size: 75%;
+    color: #aaa;
+}
+
+.messages .game-started {
+    font-weight: bold;
+}
+
+.messages .dialog-panel {
+    color: white;
+    margin-top: 1em;
+    padding: 1em;
+    background: linear-gradient(to right, #222, rgba(0,0,0,0));
+}
+
+.anchored-panel-right .messages .dialog-panel {
+    background: linear-gradient(to left, #222, rgba(0,0,0,0));
+}
+
+.messages .winner-row {
+    font-weight: bold;
+    font-size: 150%;
+}
+
+.messages .dialog-panel .award-row {
+    vertical-align: middle;
+    transition: height 0.2s ease;
+    overflow: hidden;
+}
+
+.messages .dialog-panel .award-group {
+    margin-top: 1em;
+    transition: margin-top 0.2s ease;
+}
+
+.messages .self-metric {
+    font-size: 75%;
+    color: #888;
+    font-style: italic;
+}
+
+.messages .dialog-panel .outlast-row {
+    margin-top: 0.75em;
+    transition: margin-top 0.2s ease;
+
+    color: #ccc;
+    font-style: italic;
+}
+
+.messages .action-row {
+    margin-top: 1em;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.mobile.wheel-on-left .messages .action-row {
+    flex-direction: row-reverse;
+}
+
+.messages .action-row *:nth-child(n+2)  {
+    margin-left: 1.5em;
+}
+
+.mobile.wheel-on-left .messages .action-row *:nth-child(n+2)  {
+    margin-left: 0;
+    margin-right: 1.5em;
+}
+
+.messages .winner .action-row .btn {
+    font-size: 150%;
+}
+
+.messages .community-advert {
+    display: flex;
+    align-items: center;
+
+    margin: 0.25em 8;
+    animation: none;
+}
+
+.messages .community-advert a {
+    display: flex;
+    align-items: center;
+}
+
+.messages .community-advert .label {
+    font-size: 75%;
+}
+
+.messages .community-advert i {
+    font-size: 150%;
+    margin: 0.25em;
+}
+
+.messages .info-panel .body-row {
+    font-size: 75%;
+}
+
+.messages .info-panel .header-row {
+    font-size: 110%;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+
+#spell-info-panel .spell-name {
+    margin-right: 16px;
+}
+
+#spell-info-panel .spell-description {
+    margin-bottom: 0.5em;
+}
+
+#spell-info-panel .spell-effect {
+    margin-bottom: 0.5em;
+}
+
+#spell-info-panel .spell-stats {
+    margin-top: 1em;
+}
+
+#game-panel .spell-config-container {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+
+    display: flex;
+    flex-direction: row; /* Want children to grow to maximum width */
+
+    /* Center contents */
+    align-items: center;
+    justify-content: space-around;
+}
+
+#game-panel .spell-config {
+    max-width: 800px;
+    flex-grow: 1;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+}
+
+#game-panel.desktop .spell-config {
+    padding-bottom: 72px;
+}
+
+#game-panel .spell-config-container .accept-row {
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+}
+
+#game-panel .customize-hint-container {
+    pointer-events: none;
+    box-sizing: border-box;
+    width: 100vw;
+    text-align: center;
+    margin: 0.5em;
+}
+
+#game-panel .customize-hint {
+    font-weight: bold;
+    color: white;
+}
+
+#game-panel.desktop .customize-hint {
+    font-size: 120%;
+}
+
+#game-panel .customize-hint.spell-name {
+    font-size: 100%;
+}
+
+#game-panel .customize-hint.team-hint {
+    font-size: 200%;
+    animation: emphasise-flash alternate 0.5s infinite linear;
+}
+
+.customize-hint-container .customize-option {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.customize-hint-container .customize-option .spell-icon {
+    margin: 0 0.5em;
+
+    pointer-events: all;
+    cursor: pointer;
+}
+
+#game-panel .navbar-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+#game-panel .button-panel {
+    font-size: 75%;
+}
+
+#game-panel.mobile .button-panel-row:hover {
+    color: #0cf;
+    text-shadow: 0 0 8px #0cfc;
+}
+
+#game-panel.mobile .button-panel-row {
+    pointer-events: all;
+    cursor: pointer;
+    margin: 0.5em 8;
+    font-style: italic;
+}
+
+#game-panel.mobile .button-panel-row-icon {
+    display: inline-block;
+    min-width: 2em;
+    text-align: center;
+}
+
+#game-panel.mobile .button-panel-label {
+    display: none;
+}
+
+#game-panel.desktop .button-panel-row {
+    color: #ccc;
+    padding: 0.5em;
+    text-align: center;
+}
+#game-panel.desktop .button-panel-row.button-panel-secondary {
+    color: #666;
+}
+
+#game-panel.desktop .button-panel-row .button-panel-row-label {
+    display: none;
+}
+
+#game-panel.desktop .button-panel-label {
+    display: inline-block;
+    padding: 0 0.5em;
+    color: #fff;
+    text-shadow: #fff4 0 0 8px;
+}
+
+#game-panel .in-progress-warning {
+    font-size: 120%;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    text-align: center;
+    color: white;
+}
+
+.player-name {
+    font-weight: bold;
+}
+
+.player-name i {
+    margin-left: 5px;
+}
+
+.room-name {
+    font-weight: bold;
+}
+
+.private-room {
+    font-weight: bold;
+}

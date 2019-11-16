@@ -1,0 +1,90 @@
+.json-editor {
+    flex-grow: 1;
+
+    display: flex;
+    flex-direction: row;
+
+    height: 300px;
+}
+
+.json-editor .entity-panel {
+    flex-basis: 300px;
+    max-width: 30%;
+}
+
+.json-editor .code-panel {
+    flex-grow: 1;
+}
+
+.entity-panel {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.entity-panel .entity-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.entity-list-item {
+    padding: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+.entity-list-item:hover {
+    background-color: #0cf !important;
+    color: white !important;
+    box-shadow: 0 0 8px #0cf8;
+}
+.entity-list-item.unmodded {
+    color: #888;
+}
+.entity-list-item.multi-selected {
+    background: #333;
+}
+.entity-list-item.selected {
+    background: #0cf;
+    color: white;
+}
+
+.entity-panel .button-row {
+    padding: 5px;
+}
+
+.code-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+.code-panel .code-area {
+    flex-grow: 1;
+}
+
+.editor-actions {
+    padding: 5px;
+    padding-left: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.modding-overview .code-area {
+    min-height: 20em;
+}
+
+.mod-readonly .code-area {
+    min-height: 20em;
+}
+
+.code-area {
+    display: flex;
+    flex-direction: column;
+}
+
+.code-area .codeflask {
+    flex-grow: 1;
+    position: relative;
+    height: auto;
+}

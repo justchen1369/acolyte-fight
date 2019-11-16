@@ -1,0 +1,20 @@
+.spell-stats {
+    font-size: 80%;
+    color: #ddd;
+}
+
+.spell-stats-item:hover .spell-stats-scaling {
+    color: white;
+}
+
+.spell-stats .spell-stats-item {
+    margin-right: 15px;
+}
+
+.spell-stats .spell-stats-item:last-child {
+    margin-right: 0px;
+}
+
+.spell-stats .spell-stats-item i {
+    margin-right: 5px;
+}

@@ -14,6 +14,8 @@ import RecentGamesList from './recentGameList';
 import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
 
+import './profilePanel.scss';
+
 const categories = [
     m.GameCategory.PvP,
     m.GameCategory.PvAI,

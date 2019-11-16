@@ -1,0 +1,57 @@
+.party-invite {
+    color: #ccc;
+    font-size: 75%;
+}
+
+.home .party-list .settings-icon {
+    margin-left: 0.25em;
+}
+
+.party-list .party-member {
+    display: inline-block;
+    background: #444;
+    color: #ccc;
+    padding: 3px 15px;
+    border-radius: 15px;
+    margin-right: 5px;
+
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.party-list .party-member-ready {
+    background: #22ee88;
+    color: #444;
+}
+
+.party-member-editable .settings-icon {
+    cursor: pointer;
+}
+
+.party-list .settings-icon:hover {
+    color: #00ccff;
+}
+
+.party-list .party-member :nth-child(n+2) {
+    margin-left: 0.5em;
+}
+
+.party-member-editable .check-icon {
+    cursor: pointer;
+}
+
+.party-member .check-icon:hover {
+    color: white;
+}
+
+.party-member.party-member-observing {
+    opacity: 0.5;
+}
+
+.party-panel .party-member {
+    display: flex;
+    align-items: center;
+    font-size: 120%;
+    box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin: 12px 0;
+}

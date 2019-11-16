@@ -16,6 +16,7 @@ import Link from '../controls/link';
 import RankIcon from '../controls/rankIcon';
 import UnrankedTogglePanel from './unrankedTogglePanel';
 import UserStatsPanel from './userStatsPanel';
+import './leaderboardPanel.scss';
 
 interface OwnProps {
 }

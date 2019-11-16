@@ -1,0 +1,40 @@
+.region-list-section .region {
+    display: block;
+    font-size: 120%;
+    background: #333 linear-gradient(
+        112.5deg,
+        #fff0,
+        #fff1 5%,
+        #fff3 25%,
+        #fff2 55%,
+        #fff1 85%,
+        #fff0);
+    box-shadow: 5px 5px 5px black;
+    padding: 20px;
+    margin: 12px 0;
+    animation: shine-in 0.5s;
+    transition: background-color 0.2s;
+}
+
+.region-list-section .region:hover {
+    background-color: #0cf;
+    color: white;
+    box-shadow: 0 0 8px #0cf4;
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
+@keyframes shine-in {
+    from { background-color: #666 }
+    to { }
+}
+
+.region-list-section .region-name {
+    display: inline-block;
+    min-width: 8em;
+    text-align: right;
+    font-weight: bold;
+}
+
+.region-list-section .region-details {
+    color: white;
+}

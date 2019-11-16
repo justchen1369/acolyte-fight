@@ -13,6 +13,7 @@ import * as url from '../url';
 import Link from '../controls/link';
 import PartyGameList from './partyGameList';
 import PartyMemberList from './partyMemberList';
+import './partyPanel.scss';
 
 enum PartyModeType {
     Room = "room",

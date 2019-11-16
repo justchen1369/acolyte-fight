@@ -1,0 +1,37 @@
+.btn.waiting-for-party {
+    position: relative;
+    background: #555;
+}
+
+.btn.waiting-for-party:hover {
+    box-shadow: 0 0 8px #f048;
+}
+
+.waiting-for-party-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #22ee88;
+
+    transition: width 0.2s ease;
+}
+
+.btn.waiting-for-party:hover .waiting-for-party-progress {
+    background: #ff0044;
+}
+
+.waiting-for-party-label {
+    position: relative; /* So it can appear above the absolute-positioned progress bar */
+}
+
+.btn.auto-join-btn {
+    background-color: #22ee88;
+    box-shadow: 0 0 8px #2e88;
+    transition: background-color 0.2s ease;
+}
+
+.btn.auto-join-btn:hover {
+    background-color: #ff0044;
+    box-shadow: 0 0 8px #f048;
+}

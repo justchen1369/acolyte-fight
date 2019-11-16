@@ -1,0 +1,16 @@
+.rank-icon {
+    height: 1em;
+    width: 1em;
+    vertical-align: top;
+    border: 1px rgba(255, 255, 255, 0.3) solid;
+    border-radius: 0.25em;
+    box-sizing: border-box;
+    --rank-gradient: linear-gradient(
+        160deg,
+        rgba(0, 0, 0, 0.4),
+        rgba(0, 0, 0, 0.3) 5%,
+        transparent 15%,
+        transparent 45%,
+        rgba(0, 0, 0, 0.5) 55%,
+        rgba(0, 0, 0, 0.6));
+}

@@ -11,6 +11,8 @@ import * as spellUtils from '../core/spellUtils';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
 
+import './controlsPanel.scss';
+
 namespace Toggle {
     export const On = "on";
     export const Off = "off";

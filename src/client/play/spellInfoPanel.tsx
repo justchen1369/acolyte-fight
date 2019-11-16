@@ -8,6 +8,8 @@ import * as spellUtils from '../core/spellUtils';
 import { SpellIcon } from '../controls/spellIcon';
 import SpellStats from './spellStats';
 
+import './spellInfoPanel.scss';
+
 interface Props {
     spellId: string;
     settings: AcolyteFightSettings;

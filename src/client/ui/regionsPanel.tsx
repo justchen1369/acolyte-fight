@@ -9,6 +9,7 @@ import * as s from '../store.model';
 import * as options from '../options';
 import * as pages from '../core/pages';
 import * as regions from '../core/regions';
+import './regionsPanel.scss';
 
 const RetestCount = 3;
 const RetestDelayMilliseconds = 1000;

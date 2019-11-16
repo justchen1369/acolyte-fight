@@ -14,6 +14,7 @@ import * as stats from '../core/stats';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import GameRow from './gameRow';
+import './gameList.scss';
 
 interface OwnProps {
     allGameStats: d.GameStats[];

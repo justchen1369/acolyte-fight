@@ -15,6 +15,8 @@ import BuildPanel from './buildPanel';
 import RankIcon from '../controls/rankIcon';
 import TitleListener from '../controls/titleListener';
 
+import './userStatsPanel.scss';
+
 interface OwnProps {
     profileId: string;
     category: string;

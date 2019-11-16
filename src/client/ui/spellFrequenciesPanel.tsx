@@ -14,6 +14,7 @@ import { Icons } from '../../game/icons';
 import CategorySelector from '../controls/categorySelector';
 import PercentageBar from '../controls/percentageBar';
 import SpellIcon from '../controls/spellIcon';
+import './spellFrequenciesPanel.scss';
 
 interface LeagueStatsLookup {
     [league: string]: LeagueStats;

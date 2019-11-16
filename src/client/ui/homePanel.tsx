@@ -15,6 +15,8 @@ import NavBar from '../nav/navbar';
 import PartyList from './partyList';
 import TitleListener from '../controls/titleListener';
 
+import './homePanel.scss';
+
 const scrollIntoView = require('scroll-into-view');
 
 interface Props {

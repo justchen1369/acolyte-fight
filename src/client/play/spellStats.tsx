@@ -6,6 +6,8 @@ import * as w from '../../game/world.model';
 import * as spellUtils from '../core/spellUtils';
 import { TicksPerSecond } from '../../game/constants';
 
+import './spellStats.scss';
+
 interface OwnProps {
     spellId: string;
     settings: AcolyteFightSettings;

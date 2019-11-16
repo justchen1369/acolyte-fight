@@ -8,6 +8,7 @@ import * as constants from '../../../game/constants';
 import * as StoreProvider from '../../storeProvider';
 import Button from '../../controls/button';
 import PercentageBar from '../../controls/percentageBar';
+import './performancePanel.scss';
 
 const HistorySeconds = constants.PerformanceStats.MaxHistoryLengthMilliseconds / 1000;
 

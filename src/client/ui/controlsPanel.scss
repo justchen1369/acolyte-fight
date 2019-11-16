@@ -1,0 +1,31 @@
+.controls-panel .row {
+    font-size: 120%;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.controls-panel .row.info {
+    font-size: 75%;
+    margin-top: 0em;
+    margin-bottom: 2em;
+}
+
+.controls-panel .row .label {
+    display: inline-block;
+    min-width: 30%;
+    text-align: right;
+    padding-right: 0.5em;
+}
+
+.controls-panel .row .value {
+    margin-left: 10px;
+    font-size: 120%;
+    min-width: 30%;
+    padding-left: 0.5em;
+}
+
+.controls-panel .status-row {
+    margin: 1em;
+    font-weight: bold;
+    text-align: center;
+}

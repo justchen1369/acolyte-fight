@@ -6,6 +6,7 @@ import * as pages from '../core/pages';
 import * as parties from '../core/parties';
 import * as url from '../url';
 import PartyMemberControl from './partyMemberControl';
+import './partyList.scss';
 
 interface Props {
     current: s.PathElements;
