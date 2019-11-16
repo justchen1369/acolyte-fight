@@ -3,14 +3,14 @@
 .region-list-section .region {
     display: block;
     font-size: 120%;
-    background: #888 linear-gradient(
+    background: #555 linear-gradient(
         176deg,
-        #0006,
-        #0004 30%,
-        #0006 30%,
-        #0003 85%,
-        #0005 85%,
-        #0004);
+        #fff0,
+        #fff2 30%,
+        #fff0 30%,
+        #fff3 85%,
+        #fff1 85%,
+        #fff2);
     padding: 20px;
     margin: 12px 0;
     animation: shine-in 0.5s;
