@@ -1,7 +1,7 @@
+@import '../common.scss';
+
 .leaderboard-row {
     position: relative;
-
-    box-shadow: 5px 5px 5px black;
 
     display: flex;
     align-items: center;
@@ -10,6 +10,9 @@
     padding: 10px;
 
     transition: background-color 0.2s ease;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .leaderboard-row.leaderboard-self .player-name {

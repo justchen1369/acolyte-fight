@@ -52,11 +52,13 @@
     padding: 25px;
 
     background: #333;
-    box-shadow: 5px 5px 5px black;
 
     text-align: center;
 
     transition: background-color 0.2s ease;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .stats-card-row .stats-card:hover {
@@ -74,13 +76,14 @@
 
     font-size: 400%;
 
-    box-shadow: 5px 5px 5px black;
-
     align-content: center;
     align-items: center;
     justify-content: center;
 
     transition: background-color 0.2s ease;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .stats-card-row .rating-card .rank-icon {
