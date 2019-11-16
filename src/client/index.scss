@@ -272,39 +272,39 @@ h3 {
 }
 
 .Grandmaster {
-    background: rgb(0, 255, 255) var(--rank-gradient);
+    --rating-color: rgb(0, 255, 255);
 }
 
 .Master {
-    background: rgb(0, 183, 255) var(--rank-gradient);
+    --rating-color: rgb(0, 183, 255);
 }
 
 .Diamond {
-    background: rgb(0, 102, 255) var(--rank-gradient);
+    --rating-color: rgb(0, 102, 255);
 }
 
 .Platinum {
-    background: rgb(255, 0, 136) var(--rank-gradient);
+    --rating-color: rgb(255, 0, 136);
 }
 
 .Gold {
-    background: rgb(255, 214, 32) var(--rank-gradient);
+    --rating-color: rgb(255, 214, 32);
 }
 
 .Silver {
-    background: rgb(241, 241, 241) var(--rank-gradient);
+    --rating-color: rgb(241, 241, 241);
 }
 
 .Bronze {
-    background: rgb(255, 115, 0) var(--rank-gradient);
+    --rating-color: rgb(255, 115, 0);
 }
 
 .Wood {
-    background: rgb(66, 233, 0) var(--rank-gradient);
+    --rating-color: rgb(66, 233, 0);
 }
 
 .rating-card {
-    --rank-gradient: linear-gradient(
+    background: var(--rating-color) linear-gradient(
         112.5deg,
         #0004,
         #0004 15%,
@@ -317,7 +317,9 @@ h3 {
         #0008 75%,
         #0008);
     
+    border: 1px black solid;
     @include strokeShadow(#0008 0.1em 0.1em 0.1em);
+    @include floatShadow();
 }
 
 .rating-card .rank-icon {
@@ -325,7 +327,7 @@ h3 {
 }
 
 .rating-card:hover {
-    --rank-gradient: linear-gradient(
+    background: var(--rating-color) linear-gradient(
         112.5deg,
         #0002,
         #0002 15%,
@@ -337,6 +339,8 @@ h3 {
         #0005 75%,
         #0006 75%,
         #0006);
+    border: 1px #fff4 solid;
+    @include floatShadow(0 0 8px var(--rating-color));
 }
 
 .rating-increase {

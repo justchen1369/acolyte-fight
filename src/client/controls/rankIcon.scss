@@ -2,10 +2,11 @@
     height: 1em;
     width: 1em;
     vertical-align: top;
-    border: 1px rgba(255, 255, 255, 0.3) solid;
+    border: 1px #0004 solid;
     border-radius: 0.25em;
     box-sizing: border-box;
-    --rank-gradient: linear-gradient(
+
+    background: var(--rating-color) linear-gradient(
         160deg,
         rgba(0, 0, 0, 0.4),
         rgba(0, 0, 0, 0.3) 5%,

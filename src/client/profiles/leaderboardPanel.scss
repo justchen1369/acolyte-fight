@@ -10,9 +10,6 @@
     padding: 10px;
 
     transition: background-color 0.2s ease;
-
-    border: 1px black solid;
-    @include floatShadow();
 }
 
 .leaderboard-row.leaderboard-self .player-name {
