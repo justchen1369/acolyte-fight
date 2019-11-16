@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .category-selector {
     position: absolute;
     top: 0;
@@ -11,14 +13,21 @@
     font-size: 120%;
     padding: 10px 20px;
     background: #333;
-    border: 1px #444 solid;
 
+    border: 1px black solid;
     transition: background-color 0.2s ease;
+
+    @include floatShadow();
 }
 
 .category-selector .category:hover {
-    background: #555;
+    background: #0cf;
+    border: 1px #fff4 solid;
+    color: white;
     cursor: pointer;
+    animation: shine-loop 0.5s alternate infinite linear;
+
+    @include floatShadow(0 0 8px #0cf8);
 }
 
 .category-selector .category-selected {

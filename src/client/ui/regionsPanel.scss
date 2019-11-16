@@ -27,7 +27,7 @@
     color: white;
     animation: shine-loop 0.5s alternate infinite linear;
 
-    border: 1px #0cf solid;
+    border: 1px #fff4 solid;
 
     @include floatShadow(0 0 8px #0cf4);
 }

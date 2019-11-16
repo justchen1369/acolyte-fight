@@ -155,7 +155,7 @@ a:hover, a:active {
 .btn:hover {
     --btn-color: #f80;
 
-    border: 1px var(--btn-color) solid;
+    border: 1px #fff4 solid;
 
     animation: shine-loop 0.5s alternate infinite linear;
 
