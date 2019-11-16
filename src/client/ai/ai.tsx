@@ -161,8 +161,7 @@ class AiWorker {
 
         let cooldowns: AI.CooldownsRemaining = {};
         hero.keysToSpells.forEach(spellId => {
-            const next = hero.cooldowns[spellId] || 0;
-            cooldowns[spellId] = Math.max(0, next - world.tick);
+            cooldowns[spellId] = engine.cooldownRemaining(world, hero, spellId);
         });
         const stateMsg: AI.StateMsgContract = {
             type: "state",
