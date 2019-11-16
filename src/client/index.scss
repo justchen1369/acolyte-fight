@@ -145,7 +145,19 @@ a:hover, a:active {
     cursor: pointer;
     text-align: center;
     border-radius: 0.125em;
-    background: var(--btn-color) linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004);
+    background-color: var(--btn-color);
+    background-image:
+        linear-gradient(to bottom, #fff4 0%, #fff4 7%, #0000 7%, #0000 93%, #0004 93%, #0004),
+        linear-gradient(
+            145deg,
+            #fff0 0%,
+            #fff4 25%,
+            #fff0 25%,
+            #fff0 45%,
+            #fff4 80%,
+            #fff0 80%,
+            #fff4 100%,
+        );
     border: 1px black solid;
     padding: 10px 40px;
 
