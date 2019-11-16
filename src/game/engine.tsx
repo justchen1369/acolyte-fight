@@ -546,6 +546,7 @@ function addHero(world: w.World, heroId: string) {
 		revolutionsPerTick: Hero.RevolutionsPerTick,
 		casting: null,
 		cooldowns: {},
+		cooldownRates: {},
 		createTick: world.tick,
 		throttleUntilTick: 0,
 		keysToSpells: new Map<string, string>(),
@@ -619,8 +620,12 @@ export function cooldownRemaining(world: w.World, hero: w.Hero, spellId: string)
 	return Math.max(0, hero.cooldowns[spellId] || 0);
 }
 
-function setCooldown(world: w.World, hero: w.Hero, spell: string, waitTime: number) {
-	hero.cooldowns[spell] = waitTime;
+function setCooldown(world: w.World, hero: w.Hero, spellId: string, cooldown: number) {
+	if (cooldown > 0) {
+		hero.cooldowns[spellId] = cooldown;
+	} else {
+		delete hero.cooldowns[spellId];
+	}
 }
 
 function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
@@ -630,22 +635,15 @@ function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
 	}
 
 	for (const spellId in hero.cooldowns) {
-		let cooldown = hero.cooldowns[spellId];
+		let cooldown = cooldownRemaining(world, hero, spellId);
 
-		let cooldownRate = 1;
-		hero.buffs.forEach(buff => {
-			if (buff.type === "cooldown" && (!buff.spellIds || buff.spellIds.has(spellId))) {
-				cooldownRate *= buff.cooldownRate;
-			}
-		});
+		let cooldownRate = hero.cooldownRates[spellId];
+		if (typeof cooldownRate !== 'number') {
+			cooldownRate = 1;
+		}
 
 		cooldown = Math.max(0, cooldown - cooldownRate);
-
-		if (cooldown > 0) {
-			hero.cooldowns[spellId] = cooldown;
-		} else {
-			delete hero.cooldowns[spellId];
-		}
+		setCooldown(world, hero, spellId, cooldown);
 	}
 
 	return true;
@@ -3584,13 +3582,15 @@ function applyLavaDamage(world: w.World) {
 						damageMultiplier *= buff.damageProportion;
 					}
 				});
-				if (damageMultiplier >= 0) {
+				if (damageMultiplier > 0) {
 					const heroDamagePacket = {
 						...damagePacket,
 						damage: damagePacket.damage * damageMultiplier,
 						fromHeroId: calculateKnockbackFromId(obj, world),
 					};
 					applyDamage(obj, heroDamagePacket, world);
+
+					applyBuffsFrom(World.LavaBuffs, null, obj, world);
 				}
 			}
 		} else if (obj.category === "obstacle") {
@@ -4443,7 +4443,9 @@ function detachBuff(buff: w.Buff, hero: w.Hero, world: w.World) {
 	hero.buffs.delete(buff.id);
 	hero.uiDestroyedBuffs.push(buff);
 
-	if (buff.type === "mass") {
+	if (buff.type === "cooldown") {
+		detachSilence(buff, hero, world);
+	} else if (buff.type === "mass") {
 		detachMass(buff, hero, world);
 	} else if (buff.type === "armor") {
 		detachArmor(buff, hero, world);
@@ -4667,6 +4669,7 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 		spellIds = new Set<string>([template.spellId]);
 	}
 
+	// Apply cooldown rate buff
 	const cooldownRate = template.cooldownRate !== undefined ? template.cooldownRate : 1;
 	attachStack<w.CooldownBuff>(
 		template, hero, world, config,
@@ -4680,20 +4683,23 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 		(stack) => { // Update
 			stack.cooldownRate *= cooldownRate;
 		});
+	updateSilence(hero);
 
+	// Apply min/max
 	hero.keysToSpells.forEach(spellId => {
 		if (!template.spellId || spellId === template.spellId) {
-			let cooldown = hero.cooldowns[spellId] || 0;
+			let cooldown = cooldownRemaining(world, hero, spellId);
 			if (template.maxCooldown !== undefined) {
 				cooldown = Math.min(template.maxCooldown, cooldown);
 			}
 			if (template.minCooldown !== undefined) {
 				cooldown = Math.max(template.minCooldown, cooldown);
 			}
-			hero.cooldowns[spellId] = cooldown;
+			setCooldown(world, hero, spellId, cooldown);
 		}
 	});
 
+	// Notify
 	if (template.color || template.sound) {
 		world.ui.events.push({
 			type: "cooldown",
@@ -4703,6 +4709,26 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 			heroId: hero.id,
 		});
 	}
+}
+
+function detachSilence(buff: w.CooldownBuff, hero: w.Hero, world: w.World) {
+	updateSilence(hero);
+}
+
+function updateSilence(hero: w.Hero) {
+	const cooldownRates: w.Cooldowns = {};
+
+	hero.keysToSpells.forEach(spellId => {
+		let cooldownRate = 1;
+		hero.buffs.forEach(buff => {
+			if (buff.type === "cooldown" && (!buff.spellIds || buff.spellIds.has(spellId))) {
+				cooldownRate *= buff.cooldownRate;
+			}
+		});
+		cooldownRates[spellId] = cooldownRate;
+	});
+
+	hero.cooldownRates = cooldownRates;
 }
 
 function attachArmor(template: ArmorTemplate, hero: w.Hero, world: w.World, config: BuffContext) {

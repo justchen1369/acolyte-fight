@@ -437,6 +437,7 @@ export interface Hero extends WorldObjectBase, HighlightSource {
 	target?: pl.Vec2;
 	casting: CastState | null;
 	cooldowns: Cooldowns;
+	cooldownRates: Cooldowns;
 	throttleUntilTick: number;
 	uiCastTrail?: CastHistoryItem;
 

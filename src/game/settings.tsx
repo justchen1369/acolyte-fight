@@ -49,6 +49,20 @@ const World: WorldSettings = {
     LavaDamagePerSecond: 12.5,
     LavaLifestealProportion: lifeSteal,
     LavaDamageInterval: 20,
+    LavaBuffs: [
+        {
+            type: "cooldown",
+            spellIds: [
+                "teleport",
+                "thrust",
+                "swap",
+                "vanish",
+                "voidRush",
+            ],
+            maxTicks: 20,
+            cooldownRate: 2,
+        },
+    ],
 
     SecondsToShrink: 90,
     ShrinkPowerMinPlayers: 1.5,

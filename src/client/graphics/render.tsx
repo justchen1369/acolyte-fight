@@ -2879,6 +2879,11 @@ function calculateButtonState(key: string, hero: w.Hero, selectedAction: string,
 	let age = (world.tick - (hero.spellChangedTick.get(spell.id) || 0)) / constants.TicksPerSecond;
 	let remainingInSeconds = engine.cooldownRemaining(world, hero, spell.id) / constants.TicksPerSecond;
 
+	let cooldownRate = hero.cooldownRates[spell.id];
+	if (cooldownRate > 0) {
+		remainingInSeconds /= cooldownRate;
+	}
+
 	if (isSelected) {
 		button.color = '#f0f0f0';
 	} else if (spell.passive) {
