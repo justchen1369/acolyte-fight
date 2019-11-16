@@ -1,13 +1,17 @@
+@import '../common.scss';
+
 .game-list .game-card {
     position: relative;
     background: #333;
-    box-shadow: 5px 5px 5px black;
     margin-bottom: 1em;
 
     display: flex;
     flex-direction: column;
 
     transition: background-color 0.2s ease;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .game-list .game-card .game-summary {

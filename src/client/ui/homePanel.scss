@@ -128,8 +128,8 @@
 }
 
 @keyframes glow-loop {
-    from { box-shadow: 0 0 0.1em #0cf8 }
-    to {  box-shadow: 0 0 0.2em #0cf }
+    from { box-shadow: 0 0 0.1em var(--btn-color) }
+    to {  box-shadow: 0 0 0.2em var(--btn-color) }
 }
 
 @media (max-width: 768px) {

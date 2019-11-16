@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .party-invite {
     color: #ccc;
     font-size: 75%;
@@ -20,7 +22,7 @@
 
 .party-list .party-member-ready {
     background: #22ee88;
-    color: #444;
+    color: #eee;
 }
 
 .party-member-editable .settings-icon {
@@ -51,7 +53,9 @@
     display: flex;
     align-items: center;
     font-size: 120%;
-    box-shadow: 5px 5px 5px black;
     padding: 20px;
     margin: 12px 0;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
