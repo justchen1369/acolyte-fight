@@ -254,6 +254,11 @@ const cleanse: EffectInfo = {
     title: "Cleanse",
     text: "Clears all positive and negative effects.",
 };
+const voidRecharge: EffectInfo = {
+    icon: "fas fa-clock",
+    title: "Void recharge",
+    text: "Cooldown twice as fast when in the void.",
+};
 
 const move: MoveSpell = {
     id: Actions.Move,
@@ -2513,6 +2518,7 @@ const teleport: Spell = {
             text: "For 0.25 seconds after teleporting, you will only deal 25% damage and cannot deal fatal damage.",
         },
         cleanse,
+        voidRecharge,
     ],
 
     range: 0.3,
@@ -2547,6 +2553,7 @@ const thrust: Spell = {
     description: "Accelerate quickly, knocking away anything in your path.",
     effects: [
         cleanse,
+        voidRecharge,
     ],
 
     range: 0.4,
@@ -2665,6 +2672,7 @@ const swap: Spell = {
     description: "Swap positions with an enemy, obstacle or meteor. Teleports if you miss.",
     effects: [
         cleanse,
+        voidRecharge,
     ],
     action: "projectile",
 
@@ -2744,6 +2752,7 @@ const voidRush: Spell = {
     description: "For 2.5 seconds, increase movement speed 70%, and also become immune to damage from the void.",
     effects: [
         cleanse,
+        voidRecharge,
     ],
 
     untargeted: true,
@@ -2788,6 +2797,7 @@ const vanish: Spell = {
     description: "Vanish from sight for 2.5 seconds, and also increase movement speed 70%.",
     effects: [
         cleanse,
+        voidRecharge,
     ],
 
     untargeted: true,
