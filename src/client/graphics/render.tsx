@@ -225,7 +225,7 @@ export function render(world: w.World, canvasStack: CanvasStack, options: Render
 function invalidRenderState(world: w.World, rect: ClientRect, options: RenderOptions) {
 	const buttonBar = world.ui.buttonBar;
 	if (buttonBar) {
-		if (buttonBar.screenHeight !== rect.height || buttonBar.screenWidth !== rect.width) {
+		if (buttonBar.screenHeight !== rect.height || buttonBar.screenWidth !== rect.width || buttonBar.retinaMultiplier !== options.retinaMultiplier) {
 			return true;
 		} else if (buttonBar.view === "wheel" && buttonBar.wheelOnRight !== options.wheelOnRight) {
 			return true;
@@ -2551,7 +2551,7 @@ function calculateButtonLayout(keys: KeyConfig[], rect: ClientRect, world: w.Wor
 	if (options.mobile) {
 		return calculateButtonWheelLayout(keys, rect, world, options);
 	} else {
-		return calculateButtonBarLayout(keys, rect, world);
+		return calculateButtonBarLayout(keys, rect, world, options);
 	}
 }
 
@@ -2643,7 +2643,7 @@ function renderButtonWheel(ctx: CanvasRenderingContext2D, config: w.ButtonWheelC
 	}
 }
 
-function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.World): w.ButtonBarConfig {
+function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.World, options: RenderOptions): w.ButtonBarConfig {
 	const Visuals = world.settings.Visuals;
 
 	const hitBoxes = new Map<string, ClientRect>();
@@ -2681,6 +2681,7 @@ function calculateButtonBarLayout(keys: KeyConfig[], rect: ClientRect, world: w.
 		view: "bar",
 		screenHeight: rect.height,
 		screenWidth: rect.width,
+		retinaMultiplier: options.retinaMultiplier,
 		keys,
 		hitBoxes,
 		region,
@@ -2751,6 +2752,7 @@ function calculateButtonWheelLayout(keys: KeyConfig[], rect: ClientRect, world: 
 		view: "wheel",
 		screenWidth: rect.width,
 		screenHeight: rect.height,
+		retinaMultiplier: options.retinaMultiplier,
 		wheelOnRight: options.wheelOnRight,
 		hitSectors,
 		region,

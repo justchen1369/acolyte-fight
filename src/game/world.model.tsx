@@ -170,6 +170,7 @@ export type ButtonConfig = ButtonBarConfig | ButtonWheelConfig;
 export interface ButtonConfigBase {
 	screenWidth: number;
 	screenHeight: number;
+	retinaMultiplier: number;
 }
 
 export interface ButtonBarConfig extends ButtonConfigBase {
