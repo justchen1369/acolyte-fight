@@ -14,9 +14,10 @@
     padding: 20px;
     margin: 12px 0;
     animation: shine-in 0.5s;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s, transform 0.2s;
 
     border: 1px black solid;
+    transform: scale(1);
 
     @include floatShadow();
 }
@@ -28,6 +29,7 @@
     animation: shine-loop 0.5s alternate infinite linear;
 
     border: 1px #fff4 solid;
+    transform: scale(1.05);
 
     @include floatShadow(0 0 8px #0cf4);
 }
