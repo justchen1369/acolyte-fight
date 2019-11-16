@@ -8,6 +8,12 @@
     }
 }
 
+@media (max-width: 512px) {
+    .social-bar {
+        display: none;
+    }
+}
+
 .social-bar {
     position: absolute;
     bottom: 20px;

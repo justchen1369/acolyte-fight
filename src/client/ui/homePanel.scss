@@ -181,3 +181,9 @@
     background-color: #0cf;
     box-shadow: 0 0 8px #0cf8;
 }
+
+@media (max-width: 512px) {
+    .more-io-games {
+        display: none;
+    }
+}
