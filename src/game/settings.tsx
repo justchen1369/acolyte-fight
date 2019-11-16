@@ -2523,7 +2523,7 @@ const teleport: Spell = {
 
     range: 0.3,
     maxAngleDiffInRevs: 1.0,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 12 * TicksPerSecond,
     throttle: false,
     debuff: true,
     chargeTicks: 6,
