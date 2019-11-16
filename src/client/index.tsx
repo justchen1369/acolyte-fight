@@ -36,6 +36,8 @@ import { base } from './url';
 import { Sounds } from '../game/sounds';
 import Root from './ui/root';
 
+import './index.scss';
+
 export async function initialize() {
     console.log("Base URL", url.baseUrl);
 
