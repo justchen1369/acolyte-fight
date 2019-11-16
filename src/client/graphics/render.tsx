@@ -2959,8 +2959,12 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 	const gradient = ctx.createLinearGradient(
 		buttonCenter.x - size / 2, buttonCenter.y - size / 2,
 		buttonCenter.x + size / 2, buttonCenter.y + size / 2);
-	gradient.addColorStop(0, buttonState.color);
-	gradient.addColorStop(1, ColTuple.parse(buttonState.color).darken(0.2).string());
+
+	gradient.addColorStop(0, ColTuple.parse(buttonState.color).darken(0.2).string());
+	gradient.addColorStop(0.45, buttonState.color);
+	gradient.addColorStop(0.45, ColTuple.parse(buttonState.color).darken(0.1).string());
+	gradient.addColorStop(1, buttonState.color);
+
 	ctx.fillStyle = gradient;
 
 	ctx.beginPath();
