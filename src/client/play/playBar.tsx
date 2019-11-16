@@ -41,6 +41,7 @@ class PlayBar extends React.PureComponent<Props, State> {
         return <CustomBar>
             <HrefItem disabled={!this.allowExit()} onClick={() => this.onExitClicked()}><i className="fas fa-chevron-left" /><span className="shrink"> Back to</span> Home</HrefItem>
             {this.props.children}
+            <div className="separator"></div>
             <ButtonPanelLabel />
         </CustomBar>
     }

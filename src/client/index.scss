@@ -213,9 +213,12 @@ a:hover, a:active {
 
 .clickable:hover, .clickable:active, .clickable.selected {
     color: #eee;
-    animation: shine-loop 0.5s alternate infinite linear;
 
     @include strokeShadow(0 0 8px #fff8);
+}
+
+.clickable:hover {
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .error {
