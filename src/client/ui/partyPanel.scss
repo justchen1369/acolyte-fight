@@ -5,7 +5,16 @@
     align-items: center;
 
     font-size: 120%;
-    background: #333;
+
+    background: #444 linear-gradient(
+        160deg,
+        #fff0,
+        #fff2 30%,
+        #fff0 30%,
+        #fff3 85%,
+        #fff1 85%,
+        #fff2);
+
     padding: 20px;
     margin: 12px 0;
 
@@ -18,7 +27,7 @@
 }
 
 .party-mode-row:hover {
-    background: #555;
+    background-color: #555;
 }
 
 .party-mode-row .party-mode-label {
@@ -27,9 +36,10 @@
 }
 
 .party-mode-row.party-mode-selected {
-    background: #2e8;
+    background-color: #2e8;
 }
 
 .party-qr {
     float: right;
+    @include floatShadow();
 }
