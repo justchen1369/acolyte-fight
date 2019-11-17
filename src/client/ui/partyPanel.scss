@@ -6,7 +6,7 @@
 
     font-size: 120%;
 
-    background: #444 linear-gradient(
+    background: #fff4 linear-gradient(
         160deg,
         #fff0,
         #fff2 30%,
@@ -27,7 +27,7 @@
 }
 
 .party-mode-row:hover {
-    background-color: #555;
+    background-color: #fff6;
 }
 
 .party-mode-row .party-mode-label {
@@ -36,7 +36,7 @@
 }
 
 .party-mode-row.party-mode-selected {
-    background-color: #2e8;
+    background-color: #2e8e;
 }
 
 .party-qr {

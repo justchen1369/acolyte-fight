@@ -11,7 +11,7 @@
 
 .party-list .party-member {
     display: inline-block;
-    background: #444;
+    background-color: #fff4;
     color: #ccc;
     padding: 3px 15px;
     border-radius: 15px;
@@ -21,7 +21,7 @@
 }
 
 .party-list .party-member-ready {
-    background: #22ee88;
+    background-color: #2e8e;
     color: #eee;
 }
 
@@ -58,4 +58,14 @@
 
     border: 1px black solid;
     @include floatShadow();
+
+    background-image: linear-gradient(
+        160deg,
+        #fff0,
+        #fff2 30%,
+        #fff0 30%,
+        #fff3 85%,
+        #fff1 85%,
+        #fff2);
+
 }
