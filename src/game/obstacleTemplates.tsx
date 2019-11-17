@@ -284,9 +284,16 @@ export const inward: ObstacleTemplate = {
 
 const shadow: SwatchFill = {
     type: "solid",
-    color: "#000c",
+    color: "#0008",
     shadow: true,
     flash: false,
+    expand: 0.003,
+};
+const outline: SwatchFill = {
+    type: "solid",
+    color: '#0008',
+    flash: false,
+    expand: 0.003,
 };
 
 const defaultTemplate: ObstacleTemplate = {
@@ -305,22 +312,17 @@ const defaultTemplate: ObstacleTemplate = {
             strikeOnly: true,
             bloom: 0.05,
         },
-        {
-            type: "solid",
-            color: '#000',
-            flash: false,
-        },
+        outline,
         {
             type: "solid",
             color: '#ddd',
             deadColor: '#c33',
-            expand: -0.002,
         },
         {
             type: "solid",
             color: '#999',
             deadColor: '#822',
-            expand: -0.005,
+            expand: -0.003,
         },
     ],
 };
@@ -339,22 +341,17 @@ const explosive: ObstacleTemplate = {
 
     render: [
         shadow,
-        {
-            type: "solid",
-            color: "#000",
-            flash: false,
-        },
+        outline,
         {
             type: "solid",
             color: "#fc0",
             deadColor: "#fc0",
-            expand: -0.002,
         },
         {
             type: "solid",
             color: "#c94",
             deadColor: "#fc8",
-            expand: -0.003,
+            expand: -0.002,
         },
     ],
 
@@ -387,21 +384,16 @@ const mirror: ObstacleTemplate = {
             bloom: 0.05,
             strikeOnly: true,
         },
-        {
-            type: "solid",
-            "color": "#000",
-            flash: false,
-        },
+        outline,
         {
             type: "solid",
             "color": "#0cf",
-            expand: -0.002,
         },
         {
             type: "solid",
             "color": "#0ad",
             "deadColor": "#48f",
-            "expand": -0.005,
+            "expand": -0.003,
         },
     ],
 
@@ -426,21 +418,16 @@ const bumper: ObstacleTemplate = {
             bloom: 0.05,
             strikeOnly: true,
         },
-        {
-            type: "solid",
-            color: "#000",
-            flash: false,
-        },
+        outline,
         {
             type: "solid",
             color: "#fc0",
-            expand: -0.002,
         },
         {
             type: "solid",
             "color": "#c94",
             "deadColor": "#753",
-            expand: -0.005,
+            expand: -0.003,
         },
     ],
 
@@ -464,22 +451,17 @@ const spinner: ObstacleTemplate = {
             bloom: 0.05,
             strikeOnly: true,
         },
-        {
-            type: "solid",
-            color: '#000',
-            flash: false,
-        },
+        outline,
         {
             type: "solid",
             color: '#ddd',
             deadColor: '#c33',
-            expand: -0.002,
         },
         {
             type: "solid",
             color: '#999',
             deadColor: '#822',
-            expand: -0.005,
+            expand: -0.003,
         },
     ],
 

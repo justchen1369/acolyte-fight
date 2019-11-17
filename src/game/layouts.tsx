@@ -206,7 +206,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0.16666667,
                 "numPoints": 3,
-                "extent": 0.007,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0
             }
         ],
@@ -242,7 +242,7 @@ export const Layouts: Layouts = {
                 "numPoints": 6,
                 "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.012
+                "angularWidthInRevs": 0.008
             }
         ],
         "numPoints": 6
@@ -355,7 +355,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.22,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 4,
-                "extent": 0.01,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0,
                 "angularWidthInRevs": 0.05
             }
@@ -380,7 +380,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.07,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 3,
-                "extent": 0.007,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0.5
             },
             {
@@ -433,7 +433,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.007,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0,
                 "angularWidthInRevs": 0.02
             }
@@ -467,7 +467,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.2,
                 "numPoints": 3,
-                "extent": 0.007,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0.166667
             }
         ]
@@ -589,7 +589,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.2216666667,
                 "numPoints": 3,
-                "extent": 0.007,
+                "extent": 0.005,
                 "orientationAngleOffsetInRevs": 0,
                 "pattern": [
                     1,

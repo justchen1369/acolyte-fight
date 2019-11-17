@@ -1480,7 +1480,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		// Shadow
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
 			glx.hero(ctxStack, pos.clone().add(ShadowOffset), angle, drawRadius, bodyTexRect, {
-				color: ColTuple.parse('#000c'),
+				color: ColTuple.parse('#0008'),
 			});
 		}
 
