@@ -307,14 +307,14 @@ const defaultTemplate: ObstacleTemplate = {
         },
         {
             type: "solid",
-            color: '#000c',
+            color: '#000',
             flash: false,
         },
         {
             type: "solid",
             color: '#ddd',
             deadColor: '#c33',
-            expand: -0.003,
+            expand: -0.002,
         },
         {
             type: "solid",
@@ -341,7 +341,7 @@ const explosive: ObstacleTemplate = {
         shadow,
         {
             type: "solid",
-            color: "#000c",
+            color: "#000",
             flash: false,
         },
         {
@@ -389,13 +389,13 @@ const mirror: ObstacleTemplate = {
         },
         {
             type: "solid",
-            "color": "#000c",
+            "color": "#000",
             flash: false,
         },
         {
             type: "solid",
             "color": "#0cf",
-            expand: -0.003,
+            expand: -0.002,
         },
         {
             type: "solid",
@@ -428,13 +428,13 @@ const bumper: ObstacleTemplate = {
         },
         {
             type: "solid",
-            color: "#000c",
+            color: "#000",
             flash: false,
         },
         {
             type: "solid",
             color: "#fc0",
-            expand: -0.003,
+            expand: -0.002,
         },
         {
             type: "solid",
@@ -466,14 +466,14 @@ const spinner: ObstacleTemplate = {
         },
         {
             type: "solid",
-            color: '#000c',
+            color: '#000',
             flash: false,
         },
         {
             type: "solid",
             color: '#ddd',
             deadColor: '#c33',
-            expand: -0.003,
+            expand: -0.002,
         },
         {
             type: "solid",
