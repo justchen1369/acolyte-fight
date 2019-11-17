@@ -1,3 +1,5 @@
+@import '../common.scss';
+
 .spell-frequencies-title {
     position: relative;
 }
@@ -7,6 +9,9 @@
     border-collapse: collapse;
     margin: 2em 0;
     background: #222;
+    border: 1px black solid;
+
+    @include floatShadow();
 }
 
 .spell-frequencies-table th {
