@@ -56,8 +56,9 @@
     min-width: 15em;
 }
 
-.spell-frequencies-icon canvas {
-    box-shadow: 0.1em 0.1em #0004;
+.spell-frequencies-icon .spell-icon {
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .spell-frequencies-name {
