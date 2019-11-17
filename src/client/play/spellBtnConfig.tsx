@@ -156,9 +156,9 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
         if (chosenId === spell.id || this.state.hovering === spell.id) {
             color = spell.color;
         } else if (offset === 0) {
-            color = "#888";
+            color = "#666e";
         } else {
-            color = "#444";
+            color = "#333e";
         }
 
         return <Motion key={spell.id} style={{size: spring(size, springConfig), left: spring(left, springConfig)}}>
