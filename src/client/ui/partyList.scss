@@ -18,6 +18,9 @@
     margin-right: 5px;
 
     transition: background-color 0.2s ease, opacity 0.2s ease;
+
+    border: 1px black solid;
+    @include floatShadow();
 }
 
 .party-list .party-member-ready {
