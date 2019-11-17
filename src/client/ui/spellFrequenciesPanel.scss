@@ -57,8 +57,12 @@
 }
 
 .spell-frequencies-icon .spell-icon {
-    border: 1px black solid;
+    border: 1px #fff4 solid;
     @include floatShadow();
+}
+
+.spell-frequencies-table tr:hover .spell-frequencies-icon .spell-icon {
+    @include floatShadow(0 0 8px var(--spell-color));
 }
 
 .spell-frequencies-name {
