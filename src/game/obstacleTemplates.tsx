@@ -312,13 +312,13 @@ const defaultTemplate: ObstacleTemplate = {
         },
         {
             type: "solid",
-            color: '#ccc',
+            color: '#ddd',
             deadColor: '#c33',
             expand: -0.003,
         },
         {
             type: "solid",
-            color: '#888',
+            color: '#999',
             deadColor: '#822',
             expand: -0.005,
         },
@@ -471,13 +471,13 @@ const spinner: ObstacleTemplate = {
         },
         {
             type: "solid",
-            color: '#ccc',
+            color: '#ddd',
             deadColor: '#c33',
             expand: -0.003,
         },
         {
             type: "solid",
-            color: '#888',
+            color: '#999',
             deadColor: '#822',
             expand: -0.005,
         },

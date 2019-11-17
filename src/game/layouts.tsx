@@ -2,8 +2,7 @@ export const Layouts: Layouts = {
     "circle": {
         "color": "#222835",
         "background": "#181b20",
-        "obstacles": [
-        ]
+        "obstacles": []
     },
     "cold": {
         "color": "#1d2e33",
@@ -20,11 +19,11 @@ export const Layouts: Layouts = {
             },
             {
                 "type": "slow",
-                layoutRadius: 0.0725,
-                extent: 0.002,
+                "layoutRadius": 0.0725,
+                "extent": 0.002,
                 "numObstacles": 3,
-                layoutAngleOffsetInRevs: 0.1666666666667,
-                angularWidthInRevs: 0.2
+                "layoutAngleOffsetInRevs": 0.1666666666667,
+                "angularWidthInRevs": 0.2
             },
             {
                 "numObstacles": 3,
@@ -41,31 +40,38 @@ export const Layouts: Layouts = {
                 "numPoints": 6,
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0
-            },
-        ],
+            }
+        ]
     },
     "octogon": {
-        "color": "#202c32",
+        "color": "#192c36",
         "background": "#121c21",
         "obstacles": [
             {
                 "type": "slow",
-                "numObstacles": 4,
+                "numObstacles": 3,
                 "layoutRadius": 0.075,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.05,
+                "extent": 0.0025,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.01
+                "angularWidthInRevs": 0.333333
             },
             {
-                "numObstacles": 4,
+                "numObstacles": 20,
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 4,
-                "extent": 0.03,
+                "extent": 0.009,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.01
+                "angularWidthInRevs": 0.015,
+                "pattern": [
+                    1,
+                    1,
+                    1,
+                    0,
+                    0
+                ]
             }
         ],
         "numPoints": 8
@@ -99,10 +105,10 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0
-            },
+            }
         ],
         "numPoints": 6,
-        angleOffsetInRevs: 0.2,
+        "angleOffsetInRevs": 0.2
     },
     "double": {
         "color": "#332e26",
@@ -110,7 +116,7 @@ export const Layouts: Layouts = {
         "numPoints": 4,
         "obstacles": [
             {
-                type: "bumper",
+                "type": "bumper",
                 "numObstacles": 2,
                 "layoutRadius": 0.07,
                 "layoutAngleOffsetInRevs": 0.125,
@@ -123,10 +129,10 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.33,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 4,
-                "extent": 0.007,
-                "orientationAngleOffsetInRevs": 0,
+                "extent": 0.009,
+                "orientationAngleOffsetInRevs": 0
             }
-        ],
+        ]
     },
     "ring": {
         "color": "#232833",
@@ -134,14 +140,14 @@ export const Layouts: Layouts = {
         "obstacles": [
             {
                 "type": "fast",
-                layoutRadius: 0.1325,
-                extent: 0.0025,
-                numObstacles: 10,
-                layoutAngleOffsetInRevs: 0,
-                angularWidthInRevs: 0.1
+                "layoutRadius": 0.1325,
+                "extent": 0.0025,
+                "numObstacles": 10,
+                "layoutAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.1
             },
             {
-                type: "mirror",
+                "type": "mirror",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -156,10 +162,10 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0
-            },
+            }
         ],
         "angleOffsetInRevs": 0.08333333333,
-        "numPoints": 4,
+        "numPoints": 4
     },
     "exit": {
         "color": "#1f2333",
@@ -200,9 +206,9 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0.16666667,
                 "numPoints": 3,
-                "extent": 0.005,
+                "extent": 0.007,
                 "orientationAngleOffsetInRevs": 0
-            },
+            }
         ],
         "numPoints": 0
     },
@@ -234,13 +240,13 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 6,
-                "extent": 0.007,
+                "extent": 0.025,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.03
+                "angularWidthInRevs": 0.012
             }
         ],
         "numPoints": 6
-	},
+    },
     "snowflake": {
         "color": "#2f1f33",
         "background": "#190d21",
@@ -272,7 +278,7 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.0075,
                 "orientationAngleOffsetInRevs": 0
-            },
+            }
         ]
     },
     "inside5": {
@@ -282,11 +288,11 @@ export const Layouts: Layouts = {
         "obstacles": [
             {
                 "type": "volcano",
-                layoutRadius: 0.0125,
-                extent: 0.0125,
-                numObstacles: 4,
-                angularWidthInRevs: 0.25,
-                layoutAngleOffsetInRevs: 0,
+                "layoutRadius": 0.0125,
+                "extent": 0.0125,
+                "numObstacles": 4,
+                "angularWidthInRevs": 0.25,
+                "layoutAngleOffsetInRevs": 0
             },
             {
                 "numObstacles": 5,
@@ -295,8 +301,8 @@ export const Layouts: Layouts = {
                 "numPoints": 3,
                 "extent": 0.015,
                 "orientationAngleOffsetInRevs": 0.5
-            },
-        ],
+            }
+        ]
     },
     "single": {
         "color": "#292032",
@@ -304,7 +310,7 @@ export const Layouts: Layouts = {
         "numPoints": 3,
         "obstacles": [
             {
-                type: "spinner",
+                "type": "spinner",
                 "numObstacles": 1,
                 "layoutRadius": 0,
                 "layoutAngleOffsetInRevs": 0,
@@ -349,7 +355,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.22,
                 "layoutAngleOffsetInRevs": 0,
                 "numPoints": 4,
-                "extent": 0.008,
+                "extent": 0.01,
                 "orientationAngleOffsetInRevs": 0,
                 "angularWidthInRevs": 0.05
             }
@@ -361,21 +367,21 @@ export const Layouts: Layouts = {
         "background": "#21181b",
         "obstacles": [
             {
-                type: "volcano",
-                layoutRadius: 0.32,
-                extent: 0.002,
-                numObstacles: 5,
-                layoutAngleOffsetInRevs: 0,
-                angularWidthInRevs: 0.15,
+                "type": "volcano",
+                "layoutRadius": 0.32,
+                "extent": 0.002,
+                "numObstacles": 5,
+                "layoutAngleOffsetInRevs": 0,
+                "angularWidthInRevs": 0.15
             },
             {
-                type: "explosive",
+                "type": "explosive",
                 "numObstacles": 10,
-                "layoutRadius": 0.05,
+                "layoutRadius": 0.07,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 3,
-                "extent": 0.005,
-                "orientationAngleOffsetInRevs": 0.5,
+                "extent": 0.007,
+                "orientationAngleOffsetInRevs": 0.5
             },
             {
                 "numObstacles": 5,
@@ -384,10 +390,10 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.02,
                 "orientationAngleOffsetInRevs": 0.5
-            },
+            }
         ],
         "numPoints": 5,
-        "angleOffsetInRevs": 0.1,
+        "angleOffsetInRevs": 0.1
     },
     "mirrorhenge": {
         "color": "#242b33",
@@ -411,7 +417,7 @@ export const Layouts: Layouts = {
                 "numPoints": 4,
                 "extent": 0.018,
                 "orientationAngleOffsetInRevs": 0,
-                "angularWidthInRevs": 0.025
+                "angularWidthInRevs": 0.03
             },
             {
                 "type": "mirror",
@@ -427,11 +433,11 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.005,
+                "extent": 0.007,
                 "orientationAngleOffsetInRevs": 0,
                 "angularWidthInRevs": 0.02
             }
-        ],
+        ]
     },
     "spiral": {
         "color": "#1a2233",
@@ -461,7 +467,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.2,
                 "numPoints": 3,
-                "extent": 0.005,
+                "extent": 0.007,
                 "orientationAngleOffsetInRevs": 0.166667
             }
         ]
@@ -469,19 +475,19 @@ export const Layouts: Layouts = {
     "triplet": {
         "color": "#1e2933",
         "background": "#111321",
-        obstacles: [
+        "obstacles": [
             {
-                type: "spinner",
-                numObstacles: 3,
-                layoutRadius: 0.28,
-                layoutAngleOffsetInRevs: 0.5,
-                numPoints: 3,
-                extent: 0.015 * 1.5,
-                orientationAngleOffsetInRevs: 0.5,
-            },
+                "type": "spinner",
+                "numObstacles": 3,
+                "layoutRadius": 0.28,
+                "layoutAngleOffsetInRevs": 0.5,
+                "numPoints": 3,
+                "extent": 0.0225,
+                "orientationAngleOffsetInRevs": 0.5
+            }
         ],
         "numPoints": 3,
-        "angleOffsetInRevs": 0.16666667,
+        "angleOffsetInRevs": 0.16666667
     },
     "square": {
         "color": "#1a2233",
@@ -502,7 +508,7 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.33,
                 "layoutAngleOffsetInRevs": 0.125,
                 "numPoints": 4,
-                "extent": 0.007,
+                "extent": 0.009,
                 "orientationAngleOffsetInRevs": 0
             }
         ],
@@ -517,11 +523,18 @@ export const Layouts: Layouts = {
                 "layoutRadius": 0.35,
                 "layoutAngleOffsetInRevs": 0.1,
                 "numPoints": 3,
-                "extent": 0.015,
-                "orientationAngleOffsetInRevs": 0.5
+                "extent": 0.013,
+                "orientationAngleOffsetInRevs": 0.5,
+                "pattern": [
+                    1,
+                    1,
+                    1,
+                    1,
+                    0
+                ]
             },
             {
-                type: "bumper",
+                "type": "bumper",
                 "numObstacles": 6,
                 "layoutRadius": 0.15,
                 "layoutAngleOffsetInRevs": 0.2666667,
@@ -572,13 +585,19 @@ export const Layouts: Layouts = {
             },
             {
                 "type": "explosive",
-                "numObstacles": 9,
+                "numObstacles": 12,
                 "layoutRadius": 0.06,
                 "layoutAngleOffsetInRevs": 0.2216666667,
                 "numPoints": 3,
-                "extent": 0.005,
-                "orientationAngleOffsetInRevs": 0
+                "extent": 0.007,
+                "orientationAngleOffsetInRevs": 0,
+                "pattern": [
+                    1,
+                    1,
+                    1,
+                    0
+                ]
             }
         ]
-    },
+    }
 }

@@ -95,9 +95,9 @@ class OverviewTab extends React.PureComponent<Props, State> {
         return <div>
             <h2>Reference</h2>
             <ul>
-                <li><a href="api/acolytefight.d.ts">acolytefight.d.ts</a> - this is a TypeScript file that defines the schema of settings</li>
-                <li><a href="api/ai.contracts.ts">ai.contracts.ts</a> - this is a TypeScript file that defines the inputs and outputs of the AI code</li>
-                <li><a href="api/default.acolytefight.json">default.acolytefight.json</a> - this is a JSON file containing all the default settings of the game</li>
+                <li><a href="api/acolytefight.d.ts" target="_blank">acolytefight.d.ts</a> - this is a TypeScript file that defines the schema of settings</li>
+                <li><a href="api/ai.contracts.ts" target="_blank">ai.contracts.ts</a> - this is a TypeScript file that defines the inputs and outputs of the AI code</li>
+                <li><a href="api/default.acolytefight.json" target="_blank">default.acolytefight.json</a> - this is a JSON file containing all the default settings of the game</li>
             </ul>
         </div>
     }
@@ -167,7 +167,7 @@ class OverviewTab extends React.PureComponent<Props, State> {
             <CodeEditor code={this.state.code} onChange={(code) => this.onCodeChange(code)} />
             {this.state.codeError && <div className="error">{this.state.codeError}</div>}
             <div className="button-row">
-                <div className="btn" onClick={() => this.onSaveModFile(this.props.currentMod, this.state.code)}>Save to File</div>
+                <div className="btn" onClick={(ev) => this.onSaveModClick(ev)}>Save to File</div>
             </div>
             {this.renderDiscard()}
             {this.renderReference()}
@@ -250,7 +250,30 @@ class OverviewTab extends React.PureComponent<Props, State> {
         storage.clearMod(); // Don't await
     }
 
-    private onSaveModFile(currentMod: ModTree, json: string) {
+    private onSaveModClick(ev: React.MouseEvent) {
+        if (ev.altKey && ev.shiftKey) {
+            this.saveSettingsFile();
+        } else {
+            this.saveModFile();
+        }
+    }
+
+    private saveSettingsFile() {
+        const currentMod = this.props.currentMod;
+        if (!currentMod) { return; }
+
+        const settings = editing.modToSettings(currentMod);
+        const json = JSON.stringify(settings, null, "\t");
+
+        let filename = (currentMod.Mod && currentMod.Mod.name) || "acolytefight.mod";
+        filename += ".settings.json";
+
+        FileSaver.saveAs(new Blob([json], {type: "application/json;charset=utf-8"}), filename);
+    }
+
+    private saveModFile() {
+        const currentMod = this.props.currentMod;
+        const json = this.state.code;
         if (currentMod) {
             let filename = (currentMod.Mod && currentMod.Mod.name) || "acolytefight.mod";
             if (!/\.json$/.test(filename)) {
