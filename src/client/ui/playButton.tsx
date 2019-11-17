@@ -136,7 +136,7 @@ class PlayButton extends React.PureComponent<Props, State> {
         } else {
             const state = StoreProvider.getState();
             const world = state.world;
-            if (!this.state.joining && !!world.winner) {
+            if (!this.state.joining && !!world.winner && activated.isActive()) {
                 const join = !this.props.party && !state.options.noAutoJoin && this.shouldAutoJoin(world);
                 this.setState({
                     autoJoin: {
@@ -150,11 +150,6 @@ class PlayButton extends React.PureComponent<Props, State> {
     }
 
     private shouldAutoJoin(world: w.World) {
-        if (!activated.isActive()) {
-            // Don't auto-join inactive players because that will annoy others
-            return false;
-        }
-
         if (world.ui.autoJoin !== undefined) {
             return world.ui.autoJoin;
         }
