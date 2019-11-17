@@ -2902,10 +2902,10 @@ function renderBarButton(ctx: CanvasRenderingContext2D, buttonRegion: ClientRect
 		ctx.lineWidth = 1;
 
 		const gradient = ctx.createLinearGradient(size * 1/3, 0, size * 2/3, size);
-        gradient.addColorStop(0, ColTuple.parse(buttonState.color).darken(0.4).string());
+        gradient.addColorStop(0, ColTuple.parse(buttonState.color).lighten(0.1).string());
+        gradient.addColorStop(0.4, ColTuple.parse(buttonState.color).lighten(0.3).string());
         gradient.addColorStop(0.4, buttonState.color);
-        gradient.addColorStop(0.4, ColTuple.parse(buttonState.color).darken(0.2).string());
-        gradient.addColorStop(1, buttonState.color);
+        gradient.addColorStop(1, ColTuple.parse(buttonState.color).lighten(0.2).string());
 		ctx.fillStyle = gradient;
 		
         ctx.beginPath();
@@ -2958,11 +2958,13 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 		buttonCenter.x - size / 2, buttonCenter.y - size / 2,
 		buttonCenter.x + size / 2, buttonCenter.y + size / 2);
 
-	gradient.addColorStop(0, ColTuple.parse(buttonState.color).darken(0.2).string());
+	gradient.addColorStop(0, ColTuple.parse(buttonState.color).lighten(0.1).string());
+	gradient.addColorStop(0.45, ColTuple.parse(buttonState.color).lighten(0.3).string());
 	gradient.addColorStop(0.45, buttonState.color);
-	gradient.addColorStop(0.45, ColTuple.parse(buttonState.color).darken(0.1).string());
-	gradient.addColorStop(1, buttonState.color);
+	gradient.addColorStop(1, ColTuple.parse(buttonState.color).lighten(0.2).string());
 
+	ctx.lineWidth = 1;
+	ctx.strokeStyle = "#000";
 	ctx.fillStyle = gradient;
 
 	ctx.beginPath();
@@ -2974,6 +2976,7 @@ function renderWheelButton(ctx: CanvasRenderingContext2D, sector: w.HitSector, i
 	}
 	ctx.closePath();
 	ctx.fill();
+	ctx.stroke();
 
 	ctx.clip(); // Clip icon inside button
 
