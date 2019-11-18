@@ -18,7 +18,7 @@ import SpellIcon from '../controls/spellIcon';
 interface Props {
     myGameId: string;
     myHeroId: string;
-    isFinished: boolean;
+    inTutorial: boolean;
     customizingBtn: string;
     customizingMode: boolean;
     allowSpellChoosing: boolean;
@@ -41,7 +41,7 @@ function stateToProps(state: s.State): Props {
     return {
         myGameId: world.ui.myGameId,
         myHeroId,
-        isFinished: !!world.winner || engine.isDead(myHeroId, world),
+        inTutorial: !!state.tutorialLevel,
         customizingBtn: state.world.ui.toolbar.customizingBtn,
         customizingMode: state.customizing,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
@@ -131,7 +131,7 @@ class HintPanel extends React.PureComponent<Props, State> {
             } else {
                 if (this.props.toolbar.hoverBtn) {
                     return this.renderDesktopHint();
-                } else if (this.props.myHeroId && this.props.isFinished) {
+                } else if (this.props.myHeroId && !this.props.inTutorial) {
                     return this.renderAlternativeHint();
                 } else {
                     return this.renderChangeSpellHint();
@@ -193,7 +193,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         }
 
         return <div className="customize-hint-container">
-            <div className="customize-hint">{this.props.toolbar.hoverControl || `${this.renderModifierClick()} a button below to change spells`}</div>
+            <div className="customize-hint">{this.renderModifierClick()} a button below to change spells</div>
         </div>
     }
 
