@@ -140,7 +140,10 @@ const Visuals: VisualSettings = {
         flash: true,
     },
 
-	DefaultFlashTicks: 6,
+    DefaultFlashTicks: 6,
+    
+    HeroOutlineColor: "#0008",
+    HeroOutlineProportion: 0.15,
 
 	NameMargin: Pixel * 2,
 	NameFontPixels: 9,

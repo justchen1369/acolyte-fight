@@ -1506,6 +1506,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 
 function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world: w.World): r.AtlasHeroInstruction[] {
 	const Hero = world.settings.Hero;
+	const Visuals = world.settings.Visuals;
 
 	const heroId = player.heroId;
 	const radiusPixels = Hero.Radius / ctxStack.subpixel;
@@ -1520,8 +1521,8 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 				numPoints: 0,
 				bend: 1,
 
-				stroke: 0.15,
-				strokeMask: '#0008',
+				stroke: Visuals.HeroOutlineProportion,
+				strokeMask: Visuals.HeroOutlineColor,
 			},
 			glyph: {
 				rise: 0.5,

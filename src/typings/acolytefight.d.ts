@@ -1160,6 +1160,10 @@ interface VisualSettings {
 	// Visuals when acolyte takes damage
 	Damage: RenderStrikeParams;
 
+	// Hero outline
+	HeroOutlineProportion: number;
+	HeroOutlineColor: string;
+
 	// Controls the name floating above the acolyte
 	NameMargin: number;
 	NameFontPixels: number;
