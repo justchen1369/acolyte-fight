@@ -1521,7 +1521,7 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 				bend: 1,
 
 				stroke: 0.15,
-				strokeMask: '#000c',
+				strokeMask: '#0008',
 			},
 			glyph: {
 				rise: 0.5,

@@ -12,8 +12,8 @@ export function renderBody(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius: 
 
     ctx.beginPath();
     applyBodyPath(ctx, skin.body);
-    ctx.fill();
     ctx.stroke();
+    ctx.fill();
 
     ctx.restore();
 }
@@ -40,7 +40,7 @@ export function renderGlyph(ctx: CanvasRenderingContext2D, pos: pl.Vec2, radius:
 }
 
 function applyStyle(ctx: CanvasRenderingContext2D, style: h.Style) {
-    ctx.lineWidth = style.stroke || 0;
+    ctx.lineWidth = 2 * (style.stroke || 0); // 2x because we only keep the outside half of the stroke
     ctx.strokeStyle = style.strokeMask || '#0000';
     ctx.fillStyle = style.fillMask || '#fff';
 }
