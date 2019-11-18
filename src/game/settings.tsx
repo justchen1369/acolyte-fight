@@ -33,7 +33,7 @@ const Hero: HeroSettings = {
     Damping: 3,
 
     DamageMitigationTicks: 5 * TicksPerSecond,
-    MaxCooldownWaitTicks: 15,
+    MaxCooldownWaitTicks: 1,
     ThrottleTicks: 0,
 
     MaxHealth: 100,
