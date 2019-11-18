@@ -82,26 +82,6 @@
     animation: fly-from-right 1s both ease-in;
 }
 
-@keyframes fly-from-left {
-    from { transform: translateX(-100vw) }
-    to { transform: translateX(0); }
-}
-
-@keyframes fly-from-right {
-    from { transform: translateX(100vw) }
-    to { transform: translateX(0); }
-}
-
-@keyframes fly-from-top {
-    from { transform: translateY(-100vh) }
-    to { transform: translateY(0); }
-}
-
-@keyframes fly-from-bottom {
-    from { transform: translateY(100vh) }
-    to { transform: translateY(0); }
-}
-
 
 
 .home .title-row video {

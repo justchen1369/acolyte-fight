@@ -593,6 +593,8 @@ table.player-list {
     /* Center contents */
     align-items: center;
     justify-content: space-around;
+
+    animation: fade-in 0.1s ease;
 }
 
 #game-panel .spell-config {
