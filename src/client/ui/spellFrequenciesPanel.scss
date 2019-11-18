@@ -8,7 +8,9 @@
     width: 100%;
     border-collapse: collapse;
     margin: 2em 0;
-    background: #222;
+
+    background: #282828;
+
     border: 1px black solid;
 
     @include floatShadow();
@@ -22,7 +24,7 @@
 }
 
 .spell-frequencies-table thead tr {
-    background-color: #333;
+    background-color: #444;
 }
 
 .spell-frequencies-table tr:hover {
