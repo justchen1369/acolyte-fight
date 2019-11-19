@@ -1010,7 +1010,7 @@ const retractor: Spell = {
 const backlash: Spell = {
     id: 'backlash',
     name: 'Boomerang',
-    description: "Away and back. Hit your enemy twice, if you can.",
+    description: "Away and back. Hit your enemy twice, if you can. First hit does 20 damage, second hit does 10 damage.",
     action: "projectile",
 
     color: '#00ccff',
@@ -1047,6 +1047,18 @@ const backlash: Spell = {
             {
                 trigger: { afterTicks: 37 },
                 type: "clearHits",
+            },
+        ],
+
+        buffs: [
+            {
+                type: "armor",
+                maxTicks: 75,
+                against: Alliances.Enemy,
+                proportion: -0.5,
+                stack: "backlash",
+                source: "backlash",
+                maxStacks: 1,
             },
         ],
 
