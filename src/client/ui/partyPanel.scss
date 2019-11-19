@@ -6,7 +6,7 @@
 
     font-size: 120%;
 
-    background: #fff4 linear-gradient(
+    background: #fff1 linear-gradient(
         160deg,
         #fff0,
         #fff2 30%,
@@ -20,7 +20,8 @@
 
     cursor: pointer;
 
-    transition: background-color 0.2s ease;
+    transform: scale(1);
+    transition: background-color 0.2s ease, transform 0.2s ease;
 
     border: 1px black solid;
     @include floatShadow();
@@ -28,6 +29,7 @@
 
 .party-mode-row:hover {
     background-color: #fff6;
+    transform: scale(1.05);
 }
 
 .party-mode-row .party-mode-label {
