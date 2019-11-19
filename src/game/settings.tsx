@@ -350,7 +350,7 @@ const flamestrike: Spell = {
     projectile: {
         density: 5,
         radius: 0.005,
-        speed: 0.21,
+        speed: 0.23,
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         lifeSteal,
@@ -358,9 +358,9 @@ const flamestrike: Spell = {
         expireAfterCursorTicks: 0,
 
         detonate: {
-            damage: 35,
+            damage: 30,
             lifeSteal,
-            radius: 0.048,
+            radius: 0.04,
             minImpulse: 0.00005,
             maxImpulse: 0.00005,
 
@@ -368,8 +368,8 @@ const flamestrike: Spell = {
         },
 
         partialDetonateRadius: {
-            initialMultiplier: 0.16,
-            ticks: 1.3333 * TicksPerSecond,
+            initialMultiplier: 0.21,
+            ticks: 1 * TicksPerSecond,
         },
 
         partialDamage: {
