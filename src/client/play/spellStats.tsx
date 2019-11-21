@@ -31,7 +31,7 @@ function formatTime(ticks: number) {
 }
 
 function isMultiHit(projectile: ProjectileTemplate) {
-    return projectile.hitInterval < 60 || (projectile.behaviours && projectile.behaviours.some(b => b.type === "clearHits"));
+    return projectile.hitInterval < 120;
 }
 
 class SpellStats extends React.PureComponent<Props, State> {

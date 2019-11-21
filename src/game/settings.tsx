@@ -337,7 +337,7 @@ const fireball: Spell = {
 const flamestrike: Spell = {
     id: 'flamestrike',
     name: 'Fireboom',
-    description: "It's slower than fireball - harder to aim, but does more damage. Takes 1 second to grow to full damage, so keep a little bit of distance for maximum effect.",
+    description: "It's slower than fireball - harder to aim, but does more damage. Takes 0.5 seconds to grow to full damage, so keep a little bit of distance for maximum effect.",
     action: "projectile",
 
     color: '#ff4400',
@@ -350,7 +350,7 @@ const flamestrike: Spell = {
     projectile: {
         density: 5,
         radius: 0.005,
-        speed: 0.23,
+        speed: 0.22,
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         lifeSteal,
@@ -1010,7 +1010,7 @@ const retractor: Spell = {
 const backlash: Spell = {
     id: 'backlash',
     name: 'Boomerang',
-    description: "Away and back. Hit your enemy twice, if you can. First hit does 20 damage, second hit does 10 damage.",
+    description: "Away and back. Hit your enemy twice, if you can. The first hit does 20 damage, the second hit adds another 10 damage.",
     action: "projectile",
 
     color: '#00ccff',
