@@ -474,7 +474,6 @@ const difire: Spell = {
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
     throttle: true,
-    interruptibleAfterTicks: 0,
 
     movementProportionWhileChannelling: 1.0,
 
