@@ -2040,12 +2040,7 @@ const iceBomb: Spell = {
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 1 second.",
-        },
-        {
-            icon: "fas fa-sword",
-            title: "Vulnerable",
-            text: "Enemies receive 25% more damage for 1 second.",
+            text: "Freeze nearby enemies for 2 seconds.",
         },
     ],
     sound: "iceBomb",
@@ -2084,8 +2079,9 @@ const iceBomb: Spell = {
             {
                 type: "movement",
                 stack: "iceBomb",
+                maxStacks: 1,
                 movementProportion: 0.1,
-                maxTicks: 1 * TicksPerSecond,
+                maxTicks: 2 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
@@ -2098,14 +2094,6 @@ const iceBomb: Spell = {
                     bloom: 0.03,
                 },
             },
-            {
-                type: "armor",
-                stack: "frostsplatter",
-                maxTicks: 1 * TicksPerSecond,
-                maxStacks: 1,
-                proportion: 0.25, // more damage
-                against: Alliances.NotFriendly,
-            }
         ],
 
         shieldTakesOwnership: false,
