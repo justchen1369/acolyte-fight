@@ -128,11 +128,11 @@ const Visuals: VisualSettings = {
 	TurnHighlightGrowth: 0.15,
     TurnHighlightFlash: 0.1,
 
-    CastSuccessColor: "#0009",
+    CastSuccessColor: "#1119",
     CastSuccessRadius: 0.03,
     CastSuccessTicks: 15,
     
-    CastFailedColor: "#0009",
+    CastFailedColor: "#1119",
     CastFailedRadius: 0.02,
     CastFailedLineWidth: 0.01,
     CastFailedTicks: 15,
