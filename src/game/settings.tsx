@@ -697,6 +697,10 @@ const kamehameha: Spell = {
         maxChannelingTicks: 1 * TicksPerSecond,
     },
     interruptibleAfterTicks: 0,
+    interruptCancel: {
+        cooldownTicks: 5 * TicksPerSecond,
+        maxChannelingTicks: 0,
+    },
     jitterRatio: 0.0,
 
     intervalTicks: 6,
