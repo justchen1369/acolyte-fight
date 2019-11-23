@@ -737,8 +737,8 @@ const lightning: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        density: 2,
-        radius: 0.005,
+        density: 8,
+        radius: 0.0025,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         collideWith: Categories.All ^ Categories.Projectile,
@@ -749,7 +749,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.5, ticks: 30, vanish: 0.5 },
+            { type: "ray", intermediatePoints: true, ticks: 30, vanish: 0.5 },
             { type: "strike", ticks: 30, flash: true, detonate: 0.01 },
         ],
     },
