@@ -735,8 +735,8 @@ const lightning: Spell = {
     chargeTicks: 0.1 * TicksPerSecond,
 
     projectile: {
-        density: 8,
-        radius: 0.0025,
+        density: 2,
+        radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
         collideWith: Categories.All ^ Categories.Projectile,
@@ -747,7 +747,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "ray", intermediatePoints: true, ticks: 30, vanish: 0.5 },
+            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.5, ticks: 30, vanish: 0.5 },
             { type: "strike", ticks: 30, flash: true, numParticles: 3, },
         ],
     },
@@ -2379,7 +2379,7 @@ const scourge: Spell = {
 
     detonate: {
         damage: 30,
-        radius: Hero.Radius * 4,
+        radius: Hero.Radius * 4.5,
         minImpulse: 0.001,
         maxImpulse: 0.002,
         renderTicks: 30,
