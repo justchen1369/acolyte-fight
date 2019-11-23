@@ -689,8 +689,6 @@ const kamehameha: Spell = {
     revsPerTickWhileChannelling: 0.00005,
 
     strikeCancel: {
-        cooldownTicks: 0.5 * TicksPerSecond,
-        maxChannelingTicks: 1 * TicksPerSecond,
     },
     interruptibleAfterTicks: 0,
     interruptCancel: {
@@ -2239,6 +2237,11 @@ const saber: Spell = {
     name: 'Lightsaber',
     description: "For 1 second, swing your lightsaber to deflect projectiles and knockback enemies!",
     effects: [
+        {
+            icon: "fas fa-unlink",
+            title: "Detach",
+            text: "Lightsaber cuts through any Links or Grapples.",
+        },
     ],
     untargeted: true,
 
@@ -2272,6 +2275,7 @@ const saber: Spell = {
 
     damageTemplate: { damage: 0 },
     hitBuffs: [
+        { type: "delink" },
     ],
 
     trailTicks: 5,
@@ -2294,6 +2298,11 @@ const dualSaber: Spell = {
     name: 'Dualsaber',
     description: "For 1.5 seconds, swing dual lightsabers to deflect projectiles and knockback enemies!",
     effects: [
+        {
+            icon: "fas fa-unlink",
+            title: "Detach",
+            text: "Dualsaber cuts through any Links or Grapples.",
+        },
     ],
     untargeted: true,
 
@@ -2326,6 +2335,7 @@ const dualSaber: Spell = {
 
     damageTemplate: { damage: 0 },
     hitBuffs: [
+        { type: "delink" },
     ],
 
     trailTicks: 5,
@@ -2358,7 +2368,7 @@ const scourge: Spell = {
         {
             icon: "fas fa-clock",
             title: "Recharge",
-            text: "Each enemy you hit reduces all of your cooldowns by 2 seconds.",
+            text: "Each enemy you hit reduces all of your cooldowns by 4 seconds.",
         },
     ],
 
@@ -2390,7 +2400,7 @@ const scourge: Spell = {
                 type: "cooldown",
                 owner: true,
                 against: Alliances.Enemy,
-                adjustCooldown: -2 * TicksPerSecond,
+                adjustCooldown: -4 * TicksPerSecond,
             },
         ],
     },
