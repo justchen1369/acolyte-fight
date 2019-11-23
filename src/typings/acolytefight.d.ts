@@ -493,6 +493,7 @@ declare type HomingType =
 	| "enemy" // Home towards the enemy
 	| "cursor" // Home towards where the user initially clicked when they shot this projectile
 	| "follow" // Home towards where the user's mouse is right now
+	| "release" // Home towards position of cursor when button was released
 
 declare interface BehaviourTemplateBase {
 	type: string;

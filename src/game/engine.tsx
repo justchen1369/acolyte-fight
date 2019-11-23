@@ -31,6 +31,7 @@ interface ProjectileConfig {
 	initialFilterGroupIndex?: number;
 	filterGroupIndex?: number;
 	direction?: pl.Vec2;
+	releaseTarget?: pl.Vec2;
 }
 
 interface DetonateConfig {
@@ -731,8 +732,11 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		linkable: projectileTemplate.linkable,
 		swappable: projectileTemplate.swappable !== undefined ? projectileTemplate.swappable : true,
 
-		target,
-		targetId: targetObj ? targetObj.id : null,
+		target: {
+			heroId: targetObj ? targetObj.id : null,
+			pos: target,
+			releasePos: config.releaseTarget || target,
+		},
 		hitTickLookup: new Map<string, number>(),
 		hitInterval: projectileTemplate.hitInterval,
 
@@ -854,7 +858,7 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		if (!trigger) {
 			world.behaviours.push(behaviour);
 		} else if (trigger.atCursor) {
-			const distanceToCursor = vector.distance(projectile.target, projectile.body.getPosition());
+			const distanceToCursor = vector.distance(projectile.target.pos, projectile.body.getPosition());
 			const speed = projectile.body.getLinearVelocity().length();
 			const ticksToCursor = ticksTo(distanceToCursor, speed);
 
@@ -2567,7 +2571,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 }
 
 function swapOwnership(projectile: w.Projectile, newOwner: string, world: w.World) {
-	projectile.targetId = projectile.owner;
+	projectile.target.heroId = projectile.owner;
 	projectile.owner = newOwner;
 
 	let fixture = projectile.body.getFixtureList();
@@ -2972,11 +2976,11 @@ function bounceToNext(projectile: w.Projectile, hit: w.Hero, world: w.World) {
 	let nextTargetId: string;
 
 	if (hit.id === projectile.owner) {
-		nextTargetId = projectile.targetId;
+		nextTargetId = projectile.target.heroId;
 	} else {
 		if ((calculateAlliance(projectile.owner, hit.id, world) & Alliances.NotFriendly) > 0) {
 			// Bouncer will now target the hero that it just hit
-			projectile.targetId = hit.id;
+			projectile.target.heroId = hit.id;
 		}
 		nextTargetId = projectile.owner;
 	}
@@ -3124,7 +3128,7 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 			target = owner.body.getPosition();
 		}
 	} else if (targetType === w.HomingTargets.enemy) {
-		const targetObj = world.objects.get(projectile.targetId);
+		const targetObj = world.objects.get(projectile.target.heroId);
 		if (targetObj) {
 			target = targetObj.body.getPosition();
 
@@ -3137,9 +3141,11 @@ function findHomingTarget(targetType: HomingType, projectile: w.Projectile, worl
 			}
 		}
 	} else if (targetType === w.HomingTargets.cursor) {
-		target = projectile.target;
+		target = projectile.target.pos;
+	} else if (targetType === w.HomingTargets.release) {
+		target = projectile.target.releasePos;
 	} else if (targetType === w.HomingTargets.follow) {
-		target = projectile.target;
+		target = projectile.target.pos;
 
 		const owner = world.objects.get(projectile.owner);
 		if (owner && owner.category === "hero" && owner.target) {
@@ -4041,7 +4047,9 @@ function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, 
 		}
 	}
 
-	addProjectile(world, hero, target, spell, template);
+	addProjectile(world, hero, target, spell, template, {
+		releaseTarget: hero.target,
+	});
 
 	return true;
 }
@@ -4095,7 +4103,7 @@ function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: Focu
 		done = true;
 
 		if (spell.releaseBehaviours && focus && focus.category === "projectile") {
-			focus.target = hero.target;
+			focus.target.pos = hero.target;
 			instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
 		}
 	} else if (focus && focus.category === "projectile") {

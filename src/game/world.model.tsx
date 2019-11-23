@@ -756,8 +756,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	bumpable?: boolean;
 	conveyable?: boolean;
 
-	target: pl.Vec2;
-	targetId: string | null;
+	target: ProjectileTargets;
 
 	damageTemplate: DamagePacketTemplate;
 	partialDamage?: PartialDamageParameters;
@@ -790,6 +789,13 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 
 	uiPath: pl.Vec2[]; // is only used for the UI and not guaranteed to be sync'd across clients!
 	uiShake?: Shake;
+}
+
+export interface ProjectileTargets {
+	pos: pl.Vec2; // Projectile target position
+	heroId: string; // Which hero was closest when firing the projectile
+
+	releasePos: pl.Vec2; // Cursor position when button released
 }
 
 export interface DamagePacket {
@@ -828,6 +834,7 @@ export namespace HomingTargets {
 	export const enemy = "enemy";
 	export const self = "self";
 	export const cursor = "cursor";
+	export const release = "release";
 	export const follow = "follow";
 }
 
