@@ -2354,7 +2354,7 @@ const scourge: Spell = {
         },
         {
             icon: "fas fa-clock",
-            title: "Life recharge",
+            title: "Recharge",
             text: "Each enemy you hit reduces all of your cooldowns by 2 seconds.",
         },
     ],
