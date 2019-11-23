@@ -228,7 +228,7 @@ const Choices: ChoiceSettings = {
 		"e": [
             ["armor", "shield", "icewall"],
             ["saber", "dualSaber"],
-            ["phaseOut"],
+            ["phaseOut", "blaze"],
             ["horcrux"],
             ["meteor", "meteorite"],
         ],
@@ -242,7 +242,7 @@ const Choices: ChoiceSettings = {
             ["bump", "scourge"],
             ["firespray", "iceBomb"],
             ["mines"],
-            ["halo", "blaze"],
+            ["halo"],
         ],
 	},
     Special: {
@@ -1010,14 +1010,14 @@ const retractor: Spell = {
 const backlash: Spell = {
     id: 'backlash',
     name: 'Boomerang',
-    description: "Away and back. Hit your enemy twice, if you can. The first hit does 20 damage, the second hit adds another 10 damage.",
+    description: "Away and back. Hit your enemy twice, if you can. Cooldown reduced 0.75 seconds if you hit.",
     action: "projectile",
 
     color: '#00ccff',
     icon: "crackedBallDunk",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 1.5 * TicksPerSecond,
+    cooldown: 2.25 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -1052,13 +1052,11 @@ const backlash: Spell = {
 
         buffs: [
             {
-                type: "armor",
-                maxTicks: 75,
+                type: "cooldown",
+                owner: true,
                 against: Alliances.Enemy,
-                proportion: -0.5,
-                stack: "backlash",
-                source: "backlash",
-                maxStacks: 1,
+                spellId: "backlash",
+                adjustCooldown: -0.75 * TicksPerSecond,
             },
         ],
 

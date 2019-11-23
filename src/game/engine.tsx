@@ -4689,6 +4689,9 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 	hero.keysToSpells.forEach(spellId => {
 		if (!template.spellId || spellId === template.spellId) {
 			let cooldown = cooldownRemaining(world, hero, spellId);
+			if (template.adjustCooldown !== undefined) {
+				cooldown += template.adjustCooldown;
+			}
 			if (template.maxCooldown !== undefined) {
 				cooldown = Math.min(template.maxCooldown, cooldown);
 			}

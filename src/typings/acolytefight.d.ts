@@ -854,6 +854,7 @@ declare interface SetCooldownTemplate extends BuffTemplateBase {
 	spellIds?: string[];
 	minCooldown?: number;
 	maxCooldown?: number;
+	adjustCooldown?: number; // Add or subtract cooldown
 	cooldownRate?: number; // Whether cooldown ticks faster or slower
 	color?: string;
 }
