@@ -1137,10 +1137,7 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 
 	const invisible = engine.isHeroInvisible(hero);
 	if (invisible) {
-		const visible = world.ui.myHeroId ? (engine.calculateAlliance(world.ui.myHeroId, hero.id, world) & Alliances.Friendly) > 0  : true;
-		if (!invisible.noBuffs) {
-			renderBuffs(ctxStack, hero, pos, world, visible);
-		}
+		renderBuffs(ctxStack, hero, pos, world);
 	} else {
 		renderHeroCharacter(ctxStack, hero, pos, world);
 
@@ -1156,6 +1153,11 @@ function renderHero(ctxStack: CanvasCtxStack, hero: w.Hero, world: w.World, opti
 	}
 
 	playHeroSounds(ctxStack, hero, pos, world);
+}
+
+function visibleToMe(heroId: string, world: w.World) {
+	const visible = world.ui.myHeroId ? (engine.calculateAlliance(world.ui.myHeroId, heroId, world) & Alliances.Friendly) > 0  : true;
+	return visible;
 }
 
 function renderHeroArrival(ctxStack: CanvasCtxStack, pos: pl.Vec2, outward: pl.Vec2, arriving: boolean, hero: w.Hero, world: w.World) {
@@ -1237,15 +1239,30 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 	});
 }
 
-function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World, visible: boolean = true) {
+function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world: w.World) {
+	const invisible = engine.isHeroInvisible(hero);
+	const isVisibleToMe = visibleToMe(hero.id, world);
+
 	hero.buffs.forEach(buff => {
 		if (buff.renderStart && !buff.uiStartRendered) {
 			buff.uiStartRendered = true;
-			renderBuffSmoke(ctxStack, buff.renderStart, buff, hero, pos, world, visible);
+			renderBuffSmoke(ctxStack, buff.renderStart, buff, hero, pos, world);
 		}
 
 		if (buff.render) {
-			renderBuffSmoke(ctxStack, buff.render, buff, hero, pos, world, visible);
+			let visible = true;
+			if (invisible) {
+				if (invisible.noBuffs) {
+					visible = false;
+				}
+				if (buff.render.invisible && !isVisibleToMe) {
+					visible = false;
+				}
+			}
+
+			if (visible) {
+				renderBuffSmoke(ctxStack, buff.render, buff, hero, pos, world);
+			}
 		}
 
 		if (buff.sound) {
@@ -1263,7 +1280,7 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 		}
 
 		if (buff.renderFinish) {
-			renderBuffSmoke(ctxStack, buff.renderFinish, buff, hero, pos, world, visible);
+			renderBuffSmoke(ctxStack, buff.renderFinish, buff, hero, pos, world);
 		}
 
 		if (buff.sound) {
@@ -1277,12 +1294,8 @@ function renderBuffs(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, world
 	hero.uiDestroyedBuffs = [];
 }
 
-function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World, visible: boolean = true) {
+function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.Buff, hero: w.Hero, heroPos: pl.Vec2, world: w.World) {
 	const Visuals = world.settings.Visuals;
-
-	if (render.invisible && !visible) {
-		return;
-	}
 
 	let color = render.color;
 	if (render.selfColor && buff.owner === world.ui.myHeroId) {

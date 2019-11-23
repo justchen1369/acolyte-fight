@@ -2434,7 +2434,7 @@ const shield: Spell = {
 const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Shift',
-    description: "For 0.5 seconds, disappear from the world. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cancels all knockback.",
+    description: "Hold down the button to disappear from the world for up to 0.75 seconds. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cancels all knockback.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2442,41 +2442,51 @@ const phaseOut: Spell = {
     throttle: false,
     unlink: true,
 
-    maxChannellingTicks: 0.5 * TicksPerSecond,
+    interruptibleAfterTicks: 0.25 * TicksPerSecond,
+    maxChannellingTicks: 0.75 * TicksPerSecond,
+    release: {
+        interrupt: true,
+        interruptibleAfterTicks: 0.25 * TicksPerSecond,
+    },
 
     buffs: [
         {
             type: "mass",
+            channelling: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 1 * TicksPerSecond,
             radius: 1 * Hero.Radius,
             density: 1000000,
             restrictCollideWith: 0,
         },
         {
             type: "armor",
+            channelling: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 1 * TicksPerSecond,
             proportion: -1, // Full immunity
         },
         {
             type: "movement",
+            channelling: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 1 * TicksPerSecond,
             movementProportion: 0,
         },
         {
             type: "glide",
+            channelling: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 1 * TicksPerSecond,
             linearDampingMultiplier: 1000,
         },
         {
             type: "vanish",
+            channelling: true,
             noTargetingIndicator: true,
             noBuffs: true,
             cleansable: false,
-            maxTicks: 0.5 * TicksPerSecond,
+            maxTicks: 1 * TicksPerSecond,
             sound: "phaseOut",
             renderStart: {
                 numParticles: 10,
