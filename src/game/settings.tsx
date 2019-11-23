@@ -2352,7 +2352,7 @@ const scourge: Spell = {
         {
             icon: "fas fa-weight-hanging",
             title: "Heavy",
-            text: "Overloaded energy increases your mass. Knockback reduced 75%.",
+            text: "Knockback reduced 75% while overloading.",
         },
         {
             icon: "fas fa-clock",
