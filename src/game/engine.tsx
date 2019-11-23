@@ -770,7 +770,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		minTicks: projectileTemplate.minTicks || 0,
 		maxTicks: projectileTemplate.maxTicks,
 		collideWith,
-		sensor: projectileTemplate.sensor,
+		sense: (projectileTemplate.sense || 0) | (projectileTemplate.sensor ? projectileTemplate.collideWith : 0),
 		expireOn: projectileTemplate.expireOn !== undefined ? projectileTemplate.expireOn : (Categories.All ^ Categories.Shield),
 		expireAgainstHeroes: projectileTemplate.expireAgainstHeroes !== undefined ? projectileTemplate.expireAgainstHeroes : constants.Alliances.All,
 		expireAgainstObjects: projectileTemplate.expireAgainstObjects !== undefined ? projectileTemplate.expireAgainstObjects : constants.Alliances.All,
@@ -2540,6 +2540,11 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
+	if ((other.sense & projectile.categories) > 0 && (other.collideWith & projectile.categories) === 0) {
+		// The other projectile just senses us, it does not collide with us
+		return;
+	}
+
 	takeHit(projectile, other.id, world); // Make the projectile glow
 
 	if (expireOn(world, projectile, other)) {

@@ -743,7 +743,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	owner: string;
 	body: pl.Body;
 	collideWith: number;
-	sensor?: boolean;
+	sense: number;
 	filterGroupIndex: number;
 
 	collidedTick?: number;

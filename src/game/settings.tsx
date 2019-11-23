@@ -1999,6 +1999,7 @@ const mines: Spell = {
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
+        sense: Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
         conveyable: true,
         destructible: {
