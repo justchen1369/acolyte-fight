@@ -1505,7 +1505,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		const strokeColor = ColTuple.parse(hero.casting.color).alpha(hero.casting.proportion);
 		glx.circleSwatch(ctxStack, pos, {
 			color: strokeColor,
-			minRadius: radius,
+			minRadius: 0,
 			maxRadius: radius + Visuals.ChargingRadius,
 			feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 				sigma: DefaultBloomRadius,
