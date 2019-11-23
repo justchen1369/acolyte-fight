@@ -567,7 +567,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		vector.fromAngle(vector.Tau * 5 / 8, radius).add(ev.target),
 		vector.fromAngle(vector.Tau * 7 / 8, radius).add(ev.target),
 	];
-	underlay({
+	pushTrail({
 		type: 'line',
 		initialTick: ev.tick,
 		max: Visuals.CastFailedTicks,
@@ -577,7 +577,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		fillStyle: Visuals.CastFailedColor,
 		vanish: 1,
 	}, world);
-	underlay({
+	pushTrail({
 		type: 'line',
 		initialTick: ev.tick,
 		max: Visuals.CastFailedTicks,
