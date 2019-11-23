@@ -21,6 +21,7 @@ export { CanvasStack, RenderOptions, GraphicsLevel } from './render.model';
 
 const HeroAtlasSizeMultiplier = 2; // Draw larger than the hero to ensure the edges are not cut off
 
+const VectorZero = pl.Vec2(0, 0);
 const MapCenter = pl.Vec2(0.5, 0.5);
 const MaxDestroyedTicks = constants.TicksPerSecond;
 
@@ -1252,7 +1253,7 @@ function renderTargetingIndicator(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	const pos = hero.body.getPosition();
+	const pos = hero.body.getPosition().clone().add(hero.uiEase || VectorZero);
 	const target = world.ui.nextTarget;
 	if (!(pos && target)) {
 		return;

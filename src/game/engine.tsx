@@ -1518,14 +1518,9 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 		// Close any customising dialogs as they cannot be used anymore now the game has started
 		world.ui.toolbar.customizingBtn = null;
 
-		// Clear any stockpiled burns
 		world.objects.forEach(hero => {
 			if (hero.category === "hero") {
-				hero.buffs.forEach(buff => {
-					if (buff.resetOnGameStart) {
-						buff.expireTick = Math.min(buff.expireTick, ev.closeTick);
-					}
-				});
+				resetHeroOnGameStart(hero, world);
 			}
 		});
 	}
@@ -1537,6 +1532,31 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	});
 
 	return true;
+}
+
+function resetHeroOnGameStart(hero: w.Hero, world: w.World) {
+	if (!isInsideMap(hero, world)) {
+		const RecoverProportion = 0.75;
+
+		const oldOffset = vector.diff(hero.body.getPosition(), vectorCenter);
+		const newOffset = vector.relengthen(oldOffset, calculateWorldMinExtent(world) * RecoverProportion);
+		const newPos = vectorCenter.clone().add(newOffset);
+		const adjustment = vector.diff(newPos, hero.body.getPosition());
+
+		if (!hero.uiEase) {
+			hero.uiEase = vector.zero();
+		}
+		hero.uiEase.addMul(-1, adjustment);
+
+		applyPosDelta(hero, adjustment);
+	}
+
+	// Clear any stockpiled burns
+	hero.buffs.forEach(buff => {
+		if (buff.resetOnGameStart) {
+			buff.expireTick = Math.min(buff.expireTick, world.startTick);
+		}
+	});
 }
 
 function handleTeams(ev: n.TeamsMsg, world: w.World) {
@@ -3619,7 +3639,7 @@ function applyLavaDamage(world: w.World) {
 	};
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
-			if (!isInsideMap(obj.body.getPosition(), obj.radius, world)) {
+			if (!isInsideMap(obj, world)) {
 				let damageMultiplier = 1.0;
 				obj.buffs.forEach(buff => {
 					if (buff.type === "lavaImmunity") {
@@ -3638,7 +3658,7 @@ function applyLavaDamage(world: w.World) {
 				}
 			}
 		} else if (obj.category === "obstacle") {
-			if (!isInsideMap(obj.body.getPosition(), shapes.getMinExtent(obj.shape), world)) {
+			if (!isInsideMap(obj, world)) {
 				applyDamageToObstacle(obj, damagePacket, world);
 			}
 		}
@@ -3653,7 +3673,18 @@ function calculateKnockbackFromId(hero: w.Hero, world: w.World) {
 	}
 }
 
-export function isInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
+export function isInsideMap(obj: w.WorldObject, world: w.World) {
+	const pos = obj.body.getPosition();
+	let extent = 0;
+	if (obj.category === "obstacle") {
+		extent = shapes.getMinExtent(obj.shape);
+	} else if (obj.category === "hero" || obj.category === "projectile") {
+		extent = obj.radius;
+	}
+	return isPositionInsideMap(pos, extent, world);
+}
+
+function isPositionInsideMap(pos: pl.Vec2, extent: number, world: w.World) {
 	if (world.shrink <= 0) {
 		return false;
 	}

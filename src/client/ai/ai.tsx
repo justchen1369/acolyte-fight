@@ -243,7 +243,7 @@ function worldToState(world: w.World, myHeroId: string): AI.World {
                 pos: invisible ? invisible.initialPos : obj.body.getPosition(),
                 velocity: obj.body.getLinearVelocity(),
                 heading: obj.body.getAngle(),
-                inside: engine.isInsideMap(obj.body.getPosition(), obj.radius, world),
+                inside: engine.isInsideMap(obj, world),
                 health: obj.health,
                 link: obj.link ? {
                     spellId: obj.link.spellId,
