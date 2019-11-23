@@ -1522,8 +1522,9 @@ function heroBodyInstructions(ctxStack: CanvasCtxStack, player: w.Player, world:
 	const Visuals = world.settings.Visuals;
 
 	const heroId = player.heroId;
-	const radiusPixels = Hero.Radius / ctxStack.subpixel;
-	const atlasPixels = Math.ceil(2 * radiusPixels * HeroAtlasSizeMultiplier); // 2x because need to fit diameter in the atlas not the radius
+	const atlasSizeMultiplier = 2 * HeroAtlasSizeMultiplier; // 2x because need to fit diameter in the atlas not the radius
+	const atlasPixels = Math.ceil(2 * HeroAtlasSizeMultiplier * Hero.Radius / ctxStack.subpixel);
+	const radiusPixels = atlasPixels / atlasSizeMultiplier;
 
 	const template: r.AtlasHeroInstruction = {
 		id: null,
