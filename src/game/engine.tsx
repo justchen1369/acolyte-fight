@@ -3337,11 +3337,16 @@ function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
 
 	if (world.tick < shield.expireTick) {
 		const hero = world.objects.get(shield.owner);
-		if (hero) {
+		if (hero && hero.category === "hero") {
 			shield.body.setPosition(hero.body.getPosition());
 
+			let targetAngle = hero.body.getAngle();
+			if (hero.target) {
+				targetAngle = vector.angleDiff(hero.target, hero.body.getPosition());
+			}
+
 			let angle = shield.body.getAngle();
-			angle = vector.turnTowards(angle, hero.body.getAngle(), shield.turnRate);
+			angle = vector.turnTowards(angle, targetAngle, shield.turnRate);
 			shield.body.setAngle(angle);
 
 			return true;
