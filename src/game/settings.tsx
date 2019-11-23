@@ -42,6 +42,14 @@ const Hero: HeroSettings = {
     RevolutionsPerTick: 1.0,
 }
 
+const recoverySpellIds = [
+    "teleport",
+    "thrust",
+    "swap",
+    "vanish",
+    "voidRush",
+];
+
 const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutProportion: 0.625,
@@ -52,13 +60,7 @@ const World: WorldSettings = {
     LavaBuffs: [
         {
             type: "cooldown",
-            spellIds: [
-                "teleport",
-                "thrust",
-                "swap",
-                "vanish",
-                "voidRush",
-            ],
+            spellIds: recoverySpellIds,
             maxTicks: 20,
             cooldownRate: 2,
         },
@@ -2346,12 +2348,51 @@ const scourge: Spell = {
     description: "Release a melee-range explosion that will send your enemies flying. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
 
+    effects: [
+        {
+            icon: "fas fa-clock",
+            title: "Heavy",
+            text: "Overloaded energy increases your mass. Knockback reduced 75%.",
+        },
+        {
+            icon: "fas fa-clock",
+            title: "Life recharge",
+            text: "Each enemy you hit reduces the cooldown of your recovery (Teleport, Charge, Void Rush, Vanish, Swap) spell by 4 seconds.",
+        },
+    ],
+
+    chargeBuffs: [
+        {
+            type: "mass",
+            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            radius: Hero.Radius,
+            density: Hero.Density * 3,
+        },
+        {
+            type: "glide",
+            maxTicks: 0.5 * TicksPerSecond,
+            channelling: true,
+            linearDampingMultiplier: 4,
+        },
+    ],
+
     detonate: {
         damage: 30,
         radius: Hero.Radius * 4,
         minImpulse: 0.001,
         maxImpulse: 0.002,
         renderTicks: 30,
+
+        buffs: [
+            {
+                type: "cooldown",
+                owner: true,
+                against: Alliances.Enemy,
+                spellIds: recoverySpellIds,
+                adjustCooldown: -4 * TicksPerSecond,
+            },
+        ],
     },
     chargeTicks: 0.5 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
@@ -2359,6 +2400,9 @@ const scourge: Spell = {
     unlink: true,
 
     interruptibleAfterTicks: 0,
+    interruptCancel: {
+        cooldownTicks: 5 * TicksPerSecond,
+    },
 
     selfDamage: 10,
     minSelfHealth: 1,

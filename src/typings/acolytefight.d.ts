@@ -309,7 +309,8 @@ declare interface SpellBase {
 	revsPerTickWhileChannelling?: number; // If set, defines how quickly the hero can orient themselves towards the cursor while channelling
 	cooldown: number;
 	voidCooldownMultiplier?: number; // Cooldown ticks at this rate while in the void
-    interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
+	interruptibleAfterTicks?: number; // Cannot interrupt a spell until it has been channeling for at least this length
+	interruptCancel?: SpellCancelParams; // If the spell is cancelled by the caster, apply this cooldown
 	strikeCancel?: SpellCancelParams; // If this spell is being channelled, whether being hit by something cancels it.
 	
 	chargeBuffs?: BuffTemplate[]; // Apply these buffs at the start of charging the spell

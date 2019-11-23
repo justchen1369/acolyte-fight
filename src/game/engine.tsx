@@ -1943,6 +1943,14 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 	// Start casting a new spell
 	if (!hero.casting || action !== hero.casting.action) {
+		if (hero.casting) {
+			// Cancel previous spell
+			const previousSpell = world.settings.Spells[hero.casting.action.type];
+			if (previousSpell) {
+				cancelCooldown(hero, previousSpell.id, previousSpell.interruptCancel, world);
+			}
+		}
+
 		hero.casting = {
 			id: world.nextObjectId++,
 			action: action,
@@ -2012,11 +2020,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 	if (spell.strikeCancel && hero.strikeTick && hero.strikeTick >= hero.casting.castStartTick) {
 		// Spell cancelled by getting struck
-		const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
-		const maxChannellingTicks = spell.strikeCancel.maxChannelingTicks ? spell.strikeCancel.maxChannelingTicks : Infinity;
-		if (spell.strikeCancel.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
-			setCooldown(world, hero, spell.id, spell.strikeCancel.cooldownTicks);
-		}
+		cancelCooldown(hero, spell.id, spell.strikeCancel, world);
 		hero.casting.stage = w.CastStage.Complete;
 	}
 
@@ -2105,6 +2109,16 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 	if (hero.casting.stage === w.CastStage.Complete) {
 		hero.casting = null;
+	}
+}
+
+function cancelCooldown(hero: w.Hero, spellId: string, cancelParams: SpellCancelParams, world: w.World) {
+	if (!cancelParams) { return };
+
+	const channellingTime = hero.casting.channellingStartTick ? world.tick - hero.casting.channellingStartTick : 0;
+	const maxChannellingTicks = cancelParams.maxChannelingTicks ? cancelParams.maxChannelingTicks : Infinity;
+	if (cancelParams.cooldownTicks !== undefined && channellingTime <= maxChannellingTicks) {
+		setCooldown(world, hero, spellId, cancelParams.cooldownTicks);
 	}
 }
 
