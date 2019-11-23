@@ -500,6 +500,8 @@ export interface ShieldBase extends WorldObjectBase {
 export interface Reflect extends ShieldBase {
 	type: "reflect";
 	radius: number;
+	points: pl.Vec2[];
+	turnRate: number;
 }
 
 export interface Wall extends ShieldBase {

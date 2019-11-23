@@ -925,8 +925,14 @@ declare interface ShieldSpell extends SpellBase {
 }
 
 declare interface ReflectSpell extends ShieldSpell {
-    action: "shield";
+	action: "shield";
+
 	radius: number;
+
+	angularWidthInRevs?: number;
+	numPoints?: number;
+	maxTurnRatePerTickInRevs?: number;
+
 	strike?: RenderStrikeParams;
 }
 

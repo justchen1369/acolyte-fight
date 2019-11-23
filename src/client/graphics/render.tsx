@@ -1850,11 +1850,19 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		}
 		const pos = hero.body.getPosition();
 
-		glx.circleTrail(ctxStack, pos, {
-			color,
-			maxRadius: shield.radius * scale,
-			feather,
-		});
+		if (shield.points) {
+			glx.convexTrail(ctxStack, pos, shield.points, shield.body.getAngle(), scale, {
+				color,
+				maxRadius: shield.radius * scale,
+				feather,
+			});
+		} else {
+			glx.circleTrail(ctxStack, pos, {
+				color,
+				maxRadius: shield.radius * scale,
+				feather,
+			});
+		}
 	} else if (shield.type === "wall") {
 		const pos = shield.body.getPosition();
 		const angle = shield.body.getAngle();

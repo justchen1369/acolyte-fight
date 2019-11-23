@@ -324,7 +324,20 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		position: vector.clone(hero.body.getPosition()),
 	});
 
-	body.createFixture(pl.Circle(spell.radius), {
+	let points: pl.Vec2[] = null;
+	let revs = spell.angularWidthInRevs || 1;
+	if (revs <= 0.5) {
+		points = new Array<pl.Vec2>();
+
+		let numPoints = spell.numPoints || 7;
+		for (let i = 0; i <= numPoints; ++i) {
+			let proportion = (i / numPoints) - 0.5;
+			points.push(vector.fromAngle(revs * vector.Tau * proportion, spell.radius));
+		}
+	}
+
+	let shape: pl.Shape = points ? pl.Polygon(points) : pl.Circle(spell.radius);
+	body.createFixture(shape, {
 		filterCategoryBits: Categories.Shield,
 		filterMaskBits: Categories.Hero | Categories.Projectile,
 		filterGroupIndex: hero.filterGroupIndex,
@@ -345,6 +358,8 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		radius: spell.radius,
+		points,
+		turnRate: (spell.maxTurnRatePerTickInRevs || 1) * vector.Tau,
 		color: spell.color,
 		glow: spell.glow,
 		bloom: spell.bloom,
@@ -352,8 +367,12 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 	};
 
 	world.objects.set(shield.id, shield);
-	hero.shieldIds.add(shield.id);
 	world.behaviours.push({ type: "reflectFollow", shieldId: shield.id });
+
+	if (revs >= 1) {
+		// Only consider a shield if fully enclosed
+		hero.shieldIds.add(shield.id);
+	}
 
 	return shield;
 }
@@ -3310,11 +3329,21 @@ function updateHeroDamping(hero: w.Hero) {
 }
 
 function reflectFollow(behaviour: w.ReflectFollowBehaviour, world: w.World) {
-	const shield = world.objects.get(behaviour.shieldId);
-	if (shield && shield.category === "shield" && shield.type === "reflect" && world.tick < shield.expireTick) {
+	const obj = world.objects.get(behaviour.shieldId);
+	if (!(obj && obj.category === "shield")) { return false; }
+
+	const shield: w.Shield = obj;
+	if (shield.type !== "reflect") { return false; }
+
+	if (world.tick < shield.expireTick) {
 		const hero = world.objects.get(shield.owner);
 		if (hero) {
 			shield.body.setPosition(hero.body.getPosition());
+
+			let angle = shield.body.getAngle();
+			angle = vector.turnTowards(angle, hero.body.getAngle(), shield.turnRate);
+			shield.body.setAngle(angle);
+
 			return true;
 		} else {
 			shield.expireTick = world.tick;
