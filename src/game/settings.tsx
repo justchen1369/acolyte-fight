@@ -1043,6 +1043,7 @@ const backlash: Spell = {
         collideWith: Categories.All ^ Categories.Hero,
         expireOn: Categories.Projectile ^ Categories.Hero,
         expireAgainstHeroes: Alliances.Self,
+        expireAgainstObjects: Alliances.NotFriendly,
         shieldTakesOwnership: false,
         noKnockback: true,
         bumpable: true,
