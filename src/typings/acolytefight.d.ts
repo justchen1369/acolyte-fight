@@ -928,6 +928,7 @@ declare interface ReflectSpell extends ShieldSpell {
 	action: "shield";
 
 	radius: number;
+	growthTicks?: number; // Shield grows to full size over this many ticks
 
 	angularWidthInRevs?: number;
 	numPoints?: number;
@@ -973,6 +974,7 @@ declare interface SaberSpell extends ShieldSpell {
 	angleOffsetsInRevs: number[];
 	length: number;
 	width: number;
+	growthTicks?: number;
 
 	channelling?: boolean;
 	maxTicks: number;

@@ -352,7 +352,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
-		growthTicks: 0,
+		growthTicks: spell.growthTicks !== undefined ? spell.growthTicks : 9,
 		damageMultiplier: spell.damageMultiplier,
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
@@ -465,7 +465,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
-		growthTicks: 5,
+		growthTicks: spell.growthTicks !== undefined ? spell.growthTicks : 0,
 		channelling: spell.channelling,
 
 		damageTemplate: spell.damageTemplate,

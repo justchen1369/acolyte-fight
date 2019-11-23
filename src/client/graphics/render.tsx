@@ -1909,7 +1909,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 		// Draw the saber
 		const handle = vector.fromAngle(angle).mul(hero.radius).add(pos);
-		const tip = vector.fromAngle(angle).mul(shield.length).add(pos);
+		const tip = vector.fromAngle(angle).mul(hero.radius + (shield.length - hero.radius) * scale).add(pos);
 		glx.lineTrail(ctxStack, handle, tip, {
 			color,
 			minRadius: 0,
@@ -1924,11 +1924,11 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			feather,
 		});
 
-		renderSaberTrail(ctxStack, shield, world);
+		renderSaberTrail(ctxStack, shield, scale, world);
 	}
 }
 
-function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.World) {
+function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: number, world: w.World) {
 	const previousAngle = saber.uiPreviousAngle || saber.body.getAngle();
 	const newAngle = saber.body.getAngle();
 
@@ -1937,13 +1937,14 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, world: w.Wor
 
 	applyHighlight(saber.hitTick, saber, world, saber.strike);
 
+	const minRadius = world.settings.Hero.Radius;
 	pushTrail({
 		type: "arc",
 		initialTick: world.tick,
 		max: saber.trailTicks,
 		pos: saber.body.getPosition(),
-		minRadius: world.settings.Hero.Radius,
-		maxRadius: saber.length,
+		minRadius,
+		maxRadius: minRadius + (saber.length - minRadius) * scale,
 		fromAngle: previousAngle,
 		toAngle: newAngle,
 		antiClockwise,
