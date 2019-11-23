@@ -2228,11 +2228,6 @@ const saber: Spell = {
     name: 'Lightsaber',
     description: "For 1 second, swing your lightsaber to deflect projectiles and knockback enemies!",
     effects: [
-        {
-            icon: "fas fa-unlink",
-            title: "Detach",
-            text: "Lightsaber cuts through any Links or Grapples.",
-        },
     ],
     untargeted: true,
 
@@ -2266,7 +2261,6 @@ const saber: Spell = {
 
     damageTemplate: { damage: 0 },
     hitBuffs: [
-        { type: "delink" },
     ],
 
     trailTicks: 5,
@@ -2289,11 +2283,6 @@ const dualSaber: Spell = {
     name: 'Dualsaber',
     description: "For 1.5 seconds, swing dual lightsabers to deflect projectiles and knockback enemies!",
     effects: [
-        {
-            icon: "fas fa-unlink",
-            title: "Detach",
-            text: "Dualsaber cuts through any Links or Grapples.",
-        },
     ],
     untargeted: true,
 
@@ -2326,7 +2315,6 @@ const dualSaber: Spell = {
 
     damageTemplate: { damage: 0 },
     hitBuffs: [
-        { type: "delink" },
     ],
 
     trailTicks: 5,
