@@ -922,6 +922,7 @@ declare interface ShieldSpell extends SpellBase {
 	blocksTeleporters: boolean;
 	glow?: number;
 	bloom?: number;
+	shine?: number;
 }
 
 declare interface ReflectSpell extends ShieldSpell {

@@ -2438,6 +2438,7 @@ const shield: Spell = {
     color: '#3366ff',
     glow: 0.2,
     bloom: 0.03,
+    shine: 0.3,
     strike: {
         ticks: 10,
         flash: true,
@@ -2565,6 +2566,7 @@ const icewall: Spell = {
     color: '#0088ff',
     glow: 0.2,
     bloom: 0.03,
+    shine: 0.3,
     strike: {
         ticks: 10,
         flash: true,

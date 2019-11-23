@@ -363,6 +363,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		color: spell.color,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		shine: spell.shine,
 		strike: spell.strike,
 	};
 
@@ -420,6 +421,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		selfColor: spell.selfPassthrough,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		shine: spell.shine,
 		strike: spell.strike,
 	};
 
