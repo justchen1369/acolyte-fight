@@ -1851,22 +1851,14 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = hero.body.getPosition();
 
 		const gradient = createShieldGradient(shield, color, shield.radius);
-		if (shield.points) {
-			glx.convexTrail(ctxStack, pos, shield.points, shield.body.getAngle(), scale, {
+		if (shield.angularWidth <= Math.PI) {
+			const angle = shield.body.getAngle();
+			glx.arcTrail(ctxStack, pos, angle - shield.angularWidth / 2, angle + shield.angularWidth / 2, false, {
 				color,
 				maxRadius: shield.radius * scale,
 				feather,
 				gradient,
 			});
-
-			if (feather) {
-				// Convex trails don't bloom, add some specifically
-				glx.circleTrail(ctxStack, pos, {
-					color,
-					maxRadius: 0,
-					feather,
-				});
-			}
 		} else {
 			glx.circleTrail(ctxStack, pos, {
 				color,

@@ -358,6 +358,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
 		radius: spell.radius,
+		angularWidth: revs * vector.Tau,
 		points,
 		turnRate: (spell.maxTurnRatePerTickInRevs || 1) * vector.Tau,
 		color: spell.color,
