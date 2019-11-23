@@ -1856,6 +1856,15 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 				maxRadius: shield.radius * scale,
 				feather,
 			});
+
+			if (feather) {
+				// Convex trails don't bloom, add some specifically
+				glx.circleTrail(ctxStack, pos, {
+					color,
+					maxRadius: 0,
+					feather,
+				});
+			}
 		} else {
 			glx.circleTrail(ctxStack, pos, {
 				color,
