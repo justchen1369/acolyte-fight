@@ -2582,7 +2582,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 }
 
 function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile, other: w.Projectile) {
-	if ((other.sense & projectile.categories) > 0 && (other.collideWith & projectile.categories) === 0) {
+	if ((other.sense & projectile.categories) > 0) {
 		// The other projectile just senses us, it does not collide with us
 		return;
 	}
