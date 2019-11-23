@@ -2054,8 +2054,13 @@ const iceBomb: Spell = {
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 2 seconds.",
+            text: "Freeze nearby enemies for 1.5 seconds.",
         },
+		{
+			"icon": "fas fa-sword",
+			"title": "Vulnerable",
+			"text": "Enemies receive 25% more damage for 1.5 seconds."
+		},
     ],
     sound: "iceBomb",
 
@@ -2095,7 +2100,7 @@ const iceBomb: Spell = {
                 stack: "iceBomb",
                 maxStacks: 1,
                 movementProportion: 0.1,
-                maxTicks: 2 * TicksPerSecond,
+                maxTicks: 1.5 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
@@ -2108,6 +2113,14 @@ const iceBomb: Spell = {
                     bloom: 0.03,
                 },
             },
+			{
+				"type": "armor",
+				"stack": "frostsplatter",
+				"maxTicks": 1.5 * TicksPerSecond,
+				"maxStacks": 1,
+				"proportion": 0.25,
+				"against": Alliances.Enemy,
+			},
         ],
 
         shieldTakesOwnership: false,
@@ -2234,9 +2247,9 @@ const saber: Spell = {
     unlink: true,
     takesOwnership: true,
     blocksTeleporters: false,
-    shiftMultiplier: 0.5,
+    shiftMultiplier: 0.25,
     speedMultiplier: 2,
-    maxSpeed: 0.33,
+    maxSpeed: 0.5,
     maxTurnRatePerTickInRevs: 0.1,
     damageMultiplier: 0.25,
 
@@ -2289,9 +2302,9 @@ const dualSaber: Spell = {
     unlink: true,
     takesOwnership: true,
     blocksTeleporters: false,
-    shiftMultiplier: 0.5,
+    shiftMultiplier: 0.25,
     speedMultiplier: 2,
-    maxSpeed: 0.33,
+    maxSpeed: 0.5,
     maxTurnRatePerTickInRevs: 0.1,
     damageMultiplier: 0.25,
 
