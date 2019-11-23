@@ -551,56 +551,41 @@ function renderSetCooldown(ctxStack: CanvasCtxStack, ev: w.SetCooldownEvent, wor
 function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, options: RenderOptions) {
 	if (!options.targetingIndicator) { return; }
 
+	if (ev.success) { return; } // Only care when the cast failed
+
 	const Visuals = world.settings.Visuals;
 
 	if (world.ui.myHeroId !== ev.heroId) {
 		return; // Only show off cooldown indicator for self
 	}
 
-	const spell = world.settings.Spells[ev.spellId];
-
-	if (ev.success) {
-		if (!spell.untargeted) {
-			underlay({
-				type: 'ripple',
-				initialTick: ev.tick,
-				max: Visuals.CastSuccessTicks,
-				pos: ev.target.clone(),
-				fillStyle: Visuals.CastSuccessColor,
-				vanish: 1,
-				initialRadius: 0.5 * Visuals.CastSuccessRadius,
-				finalRadius: Visuals.CastSuccessRadius,
-			}, world);
-		}
-	} else {
-		const radius = Visuals.CastFailedRadius;
-		const points = [
-			vector.fromAngle(vector.Tau * 1 / 8, radius).add(ev.target),
-			vector.fromAngle(vector.Tau * 3 / 8, radius).add(ev.target),
-			vector.fromAngle(vector.Tau * 5 / 8, radius).add(ev.target),
-			vector.fromAngle(vector.Tau * 7 / 8, radius).add(ev.target),
-		];
-		underlay({
-			type: 'line',
-			initialTick: ev.tick,
-			max: Visuals.CastFailedTicks,
-			from: points[0],
-			to: points[2],
-			width: Visuals.CastFailedLineWidth,
-			fillStyle: Visuals.CastFailedColor,
-			vanish: 1,
-		}, world);
-		underlay({
-			type: 'line',
-			initialTick: ev.tick,
-			max: Visuals.CastFailedTicks,
-			from: points[1],
-			to: points[3],
-			width: Visuals.CastFailedLineWidth,
-			fillStyle: Visuals.CastFailedColor,
-			vanish: 1,
-		}, world);
-	}
+	const radius = Visuals.CastFailedRadius;
+	const points = [
+		vector.fromAngle(vector.Tau * 1 / 8, radius).add(ev.target),
+		vector.fromAngle(vector.Tau * 3 / 8, radius).add(ev.target),
+		vector.fromAngle(vector.Tau * 5 / 8, radius).add(ev.target),
+		vector.fromAngle(vector.Tau * 7 / 8, radius).add(ev.target),
+	];
+	underlay({
+		type: 'line',
+		initialTick: ev.tick,
+		max: Visuals.CastFailedTicks,
+		from: points[0],
+		to: points[2],
+		width: Visuals.CastFailedLineWidth,
+		fillStyle: Visuals.CastFailedColor,
+		vanish: 1,
+	}, world);
+	underlay({
+		type: 'line',
+		initialTick: ev.tick,
+		max: Visuals.CastFailedTicks,
+		from: points[1],
+		to: points[3],
+		width: Visuals.CastFailedLineWidth,
+		fillStyle: Visuals.CastFailedColor,
+		vanish: 1,
+	}, world);
 }
 
 function renderEvent(ctxStack: CanvasCtxStack, ev: w.WorldEvent, world: w.World, options: RenderOptions) {
