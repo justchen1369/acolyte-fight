@@ -128,10 +128,10 @@ const Visuals: VisualSettings = {
 	TurnHighlightGrowth: 0.15,
     TurnHighlightFlash: 0.1,
 
-    CastFailedColor: "#1119",
+    CastFailedColor: "#0009",
     CastFailedRadius: 0.025,
     CastFailedLineWidth: 0.015,
-    CastFailedTicks: 15,
+    CastFailedTicks: 30,
 
 	MyHeroColor: '#00ccff',
 	AllyColor: '#00a3cc',
