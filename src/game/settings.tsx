@@ -685,7 +685,6 @@ const kamehameha: Spell = {
         cooldownTicks: 0.5 * TicksPerSecond,
         maxChannelingTicks: 1 * TicksPerSecond,
     },
-    movementCancel: true,
     interruptibleAfterTicks: 0,
     jitterRatio: 0.0,
 
@@ -2361,7 +2360,6 @@ const scourge: Spell = {
     unlink: true,
 
     interruptibleAfterTicks: 0,
-    movementCancel: true,
 
     selfDamage: 10,
     minSelfHealth: 1,

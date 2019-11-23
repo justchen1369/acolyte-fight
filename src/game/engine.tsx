@@ -2123,7 +2123,11 @@ function turnTowards(hero: w.Hero, target: pl.Vec2, revsPerTick?: number) {
 }
 
 function isValidAction(action: w.Action, hero: w.Hero) {
-	if (action.type === w.Actions.Move || action.type === w.Actions.Stop || action.type === w.Actions.Retarget) {
+	if (action.type === w.Actions.Move
+		|| action.type === w.Actions.MoveAndCancel
+		|| action.type === w.Actions.Stop
+		|| action.type === w.Actions.Retarget) {
+
 		return true;
 	} else {
 		return hero.spellsToKeys.has(action.type);
@@ -2132,21 +2136,18 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 
 function applyPreAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {
 	switch (spell.action) {
-		case "move": return moveAction(world, hero, action, spell);
+		case "move": return movePreAction(world, hero, action, spell);
 		case "retarget": return true; // All actions retarget - nothing extra to do
 		default: return false;
 	}
 }
 
-function moveAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
+function movePreAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
 	hero.moveTo = action.target;
-	if (spell.cancelChanneling && hero.casting && !hero.casting.uninterruptible) {
-		const channelling = world.settings.Spells[hero.casting.action.type];
-		if (channelling.movementCancel) {
-			hero.casting = null;
-		}
-	}
-	return true;
+
+	// To cancel, say we're not done, this makes the move spell replace the current spell and cancel
+	const done = !spell.cancelChanneling;
+	return done;
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {

@@ -412,7 +412,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             if (this.currentTouch !== null) {
                 let spell = world.settings.Spells[world.ui.nextSpellId];
                 if (!spell) {
-                    spell = Spells.move;
+                    spell = Spells.go;
                 }
                 if (spell && !spell.passive) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
