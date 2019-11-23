@@ -1086,13 +1086,13 @@ const backlash: Spell = {
 };
 const rocket: Spell = {
     id: 'rocket',
-    name: 'Spirit Missile',
-    description: "You control Spirit Missile while it is flying, but while doing this, you cannot move. Cast Spirit Missile again to detonate at exactly the right moment.",
+    name: 'Spirit Bomb',
+    description: "You control Spirit Bomb while it is flying, but while doing this, you cannot move. Cast Spirit Bomb again to detonate at exactly the right moment.",
     effects: [
         {
             icon: "fas fa-hand-paper",
             title: "Interruptible",
-            text: "If you take an enemy hit, Spirit Missile will be interrupted.",
+            text: "If you take an enemy hit, Spirit Bomb will be interrupted.",
         },
         {
             icon: "fas fa-snowflake",
@@ -1124,8 +1124,8 @@ const rocket: Spell = {
         expireOn: Categories.All ^ Categories.Shield,
         shieldTakesOwnership: false,
 
-        partialDamage: {
-            initialMultiplier: 0.5,
+        partialDetonateRadius: {
+            initialMultiplier: 0.33,
             ticks: 1 * TicksPerSecond,
         },
 
