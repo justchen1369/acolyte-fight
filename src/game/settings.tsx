@@ -2357,7 +2357,7 @@ const scourge: Spell = {
         {
             icon: "fas fa-clock",
             title: "Life recharge",
-            text: "Each enemy you hit reduces the cooldown of your recovery (Teleport, Charge, Void Rush, Vanish, Swap) spell by 4 seconds.",
+            text: "Each enemy you hit reduces all of your cooldowns by 2 seconds.",
         },
     ],
 
@@ -2389,8 +2389,7 @@ const scourge: Spell = {
                 type: "cooldown",
                 owner: true,
                 against: Alliances.Enemy,
-                spellIds: recoverySpellIds,
-                adjustCooldown: -4 * TicksPerSecond,
+                adjustCooldown: -2 * TicksPerSecond,
             },
         ],
     },
