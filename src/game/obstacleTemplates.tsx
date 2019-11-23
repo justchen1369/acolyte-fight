@@ -327,6 +327,39 @@ const defaultTemplate: ObstacleTemplate = {
     ],
 };
 
+const lightweight: ObstacleTemplate = {
+    health: 100,
+    density: 5,
+    linearDamping: 3,
+    strike: {
+        ticks: 6,
+        flash: true,
+        growth: 0.005,
+    },
+
+    render: [
+        shadow,
+        {
+            type: "bloom",
+            color: '#ccc',
+            strikeOnly: true,
+            bloom: 0.05,
+        },
+        outline,
+        {
+            type: "solid",
+            color: '#eee',
+            deadColor: '#c33',
+        },
+        {
+            type: "solid",
+            color: '#aaa',
+            deadColor: '#822',
+            expand: -0.003,
+        },
+    ],
+};
+
 const explosive: ObstacleTemplate = {
     health: 50,
     density: 10,
@@ -471,6 +504,7 @@ const spinner: ObstacleTemplate = {
 export const ObstacleTemplates: ObstacleTemplateLookup = {
     default: defaultTemplate,
     explosive,
+    lightweight,
     bumper,
     mirror,
     spinner,

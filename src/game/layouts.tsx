@@ -58,6 +58,7 @@ export const Layouts: Layouts = {
                 "angularWidthInRevs": 0.333333
             },
             {
+                type: "lightweight",
                 "numObstacles": 20,
                 "layoutRadius": 0.25,
                 "layoutAngleOffsetInRevs": 0,
