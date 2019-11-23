@@ -263,7 +263,7 @@ const Choices: ChoiceSettings = {
 const cleanse: EffectInfo = {
     icon: "fas fa-briefcase-medical",
     title: "Cleanse",
-    text: "Clears most positive and negative effects.",
+    text: "Clears all positive and negative effects.",
 };
 const voidRecharge: EffectInfo = {
     icon: "fas fa-clock",
@@ -452,7 +452,6 @@ const triplet: Spell = {
                 collideWith: Categories.Hero | Categories.Obstacle,
                 against: Alliances.NotFriendly,
                 stack: "fire",
-                cleansable: false,
                 hitInterval: TicksPerSecond / 3,
                 packet: { damage: 24 / 3 / 4 / 3, lifeSteal, noHit: true }, // 3 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
@@ -529,7 +528,6 @@ const difire: Spell = {
                 collideWith: Categories.Hero | Categories.Obstacle,
                 against: Alliances.NotFriendly,
                 stack: "fire",
-                cleansable: false,
                 hitInterval: TicksPerSecond / 3,
                 packet: { damage: 20 / 2 / 4 / 3, lifeSteal, noHit: true }, // 2 projectiles, 4 seconds, 3 times per second
                 maxTicks: 4 * TicksPerSecond,
