@@ -467,6 +467,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 		unranked: params.unranked,
 		autoJoin: params.autoJoin,
 		aco,
+		numGames: params.numGames,
 		controlKey,
 		numActionMessages: 0,
 	});

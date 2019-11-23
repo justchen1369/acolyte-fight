@@ -95,6 +95,7 @@ export interface Player {
     unranked: boolean;
     autoJoin?: boolean;
     aco: number;
+    numGames: number;
 
     controlKey: number;
     numActionMessages: number;

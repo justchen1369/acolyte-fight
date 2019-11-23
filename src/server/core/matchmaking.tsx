@@ -506,7 +506,8 @@ function formatPercent(proportion: number) {
 }
 
 function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
-    if (!((game.bots.size === 0 || game.matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId))) {
+    const Matchmaking = game.matchmaking;
+    if (!((game.bots.size === 0 || Matchmaking.AllowBotTeams) && wu(game.active.values()).every(x => !!x.userId && x.numGames >= Matchmaking.TeamsMinGames))) {
         // Everyone must be logged in to activate team mode
         return [];
     }

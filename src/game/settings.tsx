@@ -16,6 +16,7 @@ const Matchmaking: MatchmakingSettings = {
     MaxBots: 2,
     MaxPlayers: 7,
     AllowBotTeams: false,
+    TeamsMinGames: 25,
     BotRating: 1500,
     RatingPower: 2,
     OddPenalty: 0.75,

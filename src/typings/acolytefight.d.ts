@@ -115,6 +115,7 @@ declare interface MatchmakingSettings {
 	MaxBots: number; // maximum number of bots to add when Play vs AI clicked
 	MaxPlayers: number; // Maximum number of players in one game
 
+	TeamsMinGames: number; // Only create teams if all players have played at least this many games
 	AllowBotTeams: boolean; // Allow teams even when bots are in the game
 	BotRating: number; // If the bot is being matched into teams, consider it to be a player with this rating
 
