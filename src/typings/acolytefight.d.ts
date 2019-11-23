@@ -1166,6 +1166,17 @@ interface VisualSettings {
 	HeroOutlineProportion: number;
 	HeroOutlineColor: string;
 
+	// Display a circle on map when successfully cast
+	CastSuccessColor: string;
+	CastSuccessRadius: number;
+	CastSuccessTicks: number;
+
+	 // Display an X on the map when failed to cast
+	CastFailedColor: string;
+	CastFailedRadius: number;
+	CastFailedLineWidth: number;
+	CastFailedTicks: number;
+
 	// Controls the name floating above the acolyte
 	NameMargin: number;
 	NameFontPixels: number;

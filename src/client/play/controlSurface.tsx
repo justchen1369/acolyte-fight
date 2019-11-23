@@ -61,6 +61,7 @@ interface TouchState {
     id: string;
     stack: number;
     activeKey?: string;
+    touchStartSent?: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -409,7 +410,9 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const Spells = world.settings.Spells;
 
         if (world.ui.nextTarget) {
-            if (this.currentTouch !== null) {
+            if (this.currentTouch && !this.currentTouch.touchStartSent) {
+                this.currentTouch.touchStartSent = true; // Only send when the touch starts
+
                 let spell = world.settings.Spells[world.ui.nextSpellId];
                 if (!spell) {
                     spell = Spells.go;

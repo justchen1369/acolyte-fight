@@ -1084,6 +1084,7 @@ export type WorldEvent =
 	| TeleportEvent
 	| PushEvent
 	| SetCooldownEvent
+	| CastEvent
 
 export interface WorldEventBase {
 	type: string;
@@ -1117,6 +1118,14 @@ export interface SetCooldownEvent extends WorldEventBase {
 	heroId: string;
 	color?: string;
 	sound?: string;
+}
+
+export interface CastEvent extends WorldEventBase {
+	type: "cast";
+	heroId: string;
+	target: pl.Vec2;
+	spellId: string;
+	success: boolean;
 }
 
 export interface PushEvent extends WorldEventBase {

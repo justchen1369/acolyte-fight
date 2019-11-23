@@ -1976,6 +1976,15 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 				if (cooldown > world.settings.Hero.MaxCooldownWaitTicks) {
 					// Just cancel spells if they're too far off cooldown
 					hero.casting = null;
+
+					world.ui.events.push({
+						type: "cast",
+						success: false,
+						tick: world.tick,
+						heroId: hero.id,
+						target: action.target,
+						spellId: action.type,
+					});
 				}
 				return;
 			}
@@ -2038,6 +2047,15 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 			applyBuffsFrom(spell.chargeBuffs, hero.id, hero, world, {
 				spellId: spell.id,
+			});
+
+			world.ui.events.push({
+				type: "cast",
+				success: true,
+				tick: world.tick,
+				heroId: hero.id,
+				target: action.target,
+				spellId: action.type,
 			});
 		}
 		// Orientate during charging
