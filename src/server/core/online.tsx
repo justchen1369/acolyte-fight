@@ -8,6 +8,8 @@ import * as Firestore from '@google-cloud/firestore';
 import * as db from '../storage/db.model';
 import * as dbStorage from '../storage/dbStorage';
 import * as mirroring from './mirroring';
+import * as segments from '../../shared/segments';
+import * as versions from '../../game/version';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 import { getStore } from '../serverStore';
@@ -156,19 +158,28 @@ async function loadScoreboard(): Promise<void> {
     const firestore = getFirestore();
 
 	const start = Date.now();
-    const query = getLeaderboardCollection(firestore)
+    const query = getLeaderboardCollection(firestore).orderBy('expiry'); // Read oldest to newest so newer entries overwrite older entries
 
     await dbStorage.stream(query, doc => {
 		const entry = doc.data() as db.PlayerScore;
-		initScore(entry);
+
+		initScore(entry); // Keep old scoreboard so it gets cleaned up properly
+		initScore(entry, versions.version); // Load into new scoreboard as well
 	});
 
 	const elapsed = Date.now() - start;
 	logger.info(`Loaded scoreboard in ${elapsed} ms`);
 }
 
-function initScore(entry: db.PlayerScore) {
-	const scoreboard = getOrCreateScoreboard(entry.segment);
+function initScore(entry: db.PlayerScore, reversion?: string) {
+	let segment = entry.segment;
+
+	if (reversion) {
+		// the segment contains the old version, so needs updating to carry forward the leaderboard from previous versions
+		segment = segments.reversionSegment(entry.segment, versions.version);
+	}
+
+	const scoreboard = getOrCreateScoreboard(segment);
 	scoreboard.scores.set(entry.userHash, dbToScore(entry));
 }
 
@@ -327,7 +338,7 @@ export function expireMessages(scoreboard: g.Scoreboard) {
 
 function getLeaderboardCollection(firestore: Firestore.Firestore) {
     const location = mirroring.getLocation();
-    return getFirestore()
+    return firestore
         .collection(db.Collections.Scoreboard)
         .doc(location.region || "global")
         .collection(db.Collections.ScoreboardEntries)
