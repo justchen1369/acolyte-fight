@@ -2448,7 +2448,7 @@ const shield: Spell = {
     cooldown: 10 * TicksPerSecond,
     throttle: false,
     minRadius: Hero.Radius * 1.5,
-    strokeRadius: Hero.Radius * 2.2,
+    strokeRadius: Hero.Radius * 2.4,
     radius: Hero.Radius * 2.5,
     growthTicks: 9,
     angularWidthInRevs: 0.45,

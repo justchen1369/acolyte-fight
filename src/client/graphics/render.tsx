@@ -1824,12 +1824,13 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	color.alpha((MaxAlpha - MinAlpha) * proportion + MinAlpha);
 
 	let scale: number = 1;
+	let grow: number = 1;
 	if (highlight && highlight.growth) {
 		scale += highlight.growth;
 	}
 	if (world.tick - shield.createTick < shield.growthTicks) {
-		const growthProportion = (world.tick - shield.createTick) / shield.growthTicks;
-		scale *= growthProportion;
+		grow = (world.tick - shield.createTick) / shield.growthTicks;
+		scale *= grow;
 	}
 
 	let feather: r.FeatherConfig = null;
@@ -1851,30 +1852,36 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = hero.body.getPosition();
 
 		const stroke = color.clone().lighten(shield.shine || 0);
+		const minRadius = shield.minRadius * scale;
+		const strokeRadius = ((1 - grow) * minRadius + grow * shield.strokeRadius) * scale;
+		const maxRadius = shield.radius * scale;
+
 		if (shield.angularWidth <= Math.PI) {
 			const angle = shield.body.getAngle();
-			glx.arcTrail(ctxStack, pos, angle - shield.angularWidth / 2, angle + shield.angularWidth / 2, false, {
+			const minAngle = angle - shield.angularWidth / 2;
+			const maxAngle = angle + shield.angularWidth / 2;
+			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, {
 				color,
-				minRadius: shield.minRadius * scale,
-				maxRadius: shield.radius * scale,
+				minRadius,
+				maxRadius,
 				feather,
 			});
-			glx.arcTrail(ctxStack, pos, angle - shield.angularWidth / 2, angle + shield.angularWidth / 2, false, {
+			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, {
 				color: stroke,
-				minRadius: shield.strokeRadius * scale,
-				maxRadius: shield.radius * scale,
+				minRadius: strokeRadius,
+				maxRadius,
 			});
 		} else {
 			glx.circleTrail(ctxStack, pos, {
 				color,
-				minRadius: shield.minRadius * scale,
-				maxRadius: shield.radius * scale,
+				minRadius,
+				maxRadius,
 				feather,
 			});
 			glx.circleTrail(ctxStack, pos, {
 				color: stroke,
-				minRadius: shield.strokeRadius * scale,
-				maxRadius: shield.radius * scale,
+				minRadius: strokeRadius,
+				maxRadius,
 				feather,
 			});
 		}
