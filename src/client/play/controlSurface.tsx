@@ -410,19 +410,22 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const Spells = world.settings.Spells;
 
         if (world.ui.nextTarget) {
-            if (this.currentTouch && !this.currentTouch.touchStartSent) {
-                this.currentTouch.touchStartSent = true; // Only send when the touch starts
+            if (this.currentTouch) {
+                let spellId = w.Actions.Move;
+                if (!this.currentTouch.touchStartSent) {
+                    this.currentTouch.touchStartSent = true; // Only send when the touch starts
 
-                let spell = world.settings.Spells[world.ui.nextSpellId];
-                if (!spell) {
-                    spell = Spells.go;
+                    if (world.ui.nextSpellId) {
+                        spellId = world.ui.nextSpellId;
+                        world.ui.nextSpellId = null;
+                    } else {
+                        spellId = w.Actions.MoveAndCancel;
+                    }
                 }
+
+                let spell = Spells[spellId];
                 if (spell && !spell.passive) {
                     sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
-
-                    if (spell.id !== Spells.move.id) {
-                        world.ui.nextSpellId = null;
-                    }
                 }
             } else {
                 let spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
