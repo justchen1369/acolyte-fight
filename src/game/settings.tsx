@@ -274,7 +274,7 @@ const voidRecharge: EffectInfo = {
 const move: MoveSpell = {
     id: Actions.Move,
     description: "",
-    color: 'white',
+    color: null,
     maxAngleDiffInRevs: 0.25,
     interruptibleAfterTicks: 0,
     cooldown: 0,
@@ -284,7 +284,7 @@ const move: MoveSpell = {
 const go: MoveSpell = {
     id: Actions.MoveAndCancel,
     description: "",
-    color: 'white',
+    color: null,
     maxAngleDiffInRevs: 0.25,
     interruptibleAfterTicks: 0,
     cooldown: 0,
@@ -294,7 +294,7 @@ const go: MoveSpell = {
 const retarget: Spell = {
     id: Actions.Retarget,
     description: "",
-    color: 'white',
+    color: null,
     maxAngleDiffInRevs: 1.0,
     interruptibleAfterTicks: 0,
     cooldown: 0,
