@@ -266,8 +266,8 @@ export function splitGame(initial: g.Game, requestedSocketIds: string[][]): g.Ga
 		});
 	}
 
-	// Move observers to first game - remove from others
-	for (let i = 1; i < forks.length; ++i) {
+	// Move observers to last game (this will have the highest-level players) - remove from others
+	for (let i = 0; i < forks.length - 1; ++i) {
 		const fork = forks[i];
 		fork.observers.clear();
 	}
