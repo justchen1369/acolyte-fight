@@ -687,6 +687,7 @@ const kamehameha: Spell = {
     throttle: true,
     revsPerTickWhileCharging: 0.0025,
     revsPerTickWhileChannelling: 0.00005,
+	movementCancel: true,
 
     strikeCancel: {
     },
@@ -2370,6 +2371,7 @@ const scourge: Spell = {
     name: 'Overload',
     description: "Release a melee-range explosion that will send your enemies flying. Be careful - this spell is so powerful it costs you some health too.",
     untargeted: true,
+    movementCancel: true,
 
     effects: [
         {

@@ -2224,9 +2224,14 @@ function applyPreAction(world: w.World, hero: w.Hero, action: w.Action, spell: S
 function movePreAction(world: w.World, hero: w.Hero, action: w.Action, spell: MoveSpell) {
 	hero.moveTo = action.target;
 
-	// To cancel, say we're not done, this makes the move spell replace the current spell and cancel
-	const done = !spell.cancelChanneling;
-	return done;
+	if (spell.cancelChanneling && hero.casting) {
+		const current = world.settings.Spells[hero.casting.action.type];
+		if (current.movementCancel) {
+			// To cancel the current spell, say we're not done, this makes the move spell replace the current spell and cancel
+			return false;
+		}
+	}
+	return true;
 }
 
 function applyAction(world: w.World, hero: w.Hero, action: w.Action, spell: Spell): boolean {

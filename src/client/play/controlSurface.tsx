@@ -418,8 +418,6 @@ class ControlSurface extends React.PureComponent<Props, State> {
                     if (world.ui.nextSpellId) {
                         spellId = world.ui.nextSpellId;
                         world.ui.nextSpellId = null;
-                    } else {
-                        spellId = w.Actions.MoveAndCancel;
                     }
                 }
 

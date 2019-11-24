@@ -296,6 +296,7 @@ declare interface SpellBase {
 	sound?: string; // Which sound to use for charging/channelling
 	untargeted?: boolean; // No target required. i.e. cast instantly when you click the button
 	passive?: boolean; // Apply the buffs immediately
+	movementCancel?: boolean; // Moving will interrupt this spell
 
 	maxAngleDiffInRevs?: number; // How much does the acolyte have to turn to face the target?
 
