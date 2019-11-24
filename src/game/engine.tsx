@@ -950,6 +950,7 @@ function instantiateAttract(template: AttractTemplate, projectile: w.Projectile,
 		radius: template.radius,
 		accelerationPerTick: template.accelerationPerTick,
 		maxSpeed: template.maxSpeed,
+		clampSpeed: template.clampSpeed,
 		hitInterval: 1,
 		hitTickLookup: new Map(),
 	};
@@ -3103,25 +3104,35 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 			}
 		}
 
-		const acceleration = vector.diff(epicenter, obj.body.getPosition());
-		const distanceTo = acceleration.length();
+		const direction = vector.diff(epicenter, obj.body.getPosition());
+		const distanceTo = direction.length();
 		if (distanceTo >= attraction.radius) {
 			return;
 		}
-		acceleration.mul(attraction.accelerationPerTick / acceleration.length());
+		direction.normalize();
 
 		if (!takeHit(attraction, obj.id, world)) {
 			return;
 		}
 
-		const velocity = obj.body.getLinearVelocity();
-		velocity.add(acceleration);
-
+		let sign = Math.sign(attraction.accelerationPerTick);
+		let acceleration = Math.abs(attraction.accelerationPerTick);
 		if (attraction.maxSpeed) {
-			velocity.clamp(attraction.maxSpeed);
+			const currentSpeed = sign * pl.Vec2.dot(obj.body.getLinearVelocity(), direction);
+			const maxAcceleration = Math.max(0, attraction.maxSpeed - currentSpeed);
+			acceleration = Math.min(acceleration, maxAcceleration);
+		}
+		if (acceleration > 0) {
+			applyVelocityDelta(obj, direction.clone().mul(sign * acceleration));
 		}
 
-		obj.body.setLinearVelocity(velocity);
+		if (attraction.clampSpeed) {
+			const velocity = obj.body.getLinearVelocity().clone();
+			velocity.clamp(attraction.clampSpeed);
+
+			const delta = vector.diff(velocity, obj.body.getLinearVelocity());
+			applyVelocityDelta(obj, delta);
+		}
 	});
 	return true;
 }

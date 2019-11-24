@@ -1747,7 +1747,7 @@ const whirlwind: Spell = {
                 against: Alliances.NotFriendly,
                 radius: 0.04,
                 accelerationPerTick: 0.1,
-                maxSpeed: 0.4,
+                clampSpeed: 0.4,
             },
         ],
 
@@ -2044,19 +2044,14 @@ const mines: Spell = {
 const iceBomb: Spell = {
     id: 'iceBomb',
     name: 'Frostsplatter',
-    description: "Shoot a splatter of frost in a wide arc.",
+    description: "Shoot a splatter of frost in a wide arc. Pushes away objects and freezes enemies.",
     action: "spray",
     effects: [
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 1.5 seconds.",
+            text: "Freeze nearby enemies for 1 seconds.",
         },
-		{
-			"icon": "fas fa-sword",
-			"title": "Vulnerable",
-			"text": "Enemies receive 25% more damage for 1.5 seconds."
-		},
     ],
     sound: "iceBomb",
 
@@ -2087,8 +2082,20 @@ const iceBomb: Spell = {
         swappable: false,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Hero | Categories.Massive | Categories.Obstacle,
-        expireOn: Categories.All,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
+        expireOn: Categories.Massive,
+
+        behaviours: [
+            {
+                type: "attract",
+                collideLike: Categories.Massive,
+                categories: Categories.Projectile | Categories.Obstacle | Categories.Hero,
+                against: Alliances.NotFriendly,
+                radius: 0.03,
+                accelerationPerTick: -0.01,
+                maxSpeed: 0.2,
+            },
+        ],
 
         buffs: [
             {
@@ -2096,7 +2103,7 @@ const iceBomb: Spell = {
                 stack: "iceBomb",
                 maxStacks: 1,
                 movementProportion: 0.1,
-                maxTicks: 1.5 * TicksPerSecond,
+                maxTicks: 1 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
@@ -2109,14 +2116,6 @@ const iceBomb: Spell = {
                     bloom: 0.03,
                 },
             },
-			{
-				"type": "armor",
-				"stack": "frostsplatter",
-				"maxTicks": 1.5 * TicksPerSecond,
-				"maxStacks": 1,
-				"proportion": 0.25,
-				"against": Alliances.Enemy,
-			},
         ],
 
         shieldTakesOwnership: false,

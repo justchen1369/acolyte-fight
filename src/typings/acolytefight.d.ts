@@ -539,7 +539,8 @@ declare interface AttractTemplate extends BehaviourTemplateBase {
 	notCategories?: number; // What types of objects to not attract
 	radius: number; // Maximum range of attraction
 	accelerationPerTick: number; // Acceleration per tick
-	maxSpeed?: number; // Slow down anything caught in the attraction
+	maxSpeed?: number; // Cannot push an object faster than this
+	clampSpeed?: number; // Reduce an object's speed to this (no matter how much force it takes, even if it is greater than accelerationPerTick)
 }
 
 declare interface AuraTemplate extends BehaviourTemplateBase {

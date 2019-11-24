@@ -1046,6 +1046,7 @@ export interface AttractBehaviour extends BehaviourBase, HitSource {
 	radius: number;
 	accelerationPerTick: number;
 	maxSpeed?: number;
+	clampSpeed?: number;
 }
 
 export interface AuraBehaviour extends BehaviourBase, HitSource {
