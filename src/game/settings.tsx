@@ -2447,6 +2447,8 @@ const shield: Spell = {
     maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
+    minRadius: Hero.Radius * 1.5,
+    strokeRadius: Hero.Radius * 2.2,
     radius: Hero.Radius * 2.5,
     growthTicks: 9,
     angularWidthInRevs: 0.45,
@@ -2460,7 +2462,7 @@ const shield: Spell = {
     color: '#3366ff',
     glow: 0.2,
     bloom: 0.01,
-    shine: 0.2,
+    shine: 0.1,
     strike: {
         ticks: 10,
         flash: true,

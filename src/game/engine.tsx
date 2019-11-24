@@ -357,6 +357,8 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		takesOwnership: spell.takesOwnership,
 		blocksTeleporters: spell.blocksTeleporters,
 		owner: hero.id,
+		minRadius: spell.minRadius || 0,
+		strokeRadius: spell.strokeRadius !== undefined ? spell.strokeRadius : spell.radius,
 		radius: spell.radius,
 		angularWidth: revs * vector.Tau,
 		points,

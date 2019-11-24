@@ -1850,34 +1850,43 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		}
 		const pos = hero.body.getPosition();
 
-		const gradient = createShieldGradient(shield, color, shield.radius);
+		const stroke = color.clone().lighten(shield.shine || 0);
 		if (shield.angularWidth <= Math.PI) {
 			const angle = shield.body.getAngle();
 			glx.arcTrail(ctxStack, pos, angle - shield.angularWidth / 2, angle + shield.angularWidth / 2, false, {
 				color,
+				minRadius: shield.minRadius * scale,
 				maxRadius: shield.radius * scale,
 				feather,
-				gradient,
+			});
+			glx.arcTrail(ctxStack, pos, angle - shield.angularWidth / 2, angle + shield.angularWidth / 2, false, {
+				color: stroke,
+				minRadius: shield.strokeRadius * scale,
+				maxRadius: shield.radius * scale,
 			});
 		} else {
 			glx.circleTrail(ctxStack, pos, {
 				color,
+				minRadius: shield.minRadius * scale,
 				maxRadius: shield.radius * scale,
 				feather,
-				gradient,
+			});
+			glx.circleTrail(ctxStack, pos, {
+				color: stroke,
+				minRadius: shield.strokeRadius * scale,
+				maxRadius: shield.radius * scale,
+				feather,
 			});
 		}
 	} else if (shield.type === "wall") {
 		const pos = shield.body.getPosition();
 		const angle = shield.body.getAngle();
 
-		const gradient = createShieldGradient(shield, color, shield.extent);
 		glx.convexTrail(ctxStack, pos, shield.points, angle, scale, {
 			color,
 			minRadius: 0,
 			maxRadius: shield.extent * scale,
 			feather,
-			gradient,
 		});
 
 		if (feather) {
@@ -1923,21 +1932,6 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 
 		renderSaberTrail(ctxStack, shield, scale, world);
 	}
-}
-
-function createShieldGradient(shield: w.Shield, color: ColTuple, radius: number) {
-	let gradient: r.TrailGradient = null;
-	if (shield.shine) {
-		gradient = {
-			angle: vector.Tau * 1 / 8,
-			anchor: shield.body.getPosition(),
-			fromExtent: -radius,
-			fromColor: color.clone().lighten(shield.shine),
-			toExtent: radius,
-			toColor: color,
-		};
-	}
-	return gradient;
 }
 
 function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: number, world: w.World) {

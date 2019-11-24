@@ -499,6 +499,8 @@ export interface ShieldBase extends WorldObjectBase {
 
 export interface Reflect extends ShieldBase {
 	type: "reflect";
+	minRadius: number;
+	strokeRadius: number;
 	radius: number;
 	angularWidth: number;
 	points: pl.Vec2[];

@@ -930,6 +930,8 @@ declare interface ShieldSpell extends SpellBase {
 declare interface ReflectSpell extends ShieldSpell {
 	action: "shield";
 
+	minRadius?: number;
+	strokeRadius?: number;
 	radius: number;
 	growthTicks?: number; // Shield grows to full size over this many ticks
 
