@@ -61,7 +61,6 @@ interface TouchState {
     id: string;
     stack: number;
     activeKey?: string;
-    touchStartSent?: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -284,7 +283,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
             // Start of a touch will cancel any channelling spells
             world.ui.nextSpellId = w.Actions.MoveAndCancel;
         }
-        this.processCurrentTouch();
+        this.processCurrentTouch(true);
 
         if (mapTouched) {
             this.uncustomizeIfNecessary();
@@ -405,16 +404,14 @@ class ControlSurface extends React.PureComponent<Props, State> {
         this.processCurrentTouch();
     }
 
-    private processCurrentTouch() {
+    private processCurrentTouch(isNewTouch: boolean = false) {
         const world = this.props.world;
         const Spells = world.settings.Spells;
 
         if (world.ui.nextTarget) {
             if (this.currentTouch) {
                 let spellId = w.Actions.Move;
-                if (!this.currentTouch.touchStartSent) {
-                    this.currentTouch.touchStartSent = true; // Only send when the touch starts
-
+                if (isNewTouch) {
                     if (world.ui.nextSpellId) {
                         spellId = world.ui.nextSpellId;
                         world.ui.nextSpellId = null;
