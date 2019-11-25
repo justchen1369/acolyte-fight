@@ -1560,11 +1560,20 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 }
 
 function resetHeroOnGameStart(hero: w.Hero, world: w.World) {
-	if (!isInsideMap(hero, world)) {
-		const RecoverProportion = 0.75;
+	const World = world.settings.World;
 
+	if (!isInsideMap(hero, world)) {
 		const oldOffset = vector.diff(hero.body.getPosition(), vectorCenter);
-		const newOffset = vector.relengthen(oldOffset, calculateWorldMinExtent(world) * RecoverProportion);
+
+		let angularProportion = (vector.angle(oldOffset) - world.angle) / vector.Tau;
+		while (angularProportion < 0) {
+			angularProportion += 1;
+		}
+
+		const newOffset =
+			shapes.proportionalEdgePoint(world.shape, vectorZero, world.angle, angularProportion, World.HeroResetProportion)
+			.mul(calculateWorldMinExtent(world));
+
 		const newPos = vectorCenter.clone().add(newOffset);
 		const adjustment = vector.diff(newPos, hero.body.getPosition());
 

@@ -54,6 +54,7 @@ const recoverySpellIds = [
 const World: WorldSettings = {
     InitialRadius: 0.4,
     HeroLayoutProportion: 0.625,
+    HeroResetProportion: 0.625,
 
     LavaDamagePerSecond: 12.5,
     LavaLifestealProportion: lifeSteal,
