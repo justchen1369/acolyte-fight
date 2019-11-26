@@ -1915,7 +1915,13 @@ function act(world: w.World) {
 		performHeroActions(world, hero, action);
 
 		const movementProportion = calculateMovementProportion(hero, world);
-		moveTowards(world, hero, hero.moveTo, movementProportion);
+		if (hero.moveTo) {
+			// Move towards target
+			moveTowards(world, hero, hero.moveTo, movementProportion);
+		} else if (hero.target && movementProportion > 0) {
+			// Turn towards target if not moving
+			turnTowards(hero, hero.target);
+		}
 	});
 	world.actions = nextActions;
 }
