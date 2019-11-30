@@ -671,6 +671,7 @@ export interface CooldownBuff extends BuffBase {
 	type: "cooldown";
 
 	spellIds?: Set<string>;
+	notSpellIds?: Set<string>;
 	cooldownRate: number;
 }
 

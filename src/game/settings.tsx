@@ -2384,7 +2384,7 @@ const scourge: Spell = {
         {
             icon: "fas fa-clock",
             title: "Recharge",
-            text: "Each enemy you hit reduces all of your cooldowns by 4 seconds.",
+            text: "Each enemy you hit reduces your cooldowns for all spells except for Overload by 4 seconds.",
         },
     ],
 
@@ -2416,6 +2416,7 @@ const scourge: Spell = {
                 type: "cooldown",
                 owner: true,
                 against: Alliances.Enemy,
+                notSpellIds: ["scourge"],
                 adjustCooldown: -4 * TicksPerSecond,
             },
         ],
