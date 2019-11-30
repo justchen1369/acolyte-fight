@@ -4178,12 +4178,18 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 			const projectileIndex = Math.floor((i + numProjectilesPerTick * currentLength) / spell.intervalTicks);
 			const newAngle = currentAngle + 2 * Math.PI * (projectileIndex / numProjectiles) + angleOffset;
 
-			const direction = vector.fromAngle(currentAngle);
-			const jitterRadius = direction.length() * spell.jitterRatio;
-			const jitterDirection = vector.plus(direction, vector.fromAngle(newAngle).mul(jitterRadius));
+			// Spread from default angle
+			const jitterDirection = vector.plus(
+				vector.fromAngle(currentAngle),
+				vector.fromAngle(newAngle).mul(1 - Precision)); // Remove a small number (Precision) so the angle is preserved
+			const jitterAngle = vector.angle(jitterDirection);
+
+			// Reduce spread by jitter ratio
+			const resultantAngle = currentAngle + spell.jitterRatio * vector.angleDelta(currentAngle, jitterAngle);
+			const resultantDirection = vector.fromAngle(resultantAngle);
 
 			addProjectile(world, hero, action.target, spell, spell.projectile, {
-				direction: jitterDirection,
+				direction: resultantDirection,
 				filterGroupIndex: -(hero.casting.id + 1), // +1 because 0 means no filter
 			});
 		}

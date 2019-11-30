@@ -1993,9 +1993,9 @@ const mines: Spell = {
     throttle: true,
 
     intervalTicks: 1,
-    lengthTicks: 7,
+    lengthTicks: 5,
 
-    jitterRatio: 1.0,
+    jitterRatio: 0.7,
 
     projectile: {
         density: 1,
