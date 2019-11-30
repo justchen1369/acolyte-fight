@@ -1647,7 +1647,12 @@ const gravity: Spell = {
             icon: "fas fa-hourglass-half",
             title: "Silence",
             text: "Your enemy will be unable to cast spells for 0.75 seconds.",
-        }
+        },
+        {
+            icon: "fas fa-clock",
+            title: "Recharge",
+            text: "If it hits, reduces cooldowns for all your spells except Ensnare by 4 seconds.",
+        },
     ],
     action: "projectile",
 
@@ -1685,6 +1690,14 @@ const gravity: Spell = {
                 against: Alliances.NotFriendly,
                 maxTicks: 1,
                 minCooldown: 0.75 * TicksPerSecond,
+            },
+            {
+                type: "cooldown",
+                against: Alliances.NotFriendly,
+                owner: true,
+                maxTicks: 1,
+                adjustCooldown: -4 * TicksPerSecond,
+                notSpellIds: ["gravity"],
             },
         ],
 
@@ -2385,7 +2398,7 @@ const scourge: Spell = {
         {
             icon: "fas fa-clock",
             title: "Recharge",
-            text: "Each enemy you hit reduces your cooldowns for all spells except for Overload by 4 seconds.",
+            text: "Each enemy you hit reduces cooldowns for all your spells except Overload by 3 seconds.",
         },
     ],
 
