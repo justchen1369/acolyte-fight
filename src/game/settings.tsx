@@ -2174,7 +2174,7 @@ const horcrux: Spell = {
         radius: 0.0035,
         speed: 0.35,
 
-        maxTicks: 2 * TicksPerSecond,
+        maxTicks: 3 * TicksPerSecond,
         minTicks: 1,
         damage: 0,
         lifeSteal: 1,
@@ -2231,6 +2231,7 @@ const horcrux: Spell = {
         color: '#22ee88',
         renderers: [
             { type: "bloom" },
+            { type: "reticule", color: 'rgba(0, 0, 0, 0.05)', radius: 0.035, minRadius: 0.031 },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.0375, minRadius: 0.03, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1, shine: 0 },
             { type: "projectile", ticks: 10, glow: 0.2, smoke: 0.3 },
