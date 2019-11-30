@@ -1123,7 +1123,7 @@ const rocket: Spell = {
         shieldTakesOwnership: false,
 
         partialDetonateRadius: {
-            initialMultiplier: 0.5,
+            initialMultiplier: 0.33,
             ticks: 1 * TicksPerSecond,
         },
 
