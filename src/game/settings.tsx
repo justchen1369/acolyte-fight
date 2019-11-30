@@ -235,10 +235,10 @@ const Choices: ChoiceSettings = {
             ["lightning"],
         ],
 		"e": [
-            ["armor", "shield", "icewall"],
+            ["armor", "horcrux"],
+            ["shield", "icewall"],
             ["saber", "dualSaber"],
             ["phaseOut", "blaze"],
-            ["horcrux"],
             ["meteor", "meteorite"],
         ],
 		"r": [
@@ -2968,8 +2968,8 @@ const vanish: Spell = {
 
 const armor: Spell = {
     id: 'armor',
-    name: 'Disrupt',
-    description: "Passive ability. Disrupt incoming attacks, reducing their effectiveness.",
+    name: 'Spirit Armor',
+    description: "Passive ability. Every atom in your body is imbued with inner strength.",
     effects: [
         {
             icon: "fas fa-shield",
