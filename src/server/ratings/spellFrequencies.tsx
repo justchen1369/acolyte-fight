@@ -71,16 +71,14 @@ export class SpellUsageAccumulator {
             }
 
             if (frequency.usages > 0) {
-                // Player used this spell set once, but against multiple enemies
-                const weight = 1 / frequency.usages;
                 for (const spellId of player.spellIds) {
-                    this.accumulate(spellId, weight, frequency);
+                    this.accumulate(spellId, frequency);
                 }
             }
         }
     }
 
-    private accumulate(spellId: string, weight: number, frequency: Frequency) {
+    private accumulate(spellId: string, frequency: Frequency, weight: number = 1) {
         let accumulator = this.distribution.get(spellId);
         if (!accumulator) {
             accumulator = { spellId, wins: 0, usages: 0, probability: 0 };
