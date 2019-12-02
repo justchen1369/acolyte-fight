@@ -40,21 +40,25 @@ class GameAccumulator {
     async update() {
         const start = Date.now();
 
-        let numGames = 0;
+        // Calculate win rate distribution
         await statsStorage.streamAllGamesAfter(this.latestGameUnix, game => {
             this.winRateAccumulator.accept(game);
+        });
+        const winRateCache = this.winRateAccumulator.calculate();
+        this.winRateCaches.set(winRateCache.category, winRateCache);
 
-            this.spellFrequencyAccumulators.forEach(accumulator => accumulator.accept(game));
+        const distribution = winRateCache.distribution; // Assume the category of the winRateDistribution is the same for the spellFrequencyDistribution
+
+        // Calculate spell frequencies
+        let numGames = 0;
+        await statsStorage.streamAllGamesAfter(this.latestGameUnix, game => {
+            this.spellFrequencyAccumulators.forEach(accumulator => accumulator.accept(game, distribution));
 
             ++numGames;
-
             if (game.unixTimestamp) {
                 this.latestGameUnix = Math.max(this.latestGameUnix, game.unixTimestamp);
             }
         });
-
-        const winRateCache = this.winRateAccumulator.calculate();
-        this.winRateCaches.set(winRateCache.category, winRateCache);
 
         const spellFrequencyGroups =
             _(this.spellFrequencyAccumulators)
