@@ -1068,7 +1068,7 @@ const backlash: Spell = {
                 owner: true,
                 against: Alliances.Enemy,
                 spellId: "backlash",
-                adjustCooldown: -0.5 * TicksPerSecond,
+                adjustCooldown: -0.75 * TicksPerSecond,
             },
         ],
 
