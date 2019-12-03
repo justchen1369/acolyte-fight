@@ -1123,7 +1123,7 @@ const rocket: Spell = {
         shieldTakesOwnership: false,
 
         partialDetonateRadius: {
-            initialMultiplier: 0.33,
+            initialMultiplier: 0.5,
             ticks: 1 * TicksPerSecond,
         },
 
@@ -2464,9 +2464,9 @@ const shield: Spell = {
     maxTicks: 1.5 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    minRadius: Hero.Radius * 1.5,
-    strokeRadius: Hero.Radius * 2.4,
-    radius: Hero.Radius * 2.5,
+    minRadius: Hero.Radius * 1.3,
+    strokeRadius: Hero.Radius * 1.9,
+    radius: Hero.Radius * 2,
     growthTicks: 9,
     angularWidthInRevs: 0.45,
     maxTurnRatePerTickInRevs: 0.05,
