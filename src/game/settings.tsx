@@ -377,7 +377,7 @@ const flamestrike: Spell = {
         },
 
         partialDetonateRadius: {
-            initialMultiplier: 0.21,
+            initialMultiplier: 0.3,
             ticks: 1 * TicksPerSecond,
         },
 
