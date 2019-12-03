@@ -572,7 +572,7 @@ const firespray: Spell = {
         expireOn: Categories.All ^ Categories.Shield,
         radius: 0.002,
         speed: 0.5,
-        maxTicks: 0.25 * TicksPerSecond,
+        maxTicks: 12,
         damage: 5,
         lifeSteal,
 
@@ -580,7 +580,7 @@ const firespray: Spell = {
         renderers: [
             { type: "bloom", radius: 0.02 },
             { type: "projectile", ticks: 30, smoke: 0.15, vanish: 1, bloom: 0.01 },
-            { type: "ray", intermediatePoints: true, ticks: 7 },
+            { type: "ray", intermediatePoints: true, ticks: 7, vanish: 1 },
             { type: "strike", ticks: 30, flash: true, numParticles: 1 },
         ],
     },
