@@ -1028,7 +1028,7 @@ const backlash: Spell = {
     icon: "crackedBallDunk",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 2.25 * TicksPerSecond,
+    cooldown: 2 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -1068,7 +1068,7 @@ const backlash: Spell = {
                 owner: true,
                 against: Alliances.Enemy,
                 spellId: "backlash",
-                adjustCooldown: -0.75 * TicksPerSecond,
+                adjustCooldown: -0.5 * TicksPerSecond,
             },
         ],
 
