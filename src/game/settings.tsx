@@ -495,7 +495,7 @@ const difire: Spell = {
     projectile: {
         density: 7,
         radius: 0.0025,
-        speed: 0.45,
+        speed: 0.75,
         maxTicks: 1.5 * TicksPerSecond,
         damage: 0,
         lifeSteal,
