@@ -2012,6 +2012,7 @@ const mines: Spell = {
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
         sense: Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
+        expireAgainstObjects: Alliances.All ^ Alliances.Self,
         conveyable: true,
         destructible: {
         },
