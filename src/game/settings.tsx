@@ -2462,18 +2462,26 @@ const shield: Spell = {
     name: 'Reflect',
     description: "Reflect away projectile attacks. Ineffective against area-of-effect spells.",
 
-    maxTicks: 1 * TicksPerSecond,
+    maxTicks: 1.25 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
     throttle: false,
-    minRadius: Hero.Radius * 1.3,
-    strokeRadius: Hero.Radius * 1.9,
-    radius: Hero.Radius * 2,
+    minRadius: Hero.Radius * 1.2,
+    strokeRadius: Hero.Radius * 1.7,
+    radius: Hero.Radius * 1.8,
     growthTicks: 9,
     angularWidthInRevs: 0.45,
     maxTurnRatePerTickInRevs: 0.05,
     takesOwnership: true,
     blocksTeleporters: false,
     damageMultiplier: 0.5,
+
+    buffs: [
+        {
+            type: "movement",
+            maxTicks: 1 * TicksPerSecond,
+            movementProportion: 0.5,
+        },
+    ],
 
     icon: "shieldReflect",
 
