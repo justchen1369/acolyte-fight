@@ -2288,7 +2288,7 @@ const saber: Spell = {
     width: Pixel,
     length: 0.075,
 
-    movementProportionWhileChannelling: 1,
+    movementProportionWhileChannelling: 0.5,
 
     interruptibleAfterTicks: 20,
 
