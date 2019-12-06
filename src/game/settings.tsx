@@ -683,7 +683,7 @@ const kamehameha: Spell = {
     icon: "glowingHands",
 
     maxAngleDiffInRevs: 0.0001, // Requires a lot of accuracy for long-distance targets
-    chargeTicks: 0.3 * TicksPerSecond,
+    chargeTicks: 0.4 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
     revsPerTickWhileCharging: 0.0025,
