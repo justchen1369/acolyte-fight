@@ -382,7 +382,7 @@ const flamestrike: Spell = {
         },
 
         partialDamage: {
-            initialMultiplier: 0.5,
+            initialMultiplier: 0.67,
             ticks: 0.5 * TicksPerSecond,
         },
 
