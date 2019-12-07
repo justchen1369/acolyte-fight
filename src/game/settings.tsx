@@ -1661,7 +1661,7 @@ const gravity: Spell = {
     sound: "gravity",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 6 * TicksPerSecond,
     throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
 
