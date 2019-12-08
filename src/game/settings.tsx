@@ -2009,8 +2009,8 @@ const mines: Spell = {
         hitInterval: 30,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
-        sense: Categories.Projectile,
+        collideWith: Categories.Hero | Categories.Obstacle, // Passes through shield
+        sense: Categories.Projectile | Categories.Massive,
         expireOn: Categories.All ^ Categories.Shield,
         expireAgainstObjects: Alliances.All ^ Alliances.Self,
         conveyable: true,
