@@ -3109,7 +3109,7 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 
 	const epicenter = orb.body.getPosition();
 
-	queryExtent(world, epicenter, attraction.radius, obj => {
+	queryExtent(world, epicenter, attraction.radius + world.settings.World.SlopRadius, obj => {
 		if (!((obj.categories & attraction.categories) > 0 && (obj.categories & attraction.notCategories) === 0)) {
 			return;
 		}

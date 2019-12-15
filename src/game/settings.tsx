@@ -2103,6 +2103,7 @@ const iceBomb: Spell = {
         damage: 0,
         noKnockback: true,
         swappable: false,
+        attractable: false,
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Shield | Categories.Massive | Categories.Obstacle,
@@ -2112,7 +2113,7 @@ const iceBomb: Spell = {
             {
                 type: "attract",
                 collideLike: Categories.Massive,
-                categories: Categories.Projectile | Categories.Obstacle,
+                categories: Categories.Projectile | Categories.Obstacle | Categories.Hero | Categories.Massive,
                 against: Alliances.NotFriendly,
                 radius: 0.03,
                 accelerationPerTick: -0.01,
