@@ -1041,9 +1041,9 @@ const backlash: Spell = {
         speed: 0.6,
         maxTicks: 2 * TicksPerSecond,
         categories: Categories.Projectile,
-        sense: Categories.Hero,
-        collideWith: Categories.All ^ Categories.Hero,
-        expireOn: Categories.Projectile ^ Categories.Hero,
+        sense: Categories.Hero | Categories.Projectile,
+        collideWith: Categories.All ^ Categories.Hero ^ Categories.Projectile,
+        expireOn: Categories.Massive | Categories.Hero,
         expireAgainstHeroes: Alliances.Self,
         expireAgainstObjects: Alliances.NotFriendly,
         shieldTakesOwnership: false,
@@ -1138,7 +1138,7 @@ const rocket: Spell = {
             buffs: [
                 {
                     type: "movement",
-                    maxTicks: 1.5 * TicksPerSecond,
+                    maxTicks: 2.25 * TicksPerSecond,
                     movementProportion: 0.1,
                     render: {
                         color: "rgba(64, 255, 255, 1)",
@@ -1155,8 +1155,8 @@ const rocket: Spell = {
         },
 
         partialBuffDuration: {
-            initialMultiplier: 0.33,
-            ticks: 1 * TicksPerSecond,
+            initialMultiplier: 0,
+            ticks: 2.25 * TicksPerSecond,
         },
 
         behaviours: [
@@ -2274,6 +2274,11 @@ const saber: Spell = {
             title: "Detach",
             text: "Lightsaber cuts through any Links or Grapples.",
         },
+        {
+            icon: "fas fa-snowflake",
+            title: "Slow",
+            text: "Your movement speed is reduced 50% when casting Lightsaber.",
+        }
     ],
     untargeted: true,
 
