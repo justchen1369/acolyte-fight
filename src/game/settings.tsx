@@ -686,7 +686,7 @@ const kamehameha: Spell = {
     chargeTicks: 0.3 * TicksPerSecond,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
-    revsPerTickWhileCharging: 0.0025,
+    revsPerTickWhileCharging: 0,
     revsPerTickWhileChannelling: 0.00005,
 	movementCancel: true,
 
@@ -1661,7 +1661,7 @@ const gravity: Spell = {
     sound: "gravity",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 6 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
 
@@ -2111,7 +2111,7 @@ const iceBomb: Spell = {
             {
                 type: "attract",
                 collideLike: Categories.Massive,
-                categories: Categories.Projectile | Categories.Obstacle | Categories.Hero,
+                categories: Categories.Projectile | Categories.Obstacle,
                 against: Alliances.NotFriendly,
                 radius: 0.03,
                 accelerationPerTick: -0.01,
