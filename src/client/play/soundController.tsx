@@ -11,6 +11,7 @@ import * as StoreProvider from '../storeProvider';
 interface Props {
     mute?: boolean;
     live: boolean;
+    silenced: Set<string>;
     items: s.NotificationItem[];
     sounds: Sounds;
     myHeroId: string;
@@ -23,6 +24,7 @@ function stateToProps(state: s.State): Props {
         mute: state.options.mute,
         live: state.world.ui.live,
         items: state.items,
+        silenced: state.silenced,
         sounds: state.world.settings.Sounds,
         myHeroId: state.world.ui.myHeroId,
     };
@@ -61,8 +63,8 @@ class SoundController extends React.PureComponent<Props, State> {
 
     private calculateSound(notif: w.Notification) {
         if (notif.type === "text") {
-            if (this.props.live) {
-                // Messages are not shown in replays
+            if (this.props.live && !this.props.silenced.has(notif.userHash)) {
+                // Hide messages if in replays or if user silenced
                 return "message";
             }
         } else if (notif.type === "join") {
