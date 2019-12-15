@@ -783,7 +783,7 @@ const blast: Spell = {
     retarget: true,
     movementProportionWhileCharging: 0.5,
     strikeCancel: {
-        cooldownTicks: 1 * TicksPerSecond,
+        cooldownTicks: 5 * TicksPerSecond,
     },
 
     chargeDamage: {
