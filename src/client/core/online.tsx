@@ -1,5 +1,6 @@
 import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
+import * as exclusions from './exclusions';
 import * as notifications from './notifications';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
@@ -15,7 +16,7 @@ export function onOnlineMsg(data: m.OnlineMsg) {
         }
 
         if (data.texts && data.texts.length > 0) {
-            const newNotifications = new Array<w.Notification>();
+            const newNotifications = new Array<w.TextNotification>();
             data.texts.forEach(msg => {
                 const textNotification: w.TextNotification = {
                     type: "text",
@@ -25,6 +26,7 @@ export function onOnlineMsg(data: m.OnlineMsg) {
                 };
                 newNotifications.push(textNotification);
             });
+            exclusions.excludeIfNecessary(newNotifications);
             notifications.notify(...newNotifications);
         }
     }
