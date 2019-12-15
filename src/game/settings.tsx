@@ -2187,8 +2187,8 @@ const horcrux: Spell = {
     projectile: {
         density: 10,
         restitution: 0,
-        radius: 0.0035,
-        speed: 0.35,
+        radius: 0.004,
+        speed: 0.4,
 
         maxTicks: 3 * TicksPerSecond,
         minTicks: 1,
@@ -2208,19 +2208,19 @@ const horcrux: Spell = {
         behaviours: [
             {
                 type: "updateCollideWith",
-                trigger: { afterTicks: 60, atCursor: true },
+                trigger: { afterTicks: 53, atCursor: true },
                 collideWith: Categories.All,
             },
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 60, atCursor: true },
+                trigger: { afterTicks: 53, atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
-                trigger: { afterTicks: 60, atCursor: true },
+                trigger: { afterTicks: 53, atCursor: true },
                 radius: 0.04,
                 tickInterval: 6,
                 maxHits: 10,
