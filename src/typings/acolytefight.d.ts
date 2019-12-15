@@ -416,6 +416,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	bumpable?: boolean; // Whether this projectile gets knocked back by a bumper obstacle
 	conveyable?: boolean; // Whether this projectile is moved by a conveyor belt. (Collision flags must allow the projectile collide with obstacles to work.)
 	linkable?: boolean; // Whether a link can attach to this projectile
+	destroying?: boolean; // Whether to destroy any projectiles marked as destructible on contact
 
 	hitInterval?: number; // If set, the projectile is allowed to hit enemies multiple times, as long as the ticks between hits is at least this number
     bounce?: BounceParameters;

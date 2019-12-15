@@ -713,6 +713,7 @@ const kamehameha: Spell = {
         lifeSteal,
         categories: Categories.Projectile | Categories.Massive,
         swappable: false,
+        destroying: true,
 
         sound: "kamehameha",
         color: '#ffffff',
@@ -2009,8 +2010,8 @@ const mines: Spell = {
         hitInterval: 30,
 
         categories: Categories.Projectile,
-        collideWith: Categories.Hero | Categories.Obstacle, // Passes through shield
-        sense: Categories.Projectile | Categories.Massive,
+        collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
+        sense: Categories.Projectile,
         expireOn: Categories.All ^ Categories.Shield,
         expireAgainstObjects: Alliances.All ^ Alliances.Self,
         conveyable: true,

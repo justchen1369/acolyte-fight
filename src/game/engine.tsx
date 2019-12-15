@@ -750,11 +750,13 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		filterGroupIndex,
 		speed: projectileTemplate.speed,
 		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
+
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
 		bumpable: projectileTemplate.bumpable,
 		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
 		swappable: projectileTemplate.swappable !== undefined ? projectileTemplate.swappable : true,
+		destroying: projectileTemplate.destroying,
 
 		target: {
 			heroId: targetObj ? targetObj.id : null,
@@ -2612,7 +2614,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 	takeHit(projectile, other.id, world); // Make the projectile glow
 
-	if (expireOn(world, projectile, other)) {
+	if (expireOn(world, projectile, other) || (other.destroying && destructibleBy(projectile, other.owner, world))) {
 		detonateProjectile(projectile, world);
 		linkTo(projectile, other, world);
 		applySwap(projectile, other, world);
@@ -3128,7 +3130,7 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 
 		const direction = vector.diff(epicenter, obj.body.getPosition());
 		const distanceTo = direction.length();
-		if (distanceTo >= attraction.radius) {
+		if (distanceTo >= attraction.radius + getMinExtent(obj)) {
 			return;
 		}
 		direction.normalize();
@@ -3622,7 +3624,7 @@ function detonateAt(epicenter: pl.Vec2, owner: string, detonate: w.DetonateParam
 
 		if ((other.category === "hero" && other.collideWith > 0) || other.category === "projectile" || other.category === "obstacle") {
 			const diff = vector.diff(other.body.getPosition(), epicenter);
-			const extent = other.category === "obstacle" ? shapes.getMinExtent(other.shape) : other.radius;
+			const extent = getMinExtent(other);
 			const explosionRadius = detonate.radius + extent; // +extent because only need to touch the edge
 
 			const distance = diff.length();
@@ -3745,12 +3747,7 @@ function calculateKnockbackFromId(hero: w.Hero, world: w.World) {
 
 export function isInsideMap(obj: w.WorldObject, world: w.World) {
 	const pos = obj.body.getPosition();
-	let extent = 0;
-	if (obj.category === "obstacle") {
-		extent = shapes.getMinExtent(obj.shape);
-	} else if (obj.category === "hero" || obj.category === "projectile") {
-		extent = obj.radius;
-	}
+	const extent = getMinExtent(obj);
 	return isPositionInsideMap(pos, extent, world);
 }
 
@@ -5178,6 +5175,25 @@ function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, wor
 	}
 
 	obstacle.health = Math.min(obstacle.maxHealth, Math.max(0, obstacle.health - packet.damage));
+}
+
+function getMinExtent(obj: w.WorldObject): number {
+	if (obj.category === "hero") {
+		return obj.radius;
+	} else if (obj.category === "projectile") {
+		return obj.radius;
+	} else if (obj.category === "obstacle") {
+		return shapes.getMinExtent(obj.shape);
+	} else if (obj.category === "shield") {
+		const shield = obj;
+		if (shield.type === "reflect") {
+			return shield.radius;
+		} else {
+			return 0;
+		}
+	} else {
+		return 0;
+	}
 }
 
 export function initScore(heroId: string): w.HeroScore {
