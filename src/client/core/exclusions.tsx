@@ -124,6 +124,7 @@ const banned = [
     /\bniggur\b/i,
     /\bp0rn\b/i,
     /\bpen15\b/i,
+    /\bpenis\b/i,
     /\bpetukh\b/i,
     /\bpizda\b/i,
     /\bporn\b/i,
