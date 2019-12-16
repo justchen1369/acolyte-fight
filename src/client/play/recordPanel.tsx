@@ -54,6 +54,7 @@ interface State {
     error: string;
 
     hideMap?: boolean;
+    hd?: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -137,6 +138,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 <RecordBar>
                     <HrefItem onClick={() => this.onExitClicked()}><i className="fa fa-chevron-left" /> {this.state.complete ? "Back to Home" : "Cancel"}</HrefItem>
                     {!this.state.hideMap && <ButtonRow label="Hide Map" icon="fas fa-eye" onClick={() => this.onHideMapClicked()} />}
+                    {!this.state.hd && <ButtonRow label="Record in High Quality" icon="fas fa-caret-circle-up" onClick={() => this.onHighQualityClicked()} />}
                 </RecordBar>
                 <div className="recording-status-panel">
                     {!this.state.complete && <div className="recording-status"><span className="recording">Recording video {(100 * this.state.progress).toFixed(0)}%</span> - do not switch tabs or minimise this window</div>}
@@ -153,7 +155,12 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     private onHideMapClicked() {
-        this.setState({ hideMap: true });
+        this.setState({ hideMap: true, hd: true });
+        this.restart();
+    }
+
+    private onHighQualityClicked() {
+        this.setState({ hd: true });
         this.restart();
     }
 
@@ -253,7 +260,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const audioStream = audio.record();
         const stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
 
-        const qualityMultiplier = 4;
+        const qualityMultiplier = this.state.hd ? 8 : 1;
         const videoRecorder = new VideoRecorder(stream, qualityMultiplier);
         try {
             this.setState({ background: this.state.hideMap ? '#000' : world.background });

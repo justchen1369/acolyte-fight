@@ -16,6 +16,7 @@ class RecordBar extends React.PureComponent<Props> {
     render() {
         return <CustomBar>
             {this.props.children}
+            <div className="separator"></div>
             <ButtonPanelLabel />
         </CustomBar>
     }
