@@ -850,6 +850,7 @@ export type Behaviour =
 	| CooldownBehaviour
 	| FixateBehaviour
 	| DecaySpeedBehaviour
+	| AlignProjectileBehaviour
 	| LimitSpeedBehaviour
 	| DecayHealthBehaviour
 	| DecayMitigationBehaviour
@@ -906,6 +907,11 @@ export interface FixateBehaviour extends BehaviourBase {
 
 export interface DecaySpeedBehaviour extends BehaviourBase {
 	type: "decaySpeed";
+	projectileId: string;
+}
+
+export interface AlignProjectileBehaviour extends BehaviourBase {
+	type: "alignProjectile";
 	projectileId: string;
 }
 

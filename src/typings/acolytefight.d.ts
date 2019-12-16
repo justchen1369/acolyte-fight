@@ -407,7 +407,8 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 
 	ccd?: boolean; // Performance improvement: Whether to apply continuous collision detection to this projectile. Small and fast projectiles will tunnel through other objects unless CCD is on. Defaults to true.
 	density: number;
-    radius: number;
+	radius: number;
+	square?: boolean; // A square projectile will push things directly backwards, not to the side
 	speed: number;
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy

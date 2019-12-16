@@ -710,15 +710,28 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const filterGroupIndex = config.filterGroupIndex || -(index + 1); // +1 because 0 means group index doesn't apply
 
 	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
+
+	const radius = projectileTemplate.radius;
+	const shape =
+		projectileTemplate.square
+		? pl.Polygon([
+			pl.Vec2(radius, radius),
+			pl.Vec2(-radius, radius),
+			pl.Vec2(-radius, -radius),
+			pl.Vec2(radius, -radius),
+		])
+		: pl.Circle(projectileTemplate.radius);
+
 	let body = world.physics.createBody({
 		userData: id,
 		type: 'dynamic',
 		position,
 		linearVelocity: velocity,
 		linearDamping: 0,
+		angularDamping: 1000,
 		bullet: projectileTemplate.ccd !== undefined ? projectileTemplate.ccd : true,
 	});
-	body.createFixture(pl.Circle(projectileTemplate.radius), {
+	body.createFixture(shape, {
 		filterGroupIndex: config.initialFilterGroupIndex || filterGroupIndex,
 		filterCategoryBits: categories,
 		filterMaskBits: collideWith,
@@ -728,7 +741,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	});
 
 	if (projectileTemplate.sense) {
-		body.createFixture(pl.Circle(projectileTemplate.radius), {
+		body.createFixture(shape, {
 			filterGroupIndex: config.initialFilterGroupIndex || filterGroupIndex,
 			filterCategoryBits: categories,
 			filterMaskBits: projectileTemplate.sense,
@@ -819,6 +832,9 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	if (projectile.fixedSpeed) {
 		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id });
+	}
+	if (projectileTemplate.square) {
+		world.behaviours.push({ type: "alignProjectile", projectileId: projectile.id });
 	}
 	if (projectile.detonate) {
 		world.behaviours.push({ type: "detonate", projectileId: projectile.id });
@@ -1072,6 +1088,7 @@ export function tick(world: w.World) {
 	handleBehaviours(world, {
 		cooldown,
 		fixate,
+		alignProjectile,
 		decaySpeed,
 		limitSpeed,
 		decayHealth,
@@ -1164,6 +1181,20 @@ function decaySpeed(behaviour: w.DecaySpeedBehaviour, world: w.World) {
 			velocity.set(vector.fromAngle(obj.body.getAngle()).mul(newSpeed));
 		}
 		obj.body.setLinearVelocity(velocity);
+		obj.body.setAngle(vector.angle(velocity));
+	}
+	return true;
+}
+
+function alignProjectile(behaviour: w.AlignProjectileBehaviour, world: w.World) {
+	const obj = world.objects.get(behaviour.projectileId);
+	if (!(obj && obj.category === "projectile")) {
+		return false;
+	}
+
+	const velocity = obj.body.getLinearVelocity();
+	if (velocity.lengthSquared() > 0) {
+		obj.body.setAngle(vector.angle(velocity));
 	}
 	return true;
 }

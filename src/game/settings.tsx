@@ -599,6 +599,7 @@ const meteor: Spell = {
 
     projectile: {
         density: 100,
+        square: true,
         ccd: false,
         attractable: false,
         linkable: true,
@@ -638,6 +639,7 @@ const meteorite: Spell = {
 
     projectile: {
         density: 100,
+        square: true,
         ccd: false,
         attractable: false,
         swappable: true,
