@@ -1138,7 +1138,7 @@ const rocket: Spell = {
             buffs: [
                 {
                     type: "movement",
-                    maxTicks: 2.25 * TicksPerSecond,
+                    maxTicks: 1.5 * TicksPerSecond,
                     movementProportion: 0.1,
                     render: {
                         color: "rgba(64, 255, 255, 1)",
@@ -1155,9 +1155,8 @@ const rocket: Spell = {
         },
 
         partialBuffDuration: {
-            initialMultiplier: 0.2,
-            afterTicks: 0.5 * TicksPerSecond,
-            ticks: 1.75 * TicksPerSecond,
+            initialMultiplier: 0.33,
+            ticks: 1 * TicksPerSecond,
         },
 
         behaviours: [
@@ -2174,7 +2173,7 @@ const horcrux: Spell = {
     icon: "burningEye",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 6 * TicksPerSecond,
     throttle: true,
 
     buffs: [
@@ -2189,7 +2188,7 @@ const horcrux: Spell = {
         density: 10,
         restitution: 0,
         radius: 0.0035,
-        speed: 0.4,
+        speed: 0.35,
 
         maxTicks: 3 * TicksPerSecond,
         minTicks: 1,
@@ -2209,19 +2208,19 @@ const horcrux: Spell = {
         behaviours: [
             {
                 type: "updateCollideWith",
-                trigger: { afterTicks: 53, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true },
                 collideWith: Categories.All,
             },
             {
                 type: "homing",
                 targetType: "cursor",
-                trigger: { afterTicks: 53, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true },
                 newSpeed: 0,
                 redirect: true,
             },
             {
                 type: "aura",
-                trigger: { afterTicks: 53, atCursor: true },
+                trigger: { afterTicks: 60, atCursor: true },
                 radius: 0.04,
                 tickInterval: 6,
                 maxHits: 10,
