@@ -249,8 +249,12 @@ const wordFilter = new WordFilter();
 bannedSentences.forEach(sentence => wordFilter.addSentence(sentence));
 bannedWords.forEach(word => wordFilter.addWord(word));
 
-export function excludeIfNecessary(notifications: w.TextNotification[]) {
+export function silenceIfNecessary(notifications: w.TextNotification[]) {
     const state = StoreProvider.getState();
+    if (state.options.noProfanityFilter) {
+        return;
+    }
+
     const selfHash = state.userHash;
 
     const add = new Array<string>();

@@ -26,7 +26,7 @@ export function onOnlineMsg(data: m.OnlineMsg) {
                 };
                 newNotifications.push(textNotification);
             });
-            silencer.excludeIfNecessary(newNotifications);
+            silencer.silenceIfNecessary(newNotifications);
             notifications.notify(...newNotifications);
         }
     }

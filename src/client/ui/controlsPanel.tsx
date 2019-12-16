@@ -67,6 +67,7 @@ interface ControlState {
     cameraFollow: string;
     changeSpellsWith: string;
     fontSize: string;
+    profanityFilter: string;
     sounds: string;
     graphics: string;
     shake: string;
@@ -102,6 +103,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         fontSize: formatFontSize(options.fontSizeMultiplier),
         changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
+        profanityFilter: options.noProfanityFilter ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: r.formatGraphics(options.graphics),
         shake: options.noShake ? Toggle.Off : Toggle.On,
@@ -275,6 +277,13 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 </select>
             </div>
             <div className="row">
+                <span className="label">Profanity filter</span>
+                <select className="value" value={this.state.profanityFilter} onChange={ev => this.onUpdate({ profanityFilter: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
+            <div className="row">
                 <span className="label">Targeting Indicator</span>
                 <select className="value" value={this.state.targetingIndicator} onChange={ev => this.onUpdate({ targetingIndicator: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
@@ -395,6 +404,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             const options = { ...this.props.options };
             options.wheelOnRight = state.actionWheelSide === Side.Right;
             options.mute = state.sounds === Toggle.Off;
+            options.noProfanityFilter = state.profanityFilter === Toggle.Off;
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             options.noAutoJoin = state.autoJoin === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
