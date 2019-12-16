@@ -253,7 +253,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
         const audioStream = audio.record();
         const stream = new MediaStream([...videoStream.getTracks(), ...audioStream.getTracks()]);
 
-        const qualityMultiplier = 8;
+        const qualityMultiplier = 4;
         const videoRecorder = new VideoRecorder(stream, qualityMultiplier);
         try {
             this.setState({ background: this.state.hideMap ? '#000' : world.background });
