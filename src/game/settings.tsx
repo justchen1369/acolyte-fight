@@ -638,7 +638,7 @@ const meteorite: Spell = {
     throttle: true,
 
     projectile: {
-        density: 100,
+        density: 50,
         square: true,
         ccd: false,
         attractable: false,
