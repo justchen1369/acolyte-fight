@@ -1117,7 +1117,7 @@ const rocket: Spell = {
         damage: 0,
         density: 1,
         radius: 0.005,
-        speed: 0.17,
+        speed: 0.18,
         maxTicks: 2.25 * TicksPerSecond,
         collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
@@ -1155,8 +1155,9 @@ const rocket: Spell = {
         },
 
         partialBuffDuration: {
-            initialMultiplier: 0,
-            ticks: 2.25 * TicksPerSecond,
+            initialMultiplier: 0.2,
+            afterTicks: 0.5 * TicksPerSecond,
+            ticks: 1.75 * TicksPerSecond,
         },
 
         behaviours: [
