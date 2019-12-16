@@ -69,7 +69,7 @@ export interface World {
 	controlMessages: n.ControlMsg[];
 	snapshots: Snapshot[];
 	syncs: Snapshot[];
-	actions: Map<string, Action>,
+	actions: Map<string, Action[]>,
 
 	nextPositionId: number;
 	nextObjectId: number;

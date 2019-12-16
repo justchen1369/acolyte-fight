@@ -1854,16 +1854,37 @@ function removeBots(world: w.World) {
 	world.players = newPlayers;
 }
 
+function getActionQueue(world: w.World, heroId: string) {
+	let actionQueue = world.actions.get(heroId);
+	if (!actionQueue) {
+		actionQueue = [];
+		world.actions.set(heroId, actionQueue);
+	}
+	return actionQueue;
+}
+
 function handleActions(world: w.World) {
 	world.actionMessages.forEach(actionData => {
 		const heroId = world.controlKeys.get(actionData.c);
 		if (heroId) {
 			if (actionData.type === n.ActionType.GameAction) {
-				world.actions.set(heroId, {
+				const action: w.Action = {
 					type: actionData.s,
 					target: pl.Vec2(actionData.x, actionData.y),
 					release: actionData.r,
-				});
+				};
+
+				const actionQueue = getActionQueue(world, heroId);
+				while (actionQueue.length > 0) {
+					const last = actionQueue[actionQueue.length - 1];
+					if (last.type === action.type && last.release === action.release) {
+						// Only keep the most recent action of the same type
+						actionQueue.pop();
+					} else {
+						break;
+					}
+				}
+				actionQueue.push(action);
 			} else if (actionData.type === n.ActionType.Spells) {
 				handleSpellChoosing(actionData, heroId, world);
 			}
@@ -1873,11 +1894,11 @@ function handleActions(world: w.World) {
 }
 
 function act(world: w.World) {
-	const nextActions = new Map<string, w.Action>();
 	world.objects.forEach(hero => {
 		if (hero.category !== "hero") { return; }
 
-		let action = world.actions.get(hero.id);
+		const actionQueue = getActionQueue(world, hero.id);
+		let action = actionQueue.shift();
 		if (action) {
 			hero.target = action.target;
 		}
@@ -1907,7 +1928,9 @@ function act(world: w.World) {
 
 			if (!action || hero.casting.uninterruptible) {
 				// Wait until casting action is completed
-				nextActions.set(hero.id, action);
+				if (action) {
+					actionQueue.unshift(action);
+				}
 				action = hero.casting.action;
 			} else {
 				// Allow the casting action to be interrupted
@@ -1925,7 +1948,6 @@ function act(world: w.World) {
 			turnTowards(hero, hero.target);
 		}
 	});
-	world.actions = nextActions;
 }
 
 function assignKeyBindingsToHero(hero: w.Hero, keyBindings: KeyBindings, world: w.World) {
