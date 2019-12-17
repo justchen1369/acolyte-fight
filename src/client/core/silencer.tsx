@@ -3,7 +3,7 @@ import * as w from '../../game/world.model';
 import * as StoreProvider from '../storeProvider';
 
 class WordFilter {
-    static splitter = /\s+/;
+    static splitter = /\W+/;
     private lookup = new Map<string, RegExp[]>();
 
     addWord(words: string) {
@@ -86,6 +86,7 @@ const bannedWords = [
     "cyka blyat",
     "d!ck",
     "d1ck",
+    "ddick",
     "degroid",
     "downie",
     "erect",
@@ -171,12 +172,13 @@ const bannedWords = [
     "sh!t",
     "shithead",
     "sjw",
+    "slit ur",
+    "slit your",
     "slut",
     "slutt",
     "slutty",
     "sluut",
     "suck my",
-    "suicide",
     "that's gay",
     "thats gay",
     "thot",
