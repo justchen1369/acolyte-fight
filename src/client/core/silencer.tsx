@@ -4,7 +4,13 @@ import * as StoreProvider from '../storeProvider';
 
 class WordFilter {
     static splitter = /\W+/;
+
     private lookup = new Map<string, RegExp[]>();
+    private subpatterns = new Array<RegExp>();
+
+    addSubpattern(pattern: RegExp) {
+        this.subpatterns.push(pattern);
+    }
 
     addWord(words: string) {
         this.addPattern(
@@ -31,6 +37,10 @@ class WordFilter {
     }
 
     acceptable(sentence: string) {
+        if (this.subpatterns.some(filter => filter.test(sentence))) {
+            return false;
+        }
+
         const filters =
             _(sentence.split(WordFilter.splitter))
             .map(word => this.lookup.get(WordFilter.stem(word)))
@@ -52,6 +62,8 @@ const bannedSentences = [
     "too ez",
     "trash",
     "die",
+    "idiot",
+    "gay",
 ];
 
 const bannedWords = [
@@ -63,6 +75,7 @@ const bannedWords = [
     "an4l",
     "anal",
     "b.i.t.c.h",
+    "bastard",
     "b00b",
     "b00bs",
     "bish",
@@ -79,6 +92,7 @@ const bannedWords = [
     "ccunt",
     "clit",
     "clitoris",
+    "cocaine",
     "cocck",
     "cock",
     "cockk",
@@ -122,6 +136,8 @@ const bannedWords = [
     "gncels",
     "gt's gay",
     "gts gay",
+    "incest",
+    "horny",
     "j!zz",
     "jerk off",
     "jerking off",
@@ -151,6 +167,7 @@ const bannedWords = [
     "ni66er",
     "nibba",
     "nidger",
+    "nig",
     "niga",
     "niger",
     "nigga",
@@ -223,10 +240,14 @@ const bannedWords = [
     "you suck",
     "vagene",
     "vagina",
+    "vibrator",
     "w.h.o.r.e",
     "wank",
     "wanker",
     "wanking",
+    "im wet",
+    "I'm wet",
+    "i am wet",
     "whore",
     "Бля",
     "блять",
@@ -257,9 +278,15 @@ const bannedWords = [
     "nigs",
 ];
 
+const bannedSubpatterns = [
+    /porn/i,
+    /\bf+u?c?k? ?(yo)?u+\b/i,
+];
+
 const wordFilter = new WordFilter();
 bannedSentences.forEach(sentence => wordFilter.addSentence(sentence));
 bannedWords.forEach(word => wordFilter.addWord(word));
+bannedSubpatterns.forEach(pattern => wordFilter.addSubpattern(pattern));
 
 export function silenceIfNecessary(notifications: w.TextNotification[]) {
     const state = StoreProvider.getState();
