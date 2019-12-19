@@ -64,6 +64,8 @@ const bannedSentences = [
     "die",
     "idiot",
     "gay",
+    "noob",
+    "noobs",
 ];
 
 const bannedWords = [
