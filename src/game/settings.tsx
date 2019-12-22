@@ -644,7 +644,7 @@ const meteorite: Spell = {
         attractable: false,
         swappable: true,
         linkable: true,
-        radius: 0.015,
+        radius: 0.018,
         speed: 0.3,
         restitution: 0,
         minTicks: 1,
@@ -660,8 +660,8 @@ const meteorite: Spell = {
         color: '#ff0066',
         renderers: [
             { type: "bloom", radius: 0.04 },
-            { type: "projectile", ticks: 10, shine: 0, smoke: 0.5, fade: "#333" },
-            { type: "strike", ticks: 10, flash: true, growth: 0.1 },
+            { type: "projectile", ticks: 12, shine: 0, smoke: 0.5, fade: "#333" },
+            { type: "strike", ticks: 12, flash: true, growth: 0.1 },
         ],
     },
 };
