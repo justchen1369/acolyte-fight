@@ -2070,12 +2070,12 @@ const iceBomb: Spell = {
         {
             icon: "fas fa-snowflake",
             title: "Freeze",
-            text: "Freeze nearby enemies for 1 seconds.",
+            text: "Freeze nearby enemies for 1.5 seconds.",
         },
         {	
 			"icon": "fas fa-sword",	
 			"title": "Vulnerable",	
-			"text": "Enemies receive 25% more damage for 1 seconds."	
+			"text": "Enemies receive 25% more damage for 1.5 seconds."	
 		},
     ],
     sound: "iceBomb",
@@ -2115,7 +2115,7 @@ const iceBomb: Spell = {
             {
                 type: "attract",
                 collideLike: Categories.Massive,
-                categories: Categories.Projectile | Categories.Obstacle | Categories.Hero | Categories.Massive,
+                categories: Categories.Projectile | Categories.Obstacle | Categories.Massive,
                 against: Alliances.NotFriendly,
                 radius: 0.03,
                 accelerationPerTick: -0.01,
@@ -2129,7 +2129,7 @@ const iceBomb: Spell = {
                 stack: "iceBomb",
                 maxStacks: 1,
                 movementProportion: 0.1,
-                maxTicks: 1 * TicksPerSecond,
+                maxTicks: 1.5 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
@@ -2145,7 +2145,7 @@ const iceBomb: Spell = {
 			{	
 				"type": "armor",	
 				"stack": "frostsplatter",	
-				"maxTicks": 1 * TicksPerSecond,	
+				"maxTicks": 1.5 * TicksPerSecond,	
 				"maxStacks": 1,	
 				"proportion": 0.25,	
 				"against": Alliances.Enemy,	
