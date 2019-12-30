@@ -2951,20 +2951,29 @@ function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.Wor
 }
 
 function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject[], sound: string, world: w.World) {
-	const SwapReduction = world.settings.World.SwapDistanceReduction;
-
 	const owner = world.objects.get(ownerId);
 	if (!(owner && owner.category === "hero")) {
 		return;
 	}
 
-	const ownerPos = vector.clone(owner.body.getPosition());
+	const SwapReduction = world.settings.World.SwapDistanceReduction;
+
+	const initialPos = vector.clone(owner.body.getPosition());
+	let delta = vector.diff(initialPos, epicenter);
+
+	if (delta.length() < owner.radius) {
+		// Force a minimum swap length to ensure the hero always ends up on the other side of whatever they swapped with
+		const angle = vector.angle(delta);
+		delta = vector.fromAngle(angle, owner.radius);
+	}
+
+	// Apply the swap to targets
 	targets.forEach(target => {
 		if (!target.swappable) { return; }
 		if (target.id === ownerId) { return; }
 
 		const targetPos = vector.clone(target.body.getPosition());
-		target.body.setPosition(vector.diff(targetPos, epicenter).mul(SwapReduction).add(ownerPos));
+		applyPosDelta(target, vector.diff(targetPos, epicenter).mul(SwapReduction).add(delta));
 
 		if (target.category === "hero") {
 			world.ui.events.push({
@@ -2972,15 +2981,16 @@ function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject
 				tick: world.tick,
 				sound,
 				fromPos: targetPos,
-				toPos: ownerPos,
+				toPos: initialPos,
 				heroId: target.id,
 			});
 		}
 	});
 
-	const initialPos = vector.clone(owner.body.getPosition());
-	owner.body.setPosition(epicenter);
+	// Apply the swap to the owner
+	applyPosDelta(owner, delta.clone().neg());
 
+	// Notify of the swap
 	world.ui.events.push({
 		type: "teleport",
 		tick: world.tick,

@@ -2826,6 +2826,7 @@ const swap: Spell = {
         expireAfterCursorTicks: 0,
         swappable: false,
         shieldTakesOwnership: false,
+        sensor: true,
 
         detonate: {
             damage: 0,
