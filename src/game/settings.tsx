@@ -2599,7 +2599,7 @@ const icewall: Spell = {
 
     maxRange: 0.25,
     movementProportionWhileCharging: 1.0,
-    maxTicks: 1 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     growthTicks: 5,
     cooldown: 7.5 * TicksPerSecond,
     throttle: false,
@@ -2615,7 +2615,7 @@ const icewall: Spell = {
 
     categories: Categories.Shield | Categories.Obstacle,
     collideWith: Categories.Hero | Categories.Projectile | Categories.Obstacle,
-    conveyable: true,
+    conveyable: false,
     bumpable: false,
     swappable: true,
     selfPassthrough: true,
