@@ -1,6 +1,7 @@
 var center = { x: 0.5, y: 0.5 };
 
-var CloseEnoughDistance = 0.01;
+var CloseEnoughDistance = 0.05;
+var CloseEnoughRadians = 0.1 * Math.PI;
 var MissRadius = 0.05;
 var DodgeRadius = 0.15;
 var SpellCastIntervalMilliseconds = 1000;
@@ -43,12 +44,14 @@ function act(input) {
             || castSpell(state, hero, opponent, cooldowns, settings)
             || focus(hero, opponent)
             || chase(state, hero, cooldowns, opponent)
-            || move(state, hero);
+            || move(state, hero)
+            || face(state, hero, opponent)
     } else {
         action =
             chooseSpells(settings)
             || dodge(state, hero, cooldowns)
-            || move(state, hero);
+            || move(state, hero)
+            || face(state, hero, opponent)
     }
 
     if (action) {
@@ -322,6 +325,17 @@ function move(state, hero) {
     return { spellId: "move", target };
 }
 
+function face(state, hero, opponent) {
+    var target = opponent.pos;
+    var targetAngle = vectorAngle(vectorDiff(opponent.pos, hero.pos));
+    var angleDelta = vectorAngleDelta(hero.heading, targetAngle);
+    if (Math.abs(angleDelta) <= CloseEnoughRadians) {
+        return null;
+    }
+
+    return { spellId: "retarget", target };
+}
+
 function dodge(state, hero, cooldowns) {
     for (var projectileId in state.projectiles) {
         var projectile = state.projectiles[projectileId];
@@ -414,6 +428,21 @@ function vectorMidpoint(a, b) {
 
 function vectorFromAngle(angle) {
 	return { x: Math.cos(angle), y: Math.sin(angle) };
+}
+
+function vectorAngle(vec) {
+    return Math.atan2(vec.y, vec.x);
+}
+
+function vectorAngleDelta(currentAngle, targetAngle) {
+	var delta = targetAngle - currentAngle;
+	while (delta > Math.PI) {
+		delta -= 2 * Math.PI;
+	}
+	while (delta < -Math.PI) {
+		delta += 2 * Math.PI;
+	}
+	return delta;
 }
 
 // See ai.contracts.ts: Must return a BotContract
