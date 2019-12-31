@@ -77,7 +77,11 @@ class TextMessage extends React.PureComponent<Props, State> {
             return null; // Cannot self-silence
         }
 
-        return <i className="silence-btn fas fa-comment-alt-times" onClick={() => this.onSilenceClick(this.props.notification.userHash)} title="Hide all messages from this player" />;
+        return <i
+            className="silence-btn fas fa-comment-alt-times"
+            onClick={() => this.onSilenceClick(this.props.notification.userHash)}
+            title={`Hide all messages from ${this.props.notification.name}`}
+            />;
     }
 
     private onSilenceClick(userHash: string) {
