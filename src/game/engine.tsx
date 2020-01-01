@@ -936,11 +936,10 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		maxTicks = template.maxTicks;
 	}
 
-	const revolutionsPerTick = template.revolutionsPerTick || template.revolutionsPerSecond; // revolutionsPerSecond was wrongly name and deprecated, but still read from it
 	return {
 		type: "homing",
 		projectileId: projectile.id,
-		turnRate: revolutionsPerTick !== undefined ? revolutionsPerTick * 2 * Math.PI : Infinity,
+		turnRate: template.revolutionsPerSecond !== undefined ? template.revolutionsPerSecond * 2 * Math.PI : Infinity,
 		maxTurnProportion: template.maxTurnProportion !== undefined ? template.maxTurnProportion : 1.0,
 		minDistanceToTarget: template.minDistanceToTarget || 0,
 		targetType: template.targetType || w.HomingTargets.enemy,

@@ -859,7 +859,7 @@ const homing: Spell = {
         behaviours: [
             {
                 type: "homing",
-                revolutionsPerTick: 1,
+                revolutionsPerSecond: 1,
                 maxTurnProportion: 0.05,
             },
         ],
@@ -910,7 +910,7 @@ const boomerang: Spell = {
         behaviours: [
             {
                 type: "homing",
-                revolutionsPerTick: 1,
+                revolutionsPerSecond: 1,
                 maxTurnProportion: 0.055,
                 minDistanceToTarget: 0.075,
                 targetType: HomingTargets.self,
@@ -950,7 +950,7 @@ const retractor: Spell = {
             type: "homing",
             targetType: "cursor",
             newSpeed: 0.2,
-            revolutionsPerTick: 1,
+            revolutionsPerSecond: 1,
             redirect: true,
         },
         {
@@ -1056,7 +1056,7 @@ const backlash: Spell = {
             {
                 trigger: { afterTicks: 37 },
                 type: "homing",
-                revolutionsPerTick: 1,
+                revolutionsPerSecond: 1,
                 targetType: "self",
             },
             {
@@ -1165,7 +1165,7 @@ const rocket: Spell = {
             {
                 type: "homing",
                 targetType: "follow",
-                revolutionsPerTick: 0.006,
+                revolutionsPerSecond: 0.006,
             },
             { type: "expireOnChannellingEnd" },
         ],
@@ -1963,7 +1963,7 @@ const halo: Spell = {
             },
             {
                 type: "homing",
-                revolutionsPerTick: 1,
+                revolutionsPerSecond: 1,
                 maxTurnProportion: 0.15,
                 minDistanceToTarget: 0.02,
                 targetType: HomingTargets.self,

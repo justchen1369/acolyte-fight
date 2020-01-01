@@ -515,9 +515,7 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 
 	targetType?: HomingType; // Whether to home towards "self", "enemy", "cursor" or "follow". Defaults to "enemy".
 
-	revolutionsPerSecond?: number; // Don't use this, use revolutionsPerTick.
-	revolutionsPerTick?: number; // The maximum turn rate of the homing projectile. Defaults to infinity
-
+	revolutionsPerSecond?: number; // The maximum turn rate of the homing projectile. Defaults to infinity
 	maxTurnProportion?: number; // The turn rate cannot be more than this proportion of the difference between ideal and current angle. Used to make homing spells dodgeable.
 	expireWithinRevs?: number; // Stop homing once within this many revs of aiming directly at the target
 
