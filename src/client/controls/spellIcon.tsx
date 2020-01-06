@@ -41,8 +41,6 @@ export class SpellIcon extends React.PureComponent<Props, State> {
             className = className + " " + attr.className;
         }
 
-        this.redrawCanvas(); // Redraw previous canvas in response to state changes
-
         const allStyles = {
             width,
             height,
@@ -60,6 +58,14 @@ export class SpellIcon extends React.PureComponent<Props, State> {
             onMouseEnter={(ev) => this.onMouseEnter(ev)}
             onMouseLeave={(ev) => this.onMouseLeave(ev)}
         />
+    }
+
+    componentDidMount() {
+        this.redrawCanvas(); // Redraw previous canvas in response to state changes
+    }
+
+    componentDidUpdate() {
+        this.redrawCanvas(); // Redraw previous canvas in response to state changes
     }
 
     private onMouseEnter(ev: React.MouseEvent<HTMLCanvasElement>) {
