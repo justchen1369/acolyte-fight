@@ -106,4 +106,5 @@ function applyQuadraticPath(ctx: CanvasRenderingContext2D, bend: number, points:
 
         ctx.quadraticCurveTo(mid.x, mid.y, next.x, next.y);
     }
+    ctx.closePath();
 }
