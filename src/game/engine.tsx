@@ -707,7 +707,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
-	const filterGroupIndex = config.filterGroupIndex || -(index + 1); // +1 because 0 means group index doesn't apply
+	const filterGroupIndex = config.filterGroupIndex || 0;
 
 	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
 
@@ -5194,32 +5194,33 @@ function updateArmor(hero: w.Hero) {
 }
 
 function mitigateDamage(toHero: w.Hero, damage: number, fromHeroId: string, world: w.World): number {
+	if (damage <= 0) {
+		return damage;
+	}
+
 	if (!fromHeroId // Damage from environment not mitigated by damage from other heroes
 		|| fromHeroId === toHero.id) { // Self damage always received in full
 		return damage;
 	}
 
-	let damageFromThisSource = 0;
+	let totalFromThisSource = 0;
+	let maxTotal = 0;
 	toHero.damageSources.forEach((amount, heroId) => {
 		if (heroId === fromHeroId) {
-			damageFromThisSource = amount;
-		} else {
-			// Damage from multiple opponents doesn't stack
-			damage -= amount;
+			totalFromThisSource = amount;
 		}
+		maxTotal = Math.max(maxTotal, amount);
 	});
-	damage = Math.max(0, damage);
 
-	if (damage > 0) {
-		toHero.damageSources.set(fromHeroId, damageFromThisSource + damage);
-		toHero.damageSourceHistory.push({
-			heroId: fromHeroId,
-			amount: damage,
-			expireTick: world.tick + world.settings.Hero.DamageMitigationTicks,
-		});
-	}
+	const newTotal = totalFromThisSource + damage;
+	toHero.damageSources.set(fromHeroId, newTotal);
+	toHero.damageSourceHistory.push({
+		heroId: fromHeroId,
+		amount: damage,
+		expireTick: world.tick + world.settings.Hero.DamageMitigationTicks,
+	});
 
-	return damage;
+	return Math.max(0, newTotal - maxTotal);
 }
 
 function applyDamageToObstacle(obstacle: w.Obstacle, packet: w.DamagePacket, world: w.World) {
