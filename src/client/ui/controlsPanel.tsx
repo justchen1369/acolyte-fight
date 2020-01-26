@@ -328,6 +328,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={r.Graphics.High}>High</option>
                     <option value={r.Graphics.Medium}>Medium</option>
                     <option value={r.Graphics.Low}>Low</option>
+                    <option value={r.Graphics.Minimum}>Minimum</option>
                 </select>
             </div>
             {this.state.changed && <div className="status-row">

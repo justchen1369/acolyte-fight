@@ -17,6 +17,7 @@ export namespace GraphicsLevel {
 	export const High = 3; // Particles
 	export const Medium = 2;
 	export const Low = 1;
+	export const Minimum = 0.5;
 }
 
 export namespace Graphics {
@@ -26,6 +27,7 @@ export namespace Graphics {
     export const High = "high";
     export const Medium = "medium";
     export const Low = "low";
+    export const Minimum = "minimum";
 }
 
 export function isAutoGraphics(graphics: number) {
@@ -39,6 +41,7 @@ export function formatGraphics(graphics: number): string {
         case GraphicsLevel.High: return Graphics.High;
         case GraphicsLevel.Medium: return Graphics.Medium;
         case GraphicsLevel.Low: return Graphics.Low;
+        case GraphicsLevel.Minimum: return Graphics.Minimum;
         default: return Graphics.Auto;
     }
 }
@@ -50,7 +53,19 @@ export function parseGraphics(graphics: string): number {
         case Graphics.High: return GraphicsLevel.High;
         case Graphics.Medium: return GraphicsLevel.Medium;
         case Graphics.Low: return GraphicsLevel.Low;
+        case Graphics.Minimum: return GraphicsLevel.Minimum;
         default: return null;
+    }
+}
+
+export function reduceGraphics(level: number): number {
+    switch (level) {
+        case GraphicsLevel.Maximum: return GraphicsLevel.Ultra;
+        case GraphicsLevel.Ultra: return GraphicsLevel.High;
+        case GraphicsLevel.High: return GraphicsLevel.Medium;
+        case GraphicsLevel.Medium: return GraphicsLevel.Low;
+        case GraphicsLevel.Low: return GraphicsLevel.Minimum;
+        default: return GraphicsLevel.Minimum;
     }
 }
 

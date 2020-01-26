@@ -7,6 +7,8 @@ import * as StoreProvider from '../storeProvider';
 import * as engine from '../../game/engine';
 import * as performance from '../core/performance';
 import * as vector from '../../game/vector';
+
+import * as r from '../graphics/render.model'
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
@@ -174,8 +176,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     reduceGraphics() {
-        if (autoGraphics(this.props.globalGraphics) && this.props.currentGraphics > GraphicsLevel.Low) {
-            const newLevel = this.props.currentGraphics - 1;
+        if (autoGraphics(this.props.globalGraphics) && this.props.currentGraphics > GraphicsLevel.Minimum) {
+            const newLevel = r.reduceGraphics(this.props.currentGraphics);
             StoreProvider.dispatch({ type: "graphics", graphics: newLevel });
             console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
         }
@@ -230,16 +232,30 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     private calculateRetinaMultiplier() {
-        if (this.getGraphics() >= GraphicsLevel.Maximum) {
+        const graphics = this.getGraphics();
+        if (graphics >= GraphicsLevel.Maximum) {
             return window.devicePixelRatio;
+        } else if (graphics <= GraphicsLevel.Minimum) {
+            return 0.5;
         } else {
             return 1;
         }
     }
 
+    private calculateFontSizeMultiplier(retinaMultiplier: number) {
+        let fontSizeMultiplier = this.props.fontSizeMultiplier || 1;
+        if (retinaMultiplier < 1) {
+            // If not enough pixels to display font clearly, make font bigger
+            fontSizeMultiplier = Math.max(2, fontSizeMultiplier);
+        }
+        return fontSizeMultiplier;
+    }
+
     private frame(display: boolean) {
         if (this.canvasStack.atlas && this.canvasStack.gl && this.canvasStack.ui) {
             const resolvedKeys = this.resolveKeys(this.props);
+            const retinaMultiplier = this.calculateRetinaMultiplier();
+            const fontSizeMultiplier = this.calculateFontSizeMultiplier(retinaMultiplier);
             frame(this.canvasStack, this.props.world, {
                 rtx: this.getGraphics(),
                 wheelOnRight: this.props.wheelOnRight,
@@ -249,8 +265,8 @@ class CanvasPanel extends React.PureComponent<Props, State> {
                 customizingSpells: this.props.customizingSpells,
                 keysToSpells: resolvedKeys.keysToSpells,
                 rebindings: this.props.rebindings,
-                retinaMultiplier: this.calculateRetinaMultiplier(),
-                fontSizeMultiplier: this.props.fontSizeMultiplier || 1,
+                retinaMultiplier,
+                fontSizeMultiplier,
                 mobile: this.props.touched,
             }, display);
         }

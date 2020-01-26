@@ -42,8 +42,8 @@ class GraphicsLevelPanel extends React.PureComponent<Props, State> {
         let graphics = this.props.globalGraphics;
         if (!graphics) { // Auto
             graphics = r.GraphicsLevel.Maximum;
-        } else if (graphics > r.GraphicsLevel.Low) {
-            --graphics;
+        } else if (graphics > r.GraphicsLevel.Minimum) {
+            graphics = r.reduceGraphics(graphics);
         } else {
             graphics = null; // Set to auto
         }
