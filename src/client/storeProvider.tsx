@@ -175,7 +175,10 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             world: action.world,
-            items: state.items.filter(x => x.notification.type === "text"), // Keep all text messages, discard all else
+            items: state.items.filter(x =>
+                x.notification.type === "text"
+                || x.notification.type === "ratingAdjustment"
+                || x.notification.type === "disconnected"), // Keep messages relevant cross-games
             current: {
                 ...state.current,
                 gameId: action.world.ui.myGameId,
