@@ -12,7 +12,7 @@ const RatingAdjustmentMilliseconds = 30000;
 const TeamsSplashMilliseconds = 4000;
 const TextMilliseconds = 60000;
 
-const listeners = new Array<NotificationListener>();
+const listeners = new Array<NotificationListener>(onNotification);
 let nextNotificationId = 0;
 
 export function startTimers() {
@@ -63,6 +63,21 @@ function notificationCleanup() {
 
     const now = new Date().getTime();
     const items = store.items.filter(item => item.expiryTime > now);
+    if (items.length < store.items.length) {
+        StoreProvider.dispatch({ type: "updateNotifications", items });
+    }
+}
+
+function onNotification(newNotifications: w.Notification[]) {
+    if (newNotifications.some(n => n.type === "closing" && n.ticksUntilClose <= 0)) {
+        onGameStarted();
+    }
+}
+
+function onGameStarted() {
+    // Remove rating adjustment message when game starts
+    const store = StoreProvider.getState();
+    const items = store.items.filter(item => item.notification.type !== "ratingAdjustment");
     if (items.length < store.items.length) {
         StoreProvider.dispatch({ type: "updateNotifications", items });
     }

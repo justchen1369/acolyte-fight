@@ -47,7 +47,7 @@ class RatingAdjustmentMessage extends React.PureComponent<Props, State> {
 
         const notification = this.props.notification;
 
-        if (!this.props.unranked && notification.gameId === this.props.myGameId) {
+        if (!this.props.unranked) {
             const delta = notification.acoDelta;
             const finalAcoExposure = notification.initialAcoExposure + delta;
             if (!finalAcoExposure) {
