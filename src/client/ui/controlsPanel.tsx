@@ -28,11 +28,6 @@ namespace Side {
     export const Right = "right";
 }
 
-namespace ChangeSpellsWith {
-    export const RightClick = "right";
-    export const CtrlClick = "ctrl";
-}
-
 namespace TouchTracking {
     export const Fastest = "fastest";
     export const Fast = "fast";
@@ -65,7 +60,7 @@ interface ControlState {
     targetingIndicator: string;
     autoJoin: string;
     cameraFollow: string;
-    changeSpellsWith: string;
+    buttonBarClickable: string;
     fontSize: string;
     profanityFilter: string;
     sounds: string;
@@ -102,7 +97,7 @@ function controlConfigToState(rebindings: KeyBindings, options: m.GameOptions): 
         autoJoin: options.noAutoJoin ? Toggle.Off : Toggle.On,
         cameraFollow: options.noCameraFollow ? Toggle.Off : Toggle.On,
         fontSize: formatFontSize(options.fontSizeMultiplier),
-        changeSpellsWith: options.noRightClickChangeSpells ? ChangeSpellsWith.CtrlClick : ChangeSpellsWith.RightClick,
+        buttonBarClickable: options.noRightClickChangeSpells ? Toggle.Off : Toggle.On,
         profanityFilter: options.noProfanityFilter ? Toggle.Off : Toggle.On,
         sounds: options.mute ? Toggle.Off : Toggle.On,
         graphics: r.formatGraphics(options.graphics),
@@ -268,6 +263,20 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <span className="value">How fast should the cursor move?</span>
                 </div>
             </>}
+            {!touched && <>
+                <div className="row">
+                    <span className="label">On-screen buttons</span>
+                    <select className="value" value={this.state.buttonBarClickable} onChange={ev => this.onUpdate({ buttonBarClickable: ev.target.value })}>
+                        <option value={Toggle.On}>Enabled</option>
+                        <option value={Toggle.Off}>Disabled</option>
+                    </select>
+                </div>
+                <div className="row info">
+                    <span className="label"></span>
+                    {this.state.buttonBarClickable === Toggle.On && <span className="value">Click on the on-screen buttons to cast spells</span>}
+                    {this.state.buttonBarClickable === Toggle.Off && <span className="value">Must use the keyboard to cast spells</span>}
+                </div>
+            </>}
             <h2>Interface</h2>
             <div className="row">
                 <span className="label">Sound</span>
@@ -281,6 +290,21 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 <select className="value" value={this.state.profanityFilter} onChange={ev => this.onUpdate({ profanityFilter: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
+            <div className="row">
+                <span className="label">Auto-join next match</span>
+                <select className="value" value={this.state.autoJoin} onChange={ev => this.onUpdate({ autoJoin: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+            </div>
+            <h2>Visuals</h2>
+            <div className="row">
+                <span className="label">Font size</span>
+                <select className="value" value={this.state.fontSize} onChange={ev => this.onUpdate({ fontSize: ev.target.value })}>
+                    <option value={FontSize.Normal}>Normal</option>
+                    <option value={FontSize.Large}>Large</option>
                 </select>
             </div>
             <div className="row">
@@ -304,28 +328,8 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                 </div>
             </>
             <div className="row">
-                <span className="label">Font size</span>
-                <select className="value" value={this.state.fontSize} onChange={ev => this.onUpdate({ fontSize: ev.target.value })}>
-                    <option value={FontSize.Normal}>Normal</option>
-                    <option value={FontSize.Large}>Large</option>
-                </select>
-            </div>
-            {!touched && <>
-                <div className="row">
-                    <span className="label">Change spells with</span>
-                    <select className="value" value={this.state.changeSpellsWith} onChange={ev => this.onUpdate({ changeSpellsWith: ev.target.value })}>
-                        <option value={ChangeSpellsWith.RightClick}>Right-click</option>
-                        <option value={ChangeSpellsWith.CtrlClick}>Ctrl+Click</option>
-                    </select>
-                </div>
-                <div className="row info">
-                    <span className="label"></span>
-                    <span className="value">Change spells in-game by {this.state.changeSpellsWith === ChangeSpellsWith.RightClick ? "right-clicking" : "ctrl+clicking"} the spell buttons.</span>
-                </div>
-            </>}
-            <div className="row">
-                <span className="label">Auto-join next match</span>
-                <select className="value" value={this.state.autoJoin} onChange={ev => this.onUpdate({ autoJoin: ev.target.value })}>
+                <span className="label">Screen shake</span>
+                <select className="value" value={this.state.shake} onChange={ev => this.onUpdate({ shake: ev.target.value })}>
                     <option value={Toggle.On}>On</option>
                     <option value={Toggle.Off}>Off</option>
                 </select>
@@ -340,13 +344,6 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={r.Graphics.High}>High</option>
                     <option value={r.Graphics.Medium}>Medium</option>
                     <option value={r.Graphics.Low}>Low</option>
-                </select>
-            </div>
-            <div className="row">
-                <span className="label">Screen shake</span>
-                <select className="value" value={this.state.shake} onChange={ev => this.onUpdate({ shake: ev.target.value })}>
-                    <option value={Toggle.On}>On</option>
-                    <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
             {this.state.changed && <div className="status-row">
@@ -408,7 +405,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
             options.noTargetingIndicator = state.targetingIndicator === Toggle.Off;
             options.noAutoJoin = state.autoJoin === Toggle.Off;
             options.noCameraFollow = state.cameraFollow === Toggle.Off;
-            options.noRightClickChangeSpells = state.changeSpellsWith !== ChangeSpellsWith.RightClick;
+            options.noRightClickChangeSpells = state.buttonBarClickable === Toggle.Off;
             options.fontSizeMultiplier = parseFontSize(state.fontSize);
             options.touchSurfacePixels = parseTouchTracking(state.touchTracking);
             options.noShake = state.shake === Toggle.Off;

@@ -26,7 +26,7 @@ interface Props {
     world: w.World;
     customizing: boolean;
     customizingBtn: boolean;
-    noRightClickChangeSpells: boolean;
+    buttonBarClickable: boolean;
     touchSurfacePixels: number;
     wheelOnRight: boolean;
     keyBindings: KeyBindings;
@@ -68,7 +68,7 @@ function stateToProps(state: s.State): Props {
         world: state.world,
         customizing: state.customizing,
         customizingBtn: !!state.world.ui.toolbar.customizingBtn,
-        noRightClickChangeSpells: state.options.noRightClickChangeSpells,
+        buttonBarClickable: state.touched || !state.options.noRightClickChangeSpells,
         touchSurfacePixels: state.options.touchSurfacePixels,
         wheelOnRight: state.options.wheelOnRight,
         keyBindings: state.keyBindings,
@@ -205,13 +205,13 @@ class ControlSurface extends React.PureComponent<Props, State> {
         let mapTouched = false;
         points.forEach(p => {
             const key = whichKeyClicked(p.interfacePoint, world.ui.buttonBar);
-            if (key) {
+            if (key && (p.modifierBtn || this.props.buttonBarClickable)) {
                 this.actionSurface = {
                     touchId: p.touchId,
                     activeKey: key,
                     time: Date.now(),
                 };
-                if (p.modifierBtn || (p.secondaryBtn && !this.props.noRightClickChangeSpells) || this.props.customizing) {
+                if (p.modifierBtn || (p.secondaryBtn && this.props.buttonBarClickable) || this.props.customizing) {
                     this.handleCustomizeBtn(key);
                 } else {
                     this.handleButtonClick(key, world);
@@ -437,7 +437,11 @@ class ControlSurface extends React.PureComponent<Props, State> {
     }
 
     private clampToArena(target: pl.Vec2, hero: w.Hero, world: w.World) {
-        if (this.props.customizing || this.props.customizingBtn || world.ui.toolbar.hoverSpellId || world.ui.toolbar.hoverControl || world.ui.toolbar.hoverButtonPanel) {
+        if (this.props.customizing
+            || this.props.customizingBtn
+            || (world.ui.toolbar.hoverSpellId && this.props.buttonBarClickable)
+            || world.ui.toolbar.hoverControl
+            || world.ui.toolbar.hoverButtonPanel) {
             const pos = hero.body.getPosition();
             if (engine.allowSpellChoosing(world, world.ui.myHeroId)) {
                 // User is choosing a spell now, don't move them
