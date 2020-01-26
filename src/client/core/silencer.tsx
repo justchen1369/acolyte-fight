@@ -70,6 +70,7 @@ const bannedSentences = [
 
 const bannedWords = [
     "4nal",
+    "abortion",
     "a.n.a.l",
     "a.u.s.t.i.s.t",
     "a.u.t.i.s.m",
