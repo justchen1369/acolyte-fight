@@ -239,7 +239,6 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     {this.props.settings.Choices.Keys.map(keyConfig => this.renderKeyOption(keyConfig))}
                 </select>
             </div>}
-            <div className="row"></div>
             {touched && <div className="row">
                 <span className="label">Layout</span>
                 <select className="value" value={this.state.actionWheelSide} onChange={ev => this.onUpdate({ actionWheelSide: ev.target.value })}>
@@ -247,36 +246,26 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={formatOption(Side.Right)}>Left-handed</option>
                 </select>
             </div>}
-            {touched && <>
-                <div className="row">
-                    <span className="label">Touch tracking speed</span>
-                    <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
-                        <option value={formatOption(TouchTracking.Fastest)}>Fastest</option>
-                        <option value={formatOption(TouchTracking.Fast)}>Fast</option>
-                        <option value={formatOption(TouchTracking.Medium)}>Medium</option>
-                        <option value={formatOption(TouchTracking.Slow)}>Slow</option>
-                        <option value={formatOption(TouchTracking.Slowest)}>Slowest</option>
-                    </select>
-                </div>
-                <div className="row info">
-                    <span className="label"></span>
-                    <span className="value">How fast should the cursor move?</span>
-                </div>
-            </>}
-            {!touched && <>
-                <div className="row">
-                    <span className="label">On-screen buttons</span>
-                    <select className="value" value={this.state.buttonBarClickable} onChange={ev => this.onUpdate({ buttonBarClickable: ev.target.value })}>
-                        <option value={Toggle.On}>Enabled</option>
-                        <option value={Toggle.Off}>Disabled</option>
-                    </select>
-                </div>
-                <div className="row info">
-                    <span className="label"></span>
-                    {this.state.buttonBarClickable === Toggle.On && <span className="value">Click on the on-screen buttons to cast spells</span>}
-                    {this.state.buttonBarClickable === Toggle.Off && <span className="value">Must use the keyboard to cast spells</span>}
-                </div>
-            </>}
+            {touched && <div className="row">
+                <span className="label">Touch tracking speed</span>
+                <select className="value" value={this.state.touchTracking} onChange={ev => this.onUpdate({ touchTracking: ev.target.value })}>
+                    <option value={formatOption(TouchTracking.Fastest)}>Fastest</option>
+                    <option value={formatOption(TouchTracking.Fast)}>Fast</option>
+                    <option value={formatOption(TouchTracking.Medium)}>Medium</option>
+                    <option value={formatOption(TouchTracking.Slow)}>Slow</option>
+                    <option value={formatOption(TouchTracking.Slowest)}>Slowest</option>
+                </select>
+                <div className="info">How fast should the cursor move?</div>
+            </div>}
+            {!touched && <div className="row">
+                <span className="label">On-screen buttons</span>
+                <select className="value" value={this.state.buttonBarClickable} onChange={ev => this.onUpdate({ buttonBarClickable: ev.target.value })}>
+                    <option value={Toggle.On}>Enabled</option>
+                    <option value={Toggle.Off}>Disabled</option>
+                </select>
+                {this.state.buttonBarClickable === Toggle.On && <span className="info">Click on the on-screen buttons to cast spells</span>}
+                {this.state.buttonBarClickable === Toggle.Off && <span className="info">Must use the keyboard to cast spells</span>}
+            </div>}
             <h2>Interface</h2>
             <div className="row">
                 <span className="label">Sound</span>
@@ -321,10 +310,7 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                         <option value={Toggle.On}>On</option>
                         <option value={Toggle.Off}>Off</option>
                     </select>
-                </div>
-                <div className="row info">
-                    <span className="label"></span>
-                    <span className="value">Whether to zoom and pan if the screen is too small.</span>
+                    <span className="info">Whether to zoom and pan if the screen is too small.</span>
                 </div>
             </>
             <div className="row">
