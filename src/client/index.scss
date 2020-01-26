@@ -342,6 +342,7 @@ h3 {
         #0004);
     
     border: 1px black solid;
+    border-radius: 5px;
     @include strokeShadow(#0008 0.1em 0.1em 0.1em);
     @include floatShadow();
 }

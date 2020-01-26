@@ -12,6 +12,7 @@
     background: #282828;
 
     border: 1px black solid;
+    border-radius: 5px;
 
     @include floatShadow();
 }

@@ -24,6 +24,7 @@
     transition: background-color 0.2s ease, transform 0.2s ease;
 
     border: 1px black solid;
+    border-radius: 5px;
     @include floatShadow();
 }
 
