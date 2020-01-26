@@ -608,7 +608,7 @@ const meteor: Spell = {
         speed: 0.2,
         restitution: 0,
         minTicks: 1,
-        maxTicks: 3 * TicksPerSecond,
+        maxTicks: 2 * TicksPerSecond,
         hitInterval: 120,
         damage: 0,
         shieldTakesOwnership: false,
