@@ -303,16 +303,14 @@ class ControlsPanel extends React.PureComponent<Props, State> {
                     <option value={Toggle.Off}>Off</option>
                 </select>
             </div>
-            <>
-                <div className="row">
-                    <span className="label">Camera follow</span>
-                    <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
-                        <option value={Toggle.On}>On</option>
-                        <option value={Toggle.Off}>Off</option>
-                    </select>
-                    <span className="info">Whether to zoom and pan if the screen is too small.</span>
-                </div>
-            </>
+            <div className="row">
+                <span className="label">Camera follow</span>
+                <select className="value" value={this.state.cameraFollow} onChange={ev => this.onUpdate({ cameraFollow: ev.target.value })}>
+                    <option value={Toggle.On}>On</option>
+                    <option value={Toggle.Off}>Off</option>
+                </select>
+                <span className="info">Whether to zoom and pan if the screen is too small.</span>
+            </div>
             <div className="row">
                 <span className="label">Screen shake</span>
                 <select className="value" value={this.state.shake} onChange={ev => this.onUpdate({ shake: ev.target.value })}>
