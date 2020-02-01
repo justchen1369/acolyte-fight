@@ -35,7 +35,7 @@ class GraphicsLevelPanel extends React.PureComponent<Props, State> {
             let autoLevel = _.upperFirst(r.formatGraphics(this.props.currentGraphics));
             level += ` (${autoLevel})`;
         }
-        return <ButtonRow secondary={true} label={`Graphics: ${level}`} icon="fas fa-tv" onClick={() => this.onGraphicsToggle()} />
+        return <ButtonRow secondary={true} label={`Graphics: ${level}`} icon="fas fa-image" onClick={() => this.onGraphicsToggle()} />
     }
 
     private async onGraphicsToggle() {

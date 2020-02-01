@@ -11,6 +11,7 @@ import ActionWheelSidePanel from './buttons/actionWheelSidePanel';
 import AutoJoinConfigButton from './buttons/autoJoinConfigButton';
 import Button from '../controls/button';
 import ButtonPanelLabel from './buttons/buttonPanelLabel';
+import ChatButton from './buttons/chatButton';
 import InfoPanel from './infoPanel';
 import FinishedPanel from './finishedPanel';
 import GameKeyCustomizer from './gameKeyCustomizer';
@@ -46,6 +47,7 @@ interface Props {
     wheelOnRight: boolean;
     customizing: boolean;
     touched: boolean;
+    showingChat: boolean;
     showingPerformance: boolean;
 }
 interface State {
@@ -59,6 +61,7 @@ function stateToProps(state: s.State): Props {
         wheelOnRight: state.options.wheelOnRight,
         customizing: state.customizing,
         touched: state.touched,
+        showingChat: !!state.showingChat,
         showingPerformance: !!state.showingPerformance,
     };
 }
@@ -163,12 +166,12 @@ class HUD extends React.PureComponent<Props, State> {
                 <HintPanel />
             </Layout>
             <Layout className="messages" anchorBottom={true} anchorLeft={true}>
-                <MessagesPanel />
+                {this.props.showingChat && <MessagesPanel />}
                 <HelpMessage />
                 <FinishedPanel />
                 <WaitingMessage />
                 {this.props.showingPerformance && <PerformancePanel />}
-                <TextMessageBox />
+                {this.props.showingChat && <TextMessageBox />}
             </Layout>
             <PlayBar>
                 <MutePanel />
@@ -176,6 +179,7 @@ class HUD extends React.PureComponent<Props, State> {
                 <FullScreenButton />
                 <div className="separator"></div>
                 <GraphicsLevelPanel />
+                <ChatButton />
                 <PerformanceButton />
                 <div className="separator"></div>
                 <RandomizePanel />

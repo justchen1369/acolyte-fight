@@ -35,6 +35,7 @@ function initialState(): s.State {
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
         options: storage.getOptionsOrDefaults(),
+        showingChat: true,
         graphics: r.GraphicsLevel.Maximum,
         modErrors: {},
         current: { page: "", profileId: null },
@@ -201,6 +202,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, globalPerformance: action.globalPerformance }
     } else if (action.type === "showingPerformance") {
         return { ...state, showingPerformance: action.showingPerformance }
+    } else if (action.type === "showingChat") {
+        return { ...state, showingChat: action.showingChat }
     } else if (action.type === "updateSilence") {
         const silenced = new Set<string>(state.silenced);
         if (action.add) {

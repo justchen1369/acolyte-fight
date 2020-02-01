@@ -23,6 +23,7 @@ export interface State {
     options: m.GameOptions;
     graphics?: number;
     showingPerformance?: PerformanceTab;
+    showingChat?: boolean;
 
     codeTree?: e.CodeTree;
 
@@ -141,6 +142,7 @@ export type Action =
     | UpdatePerformanceAction
     | UpdateGlobalPerformanceAction
     | UpdateShowingPerformanceAction
+    | UpdateShowingChatAction
     | UpdateNotificationsAction
     | UpdateSilencedAction
     | UpdateRoomAction
@@ -203,6 +205,11 @@ export interface UpdateGlobalPerformanceAction {
 export interface UpdateShowingPerformanceAction {
     type: "showingPerformance";
     showingPerformance: PerformanceTab;
+}
+
+export interface UpdateShowingChatAction {
+    type: "showingChat";
+    showingChat: boolean;
 }
 
 export interface ServerPreparingToShutdownAction {
