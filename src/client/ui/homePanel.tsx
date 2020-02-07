@@ -81,7 +81,6 @@ class HomePanel extends React.PureComponent<Props, State> {
                 <div style={{ flexGrow: 0.1 }} />
                 {!a.noExternalLinks && <div className="more-io-games">
                     <a href="https://iogames.space">More .io Games</a>
-                    <a href="http://io-games.zone">IO Games</a>
                 </div>}
                 {!a.noExternalLinks && <SocialBar />}
             </div>
