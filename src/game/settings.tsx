@@ -2072,11 +2072,6 @@ const iceBomb: Spell = {
             title: "Freeze",
             text: "Freeze nearby enemies for 1.5 seconds.",
         },
-        {	
-			"icon": "fas fa-sword",	
-			"title": "Vulnerable",	
-			"text": "Enemies receive 25% more damage for 1.5 seconds."	
-		},
     ],
     sound: "iceBomb",
 
@@ -2142,14 +2137,6 @@ const iceBomb: Spell = {
                     bloom: 0.03,
                 },
             },
-			{	
-				"type": "armor",	
-				"stack": "frostsplatter",	
-				"maxTicks": 1.5 * TicksPerSecond,	
-				"maxStacks": 1,	
-				"proportion": 0.25,	
-				"against": Alliances.Enemy,	
-			},
         ],
 
         shieldTakesOwnership: false,
