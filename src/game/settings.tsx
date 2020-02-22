@@ -2750,7 +2750,7 @@ const blaze: Spell = {
             channelling: true,
             maxTicks: 1 * TicksPerSecond, // Limited by channelling
             radius: 0.005, // Radius of the projectile
-            restrictCollideWith: Categories.Massive | Categories.Shield,
+            restrictCollideWith: Categories.Shield,
             appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
             sense: Categories.Hero | Categories.Projectile,
         },
