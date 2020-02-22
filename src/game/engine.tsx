@@ -1524,9 +1524,7 @@ function handleSync(ev: w.Snapshot, world: w.World) {
 
 			const posDiff = vector.diff(theirHeroSnapshot.pos, myHeroSnapshot.pos);
 			if (posDiff.lengthSquared() > Precision * Precision) {
-				const position = obj.body.getPosition();
-				position.add(posDiff);
-				obj.body.setPosition(position);
+				applyPosDelta(obj, posDiff);
 
 				if (!obj.uiEase) {
 					obj.uiEase = vector.zero();
@@ -1941,6 +1939,10 @@ function act(world: w.World) {
 			action = null;
 		}
 
+		if (action && !isValidAction(action, hero)) {
+			action = null;
+		}
+
 		if (action) {
 			const spell = world.settings.Spells[action.type];
 			if (spell) {
@@ -1968,7 +1970,9 @@ function act(world: w.World) {
 			}
 		}
 
-		performHeroActions(world, hero, action);
+		if (performHeroActions(world, hero, action)) {
+			hero.casting = null;
+		}
 
 		const movementProportion = calculateMovementProportion(hero, world);
 		if (hero.moveTo) {
@@ -2049,13 +2053,14 @@ function removeProjectilesForHero(heroId: string, world: w.World) {
 	});
 }
 
+// Returns true if done
 function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
-	if (!action || !isValidAction(action, hero)) {
-		return; // Nothing to do
+	if (!action) {
+		return true; // Nothing to do
 	}
 	const spell = world.settings.Spells[action.type];
 	if (!spell) {
-		return; // Unknown spell
+		return true; // Unknown spell
 	}
 
 	const uninterruptible = _.isNil(spell.interruptibleAfterTicks) || spell.interruptibleAfterTicks > 0;
@@ -2093,9 +2098,6 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 			const cooldown = cooldownRemaining(world, hero, spell.id);
 			if (cooldown > 0) {
 				if (cooldown > world.settings.Hero.MaxCooldownWaitTicks) {
-					// Just cancel spells if they're too far off cooldown
-					hero.casting = null;
-
 					world.ui.events.push({
 						type: "cast",
 						success: false,
@@ -2104,8 +2106,12 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 						target: action.target,
 						spellId: action.type,
 					});
+
+					// Just cancel spells if they're too far off cooldown
+					return true;
+				} else {
+					return false;
 				}
-				return;
 			}
 		}
 
@@ -2118,7 +2124,7 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 		if (spell.throttle) {
 			if (world.tick < hero.throttleUntilTick) {
-				return;
+				return false;
 			}
 			hero.throttleUntilTick = world.tick + world.settings.Hero.ThrottleTicks;
 		}
@@ -2132,13 +2138,12 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 
 		const angleDiff = spell.untargeted ? 0 : turnTowards(hero, action.target);
 		if (spell.maxAngleDiffInRevs !== undefined && angleDiff > spell.maxAngleDiffInRevs * 2 * Math.PI) {
-			return; // Wait until are facing the target
+			return false; // Wait until are facing the target
 		}
 
 		if (spell.cooldown && cooldownRemaining(world, hero, spell.id) > 0) {
 			// Recheck cooldown just before casting because refract can become invalid by this point
-			hero.casting = null;
-			return;
+			return true;
 		}
 
 		hero.casting.castStartTick = world.tick;
@@ -2189,11 +2194,11 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 		// Waiting for charging to complete
 		if (spell.release && spell.release.maxChargeTicks) {
 			if (!(hero.casting.releaseTick || ticksCharging >= spell.release.maxChargeTicks)) {
-				return;
+				return false;
 			}
 		} else {
 			if (spell.chargeTicks && ticksCharging < spell.chargeTicks) {
-				return;
+				return false;
 			}
 		}
 
@@ -2245,8 +2250,9 @@ function performHeroActions(world: w.World, hero: w.Hero, action: w.Action) {
 	}
 
 	if (hero.casting.stage === w.CastStage.Complete) {
-		hero.casting = null;
+		return true;
 	}
+	return false;
 }
 
 function cancelCooldown(hero: w.Hero, spellId: string, cancelParams: SpellCancelParams, world: w.World) {
@@ -2279,6 +2285,9 @@ function isValidAction(action: w.Action, hero: w.Hero) {
 		|| action.type === w.Actions.Stop
 		|| action.type === w.Actions.Retarget) {
 
+		return true;
+	} else if (hero.casting && hero.casting.action.type === action.type) {
+		// If a user switches spells while casting, keep casting the old spell
 		return true;
 	} else {
 		return hero.spellsToKeys.has(action.type);
@@ -4092,7 +4101,8 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 			}
 		}
 	});
-	return buffIncrease * buffDecrease;
+	const movementProportion = buffIncrease * buffDecrease;
+	return movementProportion;
 }
 
 function moveTowards(world: w.World, hero: w.Hero, target: pl.Vec2, movementProportion: number = 1.0) {

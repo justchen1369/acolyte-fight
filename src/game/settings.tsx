@@ -2938,6 +2938,7 @@ const vanish: Spell = {
     debuff: true,
     movementProportionWhileChannelling: 1.7,
     interruptibleAfterTicks: 15,
+    maxChannellingTicks: 2.5 * TicksPerSecond,
 
     buffs: [
         {
