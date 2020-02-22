@@ -594,7 +594,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -634,7 +634,7 @@ const meteorite: Spell = {
     icon: "fragmentedMeteor",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
