@@ -699,6 +699,8 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 }
 
 function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, target: pl.Vec2, type: string, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
+	const World = world.settings.World;
+
 	const index = world.nextObjectId++;
 	const id = type + index;
 	const velocity = vector.fromAngle(angle).mul(projectileTemplate.speed);
@@ -762,7 +764,6 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		body,
 		filterGroupIndex,
 		speed: projectileTemplate.speed,
-		fixedSpeed: projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true,
 
 		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
 		bumpable: projectileTemplate.bumpable,
@@ -830,8 +831,9 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	world.objects.set(id, projectile);
 
-	if (projectile.fixedSpeed) {
-		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id });
+	if (projectileTemplate.fixedSpeed || projectileTemplate.speedDecayPerTick) {
+		const decayPerTick = projectileTemplate.speedDecayPerTick || World.ProjectileSpeedDecayFactorPerTick;
+		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id, decayPerTick });
 	}
 	if (projectileTemplate.square) {
 		world.behaviours.push({ type: "alignProjectile", projectileId: projectile.id });
@@ -1173,7 +1175,7 @@ function decaySpeed(behaviour: w.DecaySpeedBehaviour, world: w.World) {
 
 	const diff = obj.speed - currentSpeed;
 	if (Math.abs(diff) > world.settings.World.SlopSpeed) {
-		const newSpeed = currentSpeed + diff * world.settings.World.ProjectileSpeedDecayFactorPerTick;
+		const newSpeed = currentSpeed + diff * behaviour.decayPerTick;
 		if (currentSpeed > 0) {
 			velocity.mul(newSpeed / currentSpeed);
 		} else {

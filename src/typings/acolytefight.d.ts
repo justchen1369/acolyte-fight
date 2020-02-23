@@ -411,7 +411,9 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	square?: boolean; // A square projectile will push things directly backwards, not to the side
 	speed: number;
 	fixedSpeed?: boolean; // if true or undefined, the projectile's speed will be corrected according to ProjectileSpeedDecayFactorPerTick if it becomes faster or slower due to collisions
+	speedDecayPerTick?: number; // if set, the projectile's speed will be corrected according to this proportion per tick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
+
 	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
 	swappable?: boolean; // Whether this projectile can be swapped with
 	bumpable?: boolean; // Whether this projectile gets knocked back by a bumper obstacle

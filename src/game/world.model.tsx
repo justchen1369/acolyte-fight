@@ -756,7 +756,6 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	hit?: number;
 
 	speed: number;
-	fixedSpeed: boolean;
 	attractable?: boolean;
 	linkable?: boolean;
 	bumpable?: boolean;
@@ -908,6 +907,7 @@ export interface FixateBehaviour extends BehaviourBase {
 export interface DecaySpeedBehaviour extends BehaviourBase {
 	type: "decaySpeed";
 	projectileId: string;
+	decayPerTick: number;
 }
 
 export interface AlignProjectileBehaviour extends BehaviourBase {
