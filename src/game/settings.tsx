@@ -648,7 +648,7 @@ const meteorite: Spell = {
         speed: 0.3,
         restitution: 0,
         minTicks: 1,
-        maxTicks: 2 * TicksPerSecond,
+        maxTicks: 80,
         hitInterval: 120,
         damage: 0,
         shieldTakesOwnership: false,
