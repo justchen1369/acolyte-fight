@@ -594,7 +594,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -634,7 +634,7 @@ const meteorite: Spell = {
     icon: "fragmentedMeteor",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 5 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -2072,11 +2072,6 @@ const iceBomb: Spell = {
             title: "Freeze",
             text: "Freeze nearby enemies for 1.5 seconds.",
         },
-        {	
-			"icon": "fas fa-sword",	
-			"title": "Vulnerable",	
-			"text": "Enemies receive 25% more damage for 1.5 seconds."	
-		},
     ],
     sound: "iceBomb",
 
@@ -2142,14 +2137,6 @@ const iceBomb: Spell = {
                     bloom: 0.03,
                 },
             },
-			{	
-				"type": "armor",	
-				"stack": "frostsplatter",	
-				"maxTicks": 1.5 * TicksPerSecond,	
-				"maxStacks": 1,	
-				"proportion": 0.25,	
-				"against": Alliances.Enemy,	
-			},
         ],
 
         shieldTakesOwnership: false,
@@ -2750,7 +2737,7 @@ const blaze: Spell = {
             channelling: true,
             maxTicks: 1 * TicksPerSecond, // Limited by channelling
             radius: 0.005, // Radius of the projectile
-            restrictCollideWith: Categories.Massive | Categories.Shield,
+            restrictCollideWith: Categories.Shield,
             appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
             sense: Categories.Hero | Categories.Projectile,
         },
