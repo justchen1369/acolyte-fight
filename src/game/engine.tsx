@@ -831,7 +831,8 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	world.objects.set(id, projectile);
 
-	if (projectileTemplate.fixedSpeed || projectileTemplate.speedDecayPerTick) {
+	const fixedSpeed = projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true;
+	if (fixedSpeed || projectileTemplate.speedDecayPerTick) {
 		const decayPerTick = projectileTemplate.speedDecayPerTick || World.ProjectileSpeedDecayFactorPerTick;
 		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id, decayPerTick });
 	}
