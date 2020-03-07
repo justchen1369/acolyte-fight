@@ -6,6 +6,4 @@ export function hashSettings(settings: AcolyteFightSettings) {
     return md5(JSON.stringify(settings)).toString();
 }
 
-export const version = `${engine.version()}.${hashSettings(DefaultSettings)}`;
-
-export default version;
+export const versionXX = `${engine.versionXX()}.${hashSettings(DefaultSettings)}`;

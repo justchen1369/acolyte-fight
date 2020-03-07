@@ -178,8 +178,8 @@ function notificationTick(world: w.World) {
 
 function aiTick(world: w.World) {
 	ai.onTick(world, {
-		action: sendAction,
-		spells: sendKeyBindings,
+		action: sendActionXX,
+		spells: sendKeyBindingsXX,
 	})
 }
 
@@ -223,7 +223,7 @@ function sendSnapshot(world: w.World) {
 	sockets.getSocket().emit('sync', packet);
 }
 
-export function sendAction(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
+export function sendActionXX(gameId: string, heroId: string, action: w.Action, controlKey?: number) {
 	const Precision = 1.0 / 1024;
 
 	if (!(gameId && heroId)) {
@@ -238,7 +238,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 	}
 
 	const actionMsg: m.ActionMsg = {
-		c: controlKey || world.ui.controlKey,
+		c: controlKey || world.ui.controlKeyXX,
 		type: m.ActionType.GameAction,
 		s: action.type,
 		x: Math.round(action.target.x / Precision) * Precision,
@@ -249,7 +249,7 @@ export function sendAction(gameId: string, heroId: string, action: w.Action, con
 	send(gameId, heroId, actionMsg);
 }
 
-export function sendKeyBindings(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
+export function sendKeyBindingsXX(gameId: string, heroId: string, keyBindings: KeyBindings, controlKey?: number) {
 	if (!(gameId && heroId)) {
 		return;
 	}
@@ -257,7 +257,7 @@ export function sendKeyBindings(gameId: string, heroId: string, keyBindings: Key
 	const state = StoreProvider.getState();
 	const world = state.world;
 	const actionMsg: m.ActionMsg = {
-		c: controlKey || world.ui.controlKey,
+		c: controlKey || world.ui.controlKeyXX,
 		type: m.ActionType.Spells,
 		keyBindings,
 	}

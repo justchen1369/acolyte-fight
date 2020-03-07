@@ -8,7 +8,7 @@ import * as StoreProvider from '../../storeProvider';
 
 import ButtonRow from './buttonRow';
 
-import { sendKeyBindings } from '../../core/ticker';
+import { sendKeyBindingsXX } from '../../core/ticker';
 
 interface Props {
     gameId: string;
@@ -55,7 +55,7 @@ class RandomizePanel extends React.PureComponent<Props, State> {
 
         keyboardUtils.updateKeyBindings(config);
 
-        sendKeyBindings(this.props.gameId, this.props.heroId, config);
+        sendKeyBindingsXX(this.props.gameId, this.props.heroId, config);
     }
 }
 

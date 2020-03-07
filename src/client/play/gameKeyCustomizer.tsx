@@ -10,7 +10,7 @@ import * as StoreProvider from '../storeProvider';
 import Button from '../controls/button';
 import SpellBtnConfig from './spellBtnConfig';
 
-import { sendKeyBindings } from '../core/ticker';
+import { sendKeyBindingsXX } from '../core/ticker';
 
 interface Props {
     btn: string;
@@ -76,7 +76,7 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     }
 
     private onChosen(keyBindings: KeyBindings, random?: boolean) {
-        sendKeyBindings(this.props.gameId, this.props.heroId, keyBindings);
+        sendKeyBindingsXX(this.props.gameId, this.props.heroId, keyBindings);
         this.close();
     }
 

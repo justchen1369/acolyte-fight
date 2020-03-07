@@ -44,7 +44,7 @@ export interface World {
 
 	activePlayers: Immutable.Set<string>; // Set<heroId: string>
 	players: Immutable.Map<string, Player>; // heroId -> Player
-	controlKeys: Map<number, string>; // controlKey -> heroId
+	controlKeysXX: Map<number, string>; // controlKey -> heroId
 	scores: Immutable.Map<string, HeroScore>; // heroId -> HeroScore
 	spellRecords: Map<string, string[]>; // heroId -> spellId[]
 	teamAssignments: Immutable.Map<string, string>; // heroId -> teamId
@@ -113,7 +113,7 @@ export interface UIState {
 	myHeroId: string | null;
 	myPartyId: string | null;
 	myUserHash: string | null;
-	controlKey: number | null;
+	controlKeyXX: number | null;
 	reconnectKey: string | null;
 	universeId: number;
 	live: boolean;

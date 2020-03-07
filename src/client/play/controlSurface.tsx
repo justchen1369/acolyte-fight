@@ -15,7 +15,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
 import { worldPointFromInterfacePoint, whichKeyClicked, touchControls } from '../graphics/render';
-import { sendAction } from '../core/ticker';
+import { sendActionXX } from '../core/ticker';
 
 const MouseId = "mouse";
 const DoubleTapMilliseconds = 250;
@@ -321,7 +321,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const spell = world.settings.Spells[spellId];
         if (spell && !spell.passive) {
             if (spell.untargeted || world.ui.nextTarget && touchControls(world.ui.buttonBar)) {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
+                sendActionXX(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target: world.ui.nextTarget });
             } else {
                 world.ui.nextSpellId = spellId;
             }
@@ -420,7 +420,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
                 let spell = Spells[spellId];
                 if (spell && !spell.passive) {
-                    sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
+                    sendActionXX(world.ui.myGameId, world.ui.myHeroId, { type: spell.id, target: world.ui.nextTarget });
                 }
             } else {
                 let spellId = this.keyToSpellId(this.rebind(w.SpecialKeys.Hover)) || w.Actions.Retarget;
@@ -431,7 +431,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                         target = this.clampToArena(target, hero, world);
                     }
                 }
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
+                sendActionXX(world.ui.myGameId, world.ui.myHeroId, { type: spellId, target });
             }
         }
     }
@@ -481,7 +481,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
                 this.handleCustomizeBtn(key);
             } else {
                 if (!spell.passive && world.ui.nextTarget) {
-                    sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
+                    sendActionXX(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget });
                 }
             }
         }
@@ -512,7 +512,7 @@ class ControlSurface extends React.PureComponent<Props, State> {
         const spell = world.settings.Spells[spellType];
         if (spell && spell.release) {
             if (!spell.passive && world.ui.nextTarget) {
-                sendAction(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
+                sendActionXX(world.ui.myGameId, world.ui.myHeroId, { type: spellType, target: world.ui.nextTarget, release: true });
             }
         }
     }

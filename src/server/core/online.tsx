@@ -9,10 +9,10 @@ import * as db from '../storage/db.model';
 import * as dbStorage from '../storage/dbStorage';
 import * as mirroring from './mirroring';
 import * as segments from '../../shared/segments';
-import * as versions from '../../game/version';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 import { getStore } from '../serverStore';
+import { versionXX } from '../../game/version';
 
 const OnlineExpirySeconds = 20 * 60;
 const TextExpirySeconds = 1 * 60;
@@ -164,7 +164,7 @@ async function loadScoreboard(): Promise<void> {
 		const entry = doc.data() as db.PlayerScore;
 
 		initScore(entry); // Keep old scoreboard so it gets cleaned up properly
-		initScore(entry, versions.version); // Load into new scoreboard as well
+		initScore(entry, versionXX); // Load into new scoreboard as well
 	});
 
 	const elapsed = Date.now() - start;
@@ -176,7 +176,7 @@ function initScore(entry: db.PlayerScore, reversion?: string) {
 
 	if (reversion) {
 		// the segment contains the old version, so needs updating to carry forward the leaderboard from previous versions
-		segment = segments.reversionSegment(entry.segment, versions.version);
+		segment = segments.reversionSegment(entry.segment, versionXX);
 	}
 
 	const scoreboard = getOrCreateScoreboard(segment);

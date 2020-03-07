@@ -250,7 +250,7 @@ class HintPanel extends React.PureComponent<Props, State> {
         keyBindings[spellKey] = spellId;
         keyboardUtils.updateKeyBindings(keyBindings);
 
-        ticker.sendKeyBindings(this.props.myGameId, this.props.myHeroId, keyBindings);
+        ticker.sendKeyBindingsXX(this.props.myGameId, this.props.myHeroId, keyBindings);
         this.chooseRandomSpell();
     }
 }

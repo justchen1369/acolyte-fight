@@ -8,7 +8,7 @@ import * as StoreProvider from '../../storeProvider';
 
 import ButtonRow from './buttonRow';
 
-import { sendKeyBindings } from '../../core/ticker';
+import { sendKeyBindingsXX } from '../../core/ticker';
 
 interface Props {
     gameId: string;

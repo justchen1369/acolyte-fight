@@ -15,7 +15,7 @@ export function connectToWorld(world: w.World, data: m.HeroMsg) {
 	world.ui.myHeroId = data.heroId;
 	world.ui.myPartyId = data.partyId;
 	world.ui.myUserHash = data.userHash;
-	world.ui.controlKey = data.controlKey;
+	world.ui.controlKeyXX = data.controlKey;
 	world.ui.reconnectKey = data.reconnectKey;
 	world.ui.universeId = data.universeId;
 	world.ui.live = data.live;

@@ -1,2 +1,1 @@
-Icons used under Creative Commons license:
-* https://game-icons.net/sbed/originals/blaster.html
+Properties that end in XX will be mangled, so that the game is harder to hack

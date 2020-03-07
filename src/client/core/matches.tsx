@@ -10,7 +10,7 @@ import * as url from '../url';
 import * as vector from '../../game/vector';
 import { notify } from './notifications';
 import { getSocket } from './sockets';
-import version from '../../game/version';
+import { versionXX } from '../../game/version';
 
 export interface JoinParams {
 	gameId?: string;
@@ -45,7 +45,7 @@ export async function joinNewGame(opts: JoinParams): Promise<boolean> {
 				live,
 				locked,
 				autoJoin: opts.autoJoin,
-				version,
+				version: versionXX,
 				numBots: opts.numBots || 0,
 				numGames,
 			};

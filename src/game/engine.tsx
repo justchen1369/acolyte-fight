@@ -71,8 +71,8 @@ type BehaviourHandlers = {
 	settings.aabbExtension = 20 * settings.linearSlop;
 }
 
-export function version() {
-	return "1.0.1151";
+export function versionXX() {
+	return "1.0.4267";
 }
 
 export function initialWorld(mod: Object): w.World {
@@ -101,7 +101,7 @@ export function initialWorld(mod: Object): w.World {
 
 		activePlayers: Immutable.Set<string>(), // hero IDs
 		players: Immutable.Map<string, w.Player>(), // hero ID -> player
-		controlKeys: new Map(),
+		controlKeysXX: new Map(),
 		spellRecords: new Map(),
 		teams: Immutable.Map<string, w.Team>(), // hero ID -> team
 		teamAssignments: Immutable.Map<string, string>(), // hero ID -> team ID
@@ -138,7 +138,7 @@ export function initialWorld(mod: Object): w.World {
 			myPartyId: null,
 			myUserHash: null,
 			universeId: null,
-			controlKey: null,
+			controlKeyXX: null,
 			reconnectKey: null,
 			live: false,
 			renderedTick: null,
@@ -1810,7 +1810,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.delete(hero.id);
-	world.controlKeys.set(ev.controlKey, hero.id);
+	world.controlKeysXX.set(ev.controlKey, hero.id);
 
 	world.ui.notifications.push({ type: "bot", player });
 
@@ -1849,7 +1849,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 
 	world.players = world.players.set(hero.id, player);
 	world.activePlayers = world.activePlayers.add(hero.id);
-	world.controlKeys.set(ev.controlKey, hero.id);
+	world.controlKeysXX.set(ev.controlKey, hero.id);
 
 	world.ui.notifications.push({ type: "join", player });
 
@@ -1901,13 +1901,13 @@ function chooseNewPlayerColor(userHash: string, world: w.World) {
 }
 
 function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
-	console.log(`Player left: ${ev.heroId} split=${ev.split} controlKey=${ev.controlKey}`);
+	console.log(`Player left: ${ev.heroId} split=${ev.split} control=${ev.controlKey}`);
 	const player = world.players.get(ev.heroId);
 	if (!player) {
 		return true;
 	}
 
-	world.controlKeys.delete(player.controlKey);
+	world.controlKeysXX.delete(player.controlKey);
 	world.activePlayers = world.activePlayers.delete(ev.heroId);
 
 	world.ui.notifications.push({ type: "leave", player, split: ev.split });
@@ -1935,7 +1935,7 @@ function handleLeaving(ev: n.LeaveActionMsg, world: w.World) {
 			};
 
 			world.players = world.players.set(ev.heroId, newPlayer);
-			world.controlKeys.set(newPlayer.controlKey, ev.heroId);
+			world.controlKeysXX.set(newPlayer.controlKey, ev.heroId);
 		} else {
 			// This player split off from this game
 			hero.exitTick = world.tick;
@@ -1993,7 +1993,7 @@ function getActionQueue(world: w.World, heroId: string) {
 
 function handleActions(world: w.World) {
 	world.actionMessages.forEach(actionData => {
-		const heroId = world.controlKeys.get(actionData.c);
+		const heroId = world.controlKeysXX.get(actionData.c);
 		if (heroId) {
 			if (actionData.type === n.ActionType.GameAction) {
 				const action: w.Action = {

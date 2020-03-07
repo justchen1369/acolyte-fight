@@ -1,5 +1,6 @@
 const path = require('path');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const nodeExternals = require('webpack-node-externals');
 
 const mode = 
@@ -35,6 +36,26 @@ const clientConfig = {
         test: /\.ai\.js$/i,
         use: ['raw-loader'],
       },
+    ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        cache: true,
+        parallel: true,
+        sourceMap: true, // Must be set to true if using source-maps in production
+        terserOptions: {
+          parse: {},
+          compress: {},
+          mangle: {
+            properties: {
+              regex: /^(.+XX)$/,
+            },
+          },
+          module: true,
+        }
+      }),
     ],
   },
   output: {
@@ -118,6 +139,9 @@ const serverConfig = {
         },
       },
     ]
+  },
+  optimization: {
+    minimize: false,
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
