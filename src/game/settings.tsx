@@ -655,7 +655,7 @@ const meteorite: Spell = {
         damage: 0,
         shieldTakesOwnership: false,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All ^ Categories.Shield,
+        collideWith: Categories.All,
         expireOn: Categories.None,
 
         sound: "meteorite",
