@@ -644,7 +644,7 @@ const meteoriteProjectile: ProjectileTemplate = {
     damage: 0,
     shieldTakesOwnership: false,
     categories: Categories.Projectile | Categories.Massive,
-    collideWith: Categories.All,
+    collideWith: Categories.All ^ Categories.Shield, // Shields have no effect on Meteorite
     expireOn: Categories.None,
 
     sound: "meteorite",
