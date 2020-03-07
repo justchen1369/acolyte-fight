@@ -113,6 +113,7 @@ export function initialWorld(mod: Object): w.World {
 		behaviours: [],
 		physics: pl.World(def),
 		collisions: new Map(),
+		collisionMap: new Map(),
 
 		actions: new Map(),
 
@@ -515,7 +516,7 @@ function addHero(world: w.World, heroId: string) {
 	const World = world.settings.World;
 
 	const heroIndex = generateHeroIndex(world);
-	const filterGroupIndex = -(heroIndex + 1); // +1 because 0 means group index doesn't apply
+	const filterGroupIndex = objectToFilterGroupIndex(heroIndex);
 
 	let position;
 	let angle;
@@ -674,6 +675,10 @@ function cooldown(behaviour: w.CooldownBehaviour, world: w.World) {
 	return true;
 }
 
+function objectToFilterGroupIndex(objIndex: number): number {
+	return -(objIndex + 1); // +1 because 0 means no filter
+}
+
 function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spell, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
 	const from = hero.body.getPosition();
 
@@ -691,9 +696,19 @@ function addProjectile(world: w.World, hero: w.Hero, target: pl.Vec2, spell: Spe
 		initialFilterGroupIndex: hero.filterGroupIndex,
 	});
 
-	if (projectileTemplate.horcrux) {
-		hero.horcruxIds.add(projectile.id);
-	}
+	return projectile;
+}
+
+function addSubprojectile(world: w.World, parent: w.Projectile, angleOffset: number, projectileTemplate: ProjectileTemplate, config: ProjectileConfig = {}) {
+	const position = vector.clone(parent.body.getPosition());
+	const angle = vector.angle(parent.body.getLinearVelocity()) + angleOffset;
+	const target = parent.target.pos;
+
+	const projectile = addProjectileAt(world, position, angle, target, parent.type, projectileTemplate, {
+		...config,
+		owner: parent.owner,
+		filterGroupIndex: parent.filterGroupIndex,
+	});
 
 	return projectile;
 }
@@ -709,7 +724,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	const categories = projectileTemplate.categories === undefined ? (Categories.Projectile | Categories.Blocker) : projectileTemplate.categories;
 	const collideWith = projectileTemplate.collideWith !== undefined ? projectileTemplate.collideWith : Categories.All;
 
-	const filterGroupIndex = config.filterGroupIndex || 0;
+	const filterGroupIndex = config.filterGroupIndex || objectToFilterGroupIndex(index);
 
 	const knockbackScaling = calculateScaling(config.owner, world, projectileTemplate.knockbackScaling);
 
@@ -845,8 +860,14 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	if (!projectileTemplate.selfPassthrough) {
 		world.behaviours.push({ type: "removePassthrough", projectileId: projectile.id });
 	}
-
 	instantiateProjectileBehaviours(projectileTemplate.behaviours, projectile, world);
+
+	if (projectileTemplate.horcrux) {
+		const hero = world.objects.get(config.owner);
+		if (hero && hero.category === "hero") {
+			hero.horcruxIds.add(projectile.id);
+		}
+	}
 
 	return projectile;
 }
@@ -875,7 +896,9 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 
 	templates.forEach(template => {
 		let behaviour: w.Behaviour = null;
-		if (template.type === "homing") {
+		if (template.type === "spawn") {
+			behaviour = instantiateSpawn(template, projectile, world);
+		} else if (template.type === "homing") {
 			behaviour = instantiateHoming(template, projectile, world);
 		} else if (template.type === "accelerate") {
 			behaviour = instantiateAccelerate(template, projectile, world);
@@ -890,7 +913,9 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 		} else if (template.type === "partial") {
 			behaviour = instantiateUpdatePartial(template, projectile, world);
 		} else if (template.type === "clearHits") {
-			behaviour = { type: "clearHits", projectileId: projectile.id };
+			behaviour = instantiateClearHits(template, projectile, world);
+		} else if (template.type === "expire") {
+			behaviour = instantiateExpire(template, projectile, world);
 		} else if (template.type === "expireOnOwnerDeath") {
 			behaviour = instantiateExpireOnOwnerDeath(template, projectile, world);
 		} else if (template.type === "expireOnOwnerRetreat") {
@@ -901,7 +926,7 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 
 		const trigger = template.trigger;
 		if (!trigger) {
-			world.behaviours.push(behaviour);
+			// No wrapping
 		} else if (trigger.atCursor) {
 			const distanceToCursor = vector.distance(projectile.target.pos, projectile.body.getPosition());
 			const speed = projectile.body.getLinearVelocity().length();
@@ -914,21 +939,43 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			if (trigger.afterTicks) {
 				waitTicks = Math.min(waitTicks, trigger.afterTicks);
 			}
-			world.behaviours.push({
+			behaviour = {
 				type: "delayBehaviour",
 				afterTick: world.tick + waitTicks,
 				delayed: behaviour,
-			});
+			};
 		} else if(trigger.afterTicks) {
-			world.behaviours.push({
+			behaviour = {
 				type: "delayBehaviour",
 				afterTick: world.tick + (trigger.afterTicks || 0),
 				delayed: behaviour,
-			});
+			};
+		} else if (trigger.collideWith) {
+			behaviour = {
+				type: "collideBehaviour",
+				objId: projectile.id,
+				collideWith: trigger.collideWith,
+				delayed: behaviour,
+			};
 		} else {
 			throw "Unknown behaviour trigger: " + trigger;
 		}
+
+		world.behaviours.push(behaviour);
 	});
+}
+
+function instantiateSpawn(template: SpawnTemplate, projectile: w.Projectile, world: w.World): w.SpawnProjectileBehaviour {
+	return {
+		type: "subprojectile",
+		parentProjectileId: projectile.id,
+		template: template.projectile,
+
+		numProjectiles: template.numProjectiles || 1,
+		spread: template.spread || 0,
+
+		expire: template.expire,
+	};
 }
 
 function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, world: w.World): w.HomingBehaviour {
@@ -1023,6 +1070,17 @@ function instantiateUpdatePartial(template: UpdatePartialTemplate, projectile: w
 	};
 }
 
+function instantiateClearHits(template: ClearHitsTemplate, projectile: w.Projectile, world: w.World): w.ClearHitsBehaviour {
+	return { type: "clearHits", projectileId: projectile.id };
+}
+
+function instantiateExpire(template: ExpireTemplate, projectile: w.Projectile, world: w.World): w.ExpireBehaviour {
+	return {
+		type: "expire",
+		projectileId: projectile.id,
+	};
+}
+
 function instantiateExpireOnOwnerDeath(template: ExpireOnOwnerDeathTemplate, projectile: w.Projectile, world: w.World): w.ExpireOnOwnerDeathBehaviour {
 	return {
 		type: "expireOnOwnerDeath",
@@ -1064,6 +1122,7 @@ export function tick(world: w.World) {
 
 	handleBehaviours(world, {
 		delayBehaviour,
+		collideBehaviour,
 		homing,
 		accelerate,
 		linkForce,
@@ -1089,6 +1148,7 @@ export function tick(world: w.World) {
 	handleCollisions(world);
 
 	handleBehaviours(world, {
+		subprojectile,
 		cooldown,
 		fixate,
 		alignProjectile,
@@ -1100,6 +1160,7 @@ export function tick(world: w.World) {
 		removePassthrough,
 		thrustDecay,
 		decayMitigation,
+		expire,
 		expireBuffs,
 		expireOnOwnerDeath,
 		expireOnOwnerRetreat,
@@ -1139,9 +1200,44 @@ function delayBehaviour(behaviour: w.DelayBehaviour, world: w.World) {
 	}
 }
 
+function collideBehaviour(behaviour: w.CollideBehaviour, world: w.World) {
+	const obj = world.objects.get(behaviour.objId);
+	if (!obj) {
+		return false;
+	}
+
+	const collisionFlags = world.collisionMap.get(obj.id) || 0;
+	if (!!(collisionFlags & behaviour.collideWith)) {
+		world.behaviours.push(behaviour.delayed);
+		return false;
+	} else {
+		return true;
+	}
+}
+
 function physicsStep(world: w.World) {
 	const granularity = 1000;
 	world.physics.step(Math.floor(granularity / TicksPerSecond) / granularity);
+}
+
+function subprojectile(behaviour: w.SpawnProjectileBehaviour, world: w.World) {
+	const parent = world.objects.get(behaviour.parentProjectileId);
+	if (!(parent && parent.category === "projectile")) {
+		return false;
+	}
+
+	const step = behaviour.spread / Math.max(1, behaviour.numProjectiles - 1);
+	const spreadStart = -0.5 * behaviour.spread;
+	for (let i = 0; i < behaviour.numProjectiles; ++i) {
+		const angleOffset = vector.Tau * (spreadStart + i * step);
+		addSubprojectile(world, parent, angleOffset, behaviour.template);
+	}
+
+	if (behaviour.expire) {
+		parent.expireTick = world.tick;
+	}
+
+	return false;
 }
 
 function decayHealth(behaviour: w.DecayHealthBehaviour, world: w.World) {
@@ -2357,6 +2453,8 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 }
 
 function handleCollisions(world: w.World) {
+	world.collisionMap.clear();
+
 	let contact = world.physics.getContactList();
 	while (contact) {
 		if (!world.collisions.has(contact)) {
@@ -2432,6 +2530,8 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 		return;
 	}
 
+	registerCollisionFlag(hit.id, obstacle.categories, world);
+
 	if (world.tick > world.startTick && (obstacle.expireOn & hit.categories) > 0) {
 		obstacle.health = 0;
 	}
@@ -2502,6 +2602,8 @@ function isBumpable(obj: w.WorldObject) {
 }
 
 function handleShieldHit(world: w.World, shield: w.Shield, hit: w.WorldObject) {
+	registerCollisionFlag(hit.id, shield.categories, world);
+
 	if (shield.type === "saber") {
 		handleSaberHit(shield, hit, world);
 	}
@@ -2539,6 +2641,8 @@ function handleSaberHit(saber: w.Saber, obj: w.WorldObject, world: w.World) {
 }
 
 function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
+	registerCollisionFlag(shield.id, hero.categories, world);
+
 	if (hero.thrust) {
 		// Thrust into shield means the hero bounces off
 		hero.thrust.nullified = true;
@@ -2548,6 +2652,8 @@ function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
 
 function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const Hero = world.settings.Hero;
+
+	registerCollisionFlag(other.id, hero.categories, world);
 
 	// Push back other heroes
 	if ((hero.collideWith & Categories.Hero) > 0 && (other.collideWith & Categories.Hero) > 0) {
@@ -2594,6 +2700,8 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 }
 
 function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Projectile) {
+	registerCollisionFlag(projectile.id, hero.categories, world);
+
 	if (hero.thrust) {
 		if (projectile.categories & Categories.Massive) {
 			hero.thrust.nullified = true;
@@ -2602,6 +2710,10 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 }
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
+	if (!obstacle.sensor) {
+		registerCollisionFlag(obstacle.id, hero.categories, world);
+	}
+
 	if (hero.thrust && !obstacle.sensor) {
 		// Only cancel thrust when hitting a solid object
 		const packet = instantiateDamage(hero.thrust.damageTemplate, hero.id, world);
@@ -2662,12 +2774,18 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 		}
 	}
 
+	let linked = false;
+	let swapped = false;
 	if (expireOn(world, projectile, obstacle)) {
 		detonateProjectile(projectile, world);
-		linkTo(projectile, obstacle, world);
-		applySwap(projectile, obstacle, world);
+		linked = linkTo(projectile, obstacle, world);
+		swapped = applySwap(projectile, obstacle, world);
 		applyBuffsFromProjectile(projectile, obstacle, world);
 		projectile.expireTick = world.tick;
+	}
+
+	if (!linked && !swapped) {
+		registerCollisionFlag(obstacle.id, projectile.categories, world);
 	}
 }
 
@@ -2679,11 +2797,17 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 
 	takeHit(projectile, other.id, world); // Make the projectile glow
 
+	let linked = false;
+	let swapped = false;
 	if (expireOn(world, projectile, other) || (other.destroying && destructibleBy(projectile, other.owner, world))) {
 		detonateProjectile(projectile, world);
-		linkTo(projectile, other, world);
-		applySwap(projectile, other, world);
+		linked = linkTo(projectile, other, world);
+		swapped = applySwap(projectile, other, world);
 		projectile.expireTick = world.tick;
+	}
+
+	if (!linked && !swapped) {
+		registerCollisionFlag(other.id, projectile.categories, world);
 	}
 }
 
@@ -2700,10 +2824,15 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 		reduceDamage(projectile, shield.damageMultiplier);
 	}
 
+	let swapped = false;
 	if (!myProjectile && (expireOn(world, projectile, shield) || shield.destroying && destructibleBy(projectile, shield.owner, world))) { // Every projectile is going to hit its owner's shield on the way out
 		detonateProjectile(projectile, world);
-		applySwap(projectile, shield, world);
+		swapped = applySwap(projectile, shield, world);
 		projectile.expireTick = world.tick;
+	}
+
+	if (!swapped) {
+		registerCollisionFlag(shield.id, projectile.categories, world);
 	}
 }
 
@@ -2739,10 +2868,17 @@ function reduceDamage(projectile: w.Projectile, multiplier: number) {
 	}
 }
 
+function registerCollisionFlag(objId: string, categories: number, world: w.World) {
+	const collisions = world.collisionMap.get(objId) || 0;
+	world.collisionMap.set(objId, collisions | categories);
+}
+
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
 	if ((projectile.collideWith & Categories.Shield) && isHeroShielded(hero, world)) {
 		return;
 	}
+
+	registerCollisionFlag(hero.id, projectile.categories, world);
 
 	if (takeHit(projectile, hero.id, world) && hero.id !== projectile.owner) {
 		applyBuffsFromProjectile(projectile, hero, world);
@@ -2950,16 +3086,20 @@ function applyGravity(projectile: w.Projectile, target: w.WorldObject, world: w.
 
 function applySwap(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	if (!(projectile && projectile.swapWith && target)) {
-		return;
+		return false;
 	}
 
 	if ((target.categories & projectile.swapWith) > 0) {
 		const epicenter = target.body.getPosition();
 		applySwapAt(epicenter, projectile.owner, [target], projectile.sound, world);
-	}
 
-	// You only swap once
-	projectile.swapWith = 0;
+		// You only swap once
+		projectile.swapWith = 0;
+
+		return true;
+	} else {
+		return false;
+	}
 }
 
 function applySwapAt(epicenter: pl.Vec2, ownerId: string, targets: w.WorldObject[], sound: string, world: w.World) {
@@ -3077,17 +3217,17 @@ function applyBuffToObstacle(template: BuffTemplate, obstacle: w.Obstacle, world
 function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World) {
 	const link = projectile.link;
 	if (!link) {
-		return;
+		return false;
 	}
 
 	const owner = world.objects.get(projectile.owner);
 	if (!(
 		target && ((target.categories & link.linkWith) > 0)
 		&& owner && owner.category === "hero")) {
-		return;
+		return false;
 	}
 	if (target.category === "projectile" && !target.linkable) {
-		return;
+		return false;
 	}
 
 	const maxTicks = link.linkTicks;
@@ -3112,6 +3252,8 @@ function linkTo(projectile: w.Projectile, target: w.WorldObject, world: w.World)
 		render: link.render,
 	};
 	world.behaviours.push({ type: "linkForce", heroId: owner.id });
+
+	return true;
 }
 
 function bounceToNext(projectile: w.Projectile, hit: w.Hero, world: w.World) {
@@ -3559,6 +3701,17 @@ function isBuffExpired(buff: w.Buff, hero: w.Hero, world: w.World) {
 	}
 
 	return false;
+}
+
+function expire(behaviour: w.ExpireBehaviour, world: w.World) {
+	const projectile = world.objects.get(behaviour.projectileId);
+	if (!(projectile && projectile.category === "projectile")) {
+		return false;
+	}
+
+	projectile.expireTick = world.tick;
+
+	return true;
 }
 
 function expireOnOwnerDeath(behaviour: w.ExpireOnOwnerDeathBehaviour, world: w.World) {
@@ -4263,7 +4416,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 
 			addProjectile(world, hero, action.target, spell, spell.projectile, {
 				direction: resultantDirection,
-				filterGroupIndex: -(hero.casting.id + 1), // +1 because 0 means no filter
+				filterGroupIndex: objectToFilterGroupIndex(hero.casting.id),
 			});
 		}
 	}

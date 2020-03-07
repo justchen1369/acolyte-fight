@@ -59,6 +59,7 @@ export interface World {
 
 	physics: pl.World;
 	collisions: Map<pl.Contact, Collision>;
+	collisionMap: Map<string, number>; // objId -> collision flags
 
 	shape: shapes.Shape;
 	shrink: number;
@@ -846,6 +847,8 @@ export namespace HomingTargets {
 
 export type Behaviour =
 	DelayBehaviour
+	| CollideBehaviour
+	| SpawnProjectileBehaviour
 	| CooldownBehaviour
 	| FixateBehaviour
 	| DecaySpeedBehaviour
@@ -872,6 +875,7 @@ export type Behaviour =
 	| BurnBehaviour
 	| AttractBehaviour
 	| AuraBehaviour
+	| ExpireBehaviour
 	| ExpireBuffsBehaviour
 	| ExpireOnOwnerDeathBehaviour
 	| ExpireOnOwnerRetreatBehaviour
@@ -884,6 +888,13 @@ export interface BehaviourBase {
 export interface DelayBehaviour extends BehaviourBase {
 	type: "delayBehaviour";
 	afterTick: number;
+	delayed: Behaviour;
+}
+
+export interface CollideBehaviour extends BehaviourBase {
+	type: "collideBehaviour";
+	objId: string;
+	collideWith: number;
 	delayed: Behaviour;
 }
 
@@ -908,6 +919,17 @@ export interface DecaySpeedBehaviour extends BehaviourBase {
 	type: "decaySpeed";
 	projectileId: string;
 	decayPerTick: number;
+}
+
+export interface SpawnProjectileBehaviour extends BehaviourBase {
+	type: "subprojectile";
+	parentProjectileId: string;
+	template: ProjectileTemplate;
+
+	numProjectiles: number;
+	spread: number; // in revs
+
+	expire?: boolean;
 }
 
 export interface AlignProjectileBehaviour extends BehaviourBase {
@@ -1069,6 +1091,11 @@ export interface AuraBehaviour extends BehaviourBase, HitSource {
 	remainingHits: number;
 	packet?: DamagePacketTemplate;
 	buffs: BuffTemplate[];
+}
+
+export interface ExpireBehaviour extends BehaviourBase {
+	type: "expire";
+	projectileId: string;
 }
 
 export interface ExpireBuffsBehaviour extends BehaviourBase {

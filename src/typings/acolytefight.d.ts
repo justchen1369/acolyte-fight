@@ -482,7 +482,8 @@ declare interface HorcruxParameters {
 }
 
 declare type BehaviourTemplate =
-	HomingTemplate
+	SpawnTemplate
+	| HomingTemplate
 	| AccelerateTemplate
 	| AttractTemplate
 	| AuraTemplate
@@ -490,6 +491,7 @@ declare type BehaviourTemplate =
 	| UpdateCollideWithTemplate
 	| UpdatePartialTemplate
 	| ClearHitsTemplate
+	| ExpireTemplate
 	| ExpireOnOwnerDeathTemplate
 	| ExpireOnOwnerRetreatTemplate
 	| ExpireOnChannellingEndTemplate
@@ -510,6 +512,18 @@ declare interface BehaviourTrigger {
 	afterTicks?: number; // After this many ticks
 	atCursor?: boolean; // When projectile reaches cursor
 	minTicks?: number; // Don't trigger at cursor until this many ticks have passed
+	collideWith?: number; // Collision flags. Trigger behaviour when projectile collides with these objects.
+}
+
+declare interface SpawnTemplate extends BehaviourTemplateBase {
+	type: "spawn";
+
+	projectile: ProjectileTemplate;
+
+	numProjectiles?: number; // defaults to 1
+	spread?: number; // the angular width to spread the spawned projectiles across, in revs, defaults to 0
+
+	expire?: boolean; // Whether to expire the parent projectile as well
 }
 
 declare interface HomingTemplate extends BehaviourTemplateBase {
@@ -585,10 +599,12 @@ declare interface UpdatePartialTemplate extends BehaviourTemplateBase {
 	partialBuffDuration?: PartialDamageParameters;
 }
 
+declare interface ExpireTemplate extends BehaviourTemplateBase {
+	type: "expire";
+}
 declare interface ExpireOnOwnerDeathTemplate extends BehaviourTemplateBase {
 	type: "expireOnOwnerDeath";
 }
-
 declare interface ExpireOnOwnerRetreatTemplate extends BehaviourTemplateBase {
 	type: "expireOnOwnerRetreat";
 	maxDistance: number;

@@ -606,7 +606,7 @@ const meteor: Spell = {
         swappable: true,
         radius: 0.03,
         speed: 0.2,
-        speedDecayPerTick: 0.25,
+        speedDecayPerTick: 0.5,
         restitution: 0,
         minTicks: 1,
         maxTicks: 2 * TicksPerSecond,
@@ -626,6 +626,36 @@ const meteor: Spell = {
         ],
     },
 };
+
+const meteoriteProjectile: ProjectileTemplate = {
+    density: 50,
+    square: true,
+    ccd: false,
+    attractable: false,
+    swappable: true,
+    linkable: true,
+    radius: 0.018,
+    speed: 0.3,
+    speedDecayPerTick: 0.5,
+    restitution: 0,
+    minTicks: 1,
+    maxTicks: 2 * TicksPerSecond,
+    hitInterval: 120,
+    damage: 0,
+    shieldTakesOwnership: false,
+    categories: Categories.Projectile | Categories.Massive,
+    collideWith: Categories.All,
+    expireOn: Categories.None,
+
+    sound: "meteorite",
+    color: '#ff0066',
+    renderers: [
+        { type: "bloom", radius: 0.04 },
+        { type: "projectile", ticks: 12, shine: 0, smoke: 0.5, fade: "#333" },
+        { type: "strike", ticks: 12, flash: true, growth: 0.1 },
+    ],
+
+};
 const meteorite: Spell = {
     id: 'meteorite',
     description: "Send a little meteorite towards your enemies!",
@@ -639,34 +669,28 @@ const meteorite: Spell = {
     throttle: true,
 
     projectile: {
-        density: 50,
-        square: true,
-        ccd: false,
-        attractable: false,
-        swappable: true,
-        linkable: true,
-        radius: 0.018,
-        speed: 0.3,
-        speedDecayPerTick: 0.25,
-        restitution: 0,
-        minTicks: 1,
-        maxTicks: 80,
-        hitInterval: 120,
-        damage: 0,
-        shieldTakesOwnership: false,
-        categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All,
-        expireOn: Categories.None,
+        ...meteoriteProjectile,
 
-        sound: "meteorite",
-        color: '#ff0066',
-        renderers: [
-            { type: "bloom", radius: 0.04 },
-            { type: "projectile", ticks: 12, shine: 0, smoke: 0.5, fade: "#333" },
-            { type: "strike", ticks: 12, flash: true, growth: 0.1 },
+        behaviours: [
+            {
+                type: "spawn",
+                trigger: {
+                    collideWith: Categories.Projectile,
+                },
+                projectile: {
+                    ...meteoriteProjectile,
+                    sound: "submeteorite",
+                    maxTicks: 30,
+                    radius: 0.5 * meteoriteProjectile.radius,
+                },
+                numProjectiles: 2,
+                spread: 0.07,
+                expire: true,
+            },
         ],
     },
 };
+
 const kamehameha: Spell = {
     id: 'kamehameha',
     name: 'Acolyte Beam',
