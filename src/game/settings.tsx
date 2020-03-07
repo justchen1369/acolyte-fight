@@ -639,7 +639,7 @@ const meteoriteProjectile: ProjectileTemplate = {
     speedDecayPerTick: 0.5,
     restitution: 0,
     minTicks: 1,
-    maxTicks: 2 * TicksPerSecond,
+    maxTicks: 1.5 * TicksPerSecond,
     hitInterval: 120,
     damage: 0,
     shieldTakesOwnership: false,

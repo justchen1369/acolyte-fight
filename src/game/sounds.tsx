@@ -950,6 +950,7 @@ export const Sounds: Sounds = {
         ],
     },
     "meteorite": {
+        cutoffSeconds: 0.5,
         "start": [
             {
                 "stopTime": 1,
@@ -974,6 +975,31 @@ export const Sounds: Sounds = {
         ],
         "sustain": [
             {
+                "stopTime": 2,
+                "attack": 0.5,
+                "decay": 1,
+                "startFreq": 1,
+                "stopFreq": 10,
+                "highPass": 150,
+                "lowPass": 200,
+                "wave": "square",
+                "ratios": [
+                    1,
+                    1.5,
+                    2,
+                    2.1,
+                    2.16,
+                    3.5,
+                    6.7,
+                    8.2
+                ]
+            }
+        ]
+    },
+    "submeteorite": {
+        "sustain": [
+            {
+                "volume": 0.5,
                 "stopTime": 2,
                 "attack": 0.5,
                 "decay": 1,
