@@ -142,22 +142,28 @@ declare interface Layout {
 	radiusMultiplier?: number; // Change the radius of the world by this proportion, defaults to 1.0
 }
 
-declare interface ObstacleLayout {
+declare interface ObstacleShapeTemplate {
 	// Properties
 	type?: string;
 	health?: number;
 
 	// Layout
-	numObstacles: number;
 	layoutRadius: number;
-	layoutAngleOffsetInRevs?: number;
-	pattern?: number[];
 
 	// Individual obstacle
 	numPoints?: number; // Make this a rotationally-symmetric polygon, otherwise make this an arc
 	extent: number; // aka radius but for a polygon
-	orientationAngleOffsetInRevs?: number; // Rotate the shape
 	angularWidthInRevs?: number; // For trapezoid or arcs
+}
+
+declare interface ObstacleLayout extends ObstacleShapeTemplate {
+	// Layout
+	numObstacles: number;
+	layoutAngleOffsetInRevs?: number;
+	pattern?: number[];
+
+	// Individual obstacle
+	orientationAngleOffsetInRevs?: number; // Rotate the shape
 }
 
 declare type SwatchRender =

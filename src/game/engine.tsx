@@ -225,7 +225,7 @@ export function takeNotifications(world: w.World): w.Notification[] {
 	return notifications;
 }
 
-function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: shapes.Shape, layout: ObstacleLayout) {
+function addObstacle(world: w.World, position: pl.Vec2, angle: number, shape: shapes.Shape, layout: ObstacleShapeTemplate) {
 	const Obstacle = world.settings.Obstacle;
 	const template = world.settings.ObstacleTemplates[layout.type || "default"];
 
@@ -1547,7 +1547,7 @@ function instantiateObstacles(template: ObstacleLayout, world: w.World) {
 	}
 }
 
-function instantiateShape(layout: ObstacleLayout): shapes.Shape {
+function instantiateShape(layout: ObstacleShapeTemplate): shapes.Shape {
 	if (!layout.numPoints && layout.angularWidthInRevs) {
 		// Arc
 		const angularWidth = 2 * Math.PI * layout.angularWidthInRevs;
