@@ -12,6 +12,7 @@ export namespace Collections {
     export const GlobalMod = 'mod';
     export const Scoreboard = 'scoreboard';
     export const ScoreboardEntries = 'entries';
+    export const Ban = 'ban';
 }
 
 export interface GlobalMod {
@@ -126,4 +127,10 @@ export interface PlayerScore {
     games: number;
 
     expiry: number; // unix timestamp
+}
+
+export interface Ban {
+    ips: string[];
+    authTokens: string[];
+    userIds: string[];
 }

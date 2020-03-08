@@ -13,6 +13,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 
+import { delay } from '../../utils/delay';
 import { TicksPerSecond, Atlas } from '../../game/constants';
 import { CanvasStack, GraphicsLevel, render } from '../graphics/render';
 import { VideoRecorder } from '../core/recording';
@@ -64,12 +65,6 @@ function stateToProps(state: s.State): Props {
         sounds: state.world.settings.Sounds,
         touched: state.touched,
     };
-}
-
-function delay(milliseconds: number = TickInterval): Promise<void> {
-    return new Promise<void>(resolve => {
-        setTimeout(resolve, milliseconds);
-    });
 }
 
 function nextFrame(): Promise<void> {
@@ -236,7 +231,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
             if (this.canvasStack.gl && this.canvasStack.ui) {
                 return { ...this.canvasStack };
             }
-            delay();
+            delay(TickInterval);
         }
     }
 

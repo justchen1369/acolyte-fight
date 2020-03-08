@@ -15,6 +15,7 @@ import { authMiddleware } from './auth/auth';
 import { attachToSocket } from './facade/emitter';
 import { setLocation } from './core/mirroring';
 import { logger } from './status/logging';
+import * as bans from './core/bans';
 import * as decaying from './ratings/decaying';
 import * as deflating from './ratings/deflating';
 import * as dbStorage from './storage/dbStorage';
@@ -123,6 +124,7 @@ app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
 
+bans.startUpdateLoop().catch(logger.error);
 statsProvider.startUpdateLoop().catch(logger.error);
 performance.startLoop();
 

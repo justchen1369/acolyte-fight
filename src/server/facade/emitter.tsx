@@ -12,6 +12,7 @@ import { required, optional } from '../utils/schema';
 import * as PlayerName from '../../shared/sanitize';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
+import * as bans from '../core/bans';
 import * as constants from '../../game/constants';
 import * as gameStorage from '../storage/gameStorage';
 import * as matchmaking from '../core/matchmaking';
@@ -474,7 +475,7 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 
 		if (data.observe) {
 			replay = matchmaking.findExistingGame(data.version, room, partyId);
-		} else if (locked) {
+		} else if (locked || isBanned(socket, userId, authToken, partyId)) {
 			// The user wants a private game, create one
 			replay = games.initGame(data.version, room, partyId, locked);
 		} else {
@@ -530,6 +531,16 @@ async function onJoinGameMsgAsync(socket: SocketIO.Socket, authToken: string, da
 		logger.info(`Unable to find game [${data.gameId}] for ${playerName} (${authToken}) [${socket.id}]`);
 		return { success: false, error: `Unable to find game` };
 	}
+}
+
+function isBanned(socket: SocketIO.Socket, userId: string, authToken: string, partyId: string) {
+	if (partyId) {
+		// Allow banned users to play in private parties
+		return false;
+	}
+
+	const ips = getIPs(socket);
+	return bans.isBanned(ips, userId, authToken);
 }
 
 function onBotMsg(socket: SocketIO.Socket, data: m.BotMsg) {

@@ -206,3 +206,10 @@ export interface PlayerScore {
     games: number;
     expiry: number; // unix timestamp
 }
+
+export interface Ban {
+    banId: string;
+    ips: string[];
+    authTokens: string[];
+    userIds: string[];
+}
