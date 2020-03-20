@@ -9,10 +9,11 @@ import * as engine from '../../game/engine';
 import * as spellUtils from '../core/spellUtils';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
-import SpellIcon from '../controls/spellIcon';
+import SpellIconLookup from '../controls/spellIconLookup';
 
 interface OwnProps {
     bindings: KeyBindings;
+    size?: number;
 }
 interface Props extends OwnProps {
     settings: AcolyteFightSettings;
@@ -39,24 +40,12 @@ class BuildPanel extends React.PureComponent<Props, State> {
         const settings = this.props.settings;
         const resolved = engine.resolveKeyBindings(this.props.bindings, settings);
         return <div className="character-build">
-            {settings.Choices.Keys.map(keyConfig => keyConfig && this.renderSpell(resolved.keysToSpells.get(keyConfig.btn), settings))}
+            {settings.Choices.Keys.map(keyConfig => keyConfig && <SpellIconLookup
+                key={keyConfig.btn}
+                spellId={resolved.keysToSpells.get(keyConfig.btn)}
+                size={this.props.size || 56}
+            />)}
         </div>
-    }
-
-    private renderSpell(spellId: string, settings: AcolyteFightSettings): React.ReactNode {
-        const spell = settings.Spells[spellId];
-        if (!spell) {
-            return null;
-        }
-
-        const icon = settings.Icons[spell.icon];
-        if (!(icon && icon.path)) {
-            return null;
-        }
-
-        const spellName = spellUtils.spellName(spell);
-        const path2D = new Path2D(icon.path);
-        return <SpellIcon key={spellId} icon={path2D} color={spell.color} size={56} attr={{ title: spellName }} />
     }
 }
 

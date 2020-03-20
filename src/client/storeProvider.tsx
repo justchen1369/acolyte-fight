@@ -34,6 +34,7 @@ function initialState(): s.State {
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
+        loadouts: [],
         options: storage.getOptionsOrDefaults(),
         showingChat: true,
         graphics: r.GraphicsLevel.Maximum,
@@ -128,6 +129,11 @@ function reducer(state: s.State, action: s.Action): s.State {
                 ...state.options,
                 ...action.options,
             },
+        };
+    } else if (action.type === "loadouts") {
+        return {
+            ...state,
+            loadouts: action.loadouts,
         };
     } else if (action.type === "graphics") {
         return { ...state, graphics: action.graphics };

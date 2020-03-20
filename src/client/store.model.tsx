@@ -17,10 +17,14 @@ export interface State {
     loggedIn: boolean;
     tutorialLevel: number;
     showingHelp?: boolean;
+
     playerName: string;
+
     keyBindings: KeyBindings;
     rebindings: KeyBindings;
     options: m.GameOptions;
+    loadouts: m.Loadout[];
+
     graphics?: number;
     showingPerformance?: PerformanceTab;
     showingChat?: boolean;
@@ -131,6 +135,7 @@ export type Action =
     | UpdateKeyBindingsAction
     | UpdateCustomizingAction
     | UpdateOptionsAction
+    | UpdateLoadoutsAction
     | UpdateGraphicsAction
     | UpdateUrlAction
     | UpdateHashAction
@@ -259,6 +264,11 @@ export interface UpdateKeyBindingsAction {
 export interface UpdateOptionsAction {
     type: "updateOptions";
     options: Partial<m.GameOptions>;
+}
+
+export interface UpdateLoadoutsAction {
+    type: "loadouts";
+    loadouts: m.Loadout[];
 }
 
 export interface UpdateGraphicsAction {

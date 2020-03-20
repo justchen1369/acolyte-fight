@@ -413,3 +413,39 @@ textarea {
     from { filter: brightness(2) }
     to { filter: brightness(1) }
 }
+
+.character-build .spell-icon {
+    box-sizing: border-box;
+    box-shadow: 4px 4px 2px #0004;
+    border: 1px #000c solid;
+    filter: brightness(1.0);
+    transition: border 0.2s ease, background-color 0.2s ease, filter 0.2s ease;
+}
+
+.character-build .spell-icon:nth-child(n+2)  {
+    margin-left: 0.5em;
+}
+
+.character-build .spell-icon:hover {
+    border-color: #fff6;
+    box-shadow: 0 0 4px var(--spell-color);
+    filter: brightness(1.2);
+}
+
+.loadout-number {
+    display: block;
+
+    font-weight: bold;
+    font-size: 24px;
+
+    width: 32px;
+    height: 32px;
+
+    text-align: center;
+
+    background: #666;
+    box-sizing: border-box;
+    border-radius: 5px;
+    border: 1px #fff1 solid;
+    box-shadow: 4px 4px 2px #0004;
+}

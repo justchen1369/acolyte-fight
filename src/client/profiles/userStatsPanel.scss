@@ -14,16 +14,6 @@
     right: 0;
 }
 
-.user-stats-panel .character-build .spell-icon {
-    box-sizing: border-box;
-    border: 1px black solid;
-    @include floatShadow();
-}
-
-.user-stats-panel .character-build .spell-icon:nth-child(n+2)  {
-    margin-left: 0.5em;
-}
-
 @media (max-width: 1024px) {
     .user-stats-panel .character-build {
         position: static;

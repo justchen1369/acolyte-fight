@@ -42,6 +42,7 @@ export interface GetUserSettingsResponse {
     buttons?: KeyBindings;
     rebindings?: KeyBindings;
     options?: GameOptions;
+    loadouts?: Loadout[];
 }
 
 export interface UpdateUserSettingsRequest {
@@ -49,6 +50,7 @@ export interface UpdateUserSettingsRequest {
     buttons: KeyBindings;
     rebindings: KeyBindings;
     options: GameOptions;
+    loadouts?: Loadout[];
 }
 
 export interface UpdateUserSettingsResponse {
@@ -479,4 +481,19 @@ export interface Replay {
     mod: ModTree;
 
 	history: c.TickMsg[];
+}
+
+export interface GetLoadoutsResponse {
+    loadouts: Loadout[];
+}
+
+export interface PostLoadoutsRequest {
+    loadouts: Loadout[];
+}
+
+export interface PostLoadoutsResponse {
+}
+
+export interface Loadout {
+    buttons: KeyBindings;
 }

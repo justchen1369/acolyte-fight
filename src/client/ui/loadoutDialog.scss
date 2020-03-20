@@ -1,0 +1,52 @@
+.loadouts-dialog {
+    width: 768px;
+    min-width: 512px;
+    margin: 0;
+}
+
+.loadout-slot {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0.5em 0;
+    padding: 8px;
+    min-height: 64px;
+    background: #0001;
+
+    box-sizing: border-box;
+    max-width: 100vw;
+    flex-wrap: wrap;
+}
+
+.loadout-slot .loadout-number {
+    margin: 8px;
+}
+
+.loadout-slot .character-build {
+    margin: 0 16px;
+}
+
+.desktop .loadout-slot .loadout-slot-actions {
+    opacity: 0;
+}
+
+.loadout-slot-actions i.clickable {
+    margin: 8px;
+    font-size: 32px;
+}
+
+.loadout-slot:hover {
+    background: #fff1;
+    box-shadow: 0 0 0.2em #fff4;
+}
+
+.desktop .loadout-slot:hover .loadout-slot-actions {
+    opacity: 1;
+}
+
+@media (max-width: 512px) {
+    .loadout-slot .character-build canvas.spell-icon {
+        height: 24px !important;
+        width: 24px !important;
+    }
+}

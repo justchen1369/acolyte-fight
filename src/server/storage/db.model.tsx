@@ -13,6 +13,7 @@ export namespace Collections {
     export const Scoreboard = 'scoreboard';
     export const ScoreboardEntries = 'entries';
     export const Ban = 'ban';
+    export const Loadouts = 'loadouts';
 }
 
 export interface GlobalMod {
@@ -133,4 +134,12 @@ export interface Ban {
     ips: string[];
     authTokens: string[];
     userIds: string[];
+}
+
+export interface Loadouts {
+    loadouts: Loadout[];
+}
+
+export interface Loadout {
+    buttons: KeyBindings;
 }

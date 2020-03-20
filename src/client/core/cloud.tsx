@@ -75,20 +75,15 @@ export async function downloadSettings(): Promise<string> {
 
             if (json.buttons) {
                 StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: json.buttons });
-            } else {
-                upload = true;
             }
-
             if (json.rebindings) {
                 StoreProvider.dispatch({ type: "updateRebindings", rebindings: json.rebindings });
-            } else {
-                upload = true;
             }
-
             if (json.options) {
                 StoreProvider.dispatch({ type: "updateOptions", options: json.options });
-            } else {
-                upload = true;
+            }
+            if (json.loadouts) {
+                StoreProvider.dispatch({ type: "loadouts", loadouts: json.loadouts });
             }
 
             console.log(`Logged in as ${json.userId} - ${json.name}`);
@@ -120,6 +115,7 @@ export async function uploadSettings(): Promise<void> {
         buttons: state.keyBindings,
         rebindings: state.rebindings,
         options: state.options,
+        loadouts: state.loadouts,
     };
 
     const res = await fetch(`${base}/api/settings`, {

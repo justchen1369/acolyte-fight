@@ -1,5 +1,19 @@
 @import '../common.scss';
 
+.spell-config-toolbar {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.spell-config-toolbar-actions {
+    font-size: 32px;
+}
+
+.spell-config-toolbar-actions i {
+    margin-left: 0.5em;
+}
+
 .spell-config .key {
     box-sizing: border-box;
     display: flex;

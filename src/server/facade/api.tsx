@@ -19,6 +19,7 @@ import * as gameStorage from '../storage/gameStorage';
 import * as kongregate from '../auth/kongregate';
 import * as leaderboardProvider from '../ratings/leaderboardProvider';
 import * as loadMetrics from '../status/loadMetrics';
+import * as loadoutStorage from '../storage/loadoutStorage';
 import * as mirroring from '../core/mirroring';
 import * as performance from '../core/performance';
 import * as sanitize from '../../shared/sanitize';
@@ -428,6 +429,8 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
     const userHash = auth.getUserHashFromAuthToken(authToken);
     const user = await auth.getUserFromAccessKey(auth.enigmaAccessKey(authToken));
     if (user) {
+        const loadouts = await loadoutStorage.getLoadouts(user.userId);
+
         const result: m.GetUserSettingsResponse = {
             userHash,
             userId: user.userId,
@@ -436,6 +439,7 @@ export async function onGetUserSettingsAsync(req: express.Request, res: express.
             buttons: user.settings && user.settings.buttons,
             rebindings: user.settings && user.settings.rebindings,
             options: user.settings && user.settings.options,
+            loadouts: loadouts,
         };
 
         res.header("Content-Type", "application/json");
@@ -499,7 +503,14 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
         && required(input.buttons, "object") && Object.keys(input.buttons).map(key => input.buttons[key]).every(x => required(x, "string"))
         && required(input.rebindings, "object") && Object.keys(input.rebindings).map(key => input.rebindings[key]).every(x => optional(x, "string"))
         && required(input.options, "object")
-        && optional(input.options.wheelOnRight, "boolean")
+        && required(input.loadouts, "object")
+        && _.isArray(input.loadouts) && input.loadouts.every(loadout =>
+            !loadout || (
+                required(loadout, "object")
+                && required(loadout.buttons, "object")
+                && Object.keys(loadout.buttons).map(key => loadout.buttons[key]).every(spellId => required(spellId, "string"))
+            )
+        )
     )) {
         res.status(400).send("Bad request");
         return;
@@ -518,6 +529,7 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
             },
         };
         await userStorage.updateUser(user);
+        await loadoutStorage.setLoadouts(userId, input.loadouts);
 
         const result: m.UpdateUserSettingsResponse = {};
         res.header("Content-Type", "application/json");
