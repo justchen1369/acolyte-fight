@@ -120,6 +120,7 @@ app.get('/manifest.webmanifest', (req, res) => res.sendFile(rootDir + '/manifest
 
 
 app.get('/audioWorker.html', (req, res) => res.sendFile(rootDir + '/audioWorker.html'));
+app.get('/ads.txt', (req, res) => res.sendFile(rootDir + '/ads.txt'));
 app.get('/:page?', (req, res) => res.sendFile(rootDir + '/index.html'));
 
 online.init().catch(logger.error);
