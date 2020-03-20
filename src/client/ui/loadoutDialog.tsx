@@ -32,6 +32,7 @@ interface Props extends OwnProps {
 
 interface State {
     hoveringSlot?: number;
+    hoveringTrash?: number;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -92,6 +93,9 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
             if (mode === LoadoutDialogMode.Save) {
                 bindings = this.props.keyBindings;
             }
+            if (this.state.hoveringTrash === slot) {
+                bindings = null;
+            }
         }
 
         return <div
@@ -102,8 +106,26 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
             onMouseDown={() => this.onSlotClick(slot)}
             >
 
-            <LoadoutNumber>{slot + 1}</LoadoutNumber>
+            {this.renderNumber(slot)}
             {bindings && <BuildPanel bindings={bindings} size={48} />}
+        </div>
+    }
+
+    private renderNumber(slot: number) {
+        const trashEnabled = !this.props.touched;
+        const className = classNames({
+            'loadout-slot-number-container': true,
+            'loadout-trash-enabled': trashEnabled,
+        });
+        return <div className={className}>
+            <LoadoutNumber>{slot + 1}</LoadoutNumber>
+            {trashEnabled && <i
+                className="fas fa-trash loadout-slot-trash-btn clickable"
+                title="Clear"
+                onMouseDown={(ev) => this.onTrash(ev, slot)}
+                onMouseEnter={() => this.setState({ hoveringTrash: slot })}
+                onMouseLeave={() => this.setState({ hoveringTrash: null })}
+                />}
         </div>
     }
 
@@ -128,7 +150,9 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
     }
 
 
-    private onTrash(slot: number) {
+    private onTrash(ev: React.MouseEvent, slot: number) {
+        ev.stopPropagation();
+
         const newLoadouts = [...this.props.loadouts];
         newLoadouts[slot] = null;
 

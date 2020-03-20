@@ -23,8 +23,29 @@
     flex-wrap: wrap;
 }
 
-.loadout-slot .loadout-number {
+.loadout-slot-number-container {
     margin: 8px;
+    position: relative;
+}
+
+.loadout-slot-number-container .loadout-slot-trash-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.loadout-trash-enabled.loadout-slot-number-container .loadout-number-container {
+    opacity: 1;
+}
+.loadout-trash-enabled.loadout-slot-number-container:hover .loadout-number-container {
+    opacity: 0;
+}
+.loadout-trash-enabled.loadout-slot-number-container .loadout-slot-trash-btn {
+    opacity: 0;
+}
+.loadout-trash-enabled.loadout-slot-number-container:hover .loadout-slot-trash-btn {
+    opacity: 1;
 }
 
 .loadout-slot .character-build {
