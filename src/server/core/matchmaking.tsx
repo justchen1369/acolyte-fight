@@ -35,6 +35,7 @@ interface SplitCandidate extends CandidateBase {
 interface TeamPlayer {
     heroId: string;
     aco: number;
+    isBot?: boolean;
 }
 
 interface TeamsCandidate extends CandidateBase {
@@ -529,18 +530,20 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
 
     const sortedRatings = extractTeamPlayers(game);
 
-    const potentialNumTeams = calculatePotentialNumTeams(sortedRatings.length, Matchmaking.AllowUnevenTeams);
-    if (potentialNumTeams.length <= 0) {
-        return [];
+    const candidates = new Array<TeamsCandidate>();
+    if (Matchmaking.PvE) {
+        const pve = generatePvECandidate(sortedRatings);
+        if (pve) {
+            candidates.push(pve);
+        }
+    } else {
+        const shuffledRatings = _.shuffle(sortedRatings);
+        const potentialNumTeams = calculatePotentialNumTeams(sortedRatings.length, Matchmaking.AllowUnevenTeams);
+        const teamCandidateWeight = 1.0 / 2; // Half weight because we generate twice as many options, so don't artificially increase chance of teams
+        candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(sortedRatings, numTeams, teamCandidateWeight)));
+        candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(shuffledRatings, numTeams, teamCandidateWeight)));
     }
 
-    const shuffledRatings = _.shuffle(sortedRatings);
-
-    const teamCandidateWeight = 1.0 / 2; // Half weight because we generate twice as many options, so don't artificially increase chance of teams
-
-    const candidates = new Array<TeamsCandidate>();
-    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(sortedRatings, numTeams, teamCandidateWeight)));
-    candidates.push(...potentialNumTeams.map(numTeams => generateTeamCandidate(shuffledRatings, numTeams, teamCandidateWeight)));
     return candidates;
 }
 
@@ -578,6 +581,25 @@ function generateTeamCandidate(playerSequence: TeamPlayer[], numTeams: number, w
     };
 }
 
+function generatePvECandidate(playerSequence: TeamPlayer[]): TeamsCandidate {
+    const humans = playerSequence.filter(p => !p.isBot);
+    const bots = playerSequence.filter(p => p.isBot);
+    if (humans.length === 0 || bots.length === 0) {
+        return null;
+    }
+
+    const teams = new Array<TeamPlayer[]>();
+    teams.push(humans);
+    teams.push(bots);
+
+    return {
+        type: "teams",
+        teams,
+        avgWinProbability: evaluateTeamCandidate(teams),
+        weight: 1,
+    };
+}
+
 function evaluateTeamCandidate(teams: TeamPlayer[][]): number {
     const averageRatings = teams.map(team => _(team).map(p => p.aco).mean());
     return evaluateWinProbability(averageRatings);
@@ -590,7 +612,7 @@ function extractTeamPlayers(game: g.Game): TeamPlayer[] {
     });
     if (game.matchmaking.AllowBotTeams) {
         game.bots.forEach((socketId, heroId) => {
-            teamPlayers.push({ heroId, aco: game.matchmaking.BotRating });
+            teamPlayers.push({ heroId, aco: game.matchmaking.BotRating, isBot: true });
         });
     }
 

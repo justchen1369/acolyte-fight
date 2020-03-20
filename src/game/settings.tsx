@@ -18,6 +18,7 @@ const Matchmaking: MatchmakingSettings = {
     EnableSingles: true,
     EnableSplitting: true,
     EnableTeams: true,
+    PvE: false,
     AllowBotTeams: false,
     AllowUnevenTeams: false,
     TeamsMinGames: 5,

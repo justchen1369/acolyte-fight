@@ -121,6 +121,7 @@ declare interface MatchmakingSettings {
 	EnableTeams: boolean; // Try to group the match into teams
 
 	TeamsMinGames: number; // Only create teams if all players have played at least this many games
+	PvE: boolean; // Only create human vs bot teams
 	AllowBotTeams: boolean; // Allow teams even when bots are in the game
 	AllowUnevenTeams: boolean; // Create teams even when there is not an even number of players
 	BotRating: number; // If the bot is being matched into teams, consider it to be a player with this rating
