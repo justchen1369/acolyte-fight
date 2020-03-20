@@ -459,17 +459,27 @@ function finalizeMatchmaking(initial: g.Game) {
         return;
     }
 
+    const Matchmaking = initial.matchmaking;
+
     const queue = [initial];
     const allForks = new Array<g.Game>();
     while (queue.length > 0) {
         const game = queue.shift();
 
         const noopCandidate = generateNoopCandidate(game);
-        let candidates: Candidate[] = [
-            noopCandidate,
-            ...generateSplitCandidates(game),
-            ...generateTeamCandidates(game)
-        ];
+        const candidates = new Array<Candidate>();
+
+        if (Matchmaking.EnableTeams) {
+            candidates.push(...generateTeamCandidates(game));
+        }
+
+        if (initial.matchmaking.EnableSplitting) {
+            candidates.push(...generateSplitCandidates(game));
+        }
+
+        if (initial.matchmaking.EnableSingles || candidates.length === 0) {
+            candidates.push(noopCandidate);
+        }
 
         const choice = chooseCandidate(candidates, initial.matchmaking);
 
@@ -508,7 +518,10 @@ function formatPercent(proportion: number) {
 function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
     const Matchmaking = game.matchmaking;
     if (!((game.bots.size === 0 || Matchmaking.AllowBotTeams)
-        && wu(game.active.values()).every(x => !!x.userId && x.numGames >= Matchmaking.TeamsMinGames && x.numActionMessages > 0))) {
+        && wu(game.active.values()).every(x =>
+            (!!x.userId || !Matchmaking.TeamsMinGames) // If minimum team games is zero, create teams regardless
+            && x.numGames >= Matchmaking.TeamsMinGames
+            && (x.numActionMessages > 0 || !!game.partyId || !!game.locked)))) { // In private matches, don't check whether the players are active
         // Everyone must be logged in to activate team mode
         // Also everyone must be active and have played the minimum number of games
         return [];
@@ -516,7 +529,7 @@ function generateTeamCandidates(game: g.Game): TeamsCandidate[] {
 
     const sortedRatings = extractTeamPlayers(game);
 
-    const potentialNumTeams = calculatePotentialNumTeams(sortedRatings.length);
+    const potentialNumTeams = calculatePotentialNumTeams(sortedRatings.length, Matchmaking.AllowUnevenTeams);
     if (potentialNumTeams.length <= 0) {
         return [];
     }
@@ -584,11 +597,12 @@ function extractTeamPlayers(game: g.Game): TeamPlayer[] {
     return _.orderBy(teamPlayers, p => p.aco);
 }
 
-function calculatePotentialNumTeams(numPlayers: number): number[] {
-    if (numPlayers >= 4) {
+function calculatePotentialNumTeams(numPlayers: number, allowUneven: boolean = false): number[] {
+    if (numPlayers >= 3) {
         const candidates = new Array<number>();
-        for (let candidateTeams = 2; candidateTeams <= numPlayers / 2; ++candidateTeams) {
-            if ((numPlayers % candidateTeams) === 0) {
+        const maxTeams = Math.ceil(numPlayers / 2);
+        for (let candidateTeams = 2; candidateTeams <= maxTeams; ++candidateTeams) {
+            if (allowUneven || (numPlayers % candidateTeams) === 0) {
                 candidates.push(candidateTeams);
             }
         }
