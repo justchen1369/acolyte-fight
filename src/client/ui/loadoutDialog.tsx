@@ -13,6 +13,12 @@ import ModalPanel from '../controls/modalPanel';
 
 import './loadoutDialog.scss';
 
+enum LoadoutAction {
+    Load,
+    Save,
+    Trash,
+}
+
 interface OwnProps {
     onClose: () => void;
 }
@@ -24,7 +30,8 @@ interface Props extends OwnProps {
 }
 
 interface State {
-    hoveringSave?: number;
+    hoveringSlot?: number;
+    hoveringAction?: LoadoutAction;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -59,17 +66,29 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
 
     private renderSlot(slot: number) {
         const loadout = this.props.loadouts[slot];
-        const bindings: KeyBindings = this.state.hoveringSave === slot ? this.props.keyBindings : loadout && loadout.buttons;
-        return <div className="loadout-slot" key={slot}>
+        let bindings: KeyBindings = loadout && loadout.buttons;
+        if (this.state.hoveringSlot === slot) {
+            if (this.state.hoveringAction === LoadoutAction.Save) {
+                bindings = this.props.keyBindings;
+            } else if (this.state.hoveringAction === LoadoutAction.Trash) {
+                bindings = null;
+            }
+        }
+
+        return <div
+            className="loadout-slot"
+            key={slot}
+            onMouseEnter={() => this.onSlotHover(slot)}
+            onMouseLeave={() => this.onSlotHover(null)}
+            >
+
             <div className="loadout-number">{slot + 1}</div>
             {bindings && <BuildPanel bindings={bindings} size={48} />}
             <div className="spacer" />
             <div className="loadout-slot-actions">
-                {loadout && <i className="fas fa-folder-open clickable" title="Load" onClick={() => this.onLoad(loadout)} />}
-                <i
-                    className="fas fa-save clickable" title="Save" onClick={() => this.onSave(slot)}
-                    onMouseEnter={() => this.onSaveHover(slot)}
-                    onMouseLeave={() => this.onSaveHover(null)} />
+                {loadout && <i className="fas fa-folder-open clickable" title="Load" onClick={() => this.onLoad(loadout)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Load)} onMouseLeave={() => this.onActionHover(null)} />}
+                {loadout && <i className="fas fa-trash clickable" title="Clear" onClick={() => this.onTrash(slot)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Trash)} onMouseLeave={() => this.onActionHover(null)} />}
+                <i className="fas fa-save clickable" title="Save" onClick={() => this.onSave(slot)} onMouseEnter={() => this.onActionHover(LoadoutAction.Save)} onMouseLeave={() => this.onActionHover(null)} />
             </div>
         </div>
     }
@@ -85,6 +104,15 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         this.onClose();
     }
 
+
+    private onTrash(slot: number) {
+        const newLoadouts = [...this.props.loadouts];
+        newLoadouts[slot] = null;
+
+        StoreProvider.dispatch({ type: "loadouts", loadouts: newLoadouts });
+        cloud.uploadSettings(); // don't await
+    }
+
     private onSave(slot: number) {
         const newLoadout: m.Loadout = {
             buttons: this.props.keyBindings,
@@ -98,8 +126,12 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         this.onClose();
     }
 
-    private onSaveHover(slot: number) {
-        this.setState({ hoveringSave: slot });
+    private onSlotHover(slot: number) {
+        this.setState({ hoveringSlot: slot });
+    }
+
+    private onActionHover(action: LoadoutAction) {
+        this.setState({ hoveringAction: action });
     }
 
     private onClose() {
