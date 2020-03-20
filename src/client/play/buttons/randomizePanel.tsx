@@ -78,6 +78,7 @@ class RandomizePanel extends React.PureComponent<Props, State> {
         if (loadout && loadout.buttons) {
             this.loadKeyBindings(loadout.buttons);
         }
+        StoreProvider.dispatch({ type: "customizing", customizing: false }); // if on mobile, choosing a loadout exits spell choosing mode
     }
 
     private loadKeyBindings(config: KeyBindings) {
