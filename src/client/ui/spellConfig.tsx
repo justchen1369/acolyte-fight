@@ -6,7 +6,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as keyboardUtils from '../core/keyboardUtils';
 import BuildPanel from '../profiles/buildPanel';
-import LoadoutDialog from './loadoutDialog';
+import { LoadoutDialog, LoadoutDialogMode } from './loadoutDialog';
 import SpellBtnConfig from '../play/spellBtnConfig';
 import SpellIconLookup from '../controls/spellIconLookup';
 
@@ -19,7 +19,8 @@ interface Props {
 }
 
 interface State {
-    showingLoadouts?: boolean;
+    saving?: boolean;
+    loading?: boolean;
 }
 
 function stateToProps(state: s.State): Props {
@@ -44,7 +45,8 @@ class SpellConfig extends React.PureComponent<Props, State> {
             <div className="spell-config">
                 {keys.map(key => <SpellBtnConfig key={key} btn={key} rebinding={true} settings={this.props.settings} />)}
             </div>
-            {this.state.showingLoadouts && <LoadoutDialog onClose={() => this.onHideLoadoutsClick()} />}
+            {this.state.saving && <LoadoutDialog mode={LoadoutDialogMode.Save} onClose={() => this.setState({ saving: false })} />}
+            {this.state.loading && <LoadoutDialog mode={LoadoutDialogMode.Load} onClose={() => this.setState({ loading: false })} />}
         </div>;
     }
 
@@ -54,7 +56,8 @@ class SpellConfig extends React.PureComponent<Props, State> {
             <div className="spacer" />
             <div className="spell-config-toolbar-actions">
                 <i title="Randomize all spells" className="fas fa-dice clickable" onClick={() => this.onRandomizeClick()} />
-                <i title="Your saved loadouts" className="fas fa-list-alt clickable" onClick={() => this.onShowLoadoutsClick()} />
+                <i title="Load existing loadout" className="fas fa-folder-open clickable" onClick={() => this.setState({ loading: true })} />
+                <i title="Save loadout" className="fas fa-save clickable" onClick={() => this.setState({ saving: true })} />
             </div>
         </h1>
     }
@@ -68,14 +71,6 @@ class SpellConfig extends React.PureComponent<Props, State> {
         });
 
         keyboardUtils.updateKeyBindings(keyBindings);
-    }
-
-    private onShowLoadoutsClick() {
-        this.setState({ showingLoadouts: true });
-    }
-
-    private onHideLoadoutsClick() {
-        this.setState({ showingLoadouts: false });
     }
 }
 

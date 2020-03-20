@@ -13,13 +13,13 @@ import ModalPanel from '../controls/modalPanel';
 
 import './loadoutDialog.scss';
 
-enum LoadoutAction {
+export enum LoadoutDialogMode {
     Load,
     Save,
-    Trash,
 }
 
 interface OwnProps {
+    mode: LoadoutDialogMode;
     onClose: () => void;
 }
 
@@ -32,7 +32,6 @@ interface Props extends OwnProps {
 
 interface State {
     hoveringSlot?: number;
-    hoveringAction?: LoadoutAction;
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
@@ -45,7 +44,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
     };
 }
 
-class LoadoutDialog extends React.PureComponent<Props, State> {
+class _LoadoutDialog extends React.PureComponent<Props, State> {
     constructor(props: Props) {
         super(props);
         this.state = {};
@@ -61,20 +60,37 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         for (let i = 0; i < constants.MaxLoadouts; ++i) {
             slots.push(this.renderSlot(i));
         }
-        return <ModalPanel title="Your Saved Loadouts" className={className} onClose={() => this.onClose()}>
+
+        return <ModalPanel title={this.renderTitle()} className={className} onClose={() => this.onClose()}>
+            {this.renderCaption()}
             {slots}
         </ModalPanel>
     }
 
+    private renderTitle() {
+        switch (this.props.mode) {
+            case LoadoutDialogMode.Load: return <span><i className="fas fa-folder-open"/> Open Loadout</span>
+            case LoadoutDialogMode.Save: return <span><i className="fas fa-save" /> Save Loadout</span>
+            default: return "Loadouts";
+        }
+    }
+
+    private renderCaption() {
+        switch (this.props.mode) {
+            case LoadoutDialogMode.Load: return <p className="loadouts-dialog-caption">Choose a slot to load:</p>
+            case LoadoutDialogMode.Save: return <p className="loadouts-dialog-caption">Choose a slot to save to:</p>
+            default: return null;
+        }
+    }
+
     private renderSlot(slot: number) {
+        const mode = this.props.mode;
         const loadout = this.props.loadouts[slot];
 
         let bindings: KeyBindings = loadout && loadout.buttons;
         if (this.state.hoveringSlot === slot) {
-            if (this.state.hoveringAction === LoadoutAction.Save) {
+            if (mode === LoadoutDialogMode.Save) {
                 bindings = this.props.keyBindings;
-            } else if (this.state.hoveringAction === LoadoutAction.Trash) {
-                bindings = null;
             }
         }
 
@@ -83,17 +99,22 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
             key={slot}
             onMouseEnter={() => this.onSlotHover(slot)}
             onMouseLeave={() => this.onSlotHover(null)}
+            onMouseDown={() => this.onSlotClick(slot)}
             >
 
             <LoadoutNumber>{slot + 1}</LoadoutNumber>
             {bindings && <BuildPanel bindings={bindings} size={48} />}
-            <div className="spacer" />
-            <div className="loadout-slot-actions">
-                {loadout && <i className="fas fa-folder-open clickable" title="Load" onMouseDown={() => this.onLoad(loadout)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Load)} onMouseLeave={() => this.onActionHover(null)} />}
-                {loadout && <i className="fas fa-trash clickable" title="Clear" onMouseDown={() => this.onTrash(slot)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Trash)} onMouseLeave={() => this.onActionHover(null)} />}
-                <i className="fas fa-save clickable" title="Save" onMouseDown={() => this.onSave(slot)} onMouseEnter={() => this.onActionHover(LoadoutAction.Save)} onMouseLeave={() => this.onActionHover(null)} />
-            </div>
         </div>
+    }
+
+    private onSlotClick(slot: number) {
+        const mode = this.props.mode;
+        if (mode === LoadoutDialogMode.Load) {
+            const loadout = this.props.loadouts[slot];
+            this.onLoad(loadout);
+        } else if (mode === LoadoutDialogMode.Save) {
+            this.onSave(slot);
+        }
     }
 
     private onLoad(loadout: m.Loadout) {
@@ -130,13 +151,9 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         this.setState({ hoveringSlot: slot });
     }
 
-    private onActionHover(action: LoadoutAction) {
-        this.setState({ hoveringAction: action });
-    }
-
     private onClose() {
         this.props.onClose();
     }
 }
 
-export default ReactRedux.connect(stateToProps)(LoadoutDialog);
+export const LoadoutDialog = ReactRedux.connect(stateToProps)(_LoadoutDialog);

@@ -4,6 +4,10 @@
     margin: 0;
 }
 
+.loadouts-dialog-caption {
+    margin: 1.5rem;
+}
+
 .loadout-slot {
     display: flex;
     flex-direction: row;
@@ -12,6 +16,7 @@
     padding: 8px;
     min-height: 64px;
     background: #0001;
+    cursor: pointer;
 
     box-sizing: border-box;
     max-width: 100vw;

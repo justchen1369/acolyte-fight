@@ -4,7 +4,7 @@ import './modalPanel.scss';
 
 interface Props {
     className?: string;
-    title: string;
+    title: React.ReactNode;
     onClose?: () => void;
 }
 
