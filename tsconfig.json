@@ -68,6 +68,7 @@
     "src/typings/kongregate.d.ts",
     "src/typings/promise-defer.d.ts",
     "src/typings/poki.d.ts",
+    "src/typings/scroll-into-view.d.ts",
     "src/typings/socket.io-msgpack-parser.d.ts",
     "src/typings/qrious.d.ts",
   ],

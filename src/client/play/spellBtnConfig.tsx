@@ -19,6 +19,7 @@ interface OwnProps {
     settings: AcolyteFightSettings;
     rebinding?: boolean;
     onChosen?: (keyBindings: KeyBindings, random?: boolean) => void;
+    onRef?: (elem: HTMLElement) => void;
 }
 interface Props extends OwnProps {
     config: KeyBindings;
@@ -71,7 +72,9 @@ class SpellKeyConfig extends React.PureComponent<Props, State> {
             onTouchStart={ev => ev.stopPropagation()}
             onMouseDown={ev => ev.stopPropagation()}
             onClick={ev => ev.stopPropagation()}
-            style={style}>
+            style={style}
+            ref={this.props.onRef}
+            >
 
             <div className="key-options">
                 {options.map((row, index) => this.renderOptionsRow(index, row, chosen.id))}

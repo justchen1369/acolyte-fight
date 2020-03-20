@@ -15,6 +15,7 @@ interface OwnProps {
     bindings: KeyBindings;
     color?: string;
     size?: number;
+    onSpellDown?: (key: string) => void;
 }
 interface Props extends OwnProps {
     settings: AcolyteFightSettings;
@@ -46,6 +47,9 @@ class BuildPanel extends React.PureComponent<Props, State> {
                 spellId={resolved.keysToSpells.get(keyConfig.btn)}
                 color={this.props.color}
                 size={this.props.size || 56}
+                attr={{
+                    onMouseDown: () => this.props.onSpellDown && this.props.onSpellDown(keyConfig.btn),
+                }}
             />)}
         </div>
     }

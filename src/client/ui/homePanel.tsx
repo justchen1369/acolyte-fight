@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import scrollIntoView from 'scroll-into-view';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -16,8 +17,6 @@ import PartyList from './partyList';
 import TitleListener from '../controls/titleListener';
 
 import './homePanel.scss';
-
-const scrollIntoView = require('scroll-into-view');
 
 interface Props {
     isLoggedIn: boolean;
