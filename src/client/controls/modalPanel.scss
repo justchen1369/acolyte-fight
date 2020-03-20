@@ -25,7 +25,7 @@
     max-height: 100vh;
     overflow: hidden auto;
 
-    background: #333c linear-gradient(
+    background: #333 linear-gradient(
         160deg,
         #fff0,
         #fff2 30%,
@@ -36,7 +36,7 @@
 
     box-sizing: border-box;
     border: 1px #0001 solid;
-    box-shadow: 0.2em 0.2em 0.1em #0004;
+    box-shadow: 8px 8px 4px #0008;
 
     animation: fly-from-top 0.1s ease;
 }
