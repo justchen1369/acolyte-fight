@@ -9,6 +9,13 @@
 
 .spell-config-toolbar .character-build .spell-icon {
     cursor: pointer;
+    transform: scale(1);
+    transition: transform 0.2s ease;
+}
+
+.spell-config-toolbar .character-build .spell-icon:hover {
+    transform: scale(1.2);
+    animation: shine-loop 0.5s alternate infinite linear;
 }
 
 .spell-config-toolbar-actions {
