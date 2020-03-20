@@ -13,6 +13,7 @@ import SpellIconLookup from '../controls/spellIconLookup';
 
 interface OwnProps {
     bindings: KeyBindings;
+    color?: string;
     size?: number;
 }
 interface Props extends OwnProps {
@@ -43,6 +44,7 @@ class BuildPanel extends React.PureComponent<Props, State> {
             {settings.Choices.Keys.map(keyConfig => keyConfig && <SpellIconLookup
                 key={keyConfig.btn}
                 spellId={resolved.keysToSpells.get(keyConfig.btn)}
+                color={this.props.color}
                 size={this.props.size || 56}
             />)}
         </div>

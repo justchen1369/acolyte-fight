@@ -14,6 +14,7 @@ import SpellIcon from '../controls/spellIcon';
 interface OwnProps {
     spellId: string;
     size: number;
+    color?: string;
 
     attr?: React.HTMLAttributes<HTMLCanvasElement>;
     style?: React.CSSProperties;
@@ -57,7 +58,7 @@ class SpellIconLookup extends React.PureComponent<Props, State> {
         const path2D = new Path2D(icon.path);
         return <SpellIcon
             icon={path2D}
-            color={spell.color}
+            color={this.props.color || spell.color}
             size={this.props.size}
             attr={{ title: spellName, ...this.props.attr }}
             style={{ ...this.props.style }}

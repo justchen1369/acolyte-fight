@@ -66,6 +66,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
 
     private renderSlot(slot: number) {
         const loadout = this.props.loadouts[slot];
+
         let bindings: KeyBindings = loadout && loadout.buttons;
         if (this.state.hoveringSlot === slot) {
             if (this.state.hoveringAction === LoadoutAction.Save) {
