@@ -7,7 +7,6 @@ import * as constants from '../../game/constants';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
-import { isMobile } from '../userAgent';
 import BuildPanel from '../profiles/buildPanel';
 import LoadoutNumber from '../controls/loadoutNumber';
 import ModalPanel from '../controls/modalPanel';
@@ -28,6 +27,7 @@ interface Props extends OwnProps {
     keyBindings: KeyBindings;
     loadouts: m.Loadout[];
     settings: AcolyteFightSettings;
+    touched: boolean;
 }
 
 interface State {
@@ -41,6 +41,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         keyBindings: state.keyBindings,
         loadouts: state.loadouts,
         settings: state.room.settings,
+        touched: state.touched,
     };
 }
 
@@ -53,7 +54,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
     render() {
         const className = classNames({
             'loadouts-dialog': true,
-            'desktop': !isMobile,
+            'desktop': !this.props.touched,
         });
 
         const slots = new Array<React.ReactNode>();
@@ -88,9 +89,9 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
             {bindings && <BuildPanel bindings={bindings} size={48} />}
             <div className="spacer" />
             <div className="loadout-slot-actions">
-                {loadout && <i className="fas fa-folder-open clickable" title="Load" onClick={() => this.onLoad(loadout)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Load)} onMouseLeave={() => this.onActionHover(null)} />}
-                {loadout && <i className="fas fa-trash clickable" title="Clear" onClick={() => this.onTrash(slot)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Trash)} onMouseLeave={() => this.onActionHover(null)} />}
-                <i className="fas fa-save clickable" title="Save" onClick={() => this.onSave(slot)} onMouseEnter={() => this.onActionHover(LoadoutAction.Save)} onMouseLeave={() => this.onActionHover(null)} />
+                {loadout && <i className="fas fa-folder-open clickable" title="Load" onMouseDown={() => this.onLoad(loadout)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Load)} onMouseLeave={() => this.onActionHover(null)} />}
+                {loadout && <i className="fas fa-trash clickable" title="Clear" onMouseDown={() => this.onTrash(slot)}  onMouseEnter={() => this.onActionHover(LoadoutAction.Trash)} onMouseLeave={() => this.onActionHover(null)} />}
+                <i className="fas fa-save clickable" title="Save" onMouseDown={() => this.onSave(slot)} onMouseEnter={() => this.onActionHover(LoadoutAction.Save)} onMouseLeave={() => this.onActionHover(null)} />
             </div>
         </div>
     }
