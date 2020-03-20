@@ -18,6 +18,7 @@ const RegionUrls = [
     regions.getOrigin("eu"),
     regions.getOrigin("us"),
     regions.getOrigin("sg"),
+    regions.getOrigin("au"),
 ];
 
 const RegionNames: { [key: string]: string } = {
