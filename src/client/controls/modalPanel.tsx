@@ -19,7 +19,7 @@ export default class ModalPanel extends React.PureComponent<Props> {
                     </div>
                     <div className="spacer" />
                     <div className="modal-panel-title-bar-actions">
-                        {this.props.onClose && <i className="fas fa-times clickable" onClick={this.props.onClose} />}
+                        {this.props.onClose && <i className="fas fa-times link-icon" onClick={this.props.onClose} />}
                     </div>
                 </div>
                 <div className={bodyClassName}>

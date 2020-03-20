@@ -230,6 +230,25 @@ a:hover, a:active {
     animation: shine-loop 0.5s alternate infinite linear;
 }
 
+.link-icon {
+    color: #ccc;
+    cursor: pointer;
+
+    transition: color 0.2s ease, transform 0.2s ease;
+    transform: scale(1);
+}
+
+.link-icon:hover, .link-icon:active, .link-icon.selected {
+    color: #0cf;
+
+    @include strokeShadow(0 0 8px #0cf8);
+}
+
+.link-icon:hover {
+    transform: scale(1.2);
+    animation: shine-loop 0.5s alternate infinite linear;
+}
+
 .error {
     color: red;
     font-weight: bold;

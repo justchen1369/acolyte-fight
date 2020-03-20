@@ -120,7 +120,7 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
         return <div className={className}>
             <LoadoutNumber>{slot + 1}</LoadoutNumber>
             {trashEnabled && <i
-                className="fas fa-trash loadout-slot-trash-btn clickable"
+                className="fas fa-trash loadout-slot-trash-btn link-icon"
                 title="Clear"
                 onMouseDown={(ev) => this.onTrash(ev, slot)}
                 onMouseEnter={() => this.setState({ hoveringTrash: slot })}

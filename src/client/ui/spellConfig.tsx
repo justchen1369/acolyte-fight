@@ -63,9 +63,9 @@ class SpellConfig extends React.PureComponent<Props, State> {
             <div className="spacer" />
             <BuildPanel bindings={this.props.keyBindings} size={32} onSpellDown={(btn: string) => this.onSpellToolbarClick(btn)} />
             <div className="spell-config-toolbar-actions">
-                <i title="Randomize all spells" className="fas fa-dice clickable" onClick={() => this.onRandomizeClick()} />
-                <i title="Load existing loadout" className="fas fa-folder-open clickable" onClick={() => this.setState({ loading: true })} />
-                <i title="Save loadout" className="fas fa-save clickable" onClick={() => this.setState({ saving: true })} />
+                <i title="Randomize all spells" className="fas fa-dice link-icon" onClick={() => this.onRandomizeClick()} />
+                <i title="Load existing loadout" className="fas fa-folder-open link-icon" onClick={() => this.setState({ loading: true })} />
+                <i title="Save loadout" className="fas fa-save link-icon" onClick={() => this.setState({ saving: true })} />
             </div>
         </h1>
     }
