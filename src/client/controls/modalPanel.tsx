@@ -11,8 +11,8 @@ interface Props {
 export default class ModalPanel extends React.PureComponent<Props> {
     render() {
         const bodyClassName = `modal-panel-body ${this.props.className}`;
-        return <div className="modal-panel-container">
-            <div className="modal-panel">
+        return <div className="modal-panel-container" onClick={(ev) => this.onMaskClick(ev)}>
+            <div className="modal-panel" onClick={(ev) => this.onDialogClick(ev)}>
                 <div className="modal-panel-title-bar">
                     <div className="modal-panel-title">
                         {this.props.title}
@@ -22,10 +22,20 @@ export default class ModalPanel extends React.PureComponent<Props> {
                         {this.props.onClose && <i className="fas fa-times clickable" onClick={this.props.onClose} />}
                     </div>
                 </div>
-                <div className={this.props.className}>
+                <div className={bodyClassName}>
                     {this.props.children}
                 </div>
             </div>
         </div>
+    }
+
+    private onMaskClick(ev: React.MouseEvent) {
+        if (this.props.onClose) {
+            this.props.onClose();
+        }
+    }
+
+    private onDialogClick(ev: React.MouseEvent) {
+        ev.stopPropagation();
     }
 }
