@@ -54,6 +54,7 @@ class SpellConfig extends React.PureComponent<Props, State> {
         return <h1 className="spell-config-toolbar">
             <span>Your Spells</span>
             <div className="spacer" />
+            <BuildPanel bindings={this.props.keyBindings} size={32} />
             <div className="spell-config-toolbar-actions">
                 <i title="Randomize all spells" className="fas fa-dice clickable" onClick={() => this.onRandomizeClick()} />
                 <i title="Load existing loadout" className="fas fa-folder-open clickable" onClick={() => this.setState({ loading: true })} />
