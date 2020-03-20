@@ -4,6 +4,7 @@ import * as ReactRedux from 'react-redux';
 import * as engine from '../../game/engine';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
+import * as keyboardUtils from '../core/keyboardUtils';
 import BuildPanel from '../profiles/buildPanel';
 import LoadoutDialog from './loadoutDialog';
 import SpellBtnConfig from '../play/spellBtnConfig';
@@ -52,9 +53,21 @@ class SpellConfig extends React.PureComponent<Props, State> {
             <span>Your Spells</span>
             <div className="spacer" />
             <div className="spell-config-toolbar-actions">
-                <i className="fas fa-cog clickable" onClick={() => this.onShowLoadoutsClick()} />
+                <i title="Randomize all spells" className="fas fa-dice clickable" onClick={() => this.onRandomizeClick()} />
+                <i title="Your saved loadouts" className="fas fa-list-alt clickable" onClick={() => this.onShowLoadoutsClick()} />
             </div>
         </h1>
+    }
+
+    private onRandomizeClick() {
+        const keyBindings = { ...this.props.keyBindings };
+
+        const btns = keyboardUtils.allKeys(this.props.settings);
+        btns.forEach(btn => {
+            keyBindings[btn] = keyboardUtils.randomizeSpellId(btn, this.props.keyBindings, this.props.settings);
+        });
+
+        keyboardUtils.updateKeyBindings(keyBindings);
     }
 
     private onShowLoadoutsClick() {
