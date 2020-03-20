@@ -609,6 +609,8 @@ table.player-list {
 
 #game-panel.desktop .spell-config {
     padding-bottom: 72px;
+
+    animation: fly-from-bottom 0.1s ease;
 }
 
 #game-panel .spell-config-container .accept-row {

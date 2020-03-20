@@ -37,6 +37,8 @@
     box-sizing: border-box;
     border: 1px #0001 solid;
     box-shadow: 0.2em 0.2em 0.1em #0004;
+
+    animation: fly-from-top 0.1s ease;
 }
 
 .modal-panel-title-bar {

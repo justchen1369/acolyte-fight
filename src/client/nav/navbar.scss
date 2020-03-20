@@ -32,6 +32,8 @@
 
     background: #333;
     box-shadow: 0px 0px 5px black;
+
+    animation: fly-from-left 0.1s ease;
 }
 .navbar-vertical.navbar-open {
     display: flex;
