@@ -16,6 +16,7 @@ namespace StorageKeys {
     export const Buttons = "enigma-buttons";
     export const Rebindings = "enigma-rebindings";
     export const Options = "enigma-options";
+    export const Loadouts = "enigma-loadouts";
 }
 
 namespace SettingsKeys {
@@ -59,6 +60,14 @@ export function loadRebindingConfig(): KeyBindings {
 
 export function saveRebindingConfig(config: KeyBindings) {
     saveJson(StorageKeys.Rebindings, config);
+}
+
+export function loadLoadouts(): m.Loadout[] {
+    return loadJson(StorageKeys.Loadouts) as m.Loadout[];
+}
+
+export function saveLoadouts(loadouts: m.Loadout[]) {
+    saveJson(StorageKeys.Loadouts, loadouts);
 }
 
 export function loadOptions(): m.GameOptions {
@@ -109,6 +118,12 @@ export function getRebindingsOrDefaults(defaults: KeyBindings) {
     const rebindings = loadRebindingConfig() || defaults;
     saveRebindingConfig(rebindings);
     return rebindings;
+}
+
+export function getLoadoutsOrDefault() {
+    const loadouts = loadLoadouts() || [];
+    saveLoadouts(loadouts);
+    return loadouts;
 }
 
 export function getOptionsOrDefaults(): m.GameOptions {

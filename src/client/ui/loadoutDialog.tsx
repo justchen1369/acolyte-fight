@@ -2,8 +2,8 @@ import _ from 'lodash';
 import classNames from 'classnames';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
-import * as cloud from '../core/cloud';
 import * as constants from '../../game/constants';
+import * as keyboardUtils from '../core/keyboardUtils';
 import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
@@ -101,8 +101,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
             return;
         }
 
-        StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: loadout.buttons });
-        cloud.uploadSettings(); // don't await
+        keyboardUtils.updateKeyBindings(loadout.buttons);
 
         this.onClose();
     }
@@ -112,8 +111,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         const newLoadouts = [...this.props.loadouts];
         newLoadouts[slot] = null;
 
-        StoreProvider.dispatch({ type: "loadouts", loadouts: newLoadouts });
-        cloud.uploadSettings(); // don't await
+        keyboardUtils.updateLoadouts(newLoadouts);
     }
 
     private onSave(slot: number) {
@@ -123,8 +121,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
         const newLoadouts = [...this.props.loadouts];
         newLoadouts[slot] = newLoadout;
 
-        StoreProvider.dispatch({ type: "loadouts", loadouts: newLoadouts });
-        cloud.uploadSettings(); // don't await
+        keyboardUtils.updateLoadouts(newLoadouts);
 
         this.onClose();
     }

@@ -34,7 +34,7 @@ function initialState(): s.State {
         playerName: storage.getOrCreatePlayerName(),
         keyBindings: storage.getKeyBindingsOrDefaults(),
         rebindings: storage.getRebindingsOrDefaults(isNewPlayer ? initialRebindingsNew() : initialRebindingsOld()),
-        loadouts: [],
+        loadouts: storage.getLoadoutsOrDefault(),
         options: storage.getOptionsOrDefaults(),
         showingChat: true,
         graphics: r.GraphicsLevel.Maximum,

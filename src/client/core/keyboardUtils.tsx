@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import * as Reselect from 'reselect';
 import * as cloud from './cloud';
+import * as m from '../../shared/messages.model';
 import * as parties from './parties';
 import * as Storage from '../storage';
 import * as StoreProvider from '../storeProvider';
@@ -130,6 +131,12 @@ function saveRebinding(key: string, value: string) {
 export function updateKeyBindings(config: KeyBindings) {
     StoreProvider.dispatch({ type: "updateKeyBindings", keyBindings: config });
     Storage.saveKeyBindingConfig(config);
+    uploadSettingsDebounced();
+}
+
+export function updateLoadouts(loadouts: m.Loadout[]) {
+    StoreProvider.dispatch({ type: "loadouts", loadouts });
+    Storage.saveLoadouts(loadouts);
     uploadSettingsDebounced();
 }
 
