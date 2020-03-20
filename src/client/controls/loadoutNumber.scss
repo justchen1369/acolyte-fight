@@ -1,0 +1,29 @@
+.loadout-number-container {
+    display: block;
+
+    width: 22px;
+    height: 22px;
+    margin: 0px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-sizing: border-box;
+    border-radius: 12px 2px 6px 2px;
+    border: 1px #000 solid;
+
+    text-shadow: none;
+    box-shadow: 2px 2px 0px #000;
+
+    background: #ccc;
+    color: #333;
+}
+
+.loadout-number {
+    display: block;
+
+    font-weight: normal;
+    font-size: 16px;
+    font-style: normal;
+}

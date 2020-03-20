@@ -9,6 +9,7 @@ import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 import { isMobile } from '../userAgent';
 import BuildPanel from '../profiles/buildPanel';
+import LoadoutNumber from '../controls/loadoutNumber';
 import ModalPanel from '../controls/modalPanel';
 
 import './loadoutDialog.scss';
@@ -83,7 +84,7 @@ class LoadoutDialog extends React.PureComponent<Props, State> {
             onMouseLeave={() => this.onSlotHover(null)}
             >
 
-            <div className="loadout-number">{slot + 1}</div>
+            <LoadoutNumber>{slot + 1}</LoadoutNumber>
             {bindings && <BuildPanel bindings={bindings} size={48} />}
             <div className="spacer" />
             <div className="loadout-slot-actions">

@@ -53,7 +53,7 @@ class ButtonRow extends React.PureComponent<Props, State> {
             className += " button-panel-secondary";
         }
         return <Button className={className} onMouseEnter={() => this.hover()} onMouseLeave={() => this.unhover()} onClick={this.props.onClick}>
-            <span className="button-panel-row-icon"><i className={this.props.icon} /></span>
+            <span className="button-panel-row-icon"><i className={this.props.icon}>{this.props.children}</i></span>
             <span className="button-panel-row-label">{this.props.label}</span>
         </Button>
     }

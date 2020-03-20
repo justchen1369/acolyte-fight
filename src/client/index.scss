@@ -431,21 +431,3 @@ textarea {
     box-shadow: 0 0 4px var(--spell-color);
     filter: brightness(1.2);
 }
-
-.loadout-number {
-    display: block;
-
-    font-weight: bold;
-    font-size: 24px;
-
-    width: 32px;
-    height: 32px;
-
-    text-align: center;
-
-    background: #666;
-    box-sizing: border-box;
-    border-radius: 5px;
-    border: 1px #fff1 solid;
-    box-shadow: 4px 4px 2px #0004;
-}
