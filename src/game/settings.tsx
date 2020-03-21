@@ -2376,7 +2376,7 @@ const dualSaber: Spell = {
 
     angleOffsetsInRevs: [-0.25, 0.25],
     width: Pixel,
-    length: 0.06,
+    length: 0.07,
 
     movementProportionWhileChannelling: 1,
     interruptibleAfterTicks: 20,
