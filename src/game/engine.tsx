@@ -954,6 +954,12 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 			};
 			addCollider(projectile, collider);
 			behaviour = collider;
+		} else if (trigger.expire) {
+			behaviour = {
+				type: "triggerOnExpiry",
+				obj: projectile,
+				delayed: behaviour,
+			};
 		} else if (trigger.afterTicks) {
 			behaviour = {
 				type: "delayBehaviour",
@@ -986,7 +992,7 @@ function removeCollider(obj: w.WorldObject, collider: w.CollideBehaviour) {
 function instantiateSpawn(template: SpawnTemplate, projectile: w.Projectile, world: w.World): w.SpawnProjectileBehaviour {
 	return {
 		type: "subprojectile",
-		parentProjectileId: projectile.id,
+		parent: projectile,
 		template: template.projectile,
 
 		numProjectiles: template.numProjectiles || 1,
@@ -1141,6 +1147,7 @@ export function tick(world: w.World) {
 	handleBehaviours(world, {
 		delayBehaviour,
 		collideBehaviour,
+		triggerOnExpiry,
 		homing,
 		accelerate,
 		linkForce,
@@ -1238,13 +1245,24 @@ function collideBehaviour(behaviour: w.CollideBehaviour, world: w.World) {
 	}
 }
 
+function triggerOnExpiry(behaviour: w.TriggerOnExpiryBehaviour, world: w.World) {
+	const obj = behaviour.obj;
+	if (world.objects.has(obj.id)) {
+		return true;
+	} else {
+		console.log(`Expiry: ${obj.id}`);
+		world.behaviours.push(behaviour.delayed);
+		return false;
+	}
+}
+
 function physicsStep(world: w.World) {
 	const granularity = 1000;
 	world.physics.step(Math.floor(granularity / TicksPerSecond) / granularity);
 }
 
 function subprojectile(behaviour: w.SpawnProjectileBehaviour, world: w.World) {
-	const parent = world.objects.get(behaviour.parentProjectileId);
+	const parent = behaviour.parent;
 	if (!(parent && parent.category === "projectile")) {
 		return false;
 	}

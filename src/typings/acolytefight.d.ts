@@ -528,6 +528,8 @@ declare interface BehaviourTrigger {
 
 	collideWith?: number; // Collision flags. Trigger behaviour when projectile collides with these objects.
 	against?: number; // Only consider collisions against these alliance flags.
+
+	expire?: boolean; // Trigger on projectile expiry
 }
 
 declare interface SpawnTemplate extends BehaviourTemplateBase {

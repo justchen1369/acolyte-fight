@@ -1027,7 +1027,7 @@ const retractor: Spell = {
                 type: "accelerate",
                 maxSpeed: 0.4,
                 accelerationPerSecond: 0.4,
-            }
+            },
         ],
 
         sound: "retractor",

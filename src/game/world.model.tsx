@@ -849,6 +849,7 @@ export namespace HomingTargets {
 export type Behaviour =
 	DelayBehaviour
 	| CollideBehaviour
+	| TriggerOnExpiryBehaviour
 	| SpawnProjectileBehaviour
 	| CooldownBehaviour
 	| FixateBehaviour
@@ -904,6 +905,12 @@ export interface CollideBehaviour extends BehaviourBase {
 	collideTick?: number;
 }
 
+export interface TriggerOnExpiryBehaviour extends BehaviourBase {
+	type: "triggerOnExpiry";
+	obj: WorldObject;
+	delayed: Behaviour;
+}
+
 export interface CooldownBehaviour extends BehaviourBase {
 	type: "cooldown";
 	heroId: string;
@@ -929,7 +936,7 @@ export interface DecaySpeedBehaviour extends BehaviourBase {
 
 export interface SpawnProjectileBehaviour extends BehaviourBase {
 	type: "subprojectile";
-	parentProjectileId: string;
+	parent: WorldObject;
 	template: ProjectileTemplate;
 
 	numProjectiles: number;
