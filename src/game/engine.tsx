@@ -113,7 +113,6 @@ export function initialWorld(mod: Object): w.World {
 		behaviours: [],
 		physics: pl.World(def),
 		collisions: new Map(),
-		collisionMap: new Map(),
 
 		actions: new Map(),
 
@@ -951,18 +950,36 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 				delayed: behaviour,
 			};
 		} else if (trigger.collideWith) {
-			behaviour = {
+			const collider: w.CollideBehaviour = {
 				type: "collideBehaviour",
 				objId: projectile.id,
 				collideWith: trigger.collideWith,
+				against: trigger.against !== undefined ? trigger.against: Alliances.All,
 				delayed: behaviour,
 			};
+			addCollider(projectile, collider);
+			behaviour = collider;
 		} else {
 			throw "Unknown behaviour trigger: " + trigger;
 		}
 
-		world.behaviours.push(behaviour);
+		if (behaviour) {
+			world.behaviours.push(behaviour);
+		}
 	});
+}
+
+function addCollider(obj: w.WorldObject, collider: w.CollideBehaviour) {
+	if (!obj.colliders) {
+		obj.colliders = new Set();
+	}
+	obj.colliders.add(collider);
+}
+
+function removeCollider(obj: w.WorldObject, collider: w.CollideBehaviour) {
+	if (obj.colliders) {
+		obj.colliders.delete(collider);
+	}
 }
 
 function instantiateSpawn(template: SpawnTemplate, projectile: w.Projectile, world: w.World): w.SpawnProjectileBehaviour {
@@ -1206,9 +1223,9 @@ function collideBehaviour(behaviour: w.CollideBehaviour, world: w.World) {
 		return false;
 	}
 
-	const collisionFlags = world.collisionMap.get(obj.id) || 0;
-	if (!!(collisionFlags & behaviour.collideWith)) {
+	if (behaviour.collideTick) {
 		world.behaviours.push(behaviour.delayed);
+		removeCollider(obj, behaviour);
 		return false;
 	} else {
 		return true;
@@ -2453,8 +2470,6 @@ function spellPreactions(world: w.World, hero: w.Hero, action: w.Action, spell: 
 }
 
 function handleCollisions(world: w.World) {
-	world.collisionMap.clear();
-
 	let contact = world.physics.getContactList();
 	while (contact) {
 		if (!world.collisions.has(contact)) {
@@ -2530,7 +2545,9 @@ function handleObstacleHit(world: w.World, obstacle: w.Obstacle, hit: w.WorldObj
 		return;
 	}
 
-	registerCollisionFlag(hit.id, obstacle.categories, world);
+	if (!obstacle.mirror) {
+		registerCollision(hit, obstacle, world);
+	}
 
 	if (world.tick > world.startTick && (obstacle.expireOn & hit.categories) > 0) {
 		obstacle.health = 0;
@@ -2602,7 +2619,7 @@ function isBumpable(obj: w.WorldObject) {
 }
 
 function handleShieldHit(world: w.World, shield: w.Shield, hit: w.WorldObject) {
-	registerCollisionFlag(hit.id, shield.categories, world);
+	registerCollision(hit, shield, world);
 
 	if (shield.type === "saber") {
 		handleSaberHit(shield, hit, world);
@@ -2641,7 +2658,7 @@ function handleSaberHit(saber: w.Saber, obj: w.WorldObject, world: w.World) {
 }
 
 function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
-	registerCollisionFlag(shield.id, hero.categories, world);
+	registerCollision(shield, hero, world);
 
 	if (hero.thrust) {
 		// Thrust into shield means the hero bounces off
@@ -2653,7 +2670,7 @@ function handleHeroHitShield(world: w.World, hero: w.Hero, shield: w.Shield) {
 function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 	const Hero = world.settings.Hero;
 
-	registerCollisionFlag(other.id, hero.categories, world);
+	registerCollision(other, hero, world);
 
 	// Push back other heroes
 	if ((hero.collideWith & Categories.Hero) > 0 && (other.collideWith & Categories.Hero) > 0) {
@@ -2700,7 +2717,7 @@ function handleHeroHitHero(world: w.World, hero: w.Hero, other: w.Hero) {
 }
 
 function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Projectile) {
-	registerCollisionFlag(projectile.id, hero.categories, world);
+	registerCollision(projectile, hero, world);
 
 	if (hero.thrust) {
 		if (projectile.categories & Categories.Massive) {
@@ -2711,7 +2728,7 @@ function handleHeroHitProjectile(world: w.World, hero: w.Hero, projectile: w.Pro
 
 function handleHeroHitObstacle(world: w.World, hero: w.Hero, obstacle: w.Obstacle) {
 	if (!obstacle.sensor) {
-		registerCollisionFlag(obstacle.id, hero.categories, world);
+		registerCollision(obstacle, hero, world);
 	}
 
 	if (hero.thrust && !obstacle.sensor) {
@@ -2785,7 +2802,7 @@ function handleProjectileHitObstacle(world: w.World, projectile: w.Projectile, o
 	}
 
 	if (!linked && !swapped) {
-		registerCollisionFlag(obstacle.id, projectile.categories, world);
+		registerCollision(obstacle, projectile, world);
 	}
 }
 
@@ -2807,7 +2824,7 @@ function handleProjectileHitProjectile(world: w.World, projectile: w.Projectile,
 	}
 
 	if (!linked && !swapped) {
-		registerCollisionFlag(other.id, projectile.categories, world);
+		registerCollision(other, projectile, world);
 	}
 }
 
@@ -2832,7 +2849,7 @@ function handleProjectileHitShield(world: w.World, projectile: w.Projectile, shi
 	}
 
 	if (!swapped) {
-		registerCollisionFlag(shield.id, projectile.categories, world);
+		registerCollision(shield, projectile, world);
 	}
 }
 
@@ -2868,9 +2885,26 @@ function reduceDamage(projectile: w.Projectile, multiplier: number) {
 	}
 }
 
-function registerCollisionFlag(objId: string, categories: number, world: w.World) {
-	const collisions = world.collisionMap.get(objId) || 0;
-	world.collisionMap.set(objId, collisions | categories);
+function registerCollision(hit: w.WorldObject, other: w.WorldObject, world: w.World) {
+	if (!hit.colliders) {
+		return;
+	}
+
+	hit.colliders.forEach(collider => {
+		if (collider.collideTick) {
+			return;
+		}
+
+		if (!(collider.collideWith & other.categories)) {
+			return;
+		}
+
+		if (!(collider.against === Alliances.All || !!(collider.against & calculateAlliance(hit.owner, other.owner, world)))) {
+			return;
+		}
+
+		collider.collideTick = world.tick;
+	});
 }
 
 function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero: w.Hero) {
@@ -2878,7 +2912,7 @@ function handleProjectileHitHero(world: w.World, projectile: w.Projectile, hero:
 		return;
 	}
 
-	registerCollisionFlag(hero.id, projectile.categories, world);
+	registerCollision(hero, projectile, world);
 
 	if (takeHit(projectile, hero.id, world) && hero.id !== projectile.owner) {
 		applyBuffsFromProjectile(projectile, hero, world);

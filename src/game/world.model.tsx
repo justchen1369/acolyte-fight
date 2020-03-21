@@ -59,7 +59,6 @@ export interface World {
 
 	physics: pl.World;
 	collisions: Map<pl.Contact, Collision>;
-	collisionMap: Map<string, number>; // objId -> collision flags
 
 	shape: shapes.Shape;
 	shrink: number;
@@ -357,6 +356,8 @@ export interface WorldObjectBase {
 	impulseDelta?: pl.Vec2;
 
 	uiEase?: pl.Vec2;
+
+	colliders?: Set<CollideBehaviour>;
 }
 
 export interface HighlightSource {
@@ -894,8 +895,12 @@ export interface DelayBehaviour extends BehaviourBase {
 export interface CollideBehaviour extends BehaviourBase {
 	type: "collideBehaviour";
 	objId: string;
-	collideWith: number;
 	delayed: Behaviour;
+
+	collideWith: number;
+	against: number;
+
+	collideTick?: number;
 }
 
 export interface CooldownBehaviour extends BehaviourBase {

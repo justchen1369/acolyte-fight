@@ -525,7 +525,9 @@ declare interface BehaviourTrigger {
 	afterTicks?: number; // After this many ticks
 	atCursor?: boolean; // When projectile reaches cursor
 	minTicks?: number; // Don't trigger at cursor until this many ticks have passed
+
 	collideWith?: number; // Collision flags. Trigger behaviour when projectile collides with these objects.
+	against?: number; // Only consider collisions against these alliance flags.
 }
 
 declare interface SpawnTemplate extends BehaviourTemplateBase {
