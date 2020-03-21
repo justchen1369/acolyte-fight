@@ -488,6 +488,7 @@ function finalizeMatchmaking(initial: g.Game) {
     const previousHashes = findPreviousMatchHashes(initial);
     const queue = [initial];
     const allForks = new Array<g.Game>();
+    const allMatchups = new Array<Matchup>();
     while (queue.length > 0) {
         const game = queue.shift();
 
@@ -521,12 +522,13 @@ function finalizeMatchmaking(initial: g.Game) {
         }
 
         const matchups = extractMatchups(choice);
-        matchups.forEach(matchup => registerMatchup(matchup));
+        allMatchups.push(...matchups); // Don't register the matchups yet because it the intermediate matchups will affect final matchups
 
         logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.avgWinProbability)} -> ${formatCandidate(choice)}`);
     }
 
     games.emitForks(allForks);
+    allMatchups.forEach(matchup => registerMatchup(matchup));
 }
 
 function extractMatchups(choice: Candidate): Matchup[] {
