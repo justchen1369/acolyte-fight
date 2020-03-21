@@ -1393,11 +1393,15 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 
 	let bloom = ctxStack.rtx >= r.GraphicsLevel.Ultra ? render.bloom : render.bloomLow;
 	if (bloom) {
+		let sigma = bloom;
+		if (render.decay) {
+			sigma *= proportion;
+		}
 		glx.circleTrail(ctxStack, heroPos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
 			feather: {
-				sigma: bloom,
+				sigma,
 				alpha: render.glow !== undefined ? render.glow : DefaultGlow,
 			},
 		});

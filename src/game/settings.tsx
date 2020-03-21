@@ -2786,6 +2786,15 @@ const blaze: Spell = {
             restrictCollideWith: Categories.Shield,
             appendCollideWith: Categories.Shield, // Heroes don't normally collide with shields
             sense: Categories.Hero | Categories.Projectile,
+            render: {
+				"color": "#f0c",
+				"selfColor": true,
+				"numParticles": 0,
+				"particleRadius": 0,
+				"ticks": 1,
+				"bloom": 0.03,
+				"decay": true
+            },
         },
     ],
 
