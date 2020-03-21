@@ -1885,6 +1885,14 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 				feather,
 			});
 		}
+
+		if (feather) {
+			glx.circleTrail(ctxStack, pos, {
+				color,
+				maxRadius: 0,
+				feather,
+			});
+		}
 	} else if (shield.type === "wall") {
 		const pos = shield.body.getPosition();
 		const angle = shield.body.getAngle();
