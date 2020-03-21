@@ -4496,11 +4496,16 @@ function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: Focu
 
 	let done: boolean;
 	if (spell.release && hero.casting.releaseTick) {
-		done = true;
+		const releaseAfterTicks = spell.releaseAfterTicks || 0;
+		if (world.tick >= hero.casting.channellingStartTick + releaseAfterTicks) {
+			done = true;
 
-		if (spell.releaseBehaviours && focus && focus.category === "projectile") {
-			focus.target.pos = hero.target;
-			instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
+			if (spell.releaseBehaviours && focus && focus.category === "projectile") {
+				focus.target.pos = hero.target;
+				instantiateProjectileBehaviours(spell.releaseBehaviours, focus, world);
+			}
+		} else {
+			done = false;
 		}
 	} else if (focus && focus.category === "projectile") {
 		// Not done - still focusing projectile

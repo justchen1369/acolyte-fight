@@ -977,6 +977,7 @@ const retractor: Spell = {
 
     movementProportionWhileChannelling: 1,
     release: {},
+    releaseAfterTicks: 20,
     releaseBehaviours: [
         {
             type: "homing",

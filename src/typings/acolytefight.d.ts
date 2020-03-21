@@ -403,6 +403,7 @@ declare interface FocusSpell extends SpellBase {
 	
 	projectile: ProjectileTemplate;
 
+	releaseAfterTicks?: number; // Cannot release until this many ticks have passed
 	focusDelaysCooldown?: boolean; // Whether to delay the cooldown until focusing is complete
 	releaseBehaviours?: BehaviourTemplate[]; // Add these behaviours to the projectile when button is released. Must also specify the release property so the UI sends the release signal.
 	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
