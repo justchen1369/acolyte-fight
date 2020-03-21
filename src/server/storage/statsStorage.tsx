@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import wu from 'wu';
+import * as Firestore from '@google-cloud/firestore';
 import * as constants from '../../game/constants';
 import * as db from './db.model';
 import * as dbStorage from './dbStorage';
@@ -214,9 +215,9 @@ export async function streamAllGamesAfter(afterUnix: number, callback: (game: m.
     });
 }
 
-export async function streamAllUserRatings(callback: (user: db.User) => void) {
+export async function streamAllUserRatingsAfter(timestamp: Firestore.Timestamp, callback: (user: db.User) => void) {
     const firestore = getFirestore();
-    const query = firestore.collection(db.Collections.User).select('ratings');
+    const query = firestore.collection(db.Collections.User).where('accessed', '>=', timestamp).select('ratings');
 
     await dbStorage.stream(query, doc => {
         const user = doc.data() as db.User;

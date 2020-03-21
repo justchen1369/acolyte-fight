@@ -36,7 +36,7 @@ export class PercentilesAccumulator {
 
     accept(user: db.User) {
         const userRating = accumulatorHelpers.getUserRating(user, this.category);
-        if (userRating) {
+        if (userRating && userRating.numGames >= constants.Placements.PercentilesMinGames) {
             const acoExposure = acoToExposure(userRating.aco);
             const bin = Math.ceil(acoExposure);
             this.frequency[bin] = (this.frequency[bin] || 0) + 1;

@@ -67,6 +67,9 @@ export namespace Placements {
 	export const Silver = 40;
 	export const Bronze = 20;
 	export const Wood = 0;
+
+	export const PercentilesMinGames = 100;
+	export const PercentilesMaxAgeDays = 180;
 }
 
 export namespace SpellFrequencies {

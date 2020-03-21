@@ -1,6 +1,8 @@
 import _ from 'lodash';
+import moment from 'moment';
 import wu from 'wu';
 import deferred from 'promise-defer';
+import * as Firestore from '@google-cloud/firestore';
 import * as db from '../storage/db.model';
 import * as g from '../server.model';
 import * as m from '../../shared/messages.model';
@@ -92,7 +94,8 @@ class UserAccumulator {
         const acoEstimationAccumulator = new acoEstimator.NumGamesToAcoAccumulator(m.GameCategory.PvP);
 
         let numUsers = 0;
-        await statsStorage.streamAllUserRatings(user => {
+        const cutoff = new Firestore.Timestamp(moment().subtract(constants.Placements.PercentilesMaxAgeDays, 'd').unix(), 0);
+        await statsStorage.streamAllUserRatingsAfter(cutoff, user => {
             populationAccumulator.accept(user);
             percentileAccumulator.accept(user);
             acoEstimationAccumulator.accept(user);
