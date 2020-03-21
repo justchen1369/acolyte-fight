@@ -20,6 +20,8 @@ const BotsExitAfterTicks = 2 * TicksPerSecond;
 const vectorZero = vector.zero();
 const vectorCenter = pl.Vec2(0.5, 0.5);
 
+const DefaultAttractable: AttractableParameters = {};
+
 interface BuffContext {
 	fromHeroId?: string;
 	spellId?: string;
@@ -779,7 +781,7 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		filterGroupIndex,
 		speed: projectileTemplate.speed,
 
-		attractable: projectileTemplate.attractable !== undefined ? projectileTemplate.attractable : true,
+		attractable: parseAttractable(projectileTemplate.attractable),
 		bumpable: projectileTemplate.bumpable,
 		conveyable: projectileTemplate.conveyable,
 		linkable: projectileTemplate.linkable,
@@ -869,6 +871,17 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 	}
 
 	return projectile;
+}
+
+function parseAttractable(attractable: AttractableTemplate): AttractableParameters {
+	if (typeof attractable === "boolean") {
+		return attractable ? DefaultAttractable : null;
+	} else if (typeof attractable === "object") {
+		return attractable;
+	} else {
+		// Default to attractable
+		return DefaultAttractable;
+	}
 }
 
 export function calculateScaling(heroId: string, world: w.World, scaling: boolean = false) {
@@ -3398,7 +3411,7 @@ function attract(attraction: w.AttractBehaviour, world: w.World) {
 				return;
 			} else if (!(obj.collideWith & attraction.collideLike)) {
 				return;
-			} else if (!(calculateAlliance(attraction.owner, obj.owner, world) & attraction.against)) {
+			} else if (!(obj.attractable.ignoreAlliance || calculateAlliance(attraction.owner, obj.owner, world) & attraction.against)) {
 				return;
 			}
 		}

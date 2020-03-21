@@ -758,7 +758,7 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	hit?: number;
 
 	speed: number;
-	attractable?: boolean;
+	attractable?: AttractableParameters;
 	linkable?: boolean;
 	bumpable?: boolean;
 	conveyable?: boolean;

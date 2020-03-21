@@ -2045,9 +2045,10 @@ const mines: Spell = {
         speed: 0.5,
         maxTicks: 4.5 * TicksPerSecond,
         minTicks: 1,
-        damage: 0,
+        damage: 12,
         lifeSteal,
         hitInterval: 30,
+        source: "mines",
 
         categories: Categories.Projectile,
         collideWith: Categories.Hero | Categories.Obstacle | Categories.Massive, // Passes through shield
@@ -2057,6 +2058,9 @@ const mines: Spell = {
         conveyable: true,
         destructible: {
         },
+        attractable: {
+            ignoreAlliance: true,
+        },
 
         partialDamage: {
             initialMultiplier: 0.001,
@@ -2064,8 +2068,18 @@ const mines: Spell = {
             step: true,
         },
 
+        buffs: [
+            {
+                type: "armor",
+                maxTicks: 15,
+                maxStacks: 1,
+                proportion: -0.5,
+                source: "mines",
+            }
+        ],
+
         detonate: {
-            damage: 12,
+            damage: 0,
             lifeSteal,
             radius: 0.015,
             minImpulse: 0.0001,

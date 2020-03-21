@@ -428,7 +428,7 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	speedDecayPerTick?: number; // if set, the projectile's speed will be corrected according to this proportion per tick if it becomes faster or slower due to collisions
 	restitution?: number; // 1 means very bouncy, 0 means not bouncy
 
-	attractable?: boolean; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
+	attractable?: AttractableTemplate; // Whether the "attract" behaviour (e.g. a whirlwind) can affect this projectile
 	swappable?: boolean; // Whether this projectile can be swapped with
 	bumpable?: boolean; // Whether this projectile gets knocked back by a bumper obstacle
 	conveyable?: boolean; // Whether this projectile is moved by a conveyor belt. (Collision flags must allow the projectile collide with obstacles to work.)
@@ -466,6 +466,12 @@ declare interface ProjectileTemplate extends DamagePacketTemplate {
 	renderers: RenderParams[]; // Which render function to use
 	sound?: string;
 	soundHit?: string;
+}
+
+declare type AttractableTemplate = boolean | AttractableParameters;
+
+declare interface AttractableParameters {
+	ignoreAlliance?: boolean;
 }
 
 declare interface DestructibleParameters {
