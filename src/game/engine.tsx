@@ -3998,20 +3998,26 @@ function applyLavaDamage(world: w.World) {
 	world.objects.forEach(obj => {
 		if (obj.category === "hero") {
 			if (!isInsideMap(obj, world)) {
+				let hasLavaImmunity = false;
+
 				let damageMultiplier = 1.0;
 				obj.buffs.forEach(buff => {
 					if (buff.type === "lavaImmunity") {
+						hasLavaImmunity = true;
 						damageMultiplier *= buff.damageProportion;
 					}
 				});
-				if (damageMultiplier > 0) {
-					const heroDamagePacket = {
-						...damagePacket,
-						damage: damagePacket.damage * damageMultiplier,
-						fromHeroId: calculateKnockbackFromId(obj, world),
-					};
-					applyDamage(obj, heroDamagePacket, world);
 
+				const maxDamage = damagePacket.damage * damageMultiplier;
+				const heroDamagePacket = {
+					...damagePacket,
+					damage: damagePacket.damage,
+					minHealth: obj.health - maxDamage, // Use minHealth so that damage still gets redirected to other enemies
+					fromHeroId: calculateKnockbackFromId(obj, world),
+				};
+				applyDamage(obj, heroDamagePacket, world);
+
+				if (!hasLavaImmunity) {
 					applyBuffsFrom(World.LavaBuffs, null, obj, world);
 				}
 			}
