@@ -151,7 +151,7 @@ setInterval(async () => {
 
 		auth.cleanupUserCache();
 		online.cleanupScoreboards();
-		matchmaking.cleanupRatings();
+		matchmaking.cleanup();
 	} catch (exception) {
 		logger.error(exception);
 	}

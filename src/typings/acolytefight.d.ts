@@ -130,6 +130,7 @@ declare interface MatchmakingSettings {
 
 	OddPenalty: number; // Discourage non-even splits by this proportion
 	SmallPenalty: number; // Discourage small games by this proportion
+	SamePenalty: number; // Discourage identical consecutive matchups by this proportion
 	TeamPenaltyPower: number; // Discourage teams of unbalanced skill (e.g. newbies and GMs) with this power
 }
 

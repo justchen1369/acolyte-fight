@@ -26,6 +26,7 @@ const Matchmaking: MatchmakingSettings = {
     RatingPower: 2,
     OddPenalty: 0.75,
     SmallPenalty: 0.5,
+    SamePenalty: 0.5,
     TeamPenaltyPower: 0,
 };
 

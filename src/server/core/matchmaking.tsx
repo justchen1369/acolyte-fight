@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import stringHash from 'string-hash';
 import wu from 'wu';
 import * as aco from './aco';
 import * as acoUpdater from '../ratings/acoUpdater';
@@ -14,7 +15,9 @@ import { getStore } from '../serverStore';
 import { logger } from '../status/logging';
 import TimedCache from '../../utils/timedCache';
 
+const BotSocketId = "Bot";
 const MatchmakingExpiryMilliseconds = 20 * 60 * 1000;
+const RepeatMatchupExpiryMilliseconds = 2 * 60 * 1000;
 
 export interface SocketTeam {
     socketId: string;
@@ -26,6 +29,10 @@ export interface RatedPlayer {
     aco: number;
 }
 
+interface Matchup {
+    teams: string[][]; // socketIds, grouped by team
+}
+
 interface SplitCandidate extends CandidateBase {
     type: "split";
     threshold: number;
@@ -33,6 +40,7 @@ interface SplitCandidate extends CandidateBase {
 }
 
 interface TeamPlayer {
+    socketId: string;
     heroId: string;
     aco: number;
     isBot?: boolean;
@@ -60,15 +68,17 @@ interface CandidateBase {
 }
 
 const matchmakingRatings = new TimedCache<string, number>(MatchmakingExpiryMilliseconds); // userId -> aco
+const previousMatchups = new TimedCache<string, number>(RepeatMatchupExpiryMilliseconds); // socketId -> matchup hash
 
 export function init() {
     games.attachFinishedGameListener(onGameFinished);
 }
 
-export function cleanupRatings() {
-    const cleaned = matchmakingRatings.cleanup();
-    if (cleaned > 0) {
-        logger.info(`Cleaned ${cleaned} matchmaking ratings`);
+export function cleanup() {
+    const cleanedRatings = matchmakingRatings.cleanup();
+    const cleanedMatchups = previousMatchups.cleanup();
+    if (cleanedRatings > 0 || cleanedMatchups > 0) {
+        logger.info(`Cleaned ${cleanedRatings} matchmaking ratings and ${cleanedMatchups} previous matchups`);
     }
 }
 
@@ -193,7 +203,8 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
         return game;
     }
 
-    const choice = chooseCandidate(candidates, game.matchmaking);
+    const previousHashes = findPreviousMatchHashes(game);
+    const choice = chooseCandidate(candidates, game.matchmaking, previousHashes);
     
     const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
     const forks = games.splitGame(game, splitSocketIds);
@@ -205,12 +216,12 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     return forks[index];
 }
 
-function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: MatchmakingSettings): T {
+function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: MatchmakingSettings, previousHashes: Set<number>): T {
     if (candidates.length <= 0) {
         return undefined;
     }
 
-    const weightings = candidates.map(candidate => weightCandidate(candidate, matchmaking));
+    const weightings = candidates.map(candidate => weightCandidate(candidate, matchmaking, previousHashes));
     const total = _(weightings).sum();
     const selector = total * Math.random();
 
@@ -226,7 +237,7 @@ function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: Matc
     return candidates[candidates.length - 1];
 }
 
-function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings): number {
+function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings, previousHashes: Set<number>): number {
     let weight = Math.pow(candidate.avgWinProbability, matchmaking.RatingPower);
 
     let numOdd = 0;
@@ -253,7 +264,19 @@ function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings)
     const largeAlpha = minSize / Math.max(1, matchmaking.MaxPlayers);
     weight *= 1 * largeAlpha + matchmaking.SmallPenalty * (1 - largeAlpha);
 
+    const numSame = countSameMatchups(candidate, previousHashes);
+    weight *= Math.pow(matchmaking.SamePenalty, numSame);
+
     return weight;
+}
+
+function findPreviousMatchHashes(game: g.Game): Set<number> {
+    return new Set<number>(wu(game.active.values()).map(p => previousMatchups.get(p.socketId)).filter(_.isNumber));
+}
+
+function countSameMatchups(candidate: Candidate, previousHashes: Set<number>): number {
+    const matchups = extractMatchups(candidate);
+    return matchups.filter(matchup => previousHashes.has(hashMatchup(matchup))).length;
 }
 
 function isOdd(value: number) {
@@ -462,6 +485,7 @@ function finalizeMatchmaking(initial: g.Game) {
 
     const Matchmaking = initial.matchmaking;
 
+    const previousHashes = findPreviousMatchHashes(initial);
     const queue = [initial];
     const allForks = new Array<g.Game>();
     while (queue.length > 0) {
@@ -482,7 +506,7 @@ function finalizeMatchmaking(initial: g.Game) {
             candidates.push(noopCandidate);
         }
 
-        const choice = chooseCandidate(candidates, initial.matchmaking);
+        const choice = chooseCandidate(candidates, initial.matchmaking, previousHashes);
 
         if (choice.type === "split") {
             const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
@@ -496,10 +520,31 @@ function finalizeMatchmaking(initial: g.Game) {
             });
         }
 
+        const matchups = extractMatchups(choice);
+        matchups.forEach(matchup => registerMatchup(matchup));
+
         logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.avgWinProbability)} -> ${formatCandidate(choice)}`);
     }
 
     games.emitForks(allForks);
+}
+
+function extractMatchups(choice: Candidate): Matchup[] {
+    if (choice.type === "split") {
+        return choice.splits.map(split => (
+            { teams: split.map(p => [p.socketId]) }
+        ));
+    } else if (choice.type === "teams") {
+        return [
+            { teams: choice.teams.map(team => team.map(p => p.socketId)) },
+        ];
+    } else if (choice.type === "noop") {
+        return [
+            { teams: choice.all.map(p => [p.socketId]) },
+        ];
+    } else {
+        return [];
+    }
 }
 
 function formatCandidate(choice: Candidate) {
@@ -608,11 +653,11 @@ function evaluateTeamCandidate(teams: TeamPlayer[][]): number {
 function extractTeamPlayers(game: g.Game): TeamPlayer[] {
     const teamPlayers = new Array<TeamPlayer>();
     game.active.forEach(player => {
-        teamPlayers.push({ heroId: player.heroId, aco: player.aco });
+        teamPlayers.push({ heroId: player.heroId, aco: player.aco, socketId: player.socketId });
     });
     if (game.matchmaking.AllowBotTeams) {
         game.bots.forEach((socketId, heroId) => {
-            teamPlayers.push({ heroId, aco: game.matchmaking.BotRating, isBot: true });
+            teamPlayers.push({ heroId, aco: game.matchmaking.BotRating, socketId: BotSocketId, isBot: true });
         });
     }
 
@@ -632,4 +677,22 @@ function calculatePotentialNumTeams(numPlayers: number, allowUneven: boolean = f
     } else {
         return [];
     }
+}
+
+function registerMatchup(matchup: Matchup) {
+    const allSocketIds = _.flatten(matchup.teams);
+    const matchHash = hashMatchup(matchup);
+    for (const socketId of allSocketIds) {
+        if (socketId !== BotSocketId) {
+            previousMatchups.set(socketId, matchHash);
+        }
+    }
+}
+
+function matchupKey(matchup: Matchup) {
+    return matchup.teams.map(t => [...t].sort().join(' ')).sort().join('|');
+}
+
+function hashMatchup(matchup: Matchup) {
+    return stringHash(matchupKey(matchup));
 }

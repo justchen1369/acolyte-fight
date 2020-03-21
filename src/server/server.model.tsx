@@ -99,6 +99,8 @@ export interface Player {
 
     controlKey: number;
     numActionMessages: number;
+
+    previousMatching?: number; // matchmakerHash
 }
 
 export interface Observer {
