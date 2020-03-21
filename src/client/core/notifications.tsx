@@ -69,16 +69,21 @@ function notificationCleanup() {
 }
 
 function onNotification(newNotifications: w.Notification[]) {
-    if (newNotifications.some(n => n.type === "closing" && n.ticksUntilClose <= 0)) {
-        onGameStarted();
+    if (newNotifications.some(n => n.type === "ratingAdjustment")) {
+        onRatingAdjustmentNotification();
     }
 }
 
-function onGameStarted() {
-    // Remove rating adjustment message when game starts
+function onRatingAdjustmentNotification() {
     const store = StoreProvider.getState();
-    const items = store.items.filter(item => item.notification.type !== "ratingAdjustment");
-    if (items.length < store.items.length) {
-        StoreProvider.dispatch({ type: "updateNotifications", items });
+
+    // Only keep the last rating adjustment
+    const ratingAdjustments = store.items.filter(item => item.notification.type === "ratingAdjustment");
+    if (ratingAdjustments.length <= 1) {
+        return;
     }
+    const newItems = store.items.filter(item => item.notification.type !== "ratingAdjustment");
+    newItems.push(ratingAdjustments[ratingAdjustments.length - 1]);
+
+    StoreProvider.dispatch({ type: "updateNotifications", items: newItems });
 }
