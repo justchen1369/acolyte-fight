@@ -35,7 +35,6 @@ interface Matchup {
 
 interface SplitCandidate extends CandidateBase {
     type: "split";
-    threshold: number;
     splits: RatedPlayer[][];
 }
 
@@ -291,73 +290,85 @@ function extractSplitRatings(game: g.Game, newPlayers?: RatedPlayer[]) {
     return _.orderBy(ratings, p => p.aco);
 }
 
-function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[], weight: number = 1): SplitCandidate[] {
-    const ratings = extractSplitRatings(game, newPlayers);
-    return generateSubSplitCandidates([ratings], weight);
-}
+function generateSplitCandidates(game: g.Game, newPlayers?: RatedPlayer[]): SplitCandidate[] {
+    const MaxCandidates = 5; // If the max players is modded, don't increase search beyond this limit
 
-function generateSubSplitCandidates(partitions: RatedPlayer[][], weight: number = 1): SplitCandidate[] {
-    const minPlayers = 2;
-    const maxCandidates = 5; // If the max players is modded, don't increase search beyond this limit
+    const ratings = extractSplitRatings(game, newPlayers);
+
+    const splitCandidatesWeight = 1.0 / 2; // Half weight because we generate twice as many options, so don't artificially increase chance of a split
 
     const candidates = new Array<SplitCandidate>();
-
-    for (let partition = 0; partition < partitions.length; ++partition) {
-        const sortedRatings = _.orderBy(partitions[partition], p => p.aco);
-
-        let start = minPlayers;
-        let end = sortedRatings.length - minPlayers;
-        if (end < start) {
-            continue;
-        }
-
-        // Find best split
-        let maxDistance = 0;
-        let bestSplit = start;
-        for (let i = start; i <= end; ++i) {
-            const splitDistance = sortedRatings[i].aco - sortedRatings[i-1].aco;
-            if (splitDistance > maxDistance) {
-                maxDistance = splitDistance;
-                bestSplit = i;
-            }
-        }
-        
-        // Search around the best split
-        const searchRadius = Math.floor(maxCandidates / 2);
-        start = Math.max(start, bestSplit - searchRadius);
-        end = Math.min(end, bestSplit + searchRadius);
-
-        const otherPartitions = [...partitions];
-        otherPartitions.splice(partition, 1);
-
-        for (let i = start; i <= end; ++i) {
-            const splits = [
-                ...otherPartitions,
-                sortedRatings.slice(0, i),
-                sortedRatings.slice(i),
-            ];
-
-            let total = 0;
-            let count = 0;
-            for (let j = 0; j < splits.length; ++j) {
-                const split = splits[j];
-                const winProbability = evaluateWinProbability(split.map(p => p.aco));
-                total += split.length * winProbability;
-                count += split.length;
-            }
-            const avgWinProbability = count > 0 ? total / count : 0;
-
-            candidates.push({
-                type: "split",
-                threshold: sortedRatings[i].aco,
-                splits,
-                avgWinProbability,
-                weight,
-            });
-        }
-
-    }
+    candidates.push(...generateSortedSplitCandidates(ratings, MaxCandidates, splitCandidatesWeight));
+    candidates.push(...generateRandomSplitCandidates(ratings, MaxCandidates, splitCandidatesWeight));
     return candidates;
+}
+
+function generateSortedSplitCandidates(unsortedRatings: RatedPlayer[], maxCandidates: number, weight: number = 1): SplitCandidate[] {
+    const sortedRatings = _.orderBy(unsortedRatings, p => p.aco);
+
+    // Find best split
+    let maxDistance = 0;
+    let bestSplit = 0;
+    for (let i = 1; i < sortedRatings.length; ++i) {
+        const splitDistance = sortedRatings[i].aco - sortedRatings[i-1].aco;
+        if (splitDistance > maxDistance) {
+            maxDistance = splitDistance;
+            bestSplit = i;
+        }
+    }
+
+    return generateSplitCandidatesAround(sortedRatings, bestSplit, maxCandidates, weight);
+}
+
+function generateRandomSplitCandidates(unsortedRatings: RatedPlayer[], maxCandidates: number, weight: number = 1): SplitCandidate[] {
+    const shuffledRatings = _.shuffle(unsortedRatings);
+    const splitIndex = Math.floor(unsortedRatings.length / 2); // Start splitting in the middle
+    return generateSplitCandidatesAround(shuffledRatings, splitIndex, maxCandidates, weight);
+}
+
+function generateSplitCandidatesAround(ratings: RatedPlayer[], splitIndex: number, maxCandidates: number, weight: number = 1): SplitCandidate[] {
+    const MinPlayers = 2;
+
+    let start = MinPlayers;
+    let end = ratings.length - MinPlayers;
+    if (end < start) {
+        return [];
+    }
+    
+    // Search around the split index
+    const searchRadius = Math.floor(maxCandidates / 2);
+    start = Math.max(start, splitIndex - searchRadius);
+    end = Math.min(end, splitIndex + searchRadius);
+
+    const candidates = new Array<SplitCandidate>();
+    for (let i = start; i <= end; ++i) {
+        const splits = [
+            ratings.slice(0, i),
+            ratings.slice(i),
+        ];
+
+        candidates.push({
+            type: "split",
+            splits,
+            avgWinProbability: evaluateAvgWinProbability(splits),
+            weight,
+        });
+    }
+
+    return candidates;
+}
+
+function evaluateAvgWinProbability(splits: RatedPlayer[][]) {
+    let total = 0;
+    let count = 0;
+    for (let j = 0; j < splits.length; ++j) {
+        const split = splits[j];
+        const winProbability = evaluateWinProbability(split.map(p => p.aco));
+        total += split.length * winProbability;
+        count += split.length;
+    }
+    const avgWinProbability = count > 0 ? total / count : 0;
+    return avgWinProbability;
 }
 
 function evaluateWinProbability(acoList: number[]) {
