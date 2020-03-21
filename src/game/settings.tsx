@@ -2165,8 +2165,8 @@ const iceBomb: Spell = {
                 categories: Categories.Projectile | Categories.Obstacle | Categories.Massive,
                 against: Alliances.NotFriendly,
                 radius: 0.03,
-                accelerationPerTick: -0.01,
-                maxSpeed: 0.2,
+                "accelerationPerTick": -0.015,
+                "maxSpeed": 0.4
             },
         ],
 
