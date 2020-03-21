@@ -2768,7 +2768,7 @@ const blaze: Spell = {
     speed: 0.8,
     followCursor: true,
     damageTemplate: {
-        damage: 12,
+        damage: 16,
         lifeSteal,
     },
     buffs: [
