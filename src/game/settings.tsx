@@ -334,7 +334,7 @@ const fireball: Spell = {
         radius: 0.003,
         speed: 0.6,
         maxTicks: 1.5 * TicksPerSecond,
-        damage: 18,
+        damage: 16,
         lifeSteal,
         categories: Categories.Projectile,
 
