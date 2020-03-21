@@ -579,7 +579,7 @@ const firespray: Spell = {
         radius: 0.002,
         speed: 0.5,
         maxTicks: 12,
-        damage: 5,
+        damage: 4,
         lifeSteal,
 
         color: '#ff0044',
