@@ -70,7 +70,7 @@ const World: WorldSettings = {
             type: "cooldown",
             spellIds: recoverySpellIds,
             maxTicks: 20,
-            cooldownRate: 2,
+            cooldownRateModifier: 1,
         },
     ],
 
@@ -2531,7 +2531,7 @@ const shield: Spell = {
 const phaseOut: Spell = {
     id: 'phaseOut',
     name: 'Phase Shift',
-    description: "Hold down the button to disappear from the world for up to 0.75 seconds. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cancels all knockback.",
+    description: "Hold down the button to disappear from the world for up to 0.75 seconds. While phased shifted, you cannot be hurt, but you also cannot cast spells. Phase shift also cancels all knockback. Phase shift takes longer to cooldown the longer you stay in phase shift.",
 
     untargeted: true,
     maxAngleDiffInRevs: 1.0,
@@ -2539,7 +2539,7 @@ const phaseOut: Spell = {
     throttle: false,
     unlink: true,
 
-    interruptibleAfterTicks: 0.25 * TicksPerSecond,
+    interruptibleAfterTicks: 6,
     maxChannellingTicks: 0.75 * TicksPerSecond,
     release: {
         interrupt: true,
@@ -2547,6 +2547,14 @@ const phaseOut: Spell = {
     },
 
     buffs: [
+        {
+            type: "cooldown",
+            channelling: true,
+            cleansable: false,
+            maxTicks: 1 * TicksPerSecond,
+            spellId: "phaseOut",
+            cooldownRateModifier: -6,
+        },
         {
             type: "mass",
             channelling: true,

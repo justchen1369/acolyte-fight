@@ -5123,7 +5123,7 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 	}
 
 	// Apply cooldown rate buff
-	const cooldownRate = template.cooldownRate !== undefined ? template.cooldownRate : 1;
+	const cooldownRateModifier = template.cooldownRateModifier || 0;
 	attachStack<w.CooldownBuff>(
 		template, hero, world, config,
 		(id: string, values: w.BuffValues) => ({ // Create
@@ -5132,10 +5132,10 @@ function attachSilence(template: SetCooldownTemplate, hero: w.Hero, world: w.Wor
 			type: "cooldown",
 			spellIds,
 			notSpellIds,
-			cooldownRate,
+			cooldownRateModifier,
 		}),
 		(stack) => { // Update
-			stack.cooldownRate *= cooldownRate;
+			stack.cooldownRateModifier += cooldownRateModifier;
 		});
 	updateSilence(hero);
 
@@ -5182,7 +5182,7 @@ function updateSilence(hero: w.Hero) {
 				&& (!buff.spellIds || buff.spellIds.has(spellId))
 				&& (!buff.notSpellIds || !buff.notSpellIds.has(spellId))) {
 
-				cooldownRate *= buff.cooldownRate;
+				cooldownRate += buff.cooldownRateModifier;
 			}
 		});
 		cooldownRates[spellId] = cooldownRate;

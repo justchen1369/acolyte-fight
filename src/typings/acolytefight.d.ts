@@ -899,7 +899,7 @@ declare interface SetCooldownTemplate extends BuffTemplateBase {
 	minCooldown?: number;
 	maxCooldown?: number;
 	adjustCooldown?: number; // Add or subtract cooldown
-	cooldownRate?: number; // Whether cooldown ticks faster or slower
+	cooldownRateModifier?: number; // Positive for faster, negative for slower
 	color?: string;
 }
 
