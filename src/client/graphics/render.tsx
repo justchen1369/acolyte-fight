@@ -1418,7 +1418,7 @@ function particleVelocity(primaryVelocity: pl.Vec2, config?: RenderSmoke, multip
 
 	let speed = 0;
 
-	if (axisMultiplier) {
+	if (axisMultiplier && primaryVelocity) {
 		speed += axisMultiplier * Math.random() * vector.dot(velocity, primaryVelocity); // can be negative
 	}
 

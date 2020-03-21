@@ -1660,7 +1660,7 @@ const drain: Spell = {
 const renderGravity: RenderSwirl = {
     type: "swirl",
 
-    color: '#0ace00',
+    color: '#0ace00cc',
     radius: 0.02,
     ticks: 0.25 * TicksPerSecond,
 
@@ -1673,6 +1673,11 @@ const renderGravity: RenderSwirl = {
     shine: 0.4,
     vanish: 0.5,
     bloom: 0.04,
+
+    smoke: {
+        axisMultiplier: 0.3,
+        isotropicSpeed: 0.07,
+    },
 };
 const gravity: Spell = {
     id: 'gravity',
