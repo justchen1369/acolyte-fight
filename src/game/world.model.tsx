@@ -900,6 +900,7 @@ export interface CollideBehaviour extends BehaviourBase {
 	collideWith: number;
 	against: number;
 
+	afterTicks: number;
 	collideTick?: number;
 }
 

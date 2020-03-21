@@ -943,22 +943,23 @@ function instantiateProjectileBehaviours(templates: BehaviourTemplate[], project
 				afterTick: world.tick + waitTicks,
 				delayed: behaviour,
 			};
-		} else if(trigger.afterTicks) {
-			behaviour = {
-				type: "delayBehaviour",
-				afterTick: world.tick + (trigger.afterTicks || 0),
-				delayed: behaviour,
-			};
 		} else if (trigger.collideWith) {
 			const collider: w.CollideBehaviour = {
 				type: "collideBehaviour",
 				objId: projectile.id,
 				collideWith: trigger.collideWith,
 				against: trigger.against !== undefined ? trigger.against: Alliances.All,
+				afterTicks: trigger.afterTicks || 0,
 				delayed: behaviour,
 			};
 			addCollider(projectile, collider);
 			behaviour = collider;
+		} else if (trigger.afterTicks) {
+			behaviour = {
+				type: "delayBehaviour",
+				afterTick: world.tick + (trigger.afterTicks || 0),
+				delayed: behaviour,
+			};
 		} else {
 			throw "Unknown behaviour trigger: " + trigger;
 		}
@@ -1224,9 +1225,14 @@ function collideBehaviour(behaviour: w.CollideBehaviour, world: w.World) {
 	}
 
 	if (behaviour.collideTick) {
-		world.behaviours.push(behaviour.delayed);
 		removeCollider(obj, behaviour);
-		return false;
+
+		if (world.tick >= behaviour.collideTick + behaviour.afterTicks) {
+			world.behaviours.push(behaviour.delayed);
+			return false;
+		} else {
+			return true;
+		}
 	} else {
 		return true;
 	}
