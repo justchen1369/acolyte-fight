@@ -1248,12 +1248,13 @@ const whip: Spell = {
             movementProportion: 1.2,
             render: {
                 color: "#8800ff",
+                "alpha": 0.2,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius,
                 shine: 0.5,
-                glow: 0.3,
+                glow: 1,
                 bloom: 0.03,
                 vanish: 1,
                 decay: true,
@@ -1840,7 +1841,7 @@ const whirlwind: Spell = {
         sound: "whirlwind",
         color: "#44ffff",
         renderers: [
-            { type: "bloom", radius: 0.05, glow: 0.4 },
+            { type: "bloom", radius: 0.05 },
             {
                 type: "swirl",
 
@@ -1971,12 +1972,13 @@ const halo: Spell = {
 
             render: {
                 color: "#8800ff",
+                alpha: 0.2,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius,
                 shine: 0.5,
-                glow: 0.3,
+                glow: 1,
                 vanish: 1,
                 decay: true,
             },

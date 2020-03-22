@@ -136,17 +136,20 @@ export const Sounds: Sounds = {
     "voidRush-lavaImmunity": {
         "start": [
             {
-                "volume": 0.25,
+                "volume": 0.2,
                 "stopTime": 2.5,
-                "attack": 0.25,
-                "decay": 2.25,
-                "startFreq": 60,
-                "stopFreq": 70,
+                "attack": 0.5,
+                "decay": 2,
+                "startFreq": 30,
+                "stopFreq": 30,
                 "highPass": 40,
                 "wave": "sine",
+                "tremoloFreq": 60,
+                "tremoloStrength": 0.4,
                 "ratios": [
                     1,
-                    1.5
+                    2,
+                    3
                 ]
             },
             {
@@ -154,8 +157,8 @@ export const Sounds: Sounds = {
                 "stopTime": 2.5,
                 "attack": 0.25,
                 "decay": 2.25,
-                "highPass": 980,
-                "lowPass": 1000,
+                "highPass": 960,
+                "lowPass": 960,
                 "wave": "brown-noise"
             }
         ]

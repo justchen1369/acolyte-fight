@@ -215,10 +215,11 @@ export const fast: ObstacleTemplate = {
             movementProportion: 1.5,
             render: {
                 color: "rgba(255, 255, 255, 1)",
+                alpha: 0.2,
                 heroColor: true,
                 ticks: 30,
                 shine: 0.5,
-                glow: 0.1,
+                glow: 1,
                 bloom: 0.03,
                 vanish: 1,
                 emissionRadiusFactor: 0,
