@@ -32,6 +32,8 @@ const DefaultShine = 0.5;
 const DefaultGlow = 0.3;
 const DefaultLight = 0.8;
 
+const LightFlashProportion = 0.5;
+
 const DefaultCastingGlow = 0.1;
 
 const ShadowOffset = pl.Vec2(0, 0.005);
@@ -2459,7 +2461,9 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
 		if (highlightProportion > 0) {
 			if (trail.highlight.flash) {
-				color = color.lighten(highlightProportion);
+				let flashProportion = highlightProportion;
+				if (light) { flashProportion *= LightFlashProportion; }
+				color = color.lighten(flashProportion);
 			}
 			if (trail.highlight.growth) {
 				scale = 1 + trail.highlight.growth * highlightProportion;
