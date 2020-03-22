@@ -620,6 +620,7 @@ function renderDetonate(ctxStack: CanvasCtxStack, ev: w.DetonateEvent, world: w.
 		pos: ev.pos,
 		fillStyle: 'white',
 		radius: ev.radius,
+		light: null,
 		glow: DefaultGlow,
 		bloom: DefaultBloomRadius,
 	}, world);
@@ -655,6 +656,7 @@ function renderTeleport(ctxStack: CanvasCtxStack, ev: w.TeleportEvent, world: w.
 				fillStyle: color,
 				shine: DefaultShine,
 				glow: DefaultGlow,
+				light: null,
 				vanish: 1,
 				bloom: 0.05,
 
