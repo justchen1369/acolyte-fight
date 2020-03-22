@@ -166,7 +166,7 @@ export const slow: ObstacleTemplate = {
                 particleRadius: 0.01,
                 shine: 0.2,
                 glow: 0.7,
-                bloom: 0.03,
+                bloom: 0,
                 vanish: 1,
             },
         },
