@@ -2877,7 +2877,7 @@ const blaze: Spell = {
         renderers: [
             { type: "bloom", ownerColor: true, radius: 0.015 },
             { type: "projectile", ticks: 10, radiusMultiplier: 0.5, smoke: { isotropicSpeed: 0.15 }, vanish: 1, ownerColor: true },
-            { type: "strike", ticks: 30, flash: true },
+            { type: "strike", ticks: 30, flash: true, detonate: 0.01 },
         ],
     },
 };
