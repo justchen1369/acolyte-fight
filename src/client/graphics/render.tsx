@@ -2230,6 +2230,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 			radius: strike.detonate,
 			bloom: DefaultBloomRadius,
 			glow: DefaultGlow,
+			light: null, // never add explosions - too bright
 		}, world);
 	}
 }
