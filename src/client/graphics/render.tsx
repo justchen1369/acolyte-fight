@@ -30,6 +30,7 @@ const DefaultParticleBloomRadius = 0.015;
 
 const DefaultShine = 0.5;
 const DefaultGlow = 0.3;
+const DefaultLight = 0.8;
 
 const DefaultCastingGlow = 0.1;
 
@@ -1072,6 +1073,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		initialTick: world.tick,
 		max: smoke.ticks,
 		fillStyle: smoke.color,
+		light: smoke.light !== undefined ? smoke.light : null,
 		shine: smoke.shine,
 		fade: smoke.fade,
 		glow: smoke.glow,
@@ -1384,6 +1386,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 			initialTick: world.tick,
 			max: render.ticks,
 			fillStyle: color,
+			light: render.light !== undefined ? render.light : null,
 			glow: render.glow,
 			shine: render.shine,
 			fade: render.fade,
@@ -1739,22 +1742,22 @@ function renderHeroBars(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec2, wo
 		const barShine = pl.Vec2(barLeft.x + shineProportion * 2 * barHalfWidth, barY);
 		const barRight = pl.Vec2(pos.x + barHalfWidth, barY);
 
-		glx.lineTrail(ctxStack, pl.Vec2(barLeft.x - constants.Pixel, barLeft.y), pl.Vec2(barRight.x + constants.Pixel, barRight.y), {
+		glx.lineSwatch(ctxStack, pl.Vec2(barLeft.x - constants.Pixel, barLeft.y), pl.Vec2(barRight.x + constants.Pixel, barRight.y), {
 			color: ColTuple.parse("#111"),
 			maxRadius: barHalfHeight + 2 * constants.Pixel,
 		});
-		glx.lineTrail(ctxStack, barLeft, barMid, {
+		glx.lineSwatch(ctxStack, barLeft, barMid, {
 			color,
 			maxRadius: barHalfHeight,
 		});
 
 		if (barShine > barMid) {
-			glx.lineTrail(ctxStack, barMid, barShine, {
+			glx.lineSwatch(ctxStack, barMid, barShine, {
 				color: ColTuple.parse("#ccc"),
 				maxRadius: barHalfHeight,
 			});
 		} else {
-			glx.lineTrail(ctxStack, barShine, barMid, {
+			glx.lineSwatch(ctxStack, barShine, barMid, {
 				color: color.clone().darken(0.5),
 				maxRadius: barHalfHeight,
 			});
@@ -2091,6 +2094,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			glow: swirl.glow !== undefined ? swirl.glow : DefaultGlow,
 			vanish: swirl.vanish,
 			fade: swirl.fade,
+			light: swirl.light,
 			tag: context.tag,
 		}, world);
 	}
@@ -2159,12 +2163,17 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 		};
 	}
 
-	glx.circleTrail(ctxStack, pos, {
+	const fill: r.TrailFill = {
 		color,
 		minRadius: reticule.minRadius * proportion,
 		maxRadius: reticule.radius * proportion,
 		feather,
-	});
+	};
+	if (reticule.light) {
+		glx.circleTrail(ctxStack, pos, fill);
+	} else {
+		glx.circleSolid(ctxStack, pos, fill);
+	}
 }
 
 function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, strike: RenderStrike) {
@@ -2194,6 +2203,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				glow: strike.particleGlow !== undefined ? strike.particleGlow : DefaultGlow,
 				shine: strike.particleShine,
 				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultParticleBloomRadius,
+				light: strike.light,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -2256,7 +2266,11 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 
 	const from = owner.body.getPosition();
 	const to = target.body.getPosition();
-	glx.lineTrail(ctxStack, from, to, fromFill, toFill);
+	if (render.light) {
+		glx.lineTrail(ctxStack, from, to, fromFill, toFill);
+	} else {
+		glx.lineSolid(ctxStack, from, to, fromFill, toFill);
+	}
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -2277,6 +2291,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				from: previous,
 				to: pos,
 				fillStyle: projectileColor(render, projectile, world),
+				light: render.light,
 				shine: render.shine !== undefined ? render.shine : DefaultShine,
 				fade: render.fade,
 				vanish: render.vanish,
@@ -2309,6 +2324,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 			pos,
 			velocity,
 			fillStyle: projectileColor(render, projectile, world),
+			light: render.light,
 			shine: render.shine !== undefined ? render.shine : DefaultShine,
 			fade: render.fade,
 			radius: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
@@ -2340,6 +2356,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		angle,
 		velocity,
 		fillStyle: projectileColor(render, projectile, world),
+		light: render.light,
 		fade: render.fade,
 		extent: projectileRadiusMultiplier(projectile, world, render) * projectile.radius,
 		shine: render.shine !== undefined ? render.shine : DefaultShine,
@@ -2414,6 +2431,9 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		color.fade(trail.vanish * (1 - proportion));
 	}
 
+	const light = parseLight(trail.light, ctxStack.rtx);
+	applyLight(light, color);
+
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
@@ -2448,11 +2468,12 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const radius = scale * proportion * trail.radius;
 
-		glx.circleTrail(ctxStack, pos, {
-			color,
-			maxRadius: radius,
-			feather,
-		});
+		const fill: r.TrailFill = { color, maxRadius: radius, feather };
+		if (light) {
+			glx.circleTrail(ctxStack, pos, fill);
+		} else {
+			glx.circleSolid(ctxStack, pos, fill);
+		}
 	} else if (trail.type === "polygon") {
 		let pos = trail.pos;
 		if (trail.velocity) {
@@ -2462,39 +2483,56 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const extent = scale * proportion * trail.extent;
 
-		glx.convexTrail(ctxStack, pos, trail.points, trail.angle, extent, {
-			color,
-			maxRadius: extent,
-			feather,
-		});
+		const fill: r.TrailFill = { color, maxRadius: extent, feather };
+		if (light) {
+			glx.convexTrail(ctxStack, pos, trail.points, trail.angle, extent, fill);
+		} else {
+			glx.convexSolid(ctxStack, pos, trail.points, trail.angle, extent, fill);
+		}
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
 
-		glx.lineTrail(ctxStack, trail.from, trail.to, {
-			color,
-			minRadius: 0,
-			maxRadius: lineWidth / 2,
-			feather,
-		});
+		const fill: r.TrailFill = { color, minRadius: 0, maxRadius: lineWidth / 2, feather };
+		if (trail.light) {
+			glx.lineTrail(ctxStack, trail.from, trail.to, fill);
+		} else {
+			glx.lineSolid(ctxStack, trail.from, trail.to, fill);
+		}
 	} else if (trail.type === "ripple") {
 		const maxRadius = trail.initialRadius * proportion + trail.finalRadius * (1 - proportion);
 		const minRadius = maxRadius * (1 - proportion);
-		glx.circleTrail(ctxStack, trail.pos, {
-			color,
-			minRadius,
-			maxRadius,
-			feather,
-		});
+		const fill: r.TrailFill = { color, minRadius, maxRadius, feather };
+		if (trail.light) {
+			glx.circleTrail(ctxStack, trail.pos, fill);
+		} else {
+			glx.circleSolid(ctxStack, trail.pos, fill);
+		}
 	} else if (trail.type === "arc") {
-		glx.arcTrail(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, {
-			color,
-			minRadius: trail.minRadius,
-			maxRadius: trail.maxRadius,
-			feather: feather,
-		});
+		const fill: r.TrailFill = { color, minRadius: trail.minRadius, maxRadius: trail.maxRadius, feather: feather };
+		if (trail.light) {
+			glx.arcTrail(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill);
+		} else {
+			glx.arcSolid(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill);
+		}
 	}
 
 	return false;
+}
+
+function parseLight(input: number, rtx: number): number | null {
+	if (input !== undefined) {
+		return input;
+	} else if (rtx > r.GraphicsLevel.Low) {
+		return DefaultLight;
+	} else {
+		return null;
+	}
+}
+
+function applyLight(light: number, color: ColTuple) {
+	if (typeof light === 'number') {
+		color.fade(1 - light);
+	}
 }
 
 function calculateHighlightProportion(highlight: w.TrailHighlight, world: w.World) {

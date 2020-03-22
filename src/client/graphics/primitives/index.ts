@@ -71,6 +71,10 @@ function getSwatches(ctxStack: r.CanvasCtxStack) {
 	return shaders.getContext(ctxStack.gl).data.swatches;
 }
 
+function getSolids(ctxStack: r.CanvasCtxStack) {
+	return shaders.getContext(ctxStack.gl).data.solids;
+}
+
 function getTrails(ctxStack: r.CanvasCtxStack) {
 	return shaders.getContext(ctxStack.gl).data.trails;
 }
@@ -123,6 +127,9 @@ function circle(ctxStack: r.CanvasCtxStack, primitives: r.DrawPrimitivesData, po
 export function circleSwatch(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.TrailFill) {
 	circle(ctxStack, getSwatches(ctxStack), pos, fill);
 }
+export function circleSolid(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.TrailFill) {
+	circle(ctxStack, getSolids(ctxStack), pos, fill);
+}
 export function circleTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, fill: r.TrailFill) {
 	circle(ctxStack, getTrails(ctxStack), pos, fill);
 }
@@ -147,6 +154,9 @@ function line(ctxStack: r.CanvasCtxStack, primitives: r.DrawPrimitivesData, from
 
 export function lineSwatch(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.TrailFill, toFill: r.TrailFill = fromFill) {
 	line(ctxStack, getSwatches(ctxStack), from, to, fromFill, toFill);
+}
+export function lineSolid(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.TrailFill, toFill: r.TrailFill = fromFill) {
+	line(ctxStack, getSolids(ctxStack), from, to, fromFill, toFill);
 }
 export function lineTrail(ctxStack: r.CanvasCtxStack, from: pl.Vec2, to: pl.Vec2, fromFill: r.TrailFill, toFill: r.TrailFill = fromFill) {
 	line(ctxStack, getTrails(ctxStack), from, to, fromFill, toFill);
@@ -186,6 +196,9 @@ function arc(ctxStack: r.CanvasCtxStack, primitives: r.DrawPrimitivesData, pos: 
 export function arcSwatch(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.TrailFill) {
 	arc(ctxStack, getSwatches(ctxStack), pos, angle1, angle2, antiClockwise, fill);
 }
+export function arcSolid(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.TrailFill) {
+	arc(ctxStack, getSolids(ctxStack), pos, angle1, angle2, antiClockwise, fill);
+}
 export function arcTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, angle1: number, angle2: number, antiClockwise: boolean, fill: r.TrailFill) {
 	arc(ctxStack, getTrails(ctxStack), pos, angle1, angle2, antiClockwise, fill);
 }
@@ -209,6 +222,9 @@ function convex(ctxStack: r.CanvasCtxStack, primitives: r.DrawPrimitivesData, po
 
 export function convexSwatch(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.TrailFill) {
 	convex(ctxStack, getSwatches(ctxStack), pos, points, rotate, scale, fill);
+}
+export function convexSolid(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.TrailFill) {
+	convex(ctxStack, getSolids(ctxStack), pos, points, rotate, scale, fill);
 }
 export function convexTrail(ctxStack: r.CanvasCtxStack, pos: pl.Vec2, points: pl.Vec2[], rotate: number, scale: number, fill: r.TrailFill) {
 	convex(ctxStack, getTrails(ctxStack), pos, points, rotate, scale, fill);

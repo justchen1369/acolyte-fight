@@ -11,6 +11,7 @@ export { hero } from './heroes';
 export { image } from './images';
 export { uploadTexture } from './textures';
 export { circleSwatch, lineSwatch, arcSwatch, convexSwatch } from './primitives';
+export { circleSolid, lineSolid, arcSolid, convexSolid } from './primitives';
 export { circleTrail, lineTrail, arcTrail, convexTrail } from './primitives';
 export { circlePlate, convexPlate } from './plates';
 
@@ -39,10 +40,16 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 		u_tick: [ctxStack.tick],
 	};
 
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	runProgram(context, context.plates, uniforms, context.data.plates);
 	runProgram(context, context.swatches, uniforms, context.data.swatches);
 	runProgram(context, context.heroes, uniforms, context.data.heroes);
+	runProgram(context, context.solids, uniforms, context.data.solids);
+
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
 	runProgram(context, context.trails, uniforms, context.data.trails);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
 	runProgram(context, context.images, uniforms, context.data.images);
 }
 
@@ -163,12 +170,14 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		swatches: primitives.initPrimitives(gl),
 		heroes: heroes.initHeroes(gl),
 		images: images.initImages(gl),
+		solids: primitives.initPrimitives(gl),
 		trails: primitives.initPrimitives(gl),
 		data: {
 			plates: plates.initData(),
 			swatches: primitives.initData(),
 			heroes: heroes.initData(),
 			images: images.initData(),
+			solids: primitives.initData(),
 			trails: primitives.initData(),
 		},
 	};
@@ -181,5 +190,6 @@ export function clearGl(ctxStack: r.CanvasCtxStack) {
 	primitives.clearData(context.data.swatches);
 	heroes.clearData(context.data.heroes);
 	images.clearData(context.data.images);
+	primitives.clearData(context.data.solids);
 	primitives.clearData(context.data.trails);
 }

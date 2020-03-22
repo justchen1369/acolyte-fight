@@ -207,6 +207,7 @@ declare interface SwatchSmoke {
 	color: string;
 	particleRadius: number;
 
+	light?: number;
 	shine?: number;
 	fade?: string;
 	glow?: number;
@@ -678,6 +679,7 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	intermediatePoints?: boolean; // A ray might be so fast that we need to render the subtick that it made contact, otherwise it doesn't look like it touched the other object at all
 
 	ticks: number; // How long is the trail?
+	light?: number; // Render additively
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // How much radius to give the bloom
 	shine?: number; // Lighten the trail initially
@@ -691,6 +693,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	type: "projectile";
 
 	ticks: number; // How long is the trail?
+	light?: number; // Render additively
 	fade?: string;
 	vanish?: number;
 	smoke?: RenderSmoke;
@@ -709,6 +712,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	numPoints: number;
 	ticks: number;
 	revolutionInterval: number;
+	light?: number; // Render additively
 	fade?: string;
 	vanish?: number;
 	smoke?: RenderSmoke;
@@ -731,6 +735,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	numParticles: number;
 	particleRadius: number;
 
+	light?: number; // Render additively
 	shine?: number;
 	smoke?: RenderSmoke;
 	fade?: string;
@@ -743,6 +748,7 @@ declare interface RenderLink extends RenderParamsBase {
 	type: "link";
 	color: string;
 	width: number;
+	light?: boolean; // Render additively
 	toWidth?: number;
 	shine?: number;
 	glow?: number;
@@ -755,6 +761,7 @@ declare interface RenderReticule extends RenderParamsBase {
 	color: string;
 	remainingTicks?: number; // Only display when this many ticks remaining
 	shrinkTicks?: number;
+	light?: boolean;
 	grow?: boolean;
 	shine?: number;
 	fade?: boolean;
@@ -772,6 +779,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams, 
 	ticks: number;
 
 	detonate?: number; // Render an explosion of this radius on hit
+	light?: number; // Render additively
 	numParticles?: number;
 	particleShine?: number;
 	particleGlow?: number;
@@ -848,6 +856,7 @@ declare interface RenderBuff {
 	color: string;
 	selfColor?: boolean; // View own buffs in the self color
 	alpha?: number; // Semi-transparent
+	light?: number; // Render additively
 	shine?: number; // Brighter initially
 	glow?: number; // How much alpha to apply to the bloom
 	bloom?: number; // Bloom radius

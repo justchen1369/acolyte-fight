@@ -49,6 +49,7 @@ export const volcano: ObstacleTemplate = {
             render: {
                 color: "#ff0088",
                 alpha: 0.3,
+                light: 1,
                 ticks: 30,
                 emissionRadiusFactor: 1,
                 particleRadius: 0.005,
@@ -216,7 +217,8 @@ export const fast: ObstacleTemplate = {
             movementProportion: 1.5,
             render: {
                 color: "rgba(255, 255, 255, 1)",
-                alpha: 0.2,
+				"alpha": 0.2,
+				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 shine: 0.5,

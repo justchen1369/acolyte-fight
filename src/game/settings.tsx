@@ -343,8 +343,9 @@ const fireball: Spell = {
         color: '#f80',
         renderers: [
             { type: "bloom", radius: 0.045 },
+            { type: "projectile", ticks: 5, smoke: 0 },
             { type: "projectile", ticks: 30, smoke: 0.05 },
-            { type: "ray", ticks: 30 },
+            { type: "ray", ticks: 30, vanish: 1 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
         ],
     },
@@ -466,6 +467,7 @@ const triplet: Spell = {
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 3, // 3 projectiles
+                    light: 1,
                     ticks: 15,
                     emissionRadiusFactor: 1,
                     particleRadius: 0.5 * Hero.Radius,
@@ -544,6 +546,7 @@ const difire: Spell = {
                 render: {
                     color: "#ff0088",
                     alpha: 0.15 / 2, // 2 projectiles
+                    light: 1,
                     ticks: 15,
                     emissionRadiusFactor: 1,
                     particleRadius: 0.5 * Hero.Radius,
@@ -631,7 +634,7 @@ const meteor: Spell = {
         color: '#ff0000',
         renderers: [
             { type: "bloom", radius: 0.06 },
-            { type: "projectile", ticks: 15, shine: 0, smoke: 0.5, fade: "#333" },
+            { type: "projectile", ticks: 15, light: null, shine: 0, smoke: 0.5, fade: "#333" },
             { type: "strike", ticks: 15, flash: true, growth: 0.1 },
         ],
     },
@@ -661,7 +664,7 @@ const meteoriteProjectile: ProjectileTemplate = {
     color: '#ff0066',
     renderers: [
         { type: "bloom", radius: 0.04 },
-        { type: "projectile", ticks: 12, shine: 0, smoke: 0.5, fade: "#333" },
+        { type: "projectile", ticks: 12, light: null, shine: 0, smoke: 0.5, fade: "#333" },
         { type: "strike", ticks: 12, flash: true, growth: 0.1 },
     ],
 
@@ -906,7 +909,7 @@ const homing: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "projectile", ticks: 30, smoke: 0.05, vanish: 0.75 },
-            { type: "ray", ticks: 10, vanish: 0.75 },
+            { type: "ray", ticks: 5, light: 0.1, vanish: 0.75 },
             { type: "strike", ticks: 30, growth: 1, flash: true, numParticles: 5 },
         ],
     },
@@ -1052,7 +1055,7 @@ const retractor: Spell = {
                 vanish: 1,
                 selfColor: true,
             },
-            { type: "projectile", ticks: 1, glow: 0.3, selfColor: true },
+            { type: "projectile", ticks: 5, glow: 0.3, selfColor: true },
             { type: "ray", ticks: 15, glow: 0.3, vanish: 0.25, selfColor: true },
             { type: "strike", ticks: 15, flash: true, numParticles: 9, selfColor: true },
         ],
@@ -1248,7 +1251,8 @@ const whip: Spell = {
             movementProportion: 1.2,
             render: {
                 color: "#8800ff",
-                "alpha": 0.2,
+				"alpha": 0.2,
+				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,
@@ -1658,8 +1662,7 @@ const drain: Spell = {
         color: '#22ee88',
         renderers: [
             { type: "bloom" },
-            { type: "projectile", ticks: 1 },
-            { type: "ray", ticks: 15, vanish: 1 },
+            { type: "projectile", ticks: 15, vanish: 1 },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1 },
             { type: "strike", ticks: 30, growth: 2, flash: true, numParticles: 4 },
         ],
@@ -1854,6 +1857,7 @@ const whirlwind: Spell = {
                 numParticles: 2,
                 particleRadius: 0.02,
 
+                light: null,
                 glow: 0.7,
                 shine: 0.2,
                 smoke: 1.3,
@@ -1972,7 +1976,8 @@ const halo: Spell = {
 
             render: {
                 color: "#8800ff",
-                alpha: 0.2,
+				"alpha": 0.2,
+				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,
@@ -2209,8 +2214,8 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "bloom", radius: 0.02 },
-            { type: "projectile", ticks: 30, color: "rgba(64, 255, 255, 0.25)", shine: 0.4, glow: 0.7, smoke: 0.6, vanish: 1 },
+            { type: "bloom", radius: 0.015 },
+            { type: "projectile", ticks: 30, color: "rgba(64, 255, 255, 0.25)", light: null, shine: 0.4, glow: 0.7, smoke: 0.6, vanish: 1 },
             { type: "strike", ticks: 10, flash: true, growth: 0.1 },
         ],
     },
@@ -2980,6 +2985,8 @@ const voidRush: Spell = {
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius,
                 decay: true,
+				"alpha": 0.3,
+				"light": 1,
                 glow: 0.7,
                 shine: 0.5,
                 bloom: 0.03,

@@ -1231,6 +1231,7 @@ export interface TrailBase {
 	shine?: number; // Lighten to start with
 	fade?: string; // Fade away into this color
 	vanish?: number; // Fade away into transparent
+	light?: number; // Render additively
 
 	bloom?: number; // Bloom radius
 	glow?: number; // Bloom alpha

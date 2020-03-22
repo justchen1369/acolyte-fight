@@ -115,6 +115,7 @@ export interface GlContext {
 	swatches: DrawPrimitives;
 	heroes: DrawHeroes;
 	images: DrawImages;
+	solids: DrawPrimitives;
 	trails: DrawPrimitives;
 
 	data: DrawDataLookup;
@@ -163,6 +164,7 @@ export interface DrawDataLookup {
 	swatches: DrawPrimitivesData;
 	heroes: DrawHeroesData;
 	images: DrawImagesData;
+	solids: DrawPrimitivesData;
 	trails: DrawPrimitivesData;
 	[program: string]: DrawData;
 }
