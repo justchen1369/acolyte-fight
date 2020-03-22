@@ -465,7 +465,7 @@ const triplet: Spell = {
                 resetOnGameStart: true,
                 render: {
                     color: "#ff0088",
-                    alpha: 0.15 / 3, // 3 projectiles
+                    alpha: 0.2 / 3, // 3 projectiles
                     ticks: 15,
                     emissionRadiusFactor: 1,
                     particleRadius: 0.5 * Hero.Radius,
@@ -543,7 +543,7 @@ const difire: Spell = {
                 resetOnGameStart: true,
                 render: {
                     color: "#ff0088",
-                    alpha: 0.15 / 2, // 2 projectiles
+                    alpha: 0.2 / 2, // 2 projectiles
                     ticks: 15,
                     emissionRadiusFactor: 1,
                     particleRadius: 0.5 * Hero.Radius,
