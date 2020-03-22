@@ -1206,7 +1206,7 @@ const rocket: Spell = {
         sound: "rocket",
         color: '#ff9a00',
         renderers: [
-            { type: "bloom", ownerColor: true, radius: 0.028 },
+            { type: "bloom", ownerColor: true, radius: 0.028, glow: 0.4 },
             { type: "reticule", color: 'rgba(255, 255, 255, 0.1)', radius: 0.028, minRadius: 0.024, usePartialDamageMultiplier: true },
             { type: "projectile", ticks: 5, glow: 0.3, smoke: 0.5, ownerColor: true },
             { type: "strike", ticks: 20, flash: true, ownerColor: true, numParticles: 9 },
