@@ -343,7 +343,7 @@ const fireball: Spell = {
         color: '#f80',
         renderers: [
             { type: "bloom", radius: 0.045 },
-            { type: "projectile", ticks: 5, vanish: 1 },
+            { type: "projectile", ticks: 30, vanish: 1 },
             { type: "projectile", ticks: 30, smoke: 0.05, light: 0.6 },
             { type: "ray", ticks: 30, light: 0.6 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
@@ -909,7 +909,7 @@ const homing: Spell = {
         color: '#44ffcc',
         renderers: [
             { type: "bloom" },
-            { type: "projectile", ticks: 30, smoke: 0.05, vanish: 0.75 },
+            { type: "projectile", ticks: 30, light: 0.5, smoke: 0.05, vanish: 0.75 },
             { type: "ray", ticks: 5, light: 0.1, vanish: 0.75 },
             { type: "strike", ticks: 30, growth: 1, flash: true, numParticles: 5 },
         ],
@@ -2125,7 +2125,7 @@ const mines: Spell = {
         color: '#ff009c',
         renderers: [
             { type: "bloom", selfColor: true, radius: 0.015 },
-            { type: "projectile", ticks: 1, selfColor: true, shine: 0, glow: 0.3, noPartialRadius: true },
+            { type: "projectile", ticks: 1, light: null, selfColor: true, shine: 0, glow: 0.3, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
         ],
     },
@@ -2644,6 +2644,7 @@ const phaseOut: Spell = {
                 shine: 1,
                 bloom: 0,
                 vanish: 1,
+                light: 1,
             },
             renderFinish: {
                 numParticles: 10,
@@ -2654,6 +2655,7 @@ const phaseOut: Spell = {
                 shine: 1,
                 bloom: 0,
                 vanish: 1,
+                light: 1,
             },
         },
     ],
