@@ -344,8 +344,8 @@ const fireball: Spell = {
         renderers: [
             { type: "bloom", radius: 0.045 },
             { type: "projectile", ticks: 5, smoke: 0 },
-            { type: "projectile", ticks: 30, smoke: 0.05 },
-            { type: "ray", ticks: 30, vanish: 1 },
+            { type: "projectile", ticks: 30, smoke: 0.05, light: 0.6 },
+            { type: "ray", ticks: 30, light: 0.6 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
         ],
     },
@@ -1055,7 +1055,7 @@ const retractor: Spell = {
                 vanish: 1,
                 selfColor: true,
             },
-            { type: "projectile", ticks: 5, glow: 0.3, selfColor: true },
+            { type: "projectile", ticks: 15, glow: 0.3, selfColor: true },
             { type: "ray", ticks: 15, glow: 0.3, vanish: 0.25, selfColor: true },
             { type: "strike", ticks: 15, flash: true, numParticles: 9, selfColor: true },
         ],
@@ -1119,6 +1119,7 @@ const backlash: Spell = {
         color: '#00ccff',
         renderers: [
             { type: "bloom", ownerColor: true },
+			{ type: "projectile", "ownerColor": true, "ticks": 5, "smoke": 0.5 },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
             { type: "strike", color: '#fff', ticks: 25, growth: 1.5, flash: true, speedMultiplier: -0.5, detonate: 0.02 },
@@ -1252,7 +1253,6 @@ const whip: Spell = {
             render: {
                 color: "#8800ff",
 				"alpha": 0.2,
-				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,
@@ -1919,6 +1919,10 @@ const supernova: Spell = {
         color: '#ff9a00',
         renderers: [
             { type: "bloom", radius: 0.03 },
+            {
+                "type": "projectile",
+                "ticks": 3
+            },
             { type: "ray", ticks: 30, vanish: 1 },
             {
                 type: "reticule",
@@ -1977,7 +1981,6 @@ const halo: Spell = {
             render: {
                 color: "#8800ff",
 				"alpha": 0.2,
-				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 emissionRadiusFactor: 0,

@@ -218,7 +218,6 @@ export const fast: ObstacleTemplate = {
             render: {
                 color: "rgba(255, 255, 255, 1)",
 				"alpha": 0.2,
-				"light": 0.5,
                 heroColor: true,
                 ticks: 30,
                 shine: 0.5,
