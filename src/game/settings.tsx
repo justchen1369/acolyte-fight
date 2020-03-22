@@ -1669,7 +1669,7 @@ const renderGravity: RenderSwirl = {
     numParticles: 3,
     particleRadius: 0.02 / 3,
 
-    glow: 0.2,
+    glow: 0.4,
     shine: 0.4,
     vanish: 0.5,
     bloom: 0.04,
@@ -2806,7 +2806,8 @@ const blaze: Spell = {
 				"numParticles": 0,
 				"particleRadius": 0,
 				"ticks": 1,
-				"bloom": 0.03,
+                "bloom": 0.03,
+                glow: 0.5,
 				"decay": true
             },
         },
