@@ -2380,6 +2380,11 @@ function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: 
 	if (render.shine) {
 		color.lighten(render.shine);
 	}
+
+	const light = parseLight(render.light, ctxStack.rtx);
+	applyLight(light, color);
+	const layer = light ? r.Layer.Trail : r.Layer.Solid;
+
 	glx.circleTrail(ctxStack, projectile.body.getPosition(), {
 		color,
 		maxRadius: 0,
@@ -2387,7 +2392,7 @@ function renderBloom(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: 
 			sigma: render.radius !== undefined ? render.radius : DefaultBloomRadius,
 			alpha: render.glow !== undefined ? render.glow : DefaultGlow,
 		},
-	});
+	}, layer);
 }
 
 function projectileRadiusMultiplier(projectile: w.Projectile, world: w.World, render: RenderProjectile | RenderRay | RenderPolygon): number {
@@ -2505,12 +2510,12 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 }
 
 function parseLight(input: number, rtx: number): number | null {
-	if (input !== undefined) {
-		return input;
-	} else if (rtx > r.GraphicsLevel.Low) {
-		return DefaultLight;
-	} else {
+	if (rtx <= r.GraphicsLevel.Low) {
 		return null;
+	} else if (input !== undefined) {
+		return input;
+	} else {
+		return DefaultLight;
 	}
 }
 

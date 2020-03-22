@@ -797,6 +797,7 @@ declare interface RenderStrikeParams {
 
 declare interface RenderBloom extends RenderParamsBase, ProjectileColorParams {
 	type: "bloom";
+	light?: number;
 	shine?: number;
 	glow?: number;
 	radius?: number;

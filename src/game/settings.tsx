@@ -343,7 +343,7 @@ const fireball: Spell = {
         color: '#f80',
         renderers: [
             { type: "bloom", radius: 0.045 },
-            { type: "projectile", ticks: 5, smoke: 0 },
+            { type: "projectile", ticks: 5, vanish: 1 },
             { type: "projectile", ticks: 30, smoke: 0.05, light: 0.6 },
             { type: "ray", ticks: 30, light: 0.6 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
@@ -398,6 +398,7 @@ const flamestrike: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "reticule", color: 'rgba(128, 32, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
+            { type: "projectile", ticks: 4, vanish: 1 },
             { type: "projectile", ticks: 18, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 18 },
             { type: "strike", ticks: 18, flash: true, numParticles: 5 },
@@ -1844,7 +1845,7 @@ const whirlwind: Spell = {
         sound: "whirlwind",
         color: "#44ffff",
         renderers: [
-            { type: "bloom", radius: 0.05 },
+            { type: "bloom", radius: 0.05, light: 0.5 },
             {
                 type: "swirl",
 
@@ -1919,10 +1920,7 @@ const supernova: Spell = {
         color: '#ff9a00',
         renderers: [
             { type: "bloom", radius: 0.03 },
-            {
-                "type": "projectile",
-                "ticks": 3
-            },
+            { type: "projectile", ticks: 3, vanish: 1 },
             { type: "ray", ticks: 30, vanish: 1 },
             {
                 type: "reticule",
