@@ -343,7 +343,7 @@ const fireball: Spell = {
         color: '#f80',
         renderers: [
             { type: "bloom", radius: 0.045 },
-            { type: "projectile", ticks: 30, vanish: 1 },
+            { type: "ray", ticks: 15, vanish: 1 },
             { type: "projectile", ticks: 30, smoke: 0.05, light: 0.6 },
             { type: "ray", ticks: 30, light: 0.6 },
             { type: "strike", ticks: 30, flash: true, numParticles: 5 },
@@ -910,7 +910,7 @@ const homing: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "projectile", ticks: 30, light: 0.5, smoke: 0.05, vanish: 0.75 },
-            { type: "ray", ticks: 5, light: 0.1, vanish: 0.75 },
+            { type: "ray", ticks: 30, light: 0.1, vanish: 0.75 },
             { type: "strike", ticks: 30, growth: 1, flash: true, numParticles: 5 },
         ],
     },
@@ -1123,6 +1123,7 @@ const backlash: Spell = {
 			{ type: "projectile", "ownerColor": true, "ticks": 5, "smoke": 0.5 },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
+            { type: "ray", ownerColor: true, ticks: 5, vanish: 1 },
             { type: "strike", color: '#fff', ticks: 25, growth: 1.5, flash: true, speedMultiplier: -0.5, detonate: 0.02 },
         ],
     },
@@ -1668,8 +1669,9 @@ const drain: Spell = {
         color: '#22ee88',
         renderers: [
             { type: "bloom" },
-            { type: "projectile", ticks: 15, vanish: 1 },
-            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1 },
+            { type: "projectile", ticks: 5, vanish: 1, light: 0.5 },
+            { type: "projectile", ticks: 15, vanish: 1, light: 0.3 },
+            { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1, light: 0.5 },
             { type: "strike", ticks: 30, growth: 2, flash: true, numParticles: 4 },
         ],
     },
