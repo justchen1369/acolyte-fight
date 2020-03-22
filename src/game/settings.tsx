@@ -2384,6 +2384,7 @@ const saber: Spell = {
 
     trailTicks: 5,
     color: '#00ccff',
+    light: 0.5,
     shine: 0.1,
     glow: 0.3,
     bloom: 0.03,
@@ -2444,6 +2445,7 @@ const dualSaber: Spell = {
 
     trailTicks: 5,
     color: '#ff0044',
+    light: 0.5,
     shine: 0.1,
     glow: 0.3,
     bloom: 0.03,
@@ -2561,6 +2563,7 @@ const shield: Spell = {
 
     color: '#3366ff',
 
+    light: 0.5,
     glow: 0.3,
     bloom: 0.03,
     shine: 0.1,
@@ -2700,6 +2703,7 @@ const icewall: Spell = {
 
     color: '#0088ff',
 
+    light: 0.5,
     glow: 0.3,
     bloom: 0.03,
     shine: 0.3,

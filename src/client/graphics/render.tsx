@@ -1835,6 +1835,10 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 	}
 	color.alpha((MaxAlpha - MinAlpha) * proportion + MinAlpha);
 
+	if (shield.light) {
+		applyLight(shield.light, color);
+	}
+
 	let scale: number = 1;
 	let grow: number = 1;
 	if (highlight && highlight.growth) {
