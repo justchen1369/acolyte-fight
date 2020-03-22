@@ -593,8 +593,8 @@ const firespray: Spell = {
         color: '#ff0044',
         renderers: [
             { type: "bloom", radius: 0.02 },
-            { type: "projectile", ticks: 30, light: 0.5, smoke: 0.15, vanish: 1, bloom: 0.01 },
-            { type: "ray", intermediatePoints: true, ticks: 7, light: 0.5, vanish: 1 },
+            { type: "projectile", ticks: 30, light: 0.4, smoke: 0.15, vanish: 1, bloom: 0.01 },
+            { type: "ray", intermediatePoints: true, ticks: 7, light: 0.4, vanish: 1 },
             { type: "strike", ticks: 30, flash: true, numParticles: 1 },
         ],
     },
@@ -1367,6 +1367,7 @@ const link: Spell = {
                 "glow": 0.4,
                 "bloom": 0.005,
                 shine: 0.25,
+                light: true,
 
                 strike: {
                     ticks: 15,
@@ -1410,7 +1411,7 @@ const link: Spell = {
         color: '#4444ff',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1 },
+            { type: "polygon", color: '#4444ff', numPoints: 3, radiusMultiplier: 2, revolutionInterval: 23, ticks: 1, light: 1 },
             {
                 type: "link",
                 color: '#4444ff',
@@ -1419,6 +1420,7 @@ const link: Spell = {
                 "glow": 0.4,
                 "bloom": 0.005,
                 shine: 0.25,
+                light: true,
             },
         ],
     },
@@ -1471,6 +1473,7 @@ const grapple: Spell = {
                 "glow": 0.3,
                 "bloom": 0.01,
                 shine: 0.25,
+                light: true,
             },
         },
 
@@ -1501,7 +1504,7 @@ const grapple: Spell = {
         color: '#f02',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1 },
+            { type: "polygon", color: '#f02', numPoints: 3, radiusMultiplier: 4, revolutionInterval: 31, ticks: 1, light: 1 },
             {
                 type: "link",
                 color: '#f02',
@@ -1510,6 +1513,7 @@ const grapple: Spell = {
                 "glow": 0.3,
                 "bloom": 0.01,
                 shine: 0.25,
+                light: true,
             },
         ],
     },
@@ -2124,7 +2128,7 @@ const mines: Spell = {
         sound: "mines",
         color: '#ff009c',
         renderers: [
-            { type: "bloom", selfColor: true, radius: 0.015 },
+            { type: "bloom", selfColor: true, radius: 0.015, light: null },
             { type: "projectile", ticks: 1, light: null, selfColor: true, shine: 0, glow: 0.3, noPartialRadius: true },
             { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
         ],
@@ -2306,7 +2310,7 @@ const horcrux: Spell = {
         sound: "horcrux",
         color: '#22ee88',
         renderers: [
-            { type: "bloom" },
+            { type: "bloom", light: null },
             { type: "reticule", color: 'rgba(0, 0, 0, 0.05)', radius: 0.04, minRadius: 0.036 },
             { type: "reticule", color: 'rgba(34, 238, 136, 0.1)', radius: 0.04, minRadius: 0.0325, shrinkTicks: 13, grow: true, fade: true, repeat: true },
             { type: "polygon", color: 'rgba(34, 238, 136, 0.5)', numPoints: 5, radiusMultiplier: 2.5, revolutionInterval: 60, ticks: 1, shine: 0 },
