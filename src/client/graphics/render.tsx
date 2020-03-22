@@ -29,7 +29,7 @@ const DefaultBloomRadius = 0.03;
 const DefaultParticleBloomRadius = 0.015;
 
 const DefaultShine = 0.5;
-const DefaultGlow = 0.2;
+const DefaultGlow = 0.3;
 
 const DefaultCastingGlow = 0.1;
 
