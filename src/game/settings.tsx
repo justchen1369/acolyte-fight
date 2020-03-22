@@ -2302,9 +2302,11 @@ const horcrux: Spell = {
                         render: {
                             color: "#22ee88",
                             alpha: 0.3,
+                            glow: 0.7,
                             ticks: 15,
                             emissionRadiusFactor: 1,
                             particleRadius: 0.5 * Hero.Radius,
+                            light: 1,
                         },
                     },
                 ]
