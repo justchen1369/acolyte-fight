@@ -1191,8 +1191,9 @@ const rocket: Spell = {
                         emissionRadiusFactor: 1,
                         particleRadius: 0.01,
                         shine: 0.2,
-                        glow: 0.3,
+                        glow: 0.7,
                         bloom: 0.03,
+                        vanish: 1,
                     },
                 }
             ],
