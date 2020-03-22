@@ -20,7 +20,8 @@ const CheckInterval = 1000;
 const HiddenRenderInterval = 1000;
 const MinFrames = 30;
 const MinStalls = 10;
-const FpsThreshold = 0.7;
+const FpsThreshold = 0.9;
+const MinAutoGraphics = GraphicsLevel.Ultra;
 
 interface Props {
     world: w.World;
@@ -176,7 +177,7 @@ class CanvasPanel extends React.PureComponent<Props, State> {
     }
 
     reduceGraphics() {
-        if (autoGraphics(this.props.globalGraphics) && this.props.currentGraphics > GraphicsLevel.Minimum) {
+        if (autoGraphics(this.props.globalGraphics) && this.props.currentGraphics > MinAutoGraphics) {
             const newLevel = r.reduceGraphics(this.props.currentGraphics);
             StoreProvider.dispatch({ type: "graphics", graphics: newLevel });
             console.log(`Reducing graphics level to ${newLevel} due to low framerate`);
