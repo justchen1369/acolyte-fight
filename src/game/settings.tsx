@@ -592,8 +592,8 @@ const firespray: Spell = {
         color: '#ff0044',
         renderers: [
             { type: "bloom", radius: 0.02 },
-            { type: "projectile", ticks: 30, smoke: 0.15, vanish: 1, bloom: 0.01 },
-            { type: "ray", intermediatePoints: true, ticks: 7, vanish: 1 },
+            { type: "projectile", ticks: 30, light: 0.5, smoke: 0.15, vanish: 1, bloom: 0.01 },
+            { type: "ray", intermediatePoints: true, ticks: 7, light: 0.5, vanish: 1 },
             { type: "strike", ticks: 30, flash: true, numParticles: 1 },
         ],
     },
@@ -2376,6 +2376,7 @@ const saber: Spell = {
 
     trailTicks: 5,
     color: '#00ccff',
+    light: true,
     shine: 0.1,
     glow: 0.3,
     bloom: 0.03,
@@ -2436,6 +2437,7 @@ const dualSaber: Spell = {
 
     trailTicks: 5,
     color: '#ff0044',
+    light: true,
     shine: 0.1,
     glow: 0.3,
     bloom: 0.03,
@@ -2552,6 +2554,8 @@ const shield: Spell = {
     icon: "shieldReflect",
 
     color: '#3366ff',
+
+    light: true,
     glow: 0.3,
     bloom: 0.03,
     shine: 0.1,
@@ -2688,6 +2692,8 @@ const icewall: Spell = {
     icon: "woodenFence",
 
     color: '#0088ff',
+
+    light: true,
     glow: 0.3,
     bloom: 0.03,
     shine: 0.3,

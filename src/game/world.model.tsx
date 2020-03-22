@@ -493,6 +493,8 @@ export interface ShieldBase extends WorldObjectBase {
 	color: string;
 	selfColor?: boolean;
 	hitTick?: number;
+
+	light?: boolean;
 	glow?: number;
 	bloom?: number;
 	shine?: number;

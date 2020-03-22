@@ -1851,6 +1851,8 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		feather.sigma += highlight.bloom;
 	}
 
+	const layer = shield.light ? r.Layer.Trail : r.Layer.Solid;
+
 	if (shield.type === "reflect") {
 		const hero = world.objects.get(shield.owner);
 		if (!hero) {
@@ -1872,25 +1874,25 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 				minRadius,
 				maxRadius,
 				feather,
-			});
+			}, layer);
 			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, {
 				color: stroke,
 				minRadius: strokeRadius,
 				maxRadius,
-			});
+			}, layer);
 		} else {
 			glx.circleTrail(ctxStack, pos, {
 				color,
 				minRadius,
 				maxRadius,
 				feather,
-			});
+			}, layer);
 			glx.circleTrail(ctxStack, pos, {
 				color: stroke,
 				minRadius: strokeRadius,
 				maxRadius,
 				feather,
-			});
+			}, layer);
 		}
 
 		if (feather) {
@@ -1898,7 +1900,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 				color,
 				maxRadius: 0,
 				feather,
-			});
+			}, layer);
 		}
 	} else if (shield.type === "wall") {
 		const pos = shield.body.getPosition();
@@ -1909,14 +1911,14 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			minRadius: 0,
 			maxRadius: shield.extent * scale,
 			feather,
-		});
+		}, layer);
 
 		if (feather) {
 			glx.circleTrail(ctxStack, pos, {
 				color,
 				maxRadius: 0,
 				feather,
-			});
+			}, layer);
 
 			for (let i = 0; i < shield.points.length; ++i) {
 				const point = vector.turnVectorBy(shield.points[i], angle).add(pos);
@@ -1924,7 +1926,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 					color,
 					maxRadius: 0,
 					feather,
-				});
+				}, layer);
 			}
 		}
 	} else if (shield.type === "saber") {
@@ -1938,19 +1940,20 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		// Draw the saber
 		const handle = vector.fromAngle(angle).mul(hero.radius).add(pos);
 		const tip = vector.fromAngle(angle).mul(hero.radius + (shield.length - hero.radius) * scale).add(pos);
-		glx.lineTrail(ctxStack, handle, tip, {
+		const fill: r.TrailFill = {
 			color,
 			minRadius: 0,
 			maxRadius: shield.width,
 			feather: null, // Don't bloom the saber, bloom the owner
-		});
+		};
+		glx.lineTrail(ctxStack, handle, tip, fill, fill, layer);
 
 		// Bloom the owner
 		glx.circleTrail(ctxStack, pl.Vec2.mid(pos, tip), {
 			color,
 			maxRadius: 0,
 			feather,
-		});
+		}, layer);
 
 		renderSaberTrail(ctxStack, shield, scale, world);
 	}
@@ -1978,6 +1981,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: numbe
 		antiClockwise,
 		fillStyle: saber.color,
 		vanish: 1,
+		light: saber.light ? 1 : null,
 		glow: saber.glow,
 		shine: saber.shine,
 		highlight: saber.uiHighlight,
@@ -2433,6 +2437,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 	const light = parseLight(trail.light, ctxStack.rtx);
 	applyLight(light, color);
+	const layer = light ? r.Layer.Trail : r.Layer.Solid;
 
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
@@ -2469,11 +2474,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		const radius = scale * proportion * trail.radius;
 
 		const fill: r.TrailFill = { color, maxRadius: radius, feather };
-		if (light) {
-			glx.circleTrail(ctxStack, pos, fill);
-		} else {
-			glx.circleSolid(ctxStack, pos, fill);
-		}
+		glx.circleTrail(ctxStack, pos, fill, layer);
 	} else if (trail.type === "polygon") {
 		let pos = trail.pos;
 		if (trail.velocity) {
@@ -2484,36 +2485,20 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		const extent = scale * proportion * trail.extent;
 
 		const fill: r.TrailFill = { color, maxRadius: extent, feather };
-		if (light) {
-			glx.convexTrail(ctxStack, pos, trail.points, trail.angle, extent, fill);
-		} else {
-			glx.convexSolid(ctxStack, pos, trail.points, trail.angle, extent, fill);
-		}
+		glx.convexTrail(ctxStack, pos, trail.points, trail.angle, extent, fill, layer);
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
 
 		const fill: r.TrailFill = { color, minRadius: 0, maxRadius: lineWidth / 2, feather };
-		if (trail.light) {
-			glx.lineTrail(ctxStack, trail.from, trail.to, fill);
-		} else {
-			glx.lineSolid(ctxStack, trail.from, trail.to, fill);
-		}
+		glx.lineTrail(ctxStack, trail.from, trail.to, fill, fill, layer);
 	} else if (trail.type === "ripple") {
 		const maxRadius = trail.initialRadius * proportion + trail.finalRadius * (1 - proportion);
 		const minRadius = maxRadius * (1 - proportion);
 		const fill: r.TrailFill = { color, minRadius, maxRadius, feather };
-		if (trail.light) {
-			glx.circleTrail(ctxStack, trail.pos, fill);
-		} else {
-			glx.circleSolid(ctxStack, trail.pos, fill);
-		}
+		glx.circleTrail(ctxStack, trail.pos, fill, layer);
 	} else if (trail.type === "arc") {
 		const fill: r.TrailFill = { color, minRadius: trail.minRadius, maxRadius: trail.maxRadius, feather: feather };
-		if (trail.light) {
-			glx.arcTrail(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill);
-		} else {
-			glx.arcSolid(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill);
-		}
+		glx.arcTrail(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill, layer);
 	}
 
 	return false;

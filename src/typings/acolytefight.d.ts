@@ -977,6 +977,7 @@ declare interface ShieldSpell extends SpellBase {
 	takesOwnership: boolean;
 	damageMultiplier: number;
 	blocksTeleporters: boolean;
+	light?: boolean;
 	glow?: number;
 	bloom?: number;
 	shine?: number;

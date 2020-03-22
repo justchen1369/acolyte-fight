@@ -30,6 +30,12 @@ export namespace Graphics {
     export const Minimum = "minimum";
 }
 
+export namespace Layer {
+	export const Swatch = "swatch";
+	export const Solid = "solid";
+	export const Trail = "trail";
+}
+
 export function isAutoGraphics(graphics: number) {
 	return !graphics;
 }
