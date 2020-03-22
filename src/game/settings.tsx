@@ -1830,8 +1830,9 @@ const whirlwind: Spell = {
                     emissionRadiusFactor: 1,
                     particleRadius: 0.01,
                     shine: 0.2,
-                    glow: 0.3,
+                    glow: 0.7,
                     bloom: 0.03,
+                    vanish: 1,
                 },
             }
         ],
@@ -1839,7 +1840,7 @@ const whirlwind: Spell = {
         sound: "whirlwind",
         color: "#44ffff",
         renderers: [
-            { type: "bloom", radius: 0.05 },
+            { type: "bloom", radius: 0.05, glow: 0.4 },
             {
                 type: "swirl",
 
@@ -1852,6 +1853,7 @@ const whirlwind: Spell = {
                 numParticles: 2,
                 particleRadius: 0.02,
 
+                glow: 0.7,
                 shine: 0.2,
                 smoke: 1.3,
                 fade: "#144",
@@ -2193,8 +2195,9 @@ const iceBomb: Spell = {
                     emissionRadiusFactor: 1,
                     particleRadius: 0.01,
                     shine: 0.2,
-                    glow: 0.3,
+                    glow: 0.7,
                     bloom: 0.03,
+                    vanish: 1,
                 },
             },
         ],
@@ -2204,8 +2207,8 @@ const iceBomb: Spell = {
         sound: "iceBomb",
         color: '#44ffff',
         renderers: [
-            { type: "bloom", radius: 0.015 },
-            { type: "projectile", ticks: 30, color: "rgba(64, 255, 255, 0.25)", shine: 0.4, smoke: 0.6, vanish: 1 },
+            { type: "bloom", radius: 0.02 },
+            { type: "projectile", ticks: 30, color: "rgba(64, 255, 255, 0.25)", shine: 0.4, glow: 0.7, smoke: 0.6, vanish: 1 },
             { type: "strike", ticks: 10, flash: true, growth: 0.1 },
         ],
     },
