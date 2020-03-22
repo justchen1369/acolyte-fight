@@ -2798,9 +2798,10 @@ const thrust: Spell = {
                 ticks: 8,
                 emissionRadiusFactor: 0,
                 particleRadius: Hero.Radius * 1.5,
-                glow: 0.3,
+                glow: 0.7,
                 shine: 1,
                 bloom: 0.07,
+                light: 1,
                 decay: true,
             },
         }
