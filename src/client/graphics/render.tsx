@@ -1400,6 +1400,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 		if (render.decay) {
 			sigma *= proportion;
 		}
+		const layer = render.light ? r.Layer.Trail : r.Layer.Solid;
 		glx.circleTrail(ctxStack, heroPos, {
 			color: ColTuple.parse(color),
 			maxRadius: 0,
@@ -1407,7 +1408,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 				sigma,
 				alpha: render.glow !== undefined ? render.glow : DefaultGlow,
 			},
-		});
+		}, layer);
 	}
 }
 
