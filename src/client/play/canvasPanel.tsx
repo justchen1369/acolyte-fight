@@ -20,7 +20,7 @@ const CheckInterval = 1000;
 const HiddenRenderInterval = 1000;
 const MinFrames = 30;
 const MinStalls = 10;
-const FpsThreshold = 0.9;
+const FpsThreshold = 0.7;
 
 interface Props {
     world: w.World;
