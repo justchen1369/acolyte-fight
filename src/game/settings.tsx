@@ -980,12 +980,12 @@ const retractor: Spell = {
 
     maxAngleDiffInRevs: 0.01,
     cooldown: 1.5 * TicksPerSecond,
-    focusDelaysCooldown: false,
+    focusDelaysCooldown: true,
     throttle: true,
 
     movementProportionWhileChannelling: 1,
     release: {},
-    releaseAfterTicks: 20,
+    releaseAfterTicks: 0,
     releaseBehaviours: [
         {
             type: "homing",
