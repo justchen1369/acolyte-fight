@@ -377,8 +377,8 @@ const flamestrike: Spell = {
             damage: 30,
             lifeSteal,
             radius: 0.036,
-            minImpulse: 0.0001,
-            maxImpulse: 0.0001,
+            minImpulse: 0.00015,
+            maxImpulse: 0.00015,
 
             renderTicks: 10,
         },
