@@ -2677,7 +2677,7 @@ const phaseOut: Spell = {
 const icewall: Spell = {
     id: 'icewall',
     name: 'Forcefield',
-    description: "Create a wall that reflects projectiles and blocks other acolytes. You can pass through your own forcefield, but other acolytes cannot, even if they are using teleport.",
+    description: "Create a wall that blocks projectiles and acolytes. You can pass through your own forcefield, but other acolytes cannot, even if they are using teleport.",
 
     maxRange: 0.25,
     movementProportionWhileCharging: 1.0,
@@ -2685,7 +2685,7 @@ const icewall: Spell = {
     growthTicks: 5,
     cooldown: 7.5 * TicksPerSecond,
     throttle: false,
-    takesOwnership: true,
+    takesOwnership: false,
     blocksTeleporters: true,
     damageMultiplier: 1,
 
