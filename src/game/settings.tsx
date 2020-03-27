@@ -1737,6 +1737,7 @@ const gravity: Spell = {
         damage: 0,
         noHit: true,
         collideWith: Categories.Hero | Categories.Massive,
+        sensor: true,
 
         gravity: {
             impulsePerTick: 0.001 / TicksPerSecond,
