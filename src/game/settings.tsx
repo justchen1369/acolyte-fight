@@ -983,7 +983,7 @@ const retractor: Spell = {
     focusDelaysCooldown: true,
     throttle: true,
 
-    movementProportionWhileChannelling: 1,
+    movementProportionWhileChannelling: 0.5,
     release: {},
     releaseAfterTicks: 0,
     releaseBehaviours: [
