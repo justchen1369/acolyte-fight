@@ -783,7 +783,7 @@ const lightning: Spell = {
         radius: 0.0025,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
-        collideWith: Categories.All ^ Categories.Projectile,
+        collideWith: Categories.All,
         swappable: false,
         damage: 0,
 
