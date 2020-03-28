@@ -16,7 +16,14 @@ const clientConfig = {
   },
   module: {
     rules: [
-      tsLoader(),
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true,
+        },
+      },
       {
         test: /\.s[ac]ss$/,
         use: ['style-loader', 'css-loader', 'sass-loader'],
@@ -55,7 +62,9 @@ const clientConfig = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'client.js'
   },
-  plugins: plugins(),
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ],
 };
 
 const aiWorkerConfig = {
@@ -66,14 +75,23 @@ const aiWorkerConfig = {
   },
   module: {
     rules: [
-      tsLoader(),
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true,
+        },
+      },
     ],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'aiWorker.js'
   },
-  plugins: plugins(),
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ],
 };
 
 const audioWorkerConfig = {
@@ -84,14 +102,23 @@ const audioWorkerConfig = {
   },
   module: {
     rules: [
-      tsLoader(),
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true,
+        },
+      },
     ],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'audioWorker.js'
   },
-  plugins: plugins(),
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ],
 };
 
 const serverConfig = {
@@ -103,7 +130,14 @@ const serverConfig = {
   },
   module: {
     rules: [
-      tsLoader(),
+      {
+        test: /\.tsx?$/,
+        loader: "ts-loader",
+        options: {
+          transpileOnly: true,
+          experimentalWatchApi: true,
+        },
+      },
     ]
   },
   optimization: {
@@ -113,37 +147,10 @@ const serverConfig = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'server.js'
   },
-  plugins: plugins(),
+  plugins: [
+    new ForkTsCheckerWebpackPlugin()
+  ],
   externals: [nodeExternals()],
 };
 
 module.exports = [ clientConfig, aiWorkerConfig, audioWorkerConfig, serverConfig ];
-
-
-function plugins() {
-  if (mode === 'production') {
-    return [];
-  } else {
-    return [new ForkTsCheckerWebpackPlugin()];
-  }
-}
-
-function tsLoader() {
-  if (mode === 'production') {
-    return {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
-        options: {
-        },
-      };
-  } else {
-    return {
-        test: /\.tsx?$/,
-        loader: "ts-loader",
-        options: {
-          transpileOnly: true,
-          experimentalWatchApi: true,
-        },
-      };
-  }
-}
