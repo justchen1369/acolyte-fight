@@ -224,7 +224,7 @@ function validAttack(state, hero, opponent, spell) {
 
     var distance = vectorDistance(hero.pos, opponent.pos);
     if (spell.action === "projectile" || spell.action === "spray" || spell.action === "retractor" || spell.action === "focus" || spell.action === "charge") {
-        if (spell.projectile.swapWith) { // Swap doesn't work as an attack
+        if (spell.id === "swap") { // Swap doesn't work as an attack
             return false;
         }
         if (opponentShielded && !spell.projectile.detonate) { // Detonate spells can penetrate shields, nothing else can
