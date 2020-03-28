@@ -30,7 +30,7 @@ function stateToProps(state: s.State): Props {
     const rebindings = state.rebindings;
     const settings = state.world.settings;
     return {
-        btn: state.world.ui.toolbar.customizingBtn,
+        btn: state.customizingBtn,
         gameId: state.world.ui.myGameId,
         heroId: state.world.ui.myHeroId,
         gameStarted: state.world.tick >= state.world.startTick,
@@ -83,7 +83,11 @@ class GameKeyCustomizer extends React.PureComponent<Props, State> {
     private close() {
         StoreProvider.dispatch({
             type: "updateToolbar",
-            toolbar: { customizingBtn: null, hoverControl: null, hoverSpellId: null, hoverBtn: null },
+            toolbar: { hoverControl: null, hoverSpellId: null, hoverBtn: null },
+        });
+        StoreProvider.dispatch({
+            type: "customizingBtn",
+            customizingBtn: null,
         });
     }
 }

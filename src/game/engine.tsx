@@ -1727,9 +1727,6 @@ function handleClosing(ev: n.CloseGameMsg, world: w.World) {
 	world.startTick = ev.closeTick;
 
 	if (world.tick >= world.startTick) {
-		// Close any customising dialogs as they cannot be used anymore now the game has started
-		world.ui.toolbar.customizingBtn = null;
-
 		world.objects.forEach(hero => {
 			if (hero.category === "hero") {
 				resetHeroOnGameStart(hero, world);

@@ -67,7 +67,7 @@ function stateToProps(state: s.State): Props {
     return {
         world: state.world,
         customizing: state.customizing,
-        customizingBtn: !!state.world.ui.toolbar.customizingBtn,
+        customizingBtn: !!state.customizingBtn,
         buttonBarClickable: state.touched || !state.options.noRightClickChangeSpells,
         touchSurfacePixels: state.options.touchSurfacePixels,
         wheelOnRight: state.options.wheelOnRight,
@@ -454,8 +454,8 @@ class ControlSurface extends React.PureComponent<Props, State> {
 
     private handleCustomizeBtn(customizingBtn: string) {
         StoreProvider.dispatch({
-            type: "updateToolbar",
-            toolbar: { customizingBtn },
+            type: "customizingBtn",
+            customizingBtn,
         });
     }
 

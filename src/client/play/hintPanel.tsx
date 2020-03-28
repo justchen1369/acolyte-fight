@@ -44,7 +44,7 @@ function stateToProps(state: s.State): Props {
         myHeroId,
         inTutorial: !!state.tutorialLevel,
         started: !!world.startTick && world.tick >= world.startTick,
-        customizingBtn: state.world.ui.toolbar.customizingBtn,
+        customizingBtn: state.customizingBtn,
         customizingMode: state.customizing,
         allowSpellChoosing: engine.allowSpellChoosing(state.world, state.world.ui.myHeroId),
         noRightClickChangeSpells: state.options.noRightClickChangeSpells,

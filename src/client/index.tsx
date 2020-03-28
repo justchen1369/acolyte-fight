@@ -50,6 +50,7 @@ export async function initialize() {
 
     notifications.attachListener(n => options.getProvider().onNotification(n));
     notifications.attachListener(n => cloud.onNotification(n));
+    notifications.attachListener(n => matches.onNotification(n));
     notifications.attachListener(n => stats.onNotification(n));
     notifications.attachListener(n => rankings.onNotification(n));
     notifications.attachListener(n => tutor.onNotification(n));

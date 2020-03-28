@@ -6,7 +6,9 @@ import * as w from '../game/world.model';
 
 export interface State {
     current: PathElements;
+
     customizing: boolean;
+	customizingBtn?: string;
     iconsLoaded?: boolean;
 
     touched?: boolean;
@@ -134,6 +136,7 @@ export type Action =
     | UpdatePlayerNameAction
     | UpdateKeyBindingsAction
     | UpdateCustomizingAction
+    | UpdateCustomizingBtnAction
     | UpdateOptionsAction
     | UpdateLoadoutsAction
     | UpdateGraphicsAction
@@ -174,6 +177,11 @@ export type Action =
 export interface UpdateCustomizingAction {
     type: "customizing";
     customizing: boolean;
+}
+
+export interface UpdateCustomizingBtnAction {
+    type: "customizingBtn";
+    customizingBtn: string;
 }
 
 export interface UpdateOnlineAction {

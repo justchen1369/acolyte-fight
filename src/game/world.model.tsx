@@ -151,7 +151,6 @@ export interface ToolbarState {
 	hoverBtn?: string;
 	hoverControl?: string;
 	hoverButtonPanel?: string;
-	customizingBtn?: string;
 }
 
 export interface Camera {

@@ -165,3 +165,13 @@ export function worldInterruptible(world: w.World) {
 		|| !world.ui.myHeroId
 		|| !world.objects.has(world.ui.myHeroId);
 }
+
+export function onNotification(notifs: w.Notification[]) {
+	if (notifs.some(n => n.type === "closing" && n.ticksUntilClose <= 0)) {
+		const state = StoreProvider.getState();
+		// The game is starting, stop customising spells
+		if (state.customizingBtn) {
+			StoreProvider.dispatch({ type: "customizingBtn", customizingBtn: null });
+		}
+	}
+}

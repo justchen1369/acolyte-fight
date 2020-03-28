@@ -122,6 +122,8 @@ function reducer(state: s.State, action: s.Action): s.State {
         return { ...state, keyBindings: action.keyBindings };
     } else if (action.type === "customizing") {
         return { ...state, customizing: action.customizing };
+    } else if (action.type === "customizingBtn") {
+        return { ...state, customizingBtn: action.customizingBtn };
     } else if (action.type === "updateOptions") {
         return {
             ...state,
