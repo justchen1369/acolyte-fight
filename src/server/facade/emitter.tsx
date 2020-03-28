@@ -42,6 +42,7 @@ export function attachToSocket(_io: SocketIO.Server) {
 }
 
 export function shutdown() {
+	if (shuttingDown) { return; }
 	shuttingDown = true;
 
 	if (io) {
