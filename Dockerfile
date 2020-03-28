@@ -14,7 +14,7 @@ RUN apt-get clean
 
 ENV NODE_ENV production
 ENV PORT 80
-CMD node dist/server.js
+ENTRYPOINT node dist/server.js
 WORKDIR /app
 RUN mkdir /app/logs
 RUN mkdir /app/replays
