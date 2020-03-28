@@ -54,7 +54,8 @@ class RandomizePanel extends React.PureComponent<Props, State> {
             const loadout = this.props.loadouts[i];
             if (loadout) {
                 const slot = i + 1;
-                buttons.push(<ButtonRow key={slot} label={`Loadout #${slot}`} icon="" onClick={() => this.onLoadoutClick(loadout)}>
+                const name = loadout.name || keyboardUtils.defaultLoadoutName(i);
+                buttons.push(<ButtonRow key={slot} label={name} icon="" onClick={() => this.onLoadoutClick(loadout)}>
                     <LoadoutNumber>{slot}</LoadoutNumber>
                 </ButtonRow>);
             }
