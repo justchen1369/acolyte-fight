@@ -582,8 +582,10 @@ export function addBots(game: g.Game) {
 }
 
 export function addBot(game: g.Game) {
+	const Matchmaking = game.matchmaking;
+
 	const numPlayers = game.active.size + game.bots.size;
-	if (numPlayers >= game.matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
+	if (numPlayers >= Matchmaking.MaxPlayers || game.active.size === 0 || !game.joinable) {
 		return null;
 	}
 
@@ -591,9 +593,11 @@ export function addBot(game: g.Game) {
 
 	game.bots.set(heroId, null);
 
-	const keyBindings = {};
+	const maxGames = _.max(wu(game.active.values()).map(p => p.numGames || 0).toArray()) || 0;
+	const difficulty = Math.min(1, maxGames / Matchmaking.NumGamesToMaxBotDifficulty);
+
 	const controlKey = acquireControlKey(heroId, game);
-	queueControlMessage(game, { heroId: heroId, controlKey: controlKey, type: "bot", keyBindings });
+	queueControlMessage(game, { heroId: heroId, controlKey: controlKey, type: "bot", difficulty });
 
 	return heroId;
 }

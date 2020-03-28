@@ -6,7 +6,8 @@ export interface InputContract {
 	heroId: string; // The ID of the hero you are controlling
     cooldowns: CooldownsRemaining; // The remaining cooldowns for your hero
     state: World; // The state of the world
-    settings: AcolyteFightSettings; // The current settings for this mod - see acolytefight.d.ts
+	settings: AcolyteFightSettings; // The current settings for this mod - see acolytefight.d.ts
+	difficulty: number; // Between 0 (easy) and 1 (hard)
 }
 
 export interface OutputContract {

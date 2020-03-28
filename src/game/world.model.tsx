@@ -215,6 +215,7 @@ export interface Player {
 	isSharedBot: boolean;
 	isBot: boolean;
 	isMobile: boolean;
+	difficulty: number;
 	nonIdle?: boolean;
 	dead?: boolean;
 	left?: boolean; // This was a human player who left

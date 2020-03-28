@@ -61,7 +61,7 @@ export interface BotActionMsg extends ControlMsgBase {
     type: "bot";
     heroId: string;
     controlKey: number;
-    keyBindings: KeyBindings;
+    difficulty: number;
 }
 
 export interface LeaveActionMsg extends ControlMsgBase {

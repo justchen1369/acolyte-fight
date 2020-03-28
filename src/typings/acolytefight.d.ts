@@ -112,9 +112,11 @@ declare interface WorldSettings {
 }
 
 declare interface MatchmakingSettings {
+	MaxPlayers: number; // Maximum number of players in one game
+
 	MinBots: number; // minimum number of bots to add when Play vs AI clicked
 	MaxBots: number; // maximum number of bots to add when Play vs AI clicked
-	MaxPlayers: number; // Maximum number of players in one game
+	NumGamesToMaxBotDifficulty: number; // How many games does the person need to play until the bot reaches maximum difficulty
 
 	EnableSingles: boolean; // Try to keep the match together with no teams
 	EnableSplitting: boolean; // Try to split the match into two or more matches of similar skill levels

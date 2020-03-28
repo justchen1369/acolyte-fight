@@ -9,7 +9,8 @@ var SpellCastJitterMilliseconds = 500;
 
 var TicksPerSecond = 60;
 
-var DefaultReactionMilliseconds = 600;
+var HardReactionMilliseconds = 600;
+var EasyReactionMilliseconds = 3000;
 var ReactionMillisecondsLookup = { // Change the reaction time on certain spells
     retarget: 200,
 };
@@ -29,6 +30,7 @@ function act(input) {
     var hero = state.heroes[heroId];
     var cooldowns = input.cooldowns;
     var settings = input.settings;
+    var difficulty = input.difficulty;
 
     var opponent = findOpponent(state.heroes, heroId);
     if (!(hero && opponent)) {
@@ -56,12 +58,17 @@ function act(input) {
 
     if (action) {
         // Give the bot a reaction time otherwise it is OP
-        var reactionMilliseconds = ReactionMillisecondsLookup[action.spellId] || DefaultReactionMilliseconds;
+        var reactionMilliseconds = ReactionMillisecondsLookup[action.spellId] || defaultReactionMilliseconds(difficulty);
         action.delayMilliseconds = reactionMilliseconds;
         return action;
     } else {
         return null;
     }
+}
+
+function defaultReactionMilliseconds(difficulty) {
+    var alpha = Math.sqrt(difficulty);
+    return alpha * HardReactionMilliseconds + (1 - alpha) * EasyReactionMilliseconds;
 }
 
 function chooseSpells(settings) {

@@ -142,7 +142,8 @@ class AiWorker {
         }
 
         const hero = world.objects.get(this.heroId);
-        if (!(hero && hero.category === "hero")) {
+        const player = world.players.get(this.heroId);
+        if (!(hero && hero.category === "hero" && player)) {
             // Hero is dead
             this.terminate();
             return false;
@@ -168,6 +169,7 @@ class AiWorker {
             heroId: this.heroId,
             state: worldToState(world, this.heroId),
             cooldowns,
+            difficulty: player.difficulty,
         };
         this.worker.postMessage(JSON.stringify(stateMsg));
         this.awaitingTick = stateMsg.state.tick;

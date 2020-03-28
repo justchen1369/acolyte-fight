@@ -1834,7 +1834,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 	const Visuals = world.settings.Visuals;
 	const World = world.settings.World;
 
-	console.log("Bot joined:", ev.heroId);
+	console.log("Bot joined:", ev.heroId, ev.difficulty);
 
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
@@ -1844,7 +1844,6 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		}
 
 		hero = addHero(world, ev.heroId);
-		assignKeyBindingsToHero(hero, ev.keyBindings, world);
 	} else if (hero.category !== "hero") {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
@@ -1860,6 +1859,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		isMobile: false,
 		isBot: true,
 		isSharedBot: true,
+		difficulty: ev.difficulty,
 	};
 
 	world.players = world.players.set(hero.id, player);
@@ -1899,6 +1899,7 @@ function handleJoining(ev: n.JoinActionMsg, world: w.World) {
 		isBot: false,
 		isSharedBot: false,
 		isMobile: ev.isMobile,
+		difficulty: 1, // Human players are replaced with a bot of maximum difficulty if they leave
 	};
 
 	world.players = world.players.set(hero.id, player);

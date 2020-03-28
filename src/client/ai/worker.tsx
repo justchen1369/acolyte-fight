@@ -39,6 +39,7 @@ function onInput(msg: AI.StateMsgContract) {
                 heroId: msg.heroId,
                 cooldowns: msg.cooldowns,
                 settings,
+                difficulty: msg.difficulty,
             };
             output = bot.act(input);
         }

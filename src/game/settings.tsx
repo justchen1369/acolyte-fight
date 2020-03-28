@@ -12,9 +12,10 @@ import Code from '!!raw-loader!./default.ai.js';
 const lifeSteal = 0.3;
 
 const Matchmaking: MatchmakingSettings = {
+    MaxPlayers: 7,
     MinBots: 1,
     MaxBots: 2,
-    MaxPlayers: 7,
+    NumGamesToMaxBotDifficulty: 100,
     EnableSingles: true,
     EnableSplitting: true,
     EnableTeams: true,

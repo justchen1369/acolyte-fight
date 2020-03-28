@@ -17,6 +17,7 @@ export interface StateMsgContract {
 	heroId: string;
     state: C.World;
     cooldowns: C.CooldownsRemaining;
+    difficulty: number;
 }
 
 export interface ResponseMsgContract {
