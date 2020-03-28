@@ -165,7 +165,6 @@ http.on('close', () => {
 process.on('SIGINT', () => {
 	logger.info("Received SIGINT");
 	emitter.shutdown();
-	http.close();
 });
 
 process.on('SIGTERM', () => {
