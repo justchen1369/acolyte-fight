@@ -175,6 +175,8 @@ const Visuals: VisualSettings = {
 	ButtonBarSize: 72,
     ButtonBarGap: 12,
 
+    CursorSizeInPixels: 7,
+
 	CameraPanRate: 0.004,
 	CameraZoomRate: 0.004,
 

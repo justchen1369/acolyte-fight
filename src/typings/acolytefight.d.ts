@@ -1261,6 +1261,9 @@ interface VisualSettings {
 	ButtonBarSize: number;
 	ButtonBarGap: number;
 
+	// Cursor size (on mobile only)
+	CursorSizeInPixels: number;
+
 	// Camera
 	CameraPanRate: number;
 	CameraZoomRate: number;

@@ -329,8 +329,6 @@ function renderTrails(ctxStack: CanvasCtxStack, trails: w.Trail[], world: w.Worl
 }
 
 function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
-	const CrossHairSize = world.settings.Hero.Radius;
-
 	if (!world.ui.myHeroId) {
 		return;
 	}
@@ -344,12 +342,22 @@ function renderCursor(ctxStack: CanvasCtxStack, world: w.World) {
 		return;
 	}
 
-	const fill: r.TrailFill = {
+	const outerFill: r.TrailFill = {
+		color: ColTuple.parse("#000"),
+		maxRadius: 3 * ctxStack.pixel,
+	};
+	const innerFill: r.TrailFill = {
 		color: ColTuple.parse("#fff"),
 		maxRadius: 1 * ctxStack.pixel,
 	};
-	glx.lineTrail(ctxStack, pl.Vec2(target.x, target.y - CrossHairSize), pl.Vec2(target.x, target.y + CrossHairSize), fill);
-	glx.lineTrail(ctxStack, pl.Vec2(target.x - CrossHairSize, target.y), pl.Vec2(target.x + CrossHairSize, target.y), fill);
+
+	const innerSize = world.settings.Visuals.CursorSizeInPixels * ctxStack.pixel;
+	const outerSize = innerSize + ctxStack.pixel;
+
+	glx.lineSolid(ctxStack, pl.Vec2(target.x, target.y - outerSize), pl.Vec2(target.x, target.y + outerSize), outerFill);
+	glx.lineSolid(ctxStack, pl.Vec2(target.x - outerSize, target.y), pl.Vec2(target.x + outerSize, target.y), outerFill);
+	glx.lineSolid(ctxStack, pl.Vec2(target.x, target.y - innerSize), pl.Vec2(target.x, target.y + innerSize), innerFill);
+	glx.lineSolid(ctxStack, pl.Vec2(target.x - innerSize, target.y), pl.Vec2(target.x + innerSize, target.y), innerFill);
 }
 
 function renderObject(ctxStack: CanvasCtxStack, obj: w.WorldObject, world: w.World, options: RenderOptions) {
@@ -579,6 +587,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		width: Visuals.CastFailedLineWidth,
 		fillStyle: Visuals.CastFailedColor,
 		vanish: 1,
+		light: null,
 	}, world);
 	pushTrail({
 		type: 'line',
@@ -589,6 +598,7 @@ function renderCast(ctxStack: CanvasCtxStack, ev: w.CastEvent, world: w.World, o
 		width: Visuals.CastFailedLineWidth,
 		fillStyle: Visuals.CastFailedColor,
 		vanish: 1,
+		light: null,
 	}, world);
 }
 
