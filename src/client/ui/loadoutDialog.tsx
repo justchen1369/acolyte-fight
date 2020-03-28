@@ -57,7 +57,7 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
         });
 
         const slots = new Array<React.ReactNode>();
-        for (let i = 0; i < constants.MaxLoadouts; ++i) {
+        for (let i = 0; i < constants.Loadouts.MaxLoadouts; ++i) {
             slots.push(this.renderSlot(i));
         }
 
@@ -132,7 +132,7 @@ class _LoadoutDialog extends React.PureComponent<Props, State> {
             {this.renderNumber(slot)}
             {bindings && <BuildPanel bindings={bindings} size={48} />}
             {bindings && <input
-                type="text" className="loadout-slot-name" value={name}
+                type="text" className="loadout-slot-name" value={name} maxLength={constants.Loadouts.MaxLoadoutNameLength}
                 onKeyDown={ev => this.onSlotNameKeyDown(ev)}
                 onMouseDown={ev => this.onSlotNameClick(ev, slot, name, bindings)}
                 onChange={ev => this.onSlotChange(slot, ev.target.value, bindings)}

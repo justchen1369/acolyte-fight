@@ -50,7 +50,7 @@ export interface UpdateUserSettingsRequest {
     buttons: KeyBindings;
     rebindings: KeyBindings;
     options: GameOptions;
-    loadouts?: Loadout[];
+    loadouts: Loadout[];
 }
 
 export interface UpdateUserSettingsResponse {

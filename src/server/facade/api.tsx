@@ -504,10 +504,11 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
         && required(input.rebindings, "object") && Object.keys(input.rebindings).map(key => input.rebindings[key]).every(x => optional(x, "string"))
         && required(input.options, "object")
         && required(input.loadouts, "object")
-        && _.isArray(input.loadouts) && input.loadouts.every(loadout =>
+        && _.isArray(input.loadouts) && input.loadouts.length <= constants.Loadouts.MaxLoadouts && input.loadouts.every(loadout =>
             !loadout || (
                 required(loadout, "object")
                 && optional(loadout.name, "string")
+                && (!loadout.name || loadout.name.length <= constants.Loadouts.MaxLoadoutNameLength)
                 && required(loadout.buttons, "object")
                 && Object.keys(loadout.buttons).map(key => loadout.buttons[key]).every(spellId => required(spellId, "string"))
             )
