@@ -507,6 +507,7 @@ export async function onUpdateUserSettingsAsync(req: express.Request, res: expre
         && _.isArray(input.loadouts) && input.loadouts.every(loadout =>
             !loadout || (
                 required(loadout, "object")
+                && optional(loadout.name, "string")
                 && required(loadout.buttons, "object")
                 && Object.keys(loadout.buttons).map(key => loadout.buttons[key]).every(spellId => required(spellId, "string"))
             )

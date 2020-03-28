@@ -15,6 +15,7 @@ export function loadoutToDb(loadout: m.Loadout): db.Loadout {
     }
 
     return {
+        name: loadout.name || null,
         buttons: loadout.buttons,
     };
 }
@@ -25,6 +26,7 @@ export function dbToLoadout(dbLoadout: db.Loadout): m.Loadout {
     }
 
     return {
+        name: dbLoadout.name || null,
         buttons: dbLoadout.buttons,
     };
 }
@@ -49,6 +51,6 @@ export async function setLoadouts(userId: string, loadouts: m.Loadout[]): Promis
         loadouts: loadouts.map(loadoutToDb),
     };
 
-    const doc = await firestore.collection(Collections.Loadouts).doc(userId);
+    const doc = firestore.collection(Collections.Loadouts).doc(userId);
     doc.set(dbLoadouts);
 }

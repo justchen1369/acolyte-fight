@@ -495,5 +495,6 @@ export interface PostLoadoutsResponse {
 }
 
 export interface Loadout {
+    name: string;
     buttons: KeyBindings;
 }

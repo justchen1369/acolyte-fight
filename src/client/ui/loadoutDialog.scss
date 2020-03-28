@@ -5,7 +5,9 @@
 }
 
 .loadouts-dialog-caption {
-    margin: 1.5rem;
+    max-width: 100vw;
+    box-sizing: border-box;
+    padding: 1.5rem;
 }
 
 .loadout-slot {
@@ -66,8 +68,28 @@
     box-shadow: 0 0 0.2em #fff4;
 }
 
+.loadouts-dialog-saving .loadout-slot.loadout-slot-changed {
+    background: #0cf2;
+    box-shadow: 0 0 0.2em #0cf4;
+}
+
+.loadouts-dialog-saving .loadout-slot.loadout-slot-changed:hover {
+    background: #0cf3;
+    box-shadow: 0 0 0.2em #0cf6;
+}
+
 .desktop .loadout-slot:hover .loadout-slot-actions {
     opacity: 1;
+}
+
+input.loadout-slot-name {
+    background: transparent;
+    border: none;
+    box-sizing: border-box;
+    color: #eee;
+    flex-basis: 10em;
+    flex-shrink: 1;
+    flex-grow: 1;
 }
 
 @media (max-width: 512px) {
@@ -75,4 +97,22 @@
         height: 24px !important;
         width: 24px !important;
     }
+
+    .loadout-slot-name {
+        display: none;
+    }
+}
+
+.loadouts-dialog-action-row {
+    max-width: 100vw;
+    padding: 1.5rem;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.loadouts-dialog-action-row > div {
+    margin-left: 1em;
 }

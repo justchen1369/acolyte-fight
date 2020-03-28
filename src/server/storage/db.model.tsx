@@ -141,5 +141,6 @@ export interface Loadouts {
 }
 
 export interface Loadout {
+    name: string;
     buttons: KeyBindings;
 }

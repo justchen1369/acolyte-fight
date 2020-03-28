@@ -140,6 +140,10 @@ export function updateLoadouts(loadouts: m.Loadout[]) {
     uploadSettingsDebounced();
 }
 
+export function defaultLoadoutName(slot: number) {
+    return `Loadout #${slot + 1}`;
+}
+
 export function allKeys(settings: AcolyteFightSettings) {
     const Options = settings.Choices.Options;
     return Object.keys(Options);

@@ -7,7 +7,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as keyboardUtils from '../core/keyboardUtils';
 import BuildPanel from '../profiles/buildPanel';
-import { LoadoutDialog, LoadoutDialogMode } from './loadoutDialog';
+import LoadoutDialog from './loadoutDialog';
 import SpellBtnConfig from '../play/spellBtnConfig';
 import SpellIconLookup from '../controls/spellIconLookup';
 
@@ -48,8 +48,8 @@ class SpellConfig extends React.PureComponent<Props, State> {
             <div className="spell-config">
                 {keys.map(key => <SpellBtnConfig key={key} btn={key} rebinding={true} settings={this.props.settings} onRef={(elem) => this.onSpellBtnRef(key, elem)} />)}
             </div>
-            {this.state.saving && <LoadoutDialog mode={LoadoutDialogMode.Save} onClose={() => this.setState({ saving: false })} />}
-            {this.state.loading && <LoadoutDialog mode={LoadoutDialogMode.Load} onClose={() => this.setState({ loading: false })} />}
+            {this.state.saving && <LoadoutDialog saving={true} onClose={() => this.setState({ saving: false })} />}
+            {this.state.loading && <LoadoutDialog saving={false} onClose={() => this.setState({ loading: false })} />}
         </div>;
     }
 
