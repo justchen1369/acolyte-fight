@@ -487,6 +487,7 @@ export function joinGame(game: g.Game, params: g.JoinParameters, userId: string,
 		playerName: params.name,
 		keyBindings: params.keyBindings,
 		isMobile: params.isMobile,
+		numGames: params.numGames,
 	});
 
 	return emitJoinForSocket(game, params.socketId);

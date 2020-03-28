@@ -55,6 +55,7 @@ export interface JoinActionMsg extends ControlMsgBase {
     playerName: string;
     keyBindings: KeyBindings;
     isMobile: boolean;
+    numGames: number;
 }
 
 export interface BotActionMsg extends ControlMsgBase {

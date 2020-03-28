@@ -1872,7 +1872,7 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 }
 
 function handleJoining(ev: n.JoinActionMsg, world: w.World) {
-	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId);
+	console.log("Player joined:", ev.heroId, ev.playerName, ev.userHash, ev.userId, ev.numGames);
 	let hero = world.objects.get(ev.heroId);
 	if (!hero) {
 		if (world.players.has(ev.heroId)) {
