@@ -132,16 +132,16 @@ async function updateRatingsIfNecessary(game: g.Game, gameStats: m.GameStatsMsg)
         }
     }
 
-    const deltas = acoUpdater.calculateNewAcoRatings(ratingValues, gameStats.players, gameStats.category, aco.AcoMatchmaking);
-
-    deltas.forEach(delta => {
-        let aco = matchmakingRatings.get(delta.userId);
-        if (aco) {
+    const deltaInput = acoUpdater.prepareDeltas(ratingValues, gameStats.players);
+    for (let i = 0; i < deltaInput.players.length; ++i) {
+        const delta = acoUpdater.calculateDelta(deltaInput, i, gameStats.category, aco.AcoMatchmaking);
+        let rating = matchmakingRatings.get(delta.userId);
+        if (rating) {
             const change = _(delta.changes).map(c => c.delta).sum();
-            aco += change;
+            rating += change;
         }
-        matchmakingRatings.set(delta.userId, aco);
-    });
+        matchmakingRatings.set(delta.userId, rating);
+    }
 }
 
 export function findNewGame(version: string, room: g.Room, partyId: string | null, newPlayer: RatedPlayer): g.Game {

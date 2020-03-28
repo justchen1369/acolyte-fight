@@ -116,6 +116,13 @@ export const AcoRanked = new Aco({
     numGamesConfidence: 1000,
 });
 
+export const AcoUnranked = new Aco({
+    k: 10,
+    r: 800,
+    power: 0,
+    numGamesConfidence: 1000,
+});
+
 export const AcoMatchmaking = new Aco({
     k: 100,
     r: 800,

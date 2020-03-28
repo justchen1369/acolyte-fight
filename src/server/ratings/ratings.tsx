@@ -198,16 +198,24 @@ function calculateDeltas(snapshot: UpdateRatingsSnapshot) {
         const isRanked = snapshot.isRankedLookup.get(userId);
         ratingValues.set(userId, isRanked ? userRating.aco : userRating.acoUnranked);
     });
-    const deltas = acoUpdater.calculateNewAcoRatings(ratingValues, snapshot.knownPlayers, snapshot.category, aco.AcoRanked);
+
+    const deltaInput = acoUpdater.prepareDeltas(ratingValues, snapshot.knownPlayers);
+    const deltas = new Array<acoUpdater.PlayerDelta>();
+    for (let i = 0; i < deltaInput.players.length; ++i) {
+        const player = deltaInput.players[i];
+        const isRanked = snapshot.isRankedLookup.get(player.userId);
+        const delta = acoUpdater.calculateDelta(deltaInput, i, snapshot.category, isRanked ? aco.AcoRanked : aco.AcoUnranked);
+        deltas.push(delta);
+    }
     return deltas;
 }
 
 function applyDeltas(
-    deltas: Map<string, acoUpdater.PlayerDelta>,
+    deltas: acoUpdater.PlayerDelta[],
     snapshot: UpdateRatingsSnapshot) {
 
     const result: UpdateRatingsResult = {};
-    for (const playerDelta of wu(deltas.values()).toArray()) {
+    for (const playerDelta of deltas) {
         const isRanked = snapshot.isRankedLookup.get(playerDelta.userId);
         const initialRating = snapshot.initialRatings.get(playerDelta.userId);
         const selfRating = snapshot.userRatings.get(playerDelta.userId);
