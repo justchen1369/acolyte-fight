@@ -1848,14 +1848,15 @@ function handleBotting(ev: n.BotActionMsg, world: w.World) {
 		throw "Player tried to join as non-hero: " + ev.heroId;
 	}
 
+	const color = Visuals.BotColor || chooseNewPlayerColor(null, world);
 	const player: w.Player = {
 		heroId: hero.id,
 		controlKey: ev.controlKey,
 		userId: null,
 		userHash: null,
 		name: World.BotName,
-		uiBaseColor: Visuals.BotColor,
-		uiColor: Visuals.BotColor,
+		uiBaseColor: color,
+		uiColor: color,
 		isMobile: false,
 		isBot: true,
 		isSharedBot: true,
@@ -1928,7 +1929,7 @@ function choosePlayerColor(heroId: string, userHash: string, baseColor: string, 
 function chooseNewPlayerColor(userHash: string, world: w.World) {
 	const Visuals = world.settings.Visuals;
 
-	const preferredColor = colorWheel.getPreferredColor(userHash);
+	const preferredColor = userHash ? colorWheel.getPreferredColor(userHash) : null;
 
 	let alreadyUsedColors = new Set<string>();	
 	world.objects.forEach(hero => {
@@ -1951,7 +1952,10 @@ function chooseNewPlayerColor(userHash: string, world: w.World) {
 		uiColor = Visuals.Colors[0];
 	}
 
-	colorWheel.setPreferredColor(userHash, uiColor);
+	if (userHash) {
+		colorWheel.setPreferredColor(userHash, uiColor);
+	}
+
  	return uiColor;	
 }
 

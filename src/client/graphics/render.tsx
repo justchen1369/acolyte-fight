@@ -37,7 +37,6 @@ const LightFlashProportion = 0.5;
 const DefaultCastingGlow = 0.1;
 
 const ShadowOffset = pl.Vec2(0, 0.005);
-const ShadowFeatherRadius = 0.001;
 
 const EaseDecay = 0.9;
 
@@ -930,6 +929,19 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		};
 	}
 
+	let gradient: r.TrailGradient = null;
+	if (ctxStack.rtx > r.GraphicsLevel.Low && fill.gradient > 0) {
+		const extent = shapes.getMinExtent(obstacle.shape);
+		gradient = {
+			anchor: pos,
+			fromExtent: -extent,
+			toExtent: extent,
+			fromColor: color,
+			toColor: color.clone().darken(fill.gradient),
+			angle: vector.Tau * Visuals.GradientAngleInRevs,
+		};
+	}
+
 	const highlight = context.highlight;
 	const shape = obstacle.shape;
 	if (shape.type === "polygon" || shape.type === "radial") {
@@ -952,6 +964,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 
 		glx.convexSwatch(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
+			gradient,
 			maxRadius: 1,
 			feather,
 		});
@@ -971,6 +984,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		const toAngle = angle + shape.angularExtent;
 		glx.arcSwatch(ctxStack, drawPos, fromAngle, toAngle, false, {
 			color,
+			gradient,
 			minRadius: scale * (shape.radius - radialExtent),
 			maxRadius: scale * (shape.radius + radialExtent),
 			feather,
@@ -990,6 +1004,7 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		}
 		glx.circleSwatch(ctxStack, drawPos, {
 			color,
+			gradient,
 			maxRadius: scale * radius,
 			feather,
 		});
@@ -1558,7 +1573,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		// Shadow
 		if (ctxStack.rtx > r.GraphicsLevel.Low) {
 			glx.hero(ctxStack, pos.clone().add(ShadowOffset), angle, drawRadius, bodyTexRect, {
-				color: ColTuple.parse('#0008'),
+				color: ColTuple.parse('#000').alpha(Visuals.HeroShadowOpacity),
 			});
 		}
 
@@ -1567,8 +1582,8 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			color: style,
 			gradient: {
 				fromColor: style,
-				toColor: style.clone().darken(0.5),
-				angle: vector.Tau * 3 / 8,
+				toColor: style.clone().darken(Visuals.HeroGradientDarken),
+				angle: vector.Tau * Visuals.GradientAngleInRevs,
 			},
 		});
 	}
@@ -1577,7 +1592,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 	if (glyphTexRect) {
 		// Glyph
 		glx.hero(ctxStack, pos, angle, drawRadius, glyphTexRect, {
-			color: style.clone().lighten(0.5),
+			color: style.clone().lighten(Visuals.HeroGlyphLighten).alpha(Visuals.HeroGlyphOpacity),
 		});
 	}
 }

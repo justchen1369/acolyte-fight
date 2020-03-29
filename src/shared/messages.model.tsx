@@ -448,6 +448,7 @@ export interface SpellFrequency {
     spellId: string;
     wins: number;
     usages: number;
+    probability: number;
 }
 
 export interface FacebookLoginRequest {

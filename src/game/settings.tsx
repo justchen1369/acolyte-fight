@@ -112,8 +112,10 @@ const Visuals: VisualSettings = {
     WorldHexInterval: 7 * TicksPerSecond,
 
 	WorldAnimateWinTicks: 15,
-	WorldWinGrowth: 0.05,
+    WorldWinGrowth: 0.05,
+
 	DefaultGlowRadius: 4 * Pixel,
+    GradientAngleInRevs: 3 / 8,
 
 	ShakeDistance: 0.02,
     ShakeTicks: 11,
@@ -158,8 +160,12 @@ const Visuals: VisualSettings = {
 
     DefaultFlashTicks: 6,
     
-    HeroOutlineColor: "#0008",
-    HeroOutlineProportion: 0.15,
+    HeroOutlineColor: "#000",
+    HeroOutlineProportion: 0.1,
+    HeroGradientDarken: 0.5,
+    HeroGlyphLighten: 0.5,
+    HeroGlyphOpacity: 1,
+    HeroShadowOpacity: 0.5,
 
 	NameMargin: Pixel * 2,
 	NameFontPixels: 9,
@@ -189,26 +195,25 @@ const Visuals: VisualSettings = {
 	CameraZoomTolerance: 0.2,
 
 	Colors: [
-		"#cb8fc1",
-		"#7db37d",
-		"#917ccc",
-		"#cc7c88",
-		"#d0c16b",
-		"#56b5bf",
-		"#6d89cc",
-		"#b9cc64",
-		"#cea85c",
-		"#54b7a2",
-		"#a97fc1",
+		"#ffb0f2",
+		"#abffab",
+		"#b499ff",
+		"#ff99a8",
+		"#70ffd4",
+		"#82a7ff",
+		"#d0ff61",
+		"#ffcf70",
+		"#6effe0",
+		"#dca1ff",
 	],
 
 	TeamColors: [
-		"#cb8fc1",
-		"#d0c16b",
-		"#7db37d",
-		"#cea85c",
-		"#54b7a2",
-		"#a97fc1",
+        "#cb8fc1",
+        "#d0c16b",
+        "#7db37d",
+        "#cea85c",
+        "#54b7a2",
+        "#a97fc1",
 	],
 
 }

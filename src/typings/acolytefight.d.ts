@@ -191,7 +191,8 @@ declare interface SwatchFill extends SwatchColor {
 
 	expand?: number;
 	glow?: number;
-	bloom?: number
+	bloom?: number;
+	gradient?: number; // Between 0 and 1, how much shading to apply
 	shadow?: boolean; // Apply shadow offset and shadow feather to fill
 }
 
@@ -1187,7 +1188,8 @@ interface SoundBite {
 }
 
 interface VisualSettings {
-	// Default projectile visuals
+	// Default visuals
+	GradientAngleInRevs: number; // The angle at which to apply gradient shading to acolytes and obstacles
 	DefaultFlashTicks: number;
 	DefaultGlowRadius: number;
 
@@ -1235,9 +1237,13 @@ interface VisualSettings {
 	// Visuals when acolyte takes damage
 	Damage: RenderStrikeParams;
 
-	// Hero outline
+	// Hero
 	HeroOutlineProportion: number;
 	HeroOutlineColor: string;
+	HeroGradientDarken: number; // How much to shade the acolyte, between 0 and 1
+	HeroGlyphLighten: number;
+	HeroGlyphOpacity: number;
+	HeroShadowOpacity: number;
 
 	 // Display an X on the map when failed to cast
 	CastFailedColor: string;
