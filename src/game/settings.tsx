@@ -2567,7 +2567,7 @@ const shield: Spell = {
         {
             type: "movement",
             maxTicks: 1.5 * TicksPerSecond,
-            movementProportion: 0.5,
+            movementProportion: 0.75,
         },
     ],
 
