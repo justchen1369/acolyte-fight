@@ -636,7 +636,7 @@ const meteor: Spell = {
         damage: 0,
         shieldTakesOwnership: false,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.All ^ Categories.Shield, // Shields have no effect on Meteor
+        collideWith: Categories.All, // Shields have no effect on Meteor
         expireOn: Categories.None,
 
         sound: "meteor",
@@ -666,7 +666,7 @@ const meteoriteProjectile: ProjectileTemplate = {
     damage: 0,
     shieldTakesOwnership: false,
     categories: Categories.Projectile | Categories.Massive,
-    collideWith: Categories.All ^ Categories.Shield, // Shields have no effect on Meteorite
+    collideWith: Categories.All, // Shields have no effect on Meteorite
     expireOn: Categories.None,
 
     sound: "meteorite",
@@ -697,7 +697,7 @@ const meteorite: Spell = {
             {
                 type: "spawn",
                 trigger: {
-                    collideWith: Categories.Projectile,
+                    collideWith: Categories.Projectile | Categories.Shield,
                 },
                 projectile: {
                     ...meteoriteProjectile,
@@ -2567,7 +2567,7 @@ const shield: Spell = {
         {
             type: "movement",
             maxTicks: 1.5 * TicksPerSecond,
-            movementProportion: 0.75,
+            movementProportion: 0.5,
         },
     ],
 
