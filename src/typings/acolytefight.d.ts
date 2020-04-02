@@ -376,6 +376,7 @@ declare interface ProjectileSpell extends SpellBase {
     action: "projectile";
 
 	projectile: ProjectileTemplate;
+	recoil?: number;
 }
 
 declare interface SpraySpell extends SpellBase {
@@ -389,6 +390,8 @@ declare interface SpraySpell extends SpellBase {
     intervalTicks: number; // Spray shoots a new projectile every intervalTicks
     lengthTicks: number; // Spray continues creating new projectiles until lengthTicks has passed
 	jitterRatio: number; // The spread of the spray. 1.0 means it should go out to 90 degrees either side. Weird units, I know.
+
+	recoil?: number;
 }
 
 declare interface ChargingSpell extends SpellBase {
@@ -400,6 +403,8 @@ declare interface ChargingSpell extends SpellBase {
 	chargeDamage?: PartialDamageParameters; // Scale damage with charge time
 	chargeRadius?: PartialDamageParameters; // Scale projectile radius with charge time
 	chargeImpulse?: PartialDamageParameters; // Scale detonation knockback with charge time
+
+	recoil?: number;
 }
 
 declare interface FocusSpell extends SpellBase {
@@ -411,6 +416,8 @@ declare interface FocusSpell extends SpellBase {
 	focusDelaysCooldown?: boolean; // Whether to delay the cooldown until focusing is complete
 	releaseBehaviours?: BehaviourTemplate[]; // Add these behaviours to the projectile when button is released. Must also specify the release property so the UI sends the release signal.
 	maxChannellingTicks?: number; // Keep channelling until this many ticks has been reached
+
+	recoil?: number;
 }
 
 declare interface ProjectileTemplate extends DamagePacketTemplate {

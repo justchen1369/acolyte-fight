@@ -785,6 +785,7 @@ const lightning: Spell = {
     cooldown: 7.5 * TicksPerSecond,
     throttle: true,
     chargeTicks: 0.1 * TicksPerSecond,
+    recoil: 0.5,
 
     projectile: {
         density: 8,
@@ -799,7 +800,7 @@ const lightning: Spell = {
         color: '#00ddff',
         renderers: [
             { type: "bloom", radius: 0.05 },
-            { type: "ray", intermediatePoints: true, ticks: 30, vanish: 0.5 },
+            { type: "ray", intermediatePoints: true, ticks: 30, vanish: 1 },
             { type: "strike", ticks: 15, flash: true, detonate: 0.01, numParticles: 5, speedMultiplier: 0.2 },
         ],
     },
@@ -823,6 +824,7 @@ const blast: Spell = {
     icon: "fireRay",
     sound: "blast",
 
+    recoil: 0.4,
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
     throttle: true,

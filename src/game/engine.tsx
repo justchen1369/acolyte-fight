@@ -4425,8 +4425,19 @@ function spawnProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 	if (!action.target) { return true; }
 
 	addProjectile(world, hero, action.target, spell, spell.projectile);
+	applyRecoil(hero, action.target, spell.recoil);
 
 	return true;
+}
+
+function applyRecoil(hero: w.Hero, target: pl.Vec2, recoil: number = 0) {
+	if (recoil) {
+		const delta = vector.diff(target, hero.body.getPosition());
+		delta.normalize();
+		delta.mul(-recoil);
+
+		applyVelocityDelta(hero, delta);
+	}
 }
 
 function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, spell: ChargingSpell) {
@@ -4443,6 +4454,7 @@ function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, 
 	const chargeTicks = Math.min(spell.chargeTicks, world.tick - hero.casting.chargeStartTick);
 	const template = { ...spell.projectile };
 
+	let recoilMultiplier = 1;
 	if (spell.chargeDamage) {
 		const damageMultiplier = calculatePartialMultiplier(chargeTicks, spell.chargeDamage);
 		template.damage *= damageMultiplier;
@@ -4454,7 +4466,9 @@ function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, 
 		}
 	}
 	if (spell.chargeRadius) {
-		template.radius *= calculatePartialMultiplier(chargeTicks, spell.chargeRadius);
+		const radiusMultiplier = calculatePartialMultiplier(chargeTicks, spell.chargeRadius);
+		template.radius *= radiusMultiplier;
+		recoilMultiplier *= radiusMultiplier;
 	}
 	if (spell.chargeImpulse) {
 		const impulseMultiplier = calculatePartialMultiplier(chargeTicks, spell.chargeImpulse);
@@ -4472,6 +4486,8 @@ function chargeProjectileAction(world: w.World, hero: w.Hero, action: w.Action, 
 		releaseTarget: hero.target,
 	});
 
+	applyRecoil(hero, target, recoilMultiplier * spell.recoil);
+
 	return true;
 }
 
@@ -4488,6 +4504,7 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 		const numProjectilesPerTick = spell.numProjectilesPerTick || 1;
 		const numProjectiles = numProjectilesPerTick * spell.lengthTicks / spell.intervalTicks;
 		const angleOffset = (numProjectiles % 2 === 0) ? (Math.PI / numProjectiles) : 0; // If even number, offset either side of middle
+		const recoilPerProjectile = (spell.recoil || 0) / numProjectiles;
 
 		for (let i = 0; i < numProjectilesPerTick; ++i) {
 			const projectileIndex = Math.floor((i + numProjectilesPerTick * currentLength) / spell.intervalTicks);
@@ -4507,6 +4524,8 @@ function sprayProjectileAction(world: w.World, hero: w.Hero, action: w.Action, s
 				direction: resultantDirection,
 				filterGroupIndex: objectToFilterGroupIndex(hero.casting.id),
 			});
+
+			applyRecoil(hero, action.target, recoilPerProjectile);
 		}
 	}
 
@@ -4520,6 +4539,8 @@ function focusAction(world: w.World, hero: w.Hero, action: w.Action, spell: Focu
 	if (world.tick == hero.casting.channellingStartTick) {
 		const focus = addProjectile(world, hero, action.target, spell, spell.projectile);
 		hero.focusIds.set(spell.id, focus.id);
+
+		applyRecoil(hero, action.target, spell.recoil);
 	}
 
 	const focusId = hero.focusIds.get(spell.id);
