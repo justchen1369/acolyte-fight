@@ -933,7 +933,7 @@ const boomerang: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
@@ -942,7 +942,7 @@ const boomerang: Spell = {
         radius: 0.003,
         speed: 0.8,
         maxTicks: 4 * TicksPerSecond,
-        damage: 30,
+        damage: 24,
         bumpable: true,
         lifeSteal,
         expireOn: Categories.Hero | Categories.Massive,
@@ -959,7 +959,7 @@ const boomerang: Spell = {
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
-                maxTurnProportion: 0.055,
+                maxTurnProportion: 0.075,
                 minDistanceToTarget: 0.075,
                 targetType: HomingTargets.self,
             },
@@ -973,7 +973,7 @@ const boomerang: Spell = {
             { type: "projectile", selfColor: true, ticks: 10, vanish: 1 },
             { type: "ray", selfColor: true, ticks: 10, vanish: 1 },
             { type: "ray", selfColor: true, radiusMultiplier: 0.25, ticks: 60, vanish: 1 },
-            { type: "strike", selfColor: true, ticks: 15, flash: true, numParticles: 5 },
+            { type: "strike", selfColor: true, ticks: 15, flash: true, numParticles: 5, detonate: 0.006 },
         ],
     },
 };
