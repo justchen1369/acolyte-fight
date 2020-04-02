@@ -1587,7 +1587,7 @@ const repeater: Spell = {
         radius: 0.002,
         speed: 0.8,
         maxTicks: 1 * TicksPerSecond,
-        damage: 18,
+        damage: 15,
         source: "repeater",
         lifeSteal,
         collideWith: Categories.All ^ Categories.Projectile,
