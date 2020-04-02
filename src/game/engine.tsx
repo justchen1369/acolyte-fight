@@ -4332,10 +4332,17 @@ function calculateMovementProportion(hero: w.Hero, world: w.World): number {
 
 	hero.buffs.forEach(buff => {
 		if (buff.type === "movement") {
-			if (buff.movementProportion > 1) {
-				buffIncrease = Math.max(buffIncrease, buff.movementProportion);
-			} else if (buff.movementProportion < 1) {
-				buffDecrease = Math.min(buffDecrease, buff.movementProportion);
+			let movementProportion = buff.movementProportion;
+
+			if (buff.decay) {
+				const alpha = Math.min(1, Math.max(0, (buff.expireTick - world.tick) / buff.maxTicks));
+				movementProportion = alpha * movementProportion + (1 - alpha) * 1; // Decay back to 1
+			}
+
+			if (movementProportion > 1) {
+				buffIncrease = Math.max(buffIncrease, movementProportion);
+			} else if (movementProportion < 1) {
+				buffDecrease = Math.min(buffDecrease, movementProportion);
 			}
 		}
 	});
@@ -5023,6 +5030,7 @@ function attachMovementBuff(template: MovementBuffTemplate, hero: w.Hero, world:
 		(id, values) => ({
 			...values, id, type: "movement",
 			movementProportion: template.movementProportion,
+			decay: template.decay,
 		}),
 		(stack) => {
 			stack.movementProportion *= template.movementProportion;

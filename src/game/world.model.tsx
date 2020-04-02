@@ -669,6 +669,7 @@ export interface CleanseBuff extends BuffBase {
 export interface MovementBuff extends BuffBase {
 	type: "movement";
 	movementProportion: number;
+	decay?: boolean;
 }
 
 export interface CooldownBuff extends BuffBase {

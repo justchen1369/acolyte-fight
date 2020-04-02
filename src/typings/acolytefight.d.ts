@@ -882,6 +882,7 @@ declare interface DebuffTemplate extends BuffTemplateBase {
 declare interface MovementBuffTemplate extends BuffTemplateBase {
 	type: "movement";
 	movementProportion: number; // 0 will make the hero unable to move, 2 will make hero movement twice as fast
+	decay?: boolean;
 }
 
 declare interface GlideTemplate extends BuffTemplateBase {
