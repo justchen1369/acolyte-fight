@@ -1930,8 +1930,8 @@ const supernova: Spell = {
         detonate: {
             damage: 0,
             radius: 0.05,
-            minImpulse: 0.0004,
-            maxImpulse: 0.0010,
+            minImpulse: 0.001,
+            maxImpulse: 0.001,
             renderTicks: 30,
         },
 
