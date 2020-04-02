@@ -374,7 +374,7 @@ const flamestrike: Spell = {
     projectile: {
         density: 5,
         radius: 0.005,
-        speed: 0.22,
+        speed: 0.23,
         maxTicks: 2 * TicksPerSecond,
         damage: 0,
         lifeSteal,
