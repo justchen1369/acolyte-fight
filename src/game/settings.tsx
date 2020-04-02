@@ -933,7 +933,7 @@ const boomerang: Spell = {
     icon: "boomerangSun",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 7.5 * TicksPerSecond,
+    cooldown: 10 * TicksPerSecond,
     throttle: true,
 
     projectile: {
