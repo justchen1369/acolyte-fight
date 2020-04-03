@@ -961,7 +961,7 @@ const boomerang: Spell = {
             {
                 type: "homing",
                 revolutionsPerSecond: 1,
-                maxTurnProportion: 0.075,
+                maxTurnProportion: 0.065,
                 minDistanceToTarget: 0.075,
                 targetType: HomingTargets.self,
             },
