@@ -998,6 +998,7 @@ declare interface ShieldSpell extends SpellBase {
 declare interface ReflectSpell extends ShieldSpell {
 	action: "shield";
 
+	categories?: number;
 	minRadius?: number;
 	strokeRadius?: number;
 	radius: number;

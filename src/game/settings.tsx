@@ -2554,6 +2554,7 @@ const shield: Spell = {
 
     maxTicks: 2.0 * TicksPerSecond,
     cooldown: 10 * TicksPerSecond,
+    categories: Categories.Shield | Categories.Obstacle,
     throttle: false,
     minRadius: 0.015,
     strokeRadius: 0.024,
