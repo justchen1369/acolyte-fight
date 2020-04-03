@@ -12,10 +12,10 @@ import { Collections, Singleton } from '../storage/db.model';
 import { getFirestore } from '../storage/dbStorage';
 import { logger } from '../status/logging';
 
-export interface PlayerDeltaInput {
+export interface TeamRating {
+    teamId: string;
+    averageRating: number;
     players: m.PlayerStatsMsg[];
-    averageRatingPerTeam: { [teamId: string]: number };
-    numPlayersPerTeam: number;
 }
 
 export interface PlayerDelta {
@@ -24,92 +24,88 @@ export interface PlayerDelta {
     changes: m.AcoChangeMsg[];
 }
 
-function noSortedPlayers(): PlayerDeltaInput {
-    return {
-        players: [],
-        averageRatingPerTeam: {},
-        numPlayersPerTeam: 0,
-    };
+interface Duel {
+    otherTeamId: string;
+    otherAco: number;
+    diff: number;
+    winProbability: number;
+    learningRate: number;
+    score: number;
 }
 
-export function prepareDeltas(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[]): PlayerDeltaInput {
+export function prepareDeltas(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[]): TeamRating[] {
     if (players.length <= 0) {
-        return noSortedPlayers();
+        return [];
     }
 
     const ratedPlayers = players.filter(p => ratingValues.has(p.userId));
     if (ratedPlayers.length === 0) {
-        return noSortedPlayers();
+        return [];
     }
 
     const teams = _.groupBy(ratedPlayers, p => p.teamId || p.userHash);
-
-    const numPlayersPerTeam = _.chain(teams).map(team => team.length).max().value();
-    const highestRankPerTeam = _.mapValues(teams, players => _.min(players.map(p => p.rank)));
-    const averageRatingPerTeam =
-        _.chain(teams)
-        .mapValues((players, teamId) => players.filter(p => !!p.userId).map(p => ratingValues.get(p.userId)))
-        .mapValues((ratings) => calculateAverageRating(ratings))
-        .value()
-
-    const sortedPlayers = _.sortBy(ratedPlayers, p => highestRankPerTeam[p.teamId || p.userHash]);
-
-    return {
-        players: sortedPlayers,
-        averageRatingPerTeam,
-        numPlayersPerTeam,
+    const teamRatings = new Array<TeamRating>();
+    for (const teamId of Object.keys(teams)) {
+        const teamPlayers = teams[teamId];
+        const averageRating = calculateAverageRating(teamPlayers.map(p => ratingValues.get(p.userId)));
+        teamRatings.push({
+            teamId,
+            averageRating,
+            players: teamPlayers,
+        });
     }
+
+    const highestRankPerTeam = _.mapValues(teams, players => _.min(players.map(p => p.rank)));
+    const sortedTeamRatings = _.sortBy(teamRatings, x => highestRankPerTeam[x.teamId]);
+
+    return sortedTeamRatings;
 }
 
-export function calculateDelta(input: PlayerDeltaInput, selfIndex: number, category: string, system: aco.Aco): PlayerDelta {
-    const sortedPlayers = input.players;
-    const self = input.players[selfIndex];
+export function calculateDelta(teams: TeamRating[], self: m.PlayerStatsMsg, category: string, system: aco.Aco): PlayerDelta {
+    const selfIndex = teams.findIndex(team => team.players.some(p => p === self));
+    if (selfIndex === -1) {
+        return { userId: self.userId, teamId: self.userHash, changes: [] };
+    }
 
-    // Team games count for less points because you can't control them directly
-    const multiplier = input.numPlayersPerTeam > 1 ? (1 / input.numPlayersPerTeam) : 1;
+    const selfTeam = teams[selfIndex];
 
-    const selfTeamId = self.teamId || self.userHash;
-    const selfAco = input.averageRatingPerTeam[selfTeamId];
-
-    let deltaGain: m.AcoChangeMsg = null;
-    let deltaLoss: m.AcoChangeMsg = null;
-    for (let otherIndex = 0; otherIndex < sortedPlayers.length; ++otherIndex) {
-        const other = sortedPlayers[otherIndex];
-        if (other === self) {
+    const duels = new Array<Duel>();
+    for (let otherIndex = 0; otherIndex < teams.length; ++otherIndex) {
+        const otherTeam = teams[otherIndex];
+        if (otherTeam === selfTeam) {
             continue;
         }
 
-        const otherTeamId = other.teamId || other.userHash;
-        if (selfTeamId === otherTeamId) {
-            continue; // Can't beat players on same team
-        }
-
-        const otherAco = input.averageRatingPerTeam[otherTeamId];
-
         const score = selfIndex < otherIndex ? 1 : 0; // win === 1, loss === 0
-        const diff = system.calculateDiff(selfAco, otherAco);
+        const diff = system.calculateDiff(selfTeam.averageRating, otherTeam.averageRating);
         const winProbability = system.estimateWinProbability(diff, statsProvider.getWinRateDistribution(category) || []);
-        const adjustment = system.adjustment(winProbability, score, multiplier);
-        const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId };
-        if (change.delta >= 0) {
-            if (!deltaGain || deltaGain.delta < change.delta) { // Largest gain
-                deltaGain = change;
-            }
-        } else {
-            if (!deltaLoss || deltaLoss.delta > change.delta) { // Largest loss
-                deltaLoss = change;
-            }
-        }
+        const learningRate = system.calculateLearningRate(winProbability);
+
+        duels.push({
+            otherTeamId: otherTeam.teamId,
+            otherAco: otherTeam.averageRating,
+            score,
+            diff,
+            winProbability,
+            learningRate,
+        });
+    }
+
+    // Don't scale learning linearly with number of players because then it would be 6x larger with 7 players
+    let multiplier = 1;
+    const totalLearningRate = _(duels).map(x => x.learningRate).sum();
+    if (totalLearningRate > system.learningRateCap) {
+        multiplier *= system.learningRateCap / totalLearningRate;
     }
 
     const changes = new Array<m.AcoChangeMsg>();
-    if (deltaGain) {
-        changes.push(deltaGain);
+    for (const duel of duels) {
+        const adjustment = system.adjustment(duel.winProbability, duel.score, multiplier);
+        const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId: duel.otherTeamId };
+        changes.push(change);
     }
-    if (deltaLoss) {
-        changes.push(deltaLoss);
-    }
-    return { userId: self.userId, teamId: selfTeamId, changes };
+
+    return { userId: self.userId, teamId: selfTeam.teamId, changes };
 }
 
 function calculateAverageRating(ratings: number[]) {

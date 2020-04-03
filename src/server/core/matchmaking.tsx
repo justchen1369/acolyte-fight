@@ -133,8 +133,8 @@ async function updateRatingsIfNecessary(game: g.Game, gameStats: m.GameStatsMsg)
     }
 
     const deltaInput = acoUpdater.prepareDeltas(ratingValues, gameStats.players);
-    for (let i = 0; i < deltaInput.players.length; ++i) {
-        const delta = acoUpdater.calculateDelta(deltaInput, i, gameStats.category, aco.AcoMatchmaking);
+    for (const player of gameStats.players) {
+        const delta = acoUpdater.calculateDelta(deltaInput, player, gameStats.category, aco.AcoMatchmaking);
         let rating = matchmakingRatings.get(delta.userId);
         if (rating) {
             const change = _(delta.changes).map(c => c.delta).sum();

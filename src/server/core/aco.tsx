@@ -3,6 +3,7 @@ export interface AcoConfig {
     r: number;
     power: number;
     numGamesConfidence: number;
+    learningRateCap: number;
 }
 
 export interface ActualWinRate {
@@ -26,17 +27,23 @@ export class Aco {
     r: number;
     power: number;
     numGamesConfidence: number;
+    learningRateCap: number;
 
     constructor(config: AcoConfig) {
         this.k = config.k;
         this.r = config.r;
         this.power = config.power;
         this.numGamesConfidence = config.numGamesConfidence;
+        this.learningRateCap = config.learningRateCap;
+    }
+
+    calculateLearningRate(winProbability: number) {
+        return Math.pow(1 - winProbability, this.power);
     }
 
     adjustment(winProbability: number, score: number, weight: number = 1): AcoAdjustment {
-        const learnRate = Math.pow(1 - winProbability, this.power) * weight;
-        const delta = this.k * (score - winProbability) * learnRate;
+        const learnRate = this.calculateLearningRate(winProbability);
+        const delta = this.k * (score - winProbability) * learnRate * weight;
 
         return { delta, e: winProbability, learnRate };
     }
@@ -114,6 +121,7 @@ export const AcoRanked = new Aco({
     r: 800,
     power: 1,
     numGamesConfidence: 1000,
+    learningRateCap: 1,
 });
 
 export const AcoUnranked = new Aco({
@@ -121,6 +129,7 @@ export const AcoUnranked = new Aco({
     r: 800,
     power: 0,
     numGamesConfidence: 1000,
+    learningRateCap: 1,
 });
 
 export const AcoMatchmaking = new Aco({
@@ -128,4 +137,5 @@ export const AcoMatchmaking = new Aco({
     r: 800,
     power: 1,
     numGamesConfidence: 1000,
+    learningRateCap: 1000,
 });
