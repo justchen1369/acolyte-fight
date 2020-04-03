@@ -338,7 +338,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		}
 	}
 
-	const categories = spell.categories !== undefined ? spell.categories : Categories.Shield,;
+	const categories = spell.categories !== undefined ? spell.categories : Categories.Shield;
 	let shape: pl.Shape = points ? pl.Polygon(points) : pl.Circle(spell.radius);
 	body.createFixture(shape, {
 		filterCategoryBits: categories,
