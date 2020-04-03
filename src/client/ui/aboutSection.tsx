@@ -109,20 +109,6 @@ export class AboutSection extends React.PureComponent<Props, State> {
                 so if you play at least {constants.Placements.AcoDeflatePerDay} games a day, your rating will not decay at all.
                 This is to encourage high-ranked players to defend their title.
             </p>
-            <h2>How do I get rated against multiple players in one game?</h2>
-            <p>
-                You will be considered to have "won" against every you outlasted, and "lost" against everyone who lived longer than you.
-                In a game with more than 2 people:
-            </p>
-            <ul>
-                <li>You only gain from the individual player who adds the most points. This is the person with the highest rating who you defeated..</li>
-                <li>You only lose from the individual player who subtracts the most points. This is the person with the most similar rating to yours who defeated you.</li>
-            </ul>
-            <p>
-                That means if there are 4 players in the game, and you are in last place,
-                you only lose points for being below the player most similar to your skill level.
-                This is to discourage "noob hunting". There is nothing to be gained from defeating the newbies first when there are people more similar to your skill level in the same game.
-            </p>
             {this.renderLeagues()}
             <h2>I did a lot of damage/got a lot of kills, why did I lose points?</h2>
             <p>
