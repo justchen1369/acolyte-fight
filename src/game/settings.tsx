@@ -944,7 +944,7 @@ const boomerang: Spell = {
         radius: 0.003,
         speed: 0.8,
         maxTicks: 4 * TicksPerSecond,
-        damage: 24,
+        damage: 30,
         bumpable: true,
         lifeSteal,
         expireOn: Categories.Hero | Categories.Massive,
@@ -953,8 +953,8 @@ const boomerang: Spell = {
         shieldTakesOwnership: false,
 
         partialDamage: {
-            ticks: 0.25 * TicksPerSecond,
-            initialMultiplier: 0.1,
+            ticks: 1 * TicksPerSecond,
+            initialMultiplier: 0.5,
         },
 
         behaviours: [
