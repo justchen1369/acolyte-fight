@@ -827,7 +827,6 @@ const blast: Spell = {
     icon: "fireRay",
     sound: "blast",
 
-    recoil: 0.4,
     maxAngleDiffInRevs: 0.01,
     cooldown: 5 * TicksPerSecond,
     throttle: true,
