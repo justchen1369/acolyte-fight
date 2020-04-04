@@ -756,7 +756,7 @@ function renderMap(ctxStack: CanvasCtxStack, world: w.World, options: RenderOpti
 	if (world.winner) {
 		const proportion = Math.max(0, 1 - (world.tick - (world.winTick || 0)) / Visuals.WorldAnimateWinTicks);
 		scale *= 1 + Visuals.WorldWinGrowth * proportion;
-		color = ColTuple.parse(heroColor(world.winner, world)).darken(0.5 * (1 - proportion));
+		color = ColTuple.parse(heroColor(world.winner, world)).darken(Visuals.WorldWinDarken * (1 - proportion));
 		hexColor = color.clone();
 	} else {
 		color = ColTuple.parse(world.color);

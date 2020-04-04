@@ -113,6 +113,7 @@ const Visuals: VisualSettings = {
 
 	WorldAnimateWinTicks: 15,
     WorldWinGrowth: 0.05,
+    WorldWinDarken: 0.5,
 
 	DefaultGlowRadius: 4 * Pixel,
     GradientAngleInRevs: 3 / 8,
@@ -162,7 +163,7 @@ const Visuals: VisualSettings = {
     
     HeroOutlineColor: "#000",
     HeroOutlineProportion: 0.1,
-    HeroGradientDarken: 0.5,
+    HeroGradientDarken: 0.75,
     HeroGlyphLighten: 0.5,
     HeroGlyphOpacity: 1,
     HeroShadowOpacity: 0.5,
