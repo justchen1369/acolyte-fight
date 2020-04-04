@@ -14,7 +14,7 @@ import * as w from '../../../game/world.model';
 import Link from '../../controls/link';
 
 interface OwnProps {
-    notification: w.RatingAdjustmentNotification;
+    message: s.RatingMessage;
 }
 interface Props extends OwnProps {
     myGameId: string;
@@ -45,11 +45,11 @@ class RatingAdjustmentMessage extends React.PureComponent<Props, State> {
             return null;
         }
 
-        const notification = this.props.notification;
+        const message = this.props.message;
 
         if (!this.props.unranked) {
-            const delta = notification.acoDelta;
-            const finalAcoExposure = notification.initialAcoExposure + delta;
+            const delta = message.acoDelta;
+            const finalAcoExposure = message.initialAcoExposure + delta;
             if (!finalAcoExposure) {
                 // Data unavailable for some reason
                 return null;

@@ -46,7 +46,7 @@ function initialState(): s.State {
         room,
         party: null,
         world: engine.initialWorld(room.mod),
-        items: [],
+        messages: [],
         silenced: new Set<string>(),
         performance: { cpuLag: 0, gpuLag: 0, networkLag: 0 },
         globalPerformance: { cpuLag: 0, gpuLag: 0, networkLag: 0 },
@@ -184,10 +184,7 @@ function reducer(state: s.State, action: s.Action): s.State {
         return {
             ...state,
             world: action.world,
-            items: state.items.filter(x =>
-                x.notification.type === "text"
-                || x.notification.type === "ratingAdjustment"
-                || x.notification.type === "disconnected"), // Keep messages relevant cross-games
+            messages: state.messages.filter(x => !x.message.gameId), // Keep only messages relevant cross-games
             current: {
                 ...state.current,
                 gameId: action.world.ui.myGameId,
@@ -202,8 +199,8 @@ function reducer(state: s.State, action: s.Action): s.State {
                 gameId: null,
             },
         };
-    } else if (action.type === "updateNotifications") {
-        return { ...state, items: action.items }
+    } else if (action.type === "messages") {
+        return { ...state, messages: action.messages };
     } else if (action.type === "performance") {
         return { ...state, performance: action.performance }
     } else if (action.type === "globalPerformance") {

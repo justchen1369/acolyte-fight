@@ -1,16 +1,27 @@
 import pl from 'planck-js';
 import * as m from '../../shared/messages.model';
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as ai from '../ai/ai';
 import * as activated from './activated';
 import * as engine from '../../game/engine';
+import * as messages from './messages';
 import * as performance from './performance';
 import * as processor from './processor';
 import * as sockets from './sockets';
 import * as StoreProvider from '../storeProvider';
 import { render, direct, CanvasStack, RenderOptions} from '../graphics/render';
 import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
-import { notify } from './notifications';
+
+type PlayersMessage = s.JoinMessage | s.LeaveMessage | s.SplitMessage;
+type PlayersMessageType = PlayersMessage['type'];
+type DiscriminatePlayersMessage<T extends PlayersMessageType> = Extract<PlayersMessage, {type: T}>
+
+export interface NotificationListener {
+    (newNotifications: w.Notification[]): void;
+}
+
+const listeners = new Array<NotificationListener>();
 
 let tickQueue = new Array<m.TickMsg>();
 let incomingQueue = new Array<m.TickMsg>();
@@ -21,6 +32,10 @@ let tickEpoch = Date.now();
 let tickCounter = 0;
 
 let previousFrameTime = 0;
+
+export function attachListener(listener: NotificationListener) {
+    listeners.push(listener);
+}
 
 export function reset(history: m.TickMsg[], live: boolean) {
 	if (live) {
@@ -171,9 +186,15 @@ export function frame(canvasStack: CanvasStack, world: w.World, renderOptions: R
 
 function notificationTick(world: w.World) {
 	const notifications = engine.takeNotifications(world);
-	if (notifications.length > 0) {
-		notify(...notifications);
+	if (notifications.length === 0) {
+		return;
 	}
+
+    for (const notif of notifications) {
+        handleNotification(notif, world);
+	}
+
+    listeners.forEach(listener => listener(notifications));
 }
 
 function aiTick(world: w.World) {
@@ -273,4 +294,74 @@ function send(gameId: string, heroId: string, actionMsg: m.ActionMsg) {
 		return;
 	}
 	sockets.getSocket().emit('action', actionMsg);
+}
+
+function handleNotification(notif: w.Notification, world: w.World) {
+    switch (notif.type) {
+		case "closing": return handleClosing(notif, world);
+		case "teams": return handleTeams(notif, world);
+		case "join": return handleJoin(notif, world);
+		case "bot": return handleBot(notif, world);
+		case "leave": return handleLeave(notif, world);
+		case "kill": return handleKill(notif, world);
+        case "win": return handleWin(notif, world);
+    }
+}
+
+function handleClosing(notif: w.CloseGameNotification, world: w.World) {
+	messages.push({ ...notif, gameId: world.ui.myGameId, type: "starting" });
+}
+
+function handleTeams(notif: w.TeamsNotification, world: w.World) {
+	messages.push({ ...notif, gameId: world.ui.myGameId, type: "teams" });
+}
+
+function handleJoin(notif: w.JoinNotification, world: w.World) {
+	const gameId = world.ui.myGameId;
+	appendPlayerToMessage("join", gameId, notif.player);
+}
+
+function handleBot(notif: w.BotNotification, world: w.World) {
+	const gameId = world.ui.myGameId;
+	appendPlayerToMessage("join", gameId, notif.player);
+}
+
+function handleLeave(notif: w.LeaveNotification, world: w.World) {
+	const gameId = world.ui.myGameId;
+	if (notif.split) {
+		appendPlayerToMessage("split", gameId, notif.player);
+	} else {
+		appendPlayerToMessage("leave", gameId, notif.player);
+	}
+}
+
+function appendPlayerToMessage(type: PlayersMessageType, gameId: string, newPlayer: w.Player) {
+	messages.update(type, previous => {
+		return {
+			type,
+			gameId,
+			players: appendPlayer(gameId, previous, newPlayer),
+		};
+	});
+}
+
+function appendPlayer(gameId: string, previous: PlayersMessage, newPlayer: w.Player) {
+	let players = new Array<w.Player>();
+	if (previous && previous.gameId === gameId) {
+		players.push(...previous.players);
+
+		if (newPlayer.userHash) { // Don't repeat a player in the list
+			players = players.filter(p => p.userHash !== newPlayer.userHash);
+		}
+	}
+	players.push(newPlayer);
+	return players;
+}
+
+function handleKill(notif: w.KillNotification, world: w.World) {
+	messages.push({ ...notif, gameId: world.ui.myGameId, type: "kill" });
+}
+
+function handleWin(notif: w.WinNotification, world: w.World) {
+	messages.push({ ...notif, gameId: world.ui.myGameId, type: "win" });
 }

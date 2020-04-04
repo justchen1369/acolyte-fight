@@ -10,7 +10,7 @@ import * as w from '../../../game/world.model';
 import PlayerName from '../playerNameComponent';
 
 interface OwnProps {
-    notification: w.TextNotification;
+    message: s.TextMessage;
 }
 interface Props extends OwnProps {
     myUserHash: string;
@@ -28,7 +28,7 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
         ...ownProps,
         myUserHash: state.world.ui.myUserHash,
         silenced: state.silenced,
-        player: playerLookup.get(ownProps.notification.userHash),
+        player: playerLookup.get(ownProps.message.userHash),
         live: state.world.ui.live,
         touched: state.touched,
     };
@@ -40,12 +40,12 @@ class TextMessage extends React.PureComponent<Props, State> {
             return null; // Don't show messages in a replay
         }
 
-        const notification = this.props.notification;
-        if (this.props.silenced.has(notification.userHash)) {
+        const message = this.props.message;
+        if (this.props.silenced.has(message.userHash)) {
             return null;
         } else {
             return <div className="row text-row">
-                <span>{this.renderPlayerName()}: {this.renderMessage(notification.text)}</span>
+                <span>{this.renderPlayerName()}: {this.renderMessage(message.text)}</span>
                 {this.renderSilenceBtn()}
             </div>
         }
@@ -64,7 +64,7 @@ class TextMessage extends React.PureComponent<Props, State> {
         if (player) {
             return <PlayerName player={player} />;
         } else {
-            return <span className="player-name">{this.props.notification.name}</span>
+            return <span className="player-name">{this.props.message.name}</span>
         }
     }
 
@@ -73,14 +73,14 @@ class TextMessage extends React.PureComponent<Props, State> {
             return null; // Too easy to click by mistake mid-game
         }
 
-        if (this.props.notification.userHash === this.props.myUserHash) {
+        if (this.props.message.userHash === this.props.myUserHash) {
             return null; // Cannot self-silence
         }
 
         return <i
             className="silence-btn fas fa-comment-alt-times"
-            onClick={() => this.onSilenceClick(this.props.notification.userHash)}
-            title={`Hide all messages from ${this.props.notification.name}`}
+            onClick={() => this.onSilenceClick(this.props.message.userHash)}
+            title={`Hide all messages from ${this.props.message.name}`}
             />;
     }
 

@@ -1,6 +1,7 @@
 import * as engine from '../../game/engine';
 import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
+import * as messages from './messages';
 import * as processor from './processor';
 import * as stats from './stats';
 import * as storage from '../storage';
@@ -8,7 +9,6 @@ import * as ticker from './ticker';
 import * as StoreProvider from '../storeProvider';
 import * as url from '../url';
 import * as vector from '../../game/vector';
-import { notify } from './notifications';
 import { getSocket } from './sockets';
 import { versionXX } from '../../game/version';
 
@@ -115,7 +115,6 @@ export function leaveCurrentGame(close: boolean = true) {
 		if (close) {
 			StoreProvider.dispatch({ type: "leaveMatch" });
 		}
-		notify({ type: "exit" });
 
 		console.log("Left game " + world.ui.myGameId);
 	}
@@ -151,12 +150,6 @@ export function onHeroMsg(data: m.HeroMsg) {
 	console.log("Joined game", world.ui.myGameId, world.ui.universeId, world.ui.myHeroId, data.mod);
 
 	StoreProvider.dispatch({ type: "joinMatch", world });
-	notify({
-		type: "new",
-		gameId: world.ui.myGameId,
-		heroId: world.ui.myHeroId,
-		room: data.room,
-	});
 }
 
 export function worldInterruptible(world: w.World) {

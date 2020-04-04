@@ -12,10 +12,10 @@ import Interspersed from '../../controls/interspersed';
 import PlayerName from '../playerNameComponent';
 
 interface OwnProps {
-    message: s.LeaveMessage;
+    message: s.JoinMessage;
 }
 interface Props extends OwnProps {
-    online: Immutable.Map<string, m.OnlinePlayerMsg>;
+    activePlayers: Immutable.Set<string>;
 }
 interface State {
 }
@@ -23,16 +23,16 @@ interface State {
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
-        online: state.online,
+        activePlayers: state.world.activePlayers,
     };
 }
 
-class LeftMessage extends React.PureComponent<Props, State> {
+class JoinMessage extends React.PureComponent<Props, State> {
     render() {
-        const leftPlayers = this.props.message.players.filter(p => !!p.userHash && !this.props.online.has(p.userHash));
-        if (leftPlayers.length > 0) {
+        const activePlayers = this.props.message.players.filter(p => this.props.activePlayers.has(p.heroId));
+        if (activePlayers.length > 0) {
             return <div className="row">
-                <Interspersed items={leftPlayers.map(player => <PlayerName key={player.heroId} player={player} />)} /> left
+                <Interspersed items={activePlayers.map(player => <PlayerName key={player.heroId} player={player} />)} /> joined
             </div>
         } else {
             return null;
@@ -40,4 +40,4 @@ class LeftMessage extends React.PureComponent<Props, State> {
     }
 }
 
-export default ReactRedux.connect(stateToProps)(LeftMessage);
+export default ReactRedux.connect(stateToProps)(JoinMessage);

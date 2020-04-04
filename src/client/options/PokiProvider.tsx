@@ -43,6 +43,7 @@ export class PokiProvider implements o.OptionsProvider {
         }
     }
 
+    /*
     onNotification(notifications: w.Notification[]) {
         for (const n of notifications) {
             if (n.type === "new") {
@@ -59,4 +60,5 @@ export class PokiProvider implements o.OptionsProvider {
             }
         }
     }
+    */
 }

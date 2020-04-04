@@ -14,5 +14,4 @@ export interface OptionsProvider {
 
     init(): Promise<void>;
     commercialBreak(): Promise<void>;
-    onNotification(notifications: w.Notification[]): void;
 }

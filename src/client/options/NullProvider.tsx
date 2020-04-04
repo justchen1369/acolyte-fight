@@ -7,7 +7,5 @@ export class NullProvider implements o.OptionsProvider {
     loadingProgress() { }
 
     async commercialBreak() { }
-
-    onNotification(notifications: w.Notification[]) { }
 }
 

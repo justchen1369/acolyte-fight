@@ -10,7 +10,7 @@ import PlayButton from '../../ui/playButton';
 import PlayerName from '../playerNameComponent';
 
 interface OwnProps {
-    notification: w.WinNotification;
+    message: s.WinMessage;
 }
 interface Props extends OwnProps {
     myHeroId: string;
@@ -30,18 +30,18 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 
 class WinMessage extends React.PureComponent<Props, State> {
     render() {
-        const notification = this.props.notification;
+        const message = this.props.message;
         const score = this.props.score;
         return <div className="winner dialog-panel">
-            {this.renderWinnerRow(notification.winners)}
+            {this.renderWinnerRow(message.winners)}
 
             <div className="award-group">
                 <div className="award-row">
-                    Most damage: <PlayerName player={notification.mostDamage} /> ({notification.mostDamageAmount.toFixed(0)}). {score && <span className="self-metric">Your damage: {score.damage.toFixed(0)}.</span>}
+                    Most damage: <PlayerName player={message.mostDamage} /> ({message.mostDamageAmount.toFixed(0)}). {score && <span className="self-metric">Your damage: {score.damage.toFixed(0)}.</span>}
                 </div>
 
                 <div className="award-row">
-                    Most kills: <PlayerName player={notification.mostKills} /> ({notification.mostKillsCount} kills). {score && <span className="self-metric">Your kills: {score.kills}.</span>}
+                    Most kills: <PlayerName player={message.mostKills} /> ({message.mostKillsCount} kills). {score && <span className="self-metric">Your kills: {score.kills}.</span>}
                 </div>
 
                 {score && <div className="award-row outlast-row">You outlasted {score.outlasts} {score.outlasts === 1 ? "other" : "others"}.</div>}

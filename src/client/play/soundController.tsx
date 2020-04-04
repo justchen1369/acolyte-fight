@@ -12,7 +12,7 @@ interface Props {
     mute?: boolean;
     live: boolean;
     silenced: Set<string>;
-    items: s.NotificationItem[];
+    items: s.MessageItem[];
     sounds: Sounds;
     myHeroId: string;
 }
@@ -23,7 +23,7 @@ function stateToProps(state: s.State): Props {
     return {
         mute: state.options.mute,
         live: state.world.ui.live,
-        items: state.items,
+        items: state.messages,
         silenced: state.silenced,
         sounds: state.world.settings.Sounds,
         myHeroId: state.world.ui.myHeroId,
@@ -48,7 +48,7 @@ class SoundController extends React.PureComponent<Props, State> {
 
         const elems = new Array<audio.AudioElement>();
         this.props.items.forEach(item => {
-            let sound: string = this.calculateSound(item.notification);
+            let sound: string = this.calculateSound(item.message);
             if (sound) {
                 elems.push({ id: item.key, sound });
             }
@@ -61,14 +61,14 @@ class SoundController extends React.PureComponent<Props, State> {
         return null;
     }
 
-    private calculateSound(notif: w.Notification) {
+    private calculateSound(notif: s.Message) {
         if (notif.type === "text") {
             if (this.props.live && !this.props.silenced.has(notif.userHash)) {
                 // Hide messages if in replays or if user silenced
                 return "message";
             }
         } else if (notif.type === "join") {
-            if (notif.player.heroId !== this.props.myHeroId) {
+            if (!notif.players.every(p => p.heroId === this.props.myHeroId)) {
                 return "join";
             }
         }

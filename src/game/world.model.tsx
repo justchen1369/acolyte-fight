@@ -234,29 +234,13 @@ export interface ButtonRenderState {
 }
 
 export type Notification =
-	ExitNotification
-	| TextNotification
-	| JoinNotification 
+	JoinNotification 
 	| BotNotification 
 	| LeaveNotification 
 	| KillNotification 
-	| NewGameNotification
 	| TeamsNotification
 	| CloseGameNotification
 	| WinNotification
-	| DisconnectedNotification
-	| RatingAdjustmentNotification
-
-export interface ExitNotification {
-	type: "exit";
-}
-
-export interface TextNotification {
-	type: "text";
-	userHash: string;
-	name: string;
-	text: string;
-}
 
 export interface JoinNotification {
 	type: "join";
@@ -281,13 +265,6 @@ export interface KillNotification {
 	killer: Player | null;
 }
 
-export interface NewGameNotification {
-	type: "new";
-	gameId: string;
-	heroId: string;
-	room: string | null;
-}
-
 export interface CloseGameNotification {
 	type: "closing";
 	ticksUntilClose: number;
@@ -309,20 +286,6 @@ export interface WinNotification {
 
 	mostKills: Player;
 	mostKillsCount: number;
-}
-
-export interface DisconnectedNotification {
-	type: "disconnected";
-}
-
-export interface RatingAdjustmentNotification {
-	type: "ratingAdjustment";
-	gameId: string;
-	initialNumGames: number;
-	initialAco: number;
-	initialAcoExposure: number;
-	acoDelta: number;
-	category: string;
 }
 
 export interface Snapshot {

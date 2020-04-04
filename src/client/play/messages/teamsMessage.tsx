@@ -10,21 +10,21 @@ import * as s from '../../store.model';
 import * as w from '../../../game/world.model';
 
 interface Props {
-    items: s.NotificationItem[];
+    messages: s.MessageItem[];
 }
 
 function stateToProps(state: s.State): Props {
     return {
-        items: state.items,
+        messages: state.messages,
     };
 }
 
 export class TeamsMessage extends React.PureComponent<Props> {
     render() {
-        const notification = wu(this.props.items).map(n => n.notification).find(n => n.type === "teams") as w.TeamsNotification;
-        if (notification && notification.teamSizes) {
+        const message = wu(this.props.messages).map(x => x.message).find(x => x.type === "teams") as w.TeamsNotification;
+        if (message && message.teamSizes) {
             const items = new Array<React.ReactNode>();
-            for (let i = 0; i < notification.teamSizes.length; ++i) {
+            for (let i = 0; i < message.teamSizes.length; ++i) {
                 if (items.length > 0) {
                     items.push(<span key={`v${i}`} className="teams-splash-v">v</span>);
                 }
@@ -38,7 +38,7 @@ export class TeamsMessage extends React.PureComponent<Props> {
                     className = "teams-splash-right";
                 }
 
-                items.push(<span key={i} className={className}>{notification.teamSizes[i]}</span>);
+                items.push(<span key={i} className={className}>{message.teamSizes[i]}</span>);
             }
 
             return <div className="splash-container">

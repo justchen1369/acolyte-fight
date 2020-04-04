@@ -1,6 +1,7 @@
 import * as m from '../../shared/messages.model';
+import * as s from '../store.model';
 import * as w from '../../game/world.model';
-import * as notifications from './notifications';
+import * as messages from './messages';
 import * as silencer from './silencer';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
@@ -16,18 +17,18 @@ export function onOnlineMsg(data: m.OnlineMsg) {
         }
 
         if (data.texts && data.texts.length > 0) {
-            const newNotifications = new Array<w.TextNotification>();
+            const textMessages = new Array<s.TextMessage>();
             data.texts.forEach(msg => {
-                const textNotification: w.TextNotification = {
+                const textNotification: s.TextMessage = {
                     type: "text",
                     userHash: msg.userHash,
                     name: msg.name,
                     text: msg.text,
                 };
-                newNotifications.push(textNotification);
+                textMessages.push(textNotification);
             });
-            silencer.silenceIfNecessary(newNotifications);
-            notifications.notify(...newNotifications);
+            silencer.silenceIfNecessary(textMessages);
+            textMessages.forEach(message => messages.push(message));
         }
     }
 }

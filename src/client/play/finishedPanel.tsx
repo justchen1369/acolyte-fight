@@ -14,7 +14,7 @@ interface Props {
     myHeroId: string;
     isDead: boolean;
     isFinished: boolean;
-    items: s.NotificationItem[];
+    items: s.MessageItem[];
     touched: boolean;
 }
 
@@ -25,7 +25,7 @@ function stateToProps(state: s.State): Props {
         myHeroId,
         isDead: engine.isDead(myHeroId, world),
         isFinished: !!world.winner || world.finished,
-        items: state.items,
+        items: state.messages,
         touched: state.touched,
     };
 }
@@ -40,9 +40,9 @@ class FinishedPanel extends React.PureComponent<Props> {
     }
 
     private renderNotification() {
-        const winNotification = wu(this.props.items).map(x => x.notification).find(x => x.type === "win") as w.WinNotification;
+        const winNotification = wu(this.props.items).map(x => x.message).find(x => x.type === "win") as s.WinMessage;
         if (winNotification) {
-            return <WinMessage notification={winNotification} />
+            return <WinMessage message={winNotification} />
         } else if (this.props.myHeroId && this.props.isDead) {
             return <DeadMessage />;
         } else if (this.props.isFinished) {

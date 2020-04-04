@@ -43,7 +43,7 @@ export interface State {
     region: string;
     room: RoomState;
     world: w.World;
-    items: NotificationItem[];
+    messages: MessageItem[];
     silenced: Set<string>;
 
     performance: PerformanceState;
@@ -74,9 +74,10 @@ export namespace ScoreboardMetric {
     export const Games = "games";
 }
 
-export interface NotificationItem {
+export interface MessageItem {
     key: string;
-    notification: w.Notification;
+    message: Message;
+    duration: number;
     expiryTime: number;
 }
 
@@ -125,6 +126,89 @@ export interface PathElements {
     gclid?: string;
 }
 
+export type Message =
+    TextMessage
+    | WinMessage
+    | JoinMessage
+    | LeaveMessage
+    | SplitMessage
+    | KillMessage
+    | StartingMessage
+    | TeamsMessage
+    | RatingMessage
+    | DisconnectedMessage
+
+export interface MessageBase {
+    type: string;
+    gameId?: string; // Only display this message if currently in this game
+}
+
+export interface JoinMessage extends MessageBase {
+	type: "join";
+	players: w.Player[];
+}
+
+export interface LeaveMessage extends MessageBase {
+	type: "leave";
+	players: w.Player[];
+}
+
+export interface SplitMessage extends MessageBase {
+	type: "split";
+	players: w.Player[];
+}
+
+export interface KillMessage extends MessageBase {
+	type: "kill";
+	myHeroId: string;
+	killed: w.Player;
+	killer: w.Player | null;
+}
+
+export interface StartingMessage extends MessageBase {
+	type: "starting";
+	ticksUntilClose: number;
+	message: string;
+}
+
+export interface TeamsMessage extends MessageBase {
+	type: "teams";
+	teamSizes?: number[];
+}
+
+export interface WinMessage extends MessageBase {
+	type: "win";
+	myHeroId: string;
+	winners: w.Player[];
+
+	mostDamage: w.Player;
+	mostDamageAmount: number;
+
+	mostKills: w.Player;
+	mostKillsCount: number;
+}
+
+export interface TextMessage extends MessageBase {
+	type: "text";
+	userHash: string;
+	name: string;
+	text: string;
+}
+
+export interface RatingMessage extends MessageBase {
+	type: "ratingAdjustment";
+	gameId: string;
+	initialNumGames: number;
+	initialAco: number;
+	initialAcoExposure: number;
+	acoDelta: number;
+    category: string;
+}
+
+export interface DisconnectedMessage extends MessageBase {
+	type: "disconnected";
+}
+
 export type Action =
     DisconnectedAction
     | ServerPreparingToShutdownAction
@@ -151,7 +235,7 @@ export type Action =
     | UpdateGlobalPerformanceAction
     | UpdateShowingPerformanceAction
     | UpdateShowingChatAction
-    | UpdateNotificationsAction
+    | UpdateMessagesAction
     | UpdateSilencedAction
     | UpdateRoomAction
     | JoinPartyAction
@@ -300,9 +384,9 @@ export interface UpdatePageAction {
     profileId?: string;
 }
 
-export interface UpdateNotificationsAction {
-    type: "updateNotifications";
-    items: NotificationItem[];
+export interface UpdateMessagesAction {
+    type: "messages";
+    messages: MessageItem[];
 }
 
 export interface UpdateSilencedAction {

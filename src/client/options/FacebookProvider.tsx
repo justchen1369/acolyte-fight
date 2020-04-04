@@ -31,8 +31,6 @@ export class FacebookProvider implements o.OptionsProvider {
 
     async commercialBreak() { }
 
-    onNotification(notifications: w.Notification[]) { }
-
     private async authenticate(): Promise<string> {
         const signedInfo = await this.sdk.player.getSignedPlayerInfoAsync()
         var signature = signedInfo.getSignature();

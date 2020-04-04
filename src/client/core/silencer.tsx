@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import * as w from '../../game/world.model';
+import * as s from '../store.model';
 import * as StoreProvider from '../storeProvider';
 
 class WordFilter {
@@ -291,7 +291,7 @@ bannedSentences.forEach(sentence => wordFilter.addSentence(sentence));
 bannedWords.forEach(word => wordFilter.addWord(word));
 bannedSubpatterns.forEach(pattern => wordFilter.addSubpattern(pattern));
 
-export function silenceIfNecessary(notifications: w.TextNotification[]) {
+export function silenceIfNecessary(notifications: s.TextMessage[]) {
     const state = StoreProvider.getState();
     if (state.options.noProfanityFilter) {
         return;

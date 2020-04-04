@@ -8,8 +8,10 @@ import * as constants from '../../game/constants';
 import * as options from '../options';
 import * as StoreProvider from '../storeProvider';
 import { Matchmaking, TicksPerSecond } from '../../game/constants';
+import JoinMessage from './messages/joinMessage';
 import LeftMessage from './messages/leftMessage';
 import RatingAdjustmentMessage from './messages/ratingAdjustmentMessage';
+import SplitMessage from './messages/splitMessage';
 import TextMessage from './messages/textMessage';
 import PlayerName from './playerNameComponent';
 
@@ -18,7 +20,7 @@ interface Props {
     buttonBar: w.ButtonConfig;
     settings: AcolyteFightSettings;
     options: m.GameOptions;
-    items: s.NotificationItem[];
+    messages: s.MessageItem[];
 }
 interface State {
 }
@@ -30,7 +32,7 @@ function stateToProps(state: s.State): Props {
         buttonBar: world.ui.buttonBar,
         settings: world.settings,
         options: state.options,
-        items: state.items,
+        messages: state.messages,
     };
 }
 
@@ -45,12 +47,12 @@ class MessagesPanel extends React.PureComponent<Props, State> {
     render() {
         let rows = new Array<React.ReactNode>();
         const now = new Date().getTime();
-        this.props.items.forEach(item => {
-            if (now >= item.expiryTime) {
+        this.props.messages.forEach(msg => {
+            if (now >= msg.expiryTime) {
                 return;
             }
 
-            const row = this.renderNotification(item.key, item.notification);
+            const row = this.renderMessage(msg.key, msg.message);
             if (!row) {
                 return;
             }
@@ -63,54 +65,46 @@ class MessagesPanel extends React.PureComponent<Props, State> {
         </div>;
     }
 
-    private renderNotification(key: string, notification: w.Notification): React.ReactNode {
-        switch (notification.type) {
-            case "disconnected": return this.renderDisconnectedNotification(key, notification);
-            case "text": return <TextMessage key={key} notification={notification} />
-            case "closing": return this.renderClosingNotification(key, notification);
-            case "join": return this.renderJoinNotification(key, notification);
-            case "bot": return this.renderBotNotification(key, notification);
-            case "leave": return <LeftMessage key={key} notification={notification} />
-            case "kill": return this.renderKillNotification(key, notification);
-            case "ratingAdjustment": return <RatingAdjustmentMessage key={key} notification={notification} />
+    private renderMessage(key: string, message: s.Message): React.ReactNode {
+        switch (message.type) {
+            case "disconnected": return this.renderDisconnectedNotification(key, message);
+            case "text": return <TextMessage key={key} message={message} />
+            case "starting": return this.renderStartingNotification(key, message);
+            case "join": return <JoinMessage key={key} message={message} />
+            case "split": return <SplitMessage key={key} message={message} />
+            case "leave": return <LeftMessage key={key} message={message} />
+            case "kill": return this.renderKillNotification(key, message);
+            case "ratingAdjustment": return <RatingAdjustmentMessage key={key} message={message} />
             default: return null; // Ignore this notification
         }
     }
 
-    private renderDisconnectedNotification(key: string, notification: w.DisconnectedNotification) {
+    private renderDisconnectedNotification(key: string, message: s.DisconnectedMessage) {
         return <div key={key} className="row error">Disconnected from server. Exit the game and try again.</div>
     }
 
-    private renderClosingNotification(key: string, notification: w.CloseGameNotification) {
-        if (notification.ticksUntilClose <= 0) {
-            return <div key={key} className="row game-started">{notification.message}</div>;
-        } else if (notification.ticksUntilClose <= Matchmaking.JoinPeriod) {
+    private renderStartingNotification(key: string, message: s.StartingMessage) {
+        if (message.ticksUntilClose <= 0) {
+            return <div key={key} className="row game-started">{message.message}</div>;
+        } else if (message.ticksUntilClose <= Matchmaking.JoinPeriod) {
             return null;
         } else {
-            return <div key={key} className="row game-started">Waiting {notification.ticksUntilClose / TicksPerSecond} seconds for more players to join...</div>
+            return <div key={key} className="row game-started">Waiting {message.ticksUntilClose / TicksPerSecond} seconds for more players to join...</div>
         }
     }
 
-    private renderJoinNotification(key: string, notification: w.JoinNotification): React.ReactNode {
-        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>;
-    }
-
-    private renderBotNotification(key: string, notification: w.BotNotification): React.ReactNode {
-        return <div key={key} className="row"><PlayerName player={notification.player} /> joined</div>;
-    }
-
-    private renderKillNotification(key: string, notification: w.KillNotification) {
-        if (!notification.killed) {
+    private renderKillNotification(key: string, message: s.KillMessage) {
+        if (!message.killed) {
             return null;
         }
 
-        if (notification.killer) {
+        if (message.killer) {
             return <div key={key} className="row">
-                {notification.killer && <span key="killer"><PlayerName player={notification.killer} /> killed </span>}
-                {notification.killed && <span key="killed"><PlayerName player={notification.killed} /> </span>}
+                {message.killer && <span key="killer"><PlayerName player={message.killer} /> killed </span>}
+                {message.killed && <span key="killed"><PlayerName player={message.killed} /> </span>}
             </div>
         } else {
-            return <div key={key} className="row"><PlayerName player={notification.killed} /> died</div>
+            return <div key={key} className="row"><PlayerName player={message.killed} /> died</div>
         }
     }
 }

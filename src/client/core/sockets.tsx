@@ -1,9 +1,9 @@
 import msgpackParser from 'socket.io-msgpack-parser';
 import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
+import * as messages from './messages';
 import * as SocketIO from 'socket.io-client';
 import * as StoreProvider from '../storeProvider';
-import { notify } from './notifications';
 
 let currentSocket: SocketIOClient.Socket = null;
 
@@ -131,5 +131,5 @@ function onServerPreparingToShutdown() {
 function onServerRestarted() {
 	console.log("Server restarted");
 	StoreProvider.dispatch({ type: "disconnected" });
-	notify({ type: "disconnected" });
+	messages.push({ type: "disconnected" });
 }

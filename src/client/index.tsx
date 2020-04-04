@@ -14,7 +14,7 @@ import * as audio from './audio/audio';
 import * as cloud from './core/cloud';
 import * as loader from './core/loader';
 import * as matches from './core/matches';
-import * as notifications from './core/notifications';
+import * as messages from './core/messages';
 import * as online from './core/online';
 import * as options from './options';
 import * as pages from './core/pages';
@@ -48,12 +48,12 @@ export async function initialize() {
 
     audio.init().then(() => audio.cache(Sounds)); // Don't bother awaiting
 
-    notifications.attachListener(n => options.getProvider().onNotification(n));
-    notifications.attachListener(n => cloud.onNotification(n));
-    notifications.attachListener(n => matches.onNotification(n));
-    notifications.attachListener(n => stats.onNotification(n));
-    notifications.attachListener(n => rankings.onNotification(n));
-    notifications.attachListener(n => tutor.onNotification(n));
+    ticker.attachListener(n => cloud.onNotification(n));
+    ticker.attachListener(n => matches.onNotification(n));
+    ticker.attachListener(n => stats.onNotification(n));
+    ticker.attachListener(n => tutor.onNotification(n));
+
+    stats.attachRatingAdjustmentListener(n => rankings.onRatingAdjustment(n));
 
     sockets.listeners.onGameMsg = stats.onGameMsg;
     sockets.listeners.onHeroMsg = matches.onHeroMsg;
@@ -71,7 +71,7 @@ export async function initialize() {
         }
     }
 
-    notifications.startTimers();
+    messages.startTimers();
 
     start().then(() => loader.unblock()).catch(console.error); // Don't await
 

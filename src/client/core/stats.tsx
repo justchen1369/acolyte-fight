@@ -6,7 +6,7 @@ import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as constants from '../../game/constants';
 import * as engine from '../../game/engine';
-import * as notifications from './notifications';
+import * as messages from './messages';
 import * as rankings from './rankings';
 import * as sockets from './sockets';
 import * as storage from '../storage';
@@ -14,7 +14,15 @@ import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
 import { TicksPerSecond } from '../../game/constants';
 
+type RatingAdjustmentListener = (adjustment: s.RatingMessage) => void;
+
 let alreadyLoadedGameStats = false;
+
+const ratingAdjustmentListeners = new Array<RatingAdjustmentListener>();
+
+export function attachRatingAdjustmentListener(listener: RatingAdjustmentListener) {
+    ratingAdjustmentListeners.push(listener);
+}
 
 export function onNotification(notifs: w.Notification[]) {
     // Save the world if it has been won
@@ -36,7 +44,7 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
     // Notify
     const self = gameStats.players[gameStats.self];
     if (self && self.acoDelta) {
-        notifications.notify({
+        const adjustment: s.RatingMessage = {
             type: "ratingAdjustment",
             gameId: gameStats.id,
             initialNumGames: self.initialNumGames,
@@ -44,7 +52,9 @@ export async function onGameMsg(gameStatsMsg: m.GameStatsMsg) {
             initialAcoExposure: self.initialAcoExposure,
             acoDelta: self.acoDelta,
             category: gameStats.category,
-        });
+        };
+        messages.update("ratingAdjustment", () => adjustment);
+        ratingAdjustmentListeners.forEach(listener => listener(adjustment));
     }
 
     // Add to replays list

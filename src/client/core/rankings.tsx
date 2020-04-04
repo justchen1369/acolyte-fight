@@ -29,15 +29,7 @@ export async function downloadLeaderboard() {
     StoreProvider.dispatch({ type: "updateLeaderboard", leaderboard });
 }
 
-export function onNotification(notifs: w.Notification[]) {
-    for (const notif of notifs) {
-        if (notif.type === "ratingAdjustment") {
-            adjustRating(notif);
-        }
-    }
-}
-
-function adjustRating(adjustment: w.RatingAdjustmentNotification) {
+export function onRatingAdjustment(adjustment: s.RatingMessage) {
     // Incrementally adjust the rating until it's reloaded later
     const state = StoreProvider.getState();
     if (!(state.profile && state.profile.ratings)) {
