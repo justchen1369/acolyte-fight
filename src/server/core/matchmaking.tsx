@@ -17,7 +17,7 @@ import TimedCache from '../../utils/timedCache';
 
 const BotSocketId = "Bot";
 const MatchmakingExpiryMilliseconds = 20 * 60 * 1000;
-const RepeatMatchupExpiryMilliseconds = 5 * 60 * 1000;
+const RepeatMatchupExpiryMilliseconds = 3 * 60 * 1000;
 
 export interface SocketTeam {
     socketId: string;
