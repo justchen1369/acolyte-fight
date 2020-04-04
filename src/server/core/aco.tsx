@@ -3,19 +3,13 @@ export interface AcoConfig {
     r: number;
     power: number;
     numGamesConfidence: number;
-    learningRateCap: number;
+    lossCap: number;
 }
 
 export interface ActualWinRate {
     midpoint: number;
     winRate: number;
     numGames: number;
-}
-
-export interface AcoAdjustment {
-    delta: number;
-    e: number;
-    learnRate: number;
 }
 
 function calculateEloWinRate(diff: number, r: number) {
@@ -27,25 +21,22 @@ export class Aco {
     r: number;
     power: number;
     numGamesConfidence: number;
-    learningRateCap: number;
+    lossCap: number;
 
     constructor(config: AcoConfig) {
         this.k = config.k;
         this.r = config.r;
         this.power = config.power;
         this.numGamesConfidence = config.numGamesConfidence;
-        this.learningRateCap = config.learningRateCap;
+        this.lossCap = config.lossCap;
     }
 
     calculateLearningRate(winProbability: number) {
         return Math.pow(1 - winProbability, this.power);
     }
 
-    adjustment(winProbability: number, score: number, weight: number = 1): AcoAdjustment {
-        const learnRate = this.calculateLearningRate(winProbability);
-        const delta = this.k * (score - winProbability) * learnRate * weight;
-
-        return { delta, e: winProbability, learnRate };
+    adjustment(winProbability: number, score: number): number {
+        return this.k * (score - winProbability);
     }
 
     calculateDiff(selfRating: number, otherRating: number): number { 
@@ -121,7 +112,7 @@ export const AcoRanked = new Aco({
     r: 800,
     power: 1,
     numGamesConfidence: 1000,
-    learningRateCap: 1,
+    lossCap: 2.5,
 });
 
 export const AcoUnranked = new Aco({
@@ -129,7 +120,7 @@ export const AcoUnranked = new Aco({
     r: 800,
     power: 0,
     numGamesConfidence: 1000,
-    learningRateCap: 1,
+    lossCap: 2.5,
 });
 
 export const AcoMatchmaking = new Aco({
@@ -137,5 +128,5 @@ export const AcoMatchmaking = new Aco({
     r: 800,
     power: 1,
     numGamesConfidence: 1000,
-    learningRateCap: 1000,
+    lossCap: 25,
 });

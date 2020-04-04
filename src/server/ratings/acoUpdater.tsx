@@ -30,7 +30,9 @@ interface Duel {
     diff: number;
     winProbability: number;
     learningRate: number;
-    score: number;
+    score: number; // The result of this duel, 1 for win, 0 for loss
+    potentialLoss: number; // How much would we lose if we lost
+    adjustment: number; // How much we are actually winning/losing
 }
 
 export function prepareDeltas(ratingValues: Map<string, number>, players: m.PlayerStatsMsg[]): TeamRating[] {
@@ -81,6 +83,9 @@ export function calculateDelta(teams: TeamRating[], self: m.PlayerStatsMsg, cate
         const winProbability = system.estimateWinProbability(diff, statsProvider.getWinRateDistribution(category) || []);
         const learningRate = system.calculateLearningRate(winProbability);
 
+        const potentialLoss = -system.adjustment(winProbability, 0) * learningRate;
+        const adjustment = system.adjustment(winProbability, score) * learningRate;
+
         duels.push({
             otherTeamId: otherTeam.teamId,
             otherAco: otherTeam.averageRating,
@@ -88,20 +93,25 @@ export function calculateDelta(teams: TeamRating[], self: m.PlayerStatsMsg, cate
             diff,
             winProbability,
             learningRate,
+            potentialLoss,
+            adjustment,
         });
     }
 
     // Don't scale learning linearly with number of players because then it would be 6x larger with 7 players
     let multiplier = 1;
-    const totalLearningRate = _(duels).map(x => x.learningRate).sum();
-    if (totalLearningRate > system.learningRateCap) {
-        multiplier *= system.learningRateCap / totalLearningRate;
+    const totalPotentialLoss = _(duels).map(x => x.potentialLoss).sum();
+    if (totalPotentialLoss > system.lossCap) {
+        multiplier *= system.lossCap / totalPotentialLoss;
     }
 
     const changes = new Array<m.AcoChangeMsg>();
     for (const duel of duels) {
-        const adjustment = system.adjustment(duel.winProbability, duel.score, multiplier);
-        const change: m.AcoChangeMsg = { delta: adjustment.delta, e: adjustment.e, otherTeamId: duel.otherTeamId };
+        const change: m.AcoChangeMsg = {
+            delta: duel.adjustment * multiplier,
+            e: duel.winProbability,
+            otherTeamId: duel.otherTeamId,
+        };
         changes.push(change);
     }
 
