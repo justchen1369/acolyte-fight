@@ -234,8 +234,7 @@ export interface ButtonRenderState {
 }
 
 export type Notification =
-	HelpNotification 
-	| ExitNotification
+	ExitNotification
 	| TextNotification
 	| JoinNotification 
 	| BotNotification 
@@ -247,10 +246,6 @@ export type Notification =
 	| WinNotification
 	| DisconnectedNotification
 	| RatingAdjustmentNotification
-
-export interface HelpNotification {
-	type: "help";
-}
 
 export interface ExitNotification {
 	type: "exit";
