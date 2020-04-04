@@ -1487,7 +1487,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 
 		// Hit flash
 		if (highlight.bloom && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
-			glx.circleSwatch(ctxStack, pos, {
+			glx.circleTrail(ctxStack, pos, {
 				color: style,
 				maxRadius: 0,
 				feather: {
@@ -1530,6 +1530,11 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 			color: strokeColor,
 			minRadius: 0,
 			maxRadius: radius + Visuals.ChargingRadius,
+		});
+		glx.circleTrail(ctxStack, pos, {
+			color: strokeColor,
+			minRadius: radius + Visuals.ChargingRadius,
+			maxRadius: radius + Visuals.ChargingRadius,
 			feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
 				sigma: DefaultBloomRadius,
 				alpha: DefaultCastingGlow,
@@ -1539,7 +1544,7 @@ function renderHeroCharacter(ctxStack: CanvasCtxStack, hero: w.Hero, pos: pl.Vec
 		const proportion = 1 - (world.tick - hero.uiCastTrail.castTick) / Visuals.CastingFlashTicks;
 		if (proportion > 0) {
 			const strokeColor = ColTuple.parse(color).alpha(proportion);
-			glx.circleSwatch(ctxStack, pos, {
+			glx.circleTrail(ctxStack, pos, {
 				color: strokeColor,
 				maxRadius: 0,
 				feather: ctxStack.rtx >= r.GraphicsLevel.Ultra ? {
