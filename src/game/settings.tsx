@@ -2214,7 +2214,7 @@ const iceBomb: Spell = {
                 stack: "iceBomb",
                 maxStacks: 1,
                 movementProportion: 0.1,
-                maxTicks: 1.5 * TicksPerSecond,
+                maxTicks: 1.25 * TicksPerSecond,
                 against: Alliances.NotFriendly,
                 render: {
                     color: "rgba(64, 255, 255, 1)",
