@@ -1,18 +1,13 @@
 import * as winston from 'winston';
 import * as Transport from 'winston-transport';
 
-const LoggingWinston = require('@google-cloud/logging-winston').LoggingWinston;
+const GoogleCloudLogging = require('@google-cloud/logging-winston').LoggingWinston;
 
 let transports: Array<Transport> = [
 	new winston.transports.Console(),
 	new winston.transports.File({ filename: 'logs/server.log' }),
+	new GoogleCloudLogging(),
 ];
-
-let googleAuthenticated = false;
-if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-	transports.push(new LoggingWinston());
-	googleAuthenticated = true;
-}
 
 export const logger = winston.createLogger({
 	level: 'info',
@@ -22,5 +17,3 @@ export const logger = winston.createLogger({
 	),
 	transports,
 });
-
-logger.info(`Logging initialized: googleAuthenticated=${googleAuthenticated}`);
