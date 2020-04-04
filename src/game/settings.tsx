@@ -16,13 +16,13 @@ const Matchmaking: MatchmakingSettings = {
     MinBots: 1,
     MaxBots: 2,
     NumGamesToMaxBotDifficulty: 100,
-    EnableSingles: false, // TODO
-    EnableSplitting: false, // TODO
+    EnableSingles: true,
+    EnableSplitting: true,
     EnableTeams: true,
     PvE: false,
     AllowBotTeams: false,
     AllowUnevenTeams: false,
-    TeamsMinGames: 0, // TODO
+    TeamsMinGames: 5,
     BotRating: 1500,
     RatingPower: 2,
     OddPenalty: 0.75,
