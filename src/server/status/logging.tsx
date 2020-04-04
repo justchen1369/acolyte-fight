@@ -8,8 +8,10 @@ let transports: Array<Transport> = [
 	new winston.transports.File({ filename: 'logs/server.log' }),
 ];
 
+let googleAuthenticated = false;
 if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 	transports.push(new LoggingWinston());
+	googleAuthenticated = true;
 }
 
 export const logger = winston.createLogger({
@@ -20,3 +22,5 @@ export const logger = winston.createLogger({
 	),
 	transports,
 });
+
+logger.info(`Logging initialized: googleAuthenticated=${googleAuthenticated}`);
