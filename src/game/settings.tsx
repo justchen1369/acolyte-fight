@@ -751,7 +751,7 @@ const kamehameha: Spell = {
     },
     jitterRatio: 0.0,
 
-    intervalTicks: 6,
+    intervalTicks: 3,
     lengthTicks: 2.5 * TicksPerSecond,
 
     projectile: {
@@ -760,16 +760,19 @@ const kamehameha: Spell = {
         radius: 0.005,
         speed: 3.0,
         maxTicks: 0.5 * TicksPerSecond,
-        damage: 6,
+        damage: 3,
         lifeSteal,
         categories: Categories.Projectile | Categories.Massive,
+        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
+        expireOn: Categories.All ^ Categories.Shield,
+        sense: Categories.Projectile,
         swappable: false,
         destroying: true,
 
         sound: "kamehameha",
-        color: '#ffffff',
+        color: '#44ddff',
         renderers: [
-            { type: "ray", intermediatePoints: true, ticks: 60, glow: 0.1, bloom: 0.01 },
+            { type: "ray", intermediatePoints: true, ticks: 30, ownerColor: true, shine: 0.8, glow: 0.2, bloom: 0.005, vanish: 1 },
         ],
     },
 };
