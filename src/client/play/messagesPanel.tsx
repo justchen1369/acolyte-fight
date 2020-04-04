@@ -11,6 +11,7 @@ import { Matchmaking, TicksPerSecond } from '../../game/constants';
 import JoinMessage from './messages/joinMessage';
 import LeftMessage from './messages/leftMessage';
 import RatingAdjustmentMessage from './messages/ratingAdjustmentMessage';
+import ReminderMessage from './messages/reminderMessage';
 import SplitMessage from './messages/splitMessage';
 import TextMessage from './messages/textMessage';
 import PlayerName from './playerNameComponent';
@@ -74,6 +75,7 @@ class MessagesPanel extends React.PureComponent<Props, State> {
             case "split": return <SplitMessage key={key} message={message} />
             case "leave": return <LeftMessage key={key} message={message} />
             case "kill": return this.renderKillNotification(key, message);
+            case "reminder": return <ReminderMessage key={key} message={message} />
             case "ratingAdjustment": return <RatingAdjustmentMessage key={key} message={message} />
             default: return null; // Ignore this notification
         }

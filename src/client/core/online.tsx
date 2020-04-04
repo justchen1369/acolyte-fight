@@ -2,6 +2,7 @@ import * as m from '../../shared/messages.model';
 import * as s from '../store.model';
 import * as w from '../../game/world.model';
 import * as messages from './messages';
+import * as remind from './remind';
 import * as silencer from './silencer';
 import * as StoreProvider from '../storeProvider';
 import { getSocket } from './sockets';
@@ -29,6 +30,7 @@ export function onOnlineMsg(data: m.OnlineMsg) {
             });
             silencer.silenceIfNecessary(textMessages);
             textMessages.forEach(message => messages.push(message));
+            remind.remindIfNecessary(textMessages);
         }
     }
 }

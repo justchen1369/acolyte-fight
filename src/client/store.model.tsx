@@ -136,6 +136,7 @@ export type Message =
     | StartingMessage
     | TeamsMessage
     | RatingMessage
+    | ReminderMessage
     | DisconnectedMessage
 
 export interface MessageBase {
@@ -193,6 +194,11 @@ export interface TextMessage extends MessageBase {
 	userHash: string;
 	name: string;
 	text: string;
+}
+
+export interface ReminderMessage extends MessageBase {
+    type: "reminder";
+    text: string;
 }
 
 export interface RatingMessage extends MessageBase {
