@@ -882,9 +882,9 @@ const blast: Spell = {
         sound: "blast",
         color: '#0ff',
         renderers: [
-            { type: "bloom", selfColor: true, radius: 0.07 },
-            { type: "projectile", ticks: 10, selfColor: true, shine: 1, smoke: 0.15, glow: 0.3, vanish: 0.5 },
-            { type: "strike", ticks: 10, numParticles: 10, flash: true },
+            { type: "bloom", ownerColor: true, radius: 0.07 },
+            { type: "projectile", ticks: 10, ownerColor: true, shine: 1, smoke: 0.15, light: 0.8, vanish: 0.25 },
+            { type: "strike", ticks: 10, numParticles: 10, ownerColor: true, flash: true },
         ],
     },
 };
