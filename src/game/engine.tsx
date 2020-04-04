@@ -1804,6 +1804,7 @@ function assignTeams(teams: string[][], world: w.World) {
 
 			const player = world.players.get(heroId);
 			player.uiColor = isPresentOrPastSelf(heroId, world) ? Visuals.MyHeroColor : colorWheel.teamColor(teamColor);
+			world.players = world.players.set(heroId, player); // Treat players as immutable, even though we are mutating it
 		}
 
 		world.teams = world.teams.set(teamId, {

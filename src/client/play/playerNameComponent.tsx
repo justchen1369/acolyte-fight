@@ -1,4 +1,5 @@
-import * as _ from 'lodash';
+import _ from 'lodash';
+import Immutable from 'immutable';
 import * as React from 'react';
 import * as ReactRedux from 'react-redux';
 import * as s from '../store.model';
@@ -11,12 +12,14 @@ interface OwnProps {
 
 interface Props extends OwnProps {
     world: w.World;
+    players: Immutable.Map<string, w.Player>; // This isn't used, but needs to be here for change detection because world gets mutated
 }
 
 function stateToProps(state: s.State, ownProps: OwnProps): Props {
     return {
         ...ownProps,
         world: state.world,
+        players: state.world.players,
     };
 }
 
