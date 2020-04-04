@@ -24,7 +24,10 @@ function stateToProps(state: s.State, ownProps: OwnProps): Props {
 
 class LeftMessage extends React.PureComponent<Props, State> {
     render() {
-        return <div className="row reminder-row">Reminder: <b>{this.props.message.text}</b></div>
+        switch (this.props.message.reminder) {
+            case "ffa": return <div className="row reminder-row"><i>Reminder:</i> This game is a <b>free-for-all</b>. You <b>do not</b> need to respect 1v1s.</div>
+            default: return null;
+        }
     }
 }
 

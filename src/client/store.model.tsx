@@ -198,7 +198,7 @@ export interface TextMessage extends MessageBase {
 
 export interface ReminderMessage extends MessageBase {
     type: "reminder";
-    text: string;
+    reminder: string;
 }
 
 export interface RatingMessage extends MessageBase {
