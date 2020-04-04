@@ -30,7 +30,7 @@ const DefaultParticleBloomRadius = 0.015;
 
 const DefaultShine = 0.5;
 const DefaultGlow = 0.3;
-const DefaultLight = 0.8;
+const DefaultLight = 1;
 
 const LightFlashProportion = 0.5;
 
@@ -2470,8 +2470,15 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	let scale = 1;
 
 	let color = ColTuple.parse(trail.fillStyle);
+
+	const light = parseLight(trail.light, ctxStack.rtx);
+	applyLight(light, color);
+	const layer = light ? r.Layer.Trail : r.Layer.Solid;
+
 	if (trail.shine) {
-		color.lighten(trail.shine * proportion);
+		let shine = trail.shine;
+		if (light) { shine *= light; }
+		color.lighten(shine * proportion);
 	}
 	if (trail.fade) {
 		color.mix(ColTuple.parse(trail.fade), 1 - proportion);
@@ -2479,10 +2486,6 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 	if (trail.vanish) {
 		color.fade(trail.vanish * (1 - proportion));
 	}
-
-	const light = parseLight(trail.light, ctxStack.rtx);
-	applyLight(light, color);
-	const layer = light ? r.Layer.Trail : r.Layer.Solid;
 
 	let feather: r.FeatherConfig = null;
 	if (trail.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
@@ -2497,7 +2500,7 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		if (highlightProportion > 0) {
 			if (trail.highlight.flash) {
 				let flashProportion = highlightProportion;
-				if (light) { flashProportion *= LightFlashProportion; }
+				if (light) { flashProportion *= light; }
 				color = color.lighten(flashProportion);
 			}
 			if (trail.highlight.growth) {
