@@ -67,7 +67,7 @@ interface CandidateBase {
 }
 
 const matchmakingRatings = new TimedCache<string, number>(MatchmakingExpiryMilliseconds); // userId -> aco
-const previousMatchups = new TimedCache<string, number>(RepeatMatchupExpiryMilliseconds); // socketId -> matchup hash
+const previousMatchupFrequencies = new TimedCache<number, number>(RepeatMatchupExpiryMilliseconds); // matchup hash -> count
 
 export function init() {
     games.attachFinishedGameListener(onGameFinished);
@@ -75,7 +75,7 @@ export function init() {
 
 export function cleanup() {
     const cleanedRatings = matchmakingRatings.cleanup();
-    const cleanedMatchups = previousMatchups.cleanup();
+    const cleanedMatchups = previousMatchupFrequencies.cleanup();
     if (cleanedRatings > 0 || cleanedMatchups > 0) {
         logger.info(`Cleaned ${cleanedRatings} matchmaking ratings and ${cleanedMatchups} previous matchups`);
     }
@@ -202,8 +202,7 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
         return game;
     }
 
-    const previousHashes = findPreviousMatchHashes(game);
-    const choice = chooseCandidate(candidates, game.matchmaking, previousHashes);
+    const choice = chooseCandidate(candidates, game.matchmaking, previousMatchupFrequencies);
     
     const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
     const forks = games.splitGame(game, splitSocketIds);
@@ -215,12 +214,12 @@ function splitGameForNewPlayer(game: g.Game, newPlayer: RatedPlayer): g.Game {
     return forks[index];
 }
 
-function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: MatchmakingSettings, previousHashes: Set<number>): T {
+function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: MatchmakingSettings, previousMatchupFrequencies: TimedCache<number, number>): T {
     if (candidates.length <= 0) {
         return undefined;
     }
 
-    const weightings = candidates.map(candidate => weightCandidate(candidate, matchmaking, previousHashes));
+    const weightings = candidates.map(candidate => weightCandidate(candidate, matchmaking, previousMatchupFrequencies));
     const total = _(weightings).sum();
     const selector = total * Math.random();
 
@@ -236,7 +235,7 @@ function chooseCandidate<T extends Candidate>(candidates: T[], matchmaking: Matc
     return candidates[candidates.length - 1];
 }
 
-function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings, previousHashes: Set<number>): number {
+function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings, previousMatchupFrequencies: TimedCache<number, number>): number {
     let weight = Math.pow(candidate.avgWinProbability, matchmaking.RatingPower);
 
     let numOdd = 0;
@@ -263,19 +262,20 @@ function weightCandidate(candidate: Candidate, matchmaking: MatchmakingSettings,
     const largeAlpha = minSize / Math.max(1, matchmaking.MaxPlayers);
     weight *= 1 * largeAlpha + matchmaking.SmallPenalty * (1 - largeAlpha);
 
-    const numSame = countSameMatchups(candidate, previousHashes);
+    const numSame = countSameMatchups(candidate, previousMatchupFrequencies);
     weight *= Math.pow(matchmaking.SamePenalty, numSame);
 
     return weight;
 }
 
-function findPreviousMatchHashes(game: g.Game): Set<number> {
-    return new Set<number>(wu(game.active.values()).map(p => previousMatchups.get(p.socketId)).filter(_.isNumber));
-}
-
-function countSameMatchups(candidate: Candidate, previousHashes: Set<number>): number {
+function countSameMatchups(candidate: Candidate, previousMatchupFrequencies: TimedCache<number, number>): number {
     const matchups = extractMatchups(candidate);
-    return matchups.filter(matchup => previousHashes.has(hashMatchup(matchup))).length;
+    let count = 0;
+    for (const matchup of matchups) {
+        const hash = hashMatchup(matchup);
+        count += previousMatchupFrequencies.get(hash) || 0;
+    }
+    return count;
 }
 
 function isOdd(value: number) {
@@ -496,7 +496,6 @@ function finalizeMatchmaking(initial: g.Game) {
 
     const Matchmaking = initial.matchmaking;
 
-    const previousHashes = findPreviousMatchHashes(initial);
     const queue = [initial];
     const allForks = new Array<g.Game>();
     const allMatchups = new Array<Matchup>();
@@ -518,22 +517,29 @@ function finalizeMatchmaking(initial: g.Game) {
             candidates.push(noopCandidate);
         }
 
-        const choice = chooseCandidate(candidates, initial.matchmaking, previousHashes);
+        const choice = chooseCandidate(candidates, initial.matchmaking, previousMatchupFrequencies);
 
+        let final = false;
         if (choice.type === "split") {
             const splitSocketIds = choice.splits.map(s => s.map(p => p.socketId));
             const forks = games.splitGame(game, splitSocketIds);
             allForks.push(...forks); // Ensure to emit the forks
             queue.push(...forks); // Perhaps may split further
         } else if (choice.type === "teams") {
+            final = true;
             games.queueControlMessage(game, {
                 type: m.ActionType.Teams,
                 teams: choice.teams.map(team => team.map(p => p.heroId)),
             });
+        } else {
+            final = true;
         }
 
-        const matchups = extractMatchups(choice);
-        allMatchups.push(...matchups); // Don't register the matchups yet because it the intermediate matchups will affect final matchups
+        if (final) {
+            // Only register final matchups, not the intermediate splits
+            const matchups = extractMatchups(choice);
+            allMatchups.push(...matchups);
+        }
 
         logger.info(`Game [${game.id}]: ${formatPercent(noopCandidate.avgWinProbability)} -> ${formatCandidate(choice)}`);
     }
@@ -697,7 +703,9 @@ function registerMatchup(matchup: Matchup) {
     const matchHash = hashMatchup(matchup);
     for (const socketId of allSocketIds) {
         if (socketId !== BotSocketId) {
-            previousMatchups.set(socketId, matchHash);
+            let count = previousMatchupFrequencies.get(matchHash) || 0;
+            ++count;
+            previousMatchupFrequencies.set(matchHash, count);
         }
     }
 }
