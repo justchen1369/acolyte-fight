@@ -695,6 +695,7 @@ declare interface RenderRay extends RenderParamsBase, ProjectileColorParams {
 	shine?: number; // Lighten the trail initially
 	fade?: string; // Fade towards this color
 	vanish?: number; // Fade away the trail until it is transparent - 1 means fade it all away, 0 means do nothing
+	shadow?: number; // Render a shadow beneath the ray with this strength (between 0 and 1)
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -710,6 +711,7 @@ declare interface RenderProjectile extends RenderParamsBase, ProjectileColorPara
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	shadow?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 
@@ -729,6 +731,7 @@ declare interface RenderPolygon extends RenderParamsBase, ProjectileColorParams 
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	shadow?: number;
 	noPartialRadius?: boolean;
 	radiusMultiplier?: number;
 }
@@ -752,6 +755,7 @@ declare interface RenderSwirl extends RenderParamsBase {
 	vanish?: number;
 	glow?: number;
 	bloom?: number;
+	shadow?: number;
 }
 
 declare interface RenderLink extends RenderParamsBase {
@@ -764,6 +768,7 @@ declare interface RenderLink extends RenderParamsBase {
 	glow?: number;
 	bloom?: number;
 	strike?: RenderStrikeParams;
+	shadow?: number;
 }
 
 declare interface RenderReticule extends RenderParamsBase {
@@ -782,6 +787,7 @@ declare interface RenderReticule extends RenderParamsBase {
 	usePartialDamageMultiplier?: boolean;
 	glow?: number;
 	bloom?: number;
+	shadow?: number;
 }
 
 declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams, RenderStrikeParams {
@@ -795,6 +801,7 @@ declare interface RenderStrike extends RenderParamsBase, ProjectileColorParams, 
 	particleGlow?: number;
 	particleBloom?: number;
 	particleVanish?: number;
+	particleShadow?: number;
 	speedMultiplier?: number;
 }
 
@@ -874,6 +881,7 @@ declare interface RenderBuff {
 	bloomLow?: number; // Bloom radius when on low graphics
 	fade?: string; // Decay to this color
 	smoke?: RenderSmokeConfig; // Move smoke trail
+	shadow?: number; // Shadow under trail with this strength (between 0-1)
 	vanish?: number; // Decay to transparent
 	heroColor?: boolean;
 	decay?: boolean;
@@ -993,6 +1001,7 @@ declare interface ShieldSpell extends SpellBase {
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	shadow?: number;
 }
 
 declare interface ReflectSpell extends ShieldSpell {

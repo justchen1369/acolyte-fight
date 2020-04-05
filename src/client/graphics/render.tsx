@@ -1420,6 +1420,7 @@ function renderBuffSmoke(ctxStack: CanvasCtxStack, render: RenderBuff, buff: w.B
 			shine: render.shine,
 			fade: render.fade,
 			vanish: render.vanish,
+			shadow: render.shadow,
 		}, world);
 	}
 
@@ -1890,6 +1891,7 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		feather.sigma += highlight.bloom;
 	}
 
+	const shadow = ctxStack.rtx > r.GraphicsLevel.Low ? shield.shadow : 0;
 	const layer = shield.light ? r.Layer.Trail : r.Layer.Solid;
 
 	if (shield.type === "reflect") {
@@ -1904,34 +1906,26 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const strokeRadius = ((1 - grow) * minRadius + grow * shield.strokeRadius) * scale;
 		const maxRadius = shield.radius * scale;
 
+		const fill: r.TrailFill = { color, minRadius, maxRadius, feather };
+		const strokeFill: r.TrailFill = { color: stroke, minRadius: strokeRadius, maxRadius };
 		if (shield.angularWidth <= Math.PI) {
 			const angle = shield.body.getAngle();
 			const minAngle = angle - shield.angularWidth / 2;
 			const maxAngle = angle + shield.angularWidth / 2;
-			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, {
-				color,
-				minRadius,
-				maxRadius,
-				feather,
-			}, layer);
-			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, {
-				color: stroke,
-				minRadius: strokeRadius,
-				maxRadius,
-			}, layer);
+
+			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, fill, layer);
+			glx.arcTrail(ctxStack, pos, minAngle, maxAngle, false, strokeFill, layer);
+
+			if (shadow > 0) {
+				glx.arcTrail(ctxStack, pos.clone().add(ShadowOffset), minAngle, maxAngle, false, parseShadowFill(fill, shadow), layer);
+			}
 		} else {
-			glx.circleTrail(ctxStack, pos, {
-				color,
-				minRadius,
-				maxRadius,
-				feather,
-			}, layer);
-			glx.circleTrail(ctxStack, pos, {
-				color: stroke,
-				minRadius: strokeRadius,
-				maxRadius,
-				feather,
-			}, layer);
+			glx.circleTrail(ctxStack, pos, fill, layer);
+			glx.circleTrail(ctxStack, pos, strokeFill, layer);
+
+			if (shadow > 0) {
+				glx.circleSwatch(ctxStack, pos.clone().add(ShadowOffset), parseShadowFill(fill, shadow));
+			}
 		}
 
 		if (feather) {
@@ -1945,12 +1939,17 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 		const pos = shield.body.getPosition();
 		const angle = shield.body.getAngle();
 
-		glx.convexTrail(ctxStack, pos, shield.points, angle, scale, {
+		const fill: r.TrailFill = {
 			color,
 			minRadius: 0,
 			maxRadius: shield.extent * scale,
 			feather,
-		}, layer);
+		};
+		glx.convexTrail(ctxStack, pos, shield.points, angle, scale, fill, layer);
+
+		if (shadow > 0) {
+			glx.convexSwatch(ctxStack, pos.clone().add(ShadowOffset), shield.points, angle, scale, parseShadowFill(fill, shadow));
+		}
 
 		if (feather) {
 			glx.circleTrail(ctxStack, pos, {
@@ -1986,6 +1985,10 @@ function renderShield(ctxStack: CanvasCtxStack, shield: w.Shield, world: w.World
 			feather: null, // Don't bloom the saber, bloom the owner
 		};
 		glx.lineTrail(ctxStack, handle, tip, fill, fill, layer);
+
+		if (shadow) {
+			glx.lineSwatch(ctxStack, handle.clone().add(ShadowOffset), tip.clone().add(ShadowOffset), parseShadowFill(fill, shadow));
+		}
 
 		// Bloom the owner
 		glx.circleTrail(ctxStack, pl.Vec2.mid(pos, tip), {
@@ -2023,6 +2026,7 @@ function renderSaberTrail(ctxStack: CanvasCtxStack, saber: w.Saber, scale: numbe
 		light: saber.light ? 1 : null,
 		glow: saber.glow,
 		shine: saber.shine,
+		shadow: saber.shadow,
 		highlight: saber.uiHighlight,
 		tag: saber.id,
 	}, world);
@@ -2138,6 +2142,7 @@ function renderSwirlAt(ctxStack: CanvasCtxStack, location: pl.Vec2, world: w.Wor
 			vanish: swirl.vanish,
 			fade: swirl.fade,
 			light: swirl.light,
+			shadow: swirl.shadow,
 			tag: context.tag,
 		}, world);
 	}
@@ -2217,6 +2222,10 @@ function renderReticule(ctxStack: CanvasCtxStack, projectile: w.Projectile, worl
 	} else {
 		glx.circleSolid(ctxStack, pos, fill);
 	}
+
+	if (reticule.shadow > 0 && ctxStack.rtx > r.GraphicsLevel.Low) {
+		glx.circleSwatch(ctxStack, pos, parseShadowFill(fill, reticule.shadow));
+	}
 }
 
 function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, strike: RenderStrike) {
@@ -2247,6 +2256,7 @@ function renderStrike(ctxStack: CanvasCtxStack, projectile: w.Projectile, world:
 				shine: strike.particleShine,
 				bloom: strike.particleBloom !== undefined ? strike.particleBloom : DefaultParticleBloomRadius,
 				light: strike.light,
+				shadow: strike.particleShadow,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -2315,6 +2325,13 @@ function renderLinkBetween(ctxStack: CanvasCtxStack, owner: w.Hero, target: w.Wo
 	} else {
 		glx.lineSolid(ctxStack, from, to, fromFill, toFill);
 	}
+
+	if (render.shadow > 0 && ctxStack.rtx > r.GraphicsLevel.Low) {
+		glx.lineSwatch(
+			ctxStack,
+			from.clone().add(ShadowOffset), to.clone().add(ShadowOffset),
+			parseShadowFill(fromFill, render.shadow), parseShadowFill(toFill, render.shadow));
+	}
 }
 
 function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.World, render: RenderRay) {
@@ -2342,6 +2359,7 @@ function renderRay(ctxStack: CanvasCtxStack, projectile: w.Projectile, world: w.
 				width: multiplier * projectile.radius * 2,
 				glow: render.glow !== undefined ? render.glow : DefaultGlow,
 				bloom: render.bloom,
+				shadow: render.shadow,
 				highlight: projectile.uiHighlight,
 				tag: projectile.id,
 			}, world);
@@ -2375,6 +2393,7 @@ function renderProjectile(ctxStack: CanvasCtxStack, projectile: w.Projectile, wo
 			glow: render.glow !== undefined ? render.glow : DefaultGlow,
 			bloom: render.bloom,
 			vanish: render.vanish,
+			shadow: render.shadow,
 			highlight: projectile.uiHighlight,
 			tag: projectile.id,
 		}, world);
@@ -2406,6 +2425,7 @@ function renderPolygon(ctxStack: CanvasCtxStack, projectile: w.Projectile, world
 		shine: render.shine !== undefined ? render.shine : DefaultShine,
 		glow: render.glow,
 		bloom: render.bloom,
+		shadow: render.shadow,
 		highlight: projectile.uiHighlight,
 		tag: projectile.id,
 	}, world);
@@ -2495,6 +2515,11 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 		};
 	}
 
+	let shadow: number = 0;
+	if (trail.shadow && ctxStack.rtx > r.GraphicsLevel.Low) {
+		shadow = trail.shadow;
+	}
+
 	if (trail.highlight) {
 		const highlightProportion = calculateHighlightProportion(trail.highlight, world);
 		if (highlightProportion > 0) {
@@ -2525,6 +2550,10 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const fill: r.TrailFill = { color, maxRadius: radius, feather };
 		glx.circleTrail(ctxStack, pos, fill, layer);
+
+		if (shadow > 0) {
+			glx.circleSwatch(ctxStack, pos.clone().add(ShadowOffset), parseShadowFill(fill, trail.shadow));
+		}
 	} else if (trail.type === "polygon") {
 		let pos = trail.pos;
 		if (trail.velocity) {
@@ -2536,22 +2565,46 @@ function renderTrail(ctxStack: CanvasCtxStack, trail: w.Trail, world: w.World) {
 
 		const fill: r.TrailFill = { color, maxRadius: extent, feather };
 		glx.convexTrail(ctxStack, pos, trail.points, trail.angle, extent, fill, layer);
+
+		if (shadow > 0) {
+			glx.convexSwatch(ctxStack, pos.clone().add(ShadowOffset), trail.points, trail.angle, extent, parseShadowFill(fill, trail.shadow));
+		}
 	} else if (trail.type === "line") {
 		const lineWidth = scale * proportion * trail.width;
 
 		const fill: r.TrailFill = { color, minRadius: 0, maxRadius: lineWidth / 2, feather };
 		glx.lineTrail(ctxStack, trail.from, trail.to, fill, fill, layer);
+
+		if (shadow > 0) {
+			glx.lineSwatch(ctxStack, trail.from.clone().add(ShadowOffset), trail.to.clone().add(ShadowOffset), parseShadowFill(fill, trail.shadow));
+		}
 	} else if (trail.type === "ripple") {
 		const maxRadius = trail.initialRadius * proportion + trail.finalRadius * (1 - proportion);
 		const minRadius = maxRadius * (1 - proportion);
 		const fill: r.TrailFill = { color, minRadius, maxRadius, feather };
 		glx.circleTrail(ctxStack, trail.pos, fill, layer);
+
+		if (shadow > 0) {
+			glx.circleSwatch(ctxStack, trail.pos.clone().add(ShadowOffset), parseShadowFill(fill, trail.shadow));
+		}
 	} else if (trail.type === "arc") {
 		const fill: r.TrailFill = { color, minRadius: trail.minRadius, maxRadius: trail.maxRadius, feather: feather };
 		glx.arcTrail(ctxStack, trail.pos, trail.fromAngle, trail.toAngle, trail.antiClockwise, fill, layer);
+
+		if (shadow > 0) {
+			glx.arcSwatch(ctxStack, trail.pos.clone().add(ShadowOffset), trail.fromAngle, trail.toAngle, trail.antiClockwise, parseShadowFill(fill, trail.shadow));
+		}
 	}
 
 	return false;
+}
+
+function parseShadowFill(fill: r.TrailFill, shadow: number): r.TrailFill {
+	return {
+		...fill,
+		color: fill.color.clone().darken(1).fade(1 - shadow),
+		feather: null,
+	};
 }
 
 function parseLight(input: number, rtx: number): number | null {

@@ -456,6 +456,7 @@ export interface ShieldBase extends WorldObjectBase {
 	glow?: number;
 	bloom?: number;
 	shine?: number;
+	shadow?: number;
 	strike?: RenderStrikeParams;
 }
 
@@ -1193,6 +1194,7 @@ export interface TrailBase {
 	fade?: string; // Fade away into this color
 	vanish?: number; // Fade away into transparent
 	light?: number; // Render additively
+	shadow?: number; // Also render a shadow below this trail
 
 	bloom?: number; // Bloom radius
 	glow?: number; // Bloom alpha

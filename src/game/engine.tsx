@@ -371,6 +371,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		glow: spell.glow,
 		bloom: spell.bloom,
 		shine: spell.shine,
+		shadow: spell.shadow,
 		strike: spell.strike,
 	};
 
@@ -430,6 +431,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		glow: spell.glow,
 		bloom: spell.bloom,
 		shine: spell.shine,
+		shadow: spell.shadow,
 		strike: spell.strike,
 	};
 
@@ -495,6 +497,7 @@ function addSaber(world: w.World, hero: w.Hero, spell: SaberSpell, angleOffset: 
 		light: spell.light,
 		glow: spell.glow,
 		bloom: spell.bloom,
+		shadow: spell.shadow,
 		strike: spell.strike,
 
 		spellId: spell.id,
