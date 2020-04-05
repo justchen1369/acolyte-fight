@@ -762,9 +762,8 @@ const kamehameha: Spell = {
         damage: 3,
         lifeSteal,
         categories: Categories.Projectile | Categories.Massive,
-        collideWith: Categories.Hero | Categories.Shield | Categories.Obstacle | Categories.Massive,
+        collideWith: Categories.All,
         expireOn: Categories.All ^ Categories.Shield,
-        sense: Categories.Projectile,
         swappable: false,
         destroying: true,
 
