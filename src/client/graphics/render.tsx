@@ -1108,6 +1108,7 @@ function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, par
 		glow: smoke.glow,
 		bloom: smoke.bloom,
 		vanish: smoke.vanish,
+		shadow: smoke.shadow,
 		highlight: obstacle.uiHighlight,
 	}, world);
 }

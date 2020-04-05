@@ -216,6 +216,7 @@ declare interface SwatchSmoke {
 	glow?: number;
 	bloom?: number;
 	vanish?: number;
+	shadow?: number;
 
 	ticks: number;
 	interval?: number;
