@@ -1093,6 +1093,7 @@ const backlash: Spell = {
         restitution: 0,
         radius: 0.002,
         speed: 0.66,
+        fixedSpeed: false,
         maxTicks: 2 * TicksPerSecond,
         categories: Categories.Projectile,
         sense: Categories.Hero | Categories.Projectile,
@@ -1110,6 +1111,7 @@ const backlash: Spell = {
                 type: "homing",
                 revolutionsPerSecond: 1,
                 targetType: "self",
+                newSpeed: 0.66,
             },
             {
                 trigger: { afterTicks: 33 },
