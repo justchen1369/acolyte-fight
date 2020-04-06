@@ -338,10 +338,9 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		}
 	}
 
-	const categories = spell.categories !== undefined ? spell.categories : Categories.Shield;
 	let shape: pl.Shape = points ? pl.Polygon(points) : pl.Circle(spell.radius);
 	body.createFixture(shape, {
-		filterCategoryBits: categories,
+		filterCategoryBits: spell.categories !== undefined ? spell.categories : Categories.Shield, // Might collide like something else
 		filterMaskBits: Categories.Hero | Categories.Projectile,
 		filterGroupIndex: hero.filterGroupIndex,
 	});
@@ -351,7 +350,7 @@ function addShield(world: w.World, hero: w.Hero, spell: ReflectSpell) {
 		category: "shield",
 		type: "reflect",
 		sound: spell.sound,
-		categories,
+		categories: Categories.Shield, // Always treat as a shield for expiry, even if categories might include Categories.Obstacle for collisions
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
@@ -411,7 +410,7 @@ function addWall(world: w.World, hero: w.Hero, spell: WallSpell, position: pl.Ve
 		category: "shield",
 		type: "wall",
 		sound: spell.sound,
-		categories: Categories.Shield,
+		categories: Categories.Shield, // Always treat as shield, even if categories includes Categories.Obstacle for collisions
 		body,
 		createTick: world.tick,
 		expireTick: world.tick + spell.maxTicks,
