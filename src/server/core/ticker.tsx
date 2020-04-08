@@ -9,10 +9,10 @@ import * as m from '../../shared/messages.model';
 import * as w from '../../game/world.model';
 import * as games from './games';
 import * as gameStorage from '../storage/gameStorage';
+import * as loadMetrics from '../status/loadMetrics';
 import * as matchmaking from './matchmaking';
 import * as online from './online';
 import { getStore } from '../serverStore';
-import { addTickMilliseconds } from '../status/loadMetrics';
 import { logger } from '../status/logging';
 
 const NanoTimer = require('nanotimer');
@@ -38,27 +38,35 @@ function startTickProcessing() {
 		return;
 	}
 	ticksProcessing = true;
+	
+	const intervalMilliseconds = Math.floor(TicksPerTurn * (1000 / TicksPerSecond));
 
+	let first = true;
 	tickTimer.setInterval(() => {
-		const milliseconds = tickTimer.time(() => {
-			const running = new Array<g.Game>();
-			getStore().activeGames.forEach(game => {
-				const isGameRunning = gameTurn(game);
-				if (isGameRunning) {
-					running.push(game);
-				}
-			});
+		const start = loadMetrics.getNow();
 
-			online.updateOnlinePlayers(running);
-
-			if (running.length === 0) {
-				ticksProcessing = false;
-				tickTimer.clearInterval();
-				logger.info("Stopped processing ticks");
+		const running = new Array<g.Game>();
+		getStore().activeGames.forEach(game => {
+			const isGameRunning = gameTurn(game);
+			if (isGameRunning) {
+				running.push(game);
 			}
-		}, '', 'm');
-		addTickMilliseconds(milliseconds);
-	}, '', Math.floor(TicksPerTurn * (1000 / TicksPerSecond)) + 'm');
+		});
+
+		online.updateOnlinePlayers(running);
+
+		if (running.length === 0) {
+			ticksProcessing = false;
+			tickTimer.clearInterval();
+			logger.info("Stopped processing ticks");
+		}
+
+		const processingMilliseconds = loadMetrics.diffMilliseconds(loadMetrics.getNow(), start);
+
+		loadMetrics.tracker.track(processingMilliseconds, intervalMilliseconds, first);
+
+		first = false;
+	}, '', intervalMilliseconds + 'm');
 }
 
 function finishGameIfNecessary(game: g.Game) {

@@ -1,23 +1,86 @@
 import _ from 'lodash';
-import { getStore } from '../serverStore';
-import { TicksPerTurn, TicksPerSecond } from '../../game/constants';
-import * as m from '../../shared/messages.model';
+import process from 'process';
 
-export function addTickMilliseconds(milliseconds: number) {
-    getStore().recentTickMilliseconds.push(milliseconds);
-    if(getStore().recentTickMilliseconds.length >= 7200) {
-        getStore().recentTickMilliseconds = getStore().recentTickMilliseconds.splice(0, 3600);
+const HistoryLength = 3;
+const BucketLengthMilliseconds = 30 * 1000;
+
+export interface HRTime {
+    [0]: number; // seconds
+    [1]: number; // milliseconds
+}
+
+interface LoadStats {
+    start: HRTime;
+    stallMilliseconds: number;
+    processingMilliseconds: number;
+    totalMilliseconds: number;
+}
+
+export function getNow(): HRTime {
+    return process.hrtime();
+}
+
+export function diffMilliseconds(to: HRTime, from: HRTime): number {
+    const milliseconds = 1e3 * (to[0] - from[0]) + 1e-6 * (to[1] - from[1]);
+    return milliseconds;
+}
+
+function initLoadStats(): LoadStats {
+    return {
+        start: getNow(),
+        stallMilliseconds: 0,
+        processingMilliseconds: 0,
+        totalMilliseconds: 0,
+    };
+}
+
+export class LoadTracker {
+    private previous: HRTime = getNow();
+    private current: LoadStats = initLoadStats();
+    private history = [this.current];
+
+    track(processingMilliseconds: number, intervalMilliseconds: number, first: boolean = true) {
+        const now = getNow();
+
+        if (!first) {
+            const millisecondsSinceLast = diffMilliseconds(now, this.previous);
+            this.current.stallMilliseconds += Math.max(0, millisecondsSinceLast - intervalMilliseconds);
+        }
+        this.previous = now;
+
+        this.current.processingMilliseconds += processingMilliseconds;
+        this.current.totalMilliseconds += intervalMilliseconds;
+
+        const duration = diffMilliseconds(now, this.current.start);
+        if (duration >= BucketLengthMilliseconds) {
+            this.current = initLoadStats();
+            this.history.push(this.current);
+
+            if (this.history.length > HistoryLength) {
+                this.history.splice(0, this.history.length - HistoryLength);
+            }
+        }
+    }
+
+    averageLoadProportion(): number {
+        let processing = 0;
+        let total = 0;
+        for (const stat of this.history) {
+            processing += stat.processingMilliseconds;
+            total += stat.totalMilliseconds;
+        }
+        return processing / total;
+    }
+
+    averageStallProportion(): number {
+        let stall = 0;
+        let total = 0;
+        for (const stat of this.history) {
+            stall += stat.stallMilliseconds;
+            total += stat.totalMilliseconds;
+        }
+        return stall / total;
     }
 }
 
-export function getLoadAverage(): number {
-    const recentTickMilliseconds = getStore().recentTickMilliseconds;
-    if (recentTickMilliseconds.length === 0) {
-        return 0;
-    }
-
-    const averageMilliseconds = _.mean(recentTickMilliseconds);
-    const maxMilliseconds = TicksPerTurn * 1000 / TicksPerSecond;
-    const load = averageMilliseconds / maxMilliseconds;
-    return load;
-}
+export const tracker = new LoadTracker();

@@ -145,9 +145,7 @@ decaying.decrementAco().catch(logger.error);
 setInterval(async () => {
 	try {
 		const status = api.getInternalStatus();
-		if (status.numPlayers > 0) {
-			logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${status.numGames} games, ${status.numPlayers} players`);
-		}
+		logger.info(`Current status: ${(status.serverLoad * 100).toFixed(1)}% load, ${(status.stallProportion * 100).toFixed(1)}% stalls, ${status.numGames} games, ${status.numPlayers} players, ${status.numRooms} rooms`);
 
 		auth.cleanupUserCache();
 		online.cleanupScoreboards();

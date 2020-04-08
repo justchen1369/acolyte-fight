@@ -314,10 +314,12 @@ export interface InternalStatus {
     region: string;
     host: string;
     numUsers: number;
+    numRooms: number;
     numGames: number;
     numPlayers: number;
     numConnections: number;
     serverLoad: number;
+    stallProportion: number;
     cpuLag: number;
     gpuLag: number;
     networkLag: number;

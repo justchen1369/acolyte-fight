@@ -12,7 +12,6 @@ export interface ServerStore {
     activeGames: Map<string, Game>; // id -> game
     assignments: Map<string, string>; // socketId -> gameId
     storedGameIds: Set<string>;
-    recentTickMilliseconds: number[];
 }
 
 export interface LocationStore {

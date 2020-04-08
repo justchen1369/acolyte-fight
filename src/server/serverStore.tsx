@@ -14,7 +14,6 @@ let store: g.ServerStore = {
     activeGames: new Map<string, g.Game>(),
     assignments: new Map(),
     storedGameIds: new Set<string>(),
-    recentTickMilliseconds: [],
 };
 
 export function getStore() {
