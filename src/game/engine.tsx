@@ -774,6 +774,12 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		});
 	}
 
+	const fixedSpeed = projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true;
+	let speedDecayPerTick = 0;
+	if (fixedSpeed || projectileTemplate.speedDecayPerTick) {
+		speedDecayPerTick = projectileTemplate.speedDecayPerTick || World.ProjectileSpeedDecayFactorPerTick;
+	}
+
 	let targetObj = findNearest(world.objects, target, x => x.category === "hero" && !!(calculateAlliance(config.owner, x.id, world) & Alliances.Enemy));
 	const ticksToCursor = ticksTo(diff.length(), velocity.length())
 
@@ -785,7 +791,9 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 		type,
 		body,
 		filterGroupIndex,
+
 		speed: projectileTemplate.speed,
+		speedDecayPerTick,
 
 		attractable: parseAttractable(projectileTemplate.attractable),
 		bumpable: projectileTemplate.bumpable,
@@ -853,11 +861,6 @@ function addProjectileAt(world: w.World, position: pl.Vec2, angle: number, targe
 
 	world.objects.set(id, projectile);
 
-	const fixedSpeed = projectileTemplate.fixedSpeed !== undefined ? projectileTemplate.fixedSpeed : true;
-	if (fixedSpeed || projectileTemplate.speedDecayPerTick) {
-		const decayPerTick = projectileTemplate.speedDecayPerTick || World.ProjectileSpeedDecayFactorPerTick;
-		world.behaviours.push({ type: "decaySpeed", projectileId: projectile.id, decayPerTick });
-	}
 	if (projectileTemplate.square) {
 		world.behaviours.push({ type: "alignProjectile", projectileId: projectile.id });
 	}
@@ -1037,6 +1040,7 @@ function instantiateHoming(template: HomingTemplate, projectile: w.Projectile, w
 		minDistanceToTarget: template.minDistanceToTarget || 0,
 		targetType: template.targetType || w.HomingTargets.enemy,
 		newSpeed: template.newSpeed,
+		newSpeedDecayPerTick: template.speedDecayPerTick,
 		expireWithinAngle: template.expireWithinRevs !== undefined ? (template.expireWithinRevs * 2 * Math.PI) : null,
 		expireTick: world.tick + maxTicks,
 	};
@@ -1196,7 +1200,6 @@ export function tick(world: w.World) {
 		cooldown,
 		fixate,
 		alignProjectile,
-		decaySpeed,
 		limitSpeed,
 		decayHealth,
 		strafe,
@@ -1210,6 +1213,8 @@ export function tick(world: w.World) {
 		expireOnOwnerRetreat,
 		expireOnChannellingEnd,
 	});
+
+	decaySpeeds(world);
 
 	applyLavaDamage(world);
 	shrink(world);
@@ -1321,28 +1326,26 @@ function decayHealth(behaviour: w.DecayHealthBehaviour, world: w.World) {
 	return true;
 }
 
-function decaySpeed(behaviour: w.DecaySpeedBehaviour, world: w.World) {
-	const obj = world.objects.get(behaviour.projectileId);
-	if (!(obj && obj.category === "projectile")) {
-		return false;
-	}
+function decaySpeeds(world: w.World) {
+	world.objects.forEach(projectile => {
+		if (projectile && projectile.category === "projectile" && projectile.speedDecayPerTick) {
+			const velocity = projectile.body.getLinearVelocity();
+			const currentSpeed = velocity.length();
 
-	const velocity = obj.body.getLinearVelocity();
-	const currentSpeed = velocity.length();
-
-	const diff = obj.speed - currentSpeed;
-	if (Math.abs(diff) > world.settings.World.SlopSpeed) {
-		const newSpeed = currentSpeed + diff * behaviour.decayPerTick;
-		if (currentSpeed > 0) {
-			velocity.mul(newSpeed / currentSpeed);
-		} else {
-			// Stationary - take direction from heading
-			velocity.set(vector.fromAngle(obj.body.getAngle()).mul(newSpeed));
+			const diff = projectile.speed - currentSpeed;
+			if (Math.abs(diff) > world.settings.World.SlopSpeed) {
+				const newSpeed = currentSpeed + diff * projectile.speedDecayPerTick;
+				if (currentSpeed > 0) {
+					velocity.mul(newSpeed / currentSpeed);
+				} else {
+					// Stationary - take direction from heading
+					velocity.set(vector.fromAngle(projectile.body.getAngle()).mul(newSpeed));
+				}
+				projectile.body.setLinearVelocity(velocity);
+				projectile.body.setAngle(vector.angle(velocity));
+			}
 		}
-		obj.body.setLinearVelocity(velocity);
-		obj.body.setAngle(vector.angle(velocity));
-	}
-	return true;
+	});
 }
 
 function alignProjectile(behaviour: w.AlignProjectileBehaviour, world: w.World) {
@@ -3567,6 +3570,10 @@ function homing(homing: w.HomingBehaviour, world: w.World) {
 		newSpeed = homing.newSpeed;
 		obj.speed = homing.newSpeed;
 		delete homing.newSpeed; // Only apply the new speed once
+	}
+	if (homing.newSpeedDecayPerTick !== undefined) {
+		obj.speedDecayPerTick = homing.newSpeedDecayPerTick;
+		delete homing.newSpeedDecayPerTick; // Only apply once
 	}
 
 	const newVelocity = vector.fromAngle(newAngle).mul(newSpeed);

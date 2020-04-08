@@ -1112,6 +1112,7 @@ const backlash: Spell = {
                 revolutionsPerSecond: 1,
                 targetType: "self",
                 newSpeed: 0.66,
+                speedDecayPerTick: World.ProjectileSpeedDecayFactorPerTick,
             },
             {
                 trigger: { afterTicks: 33 },

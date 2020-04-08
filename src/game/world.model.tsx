@@ -720,6 +720,8 @@ export interface Projectile extends WorldObjectBase, HitSource, HighlightSource 
 	hit?: number;
 
 	speed: number;
+	speedDecayPerTick: number;
+
 	attractable?: AttractableParameters;
 	linkable?: boolean;
 	bumpable?: boolean;
@@ -815,7 +817,6 @@ export type Behaviour =
 	| SpawnProjectileBehaviour
 	| CooldownBehaviour
 	| FixateBehaviour
-	| DecaySpeedBehaviour
 	| AlignProjectileBehaviour
 	| LimitSpeedBehaviour
 	| DecayHealthBehaviour
@@ -890,12 +891,6 @@ export interface FixateBehaviour extends BehaviourBase {
 	turnRate: number;
 }
 
-export interface DecaySpeedBehaviour extends BehaviourBase {
-	type: "decaySpeed";
-	projectileId: string;
-	decayPerTick: number;
-}
-
 export interface SpawnProjectileBehaviour extends BehaviourBase {
 	type: "subprojectile";
 	parent: WorldObject;
@@ -943,6 +938,7 @@ export interface HomingBehaviour extends BehaviourBase {
 	expireTick: number;
 
 	newSpeed?: number;
+	newSpeedDecayPerTick?: number;
 }
 
 export interface AccelerateBehaviour extends BehaviourBase {

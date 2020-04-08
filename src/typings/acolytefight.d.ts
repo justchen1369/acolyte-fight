@@ -575,6 +575,7 @@ declare interface HomingTemplate extends BehaviourTemplateBase {
 	maxDistanceToTarget?: number; // Homing is only applied if the projectile is closer than this.
 
 	newSpeed?: number; // Update the speed of the projectile while we're redirecting it.
+	speedDecayPerTick?: number; // If set, overwrite the speedDecayPerTick setting on the projectile, which causes it to gradually revert to its original speed if sped up/slowed down by something (e.g. a collision).
 	maxTicks?: number; // Only perform homing for this many ticks
 	redirect?: boolean; // If true, this homing will only redirect the projectile one time
 }
