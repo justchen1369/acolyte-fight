@@ -62,6 +62,7 @@ export function getInternalStatus() {
     const store = getStore();
     const location = getLocation();
     const performanceStats = performance.getPerformanceStats();
+    const loadStats = loadMetrics.tracker.average();
 	const status: m.InternalStatus = {
         region: location.region,
         host: location.server,
@@ -70,8 +71,8 @@ export function getInternalStatus() {
         numGames: store.activeGames.size,
         numPlayers: wu(store.scoreboards.values()).map(scoreboard => scoreboard.online.size).reduce((a, b) => a + b, 0),
         numConnections: store.numConnections,
-        serverLoad: loadMetrics.tracker.averageLoadProportion(),
-        stallProportion: loadMetrics.tracker.averageStallProportion(),
+        serverLoad: loadStats.processingProportion,
+        stallProportion: loadStats.stallProportion,
         cpuLag: performanceStats.cpuLag,
         gpuLag: performanceStats.gpuLag,
         networkLag: performanceStats.networkLag,

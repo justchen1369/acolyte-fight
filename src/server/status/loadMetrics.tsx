@@ -16,6 +16,11 @@ interface LoadStats {
     totalMilliseconds: number;
 }
 
+interface AverageStats {
+    stallProportion: number;
+    processingProportion: number;
+}
+
 export function getNow(): HRTime {
     return process.hrtime();
 }
@@ -62,24 +67,20 @@ export class LoadTracker {
         }
     }
 
-    averageLoadProportion(): number {
+    average(): AverageStats {
         let processing = 0;
-        let total = 0;
-        for (const stat of this.history) {
-            processing += stat.processingMilliseconds;
-            total += stat.totalMilliseconds;
-        }
-        return processing / total;
-    }
-
-    averageStallProportion(): number {
         let stall = 0;
         let total = 0;
         for (const stat of this.history) {
+            processing += stat.processingMilliseconds;
             stall += stat.stallMilliseconds;
             total += stat.totalMilliseconds;
         }
-        return stall / total;
+        total = Math.max(1, total); // Avoid divide-by-zero errors
+        return {
+            processingProportion: processing / total,
+            stallProportion: stall / total,
+        };
     }
 }
 
