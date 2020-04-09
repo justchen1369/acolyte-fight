@@ -71,6 +71,10 @@ function getSwatches(ctxStack: r.CanvasCtxStack) {
 	return shaders.getContext(ctxStack.gl).data.swatches;
 }
 
+function getSwelts(ctxStack: r.CanvasCtxStack) {
+	return shaders.getContext(ctxStack.gl).data.swelts;
+}
+
 function getSolids(ctxStack: r.CanvasCtxStack) {
 	return shaders.getContext(ctxStack.gl).data.solids;
 }
@@ -82,6 +86,7 @@ function getTrails(ctxStack: r.CanvasCtxStack) {
 function getLayer(ctxStack: r.CanvasCtxStack, layer: string) {
 	switch (layer) {
 		case r.Layer.Swatch: return getSwatches(ctxStack);
+		case r.Layer.Swelt: return getSwelts(ctxStack);
 		case r.Layer.Solid: return getSolids(ctxStack);
 		default: return getTrails(ctxStack);
 	}

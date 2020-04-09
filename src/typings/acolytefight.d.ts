@@ -194,6 +194,7 @@ declare interface SwatchFill extends SwatchColor {
 	bloom?: number;
 	gradient?: number; // Between 0 and 1, how much shading to apply
 	shadow?: boolean; // Apply shadow offset and shadow feather to fill
+	light?: number;
 }
 
 declare interface SwatchBloom extends SwatchColor {
@@ -202,6 +203,7 @@ declare interface SwatchBloom extends SwatchColor {
 	glow?: number;
 	bloom?: number
 	strikeOnly?: boolean;
+	light?: number;
 }
 
 declare interface SwatchSmoke {

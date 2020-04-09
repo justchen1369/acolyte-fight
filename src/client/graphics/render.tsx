@@ -921,6 +921,10 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		scale *= 1 - context.ease;
 	}
 
+	const light = parseLight(fill.light, ctxStack.rtx, null); // Default to no light
+	applyLight(light, color);
+	const layer = light ? r.Layer.Swelt : r.Layer.Swatch;
+
 	let feather: r.FeatherConfig = null;
 	if (fill.glow && ctxStack.rtx >= r.GraphicsLevel.Ultra) {
 		feather = {
@@ -962,12 +966,12 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 			drawPos = drawPos.clone().add(ShadowOffset);
 		}
 
-		glx.convexSwatch(ctxStack, drawPos, drawShape.points, angle, scale, {
+		glx.convexTrail(ctxStack, drawPos, drawShape.points, angle, scale, {
 			color,
 			gradient,
 			maxRadius: 1,
 			feather,
-		});
+		}, layer);
 	} else if (shape.type === "arc") {
 		const center = shapes.toWorldCoords(pos, angle, shape.localCenter);
 
@@ -982,13 +986,13 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		const drawPos = vector.scaleAround(center, MapCenter, scale);
 		const fromAngle = angle - shape.angularExtent;
 		const toAngle = angle + shape.angularExtent;
-		glx.arcSwatch(ctxStack, drawPos, fromAngle, toAngle, false, {
+		glx.arcTrail(ctxStack, drawPos, fromAngle, toAngle, false, {
 			color,
 			gradient,
 			minRadius: scale * (shape.radius - radialExtent),
 			maxRadius: scale * (shape.radius + radialExtent),
 			feather,
-		});
+		}, layer);
 	} else if (shape.type === "circle") {
 		let radius = shape.radius;
 		if (highlight && highlight.growth) {
@@ -1002,12 +1006,12 @@ function renderObstacleSolid(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		if (fill.shadow) {
 			drawPos = drawPos.clone().add(ShadowOffset);
 		}
-		glx.circleSwatch(ctxStack, drawPos, {
+		glx.circleTrail(ctxStack, drawPos, {
 			color,
 			gradient,
 			maxRadius: scale * radius,
 			feather,
-		});
+		}, layer);
 	}
 }
 
@@ -1032,6 +1036,9 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 		}
 	}
 
+	const light = parseLight(fill.light, ctxStack.rtx);
+	applyLight(light, color);
+
 	let scale = 1;
 	if (context.ease > 0) {
 		scale *= 1 - context.ease;
@@ -1049,12 +1056,12 @@ function renderObstacleBloom(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, con
 
 	const pos = obstacle.body.getPosition();
 	const drawPos = vector.scaleAround(pos, MapCenter, scale);
-
+	const layer = light ? r.Layer.Trail : r.Layer.Solid;
 	glx.circleTrail(ctxStack, drawPos, {
 		color,
 		maxRadius: 0,
 		feather,
-	});
+	}, layer);
 }
 
 function renderObstacleSmoke(ctxStack: CanvasCtxStack, obstacle: w.Obstacle, params: RenderObstacleContext, smoke: SwatchSmoke, world: w.World) {
@@ -2608,13 +2615,13 @@ function parseShadowFill(fill: r.TrailFill, shadow: number): r.TrailFill {
 	};
 }
 
-function parseLight(input: number, rtx: number): number | null {
+function parseLight(input: number, rtx: number, defaultLight: number = DefaultLight): number | null {
 	if (rtx <= r.GraphicsLevel.Low) {
 		return null;
 	} else if (input !== undefined) {
 		return input;
 	} else {
-		return DefaultLight;
+		return defaultLight;
 	}
 }
 

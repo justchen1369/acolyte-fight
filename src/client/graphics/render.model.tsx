@@ -32,6 +32,7 @@ export namespace Graphics {
 
 export namespace Layer {
 	export const Swatch = "swatch";
+	export const Swelt = "swelt";
 	export const Solid = "solid";
 	export const Trail = "trail";
 }
@@ -119,6 +120,7 @@ export interface GlContext {
 
 	plates: DrawPlates;
 	swatches: DrawPrimitives;
+	swelts: DrawPrimitives;
 	heroes: DrawHeroes;
 	images: DrawImages;
 	solids: DrawPrimitives;
@@ -168,6 +170,7 @@ export interface Texture2DInfo {
 export interface DrawDataLookup {
 	plates: DrawPlatesData;
 	swatches: DrawPrimitivesData;
+	swelts: DrawPrimitivesData;
 	heroes: DrawHeroesData;
 	images: DrawImagesData;
 	solids: DrawPrimitivesData;

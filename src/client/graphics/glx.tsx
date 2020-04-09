@@ -42,13 +42,23 @@ export function renderGl(ctxStack: r.CanvasCtxStack, worldRect: ClientRect, rect
 
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 	runProgram(context, context.plates, uniforms, context.data.plates);
+
+	if (context.data.swelts.numVertices > 0) {
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+		runProgram(context, context.swatches, uniforms, context.data.swelts);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	}
+
 	runProgram(context, context.swatches, uniforms, context.data.swatches);
+
 	runProgram(context, context.heroes, uniforms, context.data.heroes);
 	runProgram(context, context.solids, uniforms, context.data.solids);
 
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-	runProgram(context, context.trails, uniforms, context.data.trails);
-	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	if (context.data.trails.numVertices > 0) {
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
+		runProgram(context, context.trails, uniforms, context.data.trails);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+	}
 
 	runProgram(context, context.images, uniforms, context.data.images);
 }
@@ -168,6 +178,7 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 
 		plates: plates.initPlates(gl),
 		swatches: primitives.initPrimitives(gl),
+		swelts: primitives.initPrimitives(gl),
 		heroes: heroes.initHeroes(gl),
 		images: images.initImages(gl),
 		solids: primitives.initPrimitives(gl),
@@ -175,6 +186,7 @@ function initContext(gl: WebGLRenderingContext): r.GlContext {
 		data: {
 			plates: plates.initData(),
 			swatches: primitives.initData(),
+			swelts: primitives.initData(),
 			heroes: heroes.initData(),
 			images: images.initData(),
 			solids: primitives.initData(),
@@ -188,6 +200,7 @@ export function clearGl(ctxStack: r.CanvasCtxStack) {
 	textures.clearData(context.textureData);
 	plates.clearData(context.data.plates);
 	primitives.clearData(context.data.swatches);
+	primitives.clearData(context.data.swelts);
 	heroes.clearData(context.data.heroes);
 	images.clearData(context.data.images);
 	primitives.clearData(context.data.solids);

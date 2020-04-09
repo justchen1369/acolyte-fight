@@ -21,6 +21,7 @@ export const volcano: ObstacleTemplate = {
             color: "rgba(255, 0, 128, 0.9)",
             deadColor: "rgba(255, 0, 128, 0.25)",
             glow: 0.2,
+            light: 0.8,
         },
         {
             type: "smoke",
@@ -83,7 +84,8 @@ export const healing: ObstacleTemplate = {
             "type": "solid",
             "color": "rgba(0, 255, 64, 0.9)",
             "deadColor": "rgba(0, 255, 64, 0.25)",
-            "glow": 0.2
+            "glow": 0.2,
+            light: 0.8,
         },
         {
             "type": "smoke",
@@ -94,7 +96,8 @@ export const healing: ObstacleTemplate = {
             "glow": 0.05,
             "ticks": 30,
             "interval": 8,
-            "speed": 0.1
+            "speed": 0.1,
+            "light": 0.5,
         }
     ],
     "buffs": [
@@ -135,6 +138,7 @@ export const slow: ObstacleTemplate = {
             "color": "rgba(64, 255, 255, 0.75)",
             deadColor: "rgba(64, 255, 255, 0.25)",
             glow: 0.2,
+            light: 0.8,
         },
         {
             type: "smoke",
@@ -146,6 +150,7 @@ export const slow: ObstacleTemplate = {
             "ticks": 15,
             "interval": 4,
             "speed": 0.05,
+            light: 0.5,
         }
     ],
 
@@ -192,6 +197,7 @@ export const fast: ObstacleTemplate = {
             "color": "rgba(255, 255, 64, 0.75)",
             deadColor: "rgba(255, 255, 64, 0.25)",
             glow: 0.2,
+            light: 0.8,
         },
         {
             type: "smoke",
@@ -203,6 +209,7 @@ export const fast: ObstacleTemplate = {
             "ticks": 15,
             "interval": 4,
             "speed": 0.05,
+            light: 0.5,
         }
     ],
 
@@ -245,6 +252,7 @@ export const conveyorBase: ObstacleTemplate = {
             "color": "rgba(64, 64, 64, 0.25)",
             deadColor: "rgba(64, 64, 64, 0.1)",
             glow: 0.2,
+            light: 0.5,
         },
         {
             type: "smoke",
