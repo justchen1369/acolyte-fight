@@ -616,7 +616,7 @@ const meteor: Spell = {
     icon: "cometSpark",
 
     maxAngleDiffInRevs: 0.01,
-    cooldown: 10 * TicksPerSecond,
+    cooldown: 7.5 * TicksPerSecond,
     throttle: true,
 
     projectile: {
