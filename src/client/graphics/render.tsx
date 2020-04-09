@@ -476,6 +476,17 @@ function renderSpell(ctxStack: CanvasCtxStack, obj: w.Projectile, world: w.World
 	obj.uiPath.push(obj.body.getPosition().clone());
 
 	obj.renderers.forEach(render => {
+		const minGraphics = render.minGraphics || 0;
+		const maxGraphics = render.maxGraphics || Infinity;
+		const minTicks = render.minTicks || 0;
+		const maxTicks = render.maxTicks || Infinity;
+
+		const lifetime = world.tick -  obj.createTick;
+		if (!(minGraphics <= ctxStack.rtx && ctxStack.rtx <= maxGraphics
+			&& minTicks <= lifetime && lifetime < maxTicks)) {
+			return;
+		}
+
 		if (render.type === "projectile") {
 			renderProjectile(ctxStack, obj, world, render);
 		} else if (render.type === "polygon") {

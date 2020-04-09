@@ -2,22 +2,16 @@ import * as pl from 'planck-js';
 import * as h from './character/character.model';
 import { Float32List } from './list';
 import ColTuple from './colorTuple';
+import { GraphicsLevel } from '../../game/constants';
 import { AudioElement } from '../audio/audio.model';
+
 export { AudioElement } from '../audio/audio.model';
 export * from './character/character.model';
+export { GraphicsLevel } from '../../game/constants';
 
 export enum Texture {
 	Images = 0,
 	Text = 1,
-}
-
-export namespace GraphicsLevel {
-	export const Maximum = 5;
-	export const Ultra = 4; // Blooms
-	export const High = 3; // Particles
-	export const Medium = 2; // Shadows
-	export const Low = 1;
-	export const Minimum = 0.5;
 }
 
 export namespace Graphics {

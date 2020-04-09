@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { TicksPerSecond, Categories, Pixel, Alliances } from './constants';
+import { TicksPerSecond, Categories, Pixel, Alliances, GraphicsLevel } from './constants';
 import { Icons } from './icons';
 import { Layouts } from './layouts';
 import { ObstacleTemplates } from './obstacleTemplates';
@@ -406,7 +406,7 @@ const flamestrike: Spell = {
         renderers: [
             { type: "bloom" },
             { type: "reticule", color: 'rgba(128, 32, 0, 0.1)', radius: 0.04, minRadius: 0.036, usePartialDamageMultiplier: true },
-            { type: "projectile", ticks: 4, vanish: 1 },
+            { type: "projectile", ticks: 4, vanish: 1, minGraphics: GraphicsLevel.Medium },
             { type: "projectile", ticks: 18, smoke: 0.4, fade: "#333" },
             { type: "ray", ticks: 18 },
             { type: "strike", ticks: 18, flash: true, numParticles: 5 },
@@ -1137,7 +1137,7 @@ const backlash: Spell = {
 			{ type: "projectile", "ownerColor": true, "ticks": 5, "smoke": 0.5 },
             { type: "polygon", ownerColor: true, numPoints: 3, radiusMultiplier: 3, revolutionInterval: 11, ticks: 1 },
             { type: "ray", ownerColor: true, ticks: 25, vanish: 0.5 },
-            { type: "ray", ownerColor: true, ticks: 5, vanish: 1 },
+            { type: "ray", ownerColor: true, ticks: 5, vanish: 1, minGraphics: GraphicsLevel.Medium },
             { type: "strike", color: '#fff', ticks: 25, growth: 1.5, flash: true, speedMultiplier: -0.5, detonate: 0.02 },
         ],
     },
@@ -1688,7 +1688,7 @@ const drain: Spell = {
         color: '#22ee88',
         renderers: [
             { type: "bloom" },
-            { type: "projectile", ticks: 5, vanish: 1, light: 0.8 },
+            { type: "projectile", ticks: 5, vanish: 1, light: 0.8, minGraphics: GraphicsLevel.Medium },
             { type: "projectile", ticks: 15, vanish: 1, light: 0.5 },
             { type: "ray", intermediatePoints: true, radiusMultiplier: 0.25, ticks: 45, vanish: 1, light: 0.8 },
             { type: "strike", ticks: 30, growth: 2, flash: true, numParticles: 4 },
@@ -2154,7 +2154,7 @@ const mines: Spell = {
         renderers: [
             { type: "bloom", selfColor: true, radius: 0.015, light: null },
             { type: "projectile", ticks: 1, light: null, selfColor: true, shine: 0, glow: 0.3, shadow: 0.5, noPartialRadius: true },
-            { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true },
+            { type: "ray", intermediatePoints: true, ticks: 3, selfColor: true, noPartialRadius: true, maxTicks: 6 },
         ],
     },
 };

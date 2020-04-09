@@ -32,6 +32,15 @@ export namespace Alliances {
 	export const NotFriendly = Enemy | Neutral;
 }
 
+export namespace GraphicsLevel {
+	export const Maximum = 5;
+	export const Ultra = 4; // Blooms
+	export const High = 3; // Particles
+	export const Medium = 2; // Shadows
+	export const Low = 1;
+	export const Minimum = 0.5;
+}
+
 export namespace Matchmaking {
 	export const MaxHistoryLength = 15 * 60 * TicksPerSecond;
 	export const WaitForMorePeriod = 10 * TicksPerSecond;

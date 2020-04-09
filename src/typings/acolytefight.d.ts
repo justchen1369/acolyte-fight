@@ -28,6 +28,14 @@ Alliance flags (against, expireAgainstHeroes, expireAgainstObjects):
 * Enemy = 0x04
 * Neutral = 0x08
 
+Graphics level:
+* Maximum = 5; // Retina displays
+* Ultra = 4; // Blooms
+* High = 3; // Particles
+* Medium = 2; // Lights and shadows
+* Low = 1;
+* Minimum = 0.5; // Low-res
+
 */
 
 declare interface AcolyteFightSettings {
@@ -680,6 +688,10 @@ declare type RenderParams =
 
 declare interface RenderParamsBase {
 	type: string;
+	minTicks?: number; // Only use this renderer if the projectile has existed for this many ticks
+	maxTicks?: number; // Only use this renderer until the projectile has existed for this many ticks
+	minGraphics?: number; // Only use this renderer if the grahpics level is greater than or equal to this level
+	maxGraphics?: number; // Only use this renderer if the grahpics level is less than or equal to this level
 }
 
 declare interface ProjectileColorParams {
